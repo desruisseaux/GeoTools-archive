@@ -16,956 +16,442 @@
  */
 package org.geotools.gce.image;
 
+import java.awt.geom.AffineTransform;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DirectColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import javax.media.jai.JAI;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.PlanarImage;
+
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Envelope;
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DirectColorModel;
-import java.awt.image.IndexColorModel;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
-import java.awt.image.WritableRaster;
-import java.awt.image.renderable.ParameterBlock;
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.URL;
-import javax.imageio.ImageIO;
-import javax.media.jai.ColorCube;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * Writes a GridCoverage to a raster image file and an accompanying world file.
  * The destination specified must point to the location of the raster file to
- * write to, as this is how the format is determined. The directory that file
- * is located in must also already exist.
- *
- * @author simone giannecchini
+ * write to, as this is how the format is determined. The directory that file is
+ * located in must also already exist.
+ * 
+ * @author Simone Giannecchini
  * @author rgould
  * @author alessio fabiani
  * @source $URL$
  */
-public class WorldImageWriter implements GridCoverageWriter {
-    /** format for this writer */
-    private Format format = new WorldImageFormat();
+public final class WorldImageWriter implements GridCoverageWriter {
+	/** format for this writer */
+	private Format format = new WorldImageFormat();
 
-    /** Destination to write to */
-    private Object destination;
+	/** Destination to write to */
+	private Object destination;
 
-    /**
-     * Destination must be a File. The directory it resides in must already
-     * exist. It must point to where the raster image is to be located. The
-     * world image will be derived from there.
-     *
-     * @param destination
-     */
-    public WorldImageWriter(Object destination) {
-        this.destination = destination;
-    }
-
-
-    /** (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageWriter#getFormat()
-     */
-    public Format getFormat() {
-        return format;
-    }
-
-    /** (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageWriter#getDestination()
-     */
-    public Object getDestination() {
-        return destination;
-    }
-
-    /** (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageWriter#getMetadataNames()
-     */
-    public String[] getMetadataNames() {
-        return null;
-    }
-
-    /** (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageWriter#setMetadataValue(java.lang.String, java.lang.String)
-     */
-    public void setMetadataValue(String name, String value)
-        throws IOException, MetadataNameNotFoundException {
-    }
-
-    /** (non-Javadoc)
-     * @see org.geotools.data.coverage.grid.GridCoverageWriter#setCurrentSubname(java.lang.String)
-     */
-    public void setCurrentSubname(String name) throws IOException {
-    }
-
-    /**
-     * Takes a GridCoverage and writes the image to the destination file. It
-     * then reads the format of the file and writes an accompanying world
-     * file. It will throw a FileFormatNotCompatibleWithGridCoverageException
-     * if Destination is not a File (URL is a read-only format!).
-     *
-     * @param coverage the GridCoverage to write.
-     * @param parameters no parameters are accepted. Currently ignored.
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.geotools.gc.GridCoverage, org.opengis.parameter.GeneralParameterValue[])
-     */
-    public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
-        throws IllegalArgumentException, IOException {
-        //checking parameters
-        //if provided we have to use them
-        //specifically this is one of the way we can provide an output format
-        if (parameters != null) {
-            this.format.getWriteParameters().parameter("format").setValue(((Parameter) parameters[0])
-                .stringValue());
-        }
-
-        //convert everything into a file when possible
-        //we have to separate the handling of a file from the handling of an
-        //output stream due to the fact that the latter requires no world file.
-        if (this.destination instanceof String) {
-            destination = new File((String) destination);
-        } else if (this.destination instanceof URL) {
-        	if(((URL)destination).getProtocol().equalsIgnoreCase("file"))
-        		destination = new File(((URL) destination).getPath());
-        	else
-        		throw new IOException("WorldImageWriter::write:It is not possible writing to an URL!");
-        } else
-        //OUTPUT STREAM HANDLING
-	    if (destination instanceof OutputStream) {
-	    	this.encode((GridCoverage2D) coverage, (OutputStream) destination);
-	    }
-
-        /**
-         * 
-         * WorldFile and projection file.
-         * 
-         */
-        if (destination instanceof File) {
-            //files destinations
-            File imageFile = (File) destination;
-            String path = imageFile.getAbsolutePath();
-            int index = path.lastIndexOf(".");
-            String baseFile = path.substring(0, index);
-            
-            //envelope and image
-            RenderedImage image = ((PlanarImage) ((GridCoverage2D) coverage)
-                    .getRenderedImage());
-            
-            //world file
-            createWorldFile(coverage.getEnvelope(),image,baseFile);
-            
-            //projection file
-            createProjectionFile(baseFile,coverage.getCoordinateReferenceSystem());
-            
-            //create new file for the image
-            imageFile = new File(baseFile + "."
-                    + format.getWriteParameters().parameter("format")
-                            .stringValue());
-            imageFile.createNewFile();
-
-            BufferedOutputStream outBuf = new BufferedOutputStream(new FileOutputStream(
-                        imageFile));
-
-            this.encode((GridCoverage2D) coverage, outBuf);
-        }
-    }
-    
-    /**
-     * This method is responsible for creating a projection file using the WKT representation
-     * of this coverage's coordinate reference system. We can reuse this file in order to
-     * rebuild later the crs.
-     * 
-     *  
-     * @param baseFile
-     * @param coordinateReferenceSystem
-     * @throws IOException
-     */
-    private void createProjectionFile(final String baseFile, final CoordinateReferenceSystem coordinateReferenceSystem) throws IOException {
-    	final File prjFile = new File(baseFile
-                + ".prj");
-    	BufferedWriter out= new BufferedWriter(new FileWriter(prjFile));
-    	out.write(coordinateReferenceSystem.toWKT());
-    	out.close();
-    	
-		
-	}
-
-    /**
-     * This method is responsible fro creating a world file to georeference an image
-     * given the image bounding box and the image geometry. The name of the file is composed
-     * by the name of the image file with a proper extension, depending on the format (see WorldImageFormat).
-     * The projection is in the world file.
-     * 
-     * @param env Envelope of this image.
-     * @param image Image to be used.
-     * @param baseFile Basename and path for this image.
-     * @throws IOException In case we cannot create the world file.
-     */
-	private void createWorldFile(final Envelope env,final RenderedImage image,final String baseFile) throws IOException {
-    	 final File worldFile = new File(baseFile
-                 + WorldImageFormat.getWorldExtension(
-                     format.getWriteParameters().parameter("format")
-                           .stringValue()));
-    	 final double xMin = env.getMinimum(0);
-    	 final double yMin = env.getMinimum(1);
-    	 final double xMax = env.getMaximum(0);
-    	 final double yMax = env.getMaximum(1);
-
-    	 final double xPixelSize = (xMax - xMin) / image.getWidth();
-    	 final double rotation1 = 0;
-    	 final double rotation2 = 0;
-    	 final double yPixelSize = (yMax - yMin) / image.getHeight();
-    	 final double xLoc = xMin;
-    	 final double yLoc = yMax;
-    	 
-         //create new files
-         worldFile.createNewFile();
-
-         //writing world file
-         final PrintWriter out = new PrintWriter(new FileOutputStream(worldFile));
-         out.println(xPixelSize);
-         out.println(rotation1);
-         out.println(rotation2);
-         out.println("-" + yPixelSize);
-         out.println(xLoc);
-         out.println(yLoc);
-         out.close();
-		
-	}
-
+	private String extension = "png";
 
 	/**
-     * Cleans up the writer. Currently does nothing.
-     *
-     * @throws IOException DOCUMENT ME!
-     */
-    public void dispose() throws IOException {
-    }
-
-    /**
-     * Encode the given coverage to the requsted output format.
-     *
-     * @param sourceCoverage the coverage to be encoded.s
-     * @param output OutputStream
-     *
-     * @throws IOException
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    private void encode(GridCoverage2D sourceCoverage, OutputStream output)
-        throws IOException {
-        //do we have a source coverage?
-        if (sourceCoverage == null) {
-            throw new IllegalArgumentException(
-                "A coverage must be provided in order for write to succeed!");
-        }
-
-        //trying to perform a rendering for this image
-        try {
-            PlanarImage surrogateImage = null;
-
-            /**
-             * Getting the non geophysics view of this grid coverage. the
-             * geophysiscs view usually comes with an index color model for 3
-             * bands, since sometimes I get some problems with JAI encoders I
-             * select only  the first band, which by the way is the only band
-             * we use.
-             */
-            surrogateImage = ((PlanarImage) (sourceCoverage).geophysics(false)
-                                             .getRenderedImage());
-
-            //surrogateImage=cleanIndexColorModel(surrogateImage);
-            //removing unused bands from this non geophysics view
-            //they might cause prblems with jai encoders
-            if (surrogateImage.getColorModel() instanceof IndexColorModel
-                    && (surrogateImage.getSampleModel().getNumBands() > 1)) {
-                surrogateImage = JAI.create("bandSelect", surrogateImage,
-                        new int[] { 0 });
-            }
-
-            //            }
-            if (surrogateImage.getColorModel() instanceof DirectColorModel) {
-                surrogateImage = direct2ComponentColorModel(surrogateImage);
-            }
-
-            /**
-             * ADJUSTMENTS FOR VARIOUS FILE FORMATS
-             */
-
-            //------------------------GIF-----------------------------------
-            if ((((String) (this.format.getWriteParameters().parameter("format")
-                                           .getValue())).compareToIgnoreCase(
-                        "gif") == 0)) {
-                /**
-                 * For the moment we do not work with DirectColorModel but
-                 * instead we switch to  component color model which is really
-                 * easier to handle even if it much more memory expensive.
-                 * Once we are in component color model is really easy to go
-                 * to Gif and similar.
-                 */
-                if (surrogateImage.getColorModel() instanceof DirectColorModel) {
-                    surrogateImage = this
-                        .reformatColorModel2ComponentColorModel(surrogateImage);
-                }
-
-                /**
-                 * IndexColorModel with more than 8 bits for sample might be a
-                 * problem because GIF allows only 8 bits based palette
-                 * therefore I prefere switching to component color model in
-                 * order to handle this properly.  NOTE. The only transfert
-                 * types avalaible for IndexColorModel are byte and ushort.
-                 */
-                if (surrogateImage.getColorModel() instanceof IndexColorModel
-                        && (surrogateImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE)) {
-                    surrogateImage = this
-                        .reformatColorModel2ComponentColorModel(surrogateImage);
-                }
-
-                /**
-                 * component color model is not well digested by the gif
-                 * encoder we need to go to indecolor model somehow.  This
-                 * code for the moment remove transparency, but I am confident
-                 * I will  find a way to add that.
-                 */
-                if (surrogateImage.getColorModel() instanceof ComponentColorModel) {
-                    surrogateImage = componentColorModel2IndexColorModel4GIF(surrogateImage);
-                } else
-                /**
-                 * IndexColorModel with full transparency support is not
-                 * suitable for gif images we need to go to bitmask loosing
-                 * some informations. we have only one full transparent color.
-                 */
-                if (surrogateImage.getColorModel() instanceof IndexColorModel) {
-                    surrogateImage = convertIndexColorModelAlpha4GIF(surrogateImage);
-                }
-            } else
-            //-----------------TIFF--------------------------------------
-
-            /**
-             * TIFF file format.  We need just a couple of correction for this
-             * format. It seems that the encoder does not work fine with
-             * IndexColorModel therefore in such a case we need the reformat
-             * the input image to a ComponentColorModel.
-             */
-            if ((((String) (this.format.getWriteParameters().parameter("format")
-                                           .getValue())).compareToIgnoreCase(
-                        "tiff") == 0)
-                    || (((String) (this.format.getWriteParameters()
-                                                  .parameter("format").getValue()))
-                    .compareToIgnoreCase("tif") == 0)) {
-                //Are we dealing with IndexColorModel? If so we need to go back to ComponentColorModel
-                if (surrogateImage.getColorModel() instanceof IndexColorModel) {
-                    surrogateImage = reformatColorModel2ComponentColorModel(surrogateImage);
-                }
-            }
-
-            /**
-             * write using JAI encoders
-             */
-            ImageIO.write(surrogateImage,
-                (String) (this.format.getWriteParameters().parameter("format")
-                                     .getValue()), output);
-        } catch (Exception e) {
-            throw new IOException("Error when writing world image: "
-                + e.getMessage());
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param surrogateImage
-     *
-     * @return
-     */
-
-    //	private PlanarImage cleanIndexColorModel(PlanarImage surrogateImage) {
-    //		final ColorModel cm=surrogateImage.getColorModel();
-    //		  if(cm instanceof IndexColorModel){
-    //			final boolean hasAlpha=cm.hasAlpha();
-    //			final int transparency=cm.getTransparency();
-    //			
-    //			//bitmask
-    //			if
-    //		  }
-    //		return surrogateImage;
-    //	}
-
-    /**
-     * This method allows me to go from DirectColorModel to ComponentColorModel
-     * which seems to be well acepted from PNGEncoder and TIFFEncoder.
-     *
-     * @param surrogateImage
-     *
-     * @return
-     */
-    private PlanarImage direct2ComponentColorModel(PlanarImage surrogateImage) {
-        ParameterBlockJAI pb = new ParameterBlockJAI("ColorConvert");
-        pb.addSource(surrogateImage);
-
-        int numBits = 8;
-
-        if (DataBuffer.TYPE_INT == surrogateImage.getSampleModel()
-                                                     .getTransferType()) {
-            numBits = 32;
-        } else if ((DataBuffer.TYPE_USHORT == surrogateImage.getSampleModel()
-                                                                .getTransferType())
-                || (DataBuffer.TYPE_SHORT == surrogateImage.getSampleModel()
-                                                               .getTransferType())) {
-            numBits = 16;
-        } else if (DataBuffer.TYPE_FLOAT == surrogateImage.getSampleModel()
-                                                              .getTransferType()) {
-            numBits = 32;
-        } else if (DataBuffer.TYPE_DOUBLE == surrogateImage.getSampleModel()
-                                                               .getTransferType()) {
-            numBits = 64;
-        }
-
-        ComponentColorModel colorModel = new ComponentColorModel(surrogateImage.getColorModel()
-                                                                               .getColorSpace(),
-                new int[] { numBits, numBits, numBits, numBits }, false,
-                surrogateImage.getColorModel().hasAlpha(),
-                surrogateImage.getColorModel().getTransparency(),
-                surrogateImage.getSampleModel().getTransferType());
-        pb.setParameter("colormodel", colorModel);
-
-        ImageLayout layout = new ImageLayout();
-        layout.setColorModel(colorModel);
-        layout.setSampleModel(colorModel.createCompatibleSampleModel(
-                surrogateImage.getWidth(), surrogateImage.getHeight()));
-
-        RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-        surrogateImage = JAI.create("ColorConvert", pb, hints);
-        pb.removeParameters();
-        pb.removeSources();
-
-        return surrogateImage;
-    }
-
-    /**
-     * GIF does not support full alpha channel we need to reduce it in order to
-     * provide a simple transparency index to a unique fully transparent
-     * color.
-     *
-     * @param surrogateImage
-     *
-     * @return
-     */
-    private PlanarImage convertIndexColorModelAlpha4GIF(
-        PlanarImage surrogateImage) {
-        //doing nothing if the input color model is correct
-        final IndexColorModel cm = (IndexColorModel) surrogateImage
-            .getColorModel();
-
-        if (cm.getTransparency() == Transparency.OPAQUE) {
-            return surrogateImage;
-        }
-
-        byte[][] rgba = new byte[4][256]; //WE MIGHT USE LESS THAN 256 COLORS
-
-        //getting all the colors
-        cm.getReds(rgba[0]);
-        cm.getGreens(rgba[1]);
-        cm.getBlues(rgba[2]);
-
-        //get the data (actually a copy of them) and prepare to rewrite them
-        WritableRaster raster = surrogateImage.copyData();
-
-        /**
-         * Now we are going to use the first transparent color as it were the
-         * transparent color and we point all the tranpsarent pixel to this
-         * color in the color map. NOTE Assuming we have just one band.
-         */
-        int transparencyIndex = -1;
-        int index = -1;
-        final int H = raster.getHeight();
-        final int W = raster.getWidth();
-
-        for (int i = 0; i < H; i++) {
-            for (int j = 0; j < W; j++) {
-                //index in the color map is given by a value in the raster.
-                index = raster.getSample(j, i, 0);
-
-                //check for transparency
-                if ((cm.getAlpha(index) & 0xff) == 0) {
-                    //FULLY TRANSPARENT PIXEL
-                    if (transparencyIndex == -1) {
-                        //setting transparent color to this one
-                        //the other tranpsarent bits will point to this one
-                        transparencyIndex = cm.getAlpha(index);
-
-                        //                      setting sample in the raster that corresponds to an index in the
-                        //color map
-                        raster.setSample(j, i, 0, transparencyIndex);
-                    } else //we alredy set the transparent color we will reuse that one
-                     {
-                        //basically do nothing here
-                        //we do not need to add a new color because we are reusing the old on
-                        //we already set
-                        //                      setting sample in the raster that corresponds to an index in the
-                        //color map
-                        raster.setSample(j, i, 0, transparencyIndex);
-                    }
-                } else //NON FULLY TRANSPARENT PIXEL
-                 {
-                    //setting sample in the raster that corresponds to an index in the
-                    //color map                    
-                    //raster.setSample(j, i, 0, colorIndex++);
-                }
-            }
-        }
-
-        /**
-         * Now all the color are opaque except one and the color map has been
-         * rebuilt loosing all the tranpsarent colors except the first one.
-         * The raster has been rebuilt as well, in order to make it point to
-         * the right color in the color map.  We have to create the new image
-         * to be returned.
-         */
-        IndexColorModel cm1 = (transparencyIndex == -1)
-            ? new IndexColorModel(cm.getComponentSize(0), 256, rgba[0],
-                rgba[1], rgba[2])
-            : new IndexColorModel(cm.getComponentSize(0), 256, rgba[0],
-                rgba[1], rgba[2], transparencyIndex);
-
-        BufferedImage image = new BufferedImage(raster.getWidth(),
-                raster.getHeight(), BufferedImage.TYPE_BYTE_INDEXED, cm1);
-        image.setData(raster);
-
-        //disposing old image
-        surrogateImage.dispose();
-
-        return PlanarImage.wrapRenderedImage(image);
-    }
-
-    /**
-     * Reformat the index color model to a component color model preserving
-     * transparency. Code from jai-interests archive.
-     *
-     * @param surrogateImage
-     *
-     * @return
-     *
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    private PlanarImage reformatColorModel2ComponentColorModel(
-        PlanarImage surrogateImage) throws IllegalArgumentException {
-        // Format the image to be expanded from IndexColorModel to
-        // ComponentColorModel
-        ParameterBlock pbFormat = new ParameterBlock();
-        pbFormat.addSource(surrogateImage);
-        pbFormat.add(surrogateImage.getSampleModel().getTransferType());
-
-        ImageLayout layout = new ImageLayout();
-        ColorModel cm1 = null;
-        final int numBits;
-
-        switch (surrogateImage.getSampleModel().getTransferType()) {
-        case DataBuffer.TYPE_BYTE:
-            numBits = 8;
-
-            break;
-
-        case DataBuffer.TYPE_USHORT:
-            numBits = 16;
-
-            break;
-
-        case DataBuffer.TYPE_SHORT:
-            numBits = 16;
-
-            break;
-
-        case DataBuffer.TYPE_INT:
-            numBits = 32;
-
-            break;
-
-        case DataBuffer.TYPE_FLOAT:
-            numBits = 32;
-
-            break;
-
-        case DataBuffer.TYPE_DOUBLE:
-            numBits = 64;
-
-            break;
-
-        default:
-            throw new IllegalArgumentException(
-                "Unsupported data type for an index color model!");
-        }
-
-        //do we need alpha?
-        final int transparency = surrogateImage.getColorModel().getTransparency();
-        final int transpPixel = ((IndexColorModel) surrogateImage.getColorModel())
-            .getTransparentPixel();
-
-        if (transparency != Transparency.OPAQUE) {
-            cm1 = new ComponentColorModel(ColorSpace.getInstance(
-                        ColorSpace.CS_sRGB),
-                    new int[] { numBits, numBits, numBits, numBits }, true,
-                    false, transparency,
-                    surrogateImage.getSampleModel().getTransferType());
-        } else {
-            cm1 = new ComponentColorModel(ColorSpace.getInstance(
-                        ColorSpace.CS_sRGB),
-                    new int[] { numBits, numBits, numBits }, false, false,
-                    transparency,
-                    surrogateImage.getSampleModel().getTransferType());
-        }
-
-        layout.setColorModel(cm1);
-        layout.setSampleModel(cm1.createCompatibleSampleModel(
-                surrogateImage.getWidth(), surrogateImage.getHeight()));
-
-        RenderingHints hint = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-        RenderedOp dst = JAI.create("format", pbFormat, hint);
-        surrogateImage = dst;
-        pbFormat.removeParameters();
-        pbFormat.removeSources();
-        dst.dispose();
-
-        return surrogateImage;
-    }
-
-    /**
-     * Convert the image to a GIF-compliant image.  This method has been
-     * created in order to convert the input image to  a form that is
-     * compatible with the GIF model.  It first remove the information about
-     * transparency since the error diffusion and the error dither operations
-     * are unable to process images with more than 3 bands.  Sfterwards the
-     * image is processed with an error diffusion operator in order to reduce
-     * the number of bands from 3 to 1 and the number of color to 216.  A
-     * suitable layout is used for the final image via the RenderingHints in
-     * order to take into account the different layout model for the final
-     * image.
-     *
-     * @param surrogateImage image to convert
-     *
-     * @return PlanarImage image converted
-     */
-    private PlanarImage componentColorModel2IndexColorModel4GIF(
-        PlanarImage surrogateImage) {
-        {
-            //parameter block
-            ParameterBlock pb = new ParameterBlock();
-            RenderedImage alphaChannel = null;
-
-            /**
-             * AMPLITUDE RESCALING
-             */
-
-            //I might also need to reformat the image in order to get it to 8 bits
-            //samples
-            if (surrogateImage.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE) {
-                surrogateImage = rescale2Byte(surrogateImage);
-            }
-
-            /**
-             * ALPHA CHANNEL  getting the alpha channel and separating from the
-             * others bands.
-             */
-            if (surrogateImage.getColorModel().hasAlpha()) {
-                int numBands = surrogateImage.getSampleModel().getNumBands();
-
-                //getting alpha channel
-                alphaChannel = JAI.create("bandSelect", surrogateImage,
-                        new int[] { numBands - 1 });
-
-                //getting needed bands
-                surrogateImage = getBandsFromImage(surrogateImage, numBands);
-            }
-
-            /**
-             * BAND MERGE  If we do not have 3 bands we have no way to go to
-             * index color model in a simple way using jai. Therefore we add
-             * the bands we need in order to get there. This trick works fine
-             * with gray scale images. ATTENTION, if the initial image had no
-             * alpha channel we proceed without  doing anything since it seems
-             * that GIF encoder in such a case works fine.
-             */
-            if ((surrogateImage.getSampleModel().getNumBands() == 1)
-                    && (alphaChannel != null)) {
-                int numBands = surrogateImage.getSampleModel().getNumBands();
-
-                //getting first band
-                RenderedImage firstBand = JAI.create("bandSelect",
-                        surrogateImage, new int[] { 0 });
-
-                //adding to the image
-                for (int i = 0; i < (3 - numBands); i++) {
-                    pb.removeParameters();
-                    pb.removeSources();
-
-                    pb.addSource(surrogateImage);
-                    pb.addSource(firstBand);
-                    surrogateImage = JAI.create("bandmerge", pb);
-
-                    pb.removeParameters();
-                    pb.removeSources();
-                }
-            }
-
-            /**
-             * ERROR DIFFUSION   we create a single banded image with index
-             * color model.
-             */
-            if (surrogateImage.getSampleModel().getNumBands() == 3) {
-                surrogateImage = reduction2IndexColorModel(surrogateImage, pb);
-            }
-
-            /**
-             * TRANSPARENCY  Adding transparency if needed, which means using
-             * the alpha channel to build a new color model
-             */
-            if (alphaChannel != null) {
-                surrogateImage = addTransparency2IndexColorModel(surrogateImage,
-                        alphaChannel, pb);
-            }
-        }
-
-        return surrogateImage;
-    }
-
-    /**
-     * This method is used to add transparency to a preexisting image whose
-     * color model is  indexcolormodel.  There are quite a few step to perform
-     * here. 1>Creating a new IndexColorModel which supports transparency,
-     * using the given image's colormodel  2>creating a suitable sample model
-     * 3>copying the old sample model to the new sample model.  4>looping
-     * through the alphaChannel and setting the corresponding pixels in the
-     * new sample model to the index for transparency  5>creating a
-     * bufferedimage  6>creating a planar image to be returned
-     *
-     * @param surrogateImage
-     * @param alphaChannel
-     * @param pb
-     *
-     * @return
-     */
-    private PlanarImage addTransparency2IndexColorModel(
-        final PlanarImage surrogateImage, final RenderedImage alphaChannel,
-        ParameterBlock pb) {
-        //getting original color model 
-        //in order to have the rgba vector
-        final IndexColorModel cm = (IndexColorModel) surrogateImage
-            .getColorModel();
-
-        //get the r g b a components
-        final int transparencyIndex = 255;
-
-        byte[][] rgba = new byte[3][256]; //WE MIGHT USE LESS THAN 256 COLORS
-
-        //cm.getRGBs(rgba);
-        cm.getReds(rgba[0]);
-        cm.getGreens(rgba[1]);
-        cm.getBlues(rgba[2]);
-
-        //setting color
-        rgba[0][transparencyIndex] = 0;
-        rgba[1][transparencyIndex] = 0;
-        rgba[2][transparencyIndex] = 0;
-
-        //get the data (actually a copy of them) and prepare to rewrite them
-        WritableRaster rasterGIF = surrogateImage.copyData();
-        Raster rasterAlpha = ((PlanarImage) alphaChannel).copyData();
-        ((PlanarImage) alphaChannel).dispose();
-
-        /**
-         * Now we are going to use the first transparent color as it were the
-         * transparent color and we point all the tranpsarent pixel to this
-         * color in the color map. NOTE Assuming we have just one band.
-         */
-        boolean foundFullyTransparent = false;
-
-        final int minX = rasterGIF.getMinX();
-        final int minY = rasterGIF.getMinY();
-        final int W = rasterGIF.getWidth();
-        final int H = rasterGIF.getHeight();
-
-        for (int i = minY; i < H; i++) {
-            for (int j = minX; j < W; j++) {
-                //check for transparency
-                if (rasterAlpha.getSample(j, i, 0) == 0) {
-                    //FULLY TRANSPARENT PIXEL
-                    foundFullyTransparent = true;
-                    rasterGIF.setSample(j, i, 0, transparencyIndex);
-                }
-            }
-        }
-
-        /**
-         * Now all the color are opaque except one and the color map has been
-         * rebuilt loosing all the tranpsarent colors except the first one.
-         * The raster has been rebuilt as well, in order to make it point to
-         * the right color in the color map.  We have to create the new image
-         * to be returned.
-         */
-        IndexColorModel cm1 = new IndexColorModel(cm.getPixelSize(), 256,
-                rgba[0], rgba[1], rgba[2], 255);
-
-        BufferedImage image = new BufferedImage(rasterGIF.getWidth(),
-                rasterGIF.getHeight(), BufferedImage.TYPE_BYTE_INDEXED, cm1);
-        image.setData(rasterGIF);
-
-        //disposing old image
-        surrogateImage.dispose();
-
-        PlanarImage retImage = PlanarImage.wrapRenderedImage(image);
-        image = null;
-        rasterGIF = null;
-        rasterAlpha = null;
-
-        return retImage;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param surrogateImage
-     * @param pb
-     *
-     * @return
-     */
-    private PlanarImage reduction2IndexColorModel(PlanarImage surrogateImage,
-        ParameterBlock pb) {
-        //error dither
-        final KernelJAI ditherMask = KernelJAI.ERROR_FILTER_STUCKI; //KernelJAI.DITHER_MASK_443;
-        final ColorCube colorMap = ColorCube.BYTE_496;
-
-        //PARAMETER BLOCK
-        pb.removeParameters();
-        pb.removeSources();
-
-        //color map
-        pb.addSource(surrogateImage);
-        pb.add(colorMap);
-        pb.add(ditherMask);
-
-        RenderedOp op1 = JAI.create("errordiffusion", pb, null);
-        pb.removeParameters();
-        pb.removeSources();
-
-        return op1;
-    }
-
-    /**
-     * Remove the alpha band and keeps the others.
-     *
-     * @param surrogateImage
-     * @param numBands
-     *
-     * @return
-     */
-    private PlanarImage getBandsFromImage(PlanarImage surrogateImage,
-        int numBands) {
-        switch (numBands - 1) {
-        case 1:
-            surrogateImage = JAI.create("bandSelect", surrogateImage,
-                    new int[] { 0 });
-
-            break;
-
-        case 3:
-            surrogateImage = JAI.create("bandSelect", surrogateImage,
-                    new int[] { 0, 1, 2 });
-
-            break;
-        }
-
-        return surrogateImage;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param surrogateImage
-     *
-     * @return
-     */
-    private PlanarImage rescale2Byte(PlanarImage surrogateImage) {
-        //rescale the initial image in order
-        //to expand the dynamic
-
-        /** EXTREMA */
-
-        // Set up the parameter block for the source image and
-        // the constants
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(surrogateImage); // The source image
-        pb.add(null); // The region of the image to scan
-        pb.add(1); // The horizontal sampling rate
-        pb.add(1); // The vertical sampling rate
-
-        // Perform the extrema operation on the source image
-        // Retrieve both the maximum and minimum pixel value
-        double[][] extrema = (double[][]) JAI.create("extrema", pb).getProperty("extrema");
-
-        /**
-         * RESCSALE
-         */
-        pb.removeSources();
-        pb.removeParameters();
-
-        //set the levels for the dynamic
-        pb.addSource(surrogateImage);
-
-        //rescaling each band to 8 bits
-        double[] scale = new double[extrema[0].length];
-        double[] offset = new double[extrema[0].length];
-
-        final int length = extrema[0].length;
-
-        for (int i = 0; i < length; i++) {
-            scale[i] = 255 / (extrema[1][i] - extrema[0][i]);
-            offset[i] = -((255 * extrema[0][i]) / (extrema[1][i]
-                - extrema[0][i]));
-        }
-
-        pb.add(scale);
-        pb.add(offset);
-
-        RenderedOp image2return = JAI.create("rescale", pb);
-
-        //setting up the right layout for this image
-        ImageLayout layout = new ImageLayout(image2return);
-        pb.removeParameters();
-        pb.removeSources();
-        pb.addSource(image2return);
-        pb.add(DataBuffer.TYPE_BYTE);
-
-        RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout);
-        image2return = JAI.create("format", pb, hints);
-        pb.removeSources();
-        pb.removeParameters();
-        surrogateImage.dispose();
-
-        return image2return;
-    }
+	 * Destination must be a File. The directory it resides in must already
+	 * exist. It must point to where the raster image is to be located. The
+	 * world image will be derived from there.
+	 * 
+	 * @param destination
+	 */
+	public WorldImageWriter(Object destination) {
+		this.destination = destination;
+
+		// convert everything into a file when possible
+		// we have to separate the handling of a file from the handling of an
+		// output stream due to the fact that the latter requires no world file.
+		if (this.destination instanceof String) {
+			destination = new File((String) destination);
+		} else if (this.destination instanceof URL) {
+			final URL url = ((URL) destination);
+			if (url.getProtocol().equalsIgnoreCase("file"))
+				destination = new File(url.getPath());
+			else
+				throw new RuntimeException(
+						"WorldImageWriter::write:It is not possible writing to an URL!");
+		} else if (!(destination instanceof ImageOutputStream)
+				&& !(destination instanceof File))
+			throw new RuntimeException(
+					"WorldImageWriter::write:It is not possible writing to an URL!");
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
+	 */
+	public Format getFormat() {
+		return format;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#getDestination()
+	 */
+	public Object getDestination() {
+		return destination;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#getMetadataNames()
+	 */
+	public String[] getMetadataNames() {
+		return null;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#setMetadataValue(java.lang.String,
+	 *      java.lang.String)
+	 */
+	public void setMetadataValue(String name, String value) throws IOException,
+			MetadataNameNotFoundException {
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#setCurrentSubname(java.lang.String)
+	 */
+	public void setCurrentSubname(String name) throws IOException {
+	}
+
+	/**
+	 * Takes a GridCoverage and writes the image to the destination file. It
+	 * then reads the format of the file and writes an accompanying world file.
+	 * It will throw a FileFormatNotCompatibleWithGridCoverageException if
+	 * Destination is not a File (URL is a read-only format!).
+	 * 
+	 * @param coverage
+	 *            the GridCoverage to write.
+	 * @param parameters
+	 *            no parameters are accepted. Currently ignored.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             DOCUMENT ME!
+	 * @throws IOException
+	 *             DOCUMENT ME!
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.geotools.gc.GridCoverage,
+	 *      org.opengis.parameter.GeneralParameterValue[])
+	 */
+	public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
+			throws IllegalArgumentException, IOException {
+		final GridCoverage2D gc = (GridCoverage2D) coverage;
+		final ImageOutputStream outstream;
+		// checking parameters
+		// if provided we have to use them
+		// specifically this is one of the way we can provide an output format
+		if (parameters != null) {
+			this.extension = ((Parameter) parameters[0]).stringValue();
+		}
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// WorldFile and projection file.
+		//
+		// ////////////////////////////////////////////////////////////////////
+		if (destination instanceof File) {
+			// files destinations
+			File imageFile = (File) destination;
+			final String path = imageFile.getAbsolutePath();
+			final int index = path.lastIndexOf(".");
+			final String baseFile = index >= 0 ? path.substring(0, index)
+					: path;
+
+			// envelope and image
+			final RenderedImage image = gc.getRenderedImage();
+
+			// world file
+			try {
+				createWorldFile(coverage, image, baseFile);
+			} catch (TransformException e) {
+				final IOException ex = new IOException();
+				ex.initCause(e);
+				throw ex;
+			}
+
+			// projection file
+			createProjectionFile(baseFile, coverage
+					.getCoordinateReferenceSystem());
+
+			// create new file for the image
+			imageFile = new File(new StringBuffer(baseFile).append(".").append(
+					extension).toString());
+			imageFile.createNewFile();
+		}
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Encoding of the original coverage
+		//
+		// ////////////////////////////////////////////////////////////////////
+		outstream = (destination instanceof ImageOutputStream) ? (ImageOutputStream) destination
+				: ImageIO.createImageOutputStream(destination);
+		if (outstream == null)
+			throw new IOException(
+					"WorldImageWriter::write:No image output stream avalaible for the provided destination");
+		this.encode(gc, outstream);
+
+	}
+
+	/**
+	 * This method is responsible for creating a projection file using the WKT
+	 * representation of this coverage's coordinate reference system. We can
+	 * reuse this file in order to rebuild later the crs.
+	 * 
+	 * 
+	 * @param baseFile
+	 * @param coordinateReferenceSystem
+	 * @throws IOException
+	 */
+	private void createProjectionFile(final String baseFile,
+			final CoordinateReferenceSystem coordinateReferenceSystem)
+			throws IOException {
+		final File prjFile = new File(new StringBuffer(baseFile).append(".prj")
+				.toString());
+		BufferedWriter out = new BufferedWriter(new FileWriter(prjFile));
+		out.write(coordinateReferenceSystem.toWKT());
+		out.close();
+
+	}
+
+	/**
+	 * This method is responsible fro creating a world file to georeference an
+	 * image given the image bounding box and the image geometry. The name of
+	 * the file is composed by the name of the image file with a proper
+	 * extension, depending on the format (see WorldImageFormat). The projection
+	 * is in the world file.
+	 * 
+	 * @param gc
+	 *            Envelope of this image.
+	 * @param image
+	 *            Image to be used.
+	 * @param baseFile
+	 *            Basename and path for this image.
+	 * @throws IOException
+	 *             In case we cannot create the world file.
+	 * @throws TransformException
+	 * @throws TransformException
+	 */
+	private void createWorldFile(GridCoverage gc, final RenderedImage image,
+			final String baseFile) throws IOException, TransformException {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// CRS information
+		//
+		// ////////////////////////////////////////////////////////////////////
+		final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
+				.getCoordinateReferenceSystem());
+		final CoordinateSystem cs = crs.getCoordinateSystem();
+		final boolean lonFirst = !GridGeometry2D.swapXY(cs);
+		final AffineTransform gridToWorld = (AffineTransform) gc
+				.getGridGeometry().getGridToCoordinateSystem();
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// World File values
+		// It is worthwhile to note that we have to keep into account the fact
+		// that the axis could be swapped (LAT,lon) therefore when getting
+		// xPixSize and yPixSize we need to look for it a thte right place
+		// inside the grid to world transform.
+		//
+		// ////////////////////////////////////////////////////////////////////
+		final double xPixelSize = (lonFirst) ? gridToWorld.getScaleX()
+				: gridToWorld.getShearY();
+		final double rotation1 = (lonFirst) ? gridToWorld.getShearX()
+				: gridToWorld.getScaleX();
+		final double rotation2 = (lonFirst) ? gridToWorld.getShearY()
+				: gridToWorld.getScaleY();
+		final double yPixelSize = (lonFirst) ? gridToWorld.getScaleY()
+				: gridToWorld.getShearX();
+		final double xLoc = gridToWorld.getTranslateX();
+		final double yLoc = gridToWorld.getTranslateY();
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// writing world file
+		//
+		// ////////////////////////////////////////////////////////////////////
+		final StringBuffer buff = new StringBuffer(baseFile);
+		buff.append(WorldImageFormat.getWorldExtension(format
+				.getWriteParameters().parameter("format").stringValue()));
+		final File worldFile = new File(buff.toString());
+		final PrintWriter out = new PrintWriter(new FileOutputStream(worldFile));
+		out.println(xPixelSize);
+		out.println(rotation1);
+		out.println(rotation2);
+		out.println(yPixelSize);
+		out.println(xLoc);
+		out.println(yLoc);
+		out.flush();
+		out.close();
+
+
+	}
+
+	/**
+	 * Cleans up the writer. Currently does nothing.
+	 * 
+	 * @throws IOException
+	 *             DOCUMENT ME!
+	 */
+	public void dispose() throws IOException {
+	}
+
+	/**
+	 * Encode the given coverage to the requsted output format.
+	 * 
+	 * @param sourceCoverage
+	 *            the coverage to be encoded.s
+	 * @param outstream
+	 *            OutputStream
+	 * @throws IOException
+	 * 
+	 * @throws IOException
+	 * @throws IllegalArgumentException
+	 *             DOCUMENT ME!
+	 */
+	private void encode(final GridCoverage2D sourceCoverage,
+			final ImageOutputStream outstream) throws IOException {
+
+		// do we have a source coverage?
+		if (sourceCoverage == null) {
+			throw new IllegalArgumentException(
+					"A coverage must be provided in order for write to succeed!");
+		}
+
+		/**
+		 * Getting the non geophysics view of this grid coverage. the
+		 * geophysiscs view usually comes with an index color model for 3 bands,
+		 * since sometimes I get some problems with JAI encoders I select only
+		 * the first band, which by the way is the only band we use.
+		 */
+		RenderedImage image =  (sourceCoverage)
+				.geophysics(false).getRenderedImage();
+		final ImageWorker worker=new ImageWorker(image);
+		
+
+		///////////////////////////////////////////////////////////////////////
+		//
+		// With index color model we want just the first band
+		//
+		///////////////////////////////////////////////////////////////////////
+		if (image.getColorModel() instanceof IndexColorModel
+				&& (image.getSampleModel().getNumBands() > 1)) {
+			worker.retainBands(1);
+			image=worker.getRenderedImage();
+		}
+
+		/**
+		 * For the moment we do not work with DirectColorModel but instead we
+		 * switch to component color model which is really easier to handle even
+		 * if it much more memory expensive. Once we are in component color
+		 * model is really easy to go to Gif and similar.
+		 */
+		if (image.getColorModel() instanceof DirectColorModel) {
+			worker.forceComponentColorModel();
+			image=worker.getRenderedImage();
+		}
+
+		/**
+		 * ADJUSTMENTS FOR VARIOUS FILE FORMATS
+		 */
+
+		// ------------------------GIF-----------------------------------
+		if (extension.compareToIgnoreCase("gif") == 0) {
+
+			/**
+			 * IndexColorModel with more than 8 bits for sample might be a
+			 * problem because GIF allows only 8 bits based palette therefore I
+			 * prefere switching to component color model in order to handle
+			 * this properly. NOTE. The only transfert types avalaible for
+			 * IndexColorModel are byte and ushort.
+			 */
+			if (image.getColorModel() instanceof IndexColorModel
+					&& (image.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE)) {
+				worker.forceComponentColorModel();
+				image=worker.getRenderedImage();
+			}
+
+			/**
+			 * component color model is not well digested by the gif encoder we
+			 * need to go to indecolor model somehow. This code for the moment
+			 * remove transparency, but I am confident I will find a way to add
+			 * that.
+			 */
+			if (image.getColorModel() instanceof ComponentColorModel) {
+				worker.forceIndexColorModelForGIF();
+				image=worker.getRenderedImage();
+			} else
+			/**
+			 * IndexColorModel with full transparency support is not suitable
+			 * for gif images we need to go to bitmask loosing some
+			 * informations. we have only one full transparent color.
+			 */
+			if (image.getColorModel() instanceof IndexColorModel) {
+				worker.forceIndexColorModelForGIF();
+				image=worker.getRenderedImage();
+			}
+		} 
+//		else
+		// -----------------TIFF--------------------------------------
+
+//		/**
+//		 * TIFF file format. We need just a couple of correction for this
+//		 * format. It seems that the encoder does not work fine with
+//		 * IndexColorModel therefore in such a case we need the reformat the
+//		 * input image to a ComponentColorModel.
+//		 */
+//		if (extension.compareToIgnoreCase("tiff") == 0
+//				|| extension.compareToIgnoreCase("tif") == 0) {
+//			// Are we dealing with IndexColorModel? If so we need to go back
+//			// to ComponentColorModel
+//			if (image.getColorModel() instanceof IndexColorModel) {
+//				surrogateImage = ImageUtilities
+//						.reformatColorModel2ComponentColorModel(surrogateImage);
+//			}
+//		}
+
+		/**
+		 * write using JAI encoders
+		 */
+		final ParameterBlockJAI pbjImageWrite = new ParameterBlockJAI(
+				"ImageWrite");
+		pbjImageWrite.addSource(image);
+		pbjImageWrite.setParameter("Output", outstream);
+		pbjImageWrite.setParameter("VerifyOutput", Boolean.FALSE);
+		pbjImageWrite.setParameter("Format", extension);
+		JAI.create("ImageWrite", pbjImageWrite);
+		outstream.flush();
+		outstream.close();
+
+	}
 }

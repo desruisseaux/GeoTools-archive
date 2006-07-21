@@ -1,7 +1,7 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,115 +12,131 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.gce.image;
 
-import junit.framework.TestCase;
-import org.geotools.coverage.grid.*;
-import org.geotools.resources.*;
-import org.opengis.coverage.grid.*;
-import org.opengis.parameter.*;
-import java.awt.*;
-import java.io.*;
-import java.net.*;
-import javax.media.jai.*;
-import javax.swing.*;
+import java.awt.Rectangle;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.logging.Logger;
 
+import junit.textui.TestRunner;
+
+import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
+import org.geotools.resources.TestData;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 /**
- * DOCUMENT ME!
- *
+ * TestCase subclass for testing readingb capabilities
+ * 
  * @author Simone Giannecchini
  * @author Alessio Fabiani
  * @author rgould
  * @source $URL$
  */
-public class WorldImageReaderTest extends TestCase {
-    private static boolean verbose = false;
+public class WorldImageReaderTest extends WorldImageBaseTestCase {
 
-    WorldImageReader wiReader;
-    ParameterValueGroup paramsRead = null;
+	private WorldImageReader wiReader;
 
-    /**
-     * Constructor for WorldImageReaderTest.
-     *
-     * @param arg0
-     */
-    public WorldImageReaderTest(String arg0) {
-        super(arg0);
-    }
+	private Logger logger = Logger.getLogger(WorldImageReaderTest.class
+			.toString());
 
-    /*
-     * @see TestCase#setUp()
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
+	/**
+	 * Constructor for WorldImageReaderTest.
+	 * 
+	 * @param arg0
+	 */
+	public WorldImageReaderTest(String arg0) {
+		super(arg0);
+	}
 
-    public void testRead() throws IOException {
-        URL url = null;
-        File file = null;
-        InputStream in = null;
+	/*
+	 * @see TestCase#setUp()
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
 
-        //checking test data directory for all kind of inputs
-        File test_data_dir = TestData.file(this, null);
-        String[] fileList = test_data_dir.list(new MyFileFilter());
+	public void testRead() throws IOException {
 
-        for (int i = 0; i < fileList.length; i++) {
-            //url
-            url = TestData.url(this, fileList[i]);
-            this.read(url);
+		// set up
+		Object in;
 
-            //file
-            file = TestData.file(this, fileList[i]);
-            this.read(file);
+		// checking test data directory for all kind of inputs
+		final File test_data_dir = TestData.file(this, null);
+		final String[] fileList = test_data_dir.list(new MyFileFilter());
+		final int length = fileList.length;
+		for (int i = 0; i < length; i++) {
+			logger.info(fileList[i]);
 
-            //inputstream
-            in = new FileInputStream(TestData.file(this, fileList[i]));
-            this.read(in);
-        }
 
-        //checking a WMS get map
-//                url = new URL("http://localhost:8080/geoserver/wms?bbox=8.284,39.347,17.221,46.43&styles=raster&Format=image/png&request=GetMap&layers=OCP_BACKSCATT_MODIS_ACQUA_20050621&width=800&height=600&srs=EPSG:4326");
-//                this.read(url);
-    }
+			// file
+			in = TestData.file(this, fileList[i]);
+			this.read(in);
 
-    /**
-     * read
-     *
-     * @param source Object
-     *
-     * @throws FileNotFoundException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     * @throws IllegalArgumentException DOCUMENT ME!
-     */
-    private void read(Object source)
-        throws FileNotFoundException, IOException, IllegalArgumentException {
-        wiReader = new WorldImageReader(source);
+		}
 
-        Format readerFormat = wiReader.getFormat();
-        paramsRead = readerFormat.getReadParameters();
+		// checking a WMS get map
+//		URL url = new URL(
+//				"http://wms.jpl.nasa.gov/wms.cgi?bbox=9,43,12,45&styles=&Format=image/png&request=GetMap&layers=global_mosaic&width=100&height=100&srs=EPSG:4326");
+//		// checking that we have an internet connection active and that the
+//		// website is up
+//		if (url.openConnection() == null)
+//			return;
+//		this.read(url);
+	}
 
-        GridCoverage2D coverage = (GridCoverage2D) wiReader.read(null);
+	/**
+	 * Read, test and show a coverage from the supplied source.
+	 * 
+	 * @param source
+	 *            Object
+	 * 
+	 * @throws FileNotFoundException
+	 *             DOCUMENT ME!
+	 * @throws IOException
+	 *             DOCUMENT ME!
+	 * @throws IllegalArgumentException
+	 *             DOCUMENT ME!
+	 */
+	private void read(Object source) throws FileNotFoundException, IOException,
+			IllegalArgumentException {
 
-        //(GeneralParameterValue[]) paramsRead.values().toArray(new GeneralParameterValue[paramsRead.values().size()]));
-        assertNotNull(coverage);
-        assertNotNull(((GridCoverage2D) coverage).getRenderedImage());
-        assertNotNull(coverage.getEnvelope());
+		// can we read it?
+		assertTrue(new WorldImageFormat().accepts(source));
 
-        if (verbose) {
-            System.out.println(((GridCoverage2D) coverage).getCoordinateReferenceSystem().toWKT());
-        }
-        if (GraphicsEnvironment.isHeadless()) {
-            return;
-        }
-        JFrame frame = new JFrame();
-        JLabel label = new JLabel(new ImageIcon(
-                    ((PlanarImage) coverage.getRenderedImage())
-                    .getAsBufferedImage()));
-        frame.getContentPane().add(label, BorderLayout.CENTER);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.show();
-    }
+		// get a reader
+		wiReader = new WorldImageReader(source);
+
+
+		 // get the coverage
+		 final GridCoverage2D coverage = (GridCoverage2D) wiReader.read(null);
+
+		// test the coverage
+		assertNotNull(coverage);
+		assertNotNull((coverage).getRenderedImage());
+		assertNotNull(coverage.getEnvelope());
+
+		// log some information
+		logger.info(coverage.getCoordinateReferenceSystem().toWKT());
+		logger.info(coverage.getEnvelope().toString());
+
+		// show it
+		coverage.show();
+	}
+
+	public static void main(String[] args) {
+		TestRunner.run(WorldImageReaderTest.class);
+	}
 }

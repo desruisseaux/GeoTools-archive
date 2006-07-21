@@ -34,6 +34,7 @@ public class WorldImageFormatTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         format = new WorldImageFormatTest("test");
+		assertNotNull(format);
     }
 
     public void testGetWorldExtension() {
