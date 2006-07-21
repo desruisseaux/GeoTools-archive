@@ -1,0 +1,59 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.geotools.gce.geotiff;
+
+import java.util.Iterator;
+
+import junit.framework.TestCase;
+
+import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.geotools.data.coverage.grid.GridFormatFinder;
+
+/**
+ * @author Simone Giannecchini
+ * 
+ */
+public class GeoTiffServiceTest extends TestCase {
+
+	/**
+	 * @param arg0
+	 */
+	public GeoTiffServiceTest(String arg0) {
+		super(arg0);
+		// TODO Auto-generated constructor stub
+	}
+
+	public static void main(java.lang.String[] args) {
+		junit.textui.TestRunner.run(GeoTiffServiceTest.class);
+	}
+
+	public void testIsAvailable() {
+		Iterator list = GridFormatFinder.getAvailableFormats();
+		boolean found = false;
+
+		while (list.hasNext()) {
+			GridFormatFactorySpi fac = (GridFormatFactorySpi) list.next();
+
+			if (fac instanceof GeoTiffFormatFactorySpi) {
+				found = true;
+
+				break;
+			}
+		}
+
+		assertTrue("GeoTiffFormatFactorySpi not registered", found);
+	}
+}

@@ -1,4 +1,19 @@
 /*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+/*
  * NOTICE OF RELEASE TO THE PUBLIC DOMAIN
  *
  * This work was created by employees of the USDA Forest Service's
@@ -20,14 +35,11 @@ package org.geotools.gce.geotiff;
 
 
 // Geotools dependencies
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-
-// GeoAPI dependencies 
-import org.opengis.coverage.grid.Format;
-
-// J2SE Dependencies
 import java.util.Collections;
 import java.util.Map;
+
+import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.opengis.coverage.grid.Format;
 
 
 /**
@@ -45,6 +57,7 @@ import java.util.Map;
  * </p>
  *
  * @author Bryce Nordgren / USDA Forest Service
+ * @author Simone Giannecchini
  * @source $URL$
  */
 public class GeoTiffFormatFactorySpi implements GridFormatFactorySpi {

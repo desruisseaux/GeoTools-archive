@@ -1,4 +1,19 @@
 /*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+/*
  * NOTICE OF RELEASE TO THE PUBLIC DOMAIN
  *
  * This work was created by employees of the USDA Forest Service's
@@ -8,7 +23,7 @@
  * changed, copied, or redistributed, with or without permission of the
  * authors, for free or for compensation.  You may not claim exclusive
  * ownership of this code because it is already owned by everyone.  Use this
- * software entirely at your own risk.  No warranty of any kind is given. 
+ * software entirely at your own risk.  No warranty of any kind is given.
  *
  * A copy of 17-USC-105 should have accompanied this distribution in the file
  * 17USC105.html.  If not, you may access the law via the US Government's
@@ -22,186 +37,191 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 /**
  * This exception is thrown when the problem with reading the GeoTiff file has
  * to do with constructing either the raster to model transform, or the
- * coordinate system.  A GeoTiffException:
+ * coordinate system. A GeoTiffException:
  * 
  * <p>
  * 
  * <ul>
- * <li>
- * encapsulates the salient information in the GeoTiff tags, making the values
- * available as read only properties.
- * </li>
- * <li>
- * sends the appropriate log message to the log stream
- * </li>
- * <li>
- * produces a readable message property for later retrieval
- * </li>
+ * <li> encapsulates the salient information in the GeoTiff tags, making the
+ * values available as read only properties. </li>
+ * <li> sends the appropriate log message to the log stream </li>
+ * <li> produces a readable message property for later retrieval </li>
  * </ul>
  * </p>
  * 
  * <p>
  * This exception is expected to be thrown when there is absolutely nothing
- * wrong with the GeoTiff file which produced it.  In this case, the exception
- * is reporting an unsupported coordinate system description or raster to
- * model transform, or some other unrecognized configuration of the GeoTIFF
- * tags.  By doing so, it attempts to record enough information so that the
- * maintainers can support it in the future.
+ * wrong with the GeoTiff file which produced it. In this case, the exception is
+ * reporting an unsupported coordinate system description or raster to model
+ * transform, or some other unrecognized configuration of the GeoTIFFWritingUtilities tags. By
+ * doing so, it attempts to record enough information so that the maintainers
+ * can support it in the future.
  * </p>
- *
+ * 
  * @author Bryce Nordgren / USDA Forest Service
+ * @author Simone Giannecchini
  * @source $URL$
  */
 public class GeoTiffException extends IOException {
-    private GeoTiffIIOMetadataAdapter metadata = null;
-    private GeoTiffIIOMetadataAdapter.GeoKeyRecord[] geoKeys = null;
 
-    /**
-     * Creates a new instance of <code>GeoTiffException</code> without detail
-     * message.
-     *
-     * @param metadata The metadata from the GeoTIFF image causing the error.
-     */
-    public GeoTiffException(GeoTiffIIOMetadataAdapter metadata) {
-        this(metadata, "");
-    }
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1008533682021487024L;
 
-    /**
-     * Constructs an instance of <code>GeoTiffException</code> with the
-     * specified detail message.
-     *
-     * @param metadata The metadata from the GeoTIFF image causing the error.
-     * @param msg the detail message.
-     */
-    public GeoTiffException(GeoTiffIIOMetadataAdapter metadata, String msg) {
-        super(msg);
-        this.metadata = metadata;
+	private GeoTiffIIOMetadataDecoder metadata = null;
 
-        int numGeoKeys = metadata.getNumGeoKeys();
+	private GeoTiffIIOMetadataDecoder.GeoKeyRecord[] geoKeys = null;
 
-        if (numGeoKeys > 0) {
-            geoKeys = new GeoTiffIIOMetadataAdapter.GeoKeyRecord[numGeoKeys];
+	/**
+	 * Creates a new instance of <code>GeoTiffException</code> without detail
+	 * message.
+	 * 
+	 * @param metadata
+	 *            The metadata from the GeoTIFFWritingUtilities image causing the error.
+	 */
+	public GeoTiffException(GeoTiffIIOMetadataDecoder metadata) {
+		this(metadata, "");
+	}
 
-            for (int i = 0; i < numGeoKeys; i++) {
-                geoKeys[i] = metadata.getGeoKeyRecordByIndex(i);
-            }
-        }
-    }
+	/**
+	 * Constructs an instance of <code>GeoTiffException</code> with the
+	 * specified detail message.
+	 * 
+	 * @param metadata
+	 *            The metadata from the GeoTIFFWritingUtilities image causing the error.
+	 * @param msg
+	 *            the detail message.
+	 */
+	public GeoTiffException(GeoTiffIIOMetadataDecoder metadata, String msg) {
+		super(msg);
+		this.metadata = metadata;
 
-    /**
-     * Getter for property modelPixelScales.
-     *
-     * @return Value of property modelPixelScales.
-     */
-    public double[] getModelPixelScales() {
-        return metadata.getModelPixelScales();
-    }
+		int numGeoKeys = metadata.getNumGeoKeys();
 
-    /**
-     * Getter for property modelTiePoints.
-     *
-     * @return Value of property modelTiePoints.
-     */
-    public double[] getModelTiePoints() {
-        return metadata.getModelTiePoints();
-    }
+		if (numGeoKeys > 0) {
+			geoKeys = new GeoTiffIIOMetadataDecoder.GeoKeyRecord[numGeoKeys];
 
-    /**
-     * Getter for property modelTransformation.
-     *
-     * @return Value of property modelTransformation.
-     */
-    public double[] getModelTransformation() {
-        return metadata.getModelTransformation();
-    }
+			for (int i = 0; i < numGeoKeys; i++) {
+				geoKeys[i] = metadata.getGeoKeyRecordByIndex(i);
+			}
+		}
+	}
 
-    /**
-     * Getter for property geoKeys.
-     *
-     * @return Value of property geoKeys.
-     */
-    public GeoTiffIIOMetadataAdapter.GeoKeyRecord[] getGeoKeys() {
-        return this.geoKeys;
-    }
+	/**
+	 * Getter for property modelPixelScales.
+	 * 
+	 * @return Value of property modelPixelScales.
+	 */
+	public double[] getModelPixelScales() {
+		return metadata.getModelPixelScales();
+	}
 
-    public String getMessage() {
-        StringWriter text = new StringWriter(1024);
-        PrintWriter message = new PrintWriter(text);
+	/**
+	 * Getter for property modelTiePoints.
+	 * 
+	 * @return Value of property modelTiePoints.
+	 */
+	public double[] getModelTiePoints() {
+		return metadata.getModelTiePoints();
+	}
 
-        //Header 
-        message.println("GEOTIFF Module Error Report");
+	/**
+	 * Getter for property modelTransformation.
+	 * 
+	 * @return Value of property modelTransformation.
+	 */
+	public double[] getModelTransformation() {
+		return metadata.getModelTransformation();
+	}
 
-        // start with the message the user specified
-        message.println(super.getMessage());
+	/**
+	 * Getter for property geoKeys.
+	 * 
+	 * @return Value of property geoKeys.
+	 */
+	public GeoTiffIIOMetadataDecoder.GeoKeyRecord[] getGeoKeys() {
+		return this.geoKeys;
+	}
 
-        // do the model pixel scale tags
-        message.print("ModelPixelScaleTag: ");
+	public String getMessage() {
+		StringWriter text = new StringWriter(1024);
+		PrintWriter message = new PrintWriter(text);
 
-        double[] modelPixelScales = getModelPixelScales();
+		// Header
+		message.println("GEOTIFF Module Error Report");
 
-        if (modelPixelScales != null) {
-            message.println("[" + modelPixelScales[0] + ","
-                + modelPixelScales[1] + "," + modelPixelScales[2] + "]");
-        } else {
-            message.println("NOT AVAILABLE");
-        }
+		// start with the message the user specified
+		message.println(super.getMessage());
 
-        // do the model tie point tags
-        message.print("ModelTiePointTag: ");
+		// do the model pixel scale tags
+		message.print("ModelPixelScaleTag: ");
 
-        double[] modelTiePoints = getModelTiePoints();
-        int numTiePoints = modelTiePoints.length;
-        message.println("(" + (numTiePoints / 6) + " tie points)");
+		double[] modelPixelScales = getModelPixelScales();
 
-        for (int i = 0; i < (numTiePoints / 6); i++) {
-            int j = i * 6;
-            message.print("TP #" + i + ": ");
-            message.print("[" + modelTiePoints[j]);
-            message.print("," + modelTiePoints[j + 1]);
-            message.print("," + modelTiePoints[j + 2]);
-            message.print("] -> [" + modelTiePoints[j + 3]);
-            message.print("," + modelTiePoints[j + 4]);
-            message.println("," + modelTiePoints[j + 5] + "]");
-        }
+		if (modelPixelScales != null) {
+			message.println("[" + modelPixelScales[0] + ","
+					+ modelPixelScales[1] + "," + modelPixelScales[2] + "]");
+		} else {
+			message.println("NOT AVAILABLE");
+		}
 
-        // do the transformation tag
-        message.print("ModelTransformationTag: ");
+		// do the model tie point tags
+		message.print("ModelTiePointTag: ");
 
-        double[] modelTransformation = getModelTransformation();
+		double[] modelTiePoints = getModelTiePoints();
+		int numTiePoints = modelTiePoints.length;
+		message.println("(" + (numTiePoints / 6) + " tie points)");
 
-        if (modelTransformation != null) {
-            message.println("[");
+		for (int i = 0; i < (numTiePoints / 6); i++) {
+			int j = i * 6;
+			message.print("TP #" + i + ": ");
+			message.print("[" + modelTiePoints[j]);
+			message.print("," + modelTiePoints[j + 1]);
+			message.print("," + modelTiePoints[j + 2]);
+			message.print("] -> [" + modelTiePoints[j + 3]);
+			message.print("," + modelTiePoints[j + 4]);
+			message.println("," + modelTiePoints[j + 5] + "]");
+		}
 
-            for (int i = 0; i < 4; i++) {
-                int j = i * 4;
-                message.print(" [" + modelTransformation[j]);
-                message.print("," + modelTransformation[j + 1]);
-                message.print("," + modelTransformation[j + 2]);
-                message.println("," + modelTransformation[j + 3] + "]");
-            }
+		// do the transformation tag
+		message.print("ModelTransformationTag: ");
 
-            message.println("]");
-        } else {
-            message.println("NOT AVAILABLE");
-        }
+		double[] modelTransformation = getModelTransformation();
 
-        //do all the GeoKeys
-        int numTags = geoKeys.length;
+		if (modelTransformation != null) {
+			message.println("[");
 
-        for (int i = 0; i < numTags; i++) {
-            message.print("GeoKey #" + (i + 1) + ": ");
-            message.println("Key = " + geoKeys[i].getKeyID() + ", Value = "
-                + metadata.getGeoKey(geoKeys[i].getKeyID()));
-        }
+			for (int i = 0; i < 4; i++) {
+				int j = i * 4;
+				message.print(" [" + modelTransformation[j]);
+				message.print("," + modelTransformation[j + 1]);
+				message.print("," + modelTransformation[j + 2]);
+				message.println("," + modelTransformation[j + 3] + "]");
+			}
 
-        String msg = text.toString();
+			message.println("]");
+		} else {
+			message.println("NOT AVAILABLE");
+		}
 
-        message.close();
+		// do all the GeoKeys
+		int numTags = geoKeys.length;
 
-        return msg;
-    }
+		for (int i = 0; i < numTags; i++) {
+			message.print("GeoKey #" + (i + 1) + ": ");
+			message.println("Key = " + geoKeys[i].getKeyID() + ", Value = "
+					+ metadata.getGeoKey(geoKeys[i].getKeyID()));
+		}
+
+		String msg = text.toString();
+
+		message.close();
+
+		return msg;
+	}
 }

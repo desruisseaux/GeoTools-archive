@@ -1,7 +1,7 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,282 +12,393 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- */ 
+ *
+ */
 package org.geotools.gce.geotiff;
 
-import org.esa.beam.util.geotiff.GeoTIFF;
-import org.esa.beam.util.geotiff.GeoTIFFMetadata;
+import java.awt.geom.AffineTransform;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLDecoder;
+
+import javax.imageio.IIOException;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOInvalidTreeException;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.FileCacheImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
+import javax.media.jai.JAI;
+import javax.media.jai.ParameterBlockJAI;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-
-import org.geotools.geometry.GeneralEnvelope;
-
-import org.geotools.referencing.wkt.ParseWKT2GeoTiffMetadata;
-
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataEncoder;
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
+import org.geotools.gce.geotiff.crs_adapters.CRS2GeoTiffMetadataAdapter;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Parent;
+import org.jdom.input.DOMBuilder;
+import org.jdom.output.DOMOutputter;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
-
-import org.opengis.metadata.Identifier;
-
 import org.opengis.parameter.GeneralParameterValue;
-
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.cs.AxisDirection;
 
-import java.awt.RenderingHints;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DirectColorModel;
-import java.awt.image.IndexColorModel;
-import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
+import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-
-import java.util.Collection;
-import java.util.TreeSet;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-
-
-/**
- * DOCUMENT ME!
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
  *
- * @author giannecchini TODO To change the template for this generated type
- *         comment go to Window - Preferences - Java - Code Style - Code
- *         Templates
- * @source $URL$
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+/**
+ * 
+ * 
+ * @author Simone Giannecchini
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffWriter.java $
  */
 public class GeoTiffWriter implements GridCoverageWriter {
-    private ImageOutputStream destination;
+	private ImageOutputStream destination;
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param destination
-     * @throws IOException
-     */
-    public GeoTiffWriter(Object destination) throws IOException {
-        super();
+	/**
+	 * DOCUMENT ME!
+	 * 
+	 * @param destination
+	 * @throws IOException
+	 */
+	public GeoTiffWriter(Object destination) throws IOException {
 
-        if (destination instanceof File || destination instanceof OutputStream) {
-            this.destination = ImageIO.createImageOutputStream(destination);
-        } else if (this.destination instanceof ImageOutputStream) {
-            this.destination = (ImageOutputStream) destination;
-        } else {
-            this.destination = null;
-        }
-    }
+		if (destination instanceof File)
+			this.destination = ImageIO.createImageOutputStream(destination);
+		else if (destination instanceof URL) {
+			final URL dest = (URL) destination;
+			if (dest.getProtocol().equalsIgnoreCase("file")) {
+				final File destFile = new File(URLDecoder.decode(
+						dest.getFile(), "UTF8"));
+				this.destination = ImageIO.createImageOutputStream(destFile);
+			}
 
-    /**
-     *
-     */
-    public GeoTiffWriter() {
-        super();
+		} else if (destination instanceof OutputStream) {
 
-        // TODO Auto-generated constructor stub
-    }
+			this.destination = new FileCacheImageOutputStream(
+					(OutputStream) destination, null);
 
-    /* (non-Javadoc)
-     * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
-     */
-    public Format getFormat() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+		} else if (destination instanceof ImageOutputStream)
+			this.destination = (ImageOutputStream) destination;
+		else
+			this.destination = null;
 
-    /* (non-Javadoc)
-     * @see org.opengis.coverage.grid.GridCoverageWriter#getDestination()
-     */
-    public Object getDestination() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	}
 
-    /* (non-Javadoc)
-     * @see org.opengis.coverage.grid.GridCoverageWriter#getMetadataNames()
-     */
-    public String[] getMetadataNames() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	/**
+	 * 
+	 */
+	public GeoTiffWriter() {
+	}
 
-    /* (non-Javadoc)
-     * @see org.opengis.coverage.grid.GridCoverageWriter#setMetadataValue(java.lang.String, java.lang.String)
-     */
-    public void setMetadataValue(String arg0, String arg1)
-        throws IOException, MetadataNameNotFoundException {
-        // TODO Auto-generated method stub
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
+	 */
+	public Format getFormat() {
+		return null;
+	}
 
-    /* (non-Javadoc)
-     * @see org.opengis.coverage.grid.GridCoverageWriter#setCurrentSubname(java.lang.String)
-     */
-    public void setCurrentSubname(String arg0) throws IOException {
-        // TODO Auto-generated method stub
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#getDestination()
+	 */
+	public Object getDestination() {
+		return destination;
+	}
 
-    /* (non-Javadoc)
-     * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage, org.opengis.parameter.GeneralParameterValue[])
-     */
-    public void write(GridCoverage gc, GeneralParameterValue[] arg1)
-        throws IllegalArgumentException, IOException {
-        //getting the coordinate reference system
-        CoordinateReferenceSystem crs = gc.getCoordinateReferenceSystem();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#getMetadataNames()
+	 */
+	public String[] getMetadataNames() {
+		return null;
+	}
 
-        //we handle just projected andgeographic crsd 
-        if (crs instanceof ProjectedCRS || crs instanceof GeographicCRS) {
-            /** CREATING METADATA AND SETTING BASE FIELDS FOR THEM */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#setMetadataValue(java.lang.String,
+	 *      java.lang.String)
+	 */
+	public void setMetadataValue(final String arg0, final String arg1)
+			throws IOException, MetadataNameNotFoundException {
 
-            //creating geotiff metadata
-            GeoTIFFMetadata metadata = new GeoTIFFMetadata();
+	}
 
-            //check if we have authority and code
-            TreeSet identifiers = new TreeSet(crs.getIdentifiers());
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#setCurrentSubname(java.lang.String)
+	 */
+	public void setCurrentSubname(final String arg0) throws IOException {
+	
+	}
 
-            //model type			
-            int modelType = (crs instanceof ProjectedCRS) ? 1 : 2;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage,
+	 *      org.opengis.parameter.GeneralParameterValue[])
+	 */
+	public void write(final GridCoverage gc, final GeneralParameterValue[] arg1)
+			throws IllegalArgumentException, IOException {
+		// getting the coordinate reference system
+		final CoordinateReferenceSystem crs = gc.getCoordinateReferenceSystem();
 
-            //GTModelTypeGeoKey
-            metadata.addGeoShortParam(GeoTiffIIOMetadataAdapter.GTModelTypeGeoKey,
-                modelType);
+		// we handle just projected andgeographic crsd
+		if (crs instanceof ProjectedCRS || crs instanceof GeographicCRS) {
 
-            //setting raster model
-            metadata.addGeoShortParam(GeoTiffIIOMetadataAdapter.GTRasterTypeGeoKey,
-                GeoTiffIIOMetadataAdapter.RasterPixelIsArea);
+			// creating geotiff metadata
+			final GeoTiffIIOMetadataEncoder metadata = new GeoTiffIIOMetadataEncoder();
+			final CRS2GeoTiffMetadataAdapter adapter = new CRS2GeoTiffMetadataAdapter(
+					crs, metadata);
+			adapter.parseCoordinateReferenceSystem();
 
-            switch (modelType) {
-            /**
-             * PROJECTED COORDINATE REFERENCE SYSTEM
-             */
-            case GeoTiffIIOMetadataAdapter.ModelTypeProjected:
+			/**
+			 * NOW WE NEED TO SET THE TIE POINTS AND THE SCALE FOR THIS IMAGE
+			 */
+			setTiePointAndScale(crs, metadata, (AffineTransform) gc
+					.getGridGeometry().getGridToCoordinateSystem());
 
-                if ((identifiers != null) && (identifiers.size() != 0)) {
-                    //ProjectedCSTypeGeoKey
-                    metadata.addGeoShortParam(GeoTiffIIOMetadataAdapter.ProjectedCSTypeGeoKey,
-                        Integer.parseInt(((Identifier) identifiers.first()).getCode()));
-                } else //USER DEFINED PCS
-                 {
-                    ParseWKT2GeoTiffMetadata parser = new ParseWKT2GeoTiffMetadata(crs.toWKT(),
-                            metadata);
+			// writing
+			writeImage(((GridCoverage2D) gc).geophysics(false)
+					.getRenderedImage(), this.destination, metadata);
 
-                    try {
-                        parser.parseCoordinateReferenceSystem();
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
+		} else
+			throw new GeoTiffException(
+					null,
+					"The supplied grid coverage uses an unsupported crs! You are allowed to use only projected and geographic coordinate reference systems");
+	}
 
-                break;
+	/**
+	 * This method is used to set the tie point and the scale parameters for the
+	 * GeoTiff file we are writing. It does this regardles of the nature fo the
+	 * crs without making any assumptions on the order or the direction of the
+	 * axes, but checking them from the supplied CRS.
+	 * 
+	 * @see http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html
+	 * @param crs
+	 * @param metadata
+	 * @param envelope
+	 * @param W
+	 * @param H
+	 * @throws IndexOutOfBoundsException
+	 */
+	private void setTiePointAndScale(final CoordinateReferenceSystem crs,
+			final GeoTiffIIOMetadataEncoder metadata,
+			final AffineTransform gridToCoord) throws IndexOutOfBoundsException {
 
-            /**
-             * GEOGRAPHIC COORDINATE REFERENCE SYSTEM
-             */
-            case GeoTiffIIOMetadataAdapter.ModelTypeGeographic:
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Setting raster type to pixel centre since the ogc specifications
+		// require so.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		metadata.addGeoShortParam(GeoTiffConstants.GTRasterTypeGeoKey,
+				GeoTiffConstants.RasterPixelIsPoint);
 
-                if ((identifiers != null) && (identifiers.size() != 0)) {
-                    //ProjectedCSTypeGeoKey
-                    metadata.addGeoShortParam(GeoTiffIIOMetadataAdapter.GeographicTypeGeoKey,
-                        Integer.parseInt(((Identifier) identifiers.first()).getCode()));
-                } else //USER DEFINED GCS
-                 {
-                    ParseWKT2GeoTiffMetadata parser = new ParseWKT2GeoTiffMetadata(crs.toWKT(),
-                            metadata);
+		// /////////////////////////////////////////////////////////////////////
+		//		
+		// checking the directions of the axes.
+		// we need to understand how the axes of this gridcoverage are
+		// specified.
+		// trying to understand the direction of the first axis in order to
+		//
+		// /////////////////////////////////////////////////////////////////////
+		boolean lonFirst = true;
+		if (crs.getCoordinateSystem().getAxis(0).getDirection().absolute()
+				.equals(AxisDirection.NORTH)) {
+			lonFirst = false;
+		}
 
-                    try {
-                        parser.parseCoordinateReferenceSystem();
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Deciding how to structure the tiep points with respect to the CRS.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		// tie points
+		final double tiePointLongitude = (lonFirst) ? gridToCoord
+				.getTranslateX() : gridToCoord.getTranslateY();
+		final double tiePointLatitude = (lonFirst) ? gridToCoord
+				.getTranslateY() : gridToCoord.getTranslateX();
+		metadata.setModelTiePoint(0, 0, 0, tiePointLongitude, tiePointLatitude,
+				0);
+		// scale
+		final double scaleModelToRasterLongitude = (lonFirst) ? Math
+				.abs(gridToCoord.getScaleX()) : Math.abs(gridToCoord
+				.getShearY());
+		final double scaleModelToRasterLatitude = (lonFirst) ? Math
+				.abs(gridToCoord.getScaleY()) : Math.abs(gridToCoord
+				.getShearX());
+		metadata.setModelPixelScale(scaleModelToRasterLongitude,
+				scaleModelToRasterLatitude, 0);
+	}
 
-                break;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.coverage.grid.GridCoverageWriter#dispose()
+	 */
+	public void dispose() throws IOException {
+	}
 
-            default:
-                throw new IllegalArgumentException("Unsuported model type");
-            }
+	/**
+	 * Writes the provided rendered image to the provided image output stream
+	 * using the supplied geotiff metadata.
+	 */
+	private boolean writeImage(final RenderedImage image,
+			final ImageOutputStream outputStream,
+			final GeoTiffIIOMetadataEncoder geoTIFFMetadata) throws IOException {
+		if (image == null || outputStream == null) {
+			throw new IllegalArgumentException("some parameters are null");
+		}
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// GETTING READER AND METADATA
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final ImageWriter writer = new TIFFImageWriterSpi()
+				.createWriterInstance();
+		final IIOMetadata metadata = createIIOMetadata(writer,
+				ImageTypeSpecifier.createFromRenderedImage(image),
+				geoTIFFMetadata);
 
-            /**
-             * NOW WE NEED TO SET THE TIUE POINTS AND THE SCALE FOR THIS IMAGE
-             */
-            GeneralEnvelope envelope = (GeneralEnvelope) gc.getEnvelope();
-            int W = gc.getGridGeometry().getGridRange().getLength(0);
-            int H = gc.getGridGeometry().getGridRange().getLength(1);
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// IMAGEWRITE
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final ParameterBlockJAI pbjWrite = new ParameterBlockJAI("ImageWrite");
+		pbjWrite.addSource(image);
+		pbjWrite.setParameter("Writer", writer);
+		pbjWrite.setParameter("Format", "tiff");
+		pbjWrite.setParameter("ImageMetadata", metadata);
+		pbjWrite.setParameter("Output", outputStream);
+		JAI.create("ImageWrite", pbjWrite);
 
-            //tie points
-            metadata.setModelTiePoint(0, 0, 0,
-                envelope.getLowerCorner().getOrdinate(0),
-                envelope.getUpperCorner().getOrdinate(1), 0);
+		// release resources
+		outputStream.flush();
+		if (!(destination instanceof ImageOutputStream))
+			outputStream.close();
+		writer.dispose();
+		return true;
+	}
 
-            //scale
-            metadata.setModelPixelScale(envelope.getLength(0) / W,
-                envelope.getLength(1) / H, 0);
+	/**
+	 * Creates image metadata which complies to the GeoTIFFWritingUtilities
+	 * specification for the given image writer, image type and
+	 * GeoTIFFWritingUtilities metadata.
+	 * 
+	 * @param writer
+	 *            the image writer, must not be null
+	 * @param type
+	 *            the image type, must not be null
+	 * @param geoTIFFMetadata
+	 *            the GeoTIFFWritingUtilities metadata, must not be null
+	 * 
+	 * @return the image metadata, never null
+	 * 
+	 * @throws IIOException
+	 *             if the metadata cannot be created
+	 */
+	private IIOMetadata createIIOMetadata(ImageWriter writer,
+			ImageTypeSpecifier type, GeoTiffIIOMetadataEncoder geoTIFFMetadata)
+			throws IIOException {
+		final IIOMetadata imageMetadata = writer.getDefaultImageMetadata(type,
+				null);
+		org.w3c.dom.Element w3cElement = (org.w3c.dom.Element) imageMetadata
+				.getAsTree(GeoTiffConstants.GEOTIFF_IIO_METADATA_FORMAT_NAME);
+		final Element element = new DOMBuilder().build(w3cElement);
 
-            //writing
-            GeoTIFF.writeImage(prepareImage4Writing(((GridCoverage2D) gc).geophysics(
-                        false).getRenderedImage()), this.destination, metadata);
+		geoTIFFMetadata.assignTo(element);
 
-            return;
-        }
+		final Parent parent = element.getParent();
+		parent.removeContent(element);
 
-        throw new IllegalArgumentException(
-            "The supplied grid coverage uses an unsupported crs! You are allowed to use " +
-            " only projected and geographic coordinate reference systems");
-    }
+		final Document document = new Document(element);
 
-    /* (non-Javadoc)
-    * @see org.opengis.coverage.grid.GridCoverageWriter#dispose()
-    */
-    public void dispose() throws IOException {
-        // TODO Auto-generated method stub
-    }
+		try {
+			final org.w3c.dom.Document w3cDoc = new DOMOutputter()
+					.output(document);
+			imageMetadata.setFromTree(
+					GeoTiffConstants.GEOTIFF_IIO_METADATA_FORMAT_NAME, w3cDoc
+							.getDocumentElement());
+		} catch (JDOMException e) {
+			throw new IIOException(
+					"Failed to set GeoTIFFWritingUtilities specific tags.", e);
+		} catch (IIOInvalidTreeException e) {
+			throw new IIOException(
+					"Failed to set GeoTIFFWritingUtilities specific tags.", e);
+		}
 
-    /**
-     * Prepare this image to be rendered correctly as a tiff. For the momet what we do is a simple check
-     * over the color model in order to convert it to ComponentColorModel which seems to be
-     * well acecepted from the TIFFEncoder in JAi. In the future we will really focus on doing
-     * some compression and on to move this code in an utility class inside main for GeoTools.
-     *
-     *
-     * @param renderedImage
-     * @return
-     */
-    private RenderedImage prepareImage4Writing(RenderedImage renderedImage) {
-        //we have nothing to do
-        if (renderedImage.getColorModel() instanceof ComponentColorModel) {
-            return renderedImage;
-        }
+		return imageMetadata;
+	}
 
-        PlanarImage image = PlanarImage.wrapRenderedImage(renderedImage);
-
-        //going from DirectColorModel to ComponentColorModel
-        if (image.getColorModel() instanceof DirectColorModel) {
-            renderedImage = GeoTiffUtils.direct2ComponentColorModel(image);
-        }
-
-        //going from IndexColorModel to ComponentColorModel
-        //Are we dealing with IndexColorModel? If so we need to go back to ComponentColorModel
-        if (image.getColorModel() instanceof IndexColorModel) {
-            image = GeoTiffUtils.reformatColorModel2ComponentColorModel(image);
-        }
-
-        return image;
-    }
+	// /**
+	// * Prepare this image to be rendered correctly as a tiff. For the momet
+	// what
+	// * we do is a simple check over the color model in order to convert it to
+	// * ComponentColorModel which seems to be well acecepted from the
+	// TIFFEncoder
+	// * in JAi. In the future we will really focus on doing some compression
+	// and
+	// * on to move this code in an utility class inside main for GeoTools.
+	// *
+	// *
+	// * @param renderedImage
+	// * @return
+	// */
+	// private RenderedImage prepareImage4Writing(RenderedImage renderedImage) {
+	// // we have nothing to do
+	// if (renderedImage.getColorModel() instanceof ComponentColorModel) {
+	// return renderedImage;
+	// }
+	//
+	// PlanarImage image = PlanarImage.wrapRenderedImage(renderedImage);
+	//
+	// // going from DirectColorModel to ComponentColorModel
+	// if (image.getColorModel() instanceof DirectColorModel) {
+	// renderedImage = GeoTiffUtils.direct2ComponentColorModel(image);
+	// }
+	//
+	// // going from IndexColorModel to ComponentColorModel
+	// // Are we dealing with IndexColorModel? If so we need to go back to
+	// // ComponentColorModel
+	// if (image.getColorModel() instanceof IndexColorModel) {
+	// image = GeoTiffUtils.reformatColorModel2ComponentColorModel(image);
+	// }
+	//
+	// return image;
+	// }
 }

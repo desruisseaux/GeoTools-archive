@@ -1,4 +1,19 @@
 /*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+/*
  * NOTICE OF RELEASE TO THE PUBLIC DOMAIN
  *
  * This work was created by employees of the USDA Forest Service's
@@ -18,24 +33,29 @@
  */
 package org.geotools.gce.geotiff;
 
-// Geotools dependencies
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.HashMap;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.ImageInputStream;
+
+import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
-
-// GeoAPI dependencies
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
-import java.io.File;
-import java.net.URL;
-import java.net.URLDecoder;
 
-// J2SE dependencies
-import java.util.HashMap;
-
+import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
 
 /**
  * Provides basic information about the GeoTIFF format IO.   This is currently
@@ -43,104 +63,149 @@ import java.util.HashMap;
  * GCEs will pick it up if it extends AbstractGridFormat.
  *
  * @author Bryce Nordgren, USDA Forest Service
+ * @author Simone Giannecchini
  * @source $URL$
  */
 public class GeoTiffFormat extends AbstractGridFormat implements Format {
-    /** Indicates whether we need to rescale the input */
-    public static final DefaultParameterDescriptor RESCALE = new DefaultParameterDescriptor("Rescale",
-            "Indicates whether we need to rescale the input", Boolean.TRUE, true);
+	/**
+	 * Creates a new instance of GeoTiffFormat
+	 */
+	public GeoTiffFormat() {
+		writeParameters = null;
+		mInfo = new HashMap();
+		mInfo.put("name", "GeoTIFF");
+		mInfo.put("description",
+				"Tagged Image File Format with Geographic information");
+		mInfo.put("vendor", "Geotools");
+		mInfo.put("version", "1.1");
+		mInfo
+				.put("docURL",
+						"http://www.remotesensing.org:16080/websites/geotiff/geotiff.html");
 
-    /**
-     * Creates a new instance of GeoTiffFormat
-     */
-    public GeoTiffFormat() {
-        writeParameters = null;
-        mInfo = new HashMap();
-        mInfo.put("name", "GeoTIFF");
-        mInfo.put("description",
-            "Tagged Image File Format with Geographic information");
-        mInfo.put("vendor", "Geotools");
-        mInfo.put("version", "1.1");
-        mInfo.put("docURL",
-            "http://www.remotesensing.org:16080/websites/geotiff/geotiff.html");
+		// reading parameters
+		readParameters = new ParameterGroup(
+				new DefaultParameterDescriptorGroup(mInfo,
+						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
 
-        //reading parameters
-        readParameters = new ParameterGroup(new DefaultParameterDescriptorGroup(
-                    mInfo, new GeneralParameterDescriptor[] { RESCALE }));
-    }
+	}
 
-    /**
-     * Currently, we only accept files, and we open the file to  verify that it
-     * has a GeoKeyDirectory tag.  If anything more subtle is  wrong with the
-     * file, we deal with that when we try and read it.
-     *
-     * @param o the source object to test for compatibility with this  format.
-     *        Must be a CatalogEntry.
-     *
-     * @return true if "o" is a CatalogEntry with a GeoTiff file as a
-     *         resource.
-     */
-    public boolean accepts(Object o) {
-        boolean goodfile = false;
+	/**
+	 * Currently, we only accept files, and we open the file to verify that it
+	 * has a GeoKeyDirectory tag. If anything more subtle is wrong with the
+	 * file, we deal with that when we try and read it.
+	 * 
+	 * @param o
+	 *            the source object to test for compatibility with this format.
+	 *            Must be a CatalogEntry.
+	 * 
+	 * @return true if "o" is a CatalogEntry with a GeoTiff file as a resource.
+	 */
+	public boolean accepts(Object o) {
 
-        goodfile = o instanceof File;
+		//
+		// if (o instanceof CatalogEntry) {
+		// o = ((CatalogEntry) o).resource();
+		// }
 
-        if (goodfile) {
-            goodfile = GeoTiffReader.isGeoTiffFile((File) o);
-        } else if (o instanceof URL) {
-            URL url = (URL) o;
+		try {
+			if (o instanceof URL) {
+				// /////////////////////////////////////////////////////////////
+				//
+				// URL management
+				// In case the URL points to a file we need to get to the fie
+				// directly and avoid caching. In case it points to http or ftp
+				// or it is an opnen stream we have very small to do and we need
+				// to enable caching.
+				//
+				// /////////////////////////////////////////////////////////////
+				final URL url = (URL) o;
+				if (url.getProtocol().equalsIgnoreCase("file"))
+					o = new File(URLDecoder.decode(url.getFile(), "UTF-8"));
+				else {
+					if (url.getProtocol().equalsIgnoreCase("http")
+							|| url.getProtocol().equalsIgnoreCase("ftp")) {
+						o = ((URL) o).openStream();
 
-						try {
-            	final String pathname = URLDecoder.decode(url.getFile(),"UTF-8");
-            
-            	goodfile = GeoTiffReader.isGeoTiffFile(new File(pathname));
-            } catch (Exception e) {
-            	goodfile = false;
-            }
-        }
+					} else
+						return false;
+				}
 
-        return goodfile;
-    }
+			}
+			// get a stream
+			final ImageInputStream inputStream = ImageIO
+					.createImageInputStream(o);
+			if (inputStream == null)
+				return false;
 
-    /**
-     * If <CODE>source</CODE> is a file, this will return a reader object. This
-     * file does not use hints in the construction of the geotiff reader.
-     *
-     * @param source must be a GeoTiff File
-     *
-     * @return a GeoTiffReader object initialized to the specified File.
-     */
-    public GridCoverageReader getReader(Object source) {
+			// get a reader
+			final ImageReader reader = new TIFFImageReaderSpi()
+					.createReaderInstance();
+			reader.setInput(inputStream);
+			final IIOMetadata metadata = reader.getImageMetadata(0);
+			try {
+				final GeoTiffIIOMetadataDecoder metadataAdapter = new GeoTiffIIOMetadataDecoder(
+						metadata);
 
-        GridCoverageReader reader = null;
+				if (metadataAdapter.getGeoKeyRevision() != 1) {
+					return false;
+				}
+			} catch (UnsupportedOperationException e) {
+				return false;
+			}
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
 
-        if (accepts(source)) {
-        		if (source instanceof URL) {
-            	URL url = (URL) source;
+	}
 
-							try {
-            		final String pathname = URLDecoder.decode(url.getFile(),"UTF-8");
-            
-            		reader = new GeoTiffReader(this, new File(pathname), null);
-            	} catch (Exception e) {
-            		reader = null;
-            	}
-            } else {
-            	reader = new GeoTiffReader(this, source, null);
-            }
-        }
+	/**
+	 * If <CODE>source</CODE> is a file, this will return a reader object.
+	 * This file does not use hints in the construction of the geotiff reader.
+	 * 
+	 * @param source
+	 *            must be a GeoTiff File
+	 * 
+	 * @return a GeoTiffReader object initialized to the specified File.
+	 */
+	public GridCoverageReader getReader(Object source) {
+		// if (source instanceof CatalogEntry) {
+		// source = ((CatalogEntry) source).resource();
+		// }
 
-        return reader;
-    }
+		if (source instanceof URL) {
+			URL url = (URL) source;
 
-    /**
-     * Always returns null.
-     *
-     * @param source ignored
-     *
-     * @return null, always.
-     */
-    public GridCoverageWriter getWriter(Object source) {
-        return null;
-    }
+			try {
+				final String pathname = URLDecoder.decode(url.getFile(),
+						"UTF-8");
+
+				return new GeoTiffReader(new File(pathname), null);
+			} catch (UnsupportedEncodingException e) {
+				return null;
+			} catch (DataSourceException e) {
+				return null;
+			}
+		}
+		try {
+			return new GeoTiffReader(source, null);
+		} catch (DataSourceException e) {
+			return null;
+		}
+
+	}
+
+	/**
+	 * 
+	 * 
+	 * @return null, always.
+	 */
+	public GridCoverageWriter getWriter(Object source) {
+		try {
+			return new GeoTiffWriter(source);
+		} catch (IOException e) {
+
+			return null;
+		}
+	}
 }
