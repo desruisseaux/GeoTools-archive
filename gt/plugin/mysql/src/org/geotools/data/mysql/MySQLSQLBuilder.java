@@ -3,6 +3,7 @@ package org.geotools.data.mysql;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.SQLEncoder;
 
@@ -15,10 +16,17 @@ import org.geotools.filter.SQLEncoder;
  */
 public class MySQLSQLBuilder extends DefaultSQLBuilder {
     
-    public MySQLSQLBuilder(SQLEncoder encoder) {
+    /**
+     * @deprecated please use MySQLSQLBuilder(encoder, ft)
+     * @param encoder
+     */
+	public MySQLSQLBuilder(SQLEncoder encoder) {
         super(encoder);
     }
-    
+
+    public MySQLSQLBuilder(SQLEncoder encoder, FeatureType ft) {
+        super(encoder, ft, null);
+    }
 
     /**
      * Produces the select information required.

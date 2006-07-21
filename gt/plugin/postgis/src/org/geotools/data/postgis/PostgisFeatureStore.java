@@ -17,9 +17,7 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,7 +29,6 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.Query;
@@ -357,7 +354,6 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      */
     public void removeFeatures(Filter filter) throws IOException {
         String sql = "";
-        String fid = null;
         String whereStmt = null;
 
         // check locks!
@@ -367,12 +363,12 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
         //boolean previousAutoCommit = getAutoCommit();
         //setAutoCommit(false);
-        boolean fail = false;
-        SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
-        unpacker.unPackOR(filter);
+        Filter encodableFilter = sqlBuilder.getPreQueryFilter(filter);
+        Filter unEncodableFilter = sqlBuilder.getPostQueryFilter(filter);
 
-        Filter encodableFilter = unpacker.getSupported();
-        Filter unEncodableFilter = unpacker.getUnSupported();
+//        SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
+//        unpacker.unPackOR(filter);
+
         Statement statement = null;
         Connection conn = null;
 
@@ -402,15 +398,12 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
             close(statement);
         } catch (SQLException sqle) {
-            fail = true;
             close(conn, getTransaction(), sqle);
 
             String message = CONN_ERROR + sqle.getMessage();
             LOGGER.warning(message);
             throw new DataSourceException(message, sqle);
         } catch (SQLEncoderException ence) {
-            fail = true;
-
             String message = "error encoding sql from filter " + ence.getMessage();
             LOGGER.warning(message);
 
@@ -457,16 +450,17 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         String fid = null;
 
         //check schema with filter???
-        SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
-        unpacker.unPackOR(filter);
+//        SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
+//        unpacker.unPackOR(filter);
 
         String whereStmt = null;
-        Filter encodableFilter = unpacker.getSupported();
-        Filter unEncodableFilter = unpacker.getUnSupported();
+        Filter encodableFilter = sqlBuilder.getPreQueryFilter(filter);
+        Filter unEncodableFilter = sqlBuilder.getPostQueryFilter(filter);
 
         try {
             conn = getConnection();
             statement = conn.createStatement();
+//            statement = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
             if (encodableFilter == null && unEncodableFilter != null) {
                 FidFilter fidFilter = getEncodableFilter(unEncodableFilter);
@@ -480,8 +474,11 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 DefaultQuery query=new DefaultQuery(getSchema().getTypeName(), filter);
                 Envelope bounds=bounds(query);
                 statement.executeUpdate(sql);
-                bounds.expandToInclude(bounds(query));
-                if( bounds!=null && !bounds.isNull())
+                if (bounds!=null && !bounds.isNull())
+                    bounds.expandToInclude(bounds(query));
+                else
+                    bounds=bounds(query);
+                if (bounds!=null && !bounds.isNull())
 	    			getJDBCDataStore().listenerManager.fireFeaturesChanged(getSchema().getTypeName(),
 	    					getTransaction(), bounds, false);
             }
@@ -641,18 +638,13 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
     /**
      * Creates a SQL statement for the PostGIS database.
-     *
+     * 
+     * @deprecated please use makeSql(query) 
      * @param unpacker the object to get the encodable filter.
      * @param query the getFeature query - for the tableName, properties and
      *        maxFeatures.
-     *
-     * @return Full SQL statement.
-     *
+     * @return
      * @throws IOException if there are problems encoding the sql.
-     * @throws DataSourceException DOCUMENT ME!
-     *
-     * @task HACK: Use the postgis SQLBuilder
-     * @task REVISIT: rewrite the unpacker.
      */
     public String makeSql(SQLUnpacker unpacker, Query query) throws IOException {
         //one to one relationship for now, so typeName is not used.
@@ -706,6 +698,74 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         }
 
         sqlStatement.append(" FROM \"" + tableName + "\" " + where + limit + ";").toString();
+        LOGGER.fine("sql statement is " + sqlStatement);
+
+        return sqlStatement.toString();
+    }
+    
+    /**
+     * Creates a SQL statement for the PostGIS database.
+     *
+     * @return Full SQL statement.
+     * @throws IOException if there are problems encoding the sql.
+     * 
+     * @task REVISIT: faithfully use sqlBuilder
+     */
+    public String makeSql(Query query) throws IOException {
+        //one to one relationship for now, so typeName is not used.
+        //String tableName = query.getTypeName();
+
+        Filter encodableFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
+        Filter unEncodableFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
+        boolean useLimit = (unEncodableFilter == null || unEncodableFilter.equals(Filter.NONE));
+
+        LOGGER.fine("Filter in making sql is " + encodableFilter);
+
+        AttributeType[] attributeTypes = getAttTypes(query);
+        int numAttributes = attributeTypes.length;
+
+        StringBuffer sqlStatement = new StringBuffer("SELECT ");
+        if (!fidMapper.returnFIDColumnsAsAttributes()) {
+            for (int i = 0; i < fidMapper.getColumnCount(); i++) {
+                sqlStatement.append(fidMapper.getColumnName(i));
+                if (numAttributes > 0 || i < (fidMapper.getColumnCount() - 1))
+                    sqlStatement.append(", ");
+            }
+        }
+
+        LOGGER.finer("making sql for " + numAttributes + " attributes");
+
+        for (int i = 0; i < numAttributes; i++) {
+            String curAttName = attributeTypes[i].getName();
+
+            if (Geometry.class.isAssignableFrom(attributeTypes[i].getType())) {
+                sqlStatement.append(", AsText(force_2d(\"" + curAttName + "\"))");
+            } else {
+                sqlStatement.append(", \"" + curAttName + "\"");
+            }
+        }
+
+        String where = "";
+
+        if (encodableFilter != null) {
+            try {
+                where = encoder.encode(encodableFilter);
+            } catch (SQLEncoderException sqle) {
+                String message = "Encoder error" + sqle.getMessage();
+                LOGGER.warning(message);
+                throw new DataSourceException(message, sqle);
+            }
+        }
+
+        //int limit = HARD_MAX_FEATURES;
+        String limit = "";
+
+        if (useLimit) {
+            limit = " LIMIT " + query.getMaxFeatures();
+        }
+
+        sqlBuilder.sqlFrom(sqlStatement, tableName);
+        sqlStatement.append(where + limit + ";");
         LOGGER.fine("sql statement is " + sqlStatement);
 
         return sqlStatement.toString();

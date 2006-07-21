@@ -62,7 +62,7 @@ public interface SQLBuilder {
      * the a Query can be optimized
      * </p>
      * @param filter
-     * @return Filter requried for post processing, or <code>null</code>
+     * @return Filter required for post processing, or <code>null</code>
      */
     public Filter getPostQueryFilter(Filter filter);
     

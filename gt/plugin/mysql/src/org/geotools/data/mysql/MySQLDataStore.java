@@ -256,7 +256,7 @@ public class MySQLDataStore extends JDBCDataStore {
         //SQLEncoder encoder = new SQLEncoder();
 		SQLEncoderMySQL encoder = new SQLEncoderMySQL(); 
         encoder.setFIDMapper(getFIDMapper(typeName));
-        return new MySQLSQLBuilder(encoder);
+        return new MySQLSQLBuilder(encoder, getSchema(typeName));
     }
 
     /**

@@ -15,6 +15,11 @@
  *
  * TODO: 26-may-2005 D. Adler Added constructor with returnFIDColumnsAsAttributes. Added accessors for ColumnInfo
  */
+/*
+ * 26-may-2005 D. Adler Added constructor with returnFIDColumnsAsAttributes.
+ *                      Added accessors for ColumnInfo
+ * 12-jul-2006 D. Adler GEOT-728 Refactor FIDMapper classes
+ */
 package org.geotools.data.jdbc.fidmapper;
 
 import org.geotools.data.DataSourceException;
@@ -175,9 +180,9 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     protected FIDMapper buildSingleColumnFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo ci) {
         if (ci.autoIncrement) {
-            return new AutoIncrementFIDMapper(tableName, ci.colName, ci.dataType);
+            return new AutoIncrementFIDMapper(schema, tableName, ci.colName, ci.dataType);
         } else if (isIntegralType(ci.dataType)) {
-            return new MaxIncFIDMapper(tableName, ci.colName, ci.dataType,
+            return new MaxIncFIDMapper(schema, tableName, ci.colName, ci.dataType,
                 this.returnFIDColumnsAsAttributes);
         } else {
             return new BasicFIDMapper(ci.colName, ci.size,
@@ -229,7 +234,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
             autoIncrement[i] = ci.autoIncrement;
         }
 
-        return new MultiColumnFIDMapper(colNames, colTypes, colSizes,
+        return new MultiColumnFIDMapper(schema, tableName, colNames, colTypes, colSizes,
             colDecimalDigits, autoIncrement);
     }
 

@@ -759,8 +759,8 @@ public class WFSDataStore extends AbstractDataStore {
         }
         // Rewrite request if we have a mxxbox
         if(maxbbox!=null){
-            WFSBBoxFilterVisitor clipVistor = new WFSBBoxFilterVisitor(maxbbox);
-            filters[0].accept(clipVistor);
+            WFSBBoxFilterVisitor clipVisitor = new WFSBBoxFilterVisitor(maxbbox);
+            filters[0].accept(clipVisitor);
         } else { // give up an request everything
             LOGGER.log( Level.FINE, "Unable to clip your query against the latlongboundingbox element" );
             // filters[0] = Filter.ALL; // uncoment this line to just give up

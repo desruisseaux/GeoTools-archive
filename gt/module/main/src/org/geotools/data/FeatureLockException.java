@@ -59,7 +59,7 @@ public class FeatureLockException extends IOException {
      *
      * @return FeatureID or <code>null</code> if unknown.
      */
-    String getFeatureID() {
+    public String getFeatureID() {
         return featureID;
     }
 }

@@ -20,12 +20,12 @@ import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderPostgis;
-
 
 /**
  * Builds sql for postgis.
@@ -55,11 +55,17 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
 
     /**
      * Constructor with encoder.
-     *
+     * 
      * @param encoder
+     * @deprecated use PostgisSQLBuilder(encoder, config, ft) instead
      */
     public PostgisSQLBuilder(SQLEncoder encoder, JDBCDataStoreConfig config) {
         super(encoder);
+        this.config = config;
+    }
+    
+    public PostgisSQLBuilder(SQLEncoder encoder, JDBCDataStoreConfig config, FeatureType ft) {
+    	super(encoder, ft, null);
         this.config = config;
     }
 

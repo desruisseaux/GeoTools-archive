@@ -64,32 +64,35 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
      * called?
      */
     public SQLEncoderPostgisGeos() {
-        capabils.addType(AbstractFilter.LOGIC_OR);
-        capabils.addType(AbstractFilter.LOGIC_AND);
-        capabils.addType(AbstractFilter.LOGIC_NOT);
-        capabils.addType(AbstractFilter.COMPARE_EQUALS);
-        capabils.addType(AbstractFilter.COMPARE_NOT_EQUALS);
-        capabils.addType(AbstractFilter.COMPARE_LESS_THAN);
-        capabils.addType(AbstractFilter.COMPARE_GREATER_THAN);
-        capabils.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
-        capabils.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
-        capabils.addType(AbstractFilter.NULL);
-        capabils.addType(AbstractFilter.BETWEEN);
-        capabils.addType((short) 12345);
-        capabils.addType((short) -12345);
-        capabils.addType(AbstractFilter.FID);
-        capabils.addType(AbstractFilter.GEOMETRY_BBOX);
-        capabils.addType(AbstractFilter.GEOMETRY_EQUALS);
-        capabils.addType(AbstractFilter.GEOMETRY_DISJOINT);
-        capabils.addType(AbstractFilter.GEOMETRY_INTERSECTS);
-        capabils.addType(AbstractFilter.GEOMETRY_CROSSES);
-        capabils.addType(AbstractFilter.GEOMETRY_WITHIN);
-        capabils.addType(AbstractFilter.GEOMETRY_CONTAINS);
-        capabils.addType(AbstractFilter.GEOMETRY_OVERLAPS);
-        capabils.addType(AbstractFilter.GEOMETRY_TOUCHES);
-        
-        capabils.addType(AbstractFilter.LIKE);
-        
+        capabils.addType((long) 12345); //Filter.ALL?
+        capabils.addType((long) -12345); //Filter.NONE?
+        capabils.addType(FilterCapabilities.BETWEEN);
+        capabils.addType(FilterCapabilities.COMPARE_EQUALS);
+        capabils.addType(FilterCapabilities.COMPARE_GREATER_THAN);
+        capabils.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
+        capabils.addType(FilterCapabilities.COMPARE_LESS_THAN);
+        capabils.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
+        capabils.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
+        capabils.addType(FilterCapabilities.FID);
+        capabils.addType(FilterCapabilities.LIKE);
+        capabils.addType(FilterCapabilities.LOGIC_AND);
+        capabils.addType(FilterCapabilities.LOGIC_NOT);
+        capabils.addType(FilterCapabilities.LOGIC_OR);
+        capabils.addType(FilterCapabilities.NO_OP);
+        capabils.addType(FilterCapabilities.NULL_CHECK);
+        capabils.addType(FilterCapabilities.SIMPLE_ARITHMETIC);
+        capabils.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+        capabils.addType(FilterCapabilities.SPATIAL_BBOX);
+        capabils.addType(FilterCapabilities.SPATIAL_BEYOND);
+        capabils.addType(FilterCapabilities.SPATIAL_CONTAINS);
+        capabils.addType(FilterCapabilities.SPATIAL_CROSSES);
+        capabils.addType(FilterCapabilities.SPATIAL_DISJOINT);
+        capabils.addType(FilterCapabilities.SPATIAL_DWITHIN);
+        capabils.addType(FilterCapabilities.SPATIAL_EQUALS);
+        capabils.addType(FilterCapabilities.SPATIAL_INTERSECT);
+        capabils.addType(FilterCapabilities.SPATIAL_OVERLAPS);
+        capabils.addType(FilterCapabilities.SPATIAL_TOUCHES);
+        capabils.addType(FilterCapabilities.SPATIAL_WITHIN);
     }
 
     /**
@@ -103,11 +106,11 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
     }
 
     /**
-     * Capabils of this encoder.
+     * Capabililities of this encoder.
      *
      * @return
      *
-     * @see org.geotools.filter.SQLEncoder#getCapabils()
+     * @see org.geotools.filter.SQLEncoder#getCapabililties()
      */
     public FilterCapabilities getCapabilities() {
         return capabils;

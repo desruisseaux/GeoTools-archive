@@ -92,21 +92,21 @@ public class SQLEncoderPostgis extends SQLEncoder
     protected FilterCapabilities createFilterCapabilities() {
         FilterCapabilities capabilities = new FilterCapabilities();
 
-        capabilities.addType(AbstractFilter.LOGIC_OR);
-        capabilities.addType(AbstractFilter.LOGIC_AND);
-        capabilities.addType(AbstractFilter.LOGIC_NOT);
-        capabilities.addType(AbstractFilter.COMPARE_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_NOT_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.NULL);
-        capabilities.addType(AbstractFilter.BETWEEN);
-        capabilities.addType((short) 12345);
-        capabilities.addType((short) -12345);
-        capabilities.addType(AbstractFilter.GEOMETRY_BBOX);
-        capabilities.addType(AbstractFilter.FID);
+        capabilities.addType((long) 12345); //Filter.ALL?
+        capabilities.addType((long) -12345); //Filter.NONE?
+        capabilities.addType(FilterCapabilities.LOGIC_OR);
+        capabilities.addType(FilterCapabilities.LOGIC_AND);
+        capabilities.addType(FilterCapabilities.LOGIC_NOT);
+        capabilities.addType(FilterCapabilities.COMPARE_EQUALS);
+        capabilities.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
+        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN);
+        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN);
+        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
+        capabilities.addType(FilterCapabilities.FID);
 
         return capabilities;
     }

@@ -254,7 +254,7 @@ public class OracleDataStore extends JDBCDataStore {
     	FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
         SQLEncoder encoder = new SQLEncoderOracle(info.getSRIDs());
         encoder.setFIDMapper(getFIDMapper(typeName));
-        return new DefaultSQLBuilder(encoder);
+        return new DefaultSQLBuilder(encoder, info.getSchema(), null);
     }
     
     /**

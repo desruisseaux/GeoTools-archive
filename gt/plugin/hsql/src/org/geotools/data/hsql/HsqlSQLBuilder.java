@@ -19,6 +19,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoder;
 
 
@@ -32,10 +33,19 @@ import org.geotools.filter.SQLEncoder;
  * @source $URL$
  */
 public class HsqlSQLBuilder extends DefaultSQLBuilder {
-    public HsqlSQLBuilder(SQLEncoder encoder) {
+
+	/**
+	 * @deprecated use HsqlSQLBuilder(encoder, ft)
+	 * @param encoder
+	 */
+	public HsqlSQLBuilder(SQLEncoder encoder) {
         super(encoder);
     }
 
+	public HsqlSQLBuilder(SQLEncoder encoder, FeatureType ft) {
+        super(encoder, ft, null);
+    }
+	
     /**
      * Produces the select information required.
      * 

@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Determines what queries can be processed server side and which can be processed client side.
  * 
  * @author dzwiers
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/wfs/src/org/geotools/data/wfs/WFSFilterVisitor.java $
+ * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/src/org/geotools/data/wfs/WFSFilterVisitor.java $
  */
 public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 		private static final Logger logger=Logger.getLogger("org.geotools.filter");
@@ -135,12 +135,22 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        if (Filter.NONE == filter) {
 	            return;
 	        }
+            if (filter == Filter.ALL) {
+                if (fcs.supports((long) 12345)) {
+                    preStack.push(filter);
+                } else {
+                    postStack.push(filter);
+                }
+                return;
+            }
 	        if( original==null )
 	        	original=filter;
 	        if (!postStack.isEmpty()) {
 	        	postStack.push(filter);
-                logger.warning(
-	                "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
+                logger.fine(
+                    		
+                		
+	                "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)"+filter.toString());
 	        } else {
 	            switch (filter.getFilterType()) {
 	            case FilterType.BETWEEN:
@@ -197,9 +207,9 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	            default:
 	                postStack.push(filter);
-	            logger.warning(
-	                    "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)");
-	
+	                logger.warning(filter.toString()
+                        + " marked for post-processing in PostPreProcessFilterSplittingVisitor");
+                    
 	                break;
 	            }
 	            
@@ -666,7 +676,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	     */
 	    public void visit(AttributeExpression expression) {
 	    	// JE: removed deprecated code
-	        if ( parent.getAttributeType(expression.getAttributePath())==null ) {
+	        if (parent == null  || parent.getAttributeType(expression.getAttributePath()) == null) {
 	        	postStack.push(expression);
 	        }
 	        if(transactionAccessor!=null){

@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
@@ -41,9 +40,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * This is a starting point for providing your own FeatureStore implementation.

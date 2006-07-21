@@ -32,7 +32,6 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.FilteringFeatureReader;
-import org.geotools.data.FilteringFeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.hsql.fidmapper.HsqlFIDMapperFactory;
@@ -84,6 +83,11 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      */
     public HsqlDataStore(HsqlConnectionFactory connectionFactory) throws IOException {
         this(connectionFactory, null);
+    }
+
+    protected boolean requireAutoCommit() {
+        //hsql is wacky in that it wants to autocommit, but also have a state object?
+        return true;
     }
 
     /**
@@ -238,18 +242,8 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
     }
     
     /**
-     * Aquire FetureWriter for modification of contents specifed by filter.
+     * Acquire FeatureWriter for modification of contents specifed by filter.
      * 
-     * <p>
-     * Quick notes: This FeatureWriter is often used to remove contents
-     * specified by the provided filter, or perform summary calculations.
-     * </p>
-     * 
-     * <p>
-     * It is not used to provide new content and should return
-     * <code>null</code> for next() when hasNext() returns <code>false</code>.
-     * </p>
-     *
      * @param typeName
      * @param filter
      * @param transaction
@@ -260,7 +254,8 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      * @throws NullPointerException If the provided filter is null
      *
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
-     *      org.geotools.filter.Filter, org.geotools.data.Transaction)
+     *      org.geotools.filter.Filter, org.geotools.data.Transaction,
+     *      org.geotools.data.jdbc.JDBC1DataStore#getFeatureWriter)
      */
     public FeatureWriter getFeatureWriter(String typeName, Filter filter,
         Transaction transaction) throws IOException {
@@ -278,26 +273,6 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
             writer = state(transaction).writer(typeName, filter);
         }
         
-        if ((filter != null) && (filter != Filter.NONE)) {
-        	final FeatureWriter writer2 = writer;
-            writer = new FilteringFeatureWriter(writer2, filter){
-            	public Feature next() throws IOException {
-            		
-                    if (hasNext()) {
-                        return super.next();
-                    }
-                    return writer2.next();
-                }
-            	
-            	public void write() throws IOException {
-                    if (writer2 == null) {
-                        throw new IOException("FeatureWriter has been closed");
-                    }
-                    writer2.write();
-                }
-            };
-        }
-
         return writer;
     }
 
@@ -369,7 +344,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
     public SQLBuilder getSqlBuilder(String typeName) throws IOException {
 		SQLEncoderHsql encoder = new SQLEncoderHsql(); 
         encoder.setFIDMapper(getFIDMapper(typeName));
-        return new HsqlSQLBuilder(encoder);
+        return new HsqlSQLBuilder(encoder, getSchema(typeName));
     }
 
     /**

@@ -16,12 +16,21 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.data.jdbc.JDBCDataStoreConfig;
+import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.postgis.attributeio.WKBEncoder;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.SQLEncoderException;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
@@ -32,6 +41,9 @@ import com.vividsolutions.jts.io.WKTWriter;
  * @source $URL$
  */
 public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
+
+    private static final Logger LOGGER = Logger.getLogger(
+    "org.geotools.data.jdbc");
 
     /** Well Known Text writer (from JTS). */
     protected static WKTWriter geometryWriter = new WKTWriter();
@@ -103,5 +115,44 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
     
     protected String encodeColumnName(String colName) {
     	return sqlBuilder.encodeColumnName(colName);
+    }
+    
+    /**
+     * For postgres >= 8.1 NOWAIT is used (meaning you get a response).
+     * Prior versions will block during concurrent editing.
+     */
+    protected String makeSelectForUpdateSql(Feature current) {
+        FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
+        FeatureType featureType = ftInfo.getSchema();
+        String tableName = featureType.getTypeName();
+
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+        Filter fid = ff.createFidFilter(current.getID());
+        
+        StringBuffer sql = new StringBuffer("SELECT ");
+        //fid will be picked up automatically
+        sqlBuilder.sqlColumns(sql, mapper, new AttributeType[] {});  
+        sqlBuilder.sqlFrom(sql, tableName);
+        try {
+            sqlBuilder.sqlWhere(sql, fid);
+        } catch (SQLEncoderException e) {
+            e.printStackTrace();
+        }
+        sql.append(" FOR UPDATE");
+        
+        //determine if "NOWAIT" is supported (postgres >= 8.1)
+        try {
+            int major = queryData.getConnection().getMetaData().getDatabaseMajorVersion();
+            int minor = queryData.getConnection().getMetaData().getDatabaseMinorVersion();
+            if ((major > 8) || ((major == 8) && minor >= 1)) {
+                sql.append(" NOWAIT"); //horray, no blocking!
+            } else {
+                LOGGER.warning("To fully support concurrent edits, please upgrade to postgres >= 8.1; the version currently in use will block");
+            }
+        } catch (SQLException e) { //we couldn't get the version :(
+            LOGGER.warning("Failed to determine postgres version; assuming < 8.1");
+        }
+
+        return (sql.toString());
     }
 }

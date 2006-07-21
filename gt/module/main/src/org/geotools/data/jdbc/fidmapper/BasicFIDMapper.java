@@ -15,6 +15,7 @@
  *
  * TODO: 26-may-2005 D. Adler Removed returnFIDColumnsAsAttributes
  *                      variable and related accessor method.
+ * 12-jul-2006 D. Adler GEOT-728 Refactor FIDMapper classes
  */
 package org.geotools.data.jdbc.fidmapper;
 
@@ -37,17 +38,12 @@ import java.sql.Types;
 public class BasicFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
 
-    /** The name of the field of the primary key */
-    private final String fieldName;
-
-    /** The size of the field of the primary key */
-    private final int fieldSize;
 
     /**
      * Create a new BasicFIDMapper
      *
-     * @param fieldName DOCUMENT ME!
-     * @param fieldSize DOCUMENT ME!
+     * @param fieldName 
+     * @param fieldSize 
      */
     public BasicFIDMapper(String fieldName, int fieldSize) {
         this(fieldName, fieldSize, false);
@@ -56,17 +52,31 @@ public class BasicFIDMapper extends AbstractFIDMapper {
     /**
      * Create a new BasicFIDMapper
      *
-     * @param fieldName DOCUMENT ME!
-     * @param fieldSize DOCUMENT ME!
-     * @param returnFIDColumnsAsAttributes DOCUMENT ME!
+     * @param tableSchemaName
+     * @param tableName
+     * @param fieldName 
+     * @param fieldSize 
+     * @param returnFIDColumnsAsAttributes 
+     */
+    public BasicFIDMapper(String tableSchemaName, String tableName, String fieldName, int fieldSize,
+        boolean returnFIDColumnsAsAttributes) {
+    	super(tableSchemaName, tableName);
+        this.returnFIDColumnsAsAttributes = returnFIDColumnsAsAttributes;
+        setInfo(fieldName, Types.VARCHAR, fieldSize, 0, false);
+    }
+    
+    /**
+     * Create a new BasicFIDMapper
+     *
+
+     * @param fieldName 
+     * @param fieldSize 
+     * @param returnFIDColumnsAsAttributes 
      */
     public BasicFIDMapper(String fieldName, int fieldSize,
         boolean returnFIDColumnsAsAttributes) {
-        this.fieldName = fieldName;
-        this.fieldSize = fieldSize;
-        this.returnFIDColumnsAsAttributes = returnFIDColumnsAsAttributes;
+    	this(null, null, fieldName, fieldSize, returnFIDColumnsAsAttributes);
     }
-
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getID(java.lang.Object[])
      */
@@ -86,59 +96,6 @@ public class BasicFIDMapper extends AbstractFIDMapper {
         return new Object[] { FID };
     }
 
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnCount()
-     */
-    public int getColumnCount() {
-        return 1;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnName(int)
-     */
-    public String getColumnName(int colIndex) {
-        if (colIndex == 0) {
-            return (fieldName);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnType(int)
-     */
-    public int getColumnType(int colIndex) {
-        if (colIndex == 0) {
-            return (Types.VARCHAR);
-        } else {
-            throw new ArrayIndexOutOfBoundsException(colIndex);
-        }
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnSize(int)
-     */
-    public int getColumnSize(int colIndex) {
-        if (colIndex == 0) {
-            return (fieldSize);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnDecimalDigits(int)
-     */
-    public int getColumnDecimalDigits(int colIndex) {
-        return (0);
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isAutoIncrement(int)
-     */
-    public boolean isAutoIncrement(int colIndex) {
-        return false;
-    }
 
     /**
      * @see java.lang.Object#equals(java.lang.Object)
@@ -150,8 +107,8 @@ public class BasicFIDMapper extends AbstractFIDMapper {
 
         BasicFIDMapper other = (BasicFIDMapper) object;
 
-        return other.fieldName.equals(fieldName)
-        && (other.fieldSize == fieldSize);
+        return other.getColumnName().equals(getColumnName())
+        && (other.getColumnSize() == getColumnSize());
     }
 
     /**
@@ -166,10 +123,4 @@ public class BasicFIDMapper extends AbstractFIDMapper {
         return (new UID()).toString();
     }
 
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#initSupportStructures()
-     */
-    public void initSupportStructures() {
-        // nothing to do
-    }
 }

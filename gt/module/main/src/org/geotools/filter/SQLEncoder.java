@@ -187,8 +187,8 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         capabilities.addType(FilterCapabilities.NULL_CHECK);
         capabilities.addType(FilterCapabilities.BETWEEN);
         capabilities.addType(FilterCapabilities.FID);
-        capabilities.addType((short) 12345);
-        capabilities.addType((short) -12345);
+        capabilities.addType((long) 12345);
+        capabilities.addType((long) -12345);
 
         return capabilities;
     }

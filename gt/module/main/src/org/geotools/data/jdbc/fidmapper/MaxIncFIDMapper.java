@@ -16,6 +16,11 @@
  *    Created on 18-apr-2004
  * TODO: 26-may-2005 D. Adler Removed returnIDAsAttribute variable and method.
  */
+/*
+ * Created on 18-apr-2004
+ * 26-may-2005 D. Adler Removed returnIDAsAttribute variable and method.
+ * 12-jul-2006 D. Adler GEOT-728 Refactor FIDMapper classes
+ */
 package org.geotools.data.jdbc.fidmapper;
 
 import org.geotools.data.DataSourceException;
@@ -25,7 +30,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 
 
 /**
@@ -39,37 +43,35 @@ import java.sql.Types;
  */
 public class MaxIncFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
-    private String FIDColumn;
-    private int FIDColumnType;
-    private String tableName;
+
 
     /**
-     * Creates a new TypedFIDMapper object.
+     * Creates a new MaxIncFIDMapper object.
      *
      * @param tableName the table name
      * @param FIDColumn the name of the FID column
      * @param FIDColumnType The SQL type of the column - must be a numeric type
      */
     public MaxIncFIDMapper(String tableName, String FIDColumn, int FIDColumnType) {
-        this(tableName, FIDColumn, FIDColumnType, false);
+        this(null, tableName, FIDColumn, FIDColumnType, false);
     }
 
     /**
-     * Creates a new TypedFIDMapper object that will return the FID columns as
+     * Creates a new MaxIncFIDMapper object that will return the FID columns as
      * business attributes.
      *
+     * @param tableSchemaName the schema of this table
      * @param tableName the table name
      * @param FIDColumn the name of the FID column
      * @param FIDColumnType The SQL type of the column - must be a numeric type
      * @param returnFIDColumnsAsAttributes true to return FID columns as
      *        attributes.
      */
-    public MaxIncFIDMapper(String tableName, String FIDColumn,
+    public MaxIncFIDMapper(String tableSchemaName, String tableName, String FIDColumn,
         int FIDColumnType, boolean returnFIDColumnsAsAttributes) {
-        this.tableName = tableName;
-        this.FIDColumn = FIDColumn;
-        this.FIDColumnType = FIDColumnType;
+    	super(tableSchemaName, tableName);
         this.returnFIDColumnsAsAttributes = returnFIDColumnsAsAttributes;
+        setInfo(FIDColumn, FIDColumnType, 0, 0, false);
     }
 
     /**
@@ -90,47 +92,7 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
 		}
     }
 
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnCount()
-     */
-    public int getColumnCount() {
-        return 1;
-    }
 
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnName(int)
-     */
-    public String getColumnName(int colIndex) {
-        return FIDColumn;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnType(int)
-     */
-    public int getColumnType(int colIndex) {
-        return Types.VARCHAR;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnSize(int)
-     */
-    public int getColumnSize(int colIndex) {
-        return 255;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnDecimalDigits(int)
-     */
-    public int getColumnDecimalDigits(int colIndex) {
-        return 0;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isAutoIncrement(int)
-     */
-    public boolean isAutoIncrement(int colIndex) {
-        return false;
-    }
 
     /**
      * @see java.lang.Object#equals(java.lang.Object)
@@ -142,8 +104,8 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
 
         MaxIncFIDMapper other = (MaxIncFIDMapper) object;
 
-        return (other.FIDColumn == this.FIDColumn)
-        && (other.FIDColumnType == this.FIDColumnType)
+        return (other.getColumnName() == this.getColumnName())
+        && (other.getColumnType() == this.getColumnType())
         && (other.returnFIDColumnsAsAttributes == this.returnFIDColumnsAsAttributes);
     }
 
@@ -155,7 +117,7 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
         throws IOException {
         try {
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("Select MAX(" + FIDColumn
+            ResultSet rs = stmt.executeQuery("Select MAX(" + getColumnName()
                     + ") from " + tableName);
 
             if (rs.next()) {
@@ -164,19 +126,12 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
                 return String.valueOf(maxFid + 1);
             } else {
                 throw new DataSourceException("Could not get MAX for "
-                    + tableName + "." + FIDColumn
+                    + tableName + "." + getColumnName()
                     + ": No result returned from query");
             }
         } catch (SQLException e) {
             throw new DataSourceException("An sql problem occurred. Are the table and the fid column there?",
                 e);
         }
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#initSupportStructures()
-     */
-    public void initSupportStructures() {
-        // no support structure needed
     }
 }

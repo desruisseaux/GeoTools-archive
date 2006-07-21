@@ -17,12 +17,14 @@ package org.geotools.data.jdbc;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
-import org.geotools.filter.SQLUnpacker;
+import org.geotools.filter.visitor.ClientTransactionAccessor;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 
 
 /**
@@ -51,6 +53,14 @@ public class DefaultSQLBuilder implements SQLBuilder {
     // The instance of the encoder to be used to generate the WHERE clause
     protected SQLEncoder encoder;
 
+    protected FeatureType ft;
+    
+    protected ClientTransactionAccessor accessor;
+    
+    private Filter lastFilter = null;
+    private Filter lastPreFilter = null;
+    private Filter lastPostFilter = null;
+    
     /**
      * Constructs an instance of this class with a default SQLEncoder
      */
@@ -61,14 +71,33 @@ public class DefaultSQLBuilder implements SQLBuilder {
     /**
      * Constructs an instance of this class using the encoder class specified.
      * This will typically be from the getSqlBuilder method of a JDBCDataStore
-     * subclass
+     * subclass.
+     * <p>
+     * This constructor should not be used to obtain Pre/Post filters, as these
+     * methods require a FeatureType to function properly.
      *
+     * @deprecated
      * @param encoder the specific encoder to be used.
      */
     public DefaultSQLBuilder(SQLEncoder encoder) {
-        this.encoder = encoder;
+    	this(encoder, null, null);
     }
 
+    /**
+     * Constructs an instance of this class using the encoder class specified.
+     * This will typically be from the getSqlBuilder method of a JDBCDataStore
+     * subclass.
+     * 
+     * @param encoder the specific encoder to be used.
+     * @param featureType
+     * @param accessor client-side transaction handler; may be null.
+     */
+    public DefaultSQLBuilder(SQLEncoder encoder, FeatureType featureType, ClientTransactionAccessor accessor) {
+    	this.encoder = encoder;
+    	this.ft = featureType;
+    	this.accessor = accessor;
+    }
+    
     /**
      * Return the postQueryFilter that must be applied to the database query
      * result set.
@@ -79,13 +108,17 @@ public class DefaultSQLBuilder implements SQLBuilder {
      *         on the result set.
      */
     public Filter getPostQueryFilter(Filter filter) {
-        FilterCapabilities cap = encoder.getCapabilities();
-        SQLUnpacker unpacker = new SQLUnpacker(cap);
-
-        //figure out which of the filter we can use.
-        unpacker.unPackAND(filter);
-
-        return unpacker.getUnSupported();
+    	if (filter != null && !filter.equals(lastFilter)) {
+    		splitFilter(filter);
+    	}
+    	return lastPostFilter;
+    	
+//        SQLUnpacker unpacker = new SQLUnpacker(cap);
+//
+//        //figure out which of the filter we can use.
+//        unpacker.unPackAND(filter);
+//
+//        return unpacker.getUnSupported();
     }
 
     /**
@@ -97,14 +130,28 @@ public class DefaultSQLBuilder implements SQLBuilder {
      *         by the database.
      */
     public Filter getPreQueryFilter(Filter filter) {
-        SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
-
-        //figure out which of the filter we can use.
-        unpacker.unPackAND(filter);
-
-        return unpacker.getSupported();
+    	if (filter != null && !filter.equals(lastFilter)) {
+    		splitFilter(filter);
+    	}
+    	return lastPreFilter;
+//        SQLUnpacker unpacker = new SQLUnpacker(encoder.getCapabilities());
+//
+//        //figure out which of the filter we can use.
+//        unpacker.unPackAND(filter);
+//
+//        return unpacker.getSupported();
     }
 
+    protected void splitFilter(Filter filter) {
+    	lastFilter = filter;
+        FilterCapabilities cap = encoder.getCapabilities();
+        PostPreProcessFilterSplittingVisitor pfv = new PostPreProcessFilterSplittingVisitor(cap, ft, accessor);
+        filter.accept(pfv);
+
+        lastPreFilter = pfv.getFilterPre();
+        lastPostFilter = pfv.getFilterPost();
+    }
+    
     /**
      * Constructs the FROM clause for a featureType
      * 

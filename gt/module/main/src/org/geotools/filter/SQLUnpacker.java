@@ -59,6 +59,7 @@ import java.util.Iterator;
  *       the filter in  each time.  If anyone is looking at this class and has
  *       suggestions email the list, as we should think this through more, but
  *       I've other pressing  tasks.
+ * @deprecated please use PostPreProcessFilterSplittingVisitor
  * @source $URL$
  */
 public class SQLUnpacker {

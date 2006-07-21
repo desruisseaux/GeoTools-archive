@@ -33,7 +33,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
-import org.geotools.geometry.JTS.ReferencedEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -256,7 +256,7 @@ public class JDBCFeatureSource implements FeatureSource {
                 return new ReferencedEnvelope(new Envelope(),featureType.getDefaultGeometry().getCoordinateSystem());
             return new Envelope();
         }               
-        return null; // to expensive right now :-)
+        return null; // too expensive right now :-)
     }
     /**
      * Retrieve total number of Query results.
@@ -275,7 +275,7 @@ public class JDBCFeatureSource implements FeatureSource {
      * Direct SQL query number of rows in query.
      * 
      * <p>
-     * Note this is a low level SQL statment and if it fails the provided
+     * Note this is a low level SQL statement and if it fails the provided
      * Transaction will be rolled back.
      * </p>
      * <p>
@@ -311,12 +311,11 @@ public class JDBCFeatureSource implements FeatureSource {
             conn = jdbc.getConnection(transaction);
 
             String typeName = getSchema().getTypeName();
-            Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
             StringBuffer sql = new StringBuffer();
-            StringBuffer sqlBuffer = new StringBuffer();
+            //chorner: we should hit an indexed column, * will likely tablescan
             sql.append("SELECT COUNT(*) as cnt");
             sqlBuilder.sqlFrom(sql, typeName);
-            sqlBuilder.sqlWhere(sql, filter);
+            sqlBuilder.sqlWhere(sql, filter); //safe to assume filter = prefilter
             
             LOGGER.finer("SQL: " + sql);
 

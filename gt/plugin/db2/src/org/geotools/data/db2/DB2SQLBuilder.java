@@ -19,6 +19,7 @@ package org.geotools.data.db2;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
@@ -49,6 +50,7 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      * or FeatureType.
      * </p>
      *
+     * @deprecated please use DB2SQLBuilder(encoder, tableSchema, featureType)
      * @param encoder an SQLEncoder
      * @param tableSchema table schema to qualify table names
      * @param tableName the table name to be used by this SQL builder
@@ -60,6 +62,27 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
         this.tableName = tableName;
     }
 
+    /**
+     * Creates a DB2SQLBuilder that will provide a table schema to qualify
+     * table names. The table schema is provided by the DB2DataStore which
+     * means that a given DataStore can only access tables within a single
+     * schema.
+     * 
+     * <p>
+     * It would be better if the table schema was managed by FeatureTypeHandler
+     * or FeatureType.
+     * </p>
+     *
+     * @param encoder an SQLEncoder
+     * @param tableSchema table schema to qualify table names
+     * @param tableName the table name to be used by this SQL builder
+     */
+    public DB2SQLBuilder(SQLEncoder encoder, String tableSchema, FeatureType featureType) {
+        super(encoder, featureType, null);
+        this.tableSchema = tableSchema;
+        this.tableName = featureType.getTypeName();
+    }
+    
     /**
      * Generates the select column specification for a DB2 geometry column.
      * 

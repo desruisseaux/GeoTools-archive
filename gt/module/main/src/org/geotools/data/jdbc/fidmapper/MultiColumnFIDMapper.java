@@ -15,6 +15,10 @@
  *
  *    Created on 18-apr-2004
  */
+/*
+ * Created on 18-apr-2004
+ * 12-jul-2006 D. Adler GEOT-728 Refactor FIDMapper classes
+ */
 package org.geotools.data.jdbc.fidmapper;
 
 import org.geotools.data.DataSourceException;
@@ -36,15 +40,12 @@ import java.sql.Statement;
 public class MultiColumnFIDMapper extends AbstractFIDMapper {
     private static final long serialVersionUID = 1L;
     private static final String UTF8 = "UTF-8";
-    private boolean[] autoIncrement;
-    private int[] colTypes;
-    private String[] colNames;
-    private int[] colDecimalDigits;
-    private int[] colSizes;
-
+    
     /**
      * Builds a new instance of the MultiColumnFIDMapper
      *
+     * @param tableSchemaName
+     * @param tableName
      * @param colNames - column names
      * @param colTypes - column types, see {@link java.sql.Types}
      * @param colSizes - column sizes
@@ -53,8 +54,10 @@ public class MultiColumnFIDMapper extends AbstractFIDMapper {
      *
      * @throws IllegalArgumentException
      */
-    public MultiColumnFIDMapper(String[] colNames, int[] colTypes,
-        int[] colSizes, int[] colDecimalDigits, boolean[] autoIncrement) {
+    public MultiColumnFIDMapper(String tableSchemaName, String tableName, 
+    		String[] colNames, int[] colTypes,
+			int[] colSizes, int[] colDecimalDigits, boolean[] autoIncrement) {
+    	super(tableSchemaName, tableName);
         if ((colNames == null) || (colTypes == null) || (autoIncrement == null)) {
             throw new IllegalArgumentException(
                 "Column description arrays must be not null");
@@ -76,14 +79,27 @@ public class MultiColumnFIDMapper extends AbstractFIDMapper {
         this.colSizes = colSizes;
         this.colDecimalDigits = colDecimalDigits;
         this.autoIncrement = autoIncrement;
+        this.returnFIDColumnsAsAttributes = true;
     }
 
     /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#initSupportStructures()
+     * Builds a new instance of the MultiColumnFIDMapper
+     *
+     * @param colNames - column names
+     * @param colTypes - column types, see {@link java.sql.Types}
+     * @param colSizes - column sizes
+     * @param colDecimalDigits - column decimals
+     * @param autoIncrement - flags for auto-increment tests
+     *
+     * @throws IllegalArgumentException
      */
-    public void initSupportStructures() {
-        // nothing to do
+    public MultiColumnFIDMapper(String[] colNames, int[] colTypes,
+        int[] colSizes, int[] colDecimalDigits, boolean[] autoIncrement) {
+    	this(null, null, colNames, colTypes, colSizes, colDecimalDigits,
+    			autoIncrement);
     }
+
+
 
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getID(java.lang.Object[])
@@ -141,52 +157,4 @@ public class MultiColumnFIDMapper extends AbstractFIDMapper {
         return getID(attValues);
     }
 
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#returnFIDColumnsAsAttributes()
-     */
-    public boolean returnFIDColumnsAsAttributes() {
-        return true;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnCount()
-     */
-    public int getColumnCount() {
-        return colNames.length;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnName(int)
-     */
-    public String getColumnName(int colIndex) {
-        return colNames[colIndex];
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnType(int)
-     */
-    public int getColumnType(int colIndex) {
-        return colTypes[colIndex];
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnSize(int)
-     */
-    public int getColumnSize(int colIndex) {
-        return colSizes[colIndex];
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnDecimalDigits(int)
-     */
-    public int getColumnDecimalDigits(int colIndex) {
-        return colDecimalDigits[colIndex];
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isAutoIncrement(int)
-     */
-    public boolean isAutoIncrement(int colIndex) {
-        return autoIncrement[colIndex];
-    }
 }

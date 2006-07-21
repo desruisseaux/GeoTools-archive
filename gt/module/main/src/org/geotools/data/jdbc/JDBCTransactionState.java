@@ -46,7 +46,7 @@ public class JDBCTransactionState implements State {
             connection = null;
             // This has not harmed the Transaction yet
             // so we don't need to force a rollback :-)
-            throw new DataSourceException("Transaction not aquire connection", e );
+            throw new DataSourceException("Transaction could not acquire connection", e );
         }
     }
     /**

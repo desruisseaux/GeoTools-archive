@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.geotools.data.postgis.fidmapper;
 
@@ -17,34 +17,62 @@ import org.geotools.feature.Feature;
  *
  */
 public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
-		implements FIDMapper {
+                implements FIDMapper {
 
-	private static final long serialVersionUID = -6082930630426171079L;
+        private static final long serialVersionUID = -6082930630426171079L;
 
-	boolean can_usepg_get_serial_sequence=true;
-	
-	public PostGISAutoIncrementFIDMapper(String tableName, String colName, int dataType) {
-		super(tableName, colName, dataType);
-	}
+        boolean can_usepg_get_serial_sequence=true;
 
-	
-	public String createID(Connection conn, Feature feature, Statement statement) throws IOException {
-		if( can_usepg_get_serial_sequence ){
-			try{
-				statement.execute("SELECT currval(pg_get_serial_sequence(\'"+tableName+"\',\'"+colName+"\'))");
-		   		ResultSet resultSet = statement.getResultSet();
-	    		if( resultSet.next() )
-	    			return resultSet.getString(this.colName);
-	    		else
-	    			return super.createID(conn, feature, statement);
-			}catch (Exception e) {
-				can_usepg_get_serial_sequence=false;
-				return super.createID(conn, feature, statement);
-			}
-		}else{
-			return super.createID(conn, feature, statement);
-		}
-	}
-	
-	
+        public PostGISAutoIncrementFIDMapper(String tableName, String colName, int dataType) {
+                super(tableName, colName, dataType);
+        }
+
+
+        public String createID( Connection conn, Feature feature, Statement statement )
+            throws IOException {
+            if (can_usepg_get_serial_sequence) {
+                try {
+                    String sql = "SELECT currval(pg_get_serial_sequence(\'";
+                    String schema = getTableSchemaName();
+                    if (schema != null && !schema.equals("")) {
+                        sql = sql + schema + "."; 
+                    }
+                    sql = sql + getTableName() + "\',\'" + getColumnName() + "\'))";
+                    statement.execute(sql); 
+                    ResultSet resultSet = statement.getResultSet();
+                    if (resultSet.next())
+                        return resultSet.getString("currval");
+                    else
+                        return findInsertedFID(conn, feature, statement);
+                } catch (Exception e) {
+                    can_usepg_get_serial_sequence = false;
+                    return findInsertedFID(conn, feature, statement);
+                }
+            } else {
+                return findInsertedFID(conn, feature, statement);
+            }
+        }
+
+        /**
+         * PostGIS couldn't supply the answer as we'd like, so we'll try to find it
+         * on our own. 
+         */
+        private String findInsertedFID( Connection conn, Feature feature, Statement statement )
+            throws IOException {
+            String sql = "SELECT \"" + getColumnName() + "\" FROM \"";
+            String schema = getTableSchemaName();
+            if (schema != null && !schema.equals("")) {
+                sql = sql + schema + "\".\""; 
+            }
+            sql = sql + getTableName() + "\" ORDER BY \"" + getColumnName()
+                + "\" DESC LIMIT 1;"; 
+            try {
+                statement.execute(sql); 
+                ResultSet resultSet = statement.getResultSet();
+                resultSet.next();
+                return resultSet.getString(getColumnName());
+            } catch (Exception e) { //i surrender
+                return super.createID(conn, feature, statement);
+            }
+        }
 }

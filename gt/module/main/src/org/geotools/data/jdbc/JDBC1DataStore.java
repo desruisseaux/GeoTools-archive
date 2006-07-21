@@ -45,7 +45,6 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.FilteringFeatureReader;
-import org.geotools.data.FilteringFeatureWriter;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
@@ -205,6 +204,15 @@ public abstract class JDBC1DataStore implements DataStore {
 	 */
 	protected boolean allowWriteOnVolatileFIDs;
 
+    /**
+     * The transaction isolation level to use in a transaction.  One of
+     * Connection.TRANSACTION_READ_UNCOMMITTED, TRANSACTION_READ_COMMITTED,
+     * TRANSACTION_REPEATABLE_READ, or SERIALIZABLE.
+     * 
+     * Connection.TRANSACTION_NONE may also be used to indicate "use default".
+     */
+    protected int transactionIsolation = Connection.TRANSACTION_NONE;
+    
 	/**
 	 * DOCUMENT ME!
 	 *
@@ -598,9 +606,11 @@ public abstract class JDBC1DataStore implements DataStore {
 		FeatureTypeInfo typeInfo = typeHandler.getFeatureTypeInfo(typeName);
 
 		SQLBuilder sqlBuilder = getSqlBuilder(typeName);
-		//Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
-		Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
-
+		
+		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter()); //process in DB
+		Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter()); //process after DB
+        ((DefaultQuery) query).setFilter(preFilter);
+		
 		String[] requestedNames = propertyNames(query);
 		String[] propertyNames;
 
@@ -613,7 +623,7 @@ public abstract class JDBC1DataStore implements DataStore {
 			//
 			// check to make sure we have enough for the filter
 			//
-			String[] filterNames = DataUtilities.attributeNames(postFilter);
+			String[] filterNames = DataUtilities.attributeNames(preFilter);
 
 			Set set = new HashSet();
 			set.addAll(Arrays.asList(requestedNames));
@@ -686,6 +696,11 @@ public abstract class JDBC1DataStore implements DataStore {
 			}
 		}
 
+        // chorner: this is redundant, since we've already created the reader with the post filter attached		
+        // if (postFilter != null && !postFilter.equals(Filter.NONE)) {
+        //     reader = new FilteringFeatureReader(reader, postFilter);
+        // }
+		
 		return reader;
 	}
 
@@ -704,7 +719,7 @@ public abstract class JDBC1DataStore implements DataStore {
 			throws IOException, DataSourceException {
 		String typeName = query.getTypeName();
 		SQLBuilder sqlBuilder = getSqlBuilder(query.getTypeName());
-		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
+		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter()); //dupe?
 		//Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
 
 		FIDMapper mapper = getFIDMapper(typeName);
@@ -763,10 +778,14 @@ public abstract class JDBC1DataStore implements DataStore {
 			Filter postFilter, QueryData queryData) throws IOException {
 		FeatureReader fReader = getJDBCFeatureReader(queryData);
 
-		if ((postFilter != null) && (postFilter != Filter.ALL)) {
+		if ((postFilter != null) && (postFilter != Filter.NONE)) {
 			fReader = new FilteringFeatureReader(fReader, postFilter);
 		}
 
+		if (postFilter == Filter.ALL) {
+			return new EmptyFeatureReader(schema);
+		}
+		
 		return fReader;
 	}
 
@@ -940,7 +959,10 @@ public abstract class JDBC1DataStore implements DataStore {
 
 	/**
 	 * Hook for subclass to return a different sql builder.
-	 *
+	 * <p>
+	 * Subclasses requiring a ClientTransactionAccessor should override
+	 * and instantiate an SQLBuilder with one in the constructor. 
+	 * 
 	 * @param typeName
 	 *            The typename for the sql builder.
 	 *
@@ -953,7 +975,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		SQLEncoder encoder = new SQLEncoder();
 		encoder.setFIDMapper(getFIDMapper(typeName));
 
-		return new DefaultSQLBuilder();
+		return new DefaultSQLBuilder(encoder, getSchema(typeName), null);
 	}
 
 	/**
@@ -978,7 +1000,13 @@ public abstract class JDBC1DataStore implements DataStore {
 
 			if (state == null) {
 				try {
-					state = new JDBCTransactionState(createConnection());
+                    Connection conn = createConnection();
+                    conn.setAutoCommit(requireAutoCommit());
+                    if (getTransactionIsolation() != Connection.TRANSACTION_NONE) {
+                        //for us, NONE means use the default, which is usually READ_COMMITTED
+                        conn.setTransactionIsolation(getTransactionIsolation());
+                    }
+					state = new JDBCTransactionState(conn);
 					transaction.putState(this, state);
 				} catch (SQLException eep) {
 					throw new DataSourceException("Connection failed:" + eep,
@@ -996,6 +1024,44 @@ public abstract class JDBC1DataStore implements DataStore {
 	}
 
 	/**
+     * Obtain the transaction isolation level for connections.
+     * 
+     * @return Connection.TRANSACTION_* value
+     * @author chorner
+     * @since 2.2.0
+     * @see setTransactionIsolation
+     * @see http://www.postgresql.org/docs/7.4/static/transaction-iso.html
+     */
+    public int getTransactionIsolation() {
+        return transactionIsolation;
+    }
+     
+    /**
+     * Sets the transaction isolation level for connections.
+     * 
+     * @param value
+     *            Connection.TRANSACTION_READ_UNCOMMITTED,
+     *            Connection.TRANSACTION_READ_COMMITTED,
+     *            Connection.TRANSACTION_REPEATABLE_READ,
+     *            Connection.SERIALIZABLE, or Connection.TRANSACTION_NONE
+     *            (for use default/do not set)
+     * @author chorner
+     * @since 2.2.0
+     * @see http://www.postgresql.org/docs/7.4/static/transaction-iso.html
+     */
+    public void setTransactionIsolation(int value) {
+        transactionIsolation = value;
+    }
+     
+    /**
+     * Return true if transaction is handled on client.  Usually this will not have to be overridden.
+     * @return true if transaction is handled on client.  Usually this will not have to be overridden.
+     */
+	protected boolean requireAutoCommit() {
+        return false;
+    }
+
+    /**
 	 * Create a connection for your JDBC1 database
 	 */
 	protected abstract Connection createConnection() throws SQLException;
@@ -1033,7 +1099,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		try {
 			conn = getConnection(Transaction.AUTO_COMMIT);
 
-			FIDMapper mapper = factory.getMapper(null, null, typeName, conn);
+			FIDMapper mapper = factory.getMapper(null, config.getDatabaseSchemaName(), typeName, conn);
 
 			return mapper;
 		} finally {
@@ -1401,7 +1467,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	}
 
 	/**
-	 * Aquire FetureWriter for modification of contents specifed by filter.
+	 * Acquire FeatureWriter for modification of contents specifed by filter.
 	 *
 	 * <p>
 	 * Quick notes: This FeatureWriter is often used to remove contents
@@ -1409,12 +1475,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * </p>
 	 *
 	 * <p>
-	 * It is not used to provide new content and should return <code>null</code>
-	 * for next() when hasNext() returns <code>false</code>.
-	 * </p>
-	 *
-	 * <p>
-	 * Subclasses are responsible for checking with the lockingManger unless
+	 * Subclasses are responsible for checking with the lockingManager unless
 	 * they are providing their own locking support.
 	 * </p>
 	 *
@@ -1451,9 +1512,9 @@ public abstract class JDBC1DataStore implements DataStore {
 		LOGGER.fine("getting feature writer for " + typeName + ": " + info);
 
 		SQLBuilder sqlBuilder = getSqlBuilder(typeName);
-		//Filter preFilter = sqlBuilder.getPreQueryFilter(filter);
+		Filter preFilter = sqlBuilder.getPreQueryFilter(filter);
 		Filter postFilter = sqlBuilder.getPostQueryFilter(filter);
-		Query query = new DefaultQuery(typeName, filter);
+		Query query = new DefaultQuery(typeName, preFilter);
 		String sqlQuery;
 
 		try {
@@ -1481,9 +1542,10 @@ public abstract class JDBC1DataStore implements DataStore {
 			writer = inProcess.checkedWriter(writer, transaction);
 		}
 
-		if ((postFilter != null) && (postFilter != Filter.NONE)) {
-			writer = new FilteringFeatureWriter(writer, postFilter);
-		}
+        // chorner: writer shouldn't have a wrapped post filter, otherwise one can't add features.
+        // if ((postFilter != null) && (postFilter != Filter.NONE)) {
+        //     writer = new FilteringFeatureWriter(writer, postFilter);
+        // }
 
 		return writer;
 	}

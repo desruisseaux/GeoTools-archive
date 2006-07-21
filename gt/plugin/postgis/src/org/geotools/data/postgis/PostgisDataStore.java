@@ -42,7 +42,6 @@ import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
-import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.InProcessLockingManager;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
@@ -72,7 +71,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.SQLEncoderPostgis;
@@ -179,39 +177,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
-    private final static FilterCapabilities capabilities = new FilterCapabilities();
-
-    static {
-    	capabilities.addType(FilterCapabilities.BETWEEN);
-    	capabilities.addType(FilterCapabilities.COMPARE_EQUALS);
-    	capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN);
-    	capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
-    	capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN);
-    	capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
-    	capabilities.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
-    	capabilities.addType(FilterCapabilities.FID);
-    	//capabilities.addType(FilterCapabilities.FUNCTIONS); //function support is spotty?
-    	capabilities.addType(FilterCapabilities.LIKE);
-    	capabilities.addType(FilterCapabilities.LOGIC_AND);
-    	capabilities.addType(FilterCapabilities.LOGIC_NOT);
-    	capabilities.addType(FilterCapabilities.LOGIC_OR);
-    	capabilities.addType(FilterCapabilities.NO_OP);
-    	capabilities.addType(FilterCapabilities.NULL_CHECK);
-    	capabilities.addType(FilterCapabilities.SIMPLE_ARITHMETIC);
-    	capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-    	capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
-    	capabilities.addType(FilterCapabilities.SPATIAL_BEYOND);
-    	capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
-    	capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
-    	capabilities.addType(FilterCapabilities.SPATIAL_DISJOINT);
-    	capabilities.addType(FilterCapabilities.SPATIAL_DWITHIN);
-    	capabilities.addType(FilterCapabilities.SPATIAL_EQUALS);
-    	capabilities.addType(FilterCapabilities.SPATIAL_INTERSECT);
-    	capabilities.addType(FilterCapabilities.SPATIAL_OVERLAPS);
-    	capabilities.addType(FilterCapabilities.SPATIAL_TOUCHES);
-    	capabilities.addType(FilterCapabilities.SPATIAL_WITHIN);
-    }
-    
     /** OPTIMIZE constants */
     public static final int OPTIMIZE_SAFE = 0;
     public static final int OPTIMIZE_SQL = 1;
@@ -517,8 +482,15 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		    Envelope envelope = null;
             //postgis 1.0+
 		    if (version.trim().startsWith("1.")) { //$NON-NLS-1$
-		    	//try the estimated_extent function
-	    	    String q = "SELECT AsText(force_2d(envelope(estimated_extent(\""+typeName+"\",\""+geomName+"\"))))";
+		    	//try the estimated_extent([schema], table, geocolumn) function
+	    	    String q;
+                String dbSchema = config.getDatabaseSchemaName(); 
+                if (dbSchema == null) {
+                    q = "SELECT AsText(force_2d(envelope(estimated_extent('"+typeName+"','"+geomName+"'))))";
+                } else {
+                    q = "SELECT AsText(force_2d(envelope(estimated_extent('"+dbSchema+"','"+typeName+"','"+geomName+"'))))";
+                }
+                st = conn.createStatement();
                 rs = st.executeQuery(q);
 		    	
 		    	if (rs.next()) {
@@ -538,7 +510,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		    			envelope.expandToInclude(minX - deltaX, minY - deltaY);
 		    			envelope.expandToInclude(maxX + deltaX, maxY + deltaY);
 		    		} else {
-                        LOGGER.info("PostGIS estimated_extent function did not return a result");
+                        LOGGER.warning("PostGIS estimated_extent function did not return a result." +
+                                "\nPerhaps 'ANALYZE "+typeName+";' needs to be run or the table is empty?");
                     }
 		    	}
 		    	
@@ -550,7 +523,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		    	
                 //try to generate an approximation
                 envelope = new Envelope();
-                st = conn.createStatement();
                 //this is an attempt to grab a handful of envelopes without counting the features
                 final int blockSize = 10; //how many features to grab on each postgis hit
                 final int fetchAllLimit = 99; //if we don't exceed this value, just fetch all features
@@ -569,8 +541,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 //offset[0] = 0;
                 int[] offset = new int[] {0,10,100,1000,10000,20000,40000};
 
+                int hits = 0;
                 int misses = 0;
-		    	for (int i = 0; i < offset.length; i++) {
+		    	for (int i = 0; i < offset.length && misses < 4; i++) {
                     String limit = " LIMIT " + blockSize + " OFFSET " + offset[i];;
                     if (i+1 < offset.length && offset[i+1]-offset[i] <= blockSize) {
                         limit = " LIMIT " + blockSize * 2 + " OFFSET " + offset[i];
@@ -581,6 +554,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     if (offset[i] > -1) {
                         q = q + limit;
                     }
+                    st = conn.createStatement();
                     rs = st.executeQuery(q);
                     boolean gotEnvelope = false;
                     while (rs.next()) {
@@ -596,8 +570,15 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                                 envelope.expandToInclude(e);
                         }
                     }
-                    if (!gotEnvelope) {
+                    if (gotEnvelope) {
+                        hits++;
+                    } else {
                         misses++;
+                        if (hits == 0) { //there are no features!
+                            rs.close();
+                            st.close();
+                            return new Envelope();
+                        }
                         if (offset[i-1] < fetchAllLimit) { //just fetch everything
                             offset[i] = -1;
                         } else {
@@ -618,16 +599,17 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                                 }
                             } else {
                                 rs.close();
+                                st.close();
                                 break;    
                             }
                         }
                         i--;
                     }
                     rs.close();
+                    st.close();
                     if (offset[i] == -1)
                         break;
                 }
-                st.close();
 		    	
 		    	// expand since this is an approximation
 		    	// Works whether or not the bounds are at the origin
@@ -766,33 +748,16 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         if ((filter == Filter.ALL) || filter.equals(Filter.ALL)) {
             return new EmptyFeatureReader(requestType);
         }
-
-        Filter[] filters = splitFilters(query,transaction); // [server][post]
         
-        ((DefaultQuery) query).setFilter(filters[0]); //set pre filter (server)
         FeatureReader reader = getFeatureReader(query, transaction);
         
         if (compare == 1) {
             reader = new ReTypeFeatureReader(reader, requestType);
         }
 
-        if (!filters[1].equals( Filter.NONE ) ) {
-        	reader = new FilteringFeatureReader(reader, filters[1]); //set post filter (client)
-        }
-        
         return reader;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param featureType
-     * @param filter
-     *
-     * @return
-     *
-     * @throws IOException DOCUMENT ME!
-     */
     /**
      * Gets the list of attribute names required for both featureType and
      * filter
@@ -864,7 +829,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         encoder.setSRID(srid);
         encoder.setLooseBbox(looseBbox);
 
-        PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder,config);
+        PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder,config,info.getSchema());
         initBuilder(builder);
         
         return builder;
@@ -1056,7 +1021,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     AttributeType getGeometryAttribute(String tableName, String columnName)
         throws IOException {
         Connection dbConnection = null;
-
+        Class type = null;
         try {
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
             String dbSchema = config.getDatabaseSchemaName();
@@ -1087,25 +1052,24 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             statement.close();
 
-            Class type = (Class) GEOM_TYPE_MAP.get(geometryType);
+            type = (Class) GEOM_TYPE_MAP.get(geometryType);
 
-            CoordinateReferenceSystem crs = null;
-
-            try {
-                crs = getPostgisAuthorityFactory().createCRS(determineSRID(
-                            tableName, columnName));
-            } catch (FactoryException e) {
-                crs = null;
-            }
-
-            return AttributeTypeFactory.newAttributeType(columnName, type,
-                true, 0, null, crs);
         } catch (SQLException sqe) {
             throw new IOException("An SQL exception occurred: "
                 + sqe.getMessage());
         } finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
+        
+        CoordinateReferenceSystem crs = null;
+
+        try {
+            crs = getPostgisAuthorityFactory().createCRS(determineSRID(tableName, columnName));
+        } catch (FactoryException e) {
+            crs = null;
+        }
+
+        return AttributeTypeFactory.newAttributeType(columnName, type, true, 0, null, crs);
     }
 
     private PostgisAuthorityFactory getPostgisAuthorityFactory() {
@@ -1824,33 +1788,4 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		//TODO: use the database schema to obtain the feature type?
 		return super.getSchema(arg0);
 	}
-	
-	/**
-	 * The filters postgis is capable of handling.
-	 * @return FilterCapabilities
-	 */
-	public FilterCapabilities getFilterCapabilities() {
-		return capabilities;
-	}
-	
-    private Filter[] splitFilters(Query q, Transaction t) throws IOException{
-    	if(q.getFilter() == null)
-    		return new Filter[]{Filter.NONE,Filter.NONE};
-    	if(q.getTypeName() == null || t == null)
-    		return new Filter[]{Filter.NONE,q.getFilter()};
-    	
-    	FeatureType ft = getSchema(q.getTypeName());
-    	
-        //postgis doesn't need a transaction accessor
-        PostPreProcessFilterSplittingVisitor pfv = new PostPreProcessFilterSplittingVisitor(capabilities, ft, null);
-
-        q.getFilter().accept(pfv);
-
-        Filter[] f = new Filter[2]; 
-        f[0] = pfv.getFilterPre(); //postgis
-        f[1] = pfv.getFilterPost(); //geotools
-
-        return f;
-    }
-
 }

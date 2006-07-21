@@ -43,6 +43,7 @@ public class TypedFIDMapper extends AbstractFIDMapper {
      * @throws IllegalArgumentException DOCUMENT ME!
      */
     public TypedFIDMapper(FIDMapper wrapped, String featureTypeName) {
+    	super(null, null);
         if (wrapped == null) {
             throw new IllegalArgumentException(
                 "The wrapped feature mapper cannot be null");
@@ -160,5 +161,15 @@ public class TypedFIDMapper extends AbstractFIDMapper {
      */
     public FIDMapper getWrappedMapper() {
         return wrappedMapper;
+    }
+    
+    public String toString() {
+    	return "Wrapped:" + getWrappedMapper().toString();
+    }
+    public String getTableName() {
+    	return ((AbstractFIDMapper)getWrappedMapper()).getTableName();
+    }
+    public String getTableSchemaName() {
+    	return ((AbstractFIDMapper)getWrappedMapper()).getTableSchemaName();
     }
 }

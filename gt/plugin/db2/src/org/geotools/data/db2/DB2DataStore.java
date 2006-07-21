@@ -297,7 +297,7 @@ public class DB2DataStore extends JDBCDataStore {
 
         // We should probably get the table schema name from the feature type
         // information - not sure that it exists there.
-        return new DB2SQLBuilder(encoder, getTableSchema(), typeName);
+        return new DB2SQLBuilder(encoder, getTableSchema(), info.getSchema());
     }
 
     /**

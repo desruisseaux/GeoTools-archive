@@ -17,6 +17,7 @@ package org.geotools.data.jdbc;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
@@ -24,6 +25,7 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
@@ -61,6 +63,15 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             "org.geotools.data.jdbc");
     FIDMapper mapper = null;
 
+    /** indicates the lock attempt is in progress */
+    final int STATE_WAIT = 1;
+
+    /** indicates the lock attempt was successful */
+    final int STATE_SUCCESS = 2;
+
+    /** indicates the lock attempt failed horribly */
+    final int STATE_FAILURE = 3;
+    
     /**
      * Creates a new instance of JDBCFeatureWriter
      *
@@ -328,7 +339,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      */
     protected void doUpdate(Feature live, Feature current)
         throws IOException, SQLException {
-    	
+        
     	if (LOGGER.isLoggable(Level.FINE)) 
              LOGGER.fine("updating postgis feature " + current);
 
@@ -338,12 +349,42 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         try {
             conn = queryData.getConnection();
             statement = conn.createStatement();
-
-            String sql = makeUpdateSql(live, current);
-            if (LOGGER.isLoggable(Level.FINE)) 
-            	LOGGER.fine(sql);
-           // System.out.println(sql);
-            statement.executeUpdate(sql);
+            
+            boolean hasLock = false;
+            String sql = makeSelectForUpdateSql(current);
+            if (sql == null) {
+                LOGGER.fine("Lock acquisition not attempted, JDBCTextFeatureWriter may block during concurrent updates");
+            } else { //we have a statement, let's use it
+                ResultSet result = null;
+                try {
+                    result = statement.executeQuery(sql);
+                    //TODO: read the result
+                    if (result != null) {
+                        System.out.println(result.toString());
+                    }
+                    hasLock = true;
+                } catch (SQLException e) {
+                    LOGGER.severe(e.getLocalizedMessage());
+                    throw new FeatureLockException("Your feature is locked!", current.getID(), e); //do not catch
+                } finally {
+                    if (result != null) {
+                        try {
+                            result.close();
+                        } catch (SQLException e) {}
+                        result = null;
+                    }
+                }
+            }
+            
+            if (sql == null || hasLock) {
+                //attempt the update if we have a lock, or we are too lazy to check
+                sql = makeUpdateSql(live, current);
+                if (LOGGER.isLoggable(Level.FINE)) 
+                    LOGGER.fine(sql);
+                statement.executeUpdate(sql);
+            } else { //shouldn't be called?
+                throw new IOException("Feature Lock failed; giving up");
+            }
         } catch (SQLException sqle) {
             String msg = "SQL Exception writing geometry column";
             LOGGER.log(Level.SEVERE, msg, sqle);
@@ -361,6 +402,22 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         }
     }
 
+    /**
+     * Generate the select for update statement, which will attempt to
+     * lock features for update.  This should be overwritten by databases
+     * which want to take advantage of this method.
+     * 
+     * This method is called in a timer thread, to prevent blocking.
+     * 
+     * @author chorner
+     * @since 2.2.0
+     * @param current
+     * @return sql string or null
+     */
+    protected String makeSelectForUpdateSql(Feature current) {
+        return null;
+    }
+    
     /**
      * Generate the update sql statement
      *

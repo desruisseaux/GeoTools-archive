@@ -264,7 +264,8 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
         JDBC1DataStore jdbc = getDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(this.getSchema().getTypeName());
 
-        if (sqlBuilder.getPostQueryFilter(query.getFilter()) != null) {
+        Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter()); 
+        if (postFilter != null && postFilter != Filter.NONE) {
             // this would require postprocessing the filter
             // so we cannot optimize
             return null;

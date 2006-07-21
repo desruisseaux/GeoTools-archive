@@ -13,6 +13,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+/*
+ * 17-Jul-2006 D. Adler GEOT-728 Refactor FIDMapper classes
+ */
 package org.geotools.data.jdbc.fidmapper;
 
 import org.geotools.feature.Feature;
@@ -36,6 +39,7 @@ public class NullFIDMapper extends AbstractFIDMapper {
     private static final String ARRAY_OUT_OF_BOUND_MESSAGE = "There are no columns in this FIDMapper";
 
     public NullFIDMapper() {
+    	super(null, null);
     }
 
     /**
@@ -61,62 +65,7 @@ public class NullFIDMapper extends AbstractFIDMapper {
         return getID(null);
     }
 
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#returnFIDColumnsAsAttributes()
-     */
-    public boolean returnFIDColumnsAsAttributes() {
-        return false;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnCount()
-     */
-    public int getColumnCount() {
-        return 0;
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnName(int)
-     */
-    public String getColumnName(int colIndex) {
-        throw new IndexOutOfBoundsException(ARRAY_OUT_OF_BOUND_MESSAGE);
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnType(int)
-     */
-    public int getColumnType(int colIndex) {
-        throw new IndexOutOfBoundsException(ARRAY_OUT_OF_BOUND_MESSAGE);
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnSize(int)
-     */
-    public int getColumnSize(int colIndex) {
-        throw new IndexOutOfBoundsException(ARRAY_OUT_OF_BOUND_MESSAGE);
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnDecimalDigits(int)
-     */
-    public int getColumnDecimalDigits(int colIndex) {
-        throw new IndexOutOfBoundsException(ARRAY_OUT_OF_BOUND_MESSAGE);
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isAutoIncrement(int)
-     */
-    public boolean isAutoIncrement(int colIndex) {
-        throw new IndexOutOfBoundsException(ARRAY_OUT_OF_BOUND_MESSAGE);
-    }
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#initSupportStructures()
-     */
-    public void initSupportStructures() {
-        // nothing to do        
-    }
-
+ 
     /**
      * This FID mappers generates unique IDs out of the blue using {@link UID
      * UID}
