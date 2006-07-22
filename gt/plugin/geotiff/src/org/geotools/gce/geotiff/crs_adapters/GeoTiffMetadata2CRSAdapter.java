@@ -559,8 +559,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 			initdatumFactory();
 			initMTFactory();
 			initCRSFactory();
-			final Hints tempHints = (Hints) hints.clone();
-			tempHints.put(Hints.DATUM_FACTORY, datumFactory);
+			final Hints tempHints = hints != null ? (Hints) hints.clone() : new Hints(new HashMap());
+			tempHints.put(Hints.DATUM_AUTHORITY_FACTORY, datumFactory);
 			tempHints.put(Hints.CS_FACTORY, csFactory);
 			tempHints.put(Hints.CRS_FACTORY, crsFactory);
 			tempHints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
