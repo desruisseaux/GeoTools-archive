@@ -61,7 +61,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
     /** The logger for the jdbc module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.jdbc");
-    FIDMapper mapper = null;
+    protected FIDMapper mapper = null;
 
     /** indicates the lock attempt is in progress */
     final int STATE_WAIT = 1;
