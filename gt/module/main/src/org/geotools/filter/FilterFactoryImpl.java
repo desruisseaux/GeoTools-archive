@@ -1,8 +1,8 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -13,9 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
- */
-/*
- * FilterFactoryImpl.java
  *
  * Created on 24 October 2002, 16:16
  */

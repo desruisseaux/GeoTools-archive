@@ -108,7 +108,7 @@ org.geotools.data.jdbc.referencing
 Seems to be added by jesse, probably a port of early access based EPSG authority?
 IP:
 - headers to (C) 2004-2006
-- TODO: ask Jesse for confirmation
+- ask Jesse for confirmation, confirmed as 2004
 
 org.geotools.data.memory
 ------------------------
@@ -215,9 +215,20 @@ IP:
 - two files missing headers
 
 org.geotools.filter
-----------------------------
+-------------------
+Origional pre GeoTools 2.0 code, revised to agree with Filter 1.1 specification for GeoTools 2.2, and
+then subclassed from GeoAPI for GeoTools 2.3.
+IP:
+- some files from justin were missing all headers/comments updated to (C) 2006 PMC
+- headers updated to (C) 200x-2006 PMC as required
+- a few early files contain an addition (C) 2002, Centre for Computational Geography
+
 org.geotools.filter.expression
-----------------------------
+------------------------------
+All files added by justin as part GeoTools 2.3 move to GeoAPI interfaces.
+IP:
+- all files required (C) 2006 PMC header
+
 org.geotools.filter.function
 ----------------------------
 org.geotools.filter.function.math
