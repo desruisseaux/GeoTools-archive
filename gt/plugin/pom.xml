@@ -101,10 +101,11 @@
     <module>geomedia</module>
 <!-- <module>geometryless</module> -->
     <module>geotiff</module>
-    <module>gml</module>
+    <!--<module>gml</module>-->
     <module>gtopo30</module>
     <module>hsql</module>
     <module>image</module>
+    <module>imagemosaic</module>
     <module>mif</module>
     <module>mysql</module>
 <!-- <module>oraclespatial</module> -->
