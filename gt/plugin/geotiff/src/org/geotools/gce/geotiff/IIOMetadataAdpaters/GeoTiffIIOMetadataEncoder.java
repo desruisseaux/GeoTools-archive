@@ -23,6 +23,19 @@ import com.sun.media.imageio.plugins.tiff.BaselineTIFFTagSet;
 import com.sun.media.imageio.plugins.tiff.GeoTIFFTagSet;
 import com.sun.media.imageio.plugins.tiff.TIFFTag;
 
+/**
+ * This class is responsible for encoding the geotiff tags into suitable
+ * metadata for the ImageIO library.
+ * 
+ * <p>
+ * Basically it is and encoder/adapter that collects all the different tags,
+ * order it accordingly to the spec and then organize then into a dom tree ready
+ * to be used by the ImageIO metadata mechanism.
+ * 
+ * @author Simone Giannecchini
+ * @since 2.3
+ * 
+ */
 public final class GeoTiffIIOMetadataEncoder {
 
 	private int numModelTiePoints;
@@ -347,8 +360,8 @@ public final class GeoTiffIIOMetadataEncoder {
 		final GeoKeyEntry entry = getGeoKeyEntry(keyID);
 
 		if (entry == null) {
-			throw new IllegalArgumentException("Unable to find an entry for the provided geo key "
-					+ keyID);
+			throw new IllegalArgumentException(
+					"Unable to find an entry for the provided geo key " + keyID);
 		}
 
 		return entry;

@@ -92,6 +92,18 @@ public final class CRS2GeoTiffMetadataAdapter {
 		this.metadata = metadata;
 	}
 
+	/**
+	 * Searches for an EPSG code inside this <code>IdentifiedObject</code>.
+	 * 
+	 * <p>
+	 * It is importanto to remarck that this function should be seen as an hack
+	 * hence it may change in the near future. DO not rely on it!
+	 * 
+	 * @param obj
+	 *            An <code>IdentifiedObject</code> to look for an EPSG code
+	 *            into.
+	 * @return An EPSG numeric code, if one is found, -1 otherwise.
+	 */
 	private static int getEPSGCode(final IdentifiedObject obj) {
 		// looking for an EPSG code
 		final Set identifiers = obj.getIdentifiers();
@@ -122,6 +134,11 @@ public final class CRS2GeoTiffMetadataAdapter {
 
 	/**
 	 * Parses a coordinate reference system.
+	 * 
+	 * <p>
+	 * For the moment we can only encode geographic and projected coordinate
+	 * reference systes, we cannot encode the other types like vertical
+	 * coordinate reference systems.
 	 * 
 	 * @throws GeoTiffException
 	 */
@@ -234,9 +251,9 @@ public final class CRS2GeoTiffMetadataAdapter {
 	}
 
 	/**
-	 * Parsing ProjectionGeoKey 3074.
+	 * Parsing ProjectionGeoKey 3074 for a <code>ProjectedCRS</code>.
 	 * 
-	 * @param projectedCRS
+	 * @param projectedCRS The <code>ProjectedCRS</code> to parse.
 	 */
 	private void parseProjection(final ProjectedCRS projectedCRS) {
 		// getting the conversion
@@ -280,7 +297,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 	}
 
 	/**
-	 * 
+	 * Parses a linear unit for a <code>ProjectedCRS</code>.
 	 * 
 	 * @todo complete the list of linear unit of measures and clean the
 	 *       exception
@@ -331,7 +348,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 	}
 
 	/**
-	 * Parsing the coordinate transformation and its parameters.
+	 * Parses a along with coordinate transformation and its parameters.
 	 * 
 	 * @param name
 	 * 
