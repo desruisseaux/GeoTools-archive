@@ -246,38 +246,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 
 	}
 
-	private PlanarImage getOverview(int i) {
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Doing an image read for reading the coverage.
-		//
-		// /////////////////////////////////////////////////////////////////////
-		// Preparing JAI ImageRead Operation
 
-		final AsciiGridsImageReader mReader = new AsciiGridsImageReader(
-				new AsciiGridsImageReaderSpi());
-		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-				"ImageRead");
-		pbjImageRead.setParameter("Input", source);
-		pbjImageRead.setParameter("Reader", mReader);
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// subsampling
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final ImageReadParam readParam = new ImageReadParam();
-		readParam.setSourceSubsampling((int) Math.pow(2, i), (int) Math.pow(2,
-				i), 0, 0);
-		pbjImageRead.setParameter("readParam", readParam);
-
-		// //
-		//
-		// image and metadata
-		//
-		// //
-		return JAI.create("ImageRead", pbjImageRead).createInstance();
-	}
 
 	private void getHRInfo(ImageReader reader) throws IOException,
 			TransformException {

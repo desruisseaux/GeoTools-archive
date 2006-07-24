@@ -71,7 +71,7 @@ public abstract class AbstractGridFormat
 	private static CoordinateReferenceSystem crs;
 	static {
 		try {
-			crs = CRS.decode("EPSG:4326");
+			crs = CRS.decode("EPSG:4326",true);
 		} catch (NoSuchAuthorityCodeException e) {
 			crs = DefaultGeographicCRS.WGS84;
 		} catch (FactoryException e) {

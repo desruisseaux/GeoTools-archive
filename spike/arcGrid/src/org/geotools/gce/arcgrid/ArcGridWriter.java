@@ -47,6 +47,7 @@ import org.geotools.factory.Hints;
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata;
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageWriter;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.parameter.Parameter;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -75,6 +76,7 @@ import org.opengis.spatialschema.geometry.Envelope;
 public class ArcGridWriter implements GridCoverageWriter {
 
 	private int bandIndex;
+
 	private ImageWriter mWriter;
 
 	/** Small number for comparaisons. */
@@ -146,16 +148,26 @@ public class ArcGridWriter implements GridCoverageWriter {
 	private void setEnvironment(GeneralParameterValue[] parameters)
 			throws InvalidParameterNameException,
 			InvalidParameterValueException, IOException {
-		
+
 		if (parameters == null) {
 			format.getWriteParameters().parameter("GRASS").setValue(false);
-			format.getWriteParameters().parameter("Compressed").setValue(false);
+			// format.getWriteParameters().parameter("Compressed").setValue(false);
 		} else {
-			
-			format.getWriteParameters().parameter("GRASS").setValue(
-					((ParameterValue) parameters[0]).booleanValue());
-			format.getWriteParameters().parameter("Compressed").setValue(
-					((ParameterValue) parameters[1]).booleanValue());
+
+			final int length = parameters.length;
+			Parameter param;
+			String name;
+			for (int i = 0; i < length; i++) {
+				param = (Parameter) parameters[i];
+				name = param.getDescriptor().getName().toString();
+				if (name.equalsIgnoreCase("GRASS"))
+					format.getWriteParameters().parameter("GRASS").setValue(
+							param.booleanValue());
+				else if (name.equalsIgnoreCase("WRITE_BAND"))
+					format.getWriteParameters().parameter("WRITE_BAND")
+							.setValue(new Integer(param.intValue()));
+
+			}
 		}
 	}
 
@@ -191,9 +203,15 @@ public class ArcGridWriter implements GridCoverageWriter {
 			// TODO make the band we write parametric, meaning that the user can
 			// choose it he wants.
 			// /////////////////////////////////////////////////////////////////
-			final int numBands = gc.getSampleDimensions().length;
+			final int numBands =  gc.getNumSampleDimensions();
 			if (numBands > 1) {
-				final int visibleBand = CoverageUtilities.getVisibleBand(gc);
+				final int suggestedBand = format.getWriteParameters()
+						.parameter("WRITE_BAND").intValue();
+				final int visibleBand;
+				if (suggestedBand > 0 && suggestedBand < numBands)
+					visibleBand = suggestedBand;
+				else
+					visibleBand = CoverageUtilities.getVisibleBand(gc);
 				DefaultProcessor processor = new DefaultProcessor(new Hints(
 						Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
 				final ParameterValueGroup param = (ParameterValueGroup) processor
@@ -300,18 +318,20 @@ public class ArcGridWriter implements GridCoverageWriter {
 		// //
 		// Setting Compression parameter if needed
 		// //
-//		if (format.getWriteParameters().parameter("Compressed").booleanValue()) {
-//			Iterator it = ImageIO.getImageWritersByFormatName("arcGrid");
-//			ImageWriter writer;
-//
-//			if (it.hasNext()) {
-//				writer = (ImageWriter) it.next();
-//
-//				ImageWriteParam param = writer.getDefaultWriteParam();
-//				param.setCompressionMode(ImageWriteParam.MODE_DEFAULT);
-//				pbjImageWrite.setParameter("WriteParam", param);
-//			}
-//		}
+		// if
+		// (format.getWriteParameters().parameter("Compressed").booleanValue())
+		// {
+		// Iterator it = ImageIO.getImageWritersByFormatName("arcGrid");
+		// ImageWriter writer;
+		//
+		// if (it.hasNext()) {
+		// writer = (ImageWriter) it.next();
+		//
+		// ImageWriteParam param = writer.getDefaultWriteParam();
+		// param.setCompressionMode(ImageWriteParam.MODE_DEFAULT);
+		// pbjImageWrite.setParameter("WriteParam", param);
+		// }
+		// }
 
 		// //
 		// no data management
@@ -492,7 +512,7 @@ public class ArcGridWriter implements GridCoverageWriter {
 	/**
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#dispose()
 	 */
-	public  void dispose() throws IOException {
+	public void dispose() throws IOException {
 		if (disposed)
 			return;
 		if (mWriter != null) {

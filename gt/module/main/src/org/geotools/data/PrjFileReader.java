@@ -1,7 +1,8 @@
 /*
- *    Geotools - OpenSource mapping toolkit
- *    (C) 2002, Centre for Computational Geography
- *
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -11,12 +12,7 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package org.geotools.data;
 
 import java.io.IOException;
@@ -28,13 +24,16 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
+import org.geotools.factory.Hints;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
- * 
+ * @author Simone Giannecchini
+ * @since 2.3
  * @source $URL:
- *         http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/plugin/shapefile/src/org/geotools/data/shapefile/prj/PrjFileReader.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/shapefile/src/org/geotools/data/shapefile/prj/PrjFileReader.java $
  */
 public class PrjFileReader {
 
@@ -46,9 +45,7 @@ public class PrjFileReader {
 
 	CharsetDecoder decoder;
 
-	org.opengis.referencing.crs.CoordinateReferenceSystem cs;
-
-	// private int[] content;
+	CoordinateReferenceSystem cs;
 
 	/**
 	 * Load the index file from the given channel.
@@ -60,6 +57,21 @@ public class PrjFileReader {
 	 */
 	public PrjFileReader(ReadableByteChannel channel) throws IOException,
 			FactoryException {
+		this(channel,null);
+	}
+
+	/**
+	 * Load the index file from the given channel.
+	 * 
+	 * @param channel
+	 *            The channel to read from.
+	 * @param hints
+	 * 
+	 * @throws IOException
+	 *             If an error occurs.
+	 */
+	public PrjFileReader(ReadableByteChannel channel, final Hints hints)
+			throws IOException, FactoryException {
 		Charset chars = Charset.forName("ISO-8859-1");
 		decoder = chars.newDecoder();
 		this.channel = channel;
@@ -73,7 +85,7 @@ public class PrjFileReader {
 
 		String wkt = charBuffer.toString();
 
-		cs = FactoryFinder.getCRSFactory(null).createFromWKT(wkt);
+		cs = FactoryFinder.getCRSFactory(hints).createFromWKT(wkt);
 	}
 
 	public org.opengis.referencing.crs.CoordinateReferenceSystem getCoodinateSystem() {

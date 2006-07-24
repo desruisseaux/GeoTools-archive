@@ -50,15 +50,14 @@ import org.opengis.parameter.ParameterValueGroup;
 public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	private final Random generator = new Random();
 
-	final static boolean readSubSampled = true;
 
 	final static boolean writeEsriCompressed = !true;
 
 	final static boolean writeGrassCompressed = !true;
 
-	final static boolean writeEsriUnCompressed = !true;
+	final static boolean writeEsriUnCompressed = true;
 
-	final static boolean writeGrassUnCompressed = !true;
+	final static boolean writeGrassUnCompressed = true;
 
 	/**
 	 * Creates a new instance of ArcGridReadWriteTest
@@ -305,9 +304,8 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 			ParameterValueGroup params;
 			params = writer.getFormat().getWriteParameters();
 			params.parameter("GRASS").setValue(true);
-			params.parameter("compressed").setValue(false);
-			GeneralParameterValue[] gpv = { params.parameter("GRASS"),
-					params.parameter("compressed") };
+//			params.parameter("compressed").setValue(false);
+			GeneralParameterValue[] gpv = { params.parameter("GRASS")};
 			writer.write(gc1, gpv);
 
 			/** Step 3: Read the just written coverage */
@@ -345,9 +343,8 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 			ParameterValueGroup params;
 			params = writer.getFormat().getWriteParameters();
 			params.parameter("GRASS").setValue(false);
-			params.parameter("compressed").setValue(false);
-			GeneralParameterValue[] gpv = { params.parameter("GRASS"),
-					params.parameter("compressed") };
+//			params.parameter("compressed").setValue(false);
+			GeneralParameterValue[] gpv = { params.parameter("GRASS") };
 			writer.write(gc1, gpv);
 
 			/** Step 3: Read the just written coverage */

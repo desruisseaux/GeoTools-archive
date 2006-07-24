@@ -55,7 +55,7 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	
 	/** Indicates the bands to write for coverage with multiple bands*/
 	public static final DefaultParameterDescriptor WRITE_BAND = new DefaultParameterDescriptor(
-			"WriteBand",
+			"WRITE_BAND",
 			Integer.class, null,new Integer(-1));
 
 //	/** Indicates whether the arcgrid data is compressed with GZIP */
