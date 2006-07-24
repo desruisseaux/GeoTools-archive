@@ -131,7 +131,7 @@ public final class AsciiGridsImageMetadata extends IIOMetadata {
 	 */
 	public void mergeTree(String formatName, Node root)
 			throws IIOInvalidTreeException {
-		// TODO Auto-generated method stub
+
 	}
 
 	/**

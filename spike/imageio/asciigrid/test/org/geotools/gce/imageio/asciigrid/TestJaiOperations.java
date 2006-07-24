@@ -18,6 +18,7 @@ package org.geotools.gce.imageio.asciigrid;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.RenderedImage;
@@ -35,6 +36,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.media.jai.ImageLayout;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
@@ -92,6 +94,11 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 		final TileCache cache = JAI.getDefaultInstance().getTileCache();
 		cache.setMemoryCapacity(200 * 1024 * 1024);
 		cache.setMemoryThreshold(1.0f);
+
+		JAI.getDefaultInstance().getTileScheduler().setParallelism(4);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(4);
+		JAI.getDefaultInstance().getTileScheduler().setPriority(7);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(7);
 		super.setUp();
 	}
 
@@ -156,9 +163,13 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 			ImageReadParam irp2 = new ImageReadParam();
 			irp2.setSourceRegion(new Rectangle(4000, 4000, 3000, 3000));
 			irp2.setSourceSubsampling(10, 10, 0, 0);
+			final ImageLayout layout = new ImageLayout();
+			layout.setTileHeight(512);
+			layout.setTileWidth(512);
 			pbjImageRead.setParameter("readParam", irp2);
 			pbjImageRead.setParameter("Input", f);
-			image = JAI.create("ImageRead", pbjImageRead);
+			image = JAI.create("ImageRead", pbjImageRead, new RenderingHints(
+					JAI.KEY_IMAGE_LAYOUT, layout));
 			visualize(image, title + " xfactor=3 & yfactor=9");
 			//
 			// ImageReadParam irp3 = new ImageReadParam();
