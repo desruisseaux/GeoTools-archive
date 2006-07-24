@@ -19,7 +19,6 @@ package org.geotools.gce.arcgrid;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,7 +26,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
@@ -54,9 +52,10 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.factory.Hints;
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata;
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReader;
-import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReaderSpi;
+import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.util.NumberRange;
@@ -93,8 +92,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 
 	private double inNoData = Double.NaN;
 
-	private MultiResolutionRenderableImage mr;;
-
 	/**
 	 * Creates a new instance of an ArcGridReader basing the decision on whether
 	 * the file is compressed or not. I assume nothing about file extension.
@@ -104,7 +101,24 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 * @throws DataSourceException
 	 */
 	public ArcGridReader(Object input) throws DataSourceException {
+		this(input, null);
 
+	}
+
+	/**
+	 * Creates a new instance of an ArcGridReader basing the decision on whether
+	 * the file is compressed or not. I assume nothing about file extension.
+	 * 
+	 * @param aSource
+	 *            Source object for which we want to build an ArcGridReader.
+	 * @param hints
+	 *            Hints to be used by this read throughout his life.
+	 * @throws DataSourceException
+	 */
+	public ArcGridReader(Object input, final Hints hints)
+			throws DataSourceException {
+
+		this.hints = hints;
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Checking input
@@ -210,7 +224,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			// Envelope and other metadata
 			//
 			// /////////////////////////////////////////////////////////////////////
-			parseMetadataAndGetEnvelope(gridMetadata);
+			parseMetadata(gridMetadata);
 
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -218,8 +232,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			//
 			// /////////////////////////////////////////////////////////////////////
 			getHRInfo(reader);
-
-			prepareOverviews();
 
 			// release the stream
 			if (closeMe)
@@ -231,18 +243,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			throw new DataSourceException(e);
 		}
-
-	}
-
-	private void prepareOverviews() {
-
-		final int numOverviews = 5;
-		final Vector v = new Vector();
-		for (int i = 0; i < numOverviews; i++) {
-			v.add(i, getOverview(i));
-		}
-
-		mr = new MultiResolutionRenderableImage(v, 0.0f, 0.0f, 1.0f);
 
 	}
 
@@ -414,12 +414,12 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		// Preparing JAI ImageRead Operation
-		// final AsciiGridsImageReader mReader = new AsciiGridsImageReader(
-		// new AsciiGridsImageReaderSpi());
-		// final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-		// "ImageRead");
-		// pbjImageRead.setParameter("Input", source);
-		// pbjImageRead.setParameter("Reader", mReader);
+		final AsciiGridsImageReader mReader = new AsciiGridsImageReader(
+				new AsciiGridsImageReaderSpi());
+		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
+				"ImageRead");
+		pbjImageRead.setParameter("Input", source);
+		pbjImageRead.setParameter("Reader", mReader);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -440,19 +440,14 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 		// 2) the subsampling factors cannot be such that the w or h are zero
 		// //
 		decimationOnReadingControl(readParam, requestedRes);
-		// pbjImageRead.setParameter("readParam", readParam);
+		pbjImageRead.setParameter("readParam", readParam);
 
 		// //
 		//
 		// image and metadata
 		//
 		// //
-		final PlanarImage asciiCoverage =((RenderedOp) mr.createScaledRendering(
-				originalGridRange.getLength(0)
-						/ readParam.getSourceXSubsampling(), originalGridRange
-						.getLength(1)
-						/ readParam.getSourceYSubsampling(), null)).createInstance();
-		LOGGER.info(Integer.toString(asciiCoverage.getTileHeight()));
+		final PlanarImage asciiCoverage = JAI.create("ImageRead", pbjImageRead);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -525,11 +520,8 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 * 
 	 * @throws MismatchedDimensionException
 	 */
-	private void parseMetadataAndGetEnvelope(
-			AsciiGridsImageMetadata gridMetadata)
+	private void parseMetadata(AsciiGridsImageMetadata gridMetadata)
 			throws MismatchedDimensionException {
-		final CoordinateSystem cs = crs.getCoordinateSystem();
-		final boolean lonFirst = !GridGeometry2D.swapXY(cs);
 
 		// getting metadata
 		final Node root = gridMetadata
@@ -568,6 +560,13 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 				.getNodeValue());
 		double yll = Double.parseDouble(attributes.getNamedItem("yll")
 				.getNodeValue());
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Geotiff specification says that PixelIsArea map a pixel to the corner
+		// of the grid while PixelIsPoint map a pixel to the centre of the grid.
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (!pixelIsArea) {
 			final double correctionX = cellsizeX / 2d;
 			final double correctionY = cellsizeY / 2d;
@@ -575,16 +574,9 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			yll -= correctionY;
 		}
 
-		if (lonFirst) { // lon, lat
-			originalEnvelope = new GeneralEnvelope(new double[] { xll, yll },
-					new double[] { xll + (hrWidth * cellsizeX),
-							yll + (hrHeight * cellsizeY) });
-		} else {
-			// lat, lon
-			originalEnvelope = new GeneralEnvelope(new double[] { yll, xll },
-					new double[] { yll + (hrHeight * cellsizeY),
-							xll + (hrWidth * cellsizeX) });
-		}
+		originalEnvelope = new GeneralEnvelope(new double[] { xll, yll },
+				new double[] { xll + (hrWidth * cellsizeX),
+						yll + (hrHeight * cellsizeY) });
 
 		// setting the coordinate reference system for the envelope
 		originalEnvelope.setCoordinateReferenceSystem(crs);
@@ -663,6 +655,8 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			LOGGER.info("crs not found proceeding with EPSG:4326");
 			crs = ArcGridFormat.getDefaultCRS();
 		}
+
+		longitudeFirst = !GridGeometry2D.swapXY(crs.getCoordinateSystem());
 
 	}
 

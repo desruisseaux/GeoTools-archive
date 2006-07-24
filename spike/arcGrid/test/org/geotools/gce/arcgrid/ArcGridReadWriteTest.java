@@ -203,84 +203,84 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 		return inNoData;
 	}
 
-	/**
-	 * A Simple Test Method which read an arcGrid and write it as an arcGrid GZ
-	 * compressed
-	 */
-	public void testWriteEsriCompressed() throws Exception {
-		if (writeEsriCompressed) {
-			final File rf = TestData.file(this, "spearfish_dem.asc.gz");
-			final File wf;
-			wf = File.createTempFile(Long.toString(Math
-					.round(100000 * generator.nextDouble())), rf.getName());
-			wf.deleteOnExit();
+//	/**
+//	 * A Simple Test Method which read an arcGrid and write it as an arcGrid GZ
+//	 * compressed
+//	 */
+//	public void testWriteEsriCompressed() throws Exception {
+//		if (writeEsriCompressed) {
+//			final File rf = TestData.file(this, "spearfish_dem.asc.gz");
+//			final File wf;
+//			wf = File.createTempFile(Long.toString(Math
+//					.round(100000 * generator.nextDouble())), rf.getName());
+//			wf.deleteOnExit();
+//
+//			/** Step 1: Reading the coverage */
+//			GridCoverageReader reader = new ArcGridReader(rf);
+//			final GridCoverage2D gc1 = (GridCoverage2D) reader.read(null);
+//
+//			/** Step 2: Write grid coverage out to temp file */
+//			final GridCoverageWriter writer = new ArcGridWriter(wf);
+//
+//			// setting write parameters
+//			ParameterValueGroup params;
+//			params = writer.getFormat().getWriteParameters();
+//			params.parameter("GRASS").setValue(false);
+//			params.parameter("compressed").setValue(true);
+//			GeneralParameterValue[] gpv = { params.parameter("GRASS"),
+//					params.parameter("compressed") };
+//			writer.write(gc1, gpv);
+//
+//			/** Step 3: Read the just written coverage */
+//			GridCoverageReader reader2 = new ArcGridReader(wf);
+//			final GridCoverage2D gc2 = (GridCoverage2D) reader2.read(null);
+//
+//			/** Step 4: Check if the 2 coverage are equals */
+//			compare(gc1, gc2);
+//
+//			/** Step 5: Show the new coverage */
+//			gc2.show();
+//		}
+//	}
 
-			/** Step 1: Reading the coverage */
-			GridCoverageReader reader = new ArcGridReader(rf);
-			final GridCoverage2D gc1 = (GridCoverage2D) reader.read(null);
-
-			/** Step 2: Write grid coverage out to temp file */
-			final GridCoverageWriter writer = new ArcGridWriter(wf);
-
-			// setting write parameters
-			ParameterValueGroup params;
-			params = writer.getFormat().getWriteParameters();
-			params.parameter("GRASS").setValue(false);
-			params.parameter("compressed").setValue(true);
-			GeneralParameterValue[] gpv = { params.parameter("GRASS"),
-					params.parameter("compressed") };
-			writer.write(gc1, gpv);
-
-			/** Step 3: Read the just written coverage */
-			GridCoverageReader reader2 = new ArcGridReader(wf);
-			final GridCoverage2D gc2 = (GridCoverage2D) reader2.read(null);
-
-			/** Step 4: Check if the 2 coverage are equals */
-			compare(gc1, gc2);
-
-			/** Step 5: Show the new coverage */
-			gc2.show();
-		}
-	}
-
-	/**
-	 * A Simple Test Method which read an arcGrid and write it as a GRASS Ascii
-	 * Grid GZ compressed
-	 */
-	public void testWriteGrassCompressed() throws Exception {
-		if (writeGrassCompressed) {
-			final File rf = TestData.file(this, "spearfish_dem.asc.gz");
-			final File wf;
-			wf = File.createTempFile(Long.toString(Math
-					.round(100000 * generator.nextDouble())), rf.getName());
-			wf.deleteOnExit();
-			/** Step 1: Reading the coverage */
-			GridCoverageReader reader = new ArcGridReader(rf);
-			final GridCoverage2D gc1 = (GridCoverage2D) reader.read(null);
-
-			/** Step 2: Write grid coverage out to temp file */
-			final GridCoverageWriter writer = new ArcGridWriter(wf);
-
-			// setting write parameters
-			ParameterValueGroup params;
-			params = writer.getFormat().getWriteParameters();
-			params.parameter("GRASS").setValue(true);
-			params.parameter("compressed").setValue(true);
-			GeneralParameterValue[] gpv = { params.parameter("GRASS"),
-					params.parameter("compressed") };
-			writer.write(gc1, gpv);
-
-			/** Step 3: Read the just written coverage */
-			GridCoverageReader reader2 = new ArcGridReader(wf);
-			final GridCoverage2D gc2 = (GridCoverage2D) reader2.read(null);
-
-			/** Step 4: Check if the 2 coverage are equals */
-			compare(gc1, gc2);
-
-			/** Step 5: Show the new coverage */
-			gc2.show();
-		}
-	}
+//	/**
+//	 * A Simple Test Method which read an arcGrid and write it as a GRASS Ascii
+//	 * Grid GZ compressed
+//	 */
+//	public void testWriteGrassCompressed() throws Exception {
+//		if (writeGrassCompressed) {
+//			final File rf = TestData.file(this, "spearfish_dem.asc.gz");
+//			final File wf;
+//			wf = File.createTempFile(Long.toString(Math
+//					.round(100000 * generator.nextDouble())), rf.getName());
+//			wf.deleteOnExit();
+//			/** Step 1: Reading the coverage */
+//			GridCoverageReader reader = new ArcGridReader(rf);
+//			final GridCoverage2D gc1 = (GridCoverage2D) reader.read(null);
+//
+//			/** Step 2: Write grid coverage out to temp file */
+//			final GridCoverageWriter writer = new ArcGridWriter(wf);
+//
+//			// setting write parameters
+//			ParameterValueGroup params;
+//			params = writer.getFormat().getWriteParameters();
+//			params.parameter("GRASS").setValue(true);
+//			params.parameter("compressed").setValue(true);
+//			GeneralParameterValue[] gpv = { params.parameter("GRASS"),
+//					params.parameter("compressed") };
+//			writer.write(gc1, gpv);
+//
+//			/** Step 3: Read the just written coverage */
+//			GridCoverageReader reader2 = new ArcGridReader(wf);
+//			final GridCoverage2D gc2 = (GridCoverage2D) reader2.read(null);
+//
+//			/** Step 4: Check if the 2 coverage are equals */
+//			compare(gc1, gc2);
+//
+//			/** Step 5: Show the new coverage */
+//			gc2.show();
+//		}
+//	}
 
 	/**
 	 * A Simple Test Method which read an arcGrid and write it as a GRASS Ascii
@@ -288,7 +288,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	 */
 	public void testWriteGrassUnCompressed() throws Exception {
 		if (writeGrassUnCompressed) {
-			final File rf = TestData.file(this, "spearfish_dem.asc.gz");
+			final File rf = TestData.file(this, "vandem.asc");
 			final File wf;
 			wf = File.createTempFile(Long.toString(Math
 					.round(100000 * generator.nextDouble())), rf.getName());
@@ -328,7 +328,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	 */
 	public void testWriteEsriUnCompressed() throws Exception {
 		if (writeEsriUnCompressed) {
-			final File rf = TestData.file(this, "spearfish_dem.asc.gz");
+			final File rf = TestData.file(this, "spearfish_dem.arx");
 			final File wf;
 			wf = File.createTempFile(Long.toString(Math
 					.round(100000 * generator.nextDouble())), rf.getName());
@@ -363,56 +363,56 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 
 	}
 
-	/**
-	 * A Simple Test Method which read an arcGrid with subsampling enabled
-	 */
-	public void testReadSubSampled() throws Exception {
-		if (readSubSampled) {
-			final File rf = TestData.file(this, "spearfish_dem.asc.gz");
-			final File wf = File.createTempFile(Long.toString(Math
-					.round(100000 * generator.nextDouble())), rf.getName());
-			wf.deleteOnExit();
-
-			/** Step 1: Reading the coverage */
-			GridCoverageReader reader = new ArcGridReader(rf);
-			ParameterValueGroup params;
-			params = reader.getFormat().getReadParameters();
-			params.parameter("sourceXSubsampling").setValue(2);
-			params.parameter("sourceYSubsampling").setValue(2);
-			GeneralParameterValue[] gpv = {
-					params.parameter("sourceXSubsampling"),
-					params.parameter("sourceYSubsampling") };
-
-			final GridCoverage2D gc1 = (GridCoverage2D) reader.read(gpv);
-			gc1.show();
-
-			/** Step 2: Write grid coverage out to temp file */
-			final GridCoverageWriter writer = new ArcGridWriter(wf);
-
-			// setting write parameters
-			ParameterValueGroup params2;
-			params2 = writer.getFormat().getWriteParameters();
-			params2.parameter("GRASS").setValue(true);
-			params2.parameter("compressed").setValue(false);
-			GeneralParameterValue[] gpv2 = { params2.parameter("GRASS"),
-					params2.parameter("compressed") };
-			writer.write(gc1, gpv2);
-
-			/** Step 3: Read the just written coverage */
-			GridCoverageReader reader2 = new ArcGridReader(wf);
-			final GridCoverage2D gc2 = (GridCoverage2D) reader2.read(null);
-
-			/** Step 4: Check if the 2 coverage are equals */
-			if(params2.parameter("GRASS").booleanValue())
-				compare(gc1, gc2);
-
-
-			/** Step 5: Show the new coverage */
-			gc2.show();
-			LOGGER.info(gc1.toString());
-			LOGGER.info(gc2.toString());
-		}
-	}
+//	/**
+//	 * A Simple Test Method which read an arcGrid with subsampling enabled
+//	 */
+//	public void testReadSubSampled() throws Exception {
+//		if (readSubSampled) {
+//			final File rf = TestData.file(this, "spearfish_dem.arx");
+//			final File wf = File.createTempFile(Long.toString(Math
+//					.round(100000 * generator.nextDouble())), rf.getName());
+//			wf.deleteOnExit();
+//
+//			/** Step 1: Reading the coverage */
+//			GridCoverageReader reader = new ArcGridReader(rf);
+//			ParameterValueGroup params;
+//			params = reader.getFormat().getReadParameters();
+//			params.parameter("sourceXSubsampling").setValue(2);
+//			params.parameter("sourceYSubsampling").setValue(2);
+//			GeneralParameterValue[] gpv = {
+//					params.parameter("sourceXSubsampling"),
+//					params.parameter("sourceYSubsampling") };
+//
+//			final GridCoverage2D gc1 = (GridCoverage2D) reader.read(gpv);
+//			gc1.show();
+//
+//			/** Step 2: Write grid coverage out to temp file */
+//			final GridCoverageWriter writer = new ArcGridWriter(wf);
+//
+//			// setting write parameters
+//			ParameterValueGroup params2;
+//			params2 = writer.getFormat().getWriteParameters();
+//			params2.parameter("GRASS").setValue(true);
+//			params2.parameter("compressed").setValue(false);
+//			GeneralParameterValue[] gpv2 = { params2.parameter("GRASS"),
+//					params2.parameter("compressed") };
+//			writer.write(gc1, gpv2);
+//
+//			/** Step 3: Read the just written coverage */
+//			GridCoverageReader reader2 = new ArcGridReader(wf);
+//			final GridCoverage2D gc2 = (GridCoverage2D) reader2.read(null);
+//
+//			/** Step 4: Check if the 2 coverage are equals */
+//			if(params2.parameter("GRASS").booleanValue())
+//				compare(gc1, gc2);
+//
+//
+//			/** Step 5: Show the new coverage */
+//			gc2.show();
+//			LOGGER.info(gc1.toString());
+//			LOGGER.info(gc2.toString());
+//		}
+//	}
 
 	public static final void main(String[] args) throws Exception {
 		junit.textui.TestRunner.run(ArcGridReadWriteTest.class);

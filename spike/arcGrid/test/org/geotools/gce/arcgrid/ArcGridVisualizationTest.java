@@ -31,6 +31,7 @@ import org.geotools.referencing.CRS;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * <p>
@@ -60,7 +61,7 @@ public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
 		super.setUp();
 		ImageIO.setUseCache(false);
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
-				200 * 1024 * 1024);
+				100 * 1024 * 1024);
 		JAI.getDefaultInstance().getTileCache().setMemoryThreshold(1);
 
 	}
@@ -87,7 +88,7 @@ public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
 		params = reader.getFormat().getReadParameters();
 
 		final GeneralEnvelope envelope = new GeneralEnvelope(new double[] {
-				-90, -180 }, new double[] { 90, 180 });
+				-180, -90 }, new double[] { 180, 90 });
 		envelope.setCoordinateReferenceSystem(CRS.decode("EPSG:4326"));
 		params.parameter(
 				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
@@ -98,7 +99,7 @@ public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
 				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 						.toString()) };
 
-		GridCoverage2D gc = (GridCoverage2D) reader.read(gpv);
+		GridCoverage2D gc = (GridCoverage2D) reader.read(null);
 		gc.show();
 
 		
@@ -108,90 +109,91 @@ public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
 		
 		
 		
+//		
+//		
+//	
+//	
+//		params.parameter(
+//				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
+//				.setValue(
+//						new GridGeometry2D(new GeneralGridRange(new Rectangle(
+//								0, 0, 800, 600)), envelope));
+//		 gpv =new GeneralParameterValue[]  { params
+//				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
+//						.toString()) };
+//
+//		gc = (GridCoverage2D) reader.read(gpv);
+//		gc.show();
+//
+//		
+//		
+//		
+//		params.parameter(
+//				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
+//				.setValue(
+//						new GridGeometry2D(new GeneralGridRange(new Rectangle(
+//								0, 0, 1024, 768)), envelope));
+//		 gpv =new GeneralParameterValue[]  { params
+//				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
+//						.toString()) };
+//
+//		gc = (GridCoverage2D) reader.read(gpv);
+//		gc.show();
+//
+//		
+//		
+//		params.parameter(
+//				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
+//				.setValue(
+//						new GridGeometry2D(new GeneralGridRange(new Rectangle(
+//								0, 0, 1024, 768)), envelope));
+//		 gpv =new GeneralParameterValue[]  { params
+//				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
+//						.toString()) };
+//
+//		gc = (GridCoverage2D) reader.read(gpv);
+//		gc.show();
+//		
+//		
+//		params.parameter(
+//				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
+//				.setValue(
+//						new GridGeometry2D(new GeneralGridRange(new Rectangle(
+//								0, 0, 1280, 1024)), envelope));
+//		 gpv =new GeneralParameterValue[]  { params
+//				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
+//						.toString()) };
+//
+//		gc = (GridCoverage2D) reader.read(gpv);
+//		gc.show();
+//		
+//		
+//		params.parameter(
+//				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
+//				.setValue(
+//						new GridGeometry2D(new GeneralGridRange(new Rectangle(
+//								0, 0, 1600, 1200)), envelope));
+//		 gpv =new GeneralParameterValue[]  { params
+//				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
+//						.toString()) };
+//
+//		gc = (GridCoverage2D) reader.read(gpv);
+//		gc.show();
 		
 		
-	
-	
-		params.parameter(
-				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
-				.setValue(
-						new GridGeometry2D(new GeneralGridRange(new Rectangle(
-								0, 0, 800, 600)), envelope));
-		 gpv =new GeneralParameterValue[]  { params
-				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-						.toString()) };
-
-		gc = (GridCoverage2D) reader.read(gpv);
-		gc.show();
-
 		
 		
-		
-		params.parameter(
-				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
-				.setValue(
-						new GridGeometry2D(new GeneralGridRange(new Rectangle(
-								0, 0, 1024, 768)), envelope));
-		 gpv =new GeneralParameterValue[]  { params
-				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-						.toString()) };
-
-		gc = (GridCoverage2D) reader.read(gpv);
-		gc.show();
-
-		
-		
-		params.parameter(
-				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
-				.setValue(
-						new GridGeometry2D(new GeneralGridRange(new Rectangle(
-								0, 0, 1024, 768)), envelope));
-		 gpv =new GeneralParameterValue[]  { params
-				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-						.toString()) };
-
-		gc = (GridCoverage2D) reader.read(gpv);
-		gc.show();
-		
-		
-		params.parameter(
-				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
-				.setValue(
-						new GridGeometry2D(new GeneralGridRange(new Rectangle(
-								0, 0, 1280, 1024)), envelope));
-		 gpv =new GeneralParameterValue[]  { params
-				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-						.toString()) };
-
-		gc = (GridCoverage2D) reader.read(gpv);
-		gc.show();
-		
-		
-		params.parameter(
-				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
-				.setValue(
-						new GridGeometry2D(new GeneralGridRange(new Rectangle(
-								0, 0, 1600, 1200)), envelope));
-		 gpv =new GeneralParameterValue[]  { params
-				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-						.toString()) };
-
-		gc = (GridCoverage2D) reader.read(gpv);
-		gc.show();
-		
-		
-		
-		params.parameter(
-				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
-				.setValue(
-						new GridGeometry2D(new GeneralGridRange(new Rectangle(
-								0, 0, 1900, 1400)), envelope));
-		 gpv =new GeneralParameterValue[]  { params
-				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-						.toString()) };
-
-		gc = (GridCoverage2D) reader.read(gpv);
-		gc.show();
+//		params.parameter(
+//				AbstractGridFormat.READ_GRIDGEOMETRY2D.getName().toString())
+//				.setValue(
+//						new GridGeometry2D(new GeneralGridRange(new Rectangle(
+//								0, 0, 1900, 1400)), envelope));
+//		 gpv =new GeneralParameterValue[]  { params
+//				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
+//						.toString()) };
+//
+//		gc = (GridCoverage2D) reader.read(gpv);
+//		gc.show();
 
 		// printing CRS information
 		LOGGER.info(gc.getCoordinateReferenceSystem().toWKT());

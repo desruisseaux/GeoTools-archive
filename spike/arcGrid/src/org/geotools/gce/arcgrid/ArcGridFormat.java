@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReaderSpi;
+import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -51,12 +51,18 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	public static final DefaultParameterDescriptor GRASS = new DefaultParameterDescriptor(
 			"GRASS", "Indicates whether the arcgrid data is in GRASS format",
 			Boolean.FALSE, true);
+	
+	
+	/** Indicates the bands to write for coverage with multiple bands*/
+	public static final DefaultParameterDescriptor WRITE_BAND = new DefaultParameterDescriptor(
+			"WriteBand",
+			Integer.class, null,new Integer(-1));
 
-	/** Indicates whether the arcgrid data is compressed with GZIP */
-	public static final DefaultParameterDescriptor COMPRESS = new DefaultParameterDescriptor(
-			"Compressed",
-			"Indicates whether the arcgrid data is compressed with GZIP",
-			Boolean.FALSE, true);
+//	/** Indicates whether the arcgrid data is compressed with GZIP */
+//	public static final DefaultParameterDescriptor COMPRESS = new DefaultParameterDescriptor(
+//			"Compressed",
+//			"Indicates whether the arcgrid data is compressed with GZIP",
+//			Boolean.FALSE, true);
 
 	/**
 	 * Creates an instance and sets the metadata.
@@ -81,12 +87,13 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 		// writing parameters
 		writeParameters = new ParameterGroup(
 				new DefaultParameterDescriptorGroup(mInfo,
-						new GeneralParameterDescriptor[] { GRASS, COMPRESS }));
+						new GeneralParameterDescriptor[] { GRASS }));
 
 		// reading parameters
 		readParameters = new ParameterGroup(
-				new DefaultParameterDescriptorGroup(mInfo,
-						new GeneralParameterDescriptor[] {READ_GRIDGEOMETRY2D }));
+				new DefaultParameterDescriptorGroup(
+						mInfo,
+						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
 	}
 
 	/**
