@@ -1,4 +1,3 @@
-
 package org.geotools.gce.imageio.asciigrid;
 
 import java.util.Arrays;
@@ -12,7 +11,7 @@ import javax.imageio.metadata.IIOMetadataFormatImpl;
  * @author Simone Giannecchini (Simboss)
  */
 
-public class AsciiGridsImageMetadataFormat extends IIOMetadataFormatImpl {
+public final class AsciiGridsImageMetadataFormat extends IIOMetadataFormatImpl {
     private static IIOMetadataFormat instance = null;
 
     protected AsciiGridsImageMetadataFormat() {

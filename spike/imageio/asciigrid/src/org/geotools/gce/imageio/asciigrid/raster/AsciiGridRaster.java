@@ -1,19 +1,3 @@
-/*
- *    Geotools2 - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- */
 package org.geotools.gce.imageio.asciigrid.raster;
 
 import java.awt.Rectangle;
@@ -25,14 +9,12 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.RasterFactory;
 import javax.media.jai.iterator.RectIter;
 
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReader;
-import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 
 /**
  * Abstract base class
@@ -61,10 +43,10 @@ public abstract class AsciiGridRaster {
 
 	protected double yllCellCoordinate = Double.NaN;
 
-	/** horizontal  subsampling */
+	/** horizontal subsampling */
 	protected int sourceXSubsampling = 1;
 
-	/** vertical  subsampling */
+	/** vertical subsampling */
 	protected int sourceYSubsampling = 1;
 
 	/**
@@ -128,11 +110,10 @@ public abstract class AsciiGridRaster {
 		abortMutex[0] = 0;
 
 	}
-	
-	protected AsciiGridRaster(ImageInputStream iis,AsciiGridsImageReader reader) {
+
+	protected AsciiGridRaster(ImageInputStream iis, AsciiGridsImageReader reader) {
 		this(iis);
-		this.reader=reader;
-		
+		this.reader = reader;
 
 	}
 
@@ -283,7 +264,7 @@ public abstract class AsciiGridRaster {
 		final WritableRaster raster;
 
 		// int perc=0;
-		//		int iPerc=1;
+		// int iPerc=1;
 		int dstWidth = -1;
 		int dstHeight = -1;
 		int srcRegionWidth = -1;
@@ -544,15 +525,16 @@ public abstract class AsciiGridRaster {
 				// Check abort request at every 10%
 				//
 				// //
-//				perc=(int) (((samplesCounted * 1.0f) / samplesToThrowAwayBeforeFirstValidSample) * 100);
-//				if( (perc  % (10*iPerc) == 0)&&(int)perc>0)
-//					synchronized (abortMutex) {
-//						if (abortMutex[0] == 1)
-//							return raster;
-//						iPerc++;
-//						
-//
-//					}
+				// perc=(int) (((samplesCounted * 1.0f) /
+				// samplesToThrowAwayBeforeFirstValidSample) * 100);
+				// if( (perc % (10*iPerc) == 0)&&(int)perc>0)
+				// synchronized (abortMutex) {
+				// if (abortMutex[0] == 1)
+				// return raster;
+				// iPerc++;
+				//						
+				//
+				// }
 
 			}
 
@@ -698,23 +680,23 @@ public abstract class AsciiGridRaster {
 					// sample found
 					samplesCounted++;
 
-					
 					// //
 					//
 					// Check abort request at every 10%
 					//
 					// //
-//					perc=(int) (((samplesCounted * 1.0f) / samplesToThrowAwayBeforeFirstValidSample) * 100);
-//					if( (perc  % (10*iPerc) == 0)&&(int)perc>0)
-//						synchronized (abortMutex) {
-//							if (abortMutex[0] == 1)
-//								return raster;
-//							reader.processImageProgress(perc);
-//							iPerc++;
-//							
-//
-//						}
-					
+					// perc=(int) (((samplesCounted * 1.0f) /
+					// samplesToThrowAwayBeforeFirstValidSample) * 100);
+					// if( (perc % (10*iPerc) == 0)&&(int)perc>0)
+					// synchronized (abortMutex) {
+					// if (abortMutex[0] == 1)
+					// return raster;
+					// reader.processImageProgress(perc);
+					// iPerc++;
+					//							
+					//
+					// }
+
 					// Resetting Values
 					value = 0;
 					valSign = 1;
@@ -726,7 +708,6 @@ public abstract class AsciiGridRaster {
 					digits = 0;
 				}
 
-				
 				// //
 				//
 				// Analysis of current byte for next value

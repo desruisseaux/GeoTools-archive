@@ -1,4 +1,8 @@
-package org.geotools.gce.imageio.asciigrid.spi;
+package org.geotools.gce.imageio.asciigrid;
+
+import it.geosolutions.imageio.stream.input.FileImageInputStreamExtImpl;
+import it.geosolutions.imageio.stream.input.ImageInputStreamAdapter;
+import it.geosolutions.imageio.stream.input.exp.GZIPImageInputStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,13 +12,10 @@ import java.net.URLDecoder;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
-import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReader;
-import org.geotools.gce.imageio.asciigrid.LoggerController;
 import org.geotools.gce.imageio.asciigrid.raster.AsciiGridRaster;
 import org.geotools.gce.imageio.asciigrid.raster.EsriAsciiGridRaster;
 import org.geotools.gce.imageio.asciigrid.raster.GrassAsciiGridRaster;
@@ -136,7 +137,7 @@ public final class AsciiGridsImageReaderSpi extends ImageReaderSpi {
 		// if input source is a File,
 		// convert input from File to FileInputStream
 		if (input instanceof File) {
-			input = ImageIO.createImageInputStream(input);
+			input = new FileImageInputStreamExtImpl((File) input);
 			closeMe = true;
 
 		}
@@ -167,27 +168,27 @@ public final class AsciiGridsImageReaderSpi extends ImageReaderSpi {
 			 */
 
 			// creating an ImageInputStream from the InputStream
-			// input = ImageInputStreamAdapter.getStream((InputStream) input);
+			input = ImageInputStreamAdapter.getStream((InputStream) input);
 		}
 
 		// input source is it an ImageInputStream?
 		if (input instanceof ImageInputStream) {
-			((ImageInputStream) input).mark();
+			((ImageInputStream)input).mark();
 			// marking the initial stream
 			// casting from object to ImageInputStream and setting
 			// the imageInputStream
 			spiImageInputStream = (ImageInputStream) input;
-			// if (!(spiImageInputStream instanceof GZIPImageInputStream)) {
-			//
-			// try {
-			// final ImageInputStream temp = new GZIPImageInputStream(
-			// spiImageInputStream);
-			// spiImageInputStream = temp;
-			// } catch (IOException e) {
-			// spiImageInputStream.reset();
-			//
-			// }
-			// }
+			if (!(spiImageInputStream instanceof GZIPImageInputStream)) {
+
+				try {
+					final ImageInputStream temp = new GZIPImageInputStream(
+							spiImageInputStream);
+					spiImageInputStream = temp;
+				} catch (IOException e) {
+					spiImageInputStream.reset();
+
+				}
+			}
 		} else {
 
 			return false;

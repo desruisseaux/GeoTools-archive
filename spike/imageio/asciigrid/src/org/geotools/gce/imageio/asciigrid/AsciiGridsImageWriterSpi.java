@@ -1,4 +1,20 @@
-package org.geotools.gce.imageio.asciigrid.spi;
+/*
+ *    Geotools2 - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ */
+package org.geotools.gce.imageio.asciigrid;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -6,8 +22,6 @@ import java.util.Locale;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriter;
 import javax.imageio.spi.ImageWriterSpi;
-
-import org.geotools.gce.imageio.asciigrid.AsciiGridsImageWriter;
 
 /**
  * Class which provides a specialized Service Provider Interface which

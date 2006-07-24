@@ -18,7 +18,6 @@ package org.geotools.gce.imageio.asciigrid;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.RenderedImage;
@@ -28,27 +27,20 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.EventListener;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-import javax.imageio.event.IIOReadProgressListener;
-import javax.media.jai.ImageLayout;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
-import javax.media.jai.RecyclingTileFactory;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.TileCache;
-import javax.media.jai.TileFactory;
-import javax.media.jai.TileScheduler;
 import javax.media.jai.operator.ScaleDescriptor;
 import javax.media.jai.widget.ScrollingImagePanel;
 import javax.swing.ImageIcon;
@@ -60,7 +52,7 @@ import junit.textui.TestRunner;
 
 import org.geotools.resources.TestData;
 
-public class TestJaiOperations extends TestCase implements WindowListener,IIOReadProgressListener{
+public class TestJaiOperations extends TestCase implements WindowListener {
 	// Booleans used to allows testing Operations
 	static final boolean _testJaiImage_GiantIMAGEReadOperation = !true;
 
@@ -96,35 +88,11 @@ public class TestJaiOperations extends TestCase implements WindowListener,IIORea
 	private RenderedImage usedImage;
 
 	protected void setUp() throws Exception {
-		super.setUp();
-		
-		
-		// getting JAI
-		final JAI jai = JAI.getDefaultInstance();
-		jai.getTileScheduler().setParallelism(20);
-		jai.getTileScheduler().setPrefetchParallelism(20);
-		jai.getTileScheduler().setPrefetchPriority(7);
-		jai.getTileScheduler().setPriority(7);
-
-		// cache
-		final TileCache cache = jai.getTileCache();
-		cache.setMemoryCapacity(64 * 1024 * 1024);
+		ImageIO.setUseCache(false);
+		final TileCache cache = JAI.getDefaultInstance().getTileCache();
+		cache.setMemoryCapacity(200 * 1024 * 1024);
 		cache.setMemoryThreshold(1.0f);
-
-		// recycling
-		TileFactory rtf = new RecyclingTileFactory();
-		final RenderingHints hints = jai.getRenderingHints();
-		hints.put(JAI.KEY_TILE_FACTORY, rtf);
-		hints.put(JAI.KEY_TILE_RECYCLER, rtf);
-		hints.put(JAI.KEY_CACHED_TILE_RECYCLING_ENABLED, Boolean.TRUE);
-		jai.setRenderingHints(hints);
-
-		// tile scheduling
-		final TileScheduler scheduler = jai.getTileScheduler();
-		scheduler.setParallelism(20);
-		scheduler.setPriority(7);
-		scheduler.setPrefetchParallelism(20);
-		scheduler.setPrefetchPriority(7);
+		super.setUp();
 	}
 
 	public static void main(String[] args) {
@@ -186,21 +154,12 @@ public class TestJaiOperations extends TestCase implements WindowListener,IIORea
 			// visualize(image, title + " xfactor=2 & yfactor=2");
 
 			ImageReadParam irp2 = new ImageReadParam();
-			irp2.setSourceRegion(new Rectangle(1000, 1000, 3000, 3000));
-			irp2.setSourceSubsampling(4, 4, 0, 0);
+			irp2.setSourceRegion(new Rectangle(4000, 4000, 3000, 3000));
+			irp2.setSourceSubsampling(10, 10, 0, 0);
 			pbjImageRead.setParameter("readParam", irp2);
 			pbjImageRead.setParameter("Input", f);
-			pbjImageRead.setParameter("Listeners",new EventListener[]{this});
-			final ImageLayout layout= new ImageLayout();
-			layout.setTileGridXOffset(0);
-			layout.setTileGridYOffset(0);
-			layout.setTileWidth(512);
-			layout.setTileHeight(512);
-			//new RenderingHints(JAI.KEY_IMAGE_LAYOUT,layout)
-			image = JAI.create("ImageRead", pbjImageRead,null);
+			image = JAI.create("ImageRead", pbjImageRead);
 			visualize(image, title + " xfactor=3 & yfactor=9");
-			
-			logger.info(image.toString());
 			//
 			// ImageReadParam irp3 = new ImageReadParam();
 			// irp3.setSourceSubsampling(11, 2, 0, 0);
@@ -537,50 +496,5 @@ public class TestJaiOperations extends TestCase implements WindowListener,IIORea
 
 	public void windowOpened(WindowEvent arg0) {
 		// TODO Auto-generated method stub
-	}
-
-	public void sequenceStarted(ImageReader source, int minIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void sequenceComplete(ImageReader source) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void imageStarted(ImageReader source, int imageIndex) {
-//		logger.info(Float.toString(imageIndex));
-		
-	}
-
-	public void imageProgress(ImageReader source, float percentageDone) {
-//		logger.info(Float.toString(percentageDone));
-		
-	}
-
-	public void imageComplete(ImageReader source) {
-//		logger.info("");
-		
-	}
-
-	public void thumbnailStarted(ImageReader source, int imageIndex, int thumbnailIndex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void thumbnailProgress(ImageReader source, float percentageDone) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void thumbnailComplete(ImageReader source) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void readAborted(ImageReader source) {
-		logger.info("");
-		
 	}
 }

@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReader;
-import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
+import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReaderSpi;
 import org.geotools.resources.TestData;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

@@ -1,4 +1,3 @@
-
 package org.geotools.gce.imageio.asciigrid;
 
 import javax.imageio.metadata.IIOInvalidTreeException;
@@ -19,7 +18,7 @@ import org.w3c.dom.Node;
  * @author Daniele Romagnoli
  * @author Simone Giannecchini(Simboss)
  */
-public class AsciiGridsImageMetadata extends IIOMetadata {
+public final class AsciiGridsImageMetadata extends IIOMetadata {
 	public static final String nativeMetadataFormatName = "org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata_1.0";
 
 	public static final String[] metadataFormatNames = { nativeMetadataFormatName };

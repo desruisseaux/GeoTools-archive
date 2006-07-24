@@ -47,17 +47,7 @@ public final class EsriAsciiGridRaster extends AsciiGridRaster {
 
 	private String noDataMarker;
 
-	/**
-	 * Creates a new instance of EsriAsciiGridRaster.
-	 * 
-	 * @param iis
-	 *            ImageInputStream needed to read the raster.
-	 * @param spi
-	 */
-	public EsriAsciiGridRaster(ImageInputStream iis,
-			AsciiGridsImageReaderSpi spi) {
-		super(iis);
-	}
+
 
 	/**
 	 * Creates a new instance of EsriAsciiGridRaster.
