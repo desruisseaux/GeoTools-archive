@@ -231,6 +231,14 @@ IP:
 
 org.geotools.filter.function
 ----------------------------
+Contains a mix of interesting functions, some of which are auto generated. Most date from GeoTools 2.1
+timeframe as they are used to provided a better SLD experience for GeoServer. GeoTools 2.2 has
+introduced some aggregation functions wrapped over the visitor framework.
+IP:
+- headers updated to (C) 2005-2006 PMC
+- ExplicitClassificationFunction missing headers
+- StaticGeometry contains (C) 2005 by David Blasby and The Open Planning Project, with a note it was released LGPL
+
 org.geotools.filter.function.math
 ----------------------------
 org.geotools.filter.parser

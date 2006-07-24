@@ -1,3 +1,25 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2005 by David Blasby and The Open Planning Project
+ *    
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *    
+ *    (C) 2005 by David Blasby and The Open Planning Project 
+ *    http://openplans.org
+ *    
+ *    Released under the LGPL
+ *    contact: dblasby@openplans.org
+ */
 package org.geotools.filter.function;
 
 
@@ -19,12 +41,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKTReader;
 
-//(C) 2005 by David Blasby and The Open Planning Project 
-//http://openplans.org
-//
-//Released under the LGPL
-//
-//contact: dblasby@openplans.org
+
 
 
 
