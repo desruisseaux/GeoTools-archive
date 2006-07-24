@@ -1,4 +1,19 @@
 /*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+/*
  * NOTICE OF RELEASE TO THE PUBLIC DOMAIN
  *
  * This work was created by employees of the USDA Forest Service's
@@ -71,11 +86,13 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
  * 
  * @author Bryce Nordgren, USDA Forest Service
  * @author Simone Giannecchini
+ * @since 2.1
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffReader.java $
  */
-public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
-		GridCoverageReader {
+public final class GeoTiffReader extends AbstractGridCoverage2DReader
+		implements
+			GridCoverageReader {
 	private Logger LOGGER = Logger.getLogger(GeoTiffReader.class.toString());
 
 	/** SPI for creating tiff readers in ImageIO tools */
@@ -185,10 +202,11 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			// Coverage name
 			//
 			// /////////////////////////////////////////////////////////////////////
-			coverageName = source instanceof File ? ((File) source).getName()
+			coverageName = source instanceof File
+					? ((File) source).getName()
 					: "geotiff_coverage";
 			final int dotIndex = coverageName.lastIndexOf('.');
-			if (dotIndex != -1)
+			if (dotIndex != -1&&dotIndex!=coverageName.length())
 				coverageName = coverageName.substring(0, dotIndex);
 
 			// /////////////////////////////////////////////////////////////////////

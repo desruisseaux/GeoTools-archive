@@ -18,6 +18,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
 /**
  * 
  * @author Simone Giannecchini
+ * @since 2.3
  * 
  */
 public final class GeoTiffVCSCodes {

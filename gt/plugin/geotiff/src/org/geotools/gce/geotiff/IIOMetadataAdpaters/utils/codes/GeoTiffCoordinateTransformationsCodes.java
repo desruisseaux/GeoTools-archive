@@ -30,10 +30,10 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
  * <strong>GeoKeys Required for "user-defined" Coordinate Transformations</strong><br>
  * <br>
  * <br>
- * PCSCitationGeoKey:<br>
- * additional parameter geokeys depending on the Coord. Trans. specified).
+
  * 
  * @author Simone Giannecchini
+ * @since 2.3
  * 
  */
 public final class GeoTiffCoordinateTransformationsCodes {

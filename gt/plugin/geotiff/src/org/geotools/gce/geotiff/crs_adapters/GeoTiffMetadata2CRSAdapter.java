@@ -91,7 +91,7 @@ import org.opengis.referencing.operation.MathTransformFactory;
  * </p>
  * 
  * <p align="center">
- * <img src="doc-files/GeoTiffFlow.jpg">
+ * <img src="../../../../../../../doc-files/GeoTiffFlow.png">
  * </p>
  * 
  * <p>
@@ -363,9 +363,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 		rasterType = getGeoKeyAsInt(GeoTiffConstants.RasterPixelIsArea);
 		// @task TODO I do not know if this is correct but it works fine
 		if (rasterType == GeoTiffConstants.UNDEFINED)
-			rasterType = GeoTiffConstants.RasterPixelIsArea;// geotiff spec says
-		// that PixelIsArea
-		// is the default
+			rasterType = GeoTiffConstants.RasterPixelIsArea;
+		// geotiff spec says that PixelIsArea is the default
 
 		// /////////////////////////////////////////////////////////////////////
 		//

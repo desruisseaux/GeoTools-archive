@@ -25,11 +25,10 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.codes;
  * Geographic Codes [ 1001, 3999] = Reserved by GeoTIFFWritingUtilities [ 4000,
  * 4199] = EPSG GCS Based on Ellipsoid only [ 4200, 4999] = EPSG GCS Based on
  * EPSG Datum [ 5000, 32766] = Reserved by GeoTIFFWritingUtilities 32767 =
- * user-defined GCS [32768, 65535] = Private User Implementations Values: Note:
- * Geodetic datum using Greenwich PM have codes equal to the corresponding Datum
- * code - 2000. 
+ * user-defined GCS [32768, 65535] = Private User 
  * 
  * @author Simone Giannecchini
+ * @since 2.3
  * 
  */
 public final class GeoTiffGCSCodes {

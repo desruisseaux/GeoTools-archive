@@ -32,6 +32,9 @@ import com.sun.media.imageio.plugins.tiff.TIFFTag;
  * order it accordingly to the spec and then organize then into a dom tree ready
  * to be used by the ImageIO metadata mechanism.
  * 
+ * <p>
+ * Quoting the geotiff spec
+ * 
  * @author Simone Giannecchini
  * @since 2.3
  * 

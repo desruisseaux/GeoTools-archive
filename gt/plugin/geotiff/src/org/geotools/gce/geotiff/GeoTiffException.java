@@ -72,7 +72,7 @@ import org.geotools.gce.geotiff.IIOMetadataAdpaters.TiePoint;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffException.java $
  */
-public class GeoTiffException extends IOException {
+public final class GeoTiffException extends IOException {
 
 	/**
 	 * 
