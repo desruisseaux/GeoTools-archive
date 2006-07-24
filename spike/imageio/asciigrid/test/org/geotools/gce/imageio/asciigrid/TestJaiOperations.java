@@ -101,6 +101,10 @@ public class TestJaiOperations extends TestCase implements WindowListener,IIORea
 		
 		// getting JAI
 		final JAI jai = JAI.getDefaultInstance();
+		jai.getTileScheduler().setParallelism(20);
+		jai.getTileScheduler().setPrefetchParallelism(20);
+		jai.getTileScheduler().setPrefetchPriority(7);
+		jai.getTileScheduler().setPriority(7);
 
 		// cache
 		final TileCache cache = jai.getTileCache();
@@ -165,7 +169,7 @@ public class TestJaiOperations extends TestCase implements WindowListener,IIORea
 			final String title = new String("TestSubsamplingOperation");
 			logger.info("\n\n " + title + " \n");
 
-			final File f = TestData.file(this, "af0400ag.asc");
+			final File f = TestData.file(this, "af0500ag.asc");
 			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
 					"ImageRead");
 			RenderedOp image;
@@ -182,7 +186,7 @@ public class TestJaiOperations extends TestCase implements WindowListener,IIORea
 			// visualize(image, title + " xfactor=2 & yfactor=2");
 
 			ImageReadParam irp2 = new ImageReadParam();
-			irp2.setSourceRegion(new Rectangle(4000, 4000, 3000, 3000));
+			irp2.setSourceRegion(new Rectangle(1000, 1000, 3000, 3000));
 			irp2.setSourceSubsampling(4, 4, 0, 0);
 			pbjImageRead.setParameter("readParam", irp2);
 			pbjImageRead.setParameter("Input", f);
