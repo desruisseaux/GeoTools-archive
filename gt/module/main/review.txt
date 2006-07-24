@@ -1,5 +1,12 @@
 MODULE MAIN
 ===========
+Module Maintainer:
+- feature
+- filter & expression - Corey
+- styling - Corey
+IP Review:
+- Jody Garnett, July 24th, 2006
+
 Welcome to the "main" module, this module started out built around core. For GeoTools 2.0 (and
 the move to subversion), default implementations from several existing modules were merged in
 order to limit developer confusion.  These origional modules are still tracked (and where named
@@ -12,11 +19,6 @@ work of Martin.
 This module is the "white whale" bottleneck with the most contributions and problems, currently
 it lists James as the module maintainer, but in practice it is a burden and thus falls on the
 PMC for maintence.
-
-Module Maintainer:
-- feature
-- filter & expression - Corey
-- styling - Corey
 
 IP:
 - LICENSE.txt updated
@@ -280,13 +282,24 @@ IP:
 - a few files lacked headers
 
 org.geotools.gml
-----------------------------
+----------------
+Looks to be the home of the sax and dom based GML parser code.
+IP:
+- updated headers, everything in order
+
 org.geotools.gml.producer
-----------------------------
+-------------------------
+Front end to the GML transformer code, produces GML from feature collections etc.
+IP:
+- updated headers, everything in order.
+
 org.geotools.map
-----------------------------
 org.geotools.map.event
-----------------------------
+----------------------
+MapContext care and handling, model used by rendering (should move to API when based on a standard?)
+IP:
+- updated headers, everything in order.
+
 org.geotools.ows
 ----------------
 Contains a simple exception...
