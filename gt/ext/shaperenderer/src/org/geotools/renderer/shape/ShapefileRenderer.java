@@ -82,6 +82,7 @@ import org.geotools.renderer.lite.LiteCoordinateSequence;
 import org.geotools.renderer.lite.LiteCoordinateSequenceFactory;
 import org.geotools.renderer.lite.LiteShape2;
 import org.geotools.renderer.lite.RendererUtilities;
+import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
 import org.geotools.styling.FeatureTypeStyle;
@@ -100,6 +101,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+
+import sun.security.acl.WorldGroupImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -1261,26 +1264,26 @@ public class ShapefileRenderer implements GTRenderer {
 		}
 
 		this.context = context;
-
 		MapLayer[] layers = context.getLayers();
 		layerIndexInfo = new IndexInfo[layers.length];
 		final int length = layers.length;
 		ShapefileDataStore sds;
-		DataStore ds;
-		for (int i = 0; i < length; i++) {
-			ds = layers[i].getFeatureSource().getDataStore();
-			assert (ds instanceof ShapefileDataStore);
-			sds = (ShapefileDataStore) ds;
-
-			try {
-				layerIndexInfo[i] = useIndex(sds);
-			} catch (Exception e) {
-				layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null,
-						null);
-				LOGGER.fine("Exception while trying to use index"
-						+ e.getLocalizedMessage());
-			}
-		}
+        for( int i = 0; i < layers.length; i++ ) {
+            DataStore ds = layers[i].getFeatureSource().getDataStore();
+            if( ds instanceof ShapefileDataStore ){
+            	sds=(ShapefileDataStore) ds;
+				try {
+					layerIndexInfo[i] = useIndex(sds);
+				} catch (Exception e) {
+					layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null,
+							null);
+					LOGGER.fine("Exception while trying to use index"
+							+ e.getLocalizedMessage());
+				}
+            }else{
+            	layerIndexInfo[i]=null;
+            }
+        }
 	}
 
 	public void paint(Graphics2D graphics, Rectangle paintArea,
@@ -1374,6 +1377,11 @@ public class ShapefileRenderer implements GTRenderer {
 				// Only render layer when layer is visible
 				continue;
 			}
+			
+			if( layerIndexInfo[i]==null ){
+				renderWithStreamingRenderer(currLayer, graphics, paintArea, envelope, transform);
+				continue;
+			}
 
 			if (renderingStopRequested) {
 				return;
@@ -1435,6 +1443,15 @@ public class ShapefileRenderer implements GTRenderer {
 			LOGGER.fine("Style cache hit ratio: " + styleFactory.getHitRatio()
 					+ " , hits " + styleFactory.getHits() + ", requests "
 					+ styleFactory.getRequests());
+	}
+
+    private void renderWithStreamingRenderer(MapLayer layer, Graphics2D graphics, Rectangle paintArea, Envelope envelope, AffineTransform transform) {
+		MapContext context=new DefaultMapContext(new MapLayer[]{layer});
+		StreamingRenderer renderer=new StreamingRenderer();
+		renderer.setContext(context);
+		renderer.setJava2DHints(getJava2DHints());
+		renderer.setRendererHints(getRendererHints());
+		renderer.paint(graphics, paintArea, envelope, transform);
 	}
 
 	/**
