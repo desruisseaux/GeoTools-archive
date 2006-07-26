@@ -28,6 +28,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.FlowHandler;
 import org.xml.sax.SAXException;
 
 
@@ -202,6 +203,8 @@ public class FCBuffer extends Thread implements FeatureReader {
     }
 
     protected FeatureType ft = null;
+
+	private volatile Date lastUpdate;
     /**
      * DOCUMENT ME!
      *
@@ -286,10 +289,10 @@ public class FCBuffer extends Thread implements FeatureReader {
 
         logger.finest("hasNext " + size);
 
-        Date d = new Date(Calendar.getInstance().getTimeInMillis() + timeout);
+        resetTimer();
 
         while ((size <= 1) && (state != FINISH) && (state != STOP)) { //&& t>0) {
-
+        	
             if (exception != null) {
                 state = STOP;
                 IOException e = new IOException(exception.toString());
@@ -300,7 +303,7 @@ public class FCBuffer extends Thread implements FeatureReader {
             logger.finest("waiting for parser");
             Thread.yield();
 
-            if (d.before(Calendar.getInstance().getTime())) {
+            if (lastUpdate.before(new Date(Calendar.getInstance().getTimeInMillis() - timeout))) {
                 exception = new SAXException("Timeout");
                 state = STOP;
             }
@@ -348,6 +351,11 @@ public class FCBuffer extends Thread implements FeatureReader {
         HashMap hints = new HashMap();
         hints.put(GMLComplexTypes.STREAM_HINT, this);
 
+        hints.put(FlowHandler.FLOW_HANDLER_HINT, new FCFlowHandler());
+        if( this.ft!=null ){
+        	hints.put("DEBUG_INFO_FEATURE_TYPE_NAME", ft.getTypeName());
+        }
+
         try {
             DocumentFactory.getInstance(document, hints);
 
@@ -370,8 +378,16 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @version $Revision: 1.9 $
      */
     public static class StopException extends SAXException {
-        StopException() {
+        public StopException() {
             super("Stopping");
         }
     }
+    
+    public int getInternalState() {
+    	return state;
+    }
+
+	public void resetTimer() {
+		this.lastUpdate = Calendar.getInstance().getTime();		
+	}
 }

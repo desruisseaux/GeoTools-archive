@@ -26,6 +26,9 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.xml.gml.FCBuffer;
+import org.geotools.xml.gml.GMLComplexTypes;
+import org.geotools.xml.gml.FCBuffer.StopException;
 import org.geotools.xml.handlers.DocumentHandler;
 import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.geotools.xml.handlers.IgnoreHandler;
@@ -50,6 +53,12 @@ import org.xml.sax.helpers.DefaultHandler;
  * ElementHandlers found on the stack have direct next handlers placed on the
  * stack. So here's the warning, be careful to read how you may be affecting
  * (or forgetting to affect) the stack.
+ * </p>
+ * 
+ * <p>
+ * If a FlowHandler implementation is available in the hints, the handler will
+ * periodically check it to see if it should stop parsing. See the FlowHandler
+ * interface.
  * </p>
  *
  * @author dzwiers, Refractions Research, Inc. http://www.refractions.net
@@ -191,6 +200,8 @@ public class XMLSAXHandler extends DefaultHandler {
     public void characters(char[] ch, int start, int length)
         throws SAXException {
         try {
+        	checkStatus();
+        	
             String text = String.copyValueOf(ch, start, length);
 
             if ((text != null) && !"".equals(text)) {
@@ -201,6 +212,19 @@ public class XMLSAXHandler extends DefaultHandler {
             throw e;
         }
     }
+
+	private void checkStatus() throws StopException {
+		if (this.hints != null && hints.get(FlowHandler.FLOW_HANDLER_HINT) != null) {
+			FlowHandler handler = (FlowHandler) hints.get(FlowHandler.FLOW_HANDLER_HINT);
+			if (handler.shouldStop(hints)) {
+				throw new StopException();
+			}
+		}
+		
+		if (Thread.currentThread().isInterrupted()) {
+			throw new StopException();
+		}
+	}
 
     /**
      * Implementation of endElement.
@@ -219,13 +243,15 @@ public class XMLSAXHandler extends DefaultHandler {
         logger.info("END: " + qName);
 
         try {
+        	
             ((XMLElementHandler) handlers.pop()).endElement(new URI(
                     namespaceURI), localName, hints);
         } catch (Exception e) {
             logger.warning(e.getMessage());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
-            e.printStackTrace();
+
+//            e.printStackTrace();
             throw new SAXException(e);
         }
     }
@@ -245,7 +271,8 @@ public class XMLSAXHandler extends DefaultHandler {
      */
     public void startElement(String namespaceURI, String localName,
         String qName, Attributes atts) throws SAXException {
-        logger.info("START: " + qName);
+
+    	checkStatus();
 
         if (schemaProxy.size() != 0) {
             logger.info("ADDING NAMESPACES: " + schemaProxy.size());
