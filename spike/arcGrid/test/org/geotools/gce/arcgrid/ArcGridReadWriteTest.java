@@ -20,11 +20,8 @@ import java.awt.image.Raster;
 import java.io.File;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
-
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
@@ -38,7 +35,6 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	private final Random generator = new Random();
-
 
 	final static boolean writeEsriCompressed = !true;
 
@@ -55,7 +51,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	 *            DOCUMENT ME!
 	 */
 	public ArcGridReadWriteTest(String name) {
-		super(name, true);
+		super(name);
 	}
 
 	/**
@@ -63,8 +59,10 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	 * @param testParam
 	 * @throws Exception
 	 */
-	public void test(final File testFile) throws Exception {
-
+	public void runMe(final File testFile) throws Exception {
+		if(testFile.getName().equalsIgnoreCase("g_etopo6min.asc"))
+			return;
+		LOGGER.info(testFile.getAbsolutePath());
 		// create a temporary output file
 		// temporary file to use
 		final File tmpFile;
@@ -72,28 +70,11 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 				.round(100000 * generator.nextDouble())), testFile.getName());
 		tmpFile.deleteOnExit();
 
-		/** Step 1 read it */
-		// read in the grid coverage
-		GridCoverageReader reader = new ArcGridReader(testFile);
-		// reading the coverage
-		final GridCoverage2D gc1 = (GridCoverage2D) reader.read(null);
+		// ESRI
+		writeEsriUnCompressed(testFile, tmpFile);
 
-		/** Step 2 write it */
-		// write grid coverage out to temp file
-		final GridCoverageWriter writer = new ArcGridWriter(tmpFile);
-		writer.write(gc1, null); //
-
-		/** Step 3 read it again and compare them */
-		// read the grid coverage back in from temp file
-		reader = new ArcGridReader(tmpFile);
-		// read it
-		final GridCoverage2D gc2 = (GridCoverage2D) reader.read(null);
-		// check that the original and temporary grid are the same
-		compare(gc1, gc2);
-
-		/** Step 4 Visualize coverages */
-		gc1.show();
-		gc2.show();
+		// GRASS
+		writeGrassUnCompressed(testFile, tmpFile);
 
 	}
 
@@ -174,14 +155,12 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 	/**
 	 * A Simple Test Method which read an arcGrid and write it as a GRASS Ascii
 	 * Grid
+	 * 
+	 * @param wf
+	 * @param rf
 	 */
-	public void testWriteGrassUnCompressed() throws Exception {
+	public void writeGrassUnCompressed(File rf, File wf) throws Exception {
 		if (writeGrassUnCompressed) {
-			final File rf = TestData.file(this, "vandem.asc");
-			final File wf;
-			wf = File.createTempFile(Long.toString(Math
-					.round(100000 * generator.nextDouble())), rf.getName());
-			wf.deleteOnExit();
 
 			/** Step 1: Reading the coverage */
 			GridCoverageReader reader = new ArcGridReader(rf);
@@ -194,8 +173,8 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 			ParameterValueGroup params;
 			params = writer.getFormat().getWriteParameters();
 			params.parameter("GRASS").setValue(true);
-//			params.parameter("compressed").setValue(false);
-			GeneralParameterValue[] gpv = { params.parameter("GRASS")};
+			// params.parameter("compressed").setValue(false);
+			GeneralParameterValue[] gpv = { params.parameter("GRASS") };
 			writer.write(gc1, gpv);
 
 			/** Step 3: Read the just written coverage */
@@ -206,6 +185,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 			compare(gc1, gc2);
 
 			/** Step 5: Show the new coverage */
+			gc1.show();
 			gc2.show();
 		}
 
@@ -213,14 +193,12 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 
 	/**
 	 * A Simple Test Method which read an arcGrid and write it as an ArcGrid
+	 * 
+	 * @param rf
+	 * @param wf
 	 */
-	public void testWriteEsriUnCompressed() throws Exception {
+	public void writeEsriUnCompressed(File rf, File wf) throws Exception {
 		if (writeEsriUnCompressed) {
-			final File rf = TestData.file(this, "spearfish_dem.arx");
-			final File wf;
-			wf = File.createTempFile(Long.toString(Math
-					.round(100000 * generator.nextDouble())), rf.getName());
-			wf.deleteOnExit();
 
 			/** Step 1: Reading the coverage */
 			GridCoverageReader reader = new ArcGridReader(rf);
@@ -233,7 +211,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 			ParameterValueGroup params;
 			params = writer.getFormat().getWriteParameters();
 			params.parameter("GRASS").setValue(false);
-//			params.parameter("compressed").setValue(false);
+			// params.parameter("compressed").setValue(false);
 			GeneralParameterValue[] gpv = { params.parameter("GRASS") };
 			writer.write(gc1, gpv);
 
@@ -245,72 +223,69 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 			compare(gc1, gc2);
 
 			/** Step 5: Show the new coverage */
+			gc1.show();
 			gc2.show();
 		}
 
 	}
 
-//	/**
-//	 * A Simple Test Method which read an arcGrid with subsampling enabled
-//	 */
-//	public void testReadSubSampled() throws Exception {
-//		if (readSubSampled) {
-//			final File rf = TestData.file(this, "spearfish_dem.arx");
-//			final File wf = File.createTempFile(Long.toString(Math
-//					.round(100000 * generator.nextDouble())), rf.getName());
-//			wf.deleteOnExit();
-//
-//			/** Step 1: Reading the coverage */
-//			GridCoverageReader reader = new ArcGridReader(rf);
-//			ParameterValueGroup params;
-//			params = reader.getFormat().getReadParameters();
-//			params.parameter("sourceXSubsampling").setValue(2);
-//			params.parameter("sourceYSubsampling").setValue(2);
-//			GeneralParameterValue[] gpv = {
-//					params.parameter("sourceXSubsampling"),
-//					params.parameter("sourceYSubsampling") };
-//
-//			final GridCoverage2D gc1 = (GridCoverage2D) reader.read(gpv);
-//			gc1.show();
-//
-//			/** Step 2: Write grid coverage out to temp file */
-//			final GridCoverageWriter writer = new ArcGridWriter(wf);
-//
-//			// setting write parameters
-//			ParameterValueGroup params2;
-//			params2 = writer.getFormat().getWriteParameters();
-//			params2.parameter("GRASS").setValue(true);
-//			params2.parameter("compressed").setValue(false);
-//			GeneralParameterValue[] gpv2 = { params2.parameter("GRASS"),
-//					params2.parameter("compressed") };
-//			writer.write(gc1, gpv2);
-//
-//			/** Step 3: Read the just written coverage */
-//			GridCoverageReader reader2 = new ArcGridReader(wf);
-//			final GridCoverage2D gc2 = (GridCoverage2D) reader2.read(null);
-//
-//			/** Step 4: Check if the 2 coverage are equals */
-//			if(params2.parameter("GRASS").booleanValue())
-//				compare(gc1, gc2);
-//
-//
-//			/** Step 5: Show the new coverage */
-//			gc2.show();
-//			LOGGER.info(gc1.toString());
-//			LOGGER.info(gc2.toString());
-//		}
-//	}
+	// /**
+	// * A Simple Test Method which read an arcGrid with subsampling enabled
+	// */
+	// public void testReadSubSampled() throws Exception {
+	// if (readSubSampled) {
+	// final File rf = TestData.file(this, "spearfish_dem.arx");
+	// final File wf = File.createTempFile(Long.toString(Math
+	// .round(100000 * generator.nextDouble())), rf.getName());
+	// wf.deleteOnExit();
+	//
+	// /** Step 1: Reading the coverage */
+	// GridCoverageReader reader = new ArcGridReader(rf);
+	// ParameterValueGroup params;
+	// params = reader.getFormat().getReadParameters();
+	// params.parameter("sourceXSubsampling").setValue(2);
+	// params.parameter("sourceYSubsampling").setValue(2);
+	// GeneralParameterValue[] gpv = {
+	// params.parameter("sourceXSubsampling"),
+	// params.parameter("sourceYSubsampling") };
+	//
+	// final GridCoverage2D gc1 = (GridCoverage2D) reader.read(gpv);
+	// gc1.show();
+	//
+	// /** Step 2: Write grid coverage out to temp file */
+	// final GridCoverageWriter writer = new ArcGridWriter(wf);
+	//
+	// // setting write parameters
+	// ParameterValueGroup params2;
+	// params2 = writer.getFormat().getWriteParameters();
+	// params2.parameter("GRASS").setValue(true);
+	// params2.parameter("compressed").setValue(false);
+	// GeneralParameterValue[] gpv2 = { params2.parameter("GRASS"),
+	// params2.parameter("compressed") };
+	// writer.write(gc1, gpv2);
+	//
+	// /** Step 3: Read the just written coverage */
+	// GridCoverageReader reader2 = new ArcGridReader(wf);
+	// final GridCoverage2D gc2 = (GridCoverage2D) reader2.read(null);
+	//
+	// /** Step 4: Check if the 2 coverage are equals */
+	// if(params2.parameter("GRASS").booleanValue())
+	// compare(gc1, gc2);
+	//
+	//
+	// /** Step 5: Show the new coverage */
+	// gc2.show();
+	// LOGGER.info(gc1.toString());
+	// LOGGER.info(gc2.toString());
+	// }
+	// }
 
 	public static final void main(String[] args) throws Exception {
 		junit.textui.TestRunner.run(ArcGridReadWriteTest.class);
 	}
 
-	/**
-	 * @see org.geotools.gce.arcgrid.ArcGridBaseTestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-		ImageIO.setUseCache(false);
+	
 
-	}
+	
+	
 }

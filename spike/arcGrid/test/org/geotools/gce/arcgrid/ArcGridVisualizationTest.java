@@ -28,10 +28,10 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * <p>
@@ -55,14 +55,16 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/test/org/geotools/gce/arcgrid/ArcGridVisualizationTest.java $
  * @version 1.0
  */
-public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
+public class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		ImageIO.setUseCache(false);
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
-				60 * 1024 * 1024);
+				32 * 1024 * 1024);
 		JAI.getDefaultInstance().getTileCache().setMemoryThreshold(1);
+
+		
 
 	}
 
@@ -73,16 +75,18 @@ public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
 	 */
 	public ArcGridVisualizationTest(String name) {
 		super(name);
+		
 	}
 
 	public static final void main(String[] args) throws Exception {
 		junit.textui.TestRunner.run(ArcGridVisualizationTest.class);
 	}
 
-	public void test(final File testFile) throws Exception {
-		LOGGER.info(testFile.getAbsolutePath());
+	public void testVisualization() throws Exception {
+		LOGGER.info("g_etopo6min.asc");
 		// read in the grid coverage
-		final GridCoverageReader reader = new ArcGridReader(testFile);
+		final GridCoverageReader reader = new ArcGridReader(TestData.file(this,
+				"g_etopo6min.asc"));
 
 		ParameterValueGroup params;
 		params = reader.getFormat().getReadParameters();
@@ -99,10 +103,14 @@ public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
 				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 						.toString()) };
 
-		GridCoverage2D gc = (GridCoverage2D) reader.read(null);
+		GridCoverage2D gc = (GridCoverage2D) reader.read(gpv);
 		gc.show();
 
 		// printing CRS information
 		LOGGER.info(gc.getCoordinateReferenceSystem().toWKT());
 	}
+
+	
+
+
 }

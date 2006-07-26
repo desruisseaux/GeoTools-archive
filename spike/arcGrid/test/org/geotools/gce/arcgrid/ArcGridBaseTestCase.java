@@ -22,6 +22,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+
 import junit.framework.TestCase;
 
 import org.geotools.resources.TestData;
@@ -39,30 +41,25 @@ public abstract class ArcGridBaseTestCase extends TestCase {
 
 	protected File[] testFiles;
 
-	final boolean skipTest;
-
-	/**
-	 * 
-	 */
-	public ArcGridBaseTestCase() {
-		super();
-		skipTest = false;
-	}
-
 	public ArcGridBaseTestCase(String name) {
 
 		super(name);
-		skipTest = false;
-	}
-
-	public ArcGridBaseTestCase(String name, boolean skipBaseTest) {
-		super(name);
-		skipTest = skipBaseTest;
-
+		
 	}
 
 	protected void setUp() throws Exception {
 		super.setUp();
+		ImageIO.setUseCache(false);
+		
+		
+//		 check that it exisits
+		File file = TestData.file(this, "arcgrid_test_data.zip");
+		assertTrue(file.exists());
+
+		// unzip it
+		TestData.unzipFile(this, "arcgrid_test_data.zip");
+		
+		
 		testFiles = TestData.file(this, ".").listFiles(new FileFilter() {
 
 			public boolean accept(File pathname) {
@@ -73,34 +70,45 @@ public abstract class ArcGridBaseTestCase extends TestCase {
 	}
 
 	protected void tearDown() throws Exception {
+//		final File[] fileList = TestData.file(this, "").listFiles();
+//		final int length = fileList.length;
+//		for (int i = 0; i < length; i++) {
+//			if (fileList[i].isDirectory()) {
+//				fileList[i].delete();
+//
+//				continue;
+//			}
+//
+//			if (!fileList[i].getName().endsWith("zip")) {
+//				fileList[i].delete();
+//			}
+//		}
 		super.tearDown();
 	}
 
 	public void testAll() throws Exception {
-		if (!skipTest) {
-			final StringBuffer errors = new StringBuffer();
-			final int length = testFiles.length;
-			for (int i = 0; i < length; i++) {
-				LOGGER.info(testFiles[i].getAbsolutePath());
-				try {
-					test(testFiles[i]);
 
-				} catch (Exception e) {
-					// e.printStackTrace();
-					final StringWriter writer = new StringWriter();
-					e.printStackTrace(new PrintWriter(writer));
-					errors.append("\nFile ").append(
-							testFiles[i].getAbsolutePath()).append(" :\n")
-							.append(e.getMessage()).append("\n").append(
-									writer.toString());
-				}
-			}
+		final StringBuffer errors = new StringBuffer();
+		final int length = testFiles.length;
+		for (int i = 0; i < length; i++) {
+			
+			try {
+				runMe(testFiles[i]);
 
-			if (errors.length() > 0) {
-				fail(errors.toString());
+			} catch (Exception e) {
+				// e.printStackTrace();
+				final StringWriter writer = new StringWriter();
+				e.printStackTrace(new PrintWriter(writer));
+				errors.append("\nFile ").append(testFiles[i].getAbsolutePath())
+						.append(" :\n").append(e.getMessage()).append("\n")
+						.append(writer.toString());
 			}
+		}
+
+		if (errors.length() > 0) {
+			fail(errors.toString());
 		}
 	}
 
-	public abstract void test(File file) throws Exception;
+	public abstract void runMe(File file) throws Exception;
 }

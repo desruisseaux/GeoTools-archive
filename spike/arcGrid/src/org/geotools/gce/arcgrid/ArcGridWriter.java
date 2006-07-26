@@ -298,10 +298,10 @@ public class ArcGridWriter implements GridCoverageWriter {
 		// (format.getWriteParameters().parameter("Compressed").booleanValue())
 		// {
 		Iterator it = ImageIO.getImageWritersByFormatName("arcGrid");
-		ImageWriter writer= (ImageWriter) it.next();
-		pbjImageWrite.setParameter("Writer",writer);
-//		pbjImageWrite.setParameter("Format","arcGrid");
-		
+		ImageWriter writer = (ImageWriter) it.next();
+		pbjImageWrite.setParameter("Writer", writer);
+		// pbjImageWrite.setParameter("Format","arcGrid");
+
 		// ImageWriteParam param = writer.getDefaultWriteParam();
 		// param.setCompressionMode(ImageWriteParam.MODE_DEFAULT);
 		// pbjImageWrite.setParameter("WriteParam", param);
@@ -313,7 +313,6 @@ public class ArcGridWriter implements GridCoverageWriter {
 		// //
 
 		double inNoData = getCandidateNoData(gc);
-
 
 		// //
 		// Construct a proper asciiGridRaster which supports metadata setting
@@ -507,7 +506,8 @@ public class ArcGridWriter implements GridCoverageWriter {
 				inNoData = candidate.getRange().getMaximum();
 			}
 		}
-	
+
 		return inNoData;
 	}
+
 }
