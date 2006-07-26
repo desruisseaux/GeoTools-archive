@@ -144,23 +144,23 @@ public class AsciiGridsImageWriter extends ImageWriter {
 		checkMetadata(root);
 
 		// Checking if the compression is needed.
-		final int compression;
-		if (param == null) {
-			param = getDefaultWriteParam();
-			compression = ImageWriteParam.MODE_DISABLED;
-		} else {
-			compression = param.getCompressionMode();
-			// if compression is needed (ImageWriteParam.MODE_DEFAULT
-			// I need to use a GZIPImageOutputStreamExt
-			if (compression == ImageWriteParam.MODE_DEFAULT) {
-				throw new UnsupportedOperationException(
-						"Compression is not supported for the moment by this plugin!");
-
-				// imageOutputStream = new
-				// GZIPImageOutputStream(imageOutputStream);
-
-			}
-		}
+//		final int compression;
+//		if (param == null) {
+//			param = getDefaultWriteParam();
+//			compression = ImageWriteParam.MODE_DISABLED;
+//		} else {
+//			compression = param.getCompressionMode();
+//			// if compression is needed (ImageWriteParam.MODE_DEFAULT
+//			// I need to use a GZIPImageOutputStreamExt
+//			if (compression == ImageWriteParam.MODE_DEFAULT) {
+//				throw new UnsupportedOperationException(
+//						"Compression is not supported for the moment by this plugin!");
+//
+//				// imageOutputStream = new
+//				// GZIPImageOutputStream(imageOutputStream);
+//
+//			}
+//		}
 
 		// Writing out the Header
 		writeHeader(root);

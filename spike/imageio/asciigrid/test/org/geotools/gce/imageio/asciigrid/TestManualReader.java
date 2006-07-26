@@ -1,4 +1,5 @@
 package org.geotools.gce.imageio.asciigrid;
+
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -20,8 +21,7 @@ import javax.swing.JScrollPane;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReader;
-import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReaderSpi;
+import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.resources.TestData;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -30,11 +30,11 @@ import com.sun.media.jai.widget.DisplayJAI;
 
 public class TestManualReader extends TestCase {
 	private Logger logger = Logger.getLogger(TestManualReader.class.toString());
-	
-	//booleans used to allows testing operations
+
+	// booleans used to allows testing operations
 
 	static final boolean _testManualMetadataOperations = !true;
-	
+
 	static final boolean _testManualDirectUseOfSPI = !true;
 
 	static final boolean _testManualbySuffixAscReader = !true;
@@ -69,7 +69,7 @@ public class TestManualReader extends TestCase {
 
 		TestRunner.run(TestManualReader.class);
 	}
-	
+
 	public void testManualMetadataOperations() throws Exception {
 		if (_testManualMetadataOperations) {
 			try {
@@ -79,11 +79,12 @@ public class TestManualReader extends TestCase {
 						new AsciiGridsImageReaderSpi());
 				final File f = TestData.file(this, "arcGrid.asc");
 				reader.setInput(f);
-				IIOMetadata metadata= reader.getImageMetadata(0);
-				String nativeFormatName = metadata.getNativeMetadataFormatName();
+				IIOMetadata metadata = reader.getImageMetadata(0);
+				String nativeFormatName = metadata
+						.getNativeMetadataFormatName();
 				Node node = metadata.getAsTree(nativeFormatName);
 				displayMetadata(node);
-				
+
 				final BufferedImage bi = reader.read(0, null);
 				visualize(bi, title);
 			} catch (Exception e) {
@@ -104,7 +105,7 @@ public class TestManualReader extends TestCase {
 				final File f = TestData.file(this, "arcGrid.asc");
 				reader.setInput(f);
 				final BufferedImage bi = reader.read(0, null);
-				visualize(bi, title+f.getPath());
+				visualize(bi, title + f.getPath());
 			} catch (Exception e) {
 				Exception e1 = new Exception();
 				e1.initCause(e);
@@ -125,7 +126,7 @@ public class TestManualReader extends TestCase {
 					final File f = TestData.file(this, "ArcGrid.asc");
 					reader.setInput(f);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f.getPath());
+					visualize(bi, title + f.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -140,8 +141,10 @@ public class TestManualReader extends TestCase {
 			try {
 				final String title = new String("testManualURLReader");
 				logger.info("\n\n " + title + " \n");
-				final URL url = new URL(
-						"**INSERT HERE A VALID URL**");//TODO Set a Valid URL
+				final URL url = new URL("**INSERT HERE A VALID URL**");// TODO
+				// Set a
+				// Valid
+				// URL
 				Iterator it = ImageIO.getImageReaders(url);
 				if (it.hasNext()) {
 					AsciiGridsImageReader reader = (AsciiGridsImageReader) it
@@ -171,7 +174,7 @@ public class TestManualReader extends TestCase {
 							.next();
 					reader.setInput(f2);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f2.getPath());
+					visualize(bi, title + f2.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -193,7 +196,7 @@ public class TestManualReader extends TestCase {
 							.next();
 					reader.setInput(f);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f.getPath());
+					visualize(bi, title + f.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -209,7 +212,10 @@ public class TestManualReader extends TestCase {
 				final String title = new String("testManualGzURLReader");
 				logger.info("\n\n " + title + " \n");
 				final URL url = new URL(
-						"**INSERT HERE A VALID URL//GZipped.asc.gz**");//TODO Set a Valid URL
+						"**INSERT HERE A VALID URL//GZipped.asc.gz**");// TODO
+				// Set a
+				// Valid
+				// URL
 				Iterator it = ImageIO.getImageReaders(url);
 				if (it.hasNext()) {
 					AsciiGridsImageReader reader = (AsciiGridsImageReader) it
@@ -238,7 +244,7 @@ public class TestManualReader extends TestCase {
 							.next();
 					reader.setInput(f);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f.getPath());
+					visualize(bi, title + f.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -253,7 +259,7 @@ public class TestManualReader extends TestCase {
 			try {
 				final String title = new String("testManualStreamReader");
 				logger.info("\n\n " + title + " \n");
-				
+
 				final File f = TestData.file(this, "ArcGrid.asc");
 				InputStream is = new FileInputStream(f);
 				Iterator it = ImageIO.getImageReaders(is);
@@ -262,7 +268,7 @@ public class TestManualReader extends TestCase {
 							.next();
 					reader.setInput(is);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f.getPath());
+					visualize(bi, title + f.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -285,7 +291,7 @@ public class TestManualReader extends TestCase {
 							.next();
 					reader.setInput(is);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f.getPath());
+					visualize(bi, title + f.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -310,7 +316,7 @@ public class TestManualReader extends TestCase {
 							.next();
 					reader.setInput(stream);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f.getPath());
+					visualize(bi, title + f.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -334,7 +340,7 @@ public class TestManualReader extends TestCase {
 
 					reader.setInput(iis);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f.getPath());
+					visualize(bi, title + f.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -356,7 +362,7 @@ public class TestManualReader extends TestCase {
 							.next();
 					reader.setInput(f);
 					final BufferedImage bi = reader.read(0, null);
-					visualize(bi, title+f.getPath());
+					visualize(bi, title + f.getPath());
 				}
 			} catch (Exception e) {
 				Exception e1 = new Exception();
@@ -399,8 +405,7 @@ public class TestManualReader extends TestCase {
 		frame.pack();
 		frame.show();
 	}
-	
-	
+
 	public void displayMetadata(Node root) {
 		displayMetadata(root, 0);
 	}
@@ -409,7 +414,7 @@ public class TestManualReader extends TestCase {
 		for (int i = 0; i < level; i++) {
 			System.out.print("  ");
 		}
-	} 
+	}
 
 	void displayMetadata(Node node, int level) {
 		indent(level); // emit open tag
@@ -419,8 +424,8 @@ public class TestManualReader extends TestCase {
 			int length = map.getLength();
 			for (int i = 0; i < length; i++) {
 				Node attr = map.item(i);
-				System.out.print(" " + attr.getNodeName() +
-				                 "=\"" + attr.getNodeValue() + "\"");
+				System.out.print(" " + attr.getNodeName() + "=\""
+						+ attr.getNodeValue() + "\"");
 			}
 		}
 

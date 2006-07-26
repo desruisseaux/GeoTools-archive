@@ -28,7 +28,6 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,10 +36,8 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
-import javax.media.jai.MultiResolutionRenderableImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 
 import org.geotools.coverage.Category;
@@ -65,7 +62,6 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -245,8 +241,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 		}
 
 	}
-
-
 
 	private void getHRInfo(ImageReader reader) throws IOException,
 			TransformException {
@@ -568,20 +562,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 */
 	private void getCoordinateReferenceSystem() throws FileNotFoundException,
 			IOException {
-		// let's check if the user provided some crs information
-		// if (format.getReadParameters() != null) {
-
-		// TODO: HANDLE THIS CASE
-		// ParameterValue pv= format.getReadParameters().parameter("crs");
-		//		
-		// if (pv != null) {
-		// // we should always get here cause I provide a default value
-		// // for the crs parameter set to WGS84
-		// coordinateReferenceSystem = (CoordinateReferenceSystem) format
-		// .getReadParameters().parameter("crs").getValue();
-		// return;
-		// }
-		// }
 
 		if (source instanceof File) {
 			crs = null;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReader;
 import org.geotools.gce.imageio.asciigrid.LoggerController;
@@ -56,6 +57,15 @@ public final class EsriAsciiGridRaster extends AsciiGridRaster {
 	 *            ImageOutputStream needed to write the raster.
 	 */
 	public EsriAsciiGridRaster(ImageInputStream ios) {
+		super(ios);
+	}
+	/**
+	 * Creates a new instance of EsriAsciiGridRaster.
+	 * 
+	 * @param ios
+	 *            ImageOutputStream needed to write the raster.
+	 */
+	public EsriAsciiGridRaster(ImageOutputStream ios) {
 		super(ios);
 	}
 

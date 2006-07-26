@@ -32,7 +32,19 @@ import org.opengis.coverage.grid.Format;
  */
 public class ArcGridFormatFactory implements GridFormatFactorySpi {
     public boolean isAvailable() {
-        return true;
+        boolean available = true;
+
+        // if these classes are here, then the runtine environment has 
+        // access to JAI and the JAI ImageI/O toolbox.
+        try {
+            Class.forName("javax.media.jai.JAI");
+            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
+            Class.forName("org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata_1.0");
+        } catch (ClassNotFoundException cnf) {
+            available = false;
+        }
+
+        return available;
     }
 
     public Format createFormat() {

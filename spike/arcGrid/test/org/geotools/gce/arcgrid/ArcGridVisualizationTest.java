@@ -61,7 +61,7 @@ public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
 		super.setUp();
 		ImageIO.setUseCache(false);
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
-				100 * 1024 * 1024);
+				60 * 1024 * 1024);
 		JAI.getDefaultInstance().getTileCache().setMemoryThreshold(1);
 
 	}

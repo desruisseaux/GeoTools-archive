@@ -63,6 +63,7 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 //			"Compressed",
 //			"Indicates whether the arcgrid data is compressed with GZIP",
 //			Boolean.FALSE, true);
+	private final AsciiGridsImageReaderSpi spi= new AsciiGridsImageReaderSpi();
 
 	/**
 	 * Creates an instance and sets the metadata.
@@ -123,7 +124,7 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	 */
 	public boolean accepts(Object input) {
 		try {
-			return new AsciiGridsImageReaderSpi().canDecodeInput(input);
+			return spi.canDecodeInput(input);
 		} catch (IOException e) {
 			return false;
 		}
