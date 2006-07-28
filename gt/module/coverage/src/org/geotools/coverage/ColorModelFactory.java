@@ -125,18 +125,20 @@ final class ColorModelFactory {
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
      *         in the <code>{@link CategoryList#getRange}</code> range.
      */
-    public static synchronized ColorModel getColorModel(final Category[] categories,
+    public static  ColorModel getColorModel(final Category[] categories,
                                                         final int type,
                                                         final int visibleBand,
                                                         final int numBands)
     {
-        ColorModelFactory key = new ColorModelFactory(categories, type, visibleBand, numBands);
-        ColorModel model = (ColorModel) colors.get(key);
-        if (model == null) {
-            model = key.getColorModel();
-            colors.put(key, model);
-        }
-        return model;
+    	synchronized (colors) {
+	        ColorModelFactory key = new ColorModelFactory(categories, type, visibleBand, numBands);
+	        ColorModel model = (ColorModel) colors.get(key);
+	        if (model == null) {
+	            model = key.getColorModel();
+	            colors.put(key, model);
+	        }
+	        return model;
+    	}
     }
     
     /**

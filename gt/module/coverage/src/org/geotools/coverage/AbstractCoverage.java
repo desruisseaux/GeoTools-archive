@@ -41,10 +41,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
-// AWT
-import java.awt.Frame;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
+
 
 // Miscellaneous
 import java.util.Map;
@@ -92,7 +89,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.FactoryFinder;
+
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.util.SimpleInternationalString;
 

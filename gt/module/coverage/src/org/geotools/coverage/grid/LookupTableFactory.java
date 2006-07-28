@@ -153,12 +153,12 @@ final class LookupTableFactory {
                 }
 
                 case DataBuffer.TYPE_DOUBLE: {
-                    final double[][]  data = new double[transforms.length][];
+                    final double[][]  data = new double[transformsLength][];
                     final double[]  buffer = new double[length];
-                    for (int i=buffer.length; --i>=0;) {
+                    for (int i=length; --i>=0;) {
                         buffer[i] = i;
                     }
-                    for (int i=transforms.length; --i>=0;) {
+                    for (int i=transformsLength; --i>=0;) {
                         final double[] array = (i==0) ? buffer : (double[])buffer.clone();
                         transforms[i].transform(array, 0, array, 0, array.length);
                         data[i] = array;
@@ -168,14 +168,14 @@ final class LookupTableFactory {
                 }
 
                 case DataBuffer.TYPE_FLOAT: {
-                    final float[][]  data = new float[transforms.length][];
+                    final float[][]  data = new float[transformsLength][];
                     final float[]  buffer = new float[length];
-                    for (int i=buffer.length; --i>=0;) {
+                    for (int i=length; --i>=0;) {
                         buffer[i] = i;
                     }
                     for (int i=transforms.length; --i>=0;) {
                         final float[] array = (i==0) ? buffer : (float[])buffer.clone();
-                        transforms[i].transform(array, 0, array, 0, array.length);
+                        transforms[i].transform(array, 0, array, 0, length);
                         data[i] = array;
                     }
                     table = new LookupTableJAI(data, offset);
@@ -183,11 +183,11 @@ final class LookupTableFactory {
                 }
 
                 case DataBuffer.TYPE_INT: {
-                    final int[][] data = new int[transforms.length][];
-                    for (int i=transforms.length; --i>=0;) {
+                    final int[][] data = new int[transformsLength][];
+                    for (int i=transformsLength; --i>=0;) {
                         final MathTransform1D tr = transforms[i];
                         final int[] array = new int[length];
-                        for (int j=array.length; --j>=0;) {
+                        for (int j=length; --j>=0;) {
                             array[j] = (int)Math.min(Math.max(Math.round(tr.transform(j+offset)),
                                                              Integer.MIN_VALUE), Integer.MAX_VALUE);
                         }
@@ -207,11 +207,11 @@ final class LookupTableFactory {
                         minimum = 0;
                         maximum = 0xFFFF;
                     }
-                    final short[][] data = new short[transforms.length][];
-                    for (int i=transforms.length; --i>=0;) {
+                    final short[][] data = new short[transformsLength][];
+                    for (int i=transformsLength; --i>=0;) {
                         final MathTransform1D tr = transforms[i];
                         final short[] array = new short[length];
-                        for (int j=array.length; --j>=0;) {
+                        for (int j=length; --j>=0;) {
                             array[j] = (short)Math.min(Math.max(Math.round(tr.transform(j+offset)),
                                                                 minimum), maximum);
                         }
@@ -222,11 +222,11 @@ final class LookupTableFactory {
                 }
 
                 case DataBuffer.TYPE_BYTE: {
-                    final byte[][] data = new byte[transforms.length][];
-                    for (int i=transforms.length; --i>=0;) {
+                    final byte[][] data = new byte[transformsLength][];
+                    for (int i=transformsLength; --i>=0;) {
                         final MathTransform1D tr = transforms[i];
                         final byte[] array = new byte[length];
-                        for (int j=array.length; --j>=0;) {
+                        for (int j=length; --j>=0;) {
                             array[j] = (byte)Math.min(Math.max(Math.round(tr.transform(j+offset)),
                                                                0), 0xFF);
                         }

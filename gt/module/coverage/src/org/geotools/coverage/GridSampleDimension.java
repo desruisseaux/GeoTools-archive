@@ -29,7 +29,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;  // For javadoc
 import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
-import java.awt.image.SampleModel;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
