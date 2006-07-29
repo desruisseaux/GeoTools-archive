@@ -15,6 +15,8 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.CompareFilter;
@@ -50,41 +52,44 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
         Logger.global.setLevel(Level.SEVERE);
     }
     
-    public static FidFilter doInsert(DataStore ds,FeatureType ft,FeatureReader insert) throws NoSuchElementException, IOException, IllegalAttributeException{
+    public static FidFilter doInsert(DataStore ds,FeatureType ft,FeatureCollection insert) throws NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
-    	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
+    	WFSFeatureStore fs = (WFSFeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
     	System.out.println("Insert Read 1");
-    	FeatureReader fr = fs.getFeatures().reader();
+    	FeatureIterator fr = fs.getFeatures().features();
     	int count1 = 0;
     	while(fr.hasNext()){
     		count1 ++; fr.next();
     	}
+        fr.close();
     	System.out.println("Insert Add Features");
     	fs.addFeatures(insert);
 
     	System.out.println("Insert Read 2");
-    	fr = fs.getFeatures().reader();
+    	fr = fs.getFeatures().features();
     	int count2 = 0;
     	while(fr.hasNext()){
     		count2 ++; fr.next();
     	}
-    	assertTrue(count2>count1);
+        fr.close();
+    	assertEquals(count1+insert.size(), count2);
 
     	System.out.println("Insert Commit");
     	t.commit();
 
     	System.out.println("Insert Read 3");
-    	fr = fs.getFeatures().reader();
+    	fr = fs.getFeatures().features();
     	int count3 = 0;
     	while(fr.hasNext()){
     		count3 ++; fr.next();
     	}
-    	assertTrue("Read 1 == "+count1+", Read 2 == "+count2+" but Read 3 = "+count3,count2==count3);
+        fr.close();
+    	assertEquals(count2,count3);
     	
     	WFSTransactionState ts = (WFSTransactionState)t.getState(ds);
     	FidFilter ff = FilterFactoryFinder.createFilterFactory().createFidFilter();
-    	String[] fids = ts.getFids();
+    	String[] fids = ts.getFids(ft.getTypeName());
     	assertNotNull(fids);
     	for(int i=0;i<fids.length;i++)
     		ff.addFid(fids[i]);
@@ -98,17 +103,18 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	fs.setTransaction(t);
     	
     	System.out.println("Delete Read 1");
-    	FeatureReader fr = fs.getFeatures().reader();
+    	FeatureIterator fr = fs.getFeatures().features();
     	int count1 = 0;
     	while(fr.hasNext()){
     		count1 ++; fr.next();
     	}
+        fr.close();
 
     	System.out.println("Delete Remove "+ff);
     	fs.removeFeatures(ff);
 
     	System.out.println("Delete Read 2");
-    	fr = fs.getFeatures().reader();
+    	fr = fs.getFeatures().features();
     	int count2 = 0;
     	while(fr.hasNext()){
     		count2 ++;
@@ -117,70 +123,79 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     		else
     			fr.next();
     	}
+        fr.close();
     	assertTrue("Read 1 == "+count1+" Read 2 == "+count2,count2<count1);
 
     	System.out.println("Delete Commit");
     	t.commit();
 
     	System.out.println("Delete Read 3");
-    	fr = fs.getFeatures().reader();
+    	fr = fs.getFeatures().features();
     	int count3 = 0;
     	while(fr.hasNext()){
     		count3 ++; fr.next();
     	}
+        fr.close();
     	assertTrue(count2==count3);
     }
     
-    public static void doUpdate(DataStore ds,FeatureType ft) throws IllegalFilterException, FactoryConfigurationError, NoSuchElementException, IOException, IllegalAttributeException{
+    public static void doUpdate(DataStore ds,FeatureType ft, String attributeToChange, Object newValue ) throws IllegalFilterException, FactoryConfigurationError, NoSuchElementException, IOException, IllegalAttributeException{
     	Transaction t = new DefaultTransaction();
     	FeatureStore fs = (FeatureStore)ds.getFeatureSource(ft.getTypeName());
     	fs.setTransaction(t);
     	
-    	AttributeType at = ft.getAttributeType("LAND_KM");
-    	assertNotNull("Attribute LAND_KM does not exist",at);
+    	AttributeType at = ft.getAttributeType(attributeToChange);
+    	assertNotNull("Attribute "+attributeToChange+" does not exist",at);
     	
     	CompareFilter f = FilterFactoryFinder.createFilterFactory().createCompareFilter(FilterType.COMPARE_EQUALS);
-    	f.addLeftValue(FilterFactoryFinder.createFilterFactory().createAttributeExpression(ft,at.getName()));
-    	f.addRightValue(FilterFactoryFinder.createFilterFactory().createLiteralExpression(3.0));
+    	f.addLeftValue(FilterFactoryFinder.createFilterFactory().createAttributeExpression(at.getName()));
+    	f.addRightValue(FilterFactoryFinder.createFilterFactory().createLiteralExpression(newValue));
 
     	System.out.println("Update Read 1");
-    	FeatureReader fr = fs.getFeatures(f).reader();
+    	FeatureIterator fr = fs.getFeatures(f).features();
     	
     	int count1 = 0;
-    	if(fr!=null)
+    	Object oldValue=null;
+        if(fr!=null)
     	while(fr.hasNext()){
-    		count1 ++; fr.next();
+    		count1 ++; oldValue=fr.next().getAttribute(attributeToChange);
     	}
 
+        fr.close();
     	System.out.println("Update Modify");
-    	fs.modifyFeatures(at,"3",Filter.NONE);
+    	fs.modifyFeatures(at,newValue,Filter.NONE);
 
     	System.out.println("Update Read 2");
-    	fr = fs.getFeatures(f).reader();
+    	fr = fs.getFeatures(f).features();
     	int count2 = 0;
     	while(fr.hasNext()){
     		count2 ++;
 //    		System.out.println(fr.next());
     		fr.next();
     	}
+        fr.close();
 //System.out.println("Read 1 == "+count1+" Read 2 == "+count2);
     	assertTrue("Read 1 == "+count1+" Read 2 == "+count2,count2>count1);
 
     	System.out.println("Update Commit");
-    	t.commit();
-    	
-    	assertTrue(((WFSTransactionState)t.getState(ds)).getFids()!=null);
+        try {
+            t.commit();
 
-    	System.out.println("Update Read 3");
-    	fr = fs.getFeatures(f).reader();
-    	int count3 = 0;
-    	while(fr.hasNext()){
-    		count3 ++; fr.next();
-    	}
-    	assertTrue(count2==count3);
-    	
-    	// cleanup
-    	fs.modifyFeatures(at,"1",Filter.NONE);
-    	t.commit();
+            assertTrue(((WFSTransactionState) t.getState(ds)).getFids(ft.getTypeName()) != null);
+
+            System.out.println("Update Read 3");
+            fr = fs.getFeatures(f).features();
+            int count3 = 0;
+            while( fr.hasNext() ) {
+                count3++;
+                fr.next();
+            }
+            fr.close();
+            assertEquals(count2, count3);
+        } finally {
+            // cleanup
+            fs.modifyFeatures(at, oldValue, Filter.NONE);
+            t.commit();
+        }
     }
 }

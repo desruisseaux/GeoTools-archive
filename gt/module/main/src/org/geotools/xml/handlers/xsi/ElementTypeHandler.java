@@ -18,6 +18,7 @@ package org.geotools.xml.handlers.xsi;
 import java.net.URI;
 
 import org.geotools.xml.XSIElementHandler;
+import org.geotools.xml.handlers.XMLTypeHelper;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
 import org.geotools.xml.schema.Type;
@@ -543,5 +544,15 @@ public class ElementTypeHandler extends ElementGroupingHandler {
         public URI getNamespace() {
             return namespace;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+			 if (this.name != null) {
+	                if (this.name.equalsIgnoreCase(localName) && getNamespace().equals(namespaceURI)) {
+	                    return this;
+	                }
+	            }
+
+	            return (type == null) ? null : XMLTypeHelper.findChildElement(type, localName, namespaceURI);
+		}
     }
 }

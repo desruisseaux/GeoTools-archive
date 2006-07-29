@@ -15,6 +15,8 @@
  */
 package org.geotools.xml.schema.impl;
 
+import java.net.URI;
+
 import org.geotools.xml.schema.Choice;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.ElementGrouping;
@@ -111,4 +113,20 @@ public class ChoiceGT implements Choice {
 
         return null;
     }
+
+	public Element findChildElement(String localName, URI namespaceURI) {
+        if (children == null) {
+            return null;
+        }
+
+        for (int i = 0; i < children.length; i++) {
+            Element e = children[i].findChildElement(localName, namespaceURI);
+
+            if (e != null) {
+                return e;
+            }
+        }
+
+        return null;
+	}
 }

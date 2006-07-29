@@ -1762,11 +1762,11 @@ public class FilterOpsComplexTypes {
             if ((hints != null)
                     && hints.containsKey(FilterSchema.FILTER_CAP_KEY)) {
                 FilterCapabilities fc = (FilterCapabilities) hints.get(FilterSchema.FILTER_CAP_KEY);
-                long elementkey = FilterCapabilities.findOperation(element
+                FilterCapabilities elementkey = FilterCapabilities.findOperation(element
                         .getName());
 
-                if ((elementkey == 0)
-                        || ((fc.getSpatialOps() & elementkey) != elementkey)) {
+                if ((elementkey == null)
+                        || !fc.supports(elementkey)) {
                     return false;
                 }
             }

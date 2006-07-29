@@ -186,7 +186,8 @@ public class ElementHandlerFactory {
         }
 
         for (int i = 0; i < eth.length; i++) {
-            if (localName.equalsIgnoreCase(eth[i].getName()) || eth[i].getName().equals(IgnoreHandler.NAME)) {
+            String name = eth[i].getName();
+			if (localName.equalsIgnoreCase(name) || name.equals(IgnoreHandler.NAME)) {
                 return createElementHandler(eth[i]);
             }
         }

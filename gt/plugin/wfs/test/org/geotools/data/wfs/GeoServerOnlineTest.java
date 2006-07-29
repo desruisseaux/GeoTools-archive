@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -21,6 +23,7 @@ import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
@@ -31,7 +34,10 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.filter.NullFilter;
+import org.geotools.filter.expression.AttributeExpression;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -44,35 +50,34 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GeoServerOnlineTest extends TestCase {
 
-    protected URL url = null;
-    
+    public static final String SERVER_URL = "http://192.168.50.92:8080/geoserver/wfs?REQUEST=GetCapabilities";
+    public static final String TO_EDIT_TYPE = "topp:bc_pubs";
+    public static final String ATTRIBUTE_TO_EDIT = "name";
+    public static final String NEW_EDIT_VALUE = "newN";
+    private static final int EPSG_CODE = 3005;
+    private URL url = null;
     public void setUp() throws MalformedURLException { 
-    	url = targetCapabilities("http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities");
-    }
-    
-    /** Subclasses may override 
-     * @throws MalformedURLException
-     */
-    protected URL targetCapabilities(String capabilities) throws MalformedURLException{
-    	URL url = new URL(capabilities);
-        InputStream stream = null;             
-        try {
-            stream = url.openStream();
-            return url;
-        }
-        catch( Throwable t ) {
-            System.err.println( getName()+ " disabled: target unavailable "+capabilities );
-            return null;
-        }
-        finally {
-            if( stream != null )
-               try {
-                   stream.close();
-               } catch (IOException e) {
-                   // whatever
-               }
-        }
-    }
+       url = new URL(SERVER_URL);
+         if( url != null && url.toString().indexOf("localhost")!= -1 ) {
+             InputStream stream = null;             
+             try {
+                 stream = url.openStream();
+             }
+             catch( Throwable t ) {
+                 System.err.println("Warning you local geoserver is not available - "+getName()+" test disabled ");
+                 url = null;
+             }
+             finally {
+                 if( stream != null )
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                        // whatever
+                    }
+             }
+         }
+    } 
+
     public void testTypes() throws IOException, NoSuchElementException {
     	if( url == null) return;
         WFSDataStore wfs; 
@@ -92,6 +97,8 @@ public class GeoServerOnlineTest extends TestCase {
         String typeName = "unknown";        
         for( int i=0; i<types.length;i++){
             typeName = types[i];
+            if( typeName.equals("topp:geometrytype"))
+            	continue;
             FeatureType type = wfs.getSchema( typeName );
             type.getTypeName();
             type.getNamespace();
@@ -121,6 +128,51 @@ public class GeoServerOnlineTest extends TestCase {
             features.close( iterator );
         }
     }
+    
+    public void testSingleType() throws IOException, NoSuchElementException {
+        WFSDataStore wfs; 
+        try {
+            wfs = WFSDataStoreReadTest.getDataStore(url);
+        } catch (ConnectException e) {
+            e.printStackTrace(System.err);
+            return;
+        } catch (UnknownHostException e) {
+            e.printStackTrace(System.err);
+            return;
+        } catch (NoRouteToHostException e) {
+            e.printStackTrace(System.err);
+            return;
+        }
+        String typeName = "topp:geometrytype";        
+            FeatureType type = wfs.getSchema( typeName );
+            type.getTypeName();
+            type.getNamespace();
+            
+            FeatureSource source = wfs.getFeatureSource( typeName );
+            source.getBounds();
+            
+            FeatureCollection features = source.getFeatures();
+            features.getBounds();
+            features.getSchema();
+            features.getFeatureType();
+            
+            DefaultQuery query = new DefaultQuery( typeName, Filter.NONE, 20, Query.ALL_NAMES, "work already" );
+            features = source.getFeatures( query );
+            features.size();
+            features.getCount();
+            Iterator reader = features.iterator();
+            while( reader.hasNext() ){
+                Feature feature = (Feature)reader.next();
+                System.out.println(feature);
+            }
+            features.close(reader);
+            
+            FeatureIterator iterator = features.features();
+            while( iterator.hasNext() ){
+                Feature feature = iterator.next();
+            }
+            features.close( iterator );
+    }
     public void testFeatureType() throws NoSuchElementException, IOException, SAXException{
 
         WFSDataStoreReadTest.doFeatureType(url,true,true,0);
@@ -142,14 +194,24 @@ public class GeoServerOnlineTest extends TestCase {
     // NOPE, it's in Lat-Long for the Env, BCAlbers for the data
     public void testFeatureReaderWithFilterBBoxGET() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException, IllegalFilterException{
         // minx,miny,maxx,maxy
-//        Envelope bbox = new Envelope(-75.791435,38.44949,-75.045998,39.840008); // lat long
-        Envelope bbox = new Envelope(556759.0,5233034,556934, 5233040.0);  // bc albers  
+
+        Map m = new HashMap();
+        m.put(WFSDataStoreFactory.URL.key,url);
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
+        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
+        
+        Envelope bbox = post.getFeatureSource(post.getTypeNames()[0]).getBounds();
         WFSDataStoreReadTest.doFeatureReaderWithBBox(url,true,false,0,bbox);
     }
     public void testFeatureReaderWithFilterBBoxPOST() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException, IllegalFilterException{
-        // minx,miny,maxx,maxy
-//      Envelope bbox = new Envelope(-75.791435,38.44949,-75.045998,39.840008); // lat long
-      Envelope bbox = new Envelope(556759.0,5233034,556934, 5233040.0);  // bc albers  
+
+        Map m = new HashMap();
+        m.put(WFSDataStoreFactory.URL.key,url);
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
+        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
+        
+        Envelope bbox = post.getFeatureSource(post.getTypeNames()[0]).getBounds();    
+        
         WFSDataStoreReadTest.doFeatureReaderWithBBox(url,true,false,0,bbox);
     }    
     
@@ -160,79 +222,80 @@ public class GeoServerOnlineTest extends TestCase {
      * </p>
      */
     
-    // Feature Set no longer at RR.
-    
-//    public void testWrite() throws NoSuchElementException, IllegalFilterException, IOException, IllegalAttributeException{
-//
-//
-//
-//        Map m = new HashMap();
-//        m.put(WFSDataStoreFactory.URL.key,url);
-//        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
-//        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
-//        FeatureType ft = post.getSchema( "gd:states" );
-//        FeatureSource fs = post.getFeatureSource( "gd:states" );        
-//        class Watcher implements FeatureListener {
-//            public int count=0;
-//            public void changed( FeatureEvent featureEvent ) {
-//                System.out.println("Event "+featureEvent );
-//                count++;
-//            }            
-//        }
-//        Watcher watcher = new Watcher();
-//        fs.addFeatureListener( watcher );
-//
-//        GeometryFactory gf = new GeometryFactory();
-//        MultiPolygon mp = gf.createMultiPolygon(new Polygon[]{gf.createPolygon(gf.createLinearRing(new Coordinate[]{new Coordinate(-88.071564,37.51099), new Coordinate(-88.467644,37.400757), new Coordinate(-90.638329,42.509361), new Coordinate(-89.834618,42.50346),new Coordinate(-88.071564,37.51099)}),new LinearRing[]{})});
-//        mp.setUserData("http://www.opengis.net/gml/srs/epsg.xml#4326");
-//        
-//        Object[] attrs = {
-//                mp,
-//                "MyStateName",
-//                "70",
-//                "Refrac",
-//                "RR",
-//                new Double(180),
-//                new Double(18),
-//                new Double(220),
-//                new Double(80),
-//                new Double(20),
-//                new Double(40),
-//                new Double(180),
-//                new Double(90),
-//                new Double(100),
-//                new Double(40),
-//                new Double(80),
-//                new Double(40),
-//                new Double(180),
-//                new Double(90),
-//                new Double(70),
-//                new Double(70),
-//                new Double(60),
-//                new Double(10)  
-//        };
-//        
-//        System.out.println(attrs[0]);
-//        Feature f = ft.create(attrs);
-//                
-//        FeatureReader inserts = DataUtilities.reader(new Feature[] {f});
-//        FidFilter fp = WFSDataStoreWriteTest.doInsert(post,ft,inserts);
-//        // geoserver does not return the correct fid here ... 
-//        // get the 3rd feature ... and delete it?        
-//        inserts.close();
-//        
-//        /// okay now count ...
-//        FeatureReader count = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);        
-//        int i = 0;
-//        while(count.hasNext() && i<3){
-//            f = count.next();i++;
-//        }
-//        count.close();       
-//        //
-//        fp = FilterFactoryFinder.createFilterFactory().createFidFilter(f.getID());
-//        
-//        WFSDataStoreWriteTest.doDelete(post,ft,fp);
-//        WFSDataStoreWriteTest.doUpdate(post,ft);
-//        //assertFalse("events fired", watcher.count == 0);
-//    }    
+    public void testWrite() throws NoSuchElementException, IllegalFilterException, IOException, IllegalAttributeException{
+
+        Map m = new HashMap();
+        m.put(WFSDataStoreFactory.URL.key,url);
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000000));
+        DataStore post = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);  
+        String typename = TO_EDIT_TYPE;
+        FeatureType ft = post.getSchema( typename );
+        FeatureSource fs = post.getFeatureSource( typename );        
+        class Watcher implements FeatureListener {
+            public int count=0;
+            public void changed( FeatureEvent featureEvent ) {
+                System.out.println("Event "+featureEvent );
+                count++;
+            }            
+        }
+        Watcher watcher = new Watcher();
+        fs.addFeatureListener( watcher );
+        
+        FidFilter startingFeatures=createFidFilter(fs);
+        try{
+        GeometryFactory gf = new GeometryFactory();
+        MultiPolygon mp = gf.createMultiPolygon(new Polygon[]{gf.createPolygon(gf.createLinearRing(new Coordinate[]{new Coordinate(-88.071564,37.51099), new Coordinate(-88.467644,37.400757), new Coordinate(-90.638329,42.509361), new Coordinate(-89.834618,42.50346),new Coordinate(-88.071564,37.51099)}),new LinearRing[]{})});
+        mp.setUserData("http://www.opengis.net/gml/srs/epsg.xml#"+EPSG_CODE);
+      
+        FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
+		NullFilter geomNullCheck = filterFac.createNullFilter();
+        AttributeExpression geometryAttributeExpression = filterFac.createAttributeExpression(ft.getDefaultGeometry().getName());
+		geomNullCheck.nullCheckValue(geometryAttributeExpression);
+		Query query=new DefaultQuery(typename, geomNullCheck.not(), 1, Query.ALL_NAMES, null);
+        FeatureIterator inStore = fs.getFeatures(query).features();
+        
+        Feature f,f2;
+        try{
+            Feature feature = inStore.next();
+            f = ft.create(ft.duplicate(feature).getAttributes(new Object[ft.getAttributeCount()]));
+            f2 = ft.create(ft.duplicate(feature).getAttributes(new Object[ft.getAttributeCount()]));
+            assertFalse("Max Feature failed", inStore.hasNext());
+        }finally{
+            inStore.close();
+        }
+        
+        Logger.getLogger("org.geotools.data.wfs").setLevel(Level.FINE);
+        FeatureCollection inserts = DataUtilities.collection(new Feature[] {f,f2});
+        FidFilter fp = WFSDataStoreWriteOnlineTest.doInsert(post,ft,inserts);
+        
+        /// okay now count ...
+        FeatureReader count = post.getFeatureReader(new DefaultQuery(ft.getTypeName()),Transaction.AUTO_COMMIT);        
+        int i = 0;
+        while(count.hasNext() && i<3){
+            f = count.next();i++;
+        }
+        count.close();       
+
+        WFSDataStoreWriteOnlineTest.doDelete(post,ft,fp);
+        WFSDataStoreWriteOnlineTest.doUpdate(post,ft, ATTRIBUTE_TO_EDIT, NEW_EDIT_VALUE);
+//        assertFalse("events not fired", watcher.count == 0);
+        }finally{
+        	try{
+        	((FeatureStore)fs).removeFeatures(startingFeatures.not());
+        	}catch (Exception e) {
+        		System.out.println(e);
+			}
+        }
+    }
+	private FidFilter createFidFilter(FeatureSource fs) throws IOException {
+		FeatureIterator iter = fs.getFeatures().features();
+		try{
+			FidFilter filter = FilterFactoryFinder.createFilterFactory().createFidFilter();
+			while(iter.hasNext())
+				filter.addFid(iter.next().getID());
+			return filter;
+		}finally{
+			iter.close();
+		}
+	}    
 }

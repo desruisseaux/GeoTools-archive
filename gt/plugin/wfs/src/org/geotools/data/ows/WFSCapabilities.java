@@ -66,7 +66,7 @@ public class WFSCapabilities extends Capabilities {
                 if(name !=null){
                 	int index = name.indexOf(':'); 
                 	if(index!=-1 && typename.equals(name.substring(index+1))){
-                	
+                	    return fsd;
                 	}
                 }
         }

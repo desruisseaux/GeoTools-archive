@@ -1397,7 +1397,10 @@ public class DocumentWriter {
                     if ((schema.getURI() != null)
                             && !schema.getTargetNamespace().equals(schema
                                 .getURI())) {
-                        s = schema.getTargetNamespace() + " " + schema.getURI();
+
+                        String endResult = schema.getURI().toString();
+                        endResult=endResult.replaceAll("&", "&amp;");
+                        s = schema.getTargetNamespace() + " " + endResult;
                     }
                 } else {
                     writer.write(" xmlns:" + imports[i].getPrefix() + "=\""
@@ -1418,8 +1421,10 @@ public class DocumentWriter {
                         if ((location != null)
                                 && !location.equals(
                                     imports[i].getTargetNamespace())) {
+                        	String endResult = location.toString();
+                        	endResult=endResult.replaceAll("&", "&amp;");
                             s += (" " + imports[i].getTargetNamespace() + " "
-                            + location);
+                            + endResult);
                         }
                     }
                 }

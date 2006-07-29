@@ -15,6 +15,7 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -239,5 +240,22 @@ public class AllHandler extends ElementGroupingHandler {
         public int getGrouping() {
             return ALL;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+			if (elements == null) {
+                return null;
+            }
+
+            for (int i = 0; i < elements.length; i++) {
+                Element t = elements[i].findChildElement(localName, namespaceURI);
+
+                if (t != null) { // found it
+
+                    return t;
+                }
+            }
+
+			return null;
+		}
     }
 }

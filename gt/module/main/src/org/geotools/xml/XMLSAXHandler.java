@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -32,6 +33,7 @@ import org.geotools.xml.gml.FCBuffer.StopException;
 import org.geotools.xml.handlers.DocumentHandler;
 import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.geotools.xml.handlers.IgnoreHandler;
+import org.geotools.xml.schema.Schema;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -214,8 +216,8 @@ public class XMLSAXHandler extends DefaultHandler {
     }
 
 	private void checkStatus() throws StopException {
-		if (this.hints != null && hints.get(FlowHandler.FLOW_HANDLER_HINT) != null) {
-			FlowHandler handler = (FlowHandler) hints.get(FlowHandler.FLOW_HANDLER_HINT);
+		if (this.hints != null && hints.get(XMLHandlerHints.FLOW_HANDLER_HINT) != null) {
+			FlowHandler handler = (FlowHandler) hints.get(XMLHandlerHints.FLOW_HANDLER_HINT);
 			if (handler.shouldStop(hints)) {
 				throw new StopException();
 			}
@@ -252,7 +254,7 @@ public class XMLSAXHandler extends DefaultHandler {
                 + locator.getColumnNumber());
 
 //            e.printStackTrace();
-            throw new SAXException(e);
+            throw (SAXException) new SAXException(e);
         }
     }
 
@@ -275,7 +277,7 @@ public class XMLSAXHandler extends DefaultHandler {
     	checkStatus();
 
         if (schemaProxy.size() != 0) {
-            logger.info("ADDING NAMESPACES: " + schemaProxy.size());
+        	logger.info("ADDING NAMESPACES: " + schemaProxy.size());
 
             String t = atts.getValue("http://www.w3.org/2001/XMLSchema-instance",
                     "schemaLocation");
@@ -297,15 +299,29 @@ public class XMLSAXHandler extends DefaultHandler {
                         String prefix = (String) schemaProxy.get(targ);
                         URI targUri = null;
 
-                        try {
-                            targUri = (instanceDocument == null) ? new URI(uri)
-                                                                 : instanceDocument
-                                .resolve(uri);
-                        } catch (URISyntaxException e1) {
-                            logger.warning(e1.toString());
-                        }
 
-                        ehf.startPrefixMapping(prefix, targ, targUri);
+                        boolean set = false;
+                        if (hints!=null && hints.containsKey(XMLHandlerHints.NAMESPACE_MAPPING)){
+
+                            Map schemas=(Map) hints.get(XMLHandlerHints.NAMESPACE_MAPPING);
+                            
+                            if( schemas.containsKey(targ) ){
+                                ehf.startPrefixMapping(prefix, targ, (URI) schemas.get(targ));
+                                set=true;
+                                break;
+                            }
+                        }
+                        
+                        if(!set){
+                            try {
+                                targUri = (instanceDocument == null) ? new URI(uri)
+                                : instanceDocument
+                                .resolve(uri);
+                            } catch (URISyntaxException e1) {
+                                logger.warning(e1.toString());
+                            }
+                            ehf.startPrefixMapping(prefix, targ, targUri);
+                        }
                         schemaProxy.remove(targ);
                     }
                 }
@@ -319,7 +335,6 @@ public class XMLSAXHandler extends DefaultHandler {
                     String prefix = (String) schemaProxy.get(targ);
                     ehf.startPrefixMapping(prefix, targ);
 
-                    //                    schemaProxy.remove(targ);
                     it.remove();
                 }
             }
@@ -449,6 +464,9 @@ public class XMLSAXHandler extends DefaultHandler {
      * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
      */
     public void endPrefixMapping(String prefix){
+    	// hard coded schemas should not be removed.  For example.  GML and WFS
+    	if( prefix.equals("gml") || prefix.equals("wfs"))
+    		return;
         ehf.endPrefixMapping(prefix);
     }
 

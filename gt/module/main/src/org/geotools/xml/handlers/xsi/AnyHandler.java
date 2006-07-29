@@ -296,5 +296,10 @@ public class AnyHandler extends ElementGroupingHandler {
         public int getGrouping() {
             return ANY;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+            //TODO look up namespace Schema and do this correctly
+			return null;
+		}
     }
 }

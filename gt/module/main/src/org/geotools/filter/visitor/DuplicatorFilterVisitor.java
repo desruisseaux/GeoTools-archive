@@ -46,13 +46,28 @@ import org.geotools.filter.expression.MathExpression;
 public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     Stack pages = new Stack(); // need a Stack as Filter structure is recursive
     FilterFactory ff;
+	private boolean strict;
 
     public Stack getPages() {
     	return pages;
     }
     
+    /**
+     * New instance
+     * @param factory factory to use for creating the filters.
+     */
     public DuplicatorFilterVisitor(FilterFactory factory) {
+       	this(factory,true);
+    }    
+    /**
+     * New instance
+     * @param factory factory to use for creating the filters.
+     * @param strict if false then unkown filters will not be copied.  The same instance will be returned as the copy.
+     * Otherwise an exception will be thrown when encountering an unkown filter.
+     */
+    public DuplicatorFilterVisitor(FilterFactory factory, boolean strict) {
         ff = factory;
+        this.strict=strict;
     }
 
     public void setFilterFactory(FilterFactory factory) {
@@ -60,8 +75,18 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     }
 
     public void visit(Filter filter) {
+    	if( filter==Filter.NONE){
+    		pages.push(Filter.NONE);
+    		return;
+    	}else if( filter==Filter.ALL){
+    		pages.push(Filter.ALL);
+    		return;
+    	}
+    	if( strict )
         // Should not happen?
     	throw new RuntimeException("visit(Filter) unsupported");
+    	else
+    		pages.push(filter);
     }
 
     public void visit(BetweenFilter filter) {
@@ -235,11 +260,7 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
 
     public void visit(AttributeExpression expression) {
     	AttributeExpression copy = null;
-    	try {
-			copy = ff.createAttributeExpression(null, expression.getAttributePath()); //not a true copy, but what the heck...
-		} catch (IllegalFilterException erp) {
-            throw new RuntimeException(erp);
-		} 
+		copy = ff.createAttributeExpression(expression.getAttributePath()); //not a true copy, but what the heck...
     	
         pages.push(copy);
     }

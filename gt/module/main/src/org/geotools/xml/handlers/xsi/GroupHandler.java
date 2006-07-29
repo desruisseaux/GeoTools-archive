@@ -329,6 +329,10 @@ public class GroupHandler extends ElementGroupingHandler {
         public Element findChildElement( String arg1 ) {
             return child==null?null:child.findChildElement(arg1);
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+			 return child==null?null:child.findChildElement(localName, namespaceURI);
+		}
         
     }
 }

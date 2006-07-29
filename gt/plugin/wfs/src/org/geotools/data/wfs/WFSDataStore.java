@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import javax.naming.OperationNotSupportedException;
@@ -51,6 +53,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypes;
@@ -250,6 +253,10 @@ public class WFSDataStore extends AbstractDataStore {
     private String[] typeNames = null;
     private Map featureTypeCache = new HashMap();
 
+	private Map fidMap=new HashMap();
+
+    private Map xmlSchemaCache=new HashMap();
+
     /**
      * @see org.geotools.data.AbstractDataStore#getTypeNames()
      */
@@ -283,7 +290,7 @@ public class WFSDataStore extends AbstractDataStore {
         
         // TODO sanity check for request with capabilities obj
 
-        FeatureType t = null;
+        FeatureType t=null;
         SAXException sax = null;
         IOException io = null;
         if (((protocol & POST_PROTOCOL) == POST_PROTOCOL) && (t == null)) {
@@ -340,21 +347,43 @@ public class WFSDataStore extends AbstractDataStore {
         if(ftName!=null){
             try {
             	t = FeatureTypeBuilder.newFeatureType(t.getAttributeTypes(),ftName==null?typeName:ftName,t.getNamespace(),t.isAbstract(),t.getAncestors(),t.getDefaultGeometry());
+                
             } catch (SchemaException e1) {
                 WFSDataStoreFactory.logger.warning(e1.getMessage());
             }
         }
-
+        try{
+            URL url = getDescribeFeatureTypeURLGet(typeName);
+            if( url!=null ) {
+				t=new WFSFeatureType(t, new URI(url.toString()));
+			}
+        }catch (URISyntaxException e) {
+            throw (RuntimeException) new RuntimeException( e );
+        }
         if (t != null) {
             featureTypeCache.put(typeName, t);
         }
 
         return t;
     }
-    
+
     //  protected for testing
     protected FeatureType getSchemaGet(String typeName)
         throws SAXException, IOException {
+        URL getUrl = getDescribeFeatureTypeURLGet(typeName);
+        HttpURLConnection hc = getConnection(getUrl,auth,false);
+
+        InputStream is = getInputStream(hc);
+        Schema schema;
+        try{
+            schema = SchemaFactory.getInstance(null, is);
+        }finally{
+            is.close();
+        }
+        return parseDescribeFeatureTypeResponse(typeName, schema);
+    }
+
+    private URL getDescribeFeatureTypeURLGet( String typeName ) throws MalformedURLException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
 
         if (getUrl == null) {
@@ -388,28 +417,34 @@ public class WFSDataStore extends AbstractDataStore {
         url += ("&TYPENAME=" + typeName);
 
         getUrl = new URL(url);
-        HttpURLConnection hc = getConnection(getUrl,auth,false);
+        return getUrl;
+    }
 
-        InputStream is = getInputStream(hc);
-        Schema schema = SchemaFactory.getInstance(null, is);
+    static FeatureType parseDescribeFeatureTypeResponse( String typeName, Schema schema ) throws SAXException {
         Element[] elements = schema.getElements();
+
+        if (elements == null) {
+            return null; // not found
+        }
+
         Element element = null;
 
         String ttname = typeName.substring(typeName.indexOf(":") + 1);
 
-        for (int i = 0; (i < elements.length) && (element == null); i++)
-
+        for (int i = 0; (i < elements.length) && (element == null); i++) {
             // HACK -- namspace related -- should be checking ns as opposed to removing prefix
             if (typeName.equals(elements[i].getName())
                     || ttname.equals(elements[i].getName())) {
                 element = elements[i];
             }
+        }
 
         if (element == null) {
             return null;
         }
 
         FeatureType ft = GMLComplexTypes.createFeatureType(element);
+
 
         return ft;
     }
@@ -453,34 +488,14 @@ public class WFSDataStore extends AbstractDataStore {
         osw.close();
         
         InputStream is = getInputStream(hc);
-        Schema schema = SchemaFactory.getInstance(null, is);
-        Element[] elements = schema.getElements();
-
-        if (elements == null) {
-            return null; // not found
+        Schema schema;
+        try{
+            schema = SchemaFactory.getInstance(null, is);
+        }finally{
+            is.close();
         }
 
-        Element element = null;
-
-        String ttname = typeName.substring(typeName.indexOf(":") + 1);
-
-        for (int i = 0; (i < elements.length) && (element == null); i++) {
-            // HACK -- namspace related -- should be checking ns as opposed to removing prefix
-            if (typeName.equals(elements[i].getName())
-                    || ttname.equals(elements[i].getName())) {
-                element = elements[i];
-            }
-        }
-
-        if (element == null) {
-            return null;
-        }
-
-        FeatureType ft = GMLComplexTypes.createFeatureType(element);
-
-        is.close();
-
-        return ft;
+        return parseDescribeFeatureTypeResponse(typeName, schema);
     }
 
     //  protected for testing
@@ -550,6 +565,8 @@ public class WFSDataStore extends AbstractDataStore {
 
         url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), "UTF-8"));
 
+        Logger.getLogger("org.geotools.data.wfs").fine(url);
+        
         getUrl = new URL(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
@@ -566,7 +583,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, getSchema(request.getTypeName()));
+                timeout, ts, (WFSFeatureType)getSchema(request.getTypeName()));
 
         return ft;
     }
@@ -667,6 +684,9 @@ public class WFSDataStore extends AbstractDataStore {
 
         // write request
         Writer w = new OutputStreamWriter(os);
+        if( Logger.getLogger("org.geotools.data.wfs").isLoggable(Level.FINE) ){
+            w=new LogWriterDecorator(w, Level.FINE);
+        }
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[2]); // GetFeature
@@ -697,7 +717,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, getSchema(query.getTypeName()));
+                timeout, ts, (WFSFeatureType)getSchema(query.getTypeName()));
 
         return ft;
     }
@@ -729,12 +749,14 @@ public class WFSDataStore extends AbstractDataStore {
         FeatureReader t = null;
         SAXException sax = null;
         IOException io = null;
-//System.out.println("Doing the Request");
+        
+        query = new DefaultQuery(query);
+        // process the filter to update fidfilters using the transaction.
+        ((DefaultQuery)query).setFilter(processFilter(query.getFilter()));
         Filter[] filters = splitFilters(query,transaction); // [server][post]
 //System.out.println("\nServer side Filter = "+filters[0]);
 //System.out.println("Client side Filter = "+filters[1]+"\n\n");
         
-        query = new DefaultQuery(query);
         // TODO modify bbox requests here
         FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities,query.getTypeName());
         
@@ -901,8 +923,11 @@ public class WFSDataStore extends AbstractDataStore {
             return new Filter[]{Filter.NONE,q.getFilter()};
         }
         WFSTransactionState state = (t == Transaction.AUTO_COMMIT)?null:(WFSTransactionState)t.getState(this);
-        PostPreProcessFilterSplittingVisitor wfsfv = new PostPreProcessFilterSplittingVisitor(capabilities
-                .getFilterCapabilities(), ft, new WFSTransactionAccessor(state));
+        WFSTransactionAccessor transactionAccessor = null;
+        if( state!=null )
+        	transactionAccessor = new WFSTransactionAccessor(state.getActions(ft.getTypeName()));
+		PostPreProcessFilterSplittingVisitor wfsfv = new PostPreProcessFilterSplittingVisitor(capabilities
+                .getFilterCapabilities(), ft, transactionAccessor);
 
         q.getFilter().accept(wfsfv);
 
@@ -941,7 +966,18 @@ public class WFSDataStore extends AbstractDataStore {
         return new WFSFeatureSource(this, typeName);
     }
 
-    private static class WFSAuthenticator extends Authenticator {
+    /**
+	 * Runs {@link FidFilterVisitor} on the filter and returns the result as long as transaction is not AUTO_COMMIT or null.
+     * @param filter filter to process.
+     * @return Runs {@link FidFilterVisitor} on the filter and returns the result as long as transaction is not AUTO_COMMIT or null.
+	 */
+	public Filter processFilter(Filter filter) {
+		FidFilterVisitor visitor=new FidFilterVisitor(fidMap); 
+		filter.accept(visitor);
+		return visitor.getProcessedFilter();
+	}
+
+	private static class WFSAuthenticator extends Authenticator {
         private PasswordAuthentication pa;
 
         private WFSAuthenticator() {
@@ -962,5 +998,17 @@ public class WFSDataStore extends AbstractDataStore {
             return pa;
         }
     }
+
+	/**
+	 * Adds a new fid mapping to the fid map. 
+	 * @param original the before fid
+	 * @param finalFid the final fid;
+	 */
+	public synchronized void addFidMapping(String original, String finalFid) {
+		if( original==null )
+			throw new NullPointerException();
+		fidMap.put(original, finalFid);
+	}
+
 }
 

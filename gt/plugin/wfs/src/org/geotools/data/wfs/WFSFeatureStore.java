@@ -17,13 +17,16 @@
 package org.geotools.data.wfs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
@@ -32,7 +35,8 @@ import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
@@ -68,13 +72,19 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         return trans;
     }
 
-    /**
-     * NOTE: The fids returned are not persistent until the transaction is
-     * commited.
-     *
-     * @see org.geotools.data.FeatureStore#addFeatures(org.geotools.data.FeatureReader)
-     */
-    public Set addFeatures(FeatureReader reader) throws IOException {
+    public Set addFeatures(final FeatureReader reader) throws IOException {
+        List features=new ArrayList();
+        while(reader.hasNext()){
+            try {
+                features.add(reader.next());
+            } catch (Exception e) {
+                throw (IOException) new IOException( ).initCause( e );
+            }
+        }
+        return addFeatures(DataUtilities.collection((Feature[]) features.toArray(new Feature[0])));
+    }
+
+	public Set addFeatures(FeatureCollection collection) throws IOException {
         WFSTransactionState ts = null;
 
         if (trans == Transaction.AUTO_COMMIT) {
@@ -85,65 +95,70 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
 
         HashSet r = new HashSet();
         
-    	AttributeType[] atrs = getSchema().getAttributeTypes();
-
-        while (reader.hasNext()){
+        AttributeType[] atrs = getSchema().getAttributeTypes();
+        FeatureIterator iter=collection.features();
+        try{
+            Envelope bounds=null;
+        while (iter.hasNext()){
             try {
-            	Envelope bounds=null;
-                Feature f = reader.next();
+                Feature f = iter.next();
                 r.add(f.getID());
-            	for(int i=0;i<atrs.length;i++){
-            		if(atrs[i] instanceof GeometryAttributeType){
-            			Geometry g = (Geometry)f.getAttribute(i);
-                		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
-                		g.setUserData(cs.getIdentifiers().iterator().next().toString());
-                		if( bounds==null ){
-                			bounds=new Envelope(g.getEnvelopeInternal());
-                		}else{
-                			bounds.expandToInclude(g.getEnvelopeInternal());
-                		}
-            		}
-            	}
-                ts.addAction(new InsertAction(f));
-
-                // Fire a notification.
-                // JE
-                if( bounds==null){
-            		// if bounds are null then send an envelope to say that features were added but
-            		// at an unknown location.
-                    ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
-                    		getTransaction(), new Envelope(), false);
-            	}else{
-                    ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
-                    		getTransaction(), bounds, false);                	
-            	}
+                for(int i=0;i<atrs.length;i++){
+                    if(atrs[i] instanceof GeometryAttributeType){
+                        Geometry g = (Geometry)f.getAttribute(i);
+                        CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
+                        if( cs!=null && !cs.getIdentifiers().isEmpty() )
+                            g.setUserData(cs.getIdentifiers().iterator().next().toString());
+                        if( g==null )
+                        	continue;
+                        if( bounds==null ){
+                            bounds=new Envelope(g.getEnvelopeInternal());
+                        }else{
+                            bounds.expandToInclude(g.getEnvelopeInternal());
+                        }
+                    }
+                }
+                ts.addAction(getSchema().getTypeName(), new InsertAction(f));
 
             } catch (NoSuchElementException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
                 throw new IOException(e.toString());
-            } catch (IllegalAttributeException e) {
-                WFSDataStoreFactory.logger.warning(e.toString());
-                throw new IOException(e.toString());
             }
         }
-        
+
+        // Fire a notification.
+        // JE
+        if( bounds==null){
+            // if bounds are null then send an envelope to say that features were added but
+            // at an unknown location.
+            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+                    getTransaction(), new Envelope(), false);
+        }else{
+            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+                    getTransaction(), bounds, false);                   
+        }
+
+        }finally{ 
+            iter.close();
+        }
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
 
-            String[] fids = ts.getFids();
+            String[] fids = ts.getFids(getSchema().getTypeName());
             r = new HashSet(Arrays.asList(fids));
 
             return r;
         }
 
         return r;
-    }
+	}
 
-    /**
+	/**
      * 
      * @see org.geotools.data.FeatureStore#removeFeatures(org.geotools.filter.Filter)
      */
-    public void removeFeatures(Filter filter) throws IOException {
+    public void removeFeatures(Filter filter2) throws IOException {
+    	Filter filter=ds.processFilter(filter2);
         WFSTransactionState ts = null;
 
         if (trans == Transaction.AUTO_COMMIT) {
@@ -152,7 +167,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             ts = (WFSTransactionState) trans.getState(ds);
         }
 
-        ts.addAction(new DeleteAction(getSchema().getTypeName(), filter));
+        ts.addAction(getSchema().getTypeName(), new DeleteAction(getSchema().getTypeName(), filter));
         // Fire a notification.  I don't know a way of quickly getting the bounds of
         // an arbitrary filter so I'm sending a NULL envelope to say "some features were removed but I don't
         // know what."  Can't be null because the convention states that null is sent on commits only.
@@ -164,13 +179,13 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             ts.commit();
         }
     }
-
     /**
      * 
      * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType[], java.lang.Object[], org.geotools.filter.Filter)
      */
     public void modifyFeatures(AttributeType[] type, Object[] value,
-        Filter filter) throws IOException {
+        Filter filter2) throws IOException {
+    	Filter filter=ds.processFilter(filter2);
         WFSTransactionState ts = null;
 
         if (trans == Transaction.AUTO_COMMIT) {
@@ -180,30 +195,48 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         }
 
         Map props = new HashMap();
-
+        
+        Envelope bounds=null;
         for (int i = 0; i < type.length; i++) {
         	if(type[i] instanceof GeometryAttributeType){
         		Geometry g = (Geometry)value[i];
         		CoordinateReferenceSystem cs = ((GeometryAttributeType)type[i]).getCoordinateSystem();
+
+                if( cs!=null && !cs.getIdentifiers().isEmpty() )
+                    g.setUserData(cs.getIdentifiers().iterator().next().toString());
         		g.setUserData(cs.getIdentifiers().iterator().next().toString());
+                if( cs!=null && !cs.getIdentifiers().isEmpty() )
+                    g.setUserData(cs.getIdentifiers().iterator().next().toString());
+                // set/expand the bounds that are being changed.
+                if( g==null )
+                	continue;
+                if( bounds==null ){
+                    bounds=new Envelope(g.getEnvelopeInternal());
+                }else{
+                    bounds.expandToInclude(g.getEnvelopeInternal());
+                }
         	}
             props.put(type[i].getName(), value[i]);
         }
 
-        ts.addAction(new UpdateAction(getSchema().getTypeName(), filter, props));
+        ts.addAction(getSchema().getTypeName(), new UpdateAction(getSchema().getTypeName(), filter, props));
 
-        // Fire a notification.  I don't know a way of quickly getting the bounds of
-        // an arbitrary filter so I'm sending a NULL envelope to say "something changed but I don't
-        // know what.  Can't be null because the convention states that null is sent on commits only.
+        // Fire a notification.
         // JE
-        ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesChanged(getSchema().getTypeName(),
-        		getTransaction(), new Envelope(), false);
+        if( bounds==null ){
+            // if bounds are null then send an envelope to say that features were modified but
+            // at an unknown location.
+            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+                    getTransaction(), new Envelope(), false);
+        }else{
+            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+                    getTransaction(), bounds, false);                   
+        }    
         
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
         }
     }
-
     /**
      * 
      * @see org.geotools.data.FeatureStore#modifyFeatures(org.geotools.feature.AttributeType, java.lang.Object, org.geotools.filter.Filter)
@@ -227,9 +260,10 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             ts = (WFSTransactionState) trans.getState(ds);
         }
 
-        ts.addAction(new DeleteAction(getSchema().getTypeName(), Filter.NONE));
-
-        while (reader.hasNext())
+        ts.addAction(getSchema().getTypeName(), new DeleteAction(getSchema().getTypeName(), Filter.NONE));
+        
+        Envelope bounds=null;
+        while (reader.hasNext()){
 
             try {
             	Feature f = reader.next();
@@ -238,16 +272,36 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             		if(atrs[i] instanceof GeometryAttributeType){
             			Geometry g = (Geometry)f.getAttribute(i);
                 		CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
-                		g.setUserData(cs.getIdentifiers().iterator().next().toString());
+                        if( cs!=null && !cs.getIdentifiers().isEmpty() )
+                            g.setUserData(cs.getIdentifiers().iterator().next().toString());
+                        if( g==null )
+                        	continue;
+                        if( bounds==null ){
+                            bounds=new Envelope(g.getEnvelopeInternal());
+                        }else{
+                            bounds.expandToInclude(g.getEnvelopeInternal());
+                        }
             		}
             	}
-                ts.addAction(new InsertAction(f));
+                ts.addAction(getSchema().getTypeName(), new InsertAction(f));
             } catch (NoSuchElementException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
             } catch (IllegalAttributeException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
             }
-
+        }
+            
+        // Fire a notification.
+        // JE
+        if( bounds==null){
+            // if bounds are null then send an envelope to say that features were added but
+            // at an unknown location.
+            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+                    getTransaction(), new Envelope(), false);
+        }else{
+            ((WFSDataStore)getDataStore()).listenerManager.fireFeaturesRemoved(getSchema().getTypeName(),
+                    getTransaction(), bounds, false);                   
+        }    
         if (trans == Transaction.AUTO_COMMIT) {
             ts.commit();
         }

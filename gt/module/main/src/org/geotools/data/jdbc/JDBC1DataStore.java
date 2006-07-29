@@ -975,7 +975,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		SQLEncoder encoder = new SQLEncoder();
 		encoder.setFIDMapper(getFIDMapper(typeName));
 
-		return new DefaultSQLBuilder(encoder, getSchema(typeName), null);
+		return new DefaultSQLBuilder(encoder);
 	}
 
 	/**

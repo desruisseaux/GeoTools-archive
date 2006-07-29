@@ -15,6 +15,8 @@
  */
 package org.geotools.xml.schema;
 
+import java.net.URI;
+
 /**
  * <p>
  * This represents an abstract collection of xml element definitions within a
@@ -117,4 +119,6 @@ public interface ElementGrouping {
      * @return
      */
     public int getMinOccurs();
+
+	public Element findChildElement(String localName, URI namespaceURI);
 }

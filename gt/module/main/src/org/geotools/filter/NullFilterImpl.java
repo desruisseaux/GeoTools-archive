@@ -125,7 +125,7 @@ public class NullFilterImpl extends AbstractFilterImpl implements NullFilter {
      *         otherwise.
      */
     public boolean equals(Object obj) {
-        if (obj.getClass() == this.getClass()) {
+        if (obj!=null && obj.getClass() == this.getClass()) {
             NullFilterImpl nullFilter = (NullFilterImpl) obj;
 
             return ((nullFilter.getFilterType() == this.filterType)

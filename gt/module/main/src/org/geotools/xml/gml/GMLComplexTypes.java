@@ -33,11 +33,13 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.gml.FCBuffer.StopException;
 import org.geotools.xml.gml.GMLSchema.AttributeList;
 import org.geotools.xml.gml.GMLSchema.GMLAttribute;
@@ -110,8 +112,6 @@ public class GMLComplexTypes {
     }
 
 
-    /** DOCUMENT ME!  */
-    public static final String STREAM_HINT = "org.geotools.xml.gml.STREAM_HINT";
     private static final String STREAM_FEATURE_NAME_HINT = "org.geotools.xml.gml.STREAM_FEATURE_NAME_HINT";
 
     static void encode(Element e, Geometry g, PrintHandler output)
@@ -703,6 +703,20 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+            if ((elements == null) || (elements.length == 0) || (localName == null)) {
+                return null;
+            }
+
+            for (int i = 0; i < elements.length; i++)
+                if (localName.equals(elements[i].getName())
+                		&& namespaceURI.equals(elements[i].getNamespace())) {
+                    return elements[i];
+                }
+
+            return null;
+		}
     }
 
     /**
@@ -783,6 +797,20 @@ public class GMLComplexTypes {
 
             return null;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+			if ((elements == null) || (elements.length == 0) || (localName == null)) {
+                return null;
+            }
+
+            for (int i = 0; i < elements.length; i++)
+                if (localName.equals(elements[i].getName())
+                		&& namespaceURI.equals(elements[i].getNamespace())) {
+                    return elements[i];
+                }
+
+            return null;
+		}
     }
 
     /**
@@ -1251,7 +1279,7 @@ public class GMLComplexTypes {
             Geometry g = (Geometry) value;
 
             output.startElement(element.getNamespace(), element.getName(), null);
-            GMLComplexTypes.encode(element, g, output);
+            GMLComplexTypes.encode(null, g, output);
             output.endElement(element.getNamespace(), element.getName());
         }
     }
@@ -4130,7 +4158,7 @@ public class GMLComplexTypes {
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints) throws SAXException {
 
-            if ((hints == null) || (hints.get(STREAM_HINT) == null)) {
+            if ((hints == null) || (hints.get(XMLHandlerHints.STREAM_HINT) == null)) {
                 return getFeature(element, value, attrs, hints, null);
             }
 
@@ -4141,8 +4169,8 @@ public class GMLComplexTypes {
             String nm = (String) hints.get(STREAM_FEATURE_NAME_HINT);
             Feature f;
             if ((nm != null) && nm.equals(element.getName())) {
-                f = getFeature(element, value, attrs, hints, ((FCBuffer) hints.get(STREAM_HINT)).ft);
-                stream(f, (FCBuffer) hints.get(STREAM_HINT));
+                f = getFeature(element, value, attrs, hints, ((FCBuffer) hints.get(XMLHandlerHints.STREAM_HINT)).ft);
+                stream(f, (FCBuffer) hints.get(XMLHandlerHints.STREAM_HINT));
 
                 return null;
             }
@@ -4539,11 +4567,11 @@ public class GMLComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-            if ((hints == null) || (hints.get(STREAM_HINT) == null)) {
+            if ((hints == null) || (hints.get(XMLHandlerHints.STREAM_HINT) == null)) {
                 return getCollection(attrs,value);
             }
 
-            FCBuffer fcb = (FCBuffer) hints.get(STREAM_HINT);
+            FCBuffer fcb = (FCBuffer) hints.get(XMLHandlerHints.STREAM_HINT);
             fcb.state = FCBuffer.FINISH;
 
             return null;
@@ -4554,7 +4582,7 @@ public class GMLComplexTypes {
          *      java.util.Map)
          */
         public boolean cache(Element element, Map hints) {
-            if ((hints == null) || (hints.get(STREAM_HINT) == null)) {
+            if ((hints == null) || (hints.get(XMLHandlerHints.STREAM_HINT) == null)) {
                 return true;
             }
 
@@ -6365,7 +6393,7 @@ public class GMLComplexTypes {
         URI ftNS = element.getType().getNamespace();
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
-        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
+        FeatureTypeBuilder typeFactory = FeatureTypeBuilder.newInstance(ftName);
         typeFactory.setNamespace(ftNS);
         typeFactory.setName(ftName);
 

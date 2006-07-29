@@ -16,6 +16,8 @@
 package org.geotools.xml.gml;
 
 import org.geotools.xml.FlowHandler;
+import org.geotools.xml.XMLHandlerHints;
+
 import java.util.Map;
 
 /**
@@ -25,8 +27,8 @@ import java.util.Map;
  */
 public class FCFlowHandler implements FlowHandler {
     public boolean shouldStop(Map hints) {
-        if ((hints != null) && (hints.get(GMLComplexTypes.STREAM_HINT) != null)) {
-            FCBuffer buffer = (FCBuffer) hints.get(GMLComplexTypes.STREAM_HINT);
+        if ((hints != null) && (hints.get(XMLHandlerHints.STREAM_HINT) != null)) {
+            FCBuffer buffer = (FCBuffer) hints.get(XMLHandlerHints.STREAM_HINT);
 
             if (buffer.getInternalState() == FCBuffer.STOP) {
                 return true;

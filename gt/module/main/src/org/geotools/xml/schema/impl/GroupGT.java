@@ -118,4 +118,8 @@ public class GroupGT implements Group {
     public Element findChildElement(String name1) {
         return (child == null) ? null : child.findChildElement(name1);
     }
+
+	public Element findChildElement(String localName, URI namespaceURI) {
+        return (child == null) ? null : child.findChildElement(localName, namespaceURI);
+	}
 }

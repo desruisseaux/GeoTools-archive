@@ -15,6 +15,8 @@
  */
 package org.geotools.xml.schema.impl;
 
+import java.net.URI;
+
 import org.geotools.xml.schema.All;
 import org.geotools.xml.schema.Element;
 
@@ -92,5 +94,19 @@ public class AllGT implements All {
 
         return null;
     }
+
+	public Element findChildElement(String localName, URI namespaceURI) {
+		if (elements != null) {
+            for (int i = 0; i < elements.length; i++) {
+                Element e = elements[i].findChildElement(localName, namespaceURI);
+
+                if (e != null) {
+                    return e;
+                }
+            }
+        }
+
+        return null;
+	}
 
 }

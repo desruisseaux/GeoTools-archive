@@ -62,7 +62,7 @@ public class ExpresionEncodeTest extends FilterTestSupport {
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         BetweenFilter bf = ff.createBetweenFilter();
         bf.addLeftValue(ff.createLiteralExpression(60000));
-        bf.addMiddleValue(ff.createAttributeExpression(testSchema,"testDouble"));
+        bf.addMiddleValue(ff.createAttributeExpression("testDouble"));
         bf.addRightValue(ff.createLiteralExpression(200000));
         
 
@@ -75,7 +75,7 @@ public class ExpresionEncodeTest extends FilterTestSupport {
     
     public void testLikeFilter() throws IllegalFilterException, OperationNotSupportedException, IOException{
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        Expression testAttribute = ff.createAttributeExpression(testSchema, "testString");
+        Expression testAttribute = ff.createAttributeExpression("testString");
 
         LikeFilter lf = ff.createLikeFilter();
         lf.setValue(testAttribute);

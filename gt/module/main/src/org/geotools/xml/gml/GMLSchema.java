@@ -621,6 +621,17 @@ public class GMLSchema implements Schema {
         public URI getNamespace() {
             return GMLSchema.NAMESPACE;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+			if (this.name != null) {
+                if (this.name.equals(localName)
+                		&& getNamespace().equals(namespaceURI)) {
+                    return this;
+                }
+            }
+
+            return null;
+		}
     }
 
     /**

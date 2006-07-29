@@ -535,7 +535,7 @@ public class ComplexElementHandler extends XMLElementHandler {
         logger.finest("Starting search for element handler " + localName
             + " :: " + namespaceURI);
 
-        Element e = type.findChildElement(localName);
+        Element e = XMLTypeHelper.findChildElement(type, localName, namespaceURI);
         if (e != null && namespaceURI.equals(e.getNamespace())){
             XMLElementHandler r = ehf.createElementHandler(e);
 

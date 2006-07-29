@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +29,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.xml.DocumentFactory;
-import org.geotools.xml.FlowHandler;
+import org.geotools.xml.XMLHandlerHints;
 import org.xml.sax.SAXException;
 
 
@@ -301,7 +302,11 @@ public class FCBuffer extends Thread implements FeatureReader {
             }
 
             logger.finest("waiting for parser");
-            Thread.yield();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                //just continue;
+            }
 
             if (lastUpdate.before(new Date(Calendar.getInstance().getTimeInMillis() - timeout))) {
                 exception = new SAXException("Timeout");
@@ -348,13 +353,8 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        HashMap hints = new HashMap();
-        hints.put(GMLComplexTypes.STREAM_HINT, this);
-
-        hints.put(FlowHandler.FLOW_HANDLER_HINT, new FCFlowHandler());
-        if( this.ft!=null ){
-        	hints.put("DEBUG_INFO_FEATURE_TYPE_NAME", ft.getTypeName());
-        }
+        XMLHandlerHints hints = new XMLHandlerHints();
+        initHints(hints);
 
         try {
             DocumentFactory.getInstance(document, hints);
@@ -368,6 +368,17 @@ public class FCBuffer extends Thread implements FeatureReader {
             exception = e;
             state = STOP;
             yield();
+        }
+    }
+
+    /**
+     * Called before parsing the FeatureCollection.  Subclasses may override to set their custom hints.  
+     */
+    protected void initHints(XMLHandlerHints hints)  {
+        hints.put(XMLHandlerHints.STREAM_HINT, this);
+        hints.put(XMLHandlerHints.FLOW_HANDLER_HINT, new FCFlowHandler());
+        if( this.ft!=null ){
+        	hints.put("DEBUG_INFO_FEATURE_TYPE_NAME", ft.getTypeName());
         }
     }
 

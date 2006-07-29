@@ -15,6 +15,7 @@
  */
 package org.geotools.xml.handlers.xsi;
 
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -301,5 +302,22 @@ public class SequenceHandler extends ElementGroupingHandler {
         public int getGrouping() {
             return SEQUENCE;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+			if (children == null) {
+                return null;
+            }
+
+            for (int i = 0; i < children.length; i++) {
+                Element t = children[i].findChildElement(localName, namespaceURI);
+
+                if (t != null) { // found it
+
+                    return t;
+                }
+            }
+
+			return null;
+		}
     }
 }

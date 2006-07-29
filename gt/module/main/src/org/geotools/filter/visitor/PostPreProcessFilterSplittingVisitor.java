@@ -127,8 +127,12 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
             if(transactionAccessor != null){
             	if(f != null && f!=Filter.ALL){
             		Filter deleteFilter = transactionAccessor.getDeleteFilter();
-	            	if( deleteFilter!=null )
-	            		f=f.and(deleteFilter);
+	            	if( deleteFilter!=null ){
+                        if( deleteFilter==Filter.ALL )
+                            f=Filter.ALL;
+                        else
+                            f=f.and(deleteFilter.not());
+                    }
             	}
             }
 
@@ -137,8 +141,17 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        
 	        Iterator iter=changedStack.iterator();
 	        Filter updateFilter=(Filter) iter.next();
-	        while( iter.hasNext() )
-	        	updateFilter=updateFilter.or((Filter) iter.next());
+	        while( iter.hasNext() ){
+                Filter next=(Filter) iter.next();
+                if( next==Filter.NONE){
+                    updateFilter=next;
+                    break;
+                }else{
+                    updateFilter=updateFilter.or(next);
+                }
+            }
+            if( updateFilter == Filter.NONE || f==Filter.NONE )
+                return Filter.NONE;
 	        return f.or(updateFilter);
 	    }
 
@@ -238,9 +251,19 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        if( original==null )
 	        	original=filter;
 
-	        if ((fcs.getScalarOps() & FilterCapabilities.BETWEEN) == FilterCapabilities.BETWEEN) {
+	        if (fcs.supports(FilterCapabilities.BETWEEN)) {
 	            int i = postStack.size();
-	            filter.getLeftValue().accept(this);
+	            Expression leftValue = filter.getLeftValue();
+	            Expression middleValue = filter.getMiddleValue();
+	            Expression rightValue = filter.getRightValue();
+	            if( leftValue==null 
+	            		|| rightValue==null 
+	            		|| middleValue==null ){
+	            	postStack.push(filter);
+	            	return; 
+	            	
+	            }
+				leftValue.accept(this);
 	
 	            if (i < postStack.size()) {
 	            	// post process it
@@ -250,7 +273,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	                return;
 	            }
 	
-	            filter.getMiddleValue().accept(this);
+				middleValue.accept(this);
 	
 	            if (i < postStack.size()) {
 	            	// post process it
@@ -261,7 +284,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	                return;
 	            }
 	
-	            filter.getRightValue().accept(this);
+				rightValue.accept(this);
 
 	            if (i < postStack.size()) {
 	            	// post process it
@@ -292,13 +315,20 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        	original=filter;
 
 	        // supports it as a group -- no need to check the type
-	        if ((fcs.getScalarOps() & FilterCapabilities.SIMPLE_COMPARISONS) != FilterCapabilities.SIMPLE_COMPARISONS) {
+	        if (!fcs.supports(FilterCapabilities.SIMPLE_COMPARISONS) ) {
 	            postStack.push(filter);
 	            return;
 	        }
 	
 	        int i = postStack.size();
-	        filter.getLeftValue().accept(this);
+	        Expression leftValue = filter.getLeftValue();
+	        Expression rightValue = filter.getRightValue();
+	        if( leftValue==null || rightValue==null ){
+	        	postStack.push(filter);
+	        	return;
+	        }
+
+	        leftValue.accept(this);
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
@@ -307,7 +337,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	            return;
 	        }
 	
-	        filter.getRightValue().accept(this);
+			rightValue.accept(this);
 	
 	        if (i < postStack.size()) {
 	        	preStack.pop(); // left
@@ -334,7 +364,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        switch (filter.getFilterType()) {
 	        case FilterType.GEOMETRY_BBOX:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_BBOX) != FilterCapabilities.SPATIAL_BBOX) {
+	            if (!fcs.supports( FilterCapabilities.SPATIAL_BBOX) ) {
 	
 	            	// JE:  This is not documented and I can not figure out why if Filter is not supported that there is
 	            	// any reason that the filter should still be sent to server.
@@ -377,7 +407,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
             	break;
 	        case FilterType.GEOMETRY_BEYOND:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_BEYOND) != FilterCapabilities.SPATIAL_BEYOND) {
+	            if (!fcs.supports(FilterCapabilities.SPATIAL_BEYOND) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -387,7 +417,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_CONTAINS:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_CONTAINS) != FilterCapabilities.SPATIAL_CONTAINS) {
+	            if (!fcs.supports(FilterCapabilities.SPATIAL_CONTAINS) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -397,7 +427,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_CROSSES:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_CROSSES) != FilterCapabilities.SPATIAL_CROSSES) {
+	            if (!fcs.supports( FilterCapabilities.SPATIAL_CROSSES) ) {
 		        	postStack.push(filter);
 	
 	                return;
@@ -407,7 +437,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_DISJOINT:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_DISJOINT) != FilterCapabilities.SPATIAL_DISJOINT) {
+	            if (!fcs.supports( FilterCapabilities.SPATIAL_DISJOINT) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -417,7 +447,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_DWITHIN:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_DWITHIN) != FilterCapabilities.SPATIAL_DWITHIN) {
+	            if (!fcs.supports( FilterCapabilities.SPATIAL_DWITHIN) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -427,7 +457,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_EQUALS:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_EQUALS) != FilterCapabilities.SPATIAL_EQUALS) {
+	            if (!fcs.supports( FilterCapabilities.SPATIAL_EQUALS) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -438,7 +468,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	            break;
 	        case FilterType.GEOMETRY_INTERSECTS:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_INTERSECT) != FilterCapabilities.SPATIAL_INTERSECT) {
+	            if (!fcs.supports( FilterCapabilities.SPATIAL_INTERSECT) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -448,7 +478,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_OVERLAPS:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_OVERLAPS) != FilterCapabilities.SPATIAL_OVERLAPS) {
+	            if (!fcs.supports( FilterCapabilities.SPATIAL_OVERLAPS) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -458,7 +488,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_TOUCHES:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_TOUCHES) != FilterCapabilities.SPATIAL_TOUCHES) {
+	            if (!fcs.supports(FilterCapabilities.SPATIAL_TOUCHES) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -468,7 +498,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	        case FilterType.GEOMETRY_WITHIN:
 	
-	            if ((fcs.getSpatialOps() & FilterCapabilities.SPATIAL_WITHIN) != FilterCapabilities.SPATIAL_WITHIN) {
+	            if (!fcs.supports( FilterCapabilities.SPATIAL_WITHIN) ) {
 	            	postStack.push(filter);
 	
 	                return;
@@ -485,7 +515,13 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
             // TODO check against tranasaction ?
 	
 	        int i = postStack.size();
-	        filter.getLeftGeometry().accept(this);
+	        Expression leftGeometry = filter.getLeftGeometry();
+	        Expression rightGeometry = filter.getRightGeometry();
+	        if( leftGeometry==null || rightGeometry==null ){
+	        	postStack.push(filter);
+	        	return;
+	        }
+			leftGeometry.accept(this);
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
@@ -494,7 +530,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	            return;
 	        }
 	
-	        filter.getRightGeometry().accept(this);
+			rightGeometry.accept(this);
 	
 	        if (i < postStack.size()) {
 	        	preStack.pop(); // left
@@ -517,7 +553,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        if( original==null )
 	        	original=filter;
 
-	        if ((fcs.getScalarOps() & FilterCapabilities.LIKE) != FilterCapabilities.LIKE) {
+	        if (!fcs.supports( FilterCapabilities.LIKE) ) {
 	        	postStack.push(filter);
 	
 	            return;
@@ -545,7 +581,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        if( original==null )
 	        	original=filter;
 
-	        if ((fcs.getScalarOps() & FilterCapabilities.LOGICAL) != FilterCapabilities.LOGICAL) {
+	        if (!fcs.supports( FilterCapabilities.LOGICAL) ) {
 	        	postStack.push(filter);
 	
 	            return;
@@ -558,7 +594,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	            Iterator it = filter.getFilterIterator();
 	
 	            if (it.hasNext()) {
-	                ((Filter) it.next()).accept(this);
+	                Filter next = (Filter) it.next();
+					(next).accept(this);
 	                
 	                if (i < postStack.size()) {
 	                	// since and can split filter into both pre and post parts
@@ -599,7 +636,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	                Iterator it = filter.getFilterIterator();
 	
 	                while (it.hasNext()) {
-	                    ((Filter) it.next()).accept(this);
+	                    Filter next = (Filter) it.next();
+						(next).accept(this);
 	                }
 	
 	                //combine the unsupported and add to the top
@@ -650,7 +688,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        if( original==null )
 	        	original=filter;
 
-	        if ((fcs.getScalarOps() & FilterCapabilities.NULL_CHECK) != FilterCapabilities.NULL_CHECK) {
+	        if (!fcs.supports( FilterCapabilities.NULL_CHECK) ) {
 	        	postStack.push(filter);
 	
 	            return;
@@ -690,7 +728,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	     */
 	    public void visit(AttributeExpression expression) {
 	    	// JE: removed deprecated code
-	        if (parent == null  || parent.getAttributeType(expression.getAttributePath()) == null) {
+	        if (parent != null  && parent.getAttributeType(expression.getAttributePath()) == null) {
 	        	postStack.push(expression);
 	        }
 	        if(transactionAccessor!=null){
@@ -731,14 +769,20 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.MathExpression)
 	     */
 	    public void visit(MathExpression expression) {
-	        if ((fcs.getScalarOps() & FilterCapabilities.SIMPLE_ARITHMETIC) != FilterCapabilities.SIMPLE_ARITHMETIC) {
+	        if (!fcs.supports( FilterCapabilities.SIMPLE_ARITHMETIC) ) {
 	        	postStack.push(expression);
 	
 	            return;
 	        }
 	
 	        int i = postStack.size();
-	        expression.getLeftValue().accept(this);
+	        Expression leftValue = expression.getLeftValue();
+	        Expression rightValue = expression.getRightValue();
+	        if( leftValue==null || rightValue==null ){
+	        	postStack.push(expression);
+	        	return;
+	        }
+	        leftValue.accept(this);
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
@@ -747,7 +791,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	            return;
 	        }
 	
-	        expression.getRightValue().accept(this);
+	        rightValue.accept(this);
 	
 	        if (i < postStack.size()) {
 	        	preStack.pop(); // left
@@ -767,7 +811,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.FunctionExpression)
 	     */
 	    public void visit(FunctionExpression expression) {
-	        if ((fcs.getScalarOps() & FilterCapabilities.FUNCTIONS) != FilterCapabilities.FUNCTIONS) {
+	        if (!fcs.supports( FilterCapabilities.FUNCTIONS) || !fcs.supports(expression.getClass()) ) {
 	        	postStack.push(expression);
 	
 	            return;
@@ -927,20 +971,22 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
          */
         public void visit( GeometryFilter filter ) {
             if(filter!=null){
-                switch (filter.getFilterType()) {
+                Expression leftGeometry = filter.getLeftGeometry();
+				Expression rightGeometry = filter.getRightGeometry();
+				switch (filter.getFilterType()) {
                 
                             case FilterType.GEOMETRY_BBOX:
                                 // find literal side and deal ...
                                 Envelope bbox = null;
                                 LiteralExpression le = null;
-                                if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-                                    le = (LiteralExpression) filter.getLeftGeometry();
+                                if (leftGeometry!=null && leftGeometry.getType() == ExpressionType.LITERAL_GEOMETRY) {
+                                    le = (LiteralExpression) leftGeometry;
                                     if(le != null &&  le.getLiteral() != null && le.getLiteral() instanceof Geometry){                
                                         bbox = ((Geometry) le.getLiteral()).getEnvelopeInternal();
                                     }
                                 } else {
-                                    if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-                                        le = (LiteralExpression) filter.getRightGeometry();
+                                    if (rightGeometry!=null && rightGeometry.getType() == ExpressionType.LITERAL_GEOMETRY) {
+                                        le = (LiteralExpression) rightGeometry;
                                         if(le != null &&  le.getLiteral() != null && le.getLiteral() instanceof Geometry){
                                             Geometry g = (Geometry) le.getLiteral();
                                             bbox = g.getEnvelopeInternal();
@@ -991,10 +1037,10 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
                             case FilterType.GEOMETRY_TOUCHES:
                             case FilterType.GEOMETRY_WITHIN:
                             default:
-                                if(filter.getLeftGeometry()!=null)
-                                    filter.getLeftGeometry().accept(this);
-                                if(filter.getRightGeometry()!=null)
-                                    filter.getRightGeometry().accept(this);
+                                if(leftGeometry!=null)
+                                    leftGeometry.accept(this);
+                                if(rightGeometry!=null)
+                                    rightGeometry.accept(this);
                                 
                 }
             }

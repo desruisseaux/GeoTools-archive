@@ -18,9 +18,12 @@ package org.geotools.xml.wfs;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -287,7 +290,7 @@ public class WFSTransactionComplexTypes {
                     transactionRequest.getLockId(), output, hints);
             }
 
-            Iterator actions = transactionRequest.getActions().iterator();
+            Iterator actions = transactionRequest.getAllActions().iterator();
 
             while (actions.hasNext()) {
                 Action a = (Action) actions.next();
@@ -1947,20 +1950,16 @@ public class WFSTransactionComplexTypes {
                 throw new SAXException("Invalid type name for element provided");
             }
 
-            Set fidSet = new HashSet();
+            List fidSet = new ArrayList();
 
             for (int i = 0; i < (value.length - 1); i++)
-                fidSet.addAll(Arrays.asList(
-                        ((FidFilter) value[i].getValue()).getFids()));
-
-            FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter();
-            r.addAllFids(fidSet);
+                fidSet.addAll( (Collection) value[i].getValue());
 
             Object[] t = (Object[]) value[value.length - 1].getValue();
             int status = ((Integer) t[0]).intValue();
             SAXException error = (SAXException) ((t.length < 2) ? null : t[1]);
 
-            return new TransactionResult(status, r, error);
+            return new TransactionResult(status, fidSet, error);
         }
 
         /**
@@ -2236,16 +2235,13 @@ public class WFSTransactionComplexTypes {
                 throw new SAXException("Invalid type name for element provided");
             }
 
-            Set fidSet = new HashSet();
+            List fidList = new ArrayList();
 
             for (int i = 0; i < value.length; i++)
-                fidSet.addAll(Arrays.asList(
+                fidList.addAll(Arrays.asList(
                         ((FidFilter) value[i].getValue()).getFids()));
 
-            FidFilter r = FilterFactoryFinder.createFilterFactory().createFidFilter();
-            r.addAllFids(fidSet);
-
-            return r;
+            return fidList;
         }
 
         /**

@@ -24,7 +24,7 @@ org.geotools.data.shapefile.indexed
 This directory contains the difficult situation of code donated from the Open Planning Project
 which was prototyped with GeoServer under the GPL licience. Since the original (C) owner
 dondated the code we are able to make use of our LGPL license - TOPP is still listed as
-a (C) holder from 2001-2003.
+a (C) holder from 2001-2003. 
 
 IP:
 - headers updated to 2003-2006 PMC as needed (for origional shapefile datastore code)

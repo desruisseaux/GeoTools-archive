@@ -1,0 +1,126 @@
+/**
+ * 
+ */
+package org.geotools.data.wfs;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+
+import org.geotools.TestData;
+import org.geotools.data.ows.WFSCapabilities;
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.function.FilterFunction_distance;
+import org.geotools.filter.function.FilterFunction_geometryType;
+import org.geotools.filter.function.math.FilterFunction_abs;
+import org.geotools.xml.DocumentFactory;
+
+import junit.framework.TestCase;
+
+/**
+ * Test the ability to read a capabilities document.  The emphasis is in making sure that 
+ * the Function expressions are constructed correctly.
+ * 
+ * @author Jesse
+ */
+public class ParseCapabilitesTest extends TestCase {
+
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	public void testNoSupportedFunctionExpression() throws Exception {
+		Map hints=new HashMap();
+		InputStream in = TestData.openStream("xml/capabilities/WFSGetCapsNoFunctionExpressions.xml");
+        WFSCapabilities obj=(WFSCapabilities) DocumentFactory.getInstance(in, hints, Level.WARNING);
+        FilterCapabilities filterCapabilities = obj.getFilterCapabilities();
+		assertFalse(filterCapabilities.supports(FilterCapabilities.FUNCTIONS));
+		
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_DISJOINT));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_EQUALS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_DWITHIN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_BEYOND));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_INTERSECT));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_TOUCHES));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_CROSSES));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_WITHIN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_CONTAINS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_OVERLAPS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_BBOX));
+		
+		assertTrue(filterCapabilities.supports(FilterCapabilities.LOGICAL));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SIMPLE_ARITHMETIC));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SIMPLE_COMPARISONS));
+
+		assertTrue(filterCapabilities.supports(FilterCapabilities.BETWEEN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.NULL_CHECK));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.LIKE));
+		
+	}
+	
+	public void testSomeSupportedFunctionExpression() throws Exception {
+		Map hints=new HashMap();
+		InputStream in = TestData.openStream("xml/capabilities/WFSGetCapsSomeFunctionExpressions.xml");
+        WFSCapabilities obj=(WFSCapabilities) DocumentFactory.getInstance(in, hints, Level.WARNING);
+        FilterCapabilities filterCapabilities = obj.getFilterCapabilities();
+		assertTrue(filterCapabilities.supports(FilterCapabilities.FUNCTIONS));
+		
+		assertTrue(filterCapabilities.supports(FilterFunction_distance.class));
+		assertFalse(filterCapabilities.supports(FilterFunction_abs.class));
+		assertFalse(filterCapabilities.supports(FilterFunction_geometryType.class));
+
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_DISJOINT));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_EQUALS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_DWITHIN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_BEYOND));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_INTERSECT));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_TOUCHES));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_CROSSES));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_WITHIN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_CONTAINS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_OVERLAPS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_BBOX));
+		
+		assertTrue(filterCapabilities.supports(FilterCapabilities.LOGICAL));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SIMPLE_ARITHMETIC));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SIMPLE_COMPARISONS));
+
+		assertTrue(filterCapabilities.supports(FilterCapabilities.BETWEEN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.NULL_CHECK));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.LIKE));
+	}
+	
+	public void testGeoserverSupportedFunctionExpression() throws Exception {
+		Map hints=new HashMap();
+		InputStream in = TestData.openStream("xml/capabilities/WFSGetCapsGeoserverFunctionExpressions.xml");
+        WFSCapabilities obj=(WFSCapabilities) DocumentFactory.getInstance(in, hints, Level.WARNING);
+        FilterCapabilities filterCapabilities = obj.getFilterCapabilities();
+		assertTrue(filterCapabilities.supports(FilterCapabilities.FUNCTIONS));
+		
+		assertTrue(filterCapabilities.supports(FilterFunction_distance.class));
+		assertTrue(filterCapabilities.supports(FilterFunction_abs.class));
+		assertTrue(filterCapabilities.supports(FilterFunction_geometryType.class));
+
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_DISJOINT));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_EQUALS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_DWITHIN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_BEYOND));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_INTERSECT));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_TOUCHES));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_CROSSES));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_WITHIN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_CONTAINS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_OVERLAPS));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SPATIAL_BBOX));
+		
+		assertTrue(filterCapabilities.supports(FilterCapabilities.LOGICAL));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SIMPLE_ARITHMETIC));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.SIMPLE_COMPARISONS));
+
+		assertTrue(filterCapabilities.supports(FilterCapabilities.BETWEEN));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.NULL_CHECK));
+		assertTrue(filterCapabilities.supports(FilterCapabilities.LIKE));
+	}
+
+}

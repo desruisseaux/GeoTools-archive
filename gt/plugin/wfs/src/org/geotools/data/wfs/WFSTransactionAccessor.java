@@ -9,10 +9,10 @@ import org.geotools.filter.visitor.ClientTransactionAccessor;
 
 public class WFSTransactionAccessor implements ClientTransactionAccessor {
 
-	private WFSTransactionState state;
+    private List actions;
 
-	WFSTransactionAccessor(WFSTransactionState state){
-		this.state=state;
+	WFSTransactionAccessor(List actions){
+        this.actions=actions;
 	}
 	
     /**
@@ -22,7 +22,7 @@ public class WFSTransactionAccessor implements ClientTransactionAccessor {
      * @return all the filters indicating deleted feature anded together. 
      */
 	public Filter getDeleteFilter() {
-		List l = state.getActions();
+		List l = actions;
 		Iterator i = l.iterator();
 		Filter deleteFilter=null;
 		while(i.hasNext()){
@@ -46,7 +46,6 @@ public class WFSTransactionAccessor implements ClientTransactionAccessor {
      * @return all the filters of updates that affect the attribute in the expression ORed together.
      */
     public Filter getUpdateFilter(String attributePath) {
-    	List actions = state.getActions();
         Iterator i = actions.iterator();
         Filter updateFilter=null;
         while(i.hasNext()){

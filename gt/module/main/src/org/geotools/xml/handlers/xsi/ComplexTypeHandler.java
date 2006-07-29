@@ -863,6 +863,21 @@ public class ComplexTypeHandler extends XSIElementHandler {
 
             return null;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+			if (children == null) {
+                return null;
+            }
+            for (int i = 0; i < children.length; i++) {
+                Element t = children[i].findChildElement(localName,namespaceURI);
+                if (t != null) { // found it
+
+                    return t;
+                }
+            }
+
+            return null;
+		}
     }
 
     /**

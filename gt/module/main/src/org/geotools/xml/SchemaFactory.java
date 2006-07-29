@@ -25,10 +25,12 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -223,6 +225,7 @@ public class SchemaFactory {
         return (Schema[])l.toArray(new Schema[l.size()]);
     }
 
+    
     private synchronized Schema getRealInstance(URI targetNamespace) {
         Schema r = (Schema) schemas.get(targetNamespace);
 
@@ -265,8 +268,9 @@ public class SchemaFactory {
             level);
     }
 
-    private synchronized Schema getRealInstance(URI targetNamespace,
+    private synchronized Schema getRealInstance(URI targetNamespace2,
         URI desiredSchema, Level level) throws SAXException {
+        URI targetNamespace=targetNamespace2;
         if ((targetNamespace == null) || (schemas.get(targetNamespace) == null)) {
             setParser();
 
@@ -276,18 +280,22 @@ public class SchemaFactory {
             try {
                 parser.parse(desiredSchema.toString(), contentHandler);
             } catch (IOException e) {
+                // TODO error handler should be notified of a connectionexception: operation timed out.
                 throw new SAXException(e);
             }
 
+            Schema schema = contentHandler.getSchema();
             if ((targetNamespace == null) || "".equals(targetNamespace)) {
-                return contentHandler.getSchema();
+                targetNamespace=schema.getTargetNamespace();
             }
 
-            schemas.put(targetNamespace, contentHandler.getSchema());
-
-            //                }
+            if( schemas.get(targetNamespace)!=null ){
+                schema=merge(schema, (Schema) schemas.get(targetNamespace));
+            }
+            schemas.put(targetNamespace, schema);
+            return schema;
         } else {
-            if (!((Schema) schemas.get(targetNamespace)).includesURI(
+            if ( !((Schema) schemas.get(targetNamespace)).includesURI(
                         desiredSchema)) {
                 Schema sh = (Schema) schemas.get(targetNamespace);
                 setParser();
@@ -318,46 +326,46 @@ public class SchemaFactory {
         return getInstance().getRealInstance(targetNamespace, is1, level);
     }
 
-    private synchronized Schema getRealInstance(URI targetNamespace,
+    private synchronized Schema getRealInstance(URI targetNamespace2,
         InputStream is1, Level level) throws SAXException {
+        URI targetNamespace=targetNamespace2;
+        
         if ((targetNamespace == null) || (schemas.get(targetNamespace) == null)) {
-            setParser();
+            XSISAXHandler contentHandler = parseSchema(is1, level);
 
-            XSISAXHandler contentHandler = getSAXHandler(null); // no uri
-            XSISAXHandler.setLogLevel(level);
-
-            try {
-                parser.parse(is1, contentHandler);
-            } catch (IOException e) {
-                throw new SAXException(e);
+            if ((targetNamespace == null) || "".equals(targetNamespace)) {
+                targetNamespace=contentHandler.getSchema().getTargetNamespace();
             }
 
-            if (targetNamespace == null) {
-                return contentHandler.getSchema();
+            Schema schema = contentHandler.getSchema();
+            if( schemas.get(targetNamespace)!=null ){
+                schema=merge(schema, (Schema) schemas.get(targetNamespace));
             }
-
+            
             schemas.put(targetNamespace, contentHandler.getSchema());
 
-            //                }
         } else {
-            // no way to test is it's already part ... so assume it's not already included
             Schema sh = (Schema) schemas.get(targetNamespace);
-            setParser();
-
-            XSISAXHandler contentHandler = getSAXHandler(null); // no uri
-            XSISAXHandler.setLogLevel(level);
-
-            try {
-                parser.parse(is1, contentHandler);
-            } catch (IOException e) {
-                throw new SAXException(e);
-            }
+            XSISAXHandler contentHandler = parseSchema(is1, level);
 
             sh = merge(sh, contentHandler.getSchema());
             schemas.put(targetNamespace, sh); // over-write
         }
-
         return (Schema) schemas.get(targetNamespace);
+    }
+
+    private XSISAXHandler parseSchema( InputStream is1, Level level ) throws SAXException {
+        setParser();
+
+        XSISAXHandler contentHandler = getSAXHandler(null);
+        XSISAXHandler.setLogLevel(level);
+
+        try {
+            parser.parse(is1, contentHandler);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        }
+        return contentHandler;
     }
 
     /*
@@ -831,4 +839,5 @@ public class SchemaFactory {
             return Collections.EMPTY_MAP;
         }
     }
+    
 }

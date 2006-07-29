@@ -236,4 +236,10 @@ public class ElementGT implements Element {
     public Element findChildElement( String name1 ) {
         return (getName()!=null && getName().equals(name1))?this:null;
     }
+
+	public Element findChildElement(String localName, URI namespaceURI) {
+        return (getName()!=null 
+        		&& getName().equals(localName)
+        		&& getNamespace().equals(namespaceURI))?this:null;
+	}
 }

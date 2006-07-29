@@ -26,8 +26,6 @@ import java.util.Map;
  *
  */
 public interface FlowHandler {
-    public final static String FLOW_HANDLER_HINT = "FLOW_HANDLER_HINT";
-
     /**
      * If this method returns true, the XMLSAXHandler will abort parsing.
      *

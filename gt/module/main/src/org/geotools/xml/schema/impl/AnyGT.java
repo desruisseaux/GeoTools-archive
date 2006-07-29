@@ -91,4 +91,8 @@ public class AnyGT implements Any {
     public Element findChildElement(String name) {
         return null;
     }
+
+	public Element findChildElement(String localName, URI namespaceURI) {
+		return null;
+	}
 }

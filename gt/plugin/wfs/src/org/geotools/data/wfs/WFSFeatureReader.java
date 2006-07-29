@@ -21,9 +21,11 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
@@ -33,8 +35,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.xml.DocumentFactory;
+import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.gml.FCBuffer;
-import org.geotools.xml.gml.GMLComplexTypes;
 import org.xml.sax.SAXException;
 
 
@@ -53,7 +55,7 @@ public class WFSFeatureReader extends FCBuffer {
     private int insertSearchIndex = -1;
 
     private WFSFeatureReader(InputStream is, int capacity, int timeout,
-        WFSTransactionState trans, FeatureType ft) {
+        WFSTransactionState trans, WFSFeatureType ft) {
         //document may be null
         super(null, capacity, timeout,ft);
         this.is = is;
@@ -71,14 +73,14 @@ public class WFSFeatureReader extends FCBuffer {
      * @throws SAXException
      */
     public static FeatureReader getFeatureReader(URI document, int capacity,
-        int timeout, WFSTransactionState transaction, FeatureType ft) throws SAXException {
+        int timeout, WFSTransactionState transaction, WFSFeatureType ft) throws SAXException {
         HttpURLConnection hc;
 
         try {
             hc = (HttpURLConnection) document.toURL().openConnection();
 
             return getFeatureReader(hc.getInputStream(), capacity, timeout,
-                transaction,ft);
+                transaction, ft);
         } catch (MalformedURLException e) {
             logger.warning(e.toString());
             throw new SAXException(e);
@@ -99,10 +101,10 @@ public class WFSFeatureReader extends FCBuffer {
      * @throws SAXException
      */
     public static WFSFeatureReader getFeatureReader(InputStream is,
-        int capacity, int timeout, WFSTransactionState transaction, FeatureType ft)
+        int capacity, int timeout, WFSTransactionState transaction, WFSFeatureType ft)
         throws SAXException {
         WFSFeatureReader fc = new WFSFeatureReader(is, capacity, timeout,
-                transaction,ft);
+                transaction, ft);
         fc.start(); // calls run
 
         if (fc.exception != null) {
@@ -116,8 +118,8 @@ public class WFSFeatureReader extends FCBuffer {
      * @see java.lang.Runnable#run()
      */
     public void run() {
-        HashMap hints = new HashMap();
-        hints.put(GMLComplexTypes.STREAM_HINT, this);
+        XMLHandlerHints hints = new XMLHandlerHints();
+        initHints(hints);
 
         try {
             try {
@@ -141,6 +143,17 @@ public class WFSFeatureReader extends FCBuffer {
         }
     }
 
+    protected void initHints( XMLHandlerHints hints ) {
+        super.initHints(hints);
+
+        if( ft instanceof WFSFeatureType){
+            Map schemas=new HashMap(1);
+            WFSFeatureType wfsFT=(WFSFeatureType) ft;
+            schemas.put(wfsFT.getNamespace().toString(), wfsFT.getSchemaURI());
+            hints.put(XMLHandlerHints.NAMESPACE_MAPPING, schemas);
+        }
+    }
+    
     /**
      * 
      * @see org.geotools.data.FeatureReader#hasNext()
@@ -165,7 +178,7 @@ public class WFSFeatureReader extends FCBuffer {
             while ((next == null) && super.hasNext())
                 next = super.next();
         } else {
-            List l = ts.getActions();
+            List l = ts.getActions(ft.getTypeName());
 
             while ((next == null) && super.hasNext()) {
                 next = super.next();
@@ -178,17 +191,7 @@ public class WFSFeatureReader extends FCBuffer {
                     while (i.hasNext() && (next != null)) {
                         Action a = (Action) i.next();
 
-                        if ((a.getType() == Action.DELETE)
-                                && a.getFilter().contains(next)) {
-                            next = null;
-                        } else {
-                            if ((a.getType() == Action.UPDATE)
-                                    && a.getFilter().contains(next)) {
-                                // update the feature
-                                UpdateAction ua = (UpdateAction) a;
-                                ua.update(next);
-                            }
-                        }
+                        next=updateFeature(a, next);
                     }
                 }
             }
@@ -196,11 +199,10 @@ public class WFSFeatureReader extends FCBuffer {
             if ((insertSearchIndex < l.size()) && (next == null)) {
                 // look for an insert then
                 // advance one spot
-                insertSearchIndex = (insertSearchIndex + 1);
 
-                while ((insertSearchIndex < l.size()) && (next == null)) {
+                while ((insertSearchIndex+1 < l.size()) && (next == null)) {
+                    insertSearchIndex++;
                     Action a = (Action) l.get(insertSearchIndex);
-
                     if (a.getType() == Action.INSERT) {
                         InsertAction ia = (InsertAction) a;
                         next = ia.getFeature();
@@ -210,23 +212,10 @@ public class WFSFeatureReader extends FCBuffer {
 
                         while ((i < l.size()) && (next != null)) {
                             a = (Action) l.get(i);
-
-                            if ((a.getType() == Action.DELETE)
-                                    && a.getFilter().contains(next)) {
-                                next = null;
-                            } else {
-                                if ((a.getType() == Action.UPDATE)
-                                        && a.getFilter().contains(next)) {
-                                    // update the feature
-                                    UpdateAction ua = (UpdateAction) a;
-                                    ua.update(next);
-                                }
-                            }
-
+                            next=updateFeature(a, next);
                             i++;
                         }
                     }
-                    insertSearchIndex++;
                 }
             }
         }
@@ -234,8 +223,22 @@ public class WFSFeatureReader extends FCBuffer {
         return next != null;
     }
 
+    private Feature updateFeature( Action a, Feature feature ) {
+        if ((a.getType() == Action.DELETE)
+                && a.getFilter().contains(feature)) {
+            return null;
+        } else {
+            if ((a.getType() == Action.UPDATE)
+                    && a.getFilter().contains(feature)) {
+                // update the feature
+                UpdateAction ua = (UpdateAction) a;
+                ua.update(feature);
+            }
+        }
+        return feature;
+    }
+
     /**
-     * 
      * @see org.geotools.data.FeatureReader#next()
      */
     public Feature next()

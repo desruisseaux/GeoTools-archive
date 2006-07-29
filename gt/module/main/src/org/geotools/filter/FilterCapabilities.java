@@ -15,9 +15,11 @@
  */
 package org.geotools.filter;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Set;
+
+import org.geotools.filter.expression.FunctionExpression;
 
 
 /**
@@ -132,187 +134,23 @@ public class FilterCapabilities {
 	 * Scalar Mask for simple comparison operations
 	 */
     public static final long SIMPLE_COMPARISONS = COMPARE_EQUALS|COMPARE_GREATER_THAN|COMPARE_GREATER_THAN_EQUAL|COMPARE_LESS_THAN|COMPARE_LESS_THAN_EQUAL|COMPARE_NOT_EQUALS;    
-    private static Map spatialFiltersMap = loadSpatialFiltersMap();
-    private static Map comparisonsMap = loadComparisonFilterMap();
-    private static Map filterTypeToFilterCapabilitiesMap = loadFilterTypeToFilterCapabilitiesMap();
     private long ops = NO_OP;
 
-    private static Map loadSpatialFiltersMap() {
-        spatialFiltersMap = new HashMap();
-        spatialFiltersMap.put("", new Long(NO_OP));
-        spatialFiltersMap.put("BBOX", new Long(SPATIAL_BBOX));
-        spatialFiltersMap.put("Equals", new Long(SPATIAL_EQUALS));
-        spatialFiltersMap.put("Disjoint", new Long(SPATIAL_DISJOINT));
-        spatialFiltersMap.put("Intersect", new Long(SPATIAL_INTERSECT));
-        spatialFiltersMap.put("Touches", new Long(SPATIAL_TOUCHES));
-        spatialFiltersMap.put("Crosses", new Long(SPATIAL_CROSSES));
-        spatialFiltersMap.put("Within", new Long(SPATIAL_WITHIN));
-        spatialFiltersMap.put("Contains", new Long(SPATIAL_CONTAINS));
-        spatialFiltersMap.put("Overlaps", new Long(SPATIAL_OVERLAPS));
-        spatialFiltersMap.put("Beyond", new Long(SPATIAL_BEYOND));
-        spatialFiltersMap.put("DWithin", new Long(SPATIAL_DWITHIN));
+	private Set functions=new HashSet();
 
-        return spatialFiltersMap;
-    }
+    public FilterCapabilities(long filterCapabilitiesType) {
+		addType(filterCapabilitiesType);
+	}
 
-    private static Map loadComparisonFilterMap() {
-        comparisonsMap = new HashMap();
-        comparisonsMap.put("", new Long(NO_OP));
-        comparisonsMap.put("Logical", new Long(LOGICAL));
-        comparisonsMap.put("Simple_Comparisons", new Long(SIMPLE_COMPARISONS));
-        comparisonsMap.put("Like", new Long(LIKE));
-        comparisonsMap.put("Between", new Long(BETWEEN));
-        comparisonsMap.put("NullCheck", new Long(NULL_CHECK));
-        comparisonsMap.put("Simple_Arithmetic", new Long(SIMPLE_ARITHMETIC));
-        comparisonsMap.put("Functions", new Long(FUNCTIONS));
+	public FilterCapabilities() {
+		this(NO_OP);
+	}
 
-        return comparisonsMap;
-    }
-    
-    private static Map loadFilterTypeToFilterCapabilitiesMap(){
-    	Map conversionMap=new HashMap();
-    	conversionMap.put(new Short(FilterType.BETWEEN), new Long(BETWEEN));
-    	conversionMap.put(new Short(FilterType.COMPARE_EQUALS), new Long(COMPARE_EQUALS));
-    	conversionMap.put(new Short(FilterType.COMPARE_GREATER_THAN), new Long(COMPARE_GREATER_THAN));
-    	conversionMap.put(new Short(FilterType.COMPARE_GREATER_THAN_EQUAL), new Long(COMPARE_GREATER_THAN_EQUAL));
-    	conversionMap.put(new Short(FilterType.COMPARE_LESS_THAN), new Long(COMPARE_LESS_THAN));
-    	conversionMap.put(new Short(FilterType.COMPARE_LESS_THAN_EQUAL), new Long(COMPARE_LESS_THAN_EQUAL));
-    	conversionMap.put(new Short(FilterType.COMPARE_NOT_EQUALS), new Long(COMPARE_NOT_EQUALS));
-    	conversionMap.put(new Short(FilterType.FID), new Long(FID));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_BBOX), new Long(SPATIAL_BBOX));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_BEYOND), new Long(SPATIAL_BEYOND));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_CONTAINS), new Long(SPATIAL_CONTAINS));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_CROSSES), new Long(SPATIAL_CROSSES));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_DISJOINT), new Long(SPATIAL_DISJOINT));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_DWITHIN), new Long(SPATIAL_DWITHIN));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_EQUALS), new Long(SPATIAL_EQUALS));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_INTERSECTS), new Long(SPATIAL_INTERSECT));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_OVERLAPS), new Long(SPATIAL_OVERLAPS));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_TOUCHES), new Long(SPATIAL_TOUCHES));
-    	conversionMap.put(new Short(FilterType.GEOMETRY_WITHIN), new Long(SPATIAL_WITHIN));
-    	conversionMap.put(new Short(FilterType.LIKE), new Long(LIKE));
-    	conversionMap.put(new Short(FilterType.LOGIC_AND), new Long(LOGIC_AND));
-    	conversionMap.put(new Short(FilterType.LOGIC_NOT), new Long(LOGIC_NOT));
-    	conversionMap.put(new Short(FilterType.LOGIC_OR), new Long(LOGIC_OR));
-    	conversionMap.put(new Short(FilterType.NULL), new Long(NULL_CHECK));
-    	return conversionMap;
-    }
+    public FilterCapabilities(Class type) {
+    	addType(type); 
+	}
 
-    /**
-     * Translates a String into an long mask for the operation
-     * 
-     * @param s String, operation name
-     * @return one of the filter constants
-     */
-    public static long findOperation(String s) {
-        if (spatialFiltersMap.containsKey(s)) {
-            return ((Long) spatialFiltersMap.get(s)).intValue();
-        }
-
-        if (comparisonsMap.containsKey(s)) {
-            return ((Long) comparisonsMap.get(s)).intValue();
-        }
-
-        return NO_OP;
-    }
-
-    /**
-     * Converts a singular mask to the appropriate string as a Spatial Op
-     * 
-     * @param i The long constant
-     * @return The String representation of the long as a FilterType
-     */
-    public static String writeSpatialOperation(long i) {
-        if ( i == SPATIAL_BBOX )
-            return "BBOX";
-
-        if ( i == SPATIAL_EQUALS )
-            return "Equals";
-
-        if ( i == SPATIAL_DISJOINT )
-            return "Disjoint";
-
-        if ( i == SPATIAL_INTERSECT )
-            return "Intersect";
-
-        if ( i == SPATIAL_TOUCHES )
-            return "Touches";
-
-        if ( i == SPATIAL_CROSSES )
-            return "Crosses";
-
-        if ( i == SPATIAL_WITHIN )
-            return "Within";
-
-        if ( i == SPATIAL_CONTAINS )
-            return "Contains";
-
-        if ( i == SPATIAL_OVERLAPS )
-            return "Overlaps";
-
-        if ( i == SPATIAL_BEYOND )
-            return "Beyond";
-
-        if ( i == SPATIAL_DWITHIN )
-            return "DWithin";
-
-        return "";
-    }
-
-    /**
-     * Converts a singular mask to the appropriate string as a Scalar Op
-     * 
-     * @param i The long constant
-     * @return The String representation of the long as a FilterType
-     */
-    public static String writeScalarOperation(long i) {
-        if( i == LOGICAL) 
-            return "Logical";
-
-        if( i == SIMPLE_COMPARISONS)
-            return "Simple_Comparisons";
-
-        if( i ==LIKE )
-            return "Like";
-
-        if( i == BETWEEN )
-            return "Between";
-
-        if( i == NULL_CHECK )
-            return "NullCheck";
-
-        if( i == SIMPLE_ARITHMETIC )
-            return "Simple_Arithmetic";
-
-        if( i == FUNCTIONS )
-            return "Functions";
-
-        if( i == FID )
-            return "FeatureID";
-        
-        if( i == COMPARE_EQUALS )
-            return "Compare_Equals";
-        
-        if( i == COMPARE_GREATER_THAN )
-            return "Compare_Greater_Than";
-        
-        if( i == COMPARE_GREATER_THAN_EQUAL )
-            return "Compare_Greater_Than_Equal";
-        
-        if( i == COMPARE_LESS_THAN )
-            return "Compare_Less_Than";
-        
-        if( i == COMPARE_LESS_THAN_EQUAL )
-            return "Compare_Less_Than_Equal";
-        
-        if( i == COMPARE_NOT_EQUALS )
-            return "Compare_Not_Equals";
-        
-        return "";
-    }
-    
-    
-    /**
+	/**
      * Adds a new support type to capabilities.
      *
      * @param type The one of the masks enumerated in this class
@@ -320,6 +158,28 @@ public class FilterCapabilities {
     public void addType( long type ) {
         ops = ops | type;
     }    
+    
+    /**
+     * Adds a new support type to capabilities.  For 2.2 only function expression support is added this way.
+     * As of geotools 2.3 this will be the supported way of adding to Filtercapabilities.
+     *  @param the class that indicates the new support.
+     */
+    public void addType( Class type ){
+    	if( FunctionExpression.class.isAssignableFrom(type) ){
+			addType(FUNCTIONS);
+    		functions.add(type);
+    	}
+    }
+    
+    /**
+     * Add all the capabilities in the provided FilterCapabilities to this capabilities.
+     * 
+     * @param capabilities capabilities to add.
+     */
+    public void addAll( FilterCapabilities capabilities){
+    	ops= capabilities.ops|ops;
+    	functions.addAll(capabilities.functions);
+    }
     
     /**
      * Adds a new support type to capabilities.
@@ -330,7 +190,7 @@ public class FilterCapabilities {
      * @see #addType(long)
      */
     public void addType( short type ) {
-        addType(convertFilterTypeToMask(type));
+        addAll(convertFilterTypeToMask(type));
     }
 
     /**
@@ -339,11 +199,14 @@ public class FilterCapabilities {
      * @param type a constant from {@link FilterType}
      * @return the mask that is equivalent to the FilterType constant.
      */
-	public long convertFilterTypeToMask(short type) {
-		Long capabilitiesType = (Long)filterTypeToFilterCapabilitiesMap.get(new Short(type));
-		if( capabilitiesType==null )
-			return NO_OP;
-		return (capabilitiesType).intValue();
+	public FilterCapabilities convertFilterTypeToMask(short type) {
+		if( type==Filter.ALL.getFilterType() )
+			return FilterNameTypeMapping.NO_OP_CAPS;
+		if( type==Filter.NONE.getFilterType() )
+			return FilterNameTypeMapping.ALL_CAPS;
+		Object object = FilterNameTypeMapping.filterTypeToFilterCapabilitiesMap.get(new Short(type));
+		return (FilterCapabilities)object;
+		
 	}
     
  
@@ -421,6 +284,14 @@ public class FilterCapabilities {
     	return (ops & type) == type;
 	}
     
+    public boolean supports(FilterCapabilities type) {
+    	return (ops & type.ops) == type.ops && functions.containsAll(type.functions);
+	}
+    
+    public boolean supports(Class type){
+    	return functions.contains(type);
+    }
+    
     public long getScalarOps() {
         return ops & (SIMPLE_ARITHMETIC|SIMPLE_COMPARISONS|FID|FUNCTIONS|LIKE|LOGICAL|NULL_CHECK|BETWEEN);
     }
@@ -429,5 +300,23 @@ public class FilterCapabilities {
         		|SPATIAL_DISJOINT|SPATIAL_DWITHIN|SPATIAL_EQUALS|SPATIAL_INTERSECT
         		|SPATIAL_OVERLAPS|SPATIAL_TOUCHES|SPATIAL_WITHIN);
     }
+    /**
+     * Translates a String into an object that represents the operation
+     * 
+     * @param s String, operation name
+     * @return one of the {@link FilterCapabilities} constants
+     */
+	public static FilterCapabilities findOperation(String name) {
+		return FilterNameTypeMapping.findOperation(name);
+	}
+    /**
+     * Translates a String into  an object that represents function expression
+     * 
+     * @param s String, expression name
+     * @return one of the {@link FilterCapabilities} constants
+     */
+	public static FilterCapabilities findFunction(String name) {
+		return FilterNameTypeMapping.findFunction(name);
+	}
 
 }

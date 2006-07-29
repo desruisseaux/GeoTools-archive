@@ -24,7 +24,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
@@ -110,7 +110,7 @@ public abstract class FilterTestSupport extends TestCase {
             };
 
         // Builds the schema
-        testSchema = FeatureTypeFactory.newFeatureType(types, "testSchema");
+        testSchema = FeatureTypeBuilder.newFeatureType(types, "testSchema");
 
         GeometryFactory geomFac = new GeometryFactory();
 

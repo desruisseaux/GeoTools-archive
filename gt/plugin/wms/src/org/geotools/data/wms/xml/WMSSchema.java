@@ -488,6 +488,11 @@ public class WMSSchema implements Schema {
         public Element findChildElement( String name ) {
             return (this.name!=null && this.name.equals(name))?this:null;
         }
+		public Element findChildElement(String localName, URI namespaceURI) {
+            return (this.name!=null 
+            		&& this.name.equals(name)
+            		&& getNamespace().equals(namespaceURI))?this:null;
+		}
     }
     
     static abstract class WMSComplexType implements ComplexType {

@@ -15,6 +15,7 @@
  */
 package org.geotools.xml.schema;
 
+import java.net.URI;
 import java.util.Map;
 
 import org.xml.sax.Attributes;
@@ -146,4 +147,5 @@ public interface ComplexType extends Type {
      * @return True, except when streaming the element.
      */
     public boolean cache(Element element, Map hints);
+
 }

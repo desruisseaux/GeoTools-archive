@@ -5,10 +5,14 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.NullFilter;
+import org.geotools.filter.function.FilterFunction_geometryType;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPreProcessFilterSplittingVisitorTests {
 
@@ -125,7 +129,7 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		assertEquals(filter, visitor.getFilterPost());
 		assertEquals(Filter.NONE, visitor.getFilterPre());
 		
-		filterCapabilitiesMask.addType(FilterCapabilities.FUNCTIONS);
+		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		visitor=newVisitor();
 		
 		filter.accept(visitor);
@@ -149,7 +153,7 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		assertEquals(funtionFilter, visitor.getFilterPost());
 		assertEquals(geomFilter, visitor.getFilterPre());
 		
-		filterCapabilitiesMask.addType(FilterCapabilities.FUNCTIONS);
+		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		visitor=newVisitor();
 		
 		andFilter.accept(visitor);
@@ -173,7 +177,7 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		assertEquals(Filter.NONE, visitor.getFilterPre());
 		assertEquals(orFilter, visitor.getFilterPost());
 		
-		filterCapabilitiesMask.addType(FilterCapabilities.FUNCTIONS);
+		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		visitor=newVisitor();
 		
 		orFilter.accept(visitor);
@@ -195,13 +199,89 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		assertEquals(not, visitor.getFilterPost());
 		assertEquals(Filter.NONE, visitor.getFilterPre());
 		
-		filterCapabilitiesMask.addType(FilterCapabilities.FUNCTIONS);
+		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		visitor=newVisitor();
 		
 		not.accept(visitor);
 
 		assertEquals(Filter.NONE, visitor.getFilterPost());
 		assertEquals(not, visitor.getFilterPre());
+	}
+
+	public void testNullParentNullAccessor() throws Exception {
+		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
+		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
+		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
+		
+		Filter funtionFilter = createFunctionFilter();
+		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		
+		Filter orFilter = funtionFilter.or(geomFilter);
+		visitor=new PostPreProcessFilterSplittingVisitor(new FilterCapabilities(), null, null);
+		orFilter.accept(visitor);
+
+		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(orFilter, visitor.getFilterPost());
+
+		visitor=new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, null, null);
+		
+		orFilter.accept(visitor);
+
+		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(orFilter, visitor.getFilterPre());
+	}
+	
+	public void testComplicatedOrFilter() throws Exception {
+		CompareFilter c1=filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
+		c1.addLeftValue(filterFactory.createAttributeExpression("eventstatus"));
+		c1.addRightValue(filterFactory.createLiteralExpression("deleted"));
+		
+		CompareFilter c2 = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
+		c2.addLeftValue(filterFactory.createAttributeExpression("eventtype"));
+		c2.addRightValue(filterFactory.createLiteralExpression("road hazard"));
+		
+		CompareFilter c3 = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
+		c3.addLeftValue(filterFactory.createAttributeExpression("eventtype"));
+		c3.addRightValue(filterFactory.createLiteralExpression("area warning"));
+
+		GeometryFilter g = filterFactory.createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		g.addLeftGeometry(filterFactory.createAttributeExpression("geom"));
+		g.addRightGeometry(filterFactory.createBBoxExpression(new Envelope(0,180,0,90)));
+		
+		Filter f = c2.or(c3);
+		f=c1.not().and(f);
+		f=f.and(g);
+		
+		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
+		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
+		
+		visitor=new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, null, null);
+		f.accept(visitor);
+		
+		assertEquals(f, visitor.getFilterPre());
+		assertEquals(Filter.NONE, visitor.getFilterPost());
+		
+		visitor=new PostPreProcessFilterSplittingVisitor( filterCapabilitiesMask, null, new ClientTransactionAccessor(){
+
+			public Filter getDeleteFilter() {
+				return null;
+			}
+
+			public Filter getUpdateFilter(String attributePath) {
+				if( attributePath.equals("eventtype") ){
+					return filterFactory.createFidFilter("fid");
+				}
+				return null;
+			}
+			
+		});
+
+		f.accept(visitor);
+		
+		assertEquals(f, visitor.getFilterPost());
+		assertEquals(f.or(filterFactory.createFidFilter("fid")), visitor.getFilterPre());
 	}
 	
 }

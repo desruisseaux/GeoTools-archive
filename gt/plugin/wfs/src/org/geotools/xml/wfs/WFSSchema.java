@@ -643,6 +643,16 @@ public class WFSSchema implements Schema {
         public URI getNamespace() {
             return WFSSchema.NAMESPACE;
         }
+
+		public Element findChildElement(String localName, URI namespaceURI) {
+			if (this.name != null) {
+                if (this.name.equals(localName) && this.getNamespace().equals(namespaceURI)) {
+                    return this;
+                }
+            }
+
+			return null;
+		}
     }
 
     /**

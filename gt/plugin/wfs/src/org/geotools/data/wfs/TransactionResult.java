@@ -16,6 +16,8 @@
  */
 package org.geotools.data.wfs;
 
+import java.util.List;
+
 import org.geotools.filter.FidFilter;
 import org.xml.sax.SAXException;
 
@@ -43,7 +45,11 @@ public class TransactionResult {
      * partial
      */
     public static final int PARTIAL = 4;
-    private FidFilter insertResult;
+    /**
+     * A list of the fids returned in the TransactionResult in the order they were received.  
+     * The first element is the FID of the first InsertResults response.
+     */
+    private List insertResult;
     private int status;
 
     private SAXException error;
@@ -58,7 +64,7 @@ public class TransactionResult {
      * @param insertResult
      * @param error
      */
-    public TransactionResult(int status, FidFilter insertResult,
+    public TransactionResult(int status, List insertResult,
         SAXException error) {
         this.status = status;
         this.insertResult = insertResult;
@@ -72,7 +78,7 @@ public class TransactionResult {
      * @param locator nullable
      * @param message
      */
-    public TransactionResult(int status, FidFilter insertResult,
+    public TransactionResult(int status, List insertResult,
         String locator, String message) {
         this.status = status;
         this.insertResult = insertResult;
@@ -132,11 +138,12 @@ public class TransactionResult {
     }
 
     /**
-     * DOCUMENT ME!
+     * A list of the fids returned in the TransactionResult in the order they were received.  
+     * The first element is the FID of the first InsertResults response.
      *
-     * @return Returns the insertResult.
+     * @return list of the fids returned in the TransactionResult in the order they were received.  
      */
-    public FidFilter getInsertResult() {
+    public List getInsertResult() {
         return insertResult;
     }
 

@@ -25,11 +25,13 @@ package org.geotools.data.wfs;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 
 
 /**
@@ -73,24 +75,23 @@ public interface Action {
      * @author dzwiers
      */
     public static class UpdateAction implements Action {
-        private Filter filter;
-        private Map properties;
-        private String typeName;
-
-        private UpdateAction() {
-            // should not be called
-        }
+        private final Filter filter;
+        private final Map properties;
+        private final String typeName;
 
         /**
-         * Makes an UpdateAction
+         * Makes an UpdateAction Filter is copied so any further changes will not be included in filter of action.
          * 
          * @param typeName The TypeName
          * @param f Filter which this update affects
-         * @param properties The properties to update
+         * @param properties The properties to update.  Entries must be <String, Object>  where String is an attribute to 
+         * update and Object is the new Value.
          */
         public UpdateAction(String typeName, Filter f, Map properties) {
-            filter = f;
-            this.properties = properties;
+        	DuplicatorFilterVisitor visitor=new DuplicatorFilterVisitor(FilterFactoryFinder.createFilterFactory(), false);
+        	f.accept(visitor);
+            filter = (Filter) visitor.getCopy();
+            this.properties = new HashMap(properties);
             this.typeName = typeName;
         }
 
@@ -162,6 +163,10 @@ public interface Action {
                 }
             }
 		}
+		
+		public String toString() {
+			return "UPDATE "+filter+" "+properties;
+		}
     }
 
     /**
@@ -170,21 +175,19 @@ public interface Action {
      * @author dzwiers
      */
     public static class DeleteAction implements Action {
-        private Filter filter;
-        private String typeName;
-
-        private DeleteAction() {
-            // should not be called
-        }
+        private final Filter filter;
+        private final String typeName;
 
         /**
-         * Represents a Delete Action
+         * Represents a Delete Action.  Filter is copied so any further changes will not be included in filter of action.
          * 
          * @param typeName TypeName
          * @param f Filter of Features to Delete
          */
         public DeleteAction(String typeName, Filter f) {
-            filter = f;
+        	DuplicatorFilterVisitor visitor=new DuplicatorFilterVisitor(FilterFactoryFinder.createFilterFactory(),false);
+        	f.accept(visitor);
+            filter = (Filter) visitor.getCopy();
             this.typeName = typeName;
         }
 
@@ -208,6 +211,11 @@ public interface Action {
         public Filter getFilter() {
             return filter;
         }
+        
+		public String toString() {
+			return "REMOVE "+filter;
+		}
+
     }
 
     /**
@@ -216,18 +224,23 @@ public interface Action {
      * @author dzwiers
      */
     public static class InsertAction implements Action {
-        private Feature feature;
-
-        private InsertAction() {
-            // should not be called
-        }
+        private final Feature feature;
 
         /**
-         * Creates an insert action for the Feature specified
+         * Creates an insert action for the Feature specified.  The feature is copied to
+         * prevent inadvertant side effect of modifing the feature after an insert.
+         * 
          * @param f Feature to add
          */
         public InsertAction(Feature f) {
-            feature = f;
+        	Feature feature;
+            try {
+				feature = f.getFeatureType().duplicate(f);
+			} catch (IllegalAttributeException e) {
+				Logger.getLogger("org.geotools.data.wfs").warning("Failed to duplicate feature:"+f);
+				feature=f;
+			}
+			this.feature=feature;
         }
 
         /**
@@ -261,5 +274,8 @@ public interface Action {
                                                              .createFidFilter(feature
                 .getID()));
         }
+		public String toString() {
+			return "INSERT "+feature;
+		}
     }
 }

@@ -48,7 +48,8 @@ public class WFSDataStoreReadTest extends TestCase {
         try{
         Map m = new HashMap();
         m.put(WFSDataStoreFactory.URL.key,server);
-        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000)); // was 1000000 for debug
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(10000)); // not debug
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(1000000)); //for debug
         return (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
 
         }catch(java.net.SocketException se){

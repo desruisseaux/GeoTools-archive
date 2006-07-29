@@ -381,7 +381,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             }
 
             if (encodableFilter != null) {
-                whereStmt = encoder.encode((AbstractFilter) encodableFilter);
+                whereStmt = encoder.encode(encodableFilter);
                 sql = "DELETE from " + sqlBuilder.encodeTableName(tableName) + whereStmt + ";";
 
                 //do actual delete
@@ -468,7 +468,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
             }
 
             if (encodableFilter != null) {
-                whereStmt = encoder.encode((AbstractFilter) encodableFilter);
+                whereStmt = encoder.encode(encodableFilter);
                 sql = makeModifySql(type, value, whereStmt);
                 LOGGER.finer("encoded modify is " + sql);
                 DefaultQuery query=new DefaultQuery(getSchema().getTypeName(), filter);

@@ -119,15 +119,17 @@ public class FilterComplexTypes {
                 throw new SAXException("Missing child element");
             }
 
-            long t = FilterCapabilities.NO_OP;
+            FilterCapabilities caps=new FilterCapabilities();
 
             for (int i = 0; i < value.length; i++) {
-                t = t
-                    | FilterCapabilities.findOperation(value[i].getElement()
-                                                               .getName());
+                String name = value[i].getElement().getName();
+                if( name.equals("Functions") )
+                	caps.addAll((FilterCapabilities) value[i].getValue());
+                else
+                	caps.addAll( FilterCapabilities.findOperation(name) );
             }
 
-            return new Long(t);
+            return caps;
         }
 
         /**
@@ -141,7 +143,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Integer.class;
+            return FilterCapabilities.class;
         }
 
         /**
@@ -214,15 +216,14 @@ public class FilterComplexTypes {
                 throw new SAXException("Missing child element");
             }
 
-            long t = FilterCapabilities.NO_OP;
+            FilterCapabilities caps=new FilterCapabilities();
 
             for (int i = 0; i < value.length; i++) {
-                t = t
-                    | FilterCapabilities.findOperation(value[i].getElement()
-                                                               .getName());
+                caps.addAll( FilterCapabilities.findOperation(value[i].getElement()
+                                                               .getName()) );
             }
 
-            return new Long(t);
+            return caps;
         }
 
         /**
@@ -236,7 +237,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Integer.class;
+            return FilterCapabilities.class;
         }
 
         /**
@@ -295,7 +296,11 @@ public class FilterComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-            return null;
+        	// TODO 
+        	FilterCapabilities caps=new FilterCapabilities();
+        	String functionName = (String)value[0].getValue();
+			caps.addAll(FilterCapabilities.findFunction(functionName.toLowerCase()));
+            return caps;
         }
 
         /**
@@ -309,7 +314,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return null;
+            return FilterCapabilities.class;
         }
 
         /**
@@ -374,7 +379,11 @@ public class FilterComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-            return null;
+        	FilterCapabilities caps=new FilterCapabilities();
+        	for (int i = 0; i < value.length; i++) {
+				caps.addAll((FilterCapabilities) value[i].getValue());
+			}
+            return caps;
         }
 
         /**
@@ -388,7 +397,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return null;
+            return FilterCapabilities.class;
         }
 
         /**
@@ -439,13 +448,24 @@ public class FilterComplexTypes {
         }
 
         /**
+         * @throws SAXException 
          * @see org.geotools.xml.schema.Type#getValue(org.geotools.xml.schema.Element,
          *      org.geotools.xml.schema.ElementValue[],
          *      org.xml.sax.Attributes, java.util.Map)
          */
         public Object getValue(Element element, ElementValue[] value,
-            Attributes attrs, Map hints){
-            return null;
+            Attributes attrs, Map hints) throws SAXException{
+        	if ((element == null) || (value == null) || (value.length != 1)) {
+                throw new SAXException(
+                    "Invalid parameters specified for Spatial_CapabilitiesType");
+            }
+
+            if (elements[0].getName().equals(value[0].getElement().getName())) {
+                return (FilterCapabilities) value[0].getValue();
+            }
+
+            throw new SAXException("Invalid child element: "
+                + value[0].getElement().getName());
         }
 
         /**
@@ -518,11 +538,12 @@ public class FilterComplexTypes {
             FilterCapabilities fc = new FilterCapabilities();
 
             if (elements[0].getName().equals(value[0].getElement().getName())) {
-                fc.addType(((Long) value[0].getValue()).intValue());
+
+            	fc.addAll((FilterCapabilities)value[0].getValue());
 
                 if (value.length > 1) {
 	                if (elements[1].getName().equals(value[1].getElement().getName())) {
-	                    fc.addType( ((Long) value[1].getValue()).intValue());
+	                	fc.addAll((FilterCapabilities)value[1].getValue());
 	                } else {
 	                    throw new SAXException("Unknown element"
 	                        + value[1].getElement().getName());
@@ -530,13 +551,12 @@ public class FilterComplexTypes {
                 }
             } else {
                 if (elements[1].getName().equals(value[0].getElement().getName())) {
-                    fc.addType( ((Long) value[0].getValue()).intValue());
+                	fc.addAll((FilterCapabilities)value[1].getValue());
 
                     if (value.length > 1) {
 	                    if (elements[0].getName().equals(value[1].getElement()
 	                                                                 .getName())) {
-	                        fc.addType( ((Long) value[1].getValue())
-	                            .intValue());
+	                    	fc.addAll((FilterCapabilities)value[0].getValue());
 	                    } else {
 	                        throw new SAXException("Unknown element"
 	                            + value[1].getElement().getName());
@@ -652,23 +672,22 @@ public class FilterComplexTypes {
                 throw new SAXException("Missing child value elements");
             }
 
-            long val = FilterCapabilities.NO_OP;
+            FilterCapabilities caps=new FilterCapabilities();
 
             for (int i = 0; i < value.length; i++) {
                 if (elements[0].getName().equals(value[i].getElement().getName())) {
                     // logical ops
-                    val = val | FilterCapabilities.LOGICAL;
+                	caps.addType(FilterCapabilities.LOGICAL);
                 } else {
                     if (elements[1].getName().equals(value[i].getElement()
                                                                  .getName())) {
                         // comparison ops
-                        val = val | ((Long) value[i].getValue()).intValue();
+                    	caps.addAll((FilterCapabilities)value[i].getValue());
                     } else {
                         if (elements[2].getName().equals(value[i].getElement()
                                                                      .getName())) {
                             // arithmetic ops
-                            val = val
-                                | ((Long) value[i].getValue()).intValue();
+                        	caps.addAll((FilterCapabilities)value[i].getValue());
                         } else {
                             // error
                             throw new SAXException("Invalid child element: "
@@ -678,7 +697,7 @@ public class FilterComplexTypes {
                 }
             }
 
-            return new Long(val);
+            return caps;
         }
 
         /**
@@ -692,7 +711,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Integer.class;
+            return FilterCapabilities.class;
         }
 
         /**
@@ -756,7 +775,7 @@ public class FilterComplexTypes {
             }
 
             if (elements[0].getName().equals(value[0].getElement().getName())) {
-                return (Long) value[0].getValue();
+                return (FilterCapabilities) value[0].getValue();
             }
 
             throw new SAXException("Invalid child element: "
@@ -774,7 +793,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Integer.class;
+            return FilterCapabilities.class;
         }
 
         /**
@@ -854,15 +873,14 @@ public class FilterComplexTypes {
                 throw new SAXException("Atleast one child element is required");
             }
 
-            long v = FilterCapabilities.NO_OP;
+            FilterCapabilities caps=new FilterCapabilities();
 
             for (int i = 0; i < value.length; i++) {
-                v = v
-                    | FilterCapabilities.findOperation(value[i].getElement()
-                                                               .getName());
+                caps.addAll( FilterCapabilities.findOperation(value[i].getElement()
+                                                               .getName()) );
             }
 
-            return new Long(v);
+            return caps;
         }
 
         /**
@@ -876,7 +894,7 @@ public class FilterComplexTypes {
          * @see org.geotools.xml.schema.Type#getInstanceType()
          */
         public Class getInstanceType() {
-            return Integer.class;
+            return FilterCapabilities.class;
         }
 
         /**
