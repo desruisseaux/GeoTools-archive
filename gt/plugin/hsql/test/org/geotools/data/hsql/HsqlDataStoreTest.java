@@ -16,8 +16,8 @@
 package org.geotools.data.hsql;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.logging.Logger;
 
 import org.geotools.data.AbstractDataStoreTest;
@@ -213,7 +213,11 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
     public DataStore tearDownDataStore(DataStore data) throws Exception {
         ((HsqlDataStore)data).removeSchema(roadType);
         ((HsqlDataStore)data).removeSchema(riverType);
-        ((HsqlDataStore)data).getConnection(Transaction.AUTO_COMMIT).close();
+        Connection conn = ((HsqlDataStore)data).getConnection(Transaction.AUTO_COMMIT);
+        Statement st = conn.createStatement();
+        st.execute("SHUTDOWN");
+        st.close();
+        conn.close();
         File file=new File("tempDB.log");
         if( file.exists())
             file.delete();
