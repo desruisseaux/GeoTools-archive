@@ -858,7 +858,7 @@
           <quiet>true</quiet><!-- Shuts off non-error and non-warning messages.                      -->
           <maxmemory>512M</maxmemory><!-- The maximum Java heap size to be used when launching the javadoc.  -->
           <encoding>ISO-8859-1</encoding><!-- Specifies the encoding name of the source files.                   -->
-          <aggregate>false</aggregate><!-- Whether to build an aggregated report at the root.                 -->
+          <aggregate>true</aggregate><!-- Whether to build an aggregated report at the root.                 -->
           <additionalparam>-keywords</additionalparam><!-- Set an additional parameter on the command line.               -->
           <!--
             Note: ${project.build.sourceDirectory} should work below. Lets try it.
