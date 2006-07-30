@@ -59,6 +59,8 @@ public class GMLStreamingParserStressTest extends TestCase {
 //    }
 
     public void skippedtestGTRoadsFeatures() throws IOException {
+    	if(!TestData.isExtensiveTest())
+    		return;
         FeatureReader fr = null;
         try {
 
@@ -95,6 +97,8 @@ public class GMLStreamingParserStressTest extends TestCase {
     }
     
     public void testFMERoadsFeatures() throws IOException {
+    	if(!TestData.isExtensiveTest())
+    		return;
         FeatureReader fr = null;
         try {
             String path = "xml/fme/roads/roads.xml";
@@ -126,6 +130,8 @@ public class GMLStreamingParserStressTest extends TestCase {
     }
     
     public void testFMELakesFeatures() throws IOException {
+    	if(!TestData.isExtensiveTest())
+    		return;
         FeatureReader fr = null;
         try {
             String path = "xml/fme/lakes/lakes.xml";
@@ -157,6 +163,8 @@ public class GMLStreamingParserStressTest extends TestCase {
     }
     
     public void testFME2StreamsFeatures() throws IOException {
+    	if(!TestData.isExtensiveTest())
+    		return;
         FeatureReader fr1 = null;
         FeatureReader fr2 = null;
         try {
