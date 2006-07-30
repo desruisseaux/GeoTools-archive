@@ -69,7 +69,7 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sample-data</artifactId>
-      <version>2.2-RC5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
