@@ -771,6 +771,35 @@
           </testFailureIgnore>
         </configuration>
       </plugin>
+      
+      <!-- ================================================================= -->
+      <!--     Code coverage                                                 -->
+      <!-- ================================================================= -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+        <configuration>
+	 <jdk>1.4</jdk>
+           <licenseLocation>gt2/clover.license</licenseLocation>
+	 <flushPolicy>directed</flushPolicy>
+        </configuration>
+        <executions>
+          <execution>
+	  <phase>pre-site</phase>
+              <goals>
+              <goal>instrument</goal>
+	      <!-- aggregation is disabled due to http://jira.codehaus.org/browse/MCLOVER-34 -->
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt2-build-configs</artifactId>
+            <version>${project.version}</version>
+	</dependency>
+        </dependencies>
+      </plugin>
 
 
 
@@ -998,11 +1027,18 @@
         <artifactId>maven-surefire-report-plugin</artifactId>
       </plugin>
       
-      <!-- Verification of coding rules -->
+      <!-- Code coverage report -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clover-plugin</artifactId>
+      </plugin>
+      
+      <!-- Verification of coding rules. Disabled, nobody is using it at the moment
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
       </plugin>
+      -->
       
       <!-- HTML based, cross-reference version of Java source code -->
       <plugin>
@@ -1015,6 +1051,7 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
       </plugin>
+      
       
       <!-- SVN activities during the last 30 days -->
       <!-- Disabled for now, because this plugin crash with a NullPointerException

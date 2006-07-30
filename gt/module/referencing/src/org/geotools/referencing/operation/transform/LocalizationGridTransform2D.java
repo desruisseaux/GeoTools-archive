@@ -620,7 +620,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * Default constructor.
          */
         public Inverse() {
-            LocalizationGridTransform2D.this.super();
+            super(LocalizationGridTransform2D.this);
         }
 
         /**

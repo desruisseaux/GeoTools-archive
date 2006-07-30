@@ -893,7 +893,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
          * Default constructor.
          */
         public Inverse() {
-            NADCONTransform.this.super();
+            super(NADCONTransform.this);
         }
 
         /**

@@ -743,7 +743,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    protected abstract class Inverse extends AbstractMathTransform implements Serializable {
+    protected static abstract class Inverse extends AbstractMathTransform implements Serializable {
         /**
          * Serial number for interoperability with different versions. This serial number is
          * especilly important for inner classes, since the default {@code serialVersionUID}
@@ -754,11 +754,13 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * http://developer.java.sun.com/developer/bugParade/bugs/4211550.html
          */
         private static final long serialVersionUID = 3528274816628012283L;
+		private AbstractMathTransform original;
 
         /**
          * Constructs an inverse math transform.
          */
-        protected Inverse() {
+        protected Inverse(AbstractMathTransform original) {
+        	this.original = original;
         }
         
         /**
@@ -767,7 +769,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * points of the enclosing math transform.
          */
         public int getSourceDimensions() {
-            return AbstractMathTransform.this.getTargetDimensions();
+            return original.getTargetDimensions();
         }
         
         /**
@@ -776,7 +778,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * points of the enclosing math transform.
          */
         public int getTargetDimensions() {
-            return AbstractMathTransform.this.getSourceDimensions();
+            return original.getSourceDimensions();
         }
         
         /**
@@ -785,7 +787,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * the enclosing math transform.
          */
         public Matrix derivative(final Point2D point) throws TransformException {
-            return invert(AbstractMathTransform.this.derivative(this.transform(point, null)));
+            return invert(original.derivative(this.transform(point, null)));
         }
         
         /**
@@ -794,7 +796,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * the enclosing math transform.
          */
         public Matrix derivative(final DirectPosition point) throws TransformException {
-            return invert(AbstractMathTransform.this.derivative(this.transform(point, null)));
+            return invert(original.derivative(this.transform(point, null)));
         }
         
         /**
@@ -803,7 +805,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * of {@code this} is always {@code AbstractMathTransform.this}.
          */
         public final MathTransform inverse() {
-            return AbstractMathTransform.this;
+            return original;
         }
         
         /**
@@ -812,14 +814,14 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * enclosing math transform.
          */
         public boolean isIdentity() {
-            return AbstractMathTransform.this.isIdentity();
+            return original.isIdentity();
         }
         
         /**
          * Returns a hash code value for this math transform.
          */
         public int hashCode() {
-            return ~AbstractMathTransform.this.hashCode();
+            return ~original.hashCode();
         }
         
         /**
@@ -859,7 +861,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                 formatter.append(parameters);
                 return "PARAM_MT";
             } else {
-                formatter.append((Formattable) AbstractMathTransform.this);
+                formatter.append((Formattable) original);
                 return "INVERSE_MT";
             }
         }
