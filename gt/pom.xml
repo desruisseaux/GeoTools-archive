@@ -1092,22 +1092,36 @@
   <!-- ===================================================================== -->
   <repositories>
     <repository>
-      <id>ibiblio</id>
-      <name>Ibiblio - the public's library and digital archive</name>
-      <url>http://www.ibiblio.org/maven2</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
+      <id>ibiblio</id>
+      <name>Ibiblio - the public's library and digital archive</name>
+      <url>http://www.ibiblio.org/maven2</url>
     </repository>
-
+    
     <repository>
+      <id>refractions</id>
+      <name>Refractions Research Maven 2 Repository</name>
+      <url>http://lists.refractions.net/m2</url>
+    </repository>
+    
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <id>geotools</id>
       <name>Geotools repository</name>
       <url>http://maven.geotools.fr/repository</url>
+    </repository>
+    
+    <repository>
       <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
+        <enabled>false</enabled>
       </snapshots>
+      <id>central</id>
+      <name>Maven Repository Switchboard</name>
+      <url>http://repo1.maven.org/maven2</url>
     </repository>
   </repositories>
 
