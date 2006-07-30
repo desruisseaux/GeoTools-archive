@@ -32,7 +32,6 @@ public abstract class GT30TestBase extends TestCase {
 	 */
 	public GT30TestBase() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -40,7 +39,7 @@ public abstract class GT30TestBase extends TestCase {
 	 */
 	public GT30TestBase(String arg0) {
 		super(arg0);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public abstract void test() throws Exception;
