@@ -48,7 +48,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author  Ian Schneider
  * @author  Martin Desruisseaux
  */
-public class TestCaseSupport extends TestCase {
+public abstract class TestCaseSupport extends TestCase {
     /**
      * Set to {@code true} if {@code println} are wanted during normal execution.
      * It doesn't apply to message displayed in case of errors.
