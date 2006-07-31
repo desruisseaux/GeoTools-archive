@@ -1,0 +1,23 @@
+PLUGIN MIF
+==========
+Module Maintainer Luca Sigfrido Percich
+IP Review Jody Garnett July 30th
+
+MapInfo MIF DataStore access.
+
+org.geotools.data.mif
+---------------------
+Cannot determine date offline :-( Seem to think this may be a port of an old GeoTools Data Source
+from before the 2.0 release. Could guess it is after 2003 due to header aggreement with the
+developers guide, but will need to check svn:
+
+IP:
+- updated headers to (C) 2002-2006 PMC
+- TODO: check against svn dates
+
+
+org.geotools.data.mif (test)
+---------------------
+IP:
+- updated headers to (C) 2002-2006 PMC
+- unable to determine IP of test data

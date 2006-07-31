@@ -1,3 +1,9 @@
+Module API
+==========
+Module Maintainer Jody Garnett
+IP Review Jody Garnett, July 8th, 2006
+IP Review Jody Garnett, July 20th, 2006
+
 Header Used:
 /*
  *    GeoTools - OpenSource mapping toolkit
@@ -22,9 +28,6 @@ Geotools2 changed to GeoTools
 
 Here is what I would like to check:
 - IP Check, do we have the correct header, is there any IP issues to consider
-
-Module API
-==========
 
 org.geotools.catalog
 --------------------

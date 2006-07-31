@@ -6,6 +6,7 @@ Module Maintainer:
 - styling - Corey
 IP Review:
 - Jody Garnett, July 24th, 2006
+- TODO: test directory
 
 Welcome to the "main" module, this module started out built around core. For GeoTools 2.0 (and
 the move to subversion), default implementations from several existing modules were merged in

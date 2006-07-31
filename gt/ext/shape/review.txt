@@ -9,6 +9,10 @@ should be rolled back into shapefile datastore for geotools 2.3 release, for now
 is useful in its own right. Even though this module was only created in 2005 it will
 retain the (C) of the 2003-2006 reflecting the origional shapefile.
 
+h4. test/
+
+ShapefileTestSuite, did not have any headers, was originally added by IanS in 2003.
+Rest of the files only needed a change of Date.
 IP:
 - LICENSE.TXT updated to (C) 2003-2006, GeoTools Project Managment Committee (PMC)
 
