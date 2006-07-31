@@ -2,17 +2,20 @@ package org.geotools.filter;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
+import org.geotools.filter.expression.AttributeExpression;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
 import org.xml.sax.InputSource;
@@ -202,7 +205,83 @@ StringReader reader = new StringReader( filter );
         
 //        assertEquals(contentHandler.filters.size(),1);
 	}
-	static class MyHandler extends XMLFilterImpl implements FilterHandler {
+    
+    /**
+     * As for GEOT-821, this test ensures that the filter parser makes proper use
+     * of the characters(...) method in ContentHandler to not truncate the content
+     * of attribute names
+     *
+     * @throws Exception
+     */
+    public void testLargeFilter() throws Exception{
+        final int filterCount = 100;
+        String filter = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+        "<GetFeature xmlns=\"http://www.opengis.net/wfs\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:ogc=\"http://www.opengis.net/ogc\" version=\"1.0.0\" service=\"WFS\" outputFormat=\"GML2\"><Query typeName=\"topp:roadevent_pnt\"><ogc:PropertyName>roadeventid</ogc:PropertyName>" +
+        "<ogc:Filter>" +
+        "<ogc:Or>";
+        for(int i = 0; i < filterCount; i++){
+            StringBuffer attName = new StringBuffer();
+            for(int repCount = 0; repCount <= i; repCount++){
+                attName.append("eventtype-" + repCount + "_");
+            }
+
+            filter += "<ogc:PropertyIsEqualTo><ogc:PropertyName>" + attName + "</ogc:PropertyName>" +
+            "<ogc:Literal>literal-" + i + "</ogc:Literal>" +
+            "</ogc:PropertyIsEqualTo>";
+        }
+        filter += "</ogc:Or>" +
+        "</ogc:Filter>" +
+        "</Query>" +
+        "</GetFeature>";
+        
+        StringReader reader = new StringReader( filter );
+        
+        InputSource requestSource = new InputSource(reader);
+        
+//       instantiante parsers and content handlers
+        MyHandler contentHandler = new MyHandler();
+        FilterFilter filterParser = new FilterFilter(contentHandler, null);
+        GMLFilterGeometry geometryFilter = new GMLFilterGeometry(filterParser);
+        GMLFilterDocument documentFilter = new GMLFilterDocument(geometryFilter);
+
+        Logger logger = Logger.getLogger("org.geotools.filter");
+        logger.setLevel(Level.INFO);
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.INFO);
+        logger.addHandler(consoleHandler);
+        
+        // read in XML file and parse to content handler
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser parser = factory.newSAXParser();
+        ParserAdapter adapter = new ParserAdapter(parser.getParser());
+        adapter.setContentHandler(documentFilter);
+        adapter.parse(requestSource);
+        
+        assertEquals(1, contentHandler.filters.size());
+        Filter f = (Filter)contentHandler.filters.get(0);
+        assertTrue(f instanceof LogicFilter);
+        assertEquals(FilterType.LOGIC_OR, f.getFilterType());
+        
+        int i = 0;
+        for(Iterator filters = ((LogicFilter)f).getFilterIterator(); filters.hasNext(); i++){
+            CompareFilter subFitler = (CompareFilter)filters.next();
+            StringBuffer attName = new StringBuffer();
+            for(int repCount = 0; repCount <= i; repCount++){
+                attName.append("eventtype-" + repCount + "_");
+            }
+            String parsedName = ((AttributeExpression)subFitler.getLeftValue()).getAttributePath();
+            try{
+                assertEquals("at index " + i, attName.toString(), parsedName);
+            }catch(AssertionFailedError e){
+                Logger.getLogger("org.geotools.filter").warning("expected " + attName + ",\n but was " + parsedName);
+                throw e;
+            }
+            assertEquals("literal-" + i, ((LiteralExpression)subFitler.getRightValue()).getLiteral());
+        }
+        assertEquals(filterCount, i);
+    }
+
+    static class MyHandler extends XMLFilterImpl implements FilterHandler {
 	
 		public List filters = new ArrayList();
 		

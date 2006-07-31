@@ -74,6 +74,10 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
 
     /** units for a distance element attribute. somewhere else? */
     private String units;
+    
+    /** collects element content on each call to {@link #characters(char[], int, int)}
+     * to be processed by endElement */
+    private StringBuffer characters;
 
     /**
      * Constructor with parent, which must implement GMLHandlerJTS.
@@ -88,6 +92,7 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
         expressionFactory = new ExpressionSAXParser(schema);
         filterFactory = new FilterSAXParser();
         logicFactory = new LogicSAXParser();
+        characters = new StringBuffer();
     }
 
     /**
@@ -105,6 +110,8 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
         String qName, Attributes atts) throws SAXException {
         LOGGER.finer("found start element: " + localName);
 
+        characters.setLength(0);
+        
         if (localName.equals("Filter")) {
             //Should we check to make sure namespace is correct?
             //perhaps let users set namespace aware...
@@ -224,24 +231,36 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
      */
     public void characters(char[] chars, int start, int length)
         throws SAXException {
-        String message = new String(chars, start, length);
+       //accumulate partial strings in the instance StringBuffer
+       //so we make sure the message is collected as a whole before
+       //passing it to expression factory
+       this.characters.append(chars, start, length);
+    }
 
-        if (insideFilter) {
-            try {
-                if (insideDistance) {
-                    LOGGER.finest("calling set distance on " + message + ", "
-                        + units);
-                    filterFactory.setDistance(message, units);
-                } else {
-                    LOGGER.finest("sending to expression factory: " + message);
-                    expressionFactory.message(message);
-                }
-            } catch (IllegalFilterException ife) {
-                throw new SAXException(ife);
-            }
-        } else {
-            parent.characters(chars, start, length);
-        }
+    /**
+     * Calling this method should be the first thing done by {@link #endElement(String, String, String)},
+     * to ensure the message passed to the expression factory contains the whole
+     * string accumulated by the potentially many calls to {@link #characters(char[], int, int)}
+     * done by the parser.
+     *
+     * @throws SAXException
+     */
+    private void processCharacters() throws SAXException {
+           if (insideFilter) {
+               String message = this.characters.toString();
+               try {
+                   if (insideDistance) {
+                       LOGGER.finest("calling set distance on " + message + ", "
+                           + units);
+                       filterFactory.setDistance(message, units);
+                   } else {
+                       LOGGER.finest("sending to expression factory: " + message);
+                       expressionFactory.message(message);
+                   }
+               } catch (IllegalFilterException ife) {
+                   throw new SAXException(ife);
+               }
+           }
     }
 
     /**
@@ -257,6 +276,8 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
         LOGGER.finer("found end element: " + localName);
+        
+        processCharacters();
 
         if (localName.equals("Filter")) {
             //moved by cholmes, bug fix for fid.
