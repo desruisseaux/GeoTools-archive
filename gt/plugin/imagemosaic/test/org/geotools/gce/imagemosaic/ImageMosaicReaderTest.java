@@ -414,7 +414,12 @@ public class ImageMosaicReaderTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
-				200 * 1024 * 1024);
+				64 * 1024 * 1024);
+		JAI.getDefaultInstance().getTileScheduler().setParallelism(50);
+		JAI.getDefaultInstance().getTileScheduler().setPriority(10);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(50);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(10);
+		
 		super.setUp();
 	}
 

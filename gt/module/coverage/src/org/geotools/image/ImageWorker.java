@@ -125,6 +125,17 @@ public class ImageWorker {
     }
     
     /**
+     * Prepare this builder for the specified image. The images to be computed (if any)
+     * will save their tiles in the default {@linkplain TileCache tile cache}.
+     *
+     * @param image The source image.
+     */
+    public ImageWorker setImage(final RenderedImage image) {
+        inheritanceStopPoint = this.image = image;
+        return this;
+    }
+    
+    /**
      * Loads an image using the provided file name and the provided hints, which 
      * are used to control caching and layout.
      * 
@@ -264,13 +275,16 @@ public class ImageWorker {
      * Set the <cite>region of interest</cite> (ROI). A {@code null} set the ROI to the whole
      * {@linkplain #image}. The ROI is used by statistical méthods like {@link #getMinimums}
      * and {@link #getMaximums}.
-     *
+     * 
+     * @return This ImageWorker
+     * 
      * @see #getMinimums
      * @see #getMaximums
      */
-    public void setROI(final ROI roi) {
+    public ImageWorker setROI(final ROI roi) {
         this.roi = roi;
         invalidateStatistics();
+        return this;
     }
 
     /**
@@ -293,12 +307,15 @@ public class ImageWorker {
      *   <li><code>setRenderingHint({@linkplain #TILING_ALLOWED}, Boolean.FALSE)</code>
      *       forces all operators to produce untiled images.</li>
      * </ul>
+     * 
+     * @return This ImageWorker
      */
-    public void setRenderingHint(final RenderingHints.Key key, final Object value) {
+    public ImageWorker setRenderingHint(final RenderingHints.Key key, final Object value) {
         if (commonHints == null) {
             commonHints = new RenderingHints(null);
         }
         commonHints.add(new RenderingHints(key,value));
+		return this;
     }
 
     /**
@@ -316,11 +333,14 @@ public class ImageWorker {
      *       call will save their tiles in the {@linkplain JAI#getTileCache JAI default tile
      *       cache}.</li>
      * </ul>
+     * 
+     * @return This ImageWorker
      */
-    public void removeRenderingHint(final RenderingHints.Key key) {
+    public ImageWorker removeRenderingHint(final RenderingHints.Key key) {
         if (commonHints != null) {
             commonHints.remove(key);
         }
+        return this;
     }
 
     /**
@@ -420,8 +440,10 @@ public class ImageWorker {
      * <p>
      * <strong>Note:</strong> This method name doesn't contain the usual {@code set} prefix
      * because it doesn't really set a flag. Instead it increments or decrements a counter.
+     * 
+     * @return This ImageWorker
      */
-    private void tileCacheEnabled(final boolean status) {
+    private ImageWorker tileCacheEnabled(final boolean status) {
         if (status) {
             if (tileCacheDisabled != 0) {
                 tileCacheDisabled--;
@@ -431,6 +453,8 @@ public class ImageWorker {
         } else {
             tileCacheDisabled++;
         }
+        
+        return this;
     }
 
     /**
@@ -489,9 +513,15 @@ public class ImageWorker {
      * Tells this builder that all statistics on pixel values (e.g. the "extrema" property
      * in the {@linkplain #image}) should not be inherited from the source images (if any).
      * This method should be invoked every time an operation changed the pixel values.
+     * 
+     * @return This ImageWorker
      */
-    private void invalidateStatistics() {
+    private ImageWorker
+    invalidateStatistics() {
         inheritanceStopPoint = image;
+        
+        return this
+        ;
     }
 
     /**
@@ -593,14 +623,16 @@ public class ImageWorker {
      * then this method does nothing. Otherwise this method computes the minimum and maximum values
      * for each band, {@linkplain RescaleDescriptor rescale} them in the range {@code [0 .. 255]}
      * and force the resulting image to {@link DataBuffer#TYPE_BYTE TYPE_BYTE}.
-     *
+     * 
+     * @return This ImageWorker
+     * 
      * @see #isBytes
      * @see RescaleDescriptor
      */
-    public void rescaleToBytes() {
+    public ImageWorker rescaleToBytes() {
         if (isBytes()) {
             // Already using bytes - nothing to do.
-            return;
+            return this;
         }
         if (isIndexed()) {
             throw new UnsupportedOperationException(
@@ -625,6 +657,7 @@ public class ImageWorker {
 
         // All post conditions for this method contract.
         assert isBytes();
+        return this;
     }
 
     /**
@@ -638,11 +671,11 @@ public class ImageWorker {
      * @see #forceIndexColorModelForGIF
      * @see OrderedDitherDescriptor
      */
-    public void forceIndexColorModel() {
+    public ImageWorker forceIndexColorModel() {
         final ColorModel cm = image.getColorModel();
         if (cm instanceof IndexColorModel) {
             // Already an index color model - nothing to do.
-            return;
+            return this;
         }
         tileCacheEnabled(false);
         forceColorSpaceRGB();
@@ -656,6 +689,7 @@ public class ImageWorker {
 
         // All post conditions for this method contract.
         assert isIndexed();
+        return this;
     }
 
     /**
@@ -664,13 +698,16 @@ public class ImageWorker {
      * transparency. If the current {@linkplain #image} already uses a suitable color model,
      * then this method do nothing.
      *
+     * @return This ImageWorker
+     * 
      * @see #isIndexed
      * @see #isTranslucent
      * @see #forceIndexColorModel
      * @see #forceIndexColorModelForGIF
      */
-    public void forceBitmaskIndexColorModel() {
+    public ImageWorker forceBitmaskIndexColorModel() {
         forceBitmaskIndexColorModel(getTransparentPixel());
+        return this;
     }
 
     /**
@@ -680,25 +717,26 @@ public class ImageWorker {
      * then this method do nothing.
      *
      * @param transparent A pixel value to define as the transparent pixel.
-     *
+     * @return This ImageWorker
+     * 
      * @see #isIndexed
      * @see #isTranslucent
      * @see #forceIndexColorModel
      * @see #forceIndexColorModelForGIF
      */
-    public void forceBitmaskIndexColorModel(int transparent) {
+    public ImageWorker forceBitmaskIndexColorModel(int transparent) {
         final ColorModel cm = image.getColorModel();
         if (cm instanceof IndexColorModel) {
             final IndexColorModel oldCM = (IndexColorModel) cm;
             switch (oldCM.getTransparency()) {
                 case Transparency.OPAQUE: {
                     // Suitable color model. There is nothing to do.
-                    return;
+                    return this;
                 }
                 case Transparency.BITMASK: {
                     if (oldCM.getTransparentPixel() == transparent) {
                         // Suitable color model. There is nothing to do.
-                        return;
+                        return this;
                     }
                     break;
                 }
@@ -773,6 +811,7 @@ public class ImageWorker {
         // All post conditions for this method contract.
         assert isIndexed();
         assert !isTranslucent();
+        return this;
     }
 
     /**
@@ -789,12 +828,14 @@ public class ImageWorker {
      * <strong>Tip:</strong> For optimizing writing GIF, we need to create the image untiled. This
      * can be done by invoking <code>{@linkplain #setRenderingHint setRenderingHint}({@linkplain
      * #TILING_ALLOWED}, Boolean.FALSE)</code> first.
-     *
+     * 
+     * @return This ImageWorker
+     * 
      * @see #isIndexed
      * @see #forceIndexColorModel
      * @see #forceBitmaskIndexColorModel
      */
-    public void forceIndexColorModelForGIF() {
+    public ImageWorker forceIndexColorModelForGIF() {
         /*
          * Checking the color model to see if we need to convert it back to color model.
          * We might also need to reformat the image in order to get it to 8 bits samples.
@@ -822,6 +863,7 @@ public class ImageWorker {
         assert isBytes();
         assert isIndexed();
         assert !isTranslucent();
+        return this;
     }
 
 	/**
@@ -832,13 +874,15 @@ public class ImageWorker {
      * <p>
      * This code is adapted from jai-interests mailing list archive.
      *
+     * @return This ImageWorker
+     * 
      * @see FormatDescriptor
 	 */
-    public void forceComponentColorModel() {
+    public ImageWorker forceComponentColorModel() {
         final ColorModel cm = image.getColorModel();
         if (cm instanceof ComponentColorModel) {
             // Already an component color model - nothing to do.
-            return;
+            return this;
         }
         final int type = image.getSampleModel().getTransferType();
         // Most of the code adapted from jai-interests is in 'getRenderingHints(int)'.
@@ -849,17 +893,20 @@ public class ImageWorker {
 
         // All post conditions for this method contract.
         assert image.getColorModel() instanceof ComponentColorModel;
+        return this;
 	}
 
     /**
      * Forces the {@linkplain #image} color model to the {@linkplain ColorSpace#CS_sRGB RGB color
      * space}. If the current color space is already of {@linkplain ColorSpace#TYPE_RGB RGB type},
      * then this method does nothing. This operation may loose the alpha channel.
-     *
+     * 
+     * @return This ImageWorker
+     * 
      * @see #isColorSpaceRGB
      * @see ColorConvertDescriptor
      */
-    public void forceColorSpaceRGB() {
+    public ImageWorker forceColorSpaceRGB() {
         if (!isColorSpaceRGB()) {
             final ColorModel cm = new ComponentColorModel(
                     ColorSpace.getInstance(ColorSpace.CS_sRGB),
@@ -873,6 +920,7 @@ public class ImageWorker {
 
         // All post conditions for this method contract.
         assert isColorSpaceRGB();
+        return this;
     }
 
     /**
@@ -885,9 +933,11 @@ public class ImageWorker {
      * the average value of the color components. It is worthwhile to note that the alpha band
      * is stripped from the image.
      *
+     * @return This ImageWorker
+     * 
      * @see BandCombineDescriptor
      */
-    public void intensity() {
+    public ImageWorker intensity() {
         /*
          * If the color model already uses a IHS color space or a Gray color space, keep only the intensity band.
          * Otherwise, we need a component color model to be sure to understand what we are doing.
@@ -896,7 +946,7 @@ public class ImageWorker {
         final ColorSpace cs = cm.getColorSpace();
         if (cs.getType()==ColorSpace.TYPE_GRAY || cs instanceof IHSColorSpace) {
             retainFirstBand();
-            return;
+            return this;
         }
         if (cm instanceof IndexColorModel) {
             forceComponentColorModel();
@@ -910,12 +960,12 @@ public class ImageWorker {
 
         // One band, nothing to combine.
         if (numBands == 1) {
-            return;
+            return this;
         }
         // One band plus alpha, let's remove alpha.
         if (numColorBands == 1 && hasAlpha) {
             retainFirstBand();
-            return;
+            return this;
         }
         /*
          * We have more than one band. Note that there is no need to remove the alpha band before
@@ -929,21 +979,25 @@ public class ImageWorker {
 
         // All post conditions for this method contract.
         assert getNumBands() == 1;
+        return this;
     }
 
     /**
      * Retains inconditionnaly the first band of {@linkplain #image}.
      * All other bands (if any) are discarted without any further processing.
      *
+     * @return This ImageWorker
+     * 
      * @see #getNumBands
      * @see #retainBands
      * @see BandSelectDescriptor
      */
-    public void retainFirstBand() {
+    public ImageWorker retainFirstBand() {
         retainBands(1);
 
         // All post conditions for this method contract.
         assert getNumBands() == 1;
+        return this;
     }
 
     /**
@@ -953,12 +1007,13 @@ public class ImageWorker {
      * a greater amount of bands than {@code numBands}.
      *
      * @param numBands the number of bands to retain.
-     *
+     * @return This ImageWorker
+     * 
      * @see #getNumBands
      * @see #retainFirstBand
      * @see BandSelectDescriptor
      */
-    public void retainBands(final int numBands) {
+    public ImageWorker retainBands(final int numBands) {
         if (getNumBands() > numBands) {
             final int[] bands = new int[numBands];
             final int length=bands.length;
@@ -970,6 +1025,7 @@ public class ImageWorker {
 
         // All post conditions for this method contract.
         assert getNumBands() <= numBands;
+        return this;
     }
 
     /**
@@ -977,16 +1033,19 @@ public class ImageWorker {
      * computes an estimation of its {@linkplain #intensity intensity}. Then, the threshold
      * value is set halfway between the minimal and maximal values found in the image.
      *
+     * @return This ImageWorker 
      * @see #isBinary
      * @see #binarize(double)
      * @see #binarize(int,int)
      * @see BinarizeDescriptor
      */
-    public void binarize() {
+    public ImageWorker binarize() {
         binarize(Double.NaN);
 
         // All post conditions for this method contract.
         assert isBinary();
+        return this;
+        
     }
 
     /**
@@ -994,13 +1053,14 @@ public class ImageWorker {
      * method does nothing.
      *
      * @param threshold The threshold value.
+     * @return This ImageWorker
      *
      * @see #isBinary
      * @see #binarize()
      * @see #binarize(int,int)
      * @see BinarizeDescriptor
      */
-    public void binarize(double threshold) {
+    public ImageWorker binarize(double threshold) {
         // If the image is already binary and the threshold is >=1 then there is no work to do.
         if (threshold < 1 || !isBinary()) {
             if (Double.isNaN(threshold)) {
@@ -1019,6 +1079,7 @@ public class ImageWorker {
 
         // All post conditions for this method contract.
         assert isBinary();
+		return this;
     }
 
     /**
@@ -1027,13 +1088,14 @@ public class ImageWorker {
      * using a custom threshold value (instead of the automatic one), invoke
      * {@link #binarize(double)} explicitly before this method.
      *
+     * @return This ImageWorker
      * @see #isBinary
      * @see #binarize()
      * @see #binarize(double)
      * @see BinarizeDescriptor
      * @see LookupDescriptor
      */
-    public void binarize(final int value0, final int value1) {
+    public ImageWorker binarize(final int value0, final int value1) {
         tileCacheEnabled(false);
         binarize();
         tileCacheEnabled(true);
@@ -1053,6 +1115,7 @@ public class ImageWorker {
         }
         image = LookupDescriptor.create(image, table, getRenderingHints());
         invalidateStatistics();
+        return this;
     }
 
     /**
@@ -1079,10 +1142,11 @@ public class ImageWorker {
      * @param newValue  The new value for every pixels in {@linkplain #image} corresponding to
      *                  {@code maskValue} in the mask.
      *
+     * @return This ImageWorker
      * @see AndDescriptor
      * @see OrDescriptor
      */
-    public void mask(RenderedImage mask, final boolean maskValue, int newValue) {
+    public ImageWorker mask(RenderedImage mask, final boolean maskValue, int newValue) {
         tileCacheEnabled(false);
         forceIndexColorModel();
         tileCacheEnabled(true);
@@ -1129,6 +1193,7 @@ public class ImageWorker {
             image = OrDescriptor.create(image, worker.image, getRenderingHints());
         }
         invalidateStatistics();
+        return this;
     }
 
     /**
@@ -1138,12 +1203,14 @@ public class ImageWorker {
      * transparent pixel value. All other pixels are left unchanged.
      * 
      * @param alphaChannel The mask to apply as a {@linkplain #binarize() binarized} image.
-     *
+     * @return This ImageWorker
+     * 
      * @see #isTranslucent
      * @see #forceBitmaskIndexColorModel
      */
-    public void addTransparencyToIndexColorModel(final RenderedImage alphaChannel) {
+    public ImageWorker addTransparencyToIndexColorModel(final RenderedImage alphaChannel) {
         addTransparencyToIndexColorModel(alphaChannel, true, getTransparentPixel());
+        return this;
     }
 
     /**
@@ -1162,8 +1229,10 @@ public class ImageWorker {
      *                     {@linkplain #image} corresponding to {@code false} in the mask. The
      *                     special value {@code -1} maps to the last pixel value allowed for the
      *                     {@linkplain IndexedColorModel indexed color model}.
+     *                     
+     * @return This ImageWorker
      */
-    private void addTransparencyToIndexColorModel(final RenderedImage alphaChannel,
+    private ImageWorker addTransparencyToIndexColorModel(final RenderedImage alphaChannel,
                                                   final boolean translucent, int transparent)
     {
         tileCacheEnabled(false);
@@ -1225,14 +1294,17 @@ public class ImageWorker {
         assert isIndexed();
         assert translucent || !isTranslucent() : translucent;
         assert ((IndexColorModel) image.getColorModel()).getAlpha(transparent) == 0;
+        return this;
 	}
 
     /**
      * If the was not already tiled, tile it. Note that no tiling will
      * be done if 'getRenderingHints()' failed to suggest a tile size.
      * This method is for internal use by {@link #write} methods only.
+     * 
+     * @return This ImageWorker
      */
-    public  void tile() {
+    public  ImageWorker tile() {
         final RenderingHints hints = getRenderingHints();
         final ImageLayout layout = getImageLayout(hints);
         if (layout.isValid(ImageLayout.TILE_WIDTH_MASK) ||
@@ -1241,6 +1313,8 @@ public class ImageWorker {
             final int type = image.getSampleModel().getDataType();
             image = FormatDescriptor.create(image, new Integer(type), hints);
 		}
+        
+        return this;
     }
 
     /**
@@ -1257,8 +1331,10 @@ public class ImageWorker {
      *   <li>If some special processing is needed for a given format, then the corresponding method
      *       is invoked. Example: {@link #forceIndexColorModelForGIF}.</li>
      * </ul>
+     * 
+     * @return This ImageWorker
      */
-    public void write(final File output) throws IOException {
+    public ImageWorker write(final File output) throws IOException {
         final String filename = output.getName();
         final int dot = filename.lastIndexOf('.');
         if (dot < 0) {
@@ -1266,6 +1342,9 @@ public class ImageWorker {
         }
         final String extension = filename.substring(dot+1).trim();
         write(output, ImageIO.getImageWritersBySuffix(extension));
+        
+        return this;
+        
     }
     
 
@@ -1273,8 +1352,10 @@ public class ImageWorker {
     /**
      * Writes the {@linkplain #image} to the specified output, trying all encoders in the
      * specified iterator in the iteration order.
+     * 
+     * @return This ImageWorker
      */
-    private void write(final Object output, final Iterator/*<ImageWriter>*/ encoders)
+    private ImageWorker write(final Object output, final Iterator/*<ImageWriter>*/ encoders)
             throws IOException
     {
         if (encoders != null) {
@@ -1326,7 +1407,7 @@ public class ImageWorker {
                 if (stream != null) {
                     stream.close();
                 }
-                return;
+                return this;
             }
         }
         throw new IIOException(Errors.format(ErrorKeys.NO_IMAGE_WRITER));
@@ -1373,10 +1454,11 @@ public class ImageWorker {
      *
      * @throws HeadlessException if {@code gt2-widgets-swing.jar} is not on the classpath,
      *         or if AWT can't create the window components.
+     * @return This ImageWorker
      *
      * @see org.geotools.gui.swing.image.OperationTreeBrowser#show(RenderedImage)
      */
-    public void show() throws HeadlessException {
+    public ImageWorker show() throws HeadlessException {
         /*
          * Uses reflection because the "gt2-widgets-swing.jar" dependency is optional
          * and may not be available in the classpath. All the complicated stuff below
@@ -1414,6 +1496,8 @@ public class ImageWorker {
              */
             throw new AssertionError(e);
         }
+        
+        return this;
     }
 
     /**

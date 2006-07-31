@@ -36,7 +36,19 @@ public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
      * @return DOCUMENT ME!
      */
     public boolean isAvailable() {
-        return true;
+        boolean available = true;
+
+        // if these classes are here, then the runtine environment has 
+        // access to JAI and the JAI ImageI/O toolbox.
+        try {
+            Class.forName("javax.media.jai.JAI");
+            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
+
+        } catch (ClassNotFoundException cnf) {
+            available = false;
+        }
+
+        return available;
     }
 
     public Format createFormat() {
