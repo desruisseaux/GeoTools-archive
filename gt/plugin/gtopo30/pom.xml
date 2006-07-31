@@ -88,14 +88,6 @@
   <!-- ==================================================== -->
   <build>
     <plugins>
-      <!-- We bypass all tests for now because the content of the 'test-data' directory has been
-           fully deleted, so there is no more images to test. We deleted all images because they
-           were too big for inclusion on SVN head. Please delete this plugin configuration block
-           to reenable the tests, if smaller images are added to the 'test-data' directory.
-           
-           Reference:       test/org/geotools/gce/gtopo30/test-data/README.txt
-           Issue tracking:  http://jira.codehaus.org/browse/GEOT-793
-      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
