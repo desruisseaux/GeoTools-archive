@@ -38,7 +38,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
         f = PostgisTests.newFixture(getFixtureFile());
         
-        PostgisConnectionFactory pcFactory = new PostgisConnectionFactory(f.host,
+        pcFactory = new PostgisConnectionFactory(f.host,
                 f.port.intValue(), f.database);
         pool = pcFactory.getConnectionPool(f.user, f.password);
 
