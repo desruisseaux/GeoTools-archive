@@ -8,7 +8,6 @@
  */
 package org.geotools.renderer.lite;
 
-
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List; 
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +58,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.parameter.Parameter;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.operation.BufferedDefaultCoordinateOperationFactory;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.renderer.GTRenderer;
@@ -78,12 +77,11 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
-import org.geotools.util.WeakValueHashMap;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.OperationNotFoundException;
@@ -118,7 +116,8 @@ import com.vividsolutions.jts.geom.GeometryCollection;
  * @author Andrea Aime
  * @author Alessio Fabiani
  * 
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/StreamingRenderer.java $
  * @version $Id$
  */
 public final class StreamingRenderer implements GTRenderer {
@@ -126,7 +125,6 @@ public final class StreamingRenderer implements GTRenderer {
 	private final static int defaultMaxFiltersToSendToDatastore = 5; // default
 
 	// value
-
 	public HashMap symbolizerAssociationHT = new HashMap(); // associate a
 
 	/** Tolerance used to compare doubles for equality */
@@ -142,9 +140,8 @@ public final class StreamingRenderer implements GTRenderer {
 	private final FilterFactory filterFactory = FilterFactoryFinder
 			.createFilterFactory();
 
-	private final static CoordinateOperationFactory operationFactory = FactoryFinder
-			.getCoordinateOperationFactory(new Hints(Hints.LENIENT_DATUM_SHIFT,
-					Boolean.TRUE));
+	private final static BufferedDefaultCoordinateOperationFactory operationFactory = new BufferedDefaultCoordinateOperationFactory(
+			new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
 
 	/**
 	 * Context which contains the layers and the bouning box which needs to be
@@ -198,9 +195,6 @@ public final class StreamingRenderer implements GTRenderer {
 
 	/** The painter class we use to depict shapes onto the screen */
 	private StyledShapePainter painter = new StyledShapePainter(labelCache);
-
-	/** The math transform cache */
-	public final static Map crsTransformationsPool = new WeakValueHashMap();
 
 	private IndexedFeatureResults indexedFeatureResults;
 
@@ -1594,11 +1588,11 @@ public final class StreamingRenderer implements GTRenderer {
 		final int length = symbolizers.length;
 		for (int m = 0; m < length; m++) {
 
-			///////////////////////////////////////////////////////////////////
+			// /////////////////////////////////////////////////////////////////
 			//
-			// 			RASTER
+			// RASTER
 			//
-			///////////////////////////////////////////////////////////////////
+			// /////////////////////////////////////////////////////////////////
 			if (symbolizers[m] instanceof RasterSymbolizer) {
 
 				renderRaster(graphics, feature,
@@ -1606,12 +1600,12 @@ public final class StreamingRenderer implements GTRenderer {
 						scaleRange);
 
 			} else {
-				
-				///////////////////////////////////////////////////////////////////
+
+				// /////////////////////////////////////////////////////////////////
 				//
-				// 			FEATURE
+				// FEATURE
 				//
-				///////////////////////////////////////////////////////////////////
+				// /////////////////////////////////////////////////////////////////
 				g = findGeometry(feature, symbolizers[m]); // pulls the
 				// geometry
 
@@ -1628,7 +1622,7 @@ public final class StreamingRenderer implements GTRenderer {
 								destinationCrs))
 							transform = null;
 						else
-							transform = StreamingRenderer.getMathTransform(
+							transform = (MathTransform2D) StreamingRenderer.getMathTransform(
 									sa.crs, destinationCrs);
 						if (transform != null && !transform.isIdentity()) {
 							transform = (MathTransform2D) ConcatenatedTransform
@@ -1699,53 +1693,6 @@ public final class StreamingRenderer implements GTRenderer {
 			decimators.put(mathTransform, decimator);
 		}
 		return decimator;
-	}
-
-	/**
-	 * Computes the math transform from the source CRS to the destination CRS.
-	 * Since this is expensive, we keep a cache of coordinate transformations
-	 * during the rendering process
-	 * 
-	 * @param sourceCrs
-	 * @param destinationCrs
-	 * @param at
-	 *            DOCUMENT ME!
-	 * @return
-	 * @throws CannotCreateTransformException
-	 * @throws FactoryException
-	 * @throws OperationNotFoundException
-	 */
-	public static MathTransform2D getMathTransform(
-			CoordinateReferenceSystem sourceCrs,
-			CoordinateReferenceSystem destinationCrs)
-			throws OperationNotFoundException, FactoryException {
-		if (((sourceCrs == null) || (destinationCrs == null))) { // no
-			// transformation
-			// possible
-
-			return null;
-		}
-		if (CRSUtilities.equalsIgnoreMetadata(sourceCrs, destinationCrs))
-			return (MathTransform2D) ProjectiveTransform
-					.create(new AffineTransform());
-		synchronized (crsTransformationsPool) {
-			final CRSTransformHashUtil key = new CRSTransformHashUtil(
-					sourceCrs, destinationCrs);
-			MathTransform2D transform = (MathTransform2D) crsTransformationsPool
-					.get(key);
-
-			if (transform != null) {
-				return transform;
-			}
-
-			transform = (MathTransform2D) operationFactory.createOperation(
-					sourceCrs, destinationCrs).getMathTransform();
-
-			crsTransformationsPool.put(key, transform);
-
-			return transform;
-		}
-
 	}
 
 	/**
@@ -2057,5 +2004,19 @@ public final class StreamingRenderer implements GTRenderer {
 
 	public boolean isCanTransform() {
 		return canTransform;
+	}
+
+	public static MathTransform getMathTransform(CoordinateReferenceSystem sourceCRS, CoordinateReferenceSystem destCRS) {
+		try {
+			CoordinateOperation op= operationFactory.createOperation(sourceCRS,destCRS);
+			if(op!=null)
+				return op.getMathTransform();
+		} catch (OperationNotFoundException e) {
+			LOGGER.log(Level.SEVERE,e.getLocalizedMessage(),e);
+			
+		} catch (FactoryException e) {
+			LOGGER.log(Level.SEVERE,e.getLocalizedMessage(),e);
+		}
+		return null;
 	}
 }
