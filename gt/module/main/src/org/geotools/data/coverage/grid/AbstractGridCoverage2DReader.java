@@ -27,7 +27,7 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.BufferedDefaultCoordinateOperationFactory;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
@@ -36,6 +36,7 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -54,10 +55,13 @@ import org.opengis.referencing.operation.TransformException;
  * environment where caching is crucial.
  * 
  * @author Simone Giannecchini
+ * @since 2.3
  * @version 0.2
  */
 public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
+	/** Buffere factory for coordinate operations. */
+	private final static CoordinateOperationFactory operationFactory = new BufferedDefaultCoordinateOperationFactory();
 
 	/**
 	 * Default color ramp. Preset colors used to generate an Image from the raw
@@ -670,8 +674,9 @@ public abstract class AbstractGridCoverage2DReader implements
 				if (crs != null
 						&& !CRSUtilities.equalsIgnoreMetadata(crs, crs2D))
 
-					envelope = CRSUtilities.transform(CRS.transform(crs2D, crs,
-							true), envelope);
+					envelope = CRSUtilities.transform(operationFactory
+							.createOperation(crs2D, crs).getMathTransform(),
+							envelope);
 
 				requestedRes = new double[2];
 				requestedRes[0] = envelope.getLength(longitudeFirst ? 0 : 1)
