@@ -487,10 +487,15 @@ public class StyleGenerator {
             // construct a filter
             try {
                 filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-                filter.addLeftValue(expression); // the attribute
-
-                // we're looking at
-                filter.addRightValue(ff.createLiteralExpression(items[item]));
+                filter.addLeftValue(expression); // the attribute we're looking at
+                
+                Expression rExpr;
+                if (items[item] == null) {
+                    rExpr = ff.createNullFilter().getNullCheckValue();
+                } else {
+                    rExpr = ff.createLiteralExpression(items[item]);
+                }
+                filter.addRightValue(rExpr);
             } catch (IllegalFilterException e) {
                 LOGGER.log(Level.SEVERE,
                     "Error during rule filter construction", e);
@@ -499,7 +504,11 @@ public class StyleGenerator {
             }
 
             // add to the title
-            title += items[item].toString();
+            if (items[item] == null) {
+                title += "NULL";
+            } else {
+                title += items[item].toString();
+            }
 
             if ((item + 1) != items.length) {
                 title += ", ";

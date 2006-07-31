@@ -17,6 +17,7 @@ package org.geotools.filter.function;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +61,24 @@ public class UniqueIntervalFunction extends ExplicitClassificationFunction {
         if (calcResult == null) return;
         List result = calcResult.toList();
         //sort the results and put them in an array
-        Collections.sort(result);
+        Collections.sort(result, new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                if (o1 == null) {
+                    if (o2 == null) {
+                        return 0; //equal
+                    }
+                    return -1; //less than
+                } else if (o2 == null) {
+                    return 1;
+                }
+                if (o1 instanceof String && o2 instanceof String) {
+                    return ((String) o1).compareTo((String) o2);
+                }
+                return 0;
+            }
+            
+        });
         Object[] results = result.toArray();
         //put the results into their respective slots/bins/buckets
         if (classNum < results.length) { //put more than one item in each class 
