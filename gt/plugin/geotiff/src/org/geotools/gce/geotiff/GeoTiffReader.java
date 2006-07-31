@@ -93,6 +93,7 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
 public final class GeoTiffReader extends AbstractGridCoverage2DReader
 		implements
 			GridCoverageReader {
+
 	private Logger LOGGER = Logger.getLogger(GeoTiffReader.class.toString());
 
 	/** SPI for creating tiff readers in ImageIO tools */
@@ -125,7 +126,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 	 *            user-supplied hints TODO currently are unused
 	 * @throws DataSourceException
 	 */
-	public GeoTiffReader(Object input, Hints hints) throws DataSourceException {
+	public GeoTiffReader(Object input, Hints uHints) throws DataSourceException {
 		// /////////////////////////////////////////////////////////////////////
 		// 
 		// Forcing longitude first since the geotiff specification seems to
@@ -134,10 +135,10 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		this.hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
 				Boolean.TRUE);
-		if (hints != null) {
+		if (uHints != null) {
 			// prevent the use from reordering axes
-			hints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
-			this.hints.add(hints);
+			uHints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+			this.hints.add(uHints);
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -174,7 +175,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 							"UTF-8"));
 			}
 
-			this.hints = hints;
+
 			boolean closeMe = true;
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -195,7 +196,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 			// Informations about multiple levels and such
 			//
 			// /////////////////////////////////////////////////////////////////////
-			getHRInfo(hints);
+			getHRInfo(this.hints);
 
 			// /////////////////////////////////////////////////////////////////////
 			// 
@@ -252,8 +253,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 		reader.setInput(inStream);
 		final IIOMetadata iioMetadata = reader.getImageMetadata(0);
 		metadata = new GeoTiffIIOMetadataDecoder(iioMetadata);
-		gtcs = new GeoTiffMetadata2CRSAdapter(hints);
-		gtcs.setMetadata(metadata);
+		gtcs = (GeoTiffMetadata2CRSAdapter) GeoTiffMetadata2CRSAdapter
+				.get(hints);
 
 		// //
 		//
@@ -261,7 +262,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 		//
 		// //
 		// get the coordinate reference system for this coverage
-		crs = gtcs.createCoordinateSystem();
+		crs = gtcs.createCoordinateSystem(metadata);
 
 		// //
 		//
@@ -289,7 +290,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 		} else
 			overViewDimensions = null;
 
-		this.raster2Model = gtcs.getRasterToModel();
+		this.raster2Model = gtcs.getRasterToModel(metadata);
 		final AffineTransform tempTransform = new AffineTransform(
 				(AffineTransform) raster2Model);
 		tempTransform.translate(-0.5, -0.5);

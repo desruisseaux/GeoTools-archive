@@ -15,8 +15,12 @@
  */
 package org.geotools.gce.geotiff.crs_adapters;
 
+import java.lang.ref.Reference;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.units.NonSI;
@@ -47,6 +51,7 @@ import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.util.LRULinkedHashMap;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterValueGroup;
@@ -62,6 +67,8 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 
+import sun.misc.LRUCache;
+
 /**
  * @author simone giannecchini
  * 
@@ -72,24 +79,70 @@ import org.opengis.referencing.operation.OperationMethod;
  */
 public final class CRS2GeoTiffMetadataAdapter {
 	/**
-	 * Comment for <code>serialVersionUID</code>
+	 * The default value for {@link #maxStrongReferences} .
 	 */
-	private static final long serialVersionUID = 3976739159681675316L;
+	public static final int DEFAULT_MAX = 100;
 
 	/**
-	 * Metadata to fill.
+	 * The pool of cached objects.
 	 */
-	private GeoTiffIIOMetadataEncoder metadata;
+	private final static Map pool = Collections
+			.synchronizedMap(new LRULinkedHashMap(50, 0.75f, true,100));
 
 	private CoordinateReferenceSystem crs;
 
 	/**
+	 * Returns an object from the pool for the specified code. If the object was
+	 * retained as a {@linkplain Reference weak reference}, the
+	 * {@link Reference#get referent} is returned.
+	 * 
+	 * @todo Consider logging a message here to the finer or finest level.
+	 */
+	public static Object get(final Object key) {
+		synchronized (pool) {
+
+			Object object = pool.get(key);
+			if (object == null) {
+				object = new CRS2GeoTiffMetadataAdapter(
+						(CoordinateReferenceSystem) key);
+				put(key, object);
+				return object;
+
+			}
+			return object;
+		}
+	}
+
+	/**
+	 * Releases resources immediately instead of waiting for the garbage
+	 * collector.
+	 */
+	public static void clear() {
+		synchronized (pool) {
+			pool.clear();
+		}
+	}
+
+	/**
+	 * Put an element in the pool. This method is invoked everytime a
+	 * {@code createFoo(...)} method is invoked, even if an object was already
+	 * in the pool for the given code, for the following reasons: 1) Replaces
+	 * weak reference by strong reference (if applicable) and 2) Alters the
+	 * linked hash set order, so that this object is declared as the last one
+	 * used.
+	 */
+	private static void put(final Object key, final Object object) {
+		synchronized (pool) {
+			pool.put(key, object);
+
+		}
+	}
+
+	/**
 	 * Constructs a parser using the default set of symbols and factories.
 	 */
-	public CRS2GeoTiffMetadataAdapter(final CoordinateReferenceSystem crs,
-			final GeoTiffIIOMetadataEncoder metadata) {
+	public CRS2GeoTiffMetadataAdapter(final CoordinateReferenceSystem crs) {
 		this.crs = crs;
-		this.metadata = metadata;
 	}
 
 	/**
@@ -142,8 +195,9 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * 
 	 * @throws GeoTiffException
 	 */
-	public void parseCoordinateReferenceSystem() throws GeoTiffException {
-
+	public GeoTiffIIOMetadataEncoder parseCoordinateReferenceSystem()
+			throws GeoTiffException {
+		final GeoTiffIIOMetadataEncoder metadata = new GeoTiffIIOMetadataEncoder();
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// CREATING METADATA AND SETTING BASE FIELDS FOR THEM
@@ -169,7 +223,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 		// /////////////////////////////////////////////////////////////////////
 		case GeoTiffGCSCodes.ModelTypeGeographic:
 
-			parseGeoGCS((DefaultGeographicCRS) crs);
+			parseGeoGCS((DefaultGeographicCRS) crs, metadata);
 
 			break;
 
@@ -180,7 +234,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		case GeoTiffPCSCodes.ModelTypeProjected:
-			parseProjCRS((ProjectedCRS) crs);
+			parseProjCRS((ProjectedCRS) crs, metadata);
 
 			break;
 
@@ -189,6 +243,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 					null,
 					"The supplied grid coverage uses an unsupported crs! You are allowed to use only projected and geographic coordinate reference systems");
 		}
+		return metadata;
 
 		//
 		// if ("VERT_CS".equals(keyword)) {
@@ -219,11 +274,13 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * 
 	 * @param projectedCRS
 	 *            The parent element.
+	 * @param metadata
 	 * @return The "PROJCS" element as a {@link ProjectedCRS} object.
 	 * @throws ParseException
 	 *             if the "GEOGCS" element can't be parsed.
 	 */
-	private void parseProjCRS(final ProjectedCRS projectedCRS) {
+	private void parseProjCRS(final ProjectedCRS projectedCRS,
+			GeoTiffIIOMetadataEncoder metadata) {
 
 		// do we have a code for this pcrs
 		final int code = getEPSGCode(projectedCRS);
@@ -243,19 +300,23 @@ public final class CRS2GeoTiffMetadataAdapter {
 				.getName().getCode());
 
 		// projection
-		parseProjection(projectedCRS);
+		parseProjection(projectedCRS, metadata);
 
 		// gographic crs
-		parseGeoGCS((DefaultGeographicCRS) (projectedCRS.getBaseCRS()));
+		parseGeoGCS((DefaultGeographicCRS) (projectedCRS.getBaseCRS()),
+				metadata);
 
 	}
 
 	/**
 	 * Parsing ProjectionGeoKey 3074 for a <code>ProjectedCRS</code>.
 	 * 
-	 * @param projectedCRS The <code>ProjectedCRS</code> to parse.
+	 * @param projectedCRS
+	 *            The <code>ProjectedCRS</code> to parse.
+	 * @param metadata
 	 */
-	private void parseProjection(final ProjectedCRS projectedCRS) {
+	private void parseProjection(final ProjectedCRS projectedCRS,
+			final GeoTiffIIOMetadataEncoder metadata) {
 		// getting the conversion
 		final Conversion conversion = projectedCRS.getConversionFromBase();
 		final int code = getEPSGCode(conversion);
@@ -289,10 +350,10 @@ public final class CRS2GeoTiffMetadataAdapter {
 		}
 
 		// key 3075 and parameters
-		parseCoordinateProjectionTransform(projTransf, name);
+		parseCoordinateProjectionTransform(projTransf, name, metadata);
 
 		// parse linear unit
-		parseLinearUnit(projectedCRS);
+		parseLinearUnit(projectedCRS, metadata);
 
 	}
 
@@ -302,8 +363,10 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * @todo complete the list of linear unit of measures and clean the
 	 *       exception
 	 * @param projectedCRS
+	 * @param metadata
 	 */
-	private void parseLinearUnit(final ProjectedCRS projectedCRS) {
+	private void parseLinearUnit(final ProjectedCRS projectedCRS,
+			GeoTiffIIOMetadataEncoder metadata) {
 
 		// getting the linear unit
 		final Unit linearUnit = CRSUtilities.getUnit(projectedCRS
@@ -351,12 +414,14 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * Parses a along with coordinate transformation and its parameters.
 	 * 
 	 * @param name
+	 * @param metadata
 	 * 
 	 * @param conversion
 	 * @throws GeoTiffException
 	 */
 	private void parseCoordinateProjectionTransform(
-			final MapProjection projTransf, final String name) {
+			final MapProjection projTransf, final String name,
+			GeoTiffIIOMetadataEncoder metadata) {
 
 		final ParameterValueGroup parameters = projTransf.getParameterValues();
 
@@ -668,9 +733,11 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * 
 	 * @param geographicCRS
 	 *            The parent element.
+	 * @param metadata
 	 * @return The "GEOGCS" element as a {@link GeographicCRS} object.
 	 */
-	private void parseGeoGCS(DefaultGeographicCRS geographicCRS) {
+	private void parseGeoGCS(DefaultGeographicCRS geographicCRS,
+			GeoTiffIIOMetadataEncoder metadata) {
 
 		// is it one of the EPSG standard GCS?
 		final int code = getEPSGCode(geographicCRS);
@@ -696,19 +763,19 @@ public final class CRS2GeoTiffMetadataAdapter {
 		// geodetic datum
 		final DefaultGeodeticDatum datum = (DefaultGeodeticDatum) geographicCRS
 				.getDatum();
-		parseDatum(datum);
+		parseDatum(datum, metadata);
 
 		// angular unit
 		final Unit angularUnit = ((EllipsoidalCS) geographicCRS
 				.getCoordinateSystem()).getAxis(0).getUnit();
-		parseUnit(angularUnit, 0);
+		parseUnit(angularUnit, 0, metadata);
 
 		// prime meridian
-		parsePrimem((DefaultPrimeMeridian) datum.getPrimeMeridian());
+		parsePrimem((DefaultPrimeMeridian) datum.getPrimeMeridian(), metadata);
 
 		// linear unit
 		final Unit linearUnit = datum.getEllipsoid().getAxisUnit();
-		parseUnit(linearUnit, 1);
+		parseUnit(linearUnit, 1, metadata);
 
 	}
 
@@ -721,11 +788,13 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * 
 	 * @param datum
 	 *            The parent element.
+	 * @param metadata
 	 * @param meridian
 	 *            the prime meridian.
 	 * @return The "DATUM" element as a {@link GeodeticDatum} object.
 	 */
-	private void parseDatum(final DefaultGeodeticDatum datum) {
+	private void parseDatum(final DefaultGeodeticDatum datum,
+			GeoTiffIIOMetadataEncoder metadata) {
 
 		// looking for an EPSG code
 		final int code = getEPSGCode(datum);
@@ -746,7 +815,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 		metadata.addGeoAscii(GeoTiffGCSCodes.GeogCitationGeoKey, datum
 				.getName().getCode());
 
-		parseSpheroid((DefaultEllipsoid) datum.getEllipsoid());
+		parseSpheroid((DefaultEllipsoid) datum.getEllipsoid(), metadata);
 
 	}
 
@@ -757,11 +826,14 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * SPHEROID["<name>", <semi-major axis>, <inverse flattening> {,<authority>}]
 	 * </code></blockquote>
 	 * 
+	 * @param metadata
+	 * 
 	 * @param parent
 	 *            The parent element.
 	 * @return The "SPHEROID" element as an {@link Ellipsoid} object.
 	 */
-	private void parseSpheroid(final DefaultEllipsoid ellipsoid) {
+	private void parseSpheroid(final DefaultEllipsoid ellipsoid,
+			GeoTiffIIOMetadataEncoder metadata) {
 
 		final int code = getEPSGCode(ellipsoid);
 		if (code != -1) {
@@ -794,13 +866,16 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * PRIMEM["<name>", <longitude> {,<authority>}]
 	 * </code></blockquote>
 	 * 
+	 * @param metadata
+	 * 
 	 * @param parent
 	 *            The parent element.
 	 * @param angularUnit
 	 *            The contextual unit.
 	 * @return The "PRIMEM" element as a {@link PrimeMeridian} object.
 	 */
-	private void parsePrimem(final DefaultPrimeMeridian pm) {
+	private void parsePrimem(final DefaultPrimeMeridian pm,
+			GeoTiffIIOMetadataEncoder metadata) {
 		// looking for an EPSG code
 		final int numCode = getEPSGCode(pm);
 		if (numCode > 0)
@@ -835,12 +910,14 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * @param unit
 	 *            The contextual unit. Usually {@link SI#METRE} or
 	 *            {@link SI#RADIAN}.
+	 * @param metadata
 	 * @return The "UNIT" element as an {@link Unit} object.
 	 * @todo Authority code is currently ignored. We may consider to create a
 	 *       subclass of {@link Unit} which implements {@link IdentifiedObject}
 	 *       in a future version.
 	 */
-	private void parseUnit(Unit unit, int model) {
+	private void parseUnit(Unit unit, int model,
+			GeoTiffIIOMetadataEncoder metadata) {
 
 		// final UnitFormat unitFormat = UnitFormat.getStandardInstance();
 		// user defined

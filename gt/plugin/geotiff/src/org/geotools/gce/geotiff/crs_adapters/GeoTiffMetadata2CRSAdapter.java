@@ -34,8 +34,10 @@
 package org.geotools.gce.geotiff.crs_adapters;
 
 import java.io.IOException;
+import java.lang.ref.Reference;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.units.NonSI;
@@ -59,24 +61,23 @@ import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.factory.epsg.DefaultFactory;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.util.LRULinkedHashMap;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.cs.CSFactory;
-import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
@@ -110,20 +111,13 @@ import org.opengis.referencing.operation.MathTransformFactory;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/crs_adapters/GeoTiffMetadata2CRSAdapter.java $
  */
 public final class GeoTiffMetadata2CRSAdapter {
+
 	// code from GeoTIFFWritingUtilities spec section 6.3.2.4
 	private static final String PM_Greenwich = "8901";
 
-	private CSAuthorityFactory csAuthorityFactory = null;
-
-	private DatumAuthorityFactory datumFactory = null;
-
-	// factories to construct CRS/CS/Datum objects directly.
 	private DatumFactory datumObjFactory = null;
 
 	private CRSFactory crsFactory = null;
-
-	/** Holds value of property metadata. */
-	private GeoTiffIIOMetadataDecoder metadata = null;
 
 	// Default values of GeoTiff angular and linear units.
 	// these will be modified if the appropriate GeoKeys are
@@ -138,15 +132,24 @@ public final class GeoTiffMetadata2CRSAdapter {
 
 	private Hints hints;
 
-	private MathTransformFactory mtFactory = null;
+	private final static MathTransformFactory mtFactory = new DefaultMathTransformFactory();
+
+	/**
+	 * The default value for {@link #maxStrongReferences} .
+	 */
+	public static final int DEFAULT_MAX = 100;
+
+	/**
+	 * The pool of cached objects.
+	 */
+	private final static Map pool = Collections
+			.synchronizedMap(new LRULinkedHashMap(50, 0.75f, true,100));
 
 	private FactoryGroup factories = null;
 
-	private CoordinateOperationAuthorityFactory opFactory = null;
-
-	private int rasterType;
-
 	private CSFactory csFactory;
+
+	private DefaultFactory factory;
 
 	/**
 	 * Creates a new instance of GeoTiffMetadata2CRSAdapter
@@ -161,32 +164,23 @@ public final class GeoTiffMetadata2CRSAdapter {
 
 	}
 
-	private  void initOperationFactory() {
-		if (opFactory == null)
-			opFactory = FactoryFinder.getCoordinateOperationAuthorityFactory(
-					"EPSG", hints);
+	private void initFactory() {
+		if (factory == null)
+			factory = new DefaultFactory(hints);
 	}
 
-	private  void initCSAuthorityFactory() {
-		if (csAuthorityFactory == null)
-			csAuthorityFactory = FactoryFinder.getCSAuthorityFactory("EPSG",
-					hints);
-	}
-
-	private  void initdatumFactory() {
-		if (datumFactory == null)
-			datumFactory = FactoryFinder
-					.getDatumAuthorityFactory("EPSG", hints);
+	private void initdatumFactory() {
+		initFactory();
 		if (datumObjFactory == null)
 			datumObjFactory = FactoryFinder.getDatumFactory(hints);
 	}
 
-	private  void initCRSFactory() {
+	private void initCRSFactory() {
 		if (crsFactory == null)
 			crsFactory = FactoryFinder.getCRSFactory(hints);
 	}
 
-	private  void initCSFactory() {
+	private void initCSFactory() {
 		if (csFactory == null)
 			csFactory = FactoryFinder.getCSFactory(hints);
 	}
@@ -211,18 +205,19 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 *             if the coordinate system specified by the GeoTiff file is not
 	 *             supported.
 	 */
-	public CoordinateReferenceSystem createCoordinateSystem()
-			throws IOException, FactoryException {
+	public CoordinateReferenceSystem createCoordinateSystem(
+			final GeoTiffIIOMetadataDecoder metadata) throws IOException,
+			FactoryException {
 
 		// the first thing to check is the Model Type.
 		// is it "Projected" or is it "Geographic"?
 		// "Geocentric" is not supported.
-		switch (getGeoKeyAsInt(GeoTiffConstants.GTModelTypeGeoKey)) {
+		switch (getGeoKeyAsInt(GeoTiffConstants.GTModelTypeGeoKey, metadata)) {
 		case GeoTiffPCSCodes.ModelTypeProjected:
-			return createProjectedCoordinateSystem();
+			return createProjectedCoordinateSystem(metadata);
 
 		case GeoTiffGCSCodes.ModelTypeGeographic:
-			return createGeographicCoordinateSystem();
+			return createGeographicCoordinateSystem(metadata);
 
 		default:
 			throw new UnsupportedOperationException(
@@ -237,11 +232,14 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * supported throughout the evolution of this specification with except of
 	 * the coordinate transformation which must be one of the supported types.
 	 * 
+	 * @param metadata
+	 * 
 	 * @return
 	 * @throws IOException
 	 * @throws FactoryException
 	 */
-	private ProjectedCRS createProjectedCoordinateSystem() throws IOException,
+	private ProjectedCRS createProjectedCoordinateSystem(
+			GeoTiffIIOMetadataDecoder metadata) throws IOException,
 			FactoryException {
 
 		// get the projection reference system code in case we have one
@@ -249,12 +247,11 @@ public final class GeoTiffMetadata2CRSAdapter {
 				.getGeoKey(GeoTiffPCSCodes.ProjectedCSTypeGeoKey);
 		if (tempCode == null)
 			tempCode = "unnamed".intern();
-		final StringBuffer projCode = new StringBuffer(tempCode.toString()
-				.trim().intern());
+		final StringBuffer projCode = new StringBuffer(tempCode.trim().intern());
 		// if it's user defined, there's a lot of work to do
-		if (tempCode.equals("unnamed")
+		if (tempCode.equalsIgnoreCase("unnamed")
 				|| tempCode.equals(GeoTiffConstants.GTUserDefinedGeoKey_String)) {
-			return createUserDefinedPCS();
+			return createUserDefinedPCS(metadata);
 
 			// if it's not user defined, just use the EPSG factory to create the
 			// coordinate system
@@ -264,7 +261,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 				projCode.insert(0, "EPSG:");
 			}
 			// it is an EPSG crs let's create it.
-			return (ProjectedCRS) CRS.decode(projCode.toString());
+			return (ProjectedCRS) CRS.decode(projCode.toString(), true);
 		} catch (FactoryException fe) {
 			final IOException ex = new GeoTiffException(metadata, fe
 					.getLocalizedMessage());
@@ -278,10 +275,13 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * GeoTiff specification. User defined values are supported for all the
 	 * possible levels of the above mentioned specification.
 	 * 
+	 * @param metadata
+	 * 
 	 * @return
 	 * @throws IOException
 	 */
-	private GeographicCRS createGeographicCoordinateSystem() throws IOException {
+	private GeographicCRS createGeographicCoordinateSystem(
+			final GeoTiffIIOMetadataDecoder metadata) throws IOException {
 		GeographicCRS gcs = null;
 
 		// get the projection code
@@ -292,7 +292,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 		// if it's user defined, there's a lot of work to do
 		if (tempCode == null
 				|| tempCode.equals(GeoTiffConstants.GTUserDefinedGeoKey_String)) {
-			gcs = createUserDefinedGCS();
+			gcs = createUserDefinedGCS(metadata);
 
 			// if it's not user defined, just use the EPSG factory to create the
 			// coordinate system
@@ -330,7 +330,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @return
 	 * @throws IOException
 	 */
-	private  int getGeoKeyAsInt(final int key) {
+	private int getGeoKeyAsInt(final int key,
+			final GeoTiffIIOMetadataDecoder metadata) {
 
 		try {
 			return Integer.parseInt(metadata.getGeoKey(key));
@@ -350,7 +351,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @return
 	 * @throws GeoTiffException
 	 */
-	public  MathTransform getRasterToModel() throws GeoTiffException {
+	public MathTransform getRasterToModel(
+			final GeoTiffIIOMetadataDecoder metadata) throws GeoTiffException {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Load initials
@@ -360,7 +362,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 		final PixelScale pixScales = metadata.getModelPixelScales();
 		final int numTiePoints = tiePoints.length;
 		MathTransform xform = null;
-		rasterType = getGeoKeyAsInt(GeoTiffConstants.RasterPixelIsArea);
+		int rasterType = getGeoKeyAsInt(GeoTiffConstants.RasterPixelIsArea,
+				metadata);
 		// @task TODO I do not know if this is correct but it works fine
 		if (rasterType == GeoTiffConstants.UNDEFINED)
 			rasterType = GeoTiffConstants.RasterPixelIsArea;
@@ -419,7 +422,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @return
 	 * @throws IOException
 	 */
-	private double getGeoKeyAsDouble(final int key) {
+	private double getGeoKeyAsDouble(final int key,
+			final GeoTiffIIOMetadataDecoder metadata) {
 
 		try {
 			return Double.parseDouble(metadata.getGeoKey(key));
@@ -430,32 +434,14 @@ public final class GeoTiffMetadata2CRSAdapter {
 	}
 
 	/**
-	 * Getter for property metadata.
-	 * 
-	 * @return Value of property metadata.
-	 */
-	public  GeoTiffIIOMetadataDecoder getMetadata() {
-		return this.metadata;
-	}
-
-	/**
-	 * Setter for property metadata.
-	 * 
-	 * @param metadata
-	 *            New value of property metadata.
-	 */
-	public  void setMetadata(final GeoTiffIIOMetadataDecoder metadata) {
-		this.metadata = metadata;
-	}
-
-	/**
 	 * We have a user defined PCRS, let's try to parse it.
 	 * 
 	 * @return
 	 * @throws IOException
 	 * @throws FactoryException
 	 */
-	private ProjectedCRS createUserDefinedPCS() throws IOException,
+	private ProjectedCRS createUserDefinedPCS(
+			final GeoTiffIIOMetadataDecoder metadata) throws IOException,
 			FactoryException {
 
 		/**
@@ -505,7 +491,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 			// getting default parameters for this projection and filling them
 			// with the values found
 			// inside the geokeys list.
-			parameters = createUserDefinedProjectionParameter(projectionName);
+			parameters = createUserDefinedProjectionParameter(projectionName,
+					metadata);
 
 			if (parameters == null)
 				throw new GeoTiffException(metadata,
@@ -514,18 +501,18 @@ public final class GeoTiffMetadata2CRSAdapter {
 			// getting the linear unit
 			linearUnit = createUnit(GeoTiffPCSCodes.ProjLinearUnitsGeoKey,
 					GeoTiffPCSCodes.ProjLinearUnitSizeGeoKey, SI.METER,
-					SI.METER);
+					SI.METER, metadata);
 
 		} else {
 			parameters = null;
-			initOperationFactory();
-			projection = (Conversion) this.opFactory
+			initFactory();
+			projection = (Conversion) this.factory
 					.createCoordinateOperation(new StringBuffer("EPSG:")
 							.append(projCode).toString());
 		}
 
 		// GEOGRAPHIC CRS
-		final GeographicCRS gcs = createGeographicCoordinateSystem();
+		final GeographicCRS gcs = createGeographicCoordinateSystem(metadata);
 
 		// was the prjection user defined?
 		// in such case we need to set the remaining parameters.
@@ -546,20 +533,20 @@ public final class GeoTiffMetadata2CRSAdapter {
 		return factories.createProjectedCRS(Collections.singletonMap("name",
 				projectedCrsName), gcs, projection,
 				DefaultCartesianCS.PROJECTED);
-
 	}
 
 	/**
 	 * 
 	 */
-	private  void initFactoryGroup() {
+	private void initFactoryGroup() {
 		if (factories == null) {
 			initCSFactory();
 			initdatumFactory();
-			initMTFactory();
 			initCRSFactory();
-			final Hints tempHints = hints != null ? (Hints) hints.clone() : new Hints(new HashMap());
-			tempHints.put(Hints.DATUM_AUTHORITY_FACTORY, datumFactory);
+			final Hints tempHints = hints != null ? (Hints) hints.clone()
+					: new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
+							Boolean.TRUE);
+			tempHints.put(Hints.DATUM_AUTHORITY_FACTORY, factory);
 			tempHints.put(Hints.CS_FACTORY, csFactory);
 			tempHints.put(Hints.CRS_FACTORY, crsFactory);
 			tempHints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
@@ -570,22 +557,14 @@ public final class GeoTiffMetadata2CRSAdapter {
 	}
 
 	/**
-	 * 
-	 */
-	private  void initMTFactory() {
-		if (mtFactory == null)
-			mtFactory = new DefaultMathTransformFactory();
-
-	}
-
-	/**
 	 * Creating a prime meridian for the gcs we are creating at an higher level.
 	 * As usua this method tries to follow tthe geotiff specification.
 	 * 
 	 * @return
 	 * @throws IOException
 	 */
-	private PrimeMeridian createPrimeMeridian() throws IOException {
+	private PrimeMeridian createPrimeMeridian(
+			final GeoTiffIIOMetadataDecoder metadata) throws IOException {
 		// look up the prime meridian:
 		// + could be an EPSG code
 		// + could be user defined
@@ -618,10 +597,10 @@ public final class GeoTiffMetadata2CRSAdapter {
 						throw io;
 					}
 				} else {
-					pm = datumFactory.createPrimeMeridian(pmCode);
+					pm = factory.createPrimeMeridian(pmCode);
 				}
 			} else {
-				pm = datumFactory.createPrimeMeridian(PM_Greenwich);
+				pm = factory.createPrimeMeridian(PM_Greenwich);
 			}
 		} catch (FactoryException fe) {
 			final IOException io = new GeoTiffException(metadata, fe
@@ -651,8 +630,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @throws GeoTiffException
 	 *             DOCUMENT ME!
 	 */
-	private GeodeticDatum createGeodeticDatum(final Unit unit)
-			throws IOException {
+	private GeodeticDatum createGeodeticDatum(final Unit unit,
+			final GeoTiffIIOMetadataDecoder metadata) throws IOException {
 		// lookup the datum (w/o PrimeMeridian), error if "user defined"
 		GeodeticDatum datum = null;
 		final String datumCode = metadata
@@ -684,11 +663,11 @@ public final class GeoTiffMetadata2CRSAdapter {
 			initdatumFactory();
 
 			// ELLIPSOID
-			final Ellipsoid ellipsoid = createEllipsoid(unit);
+			final Ellipsoid ellipsoid = createEllipsoid(unit, metadata);
 
 			// PRIME MERIDIAN
 			// lookup the Prime Meridian.
-			final PrimeMeridian primeMeridian = createPrimeMeridian();
+			final PrimeMeridian primeMeridian = createPrimeMeridian(metadata);
 
 			// DATUM
 			datum = new DefaultGeodeticDatum(datumName, ellipsoid,
@@ -700,8 +679,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 
 			// we are going to use the provided EPSG code
 			try {
-				initdatumFactory();
-				datum = (GeodeticDatum) (datumFactory.createDatum(datumCode));
+				initFactory();
+				datum = (GeodeticDatum) (factory.createDatum(datumCode));
 			} catch (FactoryException fe) {
 				final GeoTiffException ex = new GeoTiffException(metadata, fe
 						.getLocalizedMessage());
@@ -727,7 +706,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * 
 	 * @throws GeoTiffException
 	 */
-	private Ellipsoid createEllipsoid(final Unit unit) throws GeoTiffException {
+	private Ellipsoid createEllipsoid(final Unit unit,
+			final GeoTiffIIOMetadataDecoder metadata) throws GeoTiffException {
 		// ellipsoid key
 		final String ellipsoidKey = metadata
 				.getGeoKey(GeoTiffGCSCodes.GeogEllipsoidGeoKey);
@@ -756,9 +736,9 @@ public final class GeoTiffMetadata2CRSAdapter {
 		}
 
 		try {
-			initdatumFactory();
-			return datumFactory.createEllipsoid(new StringBuffer("EPSG:")
-					.append(ellipsoidKey).toString());
+			initFactory();
+			return factory.createEllipsoid(new StringBuffer("EPSG:").append(
+					ellipsoidKey).toString());
 		} catch (FactoryException fe) {
 			final GeoTiffException ex = new GeoTiffException(metadata, fe
 					.getLocalizedMessage());
@@ -784,7 +764,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @throws IOException
 	 *             DOCUMENT ME!
 	 */
-	private GeographicCRS createUserDefinedGCS() throws IOException {
+	private GeographicCRS createUserDefinedGCS(
+			final GeoTiffIIOMetadataDecoder metadata) throws IOException {
 		// coordinate reference system name
 		String name = metadata.getGeoKey(GeoTiffGCSCodes.GeogCitationGeoKey);
 		if (name == null)
@@ -793,14 +774,15 @@ public final class GeoTiffMetadata2CRSAdapter {
 		// lookup the angular units used in this file
 		angularUnit = createUnit(GeoTiffGCSCodes.GeogAngularUnitsGeoKey,
 				GeoTiffGCSCodes.GeogAngularUnitSizeGeoKey, SI.RADIAN,
-				NonSI.DEGREE_ANGLE);
+				NonSI.DEGREE_ANGLE, metadata);
 
 		// linear unit
 		linearUnit = createUnit(GeoTiffGCSCodes.GeogLinearUnitsGeoKey,
-				GeoTiffGCSCodes.GeogLinearUnitSizeGeoKey, SI.METER, SI.METER);
+				GeoTiffGCSCodes.GeogLinearUnitSizeGeoKey, SI.METER, SI.METER,
+				metadata);
 
 		// lookup the Geodetic datum
-		final GeodeticDatum datum = createGeodeticDatum(linearUnit);
+		final GeodeticDatum datum = createGeodeticDatum(linearUnit, metadata);
 
 		// coordinate reference system
 		GeographicCRS gcs = null;
@@ -838,7 +820,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @throws IOException
 	 * @throws FactoryException
 	 */
-	private ParameterValueGroup createUserDefinedProjectionParameter(String name)
+	private ParameterValueGroup createUserDefinedProjectionParameter(
+			String name, final GeoTiffIIOMetadataDecoder metadata)
 			throws IOException, FactoryException {
 		final String coordTrans = metadata
 				.getGeoKey(GeoTiffPCSCodes.ProjCoordTransGeoKey);
@@ -854,8 +837,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 		}
 
 		// getting math transform factory
-		initMTFactory();
-		return setParametersForProjection(name, coordTrans);
+		return setParametersForProjection(name, coordTrans, metadata);
 	}
 
 	/**
@@ -880,7 +862,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @throws GeoTiffException
 	 */
 	private ParameterValueGroup setParametersForProjection(String name,
-			final String coordTransCode) throws GeoTiffException {
+			final String coordTransCode,
+			final GeoTiffIIOMetadataDecoder metadata) throws GeoTiffException {
 		ParameterValueGroup parameters = null;
 		try {
 			int code = 0;
@@ -898,18 +881,17 @@ public final class GeoTiffMetadata2CRSAdapter {
 				parameters = mtFactory
 						.getDefaultParameters("transverse_mercator");
 				parameters.parameter("central_meridian").setValue(
-						getOriginLong());
+						getOriginLong(metadata));
 				parameters.parameter("latitude_of_origin").setValue(
-						getOriginLat());
-				parameters
-						.parameter("scale_factor")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey));
+						getOriginLat(metadata));
+				parameters.parameter("scale_factor").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey,
+								metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 
 				return parameters;
 			}
@@ -924,21 +906,20 @@ public final class GeoTiffMetadata2CRSAdapter {
 					|| code == GeoTiffCoordinateTransformationsCodes.CT_Mercator) {
 				parameters = mtFactory.getDefaultParameters("Mercator_1SP");
 				parameters.parameter("central_meridian").setValue(
-						getOriginLong());
+						getOriginLong(metadata));
 				// parameters
 				// .parameter("latitude_of_origin")
 				// .setValue(
 				// this
 				// .getGeoKeyAsDouble(GeoTiffPCSCodes.ProjNatOriginLatGeoKey));
-				parameters
-						.parameter("scale_factor")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey));
+				parameters.parameter("scale_factor").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey,
+								metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 
 				return parameters;
 			}
@@ -953,18 +934,17 @@ public final class GeoTiffMetadata2CRSAdapter {
 				parameters = mtFactory
 						.getDefaultParameters("lambert_conformal_conic_1SP");
 				parameters.parameter("central_meridian").setValue(
-						getOriginLong());
+						getOriginLong(metadata));
 				parameters.parameter("latitude_of_origin").setValue(
-						getOriginLat());
-				parameters
-						.parameter("scale_factor")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey));
+						getOriginLat(metadata));
+				parameters.parameter("scale_factor").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey,
+								metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 
 				return parameters;
 			}
@@ -981,23 +961,21 @@ public final class GeoTiffMetadata2CRSAdapter {
 				parameters = mtFactory
 						.getDefaultParameters("lambert_conformal_conic_2SP");
 				parameters.parameter("central_meridian").setValue(
-						getOriginLong());
+						getOriginLong(metadata));
 				parameters.parameter("latitude_of_origin").setValue(
-						getOriginLat());
-				parameters
-						.parameter("standard_parallel_1")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjStdParallel1GeoKey));
-				parameters
-						.parameter("standard_parallel_2")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjStdParallel2GeoKey));
+						getOriginLat(metadata));
+				parameters.parameter("standard_parallel_1").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjStdParallel1GeoKey,
+								metadata));
+				parameters.parameter("standard_parallel_2").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjStdParallel2GeoKey,
+								metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 
 				return parameters;
 			}
@@ -1037,20 +1015,19 @@ public final class GeoTiffMetadata2CRSAdapter {
 					|| code == GeoTiffCoordinateTransformationsCodes.CT_Stereographic) {
 				parameters = mtFactory.getDefaultParameters("stereographic");
 				parameters.parameter("central_meridian").setValue(
-						this.getOriginLong());
+						this.getOriginLong(metadata));
 
 				parameters.parameter("latitude_of_origin").setValue(
 
-				this.getOriginLat());
-				parameters
-						.parameter("scale_factor")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey));
+				this.getOriginLat(metadata));
+				parameters.parameter("scale_factor").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey,
+								metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 
 				return parameters;
 			}
@@ -1066,18 +1043,17 @@ public final class GeoTiffMetadata2CRSAdapter {
 						.getDefaultParameters("polar_stereographic");
 
 				parameters.parameter("latitude_of_origin").setValue(
-						this.getOriginLat());
-				parameters
-						.parameter("scale_factor")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey));
+						this.getOriginLat(metadata));
+				parameters.parameter("scale_factor").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjScaleAtNatOriginGeoKey,
+								metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 				parameters.parameter("central_meridian").setValue(
-						getOriginLong());
+						getOriginLong(metadata));
 
 				return parameters;
 			}
@@ -1092,20 +1068,20 @@ public final class GeoTiffMetadata2CRSAdapter {
 					|| code == GeoTiffCoordinateTransformationsCodes.CT_ObliqueMercator) {
 				parameters = mtFactory.getDefaultParameters("oblique_mercator");
 
-				parameters.parameter("scale_factor").setValue(getScaleFactor());
-				parameters
-						.parameter("azimuth")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjAzimuthAngleGeoKey));
+				parameters.parameter("scale_factor").setValue(
+						getScaleFactor(metadata));
+				parameters.parameter("azimuth").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjAzimuthAngleGeoKey,
+								metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 				parameters.parameter("longitude_of_center").setValue(
-						getOriginLong());
+						getOriginLong(metadata));
 				parameters.parameter("latitude_of_center").setValue(
-						getOriginLat());
+						getOriginLat(metadata));
 				return parameters;
 			}
 
@@ -1118,24 +1094,22 @@ public final class GeoTiffMetadata2CRSAdapter {
 					|| code == GeoTiffCoordinateTransformationsCodes.CT_AlbersEqualArea) {
 				parameters = mtFactory
 						.getDefaultParameters("Albers_Conic_Equal_Area");
-				parameters
-						.parameter("standard_parallel_1")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjStdParallel1GeoKey));
-				parameters
-						.parameter("standard_parallel_2")
-						.setValue(
-								this
-										.getGeoKeyAsDouble(GeoTiffPCSCodes.ProjStdParallel2GeoKey));
+				parameters.parameter("standard_parallel_1").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjStdParallel1GeoKey,
+								metadata));
+				parameters.parameter("standard_parallel_2").setValue(
+						this.getGeoKeyAsDouble(
+								GeoTiffPCSCodes.ProjStdParallel2GeoKey,
+								metadata));
 				parameters.parameter("latitude_of_center").setValue(
-						getOriginLat());
+						getOriginLat(metadata));
 				parameters.parameter("longitude_of_center").setValue(
-						getOriginLong());
+						getOriginLong(metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 
 				return parameters;
 			}
@@ -1150,13 +1124,13 @@ public final class GeoTiffMetadata2CRSAdapter {
 				parameters = mtFactory.getDefaultParameters("orthographic");
 
 				parameters.parameter("latitude_of_origin").setValue(
-						getOriginLat());
+						getOriginLat(metadata));
 				parameters.parameter("longitude_of_origin").setValue(
-						getOriginLong());
+						getOriginLong(metadata));
 				parameters.parameter("false_easting").setValue(
-						getFalseEasting());
+						getFalseEasting(metadata));
 				parameters.parameter("false_northing").setValue(
-						getFalseNorthing());
+						getFalseNorthing(metadata));
 
 				return parameters;
 			}
@@ -1167,7 +1141,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 		return parameters;
 	}
 
-	private double getScaleFactor() {
+	private double getScaleFactor(final GeoTiffIIOMetadataDecoder metadata) {
 		String scale = metadata
 				.getGeoKey(GeoTiffPCSCodes.ProjScaleAtCenterGeoKey);
 		if (scale == null)
@@ -1186,7 +1160,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * 
 	 * @return double False easting.
 	 */
-	private double getFalseEasting() {
+	private double getFalseEasting(final GeoTiffIIOMetadataDecoder metadata) {
 		String easting = metadata
 				.getGeoKey(GeoTiffPCSCodes.ProjFalseEastingGeoKey);
 		if (easting == null)
@@ -1206,7 +1180,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * 
 	 * @return double False northing.
 	 */
-	private double getFalseNorthing() {
+	private double getFalseNorthing(final GeoTiffIIOMetadataDecoder metadata) {
 		String northing = metadata
 				.getGeoKey(GeoTiffPCSCodes.ProjFalseNorthingGeoKey);
 		if (northing == null)
@@ -1226,7 +1200,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * 
 	 * @return double origin longitude.
 	 */
-	private double getOriginLong() {
+	private double getOriginLong(final GeoTiffIIOMetadataDecoder metadata) {
 		String origin = metadata
 				.getGeoKey(GeoTiffPCSCodes.ProjCenterLongGeoKey);
 		if (origin == null)
@@ -1248,7 +1222,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * 
 	 * @return double origin latitude.
 	 */
-	private double getOriginLat() {
+	private double getOriginLat(final GeoTiffIIOMetadataDecoder metadata) {
 		String origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjCenterLatGeoKey);
 		if (origin == null)
 			origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjNatOriginLatGeoKey);
@@ -1282,8 +1256,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 *             <code>ProjLinearUnitSizeGeoKey</code> is either not defined
 	 *             or does not contain a number.
 	 */
-	private Unit createUnit(int key, int userDefinedKey, Unit base, Unit def)
-			throws IOException {
+	private Unit createUnit(int key, int userDefinedKey, Unit base, Unit def,
+			final GeoTiffIIOMetadataDecoder metadata) throws IOException {
 		final String unitCode = metadata.getGeoKey(key);
 
 		// if not defined, return the default
@@ -1316,8 +1290,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 		} else {
 			try {
 				// using epsg code for this unit
-				initCSAuthorityFactory();
-				return csAuthorityFactory.createUnit(unitCode);
+				initFactory();
+				return factory.createUnit(unitCode);
 			} catch (FactoryException fe) {
 				final IOException io = new GeoTiffException(metadata, fe
 						.getLocalizedMessage());
@@ -1328,7 +1302,39 @@ public final class GeoTiffMetadata2CRSAdapter {
 
 	}
 
-	public int getRasterType() {
-		return rasterType;
+	/**
+	 * Returns an object from the pool for the specified code. If the object was
+	 * retained as a {@linkplain Reference weak reference}, the
+	 * {@link Reference#get referent} is returned.
+	 * 
+	 * @todo Consider logging a message here to the finer or finest level.
+	 */
+	public static Object get(final Object key) {
+		synchronized (pool) {
+
+			Object object = pool.get(key);
+			if (object == null) {
+				object = new GeoTiffMetadata2CRSAdapter((Hints) key);
+				put(key, object);
+				return object;
+
+			}
+			return object;
+		}
+	}
+
+	/**
+	 * Put an element in the pool. This method is invoked everytime a
+	 * {@code createFoo(...)} method is invoked, even if an object was already
+	 * in the pool for the given code, for the following reasons: 1) Replaces
+	 * weak reference by strong reference (if applicable) and 2) Alters the
+	 * linked hash set order, so that this object is declared as the last one
+	 * used.
+	 */
+	private static void put(final Object key, final Object object) {
+		synchronized (pool) {
+			pool.put(key, object);
+
+		}
 	}
 }

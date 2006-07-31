@@ -28,24 +28,23 @@ import junit.textui.TestRunner;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.factory.Hints;
 import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /*
- *    GeoTools - OpenSource mapping toolkit
- *    http://geotools.org
- *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)
- *
- *    This library is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
- *
- *    This library is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
+ * GeoTools - OpenSource mapping toolkit http://geotools.org (C) 2005-2006,
+ * GeoTools Project Managment Committee (PMC)
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; version 2.1 of the License.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  */
 /**
  * DOCUMENT ME!
@@ -119,51 +118,25 @@ public class GeoTiffReaderTest extends TestCase {
 			if (format.accepts(files[i])) {
 				buffer.append("ACCEPTED").append("\n");
 
-					// getting a reader
-					reader = new GeoTiffReader(files[i], null);
+				// getting a reader
+				reader = new GeoTiffReader(files[i], new Hints(
+						Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
 
-					if (reader != null) {
-					
-// final ParameterValueGroup params = reader.getFormat()
-// .getReadParameters();
-// final GeneralEnvelope envelope = new GeneralEnvelope(
-// new double[] { 13.42, 43.62 }, new double[] {
-// 13.44, 43.64 });
-// try {
-// envelope.setCoordinateReferenceSystem(CRS
-// .decode("EPSG:4326"));
-// } catch (MismatchedDimensionException e1) {
-// // TODO Auto-generated catch block
-// e1.printStackTrace();
-// } catch (NoSuchAuthorityCodeException e1) {
-// // TODO Auto-generated catch block
-// e1.printStackTrace();
-// }
-// params.parameter(
-// AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
-// .toString())
-// .setValue(
-// new GridGeometry2D(new GeneralGridRange(
-// new Rectangle(0, 0, 400, 300)),
-// envelope));
-//						
-// // reading the coverage
-// coverage = (GridCoverage2D) reader
-// .read((GeneralParameterValue[]) params.values()
-// .toArray(new GeneralParameterValue[1]));
+				if (reader != null) {
 
-						 // reading the coverage
-						 coverage = (GridCoverage2D) reader
-						 .read(null);
-						 
-						 //showing it
-						 coverage.show();
-					
+					// reading the coverage
+					coverage = (GridCoverage2D) reader.read(null);
+					buffer.append(coverage.getCoordinateReferenceSystem2D().toWKT());
+
+					// showing it
+					coverage.show();
 
 				}
 
-
-			}
+			} else
+				buffer.append("NOT ACCEPTED").append("\n");
+			LOGGER.info(buffer.toString());
 		}
+
 	}
 }

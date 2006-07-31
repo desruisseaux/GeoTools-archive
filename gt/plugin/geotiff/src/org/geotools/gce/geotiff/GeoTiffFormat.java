@@ -58,15 +58,18 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
 
 /**
- * Provides basic information about the GeoTIFF format IO.   This is currently
- * an extension of the Geotools AbstractGridFormat because the stream and file
- * GCEs will pick it up if it extends AbstractGridFormat.
- *
+ * Provides basic information about the GeoTIFF format IO. This is currently an
+ * extension of the Geotools AbstractGridFormat because the stream and file GCEs
+ * will pick it up if it extends AbstractGridFormat.
+ * 
  * @author Bryce Nordgren, USDA Forest Service
  * @author Simone Giannecchini
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffFormat.java $
  */
 public final class GeoTiffFormat extends AbstractGridFormat implements Format {
+	private final static TIFFImageReaderSpi spi = new TIFFImageReaderSpi();
+
 	/**
 	 * Creates a new instance of GeoTiffFormat
 	 */
@@ -84,7 +87,8 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 
 		// reading parameters
 		readParameters = new ParameterGroup(
-				new DefaultParameterDescriptorGroup(mInfo,
+				new DefaultParameterDescriptorGroup(
+						mInfo,
 						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
 
 	}
@@ -138,8 +142,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 				return false;
 
 			// get a reader
-			final ImageReader reader = new TIFFImageReaderSpi()
-					.createReaderInstance();
+			final ImageReader reader = spi.createReaderInstance();
 			reader.setInput(inputStream);
 			final IIOMetadata metadata = reader.getImageMetadata(0);
 			try {
