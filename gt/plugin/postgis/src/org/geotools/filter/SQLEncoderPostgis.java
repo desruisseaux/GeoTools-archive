@@ -187,49 +187,76 @@ public class SQLEncoderPostgis extends SQLEncoder
     public void visit(GeometryFilter filter) throws RuntimeException {
         LOGGER.finer("exporting GeometryFilter");
 
-        if (filter.getFilterType() == AbstractFilter.GEOMETRY_BBOX) {
-            DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
-            DefaultExpression right = (DefaultExpression) filter
-                .getRightGeometry();
-
-            try {
-                if (!looseBbox) {
-                	//JD: disjoint not supported without geos
-                	out.write("distance(");
-                    //out.write("NOT disjoint(");
-                }
-
-                if (left == null) {
-                    out.write("\"" + defaultGeom + "\"");
-                } else {
-                    left.accept(this);
-                }
-
-                if (!looseBbox) {
-                    out.write(", ");
-                } else {
-                    out.write(" && ");
-                }
-
-                if (right == null) {
-                    out.write("\"" + defaultGeom + "\"");
-                } else {
-                    right.accept(this);
-                }
-
-                if (!looseBbox) {
-                	out.write(") = 0");
-                    //out.write(")");
-                }
-            } catch (java.io.IOException ioe) {
-                LOGGER.warning("Unable to export filter" + ioe);
-            }
-        } else {
-            LOGGER.warning("exporting unknown filter type, only bbox supported");
-            throw new RuntimeException("Only BBox is currently supported");
+        switch (filter.getFilterType()) {
+        case (AbstractFilter.GEOMETRY_BBOX):
+            encodeGeomFilter(filter, "distance", "0");
+            break;
+        case (AbstractFilter.GEOMETRY_CONTAINS):
+            encodeGeomFilter(filter, "contains", "1");
+            break;
+        case (AbstractFilter.GEOMETRY_CROSSES):
+            encodeGeomFilter(filter, "crosses", "1");
+            break;
+        case (AbstractFilter.GEOMETRY_DISJOINT):
+            encodeGeomFilter(filter, "disjoint", "1");
+            break;
+        case (AbstractFilter.GEOMETRY_EQUALS):
+            encodeGeomFilter(filter, "equals", "1");
+            break;
+        case (AbstractFilter.GEOMETRY_INTERSECTS):
+            encodeGeomFilter(filter, "intersects", "1");
+            break;
+        case (AbstractFilter.GEOMETRY_OVERLAPS):
+            encodeGeomFilter(filter, "overlaps", "1");
+            break;
+        case (AbstractFilter.GEOMETRY_TOUCHES):
+            encodeGeomFilter(filter, "touches", "1");
+            break;
+        case (AbstractFilter.GEOMETRY_WITHIN):
+            encodeGeomFilter(filter, "within", "1");
+            break;
+        default:
+            LOGGER.warning("exporting unknown filter type");
+            throw new RuntimeException(filter.getFilterType() + " filter type is currently unsupported");
         }
     }
 
+    private void encodeGeomFilter(GeometryFilter filter, String function, String result) {
+        DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
+        DefaultExpression right = (DefaultExpression) filter.getRightGeometry();
+
+        try {
+            if (!looseBbox) {
+            	//not supported without geos
+            	out.write(function + "(");
+            }
+
+            if (left == null) {
+                out.write("\"" + defaultGeom + "\"");
+            } else {
+                left.accept(this);
+            }
+
+            if (looseBbox) {
+                out.write(" && ");
+            } else {
+                out.write(", ");
+            }
+
+            if (right == null) {
+                out.write("\"" + defaultGeom + "\"");
+            } else {
+                right.accept(this);
+            }
+
+            if (!looseBbox) {
+            	out.write(") = " + result);
+            }
+        } catch (java.io.IOException ioe) {
+            LOGGER.warning("Unable to export filter" + ioe);
+        }
+    }
+    
     /**
      * Checks to see if the literal is a geometry, and encodes it if it  is, if
      * not just sends to the parent class.

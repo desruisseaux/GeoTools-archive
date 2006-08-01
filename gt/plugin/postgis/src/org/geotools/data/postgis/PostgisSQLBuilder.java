@@ -67,6 +67,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     public PostgisSQLBuilder(SQLEncoder encoder, JDBCDataStoreConfig config, FeatureType ft) {
     	super(encoder);
         this.config = config;
+        this.ft = ft;
     }
 
     /**

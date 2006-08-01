@@ -152,7 +152,7 @@ public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
         UniqueVisitor uniqueVisitor = new UniqueVisitor(att2);
         fc2.accepts(uniqueVisitor, null);
         assertTrue(fc2.isOptimized); //the postgis optimization was used
-        assertEquals(6, uniqueVisitor.getResult().toSet().size());
+        assertEquals(7, uniqueVisitor.getResult().toSet().size());
     }
     
     public void testSumExpression() throws Exception {

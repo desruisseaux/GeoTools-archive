@@ -78,6 +78,7 @@ import org.geotools.filter.SQLEncoderPostgisGeos;
 import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 import org.geotools.referencing.NamedIdentifier;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -1207,13 +1208,17 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
                 if (refSys != null) {
                 	try {
-                	    Set ident = refSys.getIdentifiers();
-                	    String code = ((NamedIdentifier) ident.toArray()[0]).getCode();
-                	    SRID = Integer.parseInt(code);
-                	} catch (Exception e) {
-                		LOGGER.warning("SRID could not be determined");
-                		SRID = -1;
-                	}
+                        Set ident = refSys.getIdentifiers();
+                        if (ident == null && refSys == DefaultGeographicCRS.WGS84) {
+                            SRID = 4326;
+                        } else {
+                            String code = ((NamedIdentifier) ident.toArray()[0]).getCode();
+                            SRID = Integer.parseInt(code);
+                        }
+                    } catch (Exception e) {
+                        LOGGER.warning("SRID could not be determined");
+                        SRID = -1;
+                    }
                 } else {
                     SRID = -1;
                 }
