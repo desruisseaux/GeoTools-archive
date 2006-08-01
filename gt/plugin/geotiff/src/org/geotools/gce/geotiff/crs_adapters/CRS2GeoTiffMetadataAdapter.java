@@ -67,7 +67,7 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 
-import sun.misc.LRUCache;
+
 
 /**
  * @author simone giannecchini
