@@ -25,9 +25,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
@@ -36,6 +38,8 @@ import java.io.ObjectInputStream;
 import javax.imageio.ImageReader;
 import javax.imageio.event.IIOReadWarningListener;
 import javax.imageio.event.IIOReadProgressListener;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.UndeclaredThrowableException;
 import javax.media.jai.InterpolationNearest;
 
@@ -1046,10 +1050,16 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-    public Object evaluate(final DirectPosition coord)
-            throws CannotEvaluateException
+    public Set evaluate(final DirectPosition coord)
     {
-        return evaluate(coord, (double[]) null);
+    
+		final double[] array = evaluate(coord, (double[]) null);
+		final int length = array.length;
+		final Set set = new HashSet(length);
+		for(int i=0;i<length;i++)
+			set.add(new Double(array[i]));
+		return set;
+	
     }
     
     /**
@@ -1111,7 +1121,8 @@ public class CoverageStack extends AbstractCoverage {
         dest       = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        for (int i=0; i<byteBuffer.length; i++) {
+        final int length=byteBuffer.length;
+        for (int i=0; i<length; i++) {
             dest[i] = (byte)Math.round(dest[i] + ratio*(byteBuffer[i]-dest[i]));
         }
         return dest;
@@ -1146,7 +1157,8 @@ public class CoverageStack extends AbstractCoverage {
         dest      = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        for (int i=0; i<intBuffer.length; i++) {
+        final int length=intBuffer.length;
+        for (int i=0; i<length; i++) {
             dest[i] = (int)Math.round(dest[i] + ratio*(intBuffer[i]-dest[i]));
         }
         return dest;
@@ -1180,7 +1192,8 @@ public class CoverageStack extends AbstractCoverage {
         dest        = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        for (int i=0; i<floatBuffer.length; i++) {
+        final int length=floatBuffer.length;
+        for (int i=0; i<length; i++) {
             final float lower = dest[i];
             final float upper = floatBuffer[i];
             float value = (float)(lower + ratio*(upper-lower));
@@ -1230,7 +1243,8 @@ public class CoverageStack extends AbstractCoverage {
         dest         = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        for (int i=0; i<doubleBuffer.length; i++) {
+        final int length=doubleBuffer.length;
+        for (int i=0; i<length; i++)  {
             final double lower = dest[i];
             final double upper = doubleBuffer[i];
             double value = lower + ratio*(upper-lower);

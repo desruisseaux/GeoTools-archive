@@ -20,6 +20,8 @@
 package org.geotools.coverage;
 
 // J2SE and JAI dependencies
+import java.util.Set;
+
 import javax.media.jai.PropertySource;
 
 // OpenGIS dependencies
@@ -180,7 +182,7 @@ public class TransformedCoverage extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-    public final Object evaluate(final DirectPosition coord)
+    public final Set evaluate(final DirectPosition coord)
             throws CannotEvaluateException
     {
         try {

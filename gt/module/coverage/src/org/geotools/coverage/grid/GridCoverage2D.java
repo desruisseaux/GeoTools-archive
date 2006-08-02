@@ -47,11 +47,14 @@ import java.io.InvalidObjectException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import javax.units.Unit;
@@ -442,19 +445,64 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Return the value vector for a given point in the coverage.
+     * Return the value vector as a Set for a given point in the coverage.
      * A value for each sample dimension is included in the vector.
      */
-    public Object evaluate(final DirectPosition point) throws CannotEvaluateException {
-        switch (image.getSampleModel().getDataType()) {
-            case DataBuffer.TYPE_BYTE:   return evaluate(point, (byte  []) null);
+    public Set evaluate(final DirectPosition point) throws CannotEvaluateException {
+    	final Set set= new HashSet();
+    	Object array;
+    	
+    	///////////////////////////////////////////////////////////////////////
+    	//
+    	// PHASE 1
+    	// get the values
+    	//
+    	///////////////////////////////////////////////////////////////////////
+    	final int dataType=image.getSampleModel().getDataType();
+        switch (dataType) {
+            case DataBuffer.TYPE_BYTE:   
+            	array= evaluate(point, (byte  []) null);
+            	break;
             case DataBuffer.TYPE_SHORT:  // Fall through
             case DataBuffer.TYPE_USHORT: // Fall through
-            case DataBuffer.TYPE_INT:    return evaluate(point, (int   []) null);
-            case DataBuffer.TYPE_FLOAT:  return evaluate(point, (float []) null);
-            case DataBuffer.TYPE_DOUBLE: return evaluate(point, (double[]) null);
+            case DataBuffer.TYPE_INT:    
+            	array= evaluate(point, (int   []) null);
+            	break;
+            case DataBuffer.TYPE_FLOAT:  
+            	array= evaluate(point, (float []) null);
+            	break;
+            case DataBuffer.TYPE_DOUBLE: 
+            	array= evaluate(point, (double[]) null);
+            	break;
             default: throw new CannotEvaluateException();
         }
+        
+    	///////////////////////////////////////////////////////////////////////
+    	//
+    	// PHASE 2
+        // create a set for them
+    	//
+    	///////////////////////////////////////////////////////////////////////
+		final int length = Array.getLength(array);
+		for(int index=0;index<length;index++)
+	        switch (dataType) {
+	        case DataBuffer.TYPE_BYTE:  
+	        	set.add(new Byte(Array.getByte(array, index)));
+	        	break;
+	        case DataBuffer.TYPE_SHORT:  // Fall through
+	        case DataBuffer.TYPE_USHORT: // Fall through
+	        case DataBuffer.TYPE_INT:   
+	        	set.add(new Integer(Array.getInt(array, index)));
+	        	break;
+	        case DataBuffer.TYPE_FLOAT: 
+	        	set.add(new Float(Array.getFloat(array, index)));
+	        	break;
+	        case DataBuffer.TYPE_DOUBLE: 
+	        	set.add(new Double(Array.getDouble(array, index)));
+	        	break;
+	        default: throw new CannotEvaluateException();
+	        }
+        return set;
     }
     
     /**

@@ -70,14 +70,7 @@ public final class LRULinkedHashMap extends LinkedHashMap {
 	 * Returns <tt>true</tt> if this map should remove its eldest entry. This
 	 * method is invoked by <tt>put</tt> and <tt>putAll</tt> after inserting
 	 * a new entry into the map. It provides the implementer with the
-	 * opportunity to remove the eldest entry each time a new one is added. This
-	 * is useful if the map represents a cache: it allows the map to reduce
-	 * memory consumption by deleting stale entries. <p/> Will return true if:
-	 * <ol>
-	 * <li> the element has expired
-	 * <li> the cache size is greater than the in-memory actual. In this case we
-	 * spool to disk before returning.
-	 * </ol>
+	 * opportunity to remove the eldest entry each time a new one is added. 
 	 * 
 	 * @param eldest
 	 *            The least recently inserted entry in the map, or if this is an

@@ -27,6 +27,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.util.Date;
+import java.util.Set;
+
 import javax.media.jai.util.Range;
 
 // OpenGIS dependencies
@@ -487,7 +489,7 @@ control:    for (int p=0; p<=1; p++) {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-    public final Object evaluate(final DirectPosition coord)
+    public final Set evaluate(final DirectPosition coord)
             throws CannotEvaluateException
     {
         return coverage.evaluate(coord);
