@@ -35,6 +35,7 @@ import javax.units.Unit;
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.cs.RangeMeaning;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -79,7 +80,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * Default axis info for longitudes.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
      *
      * The abbreviation is "&lambda;" (lambda).
      *
@@ -96,7 +97,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * Default axis info for latitudes.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
      *
      * The abbreviation is "&phi;" (phi).
      * 
@@ -148,7 +149,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
      *
      * The ISO 19111 name is "<cite>geodetic longitude</cite>" and the abbreviation is "&lambda;"
      * (lambda).
@@ -168,7 +169,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
      *
      * The ISO 19111 name is "<cite>geodetic latitude</cite>" and the abbreviation is "&phi;" (phi).
      * 
@@ -248,7 +249,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * {@linkplain org.opengis.referencing.crs.SphericalCS spherical CS}.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
      *
      * The ISO 19111 name is "<cite>spherical longitude</cite>" and the abbreviation is "&Omega;"
      * (omega).
@@ -269,7 +270,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * {@linkplain org.opengis.referencing.cs.SphericalCS spherical CS}.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
      *
      * The ISO 19111 name is "<cite>spherical latitude</cite>" and the abbreviation is "&Theta;"
      * (theta).
@@ -819,4 +820,16 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         formatter.append(direction);
         return "AXIS";
     }
+
+        public double getMinimumValue() {
+                return 0;
+        }
+
+        public double getMaximumValue() {
+                return 0;
+        }
+
+        public RangeMeaning getRangeMeaning() {
+                return null;
+        }
 }

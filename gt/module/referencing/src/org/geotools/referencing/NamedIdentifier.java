@@ -40,6 +40,7 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
+import org.opengis.util.NameSpace;
 import org.opengis.util.ScopedName;
 
 // Geotools dependencies
@@ -465,6 +466,8 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     /**
      * Returns the scope (name space) of this generic name. If this name has no scope
      * (e.g. is the root), then this method returns {@code null}.
+     * 
+     * @deprecated Repalced by scope()
      */
     public GenericName getScope() {
         return getName().getScope();
@@ -551,4 +554,29 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
         }
         return hash;
     }
+
+    /**
+     * @since GeoAPI 2.1
+     */
+        public NameSpace scope() {
+                return getName().scope();
+        }
+        /**
+         * @since GeoAPI 2.1
+         */
+        public int depth() {
+                return getName().depth();
+        }
+        /** @since GeoAPI 2.1 */
+        public LocalName name() {
+                return getName().name();
+        }
+        /** @since GeoAPI 2.1 */
+        public GenericName toFullyQualifiedName() {
+                return getName().toFullyQualifiedName();
+        }
+        /** @since GeoAPI 2.1 */
+        public ScopedName push(GenericName scope) {
+                return getName().push( scope );
+        }
 }

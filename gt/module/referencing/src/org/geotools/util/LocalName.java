@@ -1,7 +1,7 @@
 /*
  * Geotools 2 - OpenSource mapping toolkit
  * (C) 2004, Geotools Project Managment Committee (PMC)
- * (C) 2004, Institut de Recherche pour le Développement
+ * (C) 2004, Institut de Recherche pour le Dï¿½veloppement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,10 +30,13 @@ import java.util.Locale;
 // OpenGIS dependencies
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
+import org.opengis.util.NameSpace;
 import org.opengis.util.ScopedName;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
+
+//import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -117,24 +120,16 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
      * This method is protected from overriding by the user.
      */
     private GenericName getInternalScope() {
-        return (asScopedName!=null) ? asScopedName.getScope() : null;
+        return (asScopedName == null || asScopedName.scope() == null) ?
+                        null :
+                                asScopedName.scope().name();
     }
 
     /**
-     * Returns the scope (name space) of this generic name. This method returns the same
-     * value than the one returned by the {@linkplain ScopedName scoped}
-     * version of this name. In other words, the following relation shall be respected:
-     * <blockquote><table border='0'><tr>
-     *   <td nowrap>{@link ScopedName#asLocalName}</td>
-     *   <td nowrap>{@code .getScope() ==}</td>
-     *   <td nowrap align="right">{@link ScopedName}</td>
-     *   <td nowrap>{@code .getScope()}</td>
-     * </tr><tr>
-     *   <td align="center"><font size=2>(a locale name)</font></td>
-     *   <td>&nbsp;</td>
-     *   <td align="center"><font size=2>(a scoped name)</font></td>
-     *   <td>&nbsp;</td>
-     * </tr></table></blockquote>
+     * Returns the scope (name space) of this generic name.
+     * 
+     * @deprecated scope()
+     * @return scope()
      */
     public GenericName getScope() {
         return getInternalScope();
@@ -234,4 +229,26 @@ public class LocalName extends org.geotools.util.GenericName implements org.open
         if (name != null) code ^= name.hashCode();
         return code;
     }
+
+        public int depth() {
+                return getInternalScope().depth()+1;
+        }
+
+        public org.opengis.util.LocalName name() {
+                return this;
+        }
+
+        public NameSpace scope() {
+                return (asScopedName!=null) ? asScopedName.scope() : null;
+        }
+
+        public GenericName toFullyQualifiedName() {
+                throw new UnsupportedOperationException();
+                //throw new NotImplementedException();
+        }
+        
+        public ScopedName push(GenericName scope) {
+                throw new UnsupportedOperationException();
+                //throw new NotImplementedException();
+        }
 }

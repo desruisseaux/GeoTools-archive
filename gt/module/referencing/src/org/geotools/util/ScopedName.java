@@ -31,6 +31,7 @@ import java.util.Locale;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
+import org.opengis.util.NameSpace;
 
 // Geotools dependencies
 import org.geotools.resources.Utilities;
@@ -186,4 +187,44 @@ public class ScopedName extends org.geotools.util.GenericName
     public int hashCode() {
         return (int)serialVersionUID ^ name.hashCode() ^ scope.hashCode();
     }
+
+        public LocalName head() {
+                // TODO Auto-generated method stub
+                return null;
+        }
+
+        public GenericName tail() {
+                // TODO Auto-generated method stub
+                return null;
+        }
+
+        public GenericName path() {
+                // TODO Auto-generated method stub
+                return null;
+        }
+
+        public LocalName name() {
+                // TODO Auto-generated method stub
+                return null;
+        }
+
+        public NameSpace scope() {
+                // TODO Auto-generated method stub
+                return null;
+        }
+
+        public int depth() {
+                // TODO Auto-generated method stub
+                return 0;
+        }
+
+        public GenericName toFullyQualifiedName() {
+                // TODO Auto-generated method stub
+                return null;
+        }
+
+        public org.opengis.util.ScopedName push(GenericName scope) {
+                // TODO Auto-generated method stub
+                return null;
+        }
 }
