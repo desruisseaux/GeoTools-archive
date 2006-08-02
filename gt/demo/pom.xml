@@ -38,7 +38,7 @@
   <dependencies>
     <dependency>
       <groupId>org.opengis</groupId>
-      <artifactId>geoapi</artifactId>
+      <artifactId>geoapi-nogenerics</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
