@@ -67,8 +67,16 @@
       </roles>
     </developer>
   </developers>
-
+      
   <contributors>
+  <contributor>
+      <name>Simone Giannecchinir</name>
+      <email>simone.giannecchini@geo-solutions.it</email>
+      <organization>GeoSolutions</organization>
+      <roles>
+        <role>Java developper</role>
+      </roles>
+    </contributor>
     <contributor>
       <name>Rémi Eve</name>
       <organization>Institut de Recherche pour le Développement (IRD)</organization>

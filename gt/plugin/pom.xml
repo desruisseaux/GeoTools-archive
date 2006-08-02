@@ -86,7 +86,7 @@
   <!--     All modules included in the build                                 -->
   <!-- ===================================================================== -->
   <modules>
-    <module>arcgrid</module>
+   <!-- <module>arcgrid</module>-->
     <!--Uncomment this module if you have access to the ESRI ArcSDE Java API
     	libraries and intend to use it. See README.txt on ./arcsde-->
     <!--
