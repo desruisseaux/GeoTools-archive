@@ -15,7 +15,6 @@
  */
 package org.geotools.feature;
 
-import org.opengis.feature.FeatureTypeFactory;
 import java.net.URI;
 
 
