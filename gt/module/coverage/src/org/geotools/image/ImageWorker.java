@@ -375,7 +375,7 @@ public class ImageWorker {
                 hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
             }
         }
-        if (tileCacheDisabled!=0 && !commonHints.containsKey(JAI.KEY_TILE_CACHE)) {
+        if (tileCacheDisabled!=0 && (commonHints!=null &&!commonHints.containsKey(JAI.KEY_TILE_CACHE))) {
             hints.put(JAI.KEY_TILE_CACHE, null);
         }
         return hints;
