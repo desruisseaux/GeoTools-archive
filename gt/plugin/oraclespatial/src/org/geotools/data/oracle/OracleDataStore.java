@@ -292,7 +292,7 @@ public class OracleDataStore extends JDBCDataStore {
     	try {
     		conn= getConnection( Transaction.AUTO_COMMIT );
 	    	Statement st = conn.createStatement();
-	    	st.execute("SELECT srid,diminfo FROM USER_SDO_GEOM_METADATA where TABLE_NAME = 'ORA_TEST_LINES'");    	
+	    	st.execute("SELECT srid,diminfo FROM USER_SDO_GEOM_METADATA where TABLE_NAME = '"+typeName+"'");    	
 	    	ResultSet set = st.getResultSet();    	
 	    	set.next();
 	    	
