@@ -52,6 +52,8 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
 
+import sun.security.krb5.internal.crypto.n;
+
 
 /**
  * Helper methods for applying JAI operations on an image. The image is specified at
@@ -144,7 +146,7 @@ public class ImageWorker {
      * @param imageChoice For multipage images.
      * @return The loaded image.
      */
-    static public PlanarImage loadPlanarImageImage(final File source,final RenderingHints hints,final int imageChoice,final boolean readMetadata){
+    static public PlanarImage loadPlanarImageImage(final String source,final RenderingHints hints,final int imageChoice,final boolean readMetadata){
     	
     	
     	///////////////////////////////////////////////////////////////////////
@@ -798,6 +800,8 @@ public class ImageWorker {
                 int numBands = getNumBands();
                 final RenderingHints hints = getRenderingHints();
                 alphaChannel = BandSelectDescriptor.create(image, new int[] {--numBands}, hints);
+                retainBands(numBands);
+                forceIndexColorModel();
                 tileCacheEnabled(true);
             }
             /*
@@ -1070,7 +1074,7 @@ public class ImageWorker {
                     tileCacheEnabled(true);
                 }
                 final double[][] extremas = getExtremas();
-                threshold = 0.5*(extremas[0][0] + extremas[1][0]);
+                threshold =extremas[1][0];// 0.5*(extremas[0][0] + extremas[1][0]);
             }
             final RenderingHints hints = getRenderingHints();
             image = BinarizeDescriptor.create(image, new Double(threshold), hints);
