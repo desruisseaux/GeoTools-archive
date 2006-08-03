@@ -26,7 +26,6 @@ import java.awt.RenderingHints;
 import java.awt.HeadlessException;
 import java.awt.color.ColorSpace;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageOutputStream;
@@ -42,7 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.media.jai.*;
 import javax.media.jai.operator.*;
 
-import com.sun.media.jai.operator.ImageReadDescriptor;
+
 import com.sun.media.jai.util.ImageUtil;
 
 // Geotools dependencies
@@ -52,7 +51,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
 
-import sun.security.krb5.internal.crypto.n;
+
 
 
 /**
