@@ -246,8 +246,10 @@ public class XMLSAXHandler extends DefaultHandler {
 
         try {
         	
-            ((XMLElementHandler) handlers.pop()).endElement(new URI(
+            XMLElementHandler handler = (XMLElementHandler) handlers.peek();
+			handler.endElement(new URI(
                     namespaceURI), localName, hints);
+			handlers.pop();
         } catch (Exception e) {
             logger.warning(e.getMessage());
             logger.warning("Line " + locator.getLineNumber() + " Col "
@@ -356,8 +358,8 @@ public class XMLSAXHandler extends DefaultHandler {
             //                            ((((Sequence)((ComplexType)parent.getType()).getChild()).getChildren()==null)?0:
             //                                ((Sequence)((ComplexType)parent.getType()).getChild()).getChildren().length)+"":"null"))));
             logger.finest("This Node = " + localName + " :: " + namespaceURI);
-
-            XMLElementHandler eh = parent.getHandler(new URI(namespaceURI),
+            URI uri = new URI(namespaceURI);
+            XMLElementHandler eh = parent.getHandler(uri,
                     localName, hints);
 
             if (eh == null) {

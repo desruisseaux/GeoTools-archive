@@ -527,9 +527,9 @@ public class SchemaHandler extends XSIElementHandler {
                 if (t instanceof ComplexTypeHandler) {
                     ComplexTypeHandler tt = (ComplexTypeHandler) t;
                     cache.add(tt.compress(this));
-                    it.remove();
                 }
             }
+            complexTypes.clear();
             it = cache.iterator();
             while( it.hasNext() )
                 complexTypes.add(it.next());
@@ -709,7 +709,8 @@ public class SchemaHandler extends XSIElementHandler {
             ComplexType[] sts = s.getComplexTypes();
 
             for( int i = 0; (sts != null) && (i < sts.length); i++ ) {
-                if (localName.equalsIgnoreCase(sts[i].getName())) {
+                String name = sts[i].getName();
+				if (localName.equalsIgnoreCase(name)) {
                     return sts[i];
                 }
             }
@@ -816,9 +817,10 @@ public class SchemaHandler extends XSIElementHandler {
             Element[] sts = s.getElements();
 
             for( int i = 0; (sts != null) && (i < sts.length); i++ ) {
-                logger.finest("checking element " + sts[i].getName());
+                String name = sts[i].getName();
+				logger.finest("checking element " + name);
 
-                if (localName.equalsIgnoreCase(sts[i].getName())) {
+                if (localName.equalsIgnoreCase(name)) {
                     return sts[i];
                 }
             }

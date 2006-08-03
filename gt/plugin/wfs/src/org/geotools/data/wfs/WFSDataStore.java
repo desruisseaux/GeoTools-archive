@@ -53,10 +53,11 @@ import org.geotools.data.Transaction;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
-import org.geotools.data.wfs.Action.DeleteAction;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.FeatureTypes;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
@@ -75,6 +76,7 @@ import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.filter.FilterSchema;
 import org.geotools.xml.gml.GMLComplexTypes;
+import org.geotools.xml.gml.WFSFeatureTypeTransformer;
 import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.wfs.WFSSchema;
@@ -335,7 +337,7 @@ public class WFSDataStore extends AbstractDataStore {
             try {
                 if(crsName!=null){
                     crs = CRS.decode(crsName);
-            	    t = FeatureTypes.transform(t,crs);
+            	    t = WFSFeatureTypeTransformer.transform(t,crs);
                 }
             } catch (FactoryException e) {
                 WFSDataStoreFactory.logger.warning(e.getMessage());
@@ -461,7 +463,7 @@ public class WFSDataStore extends AbstractDataStore {
         HttpURLConnection hc = getConnection(postUrl,auth,true);
 
         // write request
-        Writer osw = new OutputStreamWriter(hc.getOutputStream());
+        Writer osw = getOutputStream(hc);
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[1]); // DescribeFeatureType
@@ -486,8 +488,10 @@ public class WFSDataStore extends AbstractDataStore {
         
         osw.flush();
         osw.close();
-        
         InputStream is = getInputStream(hc);
+        if( WFSDataStoreFactory.logger.isLoggable(Level.FINE) ){
+            is=new LogInputStream(is, Level.FINE);
+        }
         Schema schema;
         try{
             schema = SchemaFactory.getInstance(null, is);
@@ -588,6 +592,17 @@ public class WFSDataStore extends AbstractDataStore {
         return ft;
     }
 
+    Writer getOutputStream( HttpURLConnection hc ) throws IOException {
+        OutputStream os = hc.getOutputStream();
+
+        Writer w = new OutputStreamWriter(os);
+        // write request
+        if( Logger.getLogger("org.geotools.data.wfs").isLoggable(Level.FINE) ){
+            w=new LogWriterDecorator(w, Level.FINE);
+        }
+        return w;
+    }
+
     /**
      * If the field useGZIP is true Adds gzip to the connection accept-encoding property and creates a gzip inputstream 
      * (if server supports it).  Otherwise returns a normal buffered input stream.  
@@ -595,15 +610,20 @@ public class WFSDataStore extends AbstractDataStore {
      * @return an input steam from the provided connection
      */
 	InputStream getInputStream(HttpURLConnection hc) throws IOException {
-		if( tryGZIP ){
-	        InputStream is = hc.getInputStream();
+		InputStream is = hc.getInputStream();
+        if( WFSDataStoreFactory.logger.isLoggable(Level.FINE) ){
+            is=new LogInputStream(is, Level.FINE);
+        }
+
+        if( tryGZIP ){
+
 	        if (hc.getContentEncoding() != null && hc.getContentEncoding().indexOf("gzip") != -1) {
 	        		is = new GZIPInputStream(is);
 	        } 
 	        is=new BufferedInputStream(is);
 			return is;
 		}else{
-	        return new BufferedInputStream(hc.getInputStream());
+	        return new BufferedInputStream(is);
 		}
 	}
 
@@ -680,13 +700,8 @@ public class WFSDataStore extends AbstractDataStore {
         
         HttpURLConnection hc = getConnection(postUrl,auth,true);
         
-        OutputStream os = hc.getOutputStream();
-
-        // write request
-        Writer w = new OutputStreamWriter(os);
-        if( Logger.getLogger("org.geotools.data.wfs").isLoggable(Level.FINE) ){
-            w=new LogWriterDecorator(w, Level.FINE);
-        }
+        Writer w = getOutputStream(hc);
+        
         Map hints = new HashMap();
         hints.put(DocumentWriter.BASE_ELEMENT,
             WFSSchema.getInstance().getElements()[2]); // GetFeature
@@ -697,10 +712,10 @@ public class WFSDataStore extends AbstractDataStore {
         } catch (OperationNotSupportedException e) {
             WFSDataStoreFactory.logger.warning(e.toString());
             throw new SAXException(e);
+        }finally{
+            w.flush();
+            w.close();
         }
-
-        os.flush();
-        os.close();
 
         // JE: permit possibility for GZipped data.
         InputStream is = getInputStream(hc);
@@ -744,13 +759,12 @@ public class WFSDataStore extends AbstractDataStore {
     /**
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query, org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(Query query, Transaction transaction)
+    public FeatureReader getFeatureReader(Query query2, Transaction transaction)
         throws IOException {
         FeatureReader t = null;
         SAXException sax = null;
         IOException io = null;
-        
-        query = new DefaultQuery(query);
+        Query query = new DefaultQuery(query2);
         // process the filter to update fidfilters using the transaction.
         ((DefaultQuery)query).setFilter(processFilter(query.getFilter()));
         Filter[] filters = splitFilters(query,transaction); // [server][post]

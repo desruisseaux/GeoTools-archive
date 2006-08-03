@@ -1086,30 +1086,39 @@ public class ComplexTypeHandler extends XSIElementHandler {
                 return null;
             }
 
-            values = new Object[value.length+1];
-            logger.finest("Getting value for " + element.getName() + ":" + name);
+            if( element.getType() instanceof ComplexType
+            		&& ((ComplexType)element.getType()).getChild() instanceof Choice){
+            	if( value.length>0)
+            		return value[0].getValue();
+            }else{
+	            values = new Object[value.length+1];
+	            logger.finest("Getting value for " + element.getName() + ":" + name);
+	
+	            // This seems to some how be for mixed content?  Don't really understand what
+	            // is going on here.
+	            values[0] = new ElementValue(){
+					public Element getElement() {
+						return null;
+					}
+	
+					public Object getValue() {
+						return attrs;
+					}
+	            	
+	            };
+	            
+	            
+	            for (int i = 1; i < value.length+1; i++) {
+	                values[i] = value[i-(isMixed()?0:1)].getValue();
+	                logger.finest("*"
+	                    + ((values[i] != null) ? values[i].getClass().getName()
+	                                           : "null"));
+	            }
+	            
+	            if(isMixed())
+	            	values[values.length-1] = value[0];
 
-            values[0] = new ElementValue(){
-				public Element getElement() {
-					return null;
-				}
-
-				public Object getValue() {
-					return attrs;
-				}
-            	
-            };
-            
-            for (int i = 1; i < value.length; i++) {
-                values[i] = value[i-(isMixed()?0:1)].getValue();
-                logger.finest("*"
-                    + ((values[i] != null) ? values[i].getClass().getName()
-                                           : "null"));
             }
-            
-            if(isMixed())
-            	values[values.length-1] = value[0];
-
             return values;
         }
 

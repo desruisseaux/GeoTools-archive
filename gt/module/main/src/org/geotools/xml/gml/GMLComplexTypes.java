@@ -38,6 +38,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.Filter;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.gml.FCBuffer.StopException;
@@ -4195,25 +4196,7 @@ public class GMLComplexTypes {
             for (int i = 0; i < value.length; i++){
                 //find index for value
                 int j = -1;
-                for (int k=0;k<ft.getAttributeCount() && j==-1;k++){
-                    // TODO use equals
-                    if((ft.getAttributeType(k).getName()==null && value[i].getElement().getName()==null) ||
-                            ft.getAttributeType(k).getName().equals(value[i].getElement().getName()))
-                        j = k;
-                }
-                if(j!=-1){
-                    values[j] = value[i].getValue();
-                }else{
-                    // HACK !!!
-                    
-                    // not found ... is it the same name as the FT 
-                    // (ie ... is this part of the consequences of GT's featureType model)?
-                    if(value[i].getValue()!=null)
-                    for(int k=0;k<ft.getAttributeCount();k++)
-                        if(ft.getAttributeType(k).getName().equals(ft.getTypeName()) 
-                                && ft.getAttributeType(k).getType().isAssignableFrom(value[i].getValue().getClass()))
-                                values[k] = value[i].getValue();
-                }
+                setAttribute(value, ft, values, i, j);
             }
 
             String fid = attrs.getValue("", "fid");
@@ -4242,6 +4225,77 @@ public class GMLComplexTypes {
             
             return rt;
         }
+
+		private void setAttribute(ElementValue[] value, FeatureType ft, Object[] values, int i, int j) {
+			j = searchByName(value, ft, i, j);
+			if(j!=-1){
+                assignValue(value, values, ft.getAttributeType(j), i, j);
+			}else{
+			    searchByType(value, ft, values, i);
+			}
+		}
+
+		/**
+		 * HACK !!!
+		 * 
+		 * not found ... is it the same name as the FT
+		 * (ie ... is this part of the consequences of GT's featureType model)?
+		 * 
+		 */
+		private void searchByType(ElementValue[] value, FeatureType ft, Object[] values, int i) {
+			
+			if(value[i].getValue()!=null){
+				// first check same index since it is supposed to be the same...
+				if( isMatch(value, ft, i, i) ){
+					assignValue(value, values, ft.getAttributeType(i), i, i);
+					return;
+				}
+				for(int k=0;k<ft.getAttributeCount();k++){
+				    if(isMatch(value, ft, i, k)){
+				    	if( values[i]==null)
+				    		assignValue(value, values, ft.getAttributeType(k), i, k);
+				    }
+				}
+			}
+		}
+
+		private void assignValue(ElementValue[] value, Object[] values, AttributeType at, int i, int k) {
+			if( at instanceof ChoiceAttributeType ){
+				ChoiceAttributeType choiceAT = (ChoiceAttributeType) at;
+				values[k]=choiceAT.convert(value[i].getValue());
+			}else
+				values[k] = value[i].getValue();
+		}
+
+		private boolean isMatch(ElementValue[] value, FeatureType ft, int i, int k) {
+			AttributeType attributeType = ft.getAttributeType(k);
+			String typeName = ft.getTypeName();
+			
+			if( !attributeType.getName().equals(typeName) )
+				return false;
+			
+			Class instanceClass = value[i].getValue().getClass();
+			
+			if( attributeType instanceof ChoiceAttributeType ){
+				ChoiceAttributeType choiceAT=(ChoiceAttributeType) attributeType;
+				Class[] choices = choiceAT.getChoices();
+				for (int j = 0; j < choices.length; j++) {
+					if( choices[j].isAssignableFrom(instanceClass))
+						return true;
+				}
+			}
+			return attributeType.getType().isAssignableFrom(instanceClass);
+		}
+
+		private int searchByName(ElementValue[] value, FeatureType ft, int i, int j) {
+			for (int k=0;k<ft.getAttributeCount() && j==-1;k++){
+			    // TODO use equals
+			    if((ft.getAttributeType(k).getName()==null && value[i].getElement().getName()==null) ||
+			            ft.getAttributeType(k).getName().equals(value[i].getElement().getName()))
+			        j = k;
+			}
+			return j;
+		}
 
         private void stream(Feature feature, FCBuffer featureCollectionBuffer)
             throws SAXNotSupportedException, SAXException {
@@ -5834,7 +5888,15 @@ public class GMLComplexTypes {
                 throw new SAXException("must be one geometry");
             }
 
-            return (MultiPoint) value[0].getValue();
+            Object value2 = value[0].getValue();
+        	return (MultiPoint) value2;
+//            if( value2 instanceof MultiPoint)
+//            	return (MultiPoint) value2;
+//            else if( value2 instanceof Point ){
+//            	GeometryFactory fac=new GeometryFactory();
+//            	return fac.createMultiPoint(new Point[]{(Point) value2});
+//            }
+//            throw new SAXException("Expected value was a MultiPoint, instead it was a: "+value2.getClass());
         }
 
         /**
@@ -5994,7 +6056,16 @@ public class GMLComplexTypes {
                 throw new SAXException("must be one geometry");
             }
 
-            return (MultiLineString) value[0].getValue();
+            Object value2 = value[0].getValue();
+        	return (MultiLineString) value2;
+        	
+//            if( value2 instanceof MultiLineString)
+//            	return (MultiLineString) value2;
+//            else if( value2 instanceof LineString ){
+//            	GeometryFactory fac=new GeometryFactory();
+//            	return fac.createMultiLineString(new LineString[]{(LineString) value2});
+//            }
+//            throw new SAXException("Expected value was a MultiLineString, instead it was a: "+value2.getClass());
         }
 
         /**
@@ -6153,8 +6224,18 @@ public class GMLComplexTypes {
             if ((value == null) || (value.length != 1)) {
                 throw new SAXException("must be one geometry");
             }
+            
+            Object value2 = value[0].getValue();
 
-            return (MultiPolygon) value[0].getValue();
+        	return (MultiPolygon) value2;
+//            if( value2 instanceof MultiPolygon)
+//            	return (MultiPolygon) value2;
+//            else if( value2 instanceof Polygon ){
+//            	GeometryFactory fac=new GeometryFactory();
+//            	return fac.createMultiPolygon(new Polygon[]{(Polygon) value2});
+//            }
+//            throw new SAXException("Expected value was a MultiPolygon, instead it was a: "+value2.getClass());
+
         }
 
         /**
@@ -6314,7 +6395,16 @@ public class GMLComplexTypes {
                 throw new SAXException("must be one geometry");
             }
 
-            return (GeometryCollection) value[0].getValue();
+            Object value2 = value[0].getValue();
+        	return (GeometryCollection) value2;
+            
+//            if( value2 instanceof GeometryCollection)
+//            	return (GeometryCollection) value2;
+//            else if( value2 instanceof Geometry ){
+//            	GeometryFactory fac=new GeometryFactory();
+//            	return fac.createGeometryCollection(new Geometry[]{(Geometry) value2});
+//            }
+//            throw new SAXException("Expected value was a Geometry, instead it was a: "+value2.getClass());
         }
 
         /**
@@ -6571,8 +6661,7 @@ public class GMLComplexTypes {
             return (AttributeType)l.iterator().next();
         }
             // Do some magic to find the type
-            Class type = Object.class;
-            type = getCommonType(l);
+            Class type = getCommonType(l);
             if(type == null)
                 type = Object.class;
             // Take the first name ... cause we need one anyways
@@ -6584,10 +6673,23 @@ public class GMLComplexTypes {
                         nillable = true;
                 }
             }
-            return AttributeTypeFactory.newAttributeType(name,type,nillable);
+            Class[] choices=collectionChoices(l);
+            if( Geometry.class.isAssignableFrom(type))
+            	return new ChoiceAttributeTypeImpl.Geometry(name,choices,type,nillable,1,1,null, null, Filter.NONE);
+            return new ChoiceAttributeTypeImpl(name,choices,type,nillable,1,1,null, Filter.NONE);
     }
     
-    // takes List<AttributeType>
+    private static Class[] collectionChoices(List l) {
+    	Class[] choices=new Class[l.size()];
+    	int i=0;
+    	for (Iterator iter = l.iterator(); iter.hasNext(); i++) {
+			AttributeType type = (AttributeType) iter.next();
+			choices[i]=type.getType();
+		}
+    	return choices;
+	}
+
+	// takes List<AttributeType>
     private static Class getCommonType(List attributeTypes){
         if(attributeTypes == null || attributeTypes.isEmpty())
             return null;
@@ -6611,7 +6713,22 @@ public class GMLComplexTypes {
                             if(t.isAssignableFrom(common)){
                                 common = t;
                             }else{
-                                common = findCommon(common,t);
+                            	int selection = findCompatible(common, t);
+                            	switch (selection) {
+								case 0:
+									
+									common = findCommon(common,t);
+									break;
+								case 1:
+									// common=common;  
+									break;
+								case 2:
+									common=t;
+									break;
+
+								default:
+									break;
+								}
                             }
                         }
                     }
@@ -6621,6 +6738,45 @@ public class GMLComplexTypes {
         return common;
     }
     
+    /**
+     * This is a bit of a hack to allow certain special cases.  This is required because the feature model does not 
+     * support choices and making a Choice (Polygon, MultiPolygon) a Geometry is terrible because editing will allow all
+     * types to be added but really that is incorrect.
+     * 
+     * <p>For example:
+     * Polygon and MultiPolygon are compatible.  Polygons can be made MultiPolygons easily.
+     *   
+     * @return 0 if no compatibility is possible, 1 if c1 is a good choice, 2 if c2 is a good choice.
+     */
+    private static int findCompatible(Class c1, Class c2){
+    	if( c1==Polygon.class && c2==MultiPolygon.class ){
+    		return 2;
+    	}
+    	if( c2==Polygon.class && c1==MultiPolygon.class ){
+    		return 1;
+    	}
+    	if( c1==Point.class && c2==MultiPoint.class ){
+    		return 2;
+    	}
+    	if( c2==Point.class && c1==MultiPoint.class ){
+    		return 1;
+    	}
+    	if( c1==LineString.class && c2==MultiLineString.class ){
+    		return 2;
+    	}
+    	if( c2==LineString.class && c1==MultiLineString.class ){
+    		return 1;
+    	}
+    	if( c1==Geometry.class && c2==GeometryCollection.class ){
+    		return 2;
+    	}
+    	if( c2==Geometry.class && c1==GeometryCollection.class ){
+    		return 1;
+    	}
+    	
+    	return 0;
+    	
+    }
     private static Class findCommon(Class c1, Class c2){
         if(Object.class == c1)
             return c2;
