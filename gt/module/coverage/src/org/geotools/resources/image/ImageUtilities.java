@@ -1139,7 +1139,7 @@ public final class ImageUtilities {
      * image via the RenderingHints in order to take into account the different
      * layout model for the final image.
      * 
-     * @param surrogateImage
+     * @param sourceImage
      *            image to convert
      * 
      * @return PlanarImage image converted
