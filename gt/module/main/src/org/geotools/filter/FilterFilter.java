@@ -260,6 +260,12 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
                } catch (IllegalFilterException ife) {
                    throw new SAXException(ife);
                }
+           }else if(characters.length() > 0){
+        	   LOGGER.finer("delegating characters to parent: " + characters.toString());
+        	   int len = this.characters.length();
+        	   char []chars = new char[this.characters.length()];
+        	   this.characters.getChars(0, len, chars, 0);
+        	   parent.characters(chars, 0, len);
            }
     }
 
