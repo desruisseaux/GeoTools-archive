@@ -26,6 +26,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.io.FileOutputStream;
+import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -184,6 +186,16 @@ public class SLDTransformer extends TransformerBase {
                 text.getFill().accept(this);
             }
 
+            if (text.getOptions() != null) {
+                encodeVendorOptions(text.getOptions());
+            }
+            
+            if (text.getPriority() != null) {
+                start("Priority");
+                element("PropertyName", text.getPriority());
+                end("Priority");
+            }
+            
             end("TextSymbolizer");
         }
 
@@ -617,6 +629,25 @@ public class SLDTransformer extends TransformerBase {
             end("CssParameter");
         }
 
+        void encodeVendorOptions(Map options) {
+            if (options != null) {
+                Iterator it = options.keySet().iterator();
+                while (it.hasNext()) {
+                    String key = (String) it.next();
+                    String value = (String) options.get(key);
+                    encodeVendorOption(key, value);
+                }
+            }
+        }
+        
+        void encodeVendorOption(String key, String value) {
+            AttributesImpl atts = new AttributesImpl();
+            atts.addAttribute("", "name", "name", "", key);
+            start("VendorOption", atts);
+            chars(value);
+            end("VendorOption");
+        }
+        
         public void encode(Style[] styles) {
             try {
                 contentHandler.startDocument();
