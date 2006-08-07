@@ -1,18 +1,17 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.vpf.io;
 
@@ -26,15 +25,6 @@ import org.geotools.data.vpf.exc.VPFDataFormatException;
  * @author <a href="mailto:knuterik@onemap.org">Knut-Erik Johnsen</a>, Project
  *         OneMap
  * @version 1.0.0
- */
-/**
- * DOCUMENT ME!
- *
- * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
- */
-/**
- * DOCUMENT ME!
- *
  * @author <a href="mailto:jeff@ionicenterprise.com">Jeff Yutzler</a>
  * @source $URL$
  */
