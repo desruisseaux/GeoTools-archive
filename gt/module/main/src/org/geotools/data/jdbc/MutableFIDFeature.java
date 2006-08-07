@@ -42,7 +42,7 @@ public class MutableFIDFeature extends DefaultFeature {
    *  use it by casting to it.
    * @param fid The fid to set.
    */
-  protected void setID(String id) {
+  public void setID(String id) {
     this.featureId = id;
   }
 }
