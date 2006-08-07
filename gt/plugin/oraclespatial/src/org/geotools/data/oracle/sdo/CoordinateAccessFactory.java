@@ -1,8 +1,23 @@
 /*
- * Created on Oct 29, 2003
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 200-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2003  Refractions Research Inc.
+ *    
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    Refractions Research Inc. Can be found on the web at:
+ *    http://www.refractions.net/
+ *
+ *    Created on Oct 29, 2003
  */
 package org.geotools.data.oracle.sdo;
 

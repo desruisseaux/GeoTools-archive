@@ -1,18 +1,21 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003, Geotools Project Managment Committee (PMC)
- *
+ *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2003  Refractions Research Inc.
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation;
- *    version 2.1 of the License.
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
+ *    Refractions Research Inc. Can be found on the web at:
+ *    http://www.refractions.net/
  */
 package org.geotools.data.oracle.sdo;
 
