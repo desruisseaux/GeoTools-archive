@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ * 
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.postgis.fidmapper;
 
 import java.io.IOException;
@@ -13,11 +28,13 @@ import org.postgresql.PGStatement;
 
 
 /**
+ * Supports the creation of a Feature ID based on the Potgres row OID field.
+ * <p>
+ * This is <b>NOT</b> a stable approach for FID (as updates and so on will change the
+ * OID), but it will be our best guess in the case of read only access where an
+ * index is not present.
+ * 
  * @author wolf
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- * @source $URL$
  */
 public class OIDFidMapper extends AbstractFIDMapper {
 

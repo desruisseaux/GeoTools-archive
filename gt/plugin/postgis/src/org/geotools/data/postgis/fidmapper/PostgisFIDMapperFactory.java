@@ -1,8 +1,8 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ * 
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -12,19 +12,15 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.postgis.fidmapper;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.geotools.data.jdbc.fidmapper.DefaultFIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.FeatureType;
 
 /**
  * Postgis specific FIDMapperFactory that uses the {@link org.geotools.data.postgis.fidmapper.OIDFidMapper OIDFidMapper}

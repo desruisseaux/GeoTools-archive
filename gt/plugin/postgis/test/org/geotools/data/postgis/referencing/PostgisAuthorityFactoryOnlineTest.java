@@ -1,8 +1,8 @@
 /*
- *    uDig - User Friendly Desktop Internet GIS client
- *    http://udig.refractions.net
- *    (C) 2004, Refractions Research Inc.
- *
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
+ * 
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -12,7 +12,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.postgis.referencing;
 
@@ -36,8 +35,7 @@ import junit.framework.TestCase;
 /**
  * Test PostgisAuthorityFactory
  * 
- * @author jeichar
- * @since 0.6.0
+ * @author Jesse Eichar, Refractions Research Inc.
  * @source $URL$
  */
 public class PostgisAuthorityFactoryOnlineTest extends TestCase {

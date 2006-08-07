@@ -1,3 +1,27 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002, Rob Hrananc
+ *    
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *    
+ * (C) 2002, Rob Hrananc
+ *    I am placing this code in the Public Domain. Do with it as you will.
+ *    This software comes with no guarantees or warranties but with
+ *    plenty of well-wishing instead!
+ *    
+ *    Please visit <a href="http://iharder.net/base64">http://iharder.net/base64</a>
+ *    periodically to check for updates or to contribute improvements.
+ */
 package org.geotools.data.postgis.attributeio;
 /**
  * Encodes and decodes to and from Base64 notation.
@@ -649,7 +673,7 @@ public class Base64
      * @param destOffset the index where output will be put
      * @return the number of decoded bytes converted
      * @since 1.3
-     */
+     *
    final private static int decode4to3new( byte[] source, int srcOffset, byte[] destination, int destOffset )
     {
 	   
@@ -668,7 +692,7 @@ public class Base64
            destination[ destOffset + 1 ] = (byte)( outBuff >>  8 );
            destination[ destOffset + 2 ] = (byte)( outBuff       );
            return 3;	   
-    } 
+    }*/
    
    
     
@@ -694,7 +718,7 @@ public class Base64
         byte[] b4        = new byte[4];
         int    b4Posn    = 0;
         int    i         = 0;
-        byte   sbiCrop   = 0;
+        //byte   sbiCrop   = 0;
         byte   sbiDecode = 0;
         for( i = 0; i < len; i++ )
         {

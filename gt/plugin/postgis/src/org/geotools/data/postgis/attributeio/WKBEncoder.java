@@ -1,8 +1,9 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
+ *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2004, Refractions Research Inc.
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -12,12 +13,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- */
-/*
- * package net.refractionsresearch.cwb.editor.util; WKBParser.java,v 1.3 Jan 2, 2004 kneufeld
- *
- * Copyright (c) 2004, Refractions Research Inc.
  */
 package org.geotools.data.postgis.attributeio;
 
@@ -77,11 +72,12 @@ import com.vividsolutions.jts.geom.Polygon;
  * use BigEndian format in the WKB representation.
  * </p>
  * @source $URL$
+ * @author Kevin Neufeld, Refractions Research, Inc.
  */
 public class WKBEncoder implements WKBGeometryTypes {
     private static byte wkbXDR = 0;
 
-    private static int wkbNDR = 1;
+    //private static int wkbNDR = 1;
 
     private static char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7',
             '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };

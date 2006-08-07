@@ -32,18 +32,27 @@
  */
 package org.geotools.data.postgis.attributeio;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
 
 import org.geotools.util.LiteCoordinateSequence;
 import org.geotools.util.LiteCoordinateSequenceFactory;
 
-import com.vividsolutions.jts.geom.*;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.InStream;
+import com.vividsolutions.jts.io.WKBWriter;
 
 /**
  * Reads a {@link Geometry}from a byte stream in Well-Known Binary format.

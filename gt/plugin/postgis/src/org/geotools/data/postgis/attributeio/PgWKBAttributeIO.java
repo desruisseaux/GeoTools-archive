@@ -1,8 +1,8 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
- *
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ * 
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -12,30 +12,21 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
 package org.geotools.data.postgis.attributeio;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.util.LiteCoordinateSequenceFactory;
-import org.wkb4j.engine.WKBParser;
-import org.wkb4j.jts.JTSFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 
@@ -148,7 +139,8 @@ public class PgWKBAttributeIO implements AttributeIO {
       return wkbBytes;
     }
 
-    private byte[] byteaToBytes(byte[] bytes) {
+    /*
+     private byte[] byteaToBytes(byte[] bytes) {
         for(int i = 0; i < bytes.length; i++) {
             if(bytes[i] >= 'A')
                 bytes[i] -= ('A' + 10);
@@ -157,6 +149,7 @@ public class PgWKBAttributeIO implements AttributeIO {
         }
         return bytes;
     }
+    */
     public void compare(byte[] b1, byte[] b2)
     {
     	int len = b2.length;
@@ -192,13 +185,13 @@ public class PgWKBAttributeIO implements AttributeIO {
     /**
      * @param metaData
      * @throws SQLException
-     */
+     *
     private void printMetadata(ResultSetMetaData md) throws SQLException {
         for (int i = 1; i <= md.getColumnCount(); i++) {
             System.out.println(i + " " + md.getColumnName(i) + " " + md.getColumnTypeName(i));
         }
 
-    }
+    }*/
 
     /**
      * Unsupported, will throw an UnsupportedOperationException
