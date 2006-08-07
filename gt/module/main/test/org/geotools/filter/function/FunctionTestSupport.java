@@ -1,9 +1,20 @@
 /*
- * FunctionTestSupport.java
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
  *
- * Created on May 11, 2005, 9:02 PM
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    Created on May 11, 2005, 9:02 PM
  */
-
 package org.geotools.filter.function;
 
 import org.geotools.data.DataUtilities;

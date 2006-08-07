@@ -1,8 +1,10 @@
 /*
- * Geotools - OpenSource mapping toolkit
- * (C) 2005, Geotools Project Managment Committee (PMC)
- * (C) 2003, Gerald I. Evenden
- * (C) 2000, Frank Warmerdam
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *
+ *   (C) 2005-2006, Geotools Project Managment Committee (PMC)
+ *   (C) 2003, Gerald I. Evenden
+ *   (C) 2000, Frank Warmerdam
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -13,7 +15,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  *
  *    This package contains formulas from the PROJ package of USGS.
  *    USGS's work is fully acknowledged here. This derived work has

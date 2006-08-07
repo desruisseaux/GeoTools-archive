@@ -391,3 +391,92 @@ org.geotools.xml.xsi
 Utility class for XDO based xml parsing added for GeoTools 2.1.
 IP:
 - updated header
+
+org.geotoools (test)
+-------------
+IP:
+- updated headers
+
+org.geotools.data (test)
+org.geotools.data.collection (test)
+----------------------------
+IP:
+- a few files missing headers, one uDig header
+- updated headers
+
+org.geotools.data.coverage.grid.file.test (test)
+org.geotools.data.coverage.grid.stream.test (test)
+org.geotools.data.coverage.grid.test (test)
+-------------------------------------------
+IP:
+- many files missing headers, several udig headers
+- fixed headers (C) 2004 PMC
+
+org.geotools.data.jdbc (test)
+----------------------
+IP:
+- all files missing headers
+- headers added
+
+org.geotools.data.memory (test)
+----------------------
+IP:
+- updated header
+- added header for MemoryFeatureCollectionTest
+
+org.geotools.feature (test)
+--------------------
+IP:
+- updated headers, we were missing a few
+
+org.geotools.feature.visitor (test)
+---------------------------
+IP:
+- were missing one header
+- headers updated
+
+org.geotools.filter (test)
+----------------------
+IP:
+- some functions *only* had listed (C) Centre for Computational Geography
+- updated headers
+- TestFilterHandler only mentions (c) 2002 Vision for New York - www.vfny.org w/ a GPL 2 license
+- vfny == TOPP, aka remove GPL 2 mention as they have standing arragement
+
+org.geotools.filter.function (test)
+org.geotools.filter.function.math (test)
+org.geotools.filter.visitor (test)
+---------------------------------
+IP:
+- some files missing headers
+- udpated to PMC 2005-2006
+
+org.geotools.geometry (test)
+org.geotools.geometry.jts (test)
+----------------------
+IP:
+- JTS file had uDig header, credit refractions, and update header to PMC
+- update headers
+
+org.geotools.map (test)
+----------------------
+IP:
+- update header (C) 2003-2006 PMC
+
+org.geotools.styling (test)
+org.geotools.styling.visitor (test)
+----------------------------
+IP:
+- update header, as required
+
+org.geotools.xml (test)
+----------------------
+IP:
+- all files neeeded updated header
+- two files had uDig headers by mistake
+
+org.geotools.xml.ogc (test)
+----------------------
+IP:
+- one file with uDig header by mistake
+- update headers

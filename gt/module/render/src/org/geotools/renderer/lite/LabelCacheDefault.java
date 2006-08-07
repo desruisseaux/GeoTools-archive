@@ -1,8 +1,8 @@
 /*
- *    uDig - User Friendly Desktop Internet GIS client
- *    http://udig.refractions.net
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, Geotools Project Managment Committee (PMC)
  *    (C) 2004, Refractions Research Inc.
- *    (C) 2005, Geotools PMC
  *    (c) others
  *
  *    This library is free software; you can redistribute it and/or
@@ -14,9 +14,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *     @author dblasby
- *     @author jessie
  */
 package org.geotools.renderer.lite;
 
@@ -108,8 +105,8 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
  * turns off grouping for this symbolizer c) <VendorOption name="spaceAround">5</VendorOption> --
  * do not put labels within 5 pixels of this label.
  * 
- *  @author jeichar,dblasby
- * @since 0.9.0
+ * @author jeichar
+ * @author dblasby
  * @source $URL$
  */
 public final class LabelCacheDefault implements LabelCache {

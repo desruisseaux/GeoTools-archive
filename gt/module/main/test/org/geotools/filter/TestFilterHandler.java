@@ -1,8 +1,19 @@
-/* Copyright (c) 2002 Vision for New York - www.vfny.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root 
- * application directory.
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Vision for New York
+ *    
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
-
 package org.geotools.filter;
 
 import java.util.logging.Logger;

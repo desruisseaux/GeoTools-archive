@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.renderer;
 
 import java.awt.Graphics2D;
@@ -11,14 +26,6 @@ import org.geotools.map.MapContext;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-/*
- * Geotools2 - OpenSource mapping toolkit http://geotools.org (C) 2002, Geotools Project Managment
- * Committee (PMC) This library is free software; you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software Foundation;
- * version 2.1 of the License. This library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- */
 
 /**
  * Typical usage: <pre>
@@ -38,8 +45,8 @@ import com.vividsolutions.jts.geom.Envelope;
  *          renderer.paint(graphic, paintArea, mapArea);
  *</pre>
  *
- * @author dblasby
- * @author simone giannecchini
+ * @author David Blasby
+ * @author Simone Giannecchini
  *
  * @source $URL$
  */

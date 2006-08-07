@@ -1,7 +1,8 @@
 /*
- * Geotools 2 - OpenSource mapping toolkit
- * (C) 2003, Geotools Project Managment Committee (PMC)
- * (C) 2001, Institut de Recherche pour le Développement
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2001, Institut de Recherche pour le Développement
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,10 +13,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with this library; if not, write to the Free Software
- *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.geotools.resources;
 
@@ -368,12 +365,23 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
         final String packageName = fullname.substring(0, fullname.lastIndexOf('.'));
         final File          file = new File(fullname.replace('.', '/') + ".java");
         final BufferedWriter out = new BufferedWriter(new FileWriter(file));
-        out.write("/*\n"                                                             +
-                  " * Geotools - OpenSource mapping toolkit\n"                       +
-                  " * (C) 2003, Geotools Project Managment Committee (PMC)\n"        +
-                  " *\n"                                                             +
-                  " *     THIS IS AN AUTOMATICALLY GENERATED FILE. DO NOT EDIT!\n"   +
-                  " *     Generated with: org.geotools.resources.ResourceCompiler\n" +
+        out.write("/*\n" +
+                  " *    GeoTools - OpenSource mapping toolkit\n" +
+                  " *    http://geotools.org\n" +
+                  " *    (C) 2003-2006, Geotools Project Managment Committee (PMC)\n" +
+                  " *    \n" +
+                  " *    This library is free software; you can redistribute it and/or\n" +
+                  " *    modify it under the terms of the GNU Lesser General Public\n" +
+                  " *    License as published by the Free Software Foundation; either\n" +
+                  " *    version 2.1 of the License, or (at your option) any later version.\n" +
+                  " *    \n" +
+                  " *    This library is distributed in the hope that it will be useful,\n" +
+                  " *    but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+                  " *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n" +
+                  " *    Lesser General Public License for more details.\n" +
+                  " *    \n" +
+                  " *    THIS IS AN AUTOMATICALLY GENERATED FILE. DO NOT EDIT!\n"   +
+                  " *    Generated with: org.geotools.resources.ResourceCompiler\n" +
                   " */\n");
         out.write("package ");
         out.write(packageName);

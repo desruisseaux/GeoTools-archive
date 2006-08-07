@@ -2,6 +2,9 @@
 # Ellipsoid and prime meridian names may appear in this table as well.
 # The first line shall contains the authority names. All other lines are
 # datum names.
+#
+# (C) 2005-2006, GeoTools Project Managment Committee (PMC)
+#
 
 EPSG;OGR;ESRI;Oracle
 #-----------------------------------------------------------------------
