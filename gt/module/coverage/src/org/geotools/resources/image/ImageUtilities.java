@@ -21,31 +21,51 @@ package org.geotools.resources.image;
 
 // J2SE dependencies
 import java.awt.Dimension;
-import java.awt.Transparency;
 import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.awt.color.ColorSpace;
-import java.awt.image.*;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DirectColorModel;
+import java.awt.image.IndexColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
-// Image I/O and JAI dependencies
+import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageReaderWriterSpi;
 import javax.imageio.spi.ImageWriterSpi;
-import javax.media.jai.*;
-import javax.media.jai.operator.*;
-import com.sun.media.jai.util.ImageUtil;
-import com.sun.media.jai.operator.ImageReadDescriptor;
+import javax.media.jai.ColorCube;
+import javax.media.jai.IHSColorSpace;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.KernelJAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.OpImage;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.ROI;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.BandCombineDescriptor;
+import javax.media.jai.operator.BandSelectDescriptor;
+import javax.media.jai.operator.NullDescriptor;
 
-// Geotools dependencies
 import org.geotools.image.ImageWorker;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+
+import com.sun.media.jai.operator.ImageReadDescriptor;
+import com.sun.media.jai.util.ImageUtil;
 
 
 /**
@@ -650,7 +670,7 @@ public final class ImageUtilities {
         if (sourceImage.getColorModel() instanceof IndexColorModel)
             return sourceImage;
         // error dither
-        final KernelJAI[] ditherMask = KernelJAI.DITHER_MASK_443;// KernelJAI.ERROR_FILTER_STUCKI;
+        final KernelJAI ditherMask = KernelJAI.ERROR_FILTER_FLOYD_STEINBERG;//KernelJAI.DITHER_MASK_443;
         // //
         final ColorCube colorMap = ColorCube.BYTE_496;
 
@@ -665,8 +685,10 @@ public final class ImageUtilities {
         final ImageLayout layout = ImageUtilities.getImageLayout(sourceImage);
         layout.unsetValid(ImageLayout.COLOR_MODEL_MASK);
         layout.unsetValid(ImageLayout.SAMPLE_MODEL_MASK);
+        
+       
 
-        return JAI.create("OrderedDither", pb, new RenderingHints(
+        return JAI.create("ErrorDiffusion", pb, new RenderingHints(
                 JAI.KEY_IMAGE_LAYOUT, layout));
     }
 
@@ -1079,16 +1101,17 @@ public final class ImageUtilities {
 
         /*
          * 
-         * Threshold on the alpha channel to go to 0 -255 values
+         * Threshold on the alpha channel to go to 0 - 255 values
          * 
          */
         final ParameterBlockJAI pbTheshold = new ParameterBlockJAI("Threshold");
         pbTheshold.addSource(alphaChannel);
         pbTheshold.setParameter("low", new double[] { 1 });
         pbTheshold.setParameter("high", new double[] { 254 });
-        pbTheshold.setParameter("constants", new double[] { 0 });
+        pbTheshold.setParameter("constants", new double[] { 255 });
         final RenderedOp newAlphaChannel = JAI.create("threshold", pbTheshold,
                 new RenderingHints(JAI.KEY_TILE_CACHE, null));
+
 
         /*
          * colorspacetype Threshold on the alpha channel to go to 0 -255 values
@@ -1097,8 +1120,11 @@ public final class ImageUtilities {
         final ParameterBlockJAI pbInvert = new ParameterBlockJAI("Invert");
         pbInvert.addSource(newAlphaChannel);
         final RenderedOp newInvertedAlphaChannel = JAI.create("Invert",
-                pbTheshold, new RenderingHints(JAI.KEY_TILE_CACHE, null));
+        		pbInvert, new RenderingHints(JAI.KEY_TILE_CACHE, null));
 
+        
+
+		
         /*
          * preparing hints and layout to reuse all over the methid. It worth to
          * remark on that to optimie gif writing we need to untile the gif
@@ -1119,12 +1145,14 @@ public final class ImageUtilities {
         hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
 
         /*
-         * Adding to the other image
+         * Adding to the other image exploiting the implict clamping
          * 
          */
         final ParameterBlockJAI pbjAdd = new ParameterBlockJAI("add");
         pbjAdd.addSource(surrogateImage);
         pbjAdd.addSource(newInvertedAlphaChannel);
+        
+
         return JAI.create("add", pbjAdd, hints);
     }
 
@@ -1154,16 +1182,6 @@ public final class ImageUtilities {
             w.forceIndexColorModelForGIF();
             return w.getPlanarImage();
         }
-
-        // /////////////////////////////////////////////////////////////////
-        //
-        // checking the color model to see if we need to convert it back to
-        // color model.
-        //
-        // /////////////////////////////////////////////////////////////////
-        if (sourceImage.getColorModel() instanceof DirectColorModel)
-            sourceImage = ImageUtilities
-                    .direct2ComponentColorModel(sourceImage);
 
         ParameterBlock pb = new ParameterBlock();
         RenderedImage alphaChannel = null;
@@ -1241,6 +1259,7 @@ public final class ImageUtilities {
         // alpha channel to build a new color model
         // /////////////////////////////////////////////////////////////////
         if (alphaChannel != null) {
+           
             sourceImage = ImageUtilities.addTransparency2IndexColorModel(
                     sourceImage, alphaChannel, true);
         }

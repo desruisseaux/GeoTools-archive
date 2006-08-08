@@ -40,7 +40,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.styling.RasterSymbolizer;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -58,7 +57,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Simone Giannecchini
  * @author Alessio Fabiani
  * @source $URL:
- *         http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/module/render/src/org/geotools/renderer/lite/GridCoverageRenderer.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/GridCoverageRenderer.java $
  * @version $Id: GridCoverageRenderer.java 18352 2006-03-01 06:13:42Z
  *          desruisseaux $
  * 
@@ -111,19 +110,6 @@ public final class GridCoverageRenderer {
 		// ///////////////////////////////////////////////////////////////////
 		this.destinationSize = screenSize;
 		this.destinationCRS = CRSUtilities.getCRS2D(destinationCRS);
-		// final boolean lonFirst = !GridGeometry2D.swapXY(destinationCRS
-		// .getCoordinateSystem());
-		// TODO remove ME!!!
-		// the envelope we are provided with is lon,lat always
-		// if (!lonFirst)
-		// destinationEnvelope = new GeneralEnvelope(new double[] {
-		// envelope.getMinY(), envelope.getMinX() }, new double[] {
-		// envelope.getMaxY(), envelope.getMaxX() });
-		// else
-		// destinationEnvelope = new GeneralEnvelope(new double[] {
-		// envelope.getMinX(), envelope.getMinY() }, new double[] {
-		// envelope.getMaxX(), envelope.getMaxY() });
-		// destinationEnvelope.setCoordinateReferenceSystem(destinationCRS);
 		destinationEnvelope = new GeneralEnvelope(new ReferencedEnvelope(
 				envelope, destinationCRS));
 		// ///////////////////////////////////////////////////////////////////
@@ -226,8 +212,8 @@ public final class GridCoverageRenderer {
 				gridCoverage, destinationEnvelopeInSourceGCCRS,
 				sourceCoverageCRS);
 		if (croppedGridCoverage == null)
-			return;// nothing to render, the AOI does not overlap the;
-		croppedGridCoverage.prefetch(croppedGridCoverage.getEnvelope2D());
+			return;// nothing to render, the AOI does not overlap
+			// croppedGridCoverage.prefetch(croppedGridCoverage.getEnvelope2D());
 
 		// try {
 		// ImageIO.write(croppedGridCoverage.geophysics(false)
@@ -566,7 +552,7 @@ public final class GridCoverageRenderer {
 	 * @param crs
 	 * @return
 	 */
-	private GridCoverage2D getCroppedCoverage(GridCoverage gc,
+	private GridCoverage2D getCroppedCoverage(GridCoverage2D gc,
 			GeneralEnvelope envelope, CoordinateReferenceSystem crs) {
 		final GeneralEnvelope oldEnvelope = (GeneralEnvelope) gc.getEnvelope();
 		// intersect the envelopes in order to prepare for crooping the coverage
@@ -589,7 +575,7 @@ public final class GridCoverageRenderer {
 			param.parameter("Envelope").setValue(intersectionEnvelope);
 			tempGC = (GridCoverage2D) processor.doOperation(param);
 		} else
-			tempGC = (GridCoverage2D) gc;
+			tempGC = gc;
 
 		return tempGC;
 
