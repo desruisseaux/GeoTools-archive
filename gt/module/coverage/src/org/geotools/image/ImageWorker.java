@@ -43,6 +43,7 @@ import javax.media.jai.operator.*;
 
 
 import com.sun.media.jai.util.ImageUtil;
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -802,6 +803,14 @@ public class ImageWorker {
                 retainBands(numBands);
                 forceIndexColorModel();
                 tileCacheEnabled(true);
+                
+                try {
+                	ImageIO.write(image,"tiff",new File("c:\\ant\\rgbindex.tiff"));
+    				ImageIO.write(alphaChannel,"tiff",new File("c:\\ant\\alpha.tiff"));
+    			} catch (IOException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
             }
             /*
              * Adding transparency if needed, which means using the alpha channel to build
@@ -1073,7 +1082,7 @@ public class ImageWorker {
                     tileCacheEnabled(true);
                 }
                 final double[][] extremas = getExtremas();
-                threshold =extremas[1][0];// 0.5*(extremas[0][0] + extremas[1][0]);
+                threshold = 0.5*(extremas[0][0] + extremas[1][0]);
             }
             final RenderingHints hints = getRenderingHints();
             image = BinarizeDescriptor.create(image, new Double(threshold), hints);
@@ -1116,7 +1125,23 @@ public class ImageWorker {
         } else {
             table = new LookupTableJAI(new int[] {value0, value1});
         }
+        
+        try {
+			ImageIO.write(image,"tiff",new File("c:\\ant\\lookupb.tiff"));
+			this.getMaximums();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
         image = LookupDescriptor.create(image, table, getRenderingHints());
+        
+        try {
+			ImageIO.write(image,"tiff",new File("c:\\ant\\lookupa.tiff"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         invalidateStatistics();
         return this;
     }
@@ -1163,8 +1188,18 @@ public class ImageWorker {
          */
         final ImageWorker worker = new ImageWorker(mask);
         worker.tileCacheEnabled(false);
-        worker.binarize();
+        worker.binarize(1);
         mask = worker.image;
+        
+        
+        try {
+			ImageIO.write(mask,"tiff",new File("c:\\ant\\bin1.tiff"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
         /*
          * Applies the AND operation: every pixels that correspond to a 1 value in the mask
          * are cleared to 0 (or conversely if 'maskValue' is false). All other pixels are
@@ -1180,6 +1215,15 @@ public class ImageWorker {
             }
             image = AndDescriptor.create(image, worker.image, getRenderingHints());
         }
+        
+        
+        try {
+			ImageIO.write(image,"tiff",new File("c:\\ant\\bin2.tiff"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
         /*
          * Applies the OR operation: for every pixels that corresponds to a 1 value in the mask
          * (or to 0 if 'maskValue' is false), set the bits to 'value'. Note that we don't need
@@ -1193,6 +1237,13 @@ public class ImageWorker {
             } else {
                 worker.binarize(newValue, 0);
             }
+   
+            try {
+    			ImageIO.write(mask,"tiff",new File("c:\\ant\\bin3.tiff"));
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
             image = OrDescriptor.create(image, worker.image, getRenderingHints());
         }
         invalidateStatistics();

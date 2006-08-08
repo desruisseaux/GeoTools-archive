@@ -22,9 +22,13 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationBilinear;
@@ -40,6 +44,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.styling.RasterSymbolizer;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -178,13 +183,14 @@ public final class GridCoverageRenderer {
 		//
 		// ///////////////////////////////////////////////////////////////////
 
-		// try {
-		// ImageIO.write(gridCoverage.geophysics(false).getRenderedImage(),
-		// "png", new File("c:/original.png"));
-		// } catch (IOException e2) {
-		// // TODO Auto-generated catch block
-		// e2.printStackTrace();
-		// }
+//		try {
+//			ImageIO.write(gridCoverage.geophysics(false).getRenderedImage(),
+//					"png", new File("c:/original.png"));
+//		} catch (IOException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		}
+
 		// math transform from source to target crs
 		final MathTransform GCCRSToDeviceCRSTransform = StreamingRenderer
 				.getMathTransform(sourceCoverageCRS, destinationCRS);
@@ -213,15 +219,15 @@ public final class GridCoverageRenderer {
 				sourceCoverageCRS);
 		if (croppedGridCoverage == null)
 			return;// nothing to render, the AOI does not overlap
-			// croppedGridCoverage.prefetch(croppedGridCoverage.getEnvelope2D());
+		// croppedGridCoverage.prefetch(croppedGridCoverage.getEnvelope2D());
 
-		// try {
-		// ImageIO.write(croppedGridCoverage.geophysics(false)
-		// .getRenderedImage(), "png", new File("c:/cropped.png"));
-		// } catch (IOException e1) {
-		// // TODO Auto-generated catch block
-		// e1.printStackTrace();
-		// }
+//		try {
+//			ImageIO.write(croppedGridCoverage.geophysics(false)
+//					.getRenderedImage(), "png", new File("c:/cropped.png"));
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -322,11 +328,11 @@ public final class GridCoverageRenderer {
 								.createInstance(BorderExtender.BORDER_COPY),
 						preScaledGridCoverage);
 
-			// TODO: remove these when the resample bug is fixed
-			LOGGER.info("Scaled grid coverage envelope: "
-					+ scaledGridCoverage.getEnvelope());
-			LOGGER.info("Scaled grid coverage CRS: "
-					+ scaledGridCoverage.getCoordinateReferenceSystem());
+//			// TODO: remove these when the resample bug is fixed
+//			LOGGER.info("Scaled grid coverage envelope: "
+//					+ scaledGridCoverage.getEnvelope());
+//			LOGGER.info("Scaled grid coverage CRS: "
+//					+ scaledGridCoverage.getCoordinateReferenceSystem());
 
 			// ///////////////////////////////////////////////////////////////////
 			//
@@ -341,11 +347,11 @@ public final class GridCoverageRenderer {
 			} else
 				preSymbolizer = scaledGridCoverage;
 
-			// TODO: remove these when the resample bug is fixed
-			LOGGER.info("Reprojected grid coverage envelope: "
-					+ preSymbolizer.getEnvelope());
-			LOGGER.info("Reprojected grid coverage CRS: "
-					+ preSymbolizer.getCoordinateReferenceSystem());
+//			// TODO: remove these when the resample bug is fixed
+//			LOGGER.info("Reprojected grid coverage envelope: "
+//					+ preSymbolizer.getEnvelope());
+//			LOGGER.info("Reprojected grid coverage CRS: "
+//					+ preSymbolizer.getCoordinateReferenceSystem());
 		} else {
 
 			// ///////////////////////////////////////////////////////////////////
@@ -373,14 +379,14 @@ public final class GridCoverageRenderer {
 					reprojectedCoverage);
 
 		}
-
-		// try {
-		// ImageIO.write(preSymbolizer.geophysics(false).getRenderedImage(),
-		// "png", new File("c:/preSymbolizer.png"));
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
+//
+//		try {
+//			ImageIO.write(preSymbolizer.geophysics(false).getRenderedImage(),
+//					"png", new File("c:/preSymbolizer.png"));
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -442,14 +448,14 @@ public final class GridCoverageRenderer {
 		// .getWidth(), (int) destinationSize.getHeight(),
 		// BufferedImage.TYPE_4BYTE_ABGR);
 		// final Graphics2D g = (Graphics2D) buf.getGraphics();
-		// g.drawRenderedImage(image, cloneFinalWorldToGrid);
+		// g.drawRenderedImage(finalImage, cloneFinalWorldToGrid);
 		// g.dispose();
 		// try {
 		// ImageIO.write(buf, "png", new File("c:/final.png"));
 		// } catch (IOException e) {
 		// // TODO Auto-generated catch block
 		// e.printStackTrace();
-		// }
+		//		}
 
 		// ///////////////////////////////////////////////////////////////////
 		//

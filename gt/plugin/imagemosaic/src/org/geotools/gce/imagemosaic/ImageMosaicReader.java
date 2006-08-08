@@ -1,5 +1,20 @@
-/**
- * 
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2006, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.geotools.gce.imagemosaic;
 
@@ -7,6 +22,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Area;
 import java.awt.image.ColorModel;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,17 +35,17 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.stream.FileImageInputStream;
+import javax.imageio.ImageIO;
 import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
+import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
-import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.BandMergeDescriptor;
-import javax.media.jai.operator.BandSelectDescriptor;
 import javax.media.jai.operator.MosaicDescriptor;
-import javax.media.jai.operator.MultiplyConstDescriptor;
 
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridGeometry;
@@ -55,7 +71,6 @@ import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -70,7 +85,12 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-import com.sun.media.jai.operator.ImageReadDescriptor;
+import com.sun.media.jai.imageioimpl.ImageReadCRIF;
+import com.sun.media.jai.opimage.BandMergeCRIF;
+import com.sun.media.jai.opimage.BandSelectCRIF;
+import com.sun.media.jai.opimage.MosaicRIF;
+import com.sun.media.jai.opimage.MultiplyConstCRIF;
+import com.sun.media.jai.opimage.TranslateCRIF;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -98,14 +118,23 @@ import com.vividsolutions.jts.geom.Envelope;
  * gdaltindex utility.
  * 
  * @author Simone Giannecchini
+ * @since 2.3
  * 
  */
 public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		implements GridCoverageReader {
+	private final static MosaicRIF mosaicOperationFactory = new MosaicRIF();
+
+	private final static TranslateCRIF translateFactory = new TranslateCRIF();
+
 	private final static Logger LOGGER = Logger
 			.getLogger(ImageMosaicReader.class.toString());
 
 	private static final double EPS = 10E-10;
+
+	private static final Interpolation nnInterpolation = new InterpolationNearest();
+
+	private static final MultiplyConstCRIF multiplyConstFactory = new MultiplyConstCRIF();
 
 	private final URL sourceURL;
 
@@ -118,6 +147,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private final FilterFactory ff = new FilterFactoryImpl();
 
 	private final String geometryName;
+
+	private final static RenderingHints NO_CACHE = new RenderingHints(
+			JAI.KEY_TILE_CACHE, null);
+
+	private final BandMergeCRIF bandMergeFactory = new BandMergeCRIF();
+
+	private final static BandSelectCRIF bandSelectFactory = new BandSelectCRIF();
 
 	/**
 	 * COnstructor.
@@ -132,7 +168,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		if (source == null) {
 
 			final IOException ex = new IOException(
-					"WorldImageReader:No source set to read this coverage.");
+					"ImageMosaicReader:No source set to read this coverage.");
 			throw new DataSourceException(ex);
 		}
 		this.source = source;
@@ -188,11 +224,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		featureSource = tileIndexStore.getFeatureSource(typeName);
 		geometryName = featureSource.getSchema().getDefaultGeometry().getName();
 
-		final com.vividsolutions.jts.geom.Envelope JTSbounds = featureSource
+		final ReferencedEnvelope JTSbounds = (ReferencedEnvelope) featureSource
 				.getBounds();
 		// get the crs if able to
-		final CoordinateReferenceSystem tempcrs = tileIndexStore.getSchema(
-				typeName).getDefaultGeometry().getCoordinateSystem();
+		final CoordinateReferenceSystem tempcrs = JTSbounds
+				.getCoordinateReferenceSystem();
 		if (tempcrs == null) {
 			// use the default crs
 			crs = AbstractGridFormat.getDefaultCRS();
@@ -205,24 +241,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		} else
 			crs = tempcrs;
 
-		// defensive solution reordering the axes if needed
-		// swapXY = GridGeometry2D.swapXY(crs.getCoordinateSystem());
-		// if (swapXY) {
-		// this.originalEnvelope = new GeneralEnvelope(new double[] {
-		// JTSbounds.getMinY(), JTSbounds.getMinX() }, new double[] {
-		// JTSbounds.getMaxY(), JTSbounds.getMaxX() });
-		//
-		// } else
-		// this.originalEnvelope = new GeneralEnvelope(new double[] {
-		// JTSbounds.getMinX(), JTSbounds.getMinY() }, new double[] {
-		// JTSbounds.getMaxX(), JTSbounds.getMaxY() });
-		// this.originalEnvelope.setCoordinateReferenceSystem(crs);
-
-		this.originalEnvelope = new GeneralEnvelope(new double[] {
-				JTSbounds.getMinX(), JTSbounds.getMinY() }, new double[] {
-				JTSbounds.getMaxX(), JTSbounds.getMaxY() });
-
-		this.originalEnvelope.setCoordinateReferenceSystem(crs);
+		this.originalEnvelope = new GeneralEnvelope(JTSbounds);
 
 	}
 
@@ -384,9 +403,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					.getCoordinateReferenceSystem(), this.crs)) {
 				try {
 					// transforming the envelope back to the data set crs
-					requestedEnvelope = CRSUtilities.transform(CRS.transform(
-							requestedEnvelope.getCoordinateReferenceSystem(),
-							crs, true), requestedEnvelope);
+					requestedEnvelope = CRSUtilities.transform(operationFactory
+							.createOperation(
+									requestedEnvelope
+											.getCoordinateReferenceSystem(),
+									crs).getMathTransform(), requestedEnvelope);
 					requestedEnvelope.setCoordinateReferenceSystem(this.crs);
 				} catch (TransformException e) {
 					throw new DataSourceException(
@@ -437,8 +458,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 	/**
 	 * Preparing a bbox filter to find the minimum set of tiles that overlap the
-	 * requested area.
-	 * 
+	 * requested area. XXX what if I do not have and EPSG:code
 	 * 
 	 * @param requestedJTSEnvelope
 	 * @return
@@ -465,7 +485,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			if (identifier != null)
 				code = identifier.toString();
 			else
-				code = "unknown";// TODO whay should I do?
+				code = "unknown";// TODO what should I do?
 		}
 		return (Filter) ff.bbox(geometryName, requestedJTSEnvelope.getMinX(),
 				requestedJTSEnvelope.getMinY(), requestedJTSEnvelope.getMaxX(),
@@ -524,8 +544,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			Feature feature;
 			String location;
 			Envelope bound;
-			Envelope loadingDataSetBound = new Envelope();
-			RenderedOp loadedImage;
+			Envelope loadedDataSetBound = new Envelope();
+			OpImage loadedImage;
 			File imageFile;
 			final int numImages = features.size();
 			final ROI[] rois = new ROI[numImages];
@@ -536,13 +556,17 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// envelope of the loaded dataset
 			//
 			// /////////////////////////////////////////////////////////////////////
-			loadingDataSetBound = Collection_BoundsFunction.calculateBounds(
+			loadedDataSetBound = Collection_BoundsFunction.calculateBounds(
 					features).toEnvelope();
 
 			// reusable parameters
 			boolean alphaIn = false;
 			int[] alphaIndex = null;
 			int i = 0;
+			Integer imageChoice = new Integer(0);
+			Boolean readMetadata = Boolean.FALSE;
+			Boolean readThumbnails = Boolean.FALSE;
+			Boolean verifyInput = Boolean.FALSE;
 			do {
 				// /////////////////////////////////////////////////////////////////////
 				//
@@ -560,11 +584,18 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// /////////////////////////////////////////////////////////////////////
 				imageFile = new File(new StringBuffer(parentLocation).append(
 						File.separatorChar).append(location).toString());
-				loadedImage = ImageReadDescriptor.create(
-						new FileImageInputStream(imageFile), new Integer(0),
-						Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, null,
-						null, null, null, null);
-
+				ParameterBlock pbjImageRead = new ParameterBlock();
+				pbjImageRead.add(ImageIO.createImageInputStream(imageFile));
+				pbjImageRead.add(imageChoice);
+				pbjImageRead.add(readMetadata);
+				pbjImageRead.add(readThumbnails);
+				pbjImageRead.add(verifyInput);
+				pbjImageRead.add(null);
+				pbjImageRead.add(null);
+				pbjImageRead.add(null);
+				pbjImageRead.add(null);
+				loadedImage = (OpImage) new ImageReadCRIF().create(
+						pbjImageRead, null);
 				// /////////////////////////////////////////////////////////////
 				//
 				// Input alpha management.
@@ -577,8 +608,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 					final ColorModel model = loadedImage.getColorModel();
 					alphaIn = model.hasAlpha();
-					if (alphaIn)// todo good for RGBA but what about ARGB and
-					// others???
+					if (alphaIn)
+					// XXX good for RGBA but what about ARGB and others???
 					{
 						alphaIndex = new int[] { model.getNumComponents() - 1 };
 
@@ -592,13 +623,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 				// /////////////////////////////////////////////////////////////////////
 				//
-				// add to the mosaic collection performing
+				// add to the mosaic collection
 				//
 				// /////////////////////////////////////////////////////////////////////
-				finalLayout.add(addToMosaic(pbjMosaic, bound,
-						loadingDataSetBound, res, loadedImage, singleImageROI,
-						rois, i, singleImageROIThreshold, alphaIn, alphaIndex,
-						alphaChannels));
+				addToMosaic(pbjMosaic, bound, loadedDataSetBound, res,
+						loadedImage, singleImageROI, rois, i,
+						singleImageROIThreshold, alphaIn, alphaIndex,
+						alphaChannels, finalLayout);
 
 				i++;
 			} while (i < numImages);
@@ -622,7 +653,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 			// prepare the final mosaic
 			return prepareMosaic(location, requestedEnvelope,
-					requestedJTSEnvelope, res, loadingDataSetBound, pbjMosaic,
+					requestedJTSEnvelope, res, loadedDataSetBound, pbjMosaic,
 					alpha, alphaThreshold, finalLayout);
 		} catch (IOException e) {
 			throw new DataSourceException("Unable to create this mosaic", e);
@@ -639,7 +670,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param envelope
 	 * @param requestedEnvelope
 	 * @param res
-	 * @param loadingDataSetBound
+	 * @param loadedTilesBound
 	 * @param pbjMosaic
 	 * @param alphaThreshold
 	 * @param doAlpha
@@ -653,46 +684,17 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private GridCoverage prepareMosaic(String location,
 			GeneralEnvelope requestedEnvelope,
 			final Envelope requestedJTSEnvelope, double[] res,
-			Envelope loadingDataSetBound, ParameterBlockJAI pbjMosaic,
+			Envelope loadedTilesBound, ParameterBlockJAI pbjMosaic,
 			boolean doAlpha, double alphaThreshold, Area finalLayout)
 			throws DataSourceException {
 
-		RenderedOp imageBeforeAlpha;
-
-		if (!requestedJTSEnvelope.equals(loadingDataSetBound)) {
+		OpImage imageBeforeAlpha;
+		if (!requestedJTSEnvelope.equals(loadedTilesBound)) {
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// CROP the mosaic image to the requested BBOX
 			//
 			// /////////////////////////////////////////////////////////////////////
-			// intersect the two envelopes
-			// final GeneralEnvelope intersection = new GeneralEnvelope(
-			// new double[] {
-			// swapXY ? requestedJTSEnvelope.getMinY()
-			// : requestedJTSEnvelope.getMinX(),
-			// swapXY ? requestedJTSEnvelope.getMinX()
-			// : requestedJTSEnvelope.getMinY() },
-			// new double[] {
-			// swapXY ? requestedJTSEnvelope.getMaxY()
-			// : requestedJTSEnvelope.getMaxX(),
-			// swapXY ? requestedJTSEnvelope.getMaxX()
-			// : requestedJTSEnvelope.getMaxY() });
-			// intersection.setCoordinateReferenceSystem(crs);
-			//
-			// final GeneralEnvelope loadingDataSetBoundEnv = new
-			// GeneralEnvelope(
-			// new double[] {
-			// swapXY ? loadingDataSetBound.getMinY()
-			// : loadingDataSetBound.getMinX(),
-			// swapXY ? loadingDataSetBound.getMinX()
-			// : loadingDataSetBound.getMinY() },
-			// new double[] {
-			// swapXY ? loadingDataSetBound.getMaxY()
-			// : loadingDataSetBound.getMaxX(),
-			// swapXY ? loadingDataSetBound.getMaxX()
-			// : loadingDataSetBound.getMaxY() });
-			// loadingDataSetBoundEnv.setCoordinateReferenceSystem(crs);
-
 			final GeneralEnvelope intersection = new GeneralEnvelope(
 					new double[] { requestedJTSEnvelope.getMinX(),
 							requestedJTSEnvelope.getMinY() }, new double[] {
@@ -700,32 +702,33 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 							requestedJTSEnvelope.getMaxY() });
 			intersection.setCoordinateReferenceSystem(crs);
 
-			final GeneralEnvelope loadingDataSetBoundEnv = new GeneralEnvelope(
-					new double[] { loadingDataSetBound.getMinX(),
-							loadingDataSetBound.getMinY() }, new double[] {
-							loadingDataSetBound.getMaxX(),
-							loadingDataSetBound.getMaxY() });
-			loadingDataSetBoundEnv.setCoordinateReferenceSystem(crs);
+			final GeneralEnvelope loadedTilesBoundEnv = new GeneralEnvelope(
+					new double[] { loadedTilesBound.getMinX(),
+							loadedTilesBound.getMinY() }, new double[] {
+							loadedTilesBound.getMaxX(),
+							loadedTilesBound.getMaxY() });
+			loadedTilesBoundEnv.setCoordinateReferenceSystem(crs);
 
 			// intersect them
-			intersection.intersects(loadingDataSetBoundEnv, true);
+			intersection.intersects(loadedTilesBoundEnv, true);
 
 			// get the transform for going from world to grid
 			try {
 				final MathTransform transform = GeneralGridGeometry
 						.getTransform(
 								new GeneralGridRange(finalLayout.getBounds()),
-								loadingDataSetBoundEnv, false).inverse();
+								loadedTilesBoundEnv, false).inverse();
 				final GeneralGridRange finalRange = new GeneralGridRange(
 						CRSUtilities.transform(transform, intersection));
 				// CROP
 				finalLayout.intersect(new Area(finalRange.toRectangle()));
 				Rectangle tempRect = finalLayout.getBounds();
 
-				imageBeforeAlpha = JAI.create("Mosaic", pbjMosaic,
-						new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+				imageBeforeAlpha = (OpImage) mosaicOperationFactory.create(
+						pbjMosaic, new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
 								new ImageLayout(tempRect.x, tempRect.y,
 										tempRect.width, tempRect.height)));
+
 			} catch (MismatchedDimensionException e) {
 				throw new DataSourceException(
 						"Problem when creating this mosaic.", e);
@@ -738,7 +741,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			}
 
 		} else
-			imageBeforeAlpha = JAI.create("Mosaic", pbjMosaic);
+			imageBeforeAlpha = (OpImage) mosaicOperationFactory.create(
+					pbjMosaic, null);
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -749,15 +753,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// ///////////////////////////////////////////////////////////////////
 		if (imageBeforeAlpha.getMinX() != 0 || imageBeforeAlpha.getMinY() != 0) {
 			// TRANSLATE in order to have minx and minY equal o zero
-			final ParameterBlockJAI pbjTranslate = new ParameterBlockJAI(
-					"translate");
-			pbjTranslate.addSource(imageBeforeAlpha);
-			pbjTranslate.setParameter("xTrans", new Float(-imageBeforeAlpha
-					.getMinX()));
-			pbjTranslate.setParameter("yTrans", new Float(-imageBeforeAlpha
-					.getMinY()));
-			imageBeforeAlpha = JAI.create("Translate", pbjTranslate,
-					new RenderingHints(JAI.KEY_TILE_CACHE, null));
+			final ParameterBlock pbjTranslate = new ParameterBlock();
+			pbjTranslate.addSource(imageBeforeAlpha).add(
+					new Float(-imageBeforeAlpha.getMinX())).add(
+					new Float(-imageBeforeAlpha.getMinY()))
+					.add(nnInterpolation);
+			imageBeforeAlpha = (OpImage) translateFactory.create(pbjTranslate,
+					NO_CACHE);
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -781,29 +783,21 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			w.retainFirstBand();
 			final PlanarImage alpha = w.getPlanarImage();
 
-			// final RenderedOp IHS = ImageUtilities.bandCombineSimple(
-			// imageBeforeAlpha, false);
-			// final RenderedOp I = ImageUtilities.selectBand(IHS, false);
-			// final RenderedOp binarized = ImageUtilities.binarizeImageExt(I,
-			// alphaThreshold, false);
-			// final PlanarImage alpha = BandSelectDescriptor.create(
-			// ImageUtilities
-			// .reformatColorModel2ComponentColorModel(binarized),
-			// new int[] { 0 }, new RenderingHints(JAI.KEY_TILE_CACHE,
-			// null));
-			final RenderedOp multipliedImage = MultiplyConstDescriptor.create(
-					alpha, new double[] { 255 }, new RenderingHints(
-							JAI.KEY_TILE_CACHE, null));
+			final ParameterBlock pbjMultiplyConst = new ParameterBlock();
+			pbjMultiplyConst.addSource(alpha).add(new double[] { 255 });
+			final OpImage multipliedImage = (OpImage) multiplyConstFactory
+					.create(pbjMultiplyConst, NO_CACHE);
 
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// create the coverage
 			//
 			// /////////////////////////////////////////////////////////////////////
+			final ParameterBlock pbjBandMerge = new ParameterBlock();
+			pbjBandMerge.addSource(imageBeforeAlpha).addSource(multipliedImage);
 			return FactoryFinder.getGridCoverageFactory(null).create(
 					getName(location),
-					BandMergeDescriptor.create(imageBeforeAlpha,
-							multipliedImage, null), requestedEnvelope);
+					bandMergeFactory.create(pbjBandMerge, NO_CACHE), requestedEnvelope);
 		}
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -812,7 +806,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		return FactoryFinder.getGridCoverageFactory(null).create(
 				getName(location), imageBeforeAlpha, requestedEnvelope);
-
 
 	}
 
@@ -850,14 +843,15 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param alphaChannels
 	 * @param alphaIndex
 	 * @param alphaIn
+	 * @param finalLayout
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private Area addToMosaic(ParameterBlockJAI pbjMosaic, Envelope bound,
-			Envelope globBound, double[] res, RenderedOp loadedImage,
+	private void addToMosaic(ParameterBlockJAI pbjMosaic, Envelope bound,
+			Envelope globBound, double[] res, OpImage loadedImage,
 			boolean singleImageROI, ROI[] rois, int i,
 			int singleImageROIThreshold, boolean alphaIn, int[] alphaIndex,
-			PlanarImage[] alphaChannels) {
+			PlanarImage[] alphaChannels, Area finalLayout) {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -882,15 +876,14 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		double xTrans = (bound.getMinX() - globBound.getMinX()) / res[0];
 		double yTrans = (globBound.getMaxY() - bound.getMaxY()) / res[1];
 
-		ParameterBlockJAI pbjTranslate = new ParameterBlockJAI("Translate");
+		final ParameterBlock pbjTranslate = new ParameterBlock();
 		// translation
-		pbjTranslate.addSource(loadedImage);
-		pbjTranslate.setParameter("xTrans", new Float(xTrans));
-		pbjTranslate.setParameter("yTrans", new Float(yTrans));
-		final RenderedOp readyToMosaicImage = JAI.create("Translate",
-				pbjTranslate, new RenderingHints(JAI.KEY_TILE_CACHE, null));
+		pbjTranslate.addSource(loadedImage).add(new Float(xTrans)).add(
+				new Float(yTrans)).add(nnInterpolation);
+		final OpImage readyToMosaicImage = (OpImage) translateFactory.create(
+				pbjTranslate, NO_CACHE);
 		pbjMosaic.addSource(readyToMosaicImage);
-		final Area tempArea = new Area(readyToMosaicImage.getBounds());
+		finalLayout.add(new Area(readyToMosaicImage.getBounds()));
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -904,18 +897,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			w.intensity();
 			w.binarize(singleImageROIThreshold);
 			rois[i] = w.getImageAsROI();
-
-			// rois[i] = new
-			// ROI(BandCombineDescriptor.create(readyToMosaicImage,
-			// new double[][] { { 1 / 3.0, 1 / 2.0, 1 / 3.0, 1 / 3.0 } },
-			// null), singleImageROIThreshold);
-
 		} else if (alphaIn) {
-			alphaChannels[i] = BandSelectDescriptor.create(readyToMosaicImage,
-					alphaIndex, new RenderingHints(JAI.KEY_TILE_CACHE, null));
+			final ParameterBlock pbjBandSelect = new ParameterBlock();
+			// translation
+			pbjBandSelect.addSource(readyToMosaicImage).add(alphaIndex);
+			alphaChannels[i] = (PlanarImage) bandSelectFactory.create(
+					pbjBandSelect, NO_CACHE);
 		}
-
-		return tempArea;
 
 	} /*
 		 * (non-Javadoc)

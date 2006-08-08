@@ -156,8 +156,8 @@ public class ReferencedEnvelope extends Envelope implements
 		try {
 			final Envelope2D envelope2D = new Envelope2D(envelope);
 			envelope2D.setCoordinateReferenceSystem(crs);
-			return new Envelope(envelope2D.getMinX(), envelope2D.getMinY(),
-					envelope2D.getMaxX(), envelope2D.getMaxY());
+			return new Envelope(envelope2D.getMinX(), envelope2D.getMaxX(),
+					envelope2D.getMinY(), envelope2D.getMaxY());
 
 		} catch (IllegalStateException e) {
 			final IllegalArgumentException ex = new IllegalArgumentException();

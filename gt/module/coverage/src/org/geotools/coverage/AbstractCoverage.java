@@ -1072,6 +1072,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements
 		final RenderedImage image = getRenderableImage(xAxis, yAxis)
 				.createDefaultRendering();
 		final JFrame frame = new JFrame(String.valueOf(getName()));
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		final ScrollingImagePanel panel = new ScrollingImagePanel(image, 800,
 				600);
 		frame.setTitle(title);

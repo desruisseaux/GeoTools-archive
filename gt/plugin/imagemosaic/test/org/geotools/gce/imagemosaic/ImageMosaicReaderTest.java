@@ -1,5 +1,20 @@
-/**
- * 
+/*
+ * Geotools 2 - OpenSource mapping toolkit
+ * (C) 2006, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with this library; if not, write to the Free Software
+ *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.geotools.gce.imagemosaic;
 
@@ -18,7 +33,6 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.TestData;
 import org.opengis.parameter.GeneralParameterValue;
@@ -28,6 +42,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 /**
  * @author Simone Giannecchini
+ * @since 2.3
  * 
  */
 public class ImageMosaicReaderTest extends TestCase {
@@ -264,22 +279,14 @@ public class ImageMosaicReaderTest extends TestCase {
 		// /////////////////////////////////////////////////////////////////
 		final ParameterValue gg = (ParameterValue) ImageMosaicFormat.READ_GRIDGEOMETRY2D
 				.createValue();
-		// final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[]
-		// {
-		// 36.4917718219401, 6.34617490847439 }, new double[] {
-		// 46.5907669751351,
-		// 6.34617490847439 + (20.8296831527815 - 6.34617490847439) / 2 });
-		final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
-				7,40}, new double[] { 9,42 });
+		 final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[]
+		 {
+				 7.71089711835763,38.4483357978537 }, new double[] {
+				 13.2519216051101,43.1624043574166 });
 		cropEnvelope.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
 		gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
 				100, 80)), cropEnvelope));
-		final ParameterValue alpha = (ParameterValue) ImageMosaicFormat.FINAL_ALPHA
-				.createValue();
-		alpha.setValue(Boolean.TRUE);
-		final ParameterValue roi = (ParameterValue) ImageMosaicFormat.INPUT_IMAGE_ROI
-				.createValue();
-		roi.setValue(Boolean.TRUE);
+		
 		//
 		// /////////////////////////////////////////////////////////////////
 		//
@@ -288,7 +295,7 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		// /////////////////////////////////////////////////////////////////
 		((AbstractCoverage) reader.read(new GeneralParameterValue[] { gg,
-				alpha, roi })).show("testCrop");
+				 })).show("testCrop");
 
 	}
 
