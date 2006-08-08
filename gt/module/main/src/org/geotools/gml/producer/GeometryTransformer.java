@@ -1,8 +1,8 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -13,6 +13,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
+ */
+/*
+ * GeometryTransformer.java
  *
  * Created on October 24, 2003, 1:08 PM
  */
@@ -40,16 +43,22 @@ public class GeometryTransformer extends TransformerBase {
     
     private boolean useDummyZ = false;
     
+    private int numDecimals = 4;
+    
     public void setUseDummyZ(boolean flag){
         useDummyZ = flag;
     }
    
+    public void setNumDecimals(int num) {
+    	numDecimals = num;
+    }
+    
     /**
      * @TODO remove constant from GometryTraslator contructor call
      */
     public org.geotools.xml.transform.Translator createTranslator(
             ContentHandler handler) {
-        return new GeometryTranslator(handler, 4, useDummyZ);
+        return new GeometryTranslator(handler, numDecimals, useDummyZ);
     }
     
     public static class GeometryTranslator extends TranslatorSupport {
