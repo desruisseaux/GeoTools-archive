@@ -86,7 +86,6 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
         capabilities.addType(FilterCapabilities.SIMPLE_ARITHMETIC);
         capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
         capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
-        capabilities.addType(FilterCapabilities.SPATIAL_BEYOND);
         capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
         capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
         capabilities.addType(FilterCapabilities.SPATIAL_DISJOINT);
