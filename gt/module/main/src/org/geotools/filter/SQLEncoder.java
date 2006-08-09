@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-
 /**
  * Encodes a filter into a SQL WHERE statement.  It should hopefully be generic
  * enough that any SQL database will work with it, though it has only been
@@ -59,7 +58,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     protected static final String IO_ERROR = "io problem writing filter";
 
     /** The filter types that this class can encode */
-    private static FilterCapabilities capabilities = null;
+    protected FilterCapabilities capabilities = null;
 
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
@@ -186,8 +185,8 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         capabilities.addType(FilterCapabilities.NULL_CHECK);
         capabilities.addType(FilterCapabilities.BETWEEN);
         capabilities.addType(FilterCapabilities.FID);
-        capabilities.addType((long) 12345);
-        capabilities.addType((long) -12345);
+        capabilities.addType(FilterCapabilities.NONE);
+        capabilities.addType(FilterCapabilities.ALL);
 
         return capabilities;
     }
@@ -268,11 +267,9 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
      */
     public void visit(Filter filter) {
         try {
-            //HACK: 12345 are Filter.NONE and Filter.ALL, they
-            //should have some better names though.
-            if (filter.getFilterType() == 12345) {
+            if (filter.getFilterType() == FilterType.NONE) {
                 out.write("TRUE");
-            } else if (filter.getFilterType() == -12345) {
+            } else if (filter.getFilterType() == FilterType.ALL) {
                 out.write("FALSE");
             } else {
                 LOGGER.warning("exporting unknown filter type:"

@@ -64,7 +64,7 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
             }
 
             public final short getFilterType() {
-                return 12345;
+                return FilterType.NONE;
             }
 
             public final void accept(FilterVisitor v) {
@@ -119,7 +119,7 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
             }
 
             public final short getFilterType() {
-                return -12345;
+                return FilterType.ALL;
             }
 
             public final void accept(FilterVisitor v) {

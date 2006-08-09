@@ -36,6 +36,16 @@ public class FilterCapabilities {
 	 */
     public static final long NO_OP = 0;
 
+    /**
+     * Mask for Filter.NONE
+     */
+    public static final long NONE = 12345;
+
+    /**
+     * Mask for Filter.ALL
+     */
+    public static final long ALL = -12345;
+    
     // spatial masks
 	/**
 	 * Spatial Mask for bbox operation

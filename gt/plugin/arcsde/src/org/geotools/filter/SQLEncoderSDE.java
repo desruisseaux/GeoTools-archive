@@ -93,10 +93,17 @@ public class SQLEncoderSDE extends SQLEncoder
      * @return DOCUMENT ME!
      */
     protected FilterCapabilities createFilterCapabilities() {
-        FilterCapabilities result = super.createFilterCapabilities();
-        result.addType(FilterType.FID);
+        FilterCapabilities capabilities = new FilterCapabilities();
 
-        return result;
+        capabilities.addType(FilterCapabilities.LOGICAL);
+        capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+        capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(FilterCapabilities.FID);
+        capabilities.addType(FilterCapabilities.NONE);
+        capabilities.addType(FilterCapabilities.ALL);
+
+        return capabilities;
     }
 
     /**

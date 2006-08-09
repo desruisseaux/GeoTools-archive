@@ -159,11 +159,11 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
 	     */
 	    public void visit(Filter filter) {
-	        if (Filter.NONE == filter) {
+	        if (filter == Filter.NONE) {
 	            return;
 	        }
             if (filter == Filter.ALL) {
-                if (fcs.supports((long) 12345)) {
+                if (fcs.supports(FilterType.ALL)) {
                     preStack.push(filter);
                 } else {
                     postStack.push(filter);

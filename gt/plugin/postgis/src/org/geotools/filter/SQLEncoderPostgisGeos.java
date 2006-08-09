@@ -43,12 +43,6 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
     private static WKTWriter wkt = new WKTWriter();
 
     /**
-     * The filters that this encoder can processed. (Note this value shadows
-     * private capabils in superclass)
-     */
-    private FilterCapabilities capabils = new FilterCapabilities();
-
-    /**
      * The srid of the schema, so the bbox conforms.  Could be better to have
      * it in the bbox filter itself, but this works for now.
      */
@@ -63,37 +57,49 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
      * called?
      */
     public SQLEncoderPostgisGeos() {
-        capabils.addType((long) 12345); //Filter.ALL?
-        capabils.addType((long) -12345); //Filter.NONE?
-        capabils.addType(FilterCapabilities.BETWEEN);
-        capabils.addType(FilterCapabilities.COMPARE_EQUALS);
-        capabils.addType(FilterCapabilities.COMPARE_GREATER_THAN);
-        capabils.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
-        capabils.addType(FilterCapabilities.COMPARE_LESS_THAN);
-        capabils.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
-        capabils.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
-        capabils.addType(FilterCapabilities.FID);
-        capabils.addType(FilterCapabilities.LIKE);
-        capabils.addType(FilterCapabilities.LOGIC_AND);
-        capabils.addType(FilterCapabilities.LOGIC_NOT);
-        capabils.addType(FilterCapabilities.LOGIC_OR);
-        capabils.addType(FilterCapabilities.NO_OP);
-        capabils.addType(FilterCapabilities.NULL_CHECK);
-        capabils.addType(FilterCapabilities.SIMPLE_ARITHMETIC);
-        capabils.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-        capabils.addType(FilterCapabilities.SPATIAL_BBOX);
-        capabils.addType(FilterCapabilities.SPATIAL_BEYOND);
-        capabils.addType(FilterCapabilities.SPATIAL_CONTAINS);
-        capabils.addType(FilterCapabilities.SPATIAL_CROSSES);
-        capabils.addType(FilterCapabilities.SPATIAL_DISJOINT);
-        capabils.addType(FilterCapabilities.SPATIAL_DWITHIN);
-        capabils.addType(FilterCapabilities.SPATIAL_EQUALS);
-        capabils.addType(FilterCapabilities.SPATIAL_INTERSECT);
-        capabils.addType(FilterCapabilities.SPATIAL_OVERLAPS);
-        capabils.addType(FilterCapabilities.SPATIAL_TOUCHES);
-        capabils.addType(FilterCapabilities.SPATIAL_WITHIN);
+        capabilities = createFilterCapabilities();
+        setSqlNameEscape("\"");
     }
 
+    /**
+     * @see org.geotools.filter.SQLEncoder#createFilterCapabilities()
+     */
+    protected FilterCapabilities createFilterCapabilities() {
+        FilterCapabilities capabilities = new FilterCapabilities();
+
+        capabilities.addType(FilterCapabilities.NONE);
+        capabilities.addType(FilterCapabilities.ALL);
+        capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(FilterCapabilities.COMPARE_EQUALS);
+        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN);
+        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN);
+        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
+        capabilities.addType(FilterCapabilities.FID);
+        capabilities.addType(FilterCapabilities.LIKE);
+        capabilities.addType(FilterCapabilities.LOGIC_AND);
+        capabilities.addType(FilterCapabilities.LOGIC_NOT);
+        capabilities.addType(FilterCapabilities.LOGIC_OR);
+        capabilities.addType(FilterCapabilities.NO_OP);
+        capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(FilterCapabilities.SIMPLE_ARITHMETIC);
+        capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+        capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
+        capabilities.addType(FilterCapabilities.SPATIAL_BEYOND);
+        capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
+        capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
+        capabilities.addType(FilterCapabilities.SPATIAL_DISJOINT);
+        capabilities.addType(FilterCapabilities.SPATIAL_DWITHIN);
+        capabilities.addType(FilterCapabilities.SPATIAL_EQUALS);
+        capabilities.addType(FilterCapabilities.SPATIAL_INTERSECT);
+        capabilities.addType(FilterCapabilities.SPATIAL_OVERLAPS);
+        capabilities.addType(FilterCapabilities.SPATIAL_TOUCHES);
+        capabilities.addType(FilterCapabilities.SPATIAL_WITHIN);
+        
+        return capabilities;
+    }
+    
     /**
      * Constructor with srid.
      *
@@ -102,17 +108,6 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
     public SQLEncoderPostgisGeos(int srid) {
         this();
         this.srid = srid;
-    }
-
-    /**
-     * Capabililities of this encoder.
-     *
-     * @return
-     *
-     * @see org.geotools.filter.SQLEncoder#getCapabililties()
-     */
-    public FilterCapabilities getCapabilities() {
-        return capabils;
     }
 
     /**

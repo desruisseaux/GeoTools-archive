@@ -44,12 +44,6 @@ public class SQLEncoderMySQL extends SQLEncoder
     private static WKTWriter wkt = new WKTWriter();
 
     /**
-     * The filters that this encoder can processed. (Note this value shadows
-     * private capabilities in superclass)
-     */
-    private FilterCapabilities capabilities = new FilterCapabilities();
-
-    /**
      * The srid of the schema, so the bbox conforms.  Could be better to have
      * it in the bbox filter itself, but this works for now.
      */
@@ -90,22 +84,22 @@ public class SQLEncoderMySQL extends SQLEncoder
     protected FilterCapabilities createFilterCapabilities() {
         FilterCapabilities capabilities = new FilterCapabilities();
 
-        capabilities.addType(AbstractFilter.LOGIC_OR);
-        capabilities.addType(AbstractFilter.LOGIC_AND);
-        capabilities.addType(AbstractFilter.LOGIC_NOT);
-        capabilities.addType(AbstractFilter.COMPARE_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_NOT_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
-        capabilities.addType(AbstractFilter.NULL);
-        capabilities.addType(AbstractFilter.BETWEEN);
-        capabilities.addType((short) 12345);
-        capabilities.addType((short) -12345);
-        capabilities.addType(AbstractFilter.GEOMETRY_BBOX);
-        capabilities.addType(AbstractFilter.FID);
-        capabilities.addType(AbstractFilter.LIKE);
+        capabilities.addType(FilterCapabilities.LOGIC_OR);
+        capabilities.addType(FilterCapabilities.LOGIC_AND);
+        capabilities.addType(FilterCapabilities.LOGIC_NOT);
+        capabilities.addType(FilterCapabilities.COMPARE_EQUALS);
+        capabilities.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
+        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN);
+        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN);
+        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(FilterCapabilities.NONE);
+        capabilities.addType(FilterCapabilities.ALL);
+        capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
+        capabilities.addType(FilterCapabilities.FID);
+        capabilities.addType(FilterCapabilities.LIKE);
         return capabilities;
     }
 
@@ -146,7 +140,6 @@ public class SQLEncoderMySQL extends SQLEncoder
      */
     public void visit(GeometryFilter filter) throws RuntimeException {
         LOGGER.finer("exporting GeometryFilter");
-		System.out.println("exporting GeometryFilter");
 
         if (filter.getFilterType() == AbstractFilter.GEOMETRY_BBOX) {
             DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();

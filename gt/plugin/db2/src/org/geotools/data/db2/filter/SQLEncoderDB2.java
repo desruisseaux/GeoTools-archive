@@ -105,7 +105,6 @@ public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
 
     // We need the srid to create an ST_Geometry - default to NAD83 for now
     private int srid = 1;
-    private FilterCapabilities capabilities = null;
 
     {
         DB2_SPATIAL_PREDICATES.put(new Integer(AbstractFilter.GEOMETRY_BBOX),
@@ -407,38 +406,37 @@ public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
      * @return FilterCapabilities for DB2
      */
     protected FilterCapabilities createFilterCapabilities() {
-        if (this.capabilities == null) {
-            this.capabilities = new FilterCapabilities();
-            this.capabilities.addType(AbstractFilter.LOGIC_OR);
-            this.capabilities.addType(AbstractFilter.LOGIC_AND);
-            this.capabilities.addType(AbstractFilter.LOGIC_NOT);
-            this.capabilities.addType(AbstractFilter.COMPARE_EQUALS);
-            this.capabilities.addType(AbstractFilter.COMPARE_NOT_EQUALS);
-            this.capabilities.addType(AbstractFilter.COMPARE_LESS_THAN);
-            this.capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
-            this.capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
-            this.capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
-            this.capabilities.addType(AbstractFilter.LIKE);
-            this.capabilities.addType(AbstractFilter.NULL);
-            this.capabilities.addType(AbstractFilter.BETWEEN);
-            this.capabilities.addType(AbstractFilter.FID);
-            this.capabilities.addType((short) 12345);
-            this.capabilities.addType((short) -12345);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_BBOX);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_CONTAINS);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_CROSSES);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_DISJOINT);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_EQUALS);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_INTERSECTS);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_OVERLAPS);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_TOUCHES);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_WITHIN);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_DWITHIN);
-            this.capabilities.addType(AbstractFilter.GEOMETRY_BEYOND);
-        }
+        FilterCapabilities capabilities = new FilterCapabilities();
+            
+        capabilities.addType(FilterCapabilities.LOGIC_OR);
+        capabilities.addType(FilterCapabilities.LOGIC_AND);
+        capabilities.addType(FilterCapabilities.LOGIC_NOT);
+        capabilities.addType(FilterCapabilities.COMPARE_EQUALS);
+        capabilities.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
+        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN);
+        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN);
+        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.LIKE);
+        capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(FilterCapabilities.FID);
+        capabilities.addType(FilterCapabilities.NONE);
+        capabilities.addType(FilterCapabilities.ALL);
+        capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
+        capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
+        capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
+        capabilities.addType(FilterCapabilities.SPATIAL_DISJOINT);
+        capabilities.addType(FilterCapabilities.SPATIAL_EQUALS);
+        capabilities.addType(FilterCapabilities.SPATIAL_INTERSECT);
+        capabilities.addType(FilterCapabilities.SPATIAL_OVERLAPS);
+        capabilities.addType(FilterCapabilities.SPATIAL_TOUCHES);
+        capabilities.addType(FilterCapabilities.SPATIAL_WITHIN);
+        capabilities.addType(FilterCapabilities.SPATIAL_DWITHIN);
+        capabilities.addType(FilterCapabilities.SPATIAL_BEYOND);
 
         // Does this need to be immutable???
-        return this.capabilities;
+        return capabilities;
     }
 
     /**
