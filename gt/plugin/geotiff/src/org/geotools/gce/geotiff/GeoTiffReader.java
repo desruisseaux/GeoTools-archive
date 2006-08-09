@@ -34,8 +34,11 @@
 package org.geotools.gce.geotiff;
 
 // JAI ImageIO Tools dependencies
+import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,8 +52,9 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
+import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -90,14 +94,13 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
  * @source $URL:
  *         http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffReader.java $
  */
-public final class GeoTiffReader extends AbstractGridCoverage2DReader
-		implements
-			GridCoverageReader {
+public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
+		GridCoverageReader {
 
 	private Logger LOGGER = Logger.getLogger(GeoTiffReader.class.toString());
 
 	/** SPI for creating tiff readers in ImageIO tools */
-	private final TIFFImageReaderSpi readerSPI = new TIFFImageReaderSpi();
+	private final static TIFFImageReaderSpi readerSPI = new TIFFImageReaderSpi();
 
 	/**
 	 * Number of images read from file. read() increments this counter and
@@ -114,8 +117,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 	private GeoTiffIIOMetadataDecoder metadata;
 
 	private GeoTiffMetadata2CRSAdapter gtcs;
-
-	private String coverageName;
 
 	/**
 	 * Creates a new instance of GeoTiffReader
@@ -175,7 +176,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 							"UTF-8"));
 			}
 
-
 			boolean closeMe = true;
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -203,11 +203,10 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 			// Coverage name
 			//
 			// /////////////////////////////////////////////////////////////////////
-			coverageName = source instanceof File
-					? ((File) source).getName()
+			coverageName = source instanceof File ? ((File) source).getName()
 					: "geotiff_coverage";
 			final int dotIndex = coverageName.lastIndexOf('.');
-			if (dotIndex != -1&&dotIndex!=coverageName.length())
+			if (dotIndex != -1 && dotIndex != coverageName.length())
 				coverageName = coverageName.substring(0, dotIndex);
 
 			// /////////////////////////////////////////////////////////////////////
@@ -427,14 +426,38 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 		// IMAGE READ OPERATION
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final ParameterBlockJAI pbjRead = new ParameterBlockJAI("ImageRead");
-		pbjRead.setParameter("ImageChoice", imageChoice);
-		pbjRead.setParameter("Input", source);
-		pbjRead.setParameter("Reader", readerSPI.createReaderInstance());
-		pbjRead.setParameter("ReadParam", readP);
-		pbjRead.setParameter("ReadMetadata", Boolean.FALSE);
-		pbjRead.setParameter("VerifyInput", Boolean.FALSE);
-		pbjRead.setParameter("ReadThumbnails", Boolean.FALSE);
+		final ImageReader reader = readerSPI.createReaderInstance();
+		final ImageInputStream inStream = ImageIO
+				.createImageInputStream(source);
+		reader.setInput(inStream);
+		final Hints newHints = (Hints) hints.clone();
+		inStream.mark();
+		if (!reader.isImageTiled(imageChoice.intValue())) {
+			final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
+					reader.getWidth(imageChoice.intValue()), reader
+							.getHeight(imageChoice.intValue())));
+			final ImageLayout layout = new ImageLayout();
+			layout.setTileGridXOffset(0);
+			layout.setTileGridYOffset(0);
+			layout.setTileHeight(tileSize.height);
+			layout.setTileWidth(tileSize.width);
+			newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
+		}
+		inStream.reset();
+		final ParameterBlock pbjRead = new ParameterBlock();
+		pbjRead.add(inStream);
+		pbjRead.add(imageChoice);
+		pbjRead.add(Boolean.FALSE);
+		pbjRead.add(Boolean.FALSE);
+		pbjRead.add(Boolean.FALSE);
+		pbjRead.add(null);
+		pbjRead.add(null);
+		pbjRead.add(readP);
+		pbjRead.add(reader);
+
+
+
+	
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -443,8 +466,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		// get the raster -> model transformation and
 		// create the coverage
-		return createImageCoverage(ImageUtilities.tileImage(JAI.create(
-				"ImageRead", pbjRead)));
+		return createImageCoverage((PlanarImage) readfactory.create(pbjRead,
+				(RenderingHints) newHints));
 
 	}
 

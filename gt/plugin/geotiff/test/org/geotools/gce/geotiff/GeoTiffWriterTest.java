@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Logger;
 
+import javax.media.jai.JAI;
+import javax.media.jai.TileCache;
+
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
@@ -56,7 +59,26 @@ public class GeoTiffWriterTest extends TestCase {
 		TestRunner.run(GeoTiffWriterTest.class);
 
 	}
+	/*
+	 * @see TestCase#setUp()
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
+		final JAI jaiDef = JAI.getDefaultInstance();
 
+		// using a big tile cache
+		final TileCache cache = jaiDef.getTileCache();
+		cache.setMemoryCapacity(64 * 1024 * 1024);
+		cache.setMemoryThreshold(0.75f);
+
+		// setting JAI wide hints
+//		jaiDef.getTileScheduler().setParallelism(40);
+//		jaiDef.getTileScheduler().setPrefetchParallelism(40);
+//		jaiDef.getTileScheduler().setPrefetchPriority(7);
+//		jaiDef.getTileScheduler().setPrefetchPriority(7);
+		
+	
+	}
 	/**
 	 * 
 	 * @throws IllegalArgumentException

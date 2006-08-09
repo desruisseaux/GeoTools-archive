@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.lang.ref.Reference;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.units.NonSI;
@@ -143,7 +142,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * The pool of cached objects.
 	 */
 	private final static Map pool = Collections
-			.synchronizedMap(new LRULinkedHashMap(50, 0.75f, true,100));
+			.synchronizedMap(new LRULinkedHashMap(50, 0.75f, true, 100));
 
 	private FactoryGroup factories = null;
 

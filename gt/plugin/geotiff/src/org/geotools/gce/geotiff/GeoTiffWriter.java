@@ -17,6 +17,7 @@ package org.geotools.gce.geotiff;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,7 +33,6 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -58,6 +58,7 @@ import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.TransformException;
 
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
+import com.sun.media.jai.imageioimpl.ImageWriteCRIF;
 
 /*
  * GeoTools - OpenSource mapping toolkit http://geotools.org (C) 2005-2006,
@@ -76,6 +77,11 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
  */
 public final class GeoTiffWriter implements GridCoverageWriter {
 	private ImageOutputStream destination;
+
+	private final static ImageWriteCRIF imageWriteFactory = new ImageWriteCRIF();
+
+	/** factory for getting tiff writers. */
+	private final static TIFFImageWriterSpi tiffWriterFactory = new TIFFImageWriterSpi();
 
 	/**
 	 * DOCUMENT ME!
@@ -185,8 +191,10 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		if (crs instanceof ProjectedCRS || crs instanceof GeographicCRS) {
 
 			// creating geotiff metadata
-			final CRS2GeoTiffMetadataAdapter adapter = (CRS2GeoTiffMetadataAdapter) CRS2GeoTiffMetadataAdapter.get(crs);
-			final GeoTiffIIOMetadataEncoder metadata =adapter.parseCoordinateReferenceSystem();
+			final CRS2GeoTiffMetadataAdapter adapter = (CRS2GeoTiffMetadataAdapter) CRS2GeoTiffMetadataAdapter
+					.get(crs);
+			final GeoTiffIIOMetadataEncoder metadata = adapter
+					.parseCoordinateReferenceSystem();
 
 			// setting tie points and scale
 			setTiePointAndScale(crs, metadata, (AffineTransform) gc
@@ -296,8 +304,7 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		// GETTING READER AND METADATA
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final ImageWriter writer = new TIFFImageWriterSpi()
-				.createWriterInstance();
+		final ImageWriter writer = tiffWriterFactory.createWriterInstance();
 		final IIOMetadata metadata = createIIOMetadata(writer,
 				ImageTypeSpecifier.createFromRenderedImage(image),
 				geoTIFFMetadata);
@@ -307,13 +314,15 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		// IMAGEWRITE
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final ParameterBlockJAI pbjWrite = new ParameterBlockJAI("ImageWrite");
+		final ParameterBlock pbjWrite = new ParameterBlock();
 		pbjWrite.addSource(image);
-		pbjWrite.setParameter("Writer", writer);
-		pbjWrite.setParameter("Format", "tiff");
-		pbjWrite.setParameter("ImageMetadata", metadata);
-		pbjWrite.setParameter("Output", outputStream);
-		JAI.create("ImageWrite", pbjWrite);
+		pbjWrite.add(outputStream);
+		pbjWrite.add("tiff").add(Boolean.TRUE).add(Boolean.TRUE).add(
+				Boolean.FALSE).add(Boolean.FALSE).add(null).add(null).add(
+				metadata).add(null).add(null).add(null).add(null);
+		pbjWrite.add(writer);
+
+		imageWriteFactory.create(pbjWrite,null);
 
 		// /////////////////////////////////////////////////////////////////////
 		//

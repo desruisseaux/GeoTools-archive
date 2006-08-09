@@ -28,6 +28,7 @@ import java.text.ParseException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.IHSColorSpace;
+import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 import javax.units.UnitFormat;
@@ -52,6 +53,8 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
+import com.sun.media.jai.imageioimpl.ImageReadCRIF;
+
 /**
  * This class is a first attempt for providing a way to get more informations
  * out of a single 2D raster datasets (x,y). It is worth to remark that for the
@@ -72,6 +75,8 @@ import org.opengis.referencing.operation.TransformException;
  */
 public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
+	protected final static ImageReadCRIF readfactory = new ImageReadCRIF();
+
 	/** Buffere factory for coordinate operations. */
 	protected final static CoordinateOperationFactory operationFactory = new BufferedDefaultCoordinateOperationFactory();
 
@@ -510,7 +515,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @return
 	 * @throws IOException
 	 */
-	protected GridCoverage createImageCoverage(RenderedOp image)
+	protected GridCoverage createImageCoverage(PlanarImage image)
 			throws IOException {
 
 		// deciding the number range
@@ -630,7 +635,7 @@ public abstract class AbstractGridCoverage2DReader implements
 
 	}
 
-	protected GridCoverage prepareDEMCoverage(RenderedOp image,
+	protected GridCoverage prepareDEMCoverage(PlanarImage image,
 			GeneralEnvelope envelope) {
 		// Create the SampleDimension, with colors and byte transformation
 		// needed for visualization

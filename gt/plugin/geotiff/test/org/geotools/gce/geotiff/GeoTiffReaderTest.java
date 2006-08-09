@@ -75,13 +75,16 @@ public class GeoTiffReaderTest extends TestCase {
 
 		// using a big tile cache
 		final TileCache cache = jaiDef.getTileCache();
-		cache.setMemoryCapacity(0 * 1024 * 1024);
-		cache.setMemoryThreshold(0.0f);
+		cache.setMemoryCapacity(64 * 1024 * 1024);
+		cache.setMemoryThreshold(0.75f);
 
 		// setting JAI wide hints
-		jaiDef.setRenderingHint(JAI.KEY_CACHED_TILE_RECYCLING_ENABLED,
-				Boolean.TRUE);
-
+		jaiDef.getTileScheduler().setParallelism(40);
+		jaiDef.getTileScheduler().setPrefetchParallelism(40);
+		jaiDef.getTileScheduler().setPrefetchPriority(7);
+		jaiDef.getTileScheduler().setPrefetchPriority(7);
+		
+	
 	}
 
 	public static void main(String[] args) {
