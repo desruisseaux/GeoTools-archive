@@ -122,7 +122,7 @@ public class FilteredSubsample extends Operation2D {
 	/* (non-Javadoc)
 	 * @see org.geotools.coverage.processing.AbstractOperation#doOperation(org.opengis.parameter.ParameterValueGroup, org.geotools.factory.Hints)
 	 */
-	protected Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
+	public Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
 		return FilteredSubsampledGridCoverage2D
 		.create(parameters,
 				(hints instanceof Hints) ? (Hints) hints

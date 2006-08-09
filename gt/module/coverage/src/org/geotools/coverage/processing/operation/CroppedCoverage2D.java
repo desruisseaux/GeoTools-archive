@@ -22,10 +22,12 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 
+import javax.media.jai.Interpolation;
+import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderedOp;
+import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
@@ -45,6 +47,9 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.InternationalString;
 
+import com.sun.media.jai.opimage.CropCRIF;
+import com.sun.media.jai.opimage.TranslateCRIF;
+
 /**
  * This class is responsible for applying a crop operation to a source coverage
  * with a specified envelope.
@@ -58,10 +63,20 @@ final class CroppedCoverage2D extends GridCoverage2D {
 	 */
 	private static final long serialVersionUID = -501742139906901754L;
 
+	private final static CropCRIF cropFactory = new CropCRIF();
+
+	private final static TranslateCRIF translateFactory = new TranslateCRIF();
+
+	private static final RenderingHints NN_INTERPOLATION_HINT = new RenderingHints(
+			JAI.KEY_INTERPOLATION, new InterpolationNearest());
+
+	private static final RenderingHints NOCACHE_HINT = new RenderingHints(
+			JAI.KEY_TILE_CACHE, null);
+
 	private CroppedCoverage2D(InternationalString name,
-			RenderedOp croppedImage, GridGeometry2D croppedGeometry,
+			PlanarImage translatedImage, GridGeometry2D croppedGeometry,
 			GridCoverage2D source) {
-		super(name.toString(), croppedImage, croppedGeometry,
+		super(name.toString(), translatedImage, croppedGeometry,
 				(GridSampleDimension[]) source.getSampleDimensions().clone(),
 				new GridCoverage[] { source }, null);
 	}
@@ -95,7 +110,8 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			final GridGeometry2D croppedGeometry = getCroppedGridGeometry(
 					intersectionEnvelope, source);
 			if (croppedGeometry == null) {
-				throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP));
+				throw new CannotCropException(Errors
+						.format(ErrorKeys.CANT_CROP));
 			}
 			final GridRange croppedRange = croppedGeometry.getGridRange();
 			final int xAxis = croppedGeometry.gridDimensionX;
@@ -111,7 +127,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final RenderedImage sourceImage = source.getRenderedImage();
-			final ParameterBlockJAI pbjCrop = new ParameterBlockJAI("Crop");
+			final ParameterBlock pbjCrop = new ParameterBlock();
 			pbjCrop.addSource(sourceImage);
 
 			// /////////////////////////////////////////////////////////////////////
@@ -122,26 +138,41 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final JAI processor = OperationJAI.getJAI(hints);
+			final boolean useProvidedProcessor = !processor.equals(JAI
+					.getDefaultInstance());
 
 			// executing the crop
-			pbjCrop.setParameter("x", new Float(minX));
-			pbjCrop.setParameter("y", new Float(minY));
-			pbjCrop.setParameter("width", new Float(width));
-			pbjCrop.setParameter("height", new Float(height));
-			final RenderedOp croppedImage = processor.createNS("Crop", pbjCrop,
-					hints);
+			pbjCrop.add(new Float(minX));
+			pbjCrop.add(new Float(minY));
+			pbjCrop.add(new Float(width));
+			pbjCrop.add(new Float(height));
+			hints.add(NOCACHE_HINT);
+			final PlanarImage croppedImage;
+			if (!useProvidedProcessor)
+				croppedImage = (PlanarImage) cropFactory.create(pbjCrop, hints);
+			else
+				croppedImage = processor.createNS("Crop", pbjCrop, hints);
 
 			// executing the transalte to have minx and miny set to zero
-			final ParameterBlockJAI pbjTranslate = new ParameterBlockJAI(
-					"Translate");
+			final ParameterBlock pbjTranslate = new ParameterBlock();
 			pbjTranslate.addSource(croppedImage);
-			pbjTranslate.setParameter("xTrans", new Float(-minX));
-			pbjTranslate.setParameter("yTrans", new Float(-minY));
-			if (hints.get(JAI.KEY_INTERPOLATION) != null)
-				pbjTranslate.setParameter("interpolation", hints
-						.get(JAI.KEY_INTERPOLATION) != null);
-			final RenderedOp translatedImage = processor.createNS("Translate",
-					pbjTranslate, hints);
+			pbjTranslate.add(new Float(-minX));
+			pbjTranslate.add(new Float(-minY));
+			hints.remove(JAI.KEY_TILE_CACHE);
+			final Interpolation interpolation = (Interpolation) hints
+					.get(JAI.KEY_INTERPOLATION);
+			if (interpolation != null)
+				pbjTranslate.add(hints.get(JAI.KEY_INTERPOLATION));
+			else
+				pbjTranslate.add(NN_INTERPOLATION_HINT.get(JAI.KEY_INTERPOLATION));
+
+			final PlanarImage translatedImage;
+			if (!useProvidedProcessor)
+				translatedImage = (PlanarImage) translateFactory.create(
+						pbjTranslate, hints);
+			else
+				translatedImage = processor.createNS("Translate", pbjTranslate,
+						hints);
 
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -152,11 +183,9 @@ final class CroppedCoverage2D extends GridCoverage2D {
 					new GridGeometry2D(new GeneralGridRange(translatedImage),
 							croppedGeometry.getEnvelope()), source);
 		} catch (TransformException e) {
-			throw new CannotCropException(
-					Errors.format(ErrorKeys.CANT_CROP), e);
+			throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP), e);
 		} catch (NoninvertibleTransformException e) {
-			throw new CannotCropException(
-					Errors.format(ErrorKeys.CANT_CROP), e);
+			throw new CannotCropException(Errors.format(ErrorKeys.CANT_CROP), e);
 		}
 
 		// something bad happened
@@ -197,7 +226,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 						.getGridToCoordinateSystem());
 
 		// build the new range by adding a -0.5 translation to keep into
-		// account  translation of grid geometry constructor
+		// account translation of grid geometry constructor
 		gridToWorld.translate(-0.5, -0.5);
 		final MathTransform worldToGridTransform = ProjectiveTransform
 				.create(gridToWorld.createInverse());

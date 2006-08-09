@@ -1734,7 +1734,7 @@ public final class StreamingRenderer implements GTRenderer {
 			final Object grid = feature.getAttribute("grid");
 
 			final GridCoverageRenderer gcr = new GridCoverageRenderer(
-					destinationCRS, mapExtent, screenSize);
+					destinationCRS, mapExtent, screenSize,java2dHints);
 
 			// //
 			// It is a grid coverage

@@ -73,7 +73,7 @@ public class Crop extends Operation2D {
 
 	}
 
-	protected Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
+	public Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Checking input parameteres

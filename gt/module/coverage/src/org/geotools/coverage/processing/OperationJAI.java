@@ -279,7 +279,7 @@ public class OperationJAI extends Operation2D {
      *
      * @see #deriveGridCoverage
      */
-    protected Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
+    public Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
         /*
          * Copies parameter values from the ParameterValues object to the ParameterBlockJAI,
          * except the sources. Note: it would be possible to use the ParameterBlockJAI in the

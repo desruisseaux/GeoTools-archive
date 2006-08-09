@@ -146,7 +146,7 @@ public class Scale extends Operation2D {
 	 * @see org.geotools.coverage.processing.AbstractOperation#doOperation(org.opengis.parameter.ParameterValueGroup,
 	 *      org.geotools.factory.Hints)
 	 */
-	protected Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
+	public Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
 		try {
 			return ScaledGridCoverage2D
 					.create(parameters,

@@ -20,24 +20,27 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.InterpolationNearest;
+import javax.media.jai.JAI;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.DefaultProcessor;
+import org.geotools.coverage.processing.operation.Crop;
+import org.geotools.coverage.processing.operation.FilteredSubsample;
+import org.geotools.coverage.processing.operation.Resample;
+import org.geotools.coverage.processing.operation.Scale;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -69,9 +72,31 @@ import com.vividsolutions.jts.geom.Envelope;
  * @task Add support for SLD stylers
  */
 public final class GridCoverageRenderer {
+	private final static Hints LENIENT_HINT = new Hints(
+			Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+
+	private final static Scale scaleFactory = new Scale();
+
+	private final static FilteredSubsample filteredSubsampleFactory = new FilteredSubsample();
+
+	private final static Crop coverageCropFactory = new Crop();
 
 	private static final Logger LOGGER = Logger
 			.getLogger("org.geotools.rendering");
+
+	static {
+
+		// ///////////////////////////////////////////////////////////////////
+		//
+		//
+		// ///////////////////////////////////////////////////////////////////
+		final DefaultProcessor processor = new DefaultProcessor(LENIENT_HINT);
+		resampleParams = processor.getOperation("Resample").getParameters();
+		scaleParams = processor.getOperation("Scale").getParameters();
+		cropParams = processor.getOperation("CoverageCrop").getParameters();
+		filteredSubsampleParams = processor.getOperation("FilteredSubsample")
+				.getParameters();
+	}
 
 	/** The Display (User defined) CRS * */
 	private final CoordinateReferenceSystem destinationCRS;
@@ -84,15 +109,17 @@ public final class GridCoverageRenderer {
 
 	private final AffineTransform finalWorldToGrid;
 
-	private final DefaultProcessor processor;
+	private final Hints hints= new Hints(new HashMap(5));
 
-	private final ParameterValueGroup resampleParams;
+	private final static ParameterValueGroup resampleParams;
 
-	private final ParameterValueGroup scaleParams;
+	private final static ParameterValueGroup scaleParams;
 
-	private ParameterValueGroup cropParams;
+	private static ParameterValueGroup cropParams;
 
-	private final ParameterValueGroup filteredSubsampleParams;
+	private final static ParameterValueGroup filteredSubsampleParams;
+
+	private static final Resample resampleFactory = new Resample();;
 
 	/**
 	 * Creates a new GridCoverageRenderer object.
@@ -108,6 +135,15 @@ public final class GridCoverageRenderer {
 	public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
 			final Envelope envelope, Rectangle screenSize)
 			throws TransformException, NoninvertibleTransformException {
+
+		this(destinationCRS,envelope,screenSize,null);
+
+	}
+
+	public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
+			final Envelope envelope, Rectangle screenSize,
+			RenderingHints java2dHints) throws TransformException,
+			NoninvertibleTransformException {
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -130,19 +166,17 @@ public final class GridCoverageRenderer {
 				.getTransform(new GeneralGridRange(destinationSize),
 						destinationEnvelope, false));
 		finalWorldToGrid = finalGridToWorld.createInverse();
-
+		
+		
+		
 		// ///////////////////////////////////////////////////////////////////
 		//
+		// 	HINTS
 		//
 		// ///////////////////////////////////////////////////////////////////
-		processor = new DefaultProcessor(new Hints(Hints.LENIENT_DATUM_SHIFT,
-				Boolean.TRUE));
-		resampleParams = processor.getOperation("Resample").getParameters();
-		scaleParams = processor.getOperation("Scale").getParameters();
-		cropParams = processor.getOperation("CoverageCrop").getParameters();
-		filteredSubsampleParams = processor.getOperation("FilteredSubsample")
-				.getParameters();
-
+		this.hints.add(LENIENT_HINT);
+		if(java2dHints!=null)
+			this.hints.add(java2dHints);
 	}
 
 	/**
@@ -183,13 +217,13 @@ public final class GridCoverageRenderer {
 		//
 		// ///////////////////////////////////////////////////////////////////
 
-//		try {
-//			ImageIO.write(gridCoverage.geophysics(false).getRenderedImage(),
-//					"png", new File("c:/original.png"));
-//		} catch (IOException e2) {
-//			// TODO Auto-generated catch block
-//			e2.printStackTrace();
-//		}
+		// try {
+		// ImageIO.write(gridCoverage.geophysics(false).getRenderedImage(),
+		// "png", new File("c:/original.png"));
+		// } catch (IOException e2) {
+		// // TODO Auto-generated catch block
+		// e2.printStackTrace();
+		// }
 
 		// math transform from source to target crs
 		final MathTransform GCCRSToDeviceCRSTransform = StreamingRenderer
@@ -221,13 +255,13 @@ public final class GridCoverageRenderer {
 			return;// nothing to render, the AOI does not overlap
 		// croppedGridCoverage.prefetch(croppedGridCoverage.getEnvelope2D());
 
-//		try {
-//			ImageIO.write(croppedGridCoverage.geophysics(false)
-//					.getRenderedImage(), "png", new File("c:/cropped.png"));
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
+		// try {
+		// ImageIO.write(croppedGridCoverage.geophysics(false)
+		// .getRenderedImage(), "png", new File("c:/cropped.png"));
+		// } catch (IOException e1) {
+		// // TODO Auto-generated catch block
+		// e1.printStackTrace();
+		// }
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -285,6 +319,7 @@ public final class GridCoverageRenderer {
 				/ (lonFirst ? finalGridToWorldInGCCRS.getScaleY()
 						: finalGridToWorldInGCCRS.getShearX());
 
+		final Interpolation interpolation =(Interpolation) hints.get(JAI.KEY_INTERPOLATION);
 		// //
 		//
 		// Now if we are upsampling first reproject then scale else first scale
@@ -315,7 +350,7 @@ public final class GridCoverageRenderer {
 
 			// //
 			//
-			// Second step is bilinear scale
+			// Second step is  scale
 			//
 			// //
 			final GridCoverage2D scaledGridCoverage;
@@ -323,16 +358,16 @@ public final class GridCoverageRenderer {
 				scaledGridCoverage = preScaledGridCoverage;
 			else
 				scaledGridCoverage = scale(scaleX * scaleXInt, scaleY
-						* scaleYInt, 0f, 0f, new InterpolationBilinear(),
+						* scaleYInt, 0f, 0f, interpolation==null?new InterpolationBilinear():interpolation,
 						BorderExtender
 								.createInstance(BorderExtender.BORDER_COPY),
 						preScaledGridCoverage);
 
-//			// TODO: remove these when the resample bug is fixed
-//			LOGGER.info("Scaled grid coverage envelope: "
-//					+ scaledGridCoverage.getEnvelope());
-//			LOGGER.info("Scaled grid coverage CRS: "
-//					+ scaledGridCoverage.getCoordinateReferenceSystem());
+			// // TODO: remove these when the resample bug is fixed
+			// LOGGER.info("Scaled grid coverage envelope: "
+			// + scaledGridCoverage.getEnvelope());
+			// LOGGER.info("Scaled grid coverage CRS: "
+			// + scaledGridCoverage.getCoordinateReferenceSystem());
 
 			// ///////////////////////////////////////////////////////////////////
 			//
@@ -342,16 +377,15 @@ public final class GridCoverageRenderer {
 			// ///////////////////////////////////////////////////////////////////
 			if (!GCCRSToDeviceCRSTransform.isIdentity()) {
 				preSymbolizer = resample(scaledGridCoverage, destinationCRS,
-						Interpolation
-								.getInstance(Interpolation.INTERP_BILINEAR));
+						interpolation==null?new InterpolationBilinear():interpolation);
 			} else
 				preSymbolizer = scaledGridCoverage;
 
-//			// TODO: remove these when the resample bug is fixed
-//			LOGGER.info("Reprojected grid coverage envelope: "
-//					+ preSymbolizer.getEnvelope());
-//			LOGGER.info("Reprojected grid coverage CRS: "
-//					+ preSymbolizer.getCoordinateReferenceSystem());
+			// // TODO: remove these when the resample bug is fixed
+			// LOGGER.info("Reprojected grid coverage envelope: "
+			// + preSymbolizer.getEnvelope());
+			// LOGGER.info("Reprojected grid coverage CRS: "
+			// + preSymbolizer.getCoordinateReferenceSystem());
 		} else {
 
 			// ///////////////////////////////////////////////////////////////////
@@ -363,8 +397,7 @@ public final class GridCoverageRenderer {
 			final GridCoverage2D reprojectedCoverage;
 			if (!GCCRSToDeviceCRSTransform.isIdentity()) {
 				reprojectedCoverage = resample(croppedGridCoverage,
-						destinationCRS, Interpolation
-								.getInstance(Interpolation.INTERP_BILINEAR));
+						destinationCRS, interpolation==null?new InterpolationBilinear():interpolation);
 			} else
 				reprojectedCoverage = croppedGridCoverage;
 
@@ -379,14 +412,14 @@ public final class GridCoverageRenderer {
 					reprojectedCoverage);
 
 		}
-//
-//		try {
-//			ImageIO.write(preSymbolizer.geophysics(false).getRenderedImage(),
-//					"png", new File("c:/preSymbolizer.png"));
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		//
+		// try {
+		// ImageIO.write(preSymbolizer.geophysics(false).getRenderedImage(),
+		// "png", new File("c:/preSymbolizer.png"));
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -455,7 +488,7 @@ public final class GridCoverageRenderer {
 		// } catch (IOException e) {
 		// // TODO Auto-generated catch block
 		// e.printStackTrace();
-		//		}
+		// }
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -492,7 +525,7 @@ public final class GridCoverageRenderer {
 		param.parameter("Interpolation").setValue(interpolation);
 		param.parameter("BorderExtender").setValue(be);
 
-		return (GridCoverage2D) processor.doOperation(param);
+		return (GridCoverage2D) scaleFactory.doOperation(param, hints);
 
 	}
 
@@ -512,7 +545,8 @@ public final class GridCoverageRenderer {
 		param.parameter("source").setValue(gc);
 		param.parameter("CoordinateReferenceSystem").setValue(crs);
 		param.parameter("InterpolationType").setValue(interpolation);
-		return (GridCoverage2D) processor.doOperation(param);
+		return (GridCoverage2D) resampleFactory
+				.doOperation(param, hints);
 
 	}
 
@@ -539,12 +573,16 @@ public final class GridCoverageRenderer {
 			param.parameter("source").setValue(gc);
 			param.parameter("scaleX").setValue(new Integer(scaleXInt));
 			param.parameter("scaleY").setValue(new Integer(scaleYInt));
-			param.parameter("qsFilterArray").setValue(
+			if(hints.get(JAI.KEY_INTERPOLATION)!=null&&hints.get(JAI.KEY_INTERPOLATION).equals(new InterpolationNearest()))
+				param.parameter("qsFilterArray").setValue(
+						new float[] { 1.0F });
+			else
+				param.parameter("qsFilterArray").setValue(
 					new float[] { 0.5F, 1.0F / 3.0F, 0.0F, -1.0F / 12.0F });
 			param.parameter("Interpolation").setValue(interpolation);
 			param.parameter("BorderExtender").setValue(be);
-			preScaledGridCoverage = (GridCoverage2D) processor
-					.doOperation(param);
+			preScaledGridCoverage = (GridCoverage2D) filteredSubsampleFactory
+					.doOperation(param, hints);
 
 		}
 		return preScaledGridCoverage;
@@ -579,7 +617,8 @@ public final class GridCoverageRenderer {
 					.clone();
 			param.parameter("source").setValue(gc);
 			param.parameter("Envelope").setValue(intersectionEnvelope);
-			tempGC = (GridCoverage2D) processor.doOperation(param);
+			tempGC = (GridCoverage2D) coverageCropFactory.doOperation(param,
+					hints);
 		} else
 			tempGC = gc;
 

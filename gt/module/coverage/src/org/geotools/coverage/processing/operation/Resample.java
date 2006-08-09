@@ -191,7 +191,7 @@ public class Resample extends Operation2D {
      * {@link org.geotools.coverage.processing.DefaultProcessor}
      * for the {@code "Resample"} operation.
      */
-    protected Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
+    public Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
         GridCoverage2D         source = (GridCoverage2D)               parameters.parameter("Source")                   .getValue();
         Interpolation          interp = ImageUtilities.toInterpolation(parameters.parameter("InterpolationType")        .getValue());
         CoordinateReferenceSystem crs = (CoordinateReferenceSystem)    parameters.parameter("CoordinateReferenceSystem").getValue();

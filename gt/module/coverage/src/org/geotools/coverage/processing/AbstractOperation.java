@@ -157,7 +157,7 @@ public abstract class AbstractOperation implements Operation, Serializable {
      *         and {@link Hints#JAI_INSTANCE}.
      * @return The result as a coverage.
      */
-    protected abstract Coverage doOperation(final ParameterValueGroup parameters, final Hints hints);
+    public abstract Coverage doOperation(final ParameterValueGroup parameters, final Hints hints);
 
     /**
      * Returns the {@link AbstractProcessor} instance used for an operation. The instance is fetch
