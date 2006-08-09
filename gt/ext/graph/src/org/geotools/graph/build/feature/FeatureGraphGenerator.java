@@ -22,7 +22,7 @@ import org.geotools.graph.build.basic.BasicGraphGenerator;
 import org.geotools.graph.structure.Graphable;
 
 /**
- * Builds a graph from feature objects.
+ * Builds a graph from {@link org.geotools.feature.Feature} objects.
  * <p>
  * This graph generator decorates another graph generator which 
  * builds a graph from geometries. 
