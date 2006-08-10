@@ -16,7 +16,6 @@
 package org.geotools.filter;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,8 +36,6 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 
 /**
  * Encodes Geometry filters into valid oracle SDO statements.
@@ -56,8 +53,6 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
  * @version $Id$
  */
 public class SQLEncoderOracle extends SQLEncoder {
-    /** The capabilities of the encoder */
-    private static FilterCapabilities capabilities = null;
 
     /** Logger - for logging */
     private static final Logger LOGGER = Logger.getLogger(
@@ -170,20 +165,26 @@ public class SQLEncoderOracle extends SQLEncoder {
      * @return FilterCapabilities for this Filter
      */
     protected FilterCapabilities createFilterCapabilities() {
-        FilterCapabilities capabilities = super.createFilterCapabilities();
-        capabilities.addType(AbstractFilter.GEOMETRY_BBOX);
-        capabilities.addType(AbstractFilter.GEOMETRY_CONTAINS);
-        capabilities.addType(AbstractFilter.GEOMETRY_CROSSES);
-        capabilities.addType(AbstractFilter.GEOMETRY_DISJOINT);
-        capabilities.addType(AbstractFilter.GEOMETRY_EQUALS);
-        capabilities.addType(AbstractFilter.GEOMETRY_INTERSECTS);
-        capabilities.addType(AbstractFilter.GEOMETRY_OVERLAPS);
-        capabilities.addType(AbstractFilter.GEOMETRY_TOUCHES);
-        capabilities.addType(AbstractFilter.GEOMETRY_WITHIN);
-        capabilities.addType(AbstractFilter.GEOMETRY_DWITHIN);
-        capabilities.addType(AbstractFilter.GEOMETRY_BEYOND);
-        capabilities.addType(AbstractFilter.FID);
-        capabilities.addType(AbstractFilter.LIKE);
+        FilterCapabilities capabilities = new FilterCapabilities();
+
+        capabilities.addType(FilterCapabilities.LOGICAL);
+        capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
+        capabilities.addType(FilterCapabilities.NULL_CHECK);
+        capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(FilterCapabilities.FID);
+        capabilities.addType(FilterCapabilities.NONE);
+        capabilities.addType(FilterCapabilities.ALL);
+        capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
+        capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
+        capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
+        capabilities.addType(FilterCapabilities.SPATIAL_DISJOINT);
+        capabilities.addType(FilterCapabilities.SPATIAL_EQUALS);
+        capabilities.addType(FilterCapabilities.SPATIAL_INTERSECT);
+        capabilities.addType(FilterCapabilities.SPATIAL_OVERLAPS);
+        capabilities.addType(FilterCapabilities.SPATIAL_TOUCHES);
+        capabilities.addType(FilterCapabilities.SPATIAL_WITHIN);
+        capabilities.addType(FilterCapabilities.SPATIAL_DWITHIN);
+        capabilities.addType(FilterCapabilities.SPATIAL_BEYOND);
 
         return capabilities;
     }
