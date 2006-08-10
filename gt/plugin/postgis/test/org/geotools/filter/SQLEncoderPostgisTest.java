@@ -258,10 +258,12 @@ public class SQLEncoderPostgisTest extends TestCase {
         try {
             SQLEncoderPostgis encoder = new SQLEncoderPostgis(2346);
             String out = encoder.encode((AbstractFilter) gf);
+            LOGGER.fine("out is " + out);
             fail("This filter type is supposed to be unsupported");
-        } catch (RuntimeException e) {
+        } catch (SQLEncoderException e) {
             LOGGER.fine(e.getMessage());
             // cool, we expected this
+            assertEquals("Filter type not supported", e.getMessage()); //failure is expected
         }
     }
 

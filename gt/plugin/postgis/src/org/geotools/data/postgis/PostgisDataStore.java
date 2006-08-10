@@ -73,7 +73,6 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.SQLEncoderPostgis;
-import org.geotools.filter.SQLEncoderPostgisGeos;
 import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -669,12 +668,15 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 				throw new DataSourceException(msg,t);
 			}
 			try {
-				
-				PostgisSQLBuilder builder = new PostgisSQLBuilder(-1,config);
-				initBuilder(builder);
-				
-				st.execute("SELECT * FROM " + builder.encodeTableName(typeName) + " LIMIT 0;");
-			} 
+                SQLEncoderPostgis encoder = new SQLEncoderPostgis(-1);
+                encoder.setSupportsGEOS(useGeos);
+                PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder,
+                        config);
+                initBuilder(builder);
+
+                st.execute("SELECT * FROM " + builder.encodeTableName(typeName)
+                        + " LIMIT 0;");
+            } 
 			catch (Throwable t) {
 				String msg = "Error querying relation:" + typeName + "."  +  
 						" Possible cause:" + t.getLocalizedMessage();
@@ -813,10 +815,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         FeatureTypeInfo info = typeHandler.getFeatureTypeInfo(typeName);
         int srid = -1;
 
-        // HACK: geos should be integrated with the sql encoder, not a
-        // seperate class.
-        SQLEncoderPostgis encoder = useGeos ? new SQLEncoderPostgisGeos()
-                                            : new SQLEncoderPostgis();
+        SQLEncoderPostgis encoder = new SQLEncoderPostgis();
+        encoder.setSupportsGEOS(useGeos);
         encoder.setFIDMapper(typeHandler.getFIDMapper(typeName));
 
         if (info.getSchema().getDefaultGeometry() != null) {

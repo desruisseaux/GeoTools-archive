@@ -403,8 +403,4 @@ public class DataTestCase extends TestCase {
 
         return count;
     }               
-    
-    public void testEmpty() {
-    	//an empty test so "tests" will pass
-    }
 }

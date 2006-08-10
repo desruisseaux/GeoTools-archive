@@ -38,8 +38,8 @@ import com.vividsolutions.jts.io.WKTWriter;
  *       one extend more intelligently.
  * @source $URL$
  */
-public class SQLEncoderPostgis extends SQLEncoder
-    implements org.geotools.filter.FilterVisitor {
+public class SQLEncoderPostgis extends SQLEncoder implements
+        org.geotools.filter.FilterVisitor {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
@@ -58,7 +58,12 @@ public class SQLEncoderPostgis extends SQLEncoder
     /** Whether the BBOX filter should be strict (using the exact geom), or 
      *  loose (using the envelopes) */
     protected boolean looseBbox = false;
-    
+
+    /**
+     * Whether the installed PostGIS has GEOS support. Default is false for
+     * backwards compatibility.
+     */
+    protected boolean supportsGEOS = false;
    
     /**
      * Empty constructor TODO: rethink empty constructor, as BBOXes _need_ an
@@ -86,20 +91,29 @@ public class SQLEncoderPostgis extends SQLEncoder
 
         capabilities.addType(FilterCapabilities.NONE);
         capabilities.addType(FilterCapabilities.ALL);
-        capabilities.addType(FilterCapabilities.LOGIC_OR);
-        capabilities.addType(FilterCapabilities.LOGIC_AND);
-        capabilities.addType(FilterCapabilities.LOGIC_NOT);
-        capabilities.addType(FilterCapabilities.COMPARE_EQUALS);
-        capabilities.addType(FilterCapabilities.COMPARE_NOT_EQUALS);
-        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN);
-        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN);
-        capabilities.addType(FilterCapabilities.COMPARE_LESS_THAN_EQUAL);
-        capabilities.addType(FilterCapabilities.COMPARE_GREATER_THAN_EQUAL);
+        capabilities.addType(FilterCapabilities.FID);
         capabilities.addType(FilterCapabilities.NULL_CHECK);
         capabilities.addType(FilterCapabilities.BETWEEN);
+        capabilities.addType(FilterCapabilities.LOGICAL);
+        capabilities.addType(FilterCapabilities.SIMPLE_ARITHMETIC);
+        capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
         capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
-        capabilities.addType(FilterCapabilities.FID);
+        capabilities.addType(FilterCapabilities.LIKE);
 
+        if (supportsGEOS) {
+            capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
+            capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
+            capabilities.addType(FilterCapabilities.SPATIAL_DISJOINT);
+            capabilities.addType(FilterCapabilities.SPATIAL_EQUALS);
+            capabilities.addType(FilterCapabilities.SPATIAL_INTERSECT);
+            capabilities.addType(FilterCapabilities.SPATIAL_OVERLAPS);
+            capabilities.addType(FilterCapabilities.SPATIAL_TOUCHES);
+            capabilities.addType(FilterCapabilities.SPATIAL_WITHIN);
+        }
+        
+        // TODO: add SPATIAL_BEYOND, DWITHIN to capabilities and support in
+        // visit(GeometryFilter)
+        
         return capabilities;
     }
     
@@ -136,7 +150,7 @@ public class SQLEncoderPostgis extends SQLEncoder
      * @return <tt>true</tt> if this encoder is going to do loose filtering.
      */
     public boolean isLooseBbox() {
-	return looseBbox;
+        return looseBbox;
     }
     
 
@@ -169,57 +183,25 @@ public class SQLEncoderPostgis extends SQLEncoder
         this.defaultGeom = name;
     }
 
-    /**
-     * Turns a geometry filter into the postgis sql bbox statement.
-     *
-     * @param filter the geometry filter to be encoded.
-     *
-     * @throws RuntimeException for IO exception (need a better error)
-     */
-    public void visit(GeometryFilter filter) throws RuntimeException {
-        LOGGER.finer("exporting GeometryFilter");
-
-        switch (filter.getFilterType()) {
-        case (AbstractFilter.GEOMETRY_BBOX):
-            encodeGeomFilter(filter, "distance", "0");
-            break;
-        case (AbstractFilter.GEOMETRY_CONTAINS):
-            encodeGeomFilter(filter, "contains", "1");
-            break;
-        case (AbstractFilter.GEOMETRY_CROSSES):
-            encodeGeomFilter(filter, "crosses", "1");
-            break;
-        case (AbstractFilter.GEOMETRY_DISJOINT):
-            encodeGeomFilter(filter, "disjoint", "1");
-            break;
-        case (AbstractFilter.GEOMETRY_EQUALS):
-            encodeGeomFilter(filter, "equals", "1");
-            break;
-        case (AbstractFilter.GEOMETRY_INTERSECTS):
-            encodeGeomFilter(filter, "intersects", "1");
-            break;
-        case (AbstractFilter.GEOMETRY_OVERLAPS):
-            encodeGeomFilter(filter, "overlaps", "1");
-            break;
-        case (AbstractFilter.GEOMETRY_TOUCHES):
-            encodeGeomFilter(filter, "touches", "1");
-            break;
-        case (AbstractFilter.GEOMETRY_WITHIN):
-            encodeGeomFilter(filter, "within", "1");
-            break;
-        default:
-            LOGGER.warning("exporting unknown filter type");
-            throw new RuntimeException(filter.getFilterType() + " filter type is currently unsupported");
+    public void setSupportsGEOS(boolean supports) {
+        boolean oldValue = this.supportsGEOS;
+        this.supportsGEOS = supports;
+        if (capabilities != null && supports != oldValue) {
+            //regenerate capabilities
+            capabilities = createFilterCapabilities();
         }
     }
-
-    private void encodeGeomFilter(GeometryFilter filter, String function, String result) {
+    
+    public boolean getSupportsGEOS() {
+        return supportsGEOS;
+    }
+    
+    private void encodeGeomFilter(GeometryFilter filter, String function, String comparison) {
         DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
         DefaultExpression right = (DefaultExpression) filter.getRightGeometry();
 
         try {
             if (!looseBbox) {
-            	//not supported without geos
             	out.write(function + "(");
             }
 
@@ -242,26 +224,183 @@ public class SQLEncoderPostgis extends SQLEncoder
             }
 
             if (!looseBbox) {
-            	out.write(") = " + result);
+            	out.write(")" + comparison);
             }
         } catch (java.io.IOException ioe) {
             LOGGER.warning("Unable to export filter" + ioe);
         }
     }
+
+    /**
+     * Turns a geometry filter into the postgis sql bbox statement.
+     *
+     * @param filter the geometry filter to be encoded.
+     *
+     * @throws RuntimeException for IO exception (need a better error)
+     */
+    public void visit(GeometryFilter filter) throws RuntimeException {
+        LOGGER.finer("exporting GeometryFilter");
+
+        short filterType = filter.getFilterType();
+        DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
+        DefaultExpression right = (DefaultExpression) filter.getRightGeometry();
+
+        //if geos is not supported, all we can use is distance = 0 for bbox
+        if (!supportsGEOS) {
+            if (filterType != AbstractFilter.GEOMETRY_BBOX) {
+                throw new RuntimeException(
+                        "without GEOS support, only the BBOX function is supported; failed to encode "
+                                + filterType);
+            }
+            encodeGeomFilter(filter, "distance", " = 0");
+            return;
+        }
+        
+        // Figure out if we need to constrain this query with the && constraint.
+        int literalGeometryCount = 0;
+
+        if ((left != null)
+                && (left.getType() == DefaultExpression.LITERAL_GEOMETRY)) {
+            literalGeometryCount++;
+        }
+
+        if ((right != null)
+                && (right.getType() == DefaultExpression.LITERAL_GEOMETRY)) {
+            literalGeometryCount++;
+        }
+
+        boolean constrainBBOX = (literalGeometryCount == 1);
+        boolean onlyBbox = filterType == AbstractFilter.GEOMETRY_BBOX
+                && looseBbox;
+
+        try {
+
+            // DJB: disjoint is not correctly handled in the pre-march 22/05
+            // version
+            // I changed it to not do a "&&" index search for disjoint because
+            // Geom1 and Geom2 can have a bbox overlap and be disjoint
+            // I also added test case.
+            // NOTE: this will not use the index, but its unlikely that using
+            // the index
+            // for a disjoint query will be the correct thing to do.
+
+            // DJB NOTE: need to check for a NOT(A intersects G) filter
+            // --> NOT( (A && G) AND intersects(A,G))
+            // and check that it does the right thing.
+
+            constrainBBOX = constrainBBOX
+                    && (filterType != AbstractFilter.GEOMETRY_DISJOINT);
+
+            if (constrainBBOX) {
+
+                if (left == null) {
+                    out.write("\"" + defaultGeom + "\"");
+                } else {
+                    left.accept(this);
+                }
+
+                out.write(" && ");
+
+                if (right == null) {
+                    out.write("\"" + defaultGeom + "\"");
+                } else {
+                    right.accept(this);
+                }
+                if (!onlyBbox) {
+                    out.write(" AND ");
+                }
+            }
+
+            String closingParenthesis = ")";
+
+            if (!onlyBbox) {
+                if (filterType == AbstractFilter.GEOMETRY_EQUALS) {
+                    out.write("equals");
+                } else if (filterType == AbstractFilter.GEOMETRY_DISJOINT) {
+                    out.write("NOT (intersects");
+                    closingParenthesis += ")";
+                } else if (filterType == AbstractFilter.GEOMETRY_INTERSECTS) {
+                    out.write("intersects");
+                } else if (filterType == AbstractFilter.GEOMETRY_CROSSES) {
+                    out.write("crosses");
+                } else if (filterType == AbstractFilter.GEOMETRY_WITHIN) {
+                    out.write("within");
+                } else if (filterType == AbstractFilter.GEOMETRY_CONTAINS) {
+                    out.write("contains");
+                } else if (filterType == AbstractFilter.GEOMETRY_OVERLAPS) {
+                    out.write("overlaps");
+                } else if (filterType == AbstractFilter.GEOMETRY_BBOX) {
+                    out.write("intersects");
+                } else if (filterType == AbstractFilter.GEOMETRY_TOUCHES) {
+                    out.write("touches");
+                } else {
+                    // this will choke on beyond and dwithin
+                    throw new RuntimeException("does not support filter type "
+                            + filterType);
+                }
+                out.write("(");
+
+                if (left == null) {
+                    out.write("\"" + defaultGeom + "\"");
+                } else {
+                    left.accept(this);
+                }
+
+                out.write(", ");
+
+                if (right == null) {
+                    out.write("\"" + defaultGeom + "\"");
+                } else {
+                    right.accept(this);
+                }
+
+                out.write(closingParenthesis);
+            }
+        } catch (java.io.IOException ioe) {
+            LOGGER.warning("Unable to export filter" + ioe);
+            throw new RuntimeException("io error while writing", ioe);
+        }
+    }
+
     
     /**
-     * Checks to see if the literal is a geometry, and encodes it if it  is, if
+     * Checks to see if the literal is a geometry, and encodes it if it is, if
      * not just sends to the parent class.
-     *
-     * @param expression the expression to visit and encode.
-     *
-     * @throws IOException for IO exception (need a better error)
+     * 
+     * @param expression
+     *            the expression to visit and encode.
+     * 
+     * @throws IOException
+     *             for IO exception (need a better error)
      */
     public void visitLiteralGeometry(LiteralExpression expression)
         throws IOException {
         Geometry bbox = (Geometry) expression.getLiteral();
         String geomText = wkt.write(bbox);
         out.write("GeometryFromText('" + geomText + "', " + srid + ")");
+    }
+
+    /**
+     * Checks to see if the literal is a geometry, and encodes it if it  is, if
+     * not just sends to the parent class.
+     *
+     * @param expression the expression to visit and encode.
+     *
+     * @throws RuntimeException for IO exception (need a better error)
+     */
+    public void visit(LiteralExpression expression) throws RuntimeException {
+        LOGGER.finer("exporting LiteralExpression");
+
+        try {
+            if (expression.getType() == DefaultExpression.LITERAL_GEOMETRY) {
+                visitLiteralGeometry(expression);
+            } else {
+                super.visit(expression);
+            }
+        } catch (java.io.IOException ioe) {
+            LOGGER.warning("Unable to export expression" + ioe);
+            throw new RuntimeException("io error while writing", ioe);
+        }
     }
     
     /**
@@ -307,7 +446,5 @@ public class SQLEncoderPostgis extends SQLEncoder
             throw new RuntimeException(IO_ERROR, ioe);
         }
     }
-    
-    
     
 }

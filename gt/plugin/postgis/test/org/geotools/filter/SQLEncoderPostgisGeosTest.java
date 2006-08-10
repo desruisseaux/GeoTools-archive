@@ -12,6 +12,8 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ * 
+ * TODO: roll into SQLEncoderPostgisTest (SQLEncoderPostgisGeos is deprecated)
  */
 package org.geotools.filter;
 
@@ -270,10 +272,12 @@ public void testException() throws Exception {
     try {
         SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos(2346);
         String out = encoder.encode((AbstractFilter) gf);
+        LOGGER.fine("out is " + out);
         fail("This filter type should not be supported at the moment?");
-    } catch (RuntimeException e) {
+    } catch (SQLEncoderException e) {
         LOGGER.fine(e.getMessage());
         // good, this is expected
+        assertEquals("Filter type not supported", e.getMessage());
     }
 }
 

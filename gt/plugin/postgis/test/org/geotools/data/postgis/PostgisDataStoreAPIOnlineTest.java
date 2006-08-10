@@ -1298,17 +1298,12 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
             assertEquals(type.getAttributeType(i), actual.getAttributeType(i));
         }
 
-        assertNull(type.getDefaultGeometry());
+        assertNull(type.getDefaultGeometry()); //geometry is null, therefore no bounds
         assertEquals(type.getDefaultGeometry(), actual.getDefaultGeometry());
         assertEquals(type, actual);
 
-        //try {
         Envelope b = half.getBounds();
-        assertEquals(new Envelope(1, 5, 0, 4), b);      
-
-        //  fail("half does not specify a default geometry");
-        //} catch (IOException io) {
-        //}
+        assertEquals(new Envelope(), b); //empty envelope is expected      
     }
 
     public void testGetFeatureSourceRiver()

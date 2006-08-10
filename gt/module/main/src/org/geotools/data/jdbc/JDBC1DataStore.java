@@ -609,7 +609,10 @@ public abstract class JDBC1DataStore implements DataStore {
 		
 		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter()); //process in DB
 		Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter()); //process after DB
-        ((DefaultQuery) query).setFilter(preFilter);
+		
+		//JD: This is bad, we should not assume we have the right to change the query object
+		Filter originalFilter = query.getFilter();
+		((DefaultQuery) query).setFilter(preFilter);
 		
 		String[] requestedNames = propertyNames(query);
 		String[] propertyNames;
@@ -661,7 +664,10 @@ public abstract class JDBC1DataStore implements DataStore {
 		}
 
 		String sqlQuery = constructQuery(query, attrTypes);
-
+		
+		//JD: This is bad, we should not assume we have the right to change the query object
+		((DefaultQuery) query).setFilter(originalFilter);
+		
 		QueryData queryData = executeQuery(typeInfo, typeName, sqlQuery, trans,
 				false);
 

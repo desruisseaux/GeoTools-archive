@@ -39,12 +39,14 @@ public class FilterCapabilities {
     /**
      * Mask for Filter.NONE
      */
-    public static final long NONE = 12345;
+    //public static final long NONE = 12345;
+    public static final long NONE = 0x01<<30;
 
     /**
      * Mask for Filter.ALL
      */
-    public static final long ALL = -12345;
+    //public static final long ALL = -12345;
+    public static final long ALL = 0x01<<31;
     
     // spatial masks
 	/**

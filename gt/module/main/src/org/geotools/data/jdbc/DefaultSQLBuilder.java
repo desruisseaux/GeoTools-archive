@@ -108,7 +108,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      *         on the result set.
      */
     public Filter getPostQueryFilter(Filter filter) {
-    	if (filter != null && !filter.equals(lastFilter)) {
+    	if (filter != null && ( lastFilter == null || !filter.equals(lastFilter) ) ) {
     		splitFilter(filter);
     	}
     	return lastPostFilter;
@@ -130,7 +130,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      *         by the database.
      */
     public Filter getPreQueryFilter(Filter filter) {
-    	if (filter != null && !filter.equals(lastFilter)) {
+    	if (filter != null && ( lastFilter == null || !filter.equals(lastFilter) ) ) {
     		splitFilter(filter);
     	}
     	return lastPreFilter;

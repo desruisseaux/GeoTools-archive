@@ -53,10 +53,9 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     }
 
     /**
-     * Constructor with encoder.
+     * Constructor with encoder.  Use PostgisSQLBuilder(encoder, config, ft) if possible.
      * 
      * @param encoder
-     * @deprecated use PostgisSQLBuilder(encoder, config, ft) instead
      */
     public PostgisSQLBuilder(SQLEncoder encoder, JDBCDataStoreConfig config) {
         super(encoder);
