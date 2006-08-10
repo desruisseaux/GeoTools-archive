@@ -61,6 +61,16 @@
         <role>Java Developer</role>
       </roles>
     </developer>
+    <developer>
+      <id>jdeolive</id>
+      <name>Justin Deoliveira</name>
+      <email>jdeolive@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
   </developers>
 
 
