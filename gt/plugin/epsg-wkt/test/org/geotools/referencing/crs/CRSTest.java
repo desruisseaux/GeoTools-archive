@@ -20,12 +20,14 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -84,10 +86,11 @@ public class CRSTest extends TestCase {
         math.transform( pts, 0, new double[ pts.length ], 0, pts.length/2 );
         for( int i=0; i<pts.length;i++)
             assertTrue( "pts["+i+"]", pts[i] != tst[i] );
+    }
+   
+    public void testReprojection() throws Exception{
         
-        /*
-        MathTransform transform = CRSService.reproject( bc, latlong, true );
-        
+                
         // origional bc alberts
         Polygon poly1 = poly( new double[] {
                 1187128,395268, 1187128,396027,
@@ -100,21 +103,29 @@ public class CRSTest extends TestCase {
                 -123.454638288508,48.5497352036088, -123.455007082796,48.5429008916377,
                 -123.470095558323,48.5432615620081} );        
         
-        Polygon polyAfter = CRSService.transform( poly1, transform );
-        System.out.println( "  actual:"+ polyAfter );
-        System.out.println( "expected:"+ poly2 );        
-        //assertEquals( poly2, polyAfter );
+        Polygon poly3 = poly( new double[]{
+                -123.47009555832284,48.543261561072285,
+                -123.46972894676578,48.55009592117936,
+                -123.45463828850829,48.54973520267305,
+                -123.4550070827961,48.54290089070186,
+                -123.47009555832284,48.543261561072285
+        });
+        
+        CoordinateReferenceSystem WGS84 = (CoordinateReferenceSystem) CRS.decode("EPSG:4326"); // latlong
+        CoordinateReferenceSystem BC_ALBERS = (CoordinateReferenceSystem) CRS.decode("EPSG:42102");
+        
+        MathTransform transform = CRS.transform(BC_ALBERS, WGS84 );
+        Polygon polyAfter = (Polygon) JTS.transform(poly1, transform);
+        System.out.println( polyAfter );
+        
+        assertTrue( poly3.equals( polyAfter ));
         
         Envelope before = poly1.getEnvelopeInternal();
         Envelope expected = poly2.getEnvelopeInternal();
-        Envelope after = CRSService.transform( before, transform );
-        
-        System.out.println( "  actual:"+ after );
-        System.out.println( "expected:"+ expected );                
-        //assertEquals( expected, after );        
-         */
+        Envelope after = JTS.transform( before, transform );
+        assertEquals( expected, after );        
+         
     }
-    
     public static GeometryFactory factory = new GeometryFactory();
     
     public static Polygon poly( double coords[] ) {
