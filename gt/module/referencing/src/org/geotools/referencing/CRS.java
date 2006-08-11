@@ -102,7 +102,7 @@ public final class CRS {
      * <p>
      * Sample use:
      * <blockquote><code>
-     * {@linkplain MathTransform} transform = CRS.transform(
+     * {@linkplain MathTransform} transform = CRS.findMathTransform(
      * CRS.{@linkplain #decode decode}("EPSG:42102"),
      * CRS.{@linkplain #decode decode}("EPSG:4326") );
      * </blockquote></code>
@@ -113,13 +113,12 @@ public final class CRS {
      * @throws FactoryException If no math transform can be created for the specified source and
      *         target CRS.
      */
-    public static MathTransform transform(final CoordinateReferenceSystem sourceCRS,
-                                          final CoordinateReferenceSystem targetCRS)
-            throws FactoryException
+    public static MathTransform findMathTransform(final CoordinateReferenceSystem sourceCRS,
+            final CoordinateReferenceSystem targetCRS)
+    throws FactoryException
     {
-        return transform(sourceCRS, targetCRS, false);
+    	return transform(sourceCRS, targetCRS, false);
     }
-
     /**
      * Grab a transform between two Coordinate Reference Systems. This method is similar to
      * <code>{@linkplain #transform(CoordinateReferenceSystem, CoordinateReferenceSystem)
@@ -138,6 +137,43 @@ public final class CRS {
      *         target CRS.
      *
      * @see Hints#LENIENT_DATUM_SHIFT
+     */
+    public static MathTransform findMathTransform(final CoordinateReferenceSystem sourceCRS,
+                                                  final CoordinateReferenceSystem targetCRS,
+                                                  boolean lenient)
+    throws FactoryException
+    {
+        final CoordinateOperationFactory factory =
+                FactoryFinder.getCoordinateOperationFactory(lenient ? LENIENT : null);
+        return factory.createOperation(sourceCRS, targetCRS).getMathTransform();
+    }
+    /**
+     * Grab a transform between two Coordinate Reference Systems.
+     *  
+     * @param  sourceCRS The source CRS.
+     * @param  targetCRS The target CRS.
+     * @return The math transform from {@code sourceCRS} to {@code targetCRS}.
+     * @throws FactoryException If no math transform can be created for the specified source and
+     *         target CRS.
+     * @deprecated Please use findMathTransform
+     */
+    public static MathTransform transform(final CoordinateReferenceSystem sourceCRS,
+                                          final CoordinateReferenceSystem targetCRS)
+            throws FactoryException
+    {
+        return findMathTransform(sourceCRS, targetCRS);
+    }
+    
+    /**
+     * Grab a transform between two Coordinate Reference Systems.
+     * @param  sourceCRS The source CRS.
+     * @param  targetCRS The target CRS.
+     * @param  lenient {@code true} if the math transform should be created even when there is
+     *         no information available for a datum shift. The default value is {@code false}.
+     * @return The math transform from {@code sourceCRS} to {@code targetCRS}.
+     * @throws FactoryException If no math transform can be created for the specified source and
+     *         target CRS.
+     * @deprecated use findMathTransform
      */
     public static MathTransform transform(final CoordinateReferenceSystem sourceCRS,
                                           final CoordinateReferenceSystem targetCRS,
