@@ -72,11 +72,6 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-demo-data</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-wkt</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -86,4 +81,16 @@
       <version>1.0-M1</version>
     </dependency>
   </dependencies>
+  <build>
+    <resources>
+      <resource>	
+        <directory>src</directory>
+        <includes>
+          <include>**/resources/**</include>
+        </includes>
+      </resource>
+
+    </resources>
+  </build>
 </project>
+

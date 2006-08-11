@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.gui.swing;
 
 import java.awt.event.ActionEvent;
@@ -16,11 +31,11 @@ public class SelectAction extends AbstractAction {
     JMapPane map;
     
     public SelectAction(JMapPane map){
-        URL url = this.getClass().getResource("resources/Add16.gif");
+        URL url = this.getClass().getResource("resources/Add16.gif"); //$NON-NLS-1$
         
         icon = new ImageIcon(url);
         this.putValue(Action.SMALL_ICON,icon);
-        
+        this.putValue(Action.NAME,Messages.getString("SelectAction.1")); //$NON-NLS-1$
         this.map = map;
     }
     public void actionPerformed(ActionEvent e) {

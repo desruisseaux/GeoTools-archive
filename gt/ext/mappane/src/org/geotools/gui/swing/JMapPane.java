@@ -1,5 +1,23 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.gui.swing;
-
+/** 
+ * @author Ian Turton
+ * 
+ */
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -7,22 +25,21 @@ import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.Iterator;
 
 import javax.swing.JPanel;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.gui.swing.event.HighlightChangeListener;
+import org.geotools.gui.swing.event.HighlightChangedEvent;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
@@ -43,6 +60,28 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
+/**
+ * A simple map container that is a JPanel with a map in.
+ * provides simple pan,zoom, highlight and selection
+ * The mappane stores an image of the map (drawn from the context) and 
+ * an image of the slected feature(s) to speed up 
+ * rendering of the highlights. Thus the whole map is only redrawn 
+ * when the bbox changes, selection is only redrawn when the 
+ * selected feature changes.
+ *  
+ * If you intend to use this in production code you'll
+ * need to make selection and highlighting work in the same way.
+ * @author Ian Turton
+ *
+ */
+/**
+ * @author ijt1
+ *
+ */
+/**
+ * @author ijt1
+ *
+ */
 public class JMapPane extends JPanel implements MouseListener,
         HighlightChangeListener, PropertyChangeListener {
     /**
@@ -76,25 +115,43 @@ public class JMapPane extends JPanel implements MouseListener,
      * the base image of the map
      */
     private BufferedImage baseImage;
-
+    /**
+     * image of selection
+     */
     private BufferedImage selectImage;
-
+    /**
+     * style for selected items
+     */
     private Style selectionStyle;
-
+    /**
+     * layer that selection works on
+     */
     private int selectionLayer = -1;
-
+    /**
+     * layer that highlight works on
+     */
     private MapLayer highlightLayer;
-
+    /**
+     * the object which manages highlighting
+     */
     private HighlightManager highlightManager;
-
+    /**
+     * is highlighting on or off
+     */
     private boolean highlight = true;
-
+    /** 
+     * a factory for filters
+     */
     FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-
+    /** 
+     * a factory for geometries
+     */
     GeometryFactory gf = new GeometryFactory();
-
+    /** 
+     * the collections of features to be selected or highlighted
+     */
     FeatureCollection selection, highlightFeature;
-
+    
     public static final int Reset = 0;
 
     public static final int ZoomIn = 1;
@@ -107,6 +164,9 @@ public class JMapPane extends JPanel implements MouseListener,
 
     private int state = ZoomIn;
 
+    /**
+     * how far to zoom in or out
+     */
     private double zoomFactor = 2.0;
 
     Style lineHighlightStyle;
@@ -124,11 +184,21 @@ public class JMapPane extends JPanel implements MouseListener,
     public JMapPane() {
         this(null, true, null, null);
     }
-
+    /**
+     * create a basic JMapPane
+     * @param render - how to draw the map
+     * @param context - the map context to display
+     */
     public JMapPane(GTRenderer render, MapContext context) {
         this(null, true, render, context);
     }
-
+    /**
+     * full constructor extending JPanel
+     * @param layout - layout (probably shouldn't be set)
+     * @param isDoubleBuffered - a Swing thing I don't really understand
+     * @param render - what to draw the map with
+     * @param context - what to draw
+     */
     public JMapPane(LayoutManager layout, boolean isDoubleBuffered,
             GTRenderer render, MapContext context) {
         super(layout, isDoubleBuffered);
@@ -152,7 +222,10 @@ public class JMapPane extends JPanel implements MouseListener,
         lineSelectionStyle = setupStyle(LINE, Color.cyan);
 
     }
-
+    /**
+     * get the renderer 
+     */
+    
     public GTRenderer getRenderer() {
         return renderer;
     }
@@ -300,38 +373,38 @@ public class JMapPane extends JPanel implements MouseListener,
         }
         Rectangle r = getBounds();
         Rectangle dr = new Rectangle(r.width, r.height);
-        if (!r.equals(oldRect) || reset) {
-            changed = true;
-            reset = false;
-            oldRect = r;
-            System.out.println("did resize calc");
-            double mapWidth = mapArea.getWidth();
+        if (!r.equals(oldRect) || reset) { 
+            /*either the viewer size has changed or we've done a reset*/
+            changed = true; /* note we need to redraw */
+            reset = false; /* forget about the reset */
+            oldRect = r; /* store what the current size is */
+            double mapWidth = mapArea.getWidth(); /* get the extent of the map*/
             double mapHeight = mapArea.getHeight();
-            double scaleX = r.getWidth() / mapArea.getWidth();
+            double scaleX = r.getWidth() / mapArea.getWidth(); /* calculate the new scale*/
             double scaleY = r.getHeight() / mapArea.getHeight();
-            double scale = 1.0;
-            if (scaleX < scaleY) {
+            double scale = 1.0; // stupid compiler!
+            if (scaleX < scaleY) {/*pick the smaller scale */
                 scale = scaleX;
             } else {
                 scale = scaleY;
             }
-            double deltaX = Math.abs((r.getWidth() / scale) - mapWidth);
-            double deltaY = Math.abs((r.getHeight() / scale) - mapHeight);
-            /*
-             * System.out.println("delta x "+deltaX); System.out.println("delta
-             * y "+deltaY);
-             */
+            /* calculate the difference in width and height of the new extent*/
+            double deltaX = /*Math.abs*/((r.getWidth() / scale) - mapWidth);
+            double deltaY = /*Math.abs*/((r.getHeight() / scale) - mapHeight);
+            
+            System.out.println("delta x "+deltaX); System.out.println("delta y "+deltaY);
+            /* create the new extent */
             Coordinate ll = new Coordinate(mapArea.getMinX() - (deltaX / 2.0),
                     mapArea.getMinY() - (deltaY / 2.0));
             Coordinate ur = new Coordinate(mapArea.getMaxX() + (deltaX / 2.0),
                     mapArea.getMaxY() + (deltaY / 2.0));
             mapArea = new Envelope(ll, ur);
         }
-        if (!mapArea.equals(oldMapArea)) {
+        if (!mapArea.equals(oldMapArea)) {/* did the map extent change?*/
             changed = true;
             oldMapArea = mapArea;
         }
-        if (changed) {
+        if (changed) {/* if the map changed then redraw*/
 
             baseImage = new BufferedImage(dr.width, dr.height,
                     BufferedImage.TYPE_INT_ARGB);

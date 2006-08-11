@@ -1,7 +1,7 @@
 /*
- *    Geotools2 - OpenSource mapping toolkit
+ *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002, Geotools Project Managment Committee (PMC)
+ *    (C) 2006, GeoTools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,17 +12,13 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
  */
-package org.geotools.gui.tools;
+package org.geotools.gui.swing.event;
 
-/**
- * Pan the map so that the new extent has the click point in the middle of the
- * map.
- *
- * @author Cameron Shorter
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/module/migrate/src/org/geotools/gui/tools/ClickPanTool.java $
- * @version $Id$
- */
-public interface ClickPanTool extends Tool {
+import java.util.EventListener;
+
+
+
+public interface HighlightChangeListener extends EventListener{
+    public void highlightChanged(HighlightChangedEvent e);
 }
