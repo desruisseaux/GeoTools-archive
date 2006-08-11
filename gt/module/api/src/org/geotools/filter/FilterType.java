@@ -107,10 +107,10 @@ public interface FilterType {
 
     /** Defines a fid filter, which is implemented by FidFilterImpl. */
     public static final short FID = 22;
-    
+
     /** Defines an empty filter, with static implementation Filter.NONE */
     public static final short NONE = 12345;
-    
+
     /** Defines a sieve filter, with static implementation Filter.ALL */
     public static final short ALL = -12345;
 }

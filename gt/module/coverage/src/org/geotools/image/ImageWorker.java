@@ -40,7 +40,6 @@ import javax.media.jai.operator.*;
 
 
 import com.sun.media.jai.util.ImageUtil;
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
