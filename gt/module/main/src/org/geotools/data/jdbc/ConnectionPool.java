@@ -37,9 +37,9 @@ import javax.sql.PooledConnection;
  * </p>
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation
- * @author $Author: cholmesny $
+ * @author Chris Holmes
  * @source $URL$
- * @version $Id$ Last Modified: $Date: 2003/11/05 15:37:02 $
+ * @version $Id$
  */
 public final class ConnectionPool {
     /** A logger */
@@ -203,8 +203,8 @@ public final class ConnectionPool {
      * A ConnectionEventListener for managing the list of connections in the pool.
      *
      * @author Sean Geoghegan, Defence Science and Technology Organisation
-     * @author $Author: cholmesny $
-     * @version $Id$ Last Modified: $Date: 2003/11/05 15:37:02 $
+     * @author Chris Holmes
+     * @version $Id$
      */
     private class ConnectionListManager implements ConnectionEventListener {
         /**
@@ -267,8 +267,8 @@ public final class ConnectionPool {
      * </p>
      *
      * @author Sean Geoghegan, Defence Science and Technology Organisation
-     * @author $Author: cholmesny $
-     * @version $Id$ Last Modified: $Date: 2003/11/05 15:37:02 $
+     * @author Chris Holmes
+     * @version $Id$
      */
     private class ConnectionPoolCleaner implements Runnable {
         /** Time to wait between cleaning */
