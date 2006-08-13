@@ -30,6 +30,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
+import com.vividsolutions.jts.JTSVersion;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
@@ -97,12 +98,7 @@ public class CRSTest extends TestCase {
                 1188245,396027, 1188245,395268,
                 1187128,395268} );
 
-        // transformed
-        Polygon poly2 = poly( new double[] {
-                -123.470095558323,48.5432615620081, -123.469728946766,48.5500959221152,
-                -123.454638288508,48.5497352036088, -123.455007082796,48.5429008916377,
-                -123.470095558323,48.5432615620081} );        
-        
+        // transformed     
         Polygon poly3 = poly( new double[]{
                 -123.47009555832284,48.543261561072285,
                 -123.46972894676578,48.55009592117936,
@@ -115,16 +111,17 @@ public class CRSTest extends TestCase {
         CoordinateReferenceSystem BC_ALBERS = (CoordinateReferenceSystem) CRS.decode("EPSG:42102");
         
         MathTransform transform = CRS.transform(BC_ALBERS, WGS84 );
+        
         Polygon polyAfter = (Polygon) JTS.transform(poly1, transform);
         System.out.println( polyAfter );
         
         assertTrue( poly3.equals( polyAfter ));
         
         Envelope before = poly1.getEnvelopeInternal();
-        Envelope expected = poly2.getEnvelopeInternal();
+        Envelope expected = poly3.getEnvelopeInternal();
+        
         Envelope after = JTS.transform( before, transform );
-        assertEquals( expected, after );        
-         
+        assertEquals( expected, after );                 
     }
     public static GeometryFactory factory = new GeometryFactory();
     
