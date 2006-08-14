@@ -783,22 +783,22 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	 */
 	private void parseWorldFile(File file2Parse) throws IOException {
 
-		float xPixelSize = 0;
-		float rotationX = 0;
-		float rotationY = 0;
-		float yPixelSize = 0;
+		double xPixelSize = 0;
+		double rotationX = 0;
+		double rotationY = 0;
+		double yPixelSize = 0;
 		double xULC = 0;
 		double yULC = 0;
 
 		int index = 0;
-		float value = 0;
+		double value = 0;
 		String str;
 		final BufferedReader in = new BufferedReader(new FileReader(file2Parse));
 		while ((str = in.readLine()) != null) {
 			value = 0;
 
 			try {
-				value = Float.parseFloat(str.trim());
+				value = Double.parseDouble(str.trim());
 			} catch (NumberFormatException e) {
 				// A trick to bypass invalid lines ...
 				continue;
