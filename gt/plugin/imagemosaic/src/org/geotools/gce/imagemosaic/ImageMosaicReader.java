@@ -21,6 +21,7 @@ package org.geotools.gce.imagemosaic;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Area;
+import java.awt.geom.Point2D;
 import java.awt.image.ColorModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
@@ -44,7 +45,6 @@ import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
-import javax.media.jai.operator.BandMergeDescriptor;
 import javax.media.jai.operator.MosaicDescriptor;
 
 import org.geotools.coverage.FactoryFinder;
@@ -60,10 +60,10 @@ import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.visitor.BoundsVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.filter.function.Collection_BoundsFunction;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
@@ -446,7 +446,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		final FeatureCollection features = featureSource
 				.getFeatures(bboxFilter);
-
+		// do we have any feature to load
 		final Iterator it = features.iterator();
 		if (!it.hasNext())
 			return null;
@@ -457,8 +457,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	}
 
 	/**
-	 * Preparing a bbox filter to find the minimum set of tiles that overlap the
-	 * requested area. XXX what if I do not have and EPSG:code
+	 * Preparing a bbox filter to find the minimum set of tiles that overlaps
+	 * the requested area. XXX what if I do not have and EPSG:code
 	 * 
 	 * @param requestedJTSEnvelope
 	 * @return
@@ -556,8 +556,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// envelope of the loaded dataset
 			//
 			// /////////////////////////////////////////////////////////////////////
-			loadedDataSetBound = Collection_BoundsFunction.calculateBounds(
-					features).toEnvelope();
+			// final BoundsVisitor boundsVisitor = new BoundsVisitor();
+			// features.accepts(boundsVisitor, null);
+			// loadedDataSetBound = boundsVisitor.getBounds();
+			final Point2D ULC = getULC(new Envelope(requestedJTSEnvelope
+					.getMinX(), requestedJTSEnvelope.getMaxY(),
+					requestedJTSEnvelope.getMinX(), requestedJTSEnvelope
+							.getMaxY()));
 
 			// reusable parameters
 			boolean alphaIn = false;
@@ -576,6 +581,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				feature = (Feature) it.next();
 				location = (String) feature.getAttribute("location");
 				bound = feature.getBounds();
+				loadedDataSetBound.expandToInclude(bound);
 
 				// /////////////////////////////////////////////////////////////////////
 				//
@@ -626,10 +632,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// add to the mosaic collection
 				//
 				// /////////////////////////////////////////////////////////////////////
-				addToMosaic(pbjMosaic, bound, loadedDataSetBound, res,
-						loadedImage, singleImageROI, rois, i,
-						singleImageROIThreshold, alphaIn, alphaIndex,
-						alphaChannels, finalLayout);
+				addToMosaic(pbjMosaic, bound, ULC, res, loadedImage,
+						singleImageROI, rois, i, singleImageROIThreshold,
+						alphaIn, alphaIndex, alphaChannels, finalLayout);
 
 				i++;
 			} while (i < numImages);
@@ -658,6 +663,33 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		} catch (IOException e) {
 			throw new DataSourceException("Unable to create this mosaic", e);
 		}
+	}
+
+	/**
+	 * Retrieves the ULC of the BBOX composed by all the tiles we need to load.
+	 * 
+	 * @param double *
+	 * @return
+	 * @throws IOException
+	 */
+	private Point2D getULC(Envelope envelope) throws IOException {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Create a filter
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final Filter filter = getBBOXFilter(envelope);
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Load feaures and evaluate envelope
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final FeatureCollection features = featureSource.getFeatures(filter);
+		final BoundsVisitor boundsVisitor = new BoundsVisitor();
+		features.accepts(boundsVisitor, null);
+		final Envelope loadedULC = boundsVisitor.getBounds();
+		return new Point2D.Double(loadedULC.getMinX(), loadedULC.getMaxY());
+
 	}
 
 	/**
@@ -797,7 +829,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			pbjBandMerge.addSource(imageBeforeAlpha).addSource(multipliedImage);
 			return FactoryFinder.getGridCoverageFactory(null).create(
 					getName(location),
-					bandMergeFactory.create(pbjBandMerge, NO_CACHE), requestedEnvelope);
+					bandMergeFactory.create(pbjBandMerge, NO_CACHE),
+					requestedEnvelope);
 		}
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -832,7 +865,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param pbjMosaic
 	 * @param bound
 	 *            Lon-Lat bounds of the loaded image
-	 * @param globBound
+	 * @param ulc
 	 *            Lon-Lat bounds of the loaded dataset
 	 * @param res
 	 * @param loadedImage
@@ -848,7 +881,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @throws IOException
 	 */
 	private void addToMosaic(ParameterBlockJAI pbjMosaic, Envelope bound,
-			Envelope globBound, double[] res, OpImage loadedImage,
+			Point2D ulc, double[] res, OpImage loadedImage,
 			boolean singleImageROI, ROI[] rois, int i,
 			int singleImageROIThreshold, boolean alphaIn, int[] alphaIndex,
 			PlanarImage[] alphaChannels, Area finalLayout) {
@@ -873,8 +906,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// positioning the actual image correctly in final mosaic.
 		// /////////////////////////////////////////////////////////////////////
 		// evaluate trans
-		double xTrans = (bound.getMinX() - globBound.getMinX()) / res[0];
-		double yTrans = (globBound.getMaxY() - bound.getMaxY()) / res[1];
+		double xTrans = (bound.getMinX() - ulc.getX()) / res[0];
+		double yTrans = (ulc.getY() - bound.getMaxY()) / res[1];
 
 		final ParameterBlock pbjTranslate = new ParameterBlock();
 		// translation
