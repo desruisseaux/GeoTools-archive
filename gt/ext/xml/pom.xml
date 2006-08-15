@@ -65,29 +65,29 @@
       <version>1.2</version>
 		</dependency>
     <dependency>
-      <groupId>xsdlib</groupId>
+      <groupId>activesoap</groupId>
       <artifactId>xsdlib</artifactId>
-      <version>20050614</version>
+      <version>1.5</version>
      </dependency>
      <dependency>
-       <groupId>relaxng</groupId>
+       <groupId>activesoap</groupId>
        <artifactId>relaxngDatatype</artifactId>
-       <version>X</version>
+       <version>1.5</version>
      </dependency>
      <dependency>
-       <groupId>jaxb</groupId>
+       <groupId>activesoap</groupId>
        <artifactId>jaxb-api</artifactId>
-       <version>1.3</version>
+       <version>1.5</version>
      </dependency>
      <dependency>
-       <groupId>jaxb</groupId>
+       <groupId>activesoap</groupId>
        <artifactId>jaxb-impl</artifactId>
-       <version>1.3</version>
+       <version>1.5</version>
      </dependency>
      <dependency>
-       <groupId>jaxb</groupId>
+       <groupId>activesoap</groupId>
        <artifactId>jaxb-libs</artifactId>
-       <version>1.3</version>
+       <version>1.5</version>
      </dependency>
      <dependency>
        <groupId>xerces</groupId>
