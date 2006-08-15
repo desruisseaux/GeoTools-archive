@@ -23,7 +23,7 @@ import java.net.URISyntaxException;
 
 import org.geotools.util.ProgressListener;
 
-public class AbstractFileGeoResource extends AbstractGeoResource {
+public abstract class AbstractFileGeoResource extends AbstractGeoResource {
 
 	/**
 	 * The file
@@ -95,11 +95,6 @@ public class AbstractFileGeoResource extends AbstractGeoResource {
 			return service.getFile();
 		}
 		
-		return null;
-	}
-
-	public GeoResourceInfo getInfo(ProgressListener monitor) throws IOException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

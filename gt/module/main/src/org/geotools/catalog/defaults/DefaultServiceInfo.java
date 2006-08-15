@@ -65,6 +65,10 @@ public class DefaultServiceInfo implements ServiceInfo {
         return title;
     }
 
+    public void setTitle(String title) {
+		this.title = title;
+	}
+	
     /**
      * Returns the service keywords. Maps to the Dublin Core Subject element.
      * 
@@ -74,7 +78,11 @@ public class DefaultServiceInfo implements ServiceInfo {
         return keywords;
     }
 
-    /**
+	public void setKeywords(String[] keywords) {
+		this.keywords = keywords;
+	}
+
+	/**
      * Returns the service description
      * 
      * @return
@@ -83,6 +91,10 @@ public class DefaultServiceInfo implements ServiceInfo {
         return description;
     }
 
+    public void setDescription(String description) {
+		this.description = description;
+	}
+    
     /**
      * Return the service abstract
      * 
@@ -91,6 +103,10 @@ public class DefaultServiceInfo implements ServiceInfo {
     public String getAbstract() {
         return _abstract;
     }
+
+    public void setAbstract(String _abstract) {
+		this._abstract = _abstract;
+	}
 
     /**
      * Return the service publisher
@@ -101,6 +117,10 @@ public class DefaultServiceInfo implements ServiceInfo {
         return publisher;
     }
 
+    public void setPublisher(URI publisher) {
+		this.publisher = publisher;
+	}
+    
     /**
      * Returns the xml schema namespace for this service type. Maps to the Dublin Code Format
      * element
@@ -111,6 +131,10 @@ public class DefaultServiceInfo implements ServiceInfo {
         return schema;
     }
 
+    public void setSchema(URI schema) {
+		this.schema = schema;
+	}
+    
     /**
      * Returns the service source. Maps to the Dublin Core Server Element
      * 
@@ -119,6 +143,10 @@ public class DefaultServiceInfo implements ServiceInfo {
     public URI getSource() { // aka server
         return source;
     }
+    
+	public void setSource(URI source) {
+		this.source = source;
+	}
 
     /**
      * Base symbology (with out decorators) representing this IService.
@@ -145,4 +173,10 @@ public class DefaultServiceInfo implements ServiceInfo {
     public Icon getIcon() {
         return icon;
     }
+
+
+	public void setIcon(Icon icon) {
+		this.icon = icon;
+	}
+
 }

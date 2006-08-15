@@ -93,6 +93,9 @@ public class DefaultServiceFinder implements ServiceFinder {
             ServiceFactory se = (ServiceFactory) itr.next();
 
             try {
+            		if ( !se.canProcess( target) ) 
+            			continue;
+            		
                 Map m = se.createParams(target);
 
                 if (m != null) {
@@ -107,7 +110,7 @@ public class DefaultServiceFinder implements ServiceFinder {
         Iterator i = maps.iterator();
 
         while (i.hasNext()) {
-            List o = aquire((Map) i.next());
+            List o = aquire(target, (Map) i.next());
 
             if ((o != null) && !o.isEmpty()) {
                 services.addAll(o);

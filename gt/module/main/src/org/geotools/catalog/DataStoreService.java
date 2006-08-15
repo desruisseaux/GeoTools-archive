@@ -209,7 +209,7 @@ public abstract class DataStoreService extends AbstractService {
 	 * <p>
 	 * Sublcasses should override to supply custom metadata specific to 
 	 * a particular DataStore. This default implementation supplies the 
-	 * following metadata mappings:
+	 * following metadata mappings in an instance of {@link DefaultServiceInfo}.
 	 * 	<ul>
 	 * 		<li>{@link DataStoreFactorySpi#getDisplayName()} -> {@link ServiceInfo#getTitle()}
 	 * 		<li>{@link DataStoreFactorySpi#getDescription()} -> {@link ServiceInfo#getDescription()}.
@@ -219,7 +219,7 @@ public abstract class DataStoreService extends AbstractService {
 	 * @param dataStore The underlying datastore.
 	 * @param monitor Progress monitor for blocking calls.  
 	 * 
-	 * @return The service info.
+	 * @return An instance of {@link DefaultServiceInfo}.
 	 */
 	protected ServiceInfo createMetaData( DataStore dataStore, ProgressListener monitor ) {
         DataStoreFactorySpi factory = createDataStoreFactory();

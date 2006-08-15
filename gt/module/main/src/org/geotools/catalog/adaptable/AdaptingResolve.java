@@ -99,6 +99,10 @@ public abstract class AdaptingResolve implements Resolve {
 		adapterCache = new HashMap();
 	}
 	
+	public ResolveAdapterFactoryFinder getResolveAdapterFactoryFinder() {
+		return finder;
+	}
+	
 	/**
 	 * Sublcasses need to override and ensure that returned members are 
 	 * instances of {@link AdaptingResolve}.
