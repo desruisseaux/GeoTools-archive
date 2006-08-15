@@ -93,7 +93,7 @@ public class MIFTestUtils {
         throws IOException {
         FileChannel sourceChannel = new FileInputStream(in).getChannel();
         FileChannel destinationChannel = new FileOutputStream(out).getChannel();
-        sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
+        destinationChannel.transferFrom( sourceChannel, 0, sourceChannel.size() );
         sourceChannel.close();
         destinationChannel.close();
     }

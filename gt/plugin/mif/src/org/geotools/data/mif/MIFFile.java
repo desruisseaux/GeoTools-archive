@@ -1160,10 +1160,7 @@ public class MIFFile {
             FileChannel sourceChannel = new FileInputStream(in).getChannel();
             FileChannel destinationChannel = new FileOutputStream(out)
                 .getChannel();
-            sourceChannel.transferTo(0, sourceChannel.size(), destinationChannel);
-            sourceChannel.close();
-            destinationChannel.close();
-
+            destinationChannel.transferFrom( sourceChannel, 0, sourceChannel.size() );
             if (deleteIn) {
                 in.delete();
             }
