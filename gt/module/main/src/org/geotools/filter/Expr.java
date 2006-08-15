@@ -213,16 +213,29 @@ public abstract class Expr implements FilterFactory {
 			double maxx, double maxy, String srs) {
 		
 		PropertyName name = property(propertyName);
+		return bbox( name, minx, miny, maxx, maxy, srs );
+	}
+
+	public BBOX bbox(Expression e, double minx, double miny, double maxx, double maxy, String srs) {
+		
+		PropertyName name = null;
+		if ( e instanceof PropertyName ) {
+			name = (PropertyName) e;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+		
 		BBoxExpression bbox = null;
 		try {
 			bbox = createBBoxExpression(new Envelope(minx,miny,maxx,maxy));
 		} 
-		catch (IllegalFilterException e) {
-			new IllegalArgumentException().initCause(e);
+		catch (IllegalFilterException ife) {
+			new IllegalArgumentException().initCause(ife);
 		}
 		
-		BBOXImpl box = new BBOXImpl(this,name,bbox);
-		box.setPropertyName(propertyName);
+		BBOXImpl box = new BBOXImpl(this,e,bbox);
+		box.setPropertyName( name.getPropertyName() );
 		box.setSRS(srs);
 		box.setMinX(minx);
 		box.setMinY(miny);
@@ -231,84 +244,133 @@ public abstract class Expr implements FilterFactory {
 		
 		return box;
 	}
-
+	
 	public Beyond beyond(String propertyName, Geometry geometry,
 			double distance, String units) {
 		
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		BeyondImpl beyond = new BeyondImpl(this,name,geom);
+		return beyond( name, geom, distance, units );
+	}
+
+	public Beyond beyond( 
+		Expression geometry1, Expression geometry2, double distance, String units
+	) {
+		
+		BeyondImpl beyond = new BeyondImpl(this,geometry1,geometry2);
 		beyond.setDistance(distance);
 		beyond.setUnits(units);
 		
 		return beyond;
 	}
-
+	
 	public Contains contains(String propertyName, Geometry geometry) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new ContainsImpl(this,name,geom);
+		return contains( name, geom );
+	}
+	
+	public Contains contains(Expression geometry1, Expression geometry2) {
+		return new ContainsImpl( this, geometry1, geometry2 );
 	}
 
 	public Crosses crosses(String propertyName, Geometry geometry) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new CrossesImpl(this,name,geom);
+		return crosses( name, geom );
 	}
+	
+	public Crosses crosses(Expression geometry1, Expression geometry2) {
+		return new CrossesImpl( this, geometry1, geometry2 );
+	}
+	
 
 	public Disjoint disjoint(String propertyName, Geometry geometry) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new DisjointImpl(this,name,geom);
+		return disjoint( name, geom );
 	}
 
+	
+	public Disjoint disjoint(Expression geometry1, Expression geometry2) {
+		return new DisjointImpl( this, geometry1, geometry2 );
+	}
+	
 	public DWithin dwithin(String propertyName, Geometry geometry,
 			double distance, String units) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new DWithinImpl(this,name,geom);
+		return dwithin( name, geom, distance, units );
 	}
 
+	public DWithin dwithin(Expression geometry1, Expression geometry2, double distance, String units) {
+		DWithinImpl dwithin =  new DWithinImpl( this, geometry1, geometry2 );
+		dwithin.setDistance( distance );
+		dwithin.setUnits( units );
+		
+		return dwithin;
+	}
+	
 	public Equals equals(String propertyName, Geometry geometry) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new EqualsImpl(this,name,geom);
+		return equal( name, geom );
+	}
+	
+	public Equals equal(Expression geometry1, Expression geometry2) {
+		return new EqualsImpl( this, geometry1, geometry2 );
 	}
 
 	public Intersects intersects(String propertyName, Geometry geometry) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new IntersectsImpl(this,name,geom);
+		return intersects( name, geom );
 	}
 
+	public Intersects intersects(Expression geometry1, Expression geometry2) {
+		return new IntersectsImpl( this, geometry1, geometry2 );
+	}
+	
 	public Overlaps overlaps(String propertyName, Geometry geometry) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new OverlapsImpl(this,name,geom);
+		return overlaps( name, geom );
 	}
 
+	public Overlaps overlaps(Expression geometry1, Expression geometry2) {
+		return new OverlapsImpl( this, geometry1, geometry2 );
+	}
+	
 	public Touches touches(String propertyName, Geometry geometry) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new TouchesImpl(this,name,geom);
+		return touches( name, geom );
 	}
 
+	public Touches touches(Expression geometry1, Expression geometry2) {
+		return new TouchesImpl(this,geometry1,geometry2);
+	}
+	
 	public Within within(String propertyName, Geometry geometry) {
 		PropertyName name = property(propertyName);
 		Literal geom = literal(geometry);
 		
-		return new WithinImpl(this,name,geom);
+		return within( name, geom );
 	}
 
+	public Within within(Expression geometry1, Expression geometry2) {
+		return new WithinImpl( this, geometry1, geometry2 );
+	}
+	
 	public Add add(Expression expr1, Expression expr2) {
 		return new AddImpl(expr1,expr2);
 	}

@@ -45,6 +45,8 @@ import org.geotools.filter.spatial.IntersectsImpl;
 import org.geotools.filter.spatial.OverlapsImpl;
 import org.geotools.filter.spatial.TouchesImpl;
 import org.geotools.filter.spatial.WithinImpl;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 
@@ -65,7 +67,7 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
      */
     public FilterFactoryImpl() {
     }
-
+  
     /**
      * Creates an AttributeExpression using the supplied xpath.
      * <p>

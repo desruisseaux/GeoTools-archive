@@ -18,11 +18,13 @@ package org.geotools.filter;
 import java.awt.Color;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
+
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
 
 /**
  * Utility class for working with Filters & Expression.
@@ -201,20 +203,20 @@ public class Filters {
         if (expr == null) {
             return null;
         }
-        else if (expr instanceof LiteralExpression) {
-            LiteralExpression literal = (LiteralExpression) expr;
-            Object value = literal.getLiteral();
+        else if (expr instanceof Literal) {
+        		Literal literal = (Literal) expr;
+            Object value = literal.getValue();
 
             if (TYPE.isInstance(value)) {
                 return value;
             }
         }
-        else if (expr instanceof FunctionExpression) {
-            FunctionExpression function = (FunctionExpression) expr;
-
-            if (function.getArgCount() != 0) {
-                for (int i = 0; i < function.getArgCount(); i++) {
-                    Expression e = function.getArgs()[i];
+        else if (expr instanceof Function) {
+        		Function function = (Function) expr;
+        		List params = function.getParameters();
+            if ( params != null && params.size() != 0 ) {
+                for (int i = 0; i < params.size(); i++) {
+                    Expression e = (Expression) params.get(i);
                     Object value = asType(e, TYPE);
 
                     if (value != null) {
@@ -225,7 +227,7 @@ public class Filters {
         }
         else {
             try { // this is a bad idea, not expected to work much
-                Object value = expr.getValue(null);
+                Object value = expr.evaluate(null);
 
                 if (TYPE.isInstance(value)) {
                     return value;
