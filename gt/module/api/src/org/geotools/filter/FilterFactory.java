@@ -24,6 +24,18 @@ import org.geotools.filter.expression.BBoxExpression;
 import org.geotools.filter.expression.FunctionExpression;
 import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.filter.expression.MathExpression;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 
 
 /**
@@ -381,4 +393,48 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @deprecated use {@link org.opengis.filter.FilterFactory#not(org.opengis.filter.Filter)}
      */
     public Filter not(Filter f);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    //      	SPATIAL FILTERS
+    //
+    //////////////////////////////////////////////////////////////////////////////    //
+
+        /** Checks if the geometry expression overlaps the specified bounding box. */
+        BBOX        bbox( Expression geometry, double minx, double miny, double maxx, double maxy, String srs);
+        
+
+        /** Check if all of a geometry is more distant than the given distance from this object's geometry. */
+        Beyond      beyond( Expression geometry1, Expression geometry2, double distance, String units);
+
+        /** Checks if the the first geometric operand contains the second. */
+        Contains    contains(Expression geometry1, Expression geometry2);
+
+        /** Checks if the first geometric operand crosses the second. */
+        Crosses     crosses(Expression geometry1, Expression geometry2);
+
+        /** Checks if the first operand is disjoint from the second. */
+        Disjoint    disjoint(Expression geometry1, Expression geometry2);
+
+        /** Checks if any part of the first geometry lies within the given distance of the second geometry. */
+        DWithin     dwithin(Expression geometry1, Expression geometry2, double distance, String units);
+
+        /** Checks if the geometry of the two operands are equal.
+         * @todo should be equals, resolve conflict with PropertyIsEqualTo equals( Expression, Expression )
+         */
+        Equals      equal(Expression geometry1, Expression geometry2);
+
+        /** Checks if the two geometric operands intersect. */
+        Intersects  intersects(Expression geometry1, Expression geometry2);
+
+        /** Checks if the interior of the first geometry somewhere overlaps the interior of the second geometry. */
+        Overlaps    overlaps(Expression geometry1, Expression geometry2);
+
+        /** Checks if the feature's geometry touches, but does not overlap with the geometry held by this object. */
+        Touches     touches(Expression propertyName1, Expression geometry2);
+
+        /** Checks if the feature's geometry is completely contained by the specified constant geometry. */
+        Within      within(Expression geometry1, Expression geometry2);
+    
 }
+
