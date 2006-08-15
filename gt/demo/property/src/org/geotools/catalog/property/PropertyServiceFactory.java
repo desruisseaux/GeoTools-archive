@@ -1,6 +1,7 @@
 package org.geotools.catalog.property;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -42,7 +43,7 @@ public class PropertyServiceFactory implements ServiceFactory {
 	public boolean canProcess( URI uri ) {
 		try {
 			File file = new File( uri.toURL().getFile() );
-			return file.isDirectory() && file.canRead();
+			return file.isDirectory() && file.canRead() && containsPropertyFile( file );
 		}
 		catch( MalformedURLException e) {
 			return false;
@@ -66,4 +67,24 @@ public class PropertyServiceFactory implements ServiceFactory {
 		return map;
 	}
 
+	static boolean containsPropertyFile( File dir ) {
+		if ( dir.isDirectory() ) {
+			dir.listFiles( 
+				new FilenameFilter() {
+
+					public boolean accept(File dir, String name) {
+						String s = ".properties";
+						if ( name.length() > s.length() ) {
+							return s.equals( name.substring( s.length() ) );
+						}
+						
+						return false;
+					}
+					
+				}
+			);
+		}
+		
+		return false;
+	}
 }

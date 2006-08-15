@@ -3,6 +3,7 @@ package org.geotools.catalog.property;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +61,33 @@ public class PropertyService extends DataStoreService {
 		return new PropertyGeoResource( this, typeName );
 	}
 
+	protected ServiceInfo createMetaData(DataStore dataStore, ProgressListener monitor) {
+		
+		String namespace = null;
+		try {
+			namespace = (String) PropertyDataStoreFactory.NAMESPACE.lookUp( getConnectionParams() );
+		} 
+		catch (IOException e) {
+			logger.log( Level.WARNING, "Error looking up namespace", e );
+		}
+		
+		if ( namespace == null ) {
+			return super.createMetaData( dataStore, monitor );
+		}
+		
+		DefaultServiceInfo info = (DefaultServiceInfo) super.createMetaData( dataStore, monitor );
+		
+		try {
+			info.setSchema( new URI( namespace ) );
+		}
+		catch( URISyntaxException e ) {
+			logger.log( Level.WARNING, "Error parsing namespace:" + namespace, e );
+		}
+		
+		return info;
+	}
+	
+	
 	public URI getIdentifier() {
 		return directory.toURI();
 	}

@@ -50,6 +50,9 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
     public static final Param DIRECTORY = new Param("directory", File.class,
             "Directory containting property files", true);
 
+    public static final Param NAMESPACE = new Param("namespace", String.class, 
+    		"namespace of datastore", false );
+    
     /**
      * DOCUMENT ME!
      *
