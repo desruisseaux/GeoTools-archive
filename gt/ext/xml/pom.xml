@@ -105,18 +105,18 @@
        <version>1.2</version>
      </dependency>
      <dependency>
-       <groupId>eclipse</groupId>
-       <artifactId>org.eclipse.xsd</artifactId>
-       <version>2.1.0</version>
+       <groupId>org.eclipse.xsd</groupId>
+       <artifactId>xsd</artifactId>
+       <version>2.1.1</version>
      </dependency>
      <dependency>
-       <groupId>eclipse</groupId>
-       <artifactId>org.eclipse.emf.common</artifactId>
+       <groupId>org.eclipse.emf</groupId>
+       <artifactId>common</artifactId>
        <version>2.1.0</version>
      </dependency>
  		<dependency>
-       <groupId>eclipse</groupId>
-       <artifactId>org.eclipse.emf.ecore</artifactId>
+       <groupId>org.eclipse.emf</groupId>
+       <artifactId>ecore</artifactId>
        <version>2.1.0</version>
      </dependency>
 	
