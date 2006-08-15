@@ -33,8 +33,10 @@ public class GMLAbstractFeatureTypeBindingTest extends AbstractGMLBindingTest {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		String loc = getClass().getResource("myFeature.xsd").getFile();
-		mySchema = Schemas.parse(loc,null,new XSDSchemaLocationResolver[]{new GMLSchemaLocationResolver()});
+		String loc = getClass().getResource("myFeature.xsd").toString();
+		mySchema = Schemas.parse(
+			loc,null,new XSDSchemaLocationResolver[]{new GMLSchemaLocationResolver()}
+		);
 		container = new DefaultPicoContainer();
 		
 		container.registerComponentImplementation(FeatureTypeCache.class);

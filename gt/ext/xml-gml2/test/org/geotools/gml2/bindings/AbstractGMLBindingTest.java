@@ -50,7 +50,9 @@ public class AbstractGMLBindingTest extends TestCase {
 	AttributeTypeFactory attFactory;
 	
 	protected void setUp() throws Exception {
-		String loc = GMLSchemaLocationResolver.class.getResource("feature.xsd").getFile();
+		String loc =
+			GMLSchemaLocationResolver.class.getResource("feature.xsd").toString();
+		
 		schema = Schemas.parse(loc, null, new XSDSchemaLocationResolver[]{new GMLSchemaLocationResolver()});
 		container = new DefaultPicoContainer();
 		
