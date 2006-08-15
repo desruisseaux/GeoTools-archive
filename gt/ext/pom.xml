@@ -94,6 +94,10 @@
     <module>shaperenderer</module>
     <module>validation</module>
     <module>widgets-swing</module>
+		<module>xml</module>
+		<module>xml-gml2</module>
+		<module>xml-gml3</module>
+		<module>xml-filter</module>
     <module>mappane</module>
   </modules>
 
