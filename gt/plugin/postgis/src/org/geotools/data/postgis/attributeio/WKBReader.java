@@ -39,7 +39,6 @@ import java.lang.reflect.Method;
 import org.geotools.util.LiteCoordinateSequence;
 import org.geotools.util.LiteCoordinateSequenceFactory;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;

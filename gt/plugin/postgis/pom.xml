@@ -62,8 +62,8 @@
       </roles>
     </developer>
     <developer>
-      <id>jdeolive</id>
       <name>Justin Deoliveira</name>
+      <id>jdeolive</id>
       <email>jdeolive@users.sourceforge.net</email>
       <organization>TOPP</organization>
       <roles>
