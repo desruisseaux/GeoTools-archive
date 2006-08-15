@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2-ext</artifactId>
+    <version>2.3-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.geotools</groupId>
+  <artifactId>gt2-xml-gml2</artifactId>
+  <packaging>jar</packaging>
+  <name>GML2 XML module</name>
+  <url>http://maven.geotools.fr/reports/xml-gml2/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml2/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml2/</url>
+  </scm>
+  <description>
+	GML2 XML support for Geotools.
+  </description>
+
+  <developers>
+    <developer>
+      <name>Justin Deoliveira</name>
+      <id>jdeolive</id>
+      <email>jdeolive@openplans.org</email>
+      <organization>The Open Planning Project</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-api</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverage</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-xml</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>    
+  </dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/AbstractGMLBindingTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+		</plugins>
+  </build>
+</project>

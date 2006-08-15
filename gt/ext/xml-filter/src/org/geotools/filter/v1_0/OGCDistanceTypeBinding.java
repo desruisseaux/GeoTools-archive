@@ -1,0 +1,77 @@
+package org.geotools.filter.v1_0;
+
+
+import org.geotools.xml.*;
+
+import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import javax.xml.namespace.QName;
+
+/**
+ * Binding object for the type http://www.opengis.net/ogc:DistanceType.
+ *
+ * <p>
+ *	<pre>
+ *	 <code>
+ *  &lt;xsd:complexType mixed="true" name="DistanceType"&gt;
+ *      &lt;xsd:attribute name="units" type="xsd:string" use="required"/&gt;
+ *  &lt;/xsd:complexType&gt; 
+ *		
+ *	  </code>
+ *	 </pre>
+ * </p>
+ *
+ * @generated
+ */
+public class OGCDistanceTypeBinding implements ComplexBinding {
+	/**
+	 * @generated
+	 */
+	public QName getTarget() {
+		return OGC.DISTANCETYPE;
+	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public int getExecutionMode() {
+		return AFTER;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public Class getType() {
+		return Double.class;
+	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
+	
+	}
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public Object parse(ElementInstance instance, Node node, Object value) 
+		throws Exception {
+		//TODO: return some object capable of representing units
+		String units = (String) node.getAttribute("units").getValue();
+		return Double.valueOf( (String) value );
+	}
+	
+}

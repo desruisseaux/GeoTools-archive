@@ -1,0 +1,135 @@
+package org.geotools.gml2.bindings;
+
+
+
+
+import org.geotools.xml.*;
+
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
+import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.picocontainer.MutablePicoContainer;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+/**
+ * Binding object for the type http://www.opengis.net/gml:PolygonType.
+ *
+ * <p>
+ *	<pre>
+ *	 <code>
+ *  &lt;complexType name="PolygonType"&gt;
+ *      &lt;annotation&gt;
+ *          &lt;documentation&gt;         A Polygon is defined by an outer
+ *              boundary and zero or more inner          boundaries which
+ *              are in turn defined by LinearRings.       &lt;/documentation&gt;
+ *      &lt;/annotation&gt;
+ *      &lt;complexContent&gt;
+ *          &lt;extension base="gml:AbstractGeometryType"&gt;
+ *              &lt;sequence&gt;
+ *                  &lt;element ref="gml:outerBoundaryIs"/&gt;
+ *                  &lt;element ref="gml:innerBoundaryIs" minOccurs="0" maxOccurs="unbounded"/&gt;
+ *              &lt;/sequence&gt;
+ *          &lt;/extension&gt;
+ *      &lt;/complexContent&gt;
+ *  &lt;/complexType&gt; 
+ *		
+ *	  </code>
+ *	 </pre>
+ * </p>
+ *
+ * @generated
+ */
+public class GMLPolygonTypeBinding implements ComplexBinding {
+	
+	
+	GeometryFactory gFactory;
+	
+	public GMLPolygonTypeBinding(GeometryFactory gFactory) {
+		this.gFactory = gFactory;
+	}
+	
+	/**
+	 * @generated
+	 */
+	public QName getTarget() {
+		return GML.POLYGONTYPE;
+	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public int getExecutionMode() {
+		return AFTER;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public Class getType() {
+		return null;
+	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
+	
+	}
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public Object parse(ElementInstance instance, Node node, Object value) 
+		throws Exception {
+		
+		LinearRing shell = 
+			(LinearRing) node.getChild("outerBoundaryIs").getValue();
+		
+		List innerRings = node.getChildren("innerBoundaryIs");
+		LinearRing[] holes = new LinearRing[innerRings.size()];
+		for (int i = 0; i < innerRings.size(); i++) {
+			Node inode = (Node)innerRings.get(i);
+			holes[i] = (LinearRing) inode.getValue();
+		}
+		
+		return gFactory.createPolygon(shell,holes);
+	}
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	 public void encode(Object object, Element element, Document document) {
+	 	//TODO: implement
+	 }
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	 
+	 public Object getChild(Object object, QName name) {
+	 	//TODO: implement
+	 	return null;
+	 }
+}

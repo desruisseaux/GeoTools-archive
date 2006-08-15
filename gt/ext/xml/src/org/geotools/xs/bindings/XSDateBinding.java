@@ -1,0 +1,100 @@
+package org.geotools.xs.bindings;
+
+import java.util.Calendar;
+
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.namespace.QName;
+
+import org.geotools.xml.InstanceComponent;
+import org.geotools.xml.SimpleBinding;
+
+import com.sun.xml.bind.DatatypeConverterImpl;
+
+/**
+ * Binding object for the type http://www.w3.org/2001/XMLSchema:date.
+ *
+ * <p>
+ *	<pre>
+ *	 <code>
+ *  &lt;xs:simpleType name="date" id="date"&gt;
+ *      &lt;xs:annotation&gt;
+ *          &lt;xs:appinfo&gt;
+ *              &lt;hfp:hasFacet name="pattern"/&gt;
+ *              &lt;hfp:hasFacet name="enumeration"/&gt;
+ *              &lt;hfp:hasFacet name="whiteSpace"/&gt;
+ *              &lt;hfp:hasFacet name="maxInclusive"/&gt;
+ *              &lt;hfp:hasFacet name="maxExclusive"/&gt;
+ *              &lt;hfp:hasFacet name="minInclusive"/&gt;
+ *              &lt;hfp:hasFacet name="minExclusive"/&gt;
+ *              &lt;hfp:hasProperty name="ordered" value="partial"/&gt;
+ *              &lt;hfp:hasProperty name="bounded" value="false"/&gt;
+ *              &lt;hfp:hasProperty name="cardinality" value="countably infinite"/&gt;
+ *              &lt;hfp:hasProperty name="numeric" value="false"/&gt;
+ *          &lt;/xs:appinfo&gt;
+ *          &lt;xs:documentation source="http://www.w3.org/TR/xmlschema-2/#date"/&gt;
+ *      &lt;/xs:annotation&gt;
+ *      &lt;xs:restriction base="xs:anySimpleType"&gt;
+ *          &lt;xs:whiteSpace value="collapse" fixed="true" id="date.whiteSpace"/&gt;
+ *      &lt;/xs:restriction&gt;
+ *  &lt;/xs:simpleType&gt; 
+ *		
+ *	  </code>
+ *	 </pre>
+ * </p>
+ *
+ * @generated
+ */
+public class XSDateBinding implements SimpleBinding  {
+
+	/**
+	 * @generated
+	 */	
+	public QName getTarget() {
+		return XS.DATE;
+	}
+	
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public int getExecutionMode() {
+		return AFTER;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * This binding returns objects of type {@link Calendar}.
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public Class getType() {
+		return Calendar.class;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * This binding returns objects of type {@link Calendar}.
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public Object parse(InstanceComponent instance, Object value) 
+		throws Exception {
+		DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
+		return DatatypeConverter.parseDate((String) value);
+	}
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 *	
+	 * @generated modifiable
+	 */	
+	public String encode(Object object, String value) {
+		Calendar date = (Calendar)object;
+		return DatatypeConverter.printDate(date);
+	}
+	
+}
