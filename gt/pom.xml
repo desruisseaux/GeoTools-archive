@@ -558,6 +558,7 @@
           <include>**/*.txt</include>
           <include>**/*.sql</include>
           <include>**/*.xml</include>
+          <include>**/*.xsd</include>
           <include>**/*.utf</include>
           <include>**/*.properties</include>
           <include>**/*.serialized</include>
