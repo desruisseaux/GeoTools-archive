@@ -1,6 +1,5 @@
 package org.geotools.gml2;
 
-import java.io.InputStream;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
@@ -8,7 +7,6 @@ import junit.framework.TestCase;
 import org.geotools.gml2.bindings.GMLBindingConfiguration;
 import org.geotools.gml2.bindings.GMLSchemaLocationResolver;
 import org.geotools.xml.Configuration;
-import org.geotools.xml.Parser;
 import org.geotools.xml.StreamingParser;
 import org.geotools.xs.bindings.XSBindingConfiguration;
 import org.picocontainer.MutablePicoContainer;
