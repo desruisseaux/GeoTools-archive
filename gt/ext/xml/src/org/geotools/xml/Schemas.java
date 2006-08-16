@@ -3,9 +3,14 @@ package org.geotools.xml;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
@@ -608,8 +613,12 @@ public class Schemas {
 	}
 	
 	/**
-	 * Returns a flat list of includes from the specified schema. The method 
-	 * recurses into included schemas.
+	 * Returns a flat list of includes from the specified schema.
+	 * <p> 
+	 * The method recurses into included schemas. The list returned is filtered so that 
+	 * duplicate includes are removed. Two includes are considered equal if they have the same
+	 * uri location
+	 * </p>
 	 * 
 	 * @param schema The top-level schema.
 	 * 
@@ -618,8 +627,10 @@ public class Schemas {
 	public static final List getIncludes(XSDSchema schema) {
 		LinkedList queue = new LinkedList();
 		ArrayList includes = new ArrayList();
+		HashSet added = new HashSet();
 		
 		queue.addLast(schema);
+		
 		while(!queue.isEmpty()) {
 			schema = (XSDSchema)queue.removeFirst();
 			List contents = schema.getContents();
@@ -628,13 +639,17 @@ public class Schemas {
 				if (content instanceof XSDInclude) {
 					XSDInclude include = (XSDInclude)content;
 					
-					includes.add(include);
-					queue.addLast(include.getIncorporatedSchema());
+					if ( !added.contains( include.getSchemaLocation() ) ) {
+						includes.add( include );
+						added.add( include.getSchemaLocation() );
+						
+						queue.addLast(include.getIncorporatedSchema());
+					}
 					
 				}
 			}
 		}
-		
+	
 		return includes;
 	}
 	
@@ -762,5 +777,27 @@ public class Schemas {
 			
 			return null;		
 		}
+	}
+	
+	
+	/**
+	 * Returns the namespace prefix mapped to the targetNamespace of the schema.
+	 * 
+	 * @param schema The schema in question.
+	 * 
+	 * @return The namesapce prefix, or <code>null</code> if not found.
+	 */
+	public static String getTargetPrefix( XSDSchema schema ) {
+		String ns = schema.getTargetNamespace();
+		Map pre2ns = schema.getQNamePrefixToNamespaceMap();
+		
+		for (Iterator itr = pre2ns.entrySet().iterator(); itr.hasNext();) {
+			Map.Entry entry = (Map.Entry)itr.next();
+			if (entry.getValue().equals(ns)) {
+				return  (String)entry.getKey();
+			}
+		}
+		
+		return null;
 	}
 }
