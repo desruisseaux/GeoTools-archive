@@ -95,65 +95,69 @@
       <artifactId>batik-transcoder</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-util</artifactId>
-	</dependency>
+    </dependency>
     <dependency>
        <groupId>xerces</groupId>
        <artifactId>xercesImpl</artifactId>
     </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis-xerces</artifactId>
+    </dependency>
 
-	<dependency>
-	  <groupId>batik</groupId>
+    <dependency>
+      <groupId>batik</groupId>
       <artifactId>batik-svg-dom</artifactId>
       <optional>true</optional>
-	</dependency>
-	<dependency>
-	  <groupId>batik</groupId>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
       <artifactId>batik-dom</artifactId>
       <optional>true</optional>
-	</dependency>
-	<dependency>
+    </dependency>
+    <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-css</artifactId>
       <optional>true</optional>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-bridge</artifactId>
       <optional>true</optional>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-gvt</artifactId>
       <optional>true</optional>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-ext</artifactId>
       <optional>true</optional>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-xml</artifactId>
       <optional>true</optional>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-script</artifactId>
       <optional>true</optional>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-awt-util</artifactId>
       <optional>true</optional>
-	</dependency>
+    </dependency>
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-parser</artifactId>
       <optional>true</optional>
-	</dependency>
+    </dependency>
   </dependencies>
 
 
