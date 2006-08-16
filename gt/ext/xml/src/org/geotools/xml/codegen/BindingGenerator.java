@@ -8,6 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.xsd.XSDAttributeDeclaration;
+import org.eclipse.xsd.XSDAttributeGroupDefinition;
+import org.eclipse.xsd.XSDAttributeUse;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDSchema;
@@ -88,7 +90,7 @@ public class BindingGenerator extends AbstractGenerator {
 			List types = schema.getTypeDefinitions();
 			for ( Iterator t = types.iterator(); t.hasNext(); ) {
 				XSDTypeDefinition type = (XSDTypeDefinition) t.next();
-				generate( type, schema);
+				generate( type, schema );
 				
 				if ( target( type, schema ) )
 					components.add( type );
@@ -97,6 +99,7 @@ public class BindingGenerator extends AbstractGenerator {
 		}
 		
 		if ( generateAttributes ) {
+			
 			List attributes = schema.getAttributeDeclarations();
 			for ( Iterator a = attributes.iterator(); a.hasNext(); ) {
 				XSDAttributeDeclaration attribute = 
@@ -104,8 +107,9 @@ public class BindingGenerator extends AbstractGenerator {
 				generate( attribute, schema );
 				
 				if ( target( attribute, schema ) )
-					components.add( attributes );
+					components.add( attribute );
 			}
+			
 		}
 		
 		if ( generatingBindingConfiguration ) {
@@ -138,8 +142,8 @@ public class BindingGenerator extends AbstractGenerator {
 	}
 	
 	void generate( XSDNamedComponent c, XSDSchema schema  ) {
-		if ( ! c.getTargetNamespace().equals( schema.getTargetNamespace() ) ) 
-				return;
+		if ( ! target( c, schema ) )
+			return;
 		
 		try {
 			String result = execute( "CLASS", new Object[]{ c, bindingConstructorArguments } );
