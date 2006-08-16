@@ -35,11 +35,11 @@ public class SVGGlyphRenderer implements GlyphRenderer {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
     
-    static {
+ //   static {
         // do register our xml reader wrapper against batik so that we can use
         // jaxp instead of the hard-coded xerces implementation
-        XMLResourceDescriptor.setXMLParserClassName(BatikXMLReader.class.getName());
-    }
+        //XMLResourceDescriptor.setXMLParserClassName(BatikXMLReader.class.getName());
+//    }
     
     /** Creates a new instance of SVGGlyphRenderer */
     public SVGGlyphRenderer() {
