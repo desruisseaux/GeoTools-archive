@@ -81,7 +81,15 @@ public class GenerateSVG {
 
         renderMap(map, env, g2d);
         LOGGER.finest("writing to file");
-        g2d.stream(new OutputStreamWriter(out, "UTF-8"));
+        OutputStreamWriter osw = null;
+        try {
+            osw = new OutputStreamWriter(out, "UTF-8");
+            g2d.stream(osw);
+        } finally {
+            if(osw != null)
+                osw.close();
+        }
+        
     }
 
     /**

@@ -22,9 +22,10 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.util.XMLResourceDescriptor;
 
 /**
- *
+ * Turns SVG vector drawings into buffered images geotools can use for rendering
  * @author  James
  * @source $URL$
  */
@@ -34,12 +35,18 @@ public class SVGGlyphRenderer implements GlyphRenderer {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
     
+    static {
+        // do register our xml reader wrapper against batik so that we can use
+        // jaxp instead of the hard-coded xerces implementation
+        XMLResourceDescriptor.setXMLParserClassName(BatikXMLReader.class.getName());
+    }
+    
     /** Creates a new instance of SVGGlyphRenderer */
     public SVGGlyphRenderer() {
     }
     
     public boolean canRender(String format) {
-        return (format.toLowerCase() == "image/svg"); 
+        return (format.toLowerCase().equals("image/svg+xml")); 
     }
     
     public java.util.List getFormats() {

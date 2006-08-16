@@ -79,20 +79,77 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-transcoder</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <!-- 
+         FROM HERE ON, BATIK DEPENDENCIES - I'VE TRIED WITH 1.6-1 BUT
+         TEST DID NOT PASS WITH STRANGE CLASSPATH PROBLEMS 
+         Since these are many, I've decided to make the ones not required
+         for compiling optionals...
+    -->
     <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
+      <groupId>batik</groupId>
+      <artifactId>batik-transcoder</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
+	<dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-util</artifactId>
+	</dependency>
+
+	<dependency>
+	  <groupId>batik</groupId>
+      <artifactId>batik-svg-dom</artifactId>
+      <optional>true</optional>
+	</dependency>
+	<dependency>
+	  <groupId>batik</groupId>
+      <artifactId>batik-dom</artifactId>
+      <optional>true</optional>
+	</dependency>
+	<dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-css</artifactId>
+      <optional>true</optional>
+	</dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-bridge</artifactId>
+      <optional>true</optional>
+	</dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-gvt</artifactId>
+      <optional>true</optional>
+	</dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-ext</artifactId>
+      <optional>true</optional>
+	</dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-xml</artifactId>
+      <optional>true</optional>
+	</dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-script</artifactId>
+      <optional>true</optional>
+	</dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-awt-util</artifactId>
+      <optional>true</optional>
+	</dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-parser</artifactId>
+      <optional>true</optional>
+	</dependency>
   </dependencies>
 
 
