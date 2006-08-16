@@ -25,7 +25,9 @@ import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
+import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -48,8 +50,6 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 import javax.units.UnitFormat;
 
@@ -78,6 +78,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 import com.sun.media.imageio.stream.RawImageInputStream;
@@ -228,7 +229,6 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		//
 		// ///////////////////////////////////////////////////////////
 		crs = initCRS();
-		longitudeFirst = !GridGeometry2D.swapXY(crs.getCoordinateSystem());
 		this.originalEnvelope = getBounds(crs);
 
 		// /////////////////////////////////////////////////////////////////////
@@ -236,8 +236,10 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		// Compute source Resolution
 		//
 		// /////////////////////////////////////////////////////////////////////
-		higherRes = getResolution(originalEnvelope, new Rectangle(0, 0, header
+		highestRes = getResolution(originalEnvelope, new Rectangle(0, 0, header
 				.getNCols(), header.getNRows()), crs);
+		numOverviews = 0;
+		overViewResolutions = null;
 
 	}
 
@@ -379,17 +381,12 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		latMax = yULC + yDim / 2.0;
 		longMax = longMin + imageWidth * xDim;
 		latMin = latMax - imageHeight * yDim;
-		if (longitudeFirst) {
-			// longitude
-			env.setRange(0, longMin, longMax);
-			// latitude
-			env.setRange(1, latMin, latMax);
-		} else {
-			// longitude
-			env.setRange(1, longMin, longMax);
-			// latitude
-			env.setRange(0, latMin, latMax);
-		}
+
+		// longitude
+		env.setRange(0, longMin, longMax);
+		// latitude
+		env.setRange(1, latMin, latMax);
+
 		env.setCoordinateReferenceSystem(crs);
 
 		return env;
@@ -412,28 +409,31 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 			Rectangle dim) throws IOException {
 		int hrWidth = originalGridRange.getLength(0);
 		int hrHeight = originalGridRange.getLength(1);
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// Compute requested Res
-		//
-		// /////////////////////////////////////////////////////////////////////
-		double requestedRes[] = getResolution(requestedEnvelope, dim, crs);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Setting subsampling factors with some checkings
 		// 1) the subsampling factors cannot be zero
 		// 2) the subsampling factors cannot be such that the w or h are zero
+		//
 		// /////////////////////////////////////////////////////////////////////
 		final ImageReadParam readP = new ImageReadParam();
-		super.decimationOnReadingControl(readP, requestedRes);
+		final Integer imageChoice;
+		try {
+			imageChoice = setReadParams(readP, requestedEnvelope, dim);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		} catch (TransformException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		}
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Statistics
 		//
 		// /////////////////////////////////////////////////////////////////////
-
 		final int max = stats.getMax();
 		final int min = stats.getMin();
 
@@ -444,10 +444,9 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		// /////////////////////////////////////////////////////////////////////
 		// trying to create a channel to the file to read
 		final String filePath = URLDecoder.decode(this.demURL.getFile(),
-				"US-ASCII");
+				"UTF-8");
 		final ImageInputStream iis = ImageIO.createImageOutputStream(new File(
 				filePath));
-
 		if (header.getByteOrder().compareToIgnoreCase("M") == 0) {
 			iis.setByteOrder(ByteOrder.BIG_ENDIAN);
 		} else {
@@ -474,13 +473,21 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 				/ readP.getSourceXSubsampling(), hrHeight
 				/ readP.getSourceYSubsampling(), 0, 0, (int) tileSize
 				.getWidth(), (int) tileSize.getHeight(), sm, cm);
+
 		// First operator: read the image
 		final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
 				il);
-		final ParameterBlockJAI pbj = new ParameterBlockJAI("ImageRead");
-		pbj.setParameter("Input", raw);
-		pbj.setParameter("ReadParam", readP);
-		RenderedOp image = JAI.create("ImageRead", pbj, hints);
+		final ParameterBlock pbjImageRead = new ParameterBlock();
+		pbjImageRead.add(raw);
+		pbjImageRead.add(imageChoice);
+		pbjImageRead.add(Boolean.FALSE);
+		pbjImageRead.add(Boolean.FALSE);
+		pbjImageRead.add(Boolean.FALSE);
+		pbjImageRead.add(null);
+		pbjImageRead.add(null);
+		pbjImageRead.add(readP);
+		pbjImageRead.add(null);
+		RenderedImage image = readfactory.create(pbjImageRead, hints);
 
 		// sample dimension for this coverage
 		final GridSampleDimension band = getSampleDimension(max, min);

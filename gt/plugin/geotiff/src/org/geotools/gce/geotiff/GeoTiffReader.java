@@ -108,12 +108,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	 */
 	private int imagesRead = 0;
 
-	/**
-	 * This contains the maximum number of grid coverages in the file/stream.
-	 * Until multi-image files are supported, this is going to be 0 or 1.
-	 */
-	private volatile int maxImages = 0;
-
 	private GeoTiffIIOMetadataDecoder metadata;
 
 	private GeoTiffMetadata2CRSAdapter gtcs;
@@ -268,26 +262,11 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// get the dimension of the hr image and build the model as well as
 		// computing the resolution
 		// //
-		maxImages = reader.getNumImages(true);
+		numOverviews = reader.getNumImages(true) - 1;
 		int hrWidth = reader.getWidth(0);
 		int hrHeight = reader.getHeight(0);
 		final Rectangle actualDim = new Rectangle(0, 0, hrWidth, hrHeight);
 		originalGridRange = new GeneralGridRange(actualDim);
-
-		// //
-		//
-		// get information for the successive images
-		//
-		// //
-		if (maxImages > 1) {
-			overViewDimensions = new int[maxImages - 1][2];
-			for (int i = 1; i < maxImages; i++) {
-				overViewDimensions[i - 1][0] = reader.getWidth(i);
-				overViewDimensions[i - 1][1] = reader.getHeight(i);
-			}
-
-		} else
-			overViewDimensions = null;
 
 		this.raster2Model = gtcs.getRasterToModel(metadata);
 		final AffineTransform tempTransform = new AffineTransform(
@@ -302,7 +281,24 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// setting the higher resolution avalaible for this coverage
 		//
 		// ///
-		higherRes = getResolution(originalEnvelope, actualDim, crs);
+		highestRes = getResolution(originalEnvelope, actualDim, crs);
+
+		// //
+		//
+		// get information for the successive images
+		//
+		// //
+		if (numOverviews > 1) {
+			overViewResolutions = new double[numOverviews ][2];
+			double res[];
+			for (int i = 0; i < numOverviews; i++) {
+				res = getResolution(originalEnvelope, new Rectangle(0, 0,
+						reader.getWidth(i), reader.getHeight(i)), crs);
+				overViewResolutions[i ][0] = res[0];
+				overViewResolutions[i ][1] = res[1];
+			}
+		} else
+			overViewResolutions = null;
 	}
 
 	/**
@@ -344,10 +340,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 				"GeoTIFF reader doesn't support metadata manipulation yet");
 	}
 
-	public Object getSource() {
-		return source;
-	}
-
 	/**
 	 * Returns true if another image remains to be read. This module currently
 	 * only supports one image per TIFF file, so the first read will make this
@@ -356,7 +348,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	 * @return true if another grid coverage remains to be read.
 	 */
 	public boolean hasMoreGridCoverages() {
-		return imagesRead < maxImages;
+		throw new UnsupportedOperationException(
+				"GeoTIFF reader doesn't support hasMoreGridCoverages");
 	}
 
 	/**
@@ -416,7 +409,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		Integer imageChoice = new Integer(0);
 		final ImageReadParam readP = new ImageReadParam();
 		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, dim, source);
+			imageChoice = setReadParams(readP, requestedEnvelope, dim);
 		} catch (TransformException e) {
 			new DataSourceException(e);
 		}
@@ -454,10 +447,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		pbjRead.add(null);
 		pbjRead.add(readP);
 		pbjRead.add(reader);
-
-
-
-	
 
 		// /////////////////////////////////////////////////////////////////////
 		//

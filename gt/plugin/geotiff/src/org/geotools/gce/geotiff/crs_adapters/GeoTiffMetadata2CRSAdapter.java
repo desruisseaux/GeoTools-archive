@@ -302,7 +302,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 						&& !tempCode.startsWith("epsg")) {
 					geogCode.insert(0, "EPSG:");
 				}
-				gcs = (GeographicCRS) CRS.decode(geogCode.toString());
+				gcs = (GeographicCRS) CRS.decode(geogCode.toString(),true);
 
 			} catch (FactoryException fe) {
 				final IOException ex = new GeoTiffException(metadata, fe

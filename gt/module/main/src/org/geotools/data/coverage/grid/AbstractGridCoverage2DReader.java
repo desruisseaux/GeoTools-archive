@@ -17,6 +17,7 @@ package org.geotools.data.coverage.grid;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
@@ -24,12 +25,12 @@ import java.awt.image.DataBuffer;
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.HashMap;
 
 import javax.imageio.ImageReadParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.IHSColorSpace;
 import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 import javax.units.UnitFormat;
 
@@ -94,7 +95,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * This contains the maximum number of grid coverages in the file/stream.
 	 * Until multi-image files are supported, this is going to be 0 or 1.
 	 */
-	protected volatile int maxImages = 0;
+	protected volatile int numOverviews = 0;
 
 	/** 2DGridToWorld math transform. */
 	protected MathTransform raster2Model = null;
@@ -114,19 +115,18 @@ public abstract class AbstractGridCoverage2DReader implements
 	/** Source to read from */
 	protected Object source = null;
 
-	protected Hints hints = null;
+	protected Hints hints = new Hints(new HashMap(5));
 
-	protected double[] higherRes = null;
+	protected double[] highestRes = null;
 
 	protected GeneralGridRange originalGridRange = null;
 
 	protected ImageInputStream inStream = null;
 
-	protected int[][] overViewDimensions = null;
+	protected double[][] overViewResolutions = null;
 
 	protected static final double EPS = 1E-6;
 
-	protected boolean longitudeFirst = false;
 
 	// -------------------------------------------------------------------------
 	//
@@ -151,7 +151,9 @@ public abstract class AbstractGridCoverage2DReader implements
 	// *
 	// * @return The number of predetermined overviews for the grid.
 	// */
-	// public abstract int getNumOverviews();
+	// public int getNumOverviews(){
+	// return numOverviews;
+	//	}
 	//
 	// /**
 	// * Returns the grid geometry for an overview.
@@ -378,7 +380,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @throws TransformException
 	 */
 	protected Integer setReadParams(ImageReadParam readP,
-			GeneralEnvelope requestedEnvelope, Rectangle dim, Object source)
+			GeneralEnvelope requestedEnvelope, Rectangle dim)
 			throws IOException, TransformException {
 
 		readP.setSourceSubsampling(1, 1, 0, 0);// default values for
@@ -388,7 +390,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		// Default image index 0
 		//
 		// //
-		final Integer imageChoice = new Integer(0);
+		Integer imageChoice = new Integer(0);
 
 		// //
 		//
@@ -397,7 +399,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		// Future versions should use both.
 		//
 		// //
-		final boolean decimate = (maxImages <= 1) ? true : false;
+		final boolean decimate = (numOverviews <= 0) ? true : false;
 
 		// //
 		//
@@ -409,8 +411,6 @@ public abstract class AbstractGridCoverage2DReader implements
 		if (requestedRes == null)
 			return imageChoice;
 
-		int hrWidth = this.originalGridRange.getLength(0);
-		int hrHeight = this.originalGridRange.getLength(1);
 		// //
 		//
 		// overviews or decimation
@@ -423,8 +423,8 @@ public abstract class AbstractGridCoverage2DReader implements
 			// Should we leave now? In case the resolution of the first level is
 			// already lower than the requested one we should use the first
 			// level and leave.
-			if (higherRes[0] - requestedRes[0] > EPS
-					&& higherRes[1] - requestedRes[1] > EPS)
+			if (highestRes[0] - requestedRes[0] > EPS
+					&& highestRes[1] - requestedRes[1] > EPS)
 				return imageChoice;
 
 			// Should we leave now? In case the resolution of the first level is
@@ -435,40 +435,68 @@ public abstract class AbstractGridCoverage2DReader implements
 				axis = 1;
 
 			// look for the highest lower resolution
-			double ratio;
 			double actRes;
-			int i = 1;
-			for (; i < maxImages; i++) {
-				ratio = (axis == 0) ? overViewDimensions[i][0]
-						/ (double) hrWidth : overViewDimensions[i][1]
-						/ (double) hrHeight;
-				actRes = higherRes[axis] / ratio;
+			int i = 0;
+			for (; i < numOverviews; i++) {
+				actRes = (axis == 0) ? overViewResolutions[i][0]
+						: overViewResolutions[i][1];
 				if (actRes - requestedRes[axis] > EPS)
 					break;
 			}
 			// checking that we did not exceeded the maximum number of pages.
-			return (i == maxImages) ? new Integer(maxImages - 1) : new Integer(
-					i);
-		} else
-			// /////////////////////////////////////////////////////////////////////
-			// DECIMATION ON READING
-			// /////////////////////////////////////////////////////////////////////
-			decimationOnReadingControl(readP, requestedRes);
+			if (i == numOverviews) {
+				// int subsamplingFactor=
+				imageChoice = new Integer(numOverviews);
+			} else
+				// keeping the first image at highest resolution into account
+				imageChoice = new Integer(i + 1);
+		}
+		// /////////////////////////////////////////////////////////////////////
+		// DECIMATION ON READING
+		// /////////////////////////////////////////////////////////////////////
+		decimationOnReadingControl(imageChoice, readP, requestedRes);
 		return imageChoice;
 	}
 
 	/**
+	 * This method is responsible for evaluating possible subsampling factors
+	 * once the best resolution level has been found, in case we have support
+	 * for overviews, or starting from the original coverage in case there are
+	 * no overviews availaible.
+	 * 
+	 * Anyhow this methof should not be called directly but subclasses should
+	 * make use of the setReadParams method instead in order to transparently
+	 * look for overviews.
+	 * 
+	 * @param imageChoice
 	 * @param readP
 	 * @param requestedRes
 	 * @param hrHeight2
 	 * @param hrWidth2
 	 */
-	protected void decimationOnReadingControl(ImageReadParam readP,
-			double[] requestedRes) {
+	protected void decimationOnReadingControl(Integer imageChoice,
+			ImageReadParam readP, double[] requestedRes) {
 		{
 
-			int hrWidth = this.originalGridRange.getLength(0);
-			int hrHeight = this.originalGridRange.getLength(1);
+			int w, h;
+			double selectedRes[]= new double[2];
+			final int choice = imageChoice.intValue();
+			if (choice == 0) {
+				// highest resolution
+				w = originalGridRange.getLength(0);
+				h = originalGridRange.getLength(1);
+				selectedRes[0]=highestRes[0];
+				selectedRes[1]=highestRes[1];
+			} else {
+				// some overview
+				selectedRes[0]=overViewResolutions[choice - 1][0];
+				selectedRes[1]=overViewResolutions[choice - 1][1];
+				w = (int) Math.round(originalEnvelope.getLength(0)
+						/ selectedRes[0]);
+				h = (int) Math.round(originalEnvelope.getLength(1)
+						/ selectedRes[1]);
+				
+			}
 			// /////////////////////////////////////////////////////////////////////
 			// DECIMATION ON READING
 			// Setting subsampling factors with some checkings
@@ -481,22 +509,20 @@ public abstract class AbstractGridCoverage2DReader implements
 
 			} else {
 				int subSamplingFactorX = (int) Math.floor(requestedRes[0]
-						/ higherRes[0]);
+						/ selectedRes[0]);
 				subSamplingFactorX = subSamplingFactorX == 0 ? 1
 						: subSamplingFactorX;
 
-				while (hrWidth / subSamplingFactorX <= 0
-						&& subSamplingFactorX >= 0)
+				while (w / subSamplingFactorX <= 0 && subSamplingFactorX >= 0)
 					subSamplingFactorX--;
 				subSamplingFactorX = subSamplingFactorX == 0 ? 1
 						: subSamplingFactorX;
 				int subSamplingFactorY = (int) Math.floor(requestedRes[1]
-						/ higherRes[1]);
+						/ selectedRes[1]);
 				subSamplingFactorY = subSamplingFactorY == 0 ? 1
 						: subSamplingFactorX;
 
-				while (hrHeight / subSamplingFactorY <= 0
-						&& subSamplingFactorY >= 0)
+				while (h / subSamplingFactorY <= 0 && subSamplingFactorY >= 0)
 					subSamplingFactorY--;
 				subSamplingFactorY = subSamplingFactorY == 0 ? 1
 						: subSamplingFactorY;
@@ -679,8 +705,9 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @param requestedRes
 	 * @throws DataSourceException
 	 */
-	protected double[] getResolution(GeneralEnvelope envelope, Rectangle2D dim,
-			CoordinateReferenceSystem crs) throws DataSourceException {
+	protected final double[] getResolution(GeneralEnvelope envelope,
+			Rectangle2D dim, CoordinateReferenceSystem crs)
+			throws DataSourceException {
 		double[] requestedRes = null;
 		try {
 			if (dim != null && envelope != null) {
@@ -696,9 +723,9 @@ public abstract class AbstractGridCoverage2DReader implements
 							envelope);
 
 				requestedRes = new double[2];
-				requestedRes[0] = envelope.getLength(longitudeFirst ? 0 : 1)
+				requestedRes[0] = envelope.getLength( 0 )
 						/ dim.getWidth();
-				requestedRes[1] = envelope.getLength(longitudeFirst ? 1 : 0)
+				requestedRes[1] = envelope.getLength( 1 )
 						/ dim.getHeight();
 			}
 			return requestedRes;
@@ -709,19 +736,19 @@ public abstract class AbstractGridCoverage2DReader implements
 		}
 	}
 
-	public CoordinateReferenceSystem getCrs() {
+	public final CoordinateReferenceSystem getCrs() {
 		return crs;
 	}
 
-	public GeneralGridRange getOriginalGridRange() {
+	public final GeneralGridRange getOriginalGridRange() {
 		return originalGridRange;
 	}
 
-	public GeneralEnvelope getOriginalEnvelope() {
+	public final GeneralEnvelope getOriginalEnvelope() {
 		return originalEnvelope;
 	}
 
-	public Object getSource() {
+	public final Object getSource() {
 		return source;
 	}
 

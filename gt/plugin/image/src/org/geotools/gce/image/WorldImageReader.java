@@ -16,8 +16,11 @@
  */
 package org.geotools.gce.image;
 
+import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,21 +37,23 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
+import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderedOp;
+import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
+import org.geotools.data.WorldFileReader;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.image.ImageUtilities;
@@ -59,7 +64,6 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -94,6 +98,8 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 
 	private CoordinateSystem cs;
 
+	private ImageReaderSpi readerSPI;
+
 	/**
 	 * Class constructor. Construct a new ImageWorldReader to read a
 	 * GridCoverage from the source object. The source must point to the raster
@@ -111,7 +117,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// Checking input
 		//
 		// /////////////////////////////////////////////////////////////////////
-		this.source = input;
 		coverageName = "image_coverage";
 		format = new WorldImageFormat();
 		if (input == null) {
@@ -122,6 +127,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 					"WorldImageReader", ex.getLocalizedMessage(), ex);
 			throw new DataSourceException(ex);
 		}
+		this.source = input;
 		try {
 			boolean closeMe = true;
 
@@ -145,7 +151,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 					// WMS Request? I want to be able to handle that case too
 					//
 					// /////////////////////////////////////////////////////////////////////
-					wmsRequest = WMSRequest();
+					wmsRequest = WMSRequest(input);
 
 				}
 
@@ -178,6 +184,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			// //
 			if (input instanceof ImageInputStream)
 				closeMe = false;
+
 			inStream = (ImageInputStream) (this.source instanceof ImageInputStream ? this.source
 					: ImageIO
 							.createImageInputStream((this.source instanceof URL) ? ((URL) this.source)
@@ -225,13 +232,14 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// //
 		//
 		// Get a reader for this format
-		// TOTO optimize this using image file extension when possible
+		// TODO optimize this using image file extension when possible
 		//
 		// //
 		final Iterator it = ImageIO.getImageReaders(inStream);
 		if (!it.hasNext())
 			throw new DataSourceException("No reader avalaible for this source");
 		final ImageReader reader = (ImageReader) it.next();
+		readerSPI = reader.getOriginatingProvider();
 		reader.setInput(inStream);
 
 		// //
@@ -239,26 +247,11 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// get the dimension of the hr image and build the model as well as
 		// computing the resolution
 		// //
-		maxImages = wmsRequest ? 1 : reader.getNumImages(true);
+		numOverviews = wmsRequest ? 0 : reader.getNumImages(true) - 1;
 		int hrWidth = reader.getWidth(0);
 		int hrHeight = reader.getHeight(0);
 		final Rectangle actualDim = new Rectangle(0, 0, hrWidth, hrHeight);
 		originalGridRange = new GeneralGridRange(actualDim);
-
-		// //
-		//
-		// get information for the overviews in case ony exists
-		//
-		// //
-		if (maxImages > 1) {
-			overViewDimensions = new int[maxImages - 1][2];
-			for (int i = 1; i < maxImages; i++) {
-				overViewDimensions[i - 1][0] = reader.getWidth(i);
-				overViewDimensions[i - 1][1] = reader.getHeight(i);
-			}
-
-		} else
-			overViewDimensions = null;
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -288,10 +281,25 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			// setting the higher resolution avalaible for this coverage
 			//
 			// ///
-			higherRes = getResolution(originalEnvelope, actualDim, crs);
+			highestRes = getResolution(originalEnvelope, actualDim, crs);
 
 		}
-
+		// //
+		//
+		// get information for the overviews in case ony exists
+		//
+		// //
+		if (numOverviews > 1) {
+			overViewResolutions = new double[numOverviews][2];
+			double res[];
+			for (int i = 0; i < numOverviews; i++) {
+				res = getResolution(originalEnvelope, new Rectangle(0, 0,
+						reader.getWidth(i), reader.getHeight(i)), crs);
+				overViewResolutions[i][0] = res[0];
+				overViewResolutions[i][1] = res[1];
+			}
+		} else
+			overViewResolutions = null;
 	}
 
 	/**
@@ -301,16 +309,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	 */
 	public Format getFormat() {
 		return this.format;
-	}
-
-	/**
-	 * Returns the source object containing the GridCoverage. Note that it
-	 * points to the raster, and not the world file.
-	 * 
-	 * @return the source object containing the GridCoverage.
-	 */
-	public Object getSource() {
-		return source;
 	}
 
 	/**
@@ -418,7 +416,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 				final int length = params.length;
 				for (int i = 0; i < length; i++) {
 					param = (Parameter) params[i];
-
 					if (param.getDescriptor().getName().getCode().equals(
 							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 									.toString())) {
@@ -439,41 +436,59 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		Integer imageChoice = new Integer(0);
 		final ImageReadParam readP = new ImageReadParam();
-		try {
-			imageChoice = setReadParams(readP, requestedEnvelope, dim, source);
-		} catch (TransformException e) {
-			new DataSourceException(e);
+		if (!wmsRequest) {
+			try {
+				imageChoice = setReadParams(readP, requestedEnvelope, dim);
+			} catch (TransformException e) {
+				new DataSourceException(e);
+			}
 		}
-
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Reading the source layer
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-				"ImageRead");
-		pbjImageRead
-				.setParameter(
-						"Input",
-						ImageIO
-								.createImageInputStream((this.source instanceof URL) ? ((URL) this.source)
-										.openStream()
-										: this.source));
-		pbjImageRead.setParameter("ReadParam", readP);
-		pbjImageRead.setParameter("ImageChoice", imageChoice);
-		pbjImageRead.setParameter("ReadMetadata", Boolean.FALSE);
-		pbjImageRead.setParameter("VerifyInput", Boolean.FALSE);
-		pbjImageRead.setParameter("ReadThumbnails", Boolean.FALSE);
 
-		final RenderedOp image = ImageUtilities.tileImage(JAI.create(
-				"ImageRead", pbjImageRead));
+		final ImageReader reader = readerSPI.createReaderInstance();
+		final ImageInputStream inStream = wmsRequest ? ImageIO
+				.createImageInputStream(((URL) source).openStream()) : ImageIO
+				.createImageInputStream(source);
+		reader.setInput(inStream);
+		final Hints newHints = (Hints) hints.clone();
+		inStream.mark();
+		if (!wmsRequest && !reader.isImageTiled(imageChoice.intValue())) {
+			final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
+					reader.getWidth(imageChoice.intValue()), reader
+							.getHeight(imageChoice.intValue())));
+			final ImageLayout layout = new ImageLayout();
+			layout.setTileGridXOffset(0);
+			layout.setTileGridYOffset(0);
+			layout.setTileHeight(tileSize.height);
+			layout.setTileWidth(tileSize.width);
+			newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
+		}
+		inStream.reset();
+		final ParameterBlock pbjRead = new ParameterBlock();
+		pbjRead.add(inStream);
+		pbjRead.add(imageChoice);
+		pbjRead.add(Boolean.FALSE);
+		pbjRead.add(Boolean.FALSE);
+		pbjRead.add(Boolean.FALSE);
+		pbjRead.add(null);
+		pbjRead.add(null);
+		pbjRead.add(readP);
+		pbjRead.add(reader);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// creating the coverage
+		// BUILDING COVERAGE
 		//
 		// /////////////////////////////////////////////////////////////////////
-		return createImageCoverage(image);
+		// get the raster -> model transformation and
+		// create the coverage
+		return createImageCoverage((PlanarImage) readfactory.create(pbjRead,
+				(RenderingHints) newHints));
+
 	}
 
 	/**
@@ -481,15 +496,17 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	 * a getmap request. In such a case we skip reading all the parameters we
 	 * can read from this http string.
 	 * 
+	 * @param input
+	 * 
 	 * @return true if we are dealing with a WMS request, false otherwise.
 	 */
-	private boolean WMSRequest() {
+	private boolean WMSRequest(Object input) {
 		// TODO do we need the requested envelope?
-		if (source instanceof URL
-				&& (((URL) source).getProtocol().equalsIgnoreCase("http"))) {
+		if (input instanceof URL
+				&& (((URL) input).getProtocol().equalsIgnoreCase("http"))) {
 			try {
 				// getting the query
-				final String query = java.net.URLDecoder.decode(((URL) source)
+				final String query = java.net.URLDecoder.decode(((URL) input)
 						.getQuery().intern(), "UTF-8");
 
 				// should we proceed? Let's look for a getmap WMS request
@@ -522,7 +539,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 
 					// SRS
 					if (kvp[0].equalsIgnoreCase("SRS")) {
-						crs = CRS.decode(kvp[1]);
+						crs = CRS.decode(kvp[1], true);
 					}
 
 					// layers
@@ -530,23 +547,24 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 						this.coverageName = kvp[1].replaceAll(",", "_");
 					}
 				}
-				// adjust envelope
-				if (CRSUtilities.getCRS2D(crs).getCoordinateSystem().getAxis(0)
-						.getDirection().absolute().equals(AxisDirection.NORTH)) {
-					final GeneralEnvelope tempEnvelope = new GeneralEnvelope(
-							new double[] {
-									originalEnvelope.getLowerCorner()
-											.getOrdinate(1),
-									originalEnvelope.getLowerCorner()
-											.getOrdinate(0) }, new double[] {
-									originalEnvelope.getUpperCorner()
-											.getOrdinate(1),
-									originalEnvelope.getUpperCorner()
-											.getOrdinate(0) });
-					originalEnvelope = new GeneralEnvelope(tempEnvelope);
-					originalEnvelope.setCoordinateReferenceSystem(crs);
-
-				}
+				// // adjust envelope
+				// if
+				// (CRSUtilities.getCRS2D(crs).getCoordinateSystem().getAxis(0)
+				// .getDirection().absolute().equals(AxisDirection.NORTH)) {
+				// final GeneralEnvelope tempEnvelope = new GeneralEnvelope(
+				// new double[] {
+				// originalEnvelope.getLowerCorner()
+				// .getOrdinate(1),
+				// originalEnvelope.getLowerCorner()
+				// .getOrdinate(0) }, new double[] {
+				// originalEnvelope.getUpperCorner()
+				// .getOrdinate(1),
+				// originalEnvelope.getUpperCorner()
+				// .getOrdinate(0) });
+				// originalEnvelope = new GeneralEnvelope(tempEnvelope);
+				// originalEnvelope.setCoordinateReferenceSystem(crs);
+				//
+				// }
 
 			} catch (IOException e) {
 				// TODO how to handle this?
@@ -561,11 +579,8 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			} catch (IndexOutOfBoundsException e) {
 				// TODO how to handle this?
 				return false;
-			} catch (TransformException e) {
-				// TODO how to handle this?
-				return false;
 			} catch (FactoryException e) {
-//				 TODO how to handle this?
+				// TODO how to handle this?
 				return false;
 			}
 
@@ -639,7 +654,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			throw new DataSourceException(e);
 
 		}
-		longitudeFirst = !GridGeometry2D.swapXY(cs);
+
 
 	}
 
@@ -664,8 +679,8 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 				.toString());
 
 		if (file2Parse.exists()) {
-			// parse world file
-			parseWorldFile(file2Parse);
+			final WorldFileReader reader = new WorldFileReader(file2Parse);
+			raster2Model = reader.getTransform();
 		} else {
 			// looking for another extension
 			file2Parse = new File(new StringBuffer(base).append(
@@ -673,7 +688,8 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 
 			if (file2Parse.exists()) {
 				// parse world file
-				parseWorldFile(file2Parse);
+				final WorldFileReader reader = new WorldFileReader(file2Parse);
+				raster2Model = reader.getTransform();
 				metaFile = false;
 			} else {
 				// looking for a meta file
@@ -763,113 +779,12 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		in.close();
 
 		// building up envelope of this coverage
-		if (longitudeFirst)
-			originalEnvelope = new GeneralEnvelope(new double[] { xMin, yMin },
-					new double[] { xMax, yMax });
-		else
-			originalEnvelope = new GeneralEnvelope(new double[] { yMin, xMin },
-					new double[] { yMax, xMax });
+		originalEnvelope = new GeneralEnvelope(new double[] { yMin, xMin },
+				new double[] { yMax, xMax });
 		originalEnvelope.setCoordinateReferenceSystem(crs);
 	}
 
-	/**
-	 * This method is responsible for parsing the world file associate with the
-	 * coverage to be read.
-	 * 
-	 * @param file2Parse
-	 *            File to parse for reading needed parameters.
-	 * 
-	 * @throws IOException
-	 */
-	private void parseWorldFile(File file2Parse) throws IOException {
-
-		double xPixelSize = 0;
-		double rotationX = 0;
-		double rotationY = 0;
-		double yPixelSize = 0;
-		double xULC = 0;
-		double yULC = 0;
-
-		int index = 0;
-		double value = 0;
-		String str;
-		final BufferedReader in = new BufferedReader(new FileReader(file2Parse));
-		while ((str = in.readLine()) != null) {
-			value = 0;
-
-			try {
-				value = Double.parseDouble(str.trim());
-			} catch (NumberFormatException e) {
-				// A trick to bypass invalid lines ...
-				continue;
-			}
-
-			switch (index) {
-			case 0:
-				xPixelSize = value;
-
-				break;
-
-			case 1:
-				rotationX = value;
-
-				break;
-
-			case 2:
-				rotationY = value;
-
-				break;
-
-			case 3:
-				yPixelSize = value;
-
-				break;
-
-			case 4:
-				xULC = value;
-
-				break;
-
-			case 5:
-				yULC = value;
-
-				break;
-
-			default:
-				break;
-			}
-
-			index++;
-		}
-		in.close();
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// It is worth to point out that various data sources describe the
-		// parameters in the world file as the mapping from the pixel centres'
-		// to the associated world coords.
-		// Here we directly build the needed grid to world transform and we DO
-		// NOT add any half a pixel translation given that, as stated above, the
-		// values we receive should map to the centre of the pixel.
-		//
-		// /////////////////////////////////////////////////////////////////////
-
-		// building the transform
-		final GeneralMatrix gm = new GeneralMatrix(3); // identity
-
-		// compute an "offset and scale" matrix
-		gm.setElement(0, 0, (longitudeFirst) ? xPixelSize : rotationX);
-		gm.setElement(1, 1, (longitudeFirst) ? yPixelSize : rotationY);
-		gm.setElement(0, 1, (longitudeFirst) ? rotationX : xPixelSize);
-		gm.setElement(1, 0, (longitudeFirst) ? rotationY : yPixelSize);
-
-		gm.setElement(0, 2, (longitudeFirst) ? xULC : yULC);
-		gm.setElement(1, 2, (longitudeFirst) ? yULC : xULC);
-
-		// make it a LinearTransform
-		raster2Model = ProjectiveTransform.create(gm);
-
-	}
+	
 
 	/**
 	 * Not supported, does nothing.

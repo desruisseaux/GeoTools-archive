@@ -1498,7 +1498,7 @@ public final class StreamingRenderer implements GTRenderer {
 					// error, we pretty much have to abort what we're doing!
 					throw oom;
 				} catch (Exception e) {
-					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 					fireErrorEvent(e);
 				}
 			}

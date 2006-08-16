@@ -33,7 +33,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Simone Giannecchini
  * @since 2.3
  * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/plugin/shapefile/src/org/geotools/data/shapefile/prj/PrjFileReader.java $
+ *         http://svn.geotools.org/geotools/trunk/gt/module/main/src/org/geotools/data/PrjFileReader.java $
  */
 public class PrjFileReader {
 
@@ -45,7 +45,7 @@ public class PrjFileReader {
 
 	CharsetDecoder decoder;
 
-	CoordinateReferenceSystem cs;
+	CoordinateReferenceSystem crs;
 
 	/**
 	 * Load the index file from the given channel.
@@ -57,7 +57,7 @@ public class PrjFileReader {
 	 */
 	public PrjFileReader(ReadableByteChannel channel) throws IOException,
 			FactoryException {
-		this(channel,null);
+		this(channel, null);
 	}
 
 	/**
@@ -82,14 +82,11 @@ public class PrjFileReader {
 		decoder.decode(buffer, charBuffer, true);
 		buffer.limit(buffer.capacity());
 		charBuffer.flip();
-
-		String wkt = charBuffer.toString();
-
-		cs = FactoryFinder.getCRSFactory(hints).createFromWKT(wkt);
+		crs = FactoryFinder.getCRSFactory(hints).createFromWKT(charBuffer.toString());
 	}
 
-	public org.opengis.referencing.crs.CoordinateReferenceSystem getCoodinateSystem() {
-		return cs;
+	public CoordinateReferenceSystem getCoodinateSystem() {
+		return crs;
 	}
 
 	private int fill(ByteBuffer buffer, ReadableByteChannel channel)
