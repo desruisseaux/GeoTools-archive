@@ -39,6 +39,35 @@ public class NodeImpl implements Node {
 		this.value = value;
 	}
 
+	public boolean hasChild(String name) {
+		if ( name == null )
+			return false;
+		
+		for ( int i = 0; i < children.size(); i++ ) {
+			Node child = (Node) children.get( i );
+			if ( name.equals( child.getComponent().getName() ) ) 
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean hasChild(Class clazz) {
+		if ( clazz == null )
+			return false;
+		
+		for ( int i = 0; i < children.size(); i++ ) {
+			Node child = (Node) children.get( i );
+			if ( child.getValue() == null )
+				continue;
+			
+			if ( clazz.isAssignableFrom( child.getValue().getClass() ) )
+				return true;
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * Contents of this node.
 	 * <p>

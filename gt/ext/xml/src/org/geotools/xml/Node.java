@@ -30,6 +30,24 @@ public interface Node {
 	void setValue(Object value);
 	
 	/**
+	 * Determines if the node has a child with the specified name.
+	 * 
+	 * @param name The name of a child node.
+	 * 
+	 * @return <code>true</code> if a child node exists with the name, otehrwise <code>false</code>.
+	 */
+	boolean hasChild( String name );
+	
+	/**
+	 * Determines if the node has a child whose value is of the specified class.
+	 * 
+	 * @param clazz The class of the child node value.
+	 * 
+	 * @return <code>true</code> if a child node exists with the class, otherwise <code>false</code>.
+	 */
+	boolean hasChild( Class clazz );
+	
+	/**
 	 * Returns all nodes corresponding child elements.
 	 * 
 	 * @return A list containing objects of type Node. 
