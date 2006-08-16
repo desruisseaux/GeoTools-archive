@@ -99,6 +99,10 @@
       <groupId>batik</groupId>
       <artifactId>batik-util</artifactId>
 	</dependency>
+    <dependency>
+       <groupId>xerces</groupId>
+       <artifactId>xercesImpl</artifactId>
+    </dependency>
 
 	<dependency>
 	  <groupId>batik</groupId>

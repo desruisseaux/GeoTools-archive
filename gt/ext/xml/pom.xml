@@ -59,11 +59,11 @@
   </developers>
 
   <dependencies> 
-	  <dependency>
-			<groupId>picocontainer</groupId>
+    <dependency>
+        <groupId>picocontainer</groupId>
       <artifactId>picocontainer</artifactId>
       <version>1.2</version>
-		</dependency>
+    </dependency>
     <dependency>
       <groupId>xsdlib</groupId>
       <artifactId>xsdlib</artifactId>
@@ -92,12 +92,11 @@
      <dependency>
        <groupId>xerces</groupId>
        <artifactId>xercesImpl</artifactId>
-       <version>2.7.1</version>
+       <!-- version specified in the topmost pom -->
      </dependency>
      <dependency>
        <groupId>xml-apis</groupId>
        <artifactId>xml-apis-xerces</artifactId>
-       <version>2.7.1</version>
      </dependency>
      <dependency>
        <groupId>commons-jxpath</groupId>
