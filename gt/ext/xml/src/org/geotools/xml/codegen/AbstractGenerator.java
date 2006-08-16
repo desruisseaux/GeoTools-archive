@@ -1,9 +1,14 @@
 package org.geotools.xml.codegen;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -101,11 +106,7 @@ public abstract class AbstractGenerator {
 	 */
 	protected void write( String result, String className ) throws IOException {
 		//convert package to a path
-		File location = new File( this.location );
-		if ( packageBase != null ) {
-			String path = packageBase.replace( '.', File.separatorChar );
-			location = new File( location, path );
-		}
+		File location = outputLocation();
 		
 		location.mkdirs();
 		location = new File( location, className + ".java" );
@@ -127,6 +128,50 @@ public abstract class AbstractGenerator {
 		
 		out.flush();
 		out.close();
+	}
+	
+	/**
+	 * Copues a file to the output location. 
+	 * <p>
+	 * THe file written out is located under {@link #location}, with the path 
+	 * generated from {@link #packageBase} appended.
+	 * </p>
+	 * 
+	 * @param file The file to copy.
+	 */
+	protected void copy( File file ) throws IOException {
+		File dest = new File( outputLocation(), file.getName() );
+		
+		//check for existing file
+		if ( dest.exists() && !overwriting) {
+			logger.warning( "Generated file: " + dest + " already exists." );
+			return;
+		}
+		
+		InputStream in = new BufferedInputStream( new FileInputStream( file ) );
+		OutputStream out = new BufferedOutputStream( new FileOutputStream( dest ) );
+		
+		int b = -1;
+		while( ( b = in.read() ) != -1 ) out.write( b );
+		
+		out.flush();
+		out.close();
+		in.close();
+	}
+	
+	/**
+	 * Convenience method for generating the output location of generated files based on 
+	 * {@link #getLocation()} 
+	 * @return
+	 */
+	protected File outputLocation() {
+		File location = new File( this.location );
+		if ( packageBase != null ) {
+			String path = packageBase.replace( '.', File.separatorChar );
+			location = new File( location, path );
+		}
+		
+		return location;
 	}
 	
 	/**
