@@ -47,6 +47,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
  */
 public class ImageMosaicReaderTest extends TestCase {
 
+	private final static String TEST_FILE="mosaic.shp";
 	/**
 	 * 
 	 */
@@ -63,7 +64,7 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		final URL testFile = TestData.getResource(this, "index.shp");
+		final URL testFile = TestData.getResource(this,TEST_FILE);
 		assertNotNull(testFile);
 
 		//
@@ -102,7 +103,7 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		final URL testFile = TestData.getResource(this, "index.shp");
+		final URL testFile = TestData.getResource(this, TEST_FILE);
 		assertNotNull(testFile);
 
 		//
@@ -151,7 +152,7 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		final URL testFile = TestData.getResource(this, "index.shp");
+		final URL testFile = TestData.getResource(this, TEST_FILE);
 		assertNotNull(testFile);
 
 		//
@@ -204,7 +205,7 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		final URL testFile = TestData.getResource(this, "index.shp");
+		final URL testFile = TestData.getResource(this,TEST_FILE);
 		assertNotNull(testFile);
 
 		//
@@ -256,7 +257,7 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		final URL testFile = TestData.getResource(this, "index.shp");
+		final URL testFile = TestData.getResource(this, TEST_FILE);
 
 		//
 		// /////////////////////////////////////////////////////////////////
@@ -302,63 +303,63 @@ public class ImageMosaicReaderTest extends TestCase {
 	public void testComplete() throws IOException,
 			MismatchedDimensionException, NoSuchAuthorityCodeException {
 
-		// //
-		// ///////////////////////////////////////////////////////////////////
-		// //
-		// // Get the resource.
-		// //
-		// //
-		// ///////////////////////////////////////////////////////////////////
-		// final URL testFile = TestData.getResource(this, "index.shp");
-		// assertNotNull(testFile);
-		//
-		// //
-		// ///////////////////////////////////////////////////////////////////
-		// //
-		// // Get a reader
-		// //
-		// //
-		// ///////////////////////////////////////////////////////////////////
-		// final AbstractGridFormat format = (AbstractGridFormat)
-		// GridFormatFinder
-		// .findFormat(testFile);
-		// assertNotNull(format);
-		// final ImageMosaicReader reader = (ImageMosaicReader) format
-		// .getReader(testFile);
-		// assertNotNull(reader);
-		//
-		// //
-		// // /////////////////////////////////////////////////////////////////
-		// //
-		// // alpha on output
-		// //
-		// //
-		// // /////////////////////////////////////////////////////////////////
-		// final ParameterValue alpha = (ParameterValue)
-		// ImageMosaicFormat.FINAL_ALPHA
-		// .createValue();
-		// alpha.setValue(Boolean.TRUE);
-		// final ParameterValue threshold = (ParameterValue)
-		// ImageMosaicFormat.ALPHA_THRESHOLD
-		// .createValue();
-		// threshold.setValue(1);
-		// final ParameterValue roi = (ParameterValue)
-		// ImageMosaicFormat.INPUT_IMAGE_ROI
-		// .createValue();
-		// roi.setValue(Boolean.TRUE);
-		// final ParameterValue roiTh = (ParameterValue)
-		// ImageMosaicFormat.INPUT_IMAGE_ROI_THRESHOLD
-		// .createValue();
-		// roiTh.setValue(new Integer(1));
-		//
-		// // /////////////////////////////////////////////////////////////////
-		// //
-		// // Show the coverage
-		// //
-		// //
-		// // /////////////////////////////////////////////////////////////////
-		// ((AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha,
-		// threshold, roiTh, roi })).show("testComplete");
+		 //
+		 ///////////////////////////////////////////////////////////////////
+		 //
+		 // Get the resource.
+		 //
+		 //
+		 ///////////////////////////////////////////////////////////////////
+		 final URL testFile = TestData.getResource(this, TEST_FILE);
+		 assertNotNull(testFile);
+		
+		 //
+		 ///////////////////////////////////////////////////////////////////
+		 //
+		 // Get a reader
+		 //
+		 //
+		 ///////////////////////////////////////////////////////////////////
+		 final AbstractGridFormat format = (AbstractGridFormat)
+		 GridFormatFinder
+		 .findFormat(testFile);
+		 assertNotNull(format);
+		 final ImageMosaicReader reader = (ImageMosaicReader) format
+		 .getReader(testFile);
+		 assertNotNull(reader);
+		
+		 //
+		 // /////////////////////////////////////////////////////////////////
+		 //
+		 // alpha on output
+		 //
+		 //
+		 // /////////////////////////////////////////////////////////////////
+		 final ParameterValue alpha = (ParameterValue)
+		 ImageMosaicFormat.FINAL_ALPHA
+		 .createValue();
+		 alpha.setValue(Boolean.TRUE);
+		 final ParameterValue threshold = (ParameterValue)
+		 ImageMosaicFormat.ALPHA_THRESHOLD
+		 .createValue();
+		 threshold.setValue(1);
+		 final ParameterValue roi = (ParameterValue)
+		 ImageMosaicFormat.INPUT_IMAGE_ROI
+		 .createValue();
+		 roi.setValue(Boolean.TRUE);
+		 final ParameterValue roiTh = (ParameterValue)
+		 ImageMosaicFormat.INPUT_IMAGE_ROI_THRESHOLD
+		 .createValue();
+		 roiTh.setValue(new Integer(1));
+		
+		 // /////////////////////////////////////////////////////////////////
+		 //
+		 // Show the coverage
+		 //
+		 //
+		 // /////////////////////////////////////////////////////////////////
+		 ((AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha,
+		 threshold, roiTh, roi })).show("testComplete");
 
 	}
 
@@ -371,7 +372,7 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		final URL testFile = TestData.getResource(this, "index.shp");
+		final URL testFile = TestData.getResource(this,TEST_FILE);
 		assertNotNull(testFile);
 
 		//

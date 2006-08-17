@@ -254,7 +254,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				".properties").toString());
 		assert propertiesFile.exists() && propertiesFile.isFile();
 		final Properties properties = new Properties();
-		properties.loadFromXML(new BufferedInputStream(new FileInputStream(
+		properties.load(new BufferedInputStream(new FileInputStream(
 				propertiesFile)));
 
 		// load the envelope
