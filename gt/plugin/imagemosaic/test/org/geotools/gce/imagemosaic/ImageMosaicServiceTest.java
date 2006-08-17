@@ -48,7 +48,7 @@ public class ImageMosaicServiceTest extends TestCase {
 	}
 
 	public void testIsAvailable() {
-		Iterator list = GridFormatFinder.getAvailableFormats();
+		Iterator list = GridFormatFinder.getAvailableFormats().iterator();
 		boolean found = false;
 
 		while (list.hasNext()) {
