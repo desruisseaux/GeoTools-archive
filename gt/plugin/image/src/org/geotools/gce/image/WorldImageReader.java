@@ -64,7 +64,6 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -95,8 +94,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	private String parentPath;
 
 	private String extension;
-
-	private CoordinateSystem cs;
 
 	private ImageReaderSpi readerSPI;
 
@@ -648,13 +645,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 					"Unable to find crs, continuing with default WGS4 CRS")
 					.append("\n").append(crs.toWKT()).toString());
 		}
-		try {
-			cs = CRSUtilities.getCRS2D(crs).getCoordinateSystem();
-		} catch (TransformException e) {
-			throw new DataSourceException(e);
-
-		}
-
 
 	}
 
@@ -719,10 +709,12 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	 * than another format of a WorldFile used by the GIDB database.
 	 * 
 	 * @param file2Parse
-	 *            DOCUMENT ME!
+	 *            
 	 * 
 	 * @throws NumberFormatException
 	 * @throws IOException
+	 * 
+	 * @task move me to a separate implementation
 	 */
 	private void parseMetaFile(File file2Parse) throws NumberFormatException,
 			IOException {
@@ -779,12 +771,10 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		in.close();
 
 		// building up envelope of this coverage
-		originalEnvelope = new GeneralEnvelope(new double[] { yMin, xMin },
-				new double[] { yMax, xMax });
+		originalEnvelope = new GeneralEnvelope(new double[] { xMin, yMin },
+				new double[] { xMax, yMax });
 		originalEnvelope.setCoordinateReferenceSystem(crs);
 	}
-
-	
 
 	/**
 	 * Not supported, does nothing.

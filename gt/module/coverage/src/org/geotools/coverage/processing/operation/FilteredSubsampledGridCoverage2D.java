@@ -41,12 +41,12 @@ import com.sun.media.jai.opimage.FilteredSubsampleRIF;
  */
 final class FilteredSubsampledGridCoverage2D extends GridCoverage2D {
 
-	private final static FilteredSubsampleRIF filteredSubsampleFactory = new FilteredSubsampleRIF();
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5274708130300017804L;
+
+	private final static FilteredSubsampleRIF filteredSubsampleFactory = new FilteredSubsampleRIF();
 
 	public FilteredSubsampledGridCoverage2D(PlanarImage image,
 			GridCoverage2D sourceCoverage) {
