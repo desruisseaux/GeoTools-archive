@@ -41,8 +41,8 @@ import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
+import javax.media.jai.RecyclingTileFactory;
 import javax.media.jai.RenderedOp;
-import javax.media.jai.TileCache;
 import javax.media.jai.operator.ScaleDescriptor;
 import javax.media.jai.widget.ScrollingImagePanel;
 import javax.swing.ImageIcon;
@@ -53,6 +53,10 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import org.geotools.resources.TestData;
+
+import tilecachetool.TCTool;
+
+import com.sun.media.jai.util.SunTileCache;
 
 public class TestJaiOperations extends TestCase implements WindowListener {
 	// Booleans used to allows testing Operations
@@ -90,16 +94,25 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 	private RenderedImage usedImage;
 
 	protected void setUp() throws Exception {
-		ImageIO.setUseCache(false);
-		final TileCache cache = JAI.getDefaultInstance().getTileCache();
-		cache.setMemoryCapacity(200 * 1024 * 1024);
-		cache.setMemoryThreshold(1.0f);
 
-		JAI.getDefaultInstance().getTileScheduler().setParallelism(4);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(4);
-		JAI.getDefaultInstance().getTileScheduler().setPriority(7);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(7);
-		super.setUp();
+		ImageIO.setUseCache(false);
+		final SunTileCache cache = (SunTileCache) JAI.getDefaultInstance()
+				.getTileCache();
+		cache.setMemoryCapacity(64 * 1024 * 1024);
+		cache.setMemoryThreshold(1.0f);
+		RenderingHints rh = new RenderingHints(null);
+		RecyclingTileFactory rtf = new RecyclingTileFactory();
+		rh.add(JAI.getDefaultInstance().getRenderingHints());
+		rh.put(JAI.KEY_TILE_RECYCLER, rtf);
+		rh.put(JAI.KEY_TILE_FACTORY, rtf);
+
+		JAI.getDefaultInstance().setRenderingHints(rh);
+
+		JAI.getDefaultInstance().getTileScheduler().setParallelism(20);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(20);
+		JAI.getDefaultInstance().getTileScheduler().setPriority(6);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(6);
+
 	}
 
 	public static void main(String[] args) {
@@ -140,7 +153,7 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 	public void testJaiImageTestSubsamplingOperation()
 			throws FileNotFoundException, IOException {
 		if (_testJaiImage_TestSubsamplingOperation) {
-			// final TCTool tct = new TCTool();
+			final TCTool tct = new TCTool();
 			final String title = new String("TestSubsamplingOperation");
 			logger.info("\n\n " + title + " \n");
 
@@ -162,14 +175,13 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 
 			ImageReadParam irp2 = new ImageReadParam();
 			irp2.setSourceRegion(new Rectangle(4000, 4000, 3000, 3000));
-			irp2.setSourceSubsampling(10, 10, 0, 0);
+//			irp2.setSourceSubsampling(10, 10, 0, 0);
 			final ImageLayout layout = new ImageLayout();
-			layout.setTileHeight(512);
-			layout.setTileWidth(512);
+			// layout.setTileHeight(512);
+			// layout.setTileWidth(512);
 			pbjImageRead.setParameter("readParam", irp2);
 			pbjImageRead.setParameter("Input", f);
-			image = JAI.create("ImageRead", pbjImageRead, new RenderingHints(
-					JAI.KEY_IMAGE_LAYOUT, layout));
+			image = JAI.create("ImageRead", pbjImageRead);
 			visualize(image, title + " xfactor=3 & yfactor=9");
 			//
 			// ImageReadParam irp3 = new ImageReadParam();
@@ -407,10 +419,9 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 	private void visualize(final RenderedImage bi, String test) {
 		final JFrame frame = new JFrame(test);
 		frame.getContentPane().add(new ScrollingImagePanel(bi, 800, 600));
-
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle(test);
-		frame.setSize(new Dimension(400, 300));
+		frame.setSize(new Dimension(200, 150));
 		frame.pack();
 		frame.show();
 	}

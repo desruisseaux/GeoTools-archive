@@ -1,5 +1,6 @@
 package org.geotools.gce.imageio.asciigrid.raster;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.WritableRaster;
 import java.io.EOFException;
@@ -11,7 +12,9 @@ import java.util.logging.Logger;
 import javax.imageio.ImageReadParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
+import javax.media.jai.JAI;
 import javax.media.jai.RasterFactory;
+import javax.media.jai.TileFactory;
 import javax.media.jai.iterator.RectIter;
 
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReader;
@@ -262,6 +265,14 @@ public abstract class AsciiGridRaster {
 	 */
 	public WritableRaster readRaster(ImageReadParam param) throws IOException {
 		final WritableRaster raster;
+		// System.out.println("");
+		// System.out.println(Thread.currentThread().getName());
+		// System.out.println(param.getSourceXSubsampling());
+		// System.out.println(param.getSourceYSubsampling());
+		// System.out.println(param.getSourceRegion().x);
+		// System.out.println(param.getSourceRegion().y);
+		// System.out.println(param.getSourceRegion().width);
+		// System.out.println(param.getSourceRegion().height);
 
 		// int perc=0;
 		// int iPerc=1;
@@ -335,7 +346,6 @@ public abstract class AsciiGridRaster {
 		// SubSampling variables initialization
 		xSubsamplingFactor = param.getSourceXSubsampling();
 		ySubsamplingFactor = param.getSourceYSubsampling();
-
 		if ((xSubsamplingFactor > nCols) || (ySubsamplingFactor > nRows)) {
 			throw new IOException(
 					"The subSamplingFactor cannot be greater than image size!");
@@ -373,14 +383,20 @@ public abstract class AsciiGridRaster {
 		// (srcDifference>0)?srcDifference:0;
 		// final boolean reducedWidth = (spacesBetweenUsefulData != 0) ? true:
 		// false;
-		raster = RasterFactory.createBandedRaster(
-				java.awt.image.DataBuffer.TYPE_FLOAT, dstWidth, dstHeight, 1,
-				null);
+		final TileFactory factory = (TileFactory) JAI.getDefaultInstance()
+				.getRenderingHint(JAI.KEY_TILE_FACTORY);
+		if (factory != null)
+			raster = factory.createTile(RasterFactory.createBandedSampleModel(
+					java.awt.image.DataBuffer.TYPE_FLOAT, dstWidth, dstHeight,
+					1), new Point(0, 0));
+		else
+			raster = RasterFactory.createBandedRaster(
+					java.awt.image.DataBuffer.TYPE_FLOAT, dstWidth, dstHeight,
+					1, null);
 
 		int ch = -1;
 		int prevCh = -1;
 		int samplesCounted = 0;
-		long firstUsefulDataByte = 0;
 		long streamPosition = 0;
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -402,51 +418,9 @@ public abstract class AsciiGridRaster {
 		// //
 		// I check if there is an useful entry in the TreeMap which
 		// retrieves a stream position
-		synchronized (tileTreeMutex) {
-			Long markedPos = (Long) tileMarker.get(new Long(
-					samplesToThrowAwayBeforeFirstValidSample));
-
-			// Case 1: Exact key
-			if (markedPos != null) {
-				firstUsefulDataByte = markedPos.intValue();
-				streamPosition = firstUsefulDataByte;
-				imageIS.seek(firstUsefulDataByte);
-				samplesCounted = samplesToThrowAwayBeforeFirstValidSample;
-
-				// I have found a stream Position associated to the number
-				// of spaces that I need to count before finding useful data
-				// values. Thus, I dont need to search furthermore
-
-			} else {
-				// Case 2: Nearest(Lower) Key
-				SortedMap sm = tileMarker.headMap(new Long(
-						samplesToThrowAwayBeforeFirstValidSample));
-
-				if (!sm.entrySet().isEmpty()) {
-					// searching the nearest key (belower)
-					final Long key = (Long) sm.lastKey();
-
-					// returning the stream position
-					markedPos = (Long) tileMarker.get(key);
-
-					if (markedPos != null) {
-						// I have found a stream position related to a
-						// number of white spaces smaller than the requested
-						// number. Thus, I need to manually count the
-						// remaining number of spaces.
-						streamPosition = markedPos.intValue();
-						imageIS.seek(streamPosition);
-						samplesCounted = key.intValue();
-					}
-				} else {
-					// positioning on the first data byte
-					imageIS.seek(dataStartAt);
-					streamPosition = dataStartAt;
-					samplesCounted = 0;// reinforcing
-				}
-			}
-
-		}
+		samplesCounted = getPosition(samplesToThrowAwayBeforeFirstValidSample,
+				samplesCounted);
+		streamPosition = imageIS.getStreamPosition();
 		// //
 		//
 		// Check abort request
@@ -464,7 +438,8 @@ public abstract class AsciiGridRaster {
 		// first useful data value or the tileMarker is empty
 		//
 		// //
-
+		int newSamples = 0;
+		int temp=0;
 		// If I dont need to search the first useful data value,
 		// I Skip these operations.
 		if (samplesCounted < samplesToThrowAwayBeforeFirstValidSample) {
@@ -492,6 +467,7 @@ public abstract class AsciiGridRaster {
 					if ((prevCh == 32) || (prevCh == 10) || (prevCh == 13)
 							|| (prevCh == 9)) {
 						samplesCounted++;
+						temp++;
 
 						// Another space was counted. If the number of
 						// spaces counted is multiple of the Size of
@@ -513,6 +489,19 @@ public abstract class AsciiGridRaster {
 									tileMarker.put(key, val);
 								}
 							}
+						}
+						
+						if (temp==1000) {
+							newSamples = getPosition(
+									samplesToThrowAwayBeforeFirstValidSample,
+									samplesCounted);
+
+							if (newSamples != samplesCounted) {
+								streamPosition = imageIS.getStreamPosition();
+							}
+							prevCh = -1;
+							temp=0;
+							continue;
 						}
 
 					}
@@ -538,7 +527,6 @@ public abstract class AsciiGridRaster {
 
 			}
 
-			firstUsefulDataByte = streamPosition;
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -837,6 +825,53 @@ public abstract class AsciiGridRaster {
 		}
 
 		return raster;
+	}
+
+	private int getPosition(final int samplesToThrowAwayBeforeFirstValidSample,
+			int samplesCounted) throws IOException {
+		synchronized (tileTreeMutex) {
+			Long markedPos = (Long) tileMarker.get(new Long(
+					samplesToThrowAwayBeforeFirstValidSample));
+
+			// Case 1: Exact key
+			if (markedPos != null) {
+
+				imageIS.seek(markedPos.intValue());
+				samplesCounted = samplesToThrowAwayBeforeFirstValidSample;
+
+				// I have found a stream Position associated to the number
+				// of spaces that I need to count before finding useful data
+				// values. Thus, I dont need to search furthermore
+
+			} else {
+				// Case 2: Nearest(Lower) Key
+				SortedMap sm = tileMarker.headMap(new Long(
+						samplesToThrowAwayBeforeFirstValidSample));
+
+				if (!sm.entrySet().isEmpty()) {
+					// searching the nearest key (belower)
+					final Long key = (Long) sm.lastKey();
+
+					// returning the stream position
+					markedPos = (Long) tileMarker.get(key);
+
+					if (markedPos != null) {
+						// I have found a stream position related to a
+						// number of white spaces smaller than the requested
+						// number. Thus, I need to manually count the
+						// remaining number of spaces.
+
+						imageIS.seek(markedPos.intValue());
+						samplesCounted = key.intValue();
+					}
+				} else {
+					// positioning on the first data byte
+					imageIS.seek(dataStartAt);
+				}
+			}
+
+		}
+		return samplesCounted;
 	}
 
 	/**
