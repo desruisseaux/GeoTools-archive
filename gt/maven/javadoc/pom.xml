@@ -25,8 +25,7 @@
   <name>Cross-modules javadoc</name>
   <url>http://modules.geotools.org/javadoc/</url>
   <description>
-    Generates cross-module javadoc. This plugin uses custom taglet for 'source'
-    and 'tutorial' tags.
+    Defines custom taglet for 'source' and 'tutorial' javadoc tags.
   </description>
 
 
@@ -50,19 +49,6 @@
 
 
   <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
-  <!-- ==================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-script-ant</artifactId>
-      <version>2.0.4</version>
-    </dependency>
-  </dependencies>
-
-
-
-  <!-- ==================================================== -->
   <!--     Sun's tools dependency   (from Maven FAQ)        -->
   <!-- ==================================================== -->
   <profiles>
@@ -81,56 +67,10 @@
           <version>1.5</version>
           <scope>system</scope>
           <systemPath>${java.home}/../lib/tools.jar</systemPath>
+          <!-- Note: a ${tools.jar} variable exists - we should try to use it. -->
         </dependency>
       </dependencies>
     </profile>
   </profiles>
-
-
-  <!-- ==================================================== -->
-  <!--     Build configuration                              -->
-  <!-- ==================================================== -->
-  <build>
-    <plugins>
-      <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-plugin-plugin</artifactId>
-        
-        <!-- Add the Ant plugin tools -->
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-tools-ant</artifactId>
-            <version>2.0.4</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <prefix>javadoc</prefix>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-  <!-- TODO: Disabled the dependencies reports for now, because it
-             crash Maven with (yet an other) NullPointerException. -->
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>project-team</report>
-              <report>mailing-list</report>
-              <report>issue-tracking</report>
-              <report>license</report>
-              <report>scm</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-      </plugin>
-    </plugins>
-  </reporting>
 
 </project>

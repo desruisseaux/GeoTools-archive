@@ -56,27 +56,27 @@
   <dependency>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-api</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>${project.version}</version>
   </dependency>
   <dependency>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-main</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>${project.version}</version>
   </dependency>
   <dependency>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-referencing</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>${project.version}</version>
   </dependency>
   <dependency>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-coverage</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>${project.version}</version>
   </dependency>
   <dependency>
     <groupId>com.vividsolutions</groupId>
     <artifactId>jts</artifactId>
-    <version>1.7</version>
+    <!-- The version number is specified in the parent POM. -->
   </dependency>
   <dependency>
     <groupId>javax.units</groupId>
@@ -91,7 +91,7 @@
   <dependency>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-epsg-hsql</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>${project.version}</version>
   </dependency>
   <dependency>
     <groupId>hsqldb</groupId>
@@ -101,12 +101,12 @@
   <dependency>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-indexed-shapefile</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>${project.version}</version>
   </dependency> 
   <dependency>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-shapefile</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>${project.version}</version>
   </dependency>  
  </dependencies>
 

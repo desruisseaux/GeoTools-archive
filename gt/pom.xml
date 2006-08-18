@@ -63,7 +63,7 @@
   <artifactId>gt2</artifactId>
   <packaging>pom</packaging>
   <version>2.3-SNAPSHOT</version>
-  <name>Geotools 2</name>
+  <name>Geotools</name>
   <url>http://maven.geotools.fr/reports/</url>
   <scm>
     <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/</connection>
@@ -185,11 +185,13 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <roles>
         <role>Java Developer</role>
         <role>Project Management Committee (PMC) Member</role>
       </roles>
+      <timezone>+1</timezone>
     </developer>
     <developer>
       <name>Ian Schneider</name>
@@ -611,6 +613,34 @@
 
 
   <!-- ===================================================================== -->
+  <!--     Dependencies to be inherited by all modules.                      -->
+  <!--     In some previous Geotools version, those dependencies were        -->
+  <!--     specified in module pom.xml. However, experience show that        -->
+  <!--     aggregated javadoc fails if the GeoAPI dependency is not          -->
+  <!--     specified at this level.                                          -->
+  <!-- ===================================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>geoapi-nogenerics</artifactId>
+      <!-- The version number is specified above. -->
+    </dependency>
+    <dependency>
+      <groupId>javax.units</groupId>
+      <artifactId>jsr108</artifactId>
+      <!-- The version number is specified above. -->
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <!-- The version number is specified above. -->
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+
+  <!-- ===================================================================== -->
   <!--     Build configuration (resources, ...).                             -->
   <!-- ===================================================================== -->
   <build>
@@ -708,25 +738,22 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>2.0</version>
+          <version>2.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>2.0</version>
+          <version>2.0.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.1</version>
-          <!-- Do not use 2.2 yet, since it prevents maven-plugin-tools-ant 2.0.4
-               (used in maven/javadoc) to work. Revisit when an update of tools-ant
-               will be available. -->
+          <version>2.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>2.0-beta-4</version>  <!-- beta-5 doesn't seem to work -->
+          <version>2.0-beta-5</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -768,16 +795,16 @@
       </plugins>
     </pluginManagement>
 
+    <!-- http://www.ibiblio.org/maven2/org/apache/maven/wagon/ -->
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-      </extension>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav</artifactId>
+        <version>1.0-beta-1</version>
       </extension>
     </extensions>
+
+
 
     <plugins>
       <!-- =================================================================== -->
@@ -800,6 +827,8 @@
         </dependencies>
       </plugin>
 
+
+
       <!-- =================================================================== -->
       <!--     Compilation.                                                    -->
       <!-- =================================================================== -->
@@ -807,10 +836,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.4</source>  <!-- The -source argument for the Java compiler.                            -->
-          <target>1.4</target>  <!-- The -target argument for the Java compiler.                            -->
-          <debug>true</debug>   <!-- Whether to include debugging information in the compiled class files.  -->
-          <encoding>ISO-8859-1</encoding> <!-- The -encoding argument for the Java compiler.                -->
+          <source>1.4</source>  <!-- The -source argument for the Java compiler. -->
+          <target>1.4</target>  <!-- The -target argument for the Java compiler. -->
+          <debug>true</debug>   <!-- Whether to include debugging information.   -->
+          <encoding>ISO-8859-1</encoding> <!-- The -encoding argument for the Java compiler. -->
         </configuration>
       </plugin>
 
@@ -838,7 +867,9 @@
           </testFailureIgnore>
         </configuration>
       </plugin>
-      
+
+
+
       <!-- ================================================================= -->
       <!--     Code coverage                                                 -->
       <!-- ================================================================= -->
@@ -884,19 +915,15 @@
           </archive>
         </configuration>
       </plugin>
-      <!--    </plugins>
-        </build>
-        
-        TODO: The following plugin should lives in the <reporting> section. But we
-        have to exclude it for now because maven-site-plugin seems to depend
-        again on maven-javadoc-plugin-beta-3, which is incompatible with our
-        javadoc configuration below.  Try to uncomment this block when a new
-        maven-site-plugin will be available.
-        
-        <reporting>
-        <plugins> -->
+    </plugins>
+  </build>
+
+
+
+  <reporting>
+    <plugins>
       <!-- ================================================================= -->
-      <!--     Javadoc generation for a single module.                       -->
+      <!--     Javadoc generation.                                           -->
       <!--     Notes:                                                        -->
       <!--                                                                   -->
       <!--       - Do NOT enable deep copying of "doc-files" directories     -->
@@ -904,40 +931,46 @@
       <!--         side effect to copy .svn directories as well.             -->
       <!--                                                                   -->
       <!--       - Do NOT link source code, because it duplicates            -->
-      <!--         jxr-maven-plugin.  Note that javadoc.build.xml            -->
-      <!--         do link source code.                                      -->
+      <!--         jxr-maven-plugin.                                         -->
       <!--                                                                   -->
-      <!--       - In theory, the <sourcepath/> and <subpackages/> elements  -->
-      <!--         below are not needed. However our experience show that,   -->
-      <!--         without them, javadoc fails to link expressions like      -->
-      <!--         {@link org.geotools.somepackage}, i.e. a link to a        -->
-      <!--         package (not a class or a method, which still okay).      -->
-      <!--         See http://jira.codehaus.org/browse/MJAVADOC-28           -->
+      <!--       - <sourcepath/> and <subpackages/> elements doesn't seem    -->
+      <!--         to work with aggregated javadoc.                          -->
       <!--                                                                   -->
       <!-- ================================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <source>1.4</source><!-- Necessary to enable javadoc to handle J2SE 1.4 features.           -->
-          <version>false</version><!-- Specifies whether or not the version text is included.             -->
-          <noqualifier>all</noqualifier><!-- Omits qualifying package name from ahead of class names in output. -->
-          <quiet>true</quiet><!-- Shuts off non-error and non-warning messages.                      -->
-          <maxmemory>512M</maxmemory><!-- The maximum Java heap size to be used when launching the javadoc.  -->
-          <encoding>ISO-8859-1</encoding><!-- Specifies the encoding name of the source files.                   -->
-          <aggregate>true</aggregate><!-- Whether to build an aggregated report at the root.                 -->
-          <additionalparam>-keywords</additionalparam><!-- Set an additional parameter on the command line.               -->
-          <!--
-            Note: ${project.build.sourceDirectory} should work below. Lets try it.
-            <sourcepath>${basedir}/src</sourcepath>   <!- Specifies the source paths where the subpackages are located.      ->
-            <subpackages>org.geotools</subpackages>   <!- Specifies the package directory where javadoc will be executed.    ->
-          -->
+          <dependencies>
+            <!-- Contains the Java implementation for custom taglets. -->
+            <dependency>
+              <groupId>org.geotools</groupId>
+              <artifactId>gt2-javadoc</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </dependencies>
+          <source>1.4</source>            <!-- Necessary to enable javadoc to handle J2SE 1.4 features.           -->
+          <version>false</version>        <!-- Specifies whether or not the version text is included.             -->
+          <noqualifier>all</noqualifier>  <!-- Omits qualifying package name from ahead of class names in output. -->
+          <quiet>true</quiet>             <!-- Shuts off non-error and non-warning messages.                      -->
+          <maxmemory>512M</maxmemory>     <!-- The maximum Java heap size to be used when launching the javadoc.  -->
+          <encoding>ISO-8859-1</encoding> <!-- Specifies the encoding name of the source files.                   -->
+          <aggregate>true</aggregate>     <!-- Whether to build an aggregated report at the root.                 -->
+          <additionalparam>-keywords</additionalparam> <!-- Set an additional parameter on the command line.      -->
           <excludePackageNames>
-            org.geotools.resources
+            org.geotools.resources:org.geotools.maven
           </excludePackageNames>
 
-          <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in doc comments. -->
-          <!-- Note: <placement/> should be a combinaison of the letters Xaoptcmf.                                    -->
+          <!-- Custom taglets implemented in Java. -->
+          <!-- TODO: The org.geotools.maven.taglet.Tutorial taglet is ignored. -->
+          <!-- Waiting for http://jira.codehaus.org/browse/MPJAVADOC-77 fix.   -->
+          <taglet>org.geotools.maven.taglet.Tutorial</taglet>
+          <taglet>org.geotools.maven.taglet.Source</taglet>
+          <tagletpath>${settings.localRepository}/org/geotools/gt2-javadoc/${project.version}/gt2-javadoc-${project.version}.jar</tagletpath>
+
+          <!-- Enables the Javadoc tool to interpret a simple, one-argument -->
+          <!-- custom block tag tagname in doc comments. Note: <placement/> -->
+          <!-- should be a combinaison of the letters Xaoptcmf.             -->
           <tags>
             <tag>
               <name>todo</name>
@@ -955,14 +988,9 @@
               <head>TODO:</head>
             </tag>
             <tag>
-              <name>source</name>
+              <name>generated</name>
               <placement>Xt</placement>
-              <head>Source:</head>
-            </tag>
-            <tag>
-              <name>tutorial</name>
-              <placement>Xt</placement>
-              <head>Tutorial:</head>
+              <head>Generated</head>
             </tag>
           </tags>
 
@@ -970,25 +998,21 @@
           <links>
             <link>http://java.sun.com/j2se/1.5/docs/api</link>
             <link>http://java.sun.com/j2ee/1.4/docs/api</link>
-            <link>
-              http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs
-            </link>
-            <link>
-              http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi
-            </link>
+            <link>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs</link>
+            <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
             <link>http://jsr-108.sourceforge.net/javadoc</link>
             <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
             <link>http://geoapi.sourceforge.net/pending/javadoc</link>
             <link>http://geoapi.sourceforge.net/legacy/javadoc</link>
-            <link>http://www.jump-project.org/docs/jts/1.6/api</link>
+            <link>http://www.jump-project.org/docs/jts/1.7/api</link>
           </links>
 
           <!-- Separates packages on the overview page into whatever groups is specified. -->
           <groups>
             <group>
-              <title>Features, Filters and Styling</title>
+              <title>Spatial Referencing by Coordinates</title>
               <packages>
-                org.geotools.feature*:org.geotools.filter*:org.geotools.styling*
+                org.geotools.referencing*:org.geotools.parameter*:org.geotools.axis*
               </packages>
             </group>
             <group>
@@ -1004,18 +1028,10 @@
               </packages>
             </group>
             <group>
-              <title>Spatial Referencing by Coordinates</title>
+              <title>Features, Filters and Styling</title>
               <packages>
-                org.geotools.referencing*:org.geotools.parameter*:org.geotools.axis*
+                org.geotools.feature*:org.geotools.filter*:org.geotools.styling*
               </packages>
-            </group>
-            <group>
-              <title>Meta Data</title>
-              <packages>org.geotools.metadata*</packages>
-            </group>
-            <group>
-              <title>Catalog Services</title>
-              <packages>org.geotools.catalog*</packages>
             </group>
             <group>
               <title>Data stores</title>
@@ -1028,13 +1044,21 @@
               </packages>
             </group>
             <group>
-              <title>Graphs</title>
-              <packages>org.geotools.graph*</packages>
+              <title>Catalog Services</title>
+              <packages>org.geotools.catalog*</packages>
+            </group>
+            <group>
+              <title>Meta Data</title>
+              <packages>org.geotools.metadata*</packages>
+            </group>
+            <group>
+              <title>Graphs and validation</title>
+              <packages>org.geotools.graph*:org.geotools.validation*</packages>
             </group>
             <group>
               <title>Renderer and Display Objects</title>
               <packages>
-                org.geotools.display*:org.geotools.renderer.lite*:org.geotools.renderer.shape*:org.geotools.map*
+                org.geotools.display*:org.geotools.renderer*:org.geotools.renderer.shape*:org.geotools.map*
               </packages>
             </group>
             <group>
@@ -1054,13 +1078,6 @@
           </groups>
         </configuration>
       </plugin>
-
-      <!-- See the comment before the javadoc plugin configuration. We need to delete
-        the four next lines when a new maven-site-plugin will be available. -->
-    </plugins>
-  </build>
-  <reporting>
-    <plugins>
 
 
 
@@ -1149,6 +1166,8 @@
     </repository>
   </distributionManagement>
 
+
+
   <!-- ===================================================================== -->
   <!--     Repositories (ibiblio, refractions...).                           -->
   <!--     This is where Maven looks for dependencies.                       -->
@@ -1188,9 +1207,11 @@
     </repository>
   </repositories>
 
+
+
   <!-- ===================================================================== -->
-  <!--     Plugin repositories.                           -->
-  <!--     This is where Maven looks for plugin dependencies.                       -->
+  <!--     Plugin repositories.                                              -->
+  <!--     This is where Maven looks for plugin dependencies.                -->
   <!-- ===================================================================== -->
   <pluginRepositories>
     <pluginRepository>
@@ -1206,8 +1227,10 @@
     </pluginRepository>
   </pluginRepositories>
 
+
+
   <!-- ===================================================================== -->
-  <!--     All Geotools 2 groups included in the build.                      -->
+  <!--     Modules included in the build in approximative dependency order   -->
   <!-- ===================================================================== -->
   <modules>
     <module>maven</module>

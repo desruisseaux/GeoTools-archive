@@ -32,29 +32,6 @@
   </description>
 
   <!-- ===================================================================== -->
-  <!--     External dependencies.                                            -->
-  <!--     POM in subdirectories will inherit them.                          -->
-  <!-- ===================================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi-nogenerics</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
-      <groupId>javax.units</groupId>
-      <artifactId>jsr108</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-  <!-- ===================================================================== -->
   <!--     Dependencies management.                                          -->
   <!--     If a POM declares one of those dependencies, then it will use     -->
   <!--     the version specified here. Otherwise, those dependencies are     -->
