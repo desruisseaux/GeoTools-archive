@@ -406,7 +406,7 @@ public class QuickStartGUI {
                 
                 QuickStartGUI.captureButton.setEnabled(false);
                 QuickStartGUI.saveButton.setEnabled(true);
-                QuickStartGUI.capture_as_image();
+//                QuickStartGUI.capture_as_image();
                 
               }
           });
