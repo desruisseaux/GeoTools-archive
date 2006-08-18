@@ -1,0 +1,12 @@
+This is an introductory demo. 
+
+The gui can be run from this directory, as follows:
+
+cd ../..
+
+java -classpath target/gt2-api-2.3-SNAPSHOT.jar:target/gt2-main-2.3-SNAPSHOT.jar:target/gt2-mappane-2.3-SNAPSHOT.jar:target/gt2-demo-mappane-2.3-SNAPSHOT.jar:target/gt2-shapefile-2.3-SNAPSHOT.jar:target:gt2-referencing-2.3-SNAPSHOT.jar:target/gt2-render-2.3-SNAPSHOT.jar:target/gt2-demo-introduction-2.3-SNAPSHOT.jar org.geotools.demo.introduction.QuickStartGUI
+
+
+Adrian Custer
+Friday, 18 August 2006
+Brussels, Belgium
