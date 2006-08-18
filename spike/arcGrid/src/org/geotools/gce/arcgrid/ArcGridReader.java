@@ -18,7 +18,7 @@ package org.geotools.gce.arcgrid;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,14 +34,13 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
+import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 
 import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -51,7 +50,6 @@ import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata;
-import org.geotools.gce.imageio.asciigrid.AsciiGridsImageReader;
 import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
@@ -84,6 +82,9 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 	private final static Logger LOGGER = Logger.getLogger(ArcGridReader.class
 			.toString());
 
+	/** Caches and ImageReaderSpi for an AsciiGridsImageReader. */
+	private final static ImageReaderSpi readerSPI = new AsciiGridsImageReaderSpi();
+
 	private String parentPath;
 
 	private double inNoData = Double.NaN;
@@ -113,16 +114,13 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 */
 	public ArcGridReader(Object input, final Hints hints)
 			throws DataSourceException {
-
-		this.hints = hints;
+		if (hints != null)
+			this.hints.add(hints);
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Checking input
 		//
 		// /////////////////////////////////////////////////////////////////////
-		this.source = input;
-		format = new ArcGridFormat();
-		coverageName = "AsciiGrid";
 		if (input == null) {
 
 			final IOException ex = new IOException(
@@ -130,6 +128,9 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
 			throw new DataSourceException(ex);
 		}
+		this.source = input;
+		format = new ArcGridFormat();
+		coverageName = "AsciiGrid";
 		try {
 			boolean closeMe = true;
 
@@ -197,8 +198,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			// Get a reader for this format
 			//
 			// //
-			final ImageReader reader = new AsciiGridsImageReader(
-					new AsciiGridsImageReaderSpi());
+			final ImageReader reader = readerSPI.createReaderInstance();
 			reader.setInput(inStream);
 
 			// //
@@ -227,7 +227,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			// Informations about multiple levels and such
 			//
 			// /////////////////////////////////////////////////////////////////////
-			getHRInfo(reader);
+			getResolutionInfo(reader);
 
 			// release the stream
 			if (closeMe)
@@ -242,7 +242,14 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 
 	}
 
-	private void getHRInfo(ImageReader reader) throws IOException,
+	/**
+	 * Gets resolution information about the coverage itself.
+	 * 
+	 * @param reader
+	 * @throws IOException
+	 * @throws TransformException
+	 */
+	private void getResolutionInfo(ImageReader reader) throws IOException,
 			TransformException {
 
 		// //
@@ -259,7 +266,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 		// setting the higher resolution avalaible for this coverage
 		//
 		// ///
-		higherRes = getResolution(originalEnvelope, actualDim, crs);
+		highestRes = getResolution(originalEnvelope, actualDim, crs);
 
 	}
 
@@ -296,13 +303,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getSource()
-	 */
-	public Object getSource() {
-		return source;
-	}
-
-	/**
 	 * @see org.opengis.coverage.grid.GridCoverageReader#getCurrentSubname()
 	 */
 	public String getCurrentSubname() throws IOException {
@@ -319,7 +319,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 	public GridCoverage read(GeneralParameterValue[] params)
 			throws IllegalArgumentException, IOException {
 		GeneralEnvelope readEnvelope = null;
-		Rectangle2D requestedDim = null;
+		Rectangle requestedDim = null;
 		if (params != null) {
 
 			final int length = params.length;
@@ -333,7 +333,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 					final GridGeometry2D gg = (GridGeometry2D) param.getValue();
 					readEnvelope = new GeneralEnvelope((Envelope) gg
 							.getEnvelope2D());
-					requestedDim = gg.getGridRange2D().getBounds2D();
+					requestedDim = gg.getGridRange2D().getBounds();
 				}
 
 			}
@@ -368,49 +368,50 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 	 * 
 	 * @throws java.io.IOException
 	 */
-	private GridCoverage createCoverage(GeneralEnvelope readEnvelope,
-			Rectangle2D requestedDim) throws java.io.IOException {
+	private GridCoverage createCoverage(GeneralEnvelope requestedEnvelope,
+			Rectangle requestedDim) throws java.io.IOException {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Doing an image read for reading the coverage.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		// Preparing JAI ImageRead Operation
-		final AsciiGridsImageReader mReader = new AsciiGridsImageReader(
-				new AsciiGridsImageReaderSpi());
-		final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-				"ImageRead");
-		pbjImageRead.setParameter("Input", source);
-		pbjImageRead.setParameter("Reader", mReader);
 
 		// /////////////////////////////////////////////////////////////////////
-		//
-		// subsampling
-		//
-		// /////////////////////////////////////////////////////////////////////
-		// //
-		//
-		// Compute requested Res
-		//
-		// //
-		double requestedRes[] = getResolution(readEnvelope, requestedDim, crs);
-		final ImageReadParam readParam = new ImageReadParam();
-		// //
 		//
 		// Setting subsampling factors with some checkings
 		// 1) the subsampling factors cannot be zero
 		// 2) the subsampling factors cannot be such that the w or h are zero
-		// //
-		decimationOnReadingControl(readParam, requestedRes);
-		pbjImageRead.setParameter("readParam", readParam);
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final ImageReadParam readP = new ImageReadParam();
+		final Integer imageChoice;
+		try {
+			imageChoice = setReadParams(readP, requestedEnvelope, requestedDim);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		} catch (TransformException e) {
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		}
 
 		// //
 		//
 		// image and metadata
 		//
 		// //
-		final PlanarImage asciiCoverage = JAI.create("ImageRead", pbjImageRead);
+		final ParameterBlock pbjImageRead = new ParameterBlock();
+		pbjImageRead.add(ImageIO.createImageInputStream(source));
+		pbjImageRead.add(imageChoice);
+		pbjImageRead.add(Boolean.TRUE);
+		pbjImageRead.add(Boolean.FALSE);
+		pbjImageRead.add(Boolean.FALSE);
+		pbjImageRead.add(null);
+		pbjImageRead.add(null);
+		pbjImageRead.add(readP);
+		pbjImageRead.add(readerSPI.createReaderInstance());
+		final RenderedOp asciiCoverage= JAI.create("ImageRead",pbjImageRead,hints);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -461,9 +462,9 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			// Coverage
 			//
 			// /////////////////////////////////////////////////////////////////////
-			return FactoryFinder.getGridCoverageFactory(null).create(
-					coverageName, asciiCoverage, originalEnvelope,
-					new GridSampleDimension[] { band }, null, properties); // TODO
+			return coverageFactory.create(coverageName, asciiCoverage,
+					originalEnvelope, new GridSampleDimension[] { band }, null,
+					properties);
 
 		} catch (NoSuchElementException e) {
 			IOException exc = new IOException();
@@ -604,8 +605,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 			LOGGER.info("crs not found proceeding with EPSG:4326");
 			crs = ArcGridFormat.getDefaultCRS();
 		}
-
-		longitudeFirst = !GridGeometry2D.swapXY(crs.getCoordinateSystem());
 
 	}
 
