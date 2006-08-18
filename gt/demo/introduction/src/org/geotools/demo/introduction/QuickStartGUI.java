@@ -736,9 +736,9 @@ public class QuickStartGUI {
         
         final int W = visPanel.getWidth();
         infoSP.setSize(new Dimension(3,3));
-        infoSP.setMinimumSize(new Dimension(W, 50));
-        infoSP.setPreferredSize(new Dimension(W, 50));
-        infoSP.setMaximumSize(new Dimension(W, 50));
+//        infoSP.setMinimumSize(W, 50);
+//        infoSP.setPreferredSize(W, 50);
+//        infoSP.setMaximumSize(W, 50);
 //        jmp.setSize(new Dimension(300,200));
         
         BoxLayout visPanelBoxLayout = new BoxLayout(visPanel,BoxLayout.Y_AXIS);
