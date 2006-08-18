@@ -455,7 +455,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// /////////////////////////////////////////////////////////////////////
 		// get the raster -> model transformation and
 		// create the coverage
-		return createImageCoverage((PlanarImage) readfactory.create(pbjRead,
+		return createImageCoverage(JAI.create("ImageRead",pbjRead,
 				(RenderingHints) newHints));
 
 	}

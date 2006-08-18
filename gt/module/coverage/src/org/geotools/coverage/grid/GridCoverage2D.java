@@ -928,8 +928,9 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         final int                      numBands = image.getNumBands();
         final int                   visibleBand = CoverageUtilities.getVisibleBand(image);
         final GridSampleDimension[] targetBands = (GridSampleDimension[]) sampleDimensions.clone();
-        assert targetBands.length == numBands : targetBands.length;
-        for (int i=0; i<targetBands.length; i++) {
+        final int length=targetBands.length;
+        assert targetBands.length == numBands : length;
+        for (int i=0; i<length; i++) {
             targetBands[i] = targetBands[i].geophysics(geo);
         }
         /*

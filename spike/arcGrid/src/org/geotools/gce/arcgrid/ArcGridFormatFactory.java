@@ -39,7 +39,7 @@ public class ArcGridFormatFactory implements GridFormatFactorySpi {
         try {
             Class.forName("javax.media.jai.JAI");
             Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-            Class.forName("org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata_1.0");
+            Class.forName("org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata");
         } catch (ClassNotFoundException cnf) {
             available = false;
         }

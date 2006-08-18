@@ -49,6 +49,7 @@ import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
+import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.MosaicDescriptor;
 
 import org.geotools.coverage.FactoryFinder;
@@ -625,7 +626,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			String location;
 			Envelope bound;
 			Envelope loadedDataSetBound = new Envelope();
-			OpImage loadedImage;
+			RenderedOp loadedImage;
 			File imageFile;
 			final int numImages = features.size();
 			final ROI[] rois = new ROI[numImages];
@@ -676,7 +677,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				pbjImageRead.add(null);
 				pbjImageRead.add(readP);
 				pbjImageRead.add(null);
-				loadedImage = (OpImage) readfactory.create(pbjImageRead, null);
+				loadedImage =  JAI.create("ImageRead",pbjImageRead, null);
 				// /////////////////////////////////////////////////////////////
 				//
 				// Input alpha management.
@@ -912,7 +913,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// create the coverage
 		//
 		// /////////////////////////////////////////////////////////////////////
-		return FactoryFinder.getGridCoverageFactory(null).create(coverageName,
+		return coverageFactory.create(coverageName,
 				imageBeforeAlpha, requestedEnvelope);
 
 	}
@@ -942,7 +943,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @throws IOException
 	 */
 	private void addToMosaic(ParameterBlockJAI pbjMosaic, Envelope bound,
-			Point2D ulc, double[] res, OpImage loadedImage,
+			Point2D ulc, double[] res, RenderedOp loadedImage,
 			boolean singleImageROI, ROI[] rois, int i,
 			int singleImageROIThreshold, boolean alphaIn, int[] alphaIndex,
 			PlanarImage[] alphaChannels, Area finalLayout) {

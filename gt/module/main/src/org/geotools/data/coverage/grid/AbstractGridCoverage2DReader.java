@@ -17,7 +17,6 @@ package org.geotools.data.coverage.grid;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
@@ -38,6 +37,7 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
@@ -76,7 +76,13 @@ import com.sun.media.jai.imageioimpl.ImageReadCRIF;
  */
 public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
-	protected final static ImageReadCRIF readfactory = new ImageReadCRIF();
+
+
+	/**Caches a default GridCoverageFactory for usage in plugins.*/
+	protected final static GridCoverageFactory coverageFactory = FactoryFinder
+			.getGridCoverageFactory(null);
+
+	protected static final double EPS = 1E-6;
 
 	/** Buffere factory for coordinate operations. */
 	protected final static CoordinateOperationFactory operationFactory = new BufferedDefaultCoordinateOperationFactory();
@@ -125,9 +131,6 @@ public abstract class AbstractGridCoverage2DReader implements
 
 	protected double[][] overViewResolutions = null;
 
-	protected static final double EPS = 1E-6;
-
-
 	// -------------------------------------------------------------------------
 	//
 	// Proposed new methods
@@ -153,7 +156,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	// */
 	// public int getNumOverviews(){
 	// return numOverviews;
-	//	}
+	// }
 	//
 	// /**
 	// * Returns the grid geometry for an overview.
@@ -479,23 +482,23 @@ public abstract class AbstractGridCoverage2DReader implements
 		{
 
 			int w, h;
-			double selectedRes[]= new double[2];
+			double selectedRes[] = new double[2];
 			final int choice = imageChoice.intValue();
 			if (choice == 0) {
 				// highest resolution
 				w = originalGridRange.getLength(0);
 				h = originalGridRange.getLength(1);
-				selectedRes[0]=highestRes[0];
-				selectedRes[1]=highestRes[1];
+				selectedRes[0] = highestRes[0];
+				selectedRes[1] = highestRes[1];
 			} else {
 				// some overview
-				selectedRes[0]=overViewResolutions[choice - 1][0];
-				selectedRes[1]=overViewResolutions[choice - 1][1];
+				selectedRes[0] = overViewResolutions[choice - 1][0];
+				selectedRes[1] = overViewResolutions[choice - 1][1];
 				w = (int) Math.round(originalEnvelope.getLength(0)
 						/ selectedRes[0]);
 				h = (int) Math.round(originalEnvelope.getLength(1)
 						/ selectedRes[1]);
-				
+
 			}
 			// /////////////////////////////////////////////////////////////////////
 			// DECIMATION ON READING
@@ -654,7 +657,7 @@ public abstract class AbstractGridCoverage2DReader implements
 		// if (raster2Model != null)
 		// return FactoryFinder.getGridCoverageFactory(null).create(
 		// coverageName, image, crs, raster2Model, bands, null, null);
-		return FactoryFinder.getGridCoverageFactory(null)
+		return coverageFactory
 				.create(coverageName, image,
 						new GeneralEnvelope(originalEnvelope), bands, null,
 						null);
@@ -723,10 +726,8 @@ public abstract class AbstractGridCoverage2DReader implements
 							envelope);
 
 				requestedRes = new double[2];
-				requestedRes[0] = envelope.getLength( 0 )
-						/ dim.getWidth();
-				requestedRes[1] = envelope.getLength( 1 )
-						/ dim.getHeight();
+				requestedRes[0] = envelope.getLength(0) / dim.getWidth();
+				requestedRes[1] = envelope.getLength(1) / dim.getHeight();
 			}
 			return requestedRes;
 		} catch (TransformException e) {

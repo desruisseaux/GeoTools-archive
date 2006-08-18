@@ -109,6 +109,20 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	 * @throws DataSourceException
 	 */
 	public WorldImageReader(Object input) throws DataSourceException {
+		this(input, null);
+	}
+	/**
+	 * Class constructor. Construct a new ImageWorldReader to read a
+	 * GridCoverage from the source object. The source must point to the raster
+	 * file itself, not the world file. If the source is a Java URL it checks if
+	 * it is ponting to a file and if so it converts the url into a file.
+	 * 
+	 * @param input
+	 *            The source of a GridCoverage, can be a File, a URL or an input
+	 *            stream.
+	 * @throws DataSourceException
+	 */
+	public WorldImageReader(Object input,final Hints hints) throws DataSourceException {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Checking input
@@ -445,7 +459,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// Reading the source layer
 		//
 		// /////////////////////////////////////////////////////////////////////
-
 		final ImageReader reader = readerSPI.createReaderInstance();
 		final ImageInputStream inStream = wmsRequest ? ImageIO
 				.createImageInputStream(((URL) source).openStream()) : ImageIO
@@ -483,7 +496,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		// get the raster -> model transformation and
 		// create the coverage
-		return createImageCoverage((PlanarImage) readfactory.create(pbjRead,
+		return createImageCoverage((PlanarImage) JAI.create("ImageRead",pbjRead,
 				(RenderingHints) newHints));
 
 	}

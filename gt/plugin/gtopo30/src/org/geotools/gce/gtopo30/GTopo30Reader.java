@@ -25,7 +25,6 @@ import java.awt.color.ColorSpace;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedReader;
@@ -50,11 +49,11 @@ import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 import javax.units.Unit;
 import javax.units.UnitFormat;
 
 import org.geotools.coverage.Category;
-import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -62,6 +61,7 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
@@ -142,6 +142,26 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 *             DOCUMENT ME!
 	 */
 	public GTopo30Reader(final Object source) throws IOException {
+		this(source, null);
+
+	}
+
+	/**
+	 * GTopo30Reader constructor.
+	 * 
+	 * @param source
+	 *            The source object (can be a File, an URL or a String
+	 *            representing a File or an URL).
+	 * @throws MalformedURLException
+	 *             if the URL does not correspond to one of the GTopo30 files
+	 * @throws IOException
+	 * @throws DataSourceException
+	 *             if the given url points to an unrecognized file
+	 * @throws IllegalArgumentException
+	 *             DOCUMENT ME!
+	 */
+	public GTopo30Reader(final Object source, final Hints hints)
+			throws IOException {
 		if (source == null) {
 			throw new DataSourceException(
 					"GTopo30Reader:No source set to read this coverage.");
@@ -162,7 +182,8 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		} else {
 			throw new IllegalArgumentException("Illegal input argument!");
 		}
-
+		if (hints != null)
+			this.hints.add(hints);
 		this.source = source;
 		this.format = new GTopo30Format();
 		// ///////////////////////////////////////////////////////////
@@ -240,7 +261,6 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 				.getNCols(), header.getNRows()), crs);
 		numOverviews = 0;
 		overViewResolutions = null;
-
 	}
 
 	/**
@@ -487,7 +507,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		pbjImageRead.add(null);
 		pbjImageRead.add(readP);
 		pbjImageRead.add(null);
-		RenderedImage image = readfactory.create(pbjImageRead, hints);
+		RenderedOp image = JAI.create("ImageRead", pbjImageRead, hints);
 
 		// sample dimension for this coverage
 		final GridSampleDimension band = getSampleDimension(max, min);
@@ -521,10 +541,9 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		}
 
 		// return the coverage
-		return (GridCoverage2D) FactoryFinder.getGridCoverageFactory(null)
-				.create(coverageName, image,
-						new GeneralEnvelope(originalEnvelope),
-						new GridSampleDimension[] { band }, null, metadata);
+		return (GridCoverage2D) coverageFactory.create(coverageName, image,
+				new GeneralEnvelope(originalEnvelope),
+				new GridSampleDimension[] { band }, null, metadata);
 	}
 
 	/**

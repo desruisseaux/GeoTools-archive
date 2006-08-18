@@ -17,7 +17,6 @@
 package org.geotools.gce.arcgrid;
 
 import java.awt.Rectangle;
-import java.io.File;
 
 import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
@@ -61,10 +60,13 @@ public class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
 		super.setUp();
 		ImageIO.setUseCache(false);
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
-				32 * 1024 * 1024);
-		JAI.getDefaultInstance().getTileCache().setMemoryThreshold(1);
+				64 * 1024 * 1024);
+		JAI.getDefaultInstance().getTileCache().setMemoryThreshold(1.0f);
 
-		
+		JAI.getDefaultInstance().getTileScheduler().setParallelism(50);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(50);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(5);
+		JAI.getDefaultInstance().getTileScheduler().setPriority(5);
 
 	}
 
@@ -75,7 +77,7 @@ public class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
 	 */
 	public ArcGridVisualizationTest(String name) {
 		super(name);
-		
+
 	}
 
 	public static final void main(String[] args) throws Exception {
@@ -108,9 +110,7 @@ public class ArcGridVisualizationTest extends ArcGridTestCaseAdapter {
 
 		// printing CRS information
 		LOGGER.info(gc.getCoordinateReferenceSystem().toWKT());
+		LOGGER.info(gc.getEnvelope().toString());
 	}
-
-	
-
 
 }

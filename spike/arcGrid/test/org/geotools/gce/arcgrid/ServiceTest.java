@@ -34,7 +34,6 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  */
 public class ServiceTest extends TestCase {
 
-
 	public ServiceTest(java.lang.String testName) {
 		super(testName);
 	}
@@ -46,19 +45,20 @@ public class ServiceTest extends TestCase {
 	public void testIsAvailable() throws NoSuchAuthorityCodeException,
 			FactoryException {
 
-		Iterator list = GridFormatFinder.getAvailableFormats();
+		Iterator list = GridFormatFinder.getAvailableFormats().iterator();
 		boolean found = false;
-		GridFormatFactorySpi fac;
+		GridFormatFactorySpi fac=null;
 		while (list.hasNext()) {
 			fac = (GridFormatFactorySpi) list.next();
 
 			if (fac instanceof ArcGridFormatFactory) {
 				found = true;
-
+				
 				break;
 			}
 		}
-
+		
 		assertTrue("ArcGridFormatFactory not registered", found);
+		assertTrue("ArcGridFormatFactory not available",fac.isAvailable());
 	}
 }

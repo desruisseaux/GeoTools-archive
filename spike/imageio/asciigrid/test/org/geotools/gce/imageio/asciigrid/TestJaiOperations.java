@@ -17,11 +17,11 @@
 package org.geotools.gce.imageio.asciigrid;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,6 +39,7 @@ import javax.imageio.ImageWriter;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
+import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RecyclingTileFactory;
@@ -52,10 +53,12 @@ import javax.swing.JLabel;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
+import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.resources.TestData;
 
 import tilecachetool.TCTool;
 
+import com.sun.media.jai.imageioimpl.ImageReadCRIF;
 import com.sun.media.jai.util.SunTileCache;
 
 public class TestJaiOperations extends TestCase implements WindowListener {
@@ -108,10 +111,10 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 
 		JAI.getDefaultInstance().setRenderingHints(rh);
 
-		JAI.getDefaultInstance().getTileScheduler().setParallelism(20);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(20);
-		JAI.getDefaultInstance().getTileScheduler().setPriority(6);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(6);
+		JAI.getDefaultInstance().getTileScheduler().setParallelism(50);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(50);
+		JAI.getDefaultInstance().getTileScheduler().setPriority(5);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(5);
 
 	}
 
@@ -157,10 +160,8 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 			final String title = new String("TestSubsamplingOperation");
 			logger.info("\n\n " + title + " \n");
 
-			final File f = TestData.file(this, "af0500ag.asc");
-			final ParameterBlockJAI pbjImageRead = new ParameterBlockJAI(
-					"ImageRead");
-			RenderedOp image;
+			final File f = TestData.file(this, "g_etopo6min.asc");
+			OpImage image;
 			// pbjImageRead.setParameter("Input", f);
 			//
 			// image = JAI.create("ImageRead", pbjImageRead);
@@ -174,14 +175,28 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 			// visualize(image, title + " xfactor=2 & yfactor=2");
 
 			ImageReadParam irp2 = new ImageReadParam();
-			irp2.setSourceRegion(new Rectangle(4000, 4000, 3000, 3000));
-//			irp2.setSourceSubsampling(10, 10, 0, 0);
+			// irp2.setSourceRegion(new Rectangle(4000, 4000, 3000, 3000));
+			// irp2.setSourceSubsampling(10, 10, 0, 0);
 			final ImageLayout layout = new ImageLayout();
 			// layout.setTileHeight(512);
 			// layout.setTileWidth(512);
-			pbjImageRead.setParameter("readParam", irp2);
-			pbjImageRead.setParameter("Input", f);
-			image = JAI.create("ImageRead", pbjImageRead);
+			// pbjImageRead.setParameter("readParam", irp2);
+			// pbjImageRead.setParameter("Input", f);
+			// image = JAI.create("ImageRead", pbjImageRead);
+
+			final ParameterBlock pbjImageRead = new ParameterBlock();
+			pbjImageRead.add(f);
+			pbjImageRead.add(new Integer(0));
+			pbjImageRead.add(Boolean.TRUE);
+			pbjImageRead.add(Boolean.FALSE);
+			pbjImageRead.add(Boolean.FALSE);
+			pbjImageRead.add(null);
+			pbjImageRead.add(null);
+			pbjImageRead.add(irp2);
+			pbjImageRead.add(new AsciiGridsImageReader(new AsciiGridsImageReaderSpi()));
+			image = (OpImage) new ImageReadCRIF().create(
+					pbjImageRead, null);
+
 			visualize(image, title + " xfactor=3 & yfactor=9");
 			//
 			// ImageReadParam irp3 = new ImageReadParam();
