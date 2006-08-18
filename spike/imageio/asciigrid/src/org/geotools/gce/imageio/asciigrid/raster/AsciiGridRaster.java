@@ -377,18 +377,12 @@ public abstract class AsciiGridRaster {
 		// Number of spaces to count before I find useful data
 		final int samplesToThrowAwayBeforeFirstValidSample = (nCols * srcRegionYOffset);
 
-		// Parameters needed to handle setSourceRegion Operations
-		// final int srcDifference=srcWidth - srcRegionWidth;
-		// final int spacesBetweenUsefulData =
-		// (srcDifference>0)?srcDifference:0;
-		// final boolean reducedWidth = (spacesBetweenUsefulData != 0) ? true:
-		// false;
 		final TileFactory factory = (TileFactory) JAI.getDefaultInstance()
 				.getRenderingHint(JAI.KEY_TILE_FACTORY);
 		if (factory != null)
 			raster = factory.createTile(RasterFactory.createBandedSampleModel(
 					java.awt.image.DataBuffer.TYPE_FLOAT, dstWidth, dstHeight,
-					1), new Point(0, 0));
+					1), null);
 		else
 			raster = RasterFactory.createBandedRaster(
 					java.awt.image.DataBuffer.TYPE_FLOAT, dstWidth, dstHeight,
