@@ -85,7 +85,9 @@
   <!--     All modules included in the build                                   -->
   <!-- ======================================================================= -->
   <modules>
-    <module>property</module>
     <module>data</module>
+    <module>introduction</module>
+    <module>mappane</module>
+    <module>property</module>
   </modules>
 </project>

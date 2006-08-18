@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>gt2-demo</artifactId>
+    <groupId>org.geotools</groupId>
+    <version>2.3-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.geotools</groupId>
+  <artifactId>gt2-demo-introduction</artifactId>
+  <packaging>jar</packaging>
+  <name>Geotools Introductory Demo</name>
+  <version>2.3-SNAPSHOT</version>
+  <description>Demos for Geotools 2.</description>
+  <url>http://maven.geotools.fr/reports/demo/introduction</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-api</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-mappane</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-demo-mappane</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+   <build>
+    <resources>
+      <resource>
+        <!-- targetPath>data</targetPath -->
+        <directory>.</directory>
+        <includes>
+          <include>resources/**</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+</project>
