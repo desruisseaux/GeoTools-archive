@@ -989,7 +989,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      */
     private void put(final Object key, final Object object) {
         pool.put(key, object);
-        int toReplace = maxStrongReferences - pool.size();
+        int toReplace = pool.size() - maxStrongReferences;
         if (toReplace > 0) {
             for (final Iterator it=pool.entrySet().iterator(); it.hasNext();) {
                 final Map.Entry entry = (Map.Entry) it.next();
