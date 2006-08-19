@@ -48,9 +48,9 @@
     <resources>
       <resource>
         <!-- targetPath>data</targetPath -->
-        <directory>.</directory>
+        <directory>resources</directory>
         <includes>
-          <include>resources/**</include>
+          <include>**</include>
         </includes>
       </resource>
     </resources>

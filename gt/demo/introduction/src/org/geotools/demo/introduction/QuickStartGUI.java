@@ -24,14 +24,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Formatter;
-import java.util.logging.Logger;
-import java.util.logging.StreamHandler;
 
 import javax.imageio.ImageIO;
 import javax.swing.Action;
@@ -325,7 +321,7 @@ public class QuickStartGUI {
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         //TODO: verify the file can be found
         java.net.URL imgURL = 
-            QuickStartGUI.class.getResource("/resources/GeotoolsBoxLogo.png");
+            QuickStartGUI.class.getResource("/GeotoolsBoxLogo.png");
 //        System.out.println(imgURL);
         ImageIcon icon = new ImageIcon(imgURL,"The Geotools Logo");
         JLabel iconLabel = new JLabel(icon);
