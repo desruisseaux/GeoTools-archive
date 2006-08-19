@@ -39,16 +39,4 @@
       <version>2.3-SNAPSHOT</version>
     </dependency>
   </dependencies>
-  <build>
-    <resources>
-      <resource>
-        <!-- targetPath>data</targetPath -->
-        <directory>.</directory>
-        <includes>
-          <include>data/**</include>
-          
-        </includes>
-      </resource>
-    </resources>
-  </build>
 </project>
