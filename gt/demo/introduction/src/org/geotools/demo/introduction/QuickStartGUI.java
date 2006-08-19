@@ -326,7 +326,7 @@ public class QuickStartGUI {
         //TODO: verify the file can be found
         java.net.URL imgURL = 
             QuickStartGUI.class.getResource("/resources/GeotoolsBoxLogo.png");
-        System.out.println(imgURL);
+//        System.out.println(imgURL);
         ImageIcon icon = new ImageIcon(imgURL,"The Geotools Logo");
         JLabel iconLabel = new JLabel(icon);
         buttonPanel.add(iconLabel);
@@ -352,7 +352,7 @@ public class QuickStartGUI {
                 QuickStartGUI.styleButton.setEnabled(true);
                 QuickStartGUI.create_FeatureSource_fromScratch();
                 QuickStartGUI.create_FeatureSource_fromShapefile();
-                QuickStartGUI.create_FeatureSource_fromWeb();
+//                QuickStartGUI.create_FeatureSource_fromWeb();
 //                QuickStartGUI.create_FeatureSource_fromDatabase();
                 
               }
@@ -445,6 +445,8 @@ public class QuickStartGUI {
         infoSP = new ScrollPane();
         infoSP.add(textArea);
         
+	//TOOD: use a Logger to output to the textArea. Not sure how to do this
+	//without using classes: annonymous inner class?
 //        OutputStream os = new  anOutputStream() extends OutputStream {
 //              public void write( int b ) throws IOException {
 //                  // append the data as characters to the JTextArea control
@@ -485,7 +487,7 @@ public class QuickStartGUI {
      */
     public static void create_FeatureSource_fromScratch(){
         
-        textArea.append("\tStart: Create FeatureSource from scratch.\n");
+        textArea.append("Start: Create FeatureSource from scratch.\n");
         
         /* JTS Geometry */
         // Wikipedia gives London as:  51° 30.4167′ N 0° 7.65′ W 
@@ -562,7 +564,7 @@ public class QuickStartGUI {
                 System.out.println("IOException on memoryDataStore creation: "+ ioex);
         }
 
-        textArea.append("\t  End: Created FeatureSource from scratch.\n");
+        textArea.append("  End: Created FeatureSource from scratch.\n");
     }
 
     
@@ -574,9 +576,8 @@ public class QuickStartGUI {
      */
     public static void create_FeatureSource_fromShapefile(){
 
-        textArea.append("\tStart: Create FeatureSource from shapefile.\n");
+        textArea.append("Start: Create FeatureSource from shapefile.\n");
         
-        /* Switch on the source uncommented in the intial declarations */
         shpURL = JMapPane.class.getResource(shpName);
         
         try {
@@ -593,7 +594,7 @@ public class QuickStartGUI {
          }
          
 
-         textArea.append("\t  End: Create FeatureSource from shapefile.\n");
+         textArea.append("  End: Create FeatureSource from shapefile.\n");
     }
     
     
@@ -605,10 +606,11 @@ public class QuickStartGUI {
     public static void create_FeatureSource_fromWeb(){
         
 
-        textArea.append("\tStart: Create FeatureSource from web server.\n");
-        
+        textArea.append("Start: Create FeatureSource from web server.\n");
+	
+        textArea.append("Oops!: Not yet implemented\n");
 
-        textArea.append("\t  End: Created FeatureSource from web server.\n");
+        textArea.append("  End: Created FeatureSource from web server.\n");
         
     }
 
@@ -619,9 +621,11 @@ public class QuickStartGUI {
     public static void create_FeatureSource_fromDatabase(){
         
 
-        textArea.append("\tStart: Create FeatureSource from web server.\n");
+        textArea.append("Start: Create FeatureSource from web server.\n");
+	
+        textArea.append("Oops!: Not yet implemented\n");
 
-        textArea.append("\t  End: Created FeatureSource from web server.\n");
+        textArea.append("  End: Created FeatureSource from web server.\n");
         
     }
     
@@ -630,9 +634,11 @@ public class QuickStartGUI {
      */
     public static void create_a_Catalog(){
         
-        textArea.append("\tStart: Create a Catalog.\n");
+        textArea.append("Start: Create a Catalog.\n");
+	
+        textArea.append("Oops!: Not yet implemented\n");
 
-        textArea.append("\t  End: Created a Catalog.\n");
+        textArea.append("  End: Created a Catalog.\n");
     }
 
   
@@ -643,7 +649,7 @@ public class QuickStartGUI {
      */
     public static void create_Styles_forEach_Feature(){
         
-        textArea.append("\tStart: Create the Styled Layer Descriptors.\n");
+        textArea.append("Start: Create the Styled Layer Descriptors.\n");
         
         /* Point style from scratch */
         StyleBuilder builder = new StyleBuilder();
@@ -667,7 +673,7 @@ public class QuickStartGUI {
         org.geotools.styling.Style[] shpStylArr = stylereader.readXML();
         shpStyl = shpStylArr[0];
 
-        textArea.append("\t  End: Created the Styled Layer Descriptors.\n");
+        textArea.append("  End: Created the Styled Layer Descriptors.\n");
     }
 
     
@@ -679,7 +685,7 @@ public class QuickStartGUI {
      * 
      */
     public static void initialize_JMapPane(){
-        textArea.append("\tStart: Initialize the GUI.\n");
+        textArea.append("Start: Initialize the GUI.\n");
 //        frame=new JFrame("My Map Viewer");
 //        frame.setBounds(20,20,1080,600);
 ////        frame.setBackground(Color.cyan);
@@ -732,21 +738,14 @@ public class QuickStartGUI {
         jtb.add(button);
         mapGUI.add(jtb,BorderLayout.NORTH);
         mapGUI.add(jmp);
-//        content.add(jtb,BorderLayout.NORTH);
-        
+	
         final int W = visPanel.getWidth();
-        infoSP.setSize(new Dimension(3,3));
-//        infoSP.setMinimumSize(W, 50);
-//        infoSP.setPreferredSize(W, 50);
-//        infoSP.setMaximumSize(W, 50);
-//        jmp.setSize(new Dimension(300,200));
-        
+        infoSP.setSize(new Dimension(300,60));        
         BoxLayout visPanelBoxLayout = new BoxLayout(visPanel,BoxLayout.Y_AXIS);
         visPanel.setLayout(visPanelBoxLayout);
         visPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         visPanel.add(infoSP);
-//        visPanel.add(Box.createVerticalGlue());
-        visPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+	visPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         visPanel.add(mapGUI);
         visPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         frame.getContentPane().doLayout();
@@ -754,7 +753,7 @@ public class QuickStartGUI {
         frame.getContentPane().doLayout();
         frame.setVisible(true);
 
-        textArea.append("\t  End: Initialized the GUI.\n");
+        textArea.append("  End: Initialized the GUI.\n");
         
     }
     
@@ -769,7 +768,7 @@ public class QuickStartGUI {
     public static void load_JMapPane()throws Exception{
         
 
-        textArea.append("\tStart: Load the map.\n");
+        textArea.append("Start: Load the map.\n");
         
         /* Renderer */
         renderer = new StreamingRenderer();
@@ -804,7 +803,7 @@ public class QuickStartGUI {
         frame.repaint();
         frame.doLayout();
 
-        textArea.append("\t  End: Loaded the map.\n");
+        textArea.append("  End: Loaded the map.\n");
     }
     
     
@@ -813,8 +812,8 @@ public class QuickStartGUI {
      */
     public static void filterFeatures(){
 
-        textArea.append("\tStart: Filter the features.\n");
-        textArea.append("\t  End: Filtered the features.\n");
+        textArea.append("Start: Filter the features.\n");
+        textArea.append("  End: Filtered the features.\n");
         
     }
 
@@ -826,7 +825,7 @@ public class QuickStartGUI {
      */
     public static void create_ProjectedCRS_from_DefaultGeogCRS(){
         
-        textArea.append("\tStart: Create ProjectedCRS from DefaultGeographicCRS.\n");
+        textArea.append("Start: Create ProjectedCRS from DefaultGeographicCRS.\n");
         
         /* Properties of the Projected CRS */
         Map props = new HashMap();
@@ -899,7 +898,7 @@ public class QuickStartGUI {
         }
 //        System.out.println(projCRS.toWKT())
 
-        textArea.append("\t  End: Created ProjectedCRS from DefaultGeographicCRS.\n");
+        textArea.append("  End: Created ProjectedCRS from DefaultGeographicCRS.\n");
     }
     
     
@@ -955,7 +954,7 @@ public class QuickStartGUI {
     //TODO: figure out why this doesn't work.!
     public static void display_projected_as_Mercator(){
 
-        textArea.append("\tStart: Project the map.\n");
+        textArea.append("Start: Project the map.\n");
         
 //        System.out.println("ProjCRS is: "+projCRS.toWKT());
         context.setAreaOfInterest(envlp_NoEdges, projCRS);
@@ -966,7 +965,7 @@ public class QuickStartGUI {
         frame.repaint();
         frame.doLayout();
 
-        textArea.append("\t  End: Projected the map.\n");
+        textArea.append("  End: Projected the map.\n");
         
     }
         
@@ -985,7 +984,7 @@ public class QuickStartGUI {
      */
     public static void capture_as_image(){
 
-        textArea.append("\tStart: Capture an image.\n");
+        textArea.append("Start: Capture an image.\n");
         /*
          * 1. Create an image from scratch
          */
@@ -1038,7 +1037,7 @@ public class QuickStartGUI {
         }
         g2.dispose();
 
-        textArea.append("\t  End: Captured an image.\n");
+        textArea.append("  End: Captured an image.\n");
     }
     
     /**
@@ -1048,13 +1047,13 @@ public class QuickStartGUI {
      */
     public static void main(String[] args) throws Exception {
         
-        System.out.println("QuickStart: Tutorial Start...");
+        System.out.println("QuickStart Tutorial: Start...");
         
-            System.out.println("\tStart: Create the Demo's GUI.");
+            System.out.println("Start: Create the Demo's GUI.");
         create_Geotools_DemoGUI();
-            System.out.println("\t  End: Created the Demo's GUI.");
+            System.out.println("  End: Created the Demo's GUI.");
         
-        System.out.println("QuickStart: Tutorial End.");
+        System.out.println("QuickStart Tutorial: End of non-GUI thread.");
     }
 
 }
