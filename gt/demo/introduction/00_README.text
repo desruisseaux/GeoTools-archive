@@ -1,11 +1,31 @@
-This is an introductory demo. 
+
+This is an introductory demonstration of the Geotools code library. 
+
+The demo opens a window with a series of buttons on the left hand side. Pushing 
+each highlighted button in turn will step through the demonstration.
 
 The gui can be run from this directory, as follows:
+  (Assume an SVN checkout where trunk/gt/ is at $GEOTOOLS_ROOT)
+Because Geotools is built with maven, we only need one jar in the classpath and 
+java will find all the other classes AS LONG AS they are in jars in the same 
+directory, in this example $GEOTOOLS_ROOT/target
 
-cd ../..
+java -classpath $GEOTOOLS_ROOT/target/gt2-demo-introduction-2.3-SNAPSHOT.jar \       
+                                   org.geotools.demo.introduction.QuickStartGUI
 
-java -classpath target/gt2-api-2.3-SNAPSHOT.jar:target/gt2-main-2.3-SNAPSHOT.jar:target/gt2-mappane-2.3-SNAPSHOT.jar:target/gt2-demo-mappane-2.3-SNAPSHOT.jar:target/gt2-shapefile-2.3-SNAPSHOT.jar:target:gt2-referencing-2.3-SNAPSHOT.jar:target/gt2-render-2.3-SNAPSHOT.jar:target/gt2-demo-introduction-2.3-SNAPSHOT.jar org.geotools.demo.introduction.QuickStartGUI
+Known isssues:
+* Buttons are not all the same size
+* Text area doesn't scroll as new text is added
+* Countries.sld looks for a font that doesn't necessarily exist
+* Projection doesn't work
+* Lots of rountines are missing; some buttons do nothing.
 
+License:
+This code is placed in the public domain. Note that this is different from the 
+Geotools library code itself which is licensed under the terms of the "Lesser 
+General Public License (LGPL).
+
+Enjoy.
 
 Adrian Custer
 Friday, 18 August 2006
