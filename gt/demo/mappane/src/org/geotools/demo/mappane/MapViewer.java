@@ -43,6 +43,7 @@ import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.SLDParser;
@@ -135,7 +136,7 @@ public class MapViewer {
         org.geotools.styling.Style[] style = stylereader.readXML();
         
         
-        MapContext context = new DefaultMapContext();
+        MapContext context = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         context.addLayer(fs,style[0]);
         context.getLayerBounds();
         mp.setHighlightLayer(context.getLayer(0));
