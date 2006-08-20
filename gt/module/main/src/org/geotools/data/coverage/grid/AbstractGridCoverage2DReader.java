@@ -377,24 +377,6 @@ public abstract class AbstractGridCoverage2DReader implements
 	// public abstract void buildOverviews(Interpolation interpolation,
 	// int nOverviews, BorderExtender extender)
 	// throws UnsupportedOperationException;
-	//
-	// /**
-	// * Returns the ColorModel associated with this image. All Rasters returned
-	// * from this image will have this as their ColorModel. This can return
-	// null.
-	// *
-	// * @return the ColorModel of this image
-	// */
-	// public abstract ColorModel getColorModel();
-	//
-	// /**
-	// * Returns the SampleModel associated with this image. All Rasters
-	// returned
-	//	 * from this image will have this as their SampleModel.
-	//	 * 
-	//	 * @return the SampleModel of this image.
-	//	 */
-	//	public abstract SampleModel getSampleModel();
 
 	// -------------------------------------------------------------------------
 	//
