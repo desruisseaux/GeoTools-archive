@@ -39,4 +39,18 @@
       <version>2.3-SNAPSHOT</version>
     </dependency>
   </dependencies>
+  
+  <!-- ==================================================== -->
+  <!--     Compilation (including resources)                -->
+  <!-- ==================================================== -->
+  <build>
+    <resources>
+      <resource>
+        <directory>data</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
 </project>
