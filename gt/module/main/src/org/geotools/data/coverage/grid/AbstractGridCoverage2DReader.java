@@ -54,8 +54,6 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.sun.media.jai.imageioimpl.ImageReadCRIF;
-
 /**
  * This class is a first attempt for providing a way to get more informations
  * out of a single 2D raster datasets (x,y). It is worth to remark that for the
@@ -77,8 +75,7 @@ import com.sun.media.jai.imageioimpl.ImageReadCRIF;
 public abstract class AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 
-
-	/**Caches a default GridCoverageFactory for usage in plugins.*/
+	/** Caches a default GridCoverageFactory for usage in plugins. */
 	protected final static GridCoverageFactory coverageFactory = FactoryFinder
 			.getGridCoverageFactory(null);
 
@@ -154,7 +151,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	// *
 	// * @return The number of predetermined overviews for the grid.
 	// */
-	// public int getNumOverviews(){
+	// public int getNumOverviews() {
 	// return numOverviews;
 	// }
 	//
@@ -211,6 +208,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	// * <td align="center">27</td>
 	// * </tr>
 	// * </table></td>
+	// *
 	// *
 	// <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 	// * <td valign="top"><table border=0 align="center">
@@ -354,8 +352,21 @@ public abstract class AbstractGridCoverage2DReader implements
 	// * @return
 	// */
 	// public abstract boolean isTiled(int imageindex);
+	//
+	// /**
+	// * Returns the number of tiles in the X direction.
+	// *
+	// * @return the number of tiles in the X direction.
+	// */
+	// public abstract int getNumXTiles();
 	//	
-	//	
+	// /**
+	// * Returns the number of tiles in the Y direction.
+	// *
+	// * @return the number of tiles in the Y direction.
+	// */
+	// public abstract int getNumYTiles();
+	//
 	// /**
 	// *
 	// * @param interpolation
@@ -363,9 +374,27 @@ public abstract class AbstractGridCoverage2DReader implements
 	// * @param extender
 	// * @throws UnsupportedOperationException
 	// */
-	// public abstract void buildOverviews ( Interpolation interpolation,
-	// int nOverviews,BorderExtender extender )throws
-	// UnsupportedOperationException;
+	// public abstract void buildOverviews(Interpolation interpolation,
+	// int nOverviews, BorderExtender extender)
+	// throws UnsupportedOperationException;
+	//
+	// /**
+	// * Returns the ColorModel associated with this image. All Rasters returned
+	// * from this image will have this as their ColorModel. This can return
+	// null.
+	// *
+	// * @return the ColorModel of this image
+	// */
+	// public abstract ColorModel getColorModel();
+	//
+	// /**
+	// * Returns the SampleModel associated with this image. All Rasters
+	// returned
+	//	 * from this image will have this as their SampleModel.
+	//	 * 
+	//	 * @return the SampleModel of this image.
+	//	 */
+	//	public abstract SampleModel getSampleModel();
 
 	// -------------------------------------------------------------------------
 	//
@@ -477,7 +506,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @param hrHeight2
 	 * @param hrWidth2
 	 */
-	protected void decimationOnReadingControl(Integer imageChoice,
+	protected final void decimationOnReadingControl(Integer imageChoice,
 			ImageReadParam readP, double[] requestedRes) {
 		{
 
@@ -544,7 +573,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @return
 	 * @throws IOException
 	 */
-	protected GridCoverage createImageCoverage(PlanarImage image)
+	protected final GridCoverage createImageCoverage(PlanarImage image)
 			throws IOException {
 
 		// deciding the number range
@@ -657,10 +686,8 @@ public abstract class AbstractGridCoverage2DReader implements
 		// if (raster2Model != null)
 		// return FactoryFinder.getGridCoverageFactory(null).create(
 		// coverageName, image, crs, raster2Model, bands, null, null);
-		return coverageFactory
-				.create(coverageName, image,
-						new GeneralEnvelope(originalEnvelope), bands, null,
-						null);
+		return coverageFactory.create(coverageName, image, new GeneralEnvelope(
+				originalEnvelope), bands, null, null);
 
 	}
 
