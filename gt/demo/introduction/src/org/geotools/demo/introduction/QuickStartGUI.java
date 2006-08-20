@@ -55,6 +55,7 @@ import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.PanAction;
 import org.geotools.gui.swing.ResetAction;
@@ -65,6 +66,7 @@ import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.DefiningConversion;
@@ -83,11 +85,13 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -174,8 +178,8 @@ public class QuickStartGUI {
     
     /* The handles for the ShapeFile and Styled Layer Descriptor (SLD) files. */
     /*     The data are in demo/mappane/data/ */
-    static final String shpName = "/data/countries.shp";
-    static final String sldName = "/data/countries.sld";
+    static final String shpName = "/countries.shp";
+    static final String sldName = "/countries.sld";
     
     static File shpFile;
     static URL shpURL;
@@ -774,7 +778,9 @@ public class QuickStartGUI {
         //TODO: remove testing
         switch (project_from_start){
             case PROJECT_ON_START:
-                context.setAreaOfInterest(envlp_NoEdges,projCRS);
+        		ReferencedEnvelope llEnvelope = new ReferencedEnvelope(envlp_NoEdges, DefaultGeographicCRS.WGS84);
+        		ReferencedEnvelope projEnvelope = llEnvelope.transform(projCRS, true);
+        		context.setAreaOfInterest(projEnvelope);
             case PROJECT_AFTER_START:
                 context.setAreaOfInterest(envlp_NoEdges);
         }
@@ -949,20 +955,24 @@ public class QuickStartGUI {
      */
     //TODO: figure out why this doesn't work.!
     public static void display_projected_as_Mercator(){
-
-        textArea.append("Start: Project the map.\n");
-        
-//        System.out.println("ProjCRS is: "+projCRS.toWKT());
-        context.setAreaOfInterest(envlp_NoEdges, projCRS);
-        jmp.setContext(context);
-
-        jmp.setMapArea(envlp_NoEdges);
-
-        frame.repaint();
-        frame.doLayout();
-
-        textArea.append("  End: Projected the map.\n");
-        
+    	try {
+	        textArea.append("Start: Project the map.\n");
+	        
+			ReferencedEnvelope llEnvelope = new ReferencedEnvelope(envlp_NoEdges, DefaultGeographicCRS.WGS84);
+			ReferencedEnvelope projEnvelope = llEnvelope.transform(projCRS, true);
+			context.setAreaOfInterest(projEnvelope);
+	        
+	        jmp.setContext(context);
+	
+	        jmp.setMapArea(projEnvelope);
+	
+	        frame.repaint();
+	        frame.doLayout();
+	
+	        textArea.append("  End: Projected the map.\n");
+    	} catch(Exception te) {
+    		textArea.append("Error occurred during projection");
+    	}
     }
         
     
