@@ -34,14 +34,12 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -60,7 +58,8 @@ import org.opengis.referencing.operation.TransformException;
  * @author Simone Giannecchini
  * @author rgould
  * @author alessio fabiani
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/image/src/org/geotools/gce/image/WorldImageWriter.java $
  */
 public final class WorldImageWriter implements GridCoverageWriter {
 	/** format for this writer */
@@ -69,6 +68,11 @@ public final class WorldImageWriter implements GridCoverageWriter {
 	/** Destination to write to */
 	private Object destination;
 
+	/**
+	 * Format chosen for this writer.
+	 * 
+	 * The default format is png.
+	 */
 	private String extension = "png";
 
 	/**
@@ -202,10 +206,6 @@ public final class WorldImageWriter implements GridCoverageWriter {
 			createProjectionFile(baseFile, coverage
 					.getCoordinateReferenceSystem());
 
-			// create new file for the image
-			imageFile = new File(new StringBuffer(baseFile).append(".").append(
-					extension).toString());
-			imageFile.createNewFile();
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -314,7 +314,6 @@ public final class WorldImageWriter implements GridCoverageWriter {
 		out.flush();
 		out.close();
 
-
 	}
 
 	/**
@@ -354,20 +353,19 @@ public final class WorldImageWriter implements GridCoverageWriter {
 		 * since sometimes I get some problems with JAI encoders I select only
 		 * the first band, which by the way is the only band we use.
 		 */
-		RenderedImage image =  (sourceCoverage)
-				.geophysics(false).getRenderedImage();
-		final ImageWorker worker=new ImageWorker(image);
-		
+		RenderedImage image = (sourceCoverage).geophysics(false)
+				.getRenderedImage();
+		final ImageWorker worker = new ImageWorker(image);
 
-		///////////////////////////////////////////////////////////////////////
+		// /////////////////////////////////////////////////////////////////////
 		//
 		// With index color model we want just the first band
 		//
-		///////////////////////////////////////////////////////////////////////
+		// /////////////////////////////////////////////////////////////////////
 		if (image.getColorModel() instanceof IndexColorModel
 				&& (image.getSampleModel().getNumBands() > 1)) {
 			worker.retainBands(1);
-			image=worker.getRenderedImage();
+			image = worker.getRenderedImage();
 		}
 
 		/**
@@ -378,7 +376,7 @@ public final class WorldImageWriter implements GridCoverageWriter {
 		 */
 		if (image.getColorModel() instanceof DirectColorModel) {
 			worker.forceComponentColorModel();
-			image=worker.getRenderedImage();
+			image = worker.getRenderedImage();
 		}
 
 		/**
@@ -398,7 +396,7 @@ public final class WorldImageWriter implements GridCoverageWriter {
 			if (image.getColorModel() instanceof IndexColorModel
 					&& (image.getSampleModel().getTransferType() != DataBuffer.TYPE_BYTE)) {
 				worker.forceComponentColorModel();
-				image=worker.getRenderedImage();
+				image = worker.getRenderedImage();
 			}
 
 			/**
@@ -409,7 +407,7 @@ public final class WorldImageWriter implements GridCoverageWriter {
 			 */
 			if (image.getColorModel() instanceof ComponentColorModel) {
 				worker.forceIndexColorModelForGIF();
-				image=worker.getRenderedImage();
+				image = worker.getRenderedImage();
 			} else
 			/**
 			 * IndexColorModel with full transparency support is not suitable
@@ -418,27 +416,27 @@ public final class WorldImageWriter implements GridCoverageWriter {
 			 */
 			if (image.getColorModel() instanceof IndexColorModel) {
 				worker.forceIndexColorModelForGIF();
-				image=worker.getRenderedImage();
+				image = worker.getRenderedImage();
 			}
-		} 
-//		else
+		}
+		// else
 		// -----------------TIFF--------------------------------------
 
-//		/**
-//		 * TIFF file format. We need just a couple of correction for this
-//		 * format. It seems that the encoder does not work fine with
-//		 * IndexColorModel therefore in such a case we need the reformat the
-//		 * input image to a ComponentColorModel.
-//		 */
-//		if (extension.compareToIgnoreCase("tiff") == 0
-//				|| extension.compareToIgnoreCase("tif") == 0) {
-//			// Are we dealing with IndexColorModel? If so we need to go back
-//			// to ComponentColorModel
-//			if (image.getColorModel() instanceof IndexColorModel) {
-//				surrogateImage = ImageUtilities
-//						.reformatColorModel2ComponentColorModel(surrogateImage);
-//			}
-//		}
+		// /**
+		// * TIFF file format. We need just a couple of correction for this
+		// * format. It seems that the encoder does not work fine with
+		// * IndexColorModel therefore in such a case we need the reformat the
+		// * input image to a ComponentColorModel.
+		// */
+		// if (extension.compareToIgnoreCase("tiff") == 0
+		// || extension.compareToIgnoreCase("tif") == 0) {
+		// // Are we dealing with IndexColorModel? If so we need to go back
+		// // to ComponentColorModel
+		// if (image.getColorModel() instanceof IndexColorModel) {
+		// surrogateImage = ImageUtilities
+		// .reformatColorModel2ComponentColorModel(surrogateImage);
+		// }
+		// }
 
 		/**
 		 * write using JAI encoders

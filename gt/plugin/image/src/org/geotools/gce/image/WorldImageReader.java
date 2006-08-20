@@ -463,10 +463,12 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		final ImageInputStream inStream = wmsRequest ? ImageIO
 				.createImageInputStream(((URL) source).openStream()) : ImageIO
 				.createImageInputStream(source);
-		reader.setInput(inStream);
+		
 		final Hints newHints = (Hints) hints.clone();
 		inStream.mark();
-		if (!wmsRequest && !reader.isImageTiled(imageChoice.intValue())) {
+		if (!wmsRequest){ 
+			reader.setInput(inStream);
+			if(!reader.isImageTiled(imageChoice.intValue())) {
 			final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
 					reader.getWidth(imageChoice.intValue()), reader
 							.getHeight(imageChoice.intValue())));
@@ -476,7 +478,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			layout.setTileHeight(tileSize.height);
 			layout.setTileWidth(tileSize.width);
 			newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
-		}
+		}}
 		inStream.reset();
 		final ParameterBlock pbjRead = new ParameterBlock();
 		pbjRead.add(inStream);

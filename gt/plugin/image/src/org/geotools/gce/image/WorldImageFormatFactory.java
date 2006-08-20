@@ -27,7 +27,8 @@ import org.opengis.coverage.grid.Format;
  * 
  * @author rgould TODO To change the template for this generated type comment go
  *         to Window - Preferences - Java - Code Style - Code Templates
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/image/src/org/geotools/gce/image/WorldImageFormatFactory.java $
  */
 public final class WorldImageFormatFactory implements GridFormatFactorySpi {
 	public Format createFormat() {
@@ -35,14 +36,25 @@ public final class WorldImageFormatFactory implements GridFormatFactorySpi {
 	}
 
 	public boolean isAvailable() {
-		return true;
+		boolean available = true;
+
+		// if these classes are here, then the runtine environment has
+		// access to JAI and the JAI ImageI/O toolbox.
+		try {
+			Class.forName("javax.media.jai.JAI");
+			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
+		} catch (ClassNotFoundException cnf) {
+			available = false;
+		}
+
+		return available;
 	}
 
 	/**
 	 * Returns the implementation hints. The default implementation returns en
 	 * empty map.
 	 * 
-	 * @return 
+	 * @return
 	 */
 	public Map getImplementationHints() {
 		return Collections.EMPTY_MAP;
