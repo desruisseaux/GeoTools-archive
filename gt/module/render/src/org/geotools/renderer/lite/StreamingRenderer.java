@@ -256,31 +256,6 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	/**
-	 * Returns the amount of time the renderer waits for loading an external
-	 * image before giving up and examining the other images in the Graphic
-	 * object
-	 * 
-	 * @return the timeout in milliseconds
-	 * @deprecated
-	 */
-	private static long getImageLoadingTimeout() {
-		return ImageLoader.getTimeout();
-	}
-
-	/**
-	 * Sets the maximum time to wait for getting an external image. Set it to -1
-	 * to wait undefinitely. The default value is 10 seconds
-	 * 
-	 * @param newTimeout
-	 *            the new timeout value in milliseconds
-	 * 
-	 * @deprecated
-	 */
-	private static void setImageLoadingTimeout(long newTimeout) {
-		ImageLoader.setTimeout(newTimeout);
-	}
-
-	/**
 	 * Flag which controls behaviour for applying affine transformation to the
 	 * graphics object.
 	 * 
