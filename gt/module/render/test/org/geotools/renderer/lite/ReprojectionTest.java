@@ -84,9 +84,8 @@ public class ReprojectionTest extends TestCase {
 		// slice parallel to the central meridian, -177°)
 		ReferencedEnvelope reWgs = new ReferencedEnvelope(new Envelope(-180,
 				-170, 20, 40), DefaultGeographicCRS.WGS84);
-		System.out.println(reWgs);
 		CoordinateReferenceSystem utm1N = CRS.decode("EPSG:32601");
-		System.out.println(utm1N);
+		System.out.println(CRS.getGeographicBoundingBox(utm1N));
 		ReferencedEnvelope reUtm = reWgs.transform(utm1N, true);
 
 		BufferedImage image = new BufferedImage(200, 200,
