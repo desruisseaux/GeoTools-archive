@@ -52,6 +52,14 @@
       </roles>
     </developer>
     <developer>
+      <name>Andrea Aime</name>
+      <id>aaime</id>
+      <email>andrea.aime@alice.it</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
       <name>Simone Giannecchini</name>
       <id>simboss</id>
       <email>simboss1@gmail.com</email>
@@ -82,6 +90,7 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     
     <!-- 
@@ -159,22 +168,5 @@
       <optional>true</optional>
     </dependency>
   </dependencies>
-
-
-
-  <!-- ==================================================== -->
-  <!--     Plugins configuration                            -->
-  <!-- ==================================================== -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-       <!-- <configuration>
-          <skip>true</skip>   Set this to 'true' to bypass unit tests entirely. 
-        </configuration>-->
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
