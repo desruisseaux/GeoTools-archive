@@ -34,6 +34,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.CRSUtilities;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.EngineeringCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -48,8 +49,10 @@ import com.vividsolutions.jts.geom.Envelope;
  * the "StreamingRenderer/Renderer".
  * 
  * 
- * @author dblasby 
- * @author Simone Giannecchini  * @source $URL$
+ * @author dblasby
+ * @author Simone Giannecchini *
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/RendererUtilities.java $
  */
 public final class RendererUtilities {
 
@@ -440,74 +443,105 @@ public final class RendererUtilities {
 			int imageWidth, int imageHeight, double DPI)
 			throws TransformException, FactoryException {
 
-		// //
-		//
-		// get CRS2D for this referenced envelope, check that its 2d
-		//
-		// //
-		final CoordinateReferenceSystem tempCRS = CRSUtilities
-				.getCRS2D(envelope.getCoordinateReferenceSystem());
-		// make sure the crs is 2d
-		envelope = new ReferencedEnvelope((Envelope) envelope, tempCRS);
-		MathTransform toWGS84 = StreamingRenderer.getMathTransform(tempCRS,
-				GeogCRS);
+		final double diagonalGroundDistance;
+		if (!(envelope.getCoordinateReferenceSystem() instanceof EngineeringCRS)) { // geographic or cad?
+			// //
+			//
+			// get CRS2D for this referenced envelope, check that its 2d
+			//
+			// //
+			final CoordinateReferenceSystem tempCRS = CRSUtilities
+					.getCRS2D(envelope.getCoordinateReferenceSystem());
+			// make sure the crs is 2d
+			envelope = new ReferencedEnvelope((Envelope) envelope, tempCRS);
+			MathTransform toWGS84 = StreamingRenderer.getMathTransform(tempCRS,
+					GeogCRS);
 
-		// //
-		//
-		// Make sure it intersect the world in the source projection by
-		// intersecting the provided envelope with the envelope of its crs.
-		//
-		// This will also prevent us from having problems with requests for
-		// images bigger than the world (thanks Dave!!!)
-		//
-		// It is important to note that I also have to update the image width in
-		// case the provided envelope is bigger than the envelope of the source
-		// crs.
-		// //
-		final GeneralEnvelope initialEnvelope = new GeneralEnvelope(envelope);
-		GeneralEnvelope intersectedWithSourceCRSEnvelope = (GeneralEnvelope) CRS
-				.getEnvelope(tempCRS);
-		if (intersectedWithSourceCRSEnvelope == null)
-			intersectedWithSourceCRSEnvelope = CRSUtilities.transform(toWGS84
-					.inverse(), CRS.getEnvelope(GeogCRS));
-		intersectedWithSourceCRSEnvelope.setCoordinateReferenceSystem(tempCRS);
+			// //
+			// Try to compute the source crs envelope, either by asking CRS or
+			// by trying to project the WGS84 envelope (world) to the specified
+			// CRS
+			// //
+			GeneralEnvelope sourceCRSEnvelope = (GeneralEnvelope) CRS
+					.getEnvelope(tempCRS);
+			if (sourceCRSEnvelope == null) {
+				try {
+					// try to compute the envelope by reprojecting the WGS84
+					// envelope
+					sourceCRSEnvelope = CRSUtilities.transform(toWGS84
+							.inverse(), CRS.getEnvelope(GeogCRS));
+				} catch (TransformException e) {
+					// for some transformatio this is normal, it's not possible
+					// to project the whole WGS84 envelope in many transforms,
+					// such
+					// as Mercator or Gauss (the transform does diverge)
+				}
+			}
 
-		intersectedWithSourceCRSEnvelope.intersect(initialEnvelope);
-		intersectedWithSourceCRSEnvelope.setCoordinateReferenceSystem(tempCRS);
-		if (intersectedWithSourceCRSEnvelope.isEmpty())
-			throw new IllegalArgumentException(
-					"The provided envelope is outside the world");
-		if (!intersectedWithSourceCRSEnvelope.equals(initialEnvelope)) {
-			final double scale0 = intersectedWithSourceCRSEnvelope.getLength(0)
-					/ initialEnvelope.getLength(0);
-			final double scale1 = intersectedWithSourceCRSEnvelope.getLength(1)
-					/ initialEnvelope.getLength(1);
-			imageWidth *= scale0;
-			imageHeight *= scale1;
+			// //
+			//
+			// Make sure it intersect the world in the source projection by
+			// intersecting the provided envelope with the envelope of its crs.
+			//
+			// This will also prevent us from having problems with requests for
+			// images bigger than the world (thanks Dave!!!)
+			//
+			// It is important to note that I also have to update the image
+			// width in
+			// case the provided envelope is bigger than the envelope of the
+			// source
+			// crs.
+			// //
+			final GeneralEnvelope intersectedEnvelope = new GeneralEnvelope(
+					envelope);
+			if (sourceCRSEnvelope != null) {
+				intersectedEnvelope.intersect(sourceCRSEnvelope);
+				if (intersectedEnvelope.isEmpty())
+					throw new IllegalArgumentException(
+							"The provided envelope is outside the source CRS definition area");
+				if (!intersectedEnvelope.equals(envelope)) {
+					final double scale0 = intersectedEnvelope.getLength(0)
+							/ envelope.getLength(0);
+					final double scale1 = intersectedEnvelope.getLength(1)
+							/ envelope.getLength(1);
+					imageWidth *= scale0;
+					imageHeight *= scale1;
+				}
+			}
+
+			// //
+			//
+			// Go to WGS84 in order to see how things are there
+			//
+			// //
+			final GeneralEnvelope geographicEnvelope = CRSUtilities.transform(
+					toWGS84, intersectedEnvelope);
+			geographicEnvelope.setCoordinateReferenceSystem(GeogCRS);
+
+			// //
+			//
+			// Instantiate a geodetic calculator for GCS WGS84 and get the
+			// orthodromic distance between LLC and UC of the geographic
+			// envelope.
+			//
+			// //
+			final GeodeticCalculator calculator = new GeodeticCalculator(
+					GeogCRS);
+			final DirectPosition lowerLeftCorner = geographicEnvelope
+					.getLowerCorner();
+			final DirectPosition upperRightCorner = geographicEnvelope
+					.getUpperCorner();
+			calculator.setStartingGeographicPoint(lowerLeftCorner
+					.getOrdinate(0), lowerLeftCorner.getOrdinate(1));
+			calculator.setDestinationGeographicPoint(upperRightCorner
+					.getOrdinate(0), upperRightCorner.getOrdinate(1));
+			diagonalGroundDistance = calculator
+					.getOrthodromicDistance();
+		} else {
+			// if it's an engineering crs, compute only the graphical scale, assuming a CAD space
+			diagonalGroundDistance = Math.sqrt(envelope.getWidth() * envelope.getWidth()
+					+ envelope.getHeight() * envelope.getHeight());
 		}
-
-		// //
-		//
-		// Go to WGS84 in order to see how things are there
-		//
-		// //
-		final GeneralEnvelope geographicEnvelope = CRSUtilities.transform(
-				toWGS84, intersectedWithSourceCRSEnvelope);
-		geographicEnvelope.setCoordinateReferenceSystem(GeogCRS);
-
-		// //
-		//
-		// Instantiate a geodetic calculator for GCS WGS84 and get the
-		// orthodromic distance between LLC and UC of the geographic envelope.
-		//
-		// //
-		final GeodeticCalculator calculator = new GeodeticCalculator(GeogCRS);
-		final DirectPosition lowerLeftCorner = geographicEnvelope.getLowerCorner();
-		final DirectPosition upperRightCorner = geographicEnvelope.getUpperCorner();
-		calculator.setStartingGeographicPoint(lowerLeftCorner.getOrdinate(0),lowerLeftCorner.getOrdinate(1));
-		calculator.setDestinationGeographicPoint(upperRightCorner.getOrdinate(0),upperRightCorner.getOrdinate(1));
-		final double diagonalGroundDistance = calculator
-				.getOrthodromicDistance();
 
 		// //
 		//

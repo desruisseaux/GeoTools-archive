@@ -1629,8 +1629,8 @@ public final class StreamingRenderer implements GTRenderer {
 								destinationCrs))
 							transform = null;
 						else
-							transform = (MathTransform2D) StreamingRenderer.getMathTransform(
-									sa.crs, destinationCrs);
+							transform = (MathTransform2D) StreamingRenderer
+									.getMathTransform(sa.crs, destinationCrs);
 						if (transform != null && !transform.isIdentity()) {
 							transform = (MathTransform2D) ConcatenatedTransform
 									.create(transform, ProjectiveTransform
@@ -1648,9 +1648,17 @@ public final class StreamingRenderer implements GTRenderer {
 					symbolizerAssociationHT.put(symbolizers[m], sa);
 				}
 
-				shape = getTransformedShape(g, sa.getXform());// shape =
-				// getTransformedShape(g,
-				// sa.getXform());
+				// some shapes may be too close to projection boundaries to
+				// get transformed, try to be lenient
+				try {
+					shape = getTransformedShape(g, sa.getXform());
+				} catch (TransformException te) {
+					fireErrorEvent(te);
+					continue;
+				} catch (AssertionError ae) {
+					fireErrorEvent(new RuntimeException(ae));
+					continue;
+				}
 				if (symbolizers[m] instanceof TextSymbolizer) {
 					labelCache.put((TextSymbolizer) symbolizers[m], feature,
 							shape, scaleRange);
@@ -1734,7 +1742,7 @@ public final class StreamingRenderer implements GTRenderer {
 			final Object grid = feature.getAttribute("grid");
 
 			final GridCoverageRenderer gcr = new GridCoverageRenderer(
-					destinationCRS, mapExtent, screenSize,java2dHints);
+					destinationCRS, mapExtent, screenSize, java2dHints);
 
 			// //
 			// It is a grid coverage
@@ -1750,13 +1758,11 @@ public final class StreamingRenderer implements GTRenderer {
 						AbstractGridFormat.READ_GRIDGEOMETRY2D);
 				readGG.setValue(new GridGeometry2D(new GeneralGridRange(
 						screenSize), new GeneralEnvelope(mapExtent)));
-				gcr
-						.paint(
-								graphics,
-								(GridCoverage2D) ((AbstractGridCoverage2DReader) feature
-										.getAttribute("grid"))
-										.read(new GeneralParameterValue[] { readGG }),
-								symbolizer);
+				AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) feature
+						.getAttribute("grid");
+				GridCoverage2D coverage = (GridCoverage2D) reader
+						.read(new GeneralParameterValue[] { readGG });
+				gcr.paint(graphics, coverage, symbolizer);
 			}
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("Raster rendered");
@@ -2013,16 +2019,19 @@ public final class StreamingRenderer implements GTRenderer {
 		return canTransform;
 	}
 
-	public static MathTransform getMathTransform(CoordinateReferenceSystem sourceCRS, CoordinateReferenceSystem destCRS) {
+	public static MathTransform getMathTransform(
+			CoordinateReferenceSystem sourceCRS,
+			CoordinateReferenceSystem destCRS) {
 		try {
-			CoordinateOperation op= operationFactory.createOperation(sourceCRS,destCRS);
-			if(op!=null)
+			CoordinateOperation op = operationFactory.createOperation(
+					sourceCRS, destCRS);
+			if (op != null)
 				return op.getMathTransform();
 		} catch (OperationNotFoundException e) {
-			LOGGER.log(Level.SEVERE,e.getLocalizedMessage(),e);
-			
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+
 		} catch (FactoryException e) {
-			LOGGER.log(Level.SEVERE,e.getLocalizedMessage(),e);
+			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		}
 		return null;
 	}
