@@ -728,12 +728,12 @@ public abstract class AbstractGridCoverage2DReader implements
 						.getCRS2D(envelope.getCoordinateReferenceSystem());
 
 				if (crs != null
-						&& !CRSUtilities.equalsIgnoreMetadata(crs, crs2D))
-
-					envelope = CRSUtilities.transform(operationFactory
-							.createOperation(crs2D, crs).getMathTransform(),
-							envelope);
-
+						&& !CRSUtilities.equalsIgnoreMetadata(crs, crs2D)) {
+					final MathTransform tr = operationFactory.createOperation(
+							crs2D, crs).getMathTransform();
+					if (!tr.isIdentity())
+						envelope = CRSUtilities.transform(tr, envelope);
+				}
 				requestedRes = new double[2];
 				requestedRes[0] = envelope.getLength(0) / dim.getWidth();
 				requestedRes[1] = envelope.getLength(1) / dim.getHeight();

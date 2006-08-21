@@ -37,8 +37,6 @@ import org.opengis.coverage.Coverage;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValueGroup;
 
-import com.sun.media.jai.opimage.ScaleCRIF;
-
 /**
  * GridCoverage2D specialization for creation of a scaledd version of a source
  * coverage.
@@ -51,8 +49,6 @@ final class ScaledGridCoverage2D extends GridCoverage2D {
 	 * 
 	 */
 	private static final long serialVersionUID = 2521916272257997635L;
-	
-	private final static ScaleCRIF scaleFactory= new ScaleCRIF();
 
 	/**
 	 * Creates a scaled version of a coverage with the needed scale factors,
@@ -105,13 +101,12 @@ final class ScaledGridCoverage2D extends GridCoverage2D {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final ParameterBlock pbjScale = new ParameterBlock();
-		pbjScale.add( xScale);
-		pbjScale.add( yScale);
+		pbjScale.add(xScale);
+		pbjScale.add(yScale);
 		pbjScale.add(xTrans);
-		pbjScale.add( yTrans);
-		pbjScale.add( interpolation);
+		pbjScale.add(yTrans);
+		pbjScale.add(interpolation);
 		pbjScale.addSource(sourceImage);
-
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -136,20 +131,19 @@ final class ScaledGridCoverage2D extends GridCoverage2D {
 		// Creating final grid coverage.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final JAI processor =OperationJAI.getJAI(hints);
+		final JAI processor = OperationJAI.getJAI(hints);
 		final PlanarImage image;
-		if(!processor.equals(JAI.getDefaultInstance()))
-			image = OperationJAI.getJAI(hints).createNS("Scale",
-				pbjScale, hints);
+		if (!processor.equals(JAI.getDefaultInstance()))
+			image = OperationJAI.getJAI(hints).createNS("Scale", pbjScale,
+					hints);
 		else
-			image=(PlanarImage) scaleFactory.create(pbjScale, hints);
+			image = JAI.create("Scale", pbjScale, hints);
 
 		return new ScaledGridCoverage2D(image, sourceCoverage);
 	}
 
-
 	/**
-	 *  Create a scaled coverage as requested.
+	 * Create a scaled coverage as requested.
 	 */
 	private ScaledGridCoverage2D(PlanarImage image,
 			GridCoverage2D sourceCoverage) {

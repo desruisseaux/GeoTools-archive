@@ -44,9 +44,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.InternationalString;
 
-import com.sun.media.jai.opimage.CropCRIF;
-import com.sun.media.jai.opimage.TranslateCRIF;
-
 /**
  * This class is responsible for applying a crop operation to a source coverage
  * with a specified envelope.
@@ -59,10 +56,6 @@ final class CroppedCoverage2D extends GridCoverage2D {
 	 * 
 	 */
 	private static final long serialVersionUID = -501742139906901754L;
-
-	private final static CropCRIF cropFactory = new CropCRIF();
-
-	private final static TranslateCRIF translateFactory = new TranslateCRIF();
 
 	private static final RenderingHints NN_INTERPOLATION_HINT = new RenderingHints(
 			JAI.KEY_INTERPOLATION, new InterpolationNearest());
@@ -146,7 +139,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 			hints.add(NOCACHE_HINT);
 			final PlanarImage croppedImage;
 			if (!useProvidedProcessor)
-				croppedImage = (PlanarImage) cropFactory.create(pbjCrop, hints);
+				croppedImage =  JAI.create("Crop",pbjCrop, hints);
 			else
 				croppedImage = processor.createNS("Crop", pbjCrop, hints);
 
@@ -165,7 +158,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 
 			final PlanarImage translatedImage;
 			if (!useProvidedProcessor)
-				translatedImage = (PlanarImage) translateFactory.create(
+				translatedImage =  JAI.create("Translate",
 						pbjTranslate, hints);
 			else
 				translatedImage = processor.createNS("Translate", pbjTranslate,

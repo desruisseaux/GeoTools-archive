@@ -15,33 +15,22 @@
  */
 package org.geotools.coverage.processing.operation;
 
-import java.awt.Color;
 import java.awt.RenderingHints;
-import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
 import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
-import javax.media.jai.OpImage;
 import javax.media.jai.PlanarImage;
 
-import org.geotools.coverage.Category;
-import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.OperationJAI;
 import org.geotools.factory.Hints;
-import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.util.NumberRange;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValueGroup;
-
-import com.sun.media.jai.opimage.FilteredSubsampleRIF;
 
 /**
  * @author Simone Giannecchini
@@ -53,8 +42,6 @@ final class FilteredSubsampledGridCoverage2D extends GridCoverage2D {
 	 * 
 	 */
 	private static final long serialVersionUID = 5274708130300017804L;
-
-	private final static FilteredSubsampleRIF filteredSubsampleFactory = new FilteredSubsampleRIF();
 
 	public FilteredSubsampledGridCoverage2D(PlanarImage image,
 			GridCoverage2D sourceCoverage) {
@@ -105,20 +92,16 @@ final class FilteredSubsampledGridCoverage2D extends GridCoverage2D {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		hints.add(new RenderingHints(JAI.KEY_BORDER_EXTENDER, parameters
-							.parameter("BorderExtender").getValue()));
+				.parameter("BorderExtender").getValue()));
 		hints.add(new RenderingHints(JAI.KEY_INTERPOLATION, interpolation));
 		final JAI processor = OperationJAI.getJAI(hints);
 		if (!processor.equals(JAI.getDefaultInstance()))
-			return new FilteredSubsampledGridCoverage2D(OperationJAI.getJAI(
-					hints).createNS(
-					"FilteredSubsample",
-					pbjFilteredSubsample,
-					hints),
+			return new FilteredSubsampledGridCoverage2D(processor.createNS(
+					"FilteredSubsample", pbjFilteredSubsample, hints),
 					sourceCoverage);
 		// no supplied processor
-		return new FilteredSubsampledGridCoverage2D(
-				(OpImage) filteredSubsampleFactory.create(pbjFilteredSubsample,
-						hints),
+		return new FilteredSubsampledGridCoverage2D(JAI.create(
+				"FilteredSubsample", pbjFilteredSubsample, hints),
 				sourceCoverage);
 
 	}
