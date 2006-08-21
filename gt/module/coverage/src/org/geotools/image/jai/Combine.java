@@ -137,8 +137,9 @@ public class Combine extends PointOpImage {
         super(images, ImageUtilities.createIntersection(
               (ImageLayout)hints.get(JAI.KEY_IMAGE_LAYOUT), images), hints, false);
         this.matrix    = matrix = (double[][]) matrix.clone();
-        this.sources   = new int[matrix.length][];
-        this.bands     = new int[matrix.length][];
+        final int length=matrix.length;
+        this.sources   = new int[length][];
+        this.bands     = new int[length][];
         this.transform = transform;
         int numSamples = 0;
         for (int i=getNumSources(); --i>=0;) {
@@ -146,19 +147,22 @@ public class Combine extends PointOpImage {
         }
         this.numSamples = numSamples;
         final boolean isSeparable = (transform==null) || transform.isSeparable();
-        for (int j=0; j<matrix.length; j++) {
+        int rowLength,sourcesLength;
+        for (int j=0; j<length; j++) {
             final double[] row = matrix[j];
-            if (row.length != numSamples+1) {
+            rowLength=row.length;
+            if (rowLength != numSamples+1) {
                 throw new MismatchedSizeException();
             }
             int source   = -1;
             int band     = -1;
             int numBands = 0;
             int count    = 0; // Number of non-zero coefficients.
-            final double[] copy = new double[row.length  ];
-            final int[] sources = new int   [row.length-1];
-            final int[]   bands = new int   [row.length-1];
-            for (int i=0; i<sources.length; i++) {
+            final double[] copy = new double[rowLength  ];
+            final int[] sources = new int   [rowLength-1];
+            final int[]   bands = new int   [rowLength-1];
+            sourcesLength=sources.length;
+            for (int i=0; i<sourcesLength; i++) {
                 if (++band >= numBands) {
                     band = 0;
                     numBands = getSourceImage(++source).getNumBands();
@@ -205,7 +209,8 @@ public class Combine extends PointOpImage {
         final RectIter[] iters   = new RectIter[images.length];
         final RectIter[] iterRef = new RectIter[numSamples];
         double[]         samples = null;
-        for (int i=0; i<iters.length; i++) {
+        final int length=iters.length;
+        for (int i=0; i<length; i++) {
             iters[i] = RectIterFactory.create(images[i], mapDestRect(destRect, i));
         }
         final WritableRectIter iTarget = RectIterFactory.createWritable(dest, destRect);
