@@ -66,6 +66,11 @@
       <artifactId>gt2-xml-gml2</artifactId>
       <version>2.3-SNAPSHOT</version>
     </dependency>    
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-xml-gml3</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>    
   </dependencies>
 
 </project>
