@@ -4,6 +4,7 @@ package org.geotools.filter.v1_0;
 import org.geotools.xml.*;
 
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
@@ -93,7 +94,35 @@ public class OGCLiteralTypeBinding implements ComplexBinding {
 		}
 			
 		//2. no child elements, just return the text if any
-		return factory.literal(value);
+		// first try to convert to a differnt format, numeric
+		return factory.literal( convert( value ) );
 	}
+	
+	Object convert( Object value ) {
+		
+		if ( value == null ) 
+			return value;
+		
+		if ( value instanceof String ) {
+			String string = (String) value;
+			
+			//first try integer
+			try {
+				int number = Integer.parseInt( string );
+				return new Integer( number );
+			}
+			catch( NumberFormatException ex ) {}
+			
+			//next try double
+			try {
+				double number = Double.parseDouble( string );
+				return new Double( number );
+			}
+			catch( NumberFormatException ex ) {}
+		}
+		
+		return value;
+	}
+
 
 }

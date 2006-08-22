@@ -4,12 +4,17 @@ package org.geotools.filter.v1_0;
 import javax.xml.namespace.QName;
 
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.picocontainer.MutablePicoContainer;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Binding object for the type http://www.opengis.net/ogc:DistanceBufferType.
@@ -87,28 +92,24 @@ public class OGCDistanceBufferTypeBinding implements ComplexBinding {
 		
 		//TODO: replace with element bindings
 		Number distance = (Number) node.getChildValue( Number.class );
-		Expression e1 = 
-			(Expression) node.getChildValues( Expression.class ).get( 0 );
-		Expression e2 = 
-			(Expression) node.getChildValues( Expression.class ).get( 1 );
+		
+		PropertyName propertyName = (PropertyName) node.getChildValue( PropertyName.class );
+		Literal geometry = factory.literal( node.getChildValue( Geometry.class ) );
 		
 		String name = instance.getName(); 
-//		<xsd:element name="DWithin" substitutionGroup="ogc:spatialOps" type="ogc:DistanceBufferType"/>
+		//<xsd:element name="DWithin" substitutionGroup="ogc:spatialOps" type="ogc:DistanceBufferType"/>
 		if( "DWithin".equals(name)){
 			//TOOD: units
-			return factory.dwithin( e1, e2, distance.doubleValue(), null );
+			return factory.dwithin( propertyName, geometry, distance.doubleValue(), null );
 		}		
-//		<xsd:element name="Beyond" substitutionGroup="ogc:spatialOps" type="ogc:DistanceBufferType"/>
+		//<xsd:element name="Beyond" substitutionGroup="ogc:spatialOps" type="ogc:DistanceBufferType"/>
 		else if( "Beyond".equals(name)){
 			//TODO: units
-			//TODO: method on FilterFactory2 needs to take two epxresions
-			throw new UnsupportedOperationException();
-			//return factory.beyond( e1, e2, distance.doubleValue(), null );
+			return factory.beyond( propertyName, geometry, distance.doubleValue(), null );
 		}
 		else {
 			throw new IllegalArgumentException("Unknown - " + name );			
 		}	
-		
 		
 	}
 	

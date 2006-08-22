@@ -39,7 +39,7 @@ public class OGCDistanceTypeBinding implements ComplexBinding {
 	 * @generated modifiable
 	 */	
 	public int getExecutionMode() {
-		return AFTER;
+		return OVERRIDE;
 	}
 
 	/**

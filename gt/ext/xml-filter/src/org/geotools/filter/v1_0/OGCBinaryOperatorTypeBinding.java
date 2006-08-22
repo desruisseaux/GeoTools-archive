@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 
 import org.geotools.xml.*;
 
@@ -118,5 +119,6 @@ public class OGCBinaryOperatorTypeBinding implements ComplexBinding {
 		);			
 			
 	}
-
+	
+	
 }

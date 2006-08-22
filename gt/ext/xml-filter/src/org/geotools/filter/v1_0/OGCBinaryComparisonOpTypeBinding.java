@@ -93,9 +93,8 @@ public class OGCBinaryComparisonOpTypeBinding implements ComplexBinding {
 		}
 //		<xsd:element name="PropertyIsNotEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
 		else if( "PropertyIsNotEqualTo".equals( name )){
-			//TODO: add PropertyIsNotEqualTo interface to geoapi
-			// return factory.notEquals( e1, e2 );
-			throw new UnsupportedOperationException();
+			//TODO: add geoapi interface
+			return factory.not( factory.equals( e1, e2 ) );
 		}
 //		<xsd:element name="PropertyIsLessThan" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
 		else if( "PropertyIsLessThan".equals( name )){
