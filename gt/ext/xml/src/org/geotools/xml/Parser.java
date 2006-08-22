@@ -38,6 +38,24 @@ public class Parser {
 	private InputStream input;
 	
 	/**
+	 * Creats a new instance of the parser.
+	 * 
+	 * @param configuration The parser configuration, bindings and context
+	 * 
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 */
+	public Parser( Configuration configuration ) throws ParserConfigurationException, SAXException {
+	
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		spf.setNamespaceAware(true);
+        
+		parser = spf.newSAXParser();
+		
+        handler = new ParserHandler(configuration);
+	}
+	
+	/**
 	 * Creates a new instance of the parser.
 	 * 
 	 * @param configuration Object representing the configuration of the parser.
@@ -46,6 +64,8 @@ public class Parser {
 	 * @throws ParserConfigurationException
 	 * @throws SAXException If a sax parser can not be created.
 	 * @throws URISyntaxException If <code>input</code> is not a valid uri.
+	 * 
+	 * @deprecated use {@link #Parser(Configuration)} and {@link #parse(InputStream)}.
 	 */
 	public Parser(Configuration configuration, String input) 
 		throws ParserConfigurationException, SAXException, IOException, URISyntaxException {
@@ -65,16 +85,13 @@ public class Parser {
 	 * 
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
+	 * 
+	 * @deprecated use {@link #Parser(Configuration)} and {@link #parse(InputStream)}.
 	 */
 	public Parser( Configuration configuration, InputStream input )
 		throws ParserConfigurationException, SAXException  {
 		
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		spf.setNamespaceAware(true);
-        
-		parser = spf.newSAXParser();
-		
-        handler = new ParserHandler(configuration);
+		this( configuration );
         this.input = input;
 		
 	}
@@ -89,9 +106,26 @@ public class Parser {
 	 * 
 	 * @throws IOException
 	 * @throws SAXException
+	 * 
+	 * @deprecated use {@link #parse(InputStream)}
 	 */
 	public Object parse() throws IOException, SAXException {
-		parser.parse(input,handler);
+		return parse( input );
+	}
+	
+	/**
+	 * Signals the parser to parse the entire instance document. The object 
+	 * returned from the parse is the object which has been bound to the root
+	 * element of the document. This method should only be called once for 
+	 * a single instance document.
+	 * 
+	 * @return The object representation of the root element of the document.
+	 * 
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	public Object parse( InputStream input ) throws IOException, SAXException {
+		parser.parse( input, handler );
 		return handler.getValue();
 	}
 	
