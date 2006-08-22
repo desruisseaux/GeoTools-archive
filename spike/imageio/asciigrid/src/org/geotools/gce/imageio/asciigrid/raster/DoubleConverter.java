@@ -27,13 +27,17 @@ import java.util.Vector;
  *       	final DoubleConverter converter = new DoubleConverter();
  *         // If I need to load 10 samples, I need to count 9 spaces
  *       	while (...) {
- *       
+ *       			// /////////////////////////////////////////////////////////////////
+ *       			// 
+ *       			// Read the char
+ *       			//
+ *       			// /////////////////////////////////////////////////////////////////       
  *       			ch = read();
  *       		
  *       
  *       			// /////////////////////////////////////////////////////////////////
  *       			// 
- *       			// Pushing the char into the converter
+ *       			// Push the char into the converter
  *       			//
  *       			// /////////////////////////////////////////////////////////////////
  *       			if (converter.pushChar(ch)) {

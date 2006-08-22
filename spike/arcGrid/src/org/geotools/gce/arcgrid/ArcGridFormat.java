@@ -58,11 +58,7 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 			"WRITE_BAND",
 			Integer.class, null,new Integer(-1));
 
-//	/** Indicates whether the arcgrid data is compressed with GZIP */
-//	public static final DefaultParameterDescriptor COMPRESS = new DefaultParameterDescriptor(
-//			"Compressed",
-//			"Indicates whether the arcgrid data is compressed with GZIP",
-//			Boolean.FALSE, true);
+
 	private final AsciiGridsImageReaderSpi spi= new AsciiGridsImageReaderSpi();
 
 	/**
