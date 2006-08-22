@@ -134,7 +134,7 @@ public class ShapefileRenderer implements GTRenderer {
 	private static final GeometryFactory geomFactory = new GeometryFactory(
 			new LiteCoordinateSequenceFactory());
 
-	private static final Coordinate[] COORDS;
+    private static final IndexInfo STREAMING_RENDERER_INFO = new IndexInfo((byte)0,null,null);
 
 	private static final MultiPolygon MULTI_POLYGON_GEOM;
 
@@ -147,6 +147,8 @@ public class ShapefileRenderer implements GTRenderer {
 	private static final Point POINT_GEOM;
 
 	private static final MultiPoint MULTI_POINT_GEOM;
+	
+	private static final Coordinate[] COORDS;
 
 	static {
 		COORDS = new Coordinate[5];
@@ -1267,21 +1269,21 @@ public class ShapefileRenderer implements GTRenderer {
 		layerIndexInfo = new IndexInfo[layers.length];
 		final int length = layers.length;
 		ShapefileDataStore sds;
-        for( int i = 0; i < layers.length; i++ ) {
+        for( int i = 0; i < length; i++ ) {
             DataStore ds = layers[i].getFeatureSource().getDataStore();
             if( ds instanceof ShapefileDataStore ){
-            	sds=(ShapefileDataStore) ds;
-				try {
-					layerIndexInfo[i] = useIndex(sds);
-				} catch (Exception e) {
-					layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null,
-							null);
-					LOGGER.fine("Exception while trying to use index"
-							+ e.getLocalizedMessage());
-				}
-            }else{
-            	layerIndexInfo[i]=null;
-            }
+
+	            sds = (ShapefileDataStore) ds;
+	
+	            try {
+	                layerIndexInfo[i] = useIndex(sds);
+	            } catch (Exception e) {
+	                layerIndexInfo[i] = new IndexInfo(IndexInfo.TREE_NONE, null, null);
+	                LOGGER.fine("Exception while trying to use index" + e.getLocalizedMessage());
+	            }
+	        }else{
+	        	layerIndexInfo[i]=STREAMING_RENDERER_INFO;
+	        }
         }
 	}
 
@@ -1386,7 +1388,15 @@ public class ShapefileRenderer implements GTRenderer {
 				return;
 			}
 
-			labelCache.startLayer();
+            if (renderingStopRequested) {
+                return;
+            }
+            
+            if( layerIndexInfo[i]==STREAMING_RENDERER_INFO ){
+            	renderWithStreamingRenderer(currLayer, graphics, paintArea, envelope, transform);
+            	continue;
+            }
+            labelCache.startLayer();
 
 			bbox = envelope;
 
