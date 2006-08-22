@@ -1,0 +1,105 @@
+<!-- Top Level, a description with the chapter TOC -->
+
+    <para>
+      This chapter describes, first, how to obtain the library and the 
+      tools required to be able to use the Geotools library and, second, 
+      how to use these libraries to display a map on screen with an 
+      exceedingly primitive application. 
+    </para>
+
+    <para>
+      The chapter assumes that the programmer understands the following:
+      <itemizedlist>
+        <listitem>
+          <para>
+          The Java (tm) Programming Language
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            The basics of Geographic Information Systems 
+          </para>
+        </listitem>
+      </itemizedlist>
+      This chapter tries not to assume any other specialized knowledge; 
+      the examples therefore start from the basic desktop of modern GUI 
+      operating systems either of the UNIX heritage, namely GNU based or 
+      MacOS X, or from the CPM heritage, namely Windows (tm). Since each
+      programmer uses her own tools to actually develop her programs, each 
+      will have to adapt these examples to fit her own needs.
+    </para>
+
+<sect1 id="sect-quick-start-getGt">
+    <title>Get Geotools</title>
+
+    <para>
+      Geotools is distributed in three separate pieces: as a binary 
+      distribution, as a source distribution, and as a javadoc collection. 
+      Each of these can be obtained from the project website.
+    </para>
+
+</sect1>
+
+<sect1 id="sect-quick-start-configJava">
+    <title>Configure Java</title>
+
+    <para>
+      Geotools requires a Java VM and two imaging libraries, the 
+      Java Advanced Imaging library and the Java Image I/O library. These 
+      must all be configured correctly for the examples which follow.
+    </para>
+
+</sect1>
+
+
+<sect1 id="sect-quick-start-runDemo">
+    <title>Run the Demo</title>
+
+    <para>
+      Geotools contains a handy demonstration application which is useful
+      both to ensure that the libraries are properly installed and to get 
+      programmers started exploring each of the different areas of the 
+      library.
+    </para>
+
+    <para>
+      Once the Java libraries have been configured, a simple demonstration
+      program can be run with the following command:
+    </para>
+
+    <para>
+      <computeroutput>
+java -jar /path/to/gt2-demo-introduction-VERSION_NUMBER.jar org.geotools.demo.introduction.QuickStartGUI
+      </computeroutput>
+    </para>
+
+</sect1>
+
+
+<sect1 id="sect-quick-start-readDeom">
+    <title>Read the Demo</title>
+
+    <para>
+      The source code for the Demo application provides a quick introduction 
+      to each of the major modules of the code library. The source walks 
+      through the process of creating Features, both programatically and from 
+      various sources such as shapefile and web servers. The source then
+      discusses how to create styles and display a map. The source continues 
+      by discussing advanced features of the &lib; library. The source is 
+      contained in the
+      <filename>org.geotools.demo.introduction.QuickStartGUI.java</filename>
+      source file within the 
+      <filename>gt2-demo-introduction-VERSION.jar</filename>
+      JAR file (where VERSION is replaced by the current version number).
+    </para>
+
+</sect1>
+
+
+
+
+
+
+
+
+

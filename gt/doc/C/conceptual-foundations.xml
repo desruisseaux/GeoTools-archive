@@ -1,0 +1,494 @@
+<!-- Top Level, a description with the chapter TOC -->
+
+    <para>
+      This chapter introduces the Geotools library from a conceptual point of view. The chapter starts by introducing the components of the library and showing how these components could fit into a Model/View/Controller architecture of an actual application. The chapter then details the different sub-components of the Geotools library. Each of these sub-components will be discussed in a tutorial example in the next section as these tutorials become available.
+    </para>
+
+<sect1 id="sect-conceptual-foundations-background">
+  <title>Terminology and Standards</title>
+
+  <para>
+     Geotools uses certain terms in very specific ways. The terms used to 
+     refer to geospatial information come from a set of standards developed 
+     by the International Organization for Standardization (ISO) and the Open 
+     Geospatial Consortium (OGC). These standards, for example, use the term 
+     'Feature' to describe the fundamental unit of geospatial information: both 
+     real physical entities such as rivers and abstract ideas such as 
+     property boundaries.
+  </para>
+
+  <para>
+    The fundamental standards used by Geotools are:
+  </para>
+
+<table>
+<title>Geospatial Standards</title>
+<tgroup cols="3">
+<thead>
+<row>
+  <entry>Specification</entry>
+  <entry>Title</entry>
+  <entry>Base package</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry>ISO 19103</entry>
+  <entry>Geographic information - Conceptual schema language</entry>
+  <entry>org.geotools.util</entry>
+</row>
+<row>
+  <entry>ISO 19107</entry>
+  <entry>Feature Geometry (Topic 1)</entry>
+  <entry>org.geotools.geometry</entry>
+</row>
+<row>
+  <entry>ISO 19111</entry>
+  <entry>Spatial Referencing by Coordinates (Topic 2)</entry>
+  <entry>org.geotools.referencing</entry>
+</row>
+<row>
+  <entry>ISO 19115</entry>
+  <entry>Metadata (Topic 11)</entry>
+  <entry>org.geotools.metadata</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+
+<para>
+The best introduction to this terminology is the general introduction written by the OGC.
+  </para>
+
+</sect1>
+
+
+<sect1 id="sect-conceptual-foundations-environment">
+  <title>Runtime Environment</title>
+  <para>
+   The environment on which the Geotools library runs is shown in <xref
+    linkend="fig-geotools-environment" /> .
+    <figure id="fig-geotools-environment">
+      <title>The Geotools Environment.</title>
+      <screenshot>
+        <mediaobject>
+        <imageobject>
+          <imagedata fileref="figures/geotools-environment.png" 
+              format="PNG" />
+        </imageobject>
+        <textobject>
+          <phrase>
+            An image of the components on which the Geotools library runs.
+          </phrase>
+        </textobject>
+	<caption>
+	  <para>
+	    &lib; is written in Java and therefore runs inside a Java Virtual
+            machine (VM). The Java VM generally runs through the POSIX layer on 
+            the hardware. The library requires two of the standard Java 
+            extension libraries, Java Advanced Imaging and Java Image I/O. The 
+            &lib; uses the GeoAPI project to define a standard API, the JTS 
+            project for robust geometric convolutions, and the unit definitions 
+            provided by JUnit. There are also several external libraries and 
+            code plugins which can be connected to &lib;.
+	  </para>
+	</caption>
+        </mediaobject>
+      </screenshot>
+    </figure>
+  </para>
+
+
+</sect1>
+
+
+
+<sect1 id="sect-conceptual-foundations-architecture">
+  <title>Library Architecture</title>
+
+  <para>
+     The Geotools library is split into several, essentially separate components. This component architecture makes it easy to use only part of the library, provides a clean separation to extend Geotools with new functionality, and provides a simple way to replace the default implementation of any particular component with another implementation.
+  </para>
+
+  <para>
+   The architecture of the Geotools library runs is sketched in <xref
+    linkend="fig-geotools-architecture" /> .
+    <figure id="fig-geotools-architecture">
+      <title>The General Geotools Architecture.</title>
+      <screenshot>
+        <mediaobject>
+        <imageobject>
+          <imagedata fileref="figures/geotools-architecture.png" 
+              format="PNG" />
+        </imageobject>
+        <textobject>
+          <phrase>
+            An image of the internal architecture of the Geotools library.
+          </phrase>
+        </textobject>
+	<caption>
+	  <para>
+	    The &lib; architecture is comprised of several data models and a 
+            display system.
+	  </para>
+	</caption>
+        </mediaobject>
+      </screenshot>
+    </figure>
+  </para>
+
+  <para>
+    &lib; is comprised of several models. The main library consists of the
+    geometric model, the geopositioning model, and the feature 
+            model, which jointly provide the core data model for geospatial 
+            entities. The positioning model uses one or more authorities, 
+            most notably the EPSG database. &lib; also uses a Data access and 
+            storage model, with plugins for the common data formats. A Query 
+            model provides a rich facility for data filtration and the creation 
+            of data dependent 
+  </para>
+
+<!-- TODO: add the ext/ and spike/ dirs -->
+
+  <para>
+The Geotools library is split between the Main module and the Plugin modules. The Main module provides the core libraries and the plugins provide specific functionality. There are several plugins that provide access to different format versions of the European Petroleum Survey Group (EPSG) data base of known coordinate geo-referencing systems. Similarly, there are multiple plugins which provide access to common geospatial data formats such as imagery and vector formats either on the local disk, in databases, or on the internet.
+  </para>
+
+  <para>
+The Main module itself is split into two components, the data model component and the data view component. These two components are two of the three components in a standard Model-View-Controller split used for most modern GUI application. The Model-View-Controller architecture is a standard architectural design pattern designed to cleanly separate the data model from the logic used to create and modify that model. In general, this architecture does not split the view and controller components in quite as distinctive a manner. However, the Geotools library does not provide any controller logic so the library is cleanly split into a Model-View division.
+  </para>
+
+
+  <sect2 id="sect-conceptual-foundations-architecture-dataComponent">
+  <title>The Data Component</title>
+
+  <para>
+    The &lib; library follows the standard split between the model, view, 
+    and controller components. The data component consists of the entities 
+    which describe the real world entities within the computational system.
+  </para>
+
+  <sect3 id="sect-conceptual-foundations-architecture-geometry">
+    <title>The Geometric Model</title>
+
+    <para>
+      This model provides the infrastructure for defining vector based geometric figures. The model is based on the idea of coordinates and of aggregates of these coordinates into points, lines, polygons, multipoints, multilines, or multipolygons. The geometric model also includes operators to perform standard computational geometry operations on the aggregates. In versions up to Geotools 2.2, the Geotools library depends on the Java Topology Suite (JTS) library and is therefore limited to working in two dimensions.
+    </para>
+
+  </sect3>
+
+  <sect3 id="sect-conceptual-foundations-architecture-geopositioning">
+    <title>The Geopositioning Model</title>
+
+    <para>
+      This model provides the infrastructure for geopositioning and for common operations on geo-referenced data such as transformations and re-projections. This model provides ways to define Coordinate Reference Systems (CRS) and the EPSG plugins provide a standard source for the commonly defined geodetic datums and CRS. The model further provide access to fundamental units and parameter structures.
+    </para>
+
+  </sect3>
+
+  <sect3 id="sect-conceptual-foundations-architecture-feature">
+    <title>The Feature Model</title>
+
+    <para>
+      Features are the fundamental unit of geospatial data in the terminology used by Geotools. Features may describe a real world entities or theoretical constructs. Conceptually, Features contain an identifier, a bunch of attributes in a java array, and a schema defining the attributes and the layout of these attributes within the attribute array. The attributes will include the geospatial definition of the feature, any temporal definition of the entity, and any other attributes of the feature. The standard method to obtain feature contents is through the creation of 'queries', combinations of filters and expressions; these are described below.
+    </para>
+
+  </sect3>
+
+  <sect3 id="sect-conceptual-foundations-architecture-data">
+    <title>The Data Access and Storage Model</title>
+
+    <para>
+      This model provides methods for creating, manipulating, and storing data. The model provides an approach to storing data from different sources in a single catalog structure. The model facilitates the interaction with data in vector or raster formats contained on the local file system, in a database or from a network server. The plugin module provides a number of plugins to access common data formats such as GML files, Shapefile format files, GeoTiff images, Geospatial databases, Web Mapping Servers and Web Feature Servers.
+    </para>
+
+  </sect3>
+
+  <sect3 id="sect-conceptual-foundations-architecture-query">
+    <title>The Query Model</title>
+
+    <para>
+      This model provides a standard way to discover and obtain the contents of geospatial data from the data sources and from known features. The query model involves the creation of Filters to sub-select the data contents and expressions to extract only the relevant attributes from the features of interest.
+    </para>
+
+  </sect3>
+
+  </sect2>
+
+
+
+  <sect2 id="sect-conceptual-foundations-architecture-viewComponent">
+    <title>The View Component</title>
+
+    <para>
+    </para>
+
+
+    <sect3 id="sect-conceptual-foundations-architecture-display">
+      <title>The Display Model</title>
+
+      <para>
+        The display model provides a standard approach to the creation of visuals through which to present the contents of a group of features. This model provides a standard approach to styling feature contents according the complex rules which are necessary to create visually appealing maps. The model also provides a rendering infrastructure for the creation of images.
+      </para>
+
+    </sect3>
+
+  </sect2>
+
+
+  <sect2 id="sect-conceptual-foundations-architecture-controllerComponent">
+    <title>No Controller component</title>
+
+    <para>
+      There is <emphasis>no</emphasis> controller component in the Geotools
+      library; the component is explicitly left to be implemented by 
+      library users. 
+    </para>
+
+  </sect2>
+
+
+  <sect2 id="sect-conceptual-foundations-architecture-plugins">
+    <title>Plugins</title>
+
+    <para>
+      Geotools uses several plugins to provide geopositioning information 
+      or to provide access to specific data formats.
+    </para>
+
+
+<table>
+<title>Plugins</title>
+<tgroup cols="2">
+<thead>
+<row>
+  <entry>Name</entry>
+  <entry>Description</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry>arcgrid</entry>
+  <entry>A plugin to support the use of files in the ArcGRID raster format.</entry>
+</row>
+<row>
+  <entry>arcsde</entry>
+  <entry>A plugin to support access to the ESRI ArcSDE database. This may require a download of a proprietary library through which to access the database. [TODO: Check]</entry>
+</row>
+<row>
+  <entry>db2</entry>
+  <entry>A plugin to support access to the DB2 database.</entry>
+</row>
+<row>
+  <entry>dir_ds</entry>
+  <entry>TODO</entry>
+</row>
+<row>
+  <entry>epsg-access</entry>
+  <entry>A plugin with a version of the EPSG database of coordinate reference systems and datums in the Microsoft Access (tm) database format. This is the only authoritative version.</entry>
+</row>
+<row>
+  <entry>epsg-hsql</entry>
+  <entry></entry>
+</row>
+<row>
+  <entry>epsg-postgresql</entry>
+  <entry>A plugin with a version of the EPSG database of coordinate reference systems and datums in the in-memory HSQL database format. This is an alternative, non-authoritative version.</entry>
+</row>
+<row>
+  <entry>epsg-wkt</entry>
+  <entry>A plugin with a version of the EPSG database of coordinate reference systems and datums in a set of Well-Known Text (WKT) file format. This version is almost always functional, but its content is significantly different from the content of the Access database. This is an alternative, non-authoritative version.</entry>
+</row>
+<row>
+  <entry>geomedia</entry>
+  <entry>TODO</entry>
+</row>
+<row>
+  <entry>geotiff</entry>
+  <entry>A plugin which supports access to files in the GeoTIFF image format.</entry>
+</row>
+<row>
+  <entry>gml</entry>
+  <entry>A plugin to enable the reading and writing of files in the Geographic Markup Language (GML) extension to the eXtensible Markup Language (XML) format.</entry>
+</row>
+<row>
+  <entry>image</entry>
+  <entry>TODO</entry>
+</row>
+<row>
+  <entry>mif</entry>
+  <entry>A plugin to enable access to the MIF file format.</entry>
+</row>
+<row>
+  <entry>mysql</entry>
+  <entry>A plugin to enable access to the MYSQL database.</entry>
+</row>
+<row>
+  <entry>oracle-spatial</entry>
+  <entry>A plugin to enable access to the MYSQL database.This may require a download of a proprietary library through which to access the database. [TODO: Check]</entry>
+</row>
+<row>
+  <entry>postgis</entry>
+  <entry>A plugin to enable access to a PostGIS database, a spatial extension to the PosgreSQL database.</entry>
+</row>
+<row>
+  <entry>shapefile</entry>
+  <entry>A plugin to enable the use of files in the Shapefile format.</entry>
+</row>
+<row>
+  <entry>tiger</entry>
+  <entry>A plugin to enable the use of files in the TIGER format used by the Census Bureau of the United States Government.</entry>
+</row>
+<row>
+  <entry>vpf</entry>
+  <entry>A plugin to enable the use of files in the Vector Product Format (VPF) which has become the standard format for the distribution of geo-spatial data by the United States Geological Survey (USGS).</entry>
+</row>
+<row>
+  <entry>wfs</entry>
+  <entry>A plugin to support the use, over a network, of a Web Feature Server (WFS) host.</entry>
+</row>
+<row>
+  <entry>wms</entry>
+  <entry>A plugin to support obtaining raster images, over a network, from a Web Mapping Server (WMS).</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+
+  </sect2>
+
+
+</sect1>
+
+
+<sect1 id="sect-conceptual-foundations-codeLayout">
+  <title>Code Layout</title>
+
+  <para>
+     The &lib; library consists of several modules which can be assembled
+     according to user needs. For example, a simple application could use 
+     only the api, geometric, referencing and feature modules. Each module 
+     contributes several java packages 
+     to the overall library. A few java packages are special and are built
+     piecewise from code in several modules.
+  </para>
+
+  <sect2 id="sect-conceptual-foundations-codeLayout-modules">
+    <title>The Modules</title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+  <sect2 id="sect-conceptual-foundations-codeLayout-packages">
+    <title>The Packages</title>
+
+    <para>
+      Should this be combined with the section above?
+    </para>
+
+  </sect2>
+
+
+</sect1>
+
+
+
+<sect1 id="sect-conceptual-foundations-geoapi">
+  <title>GeoAPI</title>
+
+  <para>
+     The GeoAPI project defines an Application Programming Interface (API)
+     consisting of java interfaces which outline the 
+     conceptual model developed by the ISO and OGC standards. &lib; 
+     intents eventually to be simply one implementation backing the 
+     GeoAPI interfaces. It will hopefully eventually be possible to use
+     &lib; simply by obtaining a single reference to a Geotools object 
+     and then develop all code against the GeoAPI interfaces. 
+  </para>
+
+  <warning>
+    <para>
+      Neither &lib; nor GeoAPI have matured sufficiently for the ideal
+      use pattern to be effective. Currently, the user need to mix methods
+      from the GeoAPI project, from the &lib; internal API, and from 
+      actual &lib; classes themselves.
+    </para>
+  </warning>
+
+  <para>
+     The GeoAPI project grew of the needs of &lib; and several other java
+     language geospatial projects which wanted to implement standards 
+     conformant code. 
+  </para>
+
+  <sect2 id="sect-conceptual-foundations-geoapi-design">
+    <title>The GeoAPI Design</title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+</sect1>
+
+<sect1 id="sect-conceptual-foundations-factorySystem">
+  <title>The Factory System</title>
+
+  <para>
+    &lib; uses a factory system extensively to enable users to create
+    objects while developing most of their code against the standard 
+    APIs.
+  </para>
+
+  <sect2 id="sect-conceptual-foundations-factorySystem-referencing">
+    <title>The Geo-Referencing Factory System</title>
+
+    <para>
+      The Geo-Referencing module has developed its own factory system.
+    </para>
+
+  </sect2>
+
+</sect1>
+
+<!--
+
+<sect1 id="sect-conceptual-foundations-">
+  <title></title>
+
+  <para>
+     
+  </para>
+
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+</sect1>
+-->
+
+<!--
+
+<sect1 id="sect-conceptual-foundations-">
+  <title></title>
+
+  <para>
+     
+  </para>
+
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+</sect1>
+-->

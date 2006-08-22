@@ -1,0 +1,82 @@
+<!-- Top Level, a description with the chapter TOC -->
+    <para>
+      This chapter describes the configuration of a more complete development 
+      environment for &lib; than was provided in the quick introduction in 
+      <xref linkend="chapter-quickStart"/>. This chapter assumes that the user
+      has setup a Java environment according to the instructions provided in 
+      <xref linkend="sect-quick-start-configJava"/>. The chapter describes the
+      configuration of a &lib; source distribution, the use of the Maven build
+      tool and the 
+    </para>
+
+<sect1 id="sect-sdkConfig-source">
+    <title>The Geotools SDK</title>
+
+    <para>
+      The full &lib; distribution consists of three components: a binary 
+      archive, the javadoc archive, and the source archive. The latter 
+      archive provides all the elements required to build the first two.
+    </para>
+
+    <para>
+      To be written...
+    </para>
+
+</sect1>
+
+
+
+<sect1 id="sect-sdkConfig-maven">
+    <title>Maven setup</title>
+
+    <para>
+      Maven is a java language tool designed to help build complex java
+      programs. 
+    </para>
+
+    <para>
+      To be written...
+    </para>
+
+</sect1>
+
+
+
+<sect1 id="sect-sdkConfig-commandline">
+    <title>Command-line development</title>
+
+    <para>
+      To be written...
+    </para>
+
+
+
+</sect1>
+
+<sect1 id="sect-sdkConfig-eclipse">
+    <title>Eclipse IDE development</title>
+
+    <para>
+      To be written...
+    </para>
+
+</sect1>
+
+
+
+<sect1 id="sect-sdkConfig-netbeans">
+    <title>Netbeans IDE development</title>
+
+    <para>
+      To be written...
+    </para>
+
+</sect1>
+
+
+
+
+
+
+
+
