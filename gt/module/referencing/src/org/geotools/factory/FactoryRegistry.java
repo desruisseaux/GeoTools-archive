@@ -207,10 +207,9 @@ public class FactoryRegistry extends ServiceRegistry {
                      * in case of failure.
                      */
                     final Class[] types = (Class[]) hint;
-                    final int length=types.length;
-                    Object candidate;
+                    final int length = types.length;
                     for (int i=0; i<length-1; i++) {
-                        candidate = getServiceProvider(category, types[i], filter, hints);
+                        final Object candidate = getServiceProvider(category, types[i], filter, hints);
                         if (candidate != null) {
                             return candidate;
                         }
@@ -457,7 +456,7 @@ public class FactoryRegistry extends ServiceRegistry {
          * other one. Try to remove those dependencies.
          */
         final ClassLoader[] asArray = (ClassLoader[]) loaders.toArray(new ClassLoader[loaders.size()]);
-        final int length=asArray.length;
+        final int length = asArray.length;
         for (int i=0; i<length; i++) {
             ClassLoader loader = asArray[i];
             try {
@@ -593,9 +592,8 @@ public class FactoryRegistry extends ServiceRegistry {
                  * be properly ordered. Since this code exists more for compatibility reasons
                  * than as a commited API, we ignore this short comming for now.
                  */
-                Object other;
                 for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
-                    other = it.next();
+                    final Object other = it.next();
                     if (other != factory) {
                         setOrdering(category, factory, other);
                     }
@@ -661,12 +659,10 @@ public class FactoryRegistry extends ServiceRegistry {
     public boolean setOrdering(final Class category, final Comparator comparator) {
         boolean set = false;
         final List previous = new ArrayList();
-        Object f1;
-        Object f2;
         for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
-            f1 = it.next();
+            final Object f1 = it.next();
             for (int i=previous.size(); --i>=0;) {
-                f2 = previous.get(i);
+                final Object f2 = previous.get(i);
                 final int c;
                 try {
                     c = comparator.compare(f1, f2);
@@ -714,9 +710,8 @@ public class FactoryRegistry extends ServiceRegistry {
             if (base.isAssignableFrom(category)) {
                 Object impl1 = null;
                 Object impl2 = null;
-                Object factory;
                 for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
-                    factory = it.next();
+                    final Object factory = it.next();
                     if (service1.filter(factory)) impl1 = factory;
                     if (service2.filter(factory)) impl2 = factory;
                     if (impl1!=null && impl2!=null && impl1!=impl2) {

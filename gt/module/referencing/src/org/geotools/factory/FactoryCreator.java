@@ -131,16 +131,13 @@ public class FactoryCreator extends FactoryRegistry {
                     // Should not fails, since non-class argument should
                     // have been accepted by 'getServiceProvider(...)'.
                 }
-                final int length=types.length;
-                Object candidate ;
-                Class type;
-                int modifiers;
+                final int length = types.length;
                 for (int i=0; i<length; i++) {
-                    type = types[i];
+                    final Class type = types[i];
                     if (type!=null && category.isAssignableFrom(type)) {
-                        modifiers = type.getModifiers();
+                        final int modifiers = type.getModifiers();
                         if (!Modifier.isAbstract(modifiers)) {
-                            candidate = createSafe(category, type, hints);
+                            final Object candidate = createSafe(category, type, hints);
                             if (isAcceptable(candidate, category, hints, filter)) {
                                 cache(category, candidate);
                                 return candidate;
