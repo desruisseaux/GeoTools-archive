@@ -171,8 +171,9 @@ public class ParserHandler extends DefaultHandler {
 							schemas[i/2] = 
 								Schemas.parse(location,locators,resolvers);
 						} 
-						catch (IOException e) {
+						catch (Exception e) {
 							String msg = "Error parsing: " + location;
+							logger.warning( msg );
 							throw new SAXException(msg,e);
 						}	
 					}
