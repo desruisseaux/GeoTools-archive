@@ -254,7 +254,7 @@ public final class JTS {
         }
         final MathTransform transform;
         try {
-            transform = CRS.transform(crs, DefaultGeographicCRS.WGS84, true);
+            transform = CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84, true);
         } catch (FactoryException exception) {
             throw new TransformPathNotFoundException(Errors.format(
                       ErrorKeys.CANT_TRANSFORM_ENVELOPE, exception));
@@ -465,11 +465,7 @@ public final class JTS {
     public static Envelope2D getEnvelope2D(final Envelope envelope,
             final CoordinateReferenceSystem crs) throws MismatchedDimensionException
     {
-        // //
-        //
         // Initial checks
-        //
-        // //
         ensureNonNull("envelope", envelope);
         ensureNonNull("crs",      crs);
         if (envelope instanceof ReferencedEnvelope) {
@@ -480,11 +476,7 @@ public final class JTS {
                           crs.getName().getCode(), implicitCRS.getName().getCode()));
             }
         }
-        // //
-        //
         // Ensure the CRS is 2D and retrieve the new envelope
-        //
-        // //
         final CoordinateReferenceSystem crs2D;
         try {
             crs2D = CRSUtilities.getCRS2D(crs);

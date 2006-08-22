@@ -23,7 +23,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
- * A CoordianteSystem aware Geometry AttributeType.
+ * A CoordinateSystem aware Geometry AttributeType.
  * <p>
  * This class is the bridge between our FeatureType/AttributeType
  * classes and the CoordianteSystem.
@@ -75,7 +75,7 @@ public interface GeometryAttributeType extends AttributeType,
      * PercisionModel and CoordinateSequenceFactory information.
      * </p>
      *
-     * @return CS_CoordinateSystem for this GeometryAttributeType
+     * @return The coordinate reference system for this GeometryAttributeType
      */
     public CoordinateReferenceSystem getCoordinateSystem();
 
