@@ -129,7 +129,7 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      * Key are case-insensitive, and leading and trailing spaces are ignored. The map given in
      * argument shall contains at least a <code>"code"</code> property. Other properties listed
      * in the table below are optional.
-     * <br><br>
+     * <p>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>
@@ -461,29 +461,50 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
     }
     
     /**
+     * Returns the last element in the sequence of {@linkplain #getParsedNames parsed names}.
+     *
+     * @since 2.3
+     */
+    public LocalName name() {
+        return getName().name();
+    }
+    
+    /**
+     * Returns a view of this object as a local name. The local name returned by this method
+     * will have the same {@linkplain LocalName#getScope scope} than this generic name.
+     * 
+     * @deprecated Replaced by {@link #name()}.
+     */
+    public LocalName asLocalName() {
+        return getName().asLocalName();
+    }
+    
+    /**
+     * Returns the scope (name space) in which this name is local.
+     *
+     * @since 2.3
+     */
+    public NameSpace scope() {
+        return getName().scope();
+    }
+    
+    /**
      * Returns the scope (name space) of this generic name. If this name has no scope
      * (e.g. is the root), then this method returns {@code null}.
      * 
-     * @deprecated Repalced by scope()
+     * @deprecated Replaced by {@link #scope()}.
      */
     public GenericName getScope() {
         return getName().getScope();
     }
     
     /**
-     * Returns a view of this object as a scoped name,
-     * or {@code null} if this name has no scope.
+     * Returns the depth of this name within the namespace hierarchy.
+     *
+     * @since 2.3
      */
-    public ScopedName asScopedName() {
-        return getName().asScopedName();
-    }
-    
-    /**
-     * Returns a view of this object as a local name. The local name returned by this method
-     * will have the same {@linkplain LocalName#getScope scope} than this generic name.
-     */
-    public LocalName asLocalName() {
-        return getName().asLocalName();
+    public int depth() {
+        return getName().depth();
     }
     
     /**
@@ -493,6 +514,35 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
      */
     public List getParsedNames() {
         return getName().getParsedNames();
+    }
+    
+    /**
+     * Returns this name expanded with the specified scope. One may represent this operation
+     * as a concatenation of the specified {@code name} with {@code this}.
+     *
+     * @since 2.3
+     */
+    public ScopedName push(final GenericName scope) {
+        return getName().push(scope);
+    }
+    
+    /**
+     * Returns a view of this name as a fully-qualified name.
+     *
+     * @since 2.3
+     */
+    public GenericName toFullyQualifiedName() {
+        return getName().toFullyQualifiedName();
+    }
+    
+    /**
+     * Returns a view of this object as a scoped name,
+     * or {@code null} if this name has no scope.
+     * 
+     * @deprecated Replaced by {@link #toFullyQualifiedName()}.
+     */
+    public ScopedName asScopedName() {
+        return getName().asScopedName();
     }
     
     /**
@@ -551,29 +601,4 @@ public class NamedIdentifier implements Identifier, GenericName, Serializable {
         }
         return hash;
     }
-
-    /**
-     * @since GeoAPI 2.1
-     */
-        public NameSpace scope() {
-                return getName().scope();
-        }
-        /**
-         * @since GeoAPI 2.1
-         */
-        public int depth() {
-                return getName().depth();
-        }
-        /** @since GeoAPI 2.1 */
-        public LocalName name() {
-                return getName().name();
-        }
-        /** @since GeoAPI 2.1 */
-        public GenericName toFullyQualifiedName() {
-                return getName().toFullyQualifiedName();
-        }
-        /** @since GeoAPI 2.1 */
-        public ScopedName push(GenericName scope) {
-                return getName().push( scope );
-        }
 }

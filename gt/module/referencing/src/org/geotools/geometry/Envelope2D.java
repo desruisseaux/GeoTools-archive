@@ -23,6 +23,7 @@ import java.awt.geom.Rectangle2D;
 import org.opengis.util.Cloneable;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;  // For javadoc
 
@@ -74,8 +75,8 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         // TODO: check below should be first, if only Sun could fix RFE #4093999.
         final int dimension = envelope.getDimension();
         if (dimension != 2) {
-            throw new IllegalStateException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
-                                            new Integer(dimension)));
+            throw new MismatchedDimensionException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
+                                                   new Integer(dimension)));
         }
         setCoordinateReferenceSystem(GeneralEnvelope.getCoordinateReferenceSystem(envelope));
     }

@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Locale;
 
 // OpenGIS dependencies
+import org.opengis.util.NameSpace;
+import org.opengis.util.LocalName;
+import org.opengis.util.ScopedName;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
@@ -74,10 +77,27 @@ public abstract class GenericName implements org.opengis.util.GenericName, Seria
     }
     
     /**
-     * Returns the scope (name space) of this generic name. If this name has no scope
-     * (e.g. is the root), then this method returns {@code null}.
+     * Returns the scope (name space) in which this name is local. The scope is set on creation
+     * and is not modifiable. The scope of a name determines where a name "starts". For instance,
+     * if a name has a {@linkplain #depth depth} of two ({@code "util.GenericName"}) and is
+     * associated with a {@linkplain NameSpace name space} having the name {@code "org.opengis"},
+     * then the fully qualified name would be {@code "org.opengis.util.GenericName"}.
+     *
+     * @since 2.3
      */
-    public abstract org.opengis.util.GenericName getScope();
+    public abstract NameSpace scope();
+
+    /**
+     * Returns the depth of this name within the namespace hierarchy.  This indicates the number
+     * of levels specified by this name.  For any {@link LocalName}, it is always one.  For a
+     * {@link ScopedName} it is some number greater than or equal to 2.
+     * <p>
+     * The depth is the length of the list returned by the {@link #getParsedNames} method.
+     * As such it is a derived parameter.
+     *
+     * @since 2.3
+     */
+    public abstract int depth();
     
     /**
      * Returns the sequence of {@linkplain LocalName local names} making this generic name.
@@ -85,6 +105,17 @@ public abstract class GenericName implements org.opengis.util.GenericName, Seria
      * The length of this sequence is the generic name depth.
      */
     public abstract List getParsedNames();
+
+    /**
+     * Returns the last element in the sequence of {@linkplain #getParsedNames parsed names}.
+     * For any {@link LocalName}, this is always {@code this}.
+     *
+     * @see LocalName#name
+     * @see ScopedName#name
+     *
+     * @since 2.3
+     */
+    public abstract LocalName name();
 
     /**
      * Returns the separator character. Default to <code>':'</code>.

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import javax.units.Converter;
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
@@ -71,13 +72,13 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = 1449284160523432645L;
-    
+    private static final long serialVersionUID = -7883614853277827689L;
+
     /**
      * Default axis info for longitudes.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * The abbreviation is "&lambda;" (lambda).
      *
@@ -89,12 +90,12 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis LONGITUDE = new DefaultCoordinateSystemAxis(
             VocabularyKeys.LONGITUDE, "\u03BB", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
-    
+
     /**
      * Default axis info for latitudes.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * The abbreviation is "&phi;" (phi).
      * 
@@ -106,7 +107,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis LATITUDE = new DefaultCoordinateSystemAxis(
             VocabularyKeys.LATITUDE, "\u03C6", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
-    
+
     /**
      * The default axis for altitude values.
      *
@@ -124,7 +125,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis ALTITUDE = new DefaultCoordinateSystemAxis(
             VocabularyKeys.ALTITUDE, "h", AxisDirection.UP, SI.METER);
-    
+
     /**
      * The default axis for depth.
      *
@@ -140,13 +141,13 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis DEPTH = new DefaultCoordinateSystemAxis(
             VocabularyKeys.DEPTH, "d", AxisDirection.DOWN, SI.METER);
-    
+
     /**
      * Default axis info for geodetic longitudes in a
      * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * The ISO 19111 name is "<cite>geodetic longitude</cite>" and the abbreviation is "&lambda;"
      * (lambda).
@@ -160,13 +161,13 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis GEODETIC_LONGITUDE = new DefaultCoordinateSystemAxis(
             VocabularyKeys.GEODETIC_LONGITUDE, "\u03BB", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
-    
+
     /**
      * Default axis info for geodetic latitudes in a
      * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * The ISO 19111 name is "<cite>geodetic latitude</cite>" and the abbreviation is "&phi;" (phi).
      * 
@@ -179,7 +180,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis GEODETIC_LATITUDE = new DefaultCoordinateSystemAxis(
             VocabularyKeys.GEODETIC_LATITUDE, "\u03C6", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
-    
+
     /**
      * The default axis for height values above the ellipsoid in a
      * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
@@ -200,7 +201,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis ELLIPSOIDAL_HEIGHT = new DefaultCoordinateSystemAxis(
             VocabularyKeys.ELLIPSOIDAL_HEIGHT, "h", AxisDirection.UP, SI.METER);
-    
+
     /**
      * The default axis for height values measured from gravity.
      *
@@ -217,7 +218,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis GRAVITY_RELATED_HEIGHT = new DefaultCoordinateSystemAxis(
             VocabularyKeys.GRAVITY_RELATED_HEIGHT, "h", AxisDirection.UP, SI.METER);
-    
+
     /**
      * Default axis info for radius in a
      * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
@@ -239,14 +240,14 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis GEOCENTRIC_RADIUS = new DefaultCoordinateSystemAxis(
             VocabularyKeys.GEOCENTRIC_RADIUS, "r", AxisDirection.UP, SI.METER);
-    
+
     /**
      * Default axis info for longitudes in a
      * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
      * {@linkplain org.opengis.referencing.crs.SphericalCS spherical CS}.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * The ISO 19111 name is "<cite>spherical longitude</cite>" and the abbreviation is "&Omega;"
      * (omega).
@@ -260,14 +261,14 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis SPHERICAL_LONGITUDE = new DefaultCoordinateSystemAxis(
             VocabularyKeys.SPHERICAL_LONGITUDE, "\u03A9", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
-    
+
     /**
      * Default axis info for latitudes in a
      * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
      * {@linkplain org.opengis.referencing.cs.SphericalCS spherical CS}.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE degrees}.
+     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
      *
      * The ISO 19111 name is "<cite>spherical latitude</cite>" and the abbreviation is "&Theta;"
      * (theta).
@@ -281,7 +282,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis SPHERICAL_LATITUDE = new DefaultCoordinateSystemAxis(
             VocabularyKeys.SPHERICAL_LATITUDE, "\u03B8", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
-    
+
     /**
      * Default axis info for <var>x</var> values in a
      * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
@@ -301,7 +302,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis X = new DefaultCoordinateSystemAxis(
             "x", AxisDirection.EAST, SI.METER);
-    
+
     /**
      * Default axis info for <var>y</var> values in a
      * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
@@ -321,7 +322,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis Y = new DefaultCoordinateSystemAxis(
             "y", AxisDirection.NORTH, SI.METER);
-    
+
     /**
      * Default axis info for <var>z</var> values in a
      * {@linkplain org.opengis.referencing.cs.CartesianCS cartesian CS}.
@@ -335,7 +336,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis Z = new DefaultCoordinateSystemAxis(
             "z", AxisDirection.UP, SI.METER);
-    
+
     /**
      * Default axis info for <var>x</var> values in a
      * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
@@ -352,7 +353,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis GEOCENTRIC_X = new DefaultCoordinateSystemAxis(
             VocabularyKeys.GEOCENTRIC_X, "X", AxisDirection.OTHER, SI.METER);
-    
+
     /**
      * Default axis info for <var>y</var> values in a
      * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
@@ -369,7 +370,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis GEOCENTRIC_Y = new DefaultCoordinateSystemAxis(
             VocabularyKeys.GEOCENTRIC_Y, "Y", AxisDirection.EAST, SI.METER);
-    
+
     /**
      * Default axis info for <var>z</var> values in a
      * {@linkplain org.opengis.referencing.crs.GeocentricCRS geocentric CRS} using
@@ -386,7 +387,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis GEOCENTRIC_Z = new DefaultCoordinateSystemAxis(
             VocabularyKeys.GEOCENTRIC_Z, "Z", AxisDirection.NORTH, SI.METER);
-    
+
     /**
      * Default axis info for Easting values in a
      * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS}.
@@ -405,7 +406,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis EASTING = new DefaultCoordinateSystemAxis(
             VocabularyKeys.EASTING, "E", AxisDirection.EAST, SI.METER);
-    
+
     /**
      * Default axis info for Westing values in a
      * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS}.
@@ -426,7 +427,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         EASTING.opposite = WESTING;
         WESTING.opposite = EASTING;
     }
-    
+
     /**
      * Default axis info for Northing values in a
      * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS}.
@@ -445,7 +446,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis NORTHING = new DefaultCoordinateSystemAxis(
             VocabularyKeys.NORTHING, "N", AxisDirection.NORTH, SI.METER);
-    
+
     /**
      * Default axis info for Southing values in a
      * {@linkplain org.opengis.referencing.crs.ProjectedCRS projected CRS}.
@@ -466,7 +467,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         NORTHING.opposite = SOUTHING;
         SOUTHING.opposite = NORTHING;
     }
-    
+
     /**
      * A default axis for time values in a {@linkplain org.opengis.referencing.cs.TimeCS time CS}.
      *
@@ -539,6 +540,16 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     private final Unit unit;
 
     /**
+     * Minimal and maximal value for this axis.
+     */
+    private final double minimum, maximum;
+
+    /**
+     * The range meaning for this axis.
+     */
+    private final RangeMeaning rangeMeaning;
+
+    /**
      * The axis with opposite direction, or {@code null} if unknow.
      * Not serialized because only used for the predefined constants.
      */
@@ -558,11 +569,59 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         abbreviation = axis.getAbbreviation();
         direction    = axis.getDirection();
         unit         = axis.getUnit();
+        minimum      = axis.getMinimumValue();
+        maximum      = axis.getMaximumValue();
+        rangeMeaning = axis.getRangeMeaning();
     }
 
     /**
      * Constructs an axis from a set of properties. The properties map is given unchanged to the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
+     *
+     * @param properties   Set of properties. Should contains at least <code>"name"</code>.
+     * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
+     *                     coordinate system axes.
+     * @param direction    The {@linkplain #getDirection direction} of this coordinate system axis.
+     * @param unit         The {@linkplain #getUnit unit of measure} used for this coordinate
+     *                     system axis.
+     * @param minimum      The minimum value normally allowed for this axis.
+     * @param maximum      The maximum value normally allowed for this axis.
+     * @param rangeMeaning The meaning of axis value range specified by the minimum and
+     *                     maximum values.
+     *
+     * @since 2.3
+     */
+    public DefaultCoordinateSystemAxis(final Map           properties,
+                                       final String        abbreviation,
+                                       final AxisDirection direction,
+                                       final Unit          unit,
+                                       final double        minimum,
+                                       final double        maximum,
+                                       final RangeMeaning  rangeMeaning)
+    {
+        super(properties);
+        this.abbreviation = abbreviation;
+        this.direction    = direction;
+        this.unit         = unit;
+        this.minimum      = minimum;
+        this.maximum      = maximum;
+        this.rangeMeaning = rangeMeaning;
+        ensureNonNull("abbreviation", abbreviation);
+        ensureNonNull("direction",    direction);
+        ensureNonNull("unit",         unit);
+        ensureNonNull("rangeMeaning", rangeMeaning);
+        if (!(minimum < maximum)) { // Use '!' for catching NaN
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_RANGE_$2,
+                        new Double(minimum), new Double(maximum)));
+        }
+    }
+
+    /**
+     * Constructs an unbounded axis from a set of properties. The properties map is given
+     * unchanged to the {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map)
+     * super-class constructor}. The {@linkplain #getMinimumValue minimum} and
+     * {@linkplain #getMaximumValue maximum} values are inferred from the axis unit and
+     * direction.
      *
      * @param properties   Set of properties. Should contains at least <code>"name"</code>.
      * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
@@ -576,6 +635,8 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
                                        final AxisDirection direction,
                                        final Unit          unit)
     {
+        // NOTE: we would invoke this(properties, abbreviation, ...) instead if Sun fixed
+        // RFE #4093999 ("Relax constraint on placement of this()/super() call in constructors").
         super(properties);
         this.abbreviation = abbreviation;
         this.direction    = direction;
@@ -583,6 +644,27 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         ensureNonNull("abbreviation", abbreviation);
         ensureNonNull("direction",    direction);
         ensureNonNull("unit",         unit);
+        if (unit.isCompatible(NonSI.DEGREE_ANGLE)) {
+            final Converter fromDegrees = NonSI.DEGREE_ANGLE.getConverterTo(unit);
+            final AxisDirection dir = direction.absolute();
+            if (dir.equals(AxisDirection.NORTH)) {
+                final double range = Math.abs(fromDegrees.convert(90));
+                minimum = -range;
+                maximum = +range;
+                rangeMeaning = RangeMeaning.EXACT; // 90°N do not wraps to 90°S
+                return;
+            }
+            if (dir.equals(AxisDirection.EAST)) {
+                final double range = Math.abs(fromDegrees.convert(180));
+                minimum = -range;
+                maximum = +range;
+                rangeMeaning = RangeMeaning.WRAPAROUND; // 180°E wraps to 180°W
+                return;
+            }
+        }
+        minimum = Double.NEGATIVE_INFINITY;
+        maximum = Double.POSITIVE_INFINITY;
+        rangeMeaning = RangeMeaning.EXACT;
     }
 
     /**
@@ -719,6 +801,41 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     }
 
     /**
+     * Returns the minimum value normally allowed for this axis, in the
+     * {@linkplain #getUnit unit of measure for the axis}. If there is no minimum value, then
+     * this method returns {@linkplain Double#NEGATIVE_INFINITY negative infinity}.
+     *
+     * @since 2.3
+     */
+    public double getMinimumValue() {
+        return minimum;
+    }
+
+    /**
+     * Returns the maximum value normally allowed for this axis, in the
+     * {@linkplain #getUnit unit of measure for the axis}. If there is no maximum value, then
+     * this method returns {@linkplain Double#POSITIVE_INFINITY negative infinity}.
+     *
+     * @since 2.3
+     */
+    public double getMaximumValue() {
+        return maximum;
+    }
+
+    /**
+     * Returns the meaning of axis value range specified by the {@linkplain #getMinimumValue
+     * minimum} and {@linkplain #getMaximumValue maximum} values. This element shall be omitted
+     * when both minimum and maximum values are omitted. It may be included when minimum and/or
+     * maximum values are included. If this element is omitted when minimum or maximum values are
+     * included, the meaning is unspecified.
+     *
+     * @since 2.3
+     */
+    public RangeMeaning getRangeMeaning() {
+        return rangeMeaning;
+    }
+
+    /**
      * Returns an axis with the opposite direction of this one, or {@code null} if unknown.
      * This method is not yet public because only a few predefined constants have this information.
      */
@@ -741,11 +858,11 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         }
         if (this.unit.isCompatible(unit)) {
             return new DefaultCoordinateSystemAxis(getProperties(this, null),
-                                                   abbreviation, direction, unit);
+                       abbreviation, direction, unit, minimum, maximum, rangeMeaning);
         }
         throw new IllegalArgumentException(Errors.format(ErrorKeys.INCOMPATIBLE_UNIT_$1, unit));
     }
-    
+
     /**
      * Compares the specified object with this axis for equality.
      *
@@ -761,7 +878,11 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         if (super.equals(object, compareMetadata)) {
             final DefaultCoordinateSystemAxis that = (DefaultCoordinateSystemAxis) object;
             if (compareMetadata) {
-                if (!Utilities.equals(this.abbreviation, that.abbreviation)) {
+                if (!Utilities.equals(this.abbreviation, that.abbreviation) ||
+                    !Utilities.equals(this.rangeMeaning, that.rangeMeaning) ||
+                    Double.doubleToLongBits(minimum) != Double.doubleToLongBits(that.minimum) ||
+                    Double.doubleToLongBits(maximum) != Double.doubleToLongBits(that.maximum))
+                {
                     return false;
                 }
             } else {
@@ -791,7 +912,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this axis. This value doesn't need to be the same
      * in past or future versions of this class.
@@ -803,7 +924,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         code = code*37 + unit        .hashCode();
         return code;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
@@ -817,16 +938,4 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
         formatter.append(direction);
         return "AXIS";
     }
-
-        public double getMinimumValue() {
-                return 0;
-        }
-
-        public double getMaximumValue() {
-                return 0;
-        }
-
-        public RangeMeaning getRangeMeaning() {
-                return null;
-        }
 }

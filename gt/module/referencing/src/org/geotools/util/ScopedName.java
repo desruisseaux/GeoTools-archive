@@ -115,10 +115,110 @@ public class ScopedName extends org.geotools.util.GenericName
     }
 
     /**
+     * Returns the head of this scoped name. This is the first elements in the sequence of
+     * {@linkplain #getParsedNames parsed names}. The head element must exists in the same
+     * {@linkplain NameSpace name space} than this scoped name. In other words, the following
+     * relationship must holds:
+     * <p>
+     * <ul>
+     *   <li><code>head().scope() == this.{@linkplain #scope scope()}</code></li>
+     * </ul>
+     *
+     * @since 2.3
+     *
+     * @todo Not yet implemented.
+     */
+    public LocalName head() {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    /**
+     * Returns the tail of this scoped name. The returned name contains every elements of the
+     * {@linkplain #getParsedNames parsed names list} except for the first one, which is the
+     * {@linkplain #head head}. In other words, the following relationship must holds:
+     * <p>
+     * <ul>
+     *   <li><code>tail().getParsedNames() == this.{@linkplain #getParsedNames getParsedNames()}.sublist(1,end)</code></li>
+     * </ul>
+     * <p>
+     * <strong>Note:</strong> This condition can be understood in terms of the Java
+     * {@link java.util.List#equals equals} method instead of the Java identity
+     * comparator {@code ==}.
+     *
+     * @since 2.3
+     *
+     * @todo Not yet implemented.
+     */
+    public GenericName tail() {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    /**
+     * Returns a name which contains every element of the
+     * {@linkplain #getParsedNames parsed names list} except for the last element.
+     *
+     * @see java.io.File#getPath
+     *
+     * @since 2.3
+     *
+     * @todo Not yet implemented.
+     */
+    public GenericName path() {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    /**
+     * Returns the last element in the sequence of {@linkplain #getParsedNames parsed names}.
+     *
+     * @see java.io.File#getName
+     *
+     * @since 2.3
+     *
+     * @todo Not yet implemented.
+     */
+    public LocalName name() {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    /**
+     * Returns the scope (name space) in which this name is local. The scope is set on creation
+     * and is not modifiable. The scope of a name determines where a name "starts". For instance,
+     * if a name has a {@linkplain #depth depth} of two ({@code "util.GenericName"}) and is
+     * associated with a {@linkplain NameSpace name space} having the name {@code "org.opengis"},
+     * then the fully qualified name would be {@code "org.opengis.util.GenericName"}.
+     *
+     * @since 2.3
+     *
+     * @todo Not yet implemented.
+     */
+    public NameSpace scope() {
+        return null;
+        // throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    /**
      * Returns the scope of this name.
+     *
+     * @deprecated Replaced by {@link #scope()}.
      */
     public GenericName getScope() {
         return scope;
+    }
+
+    /**
+     * Returns the depth of this name within the namespace hierarchy.  This indicates the number
+     * of levels specified by this name.  For any {@link LocalName}, it is always one.  For a
+     * {@link ScopedName} it is some number greater than or equal to 2.
+     * <p>
+     * The depth is the length of the list returned by the {@link #getParsedNames} method.
+     * As such it is a derived parameter.
+     *
+     * @since 2.3
+     *
+     * @todo Not yet implemented.
+     */
+    public int depth() {
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     /**
@@ -131,6 +231,8 @@ public class ScopedName extends org.geotools.util.GenericName
     /**
      * Returns a view of this object as a scoped name. Since this object is already
      * a scoped name, this method always returns {@code this}.
+     *
+     * @deprecated Replaced by {@link #toFullyQualifiedName}.
      */
     public org.opengis.util.ScopedName asScopedName() {
         return this;
@@ -142,6 +244,8 @@ public class ScopedName extends org.geotools.util.GenericName
      * by this method will still have the same {@linkplain LocalName#getScope scope}
      * than this scoped name. Note however that the string returned by
      * {@link LocalName#toString} will differs.
+     *
+     * @deprecated Replaced by {@link #name}.
      */
     public LocalName asLocalName() {
         return name;
@@ -160,6 +264,42 @@ public class ScopedName extends org.geotools.util.GenericName
             parsedNames = Arrays.asList(names);
         }
         return parsedNames;
+    }
+
+    /**
+     * Returns a view of this name as a fully-qualified name. The {@linkplain #scope scope}
+     * of a fully qualified name must be {@linkplain NameSpace#isGlobal global}. This method
+     * never returns {@code null}.
+     *
+     * @since 2.3
+     *
+     * @todo Not yet implemented.
+     */
+    public GenericName toFullyQualifiedName() {
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
+
+    /**
+     * Returns this name expanded with the specified scope. One may represent this operation
+     * as a concatenation of the specified {@code name} with {@code this}. In pseudo-code,
+     * the following relationships must hold:
+     * <p>
+     * <ul>
+     *   <li><code>push(<var>name</var>).getParsedList() ==
+     *       <var>name</var>.getParsedList().addAll({@linkplain #getParsedNames()})</code></li>
+     *   <li><code>push(<var>name</var>).scope() == <var>name</var>.{@linkplain #scope()}</code></li>
+     *   <li><code>push({@linkplain ScopedName#head head()}).{@linkplain ScopedName#tail tail()} == this</code></li>
+     * </ul>
+     * <p>
+     * <strong>Note:</strong> Those conditions can be understood in terms of the Java
+     * {@link Object#equals equals} method instead of the Java identity comparator {@code ==}.
+     *
+     * @since 2.3
+     *
+     * @todo Not yet implemented.
+     */
+    public org.opengis.util.ScopedName push(GenericName scope) {
+        throw new UnsupportedOperationException("Not yet implemented.");
     }
 
     /**
@@ -184,44 +324,4 @@ public class ScopedName extends org.geotools.util.GenericName
     public int hashCode() {
         return (int)serialVersionUID ^ name.hashCode() ^ scope.hashCode();
     }
-
-        public LocalName head() {
-                // TODO Auto-generated method stub
-                return null;
-        }
-
-        public GenericName tail() {
-                // TODO Auto-generated method stub
-                return null;
-        }
-
-        public GenericName path() {
-                // TODO Auto-generated method stub
-                return null;
-        }
-
-        public LocalName name() {
-                // TODO Auto-generated method stub
-                return null;
-        }
-
-        public NameSpace scope() {
-                // TODO Auto-generated method stub
-                return null;
-        }
-
-        public int depth() {
-                // TODO Auto-generated method stub
-                return 0;
-        }
-
-        public GenericName toFullyQualifiedName() {
-                // TODO Auto-generated method stub
-                return null;
-        }
-
-        public org.opengis.util.ScopedName push(GenericName scope) {
-                // TODO Auto-generated method stub
-                return null;
-        }
 }
