@@ -95,8 +95,25 @@ public class XSQNameBinding implements SimpleBinding  {
 	public Object parse(InstanceComponent instance, Object value) 
 		throws Exception {
 		DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
+		QName qName = DatatypeConverter.parseQName((String) value, namespaceContext );
+		if ( qName != null ) {
+			return qName;
+		}
 		
-		return DatatypeConverter.parseQName((String) value, namespaceContext );
+		if ( value == null ) {
+			return new QName( null );
+		}
+		
+		String s = (String) value;
+		int i = s.indexOf( ':' );
+		if ( i != -1 ) {
+			String prefix = s.substring( 0, i );
+			String local = s.substring( i+1 );
+			
+			return new QName( null, local, prefix );
+		}
+		
+		return new QName( null, s );
 	}
 
 	/**
