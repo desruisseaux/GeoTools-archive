@@ -37,6 +37,8 @@ import org.opengis.filter.FilterVisitor;
  *
  * @task REVISIT: I think AbstractFilter right now does not consider between a
  *       math filter. ch
+ *       
+ * @deprecated use {@link org.geotools.filter.IsBetweenImpl}
  */
 public class BetweenFilterImpl extends CompareFilterImpl
     implements BetweenFilter {
