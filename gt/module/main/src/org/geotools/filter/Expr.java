@@ -228,7 +228,7 @@ public abstract class Expr implements FilterFactory {
 		
 		BBoxExpression bbox = null;
 		try {
-			bbox = createBBoxExpression(new Envelope(minx,miny,maxx,maxy));
+			bbox = createBBoxExpression(new Envelope(minx,maxx,miny,maxy));
 		} 
 		catch (IllegalFilterException ife) {
 			new IllegalArgumentException().initCause(ife);
