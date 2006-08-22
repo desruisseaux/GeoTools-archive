@@ -16,30 +16,40 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Expression;
 
-public class IsNullImpl extends FilterAbstract implements
-		PropertyIsNull {
-
-	private org.opengis.filter.expression.Expression expression;
+public class IsNullImpl extends CompareFilterImpl implements
+		NullFilter {
 
 	public IsNullImpl(FilterFactory factory, org.opengis.filter.expression.Expression expression) {
-		super(factory);
-		this.expression = expression;
+		super( factory , expression , null );
+		
+		filterType = FilterType.NULL;
 	}
-	
-	public Expression getExpression() {
-		return expression;
-	}
-	
-	public void setExpression(Expression expression) {
-		this.expression = expression;
-	}
-	
-	//@Override
+
 	public boolean evaluate(Feature feature) {
-		return expression == null ||
-	       expression.evaluate( feature ) == null;
-	}	
+		return getExpression().evaluate( feature ) == null;
+	}
+
+	public Object accept(FilterVisitor visitor, Object extraData) {
+		return visitor.visit( this, extraData );
+	}
+
+	public void nullCheckValue(org.geotools.filter.expression.Expression nullCheck) throws IllegalFilterException {
+		setExpression( nullCheck );
+	}
+
+	public org.geotools.filter.expression.Expression getNullCheckValue() {
+		return (org.geotools.filter.expression.Expression) getExpression();
+	}
+
+	public Expression getExpression() {
+		return getExpression1();
+	}
+
+	public void setExpression(Expression expression) {
+		setExpression( expression );
+	}
 }

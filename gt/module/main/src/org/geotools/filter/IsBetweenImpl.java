@@ -16,25 +16,25 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.expression.Expression;
 
 /**
  * Straight implementation of GeoAPI interface.
  * 
- * @author jdeolive
+ * @author Justin Deoliveira, The Open Planning Project
  */
-public class IsBetweenImpl extends FilterAbstract implements PropertyIsBetween {
+public class IsBetweenImpl extends CompareFilterImpl implements BetweenFilter {
 
-	private Expression upperBoundary;
-	private Expression lowerBoundary;
 	private Expression expression;
 
 	protected IsBetweenImpl(FilterFactory factory, Expression lower, Expression expression, Expression upper ){
-		super( factory );
+		super( factory, lower, upper );
 		this.expression = expression;
-		this.lowerBoundary = lower;
-		this.upperBoundary = upper;
+		
+		//backwards compatability
+		filterType = FilterType.BETWEEN;
 	}
 	
 	public Expression getExpression() {
@@ -43,28 +43,49 @@ public class IsBetweenImpl extends FilterAbstract implements PropertyIsBetween {
 	public void setExpression(Expression expression) {
 		this.expression = expression;
 	}
-	public Expression getLowerBoundary() {
-		return lowerBoundary;
-	}
-	public void setLowerBoundary(Expression lowerBounds) {
-		this.lowerBoundary = lowerBounds;
-	}
-	public Expression getUpperBoundary() {
-		return upperBoundary;
-	}
-	public void setUpperBoundary(Expression upperBounds) {
-		this.upperBoundary = upperBounds;
-	}
 	
 	//@Override
 	public boolean evaluate(Feature feature) {
-		Comparable lower = comparable( lowerBoundary, feature );
+		Comparable lower = comparable( getExpression1(), feature );
 		Comparable value = comparable( expression, feature );
-		Comparable upper = comparable( upperBoundary, feature );
+		Comparable upper = comparable( getExpression2(), feature );
 
 		return lower.compareTo( value ) == -1 &&
 		       upper.compareTo( upper ) == 1;
 	}
+
+	public Object accept(FilterVisitor visitor, Object extraData) {
+		return visitor.visit( this, extraData );
+	}
+
+	public Expression getLowerBoundary() {
+		return getExpression1();
+	}
+
+	public void setLowerBoundary(Expression lowerBoundary) {
+		setExpression1( lowerBoundary );
+	}
+
+	public Expression getUpperBoundary() {
+		return getExpression2();
+	}
+
+	public void setUpperBoundary(Expression upperBoundary) {
+		setExpression2( upperBoundary );
+	}
 	
+	/**
+	 * @deprecated use {@link #getExpression()}
+	 */
+	public final org.geotools.filter.expression.Expression getMiddleValue() {
+		return (org.geotools.filter.expression.Expression) getExpression();
+	}
+	
+	/**
+	 * @deprecated use {@link #setExpression(Expression) }
+	 */
+	public void addMiddleValue(org.geotools.filter.expression.Expression middleValue) {
+		setExpression( middleValue );
+	}
 	
 }
