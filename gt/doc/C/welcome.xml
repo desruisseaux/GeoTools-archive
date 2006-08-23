@@ -22,12 +22,21 @@
   and JTS libraries. 
 </para>
 
+<warning>
+  <title>WORK IN PROGRESS!</title>
+  <para>
+    The Users' Manual is incomplete. Hopefully a first version will be
+    released with version 2.3 of the Geotools library.
+  </para>
+</warning>
+
 <para>
   &lib; can be used to build applications of many different types including 
   network server applications and desktop clients. The library consists of 
   various modules which can be combined according to programmer needs. An 
   example client application is included as the &lib; demo shown in <xref
     linkend="fig-geotools-demo" /> .
+    <!-- SYNC WITH QUICKSTART-RUNTHEDEMO -->
     <figure id="fig-geotools-demo">
       <title>The Geotools Demo showing an unprojected map of the world.</title>
       <screenshot>
@@ -65,19 +74,26 @@
     raised in the Internet Relay Chat (IRC) room.
   </para>
 
-<warning>
+<note>
+  <title>The Users' Manual vs the Developers' Guide</title>
   <para>
-    This manual is not a guide to developing and improving the library itself; 
-    for that see the 
-    <ulink url="http://www.geotools.org/Develop/" type="http">developers page
-    </ulink> of the web site and the Developers' Guide available from that web
-    page.
+    The Users' Manual is <emphasis>not</emphasis> a guide to developing and 
+    improving the &lib; library itself.
   </para>
-</warning>
+  <para> 
+    The Developers' Guide provides helpful information for those who want to
+    contribute to the library itself. For more information, see the 
+    <ulink url="http://www.geotools.org/Develop/" type="http">developers page
+    </ulink> of the web site.
+  </para>
+</note>
 
 <warning>
+  <title>Geotools is a library <emphasis>not</emphasis> an application.</title>
   <para>
-    Geotools is explicitly <emphasis>not</emphasis> an extensible application. Geotools provides almost no graphical user interface functionality. Several projects may yield more user interface elements, notably the 
+    Geotools provides almost no graphical user interface functionality. Several 
+    efforts may yield more user interface elements, notably the GO-1 module in the 
+    gt/ext/go directory and the 
     <ulink url="http://geowidgets.sourceforge.net/" type="http">
       GeoWidgets project
     </ulink> which will hopefully provide widgets based on the 
@@ -88,31 +104,33 @@
 
   <para>
     There are two notable projects which leverage Geotools to provide 
-    higher level functionality. 
-  </para>
-
-  <para>
-    The 
-    <ulink url="http://www.geoserver.org/" type="http">
-      Geoserver
-    </ulink> project is a network server to provide maps using the Web 
-    Mapping Standard (WMS) or to provide individual features using the 
-    Web Feature Standard (WFS) and its transactional extension, the Web 
-    Feature Standard for Transactions (WFS-T).  
-  </para>
-
-  <para>
-    The 
-    <ulink url="http://udig.refractions.net/" type="http">
-      User-friendly Desktop Internet GIS (uDig)
-    </ulink> project provides a powerful platform for the creation of 
-    user, desktop-based applications drawing on the  
-    <ulink url="http://www.eclipse.org/" type="http">
-      Eclipse
-    </ulink> project and its 
-    <ulink url="http://www.eclipse.org/rcp/" type="http">
-      Rich Client Plarform 
-    </ulink> sub-project.   
+    higher level functionality:
+    <itemizedlist>
+      <listitem>
+        <para>
+          <ulink url="http://www.geoserver.org/" type="http">
+            Geoserver
+          </ulink> is a network server to provide maps using the Web 
+          Mapping Standard (WMS) or to provide individual features using the 
+          Web Feature Standard (WFS) and its transactional extension, the Web 
+          Feature Standard for Transactions (WFS-T).  
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <ulink url="http://udig.refractions.net/" type="http">
+            User-friendly Desktop Internet GIS (uDig)
+          </ulink> is both a powerful desktop application and a platform for 
+          the creation of other applications. The platform draws on the  
+          <ulink url="http://www.eclipse.org/" type="http">
+            Eclipse
+          </ulink> project and its 
+          <ulink url="http://www.eclipse.org/rcp/" type="http">
+            Rich Client Plarform 
+          </ulink> sub-project.   
+        </para>
+      </listitem>
+    </itemizedlist>
   </para>
 
   <para>

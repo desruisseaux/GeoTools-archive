@@ -1,10 +1,39 @@
 <!-- Top Level, a description with the chapter TOC -->
 <para>
-
+  This chapter explains the geometric objects which are used in &lib;.
 </para>
 
-<sect1 id="sect-geomJTS-top">
-  <title></title>
+<warning>
+  <para>
+    &lib; uses the Java Topology Suite (JTS) library for all of its geometric
+    representation. Note also, that all access is done directly into JTS classes
+    rather than working through an abstract layer of interfaces. The &lib; 
+    project intends eventually to switch to use an internal geometric 
+    representation and to develop and use a standard set of GeoAPI interfaces.
+  </para>
+</warning>
+
+<sect1 id="sect-geomJTS-intro">
+  <title>Geometries in Geotools</title>
+
+  <para>
+     The core geometric model of &lib; uses lightweight objects.
+  </para>
+
+  <sect2 id="sect-geomJTS-intro-core">
+    <title>The core components of Geotools Geometries</title>
+
+    <para>
+      TODO: Make a table... Core classes;API;Modules;Packages;Create
+    </para>
+
+  </sect2>
+
+</sect1>
+
+
+<sect1 id="sect-geomJTS-JTS">
+  <title>The Java Topology Suite (JTS)</title>
 
   <para>
      
@@ -20,3 +49,177 @@
 -->
 </sect1>
 
+
+
+<sect1 id="sect-geomJTS-runThrough">
+  <title>A quick run through</title>
+
+  <para>
+     
+  </para>
+<!--
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+-->
+</sect1>
+
+
+
+<sect1 id="sect-geomJTS-resources">
+  <title>Resources</title>
+
+  <para>
+     Geometries and their analysis in computation systems present particular 
+     issues and challenges. The scientific field of Computational Geometry 
+     has emerged to tackle many of these isssues. Some of the most important
+     issues are presented elsewhere in this manual: see section 
+     <xref linkend="sect-geoSci-compGeom"/>.
+  </para>
+
+  <sect2 id="sect-geomJTS-resources-doc">
+    <title>Documentation</title>
+
+    <para>
+      JTS has its own suite of documentation, scattered in several places. The 
+      <ulink url="http://www.vividsolutions.com/jts/jtshome.htm" type="http">
+      older web site</ulink> has documentation, see especially the 'Discussion' 
+      section. The 
+      <ulink url="http://www.jump-project.org/]" type="http">
+      current web site</ulink> where the current coordination occurs includes a
+      <ulink url="http://lists.jump-project.org/pipermail/jts-devel/" type="http">
+      mailing list</ulink>. JTS releases are hosted on the
+      <ulink url="http://sourceforge.net/projects/jts-topo-suite/" type="http">
+      sourceforge site</ulink>.
+    </para>
+
+    <para>
+      The JTS Javadocs also contain useful information, although, through 
+      version 1.7.1, these are fairly thin except for:
+      <itemizedlist>
+        <listitem>
+          <para>
+            Package com.vividsolutions.jts.algorithm#Description (scroll down)
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Package com.vividsolutions.jts.overlay#Description
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Package com.vividsolutions.jts.relate#Description
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Class com.vividsolutions.jts.Geometry
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      JTS also has useful documentation in the zip distribution itself, in the 
+      'doc/' directory. This includes: 
+      <itemizedlist>
+        <listitem>
+          <para>
+            The JTS Developer Guide
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            The JTS Technical Specification
+          </para>
+        </listitem>
+      </itemizedlist>
+      which are valuable resources to understand the issue of computational 
+      precision in the JTS library.
+    </para>
+
+  </sect2>
+
+</sect1>
+
+
+<!--
+<sect1 id="sect-geomJTS-">
+  <title></title>
+
+  <para>
+     
+  </para>
+
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+</sect1>
+
+
+
+<sect1 id="sect-geomJTS-">
+  <title></title>
+
+  <para>
+     
+  </para>
+
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+</sect1>
+
+
+
+<sect1 id="sect-geomJTS-">
+  <title></title>
+
+  <para>
+     
+  </para>
+
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+</sect1>
+
+
+
+<sect1 id="sect-geomJTS-">
+  <title></title>
+
+  <para>
+     
+  </para>
+
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+</sect1>
+-->

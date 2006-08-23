@@ -23,7 +23,7 @@
 
   <!ENTITY lib "Geotools">
   <!ENTITY libversion "2.3">
-  <!ENTITY manrevision "2.3">
+  <!ENTITY manversion "0.1">
   <!ENTITY date "August 2006">
   <!ENTITY javaVersion "1.4">
 
@@ -63,7 +63,7 @@
 <!-- for translations, change lang to an appropriate code         -->
 <book id="index" lang="en">
 
-  <title>The Geotools Users' Manual, version &libversion;</title>
+  <title>Geotools Users' Manual, v. &manversion;</title>
 
 
   <bookinfo>
@@ -155,7 +155,7 @@
 
     <revhistory>
       <revision> 
-	<revnumber>The Geotools Users' Manual: Version &manrevision;</revnumber> 
+	<revnumber>The Geotools Users' Manual: Version &manversion;</revnumber> 
 	<date>&date;</date> 
 	<revdescription> 
 	  <para role="author">The Geotools Project</para>
