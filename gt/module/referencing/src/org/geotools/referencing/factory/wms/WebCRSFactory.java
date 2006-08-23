@@ -63,25 +63,31 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
 
     /**
      * Constructs a default factory for the {@code CRS} authority.
-     *
-     * @throws FactoryException if this constructor failed to register the default set of CRS
-     *         using the default factories.
      */
-    public WebCRSFactory() throws FactoryException {
+    public WebCRSFactory() {
         this(null);
     }
 
     /**
      * Constructs a factory for the {@code CRS} authority using the specified hints.
-     *
-     * @throws FactoryException if this constructor failed to register the default set of CRS
-     *         using the factories provided in the specified hints.
      */
-    public WebCRSFactory(final Hints hints) throws FactoryException {
+    public WebCRSFactory(final Hints hints) {
         super(hints, NORMAL_PRIORITY);
-        add(84, "WGS84", DefaultEllipsoid.WGS84      );
-        add(83, "NAD83", DefaultEllipsoid.GRS80      );
-        add(27, "NAD27", DefaultEllipsoid.CLARKE_1866);
+    }
+
+    /**
+     * Ensures that {@link #crsMap} is initialized. This method can't be invoked in the constructor
+     * because the constructor is invoked while {@code FactoryFinder.scanForPlugins()} is still
+     * running. Because the {@link #add} method uses factories for creating CRS objects, invoking
+     * this method during {@code FactoryFinder.scanForPlugins()} execution may result in unexpected
+     * behavior, like GEOT-935.
+     */
+    private synchronized void ensureInitialized() throws FactoryException {
+        if (crsMap.isEmpty()) {
+            add(84, "WGS84", DefaultEllipsoid.WGS84      );
+            add(83, "NAD83", DefaultEllipsoid.GRS80      );
+            add(27, "NAD27", DefaultEllipsoid.CLARKE_1866);
+        }
     }
 
     /**
@@ -98,6 +104,7 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
                      final Ellipsoid ellipsoid)
             throws FactoryException
     {
+        assert Thread.holdsLock(this);
         final Map      properties = new HashMap();
         final Citation authority  = getAuthority();
         final String   text       = String.valueOf(code);
@@ -133,6 +140,7 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
      * all authorities factory}.
      */
     public Set getAuthorityCodes(final Class type) throws FactoryException {
+        ensureInitialized();
         final Set set = new LinkedHashSet();
         for (final Iterator it=crsMap.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
@@ -176,6 +184,7 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
             e.initCause(exception);
             throw e;
         }
+        ensureInitialized();
         final CoordinateReferenceSystem crs = (CoordinateReferenceSystem) crsMap.get(new Integer(i));
         if (crs != null) {
             return crs;

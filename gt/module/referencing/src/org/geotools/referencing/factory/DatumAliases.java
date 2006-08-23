@@ -13,7 +13,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.geotools.referencing.factory;
 
 // J2SE dependencies
@@ -80,23 +79,22 @@ import org.geotools.resources.XArray;
  * example "<cite>Nouvelle Triangulation Française (Paris)</cite>" and
  * "<cite>NTF (Paris meridian)</cite>" are actually the same datum. This {@code DatumAliases}
  * class provides a way to handle that.
- * <br><br>
+ * <p>
  * {@code DatumAliases} is a class that determines if a datum name is in our list of aliases and
  * constructs a value for the {@linkplain IdentifiedObject#ALIAS_KEY aliases property} (as
  * {@linkplain GenericName generic names}) for a name. The default implementation is backed by
  * the text file "{@code DatumAliasesTable.txt}". The first line in this text file must be the
  * authority names. All other lines are the aliases.
- * <br><br>
+ * <p>
  * Since {@code DatumAliases} is a datum factory, any {@linkplain AuthorityFactory authority
  * factory} or any {@linkplain org.geotools.referencing.wkt.Parser WKT parser} using this
  * factory will takes advantage of the aliases table.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Rueben Schulz
  * @author Martin Desruisseaux
- *
- * @since 2.1
  *
  * @todo Invokes {@link #freeUnused} automatically after some amount of time, in order to release
  *       memory for unusued aliases. A timer should be set in {@code reload()} method.
@@ -189,6 +187,14 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
     /**
      * Returns the backing datum factory. If no factory were explicitly specified
      * by the user, selects the first datum factory other than {@code this}.
+     * <p>
+     * <strong>Note:</strong> We can't invoke this method in the constructor, because the
+     * constructor is typically invoked during {@code FactoryFinder.scanForPlugins()} execution.
+     * {@code scanForPlugins} is looking for {@link DatumFactory} instances, it has not finished
+     * to search them, and invoking this method in the constructor would prematurely ask an other
+     * {@link DatumFactory} instance while the list is incomplete. Instead, we will invoke this
+     * method when the first {@code createXXX} method is invoked, which typically occurs after
+     * all factories have been initialized.
      *
      * @return The backing datum factory.
      * @throws NoSuchElementException if there is no such factory.
@@ -197,7 +203,7 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
         assert Thread.holdsLock(this);
         if (factory == null) {
             DatumFactory candidate;
-            final Iterator it=FactoryFinder.getDatumFactories().iterator();
+            final Iterator it = FactoryFinder.getDatumFactories(null).iterator();
             do candidate = (DatumFactory) it.next();
             while (candidate == this);
             factory = candidate;
