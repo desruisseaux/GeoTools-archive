@@ -1,6 +1,8 @@
 <!-- Top Level, a description with the chapter TOC -->
 <para>
-  This chapter explains the geometric objects which are used in &lib;.
+  This chapter explains the geometric model used in &lib;. The geometric model 
+  provides the structure through which the Geotools library defines the spatial 
+  properties of its Features.
 </para>
 
 <warning>
@@ -13,11 +15,44 @@
   </para>
 </warning>
 
+<note>
+  <para>
+    Most development using &lib; library can be done at a higher level than 
+    opertating directly on the geometric model itself. The information in this 
+    section may be most relevant simply as background for the use of operations 
+    at a higher level.
+  </para>
+</note>
+
+
+
 <sect1 id="sect-geomJTS-intro">
   <title>Geometries in Geotools</title>
 
   <para>
      The core geometric model of &lib; uses lightweight objects.
+    <figure id="fig-geotools-geomModel">
+      <title>The Geotools Geometric Model.</title>
+      <screenshot>
+        <mediaobject>
+        <imageobject>
+          <imagedata fileref="figures/geotools-geomModel.png" 
+                     format="PNG" />
+        </imageobject>
+        <textobject>
+          <phrase>
+            An image of the geometric model containing only JTS.
+          </phrase>
+        </textobject>
+	<caption>
+	  <para>
+	    &lib; does not use its own geometric model but instead relies on 
+            the JTS library.
+	  </para>
+	</caption>
+        </mediaobject>
+      </screenshot>
+    </figure>
   </para>
 
   <sect2 id="sect-geomJTS-intro-core">
@@ -27,27 +62,63 @@
       TODO: Make a table... Core classes;API;Modules;Packages;Create
     </para>
 
-  </sect2>
-
-</sect1>
-
-
-<sect1 id="sect-geomJTS-JTS">
-  <title>The Java Topology Suite (JTS)</title>
-
-  <para>
-     
-  </para>
-<!--
-  <sect2 id="">
-    <title></title>
-
     <para>
+    <figure id="fig-geotools-geomExample">
+      <title>An example geometry.</title>
+      <screenshot>
+        <mediaobject>
+        <imageobject>
+          <imagedata fileref="figures/JTS_Architecture.png" 
+                     format="PNG" />
+        </imageobject>
+        <textobject>
+          <phrase>
+            An image of a JTS geometry.
+          </phrase>
+        </textobject>
+	<caption>
+	  <para>
+	    A JTS Geometry with its 2D projection and its envelope.
+	  </para>
+	</caption>
+        </mediaobject>
+      </screenshot>
+    </figure>
     </para>
 
   </sect2>
--->
+
+  <sect2 id="sect-geomJTS-JTS">
+    <title>The Java Topology Suite (JTS)</title>
+    
+    <para>
+     The JTS library was developed by Vivid Solutions with the intent to create a spatial model sufficiently rich to fully describe 'Simple Features' according to the Simple Features Specification for SQL (SFS) of the  Open Geospatial Consortium (OpenGIS or OGC). Since Geotools shared the same intent and because of the quality and progress of the JTS library when the Geotools project began, the Geotools project decided to rely entirely on the JTS project.
+    </para>
+    
+    <para>
+      The 'Simple Features' spatial model supported by the JTS project is fundamentally a two dimensional spatial model in a Euclidean space with orthogonal axes. While, as documented below, the JTS library provides the space for three numeric values in its fundamental coordinate data structure and the library allows the inclusion of a Spatial Reference Identification (SRID) number in an optional user data object in the fundamental geometric data strcutures, both the third ('z') coordinate and the SRID are ignored in all JTS operations. TODO: Verify again that this is correct.
+    </para>
+
+    <para>
+      TODO: Discuss here precision, replaceable coordinates, the complexity 
+      in the details...
+    </para>
+
+  </sect2>
+  
+    <sect2 id="sect-geomJTS-future">
+    <title>Future work</title>
+    
+    <para>
+      The Geotools project eventually intents to migrate to a more complex spatial model described by the International Organization for Standardization (ISO) 19107 Standard "Spatial Schema" which will be essentially identical to the new OpenGIS Abstract Specification, Topic 1: "Feature Geometry". This new standard introduces more complex geometry, more advanced spatial operators and will involve a tremendous amount of work.
+    </para>
+
+  </sect2>
+
 </sect1>
+
+
+
 
 
 
@@ -148,14 +219,86 @@
 </sect1>
 
 
+
+<sect1 id="sect-geomJTS-practical">
+  <title>Practical Code Information</title>
+
+  <para>
+     
+  </para>
+
+  <sect2 id="sect-geomJTS-practical-utilClass">
+    <title>Utility Classes</title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+  <sect2 id="sect-geomJTS-practical-factory">
+    <title>Factory System</title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+
+  <sect2 id="sect-geomJTS-practical-precision">
+    <title>Precision Model</title>
+
+    <para>
+    </para>
+
+  </sect2>
+
+
+</sect1>
+
+
+
+<sect1 id="sect-geomJTS-Coordinate">
+  <title>Coordinates</title>
+
+  <para>
+    JTS Coordinate objects are lightweight entities with fields 
+    (.x, .y, and .z), each holding a 'double' value.
+    <figure id="fig-geotools-geomJTS-coord">
+      <title>JTS Coordinates.</title>
+      <screenshot>
+        <mediaobject>
+        <imageobject>
+          <imagedata fileref="figures/JTS_Coordinate.png" 
+                     format="PNG" />
+        </imageobject>
+        <textobject>
+          <phrase>
+            An image of the JTS Coordinate class.
+          </phrase>
+        </textobject>
+	<caption>
+	  <para>
+	    Key aspects of the JTS Coordinate class.
+	  </para>
+	</caption>
+        </mediaobject>
+      </screenshot>
+    </figure>
+  </para>
+
+  <warning>
+    <title>JTS Operations are 2D only</title>
+    <para>
+      While JTS allows the inclusion of a thrid 'z' coordinate, <emphasis>this coordinate is never used in JTS operations</emphasis>! JTS performs all of its operations in the projected x-y plane. 
+    </para>
+  </warning>
+
+  <para>
+    Instances of these Coordinate values provide the spatial information for the JTS Geometry objects. Construction of Coordinate objects involves simple calls to the class constructor methods.
+  </para>
+
+
 <!--
-<sect1 id="sect-geomJTS-">
-  <title></title>
-
-  <para>
-     
-  </para>
-
   <sect2 id="">
     <title></title>
 
@@ -163,63 +306,134 @@
     </para>
 
   </sect2>
-
-</sect1>
-
-
-
-<sect1 id="sect-geomJTS-">
-  <title></title>
-
-  <para>
-     
-  </para>
-
-  <sect2 id="">
-    <title></title>
-
-    <para>
-    </para>
-
-  </sect2>
-
-</sect1>
-
-
-
-<sect1 id="sect-geomJTS-">
-  <title></title>
-
-  <para>
-     
-  </para>
-
-  <sect2 id="">
-    <title></title>
-
-    <para>
-    </para>
-
-  </sect2>
-
-</sect1>
-
-
-
-<sect1 id="sect-geomJTS-">
-  <title></title>
-
-  <para>
-     
-  </para>
-
-  <sect2 id="">
-    <title></title>
-
-    <para>
-    </para>
-
-  </sect2>
-
-</sect1>
 -->
+</sect1>
+
+
+
+<sect1 id="sect-geomJTS-Envelope">
+  <title>Envelopes</title>
+
+  <para>
+     JTS Envelope objects are axis parallel, rectangular regions of the x-y plane. Instances of this class are used expecially to define the outer extent of each JTS Geometry and every Geotools Feature using the concept of a 'bounding-box' which is an axis-parallel, rectilinear region.
+    <figure id="fig-geotools-geomJTS-envelope">
+      <title>JTS Envelope.</title>
+      <screenshot>
+        <mediaobject>
+        <imageobject>
+          <imagedata fileref="figures/JTS_Envelope.png" 
+                     format="PNG" />
+        </imageobject>
+        <textobject>
+          <phrase>
+            An image of the JTS Envelope class.
+          </phrase>
+        </textobject>
+	<caption>
+	  <para>
+	    Key aspects of the JTS Envelope class.
+	  </para>
+	</caption>
+        </mediaobject>
+      </screenshot>
+    </figure>
+  </para>
+
+  <para>
+     Construction of Envelope objects involves simple calls to the class constructor methods.
+  </para>
+
+
+<!--
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+-->
+</sect1>
+
+
+
+<sect1 id="sect-geomJTS-geometry">
+  <title>Geometries</title>
+
+  <para>
+    JTS Geometry objects define the fundamental spatial elements in the Geotools Geometric Model. JTS Geometry objects include Point, LineString, with a LinearRing which has a common end-point coordinate, Polygon, and Collection sub-classes, the latter further sub-classed into MultiPoint, MultiLineString, and MultiPolygon.
+    <figure id="fig-geotools-geomJTS-geom">
+      <title>JTS Envelope.</title>
+      <screenshot>
+        <mediaobject>
+        <imageobject>
+          <imagedata fileref="figures/JTS_Geometry.png" 
+                     format="PNG" />
+        </imageobject>
+        <textobject>
+          <phrase>
+            An image of the JTS Geometry class.
+          </phrase>
+        </textobject>
+	<caption>
+	  <para>
+	    Key aspects of the JTS Geometry class.
+	  </para>
+	</caption>
+        </mediaobject>
+      </screenshot>
+    </figure>
+  </para>
+
+  <para>
+    Conceptually, Geometry objects have, as internal fields, Coordinate objects to define the spatial nature of the Geometry, a type element describing the nature of the Geometry, an Envelope object defining the extent of the Geometry, and an optional User Data object element in which any object can be stored for programmatic convenience. Geometry objects include convenience methods such as the toText() method which converts any Geometry instance into an equivalent representation in Well Known Text (WKT) a formally defined representation of the spatial definintion of the Geometry object using a Java String. Geometry objects also include a number of spatial operator methods such as two returing Java double values, distance() and area(), and two returning new Geometry objects, convexHull() and buffer(). Construction of Geometry objects is done through the creation of a GeometryFactory object as explained in the first tutorial.
+  </para>
+<!--
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+-->
+</sect1>
+
+
+<sect1 id="sect-geomJTS-tutorials">
+  <title>Tutorials</title>
+
+  <para>
+    The "gt/demo/geomJTS/" directory has a number of tutorials which might be 
+    useful to understand the JTS library and the &lib; geometry model.
+  </para>
+<!--
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+-->
+</sect1>
+
+
+
+<sect1 id="sect-geomJTS-readCode">
+  <title>Reading more Code</title>
+
+  <para>
+    JTS geometries are used throughout the &lib; code base. Some especially 
+    interesting areas to read are: TODO
+  </para>
+<!--
+  <sect2 id="">
+    <title></title>
+
+    <para>
+    </para>
+
+  </sect2>
+-->
+</sect1>
