@@ -43,6 +43,7 @@
   <!ENTITY geomJTS              SYSTEM "geomJTS.xml">
   <!ENTITY georeferencing       SYSTEM "geo-referencing.xml">
   <!ENTITY feature              SYSTEM "feature.xml">
+  <!ENTITY gridCov              SYSTEM "grid-coverage.xml">
   <!ENTITY queryI               SYSTEM "query-I.xml">
   <!ENTITY dataAccess           SYSTEM "data-access.xml">
   <!ENTITY queryII              SYSTEM "query-II.xml">
@@ -208,42 +209,47 @@
   </chapter>
 
   <chapter id="chapter-geomJTS">
-    <title>The Geometry Model</title>
+    <title>Geometries</title>
     &geomJTS;
   </chapter>
 
   <chapter id="chapter-geoReferencing">
-    <title>The Geo-Referencing Model</title>
+    <title>Geo-Referencing</title>
     &georeferencing;
   </chapter>
 
   <chapter id="chapter-feature">
-    <title>The Feature Model</title>
+    <title>Features</title>
     &feature;
   </chapter>
 
+  <chapter id="chapter-gridCov">
+    <title>Grid Coverages</title>
+    &gridCov;
+  </chapter>
+
   <chapter id="chapter-query-I">
-    <title>The Query System (Part I)</title>
+    <title>Queries I: Features</title>
     &queryI;
   </chapter>
 
   <chapter id="chapter-dataAccess">
-    <title>The Data Access and Storage Model</title>
+    <title>Data Storage</title>
     &dataAccess;
   </chapter>
 
   <chapter id="chapter-query-II">
-    <title>The Query System (Part II)</title>
+    <title>Queries II: Storage</title>
     &queryII;
   </chapter>
 
   <chapter id="chapter-display">
-    <title>The Display and Rendering System</title>
+    <title>Display</title>
     &display;
   </chapter>
 
   <chapter id="chapter-advanced-graph">
-    <title>Network Graphs for Advanced Analysis</title>
+    <title>Advanced: Network Graphs</title>
     &advancedGraph;
   </chapter>
 

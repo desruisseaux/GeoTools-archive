@@ -48,8 +48,8 @@
 	  <para>
 	    The &lib; demonstration application uses swing components, such 
             as a label, buttons, and a text area, but also uses the JMapPane
-            component to display geospatial data and provide simple tools to
-            manipulate those data.
+            component to display geospatial data and provide a simple toolbar 
+            with tools to manipulate those data.
 	  </para>
 	</caption>
         </mediaobject>

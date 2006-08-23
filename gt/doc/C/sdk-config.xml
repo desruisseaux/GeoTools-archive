@@ -10,7 +10,7 @@
     </para>
 
 <sect1 id="sect-sdkConfig-source">
-    <title>The Geotools SDK</title>
+    <title>Geotools SDK</title>
 
     <para>
       The full &lib; distribution consists of three components: a binary 
@@ -54,7 +54,7 @@
 </sect1>
 
 <sect1 id="sect-sdkConfig-eclipse">
-    <title>Eclipse IDE development</title>
+    <title>Eclipse IDE</title>
 
     <para>
       To be written...
@@ -65,7 +65,7 @@
 
 
 <sect1 id="sect-sdkConfig-netbeans">
-    <title>Netbeans IDE development</title>
+    <title>Netbeans IDE</title>
 
     <para>
       To be written...

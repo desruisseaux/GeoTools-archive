@@ -433,20 +433,74 @@ The Main module itself is split into two components, the data model component an
 
 </sect1>
 
-<sect1 id="sect-conceptual-foundations-factorySystem">
-  <title>The Factory System</title>
+
+<sect1 id="sect-conceptual-foundations-gtapi">
+  <title>Geotools API</title>
 
   <para>
-    &lib; uses a factory system extensively to enable users to create
+     As the interfaces in Geotools mature, they are moved to a separate 
+     module and package which define the Geotools Application Programming 
+     Interface (API). As these mature, in turn, they are eventually proposed
+     for inclusion into GeoAPI.  
+  </para>
+
+  <warning>
+    <para>
+      Neither &lib; nor GeoAPI have matured sufficiently for the ideal
+      use pattern to be effective. Currently, the user need to mix methods
+      from the GeoAPI project, from the &lib; internal API, and from 
+      actual &lib; classes themselves.
+    </para>
+  </warning>
+
+<!--
+  <para>
+      
+  </para>
+
+  <sect2 id="sect-conceptual-foundations-gtapi-design">
+    <title>The Geotools API Design</title>
+
+    <para>
+    </para>
+
+  </sect2>
+-->
+</sect1>
+
+
+<sect1 id="sect-conceptual-foundations-factorySystems">
+  <title>Factory Systems</title>
+
+  <para>
+    &lib; uses the "factory" pattern extensively to enable users to create
     objects while developing most of their code against the standard 
     APIs.
   </para>
 
-  <sect2 id="sect-conceptual-foundations-factorySystem-referencing">
+  <sect2 id="sect-conceptual-foundations-factorySystems-JTS">
+    <title>The Geometry Factory System</title>
+
+    <para>
+      The JTS Geometry library has its own factory system.
+    </para>
+
+  </sect2>
+
+  <sect2 id="sect-conceptual-foundations-factorySystems-referencing">
     <title>The Geo-Referencing Factory System</title>
 
     <para>
-      The Geo-Referencing module has developed its own factory system.
+      The Geo-Referencing module has a separate factory system.
+    </para>
+
+  </sect2>
+
+  <sect2 id="sect-conceptual-foundations-factorySystems-feature">
+    <title>The Feature Factory System</title>
+
+    <para>
+      The Feature modules use the core Geotools factory system.
     </para>
 
   </sect2>
