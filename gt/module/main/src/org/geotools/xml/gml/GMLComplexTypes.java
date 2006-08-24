@@ -34,7 +34,6 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
@@ -2959,9 +2958,13 @@ public class GMLComplexTypes {
             ComplexType t = (element.getType() instanceof ComplexType)
                 ? (ComplexType) element.getType() : null;
 
-            while ((t != null) && (t != this))
-                t = (t.getParent() instanceof ComplexType)
-                    ? (ComplexType) t.getParent() : null;
+            while ((t != null) && (t != this)){
+                
+                if (t.getParent() instanceof ComplexType){
+                    t = (ComplexType) t.getParent();
+                }else
+                    t=null;
+            }
 
             return ((t != null) && (value instanceof Polygon));
         }
@@ -4662,8 +4665,10 @@ public class GMLComplexTypes {
         	id = attrs.getValue("", "ID");
         	if(id == null)
         		id = attrs.getValue(GMLSchema.NAMESPACE.toString(),"ID");
+            Object value2 = value[0].getValue();
+            Envelope envelopeInternal = ((Geometry)value2).getEnvelopeInternal();
             //bbox slot
-            GMLFeatureCollection fc = new GMLFeatureCollection(id,((Geometry)value[0].getValue()).getEnvelopeInternal());
+            GMLFeatureCollection fc = new GMLFeatureCollection(id,envelopeInternal);
 
 
             for (int i = 1; i < value.length; i++) // bbox is slot 0
@@ -5190,6 +5195,12 @@ public class GMLComplexTypes {
         // static choice
         private static final DefaultChoice seq = new DefaultChoice(elements);
 
+        private static final Geometry NULL_ENV;
+        static {
+            GeometryFactory fac=new GeometryFactory();
+            NULL_ENV=fac.toGeometry(new Envelope());
+        }
+
         /*
          * part of the singleton pattern
          *
@@ -5243,7 +5254,7 @@ public class GMLComplexTypes {
                 throw new SAXException("must be one geometry");
             }
 
-            return value[0].getValue() instanceof Geometry?(Geometry) value[0].getValue():null;
+            return value[0].getValue() instanceof Geometry?(Geometry) value[0].getValue():NULL_ENV;
         }
 
         /**
@@ -6533,7 +6544,7 @@ public class GMLComplexTypes {
         URI ftNS = element.getNamespace();
         logger.finest("Creating feature type for " + ftName + ":" + ftNS);
 
-        FeatureTypeFactory typeFactory = FeatureTypeFactory.newInstance(ftName);
+        FeatureTypeBuilder typeFactory = FeatureTypeBuilder.newInstance(ftName);
         typeFactory.setNamespace(ftNS);
         typeFactory.setName(ftName);
 

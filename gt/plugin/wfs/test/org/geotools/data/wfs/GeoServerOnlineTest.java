@@ -34,6 +34,7 @@ import junit.framework.TestCase;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
@@ -46,10 +47,12 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.NullFilter;
 import org.geotools.filter.expression.AttributeExpression;
@@ -231,12 +234,42 @@ public class GeoServerOnlineTest extends TestCase {
     }    
     
     /**
+     * Tests case where filter is makes use of 2 different attributes but Query object only requests 1 of the two 
+     * attributes.  This is a fix for a bug that has occurred.
+     */
+    public void testFeatureReaderWithQuery() throws Exception{
+        Map m = new HashMap();
+        m.put(WFSDataStoreFactory.URL.key,url);
+        m.put(WFSDataStoreFactory.TIMEOUT.key,new Integer(100000));
+        WFSDataStore wfs = (WFSDataStore)(new WFSDataStoreFactory()).createNewDataStore(m);
+        FilterFactory fac = FilterFactoryFinder.createFilterFactory();
+        CompareFilter filter=fac.createCompareFilter(FilterType.COMPARE_EQUALS);
+        filter.addLeftValue(fac.createAttributeExpression("NAME"));
+        filter.addRightValue(fac.createLiteralExpression("E 58th St"));
+        Query query=new DefaultQuery("tiger:tiger_roads", filter);
+        FeatureReader reader = wfs.getFeatureReader(query, new DefaultTransaction());
+        int expected=0;
+        while (reader.hasNext()){
+            expected++;
+            reader.next();
+        }
+        query=new DefaultQuery("tiger:tiger_roads", filter, 100, new String[]{"CFCC"}, "");
+        reader = wfs.getFeatureReader(query, new DefaultTransaction());
+        int count=0;
+        while (reader.hasNext()){
+            count++;
+            reader.next();
+        }
+        
+        assertEquals(expected, count);
+    }
+    
+    /**
      * Writing test that only engages against a remote geoserver.
      * <p>
-     * Makes referece to the standard featureTypes that geoserver ships with.
+     * Makes reference to the standard featureTypes that geoserver ships with.
      * </p>
      */
-    
     public void testWrite() throws NoSuchElementException, IllegalFilterException, IOException, IllegalAttributeException{
 
         Map m = new HashMap();

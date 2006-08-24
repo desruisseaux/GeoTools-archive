@@ -66,6 +66,8 @@ import org.xml.sax.SAXNotSupportedException;
  * @version $Id$
  */
 public class ComplexTypeHandler extends XSIElementHandler {
+    private static final long serialVersionUID = -2001189506633342497L;
+
     /** 'complexType' */
     public final static String LOCALNAME = "complexType";
 
@@ -1160,10 +1162,30 @@ public class ComplexTypeHandler extends XSIElementHandler {
             if ((parent != null) && parent.canEncode(element, value, hints)) {
                 parent.encode(element, value, output, hints);
             } else {
-                throw new OperationNotSupportedException(
-                    "This is a generic schema element -- cannot print yet");
-
-                // TODO Make generics print ... 
+                output.startElement(element.getNamespace(), element.getName(), null);
+                Type type=element.getType();
+                if( type instanceof SimpleType ){
+                    SimpleType simple=(SimpleType) type;
+                    simple.encode(element, value, output, hints);
+                }else if (type instanceof ComplexType) {
+                    ComplexType complex = (ComplexType) type;
+                    Element[] children = complex.getChildElements();
+                    boolean found=false;
+                    for (int i = 0; i < children.length; i++) {
+                        Element child = children[i];
+                        if( child.getType().canEncode(child, value, hints) ){
+                            child.getType().encode(child, value, output, hints);
+                            found=true;
+                        }
+                    }
+                    if( !found )
+                        throw new RuntimeException(
+                        "It is not known how to print this element");
+                }else{
+                    throw new OperationNotSupportedException(
+                        "It is not known how to print this element");
+                }
+                output.endElement(element.getNamespace(), element.getName());
             }
         }
     }

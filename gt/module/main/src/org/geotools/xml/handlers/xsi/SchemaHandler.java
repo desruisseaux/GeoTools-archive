@@ -101,9 +101,10 @@ public class SchemaHandler extends XSIElementHandler {
             if (prefixCache == null) {
                 prefixCache = new HashMap();
             }
-
-            prefixCache.put(uri1, pref);
-
+            
+            if( !pref.trim().equals("") || !prefixCache.containsKey(uri1) )
+                prefixCache.put(uri1, pref);
+                
             if (this.uri == null && (pref == null || "".equals(pref)))
                 try {
                     this.uri = new URI(uri1);

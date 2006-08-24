@@ -306,7 +306,8 @@ public class DocumentWriter {
         }
 
         if (e != null) {
-            e.getType().encode(e, value, wch, wch.hints);
+        	Type type = e.getType();
+            type.encode(e, value, wch, wch.hints);
         } else {
             throw new OperationNotSupportedException(
                 "Could not find an appropriate Element to use for encoding of a "

@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.logging.Level;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -50,8 +51,34 @@ public class GMLParserTest extends TestCase {
         assertNotNull(s);
     }
     
-    public void skippedtestOneFeature(){
-        try {
+    public void testParseEmptyCollectionFeatures() throws Exception {
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setNamespaceAware(true);
+            spf.setValidating(false);
+
+            SAXParser parser = spf.newSAXParser();
+
+            String path = "xml/fme/empty-collection/lakes.xml";
+            File f = TestData.copy(this,path);
+            TestData.copy(this,"xml/fme/empty-collection/lakes.xsd");
+            URI u = f.toURI();
+
+            XMLSAXHandler xmlContentHandler = new XMLSAXHandler(u,null);
+            XMLSAXHandler.setLogLevel(Level.WARNING);
+            XSISAXHandler.setLogLevel(Level.WARNING);
+            XMLElementHandler.setLogLevel(Level.WARNING);
+            XSIElementHandler.setLogLevel(Level.WARNING);
+
+            parser.parse(f, xmlContentHandler);
+
+            Object doc = xmlContentHandler.getDocument();
+            assertNotNull("Document missing", doc);
+            
+            FeatureCollection collection=(FeatureCollection) doc;
+            assertEquals(0, collection.size());
+            
+    }
+    public void skippedtestOneFeature() throws Exception {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(true);
             spf.setValidating(false);
@@ -78,10 +105,6 @@ public class GMLParserTest extends TestCase {
             
             checkFeatureCollection((FeatureCollection)doc);
             
-        } catch (Throwable e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
     }
     public void skippedtestMoreFeatures(){
         try {

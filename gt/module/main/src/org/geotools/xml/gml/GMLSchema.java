@@ -956,12 +956,20 @@ public class GMLSchema implements Schema {
                     "inapplicable", "unknown", "unavailable", "missing"
                 };
 
-            if (Arrays.binarySearch(enumeration, text) >= 0) {
+            if (contains(enumeration, text)) {
                 return value[0].getValue();
             }
 
             throw new SAXException(
                 "The value passed in to gml:NullType was not one of the allowable enumerated values."); //unacceptable result
+        }
+
+        private boolean contains(String[] enumeration, String text) {
+            for (int i = 0; i < enumeration.length; i++) {
+                if( enumeration[i].equalsIgnoreCase(text))
+                    return true;
+            }
+            return false;
         }
 
         /**

@@ -164,7 +164,8 @@ public class XSISAXHandler extends DefaultHandler {
         logger.info("END: " + qName);
 
         try {
-            ((XSIElementHandler) handlers.pop()).endElement(namespaceURI,
+            XSIElementHandler element = (XSIElementHandler) handlers.pop();
+            element.endElement(namespaceURI,
                 localName);
         } catch (SAXException e) {
             logger.warning(e.toString());

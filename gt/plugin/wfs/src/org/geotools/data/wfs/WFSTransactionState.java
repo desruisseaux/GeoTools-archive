@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,7 +70,9 @@ public class WFSTransactionState implements State {
      * A Map of <String, List<Action>> where string is the typeName of the feature type and the
      * list is the list of actions that have modified the feature type
      */
-    private Map          actionMap = new HashMap();
+    Map          actionMap = new HashMap();
+    
+    private long latestFid=Long.MAX_VALUE;
 
     private WFSTransactionState() {
         // should not be used
@@ -79,7 +82,7 @@ public class WFSTransactionState implements State {
      * @param ds
      */
     public WFSTransactionState( WFSDataStore ds ) {
-        this.ds = ds;
+        this.ds = ds; 
     }
 
     /**
@@ -121,8 +124,8 @@ public class WFSTransactionState implements State {
 
         Map copiedActions;
         synchronized (actionMap) {
-            copiedActions = copy(actionMap);
             combineActions();
+            copiedActions = copy(actionMap);
         }
         Iterator iter = copiedActions.entrySet().iterator();
         while( iter.hasNext() ) {
@@ -471,6 +474,15 @@ public class WFSTransactionState implements State {
     private void swap( List actions, int i ) {
         Object item = actions.remove(i);
         actions.add(i + 1, item);
+    }
+
+    public String nextFid( String typeName ) {
+        long fid;
+        synchronized (this) {
+            fid = latestFid;
+            latestFid--;
+        }
+        return "new"+typeName+"."+fid;
     }
 
 }

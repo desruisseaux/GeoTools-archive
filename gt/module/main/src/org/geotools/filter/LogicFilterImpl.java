@@ -279,6 +279,8 @@ public abstract class LogicFilterImpl extends BinaryLogicAbstract implements Log
      *         otherwise.
      */
     public boolean equals(Object obj) {
+    	if (obj == this )
+    		return true;
         if ((obj != null) && (obj.getClass() == this.getClass())) {
             LogicFilterImpl logFilter = (LogicFilterImpl) obj;
             LOGGER.finest("filter type match:"

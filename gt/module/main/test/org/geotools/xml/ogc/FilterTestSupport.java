@@ -138,4 +138,5 @@ public abstract class FilterTestSupport extends TestCase {
 
         //_log.getLoggerRepository().setThreshold(Level.DEBUG);
     }
+    
 }

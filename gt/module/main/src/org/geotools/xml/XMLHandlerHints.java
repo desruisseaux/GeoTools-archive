@@ -22,6 +22,83 @@ public class XMLHandlerHints implements Map {
     public final static String FLOW_HANDLER_HINT = "FLOW_HANDLER_HINT";
     /** Tells the parser to "Stream" */
     public static final String STREAM_HINT = "org.geotools.xml.gml.STREAM_HINT";
+    /** Sets the level of compliance that the filter encoder should use */
+    public static final String FILTER_COMPLIANCE_STRICTNESS = "org.geotools.xml.filter.FILTER_COMPLIANCE_STRICTNESS";
+    /** 
+     * The value so that the parser will encode all Geotools filters with no modifications.
+     */
+	public static final Integer VALUE_FILTER_COMPLIANCE_LOW = new Integer(0);
+	/**
+	 * The value so the parser will be slightly more compliant to the Filter 1.0.0 spec.
+	 *  It will encode:
+	 *  
+	 *  <pre><code>
+	 *  BBoxFilter
+	 *  	or
+	 *  FidFilter
+	 *  </code></pre>
+	 *  
+	 *  as
+	 *  
+	 *  <pre><code>
+	 *  &lt;Filter&gt;&lt;BBo&gt;...&lt;/BBox&gt;&lt;FidFilter fid="fid"/&gt;&lt;/Filter&gt;
+	 *  </code></pre>
+	 *  
+	 *  It will encode:
+	 *   <pre><code>
+	 *  BBoxFilter
+	 *  	and
+	 *  FidFilter
+	 *  </code></pre>
+	 *  as
+	 *  
+	 *  <pre><code>
+	 *  &lt;Filter&gt;&lt;FidFilter fid="fid"/&gt;&lt;/Filter&gt;
+	 *  </code></pre>
+	 *  
+	 * <p><b>IMPORTANT:</b> If this compliance level is used and a non-strict FilterFactory is used to create
+	 * the filter then the original filter must be ran on the retrieved feature because this hint will sometimes
+	 * cause more features to be returned than is requested.  Consider the following filter:
+	 * 
+	 * not(fidFilter).
+	 * 
+	 * this will return all features and so the filtering must be done on the client.
+	 * </p>
+	 */
+	public static final Integer VALUE_FILTER_COMPLIANCE_MEDIUM = new Integer(1);
+	
+	/**
+	 * The value so the parser will be compliant with the Filter 1.0.0 spec.
+	 * 
+	 *  It will throw an exception with filters like:
+	 *  BBoxFilter
+	 *  	or
+	 *  FidFilter
+	   
+	 *  
+	 *  It will encode: 
+	 *   <pre><code>
+	 *  BBoxFilter
+	 *  	and
+	 *  FidFilter
+	 *  </code></pre>
+	 *  as
+	 *  
+	 *  <pre><code>
+	 *  &lt;Filter&gt;&lt;FidFilter fid="fid"/&gt;&lt;/Filter&gt;
+	 *  </code></pre>
+	 * <p><b>IMPORTANT:</b> If this compliance level is used and a non-strict FilterFactory is used to create
+	 * the filter then the original filter must be ran on the retrieved feature because this hint will sometimes
+	 * cause more features to be returned than is requested.  Consider the following filter:
+	 * <p>
+	 * not(fidFilter).
+	 * </p>
+	 * this will return all features and so the filtering must be done on the client.
+	 * </p>
+
+	 */
+	public static final Integer VALUE_FILTER_COMPLIANCE_HIGH = new Integer(2);
+
 
     private Map map=new HashMap();
     public void clear() {

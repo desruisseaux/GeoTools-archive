@@ -247,9 +247,9 @@ public class XMLSAXHandler extends DefaultHandler {
         try {
         	
             XMLElementHandler handler = (XMLElementHandler) handlers.peek();
-			handler.endElement(new URI(
-                    namespaceURI), localName, hints);
-			handlers.pop();
+            URI uri = new URI(namespaceURI);
+            handler.endElement(uri, localName, hints);
+            handlers.pop();
         } catch (Exception e) {
             logger.warning(e.getMessage());
             logger.warning("Line " + locator.getLineNumber() + " Col "

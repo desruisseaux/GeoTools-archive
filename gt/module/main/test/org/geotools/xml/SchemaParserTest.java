@@ -76,25 +76,24 @@ public class SchemaParserTest extends TestCase {
         File f;
         try {
             f = TestData.copy(this,path);
-        URI u = f.toURI();
-        XSISAXHandler contentHandler = new XSISAXHandler(u);
-//        XSISAXHandler.setLogLevel(Level.INFO);
-        XSISAXHandler.setLogLevel(Level.WARNING);
-
-        try {
-            parser.parse(f, contentHandler);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
-
-        try{
-            assertNotNull("Schema missing", contentHandler.getSchema());
-            System.out.println(contentHandler.getSchema());
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail(e.toString());
-        }
+            URI u = f.toURI();
+            XSISAXHandler contentHandler = new XSISAXHandler(u);
+            XSISAXHandler.setLogLevel(Level.WARNING);
+    
+            try {
+                parser.parse(f, contentHandler);
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail(e.toString());
+            }
+    
+            try{
+                assertNotNull("Schema missing", contentHandler.getSchema());
+                System.out.println(contentHandler.getSchema());
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail(e.toString());
+            }
         } catch (IOException e1) {
             e1.printStackTrace();
             fail(e1.toString());

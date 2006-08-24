@@ -111,7 +111,8 @@ public class WFSDataStore extends AbstractDataStore {
     
     private int bufferSize = 10;
     private int timeout = 10000;
-	private final boolean tryGZIP;
+    private final boolean tryGZIP;
+    protected WFSStrategy strategy;
 
     /**
      * Construct <code>WFSDataStore</code>.
@@ -160,6 +161,7 @@ public class WFSDataStore extends AbstractDataStore {
         this.bufferSize = buffer;
         this.tryGZIP=tryGZIP;
         findCapabilities(host);
+        strategy=new StrictWFSStrategy(this);
     }
     
     private void findCapabilities(URL host) throws SAXException, IOException {
@@ -188,12 +190,13 @@ public class WFSDataStore extends AbstractDataStore {
     }
 
     protected HttpURLConnection getConnection(URL url, Authenticator auth, boolean isPost ) throws IOException{
-
+        
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        
         if(isPost){
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
-            connection.setRequestProperty("Content-type", "application/xml");
+            connection.setRequestProperty("Content-type", "text/xml, application/xml");
         }else{
             connection.setRequestMethod("GET");
         }
@@ -214,6 +217,7 @@ public class WFSDataStore extends AbstractDataStore {
         if (this.tryGZIP ){
     		connection.addRequestProperty("Accept-Encoding", "gzip");	
         }
+
         return connection;
     }
 
@@ -372,6 +376,8 @@ public class WFSDataStore extends AbstractDataStore {
     protected FeatureType getSchemaGet(String typeName)
         throws SAXException, IOException {
         URL getUrl = getDescribeFeatureTypeURLGet(typeName);
+        if( getUrl==null )
+            return null;
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
         InputStream is = getInputStream(hc);
@@ -488,9 +494,7 @@ public class WFSDataStore extends AbstractDataStore {
         osw.flush();
         osw.close();
         InputStream is = getInputStream(hc);
-        if( WFSDataStoreFactory.logger.isLoggable(Level.FINE) ){
-            is=new LogInputStream(is, Level.FINE);
-        }
+
         Schema schema;
         try{
             schema = SchemaFactory.getInstance(null, is);
@@ -610,9 +614,6 @@ public class WFSDataStore extends AbstractDataStore {
      */
 	InputStream getInputStream(HttpURLConnection hc) throws IOException {
 		InputStream is = hc.getInputStream();
-        if( WFSDataStoreFactory.logger.isLoggable(Level.FINE) ){
-            is=new LogInputStream(is, Level.FINE);
-        }
 
         if( tryGZIP ){
 
@@ -620,8 +621,14 @@ public class WFSDataStore extends AbstractDataStore {
 	        		is = new GZIPInputStream(is);
 	        } 
 	        is=new BufferedInputStream(is);
+            if( WFSDataStoreFactory.logger.isLoggable(Level.FINE) ){
+                is=new LogInputStream(is, Level.FINE);
+            }
 			return is;
 		}else{
+            if( WFSDataStoreFactory.logger.isLoggable(Level.FINE) ){
+                is=new LogInputStream(is, Level.FINE);
+            }
 	        return new BufferedInputStream(is);
 		}
 	}
@@ -758,121 +765,9 @@ public class WFSDataStore extends AbstractDataStore {
     /**
      * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query, org.geotools.data.Transaction)
      */
-    public FeatureReader getFeatureReader(Query query2, Transaction transaction)
+    public FeatureReader getFeatureReader(Query query, Transaction transaction)
         throws IOException {
-        FeatureReader t = null;
-        SAXException sax = null;
-        IOException io = null;
-        Query query = new DefaultQuery(query2);
-        // process the filter to update fidfilters using the transaction.
-        ((DefaultQuery)query).setFilter(processFilter(query.getFilter()));
-        Filter[] filters = splitFilters(query,transaction); // [server][post]
-//System.out.println("\nServer side Filter = "+filters[0]);
-//System.out.println("Client side Filter = "+filters[1]+"\n\n");
-        
-        // TODO modify bbox requests here
-        FeatureSetDescription fsd = WFSCapabilities.getFeatureSetDescription(capabilities,query.getTypeName());
-        
-        Envelope maxbbox = null;
-        CoordinateReferenceSystem dataCRS = null;
-        if(fsd.getSRS()!=null){
-            // reproject this
-            try {
-                dataCRS = CRS.decode(fsd.getSRS());
-                MathTransform toDataCRS = CRS.transform( DefaultGeographicCRS.WGS84, dataCRS );
-                maxbbox = JTS.transform( fsd.getLatLongBoundingBox(), null, toDataCRS, 10 );                
-            } catch (FactoryException e) {
-                WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
-            } catch (MismatchedDimensionException e) {
-                WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
-            } catch (TransformException e) {
-                WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;
-            }
-        }
-        else {
-            maxbbox = fsd.getLatLongBoundingBox();
-        }
-        // Rewrite request if we have a mxxbox
-        if(maxbbox!=null){
-            WFSBBoxFilterVisitor clipVisitor = new WFSBBoxFilterVisitor(maxbbox);
-            filters[0].accept(clipVisitor);
-        } else { // give up an request everything
-            LOGGER.log( Level.FINE, "Unable to clip your query against the latlongboundingbox element" );
-            // filters[0] = Filter.ALL; // uncoment this line to just give up
-        }
-        
-        ((DefaultQuery)query).setFilter(filters[0]);
-        if (((protocol & POST_PROTOCOL) == POST_PROTOCOL) && (t == null)) {
-            try {
-                t = getFeatureReaderPost(query, transaction);
-                if(t!=null)
-                    t.hasNext(); // throws spot
-            } catch (SAXException e) {
-                t = null;
-                WFSDataStoreFactory.logger.warning(e.toString());
-                sax = e;
-            } catch (IOException e) {
-                t = null;
-                WFSDataStoreFactory.logger.warning(e.toString());
-                io = e;
-            }
-        }
-
-        if (((protocol & GET_PROTOCOL) == GET_PROTOCOL) && (t == null)) {
-            try {
-                t = getFeatureReaderGet(query, transaction);
-                if(t!=null)
-                    t.hasNext(); // throws spot
-            } catch (SAXException e) {
-                t = null;
-                WFSDataStoreFactory.logger.warning(e.toString());
-                sax = e;
-            } catch (IOException e) {
-                t = null;
-                WFSDataStoreFactory.logger.warning(e.toString());
-                io = e;
-            }
-        }
-
-        if(t==null && sax!=null)
-            throw new IOException(sax.toString());
-        if(t==null && io!=null)
-            throw io;
-
-        if (t.hasNext()) { // opportunity to throw exception
-
-            if (t.getFeatureType() != null) {
-                if (!filters[1].equals( Filter.NONE ) ) {
-                    t = new FilteringFeatureReader(t, filters[1]);
-                }
-                FeatureReader tmp = t;
-                if (query.getCoordinateSystem() !=null &&
-                    !query.getCoordinateSystem().equals( t.getFeatureType().getDefaultGeometry().getCoordinateSystem())){
-                    try {
-                        t = new ForceCoordinateSystemFeatureReader(t,query.getCoordinateSystem());
-                    } catch (SchemaException e) {
-                        WFSDataStoreFactory.logger.warning(e.toString());
-                        t = tmp;
-                    }
-                }else{
-                    if(t.getFeatureType().getDefaultGeometry()!= null && dataCRS!=null &&
-                            t.getFeatureType().getDefaultGeometry().getCoordinateSystem()== null){
-                        // set up crs
-                        try {
-                            t = new ForceCoordinateSystemFeatureReader(t,dataCRS);
-                        } catch (SchemaException e) {
-                            WFSDataStoreFactory.logger.warning(e.toString());
-                            t = tmp;
-                        }
-                    }
-                }
-            	return t;
-            }
-            throw new IOException(
-                "There are features but no feature type ... odd");
-        }
-
-        return new EmptyFeatureReader(getSchema(query.getTypeName()));
+        return strategy.getFeatureReader(query, transaction);
     }
 
     /* (non-Javadoc)
@@ -904,7 +799,7 @@ public class WFSDataStore extends AbstractDataStore {
         return super.getBounds(query);
     }
 
-    private Filter[] splitFilters(Query q, Transaction t) throws IOException{
+    protected Filter[] splitFilters(Query q, Transaction t) throws IOException{
     	// have to figure out which part of the request the server is capable of after removing the parts in the update / delete actions
     	// [server][post]
     	if(q.getFilter() == null)

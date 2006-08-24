@@ -29,10 +29,13 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.MutableFIDFeature;
 import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.DefaultFeature;
+import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -75,7 +78,8 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         List features=new ArrayList();
         while(reader.hasNext()){
             try {
-                features.add(reader.next());
+                Feature next = reader.next();
+                features.add(next);
             } catch (Exception e) {
                 throw (IOException) new IOException( ).initCause( e );
             }
@@ -100,16 +104,23 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             Envelope bounds=null;
         while (iter.hasNext()){
             try {
-                Feature f = iter.next();
-                r.add(f.getID());
+                Feature newFeature;
+                try {
+                        Feature f = iter.next();
+                        newFeature = getSchema().create( f.getAttributes(new Object[getSchema().getAttributeCount()]), ts.nextFid(getSchema().getTypeName()));
+                        r.add(newFeature.getID());
+                } catch (IllegalAttributeException e) {
+                    throw (IOException) new IOException( e.getLocalizedMessage() );
+                }
+
                 for(int i=0;i<atrs.length;i++){
                     if(atrs[i] instanceof GeometryAttributeType){
-                        Geometry g = (Geometry)f.getAttribute(i);
+                        Geometry g = (Geometry)newFeature.getAttribute(i);
                         CoordinateReferenceSystem cs = ((GeometryAttributeType)atrs[i]).getCoordinateSystem();
+                        if( g==null )
+                            continue;
                         if( cs!=null && !cs.getIdentifiers().isEmpty() )
                             g.setUserData(cs.getIdentifiers().iterator().next().toString());
-                        if( g==null )
-                        	continue;
                         if( bounds==null ){
                             bounds=new Envelope(g.getEnvelopeInternal());
                         }else{
@@ -117,7 +128,9 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
                         }
                     }
                 }
-                ts.addAction(getSchema().getTypeName(), new InsertAction(f));
+                
+                
+                ts.addAction(getSchema().getTypeName(), new InsertAction(newFeature));
 
             } catch (NoSuchElementException e) {
                 WFSDataStoreFactory.logger.warning(e.toString());
@@ -167,6 +180,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
         }
 
         ts.addAction(getSchema().getTypeName(), new DeleteAction(getSchema().getTypeName(), filter));
+        
         // Fire a notification.  I don't know a way of quickly getting the bounds of
         // an arbitrary filter so I'm sending a NULL envelope to say "some features were removed but I don't
         // know what."  Can't be null because the convention states that null is sent on commits only.

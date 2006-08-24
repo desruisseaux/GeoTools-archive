@@ -37,6 +37,7 @@ import org.geotools.filter.NullFilter;
 import org.geotools.filter.expression.Expression;
 import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.xml.PrintHandler;
+import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.filter.FilterComplexTypes.ExpressionType;
 import org.geotools.xml.filter.FilterComplexTypes.LiteralType;
 import org.geotools.xml.filter.FilterComplexTypes.PropertyNameType;
@@ -757,8 +758,20 @@ public class FilterOpsComplexTypes {
          */
         public Object getValue(Element element, ElementValue[] value,
             Attributes attrs, Map hints){
-//        	System.out.println("end of filter"+value.length+":"+value[0]);
-            return value[0].getValue();
+                if( value.length==1 )
+                    return value[0].getValue();
+                if( value.length==0 )
+                    return Filter.ALL;
+                try{
+                    FilterFactory fac=FilterFactoryFinder.createFilterFactory();
+                    LogicFilter filter=fac.createLogicFilter(FilterType.LOGIC_OR);
+                    for (int i = 0; i < value.length; i++) {
+                        filter.addFilter((Filter) value[i].getValue());
+                    }
+                    return filter;
+                }catch(IllegalFilterException e){
+                    return value[0].getValue();
+                }
         }
 
         /**
@@ -833,15 +846,24 @@ public class FilterOpsComplexTypes {
 //                output.startElement(getNamespace(), FilterSchema.getInstance().getElements()[2].getName(),
 //                    null);
             }
+            FilterEncodingPreProcessor visitor=getFilterEncodingPreProcessor(hints);
+            filter.accept(visitor);
+            if( !visitor.getFilter().equals(Filter.ALL) )
+            	encodeFilter(visitor.getFilter(),output,hints);
+            encodeFilter(visitor.getFidFilter(), output, hints);
             
-            encodeFilter(filter,output,hints);
-
             if (element != null) {
                 output.endElement(element.getNamespace(), element.getName());
 //            }else{
 //                output.endElement(getNamespace(), FilterSchema.getInstance().getElements()[2].getName());
                 }
         }
+
+		private FilterEncodingPreProcessor getFilterEncodingPreProcessor(Map hints) {
+			if( hints!=null && hints.containsKey(XMLHandlerHints.FILTER_COMPLIANCE_STRICTNESS) )
+				return new FilterEncodingPreProcessor((Integer) hints.get(XMLHandlerHints.FILTER_COMPLIANCE_STRICTNESS));
+			return new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_LOW);
+		}
     }
 
     public static class FeatureIdType extends FilterComplexType {

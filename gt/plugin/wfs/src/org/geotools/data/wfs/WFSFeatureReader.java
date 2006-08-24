@@ -179,23 +179,7 @@ public class WFSFeatureReader extends FCBuffer {
         } else {
             List l = ts.getActions(ft.getTypeName());
 
-            while ((next == null) && super.hasNext()) {
-                next = super.next();
-
-                if ((ts != null) && (next != null)) {
-                    // 	check to make sure it wasn't deleted
-                    // 	check for updates
-                    Iterator i = l.iterator();
-
-                    while (i.hasNext() && (next != null)) {
-                        Action a = (Action) i.next();
-
-                        next=updateFeature(a, next);
-                    }
-                }
-            }
-
-            if ((insertSearchIndex < l.size()) && (next == null)) {
+            if ((insertSearchIndex < l.size()) && (next == null) ) {
                 // look for an insert then
                 // advance one spot
 
@@ -217,6 +201,23 @@ public class WFSFeatureReader extends FCBuffer {
                     }
                 }
             }
+            
+            while ((next == null) && super.hasNext()) {
+                next = super.next();
+
+                if ((ts != null) && (next != null)) {
+                    // 	check to make sure it wasn't deleted
+                    // 	check for updates
+                    Iterator i = l.iterator();
+
+                    while (i.hasNext() && (next != null)) {
+                        Action a = (Action) i.next();
+
+                        next=updateFeature(a, next);
+                    }
+                }
+            }
+
         }
 
         return next != null;
@@ -255,4 +256,5 @@ public class WFSFeatureReader extends FCBuffer {
 
         return r;
     }
+
 }
