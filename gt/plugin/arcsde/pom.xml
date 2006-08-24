@@ -93,11 +93,9 @@
       <groupId>com.esri</groupId>
       <artifactId>jsde_concurrent</artifactId>
       <!-- The version number is specified in the parent POM. -->
-      <!-- TODO: This dependencies should be removed when we will be allowed
-                 to compile for JSE 1.5. For now the classes defined in this
-                 JAR may override or be overriden by classes of same name in
-                 edu.oswego.concurrent (inherited from main). It should work
-                 anyway since it should basically be the same classes. -->
+      <!-- TODO: This dependencies should be removed when we will be allowed to
+                 compile for JSE 5. This JAR duplicates edu.oswego.concurrent
+                 inherited from main. -->
     </dependency>
     <dependency>
       <groupId>com.esri</groupId>
