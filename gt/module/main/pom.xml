@@ -217,9 +217,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.esri</groupId>
-      <artifactId>jsde_concurrent</artifactId>
+      <groupId>edu.oswego</groupId>
+      <artifactId>concurrent</artifactId>
       <!-- The version number is specified in the parent POM. -->
+      <!-- TODO: This dependencies should be removed when we
+                 will be allowed to compile for JSE 1.5. -->
     </dependency>
   </dependencies>
 
