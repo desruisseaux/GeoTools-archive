@@ -285,19 +285,36 @@ The Main module itself is split into two components, the data model component an
 </row>
 <row>
   <entry>epsg-access</entry>
-  <entry>A plugin with a version of the EPSG database of coordinate reference systems and datums in the Microsoft Access (tm) database format. This is the only authoritative version.</entry>
+  <entry>
+    A plugin for a version of the EPSG database of coordinate reference systems and datums
+    in the Microsoft Access (tm) database format. The database must be downloaded separatly
+    from the EPSG web site. This is the only authoritative version.
+  </entry>
 </row>
 <row>
   <entry>epsg-hsql</entry>
-  <entry></entry>
+  <entry>
+    A plugin bundled with a version of the EPSG database of coordinate reference systems and datums
+    in the in-memory HSQL database format. This plugin doesn't require any separated download. This
+    is an alternative, non-authoritative version.
+  </entry>
 </row>
 <row>
   <entry>epsg-postgresql</entry>
-  <entry>A plugin with a version of the EPSG database of coordinate reference systems and datums in the in-memory HSQL database format. This is an alternative, non-authoritative version.</entry>
+  <entry>
+    A plugin for a version of the EPSG database of coordinate reference systems and datums
+    in the PostgreSQL database format. The database must be downloaded separatly from the
+    EPSG web site.
+  </entry>
 </row>
 <row>
   <entry>epsg-wkt</entry>
-  <entry>A plugin with a version of the EPSG database of coordinate reference systems and datums in a set of Well-Known Text (WKT) file format. This version is almost always functional, but its content is significantly different from the content of the Access database. This is an alternative, non-authoritative version.</entry>
+  <entry>
+    A plugin with a version of the EPSG database of coordinate reference systems and
+    datums in a set of Well-Known Text (WKT) file format. This version is almost always
+    functional, but its content is significantly different from the content of the Access
+    database. This is an alternative, non-authoritative version.
+  </entry>
 </row>
 <row>
   <entry>geomedia</entry>
