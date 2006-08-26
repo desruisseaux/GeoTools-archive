@@ -174,9 +174,6 @@ public final class StreamingRenderer implements GTRenderer {
 	/** Geographic map extent */
 	private ReferencedEnvelope mapExtent;
 
-	/** Graphics object to be rendered to. Controlled by set output. */
-	private Graphics2D outputGraphics;
-
 	/** The size of the output area in output units. */
 	private Rectangle screenSize;
 
@@ -364,7 +361,6 @@ public final class StreamingRenderer implements GTRenderer {
 		try {
 			mapArea = RendererUtilities.createMapEnvelope(paintArea,
 					worldToScreen);
-			this.outputGraphics = graphics;
 			paint(graphics, paintArea, mapArea, worldToScreen);
 		} catch (NoninvertibleTransformException e) {
 			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -447,6 +443,11 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	public void paint(Graphics2D graphics, Rectangle paintArea,
 			Envelope mapArea, AffineTransform worldToScreen) {
+		// Check that we have a context to paint
+		if(context == null)
+			throw new IllegalStateException("Cannot perform paint, " +
+					"no map context has been assigned to the renderer.");
+		
 		// Check for null arguments, recompute missing ones if possible
 		if (graphics == null || paintArea == null) {
 			LOGGER.info("renderer passed null arguments");
@@ -608,7 +609,6 @@ public final class StreamingRenderer implements GTRenderer {
 		mapExtent = new ReferencedEnvelope(mapArea);
 		lonFirst = !GridGeometry2D.swapXY(destinationCrs.getCoordinateSystem());
 		this.screenSize = paintArea;
-		this.outputGraphics = graphics;
 		this.worldToScreenTransform = worldToScreen;
 		error = 0;
 		if (java2dHints != null)
