@@ -83,7 +83,7 @@
     <module>imagemosaic</module>
     <module>mif</module>
     <module>mysql</module>
-<!-- <module>oraclespatial</module> -->
+   <module>oraclespatial</module>
     <module>postgis</module>
     <module>referencing3D</module>
     <module>shapefile</module>
