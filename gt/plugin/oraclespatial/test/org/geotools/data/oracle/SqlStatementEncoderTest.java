@@ -51,8 +51,6 @@ public class SqlStatementEncoderTest extends TestCase {
 	 * 'org.geotools.data.oracle.SqlStatementEncoder.makeCreateTableSQL(FeatureType)'
 	 */
 	public void testMakeCreateFixIndex() throws Exception {
-		FeatureType schema = DataUtilities.createType("ignore",
-				"name:String, line:MultiLineString, measure:Integer");
 		String create = sql.makeCreateFidIndex();
 		String expected = "CREATE UNIQUE INDEX table_index ON (fid )";
 		assertEquals(expected, create);
