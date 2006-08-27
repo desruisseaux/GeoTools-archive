@@ -63,6 +63,7 @@ import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.factory.Hints;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.BoundsVisitor;
@@ -128,13 +129,10 @@ import com.vividsolutions.jts.geom.Envelope;
 public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		implements GridCoverageReader {
 
-
 	private final static Logger LOGGER = Logger
 			.getLogger(ImageMosaicReader.class.toString());
 
 	private final static Interpolation nnInterpolation = new InterpolationNearest();
-
-	
 
 	private final URL sourceURL;
 
@@ -142,15 +140,12 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 	private final String typeName;
 
-
 	private final FilterFactory ff = new FilterFactoryImpl();
 
 	private final String geometryName;
 
 	private final static RenderingHints NO_CACHE = new RenderingHints(
 			JAI.KEY_TILE_CACHE, null);
-
-	
 
 	/**
 	 * COnstructor.
@@ -161,7 +156,20 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @throws UnsupportedEncodingException
 	 * 
 	 */
-	public ImageMosaicReader(Object source) throws IOException {
+	public ImageMosaicReader(Object source, Hints uHints) throws IOException {
+		// /////////////////////////////////////////////////////////////////////
+		// 
+		// Forcing longitude first since the geotiff specification seems to
+		// assume that we have first longitude the latitude.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		this.hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
+				Boolean.TRUE);
+		if (uHints != null) {
+			// prevent the use from reordering axes
+			uHints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
+			this.hints.add(uHints);
+		}
 		if (source == null) {
 
 			final IOException ex = new IOException(
@@ -218,7 +226,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			throw new IllegalArgumentException(
 					"Problems when opening the index, no typenames for the schema are defined");
 		typeName = typeNames[0];
-		final FeatureSource featureSource = tileIndexStore.getFeatureSource(typeName);
+		final FeatureSource featureSource = tileIndexStore
+				.getFeatureSource(typeName);
 		geometryName = featureSource.getSchema().getDefaultGeometry().getName();
 		// get the crs if able to
 		final CoordinateReferenceSystem tempcrs = featureSource.getSchema()
@@ -282,13 +291,26 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 		// name
 		coverageName = properties.getProperty("Name");
-		
-		
-		//original gridrange (estimated)
-		originalGridRange= new GeneralGridRange(new Rectangle((int) Math.round(originalEnvelope.getLength(0)
-				/ highestRes[0]),(int) Math.round(originalEnvelope.getLength(1)
-						/ highestRes[1])));
 
+		// original gridrange (estimated)
+		originalGridRange = new GeneralGridRange(
+				new Rectangle((int) Math.round(originalEnvelope.getLength(0)
+						/ highestRes[0]), (int) Math.round(originalEnvelope
+						.getLength(1)
+						/ highestRes[1])));
+	}
+
+	/**
+	 * COnstructor.
+	 * 
+	 * @param source
+	 *            The source object.
+	 * @throws IOException
+	 * @throws UnsupportedEncodingException
+	 * 
+	 */
+	public ImageMosaicReader(Object source) throws IOException {
+		this(source, null);
 
 	}
 
@@ -481,8 +503,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final Filter bboxFilter = getBBOXFilter(requestedJTSEnvelope);
-		final FeatureCollection features = tileIndexStore.getFeatureSource(typeName)
-				.getFeatures(bboxFilter);
+		final FeatureCollection features = tileIndexStore.getFeatureSource(
+				typeName).getFeatures(bboxFilter);
 		// do we have any feature to load
 		final Iterator it = features.iterator();
 		if (!it.hasNext())
@@ -671,7 +693,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				pbjImageRead.add(null);
 				pbjImageRead.add(readP);
 				pbjImageRead.add(null);
-				loadedImage =  JAI.create("ImageRead",pbjImageRead, null);
+				loadedImage = JAI.create("ImageRead", pbjImageRead, null);
 				// /////////////////////////////////////////////////////////////
 				//
 				// Input alpha management.
@@ -754,14 +776,14 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// Load feaures and evaluate envelope
 		//
 		// /////////////////////////////////////////////////////////////////////
-		FeatureCollection features = tileIndexStore.getFeatureSource(typeName).getFeatures(filter);
+		FeatureCollection features = tileIndexStore.getFeatureSource(typeName)
+				.getFeatures(filter);
 		BoundsVisitor boundsVisitor = new BoundsVisitor();
 		features.accepts(boundsVisitor, null);
 		final Envelope loadedULC = boundsVisitor.getBounds();
-		features=null;
-		boundsVisitor=null;
+		features = null;
+		boundsVisitor = null;
 		return new Point2D.Double(loadedULC.getMinX(), loadedULC.getMaxY());
-		
 
 	}
 
@@ -829,8 +851,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				finalLayout.intersect(new Area(finalRange.toRectangle()));
 				Rectangle tempRect = finalLayout.getBounds();
 
-				imageBeforeAlpha =  JAI.create("Mosaic",
-						pbjMosaic, new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+				imageBeforeAlpha = JAI.create("Mosaic", pbjMosaic,
+						new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
 								new ImageLayout(tempRect.x, tempRect.y,
 										tempRect.width, tempRect.height)));
 
@@ -846,8 +868,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			}
 
 		} else
-			imageBeforeAlpha =  JAI.create("Mosaic",
-					pbjMosaic, null);
+			imageBeforeAlpha = JAI.create("Mosaic", pbjMosaic, null);
 
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -863,8 +884,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					new Float(-imageBeforeAlpha.getMinX())).add(
 					new Float(-imageBeforeAlpha.getMinY()))
 					.add(nnInterpolation);
-			imageBeforeAlpha =  JAI.create("Translate",pbjTranslate,
-					NO_CACHE);
+			imageBeforeAlpha = JAI.create("Translate", pbjTranslate, NO_CACHE);
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -890,7 +910,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 			final ParameterBlock pbjMultiplyConst = new ParameterBlock();
 			pbjMultiplyConst.addSource(alpha).add(new double[] { 255 });
-			final RenderedOp multipliedImage =  JAI.create("MultiplyConst",
+			final RenderedOp multipliedImage = JAI.create("MultiplyConst",
 					pbjMultiplyConst, NO_CACHE);
 
 			// /////////////////////////////////////////////////////////////////////
@@ -900,18 +920,16 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// /////////////////////////////////////////////////////////////////////
 			final ParameterBlock pbjBandMerge = new ParameterBlock();
 			pbjBandMerge.addSource(imageBeforeAlpha).addSource(multipliedImage);
-			return coverageFactory.create(
-					coverageName,
-					JAI.create("BandMerge",pbjBandMerge, NO_CACHE),
-					requestedEnvelope);
+			return coverageFactory.create(coverageName, JAI.create("BandMerge",
+					pbjBandMerge, NO_CACHE), requestedEnvelope);
 		}
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// create the coverage
 		//
 		// /////////////////////////////////////////////////////////////////////
-		return coverageFactory.create(coverageName,
-				imageBeforeAlpha, requestedEnvelope);
+		return coverageFactory.create(coverageName, imageBeforeAlpha,
+				requestedEnvelope);
 
 	}
 
@@ -959,7 +977,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// translation
 		pbjTranslate.addSource(loadedImage).add(new Float(xTrans)).add(
 				new Float(yTrans)).add(nnInterpolation);
-		final RenderedOp readyToMosaicImage =  JAI.create("Translate",
+		final RenderedOp readyToMosaicImage = JAI.create("Translate",
 				pbjTranslate, NO_CACHE);
 		pbjMosaic.addSource(readyToMosaicImage);
 		finalLayout.add(new Area(readyToMosaicImage.getBounds()));
@@ -980,8 +998,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			final ParameterBlock pbjBandSelect = new ParameterBlock();
 			// translation
 			pbjBandSelect.addSource(readyToMosaicImage).add(alphaIndex);
-			alphaChannels[i] =  JAI.create("BandSelect",
-					pbjBandSelect, NO_CACHE);
+			alphaChannels[i] = JAI
+					.create("BandSelect", pbjBandSelect, NO_CACHE);
 		}
 
 	} /*
