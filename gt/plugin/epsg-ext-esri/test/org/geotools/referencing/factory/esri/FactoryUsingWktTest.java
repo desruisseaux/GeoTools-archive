@@ -15,62 +15,78 @@
  */
 package org.geotools.referencing.crs;
 
-// J2SE dependencies
-import java.util.Arrays;
-import java.util.Iterator;
+// JSE dependencies
 import java.util.Set;
+import java.util.Iterator;
+import org.geotools.referencing.FactoryFinder;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.factory.esri.FactoryUsingWKT;
 
 // JUnit dependencies
 import junit.framework.TestCase;
 
 
 /**
- * These EPSG support.
+ * Test ESRI CRS support.
  * 
- * @author Jody Garnett
- * @since 2.1.M3
  * @source $URL$
- * @version 2.1.M3
+ * @version $Id$
+ * @author Jody Garnett
  */
-public class EPSGTest extends TestCase {
-    EPSGCRSAuthorityFactory factory;
-    /*
-     * @see junit.framework.TestCase#setUp()
+public class FactoryUsingWktTest extends TestCase {
+    /**
+     * The factory to test.
+     */
+    private CRSAuthorityFactory factory;
+
+    /**
+     * Get the authority factory for ESRI.
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = new EPSGCRSAuthorityFactory();
-    }    
+        factory = FactoryFinder.getCRSAuthorityFactory("ESRI", null);
+    }
+
+    /**
+     * Tests the authority code.
+     */
     public void testAuthority(){
         Citation authority = factory.getAuthority();
-        
-        assertNotNull( authority );
-        assertEquals( "European Petroleum Survey Group", authority.getTitle().toString() );
-        assertTrue( authority.getIdentifiers().contains( "EPSG" ) );
+        assertNotNull(authority);
+//        assertEquals("European Petroleum Survey Group", authority.getTitle().toString());
+        assertTrue(authority.getIdentifiers().contains("ESRI"));
+        assertTrue(factory instanceof FactoryUsingWKT);
     }
-    
+
+    /**
+     * Tests the vendor.
+     */
     public void testVendor(){
         Citation vendor = factory.getVendor();        
-        assertNotNull( vendor );
-        assertEquals( "Geotools", vendor.getTitle().toString() );
+        assertNotNull(vendor);
+        assertEquals("Geotools", vendor.getTitle().toString());
     }
-    
-    public void testCodes() throws Exception {
-        Set codes = factory.getAuthorityCodes( CoordinateReferenceSystem.class );
-        
-        assertNotNull( codes );
-        assertEquals( 2707, codes.size() );                               
+
+    /**
+     * Tests the codes.
+     */
+    public void testCodes() throws FactoryException {
+        Set codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+        assertNotNull(codes);
+        assertEquals(2707, codes.size());
+        assertTrue(codes.contains("26910"));
     }
-    
+
     /**
      * A random CRS for fun.
      */
