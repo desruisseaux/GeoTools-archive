@@ -408,6 +408,17 @@ public abstract class AbstractGridCoverage2DReader implements
 
 		// //
 		//
+		// Check Hint to ignore overviews
+		//
+		// //
+		Object o = hints.get(Hints.IGNORE_COVERAGE_OVERVIEW);
+		if (o != null && ((Boolean) o).booleanValue()) {
+			return imageChoice;
+
+		}
+
+		// //
+		//
 		// Am I going to decimate or to use overviews? If this geotiff has only
 		// one page we use decimation, otherwise we use the best page avalabile.
 		// Future versions should use both.
