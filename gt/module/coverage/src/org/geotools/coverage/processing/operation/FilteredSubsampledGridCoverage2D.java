@@ -34,7 +34,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author Simone Giannecchini
- * 
+ * @since 2.3
  */
 final class FilteredSubsampledGridCoverage2D extends GridCoverage2D {
 
