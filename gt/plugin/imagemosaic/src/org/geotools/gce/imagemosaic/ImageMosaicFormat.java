@@ -28,7 +28,7 @@ import java.util.HashMap;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.FeatureType;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -154,8 +154,8 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 			// reused
 			//
 			// /////////////////////////////////////////////////////////////////////
-			final IndexedShapefileDataStore tileIndexStore = new IndexedShapefileDataStore(
-					sourceURL, true, true);
+			final ShapefileDataStore tileIndexStore = new ShapefileDataStore(
+					sourceURL);
 			final String[] typeNames = tileIndexStore.getTypeNames();
 			if (typeNames.length <= 0)
 				return false;

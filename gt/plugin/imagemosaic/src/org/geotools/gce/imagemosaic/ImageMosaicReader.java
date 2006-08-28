@@ -18,10 +18,13 @@
  */
 package org.geotools.gce.imagemosaic;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedInputStream;
@@ -29,30 +32,28 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
 import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
-import javax.media.jai.OpImage;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.MosaicDescriptor;
 
-import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -61,28 +62,20 @@ import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.visitor.BoundsVisitor;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
-import org.opengis.metadata.Identifier;
-import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -91,11 +84,7 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-import com.sun.media.jai.opimage.BandMergeCRIF;
-import com.sun.media.jai.opimage.BandSelectCRIF;
-import com.sun.media.jai.opimage.MosaicRIF;
-import com.sun.media.jai.opimage.MultiplyConstCRIF;
-import com.sun.media.jai.opimage.TranslateCRIF;
+import com.sun.media.imageio.stream.FileChannelImageInputStream;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -110,7 +99,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * All source images are assumed to have been geometrically mapped into a common
  * coordinate space. The origin (minX, minY) of each image is therefore taken to
  * represent the location of the respective image in the common coordinate
- * system of the source images. This coordinate space will also be that of the
+ * system of the sour
+ * ce images. This coordinate space will also be that of the
  * destination image.
  * 
  * All source images must have the same data type and sample size for all bands
@@ -138,11 +128,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 	private final AbstractDataStore tileIndexStore;
 
-	private final String typeName;
-
-	private final FilterFactory ff = new FilterFactoryImpl();
-
-	private final String geometryName;
+	private final MemorySpatialIndex index;
 
 	private final static RenderingHints NO_CACHE = new RenderingHints(
 			JAI.KEY_TILE_CACHE, null);
@@ -163,11 +149,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// assume that we have first longitude the latitude.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		this.hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
-				Boolean.TRUE);
 		if (uHints != null) {
 			// prevent the use from reordering axes
-			uHints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
 			this.hints.add(uHints);
 		}
 		if (source == null) {
@@ -219,17 +202,32 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// reused
 		//
 		// /////////////////////////////////////////////////////////////////////
-		tileIndexStore = new IndexedShapefileDataStore(this.sourceURL, true,
-				true);
+		tileIndexStore = new ShapefileDataStore(this.sourceURL);
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine("Connected mosaic reader to its data store");
 		final String[] typeNames = tileIndexStore.getTypeNames();
 		if (typeNames.length <= 0)
 			throw new IllegalArgumentException(
 					"Problems when opening the index, no typenames for the schema are defined");
-		typeName = typeNames[0];
+
+		String typeName = typeNames[0];
 		final FeatureSource featureSource = tileIndexStore
 				.getFeatureSource(typeName);
-		geometryName = featureSource.getSchema().getDefaultGeometry().getName();
+		// //
+		//
+		// Load all the features inside the index
+		//
+		// //
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine("About to create index");
+		index = new MemorySpatialIndex(featureSource.getFeatures());
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine("Created index");
+		// //
+		//
 		// get the crs if able to
+		//
+		// //
 		final CoordinateReferenceSystem tempcrs = featureSource.getSchema()
 				.getDefaultGeometry().getCoordinateSystem();
 		if (tempcrs == null) {
@@ -272,6 +270,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			cornersV[i][1] = Double.parseDouble(pair[1]);
 		}
 		this.originalEnvelope = new GeneralEnvelope(cornersV[0], cornersV[1]);
+		this.originalEnvelope.setCoordinateReferenceSystem(crs);
 
 		// resolutions levels
 		numOverviews = Integer.parseInt(properties.getProperty("LevelsNum")) - 1;
@@ -499,16 +498,23 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Load feaures
+		// Load feaures from the index
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final Filter bboxFilter = getBBOXFilter(requestedJTSEnvelope);
-		final FeatureCollection features = tileIndexStore.getFeatureSource(
-				typeName).getFeatures(bboxFilter);
+
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine("loading tile for envelope "
+					+ requestedJTSEnvelope.toString());
+		final List features = index.findFeatures(requestedJTSEnvelope);
+
 		// do we have any feature to load
 		final Iterator it = features.iterator();
 		if (!it.hasNext())
 			return null;
+		if (features.size() > 300)
+			return fakeMosaic(requestedEnvelope, dim);
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine("We have " + features.size() + " tiles to load");
 		try {
 			return loadRequestedTiles(requestedEnvelope, alpha, alphaThreshold,
 					requestedJTSEnvelope, features, it, singleImageROI,
@@ -522,40 +528,20 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 	}
 
-	/**
-	 * Preparing a bbox filter to find the minimum set of tiles that overlaps
-	 * the requested area. XXX what if I do not have and EPSG:code
-	 * 
-	 * @param requestedJTSEnvelope
-	 * @return
-	 */
-	private Filter getBBOXFilter(final Envelope requestedJTSEnvelope) {
-		// get srs epsg code if one is found or use the name
-		final Set identifiers = crs.getIdentifiers();
-		Iterator it = identifiers.iterator();
-		String code = "";
-		Citation cite;
-		Identifier identifier;
-		while (it.hasNext()) {
-			identifier = ((Identifier) it.next());
-			cite = (Citation) identifier.getAuthority();
-			if (cite.getIdentifiers().contains("EPSG")) {
-
-				code = ((NamedIdentifier) identifier).toString();
-				break;
-
-			}
-		}
-		if (code.length() == 0) {
-			identifier = crs.getName();
-			if (identifier != null)
-				code = identifier.toString();
-			else
-				code = "unknown";// TODO what should I do?
-		}
-		return (Filter) ff.bbox(geometryName, requestedJTSEnvelope.getMinX(),
-				requestedJTSEnvelope.getMinY(), requestedJTSEnvelope.getMaxX(),
-				requestedJTSEnvelope.getMaxY(), code);
+	private GridCoverage fakeMosaic(GeneralEnvelope requestedEnvelope,
+			Rectangle dim) {
+		if (dim == null)
+			dim = new Rectangle(800, 600);
+		final BufferedImage image = new BufferedImage(dim.width, dim.height,
+				BufferedImage.TYPE_4BYTE_ABGR);
+		final Graphics2D g2D = (Graphics2D) image.getGraphics();
+		image.setAccelerationPriority(1.0f);
+		g2D.setColor(Color.red);
+		g2D.draw3DRect(0, 0, dim.width - 1, dim.height - 1, true);
+		g2D.drawLine(0, 0, dim.width, dim.height);
+		g2D.drawLine(0, dim.height, dim.width, 0);
+		g2D.dispose();
+		return coverageFactory.create(coverageName, image, requestedEnvelope);
 
 	}
 
@@ -582,9 +568,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 */
 	private GridCoverage loadRequestedTiles(GeneralEnvelope requestedEnvelope,
 			boolean alpha, double alphaThreshold,
-			final Envelope requestedJTSEnvelope,
-			final FeatureCollection features, final Iterator it,
-			boolean singleImageROI, int singleImageROIThreshold, Rectangle dim)
+			final Envelope requestedJTSEnvelope, final List features,
+			final Iterator it, boolean singleImageROI,
+			int singleImageROIThreshold, Rectangle dim)
 			throws DataSourceException, TransformException {
 
 		try {
@@ -665,6 +651,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			Boolean readMetadata = Boolean.FALSE;
 			Boolean readThumbnails = Boolean.FALSE;
 			Boolean verifyInput = Boolean.FALSE;
+
 			do {
 				// /////////////////////////////////////////////////////////////////////
 				//
@@ -681,10 +668,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// load a tile from disk as requested.
 				//
 				// /////////////////////////////////////////////////////////////////////
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine("About to read image number " + i);
 				imageFile = new File(new StringBuffer(parentLocation).append(
 						File.separatorChar).append(location).toString());
 				ParameterBlock pbjImageRead = new ParameterBlock();
-				pbjImageRead.add(ImageIO.createImageInputStream(imageFile));
+				pbjImageRead.add(new FileChannelImageInputStream(
+						new RandomAccessFile(imageFile, "r").getChannel()));
 				pbjImageRead.add(imageChoice);
 				pbjImageRead.add(readMetadata);
 				pbjImageRead.add(readThumbnails);
@@ -694,6 +684,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				pbjImageRead.add(readP);
 				pbjImageRead.add(null);
 				loadedImage = JAI.create("ImageRead", pbjImageRead, null);
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine("Just read image number " + i);
+
 				// /////////////////////////////////////////////////////////////
 				//
 				// Input alpha management.
@@ -724,6 +717,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				// add to the mosaic collection
 				//
 				// /////////////////////////////////////////////////////////////////////
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine("Adding to mosaic image number " + i);
 				addToMosaic(pbjMosaic, bound, ULC, res, loadedImage,
 						singleImageROI, rois, i, singleImageROIThreshold,
 						alphaIn, alphaIndex, alphaChannels, finalLayout);
@@ -767,22 +762,16 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private Point2D getULC(Envelope envelope) throws IOException {
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Create a filter
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final Filter filter = getBBOXFilter(envelope);
-		// /////////////////////////////////////////////////////////////////////
-		//
 		// Load feaures and evaluate envelope
 		//
 		// /////////////////////////////////////////////////////////////////////
-		FeatureCollection features = tileIndexStore.getFeatureSource(typeName)
-				.getFeatures(filter);
-		BoundsVisitor boundsVisitor = new BoundsVisitor();
-		features.accepts(boundsVisitor, null);
-		final Envelope loadedULC = boundsVisitor.getBounds();
-		features = null;
-		boundsVisitor = null;
+		List features = index.findFeatures(envelope);
+		final Envelope loadedULC = new Envelope();
+		Iterator it = features.iterator();
+		while (it.hasNext()) {
+			loadedULC.expandToInclude(((Feature) it.next())
+					.getDefaultGeometry().getEnvelopeInternal());
+		}
 		return new Point2D.Double(loadedULC.getMinX(), loadedULC.getMaxY());
 
 	}
