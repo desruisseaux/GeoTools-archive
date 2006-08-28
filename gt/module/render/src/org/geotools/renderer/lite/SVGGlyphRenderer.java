@@ -18,6 +18,7 @@
 package org.geotools.renderer.lite;
 
 import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.batik.transcoder.TranscoderInput;
@@ -68,14 +69,10 @@ public class SVGGlyphRenderer implements GlyphRenderer {
 			magic.transcode(in, null);
 			return magic.getImage();
 		} catch (java.io.IOException mue) {
-			LOGGER.warning(new StringBuffer(
-					"Unable to load external svg file, ").append(
-					mue.getMessage()).toString());
+			LOGGER.log(Level.WARNING, "Unable to load external svg file", mue);
 			return null;
 		} catch (Exception te) {
-			LOGGER.warning(new StringBuffer(
-					"Unable to render external svg file, ").append(
-					te.getMessage()).toString());
+			LOGGER.log(Level.WARNING, "Unable to load external svg file", te);
 			return null;
 		}
 	}
