@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.geotools.filter.Filter;
-import org.geotools.filter.SortBy;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
@@ -56,8 +56,6 @@ public class DefaultQuery implements Query {
     /** The namespace to get */
     private URI namespace =Query.NO_NAMESPACE;
 
-    private List sorted = Collections.EMPTY_LIST;
-    
     /** The handle associated with this query. */
     private String handle;
 
@@ -66,7 +64,11 @@ public class DefaultQuery implements Query {
     
     /** Reprojection associated associated with this query */
     private CoordinateReferenceSystem coordinateSystemReproject;
-        
+    
+    /** Sorting for the query */
+    private SortBy[] sortBy;
+    
+    /** 
     /**
      * No argument constructor.
      */
@@ -489,6 +491,15 @@ public class DefaultQuery implements Query {
      * </p>
      */
     public SortBy[] getSortBy() {
-		return (SortBy[]) sorted.toArray( new SortBy[ sorted.size() ] );
+		return sortBy;
 	}   
+    
+    /**
+     * Sets the sort by information.
+     * 
+     */
+    public void setSortBy(SortBy[] sortBy) {
+		this.sortBy = sortBy;
+	}
+    
 }
