@@ -748,6 +748,16 @@ public abstract class JDBC1DataStore implements DataStore {
 						attrTypes, preFilter);
 			}
 
+			//order by clause
+			if ( query.getSortBy() != null ) {
+				//encode the sortBy clause
+				StringBuffer buf = new StringBuffer();
+				buf.append( sqlQuery );
+				sqlBuilder.sqlOrderBy( buf, query.getSortBy() );
+				
+				sqlQuery = buf.toString();
+			}
+			
 			LOGGER.fine("sql is " + sqlQuery);
 		} catch (SQLEncoderException e) {
 			throw new DataSourceException("Error building SQL Query", e);

@@ -21,6 +21,7 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
+import org.opengis.filter.sort.SortBy;
 
 /** Provides an interface for SQL statement construction.
  * 
@@ -103,4 +104,13 @@ public interface SQLBuilder {
      * </p>
      */
     public void sqlWhere( StringBuffer sql, Filter preFilter ) throws SQLEncoderException;
+
+    /**
+     * Constructs ORDER BY clause.
+     * <p>
+     * sql: <code>ORDER BY &lt;property1&gt; [ASC|DESC], ....</code>
+     * </p>
+     */
+    public void sqlOrderBy( StringBuffer sql, SortBy[] sortBy ) throws SQLEncoderException;
+    
 }

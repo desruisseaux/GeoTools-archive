@@ -25,6 +25,8 @@ import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.ClientTransactionAccessor;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 
 
 /**
@@ -275,4 +277,31 @@ public class DefaultSQLBuilder implements SQLBuilder {
     public void sqlGeometryColumn(StringBuffer sql, AttributeType geomAttribute) {
         sql.append(encoder.escapeName(geomAttribute.getName()));
     }
+    
+    /**
+     * Generates the order by clause.
+     * <p>
+     * This uses the standard ASC,DESC sql keywords to denote ascending,descending
+     * sort respectivley.
+     * </p>
+     */
+    public void sqlOrderBy(StringBuffer sql, SortBy[] sortBy) throws SQLEncoderException {
+    	sql.append( " ORDER BY ");
+    	for ( int i = 0; i < sortBy.length; i++ ) {
+    		sql.append( encoder.escapeName( sortBy[i].getPropertyName().getPropertyName() ) );
+    		
+    		if ( SortOrder.DESCENDING.equals( sortBy[i].getSortOrder() ) ) {
+    			sql.append( " DESC");
+    		}
+    		else {
+    			sql.append( " ASC");
+    		}
+    		
+    		if ( i < sortBy.length-1 ) {
+    			sql.append( ", ");
+    		}
+    	}
+    	
+    }
+    
 }
