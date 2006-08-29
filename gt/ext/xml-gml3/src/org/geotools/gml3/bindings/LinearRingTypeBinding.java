@@ -1,10 +1,19 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.gml3.bindings;
-
-
-import java.util.List;
-
-import org.geotools.xml.*;
-import org.opengis.spatialschema.geometry.DirectPosition;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -12,16 +21,18 @@ import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
-
-
+import org.geotools.xml.*;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import java.util.List;
 import javax.xml.namespace.QName;
+
 
 /**
  * Binding object for the type http://www.opengis.net/gml:LinearRingType.
  *
  * <p>
- *	<pre>
- *	 <code>
+ *        <pre>
+ *         <code>
  *  &lt;complexType name="LinearRingType"&gt;
  *      &lt;annotation&gt;
  *          &lt;documentation&gt;A LinearRing is defined by four or more coordinate tuples, with linear interpolation between them; the first and last coordinates must be coincident.&lt;/documentation&gt;
@@ -59,51 +70,49 @@ import javax.xml.namespace.QName;
  *              &lt;/sequence&gt;
  *          &lt;/extension&gt;
  *      &lt;/complexContent&gt;
- *  &lt;/complexType&gt; 
- *		
- *	  </code>
- *	 </pre>
+ *  &lt;/complexType&gt;
+ *
+ *          </code>
+ *         </pre>
  * </p>
  *
  * @generated
  */
 public class LinearRingTypeBinding extends AbstractComplexBinding {
+    GeometryFactory gFactory;
+    CoordinateSequenceFactory csFactory;
 
-	GeometryFactory gFactory;
-	CoordinateSequenceFactory csFactory;
-	
-	public LinearRingTypeBinding( GeometryFactory gFactory, CoordinateSequenceFactory csFactory ) {
-		this.gFactory = gFactory;
-		this.csFactory = csFactory;
-	}
-	
-	/**
-	 * @generated
-	 */
-	public QName getTarget() {
-		return GML.LINEARRINGTYPE;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Class getType() {
-		return LinearRing.class;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Object parse(ElementInstance instance, Node node, Object value) 
-		throws Exception {
-		
-		return GML3ParsingUtils.linearRing( node, gFactory, csFactory );
-	}
+    public LinearRingTypeBinding(GeometryFactory gFactory,
+        CoordinateSequenceFactory csFactory) {
+        this.gFactory = gFactory;
+        this.csFactory = csFactory;
+    }
 
+    /**
+     * @generated
+     */
+    public QName getTarget() {
+        return GML.LINEARRINGTYPE;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Class getType() {
+        return LinearRing.class;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Object parse(ElementInstance instance, Node node, Object value)
+        throws Exception {
+        return GML3ParsingUtils.linearRing(node, gFactory, csFactory);
+    }
 }

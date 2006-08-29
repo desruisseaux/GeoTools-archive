@@ -1,23 +1,34 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.gml3.bindings;
-
-
-import java.util.ArrayList;
-
-import org.geotools.xml.*;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
-
-
+import org.geotools.xml.*;
+import java.util.ArrayList;
 import javax.xml.namespace.QName;
+
 
 /**
  * Binding object for the type http://www.opengis.net/gml:MultiPointType.
  *
  * <p>
- *	<pre>
- *	 <code>
+ *        <pre>
+ *         <code>
  *  &lt;complexType name="MultiPointType"&gt;
  *      &lt;annotation&gt;
  *          &lt;documentation&gt;A MultiPoint is defined by one or more Points, referenced through pointMember elements.&lt;/documentation&gt;
@@ -34,64 +45,60 @@ import javax.xml.namespace.QName;
  *              &lt;/sequence&gt;
  *          &lt;/extension&gt;
  *      &lt;/complexContent&gt;
- *  &lt;/complexType&gt; 
- *		
- *	  </code>
- *	 </pre>
+ *  &lt;/complexType&gt;
+ *
+ *          </code>
+ *         </pre>
  * </p>
  *
  * @generated
  */
 public class MultiPointTypeBinding extends AbstractComplexBinding {
+    GeometryFactory gFactory;
 
-	GeometryFactory gFactory;
-	
-	public MultiPointTypeBinding( GeometryFactory gFactory ) {
-		this.gFactory = gFactory;
-	}
-	
-	/**
-	 * @generated
-	 */
-	public QName getTarget() {
-		return GML.MULTIPOINTTYPE;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Class getType() {
-		return MultiPoint.class;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Object parse(ElementInstance instance, Node node, Object value) 
-		throws Exception {
-		
-		ArrayList points = new ArrayList();
-		
-		if ( node.hasChild( Point.class ) ) {
-			points.addAll( node.getChildValues( Point.class ) );
-		}
-		
-		if ( node.hasChild( Point[].class ) ) {
-			Point[] p = (Point[]) node.getChildValue( Point[].class );
-			for ( int i = 0; i < p.length; i++ ) 
-				points.add( p[ i ] );
-		}
-		
-		return gFactory.createMultiPoint(
-			(Point[]) points.toArray( new Point[ points.size() ] )	
-		);
-		
-	}
+    public MultiPointTypeBinding(GeometryFactory gFactory) {
+        this.gFactory = gFactory;
+    }
 
+    /**
+     * @generated
+     */
+    public QName getTarget() {
+        return GML.MULTIPOINTTYPE;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Class getType() {
+        return MultiPoint.class;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Object parse(ElementInstance instance, Node node, Object value)
+        throws Exception {
+        ArrayList points = new ArrayList();
+
+        if (node.hasChild(Point.class)) {
+            points.addAll(node.getChildValues(Point.class));
+        }
+
+        if (node.hasChild(Point[].class)) {
+            Point[] p = (Point[]) node.getChildValue(Point[].class);
+
+            for (int i = 0; i < p.length; i++)
+                points.add(p[i]);
+        }
+
+        return gFactory.createMultiPoint((Point[]) points.toArray(
+                new Point[points.size()]));
+    }
 }

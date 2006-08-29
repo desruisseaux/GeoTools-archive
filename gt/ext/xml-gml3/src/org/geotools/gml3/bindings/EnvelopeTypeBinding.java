@@ -1,32 +1,44 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.gml3.bindings;
 
-
-import java.util.List;
-
-import javax.xml.namespace.QName;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import java.util.List;
+import javax.xml.namespace.QName;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 
 /**
  * Binding object for the type http://www.opengis.net/gml:EnvelopeType.
  *
  * <p>
- *	<pre>
- *	 <code>
+ *        <pre>
+ *         <code>
  *  &lt;complexType name="EnvelopeType"&gt;
  *      &lt;annotation&gt;
- *          &lt;documentation&gt;Envelope defines an extent using a pair of positions defining opposite corners in arbitrary dimensions. The first direct 
- *  			position is the "lower corner" (a coordinate position consisting of all the minimal ordinates for each dimension for all points within the envelope), 
- *  			the second one the "upper corner" (a coordinate position consisting of all the maximal ordinates for each dimension for all points within the 
- *  			envelope).&lt;/documentation&gt;
+ *          &lt;documentation&gt;Envelope defines an extent using a pair of positions defining opposite corners in arbitrary dimensions. The first direct
+ *                          position is the "lower corner" (a coordinate position consisting of all the minimal ordinates for each dimension for all points within the envelope),
+ *                          the second one the "upper corner" (a coordinate position consisting of all the maximal ordinates for each dimension for all points within the
+ *                          envelope).&lt;/documentation&gt;
  *      &lt;/annotation&gt;
  *      &lt;choice&gt;
  *          &lt;sequence&gt;
@@ -52,82 +64,76 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
  *          &lt;/element&gt;
  *      &lt;/choice&gt;
  *      &lt;attributeGroup ref="gml:SRSReferenceGroup"/&gt;
- *  &lt;/complexType&gt; 
- *		
- *	  </code>
- *	 </pre>
+ *  &lt;/complexType&gt;
+ *
+ *          </code>
+ *         </pre>
  * </p>
  *
  * @generated
  */
 public class EnvelopeTypeBinding extends AbstractComplexBinding {
+    /**
+     * @generated
+     */
+    public QName getTarget() {
+        return GML.ENVELOPETYPE;
+    }
 
-	/**
-	 * @generated
-	 */
-	public QName getTarget() {
-		return GML.ENVELOPETYPE;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Class getType() {
-		return ReferencedEnvelope.class;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Object parse(ElementInstance instance, Node node, Object value) 
-		throws Exception {
-		
-		CoordinateReferenceSystem crs = GML3ParsingUtils.crs( node );
-		
-		if ( node.getChild( "lowerCorner" ) != null ) {
-			DirectPosition l = (DirectPosition) node.getChildValue( "lowerCorner" );
-			DirectPosition u = (DirectPosition) node.getChildValue( "upperCorner" );
-			
-			return new ReferencedEnvelope( 
-				l.getOrdinate( 0 ), l.getOrdinate( 1 ), u.getOrdinate( 0 ), u.getOrdinate( 1 ), crs
-			);
-		}
-		
-		if ( node.hasChild( Coordinate.class ) ) {
-			List c = node.getChildValues( Coordinate.class );
-			Coordinate c1 = (Coordinate) c.get( 0 );
-			Coordinate c2 = (Coordinate) c.get( 1 );
-			
-			return new ReferencedEnvelope( c1.x, c1.y, c2.x, c2.y, crs );
-		}
-		
-		if ( node.hasChild( DirectPosition.class ) ) {
-			List dp = node.getChildValues( DirectPosition.class );
-			DirectPosition dp1 = (DirectPosition) dp.get( 0 );
-			DirectPosition dp2 = (DirectPosition) dp.get( 1 );
-			
-			return new ReferencedEnvelope( 
-				dp1.getOrdinate( 0 ), dp1.getOrdinate( 1 ), dp2.getOrdinate( 0 ), dp2.getOrdinate( 1 )
-				, crs
-			);
-		}
-		
-		if ( node.hasChild( CoordinateSequence.class ) ) {
-			CoordinateSequence seq = 
-				(CoordinateSequence) node.getChildValue( CoordinateSequence.class );
-			
-			return new ReferencedEnvelope( 
-				seq.getX( 0 ), seq.getY( 0 ), seq.getX( 1 ), seq.getY( 1 ), crs
-			);
-		}
-		
-		return null;
-	}
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Class getType() {
+        return ReferencedEnvelope.class;
+    }
 
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Object parse(ElementInstance instance, Node node, Object value)
+        throws Exception {
+        CoordinateReferenceSystem crs = GML3ParsingUtils.crs(node);
+
+        if (node.getChild("lowerCorner") != null) {
+            DirectPosition l = (DirectPosition) node.getChildValue(
+                    "lowerCorner");
+            DirectPosition u = (DirectPosition) node.getChildValue(
+                    "upperCorner");
+
+            return new ReferencedEnvelope(l.getOrdinate(0), l.getOrdinate(1),
+                u.getOrdinate(0), u.getOrdinate(1), crs);
+        }
+
+        if (node.hasChild(Coordinate.class)) {
+            List c = node.getChildValues(Coordinate.class);
+            Coordinate c1 = (Coordinate) c.get(0);
+            Coordinate c2 = (Coordinate) c.get(1);
+
+            return new ReferencedEnvelope(c1.x, c1.y, c2.x, c2.y, crs);
+        }
+
+        if (node.hasChild(DirectPosition.class)) {
+            List dp = node.getChildValues(DirectPosition.class);
+            DirectPosition dp1 = (DirectPosition) dp.get(0);
+            DirectPosition dp2 = (DirectPosition) dp.get(1);
+
+            return new ReferencedEnvelope(dp1.getOrdinate(0),
+                dp1.getOrdinate(1), dp2.getOrdinate(0), dp2.getOrdinate(1), crs);
+        }
+
+        if (node.hasChild(CoordinateSequence.class)) {
+            CoordinateSequence seq = (CoordinateSequence) node.getChildValue(CoordinateSequence.class);
+
+            return new ReferencedEnvelope(seq.getX(0), seq.getY(0),
+                seq.getX(1), seq.getY(1), crs);
+        }
+
+        return null;
+    }
 }
