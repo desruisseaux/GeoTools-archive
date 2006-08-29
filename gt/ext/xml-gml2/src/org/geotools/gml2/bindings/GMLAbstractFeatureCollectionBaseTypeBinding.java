@@ -1,24 +1,37 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.gml2.bindings;
 
-
-import org.geotools.xml.*;
-
-import javax.xml.namespace.QName;
-
 import org.geotools.feature.FeatureCollections;
+import org.geotools.xml.*;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.picocontainer.MutablePicoContainer;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import javax.xml.namespace.QName;
+
+
 /**
  * Binding object for the type http://www.opengis.net/gml:AbstractFeatureCollectionBaseType.
  *
  * <p>
- *	<pre>
- *	 <code>
+ *        <pre>
+ *         <code>
  *  &lt;complexType name="AbstractFeatureCollectionBaseType" abstract="true"&gt;
  *      &lt;annotation&gt;
  *          &lt;documentation&gt;         This abstract base type just makes the
@@ -35,92 +48,92 @@ import org.w3c.dom.Element;
  *              &lt;attribute name="fid" type="ID" use="optional"/&gt;
  *          &lt;/restriction&gt;
  *      &lt;/complexContent&gt;
- *  &lt;/complexType&gt; 
- *		
- *	  </code>
- *	 </pre>
+ *  &lt;/complexType&gt;
+ *
+ *          </code>
+ *         </pre>
  * </p>
  *
  * @generated
  */
-public class GMLAbstractFeatureCollectionBaseTypeBinding implements ComplexBinding {
-	
-	FeatureCollections fcFactory;
-	
-	public GMLAbstractFeatureCollectionBaseTypeBinding(
-		FeatureCollections fcFactory
-	) {
-		this.fcFactory = fcFactory;
-	}
-	
-	/**
-	 * @generated
-	 */
-	public QName getTarget() {
-		return GML.ABSTRACTFEATURECOLLECTIONBASETYPE;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public int getExecutionMode() {
-		return AFTER;
-	}
+public class GMLAbstractFeatureCollectionBaseTypeBinding
+    implements ComplexBinding {
+    FeatureCollections fcFactory;
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Class getType() {
-		return null;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
-	
-	}
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Object parse(ElementInstance instance, Node node, Object value) 
-		throws Exception {
-		
-		//TODO: the geotools feature api doesn't allow for use to supply the 
-		// "correct" subclass without hacking, so for now we just create a 
-		// default feature collection.
-		return fcFactory.newCollection();
-	}
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	 public void encode(Object object, Element element, Document document) {
-	 	//TODO: implement
-	 }
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	 
-	 public Object getChild(Object object, QName name) {
-	 	//TODO: implement
-	 	return null;
-	 }
+    public GMLAbstractFeatureCollectionBaseTypeBinding(
+        FeatureCollections fcFactory) {
+        this.fcFactory = fcFactory;
+    }
+
+    /**
+     * @generated
+     */
+    public QName getTarget() {
+        return GML.ABSTRACTFEATURECOLLECTIONBASETYPE;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Class getType() {
+        return null;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public void initialize(ElementInstance instance, Node node,
+        MutablePicoContainer context) {
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Object parse(ElementInstance instance, Node node, Object value)
+        throws Exception {
+        //TODO: the geotools feature api doesn't allow for use to supply the 
+        // "correct" subclass without hacking, so for now we just create a 
+        // default feature collection.
+        return fcFactory.newCollection();
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public void encode(Object object, Element element, Document document) {
+        //TODO: implement
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Object getChild(Object object, QName name) {
+        //TODO: implement
+        return null;
+    }
 }
