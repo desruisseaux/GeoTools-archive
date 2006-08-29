@@ -25,6 +25,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.RenderedImage;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.media.jai.BorderExtender;
@@ -48,6 +49,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.styling.RasterSymbolizer;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -109,7 +111,7 @@ public final class GridCoverageRenderer {
 
 	private final AffineTransform finalWorldToGrid;
 
-	private final Hints hints= new Hints(new HashMap(5));
+	private final Hints hints = new Hints(new HashMap(5));
 
 	private final static ParameterValueGroup resampleParams;
 
@@ -119,7 +121,9 @@ public final class GridCoverageRenderer {
 
 	private final static ParameterValueGroup filteredSubsampleParams;
 
-	private static final Resample resampleFactory = new Resample();;
+	private static final Resample resampleFactory = new Resample();
+
+	private static final int MIN_DIM_TOLERANCE = 5;
 
 	/**
 	 * Creates a new GridCoverageRenderer object.
@@ -136,7 +140,7 @@ public final class GridCoverageRenderer {
 			final Envelope envelope, Rectangle screenSize)
 			throws TransformException, NoninvertibleTransformException {
 
-		this(destinationCRS,envelope,screenSize,null);
+		this(destinationCRS, envelope, screenSize, null);
 
 	}
 
@@ -166,16 +170,14 @@ public final class GridCoverageRenderer {
 				.getTransform(new GeneralGridRange(destinationSize),
 						destinationEnvelope, false));
 		finalWorldToGrid = finalGridToWorld.createInverse();
-		
-		
-		
+
 		// ///////////////////////////////////////////////////////////////////
 		//
-		// 	HINTS
+		// HINTS
 		//
 		// ///////////////////////////////////////////////////////////////////
 		this.hints.add(LENIENT_HINT);
-		if(java2dHints!=null)
+		if (java2dHints != null)
 			this.hints.add(java2dHints);
 	}
 
@@ -205,6 +207,9 @@ public final class GridCoverageRenderer {
 		//
 		// ///////////////////////////////////////////////////////////////////
 		final GridCoverage2D gridCoverage = gc;
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("Drawing coverage ").append(
+					gc.toString()).toString());
 		final CoordinateReferenceSystem sourceCoverageCRS = gridCoverage
 				.getCoordinateReferenceSystem2D();
 
@@ -230,6 +235,10 @@ public final class GridCoverageRenderer {
 				.getMathTransform(sourceCoverageCRS, destinationCRS);
 		final MathTransform deviceCRSToGCCRSTransform = GCCRSToDeviceCRSTransform
 				.inverse();
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer(
+					"Transforming coverage envelope with transform ").append(
+					deviceCRSToGCCRSTransform.toWKT()).toString());
 		// this is the destination envelope in the coverage crs which is going
 		// to be used for getting the crop area to crop the source coverage
 		final GeneralEnvelope destinationEnvelopeInSourceGCCRS = (!deviceCRSToGCCRSTransform
@@ -251,8 +260,16 @@ public final class GridCoverageRenderer {
 		final GridCoverage2D croppedGridCoverage = getCroppedCoverage(
 				gridCoverage, destinationEnvelopeInSourceGCCRS,
 				sourceCoverageCRS);
-		if (croppedGridCoverage == null)
-			return;// nothing to render, the AOI does not overlap
+
+		if (croppedGridCoverage == null) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER
+						.fine(new StringBuffer(
+								"Skipping current coverage because cropped to an empty area")
+								.toString());
+			return;
+		}
+		// nothing to render, the AOI does not overlap
 		// croppedGridCoverage.prefetch(croppedGridCoverage.getEnvelope2D());
 
 		// try {
@@ -318,8 +335,27 @@ public final class GridCoverageRenderer {
 		final double scaleY = actualScaleY
 				/ (lonFirst ? finalGridToWorldInGCCRS.getScaleY()
 						: finalGridToWorldInGCCRS.getShearX());
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("Scale factors are ").append(scaleX)
+					.append(" ").append(scaleY).toString());
+		final GridRange range = gc.getGridGeometry().getGridRange();
+		final int actualW = range.getLength(0);
+		final int actualH = range.getLength(1);
+		if (Math.round(actualW *scaleX) < MIN_DIM_TOLERANCE
+				|| Math.round(actualH * scaleY )< MIN_DIM_TOLERANCE) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER
+						.fine(new StringBuffer(
+								"Skipping the actual coverage because one of the final dimension is null")
+								.toString());
+			return;
+		}
 
-		final Interpolation interpolation =(Interpolation) hints.get(JAI.KEY_INTERPOLATION);
+		final Interpolation interpolation = (Interpolation) hints
+				.get(JAI.KEY_INTERPOLATION);
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("Using interpolation ").append(
+					interpolation).toString());
 		// //
 		//
 		// Now if we are upsampling first reproject then scale else first scale
@@ -341,8 +377,13 @@ public final class GridCoverageRenderer {
 			// //
 			//
 			// first step for down smapling is filtered subsample which is fast.
-			// @task @todo TODO make be and interpolation parametric
+			// 
 			// //
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER
+						.fine(new StringBuffer(
+								"Filtered subsample with factors ").append(
+								scaleXInt).append(scaleYInt).toString());
 			final GridCoverage2D preScaledGridCoverage = filteredSubsample(
 					croppedGridCoverage, scaleXInt, scaleYInt,
 					new InterpolationNearest(), BorderExtender
@@ -350,16 +391,21 @@ public final class GridCoverageRenderer {
 
 			// //
 			//
-			// Second step is  scale
+			// Second step is scale
 			//
 			// //
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine(new StringBuffer("Scale down with factors ").append(
+						scaleX * scaleXInt).append(scaleY * scaleYInt)
+						.toString());
 			final GridCoverage2D scaledGridCoverage;
 			if (scaleX * scaleXInt == 1.0 && scaleY * scaleYInt == 1.0)
 				scaledGridCoverage = preScaledGridCoverage;
 			else
 				scaledGridCoverage = scale(scaleX * scaleXInt, scaleY
-						* scaleYInt, 0f, 0f, interpolation==null?new InterpolationBilinear():interpolation,
-						BorderExtender
+						* scaleYInt, 0f, 0f,
+						interpolation == null ? new InterpolationBilinear()
+								: interpolation, BorderExtender
 								.createInstance(BorderExtender.BORDER_COPY),
 						preScaledGridCoverage);
 
@@ -377,7 +423,11 @@ public final class GridCoverageRenderer {
 			// ///////////////////////////////////////////////////////////////////
 			if (!GCCRSToDeviceCRSTransform.isIdentity()) {
 				preSymbolizer = resample(scaledGridCoverage, destinationCRS,
-						interpolation==null?new InterpolationBilinear():interpolation);
+						interpolation == null ? new InterpolationBilinear()
+								: interpolation);
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine(new StringBuffer("Reprojecting to crs ")
+							.append(destinationCRS.toWKT()).toString());
 			} else
 				preSymbolizer = scaledGridCoverage;
 
@@ -397,7 +447,12 @@ public final class GridCoverageRenderer {
 			final GridCoverage2D reprojectedCoverage;
 			if (!GCCRSToDeviceCRSTransform.isIdentity()) {
 				reprojectedCoverage = resample(croppedGridCoverage,
-						destinationCRS, interpolation==null?new InterpolationBilinear():interpolation);
+						destinationCRS,
+						interpolation == null ? new InterpolationBilinear()
+								: interpolation);
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine(new StringBuffer("Reprojecting to crs ")
+							.append(destinationCRS.toWKT()).toString());
 			} else
 				reprojectedCoverage = croppedGridCoverage;
 
@@ -406,8 +461,13 @@ public final class GridCoverageRenderer {
 			// SCALE UP to the needed resolution
 			//
 			// ///////////////////////////////////////////////////////////////////
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine(new StringBuffer("Scale up with factors ").append(
+						scaleX ).append(scaleY)
+						.toString());
 			preSymbolizer = (GridCoverage2D) scale(scaleX, scaleY, 0f, 0f,
-					new InterpolationBilinear(), BorderExtender
+					interpolation == null ? new InterpolationBilinear()
+							: interpolation, BorderExtender
 							.createInstance(BorderExtender.BORDER_COPY),
 					reprojectedCoverage);
 
@@ -427,6 +487,9 @@ public final class GridCoverageRenderer {
 		//
 		//
 		// ///////////////////////////////////////////////////////////////////
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("Raster Symbolizer ")
+					.toString());
 		final RasterSymbolizerSupport rsp = new RasterSymbolizerSupport(
 				symbolizer);
 		final float alpha = rsp.getOpacity();
@@ -545,8 +608,7 @@ public final class GridCoverageRenderer {
 		param.parameter("source").setValue(gc);
 		param.parameter("CoordinateReferenceSystem").setValue(crs);
 		param.parameter("InterpolationType").setValue(interpolation);
-		return (GridCoverage2D) resampleFactory
-				.doOperation(param, hints);
+		return (GridCoverage2D) resampleFactory.doOperation(param, hints);
 
 	}
 
@@ -573,12 +635,13 @@ public final class GridCoverageRenderer {
 			param.parameter("source").setValue(gc);
 			param.parameter("scaleX").setValue(new Integer(scaleXInt));
 			param.parameter("scaleY").setValue(new Integer(scaleYInt));
-			if(hints.get(JAI.KEY_INTERPOLATION)!=null&&hints.get(JAI.KEY_INTERPOLATION).equals(new InterpolationNearest()))
-				param.parameter("qsFilterArray").setValue(
-						new float[] { 1.0F });
+			if (hints.get(JAI.KEY_INTERPOLATION) != null
+					&& hints.get(JAI.KEY_INTERPOLATION).equals(
+							new InterpolationNearest()))
+				param.parameter("qsFilterArray").setValue(new float[] { 1.0F });
 			else
 				param.parameter("qsFilterArray").setValue(
-					new float[] { 0.5F, 1.0F / 3.0F, 0.0F, -1.0F / 12.0F });
+						new float[] { 0.5F, 1.0F / 3.0F, 0.0F, -1.0F / 12.0F });
 			param.parameter("Interpolation").setValue(interpolation);
 			param.parameter("BorderExtender").setValue(be);
 			preScaledGridCoverage = (GridCoverage2D) filteredSubsampleFactory

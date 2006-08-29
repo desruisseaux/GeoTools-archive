@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,6 +42,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
@@ -84,7 +84,6 @@ import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-import com.sun.media.imageio.stream.FileChannelImageInputStream;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -99,8 +98,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * All source images are assumed to have been geometrically mapped into a common
  * coordinate space. The origin (minX, minY) of each image is therefore taken to
  * represent the location of the respective image in the common coordinate
- * system of the sour
- * ce images. This coordinate space will also be that of the
+ * system of the sour ce images. This coordinate space will also be that of the
  * destination image.
  * 
  * All source images must have the same data type and sample size for all bands
@@ -132,6 +130,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 	private final static RenderingHints NO_CACHE = new RenderingHints(
 			JAI.KEY_TILE_CACHE, null);
+
+	private static final int MAX_TILES = 300;
 
 	/**
 	 * COnstructor.
@@ -204,7 +204,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		tileIndexStore = new ShapefileDataStore(this.sourceURL);
 		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("Connected mosaic reader to its data store");
+			LOGGER.fine("Connected mosaic reader to its data store "+sourceURL.toString());
 		final String[] typeNames = tileIndexStore.getTypeNames();
 		if (typeNames.length <= 0)
 			throw new IllegalArgumentException(
@@ -282,6 +282,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		highestRes = new double[2];
 		highestRes[0] = Double.parseDouble(pair[0]);
 		highestRes[1] = Double.parseDouble(pair[1]);
+
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("Highest res ").append(highestRes[0])
+					.append(" ").append(highestRes[1]).toString());
+
 		for (int i = 1; i < numOverviews + 1; i++) {
 			pair = pairs[i].split(",");
 			overViewResolutions[i - 1][0] = Double.parseDouble(pair[0]);
@@ -376,6 +381,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
 	 */
 	public GridCoverage read(GeneralParameterValue[] params) throws IOException {
+		
+		if (LOGGER.isLoggable(Level.FINE))
+		{
+			LOGGER.fine("Reading mosaic from "+sourceURL.toString());
+			LOGGER.fine(new StringBuffer("Highest res ").append(highestRes[0])
+					.append(" ").append(highestRes[1]).toString());
+		}
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -447,6 +459,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			boolean alpha, double alphaThreshold, boolean singleImageROI,
 			int singleImageROIThreshold, Rectangle dim) throws IOException {
 
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer(
+					"Creating pyramid to comply with envelope ").append(
+					requestedEnvelope != null ? requestedEnvelope.toString()
+							: null).append(" crs ").append(
+					crs.toWKT()).append(" dim ").append(
+					dim == null ? " null" : dim.toString()).toString());
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Check if we have something to load by intersecting the requested
@@ -462,12 +481,23 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					.getCoordinateReferenceSystem(), this.crs)) {
 				try {
 					// transforming the envelope back to the data set crs
-					requestedEnvelope = CRSUtilities.transform(operationFactory
+					final MathTransform transform = operationFactory
 							.createOperation(
 									requestedEnvelope
 											.getCoordinateReferenceSystem(),
-									crs).getMathTransform(), requestedEnvelope);
-					requestedEnvelope.setCoordinateReferenceSystem(this.crs);
+									crs).getMathTransform();
+					if (!transform.isIdentity()) {
+						requestedEnvelope = CRSUtilities.transform(transform,
+								requestedEnvelope);
+						requestedEnvelope
+								.setCoordinateReferenceSystem(this.crs);
+
+						if (LOGGER.isLoggable(Level.FINE))
+							LOGGER.fine(new StringBuffer(
+									"Reprojected envelope ").append(
+									requestedEnvelope.toString()).append(
+									" crs ").append(crs.toWKT()).toString());
+					}
 				} catch (TransformException e) {
 					throw new DataSourceException(
 							"Unable to create a coverage for this source", e);
@@ -511,7 +541,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		final Iterator it = features.iterator();
 		if (!it.hasNext())
 			return null;
-		if (features.size() > 300)
+		if (features.size() > MAX_TILES)
 			return fakeMosaic(requestedEnvelope, dim);
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("We have " + features.size() + " tiles to load");
@@ -595,6 +625,12 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				imageChoice = setReadParams(readP, requestedEnvelope, dim);
 			else
 				imageChoice = new Integer(0);
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine(new StringBuffer("Loading level ").append(
+						imageChoice.toString()).append(
+						" with subsampling factors ").append(
+						readP.getSourceXSubsampling()).append(" ").append(
+						readP.getSourceYSubsampling()).toString());
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// Resolution.
@@ -607,7 +643,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// /////////////////////////////////////////////////////////////////////
 			final double[] res;
 			if (imageChoice.intValue() == 0)
-				res = highestRes;
+			{
+				res= new double[highestRes.length];
+				res[0]=highestRes[0];
+				res[1]=highestRes[1];
+			}
 			else
 				res = overViewResolutions[imageChoice.intValue() - 1];
 			// adjusting the resolution for the source subsampling
@@ -673,8 +713,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				imageFile = new File(new StringBuffer(parentLocation).append(
 						File.separatorChar).append(location).toString());
 				ParameterBlock pbjImageRead = new ParameterBlock();
-				pbjImageRead.add(new FileChannelImageInputStream(
-						new RandomAccessFile(imageFile, "r").getChannel()));
+				pbjImageRead.add(ImageIO
+						.createImageInputStream(imageFile));
 				pbjImageRead.add(imageChoice);
 				pbjImageRead.add(readMetadata);
 				pbjImageRead.add(readThumbnails);
@@ -721,7 +761,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					LOGGER.fine("Adding to mosaic image number " + i);
 				addToMosaic(pbjMosaic, bound, ULC, res, loadedImage,
 						singleImageROI, rois, i, singleImageROIThreshold,
-						alphaIn, alphaIndex, alphaChannels, finalLayout);
+						alphaIn, alphaIndex, alphaChannels, finalLayout,
+						imageFile);
 
 				i++;
 			} while (i < numImages);
@@ -805,6 +846,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			throws DataSourceException {
 
 		RenderedOp imageBeforeAlpha;
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("Loaded bbox ").append(
+					loadedTilesBound.toString()).append(
+					" while requested bbox ").append(
+					requestedJTSEnvelope.toString()).toString());
 		if (!requestedJTSEnvelope.equals(loadedTilesBound)) {
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -858,7 +904,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 		} else
 			imageBeforeAlpha = JAI.create("Mosaic", pbjMosaic, null);
-
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("Mosaic created ").toString());
 		// ///////////////////////////////////////////////////////////////////
 		//
 		// TRANSLATE in order to have minx and minY equal o zero.
@@ -874,6 +921,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					new Float(-imageBeforeAlpha.getMinY()))
 					.add(nnInterpolation);
 			imageBeforeAlpha = JAI.create("Translate", pbjTranslate, NO_CACHE);
+
 		}
 
 		// /////////////////////////////////////////////////////////////////////
@@ -882,6 +930,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		if (doAlpha) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine(new StringBuffer("Support for alpha").toString());
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// If requested I can perform the ROI operation on the prepared ROI
@@ -943,6 +993,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param alphaIndex
 	 * @param alphaIn
 	 * @param finalLayout
+	 * @param imageFile
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
@@ -950,7 +1001,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			Point2D ulc, double[] res, RenderedOp loadedImage,
 			boolean singleImageROI, ROI[] rois, int i,
 			int singleImageROIThreshold, boolean alphaIn, int[] alphaIndex,
-			PlanarImage[] alphaChannels, Area finalLayout) {
+			PlanarImage[] alphaChannels, Area finalLayout, File imageFile) {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -961,6 +1012,12 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// evaluate trans
 		double xTrans = (bound.getMinX() - ulc.getX()) / res[0];
 		double yTrans = (ulc.getY() - bound.getMaxY()) / res[1];
+
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("Adding to mosaic image  ").append(
+					imageFile.getAbsolutePath()).append(" as number ")
+					.append(i).append(" with translations factors ").append(
+							xTrans).append(" ").append(yTrans).toString());
 
 		final ParameterBlock pbjTranslate = new ParameterBlock();
 		// translation

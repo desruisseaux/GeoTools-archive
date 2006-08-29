@@ -459,12 +459,21 @@ public abstract class AbstractGridCoverage2DReader implements
 			if (requestedRes[0] - requestedRes[1] > EPS)
 				axis = 1;
 
-			// look for the highest lower resolution
+			// //
+			//
+			// looking for the owerview with the highest lower resolution
+			// compared
+			// to the requested one.
+			// This ensure more speed but less quality. In the future we should
+			// provide a hint to control this behaviour.
+			//
+			// //
 			double actRes;
 			int i = 0;
 			for (; i < numOverviews; i++) {
 				actRes = (axis == 0) ? overViewResolutions[i][0]
 						: overViewResolutions[i][1];
+				// is actual resolution lower than the requeste resolution?
 				if (actRes - requestedRes[axis] > EPS)
 					break;
 			}
@@ -473,7 +482,8 @@ public abstract class AbstractGridCoverage2DReader implements
 				// int subsamplingFactor=
 				imageChoice = new Integer(numOverviews);
 			} else
-				// keeping the first image at highest resolution into account
+				// keeping the first image at highest resolution into account in
+				// order to get the overview wit
 				imageChoice = new Integer(i + 1);
 		}
 		// /////////////////////////////////////////////////////////////////////
