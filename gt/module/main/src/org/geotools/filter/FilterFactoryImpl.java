@@ -556,6 +556,6 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
 	}
 	
 	public SortBy sort(String propertyName, SortOrder order) {
-		throw new UnsupportedOperationException();
+		return new SortByImpl( property( propertyName ), order );
 	}
 }
