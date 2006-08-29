@@ -42,10 +42,10 @@ import org.geotools.event.GTComponent;
  * </PRE>
  * Either a channel may be selected to display in each of red, green, and blue,
  * or a single channel may be selected to display in grayscale.  (The spelling
- * “gray” is used since it seems to be more common on the Web than “grey” by a
+ * ?gray? is used since it seems to be more common on the Web than ?grey? by a
  * ratio of about 3:1.) Contrast enhancement may be applied to each channel in
  * isolation.  Channels are identified by a system and data-dependent
- * character identifier.  Commonly, channels will be labelled as “1”, “2”,
+ * character identifier.  Commonly, channels will be labelled as ?1?, ?2?,
  * etc.
  *
  * @author iant

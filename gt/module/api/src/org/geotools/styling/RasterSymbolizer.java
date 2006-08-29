@@ -163,11 +163,11 @@ public interface RasterSymbolizer extends Symbolizer {
      * for a multi-spectral raster source (such as a multi-band
      * satellite-imagery source). Either a channel may be selected to display
      * in each of red, green, and blue, or a single channel may be selected to
-     * display in grayscale.  (The spelling “gray” is used since it seems to
-     * be more common on the Web than “grey” by a ratio of about 3:1.)
+     * display in grayscale.  (The spelling ?gray? is used since it seems to
+     * be more common on the Web than ?grey? by a ratio of about 3:1.)
      * Contrast enhancement may be applied to each channel in isolation.
      * Channels are identified by a system and data-dependent character
-     * identifier.  Commonly, channels will be labelled as “1”, “2”, etc.
+     * identifier.  Commonly, channels will be labelled as ?1?, ?2?, etc.
      *
      * @param channel the channel selected
      */
@@ -178,11 +178,11 @@ public interface RasterSymbolizer extends Symbolizer {
      * for a multi-spectral raster  source (such as a multi-band
      * satellite-imagery source).   Either a channel may be selected to
      * display in each of red, green, and blue, or a single channel may be
-     * selected to display in grayscale.  (The spelling “gray” is used since
-     * it seems to be more common on the Web than “grey” by a ratio of about
+     * selected to display in grayscale.  (The spelling ?gray? is used since
+     * it seems to be more common on the Web than ?grey? by a ratio of about
      * 3:1.) Contrast enhancement may be applied to each channel in isolation.
      * Channels are identified by a system and data-dependent character
-     * identifier.  Commonly, channels will be labelled as “1”, “2”, etc.
+     * identifier.  Commonly, channels will be labelled as ?1?, ?2?, etc.
      *
      * @return the ChannelSelection object set or null if none is available.
      */
@@ -262,13 +262,13 @@ public interface RasterSymbolizer extends Symbolizer {
      * The ContrastEnhancement element defines contrast enhancement for a
      * channel of a false-color image or for a color image. In the case of a
      * color image, the relative grayscale brightness of a pixel color is
-     * used. “Normalize” means to stretch the contrast so that the dimmest
+     * used. ?Normalize? means to stretch the contrast so that the dimmest
      * color is stretched to black and the brightest color is stretched to
-     * white, with all colors in between stretched out linearly. “Histogram”
+     * white, with all colors in between stretched out linearly. ?Histogram?
      * means to stretch the contrast based on a histogram of how many colors
      * are at each brightness level on input, with the goal of producing equal
      * number of pixels in the image at each brightness level on output.  This
-     * has the effect of revealing many subtle ground features. A “GammaValue”
+     * has the effect of revealing many subtle ground features. A ?GammaValue?
      * tells how much to brighten (value greater than 1.0) or dim (value less
      * than 1.0) an image. The default GammaValue is 1.0 (no change). If none
      * of Normalize, Histogram, or GammaValue are selected in a
@@ -282,14 +282,14 @@ public interface RasterSymbolizer extends Symbolizer {
      * The ContrastEnhancement element defines contrast enhancement for a
      * channel of a false-color image or  for a color image. In the case of a
      * color image, the relative grayscale brightness of a pixel color is
-     * used.  “Normalize” means to stretch the contrast so that the dimmest
+     * used.  ?Normalize? means to stretch the contrast so that the dimmest
      * color is stretched to black and  the brightest color is stretched to
-     * white, with all colors in between stretched out linearly.   “Histogram”
+     * white, with all colors in between stretched out linearly.   ?Histogram?
      * means to stretch the contrast based on a histogram of how many colors
      * are at  each brightness level on input, with the goal of producing
      * equal number of pixels in the image at each brightness level on output.
      * This has the effect of revealing many subtle ground features.   A
-     * “GammaValue” tells how much to brighten (value greater than 1.0) or dim
+     * ?GammaValue? tells how much to brighten (value greater than 1.0) or dim
      * (value less than 1.0) an image. The default GammaValue is 1.0 (no
      * change). If none of Normalize, Histogram, or GammaValue are selected in
      * a ContrastEnhancement, then no enhancement is performed.
@@ -300,16 +300,16 @@ public interface RasterSymbolizer extends Symbolizer {
 
     /**
      * The ShadedRelief element selects the application of relief shading (or
-     * “hill shading”) to an image for a three-dimensional visual effect.  It
+     * ?hill shading?) to an image for a three-dimensional visual effect.  It
      * is defined as: Exact parameters of the shading are system-dependent
-     * (for now).  If the BrightnessOnly flag is “0” (false, default), the
+     * (for now).  If the BrightnessOnly flag is ?0? (false, default), the
      * shading is applied to the layer being rendered as the current
-     * RasterSymbol. If BrightnessOnly is “1” (true), the shading is applied
+     * RasterSymbol. If BrightnessOnly is ?1? (true), the shading is applied
      * to the brightness of the colors in the rendering canvas generated so
      * far by other layers, with the effect of relief-shading these other
-     * layers. The default for BrightnessOnly is “0” (false).  The
+     * layers. The default for BrightnessOnly is ?0? (false).  The
      * ReliefFactor gives the amount of exaggeration to use for the height of
-     * the “hills.”  A value of around 55 (times) gives reasonable results for
+     * the ?hills.?  A value of around 55 (times) gives reasonable results for
      * Earth-based DEMs. The default value is system-dependent.
      *
      * @param relief the shadedrelief object
@@ -318,16 +318,16 @@ public interface RasterSymbolizer extends Symbolizer {
 
     /**
      * The ShadedRelief element selects the application of relief shading (or
-     * “hill shading”) to an image for  a three-dimensional visual effect.  It
+     * ?hill shading?) to an image for  a three-dimensional visual effect.  It
      * is defined as: Exact parameters of the shading are system-dependent
-     * (for now).  If the BrightnessOnly flag is “0”  (false, default), the
+     * (for now).  If the BrightnessOnly flag is ?0?  (false, default), the
      * shading is applied to the layer being rendered as the current
-     * RasterSymbol. If BrightnessOnly is “1” (true), the shading is applied
+     * RasterSymbol. If BrightnessOnly is ?1? (true), the shading is applied
      * to the brightness of the colors in the rendering canvas generated so
      * far by other layers, with the effect of relief-shading these other
-     * layers. The default for BrightnessOnly is “0” (false).  The
+     * layers. The default for BrightnessOnly is ?0? (false).  The
      * ReliefFactor gives the amount of exaggeration to  use for the height of
-     * the “hills.”  A value of around 55 (times) gives reasonable results for
+     * the ?hills.?  A value of around 55 (times) gives reasonable results for
      * Earth-based DEMs. The default value is system-dependent.
      *
      * @return the shadedrelief object

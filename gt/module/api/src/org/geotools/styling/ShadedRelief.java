@@ -20,8 +20,8 @@ import org.geotools.filter.expression.Expression;
 
 
 /**
- * The ShadedRelief element selects the application of relief shading (or “hill
- * shading”) to an image for a three-dimensional visual effect.  It is defined
+ * The ShadedRelief element selects the application of relief shading (or ?hill
+ * shading?) to an image for a three-dimensional visual effect.  It is defined
  * as:
  * <pre>
  * &lt;xs:element name="ShadedRelief"&gt;
@@ -36,13 +36,13 @@ import org.geotools.filter.expression.Expression;
  * &lt;xs:element name="ReliefFactor" type="xs:double"/&gt;
  * </pre>
  * Exact parameters of the shading are system-dependent (for now).  If the
- * BrightnessOnly flag is “0” (false, default), the shading is applied to the
- * layer being rendered as the current RasterSymbol. If BrightnessOnly is “1”
+ * BrightnessOnly flag is ?0? (false, default), the shading is applied to the
+ * layer being rendered as the current RasterSymbol. If BrightnessOnly is ?1?
  * (true), the shading is applied to the brightness of the colors in the
  * rendering canvas generated so far by other layers, with the effect of
- * relief-shading these other layers. The default for BrightnessOnly is “0”
+ * relief-shading these other layers. The default for BrightnessOnly is ?0?
  * (false).  The ReliefFactor gives the amount of exaggeration to use for the
- * height of the “hills.”  A value of around 55 (times) gives reasonable
+ * height of the ?hills.?  A value of around 55 (times) gives reasonable
  * results for Earth-based DEMs. The default value is system-dependent.
  *
  * @author iant
@@ -65,7 +65,7 @@ public interface ShadedRelief extends GTComponent {
 
     /**
      * The ReliefFactor gives the amount of exaggeration to use for the height
-     * of the “hills.”  A value of around 55 (times) gives reasonable results
+     * of the ?hills.?  A value of around 55 (times) gives reasonable results
      * for Earth-based DEMs. The default value is system-dependent.
      *
      * @param reliefFactor an expression which evaluates to a double.
@@ -74,7 +74,7 @@ public interface ShadedRelief extends GTComponent {
 
     /**
      * The ReliefFactor gives the amount of exaggeration to use for the height
-     * of the “hills.”  A value of around 55 (times) gives reasonable results
+     * of the ?hills.?  A value of around 55 (times) gives reasonable results
      * for Earth-based DEMs. The default value is system-dependent.
      *
      * @return an expression which evaluates to a double.
