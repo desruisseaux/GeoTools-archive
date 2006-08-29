@@ -2,7 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2004-2006, GeoTools Project Managment Committee (PMC)
- *    
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -17,6 +17,7 @@ package org.geotools.feature;
 
 import org.geotools.resources.Utilities;
 
+
 /**
  * Simple implementation of Name, hope to bring in line with GenericName.
  * <p>
@@ -30,114 +31,111 @@ import org.geotools.resources.Utilities;
  * </ul>
  * The ISO interface move towards combining the AttributeName and Attribute classes,
  * and TypeName and Type classes, while we understand the atractiveness of this on a
- * UML diagram it is very helpful to keep these concepts seperate when playing with 
+ * UML diagram it is very helpful to keep these concepts seperate when playing with
  * a strongly typed langauge like java.
  * </p>
  * <p>
  * It case it is not obvious this is a value object and equality is based on
- * namespace and name. 
+ * namespace and name.
  * </p>
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  */
 public class Name implements org.opengis.feature.type.Name {
+    /** namespace / scope */
+    protected String namespace;
 
-	/** namespace / scope */
-	protected String namespace;
-	
-	/** local part */
-	protected String local;
-	
-	/**
-	 * Constructs an instance with the local part set. Namespace / scope is 
-	 * set to null.
-	 * 
-	 * @param local The local part of the name.
-	 */
-	public Name(String local) {
-		this(null,local);
-	}
-	
-	/**
-	 * Constructs an instance with the local part and namespace set.
-	 * 
-	 * @param namespace The namespace or scope of the name.
-	 * @param local The local part of the name.
-	 * 
-	 */
-	public Name(String namespace, String local) {
-		this.namespace = namespace;
-		this.local = local;
-	}
-	
-	public boolean isGlobal() {
-		return getNamespaceURI() == null;
-	}
-	
-	public String getNamespaceURI() {
-		return namespace;
-	}
-	
-	public String getLocalPart() {
-		return local;
-	}
-	
-	public String getURI() {
-		if (namespace == null && local == null) {
-			return null;
-		}
-		
-		if (namespace == null) {
-			return local;
-		}
-		
-		if (local == null) {
-			return namespace;
-		}
-		
-		return namespace + local; 
-	}
-	
-	
-	/**
-	 * value object with equality based on name and namespace.
-	 */
-	public int hashCode() {
-		String uri = getURI();
-		return uri != null ? uri.hashCode() : 0;
-//		
-//		final int PRIME = 1000003;
-//        int result = 0;
-//        
-//        if (local != null) {
-//            result = (PRIME * result) + local.hashCode();
-//        }
-//        
-//        if (namespace != null) {
-//        	result = (PRIME * result) + namespace.hashCode();
-//        }
-//        
-//        return result;
-	}
-	
-	/**
-	 * value object with equality based on name and namespace.
-	 */
-	public boolean equals(Object obj) {
-		if (obj instanceof Name) {
-			Name other = (Name)obj;
-			
-			return Utilities.equals(getURI(), other.getURI());
-				
-		}
-		
-		return false;
-	}
-	
-	/** name or namespace:name */
-	public String toString() {
-		return getURI();
-	}
-	
-	
+    /** local part */
+    protected String local;
+
+    /**
+     * Constructs an instance with the local part set. Namespace / scope is
+     * set to null.
+     *
+     * @param local The local part of the name.
+     */
+    public Name(String local) {
+        this(null, local);
+    }
+
+    /**
+     * Constructs an instance with the local part and namespace set.
+     *
+     * @param namespace The namespace or scope of the name.
+     * @param local The local part of the name.
+     *
+     */
+    public Name(String namespace, String local) {
+        this.namespace = namespace;
+        this.local = local;
+    }
+
+    public boolean isGlobal() {
+        return getNamespaceURI() == null;
+    }
+
+    public String getNamespaceURI() {
+        return namespace;
+    }
+
+    public String getLocalPart() {
+        return local;
+    }
+
+    public String getURI() {
+        if ((namespace == null) && (local == null)) {
+            return null;
+        }
+
+        if (namespace == null) {
+            return local;
+        }
+
+        if (local == null) {
+            return namespace;
+        }
+
+        return namespace + local;
+    }
+
+    /**
+     * value object with equality based on name and namespace.
+     */
+    public int hashCode() {
+        String uri = getURI();
+
+        return (uri != null) ? uri.hashCode() : 0;
+
+        //		
+        //		final int PRIME = 1000003;
+        //        int result = 0;
+        //        
+        //        if (local != null) {
+        //            result = (PRIME * result) + local.hashCode();
+        //        }
+        //        
+        //        if (namespace != null) {
+        //        	result = (PRIME * result) + namespace.hashCode();
+        //        }
+        //        
+        //        return result;
+    }
+
+    /**
+     * value object with equality based on name and namespace.
+     */
+    public boolean equals(Object obj) {
+        if (obj instanceof Name) {
+            Name other = (Name) obj;
+
+            return Utilities.equals(getURI(), other.getURI());
+        }
+
+        return false;
+    }
+
+    /** name or namespace:name */
+    public String toString() {
+        return getURI();
+    }
 }
