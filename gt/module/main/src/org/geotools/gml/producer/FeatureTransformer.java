@@ -25,6 +25,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
 import org.geotools.feature.FeatureType;
 import org.geotools.xml.transform.TransformerBase;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -237,7 +239,7 @@ public class FeatureTransformer extends TransformerBase {
 
     public org.geotools.xml.transform.Translator createTranslator(
         ContentHandler handler) {
-        FeatureTranslator t = new FeatureTranslator(handler, collectionPrefix,
+        FeatureTranslator t = createTranslator(handler, collectionPrefix,
                 collectionNamespace, featureTypeNamespaces, schemaLocation);
         java.util.Enumeration prefixes = nsLookup.getPrefixes();
 
@@ -257,6 +259,17 @@ public class FeatureTransformer extends TransformerBase {
         return t;
     }
 
+    /**
+     * Template method for creating the translator.
+     * @return
+     */
+    protected FeatureTranslator createTranslator( 
+		ContentHandler handler, String prefix, String ns, 
+		FeatureTypeNamespaces featureTypeNamespaces, SchemaLocationSupport schemaLocationSupport
+	) {
+    	return new FeatureTranslator( handler, prefix, ns, featureTypeNamespaces, schemaLocationSupport );
+    }
+    
     public static class FeatureTypeNamespaces {
         Map lookup = new HashMap();
         NamespaceSupport nsSupport;
@@ -358,6 +371,10 @@ public class FeatureTransformer extends TransformerBase {
             this.lockId = lockId;
         }
 
+        public FeatureTypeNamespaces getFeatureTypeNamespaces() {
+        	return types;
+        }
+        
         public void encode(Object o) throws IllegalArgumentException {
             try {
                 if (o instanceof FeatureCollection) {
@@ -607,12 +624,7 @@ public class FeatureTransformer extends TransformerBase {
                     name = currentPrefix + ":" + name;
                 }
 
-                AttributesImpl fidAtts = new org.xml.sax.helpers.AttributesImpl();
-                String fid = f.getID();
-
-                if (fid != null) {
-                    fidAtts.addAttribute("", "fid", "fid", "fids", fid);
-                }
+                Attributes fidAtts = encodeFeatureId( f );
 
                 contentHandler.startElement("", "", name, fidAtts);
 
@@ -630,5 +642,17 @@ public class FeatureTransformer extends TransformerBase {
                 throw new RuntimeException(e);
             }
         }
+        
+        protected Attributes encodeFeatureId( Feature f ) {
+        	AttributesImpl fidAtts = new org.xml.sax.helpers.AttributesImpl();
+            String fid = f.getID();
+
+            if (fid != null) {
+                fidAtts.addAttribute("", "fid", "fid", "fids", fid);
+            }
+            
+            return fidAtts;
+        }
+        
     }
 }
