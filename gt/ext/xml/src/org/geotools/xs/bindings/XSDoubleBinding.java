@@ -1,17 +1,31 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.xs.bindings;
-
-import javax.xml.namespace.QName;
 
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
+import javax.xml.namespace.QName;
 
 
 /**
  * Binding object for the type http://www.w3.org/2001/XMLSchema:double.
  *
  * <p>
- *	<pre>
- *	 <code>
+ *        <pre>
+ *         <code>
  *  &lt;xs:simpleType name="double" id="double"&gt;
  *      &lt;xs:annotation&gt;
  *          &lt;xs:appinfo&gt;
@@ -32,71 +46,73 @@ import org.geotools.xml.SimpleBinding;
  *      &lt;xs:restriction base="xs:anySimpleType"&gt;
  *          &lt;xs:whiteSpace value="collapse" fixed="true" id="double.whiteSpace"/&gt;
  *      &lt;/xs:restriction&gt;
- *  &lt;/xs:simpleType&gt; 
- *		
- *	  </code>
- *	 </pre>
+ *  &lt;/xs:simpleType&gt;
+ *
+ *          </code>
+ *         </pre>
  * </p>
  *
  * @generated
  */
-public class XSDoubleBinding implements SimpleBinding  {
+public class XSDoubleBinding implements SimpleBinding {
+    /**
+     * @generated
+     */
+    public QName getTarget() {
+        return XS.DOUBLE;
+    }
 
-	/**	
-	 * @generated
-	 */	
-	public QName getTarget() {
-		return XS.DOUBLE;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public int getExecutionMode() {
-		return OVERRIDE;
-	}
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public int getExecutionMode() {
+        return OVERRIDE;
+    }
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * This binding returns objects of type {@link java.lang.Double}.
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Class getType() {
-		return Double.class;
-	}
-	
-	/**
-	 * <!-- begin-user-doc -->
-	 * This binding returns objects of type {@link java.lang.Double}. This is an 
-	 * override so value is null.
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public Object parse(InstanceComponent instance, Object value) 
-		throws Exception {
-		
-		if( "INF".equals( value )) return new Double( Double.POSITIVE_INFINITY);
-		return new Double((String) value);
-	}
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 *	
-	 * @generated modifiable
-	 */	
-	public String encode(Object object, String value) {
-		Double d = (Double)object;
-		
-		if (Double.POSITIVE_INFINITY == d.doubleValue())
-			return "INF";
-		
-		return d.toString();
-	}
-	
+    /**
+     * <!-- begin-user-doc -->
+     * This binding returns objects of type {@link java.lang.Double}.
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Class getType() {
+        return Double.class;
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * This binding returns objects of type {@link java.lang.Double}. This is an
+     * override so value is null.
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public Object parse(InstanceComponent instance, Object value)
+        throws Exception {
+        if ("INF".equals(value)) {
+            return new Double(Double.POSITIVE_INFINITY);
+        }
+
+        return new Double((String) value);
+    }
+
+    /**
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     *
+     * @generated modifiable
+     */
+    public String encode(Object object, String value) {
+        Double d = (Double) object;
+
+        if (Double.POSITIVE_INFINITY == d.doubleValue()) {
+            return "INF";
+        }
+
+        return d.toString();
+    }
 }

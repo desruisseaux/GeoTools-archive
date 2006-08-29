@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.xml.impl;
 
 import org.eclipse.xsd.XSDSchemaContent;
@@ -5,57 +20,57 @@ import org.geotools.xml.InstanceComponent;
 
 
 public abstract class InstanceComponentImpl implements InstanceComponent {
+    /** namespace **/
+    String namespace;
 
-	/** namespace **/
-	String namespace;
-	/** name **/
-	String name;
-	/** text **/
-	StringBuffer text;
-	
-	public XSDSchemaContent getDeclaration() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /** name **/
+    String name;
 
-	public String getNamespace() {
-		return namespace;
-	}
+    /** text **/
+    StringBuffer text;
 
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
+    public XSDSchemaContent getDeclaration() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getNamespace() {
+        return namespace;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getText() {
-		return text != null ? text.toString() : "";
-	}
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
 
-	public void setText(String text) {
-		this.text = text != null ? new StringBuffer(text) : new StringBuffer();
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void addText(String text) {
-		if (this.text != null) {
-			this.text.append(text);
-		}
-		else {
-			this.text = new StringBuffer(text);
-		}
-	}
-	
-	public void addText(char[] ch, int start, int length) {
-		if (text == null) {
-			text = new StringBuffer();
-		}
-		
-		text.append(ch,start,length);
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getText() {
+        return (text != null) ? text.toString() : "";
+    }
+
+    public void setText(String text) {
+        this.text = (text != null) ? new StringBuffer(text) : new StringBuffer();
+    }
+
+    public void addText(String text) {
+        if (this.text != null) {
+            this.text.append(text);
+        } else {
+            this.text = new StringBuffer(text);
+        }
+    }
+
+    public void addText(char[] ch, int start, int length) {
+        if (text == null) {
+            text = new StringBuffer();
+        }
+
+        text.append(ch, start, length);
+    }
 }
