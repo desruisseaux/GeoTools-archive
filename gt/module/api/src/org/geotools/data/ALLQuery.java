@@ -16,7 +16,7 @@
 package org.geotools.data;
 
 import org.geotools.filter.Filter;
-import org.geotools.filter.SortBy;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import java.util.Arrays;
@@ -158,6 +158,9 @@ class ALLQuery implements Query {
         return null;
     }
 
+    /**
+     * @return {@link SortBy#UNSORTED}.
+     */
     public SortBy[] getSortBy() {
         return SortBy.UNSORTED;
     }
