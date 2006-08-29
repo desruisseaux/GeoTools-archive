@@ -77,6 +77,17 @@ public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
         CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
                                                    .getCoordinateSystem();
 
+        //make sure we have the real original 
+        if ( results instanceof ReprojectFeatureResults ) {
+        	originalCs = ((ReprojectFeatureResults) results).getOrigin().getSchema()
+        		.getDefaultGeometry().getCoordinateSystem();
+        }
+        
+        if ( results instanceof ForceCoordinateSystemFeatureResults ) {
+        	originalCs = ((ForceCoordinateSystemFeatureResults) results).getOrigin().getSchema()
+    			.getDefaultGeometry().getCoordinateSystem();
+        }
+        
         if (forcedCS.equals(originalCs)) {
             throw new IllegalArgumentException("CoordinateSystem " + forcedCS
                 + " already used (check before using wrapper)");

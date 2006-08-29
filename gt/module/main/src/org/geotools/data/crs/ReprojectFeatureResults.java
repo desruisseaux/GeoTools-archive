@@ -101,7 +101,18 @@ public class ReprojectFeatureResults extends DataFeatureCollection implements Fe
         FeatureType type = results.getSchema();
         CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
                                                    .getCoordinateSystem();
-
+        
+        //make sure we have the real original 
+        if ( results instanceof ReprojectFeatureResults ) {
+        	originalCs = ((ReprojectFeatureResults) results).getOrigin().getSchema()
+        		.getDefaultGeometry().getCoordinateSystem();
+        }
+        
+        if ( results instanceof ForceCoordinateSystemFeatureResults ) {
+        	originalCs = ((ForceCoordinateSystemFeatureResults) results).getOrigin().getSchema()
+    			.getDefaultGeometry().getCoordinateSystem();
+        }
+        
         if (destinationCS.equals(originalCs)) {
             throw new IllegalArgumentException("CoordinateSystem "
                 + destinationCS + " already used (check before using wrapper)");
