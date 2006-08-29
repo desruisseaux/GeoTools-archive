@@ -1,9 +1,21 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.filter;
 
-import java.util.LinkedList;
-
 import junit.framework.TestCase;
-
 import org.geotools.filter.v1_0.OGCSchemaLocationResolver;
 import org.geotools.gml2.bindings.GMLSchemaLocationResolver;
 import org.geotools.xml.Configuration;
@@ -13,49 +25,48 @@ import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.picocontainer.MutablePicoContainer;
+import java.util.LinkedList;
+
 
 public class OGCFilterTest extends TestCase {
-	
-	Parser parser;
-	
-	protected void setUp() throws Exception {
-		super.setUp();
-		
-		Configuration configuration = new Configuration() {
+    Parser parser;
 
-        	public void configureBindings(MutablePicoContainer container) {
-        		container.registerComponentImplementation(LinkedList.class);
-        		
-        		new XSBindingConfiguration().configure(container);
-        		new org.geotools.filter.v1_0.OGCBindingConfiguration().configure(container);
-        	
-        	}
-        	
-        	public void configureContext(MutablePicoContainer container) {
-        		container.registerComponentImplementation(GMLSchemaLocationResolver.class);
-        		container.registerComponentImplementation(OGCSchemaLocationResolver.class);
-        		container.registerComponentImplementation(FilterFactoryImpl.class);
-        		
-        	}
-        };
-        
-        parser = new Parser(configuration,getClass().getResourceAsStream("test1.xml"));
-	}
-	
-	public void testRun() throws Exception {
-		Object thing = parser.parse();
-		assertNotNull(thing);
-		assertTrue(thing instanceof PropertyIsEqualTo);
-		
-		PropertyIsEqualTo equal = (PropertyIsEqualTo) thing;
-		assertTrue( equal.getExpression1() instanceof PropertyName );
-		assertTrue( equal.getExpression2() instanceof Literal );
-		
-		PropertyName name = (PropertyName) equal.getExpression1();
-		assertEquals( "testString", name.getPropertyName() );
-		
-		Literal literal = (Literal) equal.getExpression2();
-		assertEquals( "2", literal.toString() );
-	}
+    protected void setUp() throws Exception {
+        super.setUp();
 
+        Configuration configuration = new Configuration() {
+                public void configureBindings(MutablePicoContainer container) {
+                    container.registerComponentImplementation(LinkedList.class);
+
+                    new XSBindingConfiguration().configure(container);
+                    new org.geotools.filter.v1_0.OGCBindingConfiguration()
+                    .configure(container);
+                }
+
+                public void configureContext(MutablePicoContainer container) {
+                    container.registerComponentImplementation(GMLSchemaLocationResolver.class);
+                    container.registerComponentImplementation(OGCSchemaLocationResolver.class);
+                    container.registerComponentImplementation(FilterFactoryImpl.class);
+                }
+            };
+
+        parser = new Parser(configuration,
+                getClass().getResourceAsStream("test1.xml"));
+    }
+
+    public void testRun() throws Exception {
+        Object thing = parser.parse();
+        assertNotNull(thing);
+        assertTrue(thing instanceof PropertyIsEqualTo);
+
+        PropertyIsEqualTo equal = (PropertyIsEqualTo) thing;
+        assertTrue(equal.getExpression1() instanceof PropertyName);
+        assertTrue(equal.getExpression2() instanceof Literal);
+
+        PropertyName name = (PropertyName) equal.getExpression1();
+        assertEquals("testString", name.getPropertyName());
+
+        Literal literal = (Literal) equal.getExpression2();
+        assertEquals("2", literal.toString());
+    }
 }
