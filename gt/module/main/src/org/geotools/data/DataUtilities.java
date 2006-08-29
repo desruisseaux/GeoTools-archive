@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -115,6 +116,7 @@ public class DataUtilities {
         typeMap.put("MultiLineString", MultiLineString.class);
         typeMap.put("MultiPolygon", MultiPolygon.class);
         typeMap.put("GeometryCollection", GeometryCollection.class);
+        typeMap.put("Date",Date.class);
     }
 
     /**
