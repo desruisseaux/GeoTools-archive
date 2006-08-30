@@ -82,7 +82,8 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected static final double EPS = 1E-6;
 
 	/** Buffere factory for coordinate operations. */
-	protected final static CoordinateOperationFactory operationFactory = new BufferedDefaultCoordinateOperationFactory();
+	protected final static CoordinateOperationFactory operationFactory = new BufferedDefaultCoordinateOperationFactory(
+			new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
 
 	/**
 	 * Default color ramp. Preset colors used to generate an Image from the raw
