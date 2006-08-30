@@ -204,7 +204,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		tileIndexStore = new ShapefileDataStore(this.sourceURL);
 		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("Connected mosaic reader to its data store "+sourceURL.toString());
+			LOGGER.fine("Connected mosaic reader to its data store "
+					+ sourceURL.toString());
 		final String[] typeNames = tileIndexStore.getTypeNames();
 		if (typeNames.length <= 0)
 			throw new IllegalArgumentException(
@@ -381,10 +382,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
 	 */
 	public GridCoverage read(GeneralParameterValue[] params) throws IOException {
-		
-		if (LOGGER.isLoggable(Level.FINE))
-		{
-			LOGGER.fine("Reading mosaic from "+sourceURL.toString());
+
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Reading mosaic from " + sourceURL.toString());
 			LOGGER.fine(new StringBuffer("Highest res ").append(highestRes[0])
 					.append(" ").append(highestRes[1]).toString());
 		}
@@ -463,9 +463,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			LOGGER.fine(new StringBuffer(
 					"Creating pyramid to comply with envelope ").append(
 					requestedEnvelope != null ? requestedEnvelope.toString()
-							: null).append(" crs ").append(
-					crs.toWKT()).append(" dim ").append(
-					dim == null ? " null" : dim.toString()).toString());
+							: null).append(" crs ").append(crs.toWKT()).append(
+					" dim ").append(dim == null ? " null" : dim.toString())
+					.toString());
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Check if we have something to load by intersecting the requested
@@ -542,7 +542,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		if (!it.hasNext())
 			return null;
 		if (features.size() > MAX_TILES)
-			return fakeMosaic(requestedEnvelope, dim);
+			return fakeMosaic(requestedEnvelope, features.size());
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("We have " + features.size() + " tiles to load");
 		try {
@@ -559,9 +559,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	}
 
 	private GridCoverage fakeMosaic(GeneralEnvelope requestedEnvelope,
-			Rectangle dim) {
-		if (dim == null)
-			dim = new Rectangle(800, 600);
+			int features) {
+		LOGGER.warning(new StringBuffer("We can load at most ").append(
+				MAX_TILES).append(" tiles while there were requested ").append(
+				features).append(
+				"\nI am going to print out a fake coverage, sorry about it!")
+				.toString());
+		Rectangle dim = new Rectangle(800, 600);
 		final BufferedImage image = new BufferedImage(dim.width, dim.height,
 				BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g2D = (Graphics2D) image.getGraphics();
@@ -641,13 +645,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// in the final mosaic which we do not wnat to happen.
 			// /////////////////////////////////////////////////////////////////////
 			final double[] res;
-			if (imageChoice.intValue() == 0)
-			{
-				res= new double[highestRes.length];
-				res[0]=highestRes[0];
-				res[1]=highestRes[1];
-			}
-			else
+			if (imageChoice.intValue() == 0) {
+				res = new double[highestRes.length];
+				res[0] = highestRes[0];
+				res[1] = highestRes[1];
+			} else
 				res = overViewResolutions[imageChoice.intValue() - 1];
 			// adjusting the resolution for the source subsampling
 			res[0] *= readP.getSourceXSubsampling();
@@ -712,8 +714,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				imageFile = new File(new StringBuffer(parentLocation).append(
 						File.separatorChar).append(location).toString());
 				ParameterBlock pbjImageRead = new ParameterBlock();
-				pbjImageRead.add(ImageIO
-						.createImageInputStream(imageFile));
+				pbjImageRead.add(ImageIO.createImageInputStream(imageFile));
 				pbjImageRead.add(imageChoice);
 				pbjImageRead.add(readMetadata);
 				pbjImageRead.add(readThumbnails);
