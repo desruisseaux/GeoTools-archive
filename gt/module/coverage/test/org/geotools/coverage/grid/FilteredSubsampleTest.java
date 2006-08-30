@@ -29,7 +29,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author simone
- * 
+ * @since 2.3
  */
 public class FilteredSubsampleTest extends GridCoverageTest {
 	private static final boolean SHOW = true;

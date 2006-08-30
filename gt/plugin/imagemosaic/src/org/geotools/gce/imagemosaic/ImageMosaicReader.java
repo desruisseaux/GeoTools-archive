@@ -565,7 +565,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		final BufferedImage image = new BufferedImage(dim.width, dim.height,
 				BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g2D = (Graphics2D) image.getGraphics();
-		image.setAccelerationPriority(1.0f);
 		g2D.setColor(Color.red);
 		g2D.draw3DRect(0, 0, dim.width - 1, dim.height - 1, true);
 		g2D.drawLine(0, 0, dim.width, dim.height);

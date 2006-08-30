@@ -31,7 +31,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author Simone Giannecchini
- *
+ * @since 2.3
  */
 public class FilteredSubsample extends Operation2D {
 	/**
@@ -102,7 +102,7 @@ public class FilteredSubsample extends Operation2D {
 			Citations.OGC, "BorderExtender", BorderExtender.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
-			BorderExtenderCopy.createInstance(BorderExtenderCopy.BORDER_ZERO), // Default value
+			BorderExtenderCopy.createInstance(BorderExtenderCopy.BORDER_COPY), // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure

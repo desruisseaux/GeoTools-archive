@@ -18,8 +18,10 @@
  */
 package org.geotools.gce.imagemosaic;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.LogManager;
 
 import javax.media.jai.JAI;
 
@@ -28,7 +30,6 @@ import junit.textui.TestRunner;
 
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.resources.TestData;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
@@ -57,8 +58,8 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		final URL testFile = //new File("c:/work/data/mosaic.shp").toURL();
-		 TestData.getResource(this,TEST_FILE);//
+		final URL testFile = new File("e:/work/data/chicago/mosaic.shp").toURL();
+//		 TestData.getResource(this,TEST_FILE);//
 		assertNotNull(testFile);
 
 		//
@@ -279,14 +280,13 @@ public class ImageMosaicReaderTest extends TestCase {
 	// final ParameterValue gg = (ParameterValue)
 	// ImageMosaicFormat.READ_GRIDGEOMETRY2D
 	// .createValue();
-	// final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[]
-	// {
-	// 7.71089711835763,38.4483357978537 }, new double[] {
-	// 13.2519216051101,43.1624043574166 });
+	// final GeneralEnvelope cropEnvelope = new GeneralEnvelope(new double[] {
+	// 7.71089711835763, 38.4483357978537 }, new double[] {
+	// 13.2519216051101, 43.1624043574166 });
 	// cropEnvelope.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
 	// gg.setValue(new GridGeometry2D(new GeneralGridRange(new Rectangle(0, 0,
 	// 100, 80)), cropEnvelope));
-	//		
+	//
 	// //
 	// // /////////////////////////////////////////////////////////////////
 	// //
@@ -294,11 +294,11 @@ public class ImageMosaicReaderTest extends TestCase {
 	// //
 	// //
 	// // /////////////////////////////////////////////////////////////////
-	// ((AbstractCoverage) reader.read(new GeneralParameterValue[] { gg,
-	// })).show("testCrop");
+	// ((AbstractCoverage) reader.read(new GeneralParameterValue[] { gg, }))
+	// .show("testCrop");
 	//
 	// }
-	//
+
 	// public void testComplete() throws IOException,
 	// MismatchedDimensionException, NoSuchAuthorityCodeException {
 	//
@@ -421,12 +421,13 @@ public class ImageMosaicReaderTest extends TestCase {
 	}
 
 	protected void setUp() throws Exception {
+		
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
 				64 * 1024 * 1024);
 		JAI.getDefaultInstance().getTileScheduler().setParallelism(50);
-		JAI.getDefaultInstance().getTileScheduler().setPriority(10);
+		JAI.getDefaultInstance().getTileScheduler().setPriority(6);
 		JAI.getDefaultInstance().getTileScheduler().setPrefetchParallelism(50);
-		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(10);
+		JAI.getDefaultInstance().getTileScheduler().setPrefetchPriority(6);
 
 		super.setUp();
 	}

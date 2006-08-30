@@ -397,6 +397,24 @@ public class Operations {
 		return (GridCoverage) processor.doOperation(parameters);
 
 	}
+	
+	public GridCoverage SubsampleAverage(final GridCoverage source, final double scaleX,
+			final double scaleY,final Interpolation interpolation,final BorderExtender be) {
+		final AbstractProcessor processor = getProcessor();
+		final Operation operation = processor.getOperation("SubsampleAverage");
+		final ParameterValueGroup parameters = operation.getParameters();
+		parameters.parameter("Source").setValue(source);
+		try {
+			parameters.parameter("scaleX").setValue(new Double(scaleX));
+			parameters.parameter("scaleY").setValue(new Double(scaleY));
+			parameters.parameter("Interpolation").setValue(interpolation);
+			parameters.parameter("BorderExtender").setValue(be);
+		} catch (ParameterNotFoundException cause) {
+			throw invalidParameterName(cause);
+		}
+		return (GridCoverage) processor.doOperation(parameters);
+
+	}
 	public GridCoverage scale(final GridCoverage source, final double xScale,
 			final double yScale, final double xTrans, final double yTrans,Interpolation interpolation) {
 		final AbstractProcessor processor = getProcessor();
