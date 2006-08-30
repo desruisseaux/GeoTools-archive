@@ -19,7 +19,6 @@ package org.geotools.referencing.factory;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.text.Format;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Map;
@@ -39,8 +38,8 @@ import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
-import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.wkt.Symbols;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.util.DerivedSet;
 import org.geotools.util.SimpleInternationalString;
 
@@ -51,9 +50,9 @@ import org.geotools.util.SimpleInternationalString;
  * {@linkplain org.geotools.referencing.factory.epsg.FactoryUsingSQL EPSG database backed
  * authority factory} (for example), in a portable property file.
  * <p>
- * This factory doesn't cache any result. Any call to a {@code createFoo} method will send a new
- * query to the EPSG database. For caching, this factory should be wrapped in some buffered factory
- * like {@link BufferedAuthorityFactory}.
+ * This factory doesn't cache any result. Any call to a {@code createFoo} method will trig a new
+ * WKT parsing. For caching, this factory should be wrapped in some buffered factory like
+ * {@link BufferedAuthorityFactory}.
  * <p>
  * This authority factory has a low priority. By default,
  * {@link org.geotools.referencing.FactoryFinder} will uses it only if it has been unable
@@ -95,9 +94,9 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
     private transient Map filteredCodes;
 
     /**
-     * A WKT parser. Will be used only if the generic {@link #createObject} method is invoked.
+     * A WKT parser.
      */
-    private transient Format parser;
+    private transient Parser parser;
     
     /**
      * Loads from the specified property file.
@@ -113,7 +112,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
                                     final URL          definitions)
             throws IOException
     {
-        super(factories, MINIMUM_PRIORITY+10);
+        super(factories, MINIMUM_PRIORITY + 10);
         this.authority = authority;
         final InputStream in = definitions.openStream();
         this.definitions.load(in);
@@ -163,7 +162,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
         synchronized (filteredCodes) {
             Set filtered = (Set) filteredCodes.get(type);
             if (filtered == null) {
-                filtered = new Codes(codes, type);
+                filtered = new Codes(definitions, type);
                 filteredCodes.put(type, filtered);
             }
             return filtered;
@@ -176,38 +175,48 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * specified type. Filtering is performed on the fly. Consequently, this set is cheap
      * if the user just want to check for the existence of a particular code.
      */
-    private static final class Codes extends DerivedSet {
+    private static final class Codes extends DerivedSet/*<String, String>*/ {
         /**
          * The spatial reference objects type (may be {@code Object.class}).
          */
-        private final Class type;
+        private final Class/*<? extends IdentifiedType>*/ type;
+
+        /**
+         * The reference to {@link PropertyAuthorityFactory#definitions}.
+         */
+        private final Map/*<String,String>*/ definitions;
 
         /**
          * Constructs a set of codes for the specified type.
          */
-        public Codes(final Set codes, final Class type) {
-            super(codes);
+        public Codes(final Map/*<String,String>*/ definitions,
+                     final Class/*<? extends IdentifiedType>*/ type)
+        {
+            super(definitions.keySet());
+            this.definitions = definitions;
             this.type = type;
         }
 
         /**
-         * Returns the element if it is of the expected type, or {@code null} otherwise.
+         * Returns the code if the associated key is of the expected type, or {@code null}
+         * otherwise.
          */
-        protected Object baseToDerived(final Object element) {
-            final String wkt = (String) element;
+        protected /*String*/ Object baseToDerived(final /*String*/ Object element) {
+            final String key = (String) element;
+            final String wkt = (String) definitions.get(key);
             final int length = wkt.length();
             int i=0; while (i<length && Character.isJavaIdentifierPart(wkt.charAt(i))) i++;
             Class candidate = Parser.getClassOf(wkt.substring(0,i));
             if (candidate == null) {
                 candidate = IdentifiedObject.class;
             }
-            return type.isAssignableFrom(candidate) ? element : null;
+            return type.isAssignableFrom(candidate) ? key : null;
         }
 
         /**
          * Transforms a value in this set to a value in the base set.
          */
-        protected Object derivedToBase(final Object element) {
+        protected /*String*/ Object derivedToBase(final /*String*/ Object element) {
             return element;
         }
     }
@@ -221,8 +230,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      */
     public String getWKT(final String code) throws NoSuchAuthorityCodeException {
         ensureNonNull("code", code);
-        final String epsg = trimAuthority(code);
-        final String wkt = definitions.getProperty(epsg);
+        final String wkt = definitions.getProperty(trimAuthority(code));
         if (wkt == null) {
             throw noSuchAuthorityCode(IdentifiedObject.class, code);
         }
@@ -250,10 +258,21 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
             }
         }
         return null;
-    } 
+    }
 
     /**
-     * Returns an arbitrary object from a code.
+     * Returns the parser.
+     */
+    private Parser getParser() {
+        if (parser == null) {
+            parser = new Parser();
+        }
+        return parser;
+    }
+
+    /**
+     * Returns an arbitrary object from a code. If the object type is know at compile time, it is
+     * recommended to invoke the most precise method instead of this one.
      *
      * @param  code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
@@ -263,11 +282,10 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
             throws NoSuchAuthorityCodeException, FactoryException
     {
         final String wkt = getWKT(code);
-        if (parser == null) {
-            parser = new Parser(Symbols.DEFAULT, factories);
-        }
+        final Parser parser = getParser();
         try {
             synchronized (parser) {
+                parser.code = code;
                 return (IdentifiedObject) parser.parseObject(wkt);
             }
         } catch (ParseException exception) {
@@ -276,17 +294,58 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
     }
 
     /**
-     * Returns an arbitrary {@linkplain CoordinateReferenceSystem coordinate reference system}
-     * from a code. If the coordinate reference system type is know at compile time, it is
-     * recommended to invoke the most precise method instead of this one.
+     * Returns a coordinate reference system from a code. If the object type is know at compile
+     * time, it is recommended to invoke the most precise method instead of this one.
      *
      * @param  code Value allocated by authority.
      * @throws NoSuchAuthorityCodeException if the specified {@code code} was not found.
      * @throws FactoryException if the object creation failed for some other reason.
      */
-    public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code) 
-            throws NoSuchAuthorityCodeException, FactoryException 
+    public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
+            throws NoSuchAuthorityCodeException, FactoryException
     {
-        return factories.getCRSFactory().createFromWKT(getWKT(code));
+        final String wkt = getWKT(code);
+        final Parser parser = getParser();
+        try {
+            synchronized (parser) {
+                parser.code = code;
+                // parseCoordinateReferenceSystem provides a slightly faster path than parseObject.
+                return (CoordinateReferenceSystem) parser.parseCoordinateReferenceSystem(wkt);
+            }
+        } catch (ParseException exception) {
+            throw new FactoryException(exception);
+        }
+    }
+
+    /**
+     * The WKT parser for this authority factory. This parser add automatically the authority
+     * code if it was not explicitly specified in the WKT.
+     */
+    private final class Parser extends org.geotools.referencing.wkt.Parser {
+        /**
+         * The authority code for the WKT to be parsed.
+         */
+        String code;
+
+        /**
+         * Creates the parser.
+         */
+        public Parser() {
+            super(Symbols.DEFAULT, factories);
+        }
+
+        /**
+         * Add the authority code to the specified properties, if not already present.
+         */
+        // @Override
+        protected Map alterProperties(Map properties) {
+            Object candidate = properties.get(IdentifiedObject.IDENTIFIERS_KEY);
+            if (candidate == null && code != null) {
+                properties = new HashMap(properties);
+                properties.put(IdentifiedObject.IDENTIFIERS_KEY,
+                        new NamedIdentifier(authority, trimAuthority(code)));
+            }
+            return super.alterProperties(properties);
+        }
     }
 }

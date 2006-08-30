@@ -739,6 +739,11 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @since 2.0
      * @version $Id$
      * @author Martin Desruisseaux
+     *
+     * @todo In Geotools 2.2, this class was a non-static inner class. It has been changed to
+     *       a static inner class in Geotools 2.3-M0 because Clover doesn't seem to support
+     *       inheritence in such class. This is not yet clear if this change in the Geotools
+     *       code base will be permanent or not.
      */
     protected static abstract class Inverse extends AbstractMathTransform implements Serializable {
         /**
@@ -751,6 +756,10 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * http://developer.java.sun.com/developer/bugParade/bugs/4211550.html
          */
         private static final long serialVersionUID = 3528274816628012283L;
+
+        /**
+         * Reference to the enclosing class.
+         */
 		private AbstractMathTransform original;
 
         /**

@@ -29,6 +29,7 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.PlanarProjection;
 
@@ -162,7 +163,7 @@ public abstract class Orthographic extends MapProjection {
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
         protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
-                throws ParameterNotFoundException
+                throws ParameterNotFoundException, FactoryException
         {
             // Values here are in radians (the standard units for the map projection package)
             final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
@@ -181,8 +182,7 @@ public abstract class Orthographic extends MapProjection {
                     return new OrthographicOblique(parameters, descriptors);
                 }
             } else {
-                throw new UnsupportedOperationException(Errors.format(
-                    ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
+                throw new FactoryException(Errors.format(ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
             }
         }    
     }

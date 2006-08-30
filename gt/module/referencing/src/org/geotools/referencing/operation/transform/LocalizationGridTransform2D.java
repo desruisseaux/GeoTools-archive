@@ -34,6 +34,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.Matrix;
@@ -790,9 +791,9 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
         public MathTransform createMathTransform(final ParameterValueGroup values)
-                throws ParameterNotFoundException
+                throws ParameterNotFoundException, FactoryException
         {
-            throw new UnsupportedOperationException("Not yet implemented");
+            throw new FactoryException("Not yet implemented");
         }
     }
 }

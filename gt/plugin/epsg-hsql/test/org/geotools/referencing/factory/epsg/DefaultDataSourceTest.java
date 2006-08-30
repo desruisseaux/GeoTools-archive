@@ -82,8 +82,6 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Vadim Semenov
- *
- * @todo This test suite need to be profiled in order to determine where this test spent its time.
  */
 public class DefaultDataSourceTest extends TestCase {
     /**
@@ -260,10 +258,12 @@ public class DefaultDataSourceTest extends TestCase {
         System.gc();              // If there is any object holding a connection to the EPSG
         System.runFinalization(); // database, running finalizers may help to close them.
         factory.setTimeout(200);
-        assertEquals("4273", getIdentifier(factory.createCoordinateReferenceSystem("4273")));
+        // Fetch this CRS first in order to prevent garbage collection.
+        CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("4273");
+        assertEquals("4273", getIdentifier(crs));
         try {
             assertTrue(factory.isConnected());
-            Thread.currentThread().sleep(1000);
+            Thread.currentThread().sleep(800);
             System.gc();
             System.runFinalization();
             assertFalse(factory.isConnected());
@@ -272,7 +272,7 @@ public class DefaultDataSourceTest extends TestCase {
         }
         assertFalse(factory.isConnected());
         // Should be in the cache.
-        assertEquals("4273", getIdentifier(factory.createCoordinateReferenceSystem("4273")));
+        assertSame(crs, factory.createCoordinateReferenceSystem("4273"));
         assertFalse(factory.isConnected());
         // Was not in the cache
         assertEquals("4275", getIdentifier(factory.createCoordinateReferenceSystem("4275")));

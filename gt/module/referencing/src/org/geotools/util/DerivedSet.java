@@ -37,7 +37,9 @@ import java.util.Set;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public abstract class DerivedSet extends AbstractSet implements Serializable {
+public abstract class DerivedSet/*<BaseType, DerivedType>*/ extends AbstractSet/*<DerivedType>*/
+        implements Serializable
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -49,14 +51,14 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      * @see #baseToDerived
      * @see #derivedToBase
      */
-    protected final Set base;
+    protected final Set/*<BaseType>*/ base;
     
     /**
      * Creates a new derived set from the specified base set.
      *
      * @param base The base set.
      */
-    public DerivedSet(final Set base) {
+    public DerivedSet(final Set/*<BaseType>*/ base) {
         this.base = base;
     }
 
@@ -69,7 +71,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      * @return The value that this view should contains instead of {@code element},
      *         or {@code null}.
      */
-    protected abstract Object baseToDerived(final Object element);
+    protected abstract /*DerivedType*/ Object baseToDerived(final /*BaseType*/Object element);
 
     /**
      * Transforms a value in this set to a value in the {@linkplain #base} set.
@@ -77,7 +79,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      * @param  element A value in this set.
      * @return The value stored in the {@linkplain #base} set.
      */
-    protected abstract Object derivedToBase(final Object element);
+    protected abstract /*BaseType*/ Object derivedToBase(final /*DerivedType*/ Object element);
 
     /**
      * Returns an iterator over the elements contained in this set.
@@ -85,7 +87,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      *
      * @return an iterator over the elements contained in this set.
      */
-    public Iterator iterator() {
+    public Iterator/*<DerivedType>*/ iterator() {
         return new Iter(base.iterator());
     }
     
@@ -121,7 +123,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      * @param  element object to be checked for containment in this set.
      * @return {@code true} if this set contains the specified element.
      */
-    public boolean contains(final Object element) {
+    public boolean contains(final /*DerivedType*/ Object element) {
         return base.contains(derivedToBase(element));
     }
 
@@ -135,7 +137,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      * @throws UnsupportedOperationException if the {@linkplain #base} set doesn't
      *         supports the {@code add} operation.
      */
-    public boolean add(final Object element) throws UnsupportedOperationException {
+    public boolean add(final /*DerivedType*/ Object element) throws UnsupportedOperationException {
         return base.add(derivedToBase(element));
     }
 
@@ -149,28 +151,28 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
      * @throws UnsupportedOperationException if the {@linkplain #base} set doesn't
      *         supports the {@code remove} operation.
      */
-    public boolean remove(final Object element) throws UnsupportedOperationException {
+    public boolean remove(final /*DerivedType*/ Object element) throws UnsupportedOperationException {
         return base.remove(derivedToBase(element));
     }
 
     /**
      * Iterates through the elements in the set.
      */
-    private final class Iter implements Iterator {
+    private final class Iter implements Iterator/*<DerivedType>*/ {
         /**
          * The iterator from the {@linkplain #base} set.
          */
-        private final Iterator iterator;
+        private final Iterator/*<BaseType>*/ iterator;
 
         /**
          * The next element to be returned, or {@code null}.
          */
-        private transient Object next;
+        private transient /*DerivedType*/ Object next;
 
         /**
          * The iterator from the {@linkplain #base} set.
          */
-        public Iter(final Iterator iterator) {
+        public Iter(final Iterator/*<BaseType>*/ iterator) {
             this.iterator = iterator;
         }
 
@@ -190,7 +192,7 @@ public abstract class DerivedSet extends AbstractSet implements Serializable {
         /**
          * Returns the next element in the iteration.
          */
-        public Object next() {
+        public /*DerivedType*/ Object next() {
             while (next == null) {
                 next = baseToDerived(iterator.next());
             }

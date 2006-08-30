@@ -75,7 +75,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * {@code FACTORY} hints.
      */
     public FactoryUsingWKT(final Hints hints) {
-        super(hints, MINIMUM_PRIORITY+20);
+        super(hints, MINIMUM_PRIORITY + 20);
         factories = FactoryGroup.createInstance(hints);
         setTimeout(15*60*1000L); // Closes the connection after at least 15 minutes of inactivity.
     }

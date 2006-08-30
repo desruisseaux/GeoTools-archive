@@ -37,6 +37,12 @@ import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.util.InternationalString;
 
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.factory.FactoryNotFoundException;
+
 
 /**
  * A factory which delegates all object creation to a <cite>main</cite> factory, and fallback
@@ -146,21 +152,34 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      */
     public static AuthorityFactory create(final Class/*<T extends AuthorityFactory>*/ type,
                                           final Collection/*<T>*/ factories)
-            throws NoSuchElementException, ClassCastException
+            throws FactoryNotFoundException, ClassCastException
     {
+        ensureNonNull("type", type);
+        ensureNonNull("factories", factories);
         final AuthorityFactory factory;
-        if (factories.size() <= 1) {
-            factory = (AuthorityFactory) factories.iterator().next();
-        } else if (CRSAuthorityFactory.class.equals(type)) {
-            factory = new CRS(factories);
-        } else if (CSAuthorityFactory.class.equals(type)) {
-            factory = new CS(factories);
-        } else if (DatumAuthorityFactory.class.equals(type)) {
-            factory = new Datum(factories);
-        } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
-            factory = new Operation(factories);
-        } else {
-            factory = new FallbackAuthorityFactory(factories);
+        switch (factories.size()) {
+            case 0: {
+                throw new FactoryNotFoundException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
+                        Utilities.getShortName(type)));
+            }
+            case 1: {
+                factory = (AuthorityFactory) factories.iterator().next();
+                break;
+            }
+            default: {
+                if (CRSAuthorityFactory.class.equals(type)) {
+                    factory = new CRS(factories);
+                } else if (CSAuthorityFactory.class.equals(type)) {
+                    factory = new CS(factories);
+                } else if (DatumAuthorityFactory.class.equals(type)) {
+                    factory = new Datum(factories);
+                } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
+                    factory = new Operation(factories);
+                } else {
+                    factory = new FallbackAuthorityFactory(factories);
+                }
+                break;
+            }
         }
         // return type.cast(factory);  // TODO: uncomment with J2SE 1.5.
         return factory;

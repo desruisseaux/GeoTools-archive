@@ -60,6 +60,9 @@ import org.geotools.resources.i18n.Errors;
  * @author Jody Garnett
  * @author Rueben Schulz
  * @author Martin Desruisseaux
+ *
+ * @deprecated Not used anymore. The {@code epsg-hsql} + {@code epsg-ext-*} modules are provided as
+ *             a replacement for this WKT-based factory.
  */
 public class FactoryUsingWKT extends DeferredAuthorityFactory
         implements CRSAuthorityFactory, CSAuthorityFactory, DatumAuthorityFactory

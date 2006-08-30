@@ -183,6 +183,60 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
+     * Returns all providers of the specified type.
+     *
+     * @param  type  The factory type.
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set of available factory implementations.
+     */
+    private static synchronized Set/*<T>*/ getFactories(final Class/*<T extends Factory>*/ type,
+            final Hints hints)
+    {
+        return new LazySet(getServiceRegistry().getServiceProviders(type, null, hints));
+    }
+
+    /**
+     * Returns a provider of the specified type.
+     *
+     * @param  type  The factory type.
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @param  key   The hint key to use for searching an implementation.
+     * @return The first factory that matches the supplied hints.
+     * @throws FactoryRegistryException if no implementation was found or can be created for the
+     *         specified interface.
+     */
+    private static synchronized Factory /*T*/ getFactory(final Class/*<T extends Factory>*/ type,
+            final Hints hints, final Hints.Key key)
+            throws FactoryRegistryException
+    {
+        return (Factory) getServiceRegistry().getServiceProvider(type, null, hints, key);
+    }
+
+    /**
+     * Returns the first implementation of a factory matching the specified hints. If no
+     * implementation matches, a new one is created if possible or an exception is thrown
+     * otherwise. If more than one implementation is registered and an
+     * {@linkplain #setVendorOrdering ordering is set}, then the preferred
+     * implementation is returned. Otherwise an arbitrary one is selected.
+     *
+     * @param  type      The authority factory type.
+     * @param  authority The desired authority (e.g. "EPSG").
+     * @param  hints     An optional map of hints, or {@code null} if none.
+     * @param  key   The hint key to use for searching an implementation.
+     * @return The first authority factory that matches the supplied hints.
+     * @throws FactoryRegistryException if no implementation was found or can be created for the
+     *         specfied interface.
+     */
+    private static synchronized AuthorityFactory /*T*/ getAuthorityFactory(
+            final Class/*<T extends AuthorityFactory>*/ type, final String authority,
+            final Hints hints, final Hints.Key key)
+            throws FactoryRegistryException
+    {
+        return (AuthorityFactory) getServiceRegistry().getServiceProvider(
+                type, new AuthorityFilter(authority), hints, key);
+    }
+
+    /**
      * Returns the first implementation of {@link DatumFactory} matching the specified hints.
      * If no implementation matches, a new one is created if possible or an exception is thrown
      * otherwise. If more than one implementation is registered and an
@@ -194,9 +248,8 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link DatumFactory} interface.
      */
-    public static synchronized DatumFactory getDatumFactory(final Hints hints) throws FactoryRegistryException {
-        return (DatumFactory) getServiceRegistry().getServiceProvider(
-                DatumFactory.class, null, hints, Hints.DATUM_FACTORY);
+    public static DatumFactory getDatumFactory(final Hints hints) throws FactoryRegistryException {
+        return (DatumFactory) getFactory(DatumFactory.class, hints, Hints.DATUM_FACTORY);
     }
 
     /**
@@ -214,8 +267,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getDatumFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(DatumFactory.class, null, hints));
+    public static Set getDatumFactories(final Hints hints) {
+        return getFactories(DatumFactory.class, hints);
     }
 
     /**
@@ -230,9 +283,8 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link CSFactory} interface.
      */
-    public static synchronized CSFactory getCSFactory(final Hints hints) throws FactoryRegistryException {
-        return (CSFactory) getServiceRegistry().getServiceProvider(
-                CSFactory.class, null, hints, Hints.CS_FACTORY);
+    public static CSFactory getCSFactory(final Hints hints) throws FactoryRegistryException {
+        return (CSFactory) getFactory(CSFactory.class, hints, Hints.CS_FACTORY);
     }
 
     /**
@@ -250,9 +302,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getCSFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                    CSFactory.class, null, hints));
+    public static Set getCSFactories(final Hints hints) {
+        return getFactories(CSFactory.class, hints);
     }
 
     /**
@@ -267,9 +318,8 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link CRSFactory} interface.
      */
-    public static synchronized CRSFactory getCRSFactory(final Hints hints) throws FactoryRegistryException {
-        return (CRSFactory) getServiceRegistry().getServiceProvider(
-                CRSFactory.class, null, hints, Hints.CRS_FACTORY);
+    public static CRSFactory getCRSFactory(final Hints hints) throws FactoryRegistryException {
+        return (CRSFactory) getFactory(CRSFactory.class, hints, Hints.CRS_FACTORY);
     }
 
     /**
@@ -287,9 +337,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getCRSFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                    CRSFactory.class, null, hints));
+    public static Set getCRSFactories(final Hints hints) {
+        return getFactories(CRSFactory.class, hints);
     }
 
     /**
@@ -309,11 +358,11 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link CoordinateOperationFactory} interface.
      */
-    public static synchronized CoordinateOperationFactory getCoordinateOperationFactory(final Hints hints)
+    public static CoordinateOperationFactory getCoordinateOperationFactory(final Hints hints)
             throws FactoryRegistryException
     {
-        return (CoordinateOperationFactory) getServiceRegistry().getServiceProvider(
-                CoordinateOperationFactory.class, null, hints, Hints.COORDINATE_OPERATION_FACTORY);
+        return (CoordinateOperationFactory) getFactory(CoordinateOperationFactory.class,
+                hints, Hints.COORDINATE_OPERATION_FACTORY);
     }
 
     /**
@@ -332,9 +381,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getCoordinateOperationFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                    CoordinateOperationFactory.class, null, hints));
+    public static Set getCoordinateOperationFactories(final Hints hints) {
+        return getFactories(CoordinateOperationFactory.class, hints);
     }
 
     /**
@@ -350,12 +398,12 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link DatumAuthorityFactory} interface.
      */
-    public static synchronized DatumAuthorityFactory getDatumAuthorityFactory(final String authority,
-                                                                              final Hints  hints)
+    public static DatumAuthorityFactory getDatumAuthorityFactory(final String authority,
+                                                                 final Hints  hints)
             throws FactoryRegistryException
     {
-        return (DatumAuthorityFactory) getServiceRegistry().getServiceProvider(
-                DatumAuthorityFactory.class, new AuthorityFilter(authority), hints, Hints.DATUM_AUTHORITY_FACTORY);
+        return (DatumAuthorityFactory) getAuthorityFactory(DatumAuthorityFactory.class,
+                authority, hints, Hints.DATUM_AUTHORITY_FACTORY);
     }
 
     /**
@@ -374,9 +422,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getDatumAuthorityFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                    DatumAuthorityFactory.class, null, hints));
+    public static Set getDatumAuthorityFactories(final Hints hints) {
+        return getFactories(DatumAuthorityFactory.class, hints);
     }
 
     /**
@@ -397,12 +444,12 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link CSAuthorityFactory} interface.
      */
-    public static synchronized CSAuthorityFactory getCSAuthorityFactory(final String authority,
-                                                                        final Hints  hints)
+    public static CSAuthorityFactory getCSAuthorityFactory(final String authority,
+                                                           final Hints  hints)
             throws FactoryRegistryException
     {
-        return (CSAuthorityFactory) getServiceRegistry().getServiceProvider(
-                CSAuthorityFactory.class, new AuthorityFilter(authority), hints, Hints.CS_AUTHORITY_FACTORY);
+        return (CSAuthorityFactory) getAuthorityFactory(CSAuthorityFactory.class,
+                authority, hints, Hints.CS_AUTHORITY_FACTORY);
     }
 
     /**
@@ -420,9 +467,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getCSAuthorityFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                    CSAuthorityFactory.class, null, hints));
+    public static Set getCSAuthorityFactories(final Hints hints) {
+        return getFactories(CSAuthorityFactory.class, hints);
     }
 
     /**
@@ -443,12 +489,12 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link CRSAuthorityFactory} interface.
      */
-    public static synchronized CRSAuthorityFactory getCRSAuthorityFactory(final String authority,
-                                                                          final Hints  hints)
+    public static CRSAuthorityFactory getCRSAuthorityFactory(final String authority,
+                                                             final Hints  hints)
             throws FactoryRegistryException
     {
-        return (CRSAuthorityFactory) getServiceRegistry().getServiceProvider(
-                CRSAuthorityFactory.class, new AuthorityFilter(authority), hints, Hints.CRS_AUTHORITY_FACTORY);
+        return (CRSAuthorityFactory) getAuthorityFactory(CRSAuthorityFactory.class,
+                authority, hints, Hints.CRS_AUTHORITY_FACTORY);
     }
 
     /**
@@ -470,9 +516,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getCRSAuthorityFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                    CRSAuthorityFactory.class, null, hints));
+    public static Set getCRSAuthorityFactories(final Hints hints) {
+        return getFactories(CRSAuthorityFactory.class, hints);
     }
 
     /**
@@ -488,14 +533,13 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link CoordinateOperationAuthorityFactory} interface.
      */
-    public static synchronized CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(
-                                                                        final String authority,
-                                                                        final Hints  hints)
+    public static CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(
+            final String authority, final Hints hints)
             throws FactoryRegistryException
     {
-        return (CoordinateOperationAuthorityFactory) getServiceRegistry().getServiceProvider(
-                CoordinateOperationAuthorityFactory.class,
-                new AuthorityFilter(authority), hints, Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY);
+        return (CoordinateOperationAuthorityFactory) getAuthorityFactory(
+                CoordinateOperationAuthorityFactory.class, authority, hints,
+                Hints.COORDINATE_OPERATION_AUTHORITY_FACTORY);
     }
 
     /**
@@ -514,9 +558,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getCoordinateOperationAuthorityFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                    CoordinateOperationAuthorityFactory.class, null, hints));
+    public static Set getCoordinateOperationAuthorityFactories(final Hints hints) {
+        return getFactories(CoordinateOperationAuthorityFactory.class, hints);
     }
 
     /**
@@ -531,11 +574,11 @@ loop:       for (int i=0; ; i++) {
      * @throws FactoryRegistryException if no implementation was found or can be created for the
      *         {@link MathTransformFactory} interface.
      */
-    public static synchronized MathTransformFactory getMathTransformFactory(final Hints hints)
+    public static MathTransformFactory getMathTransformFactory(final Hints hints)
             throws FactoryRegistryException
     {
-        return (MathTransformFactory) getServiceRegistry().getServiceProvider(
-                MathTransformFactory.class, null, hints, Hints.MATH_TRANSFORM_FACTORY);
+        return (MathTransformFactory) getFactory(MathTransformFactory.class, hints,
+                Hints.MATH_TRANSFORM_FACTORY);
     }
 
     /**
@@ -554,9 +597,8 @@ loop:       for (int i=0; ; i++) {
      *
      * @since 2.3
      */
-    public static synchronized Set getMathTransformFactories(final Hints hints) {
-        return new LazySet(getServiceRegistry().getServiceProviders(
-                    MathTransformFactory.class, null, hints));
+    public static Set getMathTransformFactories(final Hints hints) {
+        return getFactories(MathTransformFactory.class, hints);
     }
 
     /**

@@ -50,7 +50,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public final class Element {    
+public final class Element {
     /**
      * The position where this element starts in the string to be parsed.
      */
@@ -348,6 +348,17 @@ public final class Element {
             }
         }
         return exception;
+    }
+
+    /**
+     * Returns {@code true} if this element is the root element. For example in a WKT like
+     * {@code "GEOGCS["name", DATUM["name, ...]]"}, this is true for {@code "GEOGCS"} and
+     * false for all other elements inside, like {@code "DATUM"}.
+     *
+     * @since 2.3
+     */
+    public boolean isRoot() {
+        return this.offset == 0;
     }
 
 

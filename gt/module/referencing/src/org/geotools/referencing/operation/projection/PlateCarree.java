@@ -23,6 +23,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.FactoryException;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
@@ -109,13 +110,12 @@ public class PlateCarree extends EquidistantCylindrical {
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
         protected MathTransform createMathTransform(final ParameterValueGroup parameters) 
-                throws ParameterNotFoundException
+                throws ParameterNotFoundException, FactoryException
         {
             if (isSpherical(parameters)) {
                 return new PlateCarree(parameters);
             } else {
-                throw new UnsupportedOperationException(Errors.format(
-                        ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
+                throw new FactoryException(Errors.format(ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
             }
         }
     }

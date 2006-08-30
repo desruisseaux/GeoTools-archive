@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.crs;
+package org.geotools.referencing.factory.esri;
 
 // JSE dependencies
 import java.util.Set;
@@ -43,7 +43,7 @@ import junit.framework.TestCase;
  * @version $Id$
  * @author Jody Garnett
  */
-public class FactoryUsingWktTest extends TestCase {
+public class EpsgFallbackTest extends TestCase {
     /**
      * The factory to test.
      */

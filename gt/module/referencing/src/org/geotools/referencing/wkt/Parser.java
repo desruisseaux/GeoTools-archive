@@ -251,7 +251,7 @@ public class Parser extends MathTransformParser {
         element.close();
         return crs;
     }
-    
+
     /**
      * Parses a coordinate reference system element.
      *
@@ -307,6 +307,30 @@ public class Parser extends MathTransformParser {
     }
 
     /**
+     * Returns the properties to be given to the parsed object. This method is invoked
+     * automatically by the parser for the {@linkplain Element#isRoot root element} only.
+     * This method expect on input the properties parsed from the {@code AUTHORITY} element,
+     * and returns on output the properties to give to the object to be created. The default
+     * implementation returns the {@code properties} map unchanged. Subclasses may override
+     * this method in order to add or change properties.
+     * <p>
+     * <strong>Example:</strong> if a subclass want to add automatically an authority code when
+     * no {@code AUTHORITY} element was explicitly set in the WKT, then it may test for the
+     * {@link IdentifiedObject#IDENTIFIERS_KEY} key and add automatically an entry if this
+     * key was missing.
+     *
+     * @param  properties The properties parsed from the WKT file. Entries can be added, removed
+     *         or modified directly in this map.
+     * @return The properties to be given to the parsed object. This is usually {@code properties}
+     *         (maybe after modifications), but could also be a new map.
+     *
+     * @since 2.3
+     */
+    protected Map alterProperties(final Map properties) {
+        return properties;
+    }
+
+    /**
      * Parses an <strong>optional</strong> "AUTHORITY" element.
      * This element has the following pattern:
      *
@@ -319,20 +343,29 @@ public class Parser extends MathTransformParser {
      * @return A properties map with the parent name and the optional autority code.
      * @throws ParseException if the "AUTHORITY" can't be parsed.
      */
-    private static Map parseAuthority(final Element parent, final String name)
-            throws ParseException
-    {
+    private Map parseAuthority(final Element parent, final String name) throws ParseException {
+        final boolean  isRoot = parent.isRoot();
         final Element element = parent.pullOptionalElement("AUTHORITY");
+        Map properties;
         if (element == null) {
-            return Collections.singletonMap(IdentifiedObject.NAME_KEY, name);
+            if (isRoot) {
+                properties = new HashMap(4);
+                properties.put(IdentifiedObject.NAME_KEY, name);
+            } else {
+                properties = Collections.singletonMap(IdentifiedObject.NAME_KEY, name);
+            }
+        } else {
+            final String auth = element.pullString("name");
+            final String code = element.pullString("code");
+            element.close();
+            final Citation authority = Citations.fromName(auth);
+            properties = new HashMap(4);
+            properties.put(IdentifiedObject.       NAME_KEY, new NamedIdentifier(authority, name));
+            properties.put(IdentifiedObject.IDENTIFIERS_KEY, new NamedIdentifier(authority, code));
         }
-        final String auth = element.pullString("name");
-        final String code = element.pullString("code");
-        element.close();
-        final Map     properties = new HashMap(4);
-        final Citation authority = Citations.fromName(auth);
-        properties.put(IdentifiedObject.       NAME_KEY, new NamedIdentifier(authority, name));
-        properties.put(IdentifiedObject.IDENTIFIERS_KEY, new NamedIdentifier(authority, code));
+        if (isRoot) {
+            properties = alterProperties(properties);
+        }
         return properties;
     }
 
@@ -352,9 +385,7 @@ public class Parser extends MathTransformParser {
      * @todo Authority code is currently ignored. We may consider to create a subclass of
      *       {@link Unit} which implements {@link IdentifiedObject} in a future version.
      */
-    private static Unit parseUnit(final Element parent, final Unit unit)
-            throws ParseException
-    {
+    private Unit parseUnit(final Element parent, final Unit unit) throws ParseException {
         final Element element = parent.pullElement("UNIT");
         final String     name = element.pullString("name");
         final double   factor = element.pullDouble("factor");
@@ -463,10 +494,10 @@ public class Parser extends MathTransformParser {
     private PrimeMeridian parsePrimem(final Element parent, final Unit angularUnit)
             throws ParseException
     {
-        Element   element = parent.pullElement("PRIMEM");
-        String       name = element.pullString("name");
-        double  longitude = element.pullDouble("longitude");
-        Map    properties = parseAuthority(element, name);
+        final Element   element = parent.pullElement("PRIMEM");
+        final String       name = element.pullString("name");
+        final double  longitude = element.pullDouble("longitude");
+        final Map    properties = parseAuthority(element, name);
         element.close();
         try {
             return datumFactory.createPrimeMeridian(properties, longitude, angularUnit);
@@ -633,7 +664,7 @@ public class Parser extends MathTransformParser {
         Map              properties = parseAuthority(element, name);
         element.close();
         if (toWGS84 != null) {
-            if (properties.size() == 1) {
+            if (!(properties instanceof HashMap)) {
                 properties = new HashMap(properties);
             }
             properties.put(DefaultGeodeticDatum.BURSA_WOLF_KEY, toWGS84);
@@ -657,10 +688,10 @@ public class Parser extends MathTransformParser {
      * @throws ParseException if the "VERT_DATUM" element can't be parsed.
      */
     private VerticalDatum parseVertDatum(final Element parent) throws ParseException {        
-        Element element = parent.pullElement("VERT_DATUM");
-        String     name = element.pullString ("name");
-        final int datum = element.pullInteger("datum");
-        Map  properties = parseAuthority(element, name);
+        final Element element = parent.pullElement("VERT_DATUM");
+        final String     name = element.pullString ("name");
+        final int       datum = element.pullInteger("datum");
+        final Map  properties = parseAuthority(element, name);
         element.close();
         final VerticalDatumType type = DefaultVerticalDatum.getVerticalDatumTypeFromLegacyCode(datum);
         if (type == null) {
@@ -687,10 +718,10 @@ public class Parser extends MathTransformParser {
      * @todo The vertical datum type is currently ignored.
      */
     private EngineeringDatum parseLocalDatum(final Element parent) throws ParseException {
-        Element element = parent.pullElement("LOCAL_DATUM");
-        String     name = element.pullString ("name");
-        final int datum = element.pullInteger("datum");
-        Map  properties = parseAuthority(element, name);
+        final Element element = parent.pullElement("LOCAL_DATUM");
+        final String     name = element.pullString ("name");
+        final int       datum = element.pullInteger("datum");
+        final Map  properties = parseAuthority(element, name);
         element.close();
         try {
             return datumFactory.createEngineeringDatum(properties);
@@ -726,9 +757,8 @@ public class Parser extends MathTransformParser {
             list.add(axis);
             axis = parseAxis(element, linearUnit, false);
         } while (axis != null);
-        Map properties = parseAuthority(element, name);
+        final Map properties = parseAuthority(element, name);
         element.close();
-
         final CoordinateSystem cs;
         cs = new AbstractCS(Collections.singletonMap("name", name),
                  (CoordinateSystemAxis[]) list.toArray(new CoordinateSystemAxis[list.size()]));

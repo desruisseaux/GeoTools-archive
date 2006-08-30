@@ -449,6 +449,7 @@ public class FactoryRegistry extends ServiceRegistry {
             }
             loaders.add(loader);
         }
+        loaders.remove(null);
         /*
          * We now have a set of class loaders with duplicated object already removed
          * (e.g. system classloader == context classloader). However, we may still

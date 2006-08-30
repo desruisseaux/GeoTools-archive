@@ -32,6 +32,9 @@ import org.geotools.resources.Utilities;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo This class will be removed when we will be allowed to compile for JSE 1.6, since a
+ *       default map entry implementation is provided there.
  */
 public class MapEntry implements Map.Entry, Serializable {
     /**
