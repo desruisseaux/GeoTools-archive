@@ -342,7 +342,7 @@ public final class GridCoverageRenderer {
 		final int actualW = range.getLength(0);
 		final int actualH = range.getLength(1);
 		if (Math.round(actualW *scaleX) < MIN_DIM_TOLERANCE
-				|| Math.round(actualH * scaleY )< MIN_DIM_TOLERANCE) {
+				&& Math.round(actualH * scaleY )< MIN_DIM_TOLERANCE) {
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER
 						.fine(new StringBuffer(
