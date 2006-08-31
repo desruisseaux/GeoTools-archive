@@ -53,6 +53,9 @@ IP:
   (C) 2001, Institut de Recherche pour le Développement
   (C) 1999, Fisheries and Oceans Canada
   (C) 1998, Pêches et Océans Canada
+
+The two last ("Fisheries and Oceans Canada" and "Pêches et Océans Canada")
+are actually the same thing and could be merged in a single copyright.
  
  - updated headers as to (C) 200x - 2006 PMC as required
  
@@ -84,7 +87,9 @@ IP:
  org.geotools.metadata.sql
  -------------------------
  Appears to be low-level support for metadata wrapped over an SQL result set, interested to know
- if this is used.
+ if this is used. (Answer: not yet used in Geotools. Used in at least one external project however.
+ It could be used in a future Geotools version as a more convenient and more detailled way to store
+ pre-defined Citations (EPSG, ESRI, etc...) than hard-coded constants.)
  IP:
 - range of (C) found in headers
       (C) 2004-2006, GeoTools Project Managment Committee (PMC)
@@ -107,11 +112,15 @@ org.geotools.nature
       (C) 1999, Pêches et Océans Canada
  - updated headers
  - Calendar, SeaWater, SunRelativePosition contains note allowing JScience to distribute using BSD style license
+
+   The full org.geotools.nature may be removed from Geotools distribution if
+   JScience decide to includes them in their own distribution. JScience is
+   probably a more appropriate place than Geotools for them.
  
 org.geotools.parameter
 ----------------------
 Parameter implementation, informed by an OGC specification. Contains an breakdown of
-paramters and paramter groups with enough metadata to allow for automation.
+paramters and parameter groups with enough metadata to allow for automation.
 IP:
  - range of (C) found in headers:
       (C) 2004-2006, GeoTools Project Managment Committee (PMC)
@@ -140,7 +149,9 @@ IP:
   Programmed for CDC-6600 by LCDR L.Pfeifer NGS ROCKVILLE MD 18FEB75
   Modified for IBM SYSTEM 360 by John G.Gergen NGS ROCKVILLE MD 7507
   Source: ftp://ftp.ngs.noaa.gov/pub/pcsoft/for_inv.3d/source/
-  
+
+  The above-cited NOAA code is in public domain.
+
 - updated headers
 
 org.geotools.referencing.crs
@@ -344,7 +355,7 @@ Some neat, and more performant implementations for hacking Java 2d.
 org.geotools.resources.i18n
 ---------------------------
 Contains a breakdown of resource bundle/property files that have been processed to
-use number based lookup for speed and to minimize resource use.
+use number based lookup for speed, compile-time safety and to minimize resource use.
 
 IP:
 - updated generator program so genreated files will have correct header next time
@@ -394,5 +405,12 @@ IP:
      (C) 1998, Pêches et Océans Canada
  
  - updated headers
- - scripts, not sure what this is
+ - scripts, not sure what this is.
+   Answer from Martin: a kind of executable test suite in text form. Contains source and target CRS,
+   source points and expected target points. The test suite performs the projection and fires a test
+   failure if the computed points is significantly different than the target points specified in the
+   script. The OpenGIS test script is modified from an OGC script. All other test scripts are Rueben
+   Schulz's work (as far as I know). Rueben did this job as a Geotools contributor.
  - wkt for CoordinateReferenceSystem.txt - should confirm source of data?
+   Answer for Martin: they are mostly test scripts with comments, source and target points trimmed out.
+   So they are mostly Rueben's derivative work.
