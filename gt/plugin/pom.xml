@@ -62,11 +62,7 @@
   <!-- ===================================================================== -->
   <modules>
    <!-- <module>arcgrid</module>-->
-    <!--Uncomment this module if you have access to the ESRI ArcSDE Java API
-    	libraries and intend to use it. See README.txt on ./arcsde-->
-    <!--
     <module>arcsde</module>
-    -->
     <module>db2</module>
     <module>directory</module>
     <module>epsg-access</module>
