@@ -130,6 +130,12 @@
           <!-- This section excludes the tests, comment out if your
                testData/testparams.properties are set correctly -->
           <excludes>
+	    <!-- This excludes all the tests since the plugin compiles
+	    against the stubbed jar by default. Comment out this line
+	    if you have the esri jars on your classpath and want to
+	    execute the tests-->
+            <exclude>**/*Test.java</exclude>
+
             <exclude>**/ArcSDEJavaApiTest.java</exclude>
             <exclude>**/ArcSDEDataStoreTest.java</exclude>
             <exclude>**/ArcSDEConnectionPoolTest.java</exclude>
