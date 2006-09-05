@@ -1,5 +1,5 @@
 This module produces a fake ArcSDE Java API in order to let the geotools
-arsde plugin to compile without requiring the presence of the ArcSDE Java
+arsde plugin compile without requiring the presence of the ArcSDE Java
 API jars from ESRI.
 
 The code is written without looking at the ESRI jars or their javadocs, 
