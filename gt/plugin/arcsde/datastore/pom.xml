@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ===========================================================================
+         Project configuration file for the Geotools 2 project
+         http://www.geotools.org/
+
+         Version: $Id$
+     =========================================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2-arcsde-plugin</artifactId>
+    <version>2.3-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- ==================================================== -->
+  <!--     Module description                               -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>gt2-arcsde</artifactId>
+  <packaging>jar</packaging>
+  <name>ArcSDE DataStore plugin</name>
+  <url>http://maven.geotools.fr/reports/arcsde/</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/arcsde/</connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/arcsde/</url>
+  </scm>
+  <description>
+    ArcSDE DataStore plugin.
+  </description>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@axios.es</email>
+      <organization>Axios Engineering</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Chris Dillard</name>
+      <id>csdillard</id>
+      <email>cdillard@polexis.com</email>
+      <organization>Polexis</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jake Fear</name>
+      <id>jfear</id>
+      <email>jfear@polexis.com</email>
+      <organization>Polexis</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Dependencies                                     -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-pool</groupId>
+      <artifactId>commons-pool</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-sde-dummy</artifactId>
+      <version>2.3-SNAPSHOT</version>
+    </dependency>
+      <!-- The version number is specified in the parent POM. -->
+    <!--
+    <dependency>
+      <groupId>com.esri</groupId>
+      <artifactId>jsde_sdk</artifactId>
+    </dependency>
+    -->
+
+      <!-- The version number is specified in the parent POM. -->
+      <!-- TODO: This dependencies should be removed when we will be allowed to
+                 compile for JSE 5. This JAR duplicates edu.oswego.concurrent
+                inherited from main. -->
+     <!--
+    <dependency>
+      <groupId>com.esri</groupId>
+      <artifactId>jsde_concurrent</artifactId>
+    </dependency>
+     -->
+      <!-- The version number is specified in the parent POM. -->
+    <!--
+    <dependency>
+      <groupId>com.esri</groupId>
+      <artifactId>jsde_jpe_sdk</artifactId>
+    </dependency>
+    -->
+  </dependencies>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Plugins configuration                            -->
+  <!-- ==================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- This section excludes the tests, comment out if your
+               testData/testparams.properties are set correctly -->
+          <excludes>
+            <exclude>**/ArcSDEJavaApiTest.java</exclude>
+            <exclude>**/ArcSDEDataStoreTest.java</exclude>
+            <exclude>**/ArcSDEConnectionPoolTest.java</exclude>
+            <exclude>**/ArcSDEFeatureStoreTest.java</exclude>
+            <exclude>**/ArcSDEQueryTest.java</exclude>
+            <exclude>**/FilterTest.java</exclude>
+          </excludes>
+          <!-- End exclude tests -->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
