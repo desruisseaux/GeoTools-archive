@@ -401,18 +401,18 @@ public class ImageWorker {
         /*
          * Creates the new color model.
          */
-        ColorModel cm = image.getColorModel();
-        cm = new ComponentColorModel(
-                cm.getColorSpace(),
-                cm.hasAlpha(),              // If true, supports transparency.
-                cm.isAlphaPremultiplied(),  // If true, alpha is premultiplied.
-                cm.getTransparency(),       // What alpha values can be represented.
+        final ColorModel oldCm = image.getColorModel();
+        final ColorModel newCm= new ComponentColorModel(
+        		oldCm.getColorSpace(),
+        		oldCm.hasAlpha(),              // If true, supports transparency.
+        		oldCm.isAlphaPremultiplied(),  // If true, alpha is premultiplied.
+        		oldCm.getTransparency(),       // What alpha values can be represented.
                 type);                      // Type of primitive array used to represent pixel.
         /*
          * Creating the final image layout which should allow us to change color model.
          */
-        layout.setColorModel(cm);
-        layout.setSampleModel(cm.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
+        layout.setColorModel(newCm);
+        layout.setSampleModel(newCm.createCompatibleSampleModel(image.getWidth(), image.getHeight()));
         hints.put(JAI.KEY_IMAGE_LAYOUT, layout);
         return hints;
     }
@@ -896,7 +896,8 @@ public class ImageWorker {
         // Most of the code adapted from jai-interests is in 'getRenderingHints(int)'.
         final RenderingHints hints = getRenderingHints((cm instanceof DirectColorModel) ?
                                                         DataBuffer.TYPE_BYTE : type);
-        image = FormatDescriptor.create(image, new Integer(type), hints);
+        image = FormatDescriptor.create(image, new Integer((cm instanceof DirectColorModel) ?
+                DataBuffer.TYPE_BYTE : type), hints);
         invalidateStatistics();
 
         // All post conditions for this method contract.
