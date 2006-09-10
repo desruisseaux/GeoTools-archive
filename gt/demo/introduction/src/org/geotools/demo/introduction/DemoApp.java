@@ -99,7 +99,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
- * The QuickStart class, through its main() method, is a quick introductory
+ * The DemoApp class, through its main() method, is a quick introductory
  * tutorial to each of the major modules of the Geotools library. 
  * 
  * WARNING: This is a work in progress and is incomplete.
@@ -163,7 +163,7 @@ import com.vividsolutions.jts.geom.Point;
  * @since   2.2RC5
  *
  */
-public class QuickStartGUI {
+public class DemoApp {
     
     
 //    private static Logger textlog = 
@@ -325,7 +325,7 @@ public class QuickStartGUI {
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         //TODO: verify the file can be found
         java.net.URL imgURL = 
-            QuickStartGUI.class.getResource("/GeotoolsBoxLogo.png");
+            DemoApp.class.getResource("/GeotoolsBoxLogo.png");
 //        System.out.println(imgURL);
         ImageIcon icon = new ImageIcon(imgURL,"The Geotools Logo");
         JLabel iconLabel = new JLabel(icon);
@@ -348,32 +348,32 @@ public class QuickStartGUI {
         createButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
-                QuickStartGUI.createButton.setEnabled(false);
-                QuickStartGUI.styleButton.setEnabled(true);
-                QuickStartGUI.create_FeatureSource_fromScratch();
-                QuickStartGUI.create_FeatureSource_fromShapefile();
-//                QuickStartGUI.create_FeatureSource_fromWeb();
-//                QuickStartGUI.create_FeatureSource_fromDatabase();
+                DemoApp.createButton.setEnabled(false);
+                DemoApp.styleButton.setEnabled(true);
+                DemoApp.create_FeatureSource_fromScratch();
+                DemoApp.create_FeatureSource_fromShapefile();
+//                DemoApp.create_FeatureSource_fromWeb();
+//                DemoApp.create_FeatureSource_fromDatabase();
                 
               }
           });
         styleButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
-                QuickStartGUI.styleButton.setEnabled(false);
-                QuickStartGUI.renderButton.setEnabled(true);
-                QuickStartGUI.create_Styles_forEach_Feature();
+                DemoApp.styleButton.setEnabled(false);
+                DemoApp.renderButton.setEnabled(true);
+                DemoApp.create_Styles_forEach_Feature();
                 
               }
           });
         renderButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
-                QuickStartGUI.renderButton.setEnabled(false);
-                QuickStartGUI.projectButton.setEnabled(true);
-                QuickStartGUI.initialize_JMapPane();
+                DemoApp.renderButton.setEnabled(false);
+                DemoApp.projectButton.setEnabled(true);
+                DemoApp.initialize_JMapPane();
                 try{
-                    QuickStartGUI.load_JMapPane();
+                    DemoApp.load_JMapPane();
                 } catch (Exception ex){
                     System.err.println("Could not load the JMapPane: "+ ex);
                 }
@@ -385,18 +385,18 @@ public class QuickStartGUI {
         projectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
-                QuickStartGUI.projectButton.setEnabled(false);
-                QuickStartGUI.filterButton.setEnabled(true);
-                QuickStartGUI.create_ProjectedCRS_from_DefaultGeogCRS();
-                QuickStartGUI.display_projected_as_Mercator();
+                DemoApp.projectButton.setEnabled(false);
+                DemoApp.filterButton.setEnabled(true);
+                DemoApp.create_ProjectedCRS_from_DefaultGeogCRS();
+                DemoApp.display_projected_as_Mercator();
                 
               }
           });
         filterButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
-                QuickStartGUI.filterButton.setEnabled(false);
-                QuickStartGUI.captureButton.setEnabled(true);
+                DemoApp.filterButton.setEnabled(false);
+                DemoApp.captureButton.setEnabled(true);
 //                frame.dispose();
                 
               }
@@ -404,17 +404,17 @@ public class QuickStartGUI {
         captureButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
-                QuickStartGUI.captureButton.setEnabled(false);
-                QuickStartGUI.saveButton.setEnabled(true);
-//                QuickStartGUI.capture_as_image();
+                DemoApp.captureButton.setEnabled(false);
+                DemoApp.saveButton.setEnabled(true);
+//                DemoApp.capture_as_image();
                 
               }
           });
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
-                QuickStartGUI.saveButton.setEnabled(false);
-                QuickStartGUI.commitButton.setEnabled(true);
+                DemoApp.saveButton.setEnabled(false);
+                DemoApp.commitButton.setEnabled(true);
 //                frame.dispose();
                 
               }
@@ -450,7 +450,7 @@ public class QuickStartGUI {
 //        OutputStream os = new  anOutputStream() extends OutputStream {
 //              public void write( int b ) throws IOException {
 //                  // append the data as characters to the JTextArea control
-//                  QuickStartGUI.textArea.append( String.valueOf( ( char )b ) );
+//                  DemoApp.textArea.append( String.valueOf( ( char )b ) );
 //              }
 //        };
 //        StreamHandler sh = new StreamHandler(os , new Formatter());
@@ -1056,13 +1056,13 @@ public class QuickStartGUI {
     public static void main(String[] args) throws Exception {
     	
     	
-        System.out.println("QuickStart Tutorial: Start...");
+        System.out.println("DemoApp Tutorial: Start...");
         
             System.out.println("Start: Create the Demo's GUI.");
         create_Geotools_DemoGUI();
             System.out.println("  End: Created the Demo's GUI.");
         
-        System.out.println("QuickStart Tutorial: End of non-GUI thread.");
+        System.out.println("DemoApp Tutorial: End of non-GUI thread.");
     }
 
 }
