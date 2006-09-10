@@ -67,6 +67,8 @@ import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.datum.DefaultGeodeticDatum;
+import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.DefiningConversion;
@@ -85,13 +87,11 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.NoSuchIdentifierException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CSFactory;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -243,7 +243,7 @@ public class QuickStartGUI {
     public static void create_Geotools_DemoGUI(){
 
         frame=new JFrame("Geotools Demo");
-        frame.setBounds(20,20,800,500);
+        frame.setBounds(20,20,600,500);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 //        frame.setBackground(Color.cyan);
         
@@ -474,7 +474,7 @@ public class QuickStartGUI {
     
     
     
-    
+    // TODO: where is the DefaultGeometry determined?
     /*
      * Create London from scratch! Well, only a FeatureSource for the city.
      * 
@@ -553,6 +553,8 @@ public class QuickStartGUI {
                 System.out.println("IllegalAttributeException on Feature creation: " + iaex);
         }
         
+        //TODO: figure out default GEomsee above
+        // System.out.println("DefaultGeom is: "+ptF.getDefaultGeometry());
         
         /* DataStore and its FeatureSource */ 
         Feature [] ptFetArray = new Feature [] {ptF};
@@ -1052,7 +1054,8 @@ public class QuickStartGUI {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-        
+    	
+    	
         System.out.println("QuickStart Tutorial: Start...");
         
             System.out.println("Start: Create the Demo's GUI.");
