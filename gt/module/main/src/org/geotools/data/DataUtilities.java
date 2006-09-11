@@ -593,41 +593,13 @@ public class DataUtilities {
      */
     public static Object defaultValue(AttributeType attributeType)
         throws IllegalAttributeException {
-        if (attributeType.isNillable()) {
-            return null;
+            Object value = attributeType.createDefaultValue();
+        
+        if (value == null && !attributeType.isNillable()) {
+            throw new IllegalAttributeException(
+                "Got null default value for non-null type.");
         }
-
-        // Flight of Fancy here - I need to get a non null value
-        // lets try reflection
-        //    
-        Class type = attributeType.getType();
-        Object value;
-
-        try {
-            Constructor constractor;
-            constractor = type.getConstructor(new Class[0]);
-
-            value = constractor.newInstance(new Object[0]);
-            attributeType.validate(value);
-
-            return value;
-        } catch (Exception e) {
-            // flight of fancy ended
-        }
-
-        try {
-            value = attributeType.parse(null);
-
-            if (value != null) {
-                // hey the AttributeType new what to do!
-                return value;
-            }
-        } catch (NullPointerException notReallyExpected) {
-            // not sure if parse was expected to handle this
-        }
-
-        throw new IllegalAttributeException(
-            "Could not create a default value for " + attributeType.getName());
+        return value;
     }
 
     /**
