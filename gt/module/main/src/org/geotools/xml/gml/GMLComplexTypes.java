@@ -4323,7 +4323,14 @@ public class GMLComplexTypes {
                     while (featureCollectionBuffer.getSize() > (featureCollectionBuffer
                             .getCapacity() - 1)) {
                         logger.finest("waiting for reader");
-                        Thread.yield();
+                        synchronized (featureCollectionBuffer) {
+                            try {
+                                featureCollectionBuffer.wait(100);
+                            } catch (InterruptedException e) {
+                                throw new StopException();  // alternative to stop()
+                            }
+                        }
+//                        Thread.yield();
                         if(featureCollectionBuffer.state == FCBuffer.STOP)
                         	throw new StopException(); // alternative to stop()
                     }

@@ -144,6 +144,10 @@ public class FCBuffer extends Thread implements FeatureReader {
         if (size >= features.length) {
             return false;
         }
+        
+        synchronized (this) {
+            notify();
+        }
 
         features[end] = f;
         end++;
@@ -251,6 +255,11 @@ public class FCBuffer extends Thread implements FeatureReader {
 
         Feature f = features[head++];
 
+
+        synchronized (this) {
+            notify();
+        }
+        
         if (head == features.length) {
             head = 0;
         }
@@ -303,7 +312,9 @@ public class FCBuffer extends Thread implements FeatureReader {
 
             logger.finest("waiting for parser");
             try {
-                Thread.sleep(200);
+                synchronized (this) {
+                    wait(200);
+                }
             } catch (InterruptedException e) {
                 //just continue;
             }
