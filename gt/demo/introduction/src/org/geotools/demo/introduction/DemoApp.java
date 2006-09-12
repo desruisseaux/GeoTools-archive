@@ -243,7 +243,7 @@ public class DemoApp {
     public static void create_Geotools_DemoGUI(){
 
         frame=new JFrame("Geotools Demo");
-        frame.setBounds(20,20,600,500);
+        frame.setBounds(20,20,800,500);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 //        frame.setBackground(Color.cyan);
         
