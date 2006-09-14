@@ -35,14 +35,14 @@
   network server applications and desktop clients. The library consists of 
   various modules which can be combined according to programmer needs. An 
   example client application is included as the &lib; demo shown in <xref
-    linkend="fig-geotools-demo" /> .
+    linkend="fig-geotools-demo-render" /> .
     <!-- SYNC WITH QUICKSTART-RUNTHEDEMO -->
-    <figure id="fig-geotools-demo">
+    <figure id="fig-geotools-demo-render">
       <title>The Geotools Demo showing an unprojected map of the world.</title>
       <screenshot>
         <mediaobject>
         <imageobject>
-          <imagedata fileref="figures/geotools-demo.png" 
+          <imagedata fileref="figures/geotools-demo-render.png" 
                      format="PNG" 
                      width="600px"
                      scalefit="1"

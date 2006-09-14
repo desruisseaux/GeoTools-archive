@@ -40,7 +40,9 @@
 
   <!ENTITY sdkConfig            SYSTEM "sdk-config.xml">
 
+  <!ENTITY geoapiUtil           SYSTEM "geoapiUtil.xml">
   <!ENTITY geomJTS              SYSTEM "geomJTS.xml">
+  <!ENTITY metadata             SYSTEM "metadata.xml">
   <!ENTITY georeferencing       SYSTEM "geo-referencing.xml">
   <!ENTITY feature              SYSTEM "feature.xml">
   <!ENTITY gridCov              SYSTEM "grid-coverage.xml">
@@ -208,9 +210,19 @@
     &sdkConfig;
   </chapter>
 
+  <chapter id="chapter-geoapiUtil">
+    <title>GeoAPI Utilities</title>
+    &geoapiUtil;
+  </chapter>
+
   <chapter id="chapter-geomJTS">
     <title>Geometries</title>
     &geomJTS;
+  </chapter>
+
+  <chapter id="chapter-metadata">
+    <title>Metadata</title>
+    &metadata;
   </chapter>
 
   <chapter id="chapter-geoReferencing">
@@ -255,12 +267,9 @@
 
 
 <!--
-
   <chapter id="">
     <title></title>
-
     &;
-
   </chapter>
 -->
 

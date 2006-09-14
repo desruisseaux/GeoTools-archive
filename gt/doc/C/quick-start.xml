@@ -29,18 +29,10 @@
       will have to adapt these examples to fit her own needs.
     </para>
 
-<sect1 id="sect-quick-start-getGt">
-    <title>Get Geotools</title>
+<sect1 id="sect-quickStart-setup">
+    <title>Setup</title>
 
-    <para>
-      Geotools is distributed in three separate pieces: as a binary 
-      distribution, as a source distribution, and as a javadoc collection. 
-      Each of these can be obtained from the project website.
-    </para>
-
-</sect1>
-
-<sect1 id="sect-quick-start-configJava">
+  <sect2 id="sect-quick-start-configJava">
     <title>Configure Java</title>
 
     <para>
@@ -48,9 +40,65 @@
       Java Advanced Imaging library and the Java Image I/O library. These 
       must all be configured correctly for the examples which follow.
     </para>
+    
+    <para>
+      Most developers use the Java Software Developers' Kit (SDK) provided by 
+      Sun Microsystems (TM) which is available at no charage from the 
+      <ulink url="http://java.sun.com/" type="http">Java webpage</ulink>. The 
+      Java SDK can be installed by following the instructions on that web page. 
+      The Java SDK provides both the necessary Java Runtime Environment with its
+      virtual machine and the tools and libraries necessary to compile a Java 
+      application
+    </para>
+
+    <para>
+      The two imaging libraries must be obtained from Sun Microsystems (TM). They 
+      are also available at no charage. The Java Advanced Imaging library can be 
+      obtained from the 
+      <ulink url="http://java.sun.com/" type="http">JAI webpage</ulink> while the 
+      Java Image I/O library can be obtained from the
+      <ulink url="http://java.sun.com/" type="http">Java Image I/O webpage</ulink>. 
+      Both libraries can be installed by following the instructions on their 
+      respective web pages. 
+    </para>
+    
+    <para>
+      Once these Java components are installed, a minimal amount of 
+      configuration will ensure that the java environment can be found. Two 
+      environmental variables generally need to be modified or set. The PATH 
+      envirnomental variable must be modified to include the directory containing 
+      the binary applications provided by the SDK so that the runtime and compiler 
+      can be found by the shell. For example, on a GNU system using the tcsh, a
+      user would type "setenv PATH /path/to/the/j2sdk/bin:$PATH". The JAVA_HOME 
+      environmental variable must also be set to provide acess to the location 
+      of the java installation. For example, again on a GNU system using the 
+      tcsh, a user would type "setenv JAVA_HOME /path/to/the/j2sdk/".
+    </para>
+
+  </sect2>
+
+  <sect2 id="sect-quick-start-getGt">
+    <title>Get Geotools</title>
+
+    <para>
+      Geotools is distributed in three separate pieces: as a binary 
+      distribution, as a source distribution, and as a javadoc collection. 
+      Each of these can be obtained from the 
+      <ulink url="http://www.geotools.org/" type="http">project website</ulink>.
+    </para>
+    
+    <para>
+      Most developers get all three components although only the binary 
+      distribution is required for this demo. Once the binary distribution is 
+      downloaded, it must be unzipped. Persumably most users will expand the zip
+      archive somewhere in their home directory. Once expanded the binary 
+      distribution contains only a series of JAR files, each representing a 
+      different component of the final application.
+    </para>
+
+  </sect2>
 
 </sect1>
-
 
 <sect1 id="sect-quick-start-runDemo">
     <title>Run the Demo</title>
@@ -63,8 +111,9 @@
     </para>
 
     <para>
-      Once the Java libraries have been configured, a simple demonstration
-      program can be run with the following command:
+      Once the Java libraries have been configured and the binary distribution of 
+      &lib; installed, a simple demonstration program can be run with the 
+      following command:
       <literallayout>
 java -jar /path/to/gt2-demo-introduction-VERSION_NUMBER.jar org.geotools.demo.introduction.QuickStartGUI
       </literallayout>
@@ -75,12 +124,12 @@ java -jar /path/to/gt2-demo-introduction-VERSION_NUMBER.jar org.geotools.demo.in
     <para>
       This command will lead to the following window:
     <!-- SYNC WITH WELCOME -->
-    <figure id="fig-geotools-demo-REDUX">
-      <title>The Geotools Demo showing an unprojected map of the world.</title>
+    <figure id="fig-geotools-demo-start">
+      <title>The Geotools Demo when first opened.</title>
       <screenshot>
         <mediaobject>
         <imageobject>
-          <imagedata fileref="figures/geotools-demo.png" 
+          <imagedata fileref="figures/geotools-demo-start.png" 
                      format="PNG" 
                      width="600px"
                      scalefit="1"
@@ -88,7 +137,7 @@ java -jar /path/to/gt2-demo-introduction-VERSION_NUMBER.jar org.geotools.demo.in
         </imageobject>
         <textobject>
           <phrase>
-            A screenshot of the user demo.
+            A screenshot of the user demo as it first appears on screen.
           </phrase>
         </textobject>
 	<caption>
@@ -162,7 +211,7 @@ java -jar /path/to/gt2-demo-introduction-VERSION_NUMBER.jar org.geotools.demo.in
 
 
 <sect1 id="sect-quick-start-readDeom">
-  <title>Read the Demo</title>
+  <title>Read the Code</title>
 
   <para>
     The source code for the Demo application provides a quick introduction 
@@ -175,7 +224,7 @@ java -jar /path/to/gt2-demo-introduction-VERSION_NUMBER.jar org.geotools.demo.in
 
   <para>
     The source is contained in the
-      <filename>org.geotools.demo.introduction.QuickStartGUI.java</filename>
+      <filename>org.geotools.demo.introduction.DemoApp.java</filename>
       source file within the 
       <filename>gt2-demo-introduction-VERSION.jar</filename>
       JAR file (where VERSION is replaced by the current version number).
