@@ -230,9 +230,15 @@ public abstract class AbstractFeatureSource implements FeatureSource {
                 	return -1;
                 }
             	Diff diff = ((AbstractDataStore)dataStore).state(t).diff(namedQuery(query).getTypeName());
-            	delta=diff.added.size();
             	synchronized (diff) {
-            		Iterator it = diff.modified2.values().iterator();
+            		Iterator it = diff.added.values().iterator();
+            		while(it.hasNext()){
+            			Object feature = it.next();
+            			if( query.getFilter().evaluate(feature) )
+            				delta++;
+            		}
+            		
+            		it = diff.modified2.values().iterator();
             		while(it.hasNext()){
             			Object feature = it.next();
             			
