@@ -17,7 +17,7 @@ package org.geotools.filter.v1_0;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.filter.FilterFactory;
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;

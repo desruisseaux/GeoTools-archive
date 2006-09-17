@@ -47,6 +47,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
@@ -55,7 +56,6 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.NullFilter;
-import org.geotools.filter.expression.AttributeExpression;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;

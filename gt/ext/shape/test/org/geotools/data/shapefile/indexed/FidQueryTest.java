@@ -30,7 +30,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.expression.BBoxExpression;
+import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;

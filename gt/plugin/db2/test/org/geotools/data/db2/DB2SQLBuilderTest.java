@@ -23,14 +23,14 @@ import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.SQLEncoderException;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.LiteralExpression;
 
 import java.io.IOException;
 

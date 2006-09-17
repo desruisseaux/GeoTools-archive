@@ -27,14 +27,14 @@ import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.LiteralExpression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

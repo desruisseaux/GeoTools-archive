@@ -15,8 +15,8 @@
  */
 package org.geotools.renderer.shape;
 
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.Expression;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ColorMap;
 import org.geotools.styling.ColorMapEntry;

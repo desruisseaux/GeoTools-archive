@@ -23,9 +23,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.oracle.sdo.SDO;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.LiteralExpression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -608,7 +605,7 @@ public class SQLEncoderOracle extends SQLEncoder {
      *
      * @param literal The Literal expression to encode.
      *
-     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.expression.LiteralExpression)
+     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
      */
     public void visit(LiteralExpression literal) {
         if (literal.getType() == DefaultExpression.LITERAL_GEOMETRY) {

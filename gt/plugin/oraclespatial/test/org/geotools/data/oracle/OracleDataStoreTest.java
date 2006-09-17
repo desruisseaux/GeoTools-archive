@@ -50,12 +50,12 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
-import org.geotools.filter.expression.Expression;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import com.vividsolutions.jts.geom.Coordinate;

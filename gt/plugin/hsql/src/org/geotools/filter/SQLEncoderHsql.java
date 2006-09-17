@@ -21,8 +21,6 @@ import java.util.logging.Logger;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.LiteralExpression;
 
 
 /**

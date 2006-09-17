@@ -31,13 +31,13 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.BBoxExpression;
 import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;

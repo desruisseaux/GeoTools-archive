@@ -23,11 +23,6 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.arcsde.GeometryBuilder;
 import org.geotools.data.arcsde.GeometryBuildingException;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
-import org.geotools.filter.expression.MathExpression;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;

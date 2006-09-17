@@ -15,20 +15,20 @@
  */
 package org.geotools.renderer.shape;
 
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
+import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
-import org.geotools.filter.expression.MathExpression;
 
 import java.util.Iterator;
 

@@ -188,8 +188,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 		FeatureCollection features;
 		FeatureIterator indexIter;
 		FilterFactory fac = FilterFactoryFinder.createFilterFactory();
-		org.geotools.filter.expression.BBoxExpression bbox = fac.createBBoxExpression(newBounds);
-		org.geotools.filter.expression.AttributeExpression attrExpression = fac.createAttributeExpression(
+		org.geotools.filter.BBoxExpression bbox = fac.createBBoxExpression(newBounds);
+		org.geotools.filter.AttributeExpression attrExpression = fac.createAttributeExpression(
 				indexedDS.getSchema().getDefaultGeometry().getName());
 		GeometryFilter filter = fac
 				.createGeometryFilter(FilterType.GEOMETRY_BBOX);

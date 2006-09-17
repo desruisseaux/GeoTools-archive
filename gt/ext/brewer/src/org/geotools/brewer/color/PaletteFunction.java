@@ -16,12 +16,12 @@
 package org.geotools.brewer.color;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.function.ClassificationFunction;
 
 //import edu.psu.geovista.colorbrewer.OriginalColor;

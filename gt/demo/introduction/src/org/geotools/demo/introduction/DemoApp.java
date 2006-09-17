@@ -44,6 +44,7 @@ import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 import javax.units.SI;
 
+import org.geotools.catalog.Catalog;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -193,8 +194,6 @@ public class DemoApp {
     /* The filename for the output image */
     static final String imageFileEnd = "image.png";
     
-    
-    
     /* FeatureSource variables */
     static FeatureSource memFS, shpFS, webFS;
     
@@ -233,6 +232,11 @@ public class DemoApp {
     static GTRenderer renderer;
     static com.vividsolutions.jts.geom.Envelope worldbounds;
     
+    /* demo class */
+    static Demo demo = new Demo();
+    
+    /* catalog */
+    static Catalog catalog;
     
     /*
      * Create the Demo's GUI.
@@ -350,8 +354,8 @@ public class DemoApp {
                 
                 DemoApp.createButton.setEnabled(false);
                 DemoApp.styleButton.setEnabled(true);
-                DemoApp.create_FeatureSource_fromScratch();
-                DemoApp.create_FeatureSource_fromShapefile();
+                DemoApp.createFeatureSourceFromScratch();
+                DemoApp.createFeatureSourceFromShapefile();
 //                DemoApp.create_FeatureSource_fromWeb();
 //                DemoApp.create_FeatureSource_fromDatabase();
                 
@@ -485,86 +489,16 @@ public class DemoApp {
      *   (4) The feature
      *   (5) The MemoryDataStore from which to get a FeatureSource
      */
-    public static void create_FeatureSource_fromScratch(){
+    public static void createFeatureSourceFromScratch(){
         
         textArea.append("Start: Create FeatureSource from scratch.\n");
         
-        /* JTS Geometry */
-        // Wikipedia gives London as:  51° 30.4167′ N 0° 7.65′ W 
-        // NOTE: in Gt 2.2 axis order is Long/Lat throughout; in 2.3 the CRS rules
-        com.vividsolutions.jts.geom.Coordinate ptc = new Coordinate(0.1275d,51.507d);
-        GeometryFactory geomFac = new GeometryFactory();
-        Point ptG = geomFac.createPoint(ptc);
-        
-        
-        /* Name Attribute */
-        String name = "London";
-        
-        
-        /* Population Attribute */
-        Integer pop = new Integer(7500000);
-
-        
-        /* AttributeTypes, starting with Geometry using pre-made CRS */
-        GeometryAttributeType ptGA = 
-                (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
-                                                          "the_geom", 
-                                                          ptG.getClass(), 
-                                                          true, 
-                                                          1, 
-                                                          null,
-               org.geotools.referencing.crs.DefaultGeographicCRS.WGS84);    
-        AttributeType cityAT = 
-            AttributeTypeFactory.newAttributeType(
-                                          "CITYNAME", 
-                                          String.class, 
-                                          true, 
-                                          48, 
-                                          null);
-        AttributeType popAT = 
-            AttributeTypeFactory.newAttributeType(
-                                          "CITYPOP", 
-                                          Integer.class, 
-                                          true, 
-                                          48, 
-                                          null);
-        
-        
-        /* FeatureType */
-        AttributeType[] ptATs = new AttributeType[3];
-                ptATs[0] = ptGA;
-                ptATs[1] = cityAT;
-                ptATs[2] = popAT;
-        org.geotools.feature.FeatureType ptFT = null;
-        try{
-                ptFT = FeatureTypes.newFeatureType(ptATs, "Metropolis");
-        } catch (SchemaException schex){
-                System.out.println("SchemaException on FeatureType creation: "+ schex);
-        }
-        
-        
-        /* Feature */
-        Object [] ptElems = { ptG, name, pop };
-        
-        org.geotools.feature.Feature ptF = null;
         try {
-                ptF = ptFT.create(ptElems);
-        } catch (IllegalAttributeException iaex){
-                System.out.println("IllegalAttributeException on Feature creation: " + iaex);
-        }
-        
-        //TODO: figure out default GEomsee above
-        // System.out.println("DefaultGeom is: "+ptF.getDefaultGeometry());
-        
-        /* DataStore and its FeatureSource */ 
-        Feature [] ptFetArray = new Feature [] {ptF};
-        MemoryDataStore memds = new MemoryDataStore();
-        memds.addFeatures(ptFetArray);
-        try {
-                memFS = memds.getFeatureSource("Metropolis");
-        } catch (IOException ioex) {
-                System.out.println("IOException on memoryDataStore creation: "+ ioex);
-        }
+			memFS = demo.createFeatureSourceFromScratch();
+		} catch (IOException e) {
+			e.printStackTrace();
+			textArea.append( "Exception: "+ e.getMessage() );
+		}
 
         textArea.append("  End: Created FeatureSource from scratch.\n");
     }
@@ -576,26 +510,17 @@ public class DemoApp {
      * 
      * Create a FeatureSource from a Shapefile format file. 
      */
-    public static void create_FeatureSource_fromShapefile(){
+    public static void createFeatureSourceFromShapefile(){
 
         textArea.append("Start: Create FeatureSource from shapefile.\n");
         
-        shpURL = JMapPane.class.getResource(shpName);
-        
         try {
-            ShapefileDataStore ds = new ShapefileDataStore(shpURL);
-            try {
-                  shpFS = ds.getFeatureSource();
-            }
-            catch (IOException ioex){
-                  System.out.println("IOException on shapefile read: "+ioex);
-            }
-              
-         } catch (MalformedURLException muex){
-                System.out.println("MalformedUrlException for shpDataStore: "+ muex);
-         }
-         
-
+        	shpFS = demo.loadShapefileFeatureSource( );
+	    } 
+        catch (IOException e) {
+			e.printStackTrace();
+			textArea.append( "Exception: "+ e.getMessage() );
+		}
          textArea.append("  End: Create FeatureSource from shapefile.\n");
     }
     
@@ -643,9 +568,6 @@ public class DemoApp {
         textArea.append("  End: Created a Catalog.\n");
     }
 
-  
-    
-    
     /*
      * Create the styles that will be used for the creation of the MapLayers.
      */
@@ -653,27 +575,15 @@ public class DemoApp {
         
         textArea.append("Start: Create the Styled Layer Descriptors.\n");
         
-        /* Point style from scratch */
-        StyleBuilder builder = new StyleBuilder();
-        Mark mark    = builder.createMark("circle", Color.RED);
-        Graphic g    = builder.createGraphic(null,mark,null);
-        Symbolizer s = builder.createPointSymbolizer(g);
-        memStyl      = builder.createStyle(s);
-        
+        memStyl      = demo.createStyleFromScratch();
 
-        /* Make the sldURL from the sldName */
-        sldURL = MapViewer.class.getResource(sldName);
-        
-        /* Create the shapefile Style, uses StyleFactory and an SLD URL */
-        StyleFactory sf = StyleFactoryFinder.createStyleFactory();
-        SLDParser stylereader = null;
         try {
-                stylereader = new SLDParser(sf,sldURL);
-        } catch (IOException ioex){
-                System.out.println("IOException on SLDfile read: " + ioex);
+			shpStyl 	 = demo.createStyleFromFile();
+		} 
+        catch (IOException e) {
+			e.printStackTrace();
+			textArea.append( "Exception: " + e.getMessage() );
         }
-        org.geotools.styling.Style[] shpStylArr = stylereader.readXML();
-        shpStyl = shpStylArr[0];
 
         textArea.append("  End: Created the Styled Layer Descriptors.\n");
     }
