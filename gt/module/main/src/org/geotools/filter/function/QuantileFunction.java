@@ -22,8 +22,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.QuantileListVisitor;
+import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.Expression;
 import org.geotools.util.NullProgressListener;
 
 /**

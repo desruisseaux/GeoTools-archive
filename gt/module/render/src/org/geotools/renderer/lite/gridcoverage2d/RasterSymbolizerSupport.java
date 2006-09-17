@@ -27,7 +27,7 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.filter.expression.Expression;
+import org.geotools.filter.Expression;
 import org.geotools.styling.ColorMapEntry;
 import org.geotools.styling.RasterSymbolizer;
 import org.opengis.coverage.SampleDimension;

@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Collections;
 
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 /**

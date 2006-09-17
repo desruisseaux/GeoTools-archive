@@ -26,14 +26,14 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.filter.AttributeExpressionImpl;
+import org.geotools.filter.Expression;
+import org.geotools.filter.ExpressionType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LogicFilter;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.ExpressionType;
 import org.geotools.resources.TestData;
 
 import com.vividsolutions.jts.geom.Envelope;

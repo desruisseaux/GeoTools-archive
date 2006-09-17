@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
+import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionBuilder;
-import org.geotools.filter.expression.Expression;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

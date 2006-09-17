@@ -15,7 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.filter.expression.BBoxExpression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

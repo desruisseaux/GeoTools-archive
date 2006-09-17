@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Collections;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -39,7 +38,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  */
 public class AreaFunction extends FunctionExpressionImpl 
-	implements org.geotools.filter.expression.FunctionExpression { 
+	implements org.geotools.filter.FunctionExpression { 
     
     /**
      * Holds the geometry to calculate the area of

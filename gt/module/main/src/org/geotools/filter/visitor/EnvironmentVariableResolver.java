@@ -15,12 +15,13 @@
  */
 package org.geotools.filter.visitor;
 import java.util.logging.Logger;
+
+import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.MapScaleDenominator;
 
-import org.geotools.filter.expression.Expression;
 import org.geotools.filter.parser.ParseException;
 
 

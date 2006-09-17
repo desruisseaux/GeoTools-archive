@@ -30,7 +30,6 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.expression.AddImpl;
-import org.geotools.filter.expression.Expression;
 import org.geotools.filter.expression.SubtractImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;

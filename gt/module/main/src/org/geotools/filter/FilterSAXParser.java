@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.filter.expression.Expression;
 import org.xml.sax.Attributes;
 
 

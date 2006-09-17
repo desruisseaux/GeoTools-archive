@@ -20,6 +20,9 @@ import org.geotools.catalog.Catalog;
 import org.geotools.catalog.Service;
 import org.geotools.catalog.ServiceFactory;
 import org.geotools.catalog.ServiceFinder;
+import org.geotools.factory.FactoryFinder;
+import org.geotools.factory.FactoryRegistry;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,14 +125,22 @@ public class DefaultServiceFinder implements ServiceFinder {
 
     /**
      * This method uses the current classpath to look for instances of  {@link
-     * ServiceFactory}. Sublcasses should overide this method if they  wish to
-     * use a diffent plug-in mechanism.
-     *
+     * ServiceFactory} using the factory spi mechanism.
+     * <p>
+     * Sublcasses should overide this method if they  wish to use a diffent plug-in mechanism.
+     * </p>
+     * 
      * @return A list of ServiceFactory plugins, or an empty list if none
      *         could be found.
+     * 
+     * @see FactoryRegistry
      */
     public List getServiceFactories() {
-        //TODO: default implementation should use classpath lookup mechanism
-        return Collections.EMPTY_LIST;
+    	Iterator f = FactoryRegistry.lookupProviders( ServiceFactory.class );
+    	
+    	ArrayList factories = new ArrayList();
+        while( f.hasNext() ) factories.add( f.next() );
+        
+        return factories;
     }
 }

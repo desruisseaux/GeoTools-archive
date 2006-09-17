@@ -25,13 +25,13 @@ import java.util.Set;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.LiteralExpression;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;

@@ -17,11 +17,11 @@ package org.geotools.filter.function.math;
 
 import junit.framework.TestCase;
 import org.geotools.factory.FactoryConfigurationError;
-import org.geotools.filter.expression.Expression;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LiteralExpressionImpl;
 
 

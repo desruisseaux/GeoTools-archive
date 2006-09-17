@@ -23,13 +23,13 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
 
 /**
  * An utility class designed to ease style building by convinience methods.
@@ -1695,7 +1695,7 @@ public class StyleBuilder {
      */
     public Expression attributeExpression(String attributeName)
         throws org.geotools.filter.IllegalFilterException {
-        org.geotools.filter.expression.AttributeExpression attribute =
+        org.geotools.filter.AttributeExpression attribute =
         	ff.createAttributeExpression( attributeName );
         return attribute;
     }

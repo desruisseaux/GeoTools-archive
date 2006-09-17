@@ -19,9 +19,9 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.expression.Expression;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 
@@ -39,7 +39,7 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
         .getLogger("org.geotools.core");
     private FilterFactory filterFactory;
     private Fill fill = new FillImpl();
-    private org.geotools.filter.expression.Expression radius = null;
+    private org.geotools.filter.Expression radius = null;
 
     public HaloImpl() {
         this(FilterFactoryFinder.createFilterFactory());
@@ -90,7 +90,7 @@ public class HaloImpl extends AbstractGTComponent implements Halo, Cloneable {
      *
      * @return Value of property radius.
      */
-    public org.geotools.filter.expression.Expression getRadius() {
+    public org.geotools.filter.Expression getRadius() {
         return radius;
     }
 

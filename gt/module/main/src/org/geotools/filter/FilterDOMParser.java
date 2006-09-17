@@ -19,7 +19,6 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
-import org.geotools.filter.expression.Expression;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

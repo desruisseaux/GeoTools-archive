@@ -16,10 +16,10 @@
 package org.geotools.filter.visitor;
 
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterType;
-import org.geotools.filter.expression.Expression;
 import org.geotools.filter.function.FilterFunction_geometryType;
 import org.geotools.filter.function.math.FilterFunction_abs;
 

@@ -20,8 +20,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.ExpressionType;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsLike;
 

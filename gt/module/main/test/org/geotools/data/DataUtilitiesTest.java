@@ -23,19 +23,19 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.AbstractFilter;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.NullFilter;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
 
 import com.vividsolutions.jts.geom.Geometry;
 

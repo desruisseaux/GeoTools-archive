@@ -30,10 +30,10 @@ import org.geotools.feature.visitor.MaxVisitor.MaxResult;
 import org.geotools.feature.visitor.MedianVisitor.MedianResult;
 import org.geotools.feature.visitor.MinVisitor.MinResult;
 import org.geotools.feature.visitor.UniqueVisitor.UniqueResult;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.Expression;
 
 import com.vividsolutions.jts.geom.Envelope;
 

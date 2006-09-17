@@ -15,7 +15,7 @@
  */
 package org.geotools.filter.function;
 
-import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.FunctionExpression;
 
 public class ClassificationFunctionTest extends FunctionTestSupport {
 

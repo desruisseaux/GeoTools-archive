@@ -15,7 +15,10 @@
  */
 package org.geotools.filter.expression;
 
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.LiteralExpression;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.BinaryExpression;
 import org.opengis.filter.expression.Divide;
@@ -41,8 +44,8 @@ public class FilterVisitorExpressionWrapper implements ExpressionVisitor {
 	}
 	
 	private Object visitMath(BinaryExpression expression, Object data) {
-		if (expression instanceof org.geotools.filter.expression.MathExpression) {
-			delegate.visit((org.geotools.filter.expression.MathExpression)expression);
+		if (expression instanceof org.geotools.filter.MathExpression) {
+			delegate.visit((org.geotools.filter.MathExpression)expression);
 		}
 		
 		return data;

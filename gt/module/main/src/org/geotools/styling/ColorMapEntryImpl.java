@@ -16,9 +16,9 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.expression.Expression;
 
 
 /**
@@ -54,7 +54,7 @@ public class ColorMapEntryImpl extends AbstractGTComponent
     }
 
     /**
-     * @see org.geotools.styling.ColorMapEntry#setColor(org.geotools.filter.expression.Expression)
+     * @see org.geotools.styling.ColorMapEntry#setColor(org.geotools.filter.Expression)
      */
     public void setColor(Expression color) {
         this.color = color;
@@ -68,7 +68,7 @@ public class ColorMapEntryImpl extends AbstractGTComponent
     }
 
     /**
-     * @see org.geotools.styling.ColorMapEntry#setOpacity(org.geotools.filter.expression.Expression)
+     * @see org.geotools.styling.ColorMapEntry#setOpacity(org.geotools.filter.Expression)
      */
     public void setOpacity(Expression opacity) {
         this.opacity = opacity;
@@ -82,7 +82,7 @@ public class ColorMapEntryImpl extends AbstractGTComponent
     }
 
     /**
-     * @see org.geotools.styling.ColorMapEntry#setQuantity(org.geotools.filter.expression.Expression)
+     * @see org.geotools.styling.ColorMapEntry#setQuantity(org.geotools.filter.Expression)
      */
     public void setQuantity(Expression quantity) {
         this.quantity = quantity;

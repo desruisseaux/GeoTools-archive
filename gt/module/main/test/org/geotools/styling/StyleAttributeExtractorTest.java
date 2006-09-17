@@ -25,10 +25,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.Expression;
 
 import java.util.Set;
 

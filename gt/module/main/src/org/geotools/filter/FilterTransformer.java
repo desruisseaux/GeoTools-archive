@@ -20,7 +20,6 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
-import org.geotools.filter.expression.Expression;
 import org.geotools.gml.producer.GeometryTransformer;
 import org.geotools.xml.transform.TransformerBase;
 import org.xml.sax.ContentHandler;
@@ -199,11 +198,11 @@ public class FilterTransformer extends TransformerBase {
             
         }
         
-        public void visit(org.geotools.filter.expression.AttributeExpression expression) {
+        public void visit(org.geotools.filter.AttributeExpression expression) {
             element("PropertyName",expression.getAttributePath());
         }
         
-        public void visit(org.geotools.filter.expression.MathExpression expression) {
+        public void visit(org.geotools.filter.MathExpression expression) {
             String type = (String) expressions.get(new Integer(expression.getType()));
             start(type);
             encode(expression.getLeftValue());
@@ -211,7 +210,7 @@ public class FilterTransformer extends TransformerBase {
             end(type);
         }
         
-        public void visit(org.geotools.filter.expression.FunctionExpression expression) {
+        public void visit(org.geotools.filter.FunctionExpression expression) {
             String type = (String) expressions.get(new Integer(expression.getType()));
 
             AttributesImpl atts = new AttributesImpl();
@@ -254,7 +253,7 @@ public class FilterTransformer extends TransformerBase {
         public void visit(Expression expression) {
         }
         
-        public void visit(org.geotools.filter.expression.LiteralExpression expression) {
+        public void visit(org.geotools.filter.LiteralExpression expression) {
             Object value = expression.getLiteral();
 
             if (Geometry.class.isAssignableFrom(value.getClass())) {

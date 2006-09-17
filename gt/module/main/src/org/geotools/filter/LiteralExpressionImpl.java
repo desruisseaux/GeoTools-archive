@@ -16,7 +16,6 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.LiteralExpression;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 import com.vividsolutions.jts.geom.Geometry;

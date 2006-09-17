@@ -29,8 +29,6 @@ import javax.xml.parsers.SAXParserFactory;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
 import org.xml.sax.InputSource;

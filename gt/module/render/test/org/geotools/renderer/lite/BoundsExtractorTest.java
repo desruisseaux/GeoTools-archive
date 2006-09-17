@@ -17,13 +17,13 @@ package org.geotools.renderer.lite;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.BBoxExpression;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

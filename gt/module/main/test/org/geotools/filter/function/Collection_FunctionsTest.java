@@ -19,10 +19,10 @@ package org.geotools.filter.function;
 
 import java.util.HashSet;
 
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
+import org.geotools.filter.FunctionExpression;
 
 /**
  * Do aggregate functions actually work?

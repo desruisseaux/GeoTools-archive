@@ -18,9 +18,9 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.expression.Expression;
 
 
 /**
@@ -45,7 +45,7 @@ public class ShadedReliefImpl extends AbstractGTComponent
 
     /**
      * The ReliefFactor gives the amount of exaggeration to use for the height
-     * of the “hills.”  A value of around 55 (times) gives reasonable results
+     * of the ?hills.?  A value of around 55 (times) gives reasonable results
      * for Earth-based DEMs. The default value is system-dependent.
      *
      * @return an expression which evaluates to a double.
@@ -74,7 +74,7 @@ public class ShadedReliefImpl extends AbstractGTComponent
 
     /**
      * The ReliefFactor gives the amount of exaggeration to use for the height
-     * of the “hills.”  A value of around 55 (times) gives reasonable results
+     * of the ?hills.?  A value of around 55 (times) gives reasonable results
      * for Earth-based DEMs. The default value is system-dependent.
      *
      * @param reliefFactor an expression which evaluates to a double.

@@ -25,9 +25,9 @@ import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.expression.Expression;
 import org.geotools.styling.ContrastEnhancement;
 import org.geotools.styling.ContrastEnhancementImpl;
 import org.geotools.styling.ExternalGraphic;

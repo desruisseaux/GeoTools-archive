@@ -40,7 +40,7 @@ import java.util.Map;
 import javax.media.jai.util.Range;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.TextStyle2D;
 import org.geotools.styling.TextSymbolizer;

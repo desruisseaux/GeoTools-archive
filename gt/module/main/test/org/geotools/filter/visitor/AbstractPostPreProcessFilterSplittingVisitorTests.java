@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
@@ -28,7 +29,6 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.Expression;
 import org.geotools.filter.function.FilterFunction_geometryType;
 
 import com.vividsolutions.jts.geom.Envelope;

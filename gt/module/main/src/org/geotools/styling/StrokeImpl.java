@@ -16,9 +16,9 @@
 package org.geotools.styling;
 
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 // J2SE depedencies

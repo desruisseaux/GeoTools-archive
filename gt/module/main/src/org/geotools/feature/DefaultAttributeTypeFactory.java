@@ -21,13 +21,13 @@ import org.geotools.feature.type.NumericAttributeType;
 import org.geotools.feature.type.TemporalAttributeType;
 import org.geotools.feature.type.TextualAttributeType;
 import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LengthFunction;
-import org.geotools.filter.expression.Expression;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;

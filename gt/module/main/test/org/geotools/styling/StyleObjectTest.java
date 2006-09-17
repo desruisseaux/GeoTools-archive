@@ -16,9 +16,10 @@
 package org.geotools.styling;
 
 import junit.framework.TestCase;
+
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.expression.Expression;
 import org.opengis.util.Cloneable;
 
 

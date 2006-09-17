@@ -18,8 +18,6 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
 
 
 /**

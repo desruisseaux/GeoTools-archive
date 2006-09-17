@@ -37,12 +37,12 @@ public class IsNullImpl extends CompareFilterImpl implements
 		return visitor.visit( this, extraData );
 	}
 
-	public void nullCheckValue(org.geotools.filter.expression.Expression nullCheck) throws IllegalFilterException {
+	public void nullCheckValue(org.geotools.filter.Expression nullCheck) throws IllegalFilterException {
 		setExpression( nullCheck );
 	}
 
-	public org.geotools.filter.expression.Expression getNullCheckValue() {
-		return (org.geotools.filter.expression.Expression) getExpression();
+	public org.geotools.filter.Expression getNullCheckValue() {
+		return (org.geotools.filter.Expression) getExpression();
 	}
 
 	public Expression getExpression() {

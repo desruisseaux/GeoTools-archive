@@ -20,15 +20,15 @@ package org.geotools.filter.function;
 
 import com.vividsolutions.jts.geom.*; //generic JTS support
 
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
 import org.geotools.filter.function.StaticGeometry; //make sure you include this or you will not be able to call the functions!!
 
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
+import org.geotools.filter.LiteralExpression;
 
 
 public class FilterFunction_between extends FunctionExpressionImpl implements FunctionExpression 

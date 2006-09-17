@@ -16,8 +16,6 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
 
 /**
  * Takes an AttributeExpression, and computes the length of the data for the attribute.

@@ -19,9 +19,9 @@ package org.geotools.styling;
 
 // OpenGIS dependencies
 import org.geotools.event.AbstractGTComponent;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.expression.Expression;
 import org.geotools.resources.Utilities;
 import org.opengis.util.Cloneable;
 

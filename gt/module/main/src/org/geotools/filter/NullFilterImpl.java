@@ -16,8 +16,6 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsNull;
 

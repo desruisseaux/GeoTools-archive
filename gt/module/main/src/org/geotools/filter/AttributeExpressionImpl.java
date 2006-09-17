@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.expression.AttributeExpression;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 

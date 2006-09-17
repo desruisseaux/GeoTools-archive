@@ -30,8 +30,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.expression.AddImpl;
 import org.geotools.filter.expression.DivideImpl;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
 import org.geotools.filter.expression.MultiplyImpl;
 import org.geotools.filter.expression.SubtractImpl;
 

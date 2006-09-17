@@ -28,13 +28,13 @@ import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureList;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.SortBy;
 import org.geotools.filter.SortOrder;
-import org.geotools.filter.expression.AttributeExpression;
 import org.opengis.filter.expression.PropertyName;
 
 public class SubFeatureList extends SubFeatureCollection implements FeatureList, RandomFeatureAccess {

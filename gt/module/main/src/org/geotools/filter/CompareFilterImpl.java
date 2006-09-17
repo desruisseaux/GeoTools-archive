@@ -21,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.Expression;
 import org.opengis.filter.FilterVisitor;
 
 

@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.expression.AddImpl;
-import org.geotools.filter.expression.BBoxExpression;
 import org.geotools.filter.expression.DivideImpl;
 import org.geotools.filter.expression.MultiplyImpl;
 import org.geotools.filter.expression.SubtractImpl;

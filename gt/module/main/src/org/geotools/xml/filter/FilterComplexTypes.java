@@ -21,14 +21,14 @@ import java.util.Map;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.Expression;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
-import org.geotools.filter.expression.MathExpression;
+import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.MathExpression;
 import org.geotools.ows.ServiceException;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.filter.FilterSchema.FilterAttribute;
@@ -919,7 +919,7 @@ public class FilterComplexTypes {
     }
 
     public static class ExpressionType extends FilterComplexType
-        implements org.geotools.filter.expression.ExpressionType {
+        implements org.geotools.filter.ExpressionType {
         private static final ComplexType instance = new ExpressionType();
 
         public static ComplexType getInstance() {
@@ -1425,7 +1425,7 @@ public class FilterComplexTypes {
             output.startElement(element.getNamespace(), element.getName(), ai);
 
             switch (me.getType()) {
-            case org.geotools.filter.expression.ExpressionType.LITERAL_GEOMETRY:
+            case org.geotools.filter.ExpressionType.LITERAL_GEOMETRY:
 
                 if (me.getLiteral() instanceof Geometry) {
                     GMLSchema.getInstance().getElements()[29].getType().encode(GMLSchema.getInstance()
@@ -1435,9 +1435,9 @@ public class FilterComplexTypes {
                     break;
                 }
 
-            case org.geotools.filter.expression.ExpressionType.LITERAL_DOUBLE:
-            case org.geotools.filter.expression.ExpressionType.LITERAL_INTEGER:
-            case org.geotools.filter.expression.ExpressionType.LITERAL_STRING:
+            case org.geotools.filter.ExpressionType.LITERAL_DOUBLE:
+            case org.geotools.filter.ExpressionType.LITERAL_INTEGER:
+            case org.geotools.filter.ExpressionType.LITERAL_STRING:
                 output.characters(me.getLiteral().toString());
 
                 break;

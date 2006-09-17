@@ -25,8 +25,8 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.MaxVisitor;
 import org.geotools.feature.visitor.MinVisitor;
 import org.geotools.feature.visitor.UniqueVisitor;
+import org.geotools.filter.Expression;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.filter.expression.Expression;
 import org.geotools.util.NullProgressListener;
 
 

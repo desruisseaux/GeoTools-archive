@@ -41,7 +41,7 @@ public class PointPlacementImpl extends AbstractGTComponent
         .createFilterFactory();
     private AnchorPoint anchorPoint = new AnchorPointImpl();
     private Displacement displacement = new DisplacementImpl();
-    private org.geotools.filter.expression.Expression rotation = null;
+    private org.geotools.filter.Expression rotation = null;
 
     /**
      * Creates a new instance of DefaultPointPlacement
@@ -110,7 +110,7 @@ public class PointPlacementImpl extends AbstractGTComponent
      *
      * @return The rotation of the label.
      */
-    public org.geotools.filter.expression.Expression getRotation() {
+    public org.geotools.filter.Expression getRotation() {
         return rotation;
     }
 
@@ -119,7 +119,7 @@ public class PointPlacementImpl extends AbstractGTComponent
      *
      * @param rotation New value of property rotation.
      */
-    public void setRotation(org.geotools.filter.expression.Expression rotation) {
+    public void setRotation(org.geotools.filter.Expression rotation) {
         this.rotation = rotation;
         fireChanged();
     }
