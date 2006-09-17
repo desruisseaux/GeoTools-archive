@@ -17,7 +17,6 @@ package org.geotools.xml;
 
 import org.picocontainer.MutablePicoContainer;
 
-
 /**
  * Responsible for configuring a parser runtime environment.
  *
@@ -25,9 +24,10 @@ import org.picocontainer.MutablePicoContainer;
  * Implementations have the following responsibilites:
  *
  * <ul>
- *         <li>Configuration of bindinds.
+ *  <li>Configuration of bindings.
  *  <li>Configuration of context used by bindings.
- *  <li>Supplying specialied handlers for looking up schemas.
+ *  <li>Supplying specialized handlers for looking up schemas.
+ *  <li>Supplying specialized handlers for parsing schemas.
  * </ul>
  * </p>
  *
@@ -35,14 +35,14 @@ import org.picocontainer.MutablePicoContainer;
  * <p>
  *  In able for a particular binding to be found during a parse, the
  *  configuration must first populate a container with said binding. A binding
- *  is stored in as a key value pait. The key is the qualified name of the type '
+ *  is stored in as a key value pair. The key is the qualified name of the type '
  *  being bound to. The value is the class of the binding. For instance, the
  *  following configures a container with a binding for type <b>xs:string</b>
  *
  *  <pre>
  *          <code>
- *  void configureBindings(MutablePicoContainer container) {
- *           container.registerComponentImplementation(XS.STRING,XSStringBinding.class);
+ *  void configureBindings( MutablePicoContainer container ) {
+ *      container.registerComponentImplementation(XS.STRING,XSStringBinding.class);
  *  }
  *          </code>
  *  </pre>
@@ -101,27 +101,32 @@ import org.picocontainer.MutablePicoContainer;
  *         </code>
  * </pre>
  *
+ * 
+ * <h3>Schema Resolution</h3>
  * <p>
- *  <h3>Schema Resolution</h3>
- * XML instance documents often contain schema uri references that are invalid.
- * A configuration has the ability to supply a specialized schema resolvers and
- * locators. This prevents the parser from following an invalid schema uri and
- * prevents an errors that may occur as a result.
+ * XML instance documents often contain schema uri references that are invalid 
+ * with respect to the parser, or non-existant. A configuration can supply 
+ * specialized look up classes to prevent the parser from following an 
+ * invalid uri and prevent any errors that may occur as a result. 
  * </p>
- *
  * <p>
  * An instance of {@link org.eclipse.xsd.util.XSDSchemaLocationResolver} can be
- * used to override a schemaLocation referencing another schema. An instance of
- * {@link org.eclipse.xsd.util.XSDSchemaLocator} can be used override the
- * actual schema encountered from a particular schemaLocation.
- *
- * In order to supply a custom schema resolver or locator, an implementation can
- * be inserted into the context at configuration time.
+ * used to override a schemaLocation referencing another schema. This can be useful 
+ * when the entity parsing an instance document stores schemas in a location 
+ * unkown to the entity providing hte instance document.
+ * </p>
+ * 
+ * <p>
+ * An instance of {@link org.eclipse.xsd.util.XSDSchemaLocator} can be used 
+ * to provide an pre-parsed schema and prevent the parser from parsing a 
+ * schemaLocation manually. This can be useful when an instance document does 
+ * not supply a schemaLocation for the targetNamespace of the document.
  * <pre>
  *         <code>
  * class MyConfiguration implements Configuration {
  *
  *                void configureContext(MutablePicoContainer container) {
+ *                		  container.registerComponentImplemnetation(MySchemaLocationResolver.class);
  *                        container.registerComponentImplementation(MySchemaLocator.class);
  *                }
  * }
@@ -186,28 +191,4 @@ public interface Configuration {
      */
     void configureContext(MutablePicoContainer container);
 
-    /**
-     * Returns an array of objects used to lookup schemas.
-     *
-     * <p>This method allows a particular configuration to specialize a schema
-     * lookup for a particular namespace. This method can simply return null if
-     * no specialization is needed.<p>
-     *
-     * <p>
-     * The XSDSchemaLocator interface contains a single method:
-     *
-     * <pre>
-     * <code>
-     * XSDSchema locateSchema(XSDSchema xsdSchema, String namespaceURI,  String rawSchemaLocationURI, String resolvedSchemaLocationURI);
-     * </code>
-     * </pre>
-     *
-     * Implementations must <B>never</B> assume that any of the paramters passed
-     * into the locateSchema method are non-null.
-     * </p>
-     *
-     * @return An array of locators, or null if none are need.
-     */
-
-    //XSDSchemaLocator[] getSchemaLocators();
 }
