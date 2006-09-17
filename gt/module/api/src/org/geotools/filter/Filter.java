@@ -24,6 +24,8 @@ import org.geotools.feature.Feature;
  * @author Rob Hranac, Vision for New York
  * @source $URL$
  * @version $Id$
+ * 
+ * @deprecated use {@link org.opengis.filter.Filter}
  */
 public interface Filter extends FilterType, org.opengis.filter.Filter {
     /**

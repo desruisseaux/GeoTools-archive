@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.expression;
+package org.geotools.filter;
 
 import org.geotools.factory.Factory;
 import org.opengis.filter.expression.Function;
@@ -24,6 +24,8 @@ import org.opengis.filter.expression.Function;
  *
  * @author James Macgill, PSU
  * @source $URL$
+ * 
+ * @deprecated use {@link org.opengis.filter.expression.Function}
  */
 public interface FunctionExpression extends Expression, Factory, Function {
     /**

@@ -15,12 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
-import org.geotools.filter.expression.MathExpression;
-
 
 /**
  * An interface for classes that want to perform operations on a Filter
@@ -39,6 +33,8 @@ import org.geotools.filter.expression.MathExpression;
  * @task REVISIT: These need to throw some sort of checked exception as the
  *       implementing classes are swallowing exceptions or throwing runtime
  *       ones.
+ *       
+ * @deprecated use {@link org.opengis.filter.FilterVisitor}
  */
 public interface FilterVisitor {
     /**

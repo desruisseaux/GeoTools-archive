@@ -16,7 +16,6 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.Expression;
 import org.opengis.filter.PropertyIsBetween;
 
 
@@ -34,6 +33,8 @@ import org.opengis.filter.PropertyIsBetween;
  * @author Rob Hranac, TOPP
  * @source $URL$
  * @version $Id$
+ * 
+ * @deprecated use {@link org.opengis.filter.PropertyIsBetween}
  */
 public interface BetweenFilter extends CompareFilter, PropertyIsBetween {
     /**

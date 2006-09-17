@@ -19,8 +19,8 @@ package org.geotools.styling;
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTConstant;
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.ConstantExpression;
-import org.geotools.filter.expression.Expression;
+import org.geotools.filter.ConstantExpression;
+import org.geotools.filter.Expression;
 import java.awt.Color;
 
 

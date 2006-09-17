@@ -16,7 +16,6 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.Expression;
 import org.opengis.filter.PropertyIsLike;
 
 
@@ -26,6 +25,8 @@ import org.opengis.filter.PropertyIsLike;
  * @author Rob Hranac, Vision for New York
  * @source $URL$
  * @version $Id$
+ * 
+ * @deprecated use {@link org.opengis.filter.PropertyIsLike}
  */
 public interface LikeFilter extends Filter, PropertyIsLike {
     /**

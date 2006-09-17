@@ -16,7 +16,6 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.Expression;
 import org.opengis.filter.PropertyIsNull;
 
 
@@ -27,6 +26,8 @@ import org.opengis.filter.PropertyIsNull;
  * @author Chris Holmes, TOPP
  * @source $URL$
  * @version $Id$
+ * 
+ * @deprecated use {@link org.opengis.filter.PropertyIsNull}
  */
 public interface NullFilter extends Filter, PropertyIsNull {
     /**

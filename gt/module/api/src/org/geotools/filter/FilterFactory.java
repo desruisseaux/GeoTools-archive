@@ -19,11 +19,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.factory.Factory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.BBoxExpression;
-import org.geotools.filter.expression.FunctionExpression;
-import org.geotools.filter.expression.LiteralExpression;
-import org.geotools.filter.expression.MathExpression;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
@@ -55,6 +50,8 @@ import org.opengis.filter.spatial.Within;
  *       cleanly with that, and should handle sax parsing without too much
  *       memory overhead.
  * @task REVISIT: resolve errors, should all throw errors?
+ * 
+ * @deprecated use {@link org.opengis.filter.FilterFactory}
  */
 public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory {
     /**

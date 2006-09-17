@@ -13,10 +13,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.expression;
+package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.IllegalFilterException;
 import org.opengis.filter.expression.PropertyName;
 
 
@@ -29,6 +28,8 @@ import org.opengis.filter.expression.PropertyName;
  * </p>
  * @source $URL$
  * @version $Id$
+ * 
+ * @deprecated use {@link org.opengis.filter.expression.PropertyName}
  */
 public interface AttributeExpression extends Expression, PropertyName {
     /**

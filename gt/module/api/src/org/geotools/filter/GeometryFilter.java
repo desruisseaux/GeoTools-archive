@@ -16,7 +16,6 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.expression.Expression;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 
 
@@ -57,6 +56,8 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  *       just about all of them are mutable when creating them.  Other issue
  *       is that lots of code will need to  be changed for immutability.
  *       (comments by cholmes) - MUTABLE FACTORIES!  Sax and immutability.
+ *       
+ *  @deprecated use {@link org.opengis.filter.spatial.BinarySpatialOperator}.
  */
 public interface GeometryFilter extends Filter, BinarySpatialOperator {
     /**

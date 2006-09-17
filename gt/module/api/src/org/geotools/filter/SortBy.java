@@ -15,9 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.filter.expression.AttributeExpression;
-import org.geotools.filter.expression.Expression;
-
 
 /**
  * Defines the sort order, based on a property and assending/desending.

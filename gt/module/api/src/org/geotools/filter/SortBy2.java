@@ -15,8 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.filter.expression.Expression;
-
 
 /**
  * GeoTools allows for more pervase use of Expression then is strictly

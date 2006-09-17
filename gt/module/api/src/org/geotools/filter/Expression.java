@@ -13,10 +13,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.expression;
+package org.geotools.filter;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.FilterVisitor;
 
 
 /**
@@ -27,6 +26,8 @@ import org.geotools.filter.FilterVisitor;
  * @author Rob Hranac, Vision for New York
  * @source $URL$
  * @version $Id$
+ * 
+ * @deprecated use {@link org.opengis.filter.expression.Expression}
  */
 public interface Expression extends ExpressionType,
     org.opengis.filter.expression.Expression {
