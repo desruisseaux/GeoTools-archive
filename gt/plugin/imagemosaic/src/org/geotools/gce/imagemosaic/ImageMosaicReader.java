@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.SoftReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -126,7 +127,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 	private final AbstractDataStore tileIndexStore;
 
-	private final MemorySpatialIndex index;
+	private SoftReference index;
+
+	private final String typeName;
+
+	private final FeatureSource featureSource;
 
 	private final static RenderingHints NO_CACHE = new RenderingHints(
 			JAI.KEY_TILE_CACHE, null);
@@ -211,9 +216,9 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			throw new IllegalArgumentException(
 					"Problems when opening the index, no typenames for the schema are defined");
 
-		String typeName = typeNames[0];
-		final FeatureSource featureSource = tileIndexStore
-				.getFeatureSource(typeName);
+		typeName = typeNames[0];
+		featureSource = tileIndexStore.getFeatureSource(typeName);
+
 		// //
 		//
 		// Load all the features inside the index
@@ -221,7 +226,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// //
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("About to create index");
-		index = new MemorySpatialIndex(featureSource.getFeatures());
+		index = new SoftReference(new MemorySpatialIndex(featureSource
+				.getFeatures()));
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("Created index");
 		// //
@@ -461,7 +467,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(new StringBuffer(
-					"Creating pyramid to comply with envelope ").append(
+					"Creating mosaic to comply with envelope ").append(
 					requestedEnvelope != null ? requestedEnvelope.toString()
 							: null).append(" crs ").append(crs.toWKT()).append(
 					" dim ").append(dim == null ? " null" : dim.toString())
@@ -535,7 +541,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("loading tile for envelope "
 					+ requestedJTSEnvelope.toString());
-		final List features = index.findFeatures(requestedJTSEnvelope);
+		List features =getFeaturesFromIndex(requestedJTSEnvelope);
 
 		// do we have any feature to load
 		final Iterator it = features.iterator();
@@ -658,7 +664,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// Loop over the single features and load the images which
-			// intersectsthe requested envelope. Once all of them have been
+			// intersect the requested envelope. Once all of them have been
 			// loaded, next step is to create the mosaic and then
 			// crop it as requested.
 			//
@@ -713,6 +719,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					LOGGER.fine("About to read image number " + i);
 				imageFile = new File(new StringBuffer(parentLocation).append(
 						File.separatorChar).append(location).toString());
+
 				ParameterBlock pbjImageRead = new ParameterBlock();
 				pbjImageRead.add(ImageIO.createImageInputStream(imageFile));
 				pbjImageRead.add(imageChoice);
@@ -806,7 +813,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// Load feaures and evaluate envelope
 		//
 		// /////////////////////////////////////////////////////////////////////
-		List features = index.findFeatures(envelope);
+		List features = getFeaturesFromIndex(envelope);
 		final Envelope loadedULC = new Envelope();
 		Iterator it = features.iterator();
 		while (it.hasNext()) {
@@ -815,6 +822,37 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		}
 		return new Point2D.Double(loadedULC.getMinX(), loadedULC.getMaxY());
 
+	}
+
+	/**
+	 * Retrieves the list of features that intersect the provided evelope
+	 * loadinf them inside an index in memory where beeded.
+	 * 
+	 * @param envelope
+	 *            Envelope for selectig features that intersect.
+	 * @return A list of fetaures.
+	 * @throws IOException
+	 *             In case loading the needed features failes.
+	 */
+	private List getFeaturesFromIndex(final Envelope envelope)
+			throws IOException {
+		List features = null;
+		synchronized (index) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("Trying to  use the index...");
+			Object o = index.get();
+			if (o != null) {
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine("Index does not need to be loaded...");
+				features = ((MemorySpatialIndex) o).findFeatures(envelope);
+			} else {
+				if (LOGGER.isLoggable(Level.FINE))
+					o = new MemorySpatialIndex(featureSource.getFeatures());
+			}
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("Index Loaded");
+		}
+		return features;
 	}
 
 	/**
@@ -1010,8 +1048,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// positioning the actual image correctly in final mosaic.
 		// /////////////////////////////////////////////////////////////////////
 		// evaluate trans
-		double xTrans = (bound.getMinX() - ulc.getX()) / res[0];
-		double yTrans = (ulc.getY() - bound.getMaxY()) / res[1];
+		int xTrans = (int) Math.round((bound.getMinX() - ulc.getX()) / res[0]);
+		int yTrans = (int) Math.round((ulc.getY() - bound.getMaxY()) / res[1]);
 
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(new StringBuffer("Adding to mosaic image  ").append(

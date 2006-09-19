@@ -24,10 +24,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
@@ -51,6 +49,8 @@ public final class MemorySpatialIndex {
 			g = f.getDefaultGeometry();
 			index.insert(g.getEnvelopeInternal(), f);
 		}
+		// closing he iterator to free some resources.
+		features.close(it);
 		// force index construction --> STRTrees are build on first call to
 		// query
 		index.build();
@@ -60,21 +60,6 @@ public final class MemorySpatialIndex {
 	public List findFeatures(Envelope envelope) {
 		return index.query(envelope);
 
-	}
-
-	/**
-	 * Builds a linearRing from the passed envelope
-	 */
-	private static LinearRing geometryFromEnvelope(Envelope env) {
-		Coordinate[] ringCoords = new Coordinate[] {
-				new Coordinate(env.getMinX(), env.getMinY()),
-				new Coordinate(env.getMaxX(), env.getMinY()),
-				new Coordinate(env.getMaxX(), env.getMaxY()),
-				new Coordinate(env.getMinX(), env.getMaxY()),
-				new Coordinate(env.getMinX(), env.getMinY()) };
-		LinearRing ring = new LinearRing(ringCoords, pm, 0);
-
-		return ring;
 	}
 
 }
