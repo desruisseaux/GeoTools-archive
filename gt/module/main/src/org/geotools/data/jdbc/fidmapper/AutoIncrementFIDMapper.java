@@ -25,6 +25,7 @@ package org.geotools.data.jdbc.fidmapper;
 
 import org.geotools.feature.Feature;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.Types;
@@ -93,6 +94,8 @@ public class AutoIncrementFIDMapper extends AbstractFIDMapper {
 
         switch (getColumnType(0)) {
         case Types.INTEGER:
+        case Types.SMALLINT:
+        case Types.TINYINT:
         	try {
         		pk = new Integer(Integer.parseInt(FID));
 	        } catch(NumberFormatException nfe) {
@@ -102,7 +105,16 @@ public class AutoIncrementFIDMapper extends AbstractFIDMapper {
 	    	    pk = new Integer(-1);
 	    	}
             break;
-
+        case Types.BIGINT:
+            try {
+                pk = new BigInteger(FID);
+            } catch(NumberFormatException nfe) {
+                //if we get a really bad featureid we want to return something
+                //that will not mess up the database and throw an exception,
+                //we just want to not match against it, so we return -1
+                pk = new BigInteger("-1");
+            }
+            break;
         case Types.NUMERIC:
         	try {
         		pk = new Long(Long.parseLong(FID));
@@ -112,6 +124,11 @@ public class AutoIncrementFIDMapper extends AbstractFIDMapper {
         	    //we just want to not match against it, so we return -1
         	    pk = new Integer(-1);
         	}
+            break;
+        case Types.VARCHAR: //unlikely to be used, but you never know...
+        case Types.LONGVARCHAR:
+        case Types.CHAR:
+            pk = new String(FID);
             break;
         }
 

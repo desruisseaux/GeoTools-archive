@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -115,9 +116,10 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
                     colInfos);
 
             if (mapper == null) {
-                throw new IOException(
-                    "Cannot map primary key to a FID mapper, primary key columns are:\n"
-                    + getColumnInfoList(colInfos));
+                String msg = "Cannot map primary key to a FID mapper, primary key columns are:\n"
+                    + getColumnInfoList(colInfos); 
+                LOGGER.log(Level.SEVERE, msg);
+                throw new IOException(msg);
             }
         }
 
@@ -241,10 +243,6 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     protected ColumnInfo[] getPkColumnInfo(String catalog, String schema,
         String typeName, Connection conn)
         throws SchemaNotFoundException, DataSourceException {
-        final int NAME_COLUMN = 4;
-        final int TYPE_NAME = 6;
-        final int COLUMN_NAME = 4;
-        final int DATA_TYPE = 5;
         ResultSet tableInfo = null;
         ResultSet pkInfo = null;
         boolean pkMetadataFound = false;

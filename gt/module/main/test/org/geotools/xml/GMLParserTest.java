@@ -20,16 +20,15 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import junit.framework.TestCase;
 
+import org.geotools.TestData;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.TestData;
 import org.geotools.xml.gml.GMLFeatureCollection;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.xml.schema.Schema;
