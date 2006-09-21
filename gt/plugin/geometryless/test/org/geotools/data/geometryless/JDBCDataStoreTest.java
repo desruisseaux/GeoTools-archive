@@ -52,6 +52,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -117,8 +118,11 @@ public class JDBCDataStoreTest extends TestCase {
                local.put("user", user);
         String password = resource.getString("password");
             local.put("passwd", password);
+            
+           String dbschema = resource.getString("schema");
+            local.put("schema", dbschema);
        
-                  String Driver = resource.getString("driver");
+           String Driver = resource.getString("driver");
             local.put("driver", Driver);
 
              String urlprefix = resource.getString("urlprefix");
@@ -142,7 +146,7 @@ public class JDBCDataStoreTest extends TestCase {
             LOGGER.fine("getting connection pool");
             connPool = connFactory.getConnectionPool();
            // setupTestTable(connPool.getConnection());
-            dstore = new JDBCDataStore(connPool, TEST_NS);
+            dstore = new JDBCDataStore(connPool, dbschema, TEST_NS);
 
             dstore.setFIDMapper(
                 "testset",

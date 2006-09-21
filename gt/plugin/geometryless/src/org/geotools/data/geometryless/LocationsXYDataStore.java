@@ -55,9 +55,9 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
      * @param databaseSchemaName the database schema.  Can be null.  See the comments for the parameter schemaPattern in {@link java.sql.DatabaseMetaData#getTables(String, String, String, String[]) DatabaseMetaData.getTables}, because databaseSchemaName behaves in the same way.
      * @throws IOException if the database cannot be properly accessed
      */
-    public LocationsXYDataStore(ConnectionPool connectionPool, String databaseSchemaName, String x, String y, String geomName)    
+    public LocationsXYDataStore(ConnectionPool connectionPool, String databaseSchemaName, String namespace, String x, String y, String geomName)    
         throws IOException {
-        super(connectionPool, databaseSchemaName);
+        super(connectionPool, databaseSchemaName,namespace);
        this.XCoordColumnName = x;
        this.YCoordColumnName = y;
        this.geomName = geomName;

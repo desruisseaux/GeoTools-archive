@@ -21,8 +21,8 @@ import java.util.logging.Logger;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.SQLEncoder;
-
 
 /**
  * A an extension of DefaultSQLBuilder, which supports point geometries  that
@@ -79,11 +79,12 @@ public class LocationsXYSQLBuilder extends DefaultSQLBuilder {
         for (int i = 0; i < attributes.length; i++) {
             String colName = attributes[i].getName();
 
-            LOGGER.finest(attributes[i].getName() + " isGeom: "
-                + attributes[i].isGeometry());
+             LOGGER.finest(attributes[i].getName() + " isGeom: "
+                + (attributes[i] instanceof GeometryAttributeType) );
 
             //Here we want the x and y columns to be requested.
-            if (attributes[i].isGeometry()) {
+            if (attributes[i] instanceof GeometryAttributeType) {
+
                 sql.append(xCoordColumnName + ", " + yCoordColumnName);
 
                 //"AsText(" + attributes[i].getName() + ") AS " + attributes[i].getName());

@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.SQLEncoder;
 /**
  * A Geometryless-specific instance of DefaultSQLBuilder, which supports geometries created form standard data types
@@ -67,8 +68,10 @@ public class GeometrylessSQLBuilder extends DefaultSQLBuilder {
         for (int i = 0; i < attributes.length; i++) {
             String colName = attributes[i].getName();
 
-     	LOGGER.finest(attributes[i].getName() + " isGeom: " +attributes[i].isGeometry() );
-            if (attributes[i].isGeometry()) {
+            LOGGER.finest(attributes[i].getName() + " isGeom: "
+                + (attributes[i] instanceof GeometryAttributeType) );
+
+            if (attributes[i] instanceof GeometryAttributeType) {
                 sql.append("AsText(" + attributes[i].getName() + ") AS " + attributes[i].getName());
             } else {
                 sql.append(colName);

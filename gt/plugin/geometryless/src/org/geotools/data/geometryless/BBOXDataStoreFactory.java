@@ -134,15 +134,27 @@ public class BBOXDataStoreFactory extends AbstractFactory
             }
         };
 
+
+    /** Param, package visibiity for JUnit tests */
+    static final Param SCHEMA = new Param("schema", String.class,
+            "database schema", false);
+            
     /** Param, package visibiity for JUnit tests */
     static final Param NAMESPACE = new Param("namespace", String.class,
             "namespace prefix used", false);
 
     /** Array with all of the params */
     static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,MINXCOLUMN,MINYCOLUMN,MAXXCOLUMN,MAXYCOLUMN, GEOMNAME
+        DBTYPE, HOST, PORT, DATABASE, SCHEMA, USER, PASSWD, CHARSET, NAMESPACE,DRIVER,URLPREFIX,MINXCOLUMN,MINYCOLUMN,MAXXCOLUMN,MAXYCOLUMN, GEOMNAME
     };
 
+
+    /**
+     * Creates a new instance of - this constructor needed for factory finder apparently
+     */
+    public BBOXDataStoreFactory() {
+
+}
     /**
      * Creates a new instance of PostgisDataStoreFactory.
      * <p>
@@ -241,7 +253,8 @@ public class BBOXDataStoreFactory extends AbstractFactory
         String passwd = (String) PASSWD.lookUp(params);
         String port = (String) PORT.lookUp(params);
         String database = (String) DATABASE.lookUp(params);
-        Charset charSet = (Charset) CHARSET.lookUp(params);
+        String schema = (String) SCHEMA.lookUp(params);
+                Charset charSet = (Charset) CHARSET.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
         String driver =   (String) DRIVER.lookUp(params);
         String urlprefix =   (String) URLPREFIX.lookUp(params);
@@ -288,7 +301,7 @@ public class BBOXDataStoreFactory extends AbstractFactory
 	    geom_name = GEOM_NAME_DEFAULT;
 	}
         if (namespace != null) {
-            return new BBOXDataStore(pool, namespace, minxcolumn,
+            return new BBOXDataStore(pool, schema, namespace, minxcolumn,
                                             minycolumn,maxxcolumn,maxycolumn, geom_name);
         } else {
             return new BBOXDataStore(pool);

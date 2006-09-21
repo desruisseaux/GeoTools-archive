@@ -21,6 +21,9 @@ import java.util.logging.Logger;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.Expression;
+import org.geotools.filter.LiteralExpression;
 
 
 /**

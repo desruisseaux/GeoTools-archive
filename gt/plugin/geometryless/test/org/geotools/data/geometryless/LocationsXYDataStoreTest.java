@@ -53,6 +53,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -122,7 +123,11 @@ public class LocationsXYDataStoreTest extends TestCase {
                local.put("user", user);
         String password = resource.getString("password");
             local.put("passwd", password);
-       
+ 
+            
+           String dbschema = resource.getString("schema");
+            local.put("schema", dbschema);
+                  
                   String Driver = resource.getString("driver");
             local.put("driver", Driver);
 
@@ -151,7 +156,7 @@ public class LocationsXYDataStoreTest extends TestCase {
             LOGGER.fine("getting connection pool");
             connPool = connFactory.getConnectionPool();
             setupTestTable(connPool.getConnection());
-            dstore = new LocationsXYDataStore(connPool, TEST_NS, xcolumn, ycolumn, GEOM_NAME);
+            dstore = new LocationsXYDataStore(connPool, dbschema, TEST_NS, xcolumn, ycolumn, GEOM_NAME);
 
             dstore.setFIDMapper(
                 "testset",
@@ -188,8 +193,8 @@ public class LocationsXYDataStoreTest extends TestCase {
         } catch (Exception e) {
         }
         st.execute(
-            "CREATE TABLE testset ( gid integer, area double, perimeter double, testb_ integer, "
-                + " testb_id integer, name varchar(255), pcedflag integer, dbdflag integer, x double, y double)");
+            "CREATE TABLE testset ( gid integer, area real, perimeter real, testb_ integer, "
+                + " testb_id integer, name varchar(255), pcedflag integer, dbdflag integer, x real, y real)");
         st.close();
         PreparedStatement ps =
             conn.prepareStatement(
