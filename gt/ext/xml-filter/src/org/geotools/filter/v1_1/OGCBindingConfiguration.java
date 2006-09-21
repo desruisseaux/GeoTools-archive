@@ -22,6 +22,7 @@ import org.geotools.filter.v1_0.OGCFunctionTypeBinding;
 import org.geotools.filter.v1_0.OGCLiteralTypeBinding;
 import org.geotools.filter.v1_0.OGCPropertyIsBetweenTypeBinding;
 import org.geotools.filter.v1_0.OGCPropertyIsNullTypeBinding;
+import org.geotools.filter.v1_0.OGCPropertyNameTypeBinding;
 import org.geotools.xml.BindingConfiguration;
 import org.picocontainer.MutablePicoContainer;
 
@@ -100,7 +101,7 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(OGC.PROPERTYISNULLTYPE,
             OGCPropertyIsNullTypeBinding.class);
         container.registerComponentImplementation(OGC.PROPERTYNAMETYPE,
-            PropertyNameTypeBinding.class);
+            OGCPropertyNameTypeBinding.class);
         container.registerComponentImplementation(OGC.SCALAR_CAPABILITIESTYPE,
             Scalar_CapabilitiesTypeBinding.class);
         container.registerComponentImplementation(OGC.SORTBYTYPE,
@@ -182,8 +183,8 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(OGC.PROPERTYISNOTEQUALTO,
             PropertyIsNotEqualToBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISNULL,PropertyIsNullBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYNAME,
-            PropertyNameBinding.class);
+//        container.registerComponentImplementation(OGC.PROPERTYNAME,
+//            PropertyNameBinding.class);
         container.registerComponentImplementation(OGC.SIMPLEARITHMETIC,
             SimpleArithmeticBinding.class);
         //container.registerComponentImplementation(OGC.SORTBY,SortByBinding.class);
