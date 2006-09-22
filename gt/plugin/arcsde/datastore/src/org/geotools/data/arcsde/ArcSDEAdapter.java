@@ -460,32 +460,23 @@ public class ArcSDEAdapter {
 		final int LINESTRING_MASK = SeLayer.SE_LINE_TYPE_MASK;
 		final int AREA_MASK = SeLayer.SE_AREA_TYPE_MASK;
 		
-		switch (seShapeType) {
-		case SeLayer.TYPE_NIL:
-			break;
-		case SeLayer.TYPE_MULTI_MASK:
+		if (seShapeType == SeLayer.TYPE_NIL){
+			//do nothing
+		}else if (seShapeType == SeLayer.TYPE_MULTI_MASK){
 			clazz = GeometryCollection.class;
-		case SeLayer.TYPE_LINE:
-		case SeLayer.TYPE_SIMPLE_LINE:
+		}else if (seShapeType == SeLayer.TYPE_LINE || seShapeType == SeLayer.TYPE_SIMPLE_LINE){
 			clazz = LineString.class;
-			break;
-		case SeLayer.TYPE_MULTI_LINE:
-		case SeLayer.TYPE_MULTI_SIMPLE_LINE:
+		}else if (seShapeType == SeLayer.TYPE_MULTI_LINE || seShapeType == SeLayer.TYPE_MULTI_SIMPLE_LINE){
 			clazz = MultiLineString.class;
-			break;
-		case SeLayer.TYPE_MULTI_POINT:
+		}else if (seShapeType == SeLayer.TYPE_MULTI_POINT){
 			clazz = MultiPoint.class;
-			break;
-		case SeLayer.TYPE_MULTI_POLYGON:
+		}else if (seShapeType == SeLayer.TYPE_MULTI_POLYGON){
 			clazz = MultiPolygon.class;
-			break;
-		case SeLayer.TYPE_POINT:
+		}else if (seShapeType == SeLayer.TYPE_POINT){
 			clazz = Point.class;
-			break;
-		case SeLayer.TYPE_POLYGON:
+		}else if (seShapeType == SeLayer.TYPE_POLYGON){
 			clazz = Polygon.class;
-			break;
-		default:
+		}else{
 			
 			// in all this assignments, 1 means true and 0 false
 			final int isCollection = ((seShapeType & MULTIPART_MASK) == MULTIPART_MASK) ? 1

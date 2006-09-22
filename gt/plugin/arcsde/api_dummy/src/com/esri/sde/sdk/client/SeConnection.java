@@ -2,7 +2,7 @@ package com.esri.sde.sdk.client;
 
 public class SeConnection {
 
-	public static final int SE_UNPROTECTED_POLICY = 0;
+	public static /* GEOT-947 final*/ int SE_UNPROTECTED_POLICY = 0;
 	
 	public SeConnection(String a, int i, String b, String c, String d) {}
 	

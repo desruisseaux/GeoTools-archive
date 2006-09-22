@@ -413,59 +413,40 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			throws SeException, IOException {
 		SeColumnDefinition seColumnDefinition = null;
 		seColumnDefinition = row.getColumnDef(index);
-
-		switch (seColumnDefinition.getType()) {
-		case SeColumnDefinition.TYPE_INTEGER: {
+		
+		final int colType = seColumnDefinition.getType();
+		
+		if(colType == SeColumnDefinition.TYPE_INTEGER) {
 			if (value != null) {
 				row.setInteger(index, new Integer(value.toString()));
 			} else {
 				row.setInteger(index, null);
 			}
-
-			break;
-		}
-
-		case SeColumnDefinition.TYPE_SMALLINT: {
+		}else if(colType == SeColumnDefinition.TYPE_SMALLINT) {
 			if (value != null) {
 				row.setShort(index, new Short(value.toString()));
 			} else {
 				row.setShort(index, null);
 			}
-
-			break;
-		}
-
-		case SeColumnDefinition.TYPE_FLOAT: {
+		}else if(colType == SeColumnDefinition.TYPE_FLOAT) {
 			if (value != null) {
 				row.setFloat(index, new Float(value.toString()));
 			} else {
 				row.setFloat(index, null);
 			}
-
-			break;
-		}
-
-		case SeColumnDefinition.TYPE_DOUBLE: {
+		}else if(colType == SeColumnDefinition.TYPE_DOUBLE) {
 			if (value != null) {
 				row.setDouble(index, new Double(value.toString()));
 			} else {
 				row.setDouble(index, null);
 			}
-
-			break;
-		}
-
-		case SeColumnDefinition.TYPE_STRING: {
+		}else if(colType == SeColumnDefinition.TYPE_STRING) {
 			if (value != null) {
 				row.setString(index, value.toString());
 			} else {
 				row.setString(index, null);
 			}
-
-			break;
-		}
-
-		case SeColumnDefinition.TYPE_DATE: {
+		}else if(colType == SeColumnDefinition.TYPE_DATE) {
 			if (value != null) {
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTime((Date) value);
@@ -473,11 +454,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			} else {
 				row.setTime(index, null);
 			}
-
-			break;
-		}
-
-		case SeColumnDefinition.TYPE_SHAPE: {
+		}else if(colType == SeColumnDefinition.TYPE_SHAPE) {
 			if (value != null) {
 				try {
 					GeometryBuilder geometryBuilder = GeometryBuilder
@@ -496,9 +473,6 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			} else {
 				row.setShape(index, null);
 			}
-
-			break;
-		}
 		}
 	}
 

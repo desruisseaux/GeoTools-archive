@@ -12,8 +12,8 @@ public class SeTable {
 	public void create(SeColumnDefinition[] c, String s) {}
 	public SeColumnDefinition[] describe() throws SeException { return null; }
 	
-	public class SeTableStats {
-		public static final int SE_COUNT_STATS = 0;
+	public static class SeTableStats {
+		public static /* GEOT-947 final*/ int SE_COUNT_STATS = 0;
 		public int getCount() { return 0; }
 	}
 	

@@ -6,7 +6,7 @@ public class SeQuery {
 	
 	public SeQuery(SeConnection c, String[] s, SeSqlConstruct y) {}
 	
-	public static final int SE_OPTIMIZE = 0;
+	public static /* GEOT-947 final*/ int SE_OPTIMIZE = 0;
 	
 	public void prepareQuery() {}
 	public SeExtent calculateLayerExtent(SeQueryInfo i) { return null; }
