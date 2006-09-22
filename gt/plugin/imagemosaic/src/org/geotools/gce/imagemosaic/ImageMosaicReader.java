@@ -108,9 +108,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * components as the sources.
  * 
  * 
- * The source object has to be the index shapefile which can be built using
- * gdaltindex utility.
- * 
  * @author Simone Giannecchini
  * @since 2.3
  * 
@@ -312,7 +309,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	}
 
 	/**
-	 * COnstructor.
+	 * Constructor.
 	 * 
 	 * @param source
 	 *            The source object.
@@ -541,16 +538,20 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("loading tile for envelope "
 					+ requestedJTSEnvelope.toString());
-		List features =getFeaturesFromIndex(requestedJTSEnvelope);
-
+		final List features =getFeaturesFromIndex(requestedJTSEnvelope);
+		if(features==null)
+		{
+			return null;
+		}
 		// do we have any feature to load
 		final Iterator it = features.iterator();
 		if (!it.hasNext())
 			return null;
-		if (features.size() > MAX_TILES)
-			return fakeMosaic(requestedEnvelope, features.size());
+		final int size=features.size();
+		if (size > MAX_TILES)
+			return fakeMosaic(requestedEnvelope,size);
 		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("We have " + features.size() + " tiles to load");
+			LOGGER.fine("We have " + size + " tiles to load");
 		try {
 			return loadRequestedTiles(requestedEnvelope, alpha, alphaThreshold,
 					requestedJTSEnvelope, features, it, singleImageROI,
@@ -837,21 +838,24 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private List getFeaturesFromIndex(final Envelope envelope)
 			throws IOException {
 		List features = null;
+		Object o;
 		synchronized (index) {
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("Trying to  use the index...");
-			Object o = index.get();
+			o = index.get();
 			if (o != null) {
 				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.fine("Index does not need to be loaded...");
-				features = ((MemorySpatialIndex) o).findFeatures(envelope);
+					LOGGER.fine("Index does not need to be created...");
+				;
 			} else {
 				if (LOGGER.isLoggable(Level.FINE))
-					o = new MemorySpatialIndex(featureSource.getFeatures());
+					LOGGER.fine("Index needa to be recreated...");
+				o = new MemorySpatialIndex(featureSource.getFeatures());
 			}
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine("Index Loaded");
 		}
+		features = ((MemorySpatialIndex) o).findFeatures(envelope);
 		return features;
 	}
 
