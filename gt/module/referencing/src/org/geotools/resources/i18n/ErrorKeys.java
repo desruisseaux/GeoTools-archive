@@ -2,12 +2,12 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation; either
  *    version 2.1 of the License, or (at your option) any later version.
- *
+ *    
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -192,6 +192,7 @@ public final class ErrorKeys {
     public static final int POLYGON_CLOSED                         =   119;
     public static final int PROJECTION_CHECK_FAILED_$3             =   181;
     public static final int RANGE_OVERLAP_$4                       =   120;
+    public static final int RECURSIVE_CALL_$1                      =   193;
     public static final int RECURSIVE_CALL_$2                      =   172;
     public static final int RGB_OUT_OF_RANGE_$1                    =   122;
     public static final int RMI_FAILURE                            =   123;

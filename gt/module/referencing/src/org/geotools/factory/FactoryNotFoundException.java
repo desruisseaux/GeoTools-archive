@@ -19,11 +19,17 @@ package org.geotools.factory;
 /**
  * Thrown when a factory can't be found in the registery.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
 public class FactoryNotFoundException extends FactoryRegistryException {
+    /**
+     * For cross-version compatibility.
+     */
+    private static final long serialVersionUID = 7555229653402417318L;
+
     /**
      * Creates a new exception with the specified detail message.
      */

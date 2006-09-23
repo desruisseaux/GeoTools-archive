@@ -44,6 +44,10 @@ import org.opengis.referencing.operation.OperationNotFoundException;
  * 
  * @author Simone Giannecchini
  * @since 2.3
+ *
+ * @deprecated Replaced by {@link BufferedCoordinateOperationFactory}. User should not need to
+ *  create explicitly instance of this class, since buffered coordinate operation factory are
+ *  now registered and returned by {@link org.geotools.referencing.FactoryFinder}.
  */
 public final class BufferedDefaultCoordinateOperationFactory extends
 		DefaultCoordinateOperationFactory {

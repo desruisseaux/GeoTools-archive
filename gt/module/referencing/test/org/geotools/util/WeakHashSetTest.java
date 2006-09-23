@@ -150,7 +150,7 @@ public class WeakHashSetTest extends TestCase {
                 Thread.sleep(50);
                 System.gc();
             }
-            assertTrue("equals:", strongSet.equals(weakSet));
+            assertEquals("equals:", strongSet, weakSet);
         }
     }
 }

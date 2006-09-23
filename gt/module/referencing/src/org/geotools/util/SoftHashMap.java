@@ -29,6 +29,9 @@ import java.util.Set;
  * @author Simone Giannecchini (thanks to Dr. Kabutz on whose article the code
  *         is based)
  * @since 2.3
+ *
+ * @deprecated Replaced by {@link SoftValueHashMap}, in order to avoid unclear licensing issue
+ *             with original code (this is a work derived from Kabutz's class).
  */
 public class SoftHashMap extends AbstractMap {
 	private static final int DEFAULT_SIZE = 100;

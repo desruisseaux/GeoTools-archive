@@ -72,6 +72,11 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
                                  implements OptionalFactory
 {
     /**
+     * The priority level for this factory.
+     */
+    static final int PRIORITY = DefaultCoordinateOperationFactory.PRIORITY + 10;
+
+    /**
      * The default authority factory to use.
      */
     private static final String DEFAULT_AUTHORITY = "EPSG";
@@ -105,7 +110,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
      * @param hints The hints, or {@code null} if none.
      */
     public AuthorityBackedFactory(Hints hints) {
-        super(hints, NORMAL_PRIORITY + 10);
+        super(hints, PRIORITY);
         /*
          * Removes the hint processed by the super-class. This include hints like
          * LENIENT_DATUM_SHIFT, which usually don't apply to authority factories.
@@ -118,7 +123,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         hints.keySet().removeAll(this.hints.keySet());
         if (!hints.isEmpty()) {
             authorityFactory = FactoryFinder.getCoordinateOperationAuthorityFactory(
-                                             DEFAULT_AUTHORITY, hints);
+                    DEFAULT_AUTHORITY, hints);
         }
     }
 
@@ -367,6 +372,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
          * Single operation case.
          */
         MathTransform transform = operation.getMathTransform();
+        final MathTransformFactory mtFactory = getMathTransformFactory();
         if (prepend != null) {
             transform = mtFactory.createConcatenatedTransform(prepend, transform);
         }

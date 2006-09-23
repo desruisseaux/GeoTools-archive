@@ -19,125 +19,150 @@ import java.lang.ref.Reference;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+
 
 /**
- * This class implements a simple technique for LRU pooling of objects.
+ * A {@link Map} with a fixed maximum size which removes the <cite>least recently used</cite> (LRU)
+ * entry if an entry is added when full. This class implements a simple technique for LRU pooling
+ * of objects.
  * <p>
- * Note that this cache is based on hard references not on weak or soft references because I have
- * personally found that especially for server side applications such caches are almost useless.
+ * Note that this cache is based on hard references, not on {@linkplain java.lang.ref.WeakReference
+ * weak} or {@linkplain java.lang.ref.SoftReference soft references} because especially for server
+ * side applications such caches are often too aggressively cleared.
  * 
+ * @source $URL$
+ * @version $Id$
  * @author Simone Giannecchini
  * @since 2.3
  */
 public final class LRULinkedHashMap extends LinkedHashMap {
-
     /**
-     * 
+     * Serial number for cross-version compatibility.
      */
     private static final long serialVersionUID = 2082871604196698140L;
-
-    /** Default grow factor. */
-    private static final float DEFAULT_GROWTH_FACTOR = .75F;
-
-    /** Default initial capacity. */
-    private static final int DEFAULT_INITIAL_CAPACITY = 100;
 
     /** Default maximum capacity. */
     private static final int DEFAULT_MAXIMUM_CAPACITY = 100;
 
-    /** Maximum number of entries for this lru cache. */
+    /** Maximum number of entries for this LRU cache. */
     private final int maxEntries;
 
     /**
-     * Constructor for <code>LRULinkedHashMap</code>.
-     * 
-     * @param initialCapacity
-     * @param loadFactor
+     * Constructs a {@code LRULinkedHashMap} with default initial capacity, maximum capacity
+     * and load factor.
      */
-    public LRULinkedHashMap( int initialCapacity, float loadFactor ) {
-        super(initialCapacity, loadFactor);
-        this.maxEntries = DEFAULT_MAXIMUM_CAPACITY;
-
-    }
-
-    /**
-     * Constructor for <code>LRULinkedHashMap</code>.
-     * 
-     * @param initialCapacity
-     */
-    public LRULinkedHashMap( int initialCapacity ) {
-        super(initialCapacity, DEFAULT_GROWTH_FACTOR);
+    public LRULinkedHashMap() {
+        super();
         maxEntries = DEFAULT_MAXIMUM_CAPACITY;
     }
 
     /**
-     * Default constructor for <code>LRULinkedHashMap</code>.
+     * Constructs a {@code LRULinkedHashMap} with default maximum capacity and load factor.
+     * 
+     * @param initialCapacity The initial capacity.
      */
-    public LRULinkedHashMap() {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_GROWTH_FACTOR);
+    public LRULinkedHashMap(int initialCapacity) {
+        super(initialCapacity);
+        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
     }
 
     /**
-     * Constructor for <code>LRULinkedHashMap</code>.
+     * Constructs a {@code LRULinkedHashMap} with default maximum capacity.
      * 
-     * @param m
+     * @param initialCapacity The initial capacity.
+     * @param loadFactor      The load factor.
      */
-    private LRULinkedHashMap( Map m ) {
-        this(m, DEFAULT_MAXIMUM_CAPACITY);
-
+    public LRULinkedHashMap(int initialCapacity, float loadFactor) {
+        super(initialCapacity, loadFactor);
+        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
     }
 
     /**
-     * Constructor for <code>LRULinkedHashMap</code>.
+     * Constructs a {@code LRULinkedHashMap} with default maximum capacity.
      * 
-     * @param m
-     * @param maxEntries
+     * @param initialCapacity The initial capacity.
+     * @param loadFactor      The load factor.
+     * @param accessOrder     The ordering mode: {@code true} for access-order,
+     *                        {@code false} for insertion-order.
      */
-    private LRULinkedHashMap( Map m, final int maxEntries ) {
-        super(m);
-        this.maxEntries = maxEntries;
-
+    public LRULinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder) {
+        super(initialCapacity, loadFactor, accessOrder);
+        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
     }
 
     /**
-     * Constructor for <code>LRULinkedHashMap</code>.
+     * Constructs a {@code LRULinkedHashMap} with the specified maximum capacity.
      * 
-     * @param initialCapacity
-     * @param loadFactor
-     * @param accessOrder
-     * @param maxEntries
+     * @param initialCapacity The initial capacity.
+     * @param loadFactor      The load factor.
+     * @param accessOrder     The ordering mode: {@code true} for access-order,
+     *                        {@code false} for insertion-order.
+     * @param maxEntries      Maximum number of entries for this LRU cache.
      */
-    public LRULinkedHashMap( int initialCapacity, float loadFactor, boolean accessOrder,
-            final int maxEntries ) {
+    public LRULinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder,
+            final int maxEntries) {
         super(initialCapacity, loadFactor, accessOrder);
         this.maxEntries = maxEntries;
     }
 
     /**
-     * Constructor for <code>LRULinkedHashMap</code>.
+     * Constructs a {@code LRULinkedHashMap} with all entries from the specified map.
      * 
-     * @param initialCapacity
-     * @param loadFactor
-     * @param accessOrder
+     * @param m the map whose mappings are to be placed in this map.
      */
-    public LRULinkedHashMap( int initialCapacity, float loadFactor, boolean accessOrder ) {
-        this(initialCapacity, loadFactor, accessOrder, DEFAULT_MAXIMUM_CAPACITY);
-
+    private LRULinkedHashMap(final Map m) {
+        super(m);
+        maxEntries = DEFAULT_MAXIMUM_CAPACITY;
+        removeExtraEntries();
     }
 
     /**
-     * Returns <tt>true</tt> if this map should remove its eldest entry. This method is invoked by
-     * <tt>put</tt> and <tt>putAll</tt> after inserting a new entry into the map. It provides
-     * the implementer with the opportunity to remove the eldest entry each time a new one is added.
+     * Constructs a {@code LRULinkedHashMap} with all entries from the specified map
+     * and maximum number of entries.
+     * 
+     * @param m the map whose mappings are to be placed in this map.
+     * @param maxEntries      Maximum number of entries for this LRU cache.
+     */
+    private LRULinkedHashMap(final Map m, final int maxEntries) {
+        super(m);
+        this.maxEntries = maxEntries;
+        removeExtraEntries();
+    }
+
+    /**
+     * If there is more entries than the maximum amount, remove extra entries.
+     * <p>
+     * <b>Note:</b> Invoking {@code removeExtraEntries()} after adding all entries in the
+     * {@code LRULinkedHashMap(Map)} constructor is less efficient than just iterating over
+     * the {@code maxEntries} first entries at construction time, but super-class constructor
+     * is more efficient for maps with less than {@code maxEntries}. We assume that this is the
+     * most typical case. In addition, this method would be needed anyway if we add a
+     * {@code setMaximumEntries(int)} method in some future Geotools version.
+     */
+    private void removeExtraEntries() {
+        if (size() > maxEntries) {
+            final Iterator it = entrySet().iterator();
+            for (int c=0; c<maxEntries; c++) {
+                it.next();
+            }
+            while (it.hasNext()) {
+                it.remove();
+            }
+        }
+    }
+
+    /**
+     * Returns {@code true} if this map should remove its eldest entry. The default implementation
+     * returns {@code true} if the {@linkplain #size number of entries} in this map has reached the
+     * maximum number of entries specified at construction time.
      * 
      * @param eldest The least recently inserted entry in the map, or if this is an access-ordered
      *        map, the least recently accessed entry. This is the entry that will be removed it this
-     *        method returns <tt>true</tt>.
-     * @return true if the eldest entry should be removed from the map;
-     *         <tt>false</t> if it should be retained.
+     *        method returns {@code true}.
+     * @return {@code true} if the eldest entry should be removed from the map;
+     *         {@code false} if it should be retained.
      */
-    protected boolean removeEldestEntry( Entry eldest ) {
+    protected boolean removeEldestEntry(final Map.Entry eldest) {
         // /////////////////////////////////////////////////////////////////////
         //
         // Do I have to remove anything?
@@ -147,7 +172,5 @@ public final class LRULinkedHashMap extends LinkedHashMap {
         //
         // /////////////////////////////////////////////////////////////////////
         return size() > maxEntries;
-
     }
-
 }

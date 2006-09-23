@@ -72,13 +72,12 @@ final class WeakCollectionCleaner extends Thread {
                 //       been overriden in Reference subclasses.
                 referenceQueue.remove().clear();
             } catch (InterruptedException exception) {
-                // Somebody doesn't want to lets
-                // us sleep... Go back to work.
+                // Somebody doesn't want to lets us sleep... Go back to work.
             } catch (Exception exception) {
-                Utilities.unexpectedException("org.geotools.resources", "WeakCollection",
+                Utilities.unexpectedException("org.geotools.util", "WeakCollection",
                                               "remove", exception);
             } catch (AssertionError exception) {
-                Utilities.unexpectedException("org.geotools.resources", "WeakCollection",
+                Utilities.unexpectedException("org.geotools.util", "WeakCollection",
                                               "remove", exception);
                 // Do not kill the thread on assertion failure, in order to
                 // keep the same behaviour as if assertions were turned off.

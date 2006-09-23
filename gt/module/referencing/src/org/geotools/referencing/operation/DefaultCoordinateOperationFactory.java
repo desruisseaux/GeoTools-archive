@@ -51,6 +51,7 @@ import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.Matrix4;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -71,6 +72,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
 public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperationFactory {
+    /**
+     * The priority level for this factory.
+     */
+    static final int PRIORITY = NORMAL_PRIORITY;
+
     /**
      * A unit of one millisecond.
      */
@@ -109,7 +115,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * @param hints The hints, or {@code null} if none.
      */
     public DefaultCoordinateOperationFactory(final Hints hints) {
-        this(hints, NORMAL_PRIORITY);
+        this(hints, PRIORITY);
     }
 
     /**
@@ -417,7 +423,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                 }
             }
         }
-        return factories.getCRSFactory().createGeocentricCRS(getTemporaryName(crs), datum, STANDARD);
+        final CRSFactory crsFactory = getFactoryGroup().getCRSFactory();
+        return crsFactory.createGeocentricCRS(getTemporaryName(crs), datum, STANDARD);
     }
 
     /**
@@ -451,7 +458,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * The specified geographic coordinate system doesn't use standard axis
          * (EAST, NORTH) or the greenwich meridian. Create a new one meeting those criterions.
          */
-        return factories.getCRSFactory().createGeographicCRS(getTemporaryName(crs), datum, STANDARD);
+        final CRSFactory crsFactory = getFactoryGroup().getCRSFactory();
+        return crsFactory.createGeographicCRS(getTemporaryName(crs), datum, STANDARD);
     }
 
     /**
@@ -833,7 +841,8 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
                 }
                 final int sourceDim = getDimension(sourceCRS);
                 final int targetDim = getDimension(targetCRS);
-                final ParameterValueGroup parameters = mtFactory.getDefaultParameters(molodenskiMethod);
+                final ParameterValueGroup parameters;
+                parameters = getMathTransformFactory().getDefaultParameters(molodenskiMethod);
                 parameters.parameter("src_semi_major").setValue(sourceEllipsoid.getSemiMajorAxis());
                 parameters.parameter("src_semi_minor").setValue(sourceEllipsoid.getSemiMinorAxis());
                 parameters.parameter("tgt_semi_major").setValue(targetEllipsoid.getSemiMajorAxis());
@@ -867,7 +876,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          */
         final CartesianCS STANDARD = DefaultCartesianCS.GEOCENTRIC;
         final GeocentricCRS stepCRS;
-        final CRSFactory crsFactory = factories.getCRSFactory();
+        final CRSFactory crsFactory = getFactoryGroup().getCRSFactory();
         if (getGreenwichLongitude(targetPM) == 0) {
             stepCRS = crsFactory.createGeocentricCRS(
                       getTemporaryName(targetCRS), targetDatum, STANDARD);
@@ -1127,8 +1136,9 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         final GeocentricCRS normTargetCRS = normalize(targetCRS, datum);
         final Ellipsoid         ellipsoid = datum.getEllipsoid();
         final Unit                   unit = ellipsoid.getAxisUnit();
-        final ParameterValueGroup   param = mtFactory.getDefaultParameters("Ellipsoid_To_Geocentric");
         final MathTransform     transform;
+        final ParameterValueGroup   param;
+        param = getMathTransformFactory().getDefaultParameters("Ellipsoid_To_Geocentric");
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
         param.parameter("dim")       .setValue(getDimension(normSourceCRS));
@@ -1159,8 +1169,9 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
         final GeocentricCRS normSourceCRS = normalize(sourceCRS, datum);
         final Ellipsoid         ellipsoid = datum.getEllipsoid();
         final Unit                   unit = ellipsoid.getAxisUnit();
-        final ParameterValueGroup   param = mtFactory.getDefaultParameters("Geocentric_To_Ellipsoid");
         final MathTransform     transform;
+        final ParameterValueGroup   param;
+        param = getMathTransformFactory().getDefaultParameters("Geocentric_To_Ellipsoid");
         param.parameter("semi_major").setValue(ellipsoid.getSemiMajorAxis(), unit);
         param.parameter("semi_minor").setValue(ellipsoid.getSemiMinorAxis(), unit);
         param.parameter("dim")       .setValue(getDimension(normTargetCRS));
@@ -1211,7 +1222,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * needed. It may also be a geodetic datum change, in which case the height is part
          * of computation. Try to convert the source CRS into a 3D-geodetic CRS.
          */
-        final CoordinateReferenceSystem source3D = factories.toGeodetic3D(sourceCRS);
+        final CoordinateReferenceSystem source3D = getFactoryGroup().toGeodetic3D(sourceCRS);
         if (source3D != sourceCRS) {
             return createOperation(source3D, targetCRS);
         }
@@ -1243,7 +1254,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          * 'sourceCRS' is a 3D-geodetic CRS and 'targetCRS' is a 2D + 1D one. Test for this case.
          * Otherwise, the 'createOperationStep' invocation will throws the appropriate exception.
          */
-        final CoordinateReferenceSystem target3D = factories.toGeodetic3D(targetCRS);
+        final CoordinateReferenceSystem target3D = getFactoryGroup().toGeodetic3D(targetCRS);
         if (target3D != targetCRS) {
             return createOperation(sourceCRS, target3D);
         }
@@ -1279,6 +1290,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
          */
         for (int i=0; i<targets.length; i++) {
             if (needsGeodetic3D(sources, targets[i])) {
+                final FactoryGroup factories = getFactoryGroup();
                 final CoordinateReferenceSystem source3D = factories.toGeodetic3D(sourceCRS);
                 final CoordinateReferenceSystem target3D = factories.toGeodetic3D(targetCRS);
                 if (source3D!=sourceCRS || target3D!=targetCRS) {
@@ -1372,7 +1384,8 @@ search: for (int j=0; j<targets.length; j++) {
          */
         assert count == targets.length : count;
         while (count!=0 && steps[--count].getMathTransform().isIdentity());
-        CoordinateOperation  operation = null;
+        final FactoryGroup factories = getFactoryGroup();
+        CoordinateOperation operation = null;
         CoordinateReferenceSystem sourceStepCRS = sourceCRS;
         final XMatrix select = MatrixFactory.create(dimensions+1, indices.length+1);
         select.setZero();
@@ -1426,7 +1439,7 @@ search: for (int j=0; j<targets.length; j++) {
                     // TODO
                     throw new OperationNotFoundException("Concatenated operation not supported.");
                 }
-                mt   = mtFactory.createPassThroughTransform(lower, mt, dimensions-upper);
+                mt = getMathTransformFactory().createPassThroughTransform(lower, mt, dimensions-upper);
                 step = new DefaultPassThroughOperation(properties, sourceStepCRS, targetStepCRS,
                                                        (Operation) step, mt);
             }

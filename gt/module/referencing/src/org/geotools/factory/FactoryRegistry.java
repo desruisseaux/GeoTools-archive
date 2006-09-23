@@ -57,6 +57,7 @@ import org.geotools.resources.i18n.LoggingKeys;
  * for synchronisation. This is usually done in an utility class wrapping this
  * service registry (e.g. {@link org.geotools.referencing.FactoryFinder}).
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -85,6 +86,12 @@ public class FactoryRegistry extends ServiceRegistry {
      * The logger for all events related to factory registry.
      */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
+
+    /**
+     * Categories under scanning. This is used by {@link #safeScanForPlugins}
+     * as a guard against infinite recursivity.
+     */
+    private final Set/*<Class>*/ scanningCategories = new HashSet();
 
     /**
      * Constructs a new registry for the specified categories.
@@ -125,8 +132,30 @@ public class FactoryRegistry extends ServiceRegistry {
      * @since 2.3
      */
     public Iterator getServiceProviders(final Class category, final Filter filter, final Hints hints) {
+        if (!scanningCategories.isEmpty()) {
+            /*
+             * The 'scanningCategories' map is almost always empty, so we use the above 'isEmpty()'
+             * check because it is fast. If the map is not empty, then this mean than a scanning is
+             * under progress, i.e. 'scanForPlugins' is currently being executed. This is okay as
+             * long as the user is not asking for one of the categories under scanning. Otherwise,
+             * the answer returned by 'getServiceProviders' would be incomplete because not all
+             * plugins have been found yet. This can lead to some bugs hard to spot because this
+             * methoud could complete normally but return the wrong plugin. It is safer to thrown
+             * an exception so the user is advised that something is wrong.
+             */
+            if (scanningCategories.contains(category)) {
+                throw new RecursiveSearchException(category);
+            }
+        }
+        /*
+         * Creates a filter which is the union of the following ones:
+         *
+         *  - A filter for OptionalFactory that declares themself as available.
+         *  - A filter based on user-supplied hints, if any.
+         *  - The user-supplied filter, if any.
+         */
         final Filter hintsFilter;
-        if (hints == null || hints.isEmpty()) {
+        if (filter==null && (hints == null || hints.isEmpty())) {
             hintsFilter = FILTER;
         } else {
             hintsFilter = new DefaultFilter() {
@@ -143,7 +172,7 @@ public class FactoryRegistry extends ServiceRegistry {
              * Scans the plugin now, but for this category only.
              */
             for (final Iterator it=getClassLoaders().iterator(); it.hasNext();) {
-                scanForPlugins((ClassLoader) it.next(), category);
+                safeScanForPlugins((ClassLoader) it.next(), category);
             }
             iterator = getServiceProviders(category, hintsFilter, true);
         }
@@ -491,7 +520,27 @@ public class FactoryRegistry extends ServiceRegistry {
             final Class category = (Class) categories.next();
             for (final Iterator it=loaders.iterator(); it.hasNext();) {
                 final ClassLoader loader = (ClassLoader) it.next();
-                    scanForPlugins(loader, category);
+                safeScanForPlugins(loader, category);
+            }
+        }
+    }
+
+    /**
+     * Scans for factory plug-ins of the given category, with guard against recursivities.
+     * This check make debugging easier than inspecting a {@link StackOverflowError}.
+     *
+     * @param loader The class loader to use.
+     * @param category The category to scan for plug-ins.
+     */
+    private void safeScanForPlugins(final ClassLoader loader, final Class category) {
+        if (!scanningCategories.add(category)) {
+            throw new RecursiveSearchException(category);
+        }
+        try {
+            scanForPlugins(loader, category);
+        } finally {
+            if (!scanningCategories.remove(category)) {
+                throw new AssertionError(category);
             }
         }
     }

@@ -38,9 +38,11 @@ import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.ConcatenatedOperation;
 
 // Geotools dependencies
+import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.referencing.operation.AuthorityBackedFactory;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
@@ -110,7 +112,12 @@ public class OperationFactoryTest extends TestCase {
 
         assertSame(sourceCRS, operation.getSourceCRS());
         assertSame(targetCRS, operation.getTargetCRS());
-        assertTrue("EPSG authority factory not found.", opFactory instanceof AuthorityBackedFactory);
+        assertSame(operation, opFactory.createOperation(sourceCRS, targetCRS));
+        assertTrue("Expected a buffered factory but got " + opFactory.getClass().getName(),
+                opFactory instanceof BufferedCoordinateOperationFactory);
+        assertTrue("EPSG authority factory not found.",
+                ((BufferedCoordinateOperationFactory) opFactory).getImplementationHints().
+                get(Hints.COORDINATE_OPERATION_FACTORY) instanceof AuthorityBackedFactory);
         assertEquals("1612", getIdentifier(operation)); // See comment in DefaultDataSourceTest.
         assertEquals(1.0, AbstractCoordinateOperation.getAccuracy(operation), 1E-6);
         assertTrue(operation instanceof Transformation);

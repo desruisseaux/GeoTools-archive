@@ -735,7 +735,7 @@ public class GeodeticCalculator {
     /**
      * Returns the destination point. This method returns the point set by the last
      * call to a <code>{@linkplain #setDestinationGeographicPoint(double,double)
-     * setDestinationsetDestinationGeographicPointPoint}(...)</code>
+     * setDestinationGeographicPoint}(...)</code>
      * method, <strong>except</strong> if
      * <code>{@linkplain #setDirection(double,double) setDirection}(...)</code> has been
      * invoked after. In this later case, the destination point will be computed from the

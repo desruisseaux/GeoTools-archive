@@ -144,13 +144,20 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
 
     /**
      * The set of helper methods on factories.
+     *
+     * @see #getFactoryGroup
      */
-    final FactoryGroup factories;
+    private final FactoryGroup factories;
 
     /**
-     * The underlying math transform factory. This factory
-     * is used for constructing {@link MathTransform} objects for
-     * all {@linkplain CoordinateOperation coordinate operations}.
+     * The underlying math transform factory. This factory is used
+     * for constructing {@link MathTransform} objects for all
+     * {@linkplain CoordinateOperation coordinate operations}.
+     *
+     * @see #getMathTransformFactory
+     *
+     * @deprecated Use {@link #getMathTransformFactory} instead. This field will be made
+     *             private in a future Geotools release.
      */
     protected final MathTransformFactory mtFactory;
 
@@ -192,9 +199,27 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      *
      * @since 2.2
      */
-    public AbstractCoordinateOperationFactory(Hints hints, final int priority) {
+    public AbstractCoordinateOperationFactory(final Hints hints, final int priority) {
         super(priority);
         factories = FactoryGroup.createInstance(hints);
+        mtFactory = factories.getMathTransformFactory();
+    }
+
+    /**
+     * If the specified factory is an instance of {@code AbstractCoordinateOperationFactory},
+     * fetch the {@link FactoryGroup} from this instance instead of from the hints. This
+     * constructor is strictly reserved for factory subclasses that are wrapper around an
+     * other factory, like {@link BufferedCoordinateOperationFactory}.
+     */
+    AbstractCoordinateOperationFactory(final CoordinateOperationFactory factory,
+                                       final Hints hints, final int priority)
+    {
+        super(priority);
+        if (factory instanceof AbstractCoordinateOperationFactory) {
+            factories = ((AbstractCoordinateOperationFactory) factory).getFactoryGroup();
+        } else {
+            factories = FactoryGroup.createInstance(hints);
+        }
         mtFactory = factories.getMathTransformFactory();
     }
 
@@ -207,11 +232,20 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
     public Map getImplementationHints() {
         synchronized (hints) { // Note: avoid lock on public object.
             if (!hintsInitialized) {
-                hintsInitialized = true;
-                hints.putAll(factories.getImplementationHints());
+                initializeHints();
+                hintsInitialized = true; // Set only after success.
             }
         }
         return super.getImplementationHints();
+    }
+
+    /**
+     * Invoked when the {@link #hints} map should be initialized. This method may
+     * be overriden by subclasses like {@link BufferedCoordinateOperationFactory}.
+     */
+    void initializeHints() {
+        assert Thread.holdsLock(hints);
+        hints.putAll(getFactoryGroup().getImplementationHints());
     }
 
     /**
@@ -221,6 +255,13 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      */
     public final MathTransformFactory getMathTransformFactory() {
         return mtFactory;
+    }
+
+    /**
+     * Returns the set of helper methods on factories.
+     */
+    final FactoryGroup getFactoryGroup() {
+        return factories;
     }
 
     /**
@@ -339,7 +380,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
         final MathTransform transform;
         final Singleton method = new Singleton();
         final Map   properties = getProperties(name);
-        transform = factories.createParameterizedTransform(parameters, method);
+        transform = getFactoryGroup().createParameterizedTransform(parameters, method);
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
                                        (OperationMethod) method.get(), Operation.class);
     }

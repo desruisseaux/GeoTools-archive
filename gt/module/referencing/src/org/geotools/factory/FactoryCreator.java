@@ -37,6 +37,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * weak references}. Calls to {@link #getServiceProvider getServiceProvider} first check if a
  * previously created factory can fit.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
@@ -55,7 +56,7 @@ public class FactoryCreator extends FactoryRegistry {
 
     /**
      * Objects under construction for each implementation class.
-     * Used as a guard against infinite recursivity.
+     * Used by {@link #safeCreate} as a guard against infinite recursivity.
      */
     private final Set/*<Class>*/ underConstruction = new HashSet();
 
@@ -138,6 +139,9 @@ public class FactoryCreator extends FactoryRegistry {
                         final int modifiers = type.getModifiers();
                         if (!Modifier.isAbstract(modifiers)) {
                             final Object candidate = createSafe(category, type, hints);
+                            if (candidate == null) {
+                                continue;
+                            }
                             if (isAcceptable(candidate, category, hints, filter)) {
                                 cache(category, candidate);
                                 return candidate;
@@ -174,6 +178,9 @@ public class FactoryCreator extends FactoryRegistry {
                     throw exception;
                 }
             }
+            if (candidate == null) {
+                continue;
+            }
             if (FILTER.filter(candidate) && isAcceptable(candidate, category, hints, filter)) {
                 cache(category, candidate);
                 return candidate;
@@ -184,16 +191,16 @@ public class FactoryCreator extends FactoryRegistry {
     }
 
     /**
-     * Invokes {@link #createServiceProvider}, but checks against recursive calls.
-     * It make debugging easier than inspecting a {@link StackOverflowError}.
+     * Invokes {@link #createServiceProvider}, but checks against recursive calls. If the specified
+     * implementation is already under construction, returns {@code null} in order to tell to
+     * {@link #getServiceProvider} that it need to search for an other implementation. This is
+     * needed for avoiding infinite recursivity when a factory is a wrapper around an ther factory
+     * of the same category. For example this is the case of
+     * {@link org.geotools.referencing.operation.BufferedCoordinateOperationFactory}.
      */
-    private Object createSafe(final Class category,
-                              final Class implementation,
-                              final Hints hints)
-    {
+    private Object createSafe(final Class category, final Class implementation, final Hints hints) {
         if (!underConstruction.add(implementation)) {
-            throw new FactoryRegistryException(Errors.format(ErrorKeys.RECURSIVE_CALL_$2,
-                      Utilities.getShortName(implementation), Utilities.getShortName(category)));
+            return null;
         }
         try {
             return createServiceProvider(category, implementation, hints);
