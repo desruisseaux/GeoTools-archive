@@ -114,7 +114,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
              */
             classname = classname.substring(0, classname.length()-3);
         }
-        filename = classname.replace('.', '/') + ".utf";
+        filename = classname.substring(classname.lastIndexOf('.') + 1) + ".utf";
     }
 
     /**
@@ -217,7 +217,7 @@ public class ResourceBundle extends java.util.ResourceBundle {
                 /*
                  * Load resources from the UTF file.
                  */
-                final InputStream in = getClass().getClassLoader().getResourceAsStream(filename);
+                final InputStream in = getClass().getResourceAsStream(filename);
                 if (in == null) {
                     throw new FileNotFoundException(filename);
                 }

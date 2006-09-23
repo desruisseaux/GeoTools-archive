@@ -119,9 +119,11 @@ public class BufferedCoordinateOperationFactory extends AbstractCoordinateOperat
     private CoordinateOperationFactory factory;
 
     /**
-     * The pool of cached transformations.
+     * The pool of cached transformations. This map can not be static, because the values may
+     * be different for the same ({@code sourceCRS}, {@code targetCRS}) pair dependending of
+     * hint values like {@link Hints#LENIENT_DATUM_SHIFT}.
      */
-    private final Map/*<CRSPais, CoordinateOperation>*/ pool = new SoftValueHashMap();
+    private final Map/*<CRSPair, CoordinateOperation>*/ pool = new SoftValueHashMap();
 
     /**
      * Creates a buffered factory wrapping the {@linkplain AuthorityBackedFactory default one}.
