@@ -13,9 +13,13 @@
   <!--     Profiles: modify the build process in certain conditions.         -->
   <!--     Available profiles are:                                           -->
   <!--                                                                       -->
-  <!--     extensive.tests -  Performs more extensive tests that the         -->
-  <!--                        default. Only a few modules check for          -->
-  <!--                        this profile.                                  -->
+  <!--     extensive.tests   -  Performs more extensive tests that the       -->
+  <!--                          default. Only a few modules check for        -->
+  <!--                          this profile.                                -->
+  <!--                                                                       -->
+  <!--     interactive.tests -  Performs more extensive tests that the       -->
+  <!--                          default. Only a few modules check for        -->
+  <!--                          this profile.                                -->
   <!--                                                                       -->
   <!--     site.build      -  The main purpose of this build is to create    -->
   <!--                        reports. Consequently, a JUnit test failure    -->
@@ -34,6 +38,7 @@
     <allow.test.skip>true</allow.test.skip>
     <allow.test.failure.ignore>false</allow.test.failure.ignore>
     <extensive.tests>false</extensive.tests>
+    <interactive.tests>false</interactive.tests>
   </properties>
 
   <!-- Overwrite the above default properties according command-line parameters. -->
@@ -42,6 +47,12 @@
       <id>extensive.tests</id>
       <properties>
         <extensive.tests>true</extensive.tests>
+      </properties>
+    </profile>
+    <profile>
+      <id>interactive.tests</id>
+      <properties>
+        <interactive.tests>true</interactive.tests>
       </properties>
     </profile>
     <profile>
@@ -866,7 +877,7 @@
             <exclude>**/*OnlineTest.java</exclude>
           </excludes>
           <forkMode>once</forkMode>
-          <argLine>-Xmx512M -enableassertions -Dorg.geotools.test.extensive=${extensive.tests}</argLine>
+          <argLine>-Xmx512M -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests}</argLine>
           <!-- Ignores test failure only if we are generating a report for publication on
             the web site. See the profiles section at the begining of this pom.xml file. -->
           <testFailureIgnore>
