@@ -61,7 +61,7 @@
   <!--     All modules included in the build                                 -->
   <!-- ===================================================================== -->
   <modules>
-   <!-- <module>arcgrid</module>-->
+    <module>arcgrid</module>
     <module>arcsde</module>
     <module>db2</module>
     <module>directory</module>
