@@ -13,10 +13,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter;
+package org.geotools.filter.v1_0;
 
 import junit.framework.TestCase;
-import org.geotools.filter.v1_0.OGCSchemaLocationResolver;
+import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.gml2.bindings.GMLSchemaLocationResolver;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;

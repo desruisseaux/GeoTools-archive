@@ -17,6 +17,7 @@ package org.geotools.filter.v1_1;
 
 import org.geotools.filter.v1_0.OGCBBOXTypeBinding;
 import org.geotools.filter.v1_0.OGCDistanceTypeBinding;
+import org.geotools.filter.v1_0.OGCExpressionTypeBinding;
 import org.geotools.filter.v1_0.OGCFilterTypeBinding;
 import org.geotools.filter.v1_0.OGCFunctionTypeBinding;
 import org.geotools.filter.v1_0.OGCLiteralTypeBinding;
@@ -62,8 +63,11 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         //container.registerComponentImplementation(OGC.DISTANCETYPE,DistanceTypeBinding.class);
         container.registerComponentImplementation(OGC.DISTANCETYPE,
             OGCDistanceTypeBinding.class);
+
+        //container.registerComponentImplementation(OGC.EXPRESSIONTYPE, ExpressionTypeBinding.class);
         container.registerComponentImplementation(OGC.EXPRESSIONTYPE,
-            ExpressionTypeBinding.class);
+            OGCExpressionTypeBinding.class);
+
         container.registerComponentImplementation(OGC.FEATUREIDTYPE,
             FeatureIdTypeBinding.class);
         container.registerComponentImplementation(OGC.FILTERTYPE,
@@ -144,8 +148,7 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(OGC.EID, EIDBinding.class);
         container.registerComponentImplementation(OGC.EQUALS,
             EqualsBinding.class);
-        container.registerComponentImplementation(OGC.EXPRESSION,
-            ExpressionBinding.class);
+        //container.registerComponentImplementation(OGC.EXPRESSION, ExpressionBinding.class);
         container.registerComponentImplementation(OGC.FEATUREID,
             FeatureIdBinding.class);
         container.registerComponentImplementation(OGC.FID, FIDBinding.class);
@@ -183,8 +186,8 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(OGC.PROPERTYISNOTEQUALTO,
             PropertyIsNotEqualToBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISNULL,PropertyIsNullBinding.class);
-//        container.registerComponentImplementation(OGC.PROPERTYNAME,
-//            PropertyNameBinding.class);
+        //        container.registerComponentImplementation(OGC.PROPERTYNAME,
+        //            PropertyNameBinding.class);
         container.registerComponentImplementation(OGC.SIMPLEARITHMETIC,
             SimpleArithmeticBinding.class);
         //container.registerComponentImplementation(OGC.SORTBY,SortByBinding.class);
