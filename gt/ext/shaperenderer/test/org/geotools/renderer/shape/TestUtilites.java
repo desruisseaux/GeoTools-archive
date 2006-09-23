@@ -65,7 +65,6 @@ import com.vividsolutions.jts.geom.Envelope;
 public class TestUtilites {
     static final FilterFactory filterFactory =
     	FilterFactoryFinder.createFilterFactory();
-    public static boolean INTERACTIVE = false;
 
     public static IndexedShapefileDataStore getPolygons() throws IOException {
         return TestUtilites.getDataStore("lakes.shp");
@@ -209,7 +208,7 @@ public class TestUtilites {
         TestUtilites.render(renderer, g, new Rectangle(w, h), bounds);
 
         g.dispose();
-        if (!GraphicsEnvironment.isHeadless() && TestUtilites.INTERACTIVE) {
+        if (!GraphicsEnvironment.isHeadless() && TestData.isInteractiveTest()) {
             Frame frame = new Frame(testName);
             frame.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {

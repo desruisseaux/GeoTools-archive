@@ -41,7 +41,6 @@ import java.io.IOException;
 public class LabelingTest extends TestCase {
     private static final int CENTERX = 160;
     private static final int CENTERY = 40;
-    private static final boolean INTERACTIVE = false;
     private long timout = 1000;
 
     static Style loadStyle(String sldFilename) throws IOException {
@@ -67,7 +66,6 @@ public class LabelingTest extends TestCase {
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary = 10;
-        TestUtilites.INTERACTIVE = INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
         TestUtilites.showRender("testLineLabeling", renderer, timout, env);
@@ -89,7 +87,6 @@ public class LabelingTest extends TestCase {
         int boundary = 1;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
-        TestUtilites.INTERACTIVE = INTERACTIVE;
         TestUtilites.showRender("testPolyLabeling", renderer, timout, env);
     }
 
@@ -109,7 +106,6 @@ public class LabelingTest extends TestCase {
         int boundary = 30;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
-        TestUtilites.INTERACTIVE = INTERACTIVE;
         TestUtilites.showRender("testPolyLabeling", renderer, timout, env);
     }
 }

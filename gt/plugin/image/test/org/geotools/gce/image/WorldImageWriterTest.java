@@ -159,7 +159,8 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 		coverage = (GridCoverage2D) wiReader.read(null);
 
 		// displaying the coverage
-		coverage.show();
+		if(TestData.isInteractiveTest())
+			coverage.show();
 
 	}
 

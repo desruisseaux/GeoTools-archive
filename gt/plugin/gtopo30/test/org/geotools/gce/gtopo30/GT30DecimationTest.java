@@ -92,7 +92,8 @@ public class GT30DecimationTest extends GT30TestBase {
 									.getOriginalEnvelope()));
 			gc = ((GridCoverage2D) reader.read((GeneralParameterValue[]) params
 					.values().toArray(new GeneralParameterValue[1])));
-			gc.show();
+			if(TestData.isInteractiveTest())
+				gc.show();
 
 			// logging some info
 			logger.info(gc.getCoordinateReferenceSystem2D().toWKT());

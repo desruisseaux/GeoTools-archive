@@ -26,8 +26,6 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
-import org.geotools.map.DefaultMapContext;
-import org.geotools.map.MapContext;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.TestData;
 import org.geotools.styling.SLDParser;
@@ -37,7 +35,6 @@ import org.geotools.styling.StyleFactoryFinder;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -56,7 +53,6 @@ public class LabelingTest extends TestCase {
 	private long timout=3000;
 	private static final int CENTERX = 160;
 	private static final int CENTERY = 40;
-    private static final boolean INTERACTIVE=false;
 
 
 	/*

@@ -16,26 +16,16 @@
  */
 package org.geotools.gce.image;
 
-import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Logger;
 
 import junit.textui.TestRunner;
 
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.CRS;
 import org.geotools.resources.TestData;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+
 
 /**
  * TestCase subclass for testing readingb capabilities
@@ -132,8 +122,9 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 		logger.info(coverage.getCoordinateReferenceSystem().toWKT());
 		logger.info(coverage.getEnvelope().toString());
 
-		// show it
-		coverage.show();
+		// show it, but only if tests are interactive
+		if(TestData.isInteractiveTest())
+			coverage.show();
 	}
 
 	public static void main(String[] args) {

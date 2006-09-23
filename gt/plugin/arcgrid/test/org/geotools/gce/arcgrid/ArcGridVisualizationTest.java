@@ -20,6 +20,7 @@ package org.geotools.gce.arcgrid;
 import java.io.File;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 
 
@@ -68,7 +69,8 @@ public class ArcGridVisualizationTest extends ArcGridBaseTestCase {
 		final GridCoverage2D gc = ((GridCoverage2D) reader.read(null));
 	
 		// visualizing it
-		gc.show();
+		if(TestData.isInteractiveTest())
+			gc.show();
 	
 		// printing CRS information
 		System.out.println(gc.getCoordinateReferenceSystem().toWKT());

@@ -35,7 +35,6 @@ import java.io.IOException;
  * @source $URL$
  */
 public class IndexedRenderingTest_Disabled extends TestCase {
-    private static final boolean INTERACTIVE = false;
     private Lock lock = new Lock();
 
     protected void tearDown() {
@@ -137,7 +136,6 @@ public class IndexedRenderingTest_Disabled extends TestCase {
                 new Envelope(env.getMinX() + 10, env.getMaxX() - 10,
                     env.getMinY() + 10, env.getMaxY() - 10));
         assertNotNull("Should find records", reader.goodRecs);
-        TestUtilites.INTERACTIVE = INTERACTIVE;
         TestUtilites.showRender("testQuadTree", renderer, 1000, env,
             expectedFeatures);
     }

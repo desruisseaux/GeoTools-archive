@@ -9,12 +9,12 @@ import java.awt.image.BufferedImage;
 
 import junit.framework.TestCase;
 
+import org.geotools.resources.TestData;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 
 public class SVGGlyphRendererTest extends TestCase {
-    public static boolean INTERACTIVE = false;
 
     private SVGGlyphRenderer renderer;
 
@@ -66,7 +66,7 @@ public class SVGGlyphRendererTest extends TestCase {
             throws InterruptedException {
         if ((System.getProperty("java.awt.headless") == null || !System.getProperty(
                 "java.awt.headless").equals("true"))
-                && INTERACTIVE) {
+                && TestData.isInteractiveTest()) {
             Frame frame = new Frame(testName);
             frame.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {

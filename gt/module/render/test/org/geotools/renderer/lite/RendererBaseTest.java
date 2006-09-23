@@ -33,6 +33,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.renderer.GTRenderer;
+import org.geotools.resources.TestData;
 
 /**
  * DOCUMENT ME!
@@ -40,7 +41,6 @@ import org.geotools.renderer.GTRenderer;
  * @author Simone Giannecchini
  */
 public class RendererBaseTest {
-	public static boolean INTERACTIVE = true;
 
 	public RendererBaseTest() {
 
@@ -73,7 +73,7 @@ public class RendererBaseTest {
 		render(renderer, g, new Rectangle(w, h), bounds);
 
         final String headless = System.getProperty("java.awt.headless", "false");
-		if (!headless.equalsIgnoreCase("true") && INTERACTIVE) try {
+		if (!headless.equalsIgnoreCase("true") && TestData.isInteractiveTest()) try {
 			Frame frame = new Frame(testName);
 			frame.addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {

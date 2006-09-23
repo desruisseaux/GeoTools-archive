@@ -35,7 +35,6 @@ import org.geotools.styling.Style;
  * @source $URL$
  */ 
 public class QueryTest extends TestCase {
-    private static final boolean INTERACTIVE = true;
     private FeatureSource source;
     private Style style;
     private DefaultMapContext map;
@@ -63,7 +62,6 @@ public class QueryTest extends TestCase {
                     throw new RuntimeException(e);
                 }
             });
-        TestUtilites.INTERACTIVE = INTERACTIVE;
         TestUtilites.showRender("testFidFilter", renderer, 1000, bounds, 1);
     }
 

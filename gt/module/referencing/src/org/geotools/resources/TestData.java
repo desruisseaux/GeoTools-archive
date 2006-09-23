@@ -35,6 +35,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -87,7 +88,26 @@ public class TestData implements Runnable {
      * Encoding of URL path.
      */
     private static final String ENCODING = "UTF-8";
-
+    
+    /**
+     * The {@linkplain System#getProperty(String) system property} key for more extensive test
+     * suite. The value for this key is returned by the {@link #isExtensiveTest} method. Some
+     * test suites will perform more extensive test coverage if this property is set to
+     * {@code true}. The value for this property is typically defined on the command line as a
+     * <code>-D{@value}=true</code> option at Java or Maven starting time.
+     */
+    public static final String EXTENSIVE_TEST_KEY = "org.geotools.test.extensive";
+    
+    /**
+     * The {@linkplain System#getProperty(String) system property} key for interactive tests. 
+     * The value for this key is returned by the {@link #isInteractiveTest} method. Some
+     * test suites will show windows with maps and other artifacts related to testing 
+     * if this property is set to {@code true}. 
+     * The value for this property is typically defined on the command line as a
+     * <code>-D{@value}=true</code> option at Java or Maven starting time.
+     */
+    public static final String INTERACTIVE_TEST_KEY = "org.geotools.test.interactive";
+    
     /**
      * The file to deletes at shutdown time. {@link File#deleteOnExit} alone doesn't seem
      * suffisient since it will preserve any overwritten files.
@@ -106,6 +126,34 @@ public class TestData implements Runnable {
      * Do not allow instantiation of this class, except for extending it.
      */
     protected TestData() {
+    }
+    
+    /**
+     * Returns {@code true} if {@value #EXTENSIVE_TEST_KEY} system property is set to {@code true}.
+     * Test suites should check this value before to perform lengthly tests.
+     */
+    public static boolean isExtensiveTest() {
+        try {
+            return Boolean.getBoolean(EXTENSIVE_TEST_KEY);
+        } catch (SecurityException exception) {
+            Logger.getLogger("org.geotools").warning(exception.getLocalizedMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Returns {@code true} if {@value #INTERACTIVE_TEST_KEY} system property is set to {@code true}.
+     * Test suites should check this value before showing any kind of graphical window to the user.
+     */
+    public static boolean isInteractiveTest() {
+        try {
+            return  Boolean.getBoolean(INTERACTIVE_TEST_KEY);
+//            System.out.println("Interactive tests: " + b);
+//            return b;
+        } catch (SecurityException exception) {
+            Logger.getLogger("org.geotools").warning(exception.getLocalizedMessage());
+            return false;
+        }
     }
 
     /**

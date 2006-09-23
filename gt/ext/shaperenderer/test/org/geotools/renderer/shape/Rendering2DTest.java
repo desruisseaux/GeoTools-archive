@@ -259,7 +259,6 @@ public class Rendering2DTest extends TestCase {
         ShapefileRenderer renderer = createLineRenderer(TestUtilites.getLines());
         Envelope env = renderer.getContext().getAreaOfInterest();
 
-        //        INTERACTIVE=true;
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
 
@@ -298,7 +297,6 @@ public class Rendering2DTest extends TestCase {
                 .getDataStore("lineNoCRS.shp"));
         Envelope env = renderer.getContext().getAreaOfInterest();
 
-        //        INTERACTIVE=true;
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
 

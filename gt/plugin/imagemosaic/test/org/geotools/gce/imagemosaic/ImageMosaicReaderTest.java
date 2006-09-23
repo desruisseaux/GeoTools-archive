@@ -92,7 +92,8 @@ public class ImageMosaicReaderTest extends TestCase {
 		// /////////////////////////////////////////////////////////////////
 		final AbstractCoverage coverage = (AbstractCoverage) reader.read(null);
 		assertNotNull("Null value returned instead of a coverage", coverage);
-		coverage.show("Default Values");
+		if(TestData.isInteractiveTest())
+			coverage.show("Default Values");
 
 	}
 
@@ -134,16 +135,17 @@ public class ImageMosaicReaderTest extends TestCase {
 	 .createValue();
 	 value.setValue(Boolean.TRUE);
 	
-	 //
+	 
+ 	 //
 	 // /////////////////////////////////////////////////////////////////
 	 //
 	 // Show the coverage
 	 //
 	 //
 	 // /////////////////////////////////////////////////////////////////
-	 ((AbstractCoverage) reader.read(new GeneralParameterValue[] { value }))
-	 .show("testInputImageROI");
-	
+	 AbstractCoverage coverage = (AbstractCoverage) reader.read(new GeneralParameterValue[] { value });
+	 if(TestData.isInteractiveTest())
+		 coverage.show("testInputImageROI");
 	 }
 	
 	 public void testInputROIThreshold() throws IOException,
@@ -195,8 +197,10 @@ public class ImageMosaicReaderTest extends TestCase {
 	 //
 	 //
 	 // /////////////////////////////////////////////////////////////////
-	 ((AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha,
-	 alphaVal })).show("testInputROIThreshold");
+	 AbstractCoverage coverage = ((AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha,
+	 alphaVal }));
+	 if(TestData.isInteractiveTest())
+		 coverage.show("testInputROIThreshold");
 	
 	 }
 	
@@ -250,8 +254,10 @@ public class ImageMosaicReaderTest extends TestCase {
 	 //
 	 //
 	 // /////////////////////////////////////////////////////////////////
-	 ((AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha,
-	 threshold })).show("testFinalAlphaThreshold");
+	 AbstractCoverage coverage = (AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha,
+	 threshold });
+	 if(TestData.isInteractiveTest())
+		 coverage.show("testFinalAlphaThreshold");
 	
 	 }
 	
@@ -302,9 +308,9 @@ public class ImageMosaicReaderTest extends TestCase {
 	 //
 	 //
 	 // /////////////////////////////////////////////////////////////////
-	 ((AbstractCoverage) reader.read(new GeneralParameterValue[] { gg, }))
-	 .show("testCrop");
-	
+	 AbstractCoverage coverage = (AbstractCoverage) reader.read(new GeneralParameterValue[] { gg, });
+	 if(TestData.isInteractiveTest())
+		 coverage.show("testCrop");
 	 }
 
 	 public void testComplete() throws IOException,
@@ -360,8 +366,10 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		((AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha,
-				threshold, roiTh, roi })).show("testComplete");
+		AbstractCoverage coverage = (AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha,
+				threshold, roiTh, roi });
+		if(TestData.isInteractiveTest())
+			coverage.show("testComplete");
 
 	}
 
@@ -409,8 +417,9 @@ public class ImageMosaicReaderTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		((AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha }))
-				.show("testFinalAlpha");
+		AbstractCoverage coverage = (AbstractCoverage) reader.read(new GeneralParameterValue[] { alpha });
+		if(TestData.isInteractiveTest())
+			coverage.show("testFinalAlpha");
 
 	}
 

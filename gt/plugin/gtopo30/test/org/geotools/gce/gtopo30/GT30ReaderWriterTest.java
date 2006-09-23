@@ -91,7 +91,8 @@ public class GT30ReaderWriterTest extends GT30TestBase {
 
 			// get a grid coverage
 			gc = ((GridCoverage2D) reader.read(null));
-			gc.show();
+			if(TestData.isInteractiveTest())
+				gc.show();
 
 			// preparing to write it down
 			File testDir = TestData.file(this, "");
@@ -123,7 +124,8 @@ public class GT30ReaderWriterTest extends GT30TestBase {
 			 */
 			// packed view for this coverage
 			GridCoverage2D gc1 = gc.geophysics(false);
-			gc1.show();
+			if(TestData.isInteractiveTest())
+				gc1.show();
 
 			// logging some info
 			logger.info(gc.getCoordinateReferenceSystem2D().toWKT()+"\n"+gc.toString());

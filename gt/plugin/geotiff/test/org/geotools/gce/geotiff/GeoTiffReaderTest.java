@@ -132,7 +132,8 @@ public class GeoTiffReaderTest extends TestCase {
 					buffer.append(coverage.getCoordinateReferenceSystem2D().toWKT());
 
 					// showing it
-					coverage.show();
+					if(TestData.isInteractiveTest())
+						coverage.show();
 
 				}
 

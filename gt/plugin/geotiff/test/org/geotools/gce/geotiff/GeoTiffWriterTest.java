@@ -144,7 +144,8 @@ public class GeoTiffWriterTest extends TestCase {
 					logger.info(gc.getCoordinateReferenceSystem().toWKT());
 					logger.info(gc.getEnvelope().toString());
 					logger.info("");
-					gc.show();
+					if(TestData.isInteractiveTest())
+						gc.show();
 
 				}
 

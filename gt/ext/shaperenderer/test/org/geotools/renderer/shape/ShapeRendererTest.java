@@ -55,7 +55,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public class ShapeRendererTest extends TestCase {
-	private static final boolean INTERACTIVE = false;
     private File shp2;
     private File shx2;
     private File prj2;
@@ -153,7 +152,6 @@ public class ShapeRendererTest extends TestCase {
 		renderer.addRenderListener(listener);
 		Envelope env = context.getLayerBounds();
         int boundary=7;
-        TestUtilites.INTERACTIVE=INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
 		TestUtilites.showRender("testTransaction", renderer, 2000, env);
@@ -253,7 +251,6 @@ public class ShapeRendererTest extends TestCase {
 		renderer.addRenderListener(listener);
 		Envelope env = context.getLayerBounds();
         int boundary=7;
-        TestUtilites.INTERACTIVE=INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
 		TestUtilites.showRender("testTransaction", renderer, 2000, env);
@@ -290,7 +287,6 @@ public class ShapeRendererTest extends TestCase {
 		});
 		Envelope env = context.getLayerBounds();
         int boundary=7;
-        TestUtilites.INTERACTIVE=INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary, 
         		env.getMinY() - boundary, env.getMaxY() + boundary);
 		TestUtilites.showRender("testTransaction", renderer, 2000, env);

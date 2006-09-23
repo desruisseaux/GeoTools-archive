@@ -54,8 +54,6 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class MultiLineHandlerTest extends TestCase {
 
-	private static final boolean INTERACTIVE = false;
-
 	public void testRead() throws Exception{
 		URL url=TestData.getResource(LabelingTest.class, "streams.shp");
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
@@ -125,7 +123,6 @@ public class MultiLineHandlerTest extends TestCase {
         map.addLayer(ds.getFeatureSource(), style);
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = new Envelope(-5,6,-1.4,0);
-        TestUtilites.INTERACTIVE=INTERACTIVE;
         TestUtilites.showRender("testLineLabeling", renderer, 2000, env);
 	}
 
