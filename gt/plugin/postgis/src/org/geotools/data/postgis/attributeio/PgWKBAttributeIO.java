@@ -27,6 +27,8 @@ import org.geotools.util.LiteCoordinateSequenceFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.WKBReader;
+import com.vividsolutions.jts.io.WKBWriter;
 
 
 
@@ -204,7 +206,8 @@ public class PgWKBAttributeIO implements AttributeIO {
             if(value == null) {
                 rs.updateNull(position);
             } else {
-                rs.updateString(position, WKBEncoder.encodeGeometryHex((Geometry) value));
+                //rs.updateString(position, WKBEncoder.encodeGeometryHex((Geometry) value));
+                rs.updateBytes( position, new WKBWriter().write( (Geometry)value ));
             }
         } catch (SQLException e) {
             throw new DataSourceException("SQL exception occurred while reading the geometry.", e);
@@ -219,7 +222,8 @@ public class PgWKBAttributeIO implements AttributeIO {
             if(value == null) {
                 ps.setNull(position, Types.OTHER);
             } else {
-                ps.setString(position, WKBEncoder.encodeGeometryHex((Geometry) value));
+                //ps.setString(position, WKBEncoder.encodeGeometryHex((Geometry) value));
+                ps.setBytes( position, new WKBWriter().write( (Geometry)value ));
             }
         } catch (SQLException e) {
             throw new DataSourceException("SQL exception occurred while reading the geometry.", e);
