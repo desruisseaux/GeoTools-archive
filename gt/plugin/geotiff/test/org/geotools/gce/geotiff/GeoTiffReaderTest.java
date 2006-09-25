@@ -32,6 +32,8 @@ import org.geotools.factory.Hints;
 import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /*
  * GeoTools - OpenSource mapping toolkit http://geotools.org (C) 2005-2006,
@@ -83,8 +85,7 @@ public class GeoTiffReaderTest extends TestCase {
 		jaiDef.getTileScheduler().setPrefetchParallelism(40);
 		jaiDef.getTileScheduler().setPrefetchPriority(7);
 		jaiDef.getTileScheduler().setPrefetchPriority(7);
-		
-	
+
 	}
 
 	public static void main(String[] args) {
@@ -129,11 +130,18 @@ public class GeoTiffReaderTest extends TestCase {
 
 					// reading the coverage
 					coverage = (GridCoverage2D) reader.read(null);
-					buffer.append(coverage.getCoordinateReferenceSystem2D().toWKT());
+
+					buffer.append(coverage.getCoordinateReferenceSystem2D()
+							.toWKT());
 
 					// showing it
-					if(TestData.isInteractiveTest())
+					if (TestData.isInteractiveTest())
 						coverage.show();
+					else
+						coverage.getRenderedImage().getData();
+
+
+
 
 				}
 
@@ -143,4 +151,5 @@ public class GeoTiffReaderTest extends TestCase {
 		}
 
 	}
+
 }

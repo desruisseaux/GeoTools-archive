@@ -32,7 +32,6 @@ import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import javax.media.jai.JAI;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -56,6 +55,9 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
 import com.sun.media.jai.imageioimpl.ImageWriteCRIF;
@@ -196,7 +198,7 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 			final GeoTiffIIOMetadataEncoder metadata = adapter
 					.parseCoordinateReferenceSystem();
 
-			// setting tie points and scale
+			// setting tie points and scaley
 			setTiePointAndScale(crs, metadata, (AffineTransform) gc
 					.getGridGeometry().getGridToCoordinateSystem());
 
@@ -216,12 +218,17 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 	 * crs without making any assumptions on the order or the direction of the
 	 * axes, but checking them from the supplied CRS.
 	 * 
-	 * @see http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html
+	 * @see {@link http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html}
 	 * @param crs
+	 *            The {@link CoordinateReferenceSystem} of the
+	 *            {@link GridCoverage2D} to encode.
 	 * @param metadata
 	 * @param envelope
+	 *            The {@link Envelope} of the {@link GridCoverage2D} to encode.
 	 * @param W
+	 *            The width of the {@link GridCoverage2D} to encode.
 	 * @param H
+	 *            The height of the {@link GridCoverage2D} to encode.
 	 * @throws IndexOutOfBoundsException
 	 * @throws IOException
 	 * @throws TransformException
@@ -260,7 +267,7 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Deciding how to structure the tiep points with respect to the CRS.
+		// Deciding how to structure the tie points with respect to the CRS.
 		//
 		// /////////////////////////////////////////////////////////////////////
 		// tie points
@@ -305,10 +312,11 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		//
 		// /////////////////////////////////////////////////////////////////////
 		final ImageWriter writer = tiffWriterFactory.createWriterInstance();
-		final IIOMetadata metadata = createIIOMetadata(writer,
+		final IIOMetadata metadata = createGeoTiffIIOMetadata(writer,
 				ImageTypeSpecifier.createFromRenderedImage(image),
 				geoTIFFMetadata);
-
+		
+		
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// IMAGEWRITE
@@ -321,8 +329,7 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 				Boolean.FALSE).add(Boolean.FALSE).add(null).add(null).add(
 				metadata).add(null).add(null).add(null).add(null);
 		pbjWrite.add(writer);
-
-		imageWriteFactory.create(pbjWrite,null);
+		imageWriteFactory.create(pbjWrite, null);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -351,11 +358,15 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 	 * @throws IIOException
 	 *             if the metadata cannot be created
 	 */
-	private IIOMetadata createIIOMetadata(ImageWriter writer,
-			ImageTypeSpecifier type, GeoTiffIIOMetadataEncoder geoTIFFMetadata)
-			throws IIOException {
+	public final static IIOMetadata createGeoTiffIIOMetadata(
+			ImageWriter writer, ImageTypeSpecifier type,
+			GeoTiffIIOMetadataEncoder geoTIFFMetadata) throws IIOException {
 		final IIOMetadata imageMetadata = writer.getDefaultImageMetadata(type,
 				null);
+
+		 
+		 
+		 
 		org.w3c.dom.Element w3cElement = (org.w3c.dom.Element) imageMetadata
 				.getAsTree(GeoTiffConstants.GEOTIFF_IIO_METADATA_FORMAT_NAME);
 		final Element element = new DOMBuilder().build(w3cElement);
@@ -381,7 +392,7 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 					"Failed to set GeoTIFFWritingUtilities specific tags.", e);
 		}
 
+		
 		return imageMetadata;
 	}
-
 }

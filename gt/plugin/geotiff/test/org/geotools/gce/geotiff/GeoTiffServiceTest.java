@@ -23,6 +23,8 @@ import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.geotools.data.coverage.grid.GridFormatFinder;
 
 /**
+ * Testing {@link GeoTiffFormatFactorySpi}.
+ * 
  * @author Simone Giannecchini
  * 
  */
@@ -33,7 +35,6 @@ public class GeoTiffServiceTest extends TestCase {
 	 */
 	public GeoTiffServiceTest(String arg0) {
 		super(arg0);
-		// TODO Auto-generated constructor stub
 	}
 
 	public static void main(java.lang.String[] args) {

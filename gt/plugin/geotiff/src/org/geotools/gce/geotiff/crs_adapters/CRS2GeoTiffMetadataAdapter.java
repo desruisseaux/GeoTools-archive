@@ -210,10 +210,6 @@ public final class CRS2GeoTiffMetadataAdapter {
 		metadata
 				.addGeoShortParam(GeoTiffConstants.GTModelTypeGeoKey, modelType);
 
-		// setting raster model
-		metadata.addGeoShortParam(GeoTiffConstants.GTRasterTypeGeoKey,
-				GeoTiffConstants.RasterPixelIsArea);
-
 		switch (modelType) {
 		// /////////////////////////////////////////////////////////////////////
 		//

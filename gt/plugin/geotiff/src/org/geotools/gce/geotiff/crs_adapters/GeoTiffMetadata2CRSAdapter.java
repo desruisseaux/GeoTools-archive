@@ -302,7 +302,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 						&& !tempCode.startsWith("epsg")) {
 					geogCode.insert(0, "EPSG:");
 				}
-				gcs = (GeographicCRS) CRS.decode(geogCode.toString(),true);
+				gcs = (GeographicCRS) CRS.decode(geogCode.toString(), true);
 
 			} catch (FactoryException fe) {
 				final IOException ex = new GeoTiffException(metadata, fe
@@ -361,12 +361,11 @@ public final class GeoTiffMetadata2CRSAdapter {
 		final PixelScale pixScales = metadata.getModelPixelScales();
 		final int numTiePoints = tiePoints.length;
 		MathTransform xform = null;
-		int rasterType = getGeoKeyAsInt(GeoTiffConstants.RasterPixelIsArea,
+		int rasterType = getGeoKeyAsInt(GeoTiffConstants.GTRasterTypeGeoKey,
 				metadata);
-		// @task TODO I do not know if this is correct but it works fine
+		// geotiff spec says that PixelIsArea is the default
 		if (rasterType == GeoTiffConstants.UNDEFINED)
 			rasterType = GeoTiffConstants.RasterPixelIsArea;
-		// geotiff spec says that PixelIsArea is the default
 
 		// /////////////////////////////////////////////////////////////////////
 		//

@@ -54,7 +54,6 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -97,19 +96,17 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
 public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 
+	/**Logger for the {@link GeoTiffReader} class.*/
 	private Logger LOGGER = Logger.getLogger(GeoTiffReader.class.toString());
 
 	/** SPI for creating tiff readers in ImageIO tools */
 	private final static TIFFImageReaderSpi readerSPI = new TIFFImageReaderSpi();
 
-	/**
-	 * Number of images read from file. read() increments this counter and
-	 * hasMoreGridCoverages() accesses it.
-	 */
-	private int imagesRead = 0;
 
+	/**Decoder for the GeoTiff metadata.*/
 	private GeoTiffIIOMetadataDecoder metadata;
 
+	/**Adapter for the GeoTiff crs.*/
 	private GeoTiffMetadata2CRSAdapter gtcs;
 
 	/**
@@ -289,13 +286,13 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		//
 		// //
 		if (numOverviews > 1) {
-			overViewResolutions = new double[numOverviews ][2];
+			overViewResolutions = new double[numOverviews][2];
 			double res[];
 			for (int i = 0; i < numOverviews; i++) {
 				res = getResolution(originalEnvelope, new Rectangle(0, 0,
 						reader.getWidth(i), reader.getHeight(i)), crs);
-				overViewResolutions[i ][0] = res[0];
-				overViewResolutions[i ][1] = res[1];
+				overViewResolutions[i][0] = res[0];
+				overViewResolutions[i][1] = res[1];
 			}
 		} else
 			overViewResolutions = null;
@@ -388,7 +385,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 				final int length = params.length;
 				for (int i = 0; i < length; i++) {
 					param = (Parameter) params[i];
-
 					if (param.getDescriptor().getName().getCode().equals(
 							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 									.toString())) {
@@ -455,7 +451,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// /////////////////////////////////////////////////////////////////////
 		// get the raster -> model transformation and
 		// create the coverage
-		return createImageCoverage(JAI.create("ImageRead",pbjRead,
+		return createImageCoverage(JAI.create("ImageRead", pbjRead,
 				(RenderingHints) newHints));
 
 	}
@@ -471,6 +467,15 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// add support for multi image TIFF files later.
 		throw new UnsupportedOperationException(
 				"No support for multi-image TIFF.");
+	}
+
+	/**
+	 * Returns the geotiff metadata for this geotiff file.
+	 * 
+	 * @return the metadata
+	 */
+	public GeoTiffIIOMetadataDecoder getMetadata() {
+		return metadata;
 	}
 
 }

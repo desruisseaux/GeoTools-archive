@@ -146,6 +146,8 @@ public class GeoTiffWriterTest extends TestCase {
 					logger.info("");
 					if(TestData.isInteractiveTest())
 						gc.show();
+					else
+						gc.getRenderedImage().getData();
 
 				}
 
@@ -154,4 +156,6 @@ public class GeoTiffWriterTest extends TestCase {
 		}
 
 	}
+	
+	
 }
