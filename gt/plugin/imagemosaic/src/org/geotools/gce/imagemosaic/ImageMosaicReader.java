@@ -538,18 +538,17 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("loading tile for envelope "
 					+ requestedJTSEnvelope.toString());
-		final List features =getFeaturesFromIndex(requestedJTSEnvelope);
-		if(features==null)
-		{
+		final List features = getFeaturesFromIndex(requestedJTSEnvelope);
+		if (features == null) {
 			return null;
 		}
 		// do we have any feature to load
 		final Iterator it = features.iterator();
 		if (!it.hasNext())
 			return null;
-		final int size=features.size();
+		final int size = features.size();
 		if (size > MAX_TILES)
-			return fakeMosaic(requestedEnvelope,size);
+			return fakeMosaic(requestedEnvelope, size);
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("We have " + size + " tiles to load");
 		try {
@@ -1052,21 +1051,47 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// positioning the actual image correctly in final mosaic.
 		// /////////////////////////////////////////////////////////////////////
 		// evaluate trans
-		int xTrans = (int) Math.round((bound.getMinX() - ulc.getX()) / res[0]);
-		int yTrans = (int) Math.round((ulc.getY() - bound.getMaxY()) / res[1]);
+		double resX = (bound.getMaxX() - bound.getMinX())
+				/ loadedImage.getWidth();
+		double resY = (bound.getMaxY() - bound.getMinY())
+				/ loadedImage.getHeight();
+		double scaleX = 1.0, scaleY = 1.0;
+		// int xTrans = (int) Math.round((bound.getMinX() - ulc.getX()) /
+		// res[0]);
+		// int yTrans = (int) Math.round((ulc.getY() - bound.getMaxY()) /
+		// res[1]);
+		double xTrans=0.0, yTrans=0.0;
+		if (Math.abs((resX - res[0]) / resX) > EPS
+				|| Math.abs(resY - res[1]) > EPS) {
+			scaleX = res[0] / resX;
+			scaleY = res[1] / resY;
 
-		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine(new StringBuffer("Adding to mosaic image  ").append(
-					imageFile.getAbsolutePath()).append(" as number ")
-					.append(i).append(" with translations factors ").append(
-							xTrans).append(" ").append(yTrans).toString());
+		}
+		xTrans = (bound.getMinX() - ulc.getX()) / res[0];
+		yTrans = (ulc.getY() - bound.getMaxY()) / res[1];
 
-		final ParameterBlock pbjTranslate = new ParameterBlock();
+		// if (LOGGER.isLoggable(Level.FINE))
+		// LOGGER.fine(new StringBuffer("Adding to mosaic image ").append(
+		// imageFile.getAbsolutePath()).append(" as number ")
+		// .append(i).append(" with translations factors ").append(
+		// xTrans).append(" ").append(yTrans).toString());
+		//
+		// final ParameterBlock pbjTranslate = new ParameterBlock();
+		// // translation
+		// pbjTranslate.addSource(loadedImage).add(new Float(xTrans)).add(
+		// new Float(yTrans)).add(nnInterpolation);
+		// final RenderedOp readyToMosaicImage = JAI.create("Translate",
+		// pbjTranslate, NO_CACHE);
+		// pbjMosaic.addSource(readyToMosaicImage);
+		// finalLayout.add(new Area(readyToMosaicImage.getBounds()));
+
+		final ParameterBlock pbjScaleTranslate = new ParameterBlock();
 		// translation
-		pbjTranslate.addSource(loadedImage).add(new Float(xTrans)).add(
-				new Float(yTrans)).add(nnInterpolation);
-		final RenderedOp readyToMosaicImage = JAI.create("Translate",
-				pbjTranslate, NO_CACHE);
+		pbjScaleTranslate.addSource(loadedImage).add(new Float(scaleX)).add(
+				new Float(scaleY)).add(new Float(xTrans))
+				.add(new Float(yTrans)).add(nnInterpolation);
+		final RenderedOp readyToMosaicImage = JAI.create("Scale",
+				pbjScaleTranslate, NO_CACHE);
 		pbjMosaic.addSource(readyToMosaicImage);
 		finalLayout.add(new Area(readyToMosaicImage.getBounds()));
 
