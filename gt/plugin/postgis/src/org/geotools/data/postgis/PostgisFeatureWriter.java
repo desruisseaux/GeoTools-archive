@@ -23,7 +23,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.FeatureTypeInfo;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.QueryData;
-import org.geotools.data.postgis.attributeio.WKBEncoder;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -33,6 +33,7 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.SQLEncoderException;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKBWriter;
 import com.vividsolutions.jts.io.WKTWriter;
 
 
@@ -74,7 +75,8 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
 
     protected String getGeometryInsertText(Geometry geom, int srid) throws IOException {
         if(WKBEnabled) {
-            String wkb = WKBEncoder.encodeGeometryHex(geom);
+            //String wkb = WKBEncoder.encodeGeometryHex(geom);
+            String wkb = WKBWriter.bytesToHex( new WKBWriter().write( geom ) );
             if (byteaWKB)
             	return "setSRID('"+wkb+"'::geometry,"+srid+")";
 	        else
