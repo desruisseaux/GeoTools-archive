@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  * A set of constructs and utility methods used to test the data module.
  * <p>
- * By isolating a commong set of {@link Feature}s, {@link FeatureType}s and {@link Filter}s
+ * By isolating a common set of {@link Feature}s, {@link FeatureType}s and {@link Filter}s
  * we are able to reduce the amount of overhead in setting up new tests.
  * </p>
  * <p>

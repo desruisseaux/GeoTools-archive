@@ -15,6 +15,8 @@
  */
 package org.geotools.data.postgis.collection;
 
+import java.util.Map;
+
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DefaultQuery;
@@ -22,6 +24,7 @@ import org.geotools.data.Query;
 import org.geotools.data.jdbc.JDBCFeatureCollection;
 import org.geotools.data.jdbc.JDBCFeatureSource;
 import org.geotools.data.postgis.PostgisDataStore;
+import org.geotools.data.postgis.PostgisTests;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.visitor.AverageVisitor;
 import org.geotools.feature.visitor.CountVisitor;
@@ -37,10 +40,6 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.MathExpression;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PropertyResourceBundle;
 
 
 /**
@@ -65,23 +64,10 @@ public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
     }
 
     protected void setUp() throws Exception {
-        // super.setUp();
-        PropertyResourceBundle resource;
-        resource = new PropertyResourceBundle(this.getClass()
-                                                  .getResourceAsStream("demo-bc-fixture.properties"));
-
-        //String namespace = resource.getString("namespace");
-        Map params = new HashMap();
-        params.put("dbtype", "postgis");
-        params.put("host", resource.getString("host"));
-        params.put("port", resource.getString("port"));
-        params.put("database", resource.getString("database"));
-        params.put("user", resource.getString("user"));
-        params.put("passwd", resource.getString("password"));
-
+        super.setUp();
+        Map params = PostgisTests.getParams("demo-bc-fixture.properties");
         dstore = (PostgisDataStore) DataStoreFinder.getDataStore(params);
 
-        //String[] schemas = dstore.getTypeNames();
         featureType = dstore.getSchema("bc_voting_areas");
 
         JDBCFeatureSource source = new JDBCFeatureSource(dstore, featureType);
@@ -92,8 +78,8 @@ public class PostgisFeatureCollectionOnlineTest extends DataTestCase {
         JDBCFeatureSource source2 = new JDBCFeatureSource(dstore, featureType2);
         Query query2 = new DefaultQuery(featureType2.toString(), null);
         fc2 = new PostgisFeatureCollection(source2, query2);
-        att = ff.createAttributeExpression(null, "vregist");
-        att2 = ff.createAttributeExpression(null, "authority");
+        att = ff.createAttributeExpression("vregist");
+        att2 = ff.createAttributeExpression("authority");
     }
 
     public void testSumCount() throws Exception {

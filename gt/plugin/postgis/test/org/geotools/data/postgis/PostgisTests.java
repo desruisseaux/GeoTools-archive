@@ -16,6 +16,8 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PropertyResourceBundle;
 
 /**
@@ -60,6 +62,24 @@ public class PostgisTests {
 		public String user;
 		public String password;
 		public String schema;
-		
 	}
+    
+    public static Map getParams(Fixture f) {
+        Map params = new HashMap();
+
+        params.put(PostgisDataStoreFactory.DBTYPE.key, "postgis");
+        params.put(PostgisDataStoreFactory.HOST.key, f.host);
+        params.put(PostgisDataStoreFactory.PORT.key, f.port);
+        params.put(PostgisDataStoreFactory.DATABASE.key, f.database);
+        params.put(PostgisDataStoreFactory.USER.key, f.user);
+        params.put(PostgisDataStoreFactory.PASSWD.key, f.password);
+        params.put(PostgisDataStoreFactory.SCHEMA.key,f.schema);
+
+        return params;
+    }
+    
+    public static Map getParams(String fixtureFile) throws IOException {
+        Fixture f = newFixture(fixtureFile);
+        return getParams(f);
+    }
 }

@@ -27,7 +27,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 
@@ -126,7 +126,7 @@ public class SQLEncoderPostgisTest extends TestCase {
             };
 
         // Builds the schema
-        testSchema = FeatureTypeFactory.newFeatureType(types, "testSchema");
+        testSchema = FeatureTypeBuilder.newFeatureType(types, "testSchema");
 
         GeometryFactory geomFac = new GeometryFactory();
 
@@ -219,7 +219,9 @@ public class SQLEncoderPostgisTest extends TestCase {
         FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
 
         FidFilter fidFilter = filterFac.createFidFilter("road.345");
-        SQLEncoderPostgisGeos encoder = new SQLEncoderPostgisGeos();
+        SQLEncoderPostgis encoder = new SQLEncoderPostgis();
+        encoder.setSupportsGEOS(true);
+        encoder.setLooseBbox(false);
         encoder.setFIDMapper(new TypedFIDMapper(
                 new BasicFIDMapper("gid", 255, true), "road"));
 
@@ -233,8 +235,7 @@ public class SQLEncoderPostgisTest extends TestCase {
     public void test3() throws Exception {
         FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
         CompareFilter compFilter = filterFac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-        compFilter.addLeftValue(filterFac.createAttributeExpression(
-                testSchema, "testInteger"));
+        compFilter.addLeftValue(filterFac.createAttributeExpression("testInteger"));
         compFilter.addRightValue(filterFac.createLiteralExpression(
                 new Double(5)));
 

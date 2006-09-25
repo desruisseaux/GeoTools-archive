@@ -162,6 +162,9 @@ public final class ConnectionPool {
      *  to getConnection to throw an SQLException.
      */
     public void close() {
+        if (closed)  {
+            return;
+        }
         synchronized (mutex) {
             int size = usedConnections.size();
             for (int i = 0; i < size; i++) {

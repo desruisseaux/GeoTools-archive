@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -176,7 +175,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         }
     }
 
-    /** OPTIMIZE constants */
+    /** OPTIMIZE_MODE constants */
     public static final int OPTIMIZE_SAFE = 0;
     public static final int OPTIMIZE_SQL = 1;
     
@@ -185,7 +184,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     //private static PostgisAuthorityFactory paf = null;
     private PostgisAuthorityFactory paf = null;
 
-    
+    /** PostGIS version information (persisted here so we don't have to keep asking the database what version it is, in perpituity. */
+    protected PostgisDBInfo dbInfo;
 
     /** Enables the use of geos operators */
     protected boolean useGeos;
@@ -216,7 +216,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected boolean looseBbox;
     
-    /** Flag indicating wether schema support **/
+    /** Flag indicating whether schema support **/
     protected boolean schemaEnabled = true;
 
     protected PostgisDataStore(ConnectionPool connPool)
@@ -240,7 +240,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         String namespace, int optimizeMode) throws IOException {
         this(connPool,
             new JDBCDataStoreConfig(namespace, schema(schema), new HashMap(),
-                new HashMap()), OPTIMIZE_SQL); // DB: should this be optimizeMode instead of optimize_sql?
+                new HashMap()), optimizeMode); 
     }
 
     /** 
@@ -256,7 +256,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     public PostgisDataStore(ConnectionPool connectionPool,
         JDBCDataStoreConfig config, int optimizeMode) throws IOException {
         super(connectionPool, config);
-
         guessDataStoreOptions();
         OPTIMIZE_MODE = optimizeMode;
 
@@ -287,74 +286,16 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * to read geometries if WKB is enabled.  And it will read if GEOS is
      * enabled from the version string as well.
      *
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws IOException
      */
     protected void guessDataStoreOptions() throws IOException {
-        Connection dbConnection = null;
-
-        try {
-            String sqlStatement = "SELECT postgis_version();";
-            dbConnection = getConnection(Transaction.AUTO_COMMIT);
-
-            Statement statement = dbConnection.createStatement();
-            ResultSet result = statement.executeQuery(sqlStatement);
-            //boolean retValue = false;
-
-            if (result.next()) {
-                String version = result.getString(1);
-                LOGGER.fine("version is " + version);
-
-                int[] versionNumbers;
-
-                try {
-                    String[] values = version.trim().split(" ");
-                    String[] versionNumbersStr = values[0].trim().split("\\.");
-                    versionNumbers = new int[versionNumbersStr.length];
-
-                    for (int i = 0; i < versionNumbers.length; i++) {
-                        versionNumbers[i] = Integer.parseInt(versionNumbersStr[i]);
-                    }
-
-                    // bytea function has been introduced in 0.7.2
-                    if ((versionNumbers[0] > 0) || (versionNumbers[1] > 7)
-                            || ((versionNumbers.length > 2)
-                            && (versionNumbers[2] >= 2))) {
-                        byteaEnabled = true;
-                    }
-                    if (versionNumbers[0]>=1)
-                    	byteaWKB = true; // force new wkb writing format
-                } catch (Exception e) {
-                    LOGGER.log(Level.WARNING,
-                        "Exception occurred while parsing the version number.",
-                        e);
-                }
-
-                if (version.indexOf("USE_GEOS=1") != -1) {
-                    this.useGeos = true;
-                }
-                else {
-                	//warn about not using GEOS
-                	LOGGER.warning("GEOS is NOT enabled. This will result in limited functionality and performance.");
-                }
-                
-                //check postgres version to determine if schemas should be 
-                // enabled, pre 7.3 -> no
-                int major = dbConnection.getMetaData().getDatabaseMajorVersion();
-                int minor = dbConnection.getMetaData().getDatabaseMinorVersion();
-                
-                if (major < 7 || (major == 7 && minor < 3)) {
-                	//pre 7.3 
-                	schemaEnabled = false;
-                }
-            }
-        } catch (SQLException sqle) {
-            String message = sqle.getMessage();
-            LOGGER.warning(message);
-            throw new DataSourceException(message, sqle);
-        } finally {
-            JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
+        PostgisDBInfo dbInfo = getDBInfo();
+        byteaEnabled = dbInfo.isByteaEnabled();
+        if (dbInfo.getMajorVersion() >= 1) {
+            byteaWKB = true; // force ew wkb writing format
         }
+        useGeos = dbInfo.isGeosEnabled();
+        schemaEnabled = dbInfo.isSchemaEnabled();
     }
 
     /*
@@ -468,27 +409,17 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     	    	
     	try {
     		conn = createConnection();    		
+            Statement st = null;
+            ResultSet rs = null;
+            Envelope envelope = null;
     		    	
         	FeatureType schema = getSchema(typeName);
         	String geomName = schema.getDefaultGeometry().getName();
         	
-	    	//optimization, version >= 1.0 contains estimate_extent function 
-			// to query the stats of the table to determine the bbox, however, 
-			// it may return null
-		    StringBuffer sql = new StringBuffer();
-		    sql.append("SELECT postgis_version()"); //$NON-NLS-1$
-		    Statement st = conn.createStatement();
-		    ResultSet rs = st.executeQuery(sql.toString());
-		    
-		    //should always return a result
-		    rs.next();
-		    String version = rs.getString(1);
-		    rs.close();
-		    st.close();
-
-		    Envelope envelope = null;
-            //postgis 1.0+
-		    if (version.trim().startsWith("1.")) { //$NON-NLS-1$
+	    	// optimization, postgis version >= 1.0 contains estimated_extent
+            // function to query the stats of the table to determine the bbox,
+            // however, it may return null
+		    if (getDBInfo().getMajorVersion() >= 1) {
 		    	//try the estimated_extent([schema], table, geocolumn) function
 	    	    String q;
                 String dbSchema = config.getDatabaseSchemaName(); 
@@ -1111,22 +1042,23 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
 
     /**
-     * Creates a FeatureType in this instance of the PostgisDataStore.  Since we don't
-     * yet know which attribute in the FeatureType is the primary key, we will create
-     * our own called "fid_tablename", which has its own sequence called 
-     * "tablename_fid_seq".  The user should not interact with this column, although
-     * its value will be the FID.  The FeatureType name will be cast to lower case,
-     * since this is good postgres practice.  This method currently assumes there are
-     * only 2 dimensions. 
+     * Creates a FeatureType in this instance of the PostgisDataStore. Since we
+     * don't yet know which attribute in the FeatureType is the primary key, we
+     * will create our own called "fid_tablename", which has its own sequence
+     * called "tablename_fid_seq". The user should not interact with this
+     * column, although its value will be the FID. This method currently assumes
+     * there are only 2 dimensions.
      * 
-     * @throws IOException if something goes horribly wrong or the table already exists
+     * @throws IOException
+     *             if something goes horribly wrong or the table already exists
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
     public void createSchema(FeatureType featureType) throws IOException {
-        //chorner: imposing our will on the user
     	String tableName = featureType.getTypeName();
     	
-    	AttributeType[] attributeType = featureType.getAttributeTypes();
+    	String lcTableName = tableName.toLowerCase();
+        
+        AttributeType[] attributeType = featureType.getAttributeTypes();
         String dbSchema = config.getDatabaseSchemaName();
         
         PostgisSQLBuilder sqlb = createSQLBuilder();
@@ -1135,7 +1067,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         //the featureType won't tell us who the primary key is, so we'll create
         //our own "fid_tablename".  Later when we load the featureType, we will
         //pretend we didn't see fid_tablename when we return the attributes.
-        String fidColumn = tableName + "_fid";
+        String fidColumn = lcTableName + "_fid";
         //make sure the fid column doesn't already exist
         for (int i = 0; i < attributeType.length; i++) {
         	if (attributeType[i].getName().equalsIgnoreCase(fidColumn)) {
@@ -1215,7 +1147,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 if (refSys != null) {
                 	try {
                         Set ident = refSys.getIdentifiers();
-                        if (ident == null && refSys == DefaultGeographicCRS.WGS84) {
+                        if ((ident == null || ident.isEmpty()) && refSys == DefaultGeographicCRS.WGS84) {
                             SRID = 4326;
                         } else {
                             String code = ((NamedIdentifier) ident.toArray()[0]).getCode();
@@ -1229,12 +1161,12 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     SRID = -1;
                 }
 
-                DatabaseMetaData metaData = con.getMetaData();
-                ResultSet rs = metaData.getCatalogs();
-                rs.next();
-
-                //String dbName = rs.getString(1);
-                rs.close();
+//                DatabaseMetaData metaData = con.getMetaData();
+//                ResultSet rs = metaData.getCatalogs();
+//                rs.next();
+//
+//                //String dbName = rs.getString(1);
+//                rs.close();
 
                 String typeName = null;
 
@@ -1802,4 +1734,32 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		//TODO: use the database schema to obtain the feature type?
 		return super.getSchema(arg0);
 	}
+    
+    /**
+     * Obtains the postgis datastore connection pool.
+     *  
+     * @return ConnectionPool
+     */
+    public ConnectionPool getConnectionPool() {
+        return connectionPool;
+    }
+    
+    /**
+     * Obtains database specific information, such as version, supported
+     * functions, etc.
+     */
+    public PostgisDBInfo getDBInfo() {
+        if (dbInfo == null) {
+            Connection conn;
+            try {
+                conn = getConnection(Transaction.AUTO_COMMIT);
+                dbInfo = new PostgisDBInfo(conn);
+            } catch (IOException e1) {
+                LOGGER.severe("Could not obtain DBInfo object");
+            }
+        }
+        return dbInfo;
+    }
+    
 }
+

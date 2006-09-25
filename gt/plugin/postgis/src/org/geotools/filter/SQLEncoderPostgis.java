@@ -185,7 +185,7 @@ public class SQLEncoderPostgis extends SQLEncoder implements
     public void setSupportsGEOS(boolean supports) {
         boolean oldValue = this.supportsGEOS;
         this.supportsGEOS = supports;
-        if (capabilities != null && supports != oldValue) {
+        if (capabilities == null || supports != oldValue) {
             //regenerate capabilities
             capabilities = createFilterCapabilities();
         }
@@ -195,41 +195,44 @@ public class SQLEncoderPostgis extends SQLEncoder implements
         return supportsGEOS;
     }
     
-    private void encodeGeomFilter(GeometryFilter filter, String function, String comparison) {
+    private void encodeGeomFilter(GeometryFilter filter, String function, String comparison, boolean useIndex) {
+        //this method blindly assumes that the filter is supported
         DefaultExpression left = (DefaultExpression) filter.getLeftGeometry();
         DefaultExpression right = (DefaultExpression) filter.getRightGeometry();
 
         try {
-            if (!looseBbox) {
-            	out.write(function + "(");
-            }
-
-            if (left == null) {
-                out.write("\"" + defaultGeom + "\"");
-            } else {
-                left.accept(this);
-            }
-
-            if (looseBbox) {
+            //should we use the index?
+            if (useIndex) {
+                encodeExpression(left);
                 out.write(" && ");
-            } else {
+                encodeExpression(right);
+            }
+            
+            // looseBbox only applies to GEOMETRY_BBOX, so unless this is a
+            // BBOX, we will always generate the full SQL.
+            if (filter.getFilterType() != AbstractFilter.GEOMETRY_BBOX || !looseBbox) {
+                if (useIndex) {
+                    out.write(" AND ");
+                }
+            	out.write(function + "(");
+                encodeExpression(left);
                 out.write(", ");
-            }
-
-            if (right == null) {
-                out.write("\"" + defaultGeom + "\"");
-            } else {
-                right.accept(this);
-            }
-
-            if (!looseBbox) {
-            	out.write(")" + comparison);
+                encodeExpression(right);
+                out.write(")" + comparison);
             }
         } catch (java.io.IOException ioe) {
             LOGGER.warning("Unable to export filter" + ioe);
         }
     }
 
+    private void encodeExpression(DefaultExpression expr) throws IOException {
+        if (expr == null) {
+            out.write("\"" + defaultGeom + "\"");
+        } else {
+            expr.accept(this);
+        }
+    }
+    
     /**
      * Turns a geometry filter into the postgis sql bbox statement.
      *
@@ -251,7 +254,7 @@ public class SQLEncoderPostgis extends SQLEncoder implements
                         "without GEOS support, only the BBOX function is supported; failed to encode "
                                 + filterType);
             }
-            encodeGeomFilter(filter, "distance", " = 0");
+            encodeGeomFilter(filter, "distance", " < 0.00001", true);
             return;
         }
         
@@ -291,20 +294,10 @@ public class SQLEncoderPostgis extends SQLEncoder implements
                     && (filterType != AbstractFilter.GEOMETRY_DISJOINT);
 
             if (constrainBBOX) {
-
-                if (left == null) {
-                    out.write("\"" + defaultGeom + "\"");
-                } else {
-                    left.accept(this);
-                }
-
+                encodeExpression(left);
                 out.write(" && ");
+                encodeExpression(right);
 
-                if (right == null) {
-                    out.write("\"" + defaultGeom + "\"");
-                } else {
-                    right.accept(this);
-                }
                 if (!onlyBbox) {
                     out.write(" AND ");
                 }
@@ -339,19 +332,9 @@ public class SQLEncoderPostgis extends SQLEncoder implements
                 }
                 out.write("(");
 
-                if (left == null) {
-                    out.write("\"" + defaultGeom + "\"");
-                } else {
-                    left.accept(this);
-                }
-
+                encodeExpression(left);
                 out.write(", ");
-
-                if (right == null) {
-                    out.write("\"" + defaultGeom + "\"");
-                } else {
-                    right.accept(this);
-                }
+                encodeExpression(right);
 
                 out.write(closingParenthesis);
             }

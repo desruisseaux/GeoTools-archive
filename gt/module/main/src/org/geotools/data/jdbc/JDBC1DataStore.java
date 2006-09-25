@@ -782,7 +782,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param schema
 	 * @param postFilter
 	 *            Filter for post processing, or <code>null</code> if not
-	 *            requried.
+	 *            required.
 	 * @param queryData
 	 *            Holds a ResultSet for attribute Readers
 	 *
@@ -1004,40 +1004,46 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @throws DataSourceException
 	 *             If the connection can not be obtained.
 	 */
-	 protected Connection getConnection(Transaction transaction)
-			throws IOException {
-		if (transaction != Transaction.AUTO_COMMIT) {
-			// we will need to save a JDBC connection is
-			// transaction.putState( connectionPool, JDBCState )
-			// throw new UnsupportedOperationException("Transactions not
-			// supported yet");
-			JDBCTransactionState state = (JDBCTransactionState) transaction
-					.getState(this);
-
-			if (state == null) {
-				try {
-                    Connection conn = createConnection();
-                    conn.setAutoCommit(requireAutoCommit());
-                    if (getTransactionIsolation() != Connection.TRANSACTION_NONE) {
-                        //for us, NONE means use the default, which is usually READ_COMMITTED
-                        conn.setTransactionIsolation(getTransactionIsolation());
+     protected Connection getConnection(Transaction transaction)
+            throws IOException {
+        if (transaction != Transaction.AUTO_COMMIT) {
+            // we will need to save a JDBC connection is
+            // transaction.putState( connectionPool, JDBCState )
+            // throw new UnsupportedOperationException("Transactions not
+            // supported yet");
+            
+            JDBCTransactionState state;
+            synchronized (transaction) {
+                
+                state = (JDBCTransactionState) transaction
+    					.getState(this);
+                
+                if (state == null) {
+                    try {
+                        Connection conn = createConnection();
+                        conn.setAutoCommit(requireAutoCommit());
+                        if (getTransactionIsolation() != Connection.TRANSACTION_NONE) {
+                            // for us, NONE means use the default, which is
+                            // usually READ_COMMITTED
+                            conn.setTransactionIsolation(getTransactionIsolation());
+                        }
+                        state = new JDBCTransactionState(conn);
+                        transaction.putState(this, state);
+                    } catch (SQLException eep) {
+                        throw new DataSourceException("Connection failed:"
+                                + eep, eep);
                     }
-					state = new JDBCTransactionState(conn);
-					transaction.putState(this, state);
-				} catch (SQLException eep) {
-					throw new DataSourceException("Connection failed:" + eep,
-							eep);
-				}
-			}
-			return state.getConnection();
-		}
+                }
+            }
+            return state.getConnection();
+        }
 
-		try {
-			return createConnection();
-		} catch (SQLException sqle) {
-			throw new DataSourceException("Connection failed:" + sqle, sqle);
-		}
-	}
+        try {
+            return createConnection();
+        } catch (SQLException sqle) {
+            throw new DataSourceException("Connection failed:" + sqle, sqle);
+        }
+    }
 
 	/**
      * Obtain the transaction isolation level for connections.

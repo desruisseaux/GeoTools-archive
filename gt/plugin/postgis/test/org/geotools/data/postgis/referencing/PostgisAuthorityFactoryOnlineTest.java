@@ -15,22 +15,20 @@
  */
 package org.geotools.data.postgis.referencing;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.postgis.PostgisConnectionFactory;
 import org.geotools.data.postgis.PostgisTests;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import junit.framework.TestCase;
 
 /**
  * Test PostgisAuthorityFactory
@@ -42,7 +40,6 @@ public class PostgisAuthorityFactoryOnlineTest extends TestCase {
     
     
     private String TABLE_NAME="SPATIAL_REF_SYS";
-    private String WKT_COLUMN="SRTEXT";
     private String SRID_COLUMN="SRID";
     
     public int getSRIDs(ConnectionPool pool) throws Exception{
