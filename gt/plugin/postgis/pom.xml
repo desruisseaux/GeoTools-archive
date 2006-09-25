@@ -95,11 +95,6 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>org.wkb4j</groupId>
-      <artifactId>wkb4j</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
       <!-- TODO: this dependency should appears in wkb4j -->
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
