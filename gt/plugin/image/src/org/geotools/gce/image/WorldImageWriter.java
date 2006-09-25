@@ -97,10 +97,10 @@ public final class WorldImageWriter implements GridCoverageWriter {
 			else
 				throw new RuntimeException(
 						"WorldImageWriter::write:It is not possible writing to an URL!");
-		} else if (!(destination instanceof ImageOutputStream)
+		} /*else if (!(destination instanceof ImageOutputStream)
 				&& !(destination instanceof File))
 			throw new RuntimeException(
-					"WorldImageWriter::write:It is not possible writing to an URL!");
+					"WorldImageWriter::write:It is not possible writing to an URL!");*/
 	}
 
 	/**
