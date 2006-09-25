@@ -56,7 +56,7 @@ import junit.textui.TestRunner;
 import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.resources.TestData;
 
-import tilecachetool.TCTool;
+//import tilecachetool.TCTool;
 
 import com.sun.media.jai.imageioimpl.ImageReadCRIF;
 import com.sun.media.jai.util.SunTileCache;
@@ -156,7 +156,7 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 	public void testJaiImageTestSubsamplingOperation()
 			throws FileNotFoundException, IOException {
 		if (_testJaiImage_TestSubsamplingOperation) {
-			final TCTool tct = new TCTool();
+			//final TCTool tct = new TCTool();
 			final String title = new String("TestSubsamplingOperation");
 			logger.info("\n\n " + title + " \n");
 

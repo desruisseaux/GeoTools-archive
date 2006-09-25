@@ -837,7 +837,7 @@ public abstract class AsciiGridRaster {
 			// I can use this information to skip useless space searches
 			// operations when I load Tiles not located at the beginning of the
 			// stream
-ì			tileMarker.put(new Long(samplesToLoad
+			tileMarker.put(new Long(samplesToLoad
 					+ samplesToThrowAwayBeforeFirstValidSample), new Long(
 					streamPosition));
 		}
