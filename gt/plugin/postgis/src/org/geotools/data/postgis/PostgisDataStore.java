@@ -73,6 +73,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -270,6 +271,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected LockingManager createLockingManager() {
         return new InProcessLockingManager();
+    }
+    
+    /**
+     * Creates a new sql builder for encoding raw sql statements;
+     * 
+     */
+    protected PostgisSQLBuilder createSQLBuilder() {
+    	return new PostgisSQLBuilder( new SQLEncoderPostgis(), config );
     }
 
     /**
@@ -1115,14 +1124,13 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     public void createSchema(FeatureType featureType) throws IOException {
         //chorner: imposing our will on the user
-    	String tableName = featureType.getTypeName().toLowerCase();
+    	String tableName = featureType.getTypeName();
     	
-    	if (!tableName.equals(featureType.getTypeName())) {
-    		LOGGER.warning("FeatureType name case was modified to " + tableName);
-    	}
-    	
-        AttributeType[] attributeType = featureType.getAttributeTypes();
+    	AttributeType[] attributeType = featureType.getAttributeTypes();
         String dbSchema = config.getDatabaseSchemaName();
+        
+        PostgisSQLBuilder sqlb = createSQLBuilder();
+    		
         
         //the featureType won't tell us who the primary key is, so we'll create
         //our own "fid_tablename".  Later when we load the featureType, we will
@@ -1146,8 +1154,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             con.setAutoCommit(false);
             st = con.createStatement();
 
-            StringBuffer statementSQL = new StringBuffer("CREATE TABLE \"" + dbSchema
-                + "\".\"" + tableName + "\" (\"" + fidColumn + "\" serial PRIMARY KEY,");
+            StringBuffer statementSQL = new StringBuffer("CREATE TABLE " + sqlb.encodeTableName( tableName ) + 
+            		" (" + sqlb.encodeColumnName( fidColumn ) + " serial PRIMARY KEY,");
             statementSQL.append(makeSqlCreate(attributeType) + ");");
 
             String sql = statementSQL.toString();
@@ -1263,9 +1271,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     
                     //add geometry constaints to the table
                     if (SRID > -1) {
-	                    sql = "ALTER TABLE \"" + dbSchema + "\".\"" + tableName 
-	                        + "\" ADD CONSTRAINT enforce_srid_" + columnName + " CHECK (SRID("
-	                        + columnName + ") = " + SRID + ");"; 
+	                    sql = "ALTER TABLE " + sqlb.encodeTableName( tableName ) + 
+	                    " ADD CONSTRAINT enforce_srid_" + columnName + " CHECK (SRID("
+	                        + sqlb.encodeColumnName( columnName ) + ") = " + SRID + ");"; 
 	                    LOGGER.info(sql);
 	                    if (shouldExecute) {
 	                        st.execute(sql);
@@ -1274,17 +1282,17 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     
                     sql = "ALTER TABLE \"" + dbSchema + "\".\"" + tableName
                         + "\" ADD CONSTRAINT enforce_dims_" + columnName + " CHECK (ndims("
-                        + columnName + ") = 2);"; 
+                        + sqlb.encodeColumnName( columnName ) + ") = 2);"; 
                     LOGGER.info(sql);
                     if (shouldExecute) {
                         st.execute(sql);
                     }
 
                     if (!typeName.equals("GEOMETRY")) {
-	                    sql = "ALTER TABLE \"" + dbSchema + "\".\"" + tableName
-	                        + "\" ADD CONSTRAINT enforce_geotype_" + columnName + " CHECK (geometrytype("
-	                        + columnName + ") = '" + typeName + "'::text OR " + columnName
-	                        + " IS NULL);"; 
+	                    sql = "ALTER TABLE " + sqlb.encodeTableName( tableName ) 
+	                        + " ADD CONSTRAINT enforce_geotype_" + columnName + " CHECK (geometrytype("
+	                        + sqlb.encodeColumnName( columnName ) + ") = '" + typeName + "'::text OR " 
+	                        + sqlb.encodeColumnName( columnName ) + " IS NULL);"; 
 	                    LOGGER.info(sql);
 	                    if (shouldExecute) {
 	                        st.execute(sql);
@@ -1295,11 +1303,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 	LOGGER.warning("Error: " + geomAttribute.getName()+ " unknown type!!!");
                 }
 
+                
+                
                 //also build a spatial index on each geometry column.
                 statementSQL = new StringBuffer("CREATE INDEX spatial_"
                     + tableName + "_" + attributeType[i].getName().toLowerCase()
-                    + " ON \"" + dbSchema + "\".\"" + tableName + "\" USING GIST (\""
-                    + attributeType[i].getName() + "\");");
+                    + " ON " + sqlb.encodeTableName( tableName ) 
+                    + " USING GIST (" + sqlb.encodeColumnName( attributeType[i].getName() ) 
+                    + ");");
 
                 sql = statementSQL.toString();
                 LOGGER.info(sql);
@@ -1320,7 +1331,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 throw new IOException(sqle.getMessage());
             }
 
-            throw new IOException(e.getMessage());
+            throw (IOException) new IOException(e.getMessage()).initCause( e );
         } finally {
             try {
                 if (st != null) {
