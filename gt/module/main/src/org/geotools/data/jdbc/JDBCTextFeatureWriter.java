@@ -320,7 +320,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         Object[] pkValues = mapper.getPKAttributes(feature.getID());
 
         for (int i = 0; i < mapper.getColumnCount(); i++) {
-            statementSQL.append(mapper.getColumnName(i)).append(" = ").append(addQuotes(
+            statementSQL.append( encodeColumnName( mapper.getColumnName(i) )).append(" = ").append(addQuotes(
                     pkValues[i]));
 
             if (i < (mapper.getColumnCount() - 1)) {
