@@ -108,6 +108,9 @@ public class DataUtilities {
         typeMap.put("Float", Float.class);
         typeMap.put("float", Float.class);
         typeMap.put("0.0f", Float.class);
+        typeMap.put("Boolean", Boolean.class);
+        typeMap.put("true",Boolean.class);
+        typeMap.put("false",Boolean.class);
         typeMap.put("Geometry", Geometry.class);
         typeMap.put("Point", Point.class);
         typeMap.put("LineString", LineString.class);
