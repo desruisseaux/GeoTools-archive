@@ -79,6 +79,7 @@ import java.util.Vector;
  * sinche the underlying pool is based on them.
  * <p>
  * 
+ * @author Daniele Romagnoli
  * @author Simone Giannecchini
  * 
  */
