@@ -21,19 +21,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.xml.gml.FCBuffer;
-import org.geotools.xml.gml.GMLComplexTypes;
 import org.geotools.xml.gml.FCBuffer.StopException;
 import org.geotools.xml.handlers.DocumentHandler;
 import org.geotools.xml.handlers.ElementHandlerFactory;
 import org.geotools.xml.handlers.IgnoreHandler;
-import org.geotools.xml.schema.Schema;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -251,13 +247,32 @@ public class XMLSAXHandler extends DefaultHandler {
             handler.endElement(uri, localName, hints);
             handlers.pop();
         } catch (Exception e) {
+            processException(e);
+
             logger.warning(e.getMessage());
             logger.warning("Line " + locator.getLineNumber() + " Col "
-                + locator.getColumnNumber());
+                    + locator.getColumnNumber());
 
-//            e.printStackTrace();
-            throw (SAXException) new SAXException(e);
+            SAXException exception = new SAXException(e.getMessage()+" at Line " + locator.getLineNumber() + " Col "
+                    + locator.getColumnNumber()+" tag is: \n"+qName, e);
+            exception.initCause(e);
+            throw exception;
         }
+    }
+
+    private void processException( Exception e ) {
+        if( e instanceof RuntimeException )
+            throw (RuntimeException) e;
+        StringBuffer msg=new StringBuffer(e.getLocalizedMessage());
+        StackTraceElement[] trace = e.getStackTrace();
+        
+        for( int i = 0; i < trace.length; i++ ) {
+            StackTraceElement element = trace[i];
+            msg.append("    ");
+            msg.append(element.toString());
+            msg.append("\n");
+        }
+        logger.log(Level.SEVERE, msg.toString());
     }
 
     /**
@@ -371,10 +386,16 @@ public class XMLSAXHandler extends DefaultHandler {
             handlers.push(eh);
             eh.startElement(new URI(namespaceURI), localName, atts);
         } catch (Exception e) {
+            processException(e);
+
             logger.warning(e.toString());
             logger.warning("Line " + locator.getLineNumber() + " Col "
                 + locator.getColumnNumber());
-            throw new SAXException(e);
+
+            SAXException exception = new SAXException(e.getMessage()+" at Line " + locator.getLineNumber() + " Col "
+                    + locator.getColumnNumber()+" tag is: \n"+qName, e);
+            exception.initCause(e);
+            throw exception;        
         }
     }
 
