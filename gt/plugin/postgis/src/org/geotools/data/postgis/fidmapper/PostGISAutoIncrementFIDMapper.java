@@ -54,7 +54,7 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
                     sql = sql + getTableName() + "\',\'" + getColumnName() + "\'))";
                     statement.execute(sql); 
                     ResultSet resultSet = statement.getResultSet();
-                    if (resultSet.next())
+                    if (resultSet.next() && resultSet.getString("currval")!=null )
                         return resultSet.getString("currval");
                     else
                         return findInsertedFID(conn, feature, statement);

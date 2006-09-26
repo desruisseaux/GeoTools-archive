@@ -350,4 +350,8 @@ public class JDBCFeatureWriter implements FeatureWriter {
             reader.close();
 	}
     }
+
+    public void setFeatureListenerManager( FeatureListenerManager listenerManager2 ) {
+        this.listenerManager=listenerManager2;
+    }
 }

@@ -1576,7 +1576,9 @@ public abstract class JDBC1DataStore implements DataStore {
 			QueryData queryData) throws IOException {
 		LOGGER.fine("returning jdbc feature writer");
 
-		return new JDBCFeatureWriter(reader, queryData);
+		JDBCFeatureWriter featureWriter = new JDBCFeatureWriter(reader, queryData);
+        featureWriter.setFeatureListenerManager(this.listenerManager);
+        return featureWriter;
 	}
 
 	/**

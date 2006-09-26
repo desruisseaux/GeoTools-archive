@@ -1553,7 +1553,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         QueryData queryData) throws IOException {
     	PostgisSQLBuilder sqlBuilder = 
     		(PostgisSQLBuilder) getSqlBuilder(fReader.getFeatureType().getTypeName());
-        return new PostgisFeatureWriter(fReader, queryData, WKBEnabled,byteaWKB,sqlBuilder);
+        PostgisFeatureWriter postgisFeatureWriter = new PostgisFeatureWriter(fReader, queryData, WKBEnabled,byteaWKB,sqlBuilder);
+        postgisFeatureWriter.setFeatureListenerManager(listenerManager);
+        return postgisFeatureWriter;
     }
 
     /**
