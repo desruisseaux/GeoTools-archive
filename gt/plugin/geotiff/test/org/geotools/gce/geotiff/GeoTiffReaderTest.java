@@ -68,25 +68,6 @@ public class GeoTiffReaderTest extends TestCase {
 		super(arg0);
 	}
 
-	/*
-	 * @see TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-		final JAI jaiDef = JAI.getDefaultInstance();
-
-		// using a big tile cache
-		final TileCache cache = jaiDef.getTileCache();
-		cache.setMemoryCapacity(64 * 1024 * 1024);
-		cache.setMemoryThreshold(0.75f);
-
-		// setting JAI wide hints
-		jaiDef.getTileScheduler().setParallelism(40);
-		jaiDef.getTileScheduler().setPrefetchParallelism(40);
-		jaiDef.getTileScheduler().setPrefetchPriority(7);
-		jaiDef.getTileScheduler().setPrefetchPriority(7);
-
-	}
 
 	public static void main(String[] args) {
 		TestRunner.run(GeoTiffReaderTest.class);
@@ -139,9 +120,6 @@ public class GeoTiffReaderTest extends TestCase {
 						coverage.show();
 					else
 						coverage.getRenderedImage().getData();
-
-
-
 
 				}
 

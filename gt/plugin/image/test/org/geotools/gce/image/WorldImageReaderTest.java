@@ -125,6 +125,8 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 		// show it, but only if tests are interactive
 		if(TestData.isInteractiveTest())
 			coverage.show();
+		else
+			coverage.getRenderedImage().getData();
 	}
 
 	public static void main(String[] args) {

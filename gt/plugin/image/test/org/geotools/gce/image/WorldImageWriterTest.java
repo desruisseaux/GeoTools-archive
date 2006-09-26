@@ -161,6 +161,8 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 		// displaying the coverage
 		if(TestData.isInteractiveTest())
 			coverage.show();
+		else
+			coverage.getRenderedImage().getData();
 
 	}
 
