@@ -164,7 +164,7 @@ public class Demo {
             throw (IOException) new IOException( msg ).initCause( iaex );
 	    }
 	    
-	    //TODO: figure out default GEomsee above
+	    //TODO: figure out default Geom, see above
 	    // System.out.println("DefaultGeom is: "+ptF.getDefaultGeometry());
 	    
 	    /* DataStore and its FeatureSource */ 

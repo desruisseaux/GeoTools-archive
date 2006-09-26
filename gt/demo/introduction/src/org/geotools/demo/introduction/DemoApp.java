@@ -247,8 +247,8 @@ public class DemoApp {
     public static void create_Geotools_DemoGUI(){
 
         frame=new JFrame("Geotools Demo");
-        frame.setBounds(20,20,800,500);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setBounds(20,20,800,500);
 //        frame.setBackground(Color.cyan);
         
         Container contentPane = frame.getContentPane();
@@ -353,34 +353,38 @@ public class DemoApp {
             public void actionPerformed(ActionEvent e) {
                 
                 DemoApp.createButton.setEnabled(false);
-                DemoApp.styleButton.setEnabled(true);
+                
                 DemoApp.createFeatureSourceFromScratch();
                 DemoApp.createFeatureSourceFromShapefile();
 //                DemoApp.create_FeatureSource_fromWeb();
 //                DemoApp.create_FeatureSource_fromDatabase();
                 
+                DemoApp.styleButton.setEnabled(true);
               }
           });
         styleButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
                 DemoApp.styleButton.setEnabled(false);
-                DemoApp.renderButton.setEnabled(true);
+                
                 DemoApp.create_Styles_forEach_Feature();
                 
+                DemoApp.renderButton.setEnabled(true);
               }
           });
         renderButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 
                 DemoApp.renderButton.setEnabled(false);
-                DemoApp.projectButton.setEnabled(true);
+                
                 DemoApp.initialize_JMapPane();
                 try{
                     DemoApp.load_JMapPane();
                 } catch (Exception ex){
                     System.err.println("Could not load the JMapPane: "+ ex);
                 }
+                
+                DemoApp.projectButton.setEnabled(true);
                 
                 
                 
@@ -390,9 +394,11 @@ public class DemoApp {
             public void actionPerformed(ActionEvent e) {
                 
                 DemoApp.projectButton.setEnabled(false);
-                DemoApp.filterButton.setEnabled(true);
+                
                 DemoApp.create_ProjectedCRS_from_DefaultGeogCRS();
                 DemoApp.display_projected_as_Mercator();
+                
+                //DemoApp.filterButton.setEnabled(true);
                 
               }
           });
@@ -400,8 +406,8 @@ public class DemoApp {
             public void actionPerformed(ActionEvent e) {
                 
                 DemoApp.filterButton.setEnabled(false);
+                
                 DemoApp.captureButton.setEnabled(true);
-//                frame.dispose();
                 
               }
           });
@@ -409,8 +415,10 @@ public class DemoApp {
             public void actionPerformed(ActionEvent e) {
                 
                 DemoApp.captureButton.setEnabled(false);
+                
+//              DemoApp.capture_as_image();
+                
                 DemoApp.saveButton.setEnabled(true);
-//                DemoApp.capture_as_image();
                 
               }
           });
@@ -418,8 +426,8 @@ public class DemoApp {
             public void actionPerformed(ActionEvent e) {
                 
                 DemoApp.saveButton.setEnabled(false);
+                
                 DemoApp.commitButton.setEnabled(true);
-//                frame.dispose();
                 
               }
           });
@@ -427,8 +435,8 @@ public class DemoApp {
             public void actionPerformed(ActionEvent e) {
                 
                 commitButton.setEnabled(false);
+                
                 analyzeButton.setEnabled(true);
-//                frame.dispose();
                 
               }
           });
@@ -436,7 +444,6 @@ public class DemoApp {
             public void actionPerformed(ActionEvent e) {
                 
                 analyzeButton.setEnabled(false);
-//                frame.dispose();
                 
               }
           });
@@ -515,6 +522,7 @@ public class DemoApp {
         textArea.append("Start: Create FeatureSource from shapefile.\n");
         
         try {
+            demo.loadShapefileIntoCatalog();
         	shpFS = demo.loadShapefileFeatureSource( );
 	    } 
         catch (IOException e) {
@@ -697,8 +705,8 @@ public class DemoApp {
                 context.setAreaOfInterest(envlp_NoEdges);
         }
 //        context.setAreaOfInterest(envlp_NoEdges);
-        context.addLayer(memFS,memStyl);
         context.addLayer(shpFS,shpStyl);
+        context.addLayer(memFS,memStyl); // To keep London on top
 //      context.addLayer(webFS,webStyl);
 //      context.addLayer(dbFS,dbStyl);
 
@@ -880,6 +888,10 @@ public class DemoApp {
 	
 	        frame.repaint();
 	        frame.doLayout();
+            
+            jmp.setMapArea(jmp.getContext().getAreaOfInterest());
+            jmp.setReset(true);
+            jmp.repaint();
 	
 	        textArea.append("  End: Projected the map.\n");
     	} catch(Exception te) {
@@ -968,9 +980,9 @@ public class DemoApp {
     	
         System.out.println("DemoApp Tutorial: Start...");
         
-            System.out.println("Start: Create the Demo's GUI.");
+            System.out.println("    Start: Create the Demo's GUI.");
         create_Geotools_DemoGUI();
-            System.out.println("  End: Created the Demo's GUI.");
+            System.out.println("      End: Created the Demo's GUI.");
         
         System.out.println("DemoApp Tutorial: End of non-GUI thread.");
     }
