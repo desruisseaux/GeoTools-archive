@@ -290,12 +290,20 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     protected void guessDataStoreOptions() throws IOException {
         PostgisDBInfo dbInfo = getDBInfo();
-        byteaEnabled = dbInfo.isByteaEnabled();
-        if (dbInfo.getMajorVersion() >= 1) {
-            byteaWKB = true; // force ew wkb writing format
+        if (dbInfo == null) { //assume
+            LOGGER.severe("Could not obtain PostgisDBInfo");
+            byteaEnabled = true;
+            byteaWKB = false;
+            useGeos = true;
+            schemaEnabled = true;
+        } else {
+            byteaEnabled = dbInfo.isByteaEnabled();
+            if (dbInfo.getMajorVersion() >= 1) {
+                byteaWKB = true; // force ew wkb writing format
+            }
+            useGeos = dbInfo.isGeosEnabled();
+            schemaEnabled = dbInfo.isSchemaEnabled();
         }
-        useGeos = dbInfo.isGeosEnabled();
-        schemaEnabled = dbInfo.isSchemaEnabled();
     }
 
     /*
