@@ -46,7 +46,10 @@ import com.vividsolutions.jts.geom.Point;
 /**
  * A demo class illustrating some of the various parts of the geotools api.
  * 
+ * @author Adrian Custer, gnuGIS
  * @author Justin Deoliveira, The Open Planning Project
+ * @version 0.02
+ * @since   2.2
  *
  */
 public class Demo {

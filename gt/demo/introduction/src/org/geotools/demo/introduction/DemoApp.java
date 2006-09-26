@@ -24,7 +24,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,16 +45,6 @@ import javax.units.SI;
 
 import org.geotools.catalog.Catalog;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.demo.mappane.MapViewer;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.GeometryAttributeType;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gui.swing.JMapPane;
 import org.geotools.gui.swing.PanAction;
@@ -68,21 +57,12 @@ import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.datum.DefaultGeodeticDatum;
-import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.geotools.styling.Graphic;
-import org.geotools.styling.Mark;
-import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
-import org.geotools.styling.StyleBuilder;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyleFactoryFinder;
-import org.geotools.styling.Symbolizer;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.IdentifiedObject;
@@ -94,10 +74,7 @@ import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.Conversion;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * The DemoApp class, through its main() method, is a quick introductory
@@ -159,8 +136,8 @@ import com.vividsolutions.jts.geom.Point;
  *     Section 6   - The GUI was inspired by Ian Turton's MapViewer demo.
  *     Section 7   - MakeImage with email advice from David Adler, Aaron B. Parks.
  * 
- * @author  Adrian Custer
- * @version 0.01
+ * @author  Adrian Custer, gnuGIS
+ * @version 0.02
  * @since   2.2RC5
  *
  */
@@ -170,22 +147,15 @@ public class DemoApp {
 //    private static Logger textlog = 
 //            Logger.getLogger("org.geotools.demo.introduction.QuickStart");
     
-    /* Switch for projection order. */
-    // TODO: clean main when this works
-    static final int PROJECT_ON_START    = 0;
-    static final int PROJECT_AFTER_START = 1;
-//    static int project_from_start = PROJECT_ON_START;
-    static int project_from_start = PROJECT_AFTER_START;
-    
     /* The handles for the ShapeFile and Styled Layer Descriptor (SLD) files. */
-    /*     The data are in demo/mappane/data/ */
+    /*     The files are in 'demo/mappane/data/', accessed through the class. */
     static final String shpName = "/countries.shp";
     static final String sldName = "/countries.sld";
     
     static File shpFile;
-    static URL shpURL;
+    static URL  shpURL;
     static File sldFile;
-    static URL sldURL;
+    static URL  sldURL;
         
         
     /* The name of the website */
@@ -205,7 +175,8 @@ public class DemoApp {
     /* DataLayer variables */
     
     /* Cartographic variables */
-    static final Envelope envlp_NoEdges = new Envelope(-170.0,170.0,-80.0,80.0);
+    static final Envelope envlp_NoEdges = new Envelope(-179.0,179.0,-80.0,80.0);
+    static final ReferencedEnvelope envlp_NoEdges2 = new ReferencedEnvelope(-179.0,179.0,-80.0,80.0, DefaultGeographicCRS.WGS84);
     static CoordinateReferenceSystem projCRS = null;
 
     /* GUI frame, pane and extras */
@@ -658,14 +629,13 @@ public class DemoApp {
         jtb.add(button);
         mapGUI.add(jtb,BorderLayout.NORTH);
         mapGUI.add(jmp);
-	
-        final int W = visPanel.getWidth();
+        
         infoSP.setSize(new Dimension(300,60));        
         BoxLayout visPanelBoxLayout = new BoxLayout(visPanel,BoxLayout.Y_AXIS);
         visPanel.setLayout(visPanelBoxLayout);
         visPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         visPanel.add(infoSP);
-	visPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+	    visPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         visPanel.add(mapGUI);
         visPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         frame.getContentPane().doLayout();
@@ -694,17 +664,8 @@ public class DemoApp {
         renderer = new StreamingRenderer();
         
         /* Context */
-        context = new DefaultMapContext(); //WGS84 by default
-        //TODO: remove testing
-        switch (project_from_start){
-            case PROJECT_ON_START:
-        		ReferencedEnvelope llEnvelope = new ReferencedEnvelope(envlp_NoEdges, DefaultGeographicCRS.WGS84);
-        		ReferencedEnvelope projEnvelope = llEnvelope.transform(projCRS, true);
-        		context.setAreaOfInterest(projEnvelope);
-            case PROJECT_AFTER_START:
-                context.setAreaOfInterest(envlp_NoEdges);
-        }
-//        context.setAreaOfInterest(envlp_NoEdges);
+        context = new DefaultMapContext(DefaultGeographicCRS.WGS84); 
+        context.setAreaOfInterest(envlp_NoEdges2);
         context.addLayer(shpFS,shpStyl);
         context.addLayer(memFS,memStyl); // To keep London on top
 //      context.addLayer(webFS,webStyl);
@@ -873,7 +834,6 @@ public class DemoApp {
      * 
      * 
      */
-    //TODO: figure out why this doesn't work.!
     public static void display_projected_as_Mercator(){
     	try {
 	        textArea.append("Start: Project the map.\n");
