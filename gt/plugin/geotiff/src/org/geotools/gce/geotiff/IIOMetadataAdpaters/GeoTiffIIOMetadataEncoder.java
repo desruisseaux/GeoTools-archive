@@ -261,9 +261,8 @@ public final class GeoTiffIIOMetadataEncoder {
 	}
 
 	public void addGeoAscii(int keyID, String value) {
-		addGeoAsciiParamsRef(keyID, value.length() + 1); // +1 for the '|'
-		// character to be
-		// appended
+		addGeoAsciiParamsRef(keyID, value.length() + 1);
+		// +1 for the '|' character to be appended
 		addAsciiParam(value);
 	}
 
@@ -458,12 +457,22 @@ public final class GeoTiffIIOMetadataEncoder {
 		return ifd;
 	}
 
+	/**
+	 * Did we set the pixel scales for this set of metadata?
+	 * 
+	 * <p>
+	 * If one of the scales is not a simple number the answer is false.
+	 * 
+	 * @return true if we set them, false otherwise.
+	 */
 	private boolean isModelPixelScaleSet() {
-		if ((modelPixelScale.getScaleX() != 0.0)
-				&& (modelPixelScale.getScaleY() != 1.0))
-			return true;
+		final double xScale = modelPixelScale.getScaleX();
+		final double yScale = modelPixelScale.getScaleY();
+		if (Double.isInfinite(xScale) || Double.isNaN(xScale)
+				|| Double.isInfinite(yScale) || Double.isNaN(yScale))
+			return false;
 
-		return false;
+		return true;
 	}
 
 	private boolean hasModelTiePoints() {

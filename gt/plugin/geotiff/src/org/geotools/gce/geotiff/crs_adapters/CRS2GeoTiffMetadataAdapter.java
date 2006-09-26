@@ -67,9 +67,17 @@ import org.opengis.referencing.operation.Conversion;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.OperationMethod;
 
-
-
 /**
+ * This class implements a simple reusable adapter to adapt a
+ * {@link CoordinateReferenceSystem} into useful Geotiff metadata by mean of
+ * {@link GeoTiffIIOMetadataEncoder}.
+ * 
+ * <p>
+ * Since {@link CoordinateReferenceSystem} are essentially immutable this class
+ * implements a static pool of {@link CRS2GeoTiffMetadataAdapter} objects that
+ * would allow to avoid parsing the same {@link CoordinateReferenceSystem} more
+ * than once.
+ * 
  * @author simone giannecchini
  * 
  * @since 2.2
@@ -87,8 +95,11 @@ public final class CRS2GeoTiffMetadataAdapter {
 	 * The pool of cached objects.
 	 */
 	private final static Map pool = Collections
-			.synchronizedMap(new LRULinkedHashMap(50, 0.75f, true,100));
+			.synchronizedMap(new LRULinkedHashMap(50, 0.75f, true, 100));
 
+	/**
+	 * The {@link CoordinateReferenceSystem} to be get the metadata from:
+	 */
 	private CoordinateReferenceSystem crs;
 
 	/**

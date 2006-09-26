@@ -59,6 +59,7 @@ import org.opengis.spatialschema.geometry.Envelope;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import com.sun.media.imageio.plugins.tiff.GeoTIFFTagSet;
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
 import com.sun.media.jai.imageioimpl.ImageWriteCRIF;
 
@@ -340,9 +341,11 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		if (!(destination instanceof ImageOutputStream))
 			outputStream.close();
 		writer.dispose();
+		
 		return true;
 	}
 
+	
 	/**
 	 * Creates image metadata which complies to the GeoTIFFWritingUtilities
 	 * specification for the given image writer, image type and
