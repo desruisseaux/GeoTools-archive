@@ -70,6 +70,11 @@ public class XSISAXHandler extends DefaultHandler {
     // the Locator is used for end-user debugging
     private Locator locator;
 
+    /** Collects string chunks in {@link #characters(char[], int, int)} 
+     * callback to be handled at the beggining of {@link #endElement(String, String, String)}
+     */
+    private StringBuffer characters = new StringBuffer();
+    
     // the schema uri being parsed. This is important to resolve relative uris
     //    private URI uri;
 
@@ -135,18 +140,30 @@ public class XSISAXHandler extends DefaultHandler {
      */
     public void characters(char[] ch, int start, int length)
         throws SAXException {
+    	characters.append(ch, start, length);
+    }
+    
+    /**
+     * Handles the string chunks collected in {@link #characters}.
+     */
+    private void handleCharacters() throws SAXException{
+        final String text = characters.toString();
+        characters.setLength(0);
+    	if(text.length() == 0){
+    		return;
+    	}
+    	XSIElementHandler peek = null;
         try {
-            String text = String.copyValueOf(ch, start, length);
-
             if ((text != null) && !"".equals(text.trim())) {
-                ((XSIElementHandler) handlers.peek()).characters(text);
+                peek = (XSIElementHandler) handlers.peek();
+				peek.characters(text);
             }
         } catch (SAXException e) {
             logger.warning(e.toString());
             throw e;
         }
     }
-
+    
     /**
      * Implementation of endElement. push NS,Name
      *
@@ -161,6 +178,7 @@ public class XSISAXHandler extends DefaultHandler {
      */
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
+    	handleCharacters();
         logger.info("END: " + qName);
 
         try {
@@ -188,6 +206,7 @@ public class XSISAXHandler extends DefaultHandler {
      */
     public void startElement(String namespaceURI, String localName,
         String qName, Attributes atts) throws SAXException {
+    	characters.setLength(0);
         logger.info("START: " + qName);
 
         try {

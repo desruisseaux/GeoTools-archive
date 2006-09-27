@@ -94,6 +94,11 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
     //private String FEATURE_MEMBER_NAME = "featureMember";
     private String typeName = "GenericFeature";
 
+    /** Collects string chunks in {@link #characters(char[], int, int)} 
+     * callback to be handled at the beggining of {@link #endElement(String, String, String)}
+     */
+    private StringBuffer characters = new StringBuffer();
+    
     /**
      * Constructor with parent, which must implement GMLHandlerJTS.
      *
@@ -156,6 +161,8 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
      */
     public void startElement(String namespaceURI, String localName,
         String qName, Attributes atts) throws SAXException {
+    	characters.setLength(0);
+    	
         if (localName.endsWith("Collection")) {
             // if we scan the scema this can be done better.
             NAMESPACE = namespaceURI;
@@ -234,10 +241,21 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
      */
     public void characters(char[] ch, int start, int length)
         throws SAXException {
+    	characters.append(ch, start, length);
+    }
+    
+    /**
+     * Handles the string chunks collected in {@link #characters}.
+     */
+    private void handleCharacters() throws SAXException{
+    	if(characters.length() == 0){
+    		return;
+    	}
         // the methods here read in both coordinates and coords and take the
         // grunt-work out of this task for geometry handlers.
         // See the documentation for CoordinatesReader to see what this entails
-        String rawAttribute = new String(ch, start, length).trim();
+        String rawAttribute = characters.toString().trim();
+        characters.setLength(0);
 
         if (insideAttribute && !rawAttribute.equals("")) {
             LOGGER.info("raw att = " + rawAttribute);
@@ -256,10 +274,10 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
                 }
             }
         } else {
-            parent.characters(ch, start, length);
+            parent.characters(rawAttribute.toCharArray(), 0, rawAttribute.length());
         }
     }
-
+    
     /**
      * Checks for GML element end and - if not a coordinates element - sends it
      * directly on down the chain to the appropriate parent handler.  If it is
@@ -274,6 +292,7 @@ public class GMLFilterFeature extends XMLFilterImpl implements GMLHandlerJTS {
      */
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
+    	handleCharacters();
         if (isFeatureMember(localName)) {
             FeatureTypeFactory factory = FeatureTypeFactory.newInstance(typeName);
 

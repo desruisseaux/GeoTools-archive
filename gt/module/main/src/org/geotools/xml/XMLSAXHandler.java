@@ -77,6 +77,11 @@ public class XMLSAXHandler extends DefaultHandler {
     // the stack of handlers
     private Stack handlers = new Stack();
 
+    /** Collects string chunks in {@link #characters(char[], int, int)} 
+     * callback to be handled at the beggining of {@link #endElement(String, String, String)}
+     */
+    private StringBuffer characters = new StringBuffer();
+    
     /**
      * 
      * TODO summary sentence for resolveEntity ...
@@ -197,10 +202,21 @@ public class XMLSAXHandler extends DefaultHandler {
      */
     public void characters(char[] ch, int start, int length)
         throws SAXException {
+    	characters.append(ch, start, length);
+    }
+
+    /**
+     * Handles the string chunks collected in {@link #characters}.
+     */
+    private void handleCharacters() throws SAXException{
+    	if(characters.length() == 0){
+    		return;
+    	}
         try {
         	checkStatus();
         	
-            String text = String.copyValueOf(ch, start, length);
+            String text = characters.toString();
+            characters.setLength(0);
 
             if ((text != null) && !"".equals(text)) {
                 ((XMLElementHandler) handlers.peek()).characters(text);
@@ -210,8 +226,8 @@ public class XMLSAXHandler extends DefaultHandler {
             throw e;
         }
     }
-
-	private void checkStatus() throws StopException {
+    
+    private void checkStatus() throws StopException {
 		if (this.hints != null && hints.get(XMLHandlerHints.FLOW_HANDLER_HINT) != null) {
 			FlowHandler handler = (FlowHandler) hints.get(XMLHandlerHints.FLOW_HANDLER_HINT);
 			if (handler.shouldStop(hints)) {
@@ -238,6 +254,7 @@ public class XMLSAXHandler extends DefaultHandler {
      */
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
+    	handleCharacters();
         logger.info("END: " + qName);
 
         try {
@@ -290,7 +307,8 @@ public class XMLSAXHandler extends DefaultHandler {
      */
     public void startElement(String namespaceURI, String localName,
         String qName, Attributes atts) throws SAXException {
-
+    	characters.setLength(0);
+    	
     	checkStatus();
 
         if (schemaProxy.size() != 0) {
