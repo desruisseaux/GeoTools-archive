@@ -59,6 +59,7 @@ public class GeoTiffWriterTest extends TestCase {
 		TestRunner.run(GeoTiffWriterTest.class);
 
 	}
+
 	/*
 	 * @see TestCase#setUp()
 	 */
@@ -72,13 +73,13 @@ public class GeoTiffWriterTest extends TestCase {
 		cache.setMemoryThreshold(0.75f);
 
 		// setting JAI wide hints
-//		jaiDef.getTileScheduler().setParallelism(40);
-//		jaiDef.getTileScheduler().setPrefetchParallelism(40);
-//		jaiDef.getTileScheduler().setPrefetchPriority(7);
-//		jaiDef.getTileScheduler().setPrefetchPriority(7);
-		
-	
+		// jaiDef.getTileScheduler().setParallelism(40);
+		// jaiDef.getTileScheduler().setPrefetchParallelism(40);
+		// jaiDef.getTileScheduler().setPrefetchPriority(7);
+		// jaiDef.getTileScheduler().setPrefetchPriority(7);
+
 	}
+
 	/**
 	 * 
 	 * @throws IllegalArgumentException
@@ -123,12 +124,12 @@ public class GeoTiffWriterTest extends TestCase {
 
 				// reading the coverage
 				gc = (GridCoverage2D) reader.read(null);
-				logger.info("before");
-				logger.info(gc.getCoordinateReferenceSystem().toWKT());
-				logger.info(gc.getEnvelope().toString());
-				logger.info(gc.getRenderedImage().toString());
-				logger.info("");
-
+				if (TestData.isInteractiveTest()) {
+					logger.info(new StringBuffer("Coverage before: ").append(
+							"\n").append(
+							gc.getCoordinateReferenceSystem().toWKT()).append(
+							gc.getEnvelope().toString()).toString());
+				}
 				if (gc != null) {
 					final File writeFile = new File(new StringBuffer(writedir
 							.getAbsolutePath()).append(File.separatorChar)
@@ -140,22 +141,27 @@ public class GeoTiffWriterTest extends TestCase {
 					reader = new GeoTiffReader(writeFile, null);
 					gc = (GridCoverage2D) reader.read(null);
 
-					logger.info("after");
-					logger.info(gc.getCoordinateReferenceSystem().toWKT());
-					logger.info(gc.getEnvelope().toString());
-					logger.info("");
-					if(TestData.isInteractiveTest())
-						gc.show();
-					else
-						gc.getRenderedImage().getData();
+					if (TestData.isInteractiveTest()) {
+						logger
+								.info(new StringBuffer("Coverage after: ")
+										.append("\n")
+										.append(
+												gc
+														.getCoordinateReferenceSystem()
+														.toWKT()).append(
+												gc.getEnvelope().toString())
+										.toString());
+						if (TestData.isInteractiveTest())
+							gc.show();
+						else
+							gc.getRenderedImage().getData();
+
+					}
 
 				}
 
 			}
 
 		}
-
 	}
-	
-	
 }

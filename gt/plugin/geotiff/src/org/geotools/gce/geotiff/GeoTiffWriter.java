@@ -56,10 +56,7 @@ import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
-import com.sun.media.imageio.plugins.tiff.GeoTIFFTagSet;
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
 import com.sun.media.jai.imageioimpl.ImageWriteCRIF;
 

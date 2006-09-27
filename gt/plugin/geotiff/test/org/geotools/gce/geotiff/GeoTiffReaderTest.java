@@ -26,7 +26,6 @@ import junit.textui.TestRunner;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
-import org.geotools.gce.geotiff.utils.MetadataDumper;
 import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -49,85 +48,84 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/test/org/geotools/gce/geotiff/GeoTiffReaderTest.java $
  */
 public class GeoTiffReaderTest extends TestCase {
-    private final static Logger LOGGER = Logger
-            .getLogger(GeoTiffReaderTest.class.toString());
+	private final static Logger LOGGER = Logger
+			.getLogger(GeoTiffReaderTest.class.toString());
 
-    /**
-     * Constructor for GeoTiffReaderTest.
-     * 
-     * @param arg0
-     */
-    public GeoTiffReaderTest(String arg0) {
-        super(arg0);
-    }
+	/**
+	 * Constructor for GeoTiffReaderTest.
+	 * 
+	 * @param arg0
+	 */
+	public GeoTiffReaderTest(String arg0) {
+		super(arg0);
+	}
 
-    public static void main(String[] args) {
-        TestRunner.run(GeoTiffReaderTest.class);
+	public static void main(String[] args) {
+		TestRunner.run(GeoTiffReaderTest.class);
 
-    }
+	}
 
-    /**
-     * testReader
-     * 
-     * @throws IllegalArgumentException
-     * @throws IOException
-     * @throws NoSuchAuthorityCodeException
-     */
-    public void testReader() throws IllegalArgumentException, IOException,
-            NoSuchAuthorityCodeException {
+	/**
+	 * testReader
+	 * 
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 * @throws NoSuchAuthorityCodeException
+	 */
+	public void testReader() throws IllegalArgumentException, IOException,
+			NoSuchAuthorityCodeException {
 
-        final File file = TestData.file(GeoTiffReaderTest.class, "");
-        final File files[] = file.listFiles();
-        final int numFiles = files.length;
-        final AbstractGridFormat format = new GeoTiffFormat();
-        StringBuffer buffer;
-        GridCoverage2D coverage;
-        GridCoverageReader reader;
-        MetadataDumper metadataDumper;
-        for (int i = 0; i < numFiles; i++) {
-            buffer = new StringBuffer();
-            final String path = files[i].getAbsolutePath().toLowerCase();
-            if (!path.endsWith("tif") && !path.endsWith("tiff"))
-                continue;
+		final File file = TestData.file(GeoTiffReaderTest.class, "");
+		final File files[] = file.listFiles();
+		final int numFiles = files.length;
+		final AbstractGridFormat format = new GeoTiffFormat();
+		StringBuffer buffer;
+		GridCoverage2D coverage;
+		GridCoverageReader reader;
+		// MetadataDumper metadataDumper;
+		for (int i = 0; i < numFiles; i++) {
+			buffer = new StringBuffer();
+			final String path = files[i].getAbsolutePath().toLowerCase();
+			if (!path.endsWith("tif") && !path.endsWith("tiff"))
+				continue;
 
-            buffer.append(files[i].getAbsolutePath()).append("\n");
-            if (format.accepts(files[i])) {
-                buffer.append("ACCEPTED").append("\n");
+			buffer.append(files[i].getAbsolutePath()).append("\n");
+			if (format.accepts(files[i])) {
+				buffer.append("ACCEPTED").append("\n");
 
-                // getting a reader
-                reader = new GeoTiffReader(files[i], new Hints(
-                        Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
+				// getting a reader
+				reader = new GeoTiffReader(files[i], new Hints(
+						Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
 
-                if (reader != null) {
+				if (reader != null) {
 
-                    // reading the coverage
-                    coverage = (GridCoverage2D) reader.read(null);
+					// reading the coverage
+					coverage = (GridCoverage2D) reader.read(null);
 
-                    // Crs
-                    buffer.append("CRS: ").append(
-                            coverage.getCoordinateReferenceSystem2D().toWKT())
-                            .append("\n");
+					// Crs
+					if (TestData.isInteractiveTest())
+						buffer.append("CRS: ").append(
+							coverage.getCoordinateReferenceSystem2D().toWKT())
+							.append("\n");
 
-                    // display metadata
-                    metadataDumper = new MetadataDumper(
-                            ((GeoTiffReader) reader).getMetadata()
-                                    .getRootNode());
-                    buffer.append("TIFF metadata: ").append(
-                            metadataDumper.getMetadata())
-                            .append("\n");
-                    // showing it
-                    if (TestData.isInteractiveTest())
-                        coverage.show();
-                    else
-                        coverage.getRenderedImage().getData();
+					// display metadata
+					// metadataDumper = new MetadataDumper(
+					// ((GeoTiffReader) reader).getMetadata()
+					// .getRootNode());
+					// buffer.append("TIFF metadata: ").append(
+					//							metadataDumper.getMetadata()).append("\n");
+					// showing it
+					if (TestData.isInteractiveTest())
+						coverage.show();
+					else
+						coverage.getRenderedImage().getData();
 
-                }
+				}
 
-            }
-            else
-                buffer.append("NOT ACCEPTED").append("\n");
-            LOGGER.info(buffer.toString());
-        }
+			} else
+				buffer.append("NOT ACCEPTED").append("\n");
+			LOGGER.info(buffer.toString());
+		}
 
-    }
+	}
 }
