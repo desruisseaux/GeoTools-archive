@@ -17,6 +17,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,7 +34,6 @@ import org.geotools.catalog.GeoResource;
 import org.geotools.catalog.Service;
 import org.geotools.catalog.defaults.DefaultServiceFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.postgis.PostgisDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.wfs.WFSDataStoreFactory;
@@ -41,12 +41,16 @@ import org.geotools.demo.mappane.MapViewer;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.DefaultMapLayer;
+import org.geotools.map.MapLayer;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -176,66 +180,29 @@ public class DemoBase {
 //    private Logger textlog = 
 //            Logger.getLogger("org.geotools.demo.introduction.DemoBase");
     
-
-    
-    /* The handles for the ShapeFile and Styled Layer Descriptor (SLD) files. */
-    /*     The files are in 'demo/mappane/data/', accessed through the class. */
-    final String shpName = "/countries.shp";
-    final String sldName = "/countries.sld";
-    
-    /**
-     * Name of the test shapefile
-     */
+    /* The name of the test shapefile. */
     final String SHAPEFILENAME = "/countries.shp";
-    /**
-     * Name of the test sld for the test shapefile
-     */
+    /* The name of the test sld for the test shapefile. */
     final String SHAPEFILESLDNAME = "/countries.sld";
-    /**
-     * Url of wfs server
-     */
-    final String WFSSERVERURL = "http://www.refractions.net:8080/geoserver/wfs";
-    /**
-     * Url of postgis server
-     */
+    /*The name of the URL for the test Web Feasture Service. */
+    final String WFSSERVERURL = "http://www.refractions.net:8080/geoserver/wfs?REQUEST=GetCapabilities&";
+    /* The connection information for the test PostGIS database server. */
     final String POSTGISSERVERURL = "www.refractions.net";
     final String POSTGISUSERNAME = "postgres";
     final String POSTGISDATABASE = "geotools";
-
-    
-    File shpFile;
-    URL  shpURL;
-    File sldFile;
-    URL  sldURL;
-        
-        
-    /* The name of the website */
-    final URL webUrl = null;  
     
     /* The filename for the output image */
     final String imageFileEnd = "image.png";
     
-    /* FeatureSource variables */
-    FeatureSource memFS, shpFS, webFS;
-    
-    /* StyledLayerDescriptor variables */
-    Style memStyl;
-    Style shpStyl;
-    Style webStyl;
-    
-    /* DataLayer variables */
-    
     /* Cartographic variables */
     final Envelope envlp_NoEdges = new Envelope(-179.0,179.0,-80.0,80.0);
-    final ReferencedEnvelope envlp_NoEdges2 = new ReferencedEnvelope(-179.0,179.0,-80.0,80.0, DefaultGeographicCRS.WGS84);
+    final ReferencedEnvelope envlp_NoEdges2 = 
+                             new ReferencedEnvelope(-179.0,179.0,-80.0,80.0, 
+                                                    DefaultGeographicCRS.WGS84);
+    // TODO: move to demoGUI
     CoordinateReferenceSystem projCRS = null;
 
 
-    
-    
-    
-    
-    
     /* DemoGUI class */
     DemoGUI demoGUI;
     
@@ -253,172 +220,69 @@ public class DemoBase {
      * are pressed. Each one calls other methods below. */ 
     
     public void buttonCreateFeatures(){
-        createFeatureSourceFromScratch();
-        createFeatureSourceFromShapefile();
-//        create_FeatureSource_fromWeb();
-//        create_FeatureSource_fromDatabase();
+
+        demoGUI.textArea.append("Start: Create Features.\n");
+        
+        /* Create a Point Feature representing London as a FeatureCollection.*/
+        Feature london = createLondonPointFeatureFromScratch();
+        FeatureCollection londonCollection = makeLondonFeatureCollection(london);
+        loadLondonFeatureCollectionIntoList(londonCollection);
+        demoGUI.textArea.append(" Done: Created London from scratch.\n");
+        
+        /* Load a shapefile with the given name into the local catalog. */
+        loadShapefileIntoCatalog(SHAPEFILENAME);
+        demoGUI.textArea.append(" Done: Loaded the Shapefile into the catalog.\n");
+        
+        /* Load a reference to a web source of features into the local catalog.*/
+//        loadWebFeatureServiceIntoCatalog(WFSSERVERURL);
+//        demoGUI.textArea.append(" Done: Loaded a Web Feature Service into the catalog.\n");
+        
+        /* Load a reference to a database source of features into the local catalog.*/
+//        loadDatabaseIntoCatalog(POSTGISSERVERURL);
+//        demoGUI.textArea.append(" Done: Loaded a database into the catalog.\n");
+        
+        /* TODO: Load a reference to an external catalog. */
+
+        demoGUI.textArea.append("  End: Created Features.\n");
     }
     
     public void buttonCreateStyles(){
-        create_Styles_forEach_Feature();
+        demoGUI.textArea.append("Start: Create the styles.\n");
+        
+        Style lonstyl = createLondonStyleFromScratch();
+        demoData.theStyleMap.put("londstyl",lonstyl);
+        demoGUI.textArea.append(" Done: Created and loaded the London point Style.\n");
+        
+        Style shpstyl = createShapefileStyleFromSLDFile(SHAPEFILESLDNAME);
+        demoData.theStyleMap.put("shpstyl",shpstyl);
+        demoGUI.textArea.append(" Done: Created and loaded the Shape Style.\n");
+        
+        
+        demoGUI.textArea.append("  End: Created the styles.\n");
     }
+    
+    
     
     public void buttonCreateMap(){
-        create_the_map();
-    }
-    
-    public void buttonProjectMap(){
-      create_ProjectedCRS_from_DefaultGeogCRS();
-      display_projected_as_Mercator();
-        
-    }
-    
-    public void buttonCaptureImage(){
-        capture_as_image();
-        
-    }
-    
-    
-    // TODO: where is the DefaultGeometry determined?
-    /*
-     * Create London from scratch! Well, only a FeatureSource for the city.
-     * 
-     * Create:
-     *   (1) The attribute data:     Geometry, Others
-     *   (2) The meta 'Type' data for the Attributes
-     *   (3) The meta feature 'Type'
-     *   (4) The feature
-     *   (5) The MemoryDataStore from which to get a FeatureSource
-     */
-    public void createFeatureSourceFromScratch(){
-        
-        demoGUI.textArea.append("Start: Create FeatureSource from scratch.\n");
-        
-        try {
-            memFS = createFeatureSourceFromScratchNext();
-        } catch (IOException e) {
-            e.printStackTrace();
-            demoGUI.textArea.append( "Exception: "+ e.getMessage() );
-        }
-
-        demoGUI.textArea.append("  End: Created FeatureSource from scratch.\n");
-    }
-
-    
-    
-    /*
-     * Use a Shapefile!
-     * 
-     * Create a FeatureSource from a Shapefile format file. 
-     */
-    public void createFeatureSourceFromShapefile(){
-
-        demoGUI.textArea.append("Start: Create FeatureSource from shapefile.\n");
-        
-        try {
-            loadShapefileIntoCatalog();
-            shpFS = getFeatureSourceForShapefile( );
-        } 
-        catch (IOException e) {
-            e.printStackTrace();
-            demoGUI.textArea.append( "Exception: "+ e.getMessage() );
-        }
-         demoGUI.textArea.append("  End: Create FeatureSource from shapefile.\n");
-    }
-    
-    
-    
-    // TODO:
-    /*
-     * Create a FeatureSource from a web resource.
-     */
-    public void create_FeatureSource_fromWeb(){
-        
-
-        demoGUI.textArea.append("Start: Create FeatureSource from web server.\n");
-    
-        demoGUI.textArea.append("Oops!: Not yet implemented\n");
-
-        demoGUI.textArea.append("  End: Created FeatureSource from web server.\n");
-        
-    }
-
-    // TODO: If we can guarantee a Database will be available
-    /*
-     * Create a FeatureSource from a database.
-     */
-    public void create_FeatureSource_fromDatabase(){
-        
-
-        demoGUI.textArea.append("Start: Create FeatureSource from web server.\n");
-    
-        demoGUI.textArea.append("Oops!: Not yet implemented\n");
-
-        demoGUI.textArea.append("  End: Created FeatureSource from web server.\n");
-        
-    }
-    
-    /*
-     * Create the catalog
-     */
-    public void create_a_Catalog(){
-        
-        demoGUI.textArea.append("Start: Create a Catalog.\n");
-    
-        demoGUI.textArea.append("Oops!: Not yet implemented\n");
-
-        demoGUI.textArea.append("  End: Created a Catalog.\n");
-    }
-
-    /*
-     * Create the styles that will be used for the creation of the MapLayers.
-     */
-    public void create_Styles_forEach_Feature(){
-        
-        demoGUI.textArea.append("Start: Create the Styled Layer Descriptors.\n");
-        
-        memStyl      = createStyleFromScratch();
-
-        try {
-            shpStyl      = createStyleFromFile();
-        } 
-        catch (IOException e) {
-            e.printStackTrace();
-            demoGUI.textArea.append( "Exception: " + e.getMessage() );
-        }
-
-        demoGUI.textArea.append("  End: Created the Styled Layer Descriptors.\n");
-    }
-
-    public void create_the_map(){
+        demoGUI.textArea.append("Start: Create a map.\n");
         
         demoGUI.initialize_JMapPane();
+        demoGUI.textArea.append(" Done: Initialized the MapPane.\n");
         
-        try{
-            Thread.sleep(3000);
-        } catch (InterruptedException iex){
-            System.err.println("Could not sleep: "+ iex);
-        }
+        /* Add the London featureCollection as one layer in the map. */
+        FeatureCollection lfc = 
+                   (FeatureCollection) demoData.theFeatureCollectionList.get(0);
+        Style lsty = (Style) demoData.theStyleMap.get("londstyl");
+        MapLayer m0 = new DefaultMapLayer(lfc,lsty);
+        demoGUI.context.addLayer(m0);
         
-        load_JMapPane();
-    
-    }
-    
-    
-    /*
-     * Display features onto the screen.
-     * 
-     * This is a very crude example, showing only how do display a map. The 
-     * core class, JMapPane, also has a toolbar which is not shown here. See
-     * the demo/gui for more details.
-     */
-    public void load_JMapPane() {
+        /* Add the Shapefile FeatureSource below the first layer. */
+        FeatureSource shpFS = getAShapefileFeatureSourceFromCatalog();
+        Style shpsty = (Style) demoData.theStyleMap.get("shpstyl");
+        MapLayer m1 = new DefaultMapLayer(shpFS,shpsty);
+        demoGUI.context.addLayer(0,m1);
         
-
-        demoGUI.textArea.append("Start: Load the map.\n");
         
-        demoGUI.context.addLayer(shpFS,shpStyl);
-        demoGUI.context.addLayer(memFS,memStyl); // To keep London on top
 //      demoGUI.context.addLayer(webFS,webStyl);
 //      demoGUI.context.addLayer(dbFS,dbStyl);
         
@@ -433,107 +297,109 @@ public class DemoBase {
         demoGUI.frame.repaint();
         demoGUI.frame.doLayout();
 
-        demoGUI.textArea.append("  End: Loaded the map.\n");
+        demoGUI.textArea.append(" Done: Loaded the map.\n");
+//        load_JMapPane();
+        
+        demoGUI.textArea.append("  End: Created a map.\n");
+        
+//        create_the_map();
     }
     
-    
-    /*
-     * Filter the features by spatial extent.
-     */
-    public void filterFeatures(){
-
-        demoGUI.textArea.append("Start: Filter the features.\n");
-        demoGUI.textArea.append("  End: Filtered the features.\n");
+    public void buttonProjectMap(){
+      create_ProjectedCRS_from_DefaultGeogCRS();
+      display_projected_as_Mercator();
         
     }
+    
+    public void buttonCaptureImage(){
+        capture_as_image();
+        
+    }
+    
+    public void xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx(){
+        
+    }
+    
+    public Feature createLondonPointFeatureFromScratch(){
 
-  
-    
-    
-    /**
-     * Creates an instanceof {@link FeatureSource} from scratch.
-     * <p>
-     * The feature source is created by first creating a {@link MemoryDataStore}.
-     * </p>
-     * @return A feature source.
-     * 
-     * @throws IOException Any datastore or feature source creation errors.
-     */
-    public FeatureSource createFeatureSourceFromScratchNext() throws IOException {
-         // Wikipedia gives London as:  51?? 30.4167??? N 0?? 7.65??? W 
-        // NOTE: in Gt 2.2 axis order is Long/Lat throughout; in 2.3 the CRS rules
-        Coordinate ptc = new Coordinate(0.1275d,51.507d);
-        GeometryFactory geomFac = new GeometryFactory();
-        Point ptG = geomFac.createPoint(ptc);
-        
-        /* Name Attribute */
-        String name = "London";
-        
-        /* Population Attribute */
-        Integer pop = new Integer(7500000);
-    
-        /* AttributeTypes, starting with Geometry using pre-made CRS */
-        GeometryAttributeType ptGA = 
-                (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
-                                                          "the_geom", 
-                                                          ptG.getClass(), 
-                                                          true, 
-                                                          1, 
-                                                          null,
-               org.geotools.referencing.crs.DefaultGeographicCRS.WGS84);    
-        AttributeType cityAT = 
-            AttributeTypeFactory.newAttributeType(
-                                          "CITYNAME", 
-                                          String.class, 
-                                          true, 
-                                          48, 
-                                          null);
-        AttributeType popAT = 
-            AttributeTypeFactory.newAttributeType(
-                                          "CITYPOP", 
-                                          Integer.class, 
-                                          true, 
-                                          48, 
-                                          null);
-        
-        
-        /* FeatureType */
-        AttributeType[] ptATs = new AttributeType[3];
-        ptATs[0] = ptGA;
-        ptATs[1] = cityAT;
-        ptATs[2] = popAT;
+        // Wikipedia gives London as:  51?? 30.4167??? N 0?? 7.65??? W 
+       // NOTE: in Gt 2.2 axis order is Long/Lat throughout; in 2.3 the CRS rules
+       Coordinate ptc = new Coordinate(0.1275d,51.507d);
+       GeometryFactory geomFac = new GeometryFactory();
+       Point ptG = geomFac.createPoint(ptc);
+       
+       /* Name Attribute */
+       String name = "London";
+       
+       /* Population Attribute */
+       Integer pop = new Integer(7500000);
+   
+       /* AttributeTypes, starting with Geometry using pre-made CRS */
+       GeometryAttributeType ptGA = 
+               (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
+                                                         "the_geom", 
+                                                         ptG.getClass(), 
+                                                         true, 
+                                                         1, 
+                                                         null,
+              org.geotools.referencing.crs.DefaultGeographicCRS.WGS84);    
+       AttributeType cityAT = 
+           AttributeTypeFactory.newAttributeType(
+                                         "CITYNAME", 
+                                         String.class, 
+                                         true, 
+                                         48, 
+                                         null);
+       AttributeType popAT = 
+           AttributeTypeFactory.newAttributeType(
+                                         "CITYPOP", 
+                                         Integer.class, 
+                                         true, 
+                                         48, 
+                                         null);
+       
+       
+       /* FeatureType */
+       AttributeType[] ptATs = new AttributeType[3];
+       ptATs[0] = ptGA;
+       ptATs[1] = cityAT;
+       ptATs[2] = popAT;
 
-        FeatureType ptFT = null;
-        try{
-           ptFT = FeatureTypes.newFeatureType(ptATs, "Metropolis");
-        } 
-        catch (SchemaException schex){
-            String msg = "SchemaException on FeatureType creation: "+ schex;
-            new IOException( msg ).initCause( schex );
-        }
+       FeatureType ptFT = null;
+       try{
+          ptFT = FeatureTypes.newFeatureType(ptATs, "Metropolis");
+       } 
+       catch (SchemaException schex){
+           String msg = "SchemaException on FeatureType creation: "+ schex;
+           new IOException( msg ).initCause( schex );
+       }
+       
+       
+       /* Feature */
+       Object [] ptElems = { ptG, name, pop };
+       
+       Feature ptF = null;
+       try {
+           ptF = ptFT.create(ptElems);
+       } 
+       catch (IllegalAttributeException iaex){
+           System.err.println("IllegalAttributeException on Feature creation: " + iaex);
+//           String msg = "IllegalAttributeException on Feature creation: " + iaex;
+//           throw (IOException) new IOException( msg ).initCause( iaex );
+       }
         
+        return ptF;
+    }
+    
+    public FeatureCollection makeLondonFeatureCollection(Feature f){
         
-        /* Feature */
-        Object [] ptElems = { ptG, name, pop };
-        
-        Feature ptF = null;
-        try {
-            ptF = ptFT.create(ptElems);
-        } 
-        catch (IllegalAttributeException iaex){
-            String msg = "IllegalAttributeException on Feature creation: " + iaex;
-            throw (IOException) new IOException( msg ).initCause( iaex );
-        }
-        
-        //TODO: figure out default Geom, see above
-        // System.out.println("DefaultGeom is: "+ptF.getDefaultGeometry());
-        
-        /* DataStore and its FeatureSource */ 
-        Feature [] ptFetArray = new Feature [] {ptF};
-        MemoryDataStore memds = new MemoryDataStore();
-        memds.addFeatures(ptFetArray);
-        
-        return memds.getFeatureSource("Metropolis");
+        FeatureCollection fc = FeatureCollections.newCollection();
+        fc.add(f);
+        return fc;
+    }
+    
+    public void loadLondonFeatureCollectionIntoList(FeatureCollection fc){
+        demoData.theFeatureCollectionList.add(fc);
     }
     
     /**
@@ -541,10 +407,10 @@ public class DemoBase {
      * 
      * @throws IOException Any I/O errors loading into the catalog.
      */
-    public void loadShapefileIntoCatalog() throws IOException {
+    public void loadShapefileIntoCatalog(String shpname){
         
         //create shapefile datastore parameters
-        URL shapefileURL = getClass().getResource( SHAPEFILENAME );
+        URL shapefileURL = getClass().getResource( shpname );
         Map params = new HashMap();
         params.put( ShapefileDataStoreFactory.URLP.key, shapefileURL );
         
@@ -555,49 +421,52 @@ public class DemoBase {
         //add the service to the catalog
         demoData.localCatalog.add( (Service) services.get( 0 ) );
     }
-    
-    /**
-     * Loads a shapefile feature source from the catalog.
-     * <p>
-     * This method <b>must</b> be called after {@link #loadShapefileIntoCatalog()}.
-     * </p>
-     * @return The shapefile feature source.
-     * 
-     * @throws IOException Any I/O errors that occur accessing the shapefile resource.
-     */
-    public FeatureSource getFeatureSourceForShapefile() throws IOException {
-        
-        //create the uri to lookup
-        URI uri = null;
-        try {
-            uri =  new URI( getClass().getResource( SHAPEFILENAME ).toString() );
-        } 
-        catch ( URISyntaxException e ) {
-            throw (IOException) new IOException( "Unable to create shapefile uri").initCause( e );
-        }
-        
-        //lookup service, should be only one
-        List services = demoData.localCatalog.find( uri, null );
-        Service service = (Service) services.get( 0 );
-        
-        //shapefiles only contain a single resource
-        List resources = service.members( null );
-        GeoResource resource = (GeoResource) resources.get( 0 );
-        
-        return (FeatureSource) resource.resolve( FeatureSource.class, null );
-    }
 
     /**
-     * Loads a web feature service into the catalog.
+     * Loads a Web Feature Service into the catalog.
+     * 
+     * @param a string URL for the Web Feature Service location.
+     */
+    public void loadWebFeatureServiceIntoCatalog(String wfsurl){
+    
+        //create wfs datastore parameters
+        URL wfsURL =null;
+        try {
+            wfsURL = new URL( wfsurl );
+        } catch (MalformedURLException murlex){
+            System.err.println("MalformedURLException on creation of the WFS url: "+ murlex.getMessage() );
+        }
+        Map params = new HashMap();
+        params.put( WFSDataStoreFactory.URL.key, wfsURL );
+        
+        //load the service, there should be only one
+        DefaultServiceFinder finder = new DefaultServiceFinder( demoData.localCatalog );
+        List services = finder.aquire( params );
+        System.out.println("size is: " + services.size());
+        
+        //add the service to the catalog
+        Service s = (Service) services.get( 0 );
+        demoData.localCatalog.add( s );
+    }
+    
+    /**
+     * Loads a postgis database into the catalog.
      * 
      * @throws IOException Any I/O errors loading into the catalog.
      */
-    public void loadWebFeatureServiceIntoCatalog() throws IOException {
-    
-        //create wfs datastore parameters
-        URL wfsURL = new URL( WFSSERVERURL );
+    public void loadDatabaseIntoCatalog(String dburl) {
+        
+        //set up connection parameters
+        URL pgURL = null;
+        try {
+            pgURL = new URL( POSTGISSERVERURL );
+        } catch (MalformedURLException murlex){
+            System.err.println("MalformedURLException on creating the PostGIS URL: "+ murlex);
+        }
         Map params = new HashMap();
-        params.put( WFSDataStoreFactory.URL.key, wfsURL );
+        params.put( PostgisDataStoreFactory.HOST.key, pgURL );
+        params.put( PostgisDataStoreFactory.USER.key, POSTGISUSERNAME );
+        params.put( PostgisDataStoreFactory.DATABASE.key, POSTGISDATABASE );
         
         //load the service, there should be only one
         DefaultServiceFinder finder = new DefaultServiceFinder( demoData.localCatalog );
@@ -605,7 +474,143 @@ public class DemoBase {
         
         //add the service to the catalog
         demoData.localCatalog.add( (Service) services.get( 0 ) );
+        
     }
+    
+    /**
+     * Creates a Style for the London point feature.
+     * 
+     * @return a Style appropriate for the point feature.
+     */
+    public Style createLondonStyleFromScratch(){
+        
+        /* Point style from scratch */
+        StyleBuilder builder = new StyleBuilder();
+        Mark mark    = builder.createMark("circle", Color.RED);
+        Graphic g    = builder.createGraphic(null,mark,null);
+        Symbolizer s = builder.createPointSymbolizer(g);
+        
+        Style memStyle = builder.createStyle( s );
+        return memStyle;
+        
+    }
+    
+    // TODO: This should be done through the catalog *not* directly from the file.
+    public Style createShapefileStyleFromSLDFile(String shpSLDfile){
+    
+        // Make the sldURL from the sldName 
+        URL sldURL = MapViewer.class.getResource( shpSLDfile );
+        
+        // Create the shapefile Style, uses StyleFactory and an SLD URL
+        StyleFactory sf = StyleFactoryFinder.createStyleFactory();
+        SLDParser stylereader = null;
+        try {
+            stylereader = new SLDParser(sf,sldURL);
+        } 
+        catch (IOException ioex){
+            System.out.println("IOException on SLDfile read: " + ioex);
+        }
+        Style[] shpStylArr = stylereader.readXML();
+        Style shpStyle = shpStylArr[0];
+        
+        return shpStyle;
+        
+    }
+    
+    /**
+     * Gets a FeatureCollection with the shapefile from the catalog.
+     * <p>
+     * This method <b>must</b> be called after {@link #loadShapefileIntoCatalog()}.
+     * </p>
+     * @return The shapefile feature source.
+     * 
+     * @throws IOException Any I/O errors that occur accessing the shapefile resource.
+     */
+    public FeatureSource getAShapefileFeatureSourceFromCatalog(){
+//    public FeatureCollection getFeatureCollectionForShapefile() throws IOException {
+        
+        //create the uri to lookup
+        URI uri = null;
+        try {
+            uri =  new URI( getClass().getResource( SHAPEFILENAME ).toString() );
+        } 
+        catch ( URISyntaxException uriex ) {
+            System.err.println( "Unable to create shapefile uri"+ uriex.getMessage() );
+//            throw (IOException) new IOException( "Unable to create shapefile uri").initCause( uriex );
+        }
+        
+        //lookup service, should be only one
+        List serviceList = demoData.localCatalog.find( uri, null );
+        Service service = (Service) serviceList.get( 0 );
+        
+        //shapefiles only contain a single resource
+        List resourceList = null;
+        try{
+            resourceList = service.members( null );
+        } catch (IOException ioex){
+            System.err.println("An IOException occurred on service resolve: " + ioex.getMessage() );
+        }
+        GeoResource resource = (GeoResource) resourceList.get( 0 );
+        
+        FeatureSource shpFS = null;
+        try{
+            shpFS = (FeatureSource) resource.resolve( FeatureSource.class, null );
+        } catch (IOException ioex){
+            System.err.println("IOException on resoloving shape resource to FeatureSource: " + ioex.getMessage() );
+        }
+        return shpFS;
+    }
+
+    public void xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx(){
+        
+    }
+    
+//    
+//    /**
+//     * Gets a FeatureCollection with the shapefile from the catalog.
+//     * <p>
+//     * This method <b>must</b> be called after {@link #loadShapefileIntoCatalog()}.
+//     * </p>
+//     * @return The shapefile feature source.
+//     * 
+//     * @throws IOException Any I/O errors that occur accessing the shapefile resource.
+//     */
+//    public FeatureCollection getFeatureCollectionForShapefile(){
+////    public FeatureCollection getFeatureCollectionForShapefile() throws IOException {
+//        
+//        //create the uri to lookup
+//        URI uri = null;
+//        try {
+//            uri =  new URI( getClass().getResource( SHAPEFILENAME ).toString() );
+//        } 
+//        catch ( URISyntaxException uriex ) {
+//            System.err.println( "Unable to create shapefile uri"+ uriex.getMessage() );
+////            throw (IOException) new IOException( "Unable to create shapefile uri").initCause( uriex );
+//        }
+//        
+//        //lookup service, should be only one
+//        List serviceList = demoData.localCatalog.find( uri, null );
+//        Service service = (Service) serviceList.get( 0 );
+//        
+//        //shapefiles only contain a single resource
+//        List resourceList = null;
+//        try{
+//            resourceList = service.members( null );
+//        } catch (IOException ioex){
+//            System.err.println("An IOException occurred on service resolve: " + ioex.getMessage() );
+//        }
+//        GeoResource resource = (GeoResource) resourceList.get( 0 );
+//
+////        return (FeatureSource) resource.resolve( FeatureSource.class, null );
+//        FeatureCollection shpFC = null;
+//        try {
+//            shpFC = (FeatureCollection) resource.resolve( FeatureCollection.class, null );
+//        } catch (IOException ioex){
+//            System.err.println("An IOException occurred on resolving the resource: " + ioex.getMessage() );
+//        }
+//        return shpFC;
+//    }
+
     
     /**
      * Loads all the wfs feature sources from the wfs service.
@@ -643,66 +648,11 @@ public class DemoBase {
             }
         }
         
+//         Iterator r = featureSources.iterator();
+//         ((FeatureSource) r.next()).
         return featureSources;
     }
 
-    /**
-     * Loads a postgis database into the catalog.
-     * 
-     * @throws IOException Any I/O errors loading into the catalog.
-     */
-    public void loadPostGISintoCatalog() throws IOException {
-        
-        //set up connection parameters
-        URL postgisURL = new URL( POSTGISSERVERURL );
-        Map params = new HashMap();
-        params.put( PostgisDataStoreFactory.HOST.key, postgisURL );
-        params.put( PostgisDataStoreFactory.USER.key, POSTGISUSERNAME );
-        params.put( PostgisDataStoreFactory.DATABASE.key, POSTGISDATABASE );
-        
-        //load the service, there should be only one
-        DefaultServiceFinder finder = new DefaultServiceFinder( demoData.localCatalog );
-        List services = finder.aquire( params );
-        
-        //add the service to the catalog
-        demoData.localCatalog.add( (Service) services.get( 0 ) );
-        
-    }
-    
-    
-    
-    public Style createStyleFromFile() throws IOException {
-    
-        // Make the sldURL from the sldName 
-        URL sldURL = MapViewer.class.getResource( SHAPEFILESLDNAME );
-        
-        // Create the shapefile Style, uses StyleFactory and an SLD URL
-        StyleFactory sf = StyleFactoryFinder.createStyleFactory();
-        SLDParser stylereader = null;
-        try {
-            stylereader = new SLDParser(sf,sldURL);
-        } 
-        catch (IOException ioex){
-            System.out.println("IOException on SLDfile read: " + ioex);
-        }
-        Style[] shpStylArr = stylereader.readXML();
-        Style shpStyle = shpStylArr[0];
-        
-        return shpStyle;
-        
-    }
-    
-    public Style createStyleFromScratch() {
-        /* Point style from scratch */
-        StyleBuilder builder = new StyleBuilder();
-        Mark mark    = builder.createMark("circle", Color.RED);
-        Graphic g    = builder.createGraphic(null,mark,null);
-        Symbolizer s = builder.createPointSymbolizer(g);
-        
-        Style memStyle = builder.createStyle( s );
-        return memStyle;
-    }
-    
     /*
      * Create a Mercator ProjectedCRS from DefaultGeogCRS.
      */

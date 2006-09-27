@@ -79,6 +79,17 @@ public class DemoData {
      */
     Catalog localCatalog;
     
+    /**
+     * A Network Catalog used to store the services pointing to data on the network.
+     */
+    Catalog aNetworkCatalog;
+    
+    /**
+     * The Map of Styles used to render the different layers stored as:
+     *   String name, Style s.
+     */
+    Map theStyleMap;
+    
 	/**
 	 * Creates the demo class and an underlying catalog for storing data.
 	 */
@@ -87,6 +98,8 @@ public class DemoData {
         theFeatureCollectionList = new LinkedList();
         theDataStoreList = new LinkedList();
 		localCatalog = new DefaultCatalog();
+        aNetworkCatalog = new DefaultCatalog();//TODO: How is this done?
+        theStyleMap = new HashMap();
 	}
 	
 	/**

@@ -325,42 +325,22 @@ public class DemoGUI {
      */
     public void initialize_JMapPane(){
         textArea.append("Start: Initialize the GUI.\n");
-//        frame=new JFrame("My Map Viewer");
-//        frame.setBounds(20,20,1080,600);
-////        frame.setBackground(Color.cyan);
-//        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        
-//        Container content = frame.getContentPane();
-////        content.setBackground(Color.magenta);
-//        content.setLayout(new BorderLayout());
 
         Panel mapGUI = new Panel();
         mapGUI.setLayout(new BorderLayout());
         jmp = new JMapPane();
         jmp.setBackground(Color.white);
-//        jmp.setSize(20,100);
-      /* Renderer */
-      renderer = new StreamingRenderer();
-      
-      /* Context */
-      context = new DefaultMapContext(DefaultGeographicCRS.WGS84); 
-      context.setAreaOfInterest(demoBase.envlp_NoEdges2);
-
-      /* Add to JMapPane */
-      jmp.setRenderer(renderer);
-      jmp.setContext(context);
-      
-      /* Configure JMapPane */
-//      jmp.getContext().addLayer(new DefaultMapLayer());
-//      //TODO: Re-add. Removed because of null pointer exception
-//      jmp.setHighlightLayer(jmp.getContext().getLayer(0));
-//      jmp.setSize(200,600);
-//      //TODO: Set boundary to all that's visible, disabled for projection
-//      jmp.setMapArea(context.getLayerBounds());
-      jmp.setMapArea(demoBase.envlp_NoEdges);
         
+        /* Renderer */
+        renderer = new StreamingRenderer();
         
+        /* Context */
+        context = new DefaultMapContext(DefaultGeographicCRS.WGS84); 
+        context.setAreaOfInterest(demoBase.envlp_NoEdges2);
         
+        /* Add to JMapPane */
+        jmp.setRenderer(renderer);
+        jmp.setContext(context);
         
         
         
