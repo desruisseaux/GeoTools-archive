@@ -63,6 +63,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.gce.geotiff.crs_adapters.GeoTiffMetadata2CRSAdapter;
+import org.geotools.gce.geotiff.utils.MetadataDumper;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -242,6 +243,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// //
 		reader.setInput(inStream);
 		final IIOMetadata iioMetadata = reader.getImageMetadata(0);
+        
+       
 		metadata = new GeoTiffIIOMetadataDecoder(iioMetadata);
 		gtcs = (GeoTiffMetadata2CRSAdapter) GeoTiffMetadata2CRSAdapter
 				.get(hints);
