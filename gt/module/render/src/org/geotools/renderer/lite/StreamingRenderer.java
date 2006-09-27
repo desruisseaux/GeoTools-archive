@@ -65,7 +65,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.parameter.Parameter;
-import org.geotools.referencing.operation.BufferedDefaultCoordinateOperationFactory;
+import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.renderer.GTRenderer;
@@ -89,6 +89,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.OperationNotFoundException;
@@ -147,7 +148,7 @@ public final class StreamingRenderer implements GTRenderer {
 	private final FilterFactory filterFactory = FilterFactoryFinder
 			.createFilterFactory();
 
-	private final static BufferedDefaultCoordinateOperationFactory operationFactory = new BufferedDefaultCoordinateOperationFactory(
+	private final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
 			new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
 
 	/**
@@ -444,10 +445,10 @@ public final class StreamingRenderer implements GTRenderer {
 	public void paint(Graphics2D graphics, Rectangle paintArea,
 			Envelope mapArea, AffineTransform worldToScreen) {
 		// Check that we have a context to paint
-		if(context == null)
-			throw new IllegalStateException("Cannot perform paint, " +
-					"no map context has been assigned to the renderer.");
-		
+		if (context == null)
+			throw new IllegalStateException("Cannot perform paint, "
+					+ "no map context has been assigned to the renderer.");
+
 		// Check for null arguments, recompute missing ones if possible
 		if (graphics == null || paintArea == null) {
 			LOGGER.info("renderer passed null arguments");
