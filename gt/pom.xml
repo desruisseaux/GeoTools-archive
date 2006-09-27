@@ -724,6 +724,15 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <configuration>
+            <descriptors>
+              <descriptor>src/main/assembly/binaryDist.xml</descriptor>
+              <descriptor>src/main/assembly/sourceDist.xml</descriptor>
+            </descriptors>
+          </configuration>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
           <version>2.1</version>
@@ -1259,3 +1268,4 @@
   </modules>
   
 </project>
+
