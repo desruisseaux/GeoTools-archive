@@ -48,6 +48,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @version $Id$
  * @author Jody Garnett
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  * 
  * @see org.geotools.geometry.Envelope2D
  * @see org.geotools.geometry.GeneralEnvelope
@@ -305,10 +306,6 @@ public class ReferencedEnvelope extends Envelope implements
             final CoordinateReferenceSystem targetCRS, final boolean lenient,
             final int numPointsForTransformation) throws TransformException,
             FactoryException {
-
-        // COMMENTED OUT NEW CODE, CRS.findMathTransform does provide the flipping
-        // if needed, adding it again introduces errors
-
         // /////////////////////////////////////////////////////////////////////
         //
         // Getting the transform

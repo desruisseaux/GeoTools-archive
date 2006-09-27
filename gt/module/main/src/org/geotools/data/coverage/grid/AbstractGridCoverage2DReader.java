@@ -41,7 +41,7 @@ import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.operation.BufferedDefaultCoordinateOperationFactory;
+import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
@@ -82,7 +82,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected static final double EPS = 1E-6;
 
 	/** Buffere factory for coordinate operations. */
-	protected final static CoordinateOperationFactory operationFactory = new BufferedDefaultCoordinateOperationFactory(
+	protected final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
 			new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
 
 	/**
