@@ -126,6 +126,8 @@ public class GT30ReaderWriterTest extends GT30TestBase {
 			GridCoverage2D gc1 = gc.geophysics(false);
 			if(TestData.isInteractiveTest())
 				gc1.show();
+			else
+				gc1.getRenderedImage().getData();
 
 			// logging some info
 			logger.info(gc.getCoordinateReferenceSystem2D().toWKT()+"\n"+gc.toString());

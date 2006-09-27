@@ -94,6 +94,8 @@ public class GT30DecimationTest extends GT30TestBase {
 					.values().toArray(new GeneralParameterValue[1])));
 			if(TestData.isInteractiveTest())
 				gc.show();
+			else
+				gc.getRenderedImage().getData();
 
 			// logging some info
 			logger.info(gc.getCoordinateReferenceSystem2D().toWKT());
