@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-arcgrid</artifactId>
+  <artifactId>gt2-arcgrid-spike</artifactId>
   <packaging>jar</packaging>
   <name>ArcGrid datasource module</name>
   <url>http://maven.geotools.fr/reports/arcgrid/</url>
@@ -63,12 +63,7 @@
     </dependency>
     <dependency>
 	  <groupId>org.geotools</groupId>
-  	  <artifactId>gt2-imageio-arcgrid</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-image</artifactId>
+  	  <artifactId>imageio-asciigrid</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-imageio-arcgrid</artifactId>
+  <artifactId>imageio-asciigrid</artifactId>
   <packaging>jar</packaging>
   <name>Image IO for ArcGrid data Format</name>
   <url>http://modules.geotools.org/imageio/asciigrid</url>
