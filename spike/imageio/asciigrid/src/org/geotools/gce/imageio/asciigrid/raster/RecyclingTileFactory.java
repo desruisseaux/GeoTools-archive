@@ -141,7 +141,7 @@ public class RecyclingTileFactory extends Observable implements TileFactory,
 	 * Returns a <code>SoftReference</code> to the internal bank data of the
 	 * <code>DataBuffer</code>.
 	 */
-	private static SoftReference getBankReference(DataBuffer db) {
+	private static Object getBankReference(DataBuffer db) {
 		Object array = null;
 
 		switch (db.getDataType()) {
@@ -168,7 +168,7 @@ public class RecyclingTileFactory extends Observable implements TileFactory,
 
 		}
 
-		return new SoftReference(array);
+		return array;
 	}
 
 	/**
@@ -209,6 +209,7 @@ public class RecyclingTileFactory extends Observable implements TileFactory,
 		else
 			throw new IllegalArgumentException(
 					"Provided argument is not of type TileCache");
+		tileCache.addObserver(this);
 	}
 
 	/**
@@ -374,7 +375,7 @@ public class RecyclingTileFactory extends Observable implements TileFactory,
 			if (value != null) {
 				arrays = (ArrayList) value;
 			} else {
-				arrays = new ArrayList();
+				arrays = new ArrayList(10);
 			}
 
 			memoryUsed += getDataBankSize(db.getDataType(), db.getNumBanks(),
@@ -408,15 +409,17 @@ public class RecyclingTileFactory extends Observable implements TileFactory,
 			if (value != null) {
 				ArrayList arrays = (ArrayList) value;
 				for (int idx = arrays.size() - 1; idx >= 0; idx--) {
-					SoftReference bankRef = (SoftReference) arrays.remove(idx);
+					Object array =  arrays.remove(idx);
 					memoryUsed -= getDataBankSize(arrayType, (int) numBanks,
 							(int) arrayLength);
 					if (idx == 0) {
 						recycledArrays.remove(key);
 					}
 
-					Object array = bankRef.get();
+					
 					if (array != null) {
+						if (DEBUG)
+							System.out.println("good reference");
 						return array;
 					}
 
