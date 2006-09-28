@@ -73,8 +73,7 @@ import org.w3c.dom.Node;
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
  */
-public class ArcGridReader extends AbstractGridCoverage2DReader implements
-		GridCoverageReader {
+public class ArcGridReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
 	/**
 	 * Logger.o
 	 * 
