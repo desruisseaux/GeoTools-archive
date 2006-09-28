@@ -8,7 +8,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>gt2-demo-mappane</artifactId>
   <packaging>jar</packaging>
-  <name>Geotools JMapPane Demo</name>
+  <name>Demos of the JMapPane</name>
   <version>2.4-SNAPSHOT</version>
   <description>Demos for Geotools 2.</description>
   <url>http://maven.geotools.fr/reports/demo/property</url>
