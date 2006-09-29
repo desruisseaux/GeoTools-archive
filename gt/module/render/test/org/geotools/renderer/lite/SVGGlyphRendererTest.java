@@ -34,7 +34,7 @@ public class SVGGlyphRendererTest extends TestCase {
         StyleFactory sf = StyleFactoryFinder.createStyleFactory();
         ExternalGraphic eg = sf.createExternalGraphic(this.getClass().getResource(
                 "test-data/gradient.svg"), "image/svg+xml");
-        BufferedImage image = renderer.render(null, eg, null);
+        BufferedImage image = renderer.render(null, eg, null,-1);
         assertNotNull(image);
         showImage("Opacity", 1000, image);
     }
@@ -44,7 +44,7 @@ public class SVGGlyphRendererTest extends TestCase {
         StyleFactory sf = StyleFactoryFinder.createStyleFactory();
         ExternalGraphic eg = sf.createExternalGraphic(this.getClass().getResource(
                 "test-data/squarecss.svg"), "image/svg+xml");
-        BufferedImage image = renderer.render(null, eg, null);
+        BufferedImage image = renderer.render(null, eg, null,-1);
         assertNotNull(image);
         showImage("Opacity", 1000, image);
     }
@@ -57,7 +57,7 @@ public class SVGGlyphRendererTest extends TestCase {
         StyleFactory sf = StyleFactoryFinder.createStyleFactory();
         ExternalGraphic eg = sf.createExternalGraphic(this.getClass().getResource(
                 "test-data/text.svg"), "image/svg+xml");
-        BufferedImage image = renderer.render(null, eg, null);
+        BufferedImage image = renderer.render(null, eg, null,-1);
         assertNotNull(image);
         showImage("Opacity", 1000, image);
     }

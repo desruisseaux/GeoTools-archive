@@ -21,7 +21,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
-
+import org.w3c.dom.Document;
 
 
 /**
@@ -57,6 +57,10 @@ public class InternalTranscoder extends org.apache.batik.transcoder.image.ImageT
     public BufferedImage getImage(){
         return result;
     }
-
+  
+   public void transcode (  Document inputDoc ) throws Exception
+   {
+	   super.transcode(inputDoc,null,null);
+   }
 
 }

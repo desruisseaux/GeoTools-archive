@@ -89,13 +89,13 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Factory object that converts SLD style into rendered styles.
- * 
+ *
  * DJB:  I've made a few changes to this.
  *       The old behavior was for this class to convert <LinePlacement> tags to <PointPlacement> tags.
  *       (ie. there never was a LinePlacement option)
  *       This is *certainly* not the correct place to do this, and it was doing a very poor job of it too,
  *       and the renderer was not expecting it to be doing it!
- * 
+ *
  *       I added support in TextStyle3D for this and had this class correctly set Line/Point placement selection.
  *       NOTE: PointPlacement is the default if not present.
  *
@@ -105,7 +105,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /*
  *  orginal message on the subject:
- * 
+ *
  * I was attempting to write documentation for label placement (plus fix
 all the inconsistencies with the spec), and I noticed some problems
 with the SLDStyleFactory and TextStyle2D.
@@ -129,7 +129,7 @@ This change could affect the j2d renderer as it appears to use the
 "AbsoluteLineDisplacement" flag.
  * @source $URL$
 */
- 
+
 public class SLDStyleFactory {
     /** The logger for the rendering module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
@@ -160,10 +160,10 @@ public class SLDStyleFactory {
 
     /** This one is used as the observer object in image tracks */
     private static final Canvas obs = new Canvas();
-    
+
     /** This one holds the list of glyphRenderers that can convert glyphs into an image */
     private static List glyphRenderers = new ArrayList();
-    
+
     static { //static block to populate the lookups
         joinLookup.put("miter", new Integer(BasicStroke.JOIN_MITER));
         joinLookup.put("bevel", new Integer(BasicStroke.JOIN_BEVEL));
@@ -198,8 +198,8 @@ public class SLDStyleFactory {
         wellKnownMarks.add("x");
         wellKnownMarks.add("arrow");
         wellKnownMarks.add("hatch");
-        
-        /** 
+
+        /**
          * Initialize the gliph renderers array with the default ones
          */
         glyphRenderers.add(new CustomGlyphRenderer());
@@ -218,7 +218,7 @@ public class SLDStyleFactory {
     WeakHashMap dynamicSymbolizers = new WeakHashMap();
 
     /** Symbolizers that do not depend on attributes */
-    HashMap staticSymbolizers = new HashMap();  //DJB: your system should have a max number of static symbolizers, so this isnt going to leak that much memory. it used to be a weakhash -- this is faster.
+    WeakHashMap staticSymbolizers = new WeakHashMap(); 
 
     private static Set getSupportedGraphicFormats() {
         if (supportedGraphicFormats == null) {
@@ -233,35 +233,35 @@ public class SLDStyleFactory {
 
         return supportedGraphicFormats;
     }
-    
+
     private long hits;
-    
+
     private long requests;
-    
+
     /**
      * Holds value of property mapScaleDenominator.
      */
     private double mapScaleDenominator = Double.NaN;;
-    
-    
+
+
     public double getHitRatio() {
         return (double) hits/ (double) requests;
     }
-    
+
     public long getHits() {
         return hits;
     }
-    
+
     public long getRequests() {
         return requests;
     }
-    
+
 
     /**
      * <p>
      * Creates a rendered style
      * </p>
-     * 
+     *
      * <p>
      * Makes use of a symbolizer cache based on identity to avoid recomputing over and over the
      * same style object and to reduce memory usage. The same Style2D object will be returned by
@@ -280,7 +280,7 @@ public class SLDStyleFactory {
 
         SymbolizerKey key = new SymbolizerKey(symbolizer, scaleRange);
         style = (Style2D) staticSymbolizers.get(key);
-        
+
         requests++;
 
         if (style != null) {
@@ -305,7 +305,16 @@ public class SLDStyleFactory {
                 }
             }
         }
-
+        //DJB: with the Environmental variables, we can have a large number of symbolizers
+        //    comming through here.  So, top it at 10,000 instead of having java's GC handle
+        //    the weakhash for us.
+        // also read the weakHashMap javadoc, we maybe using it a bit wrong!
+        
+        if (staticSymbolizers.size() > 10000)
+        	staticSymbolizers = new WeakHashMap();
+        if (dynamicSymbolizers.size() > 10000)
+        	dynamicSymbolizers = new WeakHashMap();
+        
         return style;
     }
 
@@ -444,16 +453,17 @@ public class SLDStyleFactory {
                 if (LOGGER.isLoggable(Level.FINER)) {
                     LOGGER.finer("rendering External graphic");
                 }
-                
+
 				eg = (ExternalGraphic) symbols[i];
 				img = null;
-                
-                // first see if any glyph renderers can handle this 
+
+                // first see if any glyph renderers can handle this
                 for(Iterator it = glyphRenderers.iterator(); it.hasNext() && (img == null); ) {
 					r = (GlyphRenderer) it.next();
 
                     if (r.canRender(eg.getFormat())) {
-                        img = r.render(sldGraphic, eg, feature);
+                        img = r.render(sldGraphic, eg, feature,size);
+                        break; // dont render twice
                     }
                 }
 
@@ -466,14 +476,39 @@ public class SLDStyleFactory {
                     continue;
                 }
 
-				dsize = (double) size;
-				scaleTx = AffineTransform.getScaleInstance(dsize
-						/ img.getWidth(), dsize / img.getHeight());
-				ato = new AffineTransformOp(scaleTx,
-						AffineTransformOp.TYPE_BILINEAR);
-				scaledImage = ato.createCompatibleDestImage(img, img
-						.getColorModel());
-				img = ato.filter(img, scaledImage);
+//SLD SPEC page 52 on ExternalGraphic
+// The default size of an image format (such as GIF) is the inherent size of the image. The
+//default size of a format without an inherent size (such as SVG) is defined to be 16 pixels
+//in height and the corresponding aspect in width. If a size is specified, the height of the
+//graphic will be scaled to that size and the corresponding aspect will be used for the width.
+
+//				dsize = (double) size;
+//				scaleTx = AffineTransform.getScaleInstance(dsize
+//						/ img.getWidth(), dsize / img.getHeight());
+//				ato = new AffineTransformOp(scaleTx,
+//						AffineTransformOp.TYPE_BILINEAR);
+//				scaledImage = ato.createCompatibleDestImage(img, img
+//						.getColorModel());
+//				img = ato.filter(img, scaledImage);
+
+ 			    // therefore, we determine the scaling required for "y" (height), then calculate a corresponding
+ 			    // scaling for "x" in which we keep the original's aspect ratio
+
+                if (img.getHeight() != size) //need to scale
+                {     
+                	dsize = (double) size;
+
+	 			    double scaleY = dsize/img.getHeight(); // >1 if you're magnifying
+	 			    double scaleX =  scaleY; // keep aspect ratio!
+	
+	
+	                scaleTx = AffineTransform.getScaleInstance(scaleX,scaleY);  //DJB: keep aspect ratio
+	                ato = new AffineTransformOp(scaleTx,
+	                        AffineTransformOp.TYPE_BILINEAR);
+	                scaledImage = ato.createCompatibleDestImage(img, img.getColorModel());
+	                img = ato.filter(img, scaledImage);
+                }
+        
 
                 if (img != null) {
                     retval = new GraphicStyle2D(img, rotation, opacity);
@@ -524,8 +559,8 @@ public class SLDStyleFactory {
 
         return retval;
     }
-    
-   
+
+
 
     Style2D createTextStyle(Feature feature, TextSymbolizer symbolizer, Range scaleRange) {
         TextStyle2D ts2d = new TextStyle2D();
@@ -544,7 +579,7 @@ public class SLDStyleFactory {
         // extract geometry
         Geometry geom = findGeometry(feature, geomName);
 
-        if ( (geom == null) || geom.isEmpty()) 
+        if ( (geom == null) || geom.isEmpty())
         {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("empty geometry");
@@ -589,7 +624,7 @@ public class SLDStyleFactory {
         double dispX = 0;
         double dispY = 0;
 
-        if (placement instanceof PointPlacement) 
+        if (placement instanceof PointPlacement)
         {
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.finer("setting pointPlacement");
@@ -612,10 +647,10 @@ public class SLDStyleFactory {
 				rotation = ((Number) p.getRotation().getValue(feature)).doubleValue();
 				rotation *= (Math.PI / 180.0);
 			}
-            
+
             ts2d.setPointPlacement(true);
-        } 
-        else if (placement instanceof LinePlacement) 
+        }
+        else if (placement instanceof LinePlacement)
         {
         	  // this code used to really really really really suck, so I removed it!
         	if (LOGGER.isLoggable(Level.FINER)) {
@@ -647,20 +682,20 @@ public class SLDStyleFactory {
         }
 
         Graphic graphicShield = null;
-        if  (symbolizer instanceof TextSymbolizer2) 
+        if  (symbolizer instanceof TextSymbolizer2)
         {
         	    graphicShield = ( (TextSymbolizer2) symbolizer).getGraphic();
-        		if (graphicShield != null) 
+        		if (graphicShield != null)
         		{
         			PointSymbolizer p = StyleFactoryFinder.createStyleFactory().createPointSymbolizer();
         			p.setGraphic(graphicShield);
-        
+
         			Style2D shieldStyle = createPointStyle(feature, p, scaleRange);
         			ts2d.setGraphic(shieldStyle);
         		}
         }
-        
-        
+
+
         return ts2d;
     }
 
@@ -702,7 +737,7 @@ public class SLDStyleFactory {
 
             List f = Arrays.asList(ge.getAvailableFontFamilyNames());
             fontFamilies.addAll(f);
-           
+
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("there are " + fontFamilies.size() + " fonts available");
             }
@@ -1400,7 +1435,7 @@ public class SLDStyleFactory {
             return (int) (bits ^ (bits >>> 32));
         }
     }
-    
+
      private float evalToFloat(Expression exp, Feature f, float fallback){
         if(exp == null){
             return fallback;
@@ -1412,7 +1447,7 @@ public class SLDStyleFactory {
             return fallback;
         }
     }
-    
+
     private double evalToDouble(Expression exp, Feature f, double fallback){
         if(exp == null){
             return fallback;
@@ -1424,7 +1459,7 @@ public class SLDStyleFactory {
             return fallback;
         }
     }
-    
+
     private Color evalToColor(Expression exp, Feature f, Color fallback){
         if(exp == null){
             return fallback;
@@ -1436,9 +1471,9 @@ public class SLDStyleFactory {
             return fallback;
         }
     }
-    
+
     private float evalOpacity(Expression e, Feature f){
         return evalToFloat(e,f,1);
     }
-    
+
 }
