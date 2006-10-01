@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
@@ -68,7 +70,13 @@ import org.opengis.spatialschema.geometry.Envelope;
  * @author Simone Giannecchini (simboss)
  */
 public class ArcGridWriter implements GridCoverageWriter {
-
+	/**
+	 * Logger.
+	 * 
+	 */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.arcgrid");
+	
 	private ImageWriter mWriter;
 
 	/** Small number for comparaisons. */
@@ -262,8 +270,10 @@ public class ArcGridWriter implements GridCoverageWriter {
 					.getProperty("JAI.ImageWriter");
 			mWriter.dispose();
 			// TODO: Auto-dispose. Maybe I need to allow a manual dispose call?
-		} catch (IOException ioe) {
-			throw new DataSourceException("IOError writing", ioe);
+		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			throw new DataSourceException("IOError writing", e);
 		}
 	}
 

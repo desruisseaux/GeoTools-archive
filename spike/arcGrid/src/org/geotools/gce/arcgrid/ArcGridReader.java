@@ -75,11 +75,11 @@ import org.w3c.dom.Node;
  */
 public class ArcGridReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
 	/**
-	 * Logger.o
+	 * Logger.
 	 * 
 	 */
-	private final static Logger LOGGER = Logger.getLogger(ArcGridReader.class
-			.toString());
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.arcgrid");
 
 	/** Caches and ImageReaderSpi for an AsciiGridsImageReader. */
 	private final static ImageReaderSpi readerSPI = new AsciiGridsImageReaderSpi();
@@ -124,7 +124,8 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 
 			final IOException ex = new IOException(
 					"ArcGrid:No source set to read this coverage.");
-			LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
 			throw new DataSourceException(ex);
 		}
 		this.source = input;
@@ -232,10 +233,12 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 			if (closeMe)
 				inStream.close();
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			throw new DataSourceException(e);
 		} catch (TransformException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			throw new DataSourceException(e);
 		}
 
@@ -388,10 +391,12 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 		try {
 			imageChoice = setReadParams(readP, requestedEnvelope, requestedDim);
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			return null;
 		} catch (TransformException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			return null;
 		}
 
@@ -410,7 +415,8 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 		pbjImageRead.add(null);
 		pbjImageRead.add(readP);
 		pbjImageRead.add(readerSPI.createReaderInstance());
-		final RenderedOp asciiCoverage= JAI.create("ImageRead",pbjImageRead,hints);
+		final RenderedOp asciiCoverage = JAI.create("ImageRead", pbjImageRead,
+				hints);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -466,6 +472,8 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 					properties);
 
 		} catch (NoSuchElementException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			IOException exc = new IOException();
 			exc.initCause(e);
 			throw exc;
