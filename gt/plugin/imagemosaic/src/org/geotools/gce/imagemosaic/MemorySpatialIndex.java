@@ -19,6 +19,8 @@
 package org.geotools.gce.imagemosaic;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -30,17 +32,53 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 /**
+ * This class simply builds an SRTREE spatial index in memory for fast indexed
+ * geometric queries.
+ * 
+ * <p>
+ * Since the {@link ImageMosaicReader} heavily uses spatial queries to find out
+ * which are the involved tiles during mosaic creation, it is better to do some
+ * caching and keep the index in memory as much as possible, hence we came up
+ * with this index.
+ * 
  * @author Simone Giannecchini
  * @since 2.3
  */
 public final class MemorySpatialIndex {
 
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.imagemosaic");
+
+	/** The {@link STRtree} index. */
 	private final STRtree index;
 
+	/** Internally used {@link PrecisionModel}. */
 	private final static PrecisionModel pm = new PrecisionModel();
 
+	/**
+	 * Constructs a {@link MemorySpatialIndex} out of a
+	 * {@link FeatureCollection}.
+	 * 
+	 * @param features
+	 */
 	public MemorySpatialIndex(FeatureCollection features) {
+		if (features == null) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER
+						.warning("The provided FeatureCollection is null, it's impossible to create an index!");
+			throw new IllegalArgumentException(
+					"The provided FeatureCollection is null, it's impossible to create an index!");
+
+		}
 		final FeatureIterator it = features.features();
+		if (!it.hasNext()) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER
+						.warning("The provided FeatureCollection  or empty, it's impossible to create an index!");
+			throw new IllegalArgumentException(
+					"The provided FeatureCollection  or empty, it's impossible to create an index!");
+		}
 		index = new com.vividsolutions.jts.index.strtree.STRtree();
 		Feature f;
 		Geometry g;
@@ -57,6 +95,14 @@ public final class MemorySpatialIndex {
 
 	}
 
+	/**
+	 * Finds the features that intersects the provided {@link Envelope}:
+	 * 
+	 * @param envelope
+	 *            The {@link Envelope} to test for intersection.
+	 * @return List of {@link Feature} that intersect the providede
+	 *         {@link Envelope}.
+	 */
 	public List findFeatures(Envelope envelope) {
 		return index.query(envelope);
 

@@ -25,10 +25,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureType;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -39,11 +42,18 @@ import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
+ * {@link AbstractGridFormat} sublass for controlling {@link ImageMosaicReader}
+ * creation.
  * 
  * @author Simone Giannecchini (simboss)
+ * @since 2.3
  */
 public final class ImageMosaicFormat extends AbstractGridFormat implements
 		Format {
+
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.imagemosaic");
 
 	public static final DefaultParameterDescriptor FINAL_ALPHA = new DefaultParameterDescriptor(
 			"FinalAlpha", Boolean.class, null, Boolean.FALSE);
@@ -89,24 +99,18 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 	}
 
 	/**
-	 * 
+	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object)
 	 */
 	public GridCoverageReader getReader(Object source) {
-		try {
-
-			return new ImageMosaicReader(source);
-		} catch (MalformedURLException e) {
-			return null;
-		} catch (IOException e) {
-			return null;
-		}
+		return getReader(source, null);
 	}
 
 	/**
 	 * 
 	 */
 	public GridCoverageWriter getWriter(Object destination) {
-		return null;
+		throw new UnsupportedOperationException(
+				"This plugin does not support writing.");
 	}
 
 	/**
@@ -139,9 +143,15 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 
 						}
 					} catch (MalformedURLException e) {
+						if (LOGGER.isLoggable(Level.WARNING))
+							LOGGER.log(Level.WARNING, e.getLocalizedMessage(),
+									e);
 						return false;
 
 					} catch (UnsupportedEncodingException e) {
+						if (LOGGER.isLoggable(Level.WARNING))
+							LOGGER.log(Level.WARNING, e.getLocalizedMessage(),
+									e);
 						return false;
 
 					}
@@ -171,10 +181,30 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 
 			return true;
 		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return false;
 
 		}
 
+	}
+
+	/**
+	 * @see AbstractGridFormat#getReader(Object, Hints)
+	 */
+	public GridCoverageReader getReader(Object source, Hints hints) {
+		try {
+
+			return new ImageMosaicReader(source, hints);
+		} catch (MalformedURLException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			return null;
+		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			return null;
+		}
 	}
 
 }

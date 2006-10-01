@@ -115,9 +115,11 @@ import com.vividsolutions.jts.geom.Envelope;
 public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		implements GridCoverageReader {
 
+	/**Logger.*/
 	private final static Logger LOGGER = Logger
-			.getLogger(ImageMosaicReader.class.toString());
+			.getLogger("org.geotools.gce.imagemosaic");
 
+	/** Cachin neares neighbohr interpolator (immutable) */
 	private final static Interpolation nnInterpolation = new InterpolationNearest();
 
 	private final URL sourceURL;
@@ -159,6 +161,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 			final IOException ex = new IOException(
 					"ImageMosaicReader:No source set to read this coverage.");
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
 			throw new DataSourceException(ex);
 		}
 		this.source = source;
@@ -186,10 +190,14 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 					}
 				} catch (MalformedURLException e) {
+					if (LOGGER.isLoggable(Level.WARNING))
+						LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 					throw new IllegalArgumentException(
 							"This plugin accepts only File,  URL and String pointing to a file");
 
 				} catch (UnsupportedEncodingException e) {
+					if (LOGGER.isLoggable(Level.WARNING))
+						LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 					throw new IllegalArgumentException(
 							"This plugin accepts only File,  URL and String pointing to a file");
 
@@ -327,7 +335,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
 	 */
-	public Format getFormat() {
+	public synchronized Format getFormat() {
 		if (format == null)
 			format = new ImageMosaicFormat();
 		return format;
@@ -1060,7 +1068,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// res[0]);
 		// int yTrans = (int) Math.round((ulc.getY() - bound.getMaxY()) /
 		// res[1]);
-		double xTrans=0.0, yTrans=0.0;
+		double xTrans = 0.0, yTrans = 0.0;
 		if (Math.abs((resX - res[0]) / resX) > EPS
 				|| Math.abs(resY - res[1]) > EPS) {
 			scaleX = res[0] / resX;
