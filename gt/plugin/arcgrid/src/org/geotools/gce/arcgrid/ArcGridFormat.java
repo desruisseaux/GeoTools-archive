@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.stream.IOExchange;
+import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -221,5 +222,9 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	 */
 	public ParameterValueGroup getWriteParameters() {
 		return writeParameters;
+	}
+
+	public GridCoverageReader getReader(Object arg0, Hints arg1) {
+		return null;
 	}
 }
