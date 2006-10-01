@@ -62,6 +62,7 @@ public final class LoggingKeys {
     public static final int OFFSCREEN_RENDERING_FAILED_$1       =    12;
     public static final int PAINTING_LAYER_$2                   =    13;
     public static final int POLYGON_CACHE_USE_$4                =    14;
+    public static final int REDIRECTED_TO_COMMONS_LOGGING       =    39;
     public static final int REGISTERED_JAI_OPERATIONS           =    31;
     public static final int RESSAMPLING_RENDERED_IMAGE_$3       =    15;
     public static final int SAMPLE_TRANSCODE_$3                 =    16;

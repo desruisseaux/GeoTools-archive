@@ -270,11 +270,10 @@ public class MonolineFormatter extends Formatter {
      * <code>"logger:long"</code> or <code>"class:long"</code>.
      *
      * The difference between a {@code null} and <code>"none"</code> is that {@code null}
-     * may be replaced by a default value, while <code>"none"</code> means that the user explicitly
-     * requested no source.
+     * may be replaced by a default value, while <code>"none"</code> means that the user
+     * explicitly requested no source.
      *
-     * @param format The format for displaying the source, or {@code null}
-     *        to disable source formatting.
+     * @param format The format for displaying the source.
      */
     public synchronized void setSourceFormat(String format) {
         if (format != null) {
@@ -316,7 +315,7 @@ public class MonolineFormatter extends Formatter {
          * "org.geotools.util.MonolineFormatter.time" property.
          */
         if (timeFormat != null) {
-            Date time = new Date(record.getMillis() - startMillis);
+            Date time = new Date(Math.max(0, record.getMillis() - startMillis));
             timeFormat.format(time, buffer, new FieldPosition(0));
             buffer.append(' ');
         }
@@ -404,21 +403,31 @@ public class MonolineFormatter extends Formatter {
      * @return The registered {@code MonolineFormatter} (never {@code null}).
      *         The formatter output can be configured using the {@link #setTimeFormat}
      *         and {@link #setSourceFormat} methods.
+     *
+     * @deprecated Use {@link Logging#forceMonolineConsoleOutput()} instead (which provides a
+     *             central place for logging configuration), or {@link #init(String,Level)} if
+     *             more control is wanted.
      */
     public static MonolineFormatter init(final String base) {
         return init(base, null);
     }
 
     /**
-     * Convenience method setting both a {@code MonolineFormatter} and the logger levels.
-     * This method behave like {@link #init(String)}, except that it accepts an optional level
-     * argument. If the level is non-null, then all {@link Handler}s using the monoline formatter
-     * will be set to the specified level. The logger named {@code base} will also be set to
-     * this level.
+     * Setup a {@code MonolineFormatter} for the specified logger and its children. This method
+     * search for all instances of {@link ConsoleHandler} using the {@link SimpleFormatter}. If
+     * such instances are found, they are replaced by a single instance of {@code MonolineFormatter}
+     * writting to the {@linkplain System#out standard output stream} (instead of the {@linkplain
+     * System#err standard error stream}). If no such {@link ConsoleHandler} are found, then a new
+     * one is created with this {@code MonolineFormatter}. This action has no effect on any loggers
+     * outside the {@code base} namespace.
      * <p>
-     * Note: Avoid this method as much as possible,  since it overrides user's level setting for
-     *       the {@code base} logger. A user trying to configure its logging properties may
-     *       find confusing to see his setting ignored.
+     * In addition, this method can set the logger levels. If the level is non-null, then all
+     * {@link Handler}s using the monoline formatter will be set to the specified level. The
+     * logger named {@code base} will also be set to this level.
+     * <p>
+     * <b>Note:</b> Avoid non-null {@code level} argument as much as possible, since it overrides
+     * user's level setting for the {@code base} logger. A user trying to configure his logging
+     * properties may find confusing to see his setting ignored.
      *
      * @param  base The base logger name to apply the change on (e.g. "org.geotools").
      * @param  level The desired level, or {@code null} if no level should be set.
@@ -512,6 +521,10 @@ public class MonolineFormatter extends Formatter {
 
     /**
      * Initialise the formatter for the "{@code org.geotools}" loggers.
+     *
+     * @deprecated Use {@link Logging#forceMonolineConsoleOutput()} instead (which provides a
+     *             central place for logging configuration), or {@link #init(String,Level)} if
+     *             more control is wanted.
      */
     public static void initGeotools() {
         initGeotools(null);
@@ -524,6 +537,10 @@ public class MonolineFormatter extends Formatter {
      * configure its logging properties may find confusing to see his setting ignored.
      *
      * @param level The logging level, or {@code null} if no level should be set.
+     *
+     * @deprecated Use {@link Logging#forceMonolineConsoleOutput(Level)} instead (which provides
+     *             a central place for logging configuration), or {@link #init(String,Level)} if
+     *             more control is wanted.
      */
     public static void initGeotools(final Level level) {
         final MonolineFormatter f = init("org.geotools", level);
