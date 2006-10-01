@@ -20,10 +20,12 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -32,8 +34,6 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.Envelope;
 
 /**
  * A Format to allow discovery of Readers/Writers for raster images that support
@@ -41,11 +41,18 @@ import org.opengis.spatialschema.geometry.Envelope;
  * .jpg/.jpeg+.jgw, .tif/.tiff+.tfw and .png+.pgw. .wld may be used in place of
  * the format specific extension (.jpg+.wld, etc) Designed to be used with
  * GridCoverageExchange.
- * @source $URL$
+ * 
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/image/src/org/geotools/gce/image/WorldImageFormat.java $
  * @author Simone Giannecchini
  */
 public final class WorldImageFormat extends AbstractGridFormat implements
 		Format {
+
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.image");
+
 	/**
 	 * Format writing parameter. When writing a world image we need to provide
 	 * an output format in which we want to encode the image itself. PNG is
@@ -53,17 +60,6 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 */
 	public static final ParameterDescriptor FORMAT = new DefaultParameterDescriptor(
 			"Format", "Indicates the output format for this image", "png", true);
-
-	public static final ParameterDescriptor CRS = new DefaultParameterDescriptor(
-			"CRS", CoordinateReferenceSystem.class, // class of the object we
-			// will pass
-			null, // list of valid values not provided
-			getDefaultCRS() // default value
-	);
-
-	public static final ParameterDescriptor ENVELOPE = new DefaultParameterDescriptor(
-			"envelope", Envelope.class, null, new GeneralEnvelope(new double[] {
-					0, 0 }, new double[] { 1, 1 })); // default envelope to
 
 	/**
 	 * WorldImageFormat
@@ -96,15 +92,10 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 						new GeneralParameterDescriptor[] { FORMAT }));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.data.coverage.grid.Format#getReader(java.lang.Object)
-	 */
-
 	/**
-	 * Call the accepts() method before asking for a reader to determine if the
-	 * current object is supported.
+	 * Retrieves a {@link WorldImageReader} in case the providede
+	 * <code>source</code> can be accepted as a valid source for a world
+	 * image. The method returns null otherwise.
 	 * 
 	 * @param source
 	 *            The source object to read a WorldImage from
@@ -112,18 +103,8 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 * @return a new WorldImageReader for the source
 	 */
 	public GridCoverageReader getReader(Object source) {
-		try {
-			return new WorldImageReader(source);
-		} catch (DataSourceException e) {
-			throw new RuntimeException(e);
-		}
+		return getReader(source, null);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.data.coverage.grid.Format#getWriter(java.lang.Object)
-	 */
 
 	/**
 	 * Call the accepts() method before asking for a writer to determine if the
@@ -137,12 +118,6 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	public GridCoverageWriter getWriter(Object destination) {
 		return new WorldImageWriter(destination);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.geotools.data.coverage.grid.Format#accepts(java.lang.Object)
-	 */
 
 	/**
 	 * Takes the input and determines if it is a class that we can understand
@@ -169,6 +144,9 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 						query = java.net.URLDecoder.decode(url.getQuery()
 								.intern(), "UTF-8");
 					} catch (UnsupportedEncodingException e) {
+						if (LOGGER.isLoggable(Level.WARNING))
+							LOGGER.log(Level.WARNING, e.getLocalizedMessage(),
+									e);
 						return false;
 					}
 
@@ -274,5 +252,26 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 		}
 
 		return null;
+	}
+
+	/**
+	 * Retrieves a {@link WorldImageReader} in case the providede
+	 * <code>source</code> can be accepted as a valid source for a world
+	 * image. The method returns null otherwise.
+	 * 
+	 * @param source
+	 *            The source object to read a WorldImage from
+	 * @param hints
+	 *            {@link Hints} to control the provided {@link WorldImageReader}.
+	 * @return a new WorldImageReader for the source
+	 */
+	public GridCoverageReader getReader(Object source, Hints hints) {
+		try {
+			return new WorldImageReader(source, hints);
+		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			return null;
+		}
 	}
 }
