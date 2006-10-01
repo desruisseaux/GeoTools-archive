@@ -31,6 +31,8 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -72,9 +74,15 @@ import com.sun.media.jai.operator.ImageWriteDescriptor;
  * @author jeichar
  * @author Simone Giannecchini
  * @author mkraemer
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/src/org/geotools/gce/gtopo30/GTopo30Writer.java $
  */
 final public class GTopo30Writer implements GridCoverageWriter {
+
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.gtopo30");
+
 	static {
 		// register new JAI operation
 		NoDataReplacerOpImage.register(JAI.getDefaultInstance());
@@ -167,6 +175,8 @@ final public class GTopo30Writer implements GridCoverageWriter {
 						.setLevel(Deflater.BEST_COMPRESSION);
 			}
 		} catch (Exception e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			destination = null;
 		}
 	}

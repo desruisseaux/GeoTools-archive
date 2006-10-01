@@ -18,6 +18,8 @@ package org.geotools.gce.gtopo30;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
@@ -33,6 +35,11 @@ import org.opengis.coverage.grid.Format;
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/src/org/geotools/gce/gtopo30/GTopo30FormatFactory.java $
  */
 public class GTopo30FormatFactory implements GridFormatFactorySpi {
+
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.gtopo30");
+
 	/**
 	 * Creates a new instance of GTopo30Format
 	 * 
@@ -56,7 +63,9 @@ public class GTopo30FormatFactory implements GridFormatFactorySpi {
 		try {
 			Class.forName("javax.media.jai.JAI");
 			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-		} catch (ClassNotFoundException cnf) {
+		} catch (ClassNotFoundException e) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 			available = false;
 		}
 

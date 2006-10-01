@@ -27,8 +27,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
 import org.opengis.coverage.grid.Format;
@@ -41,9 +44,15 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * 
  * @author Simone Giannecchini
  * @author mkraemer
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/src/org/geotools/gce/gtopo30/GTopo30Format.java $
  */
 public final class GTopo30Format extends AbstractGridFormat implements Format {
+
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.gtopo30");
+
 	/**
 	 * Creates an instance and sets the metadata.
 	 */
@@ -77,11 +86,7 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 	 *         not be accessed.
 	 */
 	public GridCoverageReader getReader(final Object o) {
-		try {
-			return new GTopo30Reader(o);
-		} catch (Exception e) {
-			return null;
-		}
+		return getReader(o, null);
 	}
 
 	/**
@@ -114,6 +119,8 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 			try {
 				urlToUse = ((File) o).toURL();
 			} catch (MalformedURLException e) {
+				if (LOGGER.isLoggable(Level.SEVERE))
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 				return false;
 			}
 		} else if (o instanceof URL) {
@@ -128,6 +135,8 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 				try {
 					urlToUse = new URL((String) o);
 				} catch (MalformedURLException e1) {
+					if (LOGGER.isLoggable(Level.SEVERE))
+						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 					return false;
 				}
 			}
@@ -139,9 +148,35 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 		try {
 			final GTopo30Reader reader = new GTopo30Reader(urlToUse);
 		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			return false;
 		}
 
 		return true;
 	}
+
+	/**
+	 * Returns a reader object which you can use to read GridCoverages from a
+	 * given source
+	 * 
+	 * @param o
+	 *            the the source object. This can be a File, an URL or a String
+	 *            (representing a filename or an URL)
+	 * 
+	 * @return a GridCoverageReader object or null if the source object could
+	 *         not be accessed.
+	 */
+	public GridCoverageReader getReader(final Object o, Hints hints) {
+
+		try {
+			return new GTopo30Reader(o);
+		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		}
+
+	}
+
 }

@@ -95,8 +95,9 @@ import com.sun.media.imageio.stream.RawImageInputStream;
 public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
 
-	private final static Logger LOGGER = Logger.getLogger(GTopo30Reader.class
-			.toString());
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.gtopo30");
 
 	private final static String dmext = ".dem";
 
