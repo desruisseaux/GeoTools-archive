@@ -39,6 +39,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -47,6 +49,7 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -69,6 +72,10 @@ import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
  */
 public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	private final static TIFFImageReaderSpi spi = new TIFFImageReaderSpi();
+
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.geotiff");
 
 	/**
 	 * Creates a new instance of GeoTiffFormat
@@ -100,9 +107,10 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 * 
 	 * @param o
 	 *            the source object to test for compatibility with this format.
-	 *            Must be a CatalogEntry.
 	 * 
-	 * @return true if "o" is a CatalogEntry with a GeoTiff file as a resource.
+	 * 
+	 * @return true if "o" is a File or a URL that points to a GeoTiff with a
+	 *         GeoTiff file as a resource.
 	 */
 	public boolean accepts(Object o) {
 
@@ -138,8 +146,11 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 			// get a stream
 			final ImageInputStream inputStream = ImageIO
 					.createImageInputStream(o);
-			if (inputStream == null)
+			if (inputStream == null) {
+				if (LOGGER.isLoggable(Level.WARNING))
+					LOGGER.warning("Unable to get an ImageInputStream");
 				return false;
+			}
 
 			// get a reader
 			final ImageReader reader = spi.createReaderInstance();
@@ -153,9 +164,13 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 					return false;
 				}
 			} catch (UnsupportedOperationException e) {
+				if (LOGGER.isLoggable(Level.WARNING))
+					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 				return false;
 			}
 		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return false;
 		}
 		return true;
@@ -172,6 +187,23 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 * @return a GeoTiffReader object initialized to the specified File.
 	 */
 	public GridCoverageReader getReader(Object source) {
+		return getReader(source, null);
+
+	}
+
+	/**
+	 * If <CODE>source</CODE> is a file, this will return a reader object.
+	 * This file does not use hints in the construction of the geotiff reader.
+	 * 
+	 * @param source
+	 *            must be a GeoTiff File
+	 * @param hints
+	 *            Hints to pass the hypothetic {@link GridCoverageReader} to
+	 *            control its behaviour.
+	 * 
+	 * @return a GeoTiffReader object initialized to the specified File.
+	 */
+	public GridCoverageReader getReader(Object source, Hints hints) {
 		// if (source instanceof CatalogEntry) {
 		// source = ((CatalogEntry) source).resource();
 		// }
@@ -183,31 +215,47 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 				final String pathname = URLDecoder.decode(url.getFile(),
 						"UTF-8");
 
-				return new GeoTiffReader(new File(pathname), null);
+				return new GeoTiffReader(new File(pathname), hints);
 			} catch (UnsupportedEncodingException e) {
+				if (LOGGER.isLoggable(Level.WARNING))
+					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 				return null;
 			} catch (DataSourceException e) {
+				if (LOGGER.isLoggable(Level.WARNING))
+					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 				return null;
 			}
 		}
 		try {
 			return new GeoTiffReader(source, null);
 		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return null;
 		}
 
 	}
 
 	/**
+	 * Retrieves a {@link GeoTiffWriter} or <code>null</code> if the provided
+	 * <code>destination</code> is suitable.
 	 * 
+	 * This file does not use hints in the construction of the geotiff reader.
 	 * 
-	 * @return null, always.
+	 * @param source
+	 *            must be a GeoTiff File
+	 * @param hints
+	 *            Hints to pass the hypothetic {@link GridCoverageReader} to
+	 *            control its behaviour.
+	 * 
+	 * @return a GeoTiffReader object initialized to the specified File.
 	 */
-	public GridCoverageWriter getWriter(Object source) {
+	public GridCoverageWriter getWriter(Object destination) {
 		try {
-			return new GeoTiffWriter(source);
+			return new GeoTiffWriter(destination);
 		} catch (IOException e) {
-
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
