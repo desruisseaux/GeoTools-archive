@@ -52,7 +52,7 @@ public final class Logging {
     private final String root;
 
     /**
-     * {@code true} if {@link #redirectToCommonLogging} has been invoked.
+     * {@code true} if {@link #redirectToCommonsLogging} has been invoked.
      */
     private boolean redirected;
 
@@ -72,8 +72,9 @@ public final class Logging {
      * <p>
      * Note that {@link MonolineFormatter} writes to the {@linkplain System#out standard
      * output stream} instead of the {@linkplain System#err standard error stream}.
-     *
-     * @throws IllegalStateException is {@link #redirectToCommonLogging} has been invoked.
+     * 
+     * 
+     * @throws IllegalStateException is {@link #redirectToCommonsLogging} has been invoked.
      */
     public void forceMonolineConsoleOutput() throws IllegalStateException {
         forceMonolineConsoleOutput(null);
@@ -87,8 +88,9 @@ public final class Logging {
      * <b>Note:</b> Avoid this method as much as possible, since it overrides user's level
      * setting. A user trying to configure his logging properties may find confusing to see
      * his setting ignored.
-     *
-     * @throws IllegalStateException is {@link #redirectToCommonLogging} has been invoked.
+     * 
+     * 
+     * @throws IllegalStateException is {@link #redirectToCommonsLogging} has been invoked.
      */
     public synchronized void forceMonolineConsoleOutput(final Level level)
             throws IllegalStateException
@@ -119,7 +121,7 @@ public final class Logging {
      * @return {@code true} if the adapter has been installed or re-installed, or
      *         {@code false} if this method did nothing.
      */
-    public synchronized boolean redirectToCommonLogging() {
+    public synchronized boolean redirectToCommonsLogging() {
         try {
             if (CommonHandler.install(root)) {
                 redirected = true;
@@ -128,7 +130,7 @@ public final class Logging {
         } catch (NoClassDefFoundError error) {
             // May occurs if commons-logging is not in the classpath.
             Utilities.unexpectedException("org.geotools.util", "Logging",
-                    "redirectToCommonLogging", error);
+                    "redirectToCommonsLogging", error);
         }
         return false;
     }
