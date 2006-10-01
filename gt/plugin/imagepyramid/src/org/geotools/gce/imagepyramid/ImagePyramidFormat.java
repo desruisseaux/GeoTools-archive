@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -52,6 +53,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public final class ImagePyramidFormat extends AbstractGridFormat implements
 		Format {
 
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.imagepyramid");
+
 	public static final DefaultParameterDescriptor FINAL_ALPHA = new DefaultParameterDescriptor(
 			"FinalAlpha", Boolean.class, null, Boolean.FALSE);
 
@@ -63,10 +68,6 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 
 	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI_THRESHOLD = new DefaultParameterDescriptor(
 			"InputImageROIThreshold", Integer.class, null, new Integer(1));
-
-	/** Logger. */
-	private static final Logger LOGGER = Logger
-			.getLogger(ImagePyramidFormatFactory.class.toString());
 
 	/**
 	 * Creates an instance and sets the metadata.
@@ -109,24 +110,7 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 	 *         using this plugin or null.
 	 */
 	public GridCoverageReader getReader(Object source) {
-		try {
-
-			return new ImagePyramidReader(source);
-		} catch (MalformedURLException e) {
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER
-						.fine(new StringBuffer(
-								"impossible to get a reader for the provided source. The error is ")
-								.append(e.getLocalizedMessage()).toString());
-			return null;
-		} catch (IOException e) {
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER
-						.fine(new StringBuffer(
-								"impossible to get a reader for the provided source. The error is ")
-								.append(e.getLocalizedMessage()).toString());
-			return null;
-		}
+		return getReader(source, null);
 	}
 
 	/**
@@ -190,13 +174,22 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 						new StringBuffer(fileName).append(".prj").toString(),
 						"r").getChannel());
 			} catch (FactoryException e) {
+				if (LOGGER.isLoggable(Level.WARNING))
+					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 				throw new DataSourceException(e);
 			}
-			final CoordinateReferenceSystem tempcrs = crsReader
+			CoordinateReferenceSystem tempcrs = crsReader
 					.getCoodinateSystem();
-			if (tempcrs == null)
-				return false;
-
+			if (tempcrs == null) {
+				// use the default crs
+				tempcrs = AbstractGridFormat.getDefaultCRS();
+				LOGGER
+						.log(
+								Level.WARNING,
+								new StringBuffer(
+										"Unable to find a CRS for this coverage, using a default one: ")
+										.append(tempcrs.toWKT()).toString());
+			}
 			//
 			// ///////////////////////////////////////////////////////////////////
 			//
@@ -245,12 +238,48 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 
 			return true;
 		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return false;
 
 		} catch (NumberFormatException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return false;
 		}
 
+	}
+
+	/**
+	 * Retrieves a reader for this source object in case the provided source can
+	 * be read using this plugin.
+	 * 
+	 * @param source
+	 *            Object
+	 * @param hints
+	 *            {@link Hints} to control the reader behaviour.
+	 * @return An {@link ImagePyramidReader} if the provided object can be read
+	 *         using this plugin or null.
+	 */
+	public GridCoverageReader getReader(Object source, Hints hints) {
+		try {
+
+			return new ImagePyramidReader(source, hints);
+		} catch (MalformedURLException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER
+						.severe(new StringBuffer(
+								"impossible to get a reader for the provided source. The error is ")
+								.append(e.getLocalizedMessage()).toString());
+			return null;
+		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER
+						.severe(new StringBuffer(
+								"impossible to get a reader for the provided source. The error is ")
+								.append(e.getLocalizedMessage()).toString());
+			return null;
+		}
 	}
 
 }
