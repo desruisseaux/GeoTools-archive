@@ -92,8 +92,9 @@ public final class GridFormatFinder {
 	public static Format findFormat(Object o) {
 		Format[] formats = getFormatArray();
 		final int length = formats.length;
+		Format f;
 		for (int i = 0; i < length; i++) {
-			Format f = formats[i];
+			f = formats[i];
 			if (((AbstractGridFormat) f).accepts(o))
 				return f;
 		}

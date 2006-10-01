@@ -18,14 +18,19 @@ package org.geotools.data.coverage.grid;
 import java.util.Map;
 
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.coverage.grid.Format;
+import org.opengis.coverage.grid.GridCoverageReader;
+import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import sun.misc.FormattedFloatingDecimal.Form;
 
 /**
  * AbstractGridFormat is a convenience class so subclasses only need to populate
@@ -47,15 +52,13 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * }</code>
  * 
  * @author jeichar
- * @author <a href="mailto:simboss1@gmail.com">Simone Giannecchini (simboss)</a>
- * @see AbstractFormatFactory
+ * @author Simone Giannecchini
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/module/main/src/org/geotools/data/coverage/grid/AbstractGridFormat.java $
  */
-public abstract class AbstractGridFormat
-    implements Format {
+public abstract class AbstractGridFormat implements Format {
 
-  /**
+	/**
 	 * The Map object is used by the information methods(such as getName()) as a
 	 * data source. The keys in the Map object (for the associated method) are
 	 * as follows: getName() key = "name" value type=String getDescription() key =
@@ -64,100 +67,146 @@ public abstract class AbstractGridFormat
 	 * "version" value type=String Naturally, any methods that are overridden
 	 * need not have an entry in the Map
 	 */
-  protected Map mInfo;
-  protected ParameterValueGroup readParameters;
-  protected ParameterValueGroup writeParameters;
+	protected Map mInfo;
+
+	protected ParameterValueGroup readParameters;
+
+	protected ParameterValueGroup writeParameters;
+
 	private static CoordinateReferenceSystem crs;
 	static {
 		try {
-			crs = CRS.decode("EPSG:4326",true);
+			crs = CRS.decode("EPSG:4326", true);
 		} catch (NoSuchAuthorityCodeException e) {
 			crs = DefaultGeographicCRS.WGS84;
 		} catch (FactoryException e) {
 			crs = DefaultGeographicCRS.WGS84;
 		}
 	}
+
 	/** Indicates the area to load from */
 	public static final DefaultParameterDescriptor READ_GRIDGEOMETRY2D = new DefaultParameterDescriptor(
 			"ReadGridGeometry2D", GridGeometry2D.class, null, null);
 
-
-  /**
+	/**
 	 * @see org.opengis.coverage.grid.Format#getName()
 	 */
-  public String getName() {
-    return (String) mInfo.get("name");
-  }
+	public String getName() {
+		return (String) mInfo.get("name");
+	}
 
-  /**
+	/**
 	 * @see org.opengis.coverage.grid.Format#getDescription()
 	 */
-  public String getDescription() {
-    return (String) mInfo.get("description");
-  }
+	public String getDescription() {
+		return (String) mInfo.get("description");
+	}
 
-  /**
+	/**
 	 * @see org.opengis.coverage.grid.Format#getVendor()
 	 */
-  public String getVendor() {
-    return (String) mInfo.get("vendor");
-  }
+	public String getVendor() {
+		return (String) mInfo.get("vendor");
+	}
 
-  /**
+	/**
 	 * @see org.opengis.coverage.grid.Format#getDocURL()
 	 */
-  public String getDocURL() {
-    return (String) mInfo.get("docURL");
-  }
+	public String getDocURL() {
+		return (String) mInfo.get("docURL");
+	}
 
-  /**
+	/**
 	 * @see org.opengis.coverage.grid.Format#getVersion()
 	 */
-  public String getVersion() {
-    return (String) mInfo.get("version");
-  }
+	public String getVersion() {
+		return (String) mInfo.get("version");
+	}
 
-  /**
-	 * @todo javadoc
+	/**
+	 * Gets a {@link GridCoverageReader} for this format able to create
+	 * coverages out of the <code>source</code> object.
+	 * 
+	 * <p>
+	 * In case this {@link Format} cannot reader the provided
+	 * <code>source</code> object <code>null</code> is returned.
+	 * 
+	 * @param source
+	 *            The source object to parse.
+	 * @return A reader for this {@link Format} or null.
 	 */
-  abstract public org.opengis.coverage.grid.GridCoverageReader getReader(Object
-      source);
+	abstract public GridCoverageReader getReader(Object source);
 
-  /**
-	 * @todo javadoc
+	/**
+	 * 
+	 * Gets a {@link GridCoverageReader} for this format able to create
+	 * coverages out of the <code>source</code> object using the provided
+	 * <code>hints</code>.
+	 * 
+	 * <p>
+	 * In case this {@link Format} cannot reader the provided
+	 * <code>source</code> object <code>null</code> is returned.
+	 * 
+	 * @param source
+	 *            The source object to parse. *
+	 * @param hints
+	 *            The {@link Hints} to use when trying to instantiate this
+	 *            reader.
+	 * @return A reader for this {@link Format} or null.
 	 */
-  abstract public org.opengis.coverage.grid.GridCoverageWriter getWriter(Object
-      destination);
+	abstract public GridCoverageReader getReader(Object source, Hints hints);
 
-  abstract public boolean accepts(Object input);
+	/**
+	 * Retrieves a {@link GridCoverageWriter} suitable for writing to the
+	 * provided <code>destination</code> with this format.
+	 * 
+	 * <p>
+	 * In case no writers are availaible <code>null</code> is returned.
+	 * 
+	 * @param destination
+	 *            The destinatin where to write.
+	 * @return A {@link GridCoverageWriter} suitable for writing to the provided
+	 *         <code>destination</code> with this format.
+	 */
+	abstract public GridCoverageWriter getWriter(Object destination);
 
-  /**
+	/**
+	 * Tells me if this {@link Format} can read the provided <code>input</code>.
+	 * 
+	 * 
+	 * @param input
+	 *            The input object to test for suitablilty.
+	 * @return True if this format can read this object, False otherwise.
+	 */
+	abstract public boolean accepts(Object input);
+
+	/**
 	 * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)
 	 */
-  public boolean equals(Format f) {
-    if (f.getClass() == getClass()) {
-      return true;
-    }
-    return false;
-  }
+	public boolean equals(Format f) {
+		if (f.getClass() == getClass()) {
+			return true;
+		}
+		return false;
+	}
 
-  /*
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.opengis.coverage.grid.Format#getReadParameters()
 	 */
-  public ParameterValueGroup getReadParameters() {
-    return this.readParameters;
-  }
+	public ParameterValueGroup getReadParameters() {
+		return this.readParameters;
+	}
 
-  /*
+	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.opengis.coverage.grid.Format#getWriteParameters()
 	 */
-  public ParameterValueGroup getWriteParameters() {
-    return this.writeParameters;
-  }
+	public ParameterValueGroup getWriteParameters() {
+		return this.writeParameters;
+	}
 
 	/**
 	 * getDefaultCRS

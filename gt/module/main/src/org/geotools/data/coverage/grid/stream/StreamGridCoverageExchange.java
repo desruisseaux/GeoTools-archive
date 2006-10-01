@@ -46,9 +46,10 @@ public class StreamGridCoverageExchange implements GridCoverageExchange {
 	Set formats = new java.util.HashSet();
 
 	public StreamGridCoverageExchange() {
+		GridFormatFactorySpi factory;
 		for (Iterator iter = GridFormatFinder.getAvailableFormats().iterator(); iter
 				.hasNext();) {
-			GridFormatFactorySpi factory = (GridFormatFactorySpi) iter.next();
+			factory = (GridFormatFactorySpi) iter.next();
 			formats.add(factory.createFormat());
 		}
 	}
@@ -161,9 +162,9 @@ public class StreamGridCoverageExchange implements GridCoverageExchange {
 		return null;
 	}
 
-	/** new Format[formatSet.size()]
-	 * This is a stateless GridCoverageExchange therefore nothing needs to be
-	 * done
+	/**
+	 * new Format[formatSet.size()] This is a stateless GridCoverageExchange
+	 * therefore nothing needs to be done
 	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageExchange#dispose()
 	 */

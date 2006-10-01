@@ -238,12 +238,15 @@ public class GridCoverageFactory extends AbstractFactory {
         final WritableRaster raster;
         // Need to use JAI raster factory, since WritableRaster
         // does not supports TYPE_FLOAT as of J2SE 1.5.0_06.
+        int rowLength;
+        int i;;
         raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT, width, height, 1, null);
         for (int j=0; j<height; j++) {
-            int i=0;
+            i=0;
             final float[] row = matrix[j];
             if (row != null) {
-                for (; i<row.length; i++) {
+            	rowLength=row.length;
+                for (; i<rowLength; i++) {
                     raster.setSample(i, j, 0, row[i]);
                 }
             }
