@@ -101,7 +101,7 @@ final class Resampler2D extends GridCoverage2D {
 	 * @todo Remove this hack when Sun will fix the medialib bug. See
 	 *       http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854
 	 */
-	private final static int lock[]= new int[1];
+	private final static int lock[] = new int[1];
 
 	/**
 	 * Constructs a new grid coverage for the specified grid geometry.
@@ -184,11 +184,11 @@ final class Resampler2D extends GridCoverage2D {
 		final JAI processor;
 		while (true) {
 			sourceGG = (GridGeometry2D) sourceCoverage.getGridGeometry(); // TODO:
-																			// remove
-																			// cast
-																			// with
-																			// J2SE
-																			// 1.5.
+			// remove
+			// cast
+			// with
+			// J2SE
+			// 1.5.
 			sourceCRS = sourceCoverage.getCoordinateReferenceSystem();
 			if (targetCRS == null) {
 				targetCRS = sourceCRS;
@@ -275,8 +275,8 @@ final class Resampler2D extends GridCoverage2D {
 			 */
 			if (!targetGG.isDefined(GridGeometry2D.GRID_TO_CRS)) {
 				step1 = sourceGG.getGridToCoordinateSystem(); // Really
-																// sourceGG, not
-																// targetGG
+				// sourceGG, not
+				// targetGG
 				step2 = IdentityTransform.create(step1.getTargetDimensions());
 				step3 = step1.inverse();
 				allSteps = IdentityTransform
@@ -318,18 +318,17 @@ final class Resampler2D extends GridCoverage2D {
 			targetEnvelope.setCoordinateReferenceSystem(targetCRS);
 			/*
 			 * If the target GridGeometry is incomplete, provides default values
-			 * for the missing fields. Three cases may occurs:
-			 *  - User provided no GridGeometry at all. Then, constructs an
-			 * image of the same size than the source image and set an envelope
-			 * big enough to contains the projected coordinates. The transform
-			 * will derivate from the grid range and the envelope.
-			 *  - User provided only a grid range. Then, set an envelope big
-			 * enough to contains the projected coordinates. The transform will
-			 * derivate from the grid range and the envelope.
-			 *  - User provided only a "grid to coordinate system" transform.
-			 * Then, transform the projected envelope to "grid units" using the
-			 * specified transform, and create a grid range big enough to hold
-			 * the result.
+			 * for the missing fields. Three cases may occurs: - User provided
+			 * no GridGeometry at all. Then, constructs an image of the same
+			 * size than the source image and set an envelope big enough to
+			 * contains the projected coordinates. The transform will derivate
+			 * from the grid range and the envelope. - User provided only a grid
+			 * range. Then, set an envelope big enough to contains the projected
+			 * coordinates. The transform will derivate from the grid range and
+			 * the envelope. - User provided only a "grid to coordinate system"
+			 * transform. Then, transform the projected envelope to "grid units"
+			 * using the specified transform, and create a grid range big enough
+			 * to hold the result.
 			 */
 			if (targetGG == null) {
 				targetGG = new GridGeometry2D(sourceGG.getGridRange(),
@@ -347,11 +346,10 @@ final class Resampler2D extends GridCoverage2D {
 							targetEnvelope);
 					for (int i = gridRange.getDimension(); --i >= 0;) {
 						// According OpenGIS specification, GridGeometry maps
-						// pixel's center. But
-						// the bounding box was for all pixels, not pixel's
-						// centers. Offset by
-						// 0.5 (use +0.5 for maximum too, not -0.5, since
-						// maximum is exclusive).
+						// pixel's center. But the bounding box was for all
+						// pixels, not pixel's centers. Offset by 0.5 (use +0.5
+						// for maximum too, not -0.5, since maximum is
+						// exclusive).
 						gridRange.setRange(i, gridRange.getMinimum(i) + 0.5,
 								gridRange.getMaximum(i) + 0.5);
 					}
@@ -406,6 +404,8 @@ final class Resampler2D extends GridCoverage2D {
 			layout = (ImageLayout) layout.clone();
 		} else {
 			layout = new ImageLayout(sourceImage);
+			layout.unsetImageBounds();
+			layout.unsetTileLayout();
 		}
 		if ((layout.getValidMask() & (ImageLayout.MIN_X_MASK
 				| ImageLayout.MIN_Y_MASK | ImageLayout.WIDTH_MASK | ImageLayout.HEIGHT_MASK)) == 0) {
@@ -512,18 +512,16 @@ final class Resampler2D extends GridCoverage2D {
 					(MathTransform2D) allSteps2D);
 			paramBlk = paramBlk.add(warp).add(interpolation).add(background);
 		}
-		
+
 		final RenderedOp targetImage;
 		final PlanarImage currentRenderingOfTargetImage;
-		if( (operation.equalsIgnoreCase("warp")
-				|| operation.equalsIgnoreCase("affine")) 
-			&& ((sourceCoverage.getRenderedImage().getSampleModel()
-					.getDataType() == DataBuffer.TYPE_FLOAT||sourceCoverage.getRenderedImage().getSampleModel()
-					.getDataType() == DataBuffer.TYPE_DOUBLE)
-					&& !(interpolation instanceof InterpolationNearest))) {
-				synchronized (lock) {
-					
-				
+		if ((operation.equalsIgnoreCase("warp") || operation
+				.equalsIgnoreCase("affine"))
+				&& ((sourceCoverage.getRenderedImage().getSampleModel()
+						.getDataType() == DataBuffer.TYPE_FLOAT || sourceCoverage
+						.getRenderedImage().getSampleModel().getDataType() == DataBuffer.TYPE_DOUBLE) && !(interpolation instanceof InterpolationNearest))) {
+			synchronized (lock) {
+
 				/**
 				 * Disables the native acceleration for the "Affine" operation.
 				 * In JAI 1.1.2, the "Affine" operation on TYPE_FLOAT datatype
@@ -541,24 +539,21 @@ final class Resampler2D extends GridCoverage2D {
 
 				targetImage = processor.createNS(operation, paramBlk,
 						targetHints);
-				currentRenderingOfTargetImage = targetImage
-				.getRendering();// force rendering
+				currentRenderingOfTargetImage = targetImage.getRendering();// force
+				// rendering
 
 				/**
 				 * see above
 				 */
 				Registry.setNativeAccelerationAllowed("Affine", true);
-				
+
 			}
-		}
-		else
-		{
-			targetImage = processor.createNS(operation, paramBlk,
-					targetHints);
+		} else {
+			targetImage = processor.createNS(operation, paramBlk, targetHints);
 			currentRenderingOfTargetImage = targetImage;
 		}
 		final Locale locale = sourceCoverage.getLocale(); // For logging
-															// purpose.
+		// purpose.
 		/*
 		 * The JAI operation sometime returns an image with a bounding box
 		 * different than what we expected. This is true especially for the
