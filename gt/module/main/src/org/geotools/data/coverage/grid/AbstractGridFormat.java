@@ -30,8 +30,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import sun.misc.FormattedFloatingDecimal.Form;
-
 /**
  * AbstractGridFormat is a convenience class so subclasses only need to populate
  * a Map class and set the read and write parameter fields.
