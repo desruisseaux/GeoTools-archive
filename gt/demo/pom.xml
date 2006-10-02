@@ -89,5 +89,6 @@
     <module>introduction</module>
     <module>mappane</module>
     <module>property</module>
+    <module>svgsupport</module>
   </modules>
 </project>
