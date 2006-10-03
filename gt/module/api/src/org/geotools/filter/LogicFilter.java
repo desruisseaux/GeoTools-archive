@@ -29,7 +29,7 @@ import java.util.Iterator;
  * @author Chris Holmes, TOPP
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.BinaryLogicOperator}
  */
 public interface LogicFilter extends Filter, BinaryLogicOperator {

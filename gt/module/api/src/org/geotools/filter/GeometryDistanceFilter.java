@@ -48,7 +48,7 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  *
  * @task REVISIT: add units for distance.  Should it just be a string?  Or
  *       should it actually resolve the definition?
- *       
+ *
  * @deprecated use {@link org.opengis.filter.spatial.DistanceBufferOperator}
  *
  */

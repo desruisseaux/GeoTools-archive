@@ -26,7 +26,7 @@ import org.opengis.filter.expression.Literal;
  * @author Chris Holmes, TOPP
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.expression.Literal}
  */
 public interface LiteralExpression extends Expression, Literal {

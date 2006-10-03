@@ -26,7 +26,7 @@ import org.opengis.filter.PropertyIsNull;
  * @author Chris Holmes, TOPP
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.PropertyIsNull}
  */
 public interface NullFilter extends Filter, PropertyIsNull {

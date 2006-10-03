@@ -28,7 +28,7 @@ import java.util.Collection;
  * @author Rob Hranac, TOPP
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.FeatureId}
  */
 public interface FidFilter extends Filter, FeatureId {

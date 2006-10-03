@@ -26,7 +26,7 @@ import org.geotools.feature.Feature;
  * @author Rob Hranac, Vision for New York
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.expression.Expression}
  */
 public interface Expression extends ExpressionType,

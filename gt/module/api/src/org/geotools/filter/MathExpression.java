@@ -33,7 +33,7 @@ import org.opengis.filter.expression.BinaryExpression;
  * @author Rob Hranac, Vision for New York
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.expression.BinaryExpression}
  */
 public interface MathExpression extends Expression, BinaryExpression {

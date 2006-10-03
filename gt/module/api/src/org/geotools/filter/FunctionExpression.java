@@ -24,7 +24,7 @@ import org.opengis.filter.expression.Function;
  *
  * @author James Macgill, PSU
  * @source $URL$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.expression.Function}
  */
 public interface FunctionExpression extends Expression, Factory, Function {

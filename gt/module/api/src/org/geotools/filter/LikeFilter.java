@@ -25,7 +25,7 @@ import org.opengis.filter.PropertyIsLike;
  * @author Rob Hranac, Vision for New York
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.PropertyIsLike}
  */
 public interface LikeFilter extends Filter, PropertyIsLike {

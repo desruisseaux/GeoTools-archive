@@ -33,7 +33,7 @@ import org.opengis.filter.PropertyIsBetween;
  * @author Rob Hranac, TOPP
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.PropertyIsBetween}
  */
 public interface BetweenFilter extends CompareFilter, PropertyIsBetween {

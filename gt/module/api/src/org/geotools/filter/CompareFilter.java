@@ -37,7 +37,7 @@ import org.opengis.filter.BinaryComparisonOperator;
  * @author Rob Hranac, Vision for New York
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.BinaryComparisonOperator}
  */
 public interface CompareFilter extends Filter, BinaryComparisonOperator {

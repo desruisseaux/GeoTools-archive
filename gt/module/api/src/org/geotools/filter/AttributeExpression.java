@@ -28,7 +28,7 @@ import org.opengis.filter.expression.PropertyName;
  * </p>
  * @source $URL$
  * @version $Id$
- * 
+ *
  * @deprecated use {@link org.opengis.filter.expression.PropertyName}
  */
 public interface AttributeExpression extends Expression, PropertyName {

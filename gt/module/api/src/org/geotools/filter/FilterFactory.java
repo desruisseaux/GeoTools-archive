@@ -50,7 +50,7 @@ import org.opengis.filter.spatial.Within;
  *       cleanly with that, and should handle sax parsing without too much
  *       memory overhead.
  * @task REVISIT: resolve errors, should all throw errors?
- * 
+ *
  * @deprecated use {@link org.opengis.filter.FilterFactory}
  */
 public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory {

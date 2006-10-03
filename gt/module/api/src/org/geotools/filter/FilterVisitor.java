@@ -33,7 +33,7 @@ package org.geotools.filter;
  * @task REVISIT: These need to throw some sort of checked exception as the
  *       implementing classes are swallowing exceptions or throwing runtime
  *       ones.
- *       
+ *
  * @deprecated use {@link org.opengis.filter.FilterVisitor}
  */
 public interface FilterVisitor {
