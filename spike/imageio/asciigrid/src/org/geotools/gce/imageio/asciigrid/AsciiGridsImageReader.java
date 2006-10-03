@@ -29,6 +29,9 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -170,43 +173,103 @@ public final class AsciiGridsImageReader extends ImageReader {
 	 * 
 	 */
 	public void setInput(Object input) {
-
-		// //
+		if (logger.isLoggable(Level.FINE))
+			logger.fine("Setting Input");
+		// ////////////////////////////////////////////////////////////////////
 		//
 		// Reset the state of this reader
 		//
 		// Prior to set a new input, I need to do a pre-emptive reset in order
 		// to clear any value-object related to the previous input.
-		// //
+		// ////////////////////////////////////////////////////////////////////
 		if (this.imageInputStream != null) {
 			reset();
+			if (logger.isLoggable(Level.FINE))
+				logger.fine("Resetting old stream");
+
 		}
-		
-		if (logger.isLoggable(Level.FINE))
-			logger.fine("Setting Input");
 
-
-	
+		// ////////////////////////////////////////////////////////////////////
+		//
+		// ImageInputStream?
+		// 
+		// ////////////////////////////////////////////////////////////////////
 		if (input instanceof ImageInputStream)
 			imageInputStream = (ImageInputStream) input;
+		else
 
-		else {
-// try {
+		// ////////////////////////////////////////////////////////////////////
+		//
+		// URL?
+		// 
+		// ////////////////////////////////////////////////////////////////////
+		if (input instanceof URL) {
+			final URL testUrl = (URL) input;
+			if (!testUrl.getProtocol().equalsIgnoreCase("file")) {
+				// is not a file let's reject it
+				if (logger.isLoggable(Level.SEVERE))
+					logger.severe("Unsupported URL provided as input!");
+				throw new IllegalArgumentException(
+						"Unsupported URL provided as input!");
+			}
+			// now we know it is pointing to a file
+			// let's see if it exists
+			try {
+				final File inFile = new File(URLDecoder.decode(testUrl
+						.getFile(), "UTF-8"));
+				if (!inFile.exists()) {
+					// is not a file let's reject it
+					if (logger.isLoggable(Level.SEVERE))
+						logger.severe("Input file does not exists!");
+					throw new IllegalArgumentException(
+							"Input file does not exists!");
+				}
+			} catch (UnsupportedEncodingException e) {
+				// a problem occurred
+				if (logger.isLoggable(Level.SEVERE))
+					logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				final IllegalArgumentException ex = new IllegalArgumentException();
+				ex.initCause(e);
+				throw ex;
+			}
+		} else
 
-				imageInputStream = ImageIO.createImageInputStream((File) input);
-// } catch (Exception e) {
-// throw new RuntimeException("Not a Valid Input", e);
-// }
-
+		// ////////////////////////////////////////////////////////////////////
+		//
+		// FILE?
+		// 
+		// ////////////////////////////////////////////////////////////////////
+		if (input instanceof File) {
+			final File inFile = (File) input;
+			if (!inFile.exists()) {
+				// is not a file let's reject it
+				if (logger.isLoggable(Level.SEVERE))
+					logger.severe("Input file does not exists!");
+				throw new IllegalArgumentException(
+						"Input file does not exists!");
+			}
+		} else {
+			// is not something we can decode
+			if (logger.isLoggable(Level.SEVERE))
+				logger.severe("Input is not decodable!");
+			throw new IllegalArgumentException("Input is not decodable!");
 		}
 
-
-
-		if(imageInputStream==NULL) {
-			// XXXXX
-			throw new IllegalArgumentException(
-					"Unsupported object provided as input!");
-		}
+		if (imageInputStream == null)
+			try {
+				imageInputStream = ImageIO.createImageInputStream(input);
+				if (imageInputStream == null) {
+					// XXXXX
+					throw new IllegalArgumentException(
+							"Unsupported object provided as input!");
+				}
+			} catch (IOException e) {
+				if (logger.isLoggable(Level.SEVERE))
+					logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				final IllegalArgumentException ex = new IllegalArgumentException();
+				ex.initCause(e);
+				throw ex;
+			}
 
 		// /////////////////////////////////////////////////////////////////////
 		// Now, I have an ImageInputStream and I can try to see if input can
@@ -214,9 +277,12 @@ public final class AsciiGridsImageReader extends ImageReader {
 		// /////////////////////////////////////////////////////////////////////
 		try {
 			imageInputStream.reset();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
+		} catch (IOException e) {
+			if (logger.isLoggable(Level.SEVERE))
+				logger.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			final IllegalArgumentException ex = new IllegalArgumentException();
+			ex.initCause(e);
+			throw ex;
 		}
 		imageInputStream.mark();
 
@@ -233,7 +299,7 @@ public final class AsciiGridsImageReader extends ImageReader {
 				rasterReader.parseHeader();
 			} catch (IOException e1) {
 				// Input cannot be decoded
-				throw new RuntimeException(
+				throw new IllegalArgumentException(
 						"Unable to parse the header for the provided input", e1);
 			}
 		}
@@ -670,6 +736,7 @@ public final class AsciiGridsImageReader extends ImageReader {
 		GRASS = false;
 		metadata = null;
 
+
 	}
 
 	public synchronized void abort() {
@@ -686,7 +753,14 @@ public final class AsciiGridsImageReader extends ImageReader {
 	}
 
 	public void processImageProgress(float percentageDone) {
-		// TODO Auto-generated method stub
 		super.processImageProgress(percentageDone);
+	}
+
+	public void setInput(Object input, boolean seekForwardOnly, boolean ignoreMetadata) {
+		this.setInput(input);
+	}
+
+	public void setInput(Object input, boolean seekForwardOnly) {
+		this.setInput(input);
 	}
 }

@@ -402,7 +402,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements
 		final ParameterBlock pbjImageRead = new ParameterBlock();
 		pbjImageRead.add(ImageIO.createImageInputStream(source));
 		pbjImageRead.add(imageChoice);
-		pbjImageRead.add(Boolean.TRUE);
+		pbjImageRead.add(Boolean.FALSE);
 		pbjImageRead.add(Boolean.FALSE);
 		pbjImageRead.add(Boolean.FALSE);
 		pbjImageRead.add(null);
