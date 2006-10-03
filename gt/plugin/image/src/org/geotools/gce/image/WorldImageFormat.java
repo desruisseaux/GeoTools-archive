@@ -118,6 +118,19 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	public GridCoverageWriter getWriter(Object destination) {
 		return new WorldImageWriter(destination);
 	}
+	
+	/**
+	 * Call the accepts() method before asking for a writer to determine if the
+	 * current object is supported.
+	 * 
+	 * @param destination
+	 *            the destination object to write a WorldImage to
+	 * 
+	 * @return a new WorldImageWriter for the destination
+	 */
+	public GridCoverageWriter getWriter(Object destination,Hints hints) {
+		return new WorldImageWriter(destination,hints);
+	}
 
 	/**
 	 * Takes the input and determines if it is a class that we can understand

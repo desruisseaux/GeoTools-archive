@@ -18,46 +18,68 @@ package org.geotools.gce.arcgrid;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 
-
 /**
  * Implementation of the GridCoverageFormat service provider interface for arc
  * grid files.
- *
+ * 
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
  */
 public class ArcGridFormatFactory implements GridFormatFactorySpi {
-    public boolean isAvailable() {
-        boolean available = true;
+	/** Logger. */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.arcgrid");
 
-        // if these classes are here, then the runtine environment has 
-        // access to JAI and the JAI ImageI/O toolbox.
-        try {
-            Class.forName("javax.media.jai.JAI");
-            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-            Class.forName("org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata");
-        } catch (ClassNotFoundException cnf) {
-            available = false;
-        }
+	/**
+	 * Tells me if the coverage plugin to access Ascii grids is availaible or
+	 * not.
+	 * 
+	 * @return True if the plugin is availaible, False otherwise.
+	 */
+	public boolean isAvailable() {
+		boolean available = true;
 
-        return available;
-    }
+		// if these classes are here, then the runtine environment has
+		// access to JAI and the JAI ImageI/O toolbox.
+		try {
 
-    public Format createFormat() {
-        return new ArcGridFormat();
-    }
+			Class.forName("javax.media.jai.JAI");
+			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
+			Class
+					.forName("org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata");
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("ArcGridFormatFactory is availaible.");
+		} catch (ClassNotFoundException cnf) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("ArcGridFormatFactory is not availaible.");
+			available = false;
+		}
 
-    /**
-     * Returns the implementation hints. The default implementation returns en
-     * empty map.
-     *
-     * @return DOCUMENT ME!
-     */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
-    }
+		return available;
+	}
+
+	/**
+	 * Creating an {@link ArcGridFormat}.
+	 * 
+	 * @return An {@link ArcGridFormat}.;
+	 */
+	public Format createFormat() {
+		return new ArcGridFormat();
+	}
+
+	/**
+	 * Returns the implementation hints. The default implementation returns en
+	 * empty map.
+	 * 
+	 * @return DOCUMENT ME!
+	 */
+	public Map getImplementationHints() {
+		return Collections.EMPTY_MAP;
+	}
 }

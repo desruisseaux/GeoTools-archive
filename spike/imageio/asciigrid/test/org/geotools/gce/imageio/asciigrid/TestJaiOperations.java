@@ -163,7 +163,7 @@ public class TestJaiOperations extends TestCase implements WindowListener {
 			final String title = new String("TestSubsamplingOperation");
 			logger.info("\n\n " + title + " \n");
 
-			final File f = TestData.file(this, "g_etopo6min.asc");
+			final File f = TestData.file(this, "g_cntry6min.asc");
 			RenderedOp image;
 			
 			final ParameterBlock pbjImageRead = new ParameterBlock();

@@ -129,7 +129,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		coverageName = "image_coverage";
-		format = new WorldImageFormat();
 		if (input == null) {
 
 			final IOException ex = new IOException(
@@ -319,7 +318,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	 * @return a new WorldImageFormat class
 	 */
 	public Format getFormat() {
-		return this.format;
+		return new WorldImageFormat();
 	}
 
 	/**

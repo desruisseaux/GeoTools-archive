@@ -35,7 +35,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
- * A simple implementation of the Arc Grid Format.
+ * An implementation a {@link Format} for the ASCII grid ESRI and GRASS format.
  * 
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
@@ -64,6 +64,8 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	 * Creates an instance and sets the metadata.
 	 */
 	public ArcGridFormat() {
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine("Creating a new ArcGriFormat.");
 		setInfo();
 	}
 
@@ -105,7 +107,27 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	 *      destination)
 	 */
 	public GridCoverageWriter getWriter(Object destination) {
-		return new ArcGridWriter(destination);
+		try {
+			return new ArcGridWriter(destination);
+		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		}
+	}
+
+	/**
+	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object
+	 *      destination,Hints hints)
+	 */
+	public GridCoverageWriter getWriter(Object destination, Hints hints) {
+		try {
+			return new ArcGridWriter(destination, hints);
+		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		}
 	}
 
 	/**

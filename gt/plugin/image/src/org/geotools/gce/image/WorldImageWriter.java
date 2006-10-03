@@ -37,6 +37,8 @@ import javax.media.jai.ParameterBlockJAI;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
+import org.geotools.factory.Hints;
 import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
 import org.geotools.resources.CRSUtilities;
@@ -61,7 +63,7 @@ import org.opengis.referencing.operation.TransformException;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/image/src/org/geotools/gce/image/WorldImageWriter.java $
  */
-public final class WorldImageWriter implements GridCoverageWriter {
+public final class WorldImageWriter extends AbstractGridCoverageWriter implements GridCoverageWriter {
 	/** format for this writer */
 	private Format format = new WorldImageFormat();
 
@@ -83,6 +85,16 @@ public final class WorldImageWriter implements GridCoverageWriter {
 	 * @param destination
 	 */
 	public WorldImageWriter(Object destination) {
+		this(destination,null);
+	}
+	/**
+	 * Destination must be a File. The directory it resides in must already
+	 * exist. It must point to where the raster image is to be located. The
+	 * world image will be derived from there.
+	 * 
+	 * @param destination
+	 */
+	public WorldImageWriter(Object destination,Hints hints) {
 		this.destination = destination;
 
 		// convert everything into a file when possible
@@ -101,8 +113,17 @@ public final class WorldImageWriter implements GridCoverageWriter {
 				&& !(destination instanceof File))
 			throw new RuntimeException(
 					"WorldImageWriter::write:It is not possible writing to an URL!");*/
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (hints != null) {
+			if (super.hints == null)
+				this.hints = new Hints(null);
+			hints.add(hints);
+		}
 	}
-
 	/**
 	 * (non-Javadoc)
 	 * 

@@ -186,7 +186,6 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		if (hints != null)
 			this.hints.add(hints);
 		this.source = source;
-		this.format = new GTopo30Format();
 		// ///////////////////////////////////////////////////////////
 		//
 		// decoding source
@@ -268,7 +267,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
 	 */
 	public Format getFormat() {
-		return format;
+		return  new GTopo30Format();
 	}
 
 	/**

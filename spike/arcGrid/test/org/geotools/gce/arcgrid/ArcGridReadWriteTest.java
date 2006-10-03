@@ -211,7 +211,6 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 			ParameterValueGroup params;
 			params = writer.getFormat().getWriteParameters();
 			params.parameter("GRASS").setValue(false);
-			// params.parameter("compressed").setValue(false);
 			GeneralParameterValue[] gpv = { params.parameter("GRASS") };
 			writer.write(gc1, gpv);
 

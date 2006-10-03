@@ -55,6 +55,8 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.Operations;
+import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
+import org.geotools.factory.Hints;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.util.NumberRange;
@@ -77,7 +79,7 @@ import com.sun.media.jai.operator.ImageWriteDescriptor;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/src/org/geotools/gce/gtopo30/GTopo30Writer.java $
  */
-final public class GTopo30Writer implements GridCoverageWriter {
+final public class GTopo30Writer extends AbstractGridCoverageWriter implements GridCoverageWriter {
 
 	/** Logger. */
 	private final static Logger LOGGER = Logger
@@ -110,6 +112,16 @@ final public class GTopo30Writer implements GridCoverageWriter {
 	 *            representing a directory or an URL to a directory.
 	 */
 	public GTopo30Writer(final Object dest) {
+		this(dest,null);
+	}/**
+	 * Creates a GTopo30Writer.
+	 * 
+	 * @param dest
+	 *            The destination object can be a File (a directory actually),
+	 *            an URL to a directory, a ZipOutputStream or a String
+	 *            representing a directory or an URL to a directory.
+	 */
+	public GTopo30Writer(final Object dest,final Hints hints) {
 		destination = dest;
 
 		if (dest == null) {
@@ -178,6 +190,17 @@ final public class GTopo30Writer implements GridCoverageWriter {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			destination = null;
+		}
+		
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (hints != null) {
+			if (super.hints == null)
+				this.hints = new Hints(null);
+			hints.add(hints);
 		}
 	}
 

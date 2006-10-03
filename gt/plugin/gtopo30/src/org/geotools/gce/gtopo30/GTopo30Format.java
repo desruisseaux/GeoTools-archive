@@ -103,6 +103,18 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 	}
 
 	/**
+	 * Returns a writer object which you can use to write GridCoverages to a
+	 * given destination.
+	 * 
+	 * @param destination
+	 *            The destination object
+	 * 
+	 * @return a GridCoverageWriter object
+	 */
+	public GridCoverageWriter getWriter(final Object destination,Hints hints) {
+		return new GTopo30Writer(destination,hints);
+	}
+	/**
 	 * Checks if the GTopo30DataSource supports a given file
 	 * 
 	 * @param o

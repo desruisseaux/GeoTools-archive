@@ -22,43 +22,53 @@ import java.util.Map;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 
-
 /**
  * Implementation of the GridCoverageFormat service provider interface for ECW
  * grid files.
- *
+ * 
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
  */
 public class ECWFormatFactory implements GridFormatFactorySpi {
-    public boolean isAvailable() {
-        boolean available = true;
 
-        // if these classes are here, then the runtine environment has 
-        // access to JAI and the JAI ImageI/O toolbox.
-        try {
-            Class.forName("javax.media.jai.JAI");
-            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-            Class.forName("javax.imageio.plugins.ecw.ECWImageReader");
-            Class.forName("it.geosolutions.imageio.stream.input.FileImageInputStreamExt");
-        } catch (ClassNotFoundException cnf) {
-            available = false;
-        }
+	/**
+	 * Tells if the ECW coverage plugins is not availaible.
+	 * 
+	 * @return False if the ECW coverage plugins is not availaible, True
+	 *         otherwise.
+	 */
+	public boolean isAvailable() {
+		boolean available = true;
 
-        return available;
-    }
+		// if these classes are here, then the runtine environment has
+		// access to JAI and the JAI ImageI/O toolbox.
+		try {
+			Class.forName("javax.media.jai.JAI");
+			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
+			Class.forName("javax.imageio.plugins.ecw.ECWImageReader");
+			Class
+					.forName("it.geosolutions.imageio.stream.input.FileImageInputStreamExt");
+		} catch (ClassNotFoundException cnf) {
+			available = false;
+		}
 
-    public Format createFormat() {
-        return new ECWFormat();
-    }
+		return available;
+	}
 
-    /**
-     * Returns the implementation hints. The default implementation returns en
-     * empty map.
-     *
-     * @return DOCUMENT ME!
-     */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
-    }
+	/**
+	 * Creates an {@link ECWFormat} object.
+	 */
+	public Format createFormat() {
+		return new ECWFormat();
+	}
+
+	/**
+	 * Returns the implementation hints. The default implementation returns an
+	 * empty map.
+	 * 
+	 * @return An empty map.
+	 */
+	public Map getImplementationHints() {
+		return Collections.EMPTY_MAP;
+	}
 }

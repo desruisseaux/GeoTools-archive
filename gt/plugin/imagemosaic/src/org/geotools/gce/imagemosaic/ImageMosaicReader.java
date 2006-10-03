@@ -335,10 +335,8 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
 	 */
-	public synchronized Format getFormat() {
-		if (format == null)
-			format = new ImageMosaicFormat();
-		return format;
+	public Format getFormat() {
+		return new ImageMosaicFormat();
 	}
 
 	/*

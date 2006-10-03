@@ -73,11 +73,9 @@ import org.w3c.dom.Node;
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
  */
-public class ArcGridReader extends AbstractGridCoverage2DReader implements GridCoverageReader {
-	/**
-	 * Logger.
-	 * 
-	 */
+public class ArcGridReader extends AbstractGridCoverage2DReader implements
+		GridCoverageReader {
+	/** Logger. */
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.arcgrid");
 
@@ -121,15 +119,13 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 		//
 		// /////////////////////////////////////////////////////////////////////
 		if (input == null) {
-
-			final IOException ex = new IOException(
+			final DataSourceException ex = new DataSourceException(
 					"ArcGrid:No source set to read this coverage.");
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
-			throw new DataSourceException(ex);
+			throw ex;
 		}
 		this.source = input;
-		format = new ArcGridFormat();
 		coverageName = "AsciiGrid";
 		try {
 			boolean closeMe = true;
@@ -146,7 +142,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 					this.source = input = new File(URLDecoder.decode(sourceURL
 							.getFile(), "UTF-8"));
 				}
-
 			}
 
 			// //
@@ -178,7 +173,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 									.openStream()
 									: this.source));
 			if (inStream == null)
-				throw new IllegalArgumentException(
+				throw new DataSourceException(
 						"No input stream for the provided source");
 
 			// /////////////////////////////////////////////////////////////////////
@@ -208,7 +203,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 			// //
 			final Object metadata = reader.getImageMetadata(0);
 			if (!(metadata instanceof AsciiGridsImageMetadata))
-
 				throw new DataSourceException(
 						"Unexpected error! Metadata are not of the expected class.");
 
@@ -259,8 +253,8 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 		// get the dimension of the hr image and build the model as well as
 		// computing the resolution
 		// //
-		final Rectangle actualDim = new Rectangle(0, 0, originalGridRange
-				.getLength(0), originalGridRange.getLength(1));
+		final Rectangle actualDim = new Rectangle(0, 0, reader
+				.getWidth(0), reader.getHeight(0));
 		originalGridRange = new GeneralGridRange(actualDim);
 
 		// ///
@@ -301,7 +295,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
 	 */
 	public Format getFormat() {
-		return format;
+		return new ArcGridFormat();
 	}
 
 	/**
@@ -379,13 +373,13 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 		//
 		// /////////////////////////////////////////////////////////////////////
 
-		// /////////////////////////////////////////////////////////////////////
+		// //
 		//
 		// Setting subsampling factors with some checkings
 		// 1) the subsampling factors cannot be zero
 		// 2) the subsampling factors cannot be such that the w or h are zero
 		//
-		// /////////////////////////////////////////////////////////////////////
+		// //
 		final ImageReadParam readP = new ImageReadParam();
 		final Integer imageChoice;
 		try {
@@ -417,12 +411,6 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 		pbjImageRead.add(readerSPI.createReaderInstance());
 		final RenderedOp asciiCoverage = JAI.create("ImageRead", pbjImageRead,
 				hints);
-
-		// /////////////////////////////////////////////////////////////////////
-		//
-		// CRS and Envelope
-		//
-		// /////////////////////////////////////////////////////////////////////
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -474,9 +462,7 @@ public class ArcGridReader extends AbstractGridCoverage2DReader implements GridC
 		} catch (NoSuchElementException e) {
 			if (LOGGER.isLoggable(Level.SEVERE))
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			IOException exc = new IOException();
-			exc.initCause(e);
-			throw exc;
+			throw new DataSourceException(e);
 		}
 	}
 

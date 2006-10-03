@@ -17,7 +17,6 @@ package org.geotools.gce.geotiff;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,6 +24,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 
 import javax.imageio.IIOException;
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.ImageWriter;
@@ -35,6 +35,8 @@ import javax.imageio.stream.ImageOutputStream;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
+import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataEncoder;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
 import org.geotools.gce.geotiff.crs_adapters.CRS2GeoTiffMetadataAdapter;
@@ -58,7 +60,6 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageWriterSpi;
-import com.sun.media.jai.imageioimpl.ImageWriteCRIF;
 
 /*
  * GeoTools - OpenSource mapping toolkit http://geotools.org (C) 2005-2006,
@@ -75,21 +76,34 @@ import com.sun.media.jai.imageioimpl.ImageWriteCRIF;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/GeoTiffWriter.java $
  */
-public final class GeoTiffWriter implements GridCoverageWriter {
+public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
+		GridCoverageWriter {
+	
+	/**The {@link ImageOutputStream} destination.*/
 	private ImageOutputStream destination;
-
-	private final static ImageWriteCRIF imageWriteFactory = new ImageWriteCRIF();
 
 	/** factory for getting tiff writers. */
 	private final static TIFFImageWriterSpi tiffWriterFactory = new TIFFImageWriterSpi();
 
 	/**
-	 * DOCUMENT ME!
+	 * Constructor for a {@link GeoTiffWriter}.
 	 * 
 	 * @param destination
 	 * @throws IOException
 	 */
 	public GeoTiffWriter(Object destination) throws IOException {
+		this(destination, null);
+
+	}
+
+	/**
+	 * Constructor for a {@link GeoTiffWriter}.
+	 * 
+	 * @param destination
+	 * @param hints
+	 * @throws IOException
+	 */
+	public GeoTiffWriter(Object destination, Hints hints) throws IOException {
 
 		if (destination instanceof File)
 			this.destination = ImageIO.createImageOutputStream(destination);
@@ -111,13 +125,17 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		else
 			throw new IllegalArgumentException(
 					"The provided destination canno be used!");
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (hints != null) {
+			if (super.hints == null)
+				this.hints = new Hints(null);
+			hints.add(hints);
+		}
 
-	}
-
-	/**
-	 * 
-	 */
-	public GeoTiffWriter() {
 	}
 
 	/*
@@ -126,7 +144,7 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
 	 */
 	public Format getFormat() {
-		return null;
+		return new GeoTiffFormat();
 	}
 
 	/*
@@ -144,7 +162,8 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getMetadataNames()
 	 */
 	public String[] getMetadataNames() {
-		return null;
+		throw new UnsupportedOperationException(
+				"Method not currently supported");
 	}
 
 	/*
@@ -155,6 +174,8 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 	 */
 	public void setMetadataValue(final String arg0, final String arg1)
 			throws IOException, MetadataNameNotFoundException {
+		throw new UnsupportedOperationException(
+				"Method not currently supported");
 
 	}
 
@@ -164,7 +185,8 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#setCurrentSubname(java.lang.String)
 	 */
 	public void setCurrentSubname(final String arg0) throws IOException {
-
+		throw new UnsupportedOperationException(
+				"Method not currently supported");
 	}
 
 	/*
@@ -313,21 +335,16 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		final IIOMetadata metadata = createGeoTiffIIOMetadata(writer,
 				ImageTypeSpecifier.createFromRenderedImage(image),
 				geoTIFFMetadata);
-		
-		
+
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// IMAGEWRITE
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final ParameterBlock pbjWrite = new ParameterBlock();
-		pbjWrite.addSource(image);
-		pbjWrite.add(outputStream);
-		pbjWrite.add("tiff").add(Boolean.TRUE).add(Boolean.TRUE).add(
-				Boolean.FALSE).add(Boolean.FALSE).add(null).add(null).add(
-				metadata).add(null).add(null).add(null).add(null);
-		pbjWrite.add(writer);
-		imageWriteFactory.create(pbjWrite, null);
+		writer.setOutput(outputStream);
+		writer.write(writer.getDefaultStreamMetadata(writer
+				.getDefaultWriteParam()), new IIOImage(image, null, metadata),
+				null);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -338,11 +355,10 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		if (!(destination instanceof ImageOutputStream))
 			outputStream.close();
 		writer.dispose();
-		
+
 		return true;
 	}
 
-	
 	/**
 	 * Creates image metadata which complies to the GeoTIFFWritingUtilities
 	 * specification for the given image writer, image type and
@@ -364,9 +380,6 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 		final IIOMetadata imageMetadata = writer.getDefaultImageMetadata(type,
 				null);
 
-		 
-		 
-		 
 		org.w3c.dom.Element w3cElement = (org.w3c.dom.Element) imageMetadata
 				.getAsTree(GeoTiffConstants.GEOTIFF_IIO_METADATA_FORMAT_NAME);
 		final Element element = new DOMBuilder().build(w3cElement);
@@ -392,7 +405,6 @@ public final class GeoTiffWriter implements GridCoverageWriter {
 					"Failed to set GeoTIFFWritingUtilities specific tags.", e);
 		}
 
-		
 		return imageMetadata;
 	}
 }

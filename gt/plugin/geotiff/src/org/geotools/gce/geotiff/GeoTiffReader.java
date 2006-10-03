@@ -138,7 +138,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		if (input == null) {
-
 			final IOException ex = new IOException(
 					"GeoTiffReader:No source set to read this coverage.");
 			throw new DataSourceException(ex);
@@ -150,7 +149,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// /////////////////////////////////////////////////////////////////////
 		try {
 			this.source = input;
-			format = new GeoTiffFormat();
 			// setting source
 			if (input instanceof URL) {
 				final URL sourceURL = (URL) input;
@@ -321,9 +319,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	}
 
 	public Format getFormat() {
-		if (format == null)
-			format = new GeoTiffFormat();
-		return format;
+		return new GeoTiffFormat();
 	}
 
 	public String[] getMetadataNames() throws IOException {

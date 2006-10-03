@@ -20,39 +20,44 @@ import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageTypeSpecifier;
 import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.RasterFactory;
 
 import org.geotools.gce.imageio.asciigrid.raster.AsciiGridRaster;
 import org.geotools.gce.imageio.asciigrid.raster.EsriAsciiGridRaster;
 import org.geotools.gce.imageio.asciigrid.raster.GrassAsciiGridRaster;
+import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 
 /**
- * class used for reading ASCII ArcInfo Grid Format (ArcGrid) and ASCII GRASS
- * Grid Format and to create a BufferedImage
+ * Class used for reading ASCII ArcInfo Grid Format (ArcGrid) and ASCII GRASS
+ * Grid Format and to create {@link RenderedImage}s and {@link Raster}s.
  * 
  * @author Daniele Romagnoli
  * @author Simone Giannecchini(Simboss)
  */
-public class AsciiGridsImageReader extends ImageReader {
+public final class AsciiGridsImageReader extends ImageReader {
+	/** Logger. */
 	private static final Logger logger = Logger
-			.getLogger(AsciiGridsImageReader.class.toString());
+			.getLogger("org.geotools.gce.imageio.asciigrid");
 
 	private static final int MIN_SIZE_NEED_TILING = 5242880; // 5 MByte
 
@@ -73,27 +78,69 @@ public class AsciiGridsImageReader extends ImageReader {
 	// we proceed to image tiling
 	private boolean isTiled = false;
 
+	/**
+	 * Tile width for the underlying raster.
+	 */
 	private int tileWidth = -1;
 
+	/**
+	 * Tile height for the underlying raster.
+	 */
 	private int tileHeight = -1;
 
+	/**
+	 * The thread-safe {@link AsciiGridRaster} to read rasters out of an ascii
+	 * grid file.
+	 * 
+	 * <p>
+	 * Every {@link AsciiGridsImageReader} will cache this raster-reader between
+	 * differet reads because it will internally save information about the
+	 * positions of the tiles on disk.
+	 * 
+	 */
 	private AsciiGridRaster rasterReader = null;
 
-	private ComponentColorModel cm;
+	/**
+	 * The Color model for an {@link AsciiGridsImageReader}.
+	 * 
+	 * The color model is always the same, moreover a {@link ColorModel} in java
+	 * is an immutable, therefore it is possible to create it just once for all
+	 * the possible {@link AsciiGridsImageReader}.
+	 * 
+	 * 
+	 */
+	private final static ComponentColorModel cm = RasterFactory
+			.createComponentColorModel(DataBuffer.TYPE_FLOAT,
+			// dataType
+					ColorSpace.getInstance(ColorSpace.CS_GRAY), // color space
+					false, // has alpha
+					false, // is alphaPremultiplied
+					Transparency.OPAQUE); // transparency;
 
+	/** The {@link SampleModel} associated to this reader. */
 	private SampleModel sm;
 
+	/** The {@link ImageTypeSpecifier} associated to this reader. */
 	private ImageTypeSpecifier imageType;
 
-	private ImageReadParam imageReadParam = getDefaultReadParam();
+	/** Default {@link ImageReadParam} for this reader. */
+	private final ImageReadParam imageReadParam = getDefaultReadParam();
 
-	private BufferedImage theImage = null;
-
+	/** The {@link imageInputStream} associated to this reader. */
 	private ImageInputStream imageInputStream = null;
 
+	/** The {@link AsciiGridsImageMetadata} associated to this reader. */
 	private AsciiGridsImageMetadata metadata;
 
-	public AsciiGridsImageReader(ImageReaderSpi originatingProvider) {
+	/**
+	 * Constructor.
+	 * 
+	 * It builts up an {@link AsciiGridsImageReader} by providing an
+	 * {@link AsciiGridsImageReaderSpi}
+	 * 
+	 * @param originatingProvider
+	 */
+	public AsciiGridsImageReader(AsciiGridsImageReaderSpi originatingProvider) {
 		super(originatingProvider);
 
 	}
@@ -124,14 +171,38 @@ public class AsciiGridsImageReader extends ImageReader {
 	 */
 	public void setInput(Object input) {
 
+		// //
+		//
+		// Reset the state of this reader
+		//
+		// Prior to set a new input, I need to do a pre-emptive reset in order
+		// to clear any value-object related to the previous input.
+		// //
 		if (this.imageInputStream != null) {
 			reset();
 		}
+		
+		if (logger.isLoggable(Level.FINE))
+			logger.fine("Setting Input");
 
-		if (input != null && (input instanceof ImageInputStream))
+
+	
+		if (input instanceof ImageInputStream)
 			imageInputStream = (ImageInputStream) input;
 
 		else {
+// try {
+
+				imageInputStream = ImageIO.createImageInputStream((File) input);
+// } catch (Exception e) {
+// throw new RuntimeException("Not a Valid Input", e);
+// }
+
+		}
+
+
+
+		if(imageInputStream==NULL) {
 			// XXXXX
 			throw new IllegalArgumentException(
 					"Unsupported object provided as input!");
@@ -148,23 +219,7 @@ public class AsciiGridsImageReader extends ImageReader {
 			e2.printStackTrace();
 		}
 		imageInputStream.mark();
-		// if (!(imageInputStream instanceof GZIPImageInputStream)) {
-		//
-		// try {
-		//
-		// final ImageInputStream temp = new GZIPImageInputStream(
-		// imageInputStream);
-		// imageInputStream = temp;
-		// } catch (IOException e) {
-		// try {
-		// imageInputStream.reset();
-		// } catch (IOException e1) {
-		// // TODO handle me
-		//
-		// }
-		// }
-		//
-		// }
+
 		try {
 
 			// Header Parsing to check if it is an EsriAsciiGridRaster
@@ -192,10 +247,11 @@ public class AsciiGridsImageReader extends ImageReader {
 	}
 
 	/**
-	 * This method initializes the AsciiGridsImageReader (if it has already
-	 * decoded an input source) by setting some fields, like the
-	 * imageInputStream, the ColorModel and the SampleModel, the image
-	 * dimensions and so on.
+	 * This method initializes the {@link AsciiGridsImageReader} (if it has
+	 * already decoded an input source) by setting some fields, like the
+	 * imageInputStream, the {@link ColorModel} and the {@link SampleModel},
+	 * the image dimensions and so on.
+	 * 
 	 */
 	private void initializeReader() {
 
@@ -210,15 +266,6 @@ public class AsciiGridsImageReader extends ImageReader {
 		// Image dimensions initialization
 		width = rasterReader.getNCols();
 		height = rasterReader.getNRows();
-
-		// creating color model and sample model
-		final ColorSpace cspace = ColorSpace.getInstance(ColorSpace.CS_GRAY);
-
-		cm = RasterFactory.createComponentColorModel(DataBuffer.TYPE_FLOAT, // dataType
-				cspace, // color space
-				false, // has alpha
-				false, // is alphaPremultiplied
-				Transparency.OPAQUE); // transparency
 
 		sm = cm.createCompatibleSampleModel(width, height);
 
@@ -276,7 +323,7 @@ public class AsciiGridsImageReader extends ImageReader {
 	 * @throws IndexOutOfBoundsException
 	 *             if imageIndex is greater than 0.
 	 */
-	final private void checkImageIndex(final int imageIndex) {
+	private void checkImageIndex(final int imageIndex) {
 		/* AsciiGrid file format can "contain" only 1 image */
 		if (imageIndex != 0) {
 			throw new IndexOutOfBoundsException("illegal Index");
@@ -365,10 +412,8 @@ public class AsciiGridsImageReader extends ImageReader {
 	}
 
 	/**
-	 * read the raster and return a BufferedImage
+	 * Reads the raster and return a BufferedImage
 	 * 
-	 * @todo
-	 * @task TODO reusing cm and sm?
 	 * @see javax.imageio.ImageReader#read(int, javax.imageio.ImageReadParam)
 	 */
 	public BufferedImage read(final int imageIndex, ImageReadParam param)
@@ -379,36 +424,40 @@ public class AsciiGridsImageReader extends ImageReader {
 
 		checkImageIndex((imageIndex));
 		processImageStarted(imageIndex);
+		return new BufferedImage(cm, (WritableRaster) readRaster(imageIndex,
+				param), false, null);
 
-		final WritableRaster rasterTiled = (WritableRaster) readRaster(
-				imageIndex, param);
-
-		// Initialize the destination image
-		final Iterator imageTypes = getImageTypes(0);
-
-		theImage = getDestination(param, imageTypes, width, height);
-
-		final Rectangle srcRegion = new Rectangle(0, 0, 0, 0);
-		final Rectangle destRegion = new Rectangle(0, 0, 0, 0);
-
-		computeRegions(imageReadParam, width, height, theImage, srcRegion,
-				destRegion);
-
-		// Creating a color model if not present
-		if ((sm == null) || (cm == null)) {
-			final ColorSpace cspace = ColorSpace
-					.getInstance(ColorSpace.CS_GRAY);
-
-			cm = RasterFactory.createComponentColorModel(DataBuffer.TYPE_FLOAT,
-			// dataType
-					cspace, // color space
-					false, // has alpha
-					false, // is alphaPremultiplied
-					Transparency.OPAQUE); // transparency
-		}
-
-		processImageComplete();
-		return new BufferedImage(cm, rasterTiled, false, null);
+		// // Initialize the destination image
+		// final Iterator imageTypes = getImageTypes(0);
+		// imageTypes
+		// .next();
+		//
+		// final BufferedImage theImage = getDestination(param, imageTypes,
+		// width,
+		// height);
+		//
+		// final Rectangle srcRegion = new Rectangle(0, 0, 0, 0);
+		// final Rectangle destRegion = new Rectangle(0, 0, 0, 0);
+		//
+		// computeRegions(imageReadParam, width, height, theImage, srcRegion,
+		// destRegion);
+		//
+		// // Creating a color model if not present
+		// synchronized (mutex) {
+		//			
+		// }
+		// if ((sm == null) || (cm == null)) {
+		// cm = RasterFactory.createComponentColorModel(DataBuffer.TYPE_FLOAT,
+		// // dataType
+		// ColorSpace
+		// .getInstance(ColorSpace.CS_GRAY), // color space
+		// false, // has alpha
+		// false, // is alphaPremultiplied
+		// Transparency.OPAQUE); // transparency
+		// }
+		//
+		// processImageComplete();
+		// return new BufferedImage(cm, rasterTiled, false, null);
 	}
 
 	public int getTileGridXOffset(final int imageIndex) throws IOException {
@@ -487,8 +536,7 @@ public class AsciiGridsImageReader extends ImageReader {
 		if (param == null) {
 			param = getDefaultReadParam();
 		}
-		imageReadParam = param;
-		return rasterReader.readRaster(imageReadParam);
+		return rasterReader.readRaster(param);
 	}
 
 	public BufferedImage readTile(final int imageIndex, final int tileX,
@@ -541,16 +589,6 @@ public class AsciiGridsImageReader extends ImageReader {
 		return readTile(imageIndex, tileX, tileY).getRaster();
 	}
 
-	public void setInput(Object input, boolean seekForwardOnly,
-			boolean ignoreMetadata) {
-		this.setInput(input);
-	}
-
-	public void setInput(Object input, boolean seekForwardOnly) {
-
-		this.setInput(input);
-	}
-
 	public boolean canReadRaster() {
 		return true;
 	}
@@ -567,6 +605,14 @@ public class AsciiGridsImageReader extends ImageReader {
 		return false;
 	}
 
+	/**
+	 * Returns <code>true</code> if the current input source has been marked
+	 * as allowing metadata to be ignored by passing <code>true</code> as the
+	 * <code>ignoreMetadata</code> argument to the
+	 * {@link AsciiGridsImageReader#setInput} method.
+	 * 
+	 * @return <code>true</code> if the metadata may be ignored.
+	 */
 	public boolean isIgnoringMetadata() {
 		return ignoreMetadata;
 	}
@@ -577,7 +623,7 @@ public class AsciiGridsImageReader extends ImageReader {
 	 * 
 	 * @return Returns the rasterReader.
 	 */
-	final public AsciiGridRaster getRasterReader() {
+	public AsciiGridRaster getRasterReader() {
 		return rasterReader;
 	}
 
@@ -587,10 +633,13 @@ public class AsciiGridsImageReader extends ImageReader {
 	 * 
 	 * @return Returns the imageInputStream.
 	 */
-	final public ImageInputStream getCurrentImageInputStream() {
+	public ImageInputStream getCurrentImageInputStream() {
 		return imageInputStream;
 	}
 
+	/**
+	 * Cleans this {@link AsciiGridsImageReader} up.
+	 */
 	public void dispose() {
 		if (imageInputStream != null)
 			try {
@@ -600,14 +649,11 @@ public class AsciiGridsImageReader extends ImageReader {
 			}
 
 		imageInputStream = null;
-		if (theImage != null)
-			theImage.flush();
-		theImage = null;
 		super.dispose();
 	}
 
 	/**
-	 * A reset method
+	 * Resets this {@link AsciiGridsImageReader}.
 	 * 
 	 * @see javax.imageio.ImageReader#reset()
 	 */
@@ -615,10 +661,9 @@ public class AsciiGridsImageReader extends ImageReader {
 		dispose();
 		super.setInput(null, false, false);
 		rasterReader = null;
-		tileHeight = tileHeight = -1;
+		tileHeight = tileWidth = -1;
 		width = height = -1;
 		sm = null;
-		cm = null;
 		isTiled = false;
 		imageType = null;
 		imageSize = -1;

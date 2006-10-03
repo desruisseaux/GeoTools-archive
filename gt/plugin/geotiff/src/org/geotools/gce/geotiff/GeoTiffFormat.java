@@ -235,7 +235,29 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 		}
 
 	}
-
+	/**
+	 * Retrieves a {@link GeoTiffWriter} or <code>null</code> if the provided
+	 * <code>destination</code> is suitable.
+	 * 
+	 * This file does not use hints in the construction of the geotiff reader.
+	 * 
+	 * @param source
+	 *            must be a GeoTiff File
+	 * @param hints
+	 *            Hints to pass the hypothetic {@link GridCoverageReader} to
+	 *            control its behaviour.
+	 * 
+	 * @return a GeoTiffReader object initialized to the specified File.
+	 */
+	public GridCoverageWriter getWriter(Object destination,Hints hints) {
+		try {
+			return new GeoTiffWriter(destination,hints);
+		} catch (IOException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			return null;
+		}
+	}
 	/**
 	 * Retrieves a {@link GeoTiffWriter} or <code>null</code> if the provided
 	 * <code>destination</code> is suitable.

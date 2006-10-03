@@ -22,18 +22,19 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderedOp;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
@@ -41,11 +42,14 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.DefaultProcessor;
-import org.geotools.coverage.processing.Operations;
+import org.geotools.coverage.processing.operation.Resample;
+import org.geotools.coverage.processing.operation.SelectSampleDimension;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
 import org.geotools.factory.Hints;
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageMetadata;
 import org.geotools.gce.imageio.asciigrid.AsciiGridsImageWriter;
+import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageWriterSpi;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.resources.i18n.Vocabulary;
@@ -69,26 +73,42 @@ import org.opengis.spatialschema.geometry.Envelope;
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
  */
-public class ArcGridWriter implements GridCoverageWriter {
-	/**
-	 * Logger.
-	 * 
-	 */
+public class ArcGridWriter extends AbstractGridCoverageWriter implements
+		GridCoverageWriter {
+	/** Logger. */
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.arcgrid");
-	
-	private ImageWriter mWriter;
+
+	/** Imageio {@link AsciiGridsImageWriter} we will use to write out. */
+	private AsciiGridsImageWriter mWriter = new AsciiGridsImageWriter(
+			new AsciiGridsImageWriterSpi());
+
+	/** Default {@link ParameterValueGroup} for doing a bandselect. */
+	private final static ParameterValueGroup bandSelectParams;
+
+	/** Default {@link ParameterValueGroup} for doing a reshape. */
+	private final static ParameterValueGroup reShapeParams;
+
+	/** Caching a {@link Resample} operation. */
+	private static final Resample resampleFactory = new Resample();
+
+	/** Caching a {@link SelectSampleDimension} operation. */
+	private static final SelectSampleDimension bandSelectFactory = new SelectSampleDimension();
+	static {
+		DefaultProcessor processor = new DefaultProcessor(new Hints(
+				Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
+		bandSelectParams = (ParameterValueGroup) processor.getOperation(
+				"SelectSampleDimension").getParameters();
+
+		reShapeParams = (ParameterValueGroup) processor
+				.getOperation("Resample").getParameters();
+	}
 
 	/** Small number for comparaisons. */
 	private static final double EPS = 1E-6;
 
 	/** the destination object where we will do the writing */
 	private Object destination;
-
-	/** Format for this wirter. */
-	private Format format = (new ArcGridFormatFactory()).createFormat();
-
-	private boolean disposed = false;
 
 	private boolean grass = false;
 
@@ -100,9 +120,78 @@ public class ArcGridWriter implements GridCoverageWriter {
 	 * 
 	 * @param destination
 	 *            the URL or String pointing to the file to load the ArcGrid
+	 * @throws DataSourceException
 	 */
-	public ArcGridWriter(Object destination) {
+	public ArcGridWriter(Object destination) throws DataSourceException {
+		this(destination, null);
+	}
+
+	/**
+	 * Takes either a URL or a String that points to an ArcGridCoverage file and
+	 * converts it to a URL that can then be written to.
+	 * 
+	 * @param destination
+	 *            the URL or String pointing to the file to load the ArcGrid
+	 * @throws DataSourceException
+	 */
+	public ArcGridWriter(Object destination, Hints hints)
+			throws DataSourceException {
 		this.destination = destination;
+		if (destination instanceof File)
+			try {
+				super.outStream = ImageIO.createImageOutputStream(destination);
+			} catch (IOException e) {
+				if (LOGGER.isLoggable(Level.SEVERE))
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				throw new DataSourceException(e);
+			}
+		else if (destination instanceof URL) {
+			final URL dest = (URL) destination;
+			if (dest.getProtocol().equalsIgnoreCase("file")) {
+				File destFile;
+				try {
+					destFile = new File(URLDecoder.decode(dest.getFile(),
+							"UTF8"));
+				} catch (UnsupportedEncodingException e) {
+					if (LOGGER.isLoggable(Level.SEVERE))
+						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					throw new DataSourceException(e);
+				}
+				try {
+					super.outStream = ImageIO.createImageOutputStream(destFile);
+				} catch (IOException e) {
+					if (LOGGER.isLoggable(Level.SEVERE))
+						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					throw new DataSourceException(e);
+				}
+			}
+
+		} else if (destination instanceof OutputStream) {
+
+			try {
+				super.outStream = ImageIO
+						.createImageOutputStream((OutputStream) destination);
+			} catch (IOException e) {
+				if (LOGGER.isLoggable(Level.SEVERE))
+					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				throw new DataSourceException(e);
+			}
+
+		} else if (destination instanceof ImageOutputStream)
+			this.destination = outStream = (ImageOutputStream) destination;
+		else
+			throw new DataSourceException(
+					"The provided destination cannot be used!");
+		// //
+		//
+		// managing hints
+		//
+		// //
+		if (hints != null) {
+			if (super.hints == null)
+				this.hints = new Hints(null);
+			hints.add(hints);
+		}
 	}
 
 	/**
@@ -114,7 +203,8 @@ public class ArcGridWriter implements GridCoverageWriter {
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getMetadataNames()
 	 */
 	public String[] getMetadataNames() {
-		return null;
+		throw new UnsupportedOperationException(
+				"No metadata is suppoprted yet.");
 	}
 
 	/**
@@ -126,7 +216,7 @@ public class ArcGridWriter implements GridCoverageWriter {
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
 	 */
 	public Format getFormat() {
-		return format;
+		return new ArcGridFormat();
 	}
 
 	/**
@@ -197,7 +287,6 @@ public class ArcGridWriter implements GridCoverageWriter {
 			// TODO make the band we write parametric, meaning that the user can
 			// choose it he wants.
 			// /////////////////////////////////////////////////////////////////
-			DefaultProcessor processor = null;
 			final int numBands = gc.getNumSampleDimensions();
 			if (numBands > 1) {
 				final int visibleBand;
@@ -205,14 +294,14 @@ public class ArcGridWriter implements GridCoverageWriter {
 					visibleBand = writeBand;
 				else
 					visibleBand = CoverageUtilities.getVisibleBand(gc);
-				processor = new DefaultProcessor(new Hints(
-						Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
-				final ParameterValueGroup param = (ParameterValueGroup) processor
-						.getOperation("SelectSampleDimension").getParameters();
+
+				final ParameterValueGroup param = (ParameterValueGroup) this.bandSelectParams
+						.clone();
 				param.parameter("source").setValue(gc);
 				param.parameter("SampleDimensions").setValue(
 						new int[] { visibleBand });
-				gc = (GridCoverage2D) processor.doOperation(param);
+				gc = (GridCoverage2D) bandSelectFactory
+						.doOperation(param, null);
 			}
 			// /////////////////////////////////////////////////////////////////
 			//
@@ -223,7 +312,7 @@ public class ArcGridWriter implements GridCoverageWriter {
 			if (!grass)
 				gc = reShapeData(gc, oldEnv.getLength(0), // W
 						oldEnv.getLength(1)// H
-						, processor);
+				);
 
 			// /////////////////////////////////////////////////////////////////
 			//
@@ -251,11 +340,25 @@ public class ArcGridWriter implements GridCoverageWriter {
 			final int rows = source.getHeight();
 
 			// Preparing main parameters for JAI imageWrite Operation
-			final ParameterBlockJAI pbjImageWrite = buildImageWriteParameters(
-					cols, rows, cellsizeX, cellsizeY, xl, yl, grass, gc);
+			// //
+			// Setting Output
+			// //
+			mWriter.setOutput(outStream);
+
+			// //
+			// no data management
+			// //
+			double inNoData = getCandidateNoData(gc);
+
+			// //
+			// Construct a proper asciiGridRaster which supports metadata
+			// setting
+			// //
 
 			// Setting the source for the image write operation
-			pbjImageWrite.addSource(source);
+			mWriter.write(null, new IIOImage(source, null,
+					new AsciiGridsImageMetadata(cols, rows, cellsizeX,
+							cellsizeY, xl, yl, true, grass, inNoData)), null);
 
 			// writing crs info
 			writeCRSInfo(crs);
@@ -265,9 +368,6 @@ public class ArcGridWriter implements GridCoverageWriter {
 			// Creating the imageWrite Operation
 			//
 			// /////////////////////////////////////////////////////////////////
-			final RenderedOp image = JAI.create("ImageWrite", pbjImageWrite);
-			mWriter = (AsciiGridsImageWriter) image
-					.getProperty("JAI.ImageWriter");
 			mWriter.dispose();
 			// TODO: Auto-dispose. Maybe I need to allow a manual dispose call?
 		} catch (IOException e) {
@@ -275,62 +375,6 @@ public class ArcGridWriter implements GridCoverageWriter {
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 			throw new DataSourceException("IOError writing", e);
 		}
-	}
-
-	/**
-	 * A simple method which prepares imageWrite parameters and set metadata
-	 * 
-	 * @param cols
-	 * @param rows
-	 * @param cellsize
-	 * @param xl
-	 * @param yl
-	 * @param yl2
-	 * @param GRASS
-	 * @param gc
-	 */
-	private ParameterBlockJAI buildImageWriteParameters(final int cols,
-			final int rows, final double cellsizeX, final double cellsizeY,
-			final double xl, final double yl, final boolean GRASS,
-			GridCoverage2D gc) {
-
-		final ParameterBlockJAI pbjImageWrite = new ParameterBlockJAI(
-				"ImageWrite");
-		// //
-		// Setting Output
-		// //
-		pbjImageWrite.setParameter("Output", destination);
-
-		// //
-		// Setting Compression parameter if needed
-		// //
-		// if
-		// (format.getWriteParameters().parameter("Compressed").booleanValue())
-		// {
-		Iterator it = ImageIO.getImageWritersByFormatName("arcGrid");
-		ImageWriter writer = (ImageWriter) it.next();
-		pbjImageWrite.setParameter("Writer", writer);
-		// pbjImageWrite.setParameter("Format","arcGrid");
-
-		// ImageWriteParam param = writer.getDefaultWriteParam();
-		// param.setCompressionMode(ImageWriteParam.MODE_DEFAULT);
-		// pbjImageWrite.setParameter("WriteParam", param);
-		// }
-		// }
-
-		// //
-		// no data management
-		// //
-
-		double inNoData = getCandidateNoData(gc);
-
-		// //
-		// Construct a proper asciiGridRaster which supports metadata setting
-		// //
-		pbjImageWrite.setParameter("ImageMetadata",
-				new AsciiGridsImageMetadata(cols, rows, cellsizeX, cellsizeY,
-						xl, yl, true, GRASS, inNoData));
-		return pbjImageWrite;
 	}
 
 	/**
@@ -343,12 +387,9 @@ public class ArcGridWriter implements GridCoverageWriter {
 	 *            Geospatial width of this coverage.
 	 * @param H
 	 *            Geospatial height of this coverage.
-	 * @param processor
-	 * 
 	 * @return A new coverage with square pixels.
 	 */
-	private GridCoverage2D reShapeData(GridCoverage2D gc, double W, double H,
-			DefaultProcessor processor) {
+	private GridCoverage2D reShapeData(GridCoverage2D gc, double W, double H) {
 
 		// resampling the image if needed
 		final RenderedImage image = gc.getRenderedImage();
@@ -360,10 +401,7 @@ public class ArcGridWriter implements GridCoverageWriter {
 		if (Math.abs(dx - dy) <= ArcGridWriter.EPS) {
 			return gc;
 		}
-		// do we already have a processor?
-		if (processor == null)
-			processor = new DefaultProcessor(new Hints(
-					Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
+
 		final double _Nx;
 		final double _Ny;
 
@@ -392,9 +430,15 @@ public class ArcGridWriter implements GridCoverageWriter {
 				0, 0 }, new int[] { Nx, Ny });
 		final GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
 				new GeneralEnvelope(gc.getEnvelope()));
-		return (GridCoverage2D) Operations.DEFAULT.resample(gc, gc
-				.getCoordinateReferenceSystem(), newGridGeometry, Interpolation
-				.getInstance(Interpolation.INTERP_NEAREST));
+		final ParameterValueGroup param = (ParameterValueGroup) reShapeParams
+				.clone();
+		param.parameter("source").setValue(gc);
+		param.parameter("CoordinateReferenceSystem").setValue(
+				gc.getCoordinateReferenceSystem2D());
+		param.parameter("GridGeometry").setValue(newGridGeometry);
+		param.parameter("InterpolationType").setValue(
+				Interpolation.getInstance(Interpolation.INTERP_NEAREST));
+		return (GridCoverage2D) resampleFactory.doOperation(param, hints);
 	}
 
 	/**
@@ -461,6 +505,8 @@ public class ArcGridWriter implements GridCoverageWriter {
 			MetadataNameNotFoundException {
 		// Metadata has not been handled at this point ie there is not spec on
 		// where it should be written
+		throw new UnsupportedOperationException(
+				"No metadata is suppoprted yet.");
 	}
 
 	/**
@@ -491,12 +537,19 @@ public class ArcGridWriter implements GridCoverageWriter {
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#dispose()
 	 */
 	public void dispose() throws IOException {
-		if (disposed)
-			return;
+
 		if (mWriter != null) {
 			mWriter.dispose();
 			mWriter = null;
-			disposed = true;
+
+		}
+		if (outStream != null) {
+			outStream.flush();
+			try {
+				outStream.close();
+			} catch (IOException e) {
+			}
+
 		}
 	}
 

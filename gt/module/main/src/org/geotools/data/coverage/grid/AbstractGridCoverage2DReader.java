@@ -111,10 +111,8 @@ public abstract class AbstractGridCoverage2DReader implements
 	protected GeneralEnvelope originalEnvelope = null;
 
 	/** Coverage name */
-	protected String coverageName = "image_coverage";
+	protected String coverageName = "geotools_coverage";
 
-	/** Format for this reader */
-	protected Format format = null;
 
 	/** Source to read from */
 	protected Object source = null;

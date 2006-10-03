@@ -62,6 +62,7 @@ public class ECWVisualizationTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
+
 		ImageIO.setUseCache(false);
 		JAI.getDefaultInstance().getTileCache().setMemoryCapacity(
 				64 * 1024 * 1024);
@@ -100,14 +101,16 @@ public class ECWVisualizationTest extends TestCase {
 		params.parameter(ECWFormat.READ_GRIDGEOMETRY2D.getName().toString())
 				.setValue(
 						new GridGeometry2D(new GeneralGridRange(new Rectangle(
-								0, 0, 120, 80)), envelope));
+								0, 0, 1200, 1200)), envelope));
 		GeneralParameterValue[] gpv = { params
 				.parameter(AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 						.toString()) };
 
-		GridCoverage2D gc = (GridCoverage2D) reader.read(gpv);
+		GridCoverage2D gc = (GridCoverage2D) reader.read(null);
 		gc.show();
 
+		
+		
 		// printing CRS information
 		LOGGER.info(gc.getCoordinateReferenceSystem().toWKT());
 		LOGGER.info(gc.getEnvelope().toString());

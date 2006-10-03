@@ -18,7 +18,6 @@ package org.geotools.gce.ecw;
 
 import it.geosolutions.imageio.stream.input.FileImageInputStreamExt;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -28,9 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,15 +36,10 @@ import javax.imageio.ImageReader;
 import javax.imageio.plugins.ecw.ECWImageReader;
 import javax.imageio.plugins.ecw.ECWImageReaderSpi;
 import javax.imageio.plugins.gdalframework.GDALImageReader;
-import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-import javax.units.Unit;
 
-import org.geotools.coverage.Category;
-import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.DataSourceException;
@@ -61,7 +52,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.image.ImageUtilities;
-import org.geotools.util.NumberRange;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -80,19 +70,12 @@ import org.opengis.spatialschema.geometry.Envelope;
  */
 public class ECWReader extends AbstractGridCoverage2DReader implements
 		GridCoverageReader {
-	/**
-	 * Logger.
-	 * 
-	 */
+	/** Logger. */
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.arcgrid");
 
 	/** Caches and ImageReaderSpi for an AsciiGridsImageReader. */
-	private final static ImageReaderSpi readerSPI = new ECWImageReaderSpi();
-
-	private String parentPath;
-
-	private double inNoData = Double.NaN;
+	private final static ECWImageReaderSpi readerSPI = new ECWImageReaderSpi();
 
 	/**
 	 * Creates a new instance of an ArcGridReader basing the decision on whether
@@ -136,8 +119,8 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 			throw new DataSourceException(ex);
 		}
 		this.source = input;
-		format = new ECWFormat();
-		coverageName = "AsciiGrid";
+		coverageName = "ECW";
+		boolean parsed = false;
 		try {
 			boolean closeMe = true;
 
@@ -150,9 +133,14 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 				// URL that point to a file
 				final URL sourceURL = ((URL) input);
 				if (sourceURL.getProtocol().compareToIgnoreCase("file") == 0) {
-					this.source = input = new File(URLDecoder.decode(sourceURL
+					this.source = new File(URLDecoder.decode(sourceURL
 							.getFile(), "UTF-8"));
-					inStream = ImageIO.createImageInputStream(source);
+					if (LOGGER.isLoggable(Level.FINE))
+						LOGGER.fine(new StringBuffer(
+								"Input object is a URL that points to ")
+								.append(((File) source).getAbsolutePath())
+								.toString());
+					parsed = true;
 				} else {
 					final IOException ex = new IOException(
 							"ECW:The input provided does not point to a file.");
@@ -160,7 +148,7 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 						LOGGER.log(Level.SEVERE, ex.getLocalizedMessage(), ex);
 					throw new DataSourceException(ex);
 				}
-			} else
+			}
 			// //
 			//
 			// Name, path, etc...
@@ -169,13 +157,16 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 			if (input instanceof File) {
 				final File sourceFile = (File) input;
 				this.source = sourceFile;
-				this.parentPath = sourceFile.getParent();
 				this.coverageName = sourceFile.getName();
 				final int dotIndex = coverageName.indexOf(".");
 				coverageName = (dotIndex == -1) ? coverageName : coverageName
 						.substring(0, dotIndex);
-				inStream = ImageIO.createImageInputStream(sourceFile);
-			} else
+				if (LOGGER.isLoggable(Level.FINE) && !parsed)
+					LOGGER.fine(new StringBuffer(
+							"Input object is a File that points to ").append(
+							((File) source).getAbsolutePath()).toString());
+				parsed = true;
+			}
 			// //
 			//
 			// Get a stream in order to read from it for getting the basic
@@ -184,6 +175,13 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 			// //
 			if (input instanceof FileImageInputStreamExt) {
 				this.source = ((FileImageInputStreamExt) input).getFile();
+				if (LOGGER.isLoggable(Level.FINE) && !parsed)
+					LOGGER
+							.fine(new StringBuffer(
+									"Input object is a FileImageInputStreamExt that points to ")
+									.append(((File) source).getAbsolutePath())
+									.toString());
+				parsed = true;
 				closeMe = false;
 			} else {
 				final IOException ex = new IOException(
@@ -207,6 +205,9 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 			// Get a reader for this format
 			//
 			// //
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER
+						.fine("Instantiating an ECWImageReader for this ECWReader");
 			final ECWImageReader reader = (ECWImageReader) readerSPI
 					.createReaderInstance();
 			reader.setInput(inStream);
@@ -218,6 +219,9 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 			// //
 			try {
 				crs = CRS.parseWKT(reader.getProjection());
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine(new StringBuffer("CRS is ").append(
+							reader.getProjection()).toString());
 			} catch (FactoryException e) {
 				if (LOGGER.isLoggable(Level.WARNING))
 					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
@@ -226,12 +230,6 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 				LOGGER.info("crs not found proceeding with EPSG:4326");
 				crs = ECWFormat.getDefaultCRS();
 			}
-
-			// //
-			//
-			// Getting metadata
-			//
-			// //
 
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -264,33 +262,49 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 	 */
 	private void getResolutionInfo(GDALImageReader reader) throws IOException,
 			TransformException {
-
+		numOverviews = 0;
+		overViewResolutions = null;
+		
 		// //
+		//
+		//			GeneralGridRange
 		//
 		// get the dimension of the hr image and build the model as well as
 		// computing the resolution
+		//
 		// //
-		numOverviews = 0;
-		overViewResolutions = null;
-
 		int hrWidth = reader.getWidth(0);
 		int hrHeight = reader.getHeight(0);
 		final Rectangle actualDim = new Rectangle(0, 0, hrWidth, hrHeight);
 		originalGridRange = new GeneralGridRange(actualDim);
-
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("OriginalGridRange is").append(
+					originalGridRange.toString()).toString());
+		
+		
+		// //
+		//
+		//			GeneralEnvelope
+		//
+		// get the dimension of the hr image and build the model as well as
+		// computing the resolution
+		//
+		// //
 		final double geoTransform[] = reader.getGeoTransform();
 		if (geoTransform != null) {
 			this.raster2Model = ProjectiveTransform.create(new AffineTransform(
-					geoTransform[1], 0.0,  0.0,geoTransform[5],
+					geoTransform[1], 0.0, 0.0, geoTransform[5],
 					geoTransform[0], geoTransform[3]));
 		}
-
 		final AffineTransform tempTransform = new AffineTransform(
 				(AffineTransform) raster2Model);
 		tempTransform.translate(-0.5, -0.5);
 		originalEnvelope = CRSUtilities.transform(ProjectiveTransform
 				.create(tempTransform), new GeneralEnvelope(actualDim));
 		originalEnvelope.setCoordinateReferenceSystem(crs);
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine(new StringBuffer("GeneralEnvelope is").append(
+					originalEnvelope.toString()).toString());
 
 		// ///
 		// 
@@ -307,7 +321,7 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 	public String[] getMetadataNames() throws IOException {
 		// Metadata has not been handled at this point ie there is not spec on
 		// where it should be obtained
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -330,7 +344,7 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
 	 */
 	public Format getFormat() {
-		return format;
+		return new ECWFormat();
 	}
 
 	/**
@@ -369,8 +383,7 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 
 			}
 		}
-		
-		
+
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// set params
@@ -381,6 +394,8 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 		try {
 			imageChoice = setReadParams(readP, readEnvelope, requestedDim);
 		} catch (TransformException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			new DataSourceException(e);
 		}
 
@@ -433,17 +448,16 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 	 * @see org.opengis.coverage.grid.GridCoverageReader#dispose()
 	 */
 	public void dispose() throws IOException {
-		
-		if(inStream!=null){
-			try{
-			inStream.close();
-			}
-			catch(IOException e){
-				if(LOGGER.isLoggable(Level.WARNING))
-					LOGGER.log(Level.WARNING,e.getLocalizedMessage(),e);
+
+		if (inStream != null) {
+			try {
+				inStream.close();
+			} catch (IOException e) {
+				if (LOGGER.isLoggable(Level.WARNING))
+					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			}
 		}
-		
+
 	}
 
 	/**
@@ -452,7 +466,6 @@ public class ECWReader extends AbstractGridCoverage2DReader implements
 	public int getGridCoverageCount() {
 		return 1;
 	}
-
 
 	/**
 	 * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()

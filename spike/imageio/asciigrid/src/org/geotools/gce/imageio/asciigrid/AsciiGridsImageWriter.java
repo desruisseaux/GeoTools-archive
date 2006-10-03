@@ -43,7 +43,7 @@ import org.w3c.dom.Node;
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
  */
-public class AsciiGridsImageWriter extends ImageWriter {
+public final  class AsciiGridsImageWriter extends ImageWriter {
 	private static final Logger logger = Logger
 			.getLogger(AsciiGridsImageWriter.class.toString());
 
