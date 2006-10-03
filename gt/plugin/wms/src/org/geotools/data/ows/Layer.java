@@ -17,7 +17,9 @@ package org.geotools.data.ows;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -43,7 +45,8 @@ public class Layer implements Comparable {
 
     /** A set of Strings representing SRSs */
     private Set srs = null;
-
+    /** the union of the layers's SRSs and the parent's SRSs */
+    private Set allSRSCache = null;
     /**
      * A HashMap representings the bounding boxes on each layer. The Key is the
      * CRS (or SRS) of the bounding box. The Value is the BoundingBox object
@@ -145,21 +148,23 @@ public class Layer implements Comparable {
      * @return Set of all srs/crs for this layer and its ancestors
      */
     public Set getSrs() {
-       TreeSet allSrs = new TreeSet();
-       // Get my ancestor's srs/crs
-       Layer parent = this.getParent();
-       if (parent != null) {
-          Set parentSrs = parent.getSrs();
-          if (parentSrs != null)  //got something, add to accumulation
-             allSrs.addAll(parentSrs);
-       }
-       // Now add my srs/crs, if any. Set collection intrinsically prevents duplicates
-       allSrs.addAll(srs);
+        synchronized (this) {
+            if( allSRSCache==null ){
+                allSRSCache = new HashSet(srs);
+                // Get my ancestor's srs/crs
+                Layer parent = this.getParent();
+                if (parent != null) {
+                   Set parentSrs = parent.getSrs();
+                   if (parentSrs != null)  //got something, add to accumulation
+                       allSRSCache.addAll(parentSrs);
+                }
+            }
+            // May return an empty list, but spec says at least one must be specified. Perhaps, need
+            // to check and throw exception if set is empty. I'm leaving that out for now since 
+            // it changes the method signature and would potentially break existing users of this class
+            return allSRSCache;
+        }
        
-       // May return an empty list, but spec says at least one must be specified. Perhaps, need
-       // to check and throw exception if set is empty. I'm leaving that out for now since 
-       // it changes the method signature and would potentially break existing users of this class
-       return allSrs;
     }
 
     public void setSrs(Set srs) {
