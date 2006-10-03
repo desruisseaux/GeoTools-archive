@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -1025,8 +1026,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 header.addColumn(colName, 'N', Math.min(fieldLen, 9), 0);
             } else if (colType == Long.class) {
                 header.addColumn(colName, 'N', Math.min(fieldLen, 19), 0);
-            } else if ((colType == Double.class) || (colType == Float.class)
-                    || (colType == Number.class)) {
+            } else if (colType == BigInteger.class) {
+                header.addColumn(colName, 'N', Math.min(fieldLen, 33), 0);
+            } else if (Number.class.isAssignableFrom(colType)) {
                 int l = Math.min(fieldLen, 33);
                 int d = Math.max(l - 2, 0);
                 header.addColumn(colName, 'N', l, d);

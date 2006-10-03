@@ -19,6 +19,8 @@ package org.geotools.data.shapefile;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -330,6 +332,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         factory.addType(AttributeTypeFactory.newAttributeType("h",Boolean.class));
         factory.addType(AttributeTypeFactory.newAttributeType("i",Number.class));
         factory.addType(AttributeTypeFactory.newAttributeType("j",Long.class));
+        factory.addType(AttributeTypeFactory.newAttributeType("k",BigDecimal.class));
+        factory.addType(AttributeTypeFactory.newAttributeType("l",BigInteger.class));
         FeatureType type = factory.getFeatureType();
         FeatureCollection features = FeatureCollections.newCollection();
         for (int i = 0, ii = 20; i < ii; i++) {
@@ -343,7 +347,9 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 new Date( i ),
                 new Boolean( true ),
                 new Integer(22),
-                new Long(1234567890123456789L)
+                new Long(1234567890123456789L),
+                new BigDecimal(new BigInteger("12345678901234567890123456789"), 2),
+                new BigInteger("12345678901234567890123456789")
             }));
         }
         return features;
@@ -356,6 +362,35 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURL());
         writeFeatures(s, features);
     }
+    
+    public void testWriteReadBigNumbers() throws Exception {
+    	// create feature type
+		FeatureTypeFactory factory = FeatureTypeFactory.newInstance("junk");
+		factory.addType(AttributeTypeFactory.newAttributeType("a", Geometry.class));
+		factory.addType(AttributeTypeFactory.newAttributeType("b", BigDecimal.class));
+		factory.addType(AttributeTypeFactory.newAttributeType("c", BigInteger.class));
+		FeatureType type = factory.getFeatureType();
+		FeatureCollection features = FeatureCollections.newCollection();
+		BigInteger bi = new BigInteger("1234567890123456789");
+		BigDecimal bd = new BigDecimal(bi, 2);
+		features.add(type.create(new Object[] {
+				new GeometryFactory().createPoint(new Coordinate(1, -1)),
+				bd, bi }));
+		
+		// store features
+		File tmpFile = getTempFile();
+		tmpFile.createNewFile();
+		ShapefileDataStore s = new ShapefileDataStore(tmpFile.toURL());
+		writeFeatures(s, features);
+
+		// read them back
+		FeatureReader fr = s.getFeatureReader("junk");
+		Feature f = fr.next();
+		
+		// check attribute values (type won't be preserved)
+		assertEquals(((Number) f.getAttribute("b")).doubleValue(), bd.doubleValue(), 0.000001);
+		assertEquals(((Number) f.getAttribute("c")).longValue(), bi.longValue());
+	}
     
     public void testGeometriesWriting() throws Exception {
         
