@@ -278,7 +278,7 @@ public final class JTS {
         double[] coords=new double[]{envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY()};
         double[] newcoords=new double[4];
 
-        MathTransform transform = CRS.transform(envelope.getCRS(),crs,lenient);
+        MathTransform transform = CRS.findMathTransform(envelope.getCRS(),crs,lenient);
         transform.transform(coords, 0, newcoords, 0, 2);
         return new ReferencedEnvelope(new Envelope(newcoords[0],newcoords[2],newcoords[1],newcoords[3]),crs);
     }

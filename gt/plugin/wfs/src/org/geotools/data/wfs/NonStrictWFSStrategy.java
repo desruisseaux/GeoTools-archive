@@ -187,7 +187,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
             // reproject this
             try {
                 dataCRS = CRS.decode(fsd.getSRS());
-                MathTransform toDataCRS = CRS.transform( DefaultGeographicCRS.WGS84, dataCRS );
+                MathTransform toDataCRS = CRS.findMathTransform( DefaultGeographicCRS.WGS84, dataCRS );
                 maxbbox = JTS.transform( fsd.getLatLongBoundingBox(), null, toDataCRS, 10 );                
             } catch (FactoryException e) {
                 WFSDataStoreFactory.logger.warning(e.getMessage());maxbbox = null;

@@ -110,7 +110,7 @@ public class CRSTest extends TestCase {
         CoordinateReferenceSystem WGS84 = (CoordinateReferenceSystem) CRS.decode("EPSG:4326"); // latlong
         CoordinateReferenceSystem BC_ALBERS = (CoordinateReferenceSystem) CRS.decode("EPSG:42102");
         
-        MathTransform transform = CRS.transform(BC_ALBERS, WGS84 );
+        MathTransform transform = CRS.findMathTransform(BC_ALBERS, WGS84 );
         
         Polygon polyAfter = (Polygon) JTS.transform(poly1, transform);
         System.out.println( polyAfter );

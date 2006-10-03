@@ -475,7 +475,7 @@ public class CTSTutorial {
 		System.out.println("Source CRS: " + sourceCRS.getName().getCode());
 		System.out.println("Target CRS: " + targetCRS.getName().getCode());
 		
-		MathTransform mathTransform =CRS.transform( sourceCRS, targetCRS );
+		MathTransform mathTransform =CRS.findMathTransform( sourceCRS, targetCRS );
 		System.out.println("MT: " + mathTransform.toWKT());
 	    DirectPosition pt = new GeneralDirectPosition(4089881.3, -4874130.7, 441946.6); //x,y,z
 	    System.out.println("Input point: " + pt);

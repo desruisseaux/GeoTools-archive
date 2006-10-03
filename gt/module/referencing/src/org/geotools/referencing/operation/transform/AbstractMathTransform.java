@@ -87,26 +87,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
 
     /**
      * Gets the dimension of input points.
-     *
-     * @deprecated Renamed {@link #getSourceDimensions} for consistency with {@link OperationMethod}.
-     */
-    public final int getDimSource() {
-        return getSourceDimensions();
-    }
-
-    /**
-     * Gets the dimension of input points.
      */
     public abstract int getSourceDimensions();
-    
-    /**
-     * Gets the dimension of output points.
-     *
-     * @deprecated Renamed {@link #getTargetDimensions} for consistency with {@link OperationMethod}.
-     */
-    public final int getDimTarget() {
-        return getTargetDimensions();
-    }
     
     /**
      * Gets the dimension of output points.

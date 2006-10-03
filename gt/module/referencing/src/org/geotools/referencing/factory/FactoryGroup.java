@@ -110,7 +110,7 @@ public final class FactoryGroup extends ReferencingFactory {
      * @param    mtFactory The {@linkplain MathTransform math transform} factory.
      *
      * @deprecated Use {@link #createInstance} instead. The fate of this constructor is
-     *             incertain. It may be removed in Geotools 2.3, or refactored as a new
+     *             incertain. It may be removed in Geotools 2.4, or refactored as a new
      *             {@code createInstance} convenience method.
      */
     public FactoryGroup(final DatumFactory      datumFactory,

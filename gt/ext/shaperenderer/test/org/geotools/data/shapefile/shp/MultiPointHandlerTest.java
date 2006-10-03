@@ -50,7 +50,7 @@ public class MultiPointHandlerTest extends TestCase {
 		Envelope env=new Envelope(-180,180,-90,90);
 //		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
-		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
+		MathTransform2D mt=(MathTransform2D) CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
 		reader.setHandler(new MultiPointHandler(reader.getHeader().getShapeType(), env, mt, false));

@@ -1407,7 +1407,7 @@ public class ShapefileRenderer implements GTRenderer {
 						.getCoordinateSystem();
 
 				try {
-					mt = CRS.transform(dataCRS, destinationCrs, true);
+					mt = CRS.findMathTransform(dataCRS, destinationCrs, true);
 					bbox = JTS.transform(bbox, mt.inverse(), 10);
 				} catch (Exception e) {
 					mt = null;

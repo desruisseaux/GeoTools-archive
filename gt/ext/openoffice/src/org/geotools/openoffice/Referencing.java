@@ -879,7 +879,7 @@ public final class Referencing extends Formulas implements XReferencing {
                 targetPt.ordinates[i] = (i<dst.length) ? dst[i] : 0;
             }
             try {
-                calculator.setAnchorPosition     (sourcePt);
+                calculator.setStartingPosition   (sourcePt);
                 calculator.setDestinationPosition(targetPt);
             } catch (TransformException exception) {
                 if (!failureReported) {
@@ -933,7 +933,7 @@ public final class Referencing extends Formulas implements XReferencing {
             }
             final DirectPosition targetPt;
             try {
-                calculator.setAnchorPosition(sourcePt);
+                calculator.setStartingPosition(sourcePt);
                 calculator.setDirection(azimuth, distance);
                 targetPt = calculator.getDestinationPosition();
             } catch (TransformException exception) {

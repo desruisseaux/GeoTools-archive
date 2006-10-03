@@ -515,7 +515,7 @@ public class Rendering2DTest extends TestCase {
 				+ "PARAMETER[\"false_northing\",0],"
 				+ "UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],"
 				+ "AUTHORITY[\"EPSG\",\"3005\"]]");
-		final MathTransform t = CRS.transform(DefaultGeographicCRS.WGS84, crs,
+		final MathTransform t = CRS.findMathTransform(DefaultGeographicCRS.WGS84, crs,
 				true);
 
 		// //

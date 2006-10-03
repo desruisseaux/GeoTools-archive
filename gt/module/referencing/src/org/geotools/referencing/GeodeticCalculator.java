@@ -516,13 +516,6 @@ public class GeodeticCalculator {
     }
 
     /**
-     * @deprecated Renamed as {@link #setStartingGeographicPoint(double,double)}.
-     */
-    public void setAnchorPoint(double longitude, double latitude) throws IllegalArgumentException {
-        setStartingGeographicPoint(longitude, latitude);
-    }
-
-    /**
      * Set the starting point in geographic coordinates.
      * The {@linkplain #getAzimuth() azimuth},
      * the {@linkplain #getOrthodromicDistance() orthodromic distance} and
@@ -550,13 +543,6 @@ public class GeodeticCalculator {
     }
 
     /**
-     * @deprecated Renamed as {@link #setStartingGeographicPoint(Point2D)}.
-     */
-    public void setAnchorPoint(final Point2D point) throws IllegalArgumentException {
-        setStartingGeographicPoint(point);
-    }
-
-    /**
      * Set the starting point in geographic coordinates. The <var>x</var> and <var>y</var>
      * coordinates must be the longitude and latitude in decimal degrees, respectively.
      *
@@ -571,13 +557,6 @@ public class GeodeticCalculator {
      */
     public void setStartingGeographicPoint(final Point2D point) throws IllegalArgumentException {
         setStartingGeographicPoint(point.getX(), point.getY());
-    }
-
-    /**
-     * @deprecated Renamed as {@link #setStartingPosition}.
-     */
-    public void setAnchorPosition(final Position position) throws TransformException {
-        setStartingPosition(position);
     }
 
     /**
@@ -600,13 +579,6 @@ public class GeodeticCalculator {
     }
 
     /**
-     * @deprecated Renamed as {@link #getStartingGeographicPoint}.
-     */
-    public Point2D getAnchorPoint() {
-        return getStartingGeographicPoint();
-    }
-
-    /**
      * Returns the starting point in geographic coordinates. The <var>x</var> and <var>y</var>
      * coordinates are the longitude and latitude in decimal degrees, respectively. If the
      * starting point has never been set, then the default value is (0,0).
@@ -617,13 +589,6 @@ public class GeodeticCalculator {
      */
     public Point2D getStartingGeographicPoint() {
         return new Point2D.Double(Math.toDegrees(long1), Math.toDegrees(lat1));
-    }
-
-    /**
-     * @deprecated Renamed as {@link #getStartingPosition}.
-     */
-    public DirectPosition getAnchorPosition() throws TransformException {
-        return getStartingPosition();
     }
 
     /**
@@ -646,13 +611,6 @@ public class GeodeticCalculator {
             position = userToGeodetic.inverseTransform();
         }
         return position;
-    }
-
-    /**
-     * @deprecated Renamed as {@link #setDestinationGeographicPoint(double,double)}.
-     */
-    public void setDestinationPoint(double longitude, double latitude) throws IllegalArgumentException {
-        setDestinationGeographicPoint(longitude, latitude);
     }
 
     /**
@@ -681,13 +639,6 @@ public class GeodeticCalculator {
     }
 
     /**
-     * @deprecated Renamed as {@link #setDestinationGeographicPoint(Point2D)}.
-     */
-    public void setDestinationPoint(final Point2D point) throws IllegalArgumentException {
-        setDestinationGeographicPoint(point);
-    }
-
-    /**
      * Set the destination point in geographic coordinates. The <var>x</var> and <var>y</var>
      * coordinates must be the longitude and latitude in decimal degrees, respectively.
      *
@@ -703,7 +654,7 @@ public class GeodeticCalculator {
     public void setDestinationGeographicPoint(final Point2D point)
             throws IllegalArgumentException
     {
-        setDestinationPoint(point.getX(), point.getY());
+        setDestinationGeographicPoint(point.getX(), point.getY());
     }
 
     /**
@@ -722,14 +673,7 @@ public class GeodeticCalculator {
             userToGeodetic.transform(p);
             p = userToGeodetic;
         }
-        setDestinationPoint(p.getOrdinate(0), p.getOrdinate(1));
-    }
-
-    /**
-     * @deprecated Renamed as {@link #getDestinationGeographicPoint}.
-     */
-    public Point2D getDestinationPoint() throws IllegalStateException {
-        return getDestinationGeographicPoint();
+        setDestinationGeographicPoint(p.getOrdinate(0), p.getOrdinate(1));
     }
 
     /**

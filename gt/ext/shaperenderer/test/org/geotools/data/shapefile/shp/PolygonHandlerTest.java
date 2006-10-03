@@ -58,7 +58,7 @@ public class PolygonHandlerTest extends TestCase {
 //		Envelope env=new Envelope(-180,180,-90,90);
 		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 //		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
-		MathTransform2D mt=(MathTransform2D) CRS.transform(crs, DefaultGeographicCRS.WGS84);
+		MathTransform2D mt=(MathTransform2D) CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
 		
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
         if (true) {
@@ -89,7 +89,7 @@ public class PolygonHandlerTest extends TestCase {
 //		Envelope env=new Envelope(-180,180,-90,90);
 //		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
-		MathTransform mt= CRS.transform(crs, DefaultGeographicCRS.WGS84);
+		MathTransform mt= CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
 		AffineTransform at=RendererUtilities.worldToScreenTransform(env,new Rectangle(300,300));
 		mt = FactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt, FactoryFinder.getMathTransformFactory(null)

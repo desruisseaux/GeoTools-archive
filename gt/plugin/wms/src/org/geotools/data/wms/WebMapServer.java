@@ -333,7 +333,7 @@ public class WebMapServer extends AbstractOpenWebService {
                 CoordinateReferenceSystem fromCRS = null;
                 try {
                     fromCRS = CRS.decode(epsg);
-                    MathTransform transform = CRS.transform(fromCRS, crs, true);
+                    MathTransform transform = CRS.findMathTransform(fromCRS, crs, true);
                     
                     DirectPosition newLower = transform.transform(env.getLowerCorner(),null);
                     DirectPosition newUpper = transform.transform(env.getUpperCorner(),null);

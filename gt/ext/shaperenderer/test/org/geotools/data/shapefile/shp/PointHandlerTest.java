@@ -57,7 +57,7 @@ public class PointHandlerTest extends TestCase {
 //		Envelope env=new Envelope(-180,180,-90,90);
 //		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
-		MathTransform mt=CRS.transform(crs, DefaultGeographicCRS.WGS84);
+		MathTransform mt=CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
 		
 		AffineTransform transform=RendererUtilities.worldToScreenTransform(env, new Rectangle(300,300));
 		GeneralMatrix matrix=new GeneralMatrix(transform);

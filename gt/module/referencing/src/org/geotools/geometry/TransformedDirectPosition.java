@@ -133,20 +133,6 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
     }
 
     /**
-     * Creates a new direct position with the specified coordinate reference system.
-     *
-     * @param crs The CRS for this direct position.
-     * @param hints The set of hints to use for fetching a {@link CoordinateOperationFactory},
-     *        or {@code null} if none.
-     *
-     * @deprecated Replaced by {@link #TransformedDirectPosition(CoordinateReferenceSystem,
-     *             CoordinateReferenceSystem, Hints)}.
-     */
-    public TransformedDirectPosition(final CoordinateReferenceSystem crs, final Hints hints) {
-        this(null, crs, hints);
-    }
-
-    /**
      * Creates a new position which will contains the result of coordinate transformations from
      * {@code sourceCRS} to {@code targetCRS}. The {@linkplain #getCoordinateReferenceSystem CRS
      * associated with this position} will be initially set to {@code targetCRS}.
@@ -272,15 +258,6 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
         if (forward.transform(position, this) != this) {
             throw new AssertionError(forward); // Should never occurs.
         }
-    }
-
-    /**
-     * @deprecated Renamed as {@link #inverseTransform}.
-     */
-    public DirectPosition transform(final CoordinateReferenceSystem crs)
-            throws TransformException
-    {
-        return inverseTransform(crs);
     }
 
     /**

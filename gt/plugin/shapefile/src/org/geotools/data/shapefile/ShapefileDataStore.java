@@ -749,7 +749,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 if (cs != null) {
                     try {
                         transformedBounds = JTS.transform(env,
-                                CRS.transform(DefaultGeographicCRS.WGS84, cs,
+                                CRS.findMathTransform(DefaultGeographicCRS.WGS84, cs,
                                     true));
                     } catch (Exception e) {
                         cs = null;

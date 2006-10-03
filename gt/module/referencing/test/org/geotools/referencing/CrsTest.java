@@ -84,7 +84,7 @@ public class CrsTest extends TestCase {
                      "  UNIT[\"Meter\",1]]";
         final CoordinateReferenceSystem mapCRS = CRS.parseWKT(wkt);
         final CoordinateReferenceSystem WGS84  = DefaultGeographicCRS.WGS84;
-        final MathTransform crsTransform = CRS.transform(WGS84, mapCRS, true);
+        final MathTransform crsTransform = CRS.findMathTransform(WGS84, mapCRS, true);
         assertFalse(crsTransform.isIdentity());
 
         final GeneralEnvelope firstEnvelope, transformedEnvelope, oldEnvelope;

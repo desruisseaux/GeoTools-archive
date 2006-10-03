@@ -133,15 +133,6 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
     };
 
     /**
-     * Instances of {@link OrderedAxisAuthorityFactory} registered in {@link FactoryFinder} for
-     * the specified authority names. This is used by {@link #register} and {@link #unregister}
-     * methods.
-     *
-     * @deprecated Remove after we deleted {@link #register} and {@link #unregister}.
-     */
-    private static final Map/*<String,OrderedAxisAuthorityFactory>*/ REGISTERED = new HashMap();
-
-    /**
      * The rank to be given to each axis direction. The rank is stored at the indice
      * corresponding to the direction {@linkplain AxisDirection#ordinal ordinal} value.
      */
@@ -230,54 +221,6 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
     }
 
     /**
-     * Creates a factory which will reorder the axis of all objects created by the default
-     * authority factories. The factories are fetched using {@link FactoryFinder}.
-     * <p>
-     * <strong>WARNING:</strong> Do not invoke this constructor from a subclass to be registered in
-     * a {@code META-INF/services/} file for use by {@link FactoryFinder}. It may lead to recursive
-     * calls until a {@link StackOverflowError} is thrown.
-     *
-     * @param  authority The authority to wraps (example: {@code "EPSG"}).
-     * @param  hints An optional set of hints, or {@code null} if none.
-     * @param  forceStandardUnits {@code true} if this authority factory should also force all
-     *         angular units to decimal degrees and linear units to meters, or {@code false} if
-     *         the units should be left unchanged.
-     * @throws FactoryRegistryException if at least one factory can not be obtained.
-     *
-     * @deprecated Replaced by {@link #OrderedAxisAuthorityFactory(String,Hints,AxisDirection[])}.
-     */
-    public OrderedAxisAuthorityFactory(String authority, Hints hints, boolean forceStandardUnits) {
-        this(authority, mergeHints(hints, forceStandardUnits), null);
-    }
-
-    /**
-     * Creates a factory which will reorder the axis of all objects created by
-     * the supplied factory.
-     *
-     * @param factory  The factory that produces objects using arbitrary axis order.
-     * @param forceStandardUnits {@code true} if this authority factory should also force all
-     *        angular units to decimal degrees and linear units to meters, or {@code false} if
-     *        the units should be left unchanged.
-     *
-     * @deprecated Replaced by {@link #OrderedAxisAuthorityFactory(AbstractAuthorityFactory,Hints,
-     *             AxisDirection[])}.
-     */
-    public OrderedAxisAuthorityFactory(final AbstractAuthorityFactory factory,
-                                       final boolean forceStandardUnits)
-    {
-        this(factory, mergeHints(null, forceStandardUnits), null);
-    }
-
-    /**
-     * @deprecated To be removed after we removed the deprecated constructors.
-     */
-    private static Hints mergeHints(Hints hints, final boolean forceStandardUnits) {
-        hints = new Hints(hints);
-        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS, Boolean.valueOf(forceStandardUnits));
-        return hints;
-    }
-
-    /**
      * Returns the boolean value for the specified hint.
      */
     private static boolean booleanValue(final Hints hints, final Hints.Key key) {
@@ -301,76 +244,6 @@ public class OrderedAxisAuthorityFactory extends TransformedAuthorityFactory
         // but tells to the user what this factory do about axis order.
         if (compare(DefaultCoordinateSystemAxis.EASTING, DefaultCoordinateSystemAxis.NORTHING) < 0) {
             hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-        }
-    }
-
-    /**
-     * Registers an <cite>ordered axis authority factory</cite> as a replacement of the specified
-     * authority. If this method has already been invoked previously for the same authority, then
-     * this method invocation does nothing. Otherwise, it performs the following steps:
-     * <p>
-     * <ul>
-     *   <li>A new {@code OrderedAxisAuthorityFactory} instance is created as a wrapper around
-     *       the default authority factories provided by
-     * <code>{@linkplain FactoryFinder}.get<var>Foo</var>AuthorityFactory(authority)</code></li>
-     *
-     *   <li>This new instance is registered in {@link FactoryFinder} with a priority slightly
-     *       higher than the priority of wrapped factories. Consequently, the <cite>reordered
-     *       axis authority factory</cite> should become the default one for the specified
-     *       authority.</li>
-     * </ul>
-     * <p>
-     * <strong>WARNING:</strong> this method has a system-wide effect. Any user asking for the
-     * specified {@code authority} will get an <cite>ordered axis authority factory</cite>
-     * instance. It may be misleading for client code expecting the official factory. Avoid
-     * this method unless you really need reordered axis for all code in the current Java
-     * Virtual Machine.
-     *
-     * @param  authority The name of the authority factories to override with an ordered axis
-     *         instance.
-     * @throws FactoryRegistryException if the registration failed.
-     *
-     * @deprecated This method has a system-wide effect. Use
-     *             {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} instead, which provides
-     *             a case-by-case control. If a system-wide effect is really wanted, use
-     *             {@code System.setProperty("org.geotools.referencing.forceXY", "true")}.
-     */
-    public static void register(String authority) throws FactoryRegistryException {
-        authority = authority.toUpperCase().trim();
-        synchronized (REGISTERED) {
-            if (REGISTERED.containsKey(authority)) {
-                return;
-            }
-            final OrderedAxisAuthorityFactory candidate =
-                    new OrderedAxisAuthorityFactory(authority, null, false);
-            FactoryFinder.addAuthorityFactory(candidate);
-            if (REGISTERED.put(authority, candidate) != null) {
-                // Paranoïac check: should never happen because of the 'containsKey' check above.
-                throw new AssertionError();
-            }
-        }
-    }
-
-    /**
-     * Unregisters an <cite>ordered axis authority factory</cite> previously registered with
-     * the {@link #register register} method.
-     *
-     * @param  authority The authority name given to the {@link #register register} method.
-     * @throws FactoryRegistryException if the unregistration failed.
-     *
-     * @deprecated This method has a system-wide effect. Use
-     *             {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER} instead, which provides
-     *             a case-by-case control. If a system-wide effect is really wanted, use
-     *             {@code System.setProperty("org.geotools.referencing.forceXY", "false")}.
-     */
-    public static void unregister(String authority) throws FactoryRegistryException {
-        authority = authority.toUpperCase().trim();
-        synchronized (REGISTERED) {
-            final AbstractAuthorityFactory candidate;
-            candidate = (AbstractAuthorityFactory) REGISTERED.remove(authority);
-            if (candidate != null) {
-                FactoryFinder.removeAuthorityFactory(candidate);
-            }
         }
     }
 

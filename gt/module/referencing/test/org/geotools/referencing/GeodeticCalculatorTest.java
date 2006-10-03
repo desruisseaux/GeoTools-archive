@@ -77,11 +77,11 @@ public class GeodeticCalculatorTest extends TestCase {
         final double EPS = 2E-1;
         final GeodeticCalculator calculator = new GeodeticCalculator();
         assertTrue(calculator.getCoordinateReferenceSystem() instanceof GeographicCRS);
-        calculator.setAnchorPoint(12, 20);
-        calculator.setDestinationPoint(13, 20);  assertEquals("East",   90, calculator.getAzimuth(), EPS);
-        calculator.setDestinationPoint(12, 21);  assertEquals("North",   0, calculator.getAzimuth(), EPS);
-        calculator.setDestinationPoint(11, 20);  assertEquals("West",  -90, calculator.getAzimuth(), EPS);
-        calculator.setDestinationPoint(12, 19);  assertEquals("South", 180, calculator.getAzimuth(), EPS);
+        calculator.setStartingGeographicPoint(12, 20);
+        calculator.setDestinationGeographicPoint(13, 20);  assertEquals("East",   90, calculator.getAzimuth(), EPS);
+        calculator.setDestinationGeographicPoint(12, 21);  assertEquals("North",   0, calculator.getAzimuth(), EPS);
+        calculator.setDestinationGeographicPoint(11, 20);  assertEquals("West",  -90, calculator.getAzimuth(), EPS);
+        calculator.setDestinationGeographicPoint(12, 19);  assertEquals("South", 180, calculator.getAzimuth(), EPS);
     }
 
     /**
@@ -115,9 +115,9 @@ public class GeodeticCalculatorTest extends TestCase {
         final double             R          = 20000/Math.PI;
         final DefaultEllipsoid   ellipsoid  = DefaultEllipsoid.createEllipsoid("Test",R,R,SI.KILO(SI.METER));
         final GeodeticCalculator calculator = new GeodeticCalculator(ellipsoid);
-        calculator.setAnchorPoint(0, 45);
+        calculator.setStartingGeographicPoint(0, 45);
         for (int i=0; i<DATA.length; i+=3) {
-            calculator.setDestinationPoint(DATA[i], 45);
+            calculator.setDestinationGeographicPoint(DATA[i], 45);
             final double orthodromic = calculator.getOrthodromicDistance();
 //          final double loxodromic  = calculator. getLoxodromicDistance();
             assertEquals("Orthodromic distance", DATA[i+1], orthodromic, 0.75);
@@ -167,14 +167,14 @@ public class GeodeticCalculatorTest extends TestCase {
 
         final double x = 45;
         final double y = 30;
-        calculator.setAnchorPosition(new DirectPosition2D(x,y));
-        Point2D point = calculator.getAnchorPoint();
+        calculator.setStartingPosition(new DirectPosition2D(x,y));
+        Point2D point = calculator.getStartingGeographicPoint();
         assertEquals(y, point.getX(), 1E-5);
         assertEquals(x, point.getY(), 1E-5);
 
         calculator.setDirection(10, 100);
         DirectPosition position = calculator.getDestinationPosition();
-        point = calculator.getDestinationPoint();
+        point = calculator.getDestinationGeographicPoint();
         assertEquals(point.getX(), position.getOrdinate(1), 1E-5);
         assertEquals(point.getY(), position.getOrdinate(0), 1E-5);
     }

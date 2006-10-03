@@ -482,24 +482,6 @@ public class GeotoolsFactory extends ReferencingFactory
     }
 
     /**
-     * Creates a cylindrical coordinate system from the given polar CS and
-     * perpendicular axis.
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  polarCS The polar coordinate system.
-     * @param  axis The perpendicular axis.
-     * @throws FactoryException if the object creation failed.
-     *
-     * @deprecated Uses the method expecting 3 axis instead.
-     */
-    public CylindricalCS createCylindricalCS(Map            properties,
-                                             PolarCS           polarCS,
-                                             CoordinateSystemAxis axis) throws FactoryException
-    {
-        return createCylindricalCS(properties, polarCS.getAxis(0), polarCS.getAxis(1), axis);
-    }
-
-    /**
      * Creates a cylindrical coordinate system from the given set of axis.
      *
      * @param  properties Name and other properties to give to the new object.
@@ -892,37 +874,6 @@ public class GeotoolsFactory extends ReferencingFactory
      * map performing a rotation, then any mixed axes must have identical units.
      * For example, a (<var>lat_deg</var>, <var>lon_deg</var>, <var>height_feet</var>)
      * system can be rotated in the (<var>lat</var>, <var>lon</var>) plane, since both
-     * affected axes are in decimal degrees.  But you should not rotate this coordinate
-     * system in any other plane.
-     * <p>
-     * <strong>NOTE:</strong>
-     * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
-     * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
-     * change of axis order}, if needed. The {@link FactoryGroup} class provides conveniences
-     * methods for this task.
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  base Coordinate reference system to base the derived CRS on.
-     * @param  baseToDerived The transform from the base CRS to returned CRS.
-     * @param  derivedCS The coordinate system for the derived CRS.
-     * @throws FactoryException if the object creation failed.
-     *
-     * @deprecated Use the method with an {@link OperationMethod} argument instead.
-     */
-    public DerivedCRS createDerivedCRS(Map                 properties,
-                                       CoordinateReferenceSystem base,
-                                       MathTransform    baseToDerived,
-                                       CoordinateSystem     derivedCS) throws FactoryException
-    {
-        return createDerivedCRS(properties, new DefaultOperationMethod(baseToDerived),
-                                base, baseToDerived, derivedCS);
-    }
-
-    /**
-     * Creates a derived coordinate reference system. If the transformation is an affine
-     * map performing a rotation, then any mixed axes must have identical units.
-     * For example, a (<var>lat_deg</var>, <var>lon_deg</var>, <var>height_feet</var>)
-     * system can be rotated in the (<var>lat</var>, <var>lon</var>) plane, since both
      * affected axes are in decimal degrees. But you should not rotate this coordinate
      * system in any other plane.
      * <p>
@@ -966,32 +917,6 @@ public class GeotoolsFactory extends ReferencingFactory
      * methods for this task.
      * 
      * @param  properties Name and other properties to give to the new object.
-     * @param  geoCRS Geographic coordinate reference system to base projection on.
-     * @param  toProjected The transform from the geographic to the projected CRS.
-     * @param  cs The coordinate system for the projected CRS.
-     * @throws FactoryException if the object creation failed.
-     *
-     * @deprecated Use the method with an {@link OperationMethod} argument instead.
-     */
-    public ProjectedCRS createProjectedCRS(Map            properties,
-                                           GeographicCRS      geoCRS,
-                                           MathTransform toProjected,
-                                           CartesianCS            cs) throws FactoryException
-    {
-        return createProjectedCRS(properties, new DefaultOperationMethod(toProjected),
-                                  geoCRS, toProjected, cs);
-    }
-    
-    /**
-     * Creates a projected coordinate reference system from a transform.
-     * <p>
-     * <strong>NOTE:</strong>
-     * It is the user's responsability to ensure that the {@code baseToDerived} transform performs
-     * all required steps, including {@linkplain AbstractCS#swapAndScaleAxis unit conversions and
-     * change of axis order}, if needed. The {@link FactoryGroup} class provides conveniences
-     * methods for this task.
-     * 
-     * @param  properties Name and other properties to give to the new object.
      * @param  method A description of the {@linkplain Conversion#getMethod method for the
      *         projection}.
      * @param  base Geographic coordinate reference system to base projection on.
@@ -1013,81 +938,6 @@ public class GeotoolsFactory extends ReferencingFactory
         }
         crs = (ProjectedCRS) pool.canonicalize(crs);
         return crs;
-    }
-
-    /**
-     * Creates a projected coordinate reference system from a projection name.
-     * 
-     * @param  properties Name and other properties to give to the new object.
-     * @param  geoCRS Geographic coordinate reference system to base projection on.
-     * @param  method The method name for the projection to be created
-     *         (e.g. "Transverse_Mercator", "Mercator_1SP", "Oblique_Stereographic", etc.).
-     * @param  parameters The parameter values to give to the projection. May includes
-     *         "central_meridian", "latitude_of_origin", "scale_factor", "false_easting",
-     *         "false_northing" and any other parameters specific to the projection.
-     * @param  cs The coordinate system for the projected CRS.
-     * @throws FactoryException if the object creation failed.
-     *
-     * @deprecated Replaced by {@link #createProjectedCRS(Map,GeographicCRS,ParameterValueGroup,CartesianCS)}
-     *             for concistency with the rest of the API, which work with {@link ParameterValueGroup}
-     *             rather than an array of {@link GeneralParameterValue}.
-     */
-    public ProjectedCRS createProjectedCRS(Map                     properties,
-                                           GeographicCRS               geoCRS,
-                                           String                      method,
-                                           GeneralParameterValue[] parameters,
-                                           CartesianCS                     cs)
-            throws FactoryException
-    {
-        final ParameterValueGroup group = getDefaultParameters(method);
-        for (int i=0; i<parameters.length; i++) {
-            final GeneralParameterValue gp = parameters[i];
-            if (gp instanceof ParameterValue) {
-                final ParameterValue p = (ParameterValue) gp;
-                group.parameter(p.getDescriptor().getName().getCode()).setValue(p.getValue());
-            } else {
-                throw new UnsupportedOperationException();        
-            }
-        }
-        return createProjectedCRS(properties, geoCRS, group, cs);
-    }
-
-    /**
-     * Creates a projected coordinate reference system from a set of parameters.
-     *
-     * @param  properties Name and other properties to give to the new object.
-     * @param  base Geographic coordinate reference system to base projection on.
-     * @param  parameters The parameter values to give to the projection.
-     * @param  derivedCS The coordinate system for the projected CRS.
-     * @throws FactoryException if the object creation failed.
-     *
-     * @see #getDefaultParameters
-     *
-     * @deprecated Use {@link FactoryGroup#createProjectedCRS} instead.
-     */
-    private ProjectedCRS createProjectedCRS(Map                 properties,
-                                            GeographicCRS             base,
-                                            ParameterValueGroup parameters,
-                                            CartesianCS          derivedCS)
-            throws FactoryException
-    {
-        return new FactoryGroup(this, this, this, null).createProjectedCRS(
-                                properties, base, null, parameters, derivedCS);
-    }
-
-    /**
-     * Returns the default parameter values for a derived or projected CRS using the given method.
-     *
-     * @param  method The case insensitive name of the method to search for.
-     * @return The default parameter values.
-     * @throws NoSuchIdentifierException if there is no operation registered for the specified method.
-     *
-     * @deprecated This method will be removed.
-     */
-    private ParameterValueGroup getDefaultParameters(final String method)
-            throws NoSuchIdentifierException
-    {
-        return FactoryFinder.getMathTransformFactory(null).getDefaultParameters(method);
     }
 
     /**

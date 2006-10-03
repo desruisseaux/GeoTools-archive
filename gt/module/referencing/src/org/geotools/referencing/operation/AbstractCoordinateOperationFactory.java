@@ -155,11 +155,8 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
      * {@linkplain CoordinateOperation coordinate operations}.
      *
      * @see #getMathTransformFactory
-     *
-     * @deprecated Use {@link #getMathTransformFactory} instead. This field will be made
-     *             private in a future Geotools release.
      */
-    protected final MathTransformFactory mtFactory;
+    private final MathTransformFactory mtFactory;
 
     /**
      * A pool of coordinate operation. This pool is used in order

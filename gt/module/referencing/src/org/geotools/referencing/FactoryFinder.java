@@ -163,13 +163,14 @@ public final class FactoryFinder {
     public static synchronized Set/*<String>*/ getAuthorityNames() {
         if (authorityNames == null) {
             authorityNames = new LinkedHashSet();
+            final Hints hints = null;
 loop:       for (int i=0; ; i++) {
                 final Set/*<AuthorityFactory>*/ factories;
                 switch (i) {
-                    case 0:  factories = getCRSAuthorityFactories();                 break;
-                    case 1:  factories = getCSAuthorityFactories();                  break;
-                    case 2:  factories = getDatumAuthorityFactories();               break;
-                    case 3:  factories = getCoordinateOperationAuthorityFactories(); break;
+                    case 0:  factories = getCRSAuthorityFactories(hints);                 break;
+                    case 1:  factories = getCSAuthorityFactories(hints);                  break;
+                    case 2:  factories = getDatumAuthorityFactories(hints);               break;
+                    case 3:  factories = getCoordinateOperationAuthorityFactories(hints); break;
                     default: break loop;
                 }
                 for (final Iterator it=factories.iterator(); it.hasNext();) {
@@ -253,13 +254,6 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
-     * @deprecated Replaced by {@link #getDatumFactories(Hints)}.
-     */
-    public static Set getDatumFactories() {
-        return getDatumFactories(null);
-    }
-
-    /**
      * Returns a set of all available implementations for the {@link DatumFactory} interface.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
@@ -288,13 +282,6 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
-     * @deprecated Replaced by {@link #getCSFactories(Hints)}.
-     */
-    public static Set getCSFactories() {
-        return getCSFactories(null);
-    }
-
-    /**
      * Returns a set of all available implementations for the {@link CSFactory} interface.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
@@ -320,13 +307,6 @@ loop:       for (int i=0; ; i++) {
      */
     public static CRSFactory getCRSFactory(final Hints hints) throws FactoryRegistryException {
         return (CRSFactory) getFactory(CRSFactory.class, hints, Hints.CRS_FACTORY);
-    }
-
-    /**
-     * @deprecated Replaced by {@link #getCRSFactories(Hints)}.
-     */
-    public static Set getCRSFactories() {
-        return getCRSFactories(null);
     }
 
     /**
@@ -366,13 +346,6 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
-     * @deprecated Replaced by {@link #getCoordinateOperationFactories(Hints)}.
-     */
-    public static Set getCoordinateOperationFactories() {
-        return getCoordinateOperationFactories(null);
-    }
-
-    /**
      * Returns a set of all available implementations for the
      * {@link CoordinateOperationFactory} interface.
      *
@@ -404,13 +377,6 @@ loop:       for (int i=0; ; i++) {
     {
         return (DatumAuthorityFactory) getAuthorityFactory(DatumAuthorityFactory.class,
                 authority, hints, Hints.DATUM_AUTHORITY_FACTORY);
-    }
-
-    /**
-     * @deprecated Replaced by {@link #getDatumAuthorityFactories(Hints)}.
-     */
-    public static Set getDatumAuthorityFactories() {
-        return getDatumAuthorityFactories(null);
     }
 
     /**
@@ -453,13 +419,6 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
-     * @deprecated Replaced by {@link #getCSAuthorityFactories(Hints)}.
-     */
-    public static Set getCSAuthorityFactories() {
-        return getCSAuthorityFactories(null);
-    }
-
-    /**
      * Returns a set of all available implementations for the {@link CSAuthorityFactory} interface.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
@@ -495,13 +454,6 @@ loop:       for (int i=0; ; i++) {
     {
         return (CRSAuthorityFactory) getAuthorityFactory(CRSAuthorityFactory.class,
                 authority, hints, Hints.CRS_AUTHORITY_FACTORY);
-    }
-
-    /**
-     * @deprecated Replaced by {@link #getCRSAuthorityFactories(Hints)}.
-     */
-    public static Set getCRSAuthorityFactories() {
-        return getCRSAuthorityFactories(null);
     }
 
     /**
@@ -543,13 +495,6 @@ loop:       for (int i=0; ; i++) {
     }
 
     /**
-     * @deprecated Replaced by {@link #getCoordinateOperationAuthorityFactories(Hints)}.
-     */
-    public static Set getCoordinateOperationAuthorityFactories() {
-        return getCoordinateOperationAuthorityFactories(null);
-    }
-
-    /**
      * Returns a set of all available implementations for the
      * {@link CoordinateOperationAuthorityFactory} interface.
      *
@@ -579,13 +524,6 @@ loop:       for (int i=0; ; i++) {
     {
         return (MathTransformFactory) getFactory(MathTransformFactory.class, hints,
                 Hints.MATH_TRANSFORM_FACTORY);
-    }
-
-    /**
-     * @deprecated Replaced by {@link #getMathTransformFactories(Hints)}.
-     */
-    public static Set getMathTransformFactories() {
-        return getMathTransformFactories(null);
     }
 
     /**

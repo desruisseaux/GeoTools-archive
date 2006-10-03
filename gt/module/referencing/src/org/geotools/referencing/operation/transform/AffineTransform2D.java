@@ -91,32 +91,12 @@ final class AffineTransform2D extends XAffineTransform
     public ParameterValueGroup getParameterValues() {
         return ProjectiveTransform.getParameterValues(getMatrix());
     }
-
-    /**
-     * Gets the dimension of input points.
-     *
-     * @deprecated Renamed {@link #getSourceDimensions} for consistency with
-     *             {@link org.opengis.referencing.operation.OperationMethod}.
-     */
-    public final int getDimSource() {
-        return getSourceDimensions();
-    }
     
     /**
      * Gets the dimension of input points.
      */
     public int getSourceDimensions() {
         return 2;
-    }
-    
-    /**
-     * Gets the dimension of output points.
-     *
-     * @deprecated Renamed {@link #getTargetDimensions} for consistency with
-     *             {@link org.opengis.referencing.operation.OperationMethod}.
-     */
-    public final int getDimTarget() {
-        return getTargetDimensions();
     }
     
     /**

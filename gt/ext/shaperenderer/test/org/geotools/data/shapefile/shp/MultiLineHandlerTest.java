@@ -94,7 +94,7 @@ public class MultiLineHandlerTest extends TestCase {
 		
 		Envelope env=new Envelope(-7.105552354197932,8.20555235419793,-3.239388966356115,4.191388966388683);
 		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
-		MathTransform mt=CRS.transform(crs, DefaultGeographicCRS.WGS84);
+		MathTransform mt=CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
 		AffineTransform at=RendererUtilities.worldToScreenTransform(env,new Rectangle(300,300));
 		MathTransform worldToScreen=FactoryFinder.getMathTransformFactory(null)
 		.createAffineTransform(new GeneralMatrix(at));

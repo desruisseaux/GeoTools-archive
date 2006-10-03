@@ -317,7 +317,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     public void testLongitudeFirst() throws FactoryException {
         final CoordinateReferenceSystem standard = CRS.decode("EPSG:4326", false);
         final CoordinateReferenceSystem modified = CRS.decode("EPSG:4326", true );
-        final MathTransform transform = CRS.transform(standard, modified);
+        final MathTransform transform = CRS.findMathTransform(standard, modified);
         assertTrue(transform instanceof LinearTransform);
         final Matrix matrix = ((LinearTransform) transform).getMatrix();
         assertEquals(new GeneralMatrix(new double[][] {

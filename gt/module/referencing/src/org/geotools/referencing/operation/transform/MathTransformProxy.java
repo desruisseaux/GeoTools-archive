@@ -76,28 +76,10 @@ public class MathTransformProxy implements MathTransform, Serializable {
     }
 
     /**
-     * Gets the dimension of input points.
-     *
-     * @deprecated Renamed {@link #getSourceDimensions}.
-     */
-    public final int getDimSource() {
-        return getSourceDimensions();
-    }
-
-    /**
      * Gets the dimension of output points.
      */
     public int getTargetDimensions() {
         return transform.getSourceDimensions();
-    }
-    
-    /**
-     * Gets the dimension of output points.
-     *
-     * @deprecated Renamed {@link #getTargetDimensions}.
-     */
-    public final int getDimTarget() {
-        return getTargetDimensions();
     }
     
     /**

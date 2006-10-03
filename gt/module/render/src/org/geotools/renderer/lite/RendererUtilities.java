@@ -313,7 +313,7 @@ public final class RendererUtilities {
 		cs[3] = p2.y;
 
 		// transform the provided crs to WGS84 lon,lat
-		MathTransform transform = CRS.transform(tempCRS,
+		MathTransform transform = CRS.findMathTransform(tempCRS,
 				DefaultGeographicCRS.WGS84, true);
 		// transform = ConcatenatedTransform.create(preTransform, transform);//
 		// TODO

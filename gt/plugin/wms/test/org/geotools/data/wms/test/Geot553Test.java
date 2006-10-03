@@ -47,7 +47,7 @@ public class Geot553Test extends TestCase {
     	CoordinateReferenceSystem epsg26591 = CRS.decode("EPSG:26591");
     	CoordinateReferenceSystem epsg4326 = CRS.decode("EPSG:4326");
     	
-    	MathTransform transform =CRS.transform(epsg26591, epsg4326, true);
+    	MathTransform transform = CRS.findMathTransform(epsg26591, epsg4326, true);
     	DirectPosition min = transform.transform(new GeneralDirectPosition(minx, miny), null);
     	DirectPosition max = transform.transform(new GeneralDirectPosition(maxx, maxy), null);
     	System.out.println(min);
