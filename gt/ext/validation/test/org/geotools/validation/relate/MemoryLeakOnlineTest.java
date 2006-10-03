@@ -62,7 +62,7 @@ import org.geotools.validation.ValidationResults;
  * @author Jody Garnett, Refractions Research
  * @source $URL$
  */
-public class MemoryLeakTest extends DataTestCase {
+public class MemoryLeakOnlineTest extends DataTestCase {
     
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
@@ -78,7 +78,7 @@ public class MemoryLeakTest extends DataTestCase {
      *
      * @throws AssertionError DOCUMENT ME!
      */
-    public MemoryLeakTest(String test) {
+    public MemoryLeakOnlineTest(String test) {
         super(test);
     }
 

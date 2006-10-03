@@ -53,10 +53,10 @@ import com.vividsolutions.jts.geom.Geometry;
  * @source $URL$
  * @version $Id$
  */
-public class GazetteerNameValidationTest extends TestCase {
+public class GazetteerNameValidationOnlineTest extends TestCase {
 
-	public GazetteerNameValidationTest(){super("");}
-	public GazetteerNameValidationTest(String s){super(s);}
+	public GazetteerNameValidationOnlineTest(){super("");}
+	public GazetteerNameValidationOnlineTest(String s){super(s);}
 	
 	public void testValidate() {
 		class testFeature implements Feature{
