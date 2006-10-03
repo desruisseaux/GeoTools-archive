@@ -140,7 +140,7 @@ public class SchemaImpl implements Schema {
 
 	public Object put(Object name, Object type) {
 		if( !(name instanceof Name) ){
-			throw new IllegalArgumentException("Please use a TypeName");
+			throw new IllegalArgumentException("Please use a Name");
 		}
 		Name n = (Name) name;
 		if( !(n.toString().startsWith(uri.toString() ))){
