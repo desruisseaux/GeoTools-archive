@@ -33,11 +33,11 @@ import org.xml.sax.SAXException;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/wfs/test/org/geotools/data/wfs/IonicTest.java $
  */
-public class IonicTest extends TestCase {
+public class IonicOnlineTest extends TestCase {
 
 	private URL url = null;
 
-	public IonicTest() throws MalformedURLException {
+	public IonicOnlineTest() throws MalformedURLException {
 		url = new URL(
 				"http://webservices.ionicsoft.com/ionicweb/wfs/BOSTON_ORA?version=1.0.0&request=getcapabilities&service=WFS");
 	}
