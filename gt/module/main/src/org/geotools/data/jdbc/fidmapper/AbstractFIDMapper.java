@@ -62,7 +62,8 @@ public abstract class AbstractFIDMapper implements FIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getColumnCount()
      */
     public int getColumnCount() {
-        return colNames.length;
+    	if (colNames[0] == null) return 0;
+        else return colNames.length;
     }
     
     /**
