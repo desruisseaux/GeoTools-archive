@@ -121,7 +121,7 @@ public class MaxIncFIDMapper extends AbstractFIDMapper {
                     + ") from " + tableName);
 
             if (rs.next()) {
-                int maxFid = rs.getInt(1);
+                long maxFid = rs.getLong(1);
 
                 return String.valueOf(maxFid + 1);
             } else {

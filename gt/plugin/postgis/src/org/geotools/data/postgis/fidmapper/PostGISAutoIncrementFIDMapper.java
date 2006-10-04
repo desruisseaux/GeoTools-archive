@@ -29,47 +29,114 @@ import org.geotools.feature.Feature;
  * use with editing.
  * 
  * @author Jesse Eichar, Refractions Research, Inc.
+ * @author Cory Horner, Refractions Research, Inc.
  */
 public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
                 implements FIDMapper {
 
         private static final long serialVersionUID = -6082930630426171079L;
 
-        boolean can_usepg_get_serial_sequence=true;
+        /** Indicates that the pg_get_serial_sequence function exists, and works for this table */ 
+        boolean can_usepg_get_serial_sequence = true;
 
+        /** Flag to indicate when we can't find the table's sequence */
+        boolean hasSerialSequence = true;
+        
+        /** The actual name of the sequence, if we have found it */
+        String sequenceName = null;
+        
         public PostGISAutoIncrementFIDMapper(String tableName, String colName, int dataType) {
                 super(tableName, colName, dataType);
         }
 
-
+        /**
+         * Attempts to determine the FID after it was inserted, using three techniques:
+         * 1. SELECT currval(pg_get_serial_sequence(...))
+         * 2. SELECT currval(sequence name) <-- using other methods to get name
+         * 3. SELECT fid ... ORDER BY fid DESC LIMIT 1
+         */
         public String createID( Connection conn, Feature feature, Statement statement )
             throws IOException {
+            ResultSet rs = null;
             if (can_usepg_get_serial_sequence) {
                 try {
-                    String sql = "SELECT currval(pg_get_serial_sequence(\'";
+                    //use pg_get_serial_sequence('"table name"','"column name"')
+                    String sql = "SELECT currval(pg_get_serial_sequence('\"";
                     String schema = getTableSchemaName();
                     if (schema != null && !schema.equals("")) {
                         sql = sql + schema + "."; 
                     }
-                    sql = sql + getTableName() + "\',\'" + getColumnName() + "\'))";
-                    statement.execute(sql); 
-                    ResultSet resultSet = statement.getResultSet();
-                    if (resultSet.next() && resultSet.getString("currval")!=null )
-                        return resultSet.getString("currval");
-                    else
-                        return findInsertedFID(conn, feature, statement);
+                    sql = sql + getTableName() + "\"','" + getColumnName() + "'))";
+                    rs = statement.executeQuery(sql); 
+                    if (rs.next() && rs.getString("currval") != null)
+                        return rs.getString("currval");
+                    else {
+                        can_usepg_get_serial_sequence = false;
+                    }
                 } catch (Exception e) {
                     can_usepg_get_serial_sequence = false;
-                    return findInsertedFID(conn, feature, statement);
+                } finally {
+                    try {
+                        if (rs != null)
+                            rs.close();
+                    } catch (Exception e) {
+                        //oh well
+                    }
                 }
-            } else {
-                return findInsertedFID(conn, feature, statement);
             }
+            //TODO: add logging
+            if (hasSerialSequence) {
+                if (sequenceName == null) {
+                    // try to find the sequence (this makes the assumption that
+                    // the sequence name contains "tableName_columnName")
+                    String sql = "SELECT relname FROM pg_catalog.pg_class WHERE relkind = 'S' AND relname LIKE '"
+                        + getTableName() + "_" + getColumnName() + "_seq'";
+                    try {
+                        rs = statement.executeQuery(sql);
+                        if (rs.next() && rs.getString(1) != null) {
+                            sequenceName = rs.getString(1);
+                        } else {
+                            hasSerialSequence = false;
+                        }
+                    } catch (Exception e) {
+                        hasSerialSequence = false;
+                    } finally {
+                        try {
+                            if (rs != null)
+                                rs.close();
+                        } catch (Exception e) {
+                            //oh well
+                        }
+                    }
+                }
+                
+                if (sequenceName != null) {
+                    //get the sequence value
+                    String sql = "SELECT currval('\"" + sequenceName + "\"')";
+                    try {
+                        rs = statement.executeQuery(sql); 
+                        if (rs.next() && rs.getString("currval") != null)
+                            return rs.getString("currval");
+                        else {
+                            hasSerialSequence = false;
+                        }
+                    } catch (Exception e) {
+                        hasSerialSequence = false;
+                    } finally {
+                        try {
+                            if (rs != null)
+                                rs.close();
+                        } catch (Exception e) {
+                            //oh well
+                        }
+                    }
+                }
+            }
+            return findInsertedFID(conn, feature, statement);
         }
 
         /**
-         * PostGIS couldn't supply the answer as we'd like, so we'll try to find it
-         * on our own. 
+         * Our last resort method for getting the FID. 
          */
         private String findInsertedFID( Connection conn, Feature feature, Statement statement )
             throws IOException {
@@ -80,13 +147,21 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
             }
             sql = sql + getTableName() + "\" ORDER BY \"" + getColumnName()
                 + "\" DESC LIMIT 1;"; 
+            ResultSet rs = null;
             try {
                 statement.execute(sql); 
-                ResultSet resultSet = statement.getResultSet();
-                resultSet.next();
-                return resultSet.getString(getColumnName());
+                rs = statement.getResultSet();
+                rs.next();
+                return rs.getString(getColumnName());
             } catch (Exception e) { //i surrender
                 return super.createID(conn, feature, statement);
+            } finally {
+                try {
+                    if (rs != null)
+                        rs.close();
+                } catch (Exception e) {
+                    //oh well
+                }
             }
         }
 }

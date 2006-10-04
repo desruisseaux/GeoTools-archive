@@ -29,7 +29,7 @@ public class PostgisDBInfoOnlineTest extends TestCase {
     }
     
     protected void tearDown() throws Exception {
-        ds.getConnectionPool().close();
+        //ds.getConnectionPool().close();
         ds = null;
         super.tearDown();
     }

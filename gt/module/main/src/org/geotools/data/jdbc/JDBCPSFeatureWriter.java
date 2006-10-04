@@ -123,7 +123,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      */
     private void fillInsertParameters(PreparedStatement statement,
         MutableFIDFeature feature) throws IOException, SQLException {
-        int baseIndex = fillPrimayKeyParameters(statement, feature, 1);
+        int baseIndex = fillPrimaryKeyParameters(statement, feature, 1);
 
         Object[] attributes = feature.getAttributes(null);
         AttributeType[] attributeTypes = feature.getFeatureType()
@@ -251,7 +251,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      */
     private void fillDeleteParameters(PreparedStatement statement,
         MutableFIDFeature feature) throws IOException, SQLException {
-        fillPrimayKeyParameters(statement, feature, 1);
+        fillPrimaryKeyParameters(statement, feature, 1);
     }
 
     /**
@@ -267,7 +267,7 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @throws IOException
      * @throws SQLException
      */
-    private int fillPrimayKeyParameters(PreparedStatement statement,
+    private int fillPrimaryKeyParameters(PreparedStatement statement,
         Feature feature, int baseIndex) throws IOException, SQLException {
         if (!mapper.returnFIDColumnsAsAttributes()
                 && !mapper.hasAutoIncrementColumns()) {
@@ -355,11 +355,11 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
 
         if (!mapper.returnFIDColumnsAsAttributes()
                 && !mapper.hasAutoIncrementColumns()) {
-            baseIndex = fillPrimayKeyParameters(statement, current, baseIndex);
+            baseIndex = fillPrimaryKeyParameters(statement, current, baseIndex);
         }
 
         // set the old values of the primary key in order to look up for the right tuple
-        fillPrimayKeyParameters(statement, live, baseIndex + 1);
+        fillPrimaryKeyParameters(statement, live, baseIndex + 1);
     }
 
     /**

@@ -197,14 +197,14 @@ public class QueryData implements AttributeReader, AttributeWriter {
      *
      * @param index the column index among the primary key columns (as reported by the FIDMapper) 
      *
-     * @return DOCUMENT ME!
+     * @return fid value
      *
-     * @throws IOException DOCUMENT ME!
-     * @throws DataSourceException DOCUMENT ME!
+     * @throws IOException
+     * @throws DataSourceException
      */
     public Object readFidColumn(int index) throws IOException {
         try {
-            return resultSet.getObject(index + 1);
+            return resultSet.getString(index + 1); //we turn it into a string anyhow...
         } catch (SQLException e) {
             throw new DataSourceException("Error reading fid column " + index, e);
         }

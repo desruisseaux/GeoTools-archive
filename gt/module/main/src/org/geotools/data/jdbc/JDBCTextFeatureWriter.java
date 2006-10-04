@@ -110,8 +110,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
             // should the ID be generated during an insert, we need to read it back
             // and set it into the feature
-          if (((mapper.getColumnCount() > 0)
-          && mapper.hasAutoIncrementColumns())) {
+            if (((mapper.getColumnCount() > 0)
+                && mapper.hasAutoIncrementColumns())) {
 //          if (((mapper.getColumnCount() > 0))) {
                 current.setID(mapper.createID(conn, current, statement));
             }
@@ -145,15 +145,15 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      */
     protected String makeInsertSql(Feature feature) throws IOException {
         FeatureTypeInfo ftInfo = queryData.getFeatureTypeInfo();
-        FeatureType fetureType = ftInfo.getSchema();
+        FeatureType featureType = ftInfo.getSchema();
 
-        String tableName = encodeName(fetureType.getTypeName());
-        AttributeType[] attributeTypes = fetureType.getAttributeTypes();
+        String tableName = encodeName(featureType.getTypeName());
+        AttributeType[] attributeTypes = featureType.getAttributeTypes();
 
         String attrValue;
 
         StringBuffer statementSQL = new StringBuffer("INSERT INTO " + tableName
-                + "(");
+                + " (");
 
         if (!mapper.returnFIDColumnsAsAttributes()) {
             for (int i = 0; i < mapper.getColumnCount(); i++) {

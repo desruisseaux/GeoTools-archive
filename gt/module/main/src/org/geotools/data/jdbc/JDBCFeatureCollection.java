@@ -308,7 +308,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
             sqlBuilder.sqlWhere(sql, filter);
 
             //LOGGER.finer("SQL: " + sql);
-            System.out.println("SQL: " + sql);
+            //System.out.println("SQL: " + sql);
 
             statement = conn.createStatement();
             results = statement.executeQuery(sql.toString());
