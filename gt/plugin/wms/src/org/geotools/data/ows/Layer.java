@@ -16,13 +16,24 @@
 package org.geotools.data.ows;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.WeakHashMap;
+
+import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 /**
@@ -69,6 +80,8 @@ public class Layer implements Comparable {
     
     private Layer parent;
     private Layer[] children;
+
+	private Map envelopeCache=Collections.synchronizedMap(new WeakHashMap());
     
     public Layer() {
         
@@ -358,5 +371,115 @@ public class Layer implements Comparable {
 
 	public void setScaleHintMin(double scaleHintMin) {
 		this.scaleHintMin = scaleHintMin;
+	}
+
+	public GeneralEnvelope getEnvelope(CoordinateReferenceSystem crs) {
+		{
+			GeneralEnvelope result=(GeneralEnvelope) envelopeCache.get(crs);
+			if( result!=null )
+				return result;
+		}
+		for (final Iterator i=crs.getIdentifiers().iterator(); i.hasNext();) {
+            String epsgCode = i.next().toString();
+
+            CRSEnvelope tempBBox = null;
+            Layer parentLayer = this;
+
+            //Locate a BBOx if we can
+            while( tempBBox == null && parentLayer != null ) {
+                tempBBox = (CRSEnvelope) parentLayer.getBoundingBoxes().get(epsgCode);
+                
+                parentLayer = parentLayer.getParent();
+            }
+    
+            //Otherwise, locate a LatLon BBOX
+    
+            if (tempBBox == null && ("EPSG:4326".equals(epsgCode.toUpperCase()))) { //$NON-NLS-1$
+                CRSEnvelope latLonBBox = null;
+    
+                parentLayer = this;
+                while (latLonBBox == null && parentLayer != null) {
+                    latLonBBox = parentLayer.getLatLonBoundingBox();
+                    if (latLonBBox != null) {
+                        try {
+                            new GeneralEnvelope(new double[] {latLonBBox.getMinX(), latLonBBox.getMinY()}, 
+                                    new double[] { latLonBBox.getMaxX(), latLonBBox.getMaxY() });
+                            break;
+                        } catch (IllegalArgumentException e) {
+                            //TODO LOG here
+                            //log("Layer "+layer.getName()+" has invalid bbox declared: "+tempBbox.toString());
+                            latLonBBox = null;
+                        }
+                    }
+                    parentLayer = parentLayer.getParent();
+                }
+                
+                if (latLonBBox == null) {
+                    //TODO could convert another bbox to latlon?
+                    tempBBox = new CRSEnvelope("EPSG:4326", -180, -90, 180, 90);
+                }
+                
+                tempBBox = new CRSEnvelope("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
+            }
+            
+            if (tempBBox == null) {
+                //Haven't found a bbox in the requested CRS. Attempt to transform another bbox
+                
+                String epsg = null;
+                if (getLatLonBoundingBox() != null) {
+                    CRSEnvelope latLonBBox = getLatLonBoundingBox();
+                    tempBBox = new CRSEnvelope("EPSG:4326", latLonBBox.getMinX(), latLonBBox.getMinY(), latLonBBox.getMaxX(), latLonBBox.getMaxY());
+                    epsg = "EPSG:4326";
+                }
+                
+                if (tempBBox == null && getBoundingBoxes() != null && getBoundingBoxes().size() > 0) {
+                    tempBBox = (CRSEnvelope) getBoundingBoxes().values().iterator().next();
+                    epsg = tempBBox.getEPSGCode();
+                }
+                
+                if (tempBBox == null) {
+                    continue;
+                }
+                
+                GeneralEnvelope env = new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
+                        new double[] { tempBBox.getMaxX(), tempBBox.getMaxY() });
+                
+                CoordinateReferenceSystem fromCRS = null;
+                try {
+                    fromCRS = CRS.decode(epsg);
+                    MathTransform transform = CRS.findMathTransform(fromCRS, crs, true);
+                    
+                    DirectPosition newLower = transform.transform(env.getLowerCorner(),null);
+                    DirectPosition newUpper = transform.transform(env.getUpperCorner(),null);
+                    
+                    env = new GeneralEnvelope(newLower.getCoordinates(), newUpper.getCoordinates());
+                    env.setCoordinateReferenceSystem(fromCRS);
+                    
+                    //success!!
+                    envelopeCache.put(crs, env);
+                    return env;
+                    
+                } catch (NoSuchAuthorityCodeException e) {
+                    // TODO Catch e
+                } catch (FactoryException e) {
+                    // TODO Catch e
+                } catch (MismatchedDimensionException e) {
+                    // TODO Catch e
+                } catch (TransformException e) {
+                    // TODO Catch e
+                }
+            }
+            
+            //TODO Attempt to figure out the valid area of the CRS and use that.
+            
+            if (tempBBox != null) {
+                GeneralEnvelope env = new GeneralEnvelope(new double[] { tempBBox.getMinX(), tempBBox.getMinY()}, 
+                        new double[] { tempBBox.getMaxX(), tempBBox.getMaxY() });
+                env.setCoordinateReferenceSystem(crs);
+                return env;
+            }
+    
+        }
+        return null;
 	}
 }
