@@ -692,6 +692,33 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     }
 
     /**
+     * This method is used to force the creation of a .prj file.
+     * <p>
+     * The internally cached FeatureType will be removed, so the next call to
+     * getSchema() will read in the created file. This method is not thread safe
+     * and will have dire consequences for any other thread making use of the
+     * shapefile.
+     * <p>
+     * @param crs
+     */
+    public void forceSchemaCRS( CoordinateReferenceSystem crs ) throws IOException {
+        if( crs == null ) throw new NullPointerException("CRS required for .prj file");
+        
+        long temp = System.currentTimeMillis();
+        
+        String s = crs.toWKT();        
+        FileWriter out = new FileWriter(getStorageFile(prjURL, temp));
+            
+        try {
+            out.write(s);
+        } finally {
+            out.close();
+        }
+        copyAndDelete(prjURL, temp);
+        schema = null;        
+    }
+    
+    /**
      * Set the FeatureType of this DataStore. This method will delete any
      * existing local resources or throw an IOException if the DataStore is
      * remote.
@@ -799,7 +826,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         	}catch(FileNotFoundException e){
         		LOGGER.warning(".prj could not be created.");
         	}
-		}
+	}
     }
 
     /**

@@ -49,8 +49,10 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.Filter;
+import org.geotools.referencing.CRS;
 import org.geotools.xml.gml.GMLSchema;
 import org.geotools.TestData;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -155,16 +157,48 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         ShapefileDataStore ds=new ShapefileDataStore(toURL);
         ds.createSchema( DataUtilities.createType("test", "geom:MultiPolygon") );
         
-        ds = new ShapefileDataStore(toURL);
-        
+        // ds = new ShapefileDataStore(toURL); this is not needed?        
         assertEquals("test", ds.getSchema().getTypeName());
-        file.delete();
-        file=new File("test.prj");
-        file.delete();
+        
+        file.deleteOnExit();        
         file=new File("test.dbf");
-        file.delete();
+        file.deleteOnExit();
         file=new File("test.shp");
-        file.delete();
+        file.deleteOnExit();
+        
+        file=new File("test.prj");
+        if( file.exists() ) file.deleteOnExit();
+
+        file=new File("test.shx");
+        if( file.exists() ) file.deleteOnExit();
+    }
+    public void testForceCRS() throws Exception {
+        File file = new File( "test.shp" );
+        URL toURL = file.toURL();
+        
+        ShapefileDataStore ds=new ShapefileDataStore(toURL);
+        ds.createSchema( DataUtilities.createType("test", "geom:MultiPolygon") );
+        FeatureType before = ds.getSchema();
+        
+        ds.forceSchemaCRS( CRS.decode("EPSG:3005") );
+        FeatureType after = ds.getSchema();
+        
+        assertNotSame( before, after );        
+        assertNull( "4326", before.getDefaultGeometry().getCoordinateSystem() );
+        assertEquals( "NAD83 / BC Albers", after.getDefaultGeometry().getCoordinateSystem().getName().getCode() );
+                
+        file.deleteOnExit();        
+        file=new File("test.dbf");
+        file.deleteOnExit();
+        file=new File("test.shp");
+        file.deleteOnExit();
+        
+        file=new File("test.prj");
+        System.out.println( file );
+        if( file.exists() ) file.deleteOnExit();
+        
+        file=new File("test.shx");
+        if( file.exists() ) file.deleteOnExit();
     }
     
     private ShapefileDataStore createDataStore(File f) throws Exception {
