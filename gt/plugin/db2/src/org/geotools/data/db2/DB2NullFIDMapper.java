@@ -37,7 +37,15 @@ public class DB2NullFIDMapper extends NullFIDMapper {
     public DB2NullFIDMapper() {
         super();
     }
-
+    /** 
+     * Constructor to set schema and table name for Null mapper.
+     * 
+     * @param tableSchemaName
+     * @param tableName
+     */
+    public DB2NullFIDMapper(String tableSchemaName, String tableName) {
+    	super(tableSchemaName, tableName);
+    }
     /**
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#getID(java.lang.Object[])
      */

@@ -144,7 +144,7 @@ public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
     protected FIDMapper buildNoPKMapper(String schema, String tableName,
         Connection connection) {
         FIDMapper mapper;
-        mapper = new DB2NullFIDMapper();
+        mapper = new DB2NullFIDMapper(schema, tableName);
 
         return mapper;
     }
