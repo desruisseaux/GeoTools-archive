@@ -134,7 +134,7 @@ public abstract class XMLElementHandler implements Serializable {
      *
      * @throws SAXException
      *
-     * @see Type#getValue;
+     * @see Type#getValue
      */
     public abstract Object getValue() throws SAXException;
 

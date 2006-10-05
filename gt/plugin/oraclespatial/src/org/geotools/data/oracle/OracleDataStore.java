@@ -148,7 +148,7 @@ public class OracleDataStore extends JDBCDataStore {
 
     /**
      * Overrides the buildAttributeType method to check for SDO_GEOMETRY columns.
-     * @see http://download-west.oracle.com/docs/cd/B14117_01/appdev.101/b10826.pdf
+     * @see <a href="http://download-west.oracle.com/docs/cd/B14117_01/appdev.101/b10826.pdf">A doc from Oracle.</a>
      * 
      *  TODO: Determine the specific type of the geometry.
      */

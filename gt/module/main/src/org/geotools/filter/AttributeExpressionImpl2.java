@@ -79,7 +79,7 @@ public class AttributeExpressionImpl2 extends DefaultExpression
     /**
      * Gets the path to the attribute to be evaluated by this expression.
      *
-     * @see {@link org.opengis.filter.expression.PropertyName#getPropertyName()}.
+     * {@link org.opengis.filter.expression.PropertyName#getPropertyName()}.
      */
    public String getPropertyName() {
 		return attPath;

@@ -34,9 +34,9 @@ package org.geotools.data;
  * <p>An AbstractLockingDataSource with appropriate overrideable callbacks
  * may be an elegent way to acomplish this.</p>
  * 
- * @see http://vwfs.refractions.net/docs/Database_Research.pdf
- * @see http://vwfs.refractions.net/docs/Transactional_WFS_Design.pdf
- * @see http://vwfs.refractions.net/docs/Design_Implications.pdf
+ * @see <a href="http://vwfs.refractions.net/docs/Database_Research.pdf">Database_Research.pdf</a>
+ * @see <a href="http://vwfs.refractions.net/docs/Transactional_WFS_Design.pdf">Transactional_WFS_Design.pdf</a>
+ * @see <a href="http://vwfs.refractions.net/docs/Design_Implications.pdf">Design_Implications.pdf</a>
  * @author jgarnett, Refractions Research, Inc.
  * </p> 
  * @source $URL$
