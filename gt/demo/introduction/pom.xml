@@ -57,6 +57,13 @@
    <build>
     <resources>
       <resource>
+        <directory>.</directory>
+        <includes>
+          <include>LICENSE*</include>
+          <include>README*</include>
+        </includes>
+      </resource>
+      <resource>
         <!-- targetPath>data</targetPath -->
         <directory>resources</directory>
         <includes>
