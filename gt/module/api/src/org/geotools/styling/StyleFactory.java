@@ -237,7 +237,7 @@ public interface StyleFactory extends Factory {
         ContrastEnhancement enhancement);
 
     /**
-     * @deprecated Use {@link #createSelectedChannelType(String, ContrastEnhancement)
+     * @deprecated Use {@link #createSelectedChannelType(String, ContrastEnhancement)}
      */
     public SelectedChannelType createSelectedChannelType(String name,
         Expression gammaValue);

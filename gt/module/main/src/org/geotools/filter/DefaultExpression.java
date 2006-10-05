@@ -125,7 +125,7 @@ public abstract class DefaultExpression extends ExpressionAbstract implements Ex
      * @param expressionType Type of expression for check.
      *
      * @return Whether or not this is a math expression type.
-     * @deprecated use {@link #is
+     * @deprecated use {@link #is}
      */
     protected static boolean isMathExpression(short expressionType) {
         return ((expressionType == MATH_ADD)

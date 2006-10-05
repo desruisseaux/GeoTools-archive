@@ -131,7 +131,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
      *
      * @throws IllegalFilterException Filter is not internally consistent.
      *
-     * @deprecated use {@link #set
+     * @deprecated use {@link #set}
      * 
      */
     public final void addRightGeometry(Expression rightGeometry)

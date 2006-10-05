@@ -36,7 +36,7 @@ public interface AdaptingResolveAware {
 	 * <p>
 	 * This method is always called before either of:
 	 * {@link ResolveAdapterFactory#canAdapt(Resolve, Class)}
-	 * {@link ResolveAdapterFactory#adapt(Resolve, Class, ProgressListener)
+	 * {@link ResolveAdapterFactory#adapt(Resolve, Class, ProgressListener)}
 	 * </p>
 	 * @param adaptingResolve The adapting resolve which is a delegate for 
 	 * the resolve being adapted.

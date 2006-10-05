@@ -221,11 +221,11 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @throws IllegalFilterException if there were creation problems.
      *
      * @deprecated use one of {@link org.opengis.filter.FilterFactory#less(Expression, Expression)}
-     *         {@link org.opengis.filter.FilterFactory#lessOrEqual(Expression, Expression)
-     *         {@link org.opengis.filter.FilterFactory#equals(Expression, Expression)
-     *         {@link org.opengis.filter.FilterFactory#greater(Expression, Expression)
-     *         {@link org.opengis.filter.FilterFactory#greaterOrEqual(Expression, Expression)
-     *         {@link org.opengis.filter.FilterFactory#between(Expression, Expression, Expression)
+     *         {@link org.opengis.filter.FilterFactory#lessOrEqual(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#equals(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#greater(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#greaterOrEqual(Expression, Expression)}
+     *         {@link org.opengis.filter.FilterFactory#between(Expression, Expression, Expression)}
      */
     public CompareFilter createCompareFilter(short type)
         throws IllegalFilterException;
@@ -310,16 +310,16 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      *
      * @deprecated use one of
      *         {@link org.opengis.filter.FilterFactory#bbox(String, double, double, double, double, String)}
-     *  {@link org.opengis.filter.FilterFactory#beyond(String, Geometry, double, String)
-     *  {@link org.opengis.filter.FilterFactory#contains(String, Geometry)
-     *  {@link org.opengis.filter.FilterFactory#crosses(String, Geometry)
-     *  {@link org.opengis.filter.FilterFactory#disjoint(String, Geometry)
-     *  {@link org.opengis.filter.FilterFactory#dwithin(String, Geometry, double, String)
-     *  {@link org.opengis.filter.FilterFactory#equals(String, Geometry)
-     *  {@link org.opengis.filter.FilterFactory#intersects(String, Geometry)
-     *  {@link org.opengis.filter.FilterFactory#overlaps(String, Geometry)
-     *  {@link org.opengis.filter.FilterFactory#touches(String, Geometry)
-     *  {@link org.opengis.filter.FilterFactory#within(String, Geometry)
+     *  {@link org.opengis.filter.FilterFactory#beyond(String, Geometry, double, String)}
+     *  {@link org.opengis.filter.FilterFactory#contains(String, Geometry)}
+     *  {@link org.opengis.filter.FilterFactory#crosses(String, Geometry)}
+     *  {@link org.opengis.filter.FilterFactory#disjoint(String, Geometry)}
+     *  {@link org.opengis.filter.FilterFactory#dwithin(String, Geometry, double, String)}
+     *  {@link org.opengis.filter.FilterFactory#equals(String, Geometry)}
+     *  {@link org.opengis.filter.FilterFactory#intersects(String, Geometry)}
+     *  {@link org.opengis.filter.FilterFactory#overlaps(String, Geometry)}
+     *  {@link org.opengis.filter.FilterFactory#touches(String, Geometry)}
+     *  {@link org.opengis.filter.FilterFactory#within(String, Geometry)}
      */
     public GeometryFilter createGeometryFilter(short filterType)
         throws IllegalFilterException;
@@ -335,8 +335,8 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      *         distance type.
      *
      * @deprecated use one of
-     *  {@link org.opengis.filter.FilterFactory#beyond(String, Geometry, double, String)
-     *         {@link org.opengis.filter.FilterFactory#dwithin(String, Geometry, double, String)
+     *  {@link org.opengis.filter.FilterFactory#beyond(String, Geometry, double, String)}
+     *         {@link org.opengis.filter.FilterFactory#dwithin(String, Geometry, double, String)}
      *
      */
     public GeometryDistanceFilter createGeometryDistanceFilter(short filterType)
