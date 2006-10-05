@@ -45,6 +45,53 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * {@link AbstractGridFormat} sublass for controlling {@link ImageMosaicReader}
  * creation.
  * 
+ * As the name says, it handles mosaic of georeferenced images, which means
+ * <ol>
+ * <li>tiff+tfw+prj</li>
+ * <li>jpeg+tfw+prj</li>
+ * <li>png+tfw+prj</li>
+ * <li>geotif</li>
+ * </ol>
+ * This does not mean that you throw there a couple of images and it will do the
+ * trick no matter how these images are. Requirements are:
+ * 
+ * <ul>
+ * <li>(almost) equal spatial resolution</li>
+ * <li>same number of bands</li>
+ * <li>same data type on all bands</li>
+ * <li>same projection</li>
+ * </ul>
+ * 
+ * The first requirement can be relaxed a little but if they have the same
+ * spatial resolution the performances are much better.
+ * 
+ * There are parameters that you can use to control the behaviour of the mosaic
+ * in terms of thresholding and transparency. They are as follows:
+ * 
+ * <ul>
+ * <li>--DefaultParameterDescriptor FINAL_ALPHA = new
+ * DefaultParameterDescriptor( "FinalAlpha", Boolean.class, null,
+ * Boolean.FALSE)-- It asks the plugin to add transparency on the final created
+ * mosaic. IT simply performs a threshonding looking for areas where there is no
+ * data, i.e., intensity is really low and transform them into transparent
+ * areas. It is obvious that depending on the nature of the input images it
+ * might interfere with the original values.</li>
+ * 
+ * 
+ * <li>---ALPHA_THRESHOLD = new DefaultParameterDescriptor( "AlphaThreshold",
+ * Double.class, null, new Double(1));--- Controls the transparency addition by
+ * specifying the treshold to use.</li>
+ * 
+ * 
+ * <li>INPUT_IMAGE_ROI = new DefaultParameterDescriptor( "InputImageROI",
+ * Boolean.class, null, Boolean.FALSE)--- INPUT_IMAGE_ROI_THRESHOLD = new
+ * DefaultParameterDescriptor( "InputImageROIThreshold", Integer.class, null,
+ * new Integer(1));--- These two can be used to control the application of ROIs
+ * on the input images based on tresholding vlues. Basically using the threshold
+ * you can ask the mosaic plugin to load or not certain pixels of the original
+ * images.</li>
+ * 
+ * 
  * @author Simone Giannecchini (simboss)
  * @since 2.3
  */
@@ -55,15 +102,19 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.imagemosaic");
 
+	/** Control the transparency of the output image. */
 	public static final DefaultParameterDescriptor FINAL_ALPHA = new DefaultParameterDescriptor(
 			"FinalAlpha", Boolean.class, null, Boolean.FALSE);
 
+	/** Control the transparency of the output image. */
 	public static final DefaultParameterDescriptor ALPHA_THRESHOLD = new DefaultParameterDescriptor(
 			"AlphaThreshold", Double.class, null, new Double(1));
 
+	/** Control the thresholding on the input images */
 	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI = new DefaultParameterDescriptor(
 			"InputImageROI", Boolean.class, null, Boolean.FALSE);
 
+	/** Control the thresholding on the input images */
 	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI_THRESHOLD = new DefaultParameterDescriptor(
 			"InputImageROIThreshold", Integer.class, null, new Integer(1));
 
@@ -173,11 +224,9 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 			final FeatureSource featureSource = tileIndexStore
 					.getFeatureSource(typeName);
 			final FeatureType schema = featureSource.getSchema();
+			// looking for the location attribute
 			if (schema.getAttributeType("location") == null)
-				return false;// looking
-			// for the
-			// location
-			// attribute
+				return false;
 
 			return true;
 		} catch (IOException e) {

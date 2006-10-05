@@ -53,10 +53,12 @@ import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
 import javax.media.jai.RenderedOp;
+import javax.media.jai.TileCache;
 import javax.media.jai.operator.MosaicDescriptor;
 
 import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
@@ -115,27 +117,46 @@ import com.vividsolutions.jts.geom.Envelope;
 public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		implements GridCoverageReader {
 
-	/**Logger.*/
+	/** Logger. */
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.imagemosaic");
 
 	/** Cachin neares neighbohr interpolator (immutable) */
 	private final static Interpolation nnInterpolation = new InterpolationNearest();
 
+	/**
+	 * The source {@link URL} pointing to the index shapefile for this
+	 * {@link ImageMosaicReader}.
+	 */
 	private final URL sourceURL;
 
+	/** {@link AbstractDataStore} pointd to the index shapefile. */
 	private final AbstractDataStore tileIndexStore;
 
+	/** {@link SoftReference} to the index holding the tiles' envelopes. */
 	private SoftReference index;
 
+	/**
+	 * The typename of the chems inside the {@link ShapefileDataStore} that
+	 * contains the index for this {@link ImageMosaicReader}.
+	 */
 	private final String typeName;
 
+	/** {@link FeatureSource} for the shape index. */
 	private final FeatureSource featureSource;
 
+	/** Hints for {@link JAI} to not use {@link TileCache}. */
 	private final static RenderingHints NO_CACHE = new RenderingHints(
 			JAI.KEY_TILE_CACHE, null);
 
-	private static final int MAX_TILES = 300;
+	/**
+	 * Max number of tiles that this plugin will load.
+	 * 
+	 * If this number is exceeded, i.e. we request an area which is too large
+	 * instead of getting stuck ith opening thousands of files I give you back a
+	 * fake coverage.
+	 */
+	public static final int MAX_TILES = 300;
 
 	/**
 	 * COnstructor.
@@ -809,8 +830,10 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	/**
 	 * Retrieves the ULC of the BBOX composed by all the tiles we need to load.
 	 * 
-	 * @param double *
-	 * @return
+	 * @param double
+	 * @return A {@link Point2D} pointing to the ULC of the smalles area made by
+	 *         mosaicking all the tile that actually intersect the passed
+	 *         envelope.
 	 * @throws IOException
 	 */
 	private Point2D getULC(Envelope envelope) throws IOException {
@@ -880,7 +903,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param doAlpha
 	 * @param finalLayout
 	 * @param singleImageROI
-	 * @return
+	 * @return A {@link GridCoverage}, wewll actually a {@link GridCoverage2D}.
 	 * @throws IllegalArgumentException
 	 * @throws FactoryRegistryException
 	 * @throws DataSourceException

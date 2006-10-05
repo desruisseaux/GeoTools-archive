@@ -65,7 +65,7 @@ public final class ImagePyramidFormatFactory implements GridFormatFactorySpi {
 	 * Returns the implementation hints. The default implementation returns en
 	 * empty map.
 	 * 
-	 * @return an empty map.
+	 * @return An empty map.
 	 */
 	public Map getImplementationHints() {
 		return Collections.EMPTY_MAP;

@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageReadParam;
 
 import org.geotools.coverage.grid.GeneralGridRange;
+import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
@@ -96,18 +97,18 @@ import org.opengis.referencing.operation.TransformException;
  * file with this structure:
  * 
  * <pre>
- *         #
- *         #Mon Aug 21 22:23:27 CEST 2006
- *         #name of the coverage
- *         Name=ikonos
- *         #different resolution levels available
- *         Levels=1.2218682749859724E-5,9.220132503102996E-6 2.4428817977683634E-5,1.844026500620314E-5 4.8840552865873626E-5,3.686350299024973E-5 9.781791400307775E-5,7.372700598049946E-5 1.956358280061555E-4,1.4786360643866836E-4 3.901787184256844E-4,2.9572721287731037E-4
- *         #where all the levels reside
- *         LevelsDirs=0 2 4 8 16 32
- *         #number of levels availaible
- *         LevelsNum=5
- *         #envelope for this pyramid
- *         Envelope2D=13.398228477973406,43.591366397808976 13.537912459169803,43.67121274528585
+ *          #
+ *          #Mon Aug 21 22:23:27 CEST 2006
+ *          #name of the coverage
+ *          Name=ikonos
+ *          #different resolution levels available
+ *          Levels=1.2218682749859724E-5,9.220132503102996E-6 2.4428817977683634E-5,1.844026500620314E-5 4.8840552865873626E-5,3.686350299024973E-5 9.781791400307775E-5,7.372700598049946E-5 1.956358280061555E-4,1.4786360643866836E-4 3.901787184256844E-4,2.9572721287731037E-4
+ *          #where all the levels reside
+ *          LevelsDirs=0 2 4 8 16 32
+ *          #number of levels availaible
+ *          LevelsNum=5
+ *          #envelope for this pyramid
+ *          Envelope2D=13.398228477973406,43.591366397808976 13.537912459169803,43.67121274528585
  * </pre>
  * 
  * @author Simone Giannecchini
@@ -431,7 +432,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * @param singleImageROI
 	 * @param dim
 	 * @param params
-	 * @return
+	 * @return A {@link GridCoverage}, well actually a {@link GridCoverage2D}.
 	 * @throws IOException
 	 */
 	private GridCoverage loadTiles(GeneralEnvelope requestedEnvelope,
@@ -500,7 +501,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * @param singleImageROIThreshold
 	 * @param dim
 	 * @param ggParam
-	 * @return
+	 * @return A {@link GridCoverage}, well actually a {@link GridCoverage2D}.
 	 * @throws TransformException
 	 * @throws IOException
 	 * @throws IOException

@@ -24,46 +24,52 @@ import java.util.Map;
 import org.geotools.data.coverage.grid.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 
-
 /**
- * Implementation of the GridCoverageFormat service provider interface for arc
- * grid files.
- *
+ * Implementation of the GridCoverageFormat service provider interface for
+ * mosaic of georeferenced images.
+ * 
  * @author Simone Giannecchini (simboss)
  * @since 2.3
  */
 public final class ImageMosaicFormatFactory implements GridFormatFactorySpi {
-    /**
-     * DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
-    public boolean isAvailable() {
-        boolean available = true;
+	/**
+	 * Tells me if this plugin will work on not given the actual installation.
+	 * 
+	 * <p>
+	 * Dependecies are mostly from JAI and ImageIO so if they are installed you
+	 * should not have many problems.
+	 * 
+	 * @return False if something's missing, true otherwise.
+	 */
+	public boolean isAvailable() {
+		boolean available = true;
 
-        // if these classes are here, then the runtine environment has 
-        // access to JAI and the JAI ImageI/O toolbox.
-        try {
-            Class.forName("javax.media.jai.JAI");
-            Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
-        } catch (ClassNotFoundException cnf) {
-            available = false;
-        }
+		// if these classes are here, then the runtine environment has
+		// access to JAI and the JAI ImageI/O toolbox.
+		try {
+			Class.forName("javax.media.jai.JAI");
+			Class.forName("com.sun.media.jai.operator.ImageReadDescriptor");
+		} catch (ClassNotFoundException cnf) {
+			available = false;
+		}
 
-        return available;
-    }
+		return available;
+	}
 
-    public Format createFormat() {
-        return new ImageMosaicFormat();
-    }
+	/**
+	 * @see GridFormatFactorySpi#createFormat().
+	 */
+	public Format createFormat() {
+		return new ImageMosaicFormat();
+	}
 
-    /**
-     * Returns the implementation hints. The default implementation returns en
-     * empty map.
-     *
-     * @return DOCUMENT ME!
-     */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
-    }
+	/**
+	 * Returns the implementation hints. The default implementation returns en
+	 * empty map.
+	 * 
+	 * @return An empty map.
+	 */
+	public Map getImplementationHints() {
+		return Collections.EMPTY_MAP;
+	}
 }

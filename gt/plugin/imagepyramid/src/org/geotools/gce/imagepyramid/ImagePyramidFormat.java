@@ -57,17 +57,22 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.imagepyramid");
 
+	/** Control the transparency of the output image. */
 	public static final DefaultParameterDescriptor FINAL_ALPHA = new DefaultParameterDescriptor(
 			"FinalAlpha", Boolean.class, null, Boolean.FALSE);
 
+	/** Control the transparency of the output image. */
 	public static final DefaultParameterDescriptor ALPHA_THRESHOLD = new DefaultParameterDescriptor(
 			"AlphaThreshold", Double.class, null, new Double(1));
 
+	/** Control the thresholding on the input images */
 	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI = new DefaultParameterDescriptor(
 			"InputImageROI", Boolean.class, null, Boolean.FALSE);
 
+	/** Control the thresholding on the input images */
 	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI_THRESHOLD = new DefaultParameterDescriptor(
 			"InputImageROIThreshold", Integer.class, null, new Integer(1));
+
 
 	/**
 	 * Creates an instance and sets the metadata.
