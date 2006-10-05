@@ -38,7 +38,8 @@ import org.geotools.validation.xml.ValidationException;
  * configuration.
  * </p>
  *
- * @see http://vwfs.refractions.net/docs/Validating_Web_Feature_Server.pdf
+ * @see <a http://vwfs.refractions.net/docs/Validating_Web_Feature_Server.pdf>A 
+ *      PDF on Validating Web Feature Servers</a>
  * @source $URL$
  */
 public class PlugIn {

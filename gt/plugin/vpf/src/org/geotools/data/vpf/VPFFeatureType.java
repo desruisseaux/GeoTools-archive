@@ -168,7 +168,8 @@ public class VPFFeatureType implements FeatureType {
         return featureClass.getAttributeTypes();
     }
     /**
-     * @return
+     * @return The <code>VPFCoverage</code> that this <code>FeatureType</code> 
+     *         belongs to.
      */
     public VPFCoverage getCoverage() {
         return featureClass.getCoverage();
@@ -181,7 +182,9 @@ public class VPFFeatureType implements FeatureType {
         return featureClass.getDefaultGeometry();
     }
     /**
-     * @return
+     * @return The <code>String</code> path for the directory containing the
+     *         <code>VPFFeatureClass</code> that this <code>FeatureType</code> 
+     *         belongs to.
      */
     public String getDirectoryName() {
         return featureClass.getDirectoryName();
@@ -195,13 +198,16 @@ public class VPFFeatureType implements FeatureType {
     /**
      * Returns a list of file objects
      *
-     * @return a <code>List</code> containing <code>VPFFile</code> objects
+     * @return A <code>List</code> containing <code>VPFFile</code> objects.
      */
     public List getFileList() {
         return featureClass.getFileList();
     }
     /**
-     * @return
+     * @return A <code>List</code> containing the <code>ColumnPair</code>
+     *         objects which identify the file joins for the 
+     *         <code>VPFFeatureClass</code> that this <code>FeatureType</code> 
+     *         belongs to.
      */
     public List getJoinList() {
         return featureClass.getJoinList();

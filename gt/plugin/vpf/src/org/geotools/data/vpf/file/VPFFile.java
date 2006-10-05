@@ -477,10 +477,10 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
     }
 
     /**
-     * Determines if the stream contains storage for another object Who knows
-     * how well this will work on variable length objects
+     * Determines if the stream contains storage for another object. Who knows
+     * how well this will work on variable length objects?
      *
-     * @return
+     * @return a <code>boolean</code> 
      */
     public boolean hasNext() {
         boolean result = false;

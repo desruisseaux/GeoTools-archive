@@ -126,9 +126,10 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
     
     /**
      * Complete constructor
+     * 
      * @param libraryFeature a feature from the library attribute table
      * @param dir the containing directory
-     * @param base the containing database
+     *  
      * @throws IOException
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
      */
@@ -144,7 +145,9 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
 
     /**
      * Constructor that adds a namespace to the File only constructor.  If
-     * using another constructor then use {@link #setNamespace(URI)}
+     * using another constructor then use setNamespace(URI) 
+     * ((javadocTODO: add the correct link to previous method.))
+     * 
      * @param dir the containing directory
      * @throws IOException
      * @throws SchemaException for problems making a featureType.

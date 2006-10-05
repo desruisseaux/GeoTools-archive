@@ -50,7 +50,7 @@ public abstract class RelationIntegrity extends DefaultIntegrityValidation
      *
      * @return Array of typeNames, or empty array for all, null for disabled
      *
-     * @see org.geotools.validation.Validation#getTypeNames()
+     * @see org.geotools.validation.Validation#getTypeRefs()
      */
     public String[] getTypeRefs() 
     {
@@ -75,7 +75,7 @@ public abstract class RelationIntegrity extends DefaultIntegrityValidation
     /**
      * Set polygonTypeRef to polygonTypeRef.
      *
-     * @param lineTypeRef The polygonTypeRef to set.
+     * @param typeRefA The polygonTypeRef to set.
      */
     public final void setGeomTypeRefA(String typeRefA) {
         this.geomTypeRefA = typeRefA;
@@ -93,7 +93,7 @@ public abstract class RelationIntegrity extends DefaultIntegrityValidation
     /**
      * Set restrictedPolygonTypeRef to restrictedPolygonTypeRef.
      *
-     * @param pointTypeRef The restrictedPolygonTypeRef to set.
+     * @param typeRefB The restrictedPolygonTypeRef to set.
      */
     public final void setGeomTypeRefB(String typeRefB) 
     {

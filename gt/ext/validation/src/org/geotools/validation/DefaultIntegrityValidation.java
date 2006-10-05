@@ -129,7 +129,7 @@ public class DefaultIntegrityValidation implements IntegrityValidation {
      *
      * @return Array of typeNames, or empty array for all, null for disabled
      *
-     * @see org.geotools.validation.Validation#getTypeNames()
+     * @see org.geotools.validation.Validation#getTypeRefs()
      */
     public String[] getTypeRefs() {
         return null; // disabled by default

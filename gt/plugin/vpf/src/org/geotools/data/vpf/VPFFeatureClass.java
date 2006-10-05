@@ -319,7 +319,7 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     /**
      * Returns a list of file objects
      *
-     * @return a <code>List</code> containing <code>VPFFile</code> objects
+     * @return a <code>List</code> containing <code>VPFFile</code> objects.
      */
     public List getFileList() {
         return fileList;
@@ -328,7 +328,8 @@ public class VPFFeatureClass implements DataTypesDefinition, FileConstants,
     /**
      * DOCUMENT ME!
      *
-     * @return
+     * @return a<code>List</code> containing <code>ColumnPair</code> objects 
+     *         which identify the file joins.
      */
     public List getJoinList() {
         return joinList;

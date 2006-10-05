@@ -47,7 +47,7 @@ import java.util.Map;
  * @source $URL$
  * @version $Id$
  *
- * @see MIFDataStore#MIFDataStore(String, HashMap);
+ * @see MIFDataStore#MIFDataStore(String, HashMap)
  */
 public class MIFDataStoreFactory implements DataStoreFactorySpi {
     // DataStore - specific parameters

@@ -80,7 +80,7 @@ public class IsValidGeometryValidation extends DefaultFeatureValidation {
      *
      * @return An array of TypeNames
      *
-     * @see org.geotools.validation.Validation#getTypeNames()
+     * @see org.geotools.validation.Validation#getTypeRefs()
      */
     public String[] getTypeNames() {
         if (getTypeRef() == null) {
@@ -107,8 +107,9 @@ public class IsValidGeometryValidation extends DefaultFeatureValidation {
      *
      * @return True if the feature is a valid geometry.
      *
-     * @see org.geotools.validation.FeatureValidation#validate(org.geotools.feature.Feature,
-     *      org.geotools.feature.FeatureTypeInfo,
+     * @see org.geotools.validation.FeatureValidation#validate(
+     *      org.geotools.feature.Feature,
+     *      org.geotools.feature.FeatureType,
      *      org.geotools.validation.ValidationResults)
      */
     public boolean validate(Feature feature, FeatureType type,

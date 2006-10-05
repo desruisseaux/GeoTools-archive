@@ -22,7 +22,6 @@ package org.geotools.data.vpf.exc;
  *
  * @author <a href="mailto:kobit@users.sourceforge.net">Artur Hefczyc</a>
  * @source $URL$
- * @version
  */
 public class VPFRowDataException extends VPFDataException {
     /**

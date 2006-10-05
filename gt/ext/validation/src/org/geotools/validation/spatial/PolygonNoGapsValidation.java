@@ -55,8 +55,8 @@ public class PolygonNoGapsValidation extends DefaultFeatureValidation {
      * 
      * <p></p>
      *
-     * @param layers a HashMap of key="TypeName" value="FeatureSource"
-     * @param envelope The bounding box of modified features
+     * wasparam layers a HashMap of key="TypeName" value="FeatureSource"
+     * wasparam envelope The bounding box of modified features
      * @param results Storage for the error and warning messages
      *
      * @return True if no features intersect. If they do then the validation

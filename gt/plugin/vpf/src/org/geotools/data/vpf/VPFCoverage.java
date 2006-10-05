@@ -69,9 +69,9 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
     /**
      * Constructor
      *
-     * @param cModule the owning module (needed for navigability to tiles)
+     * cModule the owning module (needed for navigability to tiles)
      * @param cDirectoryName path to directory containing coverage
-     * @param cTopologyLevel the topology level (0-3)
+     * cTopologyLevel the topology level (0-3)
      *
      * @throws IOException if the directory does not contain a valid FCS file
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
@@ -84,9 +84,9 @@ public class VPFCoverage implements FCode, FileConstants, VPFCoverageIfc {
     /**
      * Constructor with namespace
      *
-     * @param cModule the owning module (needed for navigability to tiles)
+     * cModule the owning module (needed for navigability to tiles)
      * @param cDirectoryName path to directory containing coverage
-     * @param cTopologyLevel the topology level (0-3)
+     * cTopologyLevel the topology level (0-3)
      *
      * @throws IOException if the directory does not contain a valid FCS file
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
