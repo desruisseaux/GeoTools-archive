@@ -47,8 +47,7 @@ public interface SortBy2 extends SortBy {
     /**
      * GeoTools allows for more pervase use of Expression then is strictly
      * supported by the specification.
-     *
-     * @return Will return the same Expression as getAttributeExpression.
+     * 
      */
     public void setExpression(Expression expression);
 }

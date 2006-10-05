@@ -108,8 +108,6 @@ public abstract class MathExpressionImpl extends DefaultExpression
     /**
      * 
      * Gets the left or first expression.
-     *
-     * @return the expression on the first side of the comparison.
      * 
      * @throws IllegalFilterException
      */
@@ -144,8 +142,7 @@ public abstract class MathExpressionImpl extends DefaultExpression
     
     /**
      * Gets the second expression.
-     *
-     * @return the expression on the second side of the comparison.
+     * 
      * @throws IllegalFilterException
      */
     public void setExpression2(org.opengis.filter.expression.Expression expression) {

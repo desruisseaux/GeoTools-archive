@@ -155,7 +155,7 @@ public final class IndexedFeatureResults implements FeatureResults {
 
 	/**
 	 * @param envelope
-	 * @return
+	 * 
 	 */
 	public void setQueryBounds(Envelope queryBounds) {
 		this.queryBounds = queryBounds;

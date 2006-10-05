@@ -88,7 +88,7 @@ public interface MapContext {
 	 * Add a new layer and trigger a {@link LayerListEvent}
 	 * 
 	 * @param layer
-	 * @return
+	 * 
 	 */
 	void addLayer(GridCoverage gridCoverage, Style style);
 	
@@ -96,7 +96,7 @@ public interface MapContext {
 	 * Add a new layer and trigger a {@link LayerListEvent}
 	 * 
 	 * @param layer
-	 * @return
+	 * 
 	 */
 	void addLayer(AbstractGridCoverage2DReader gridCoverage, Style style);
 
