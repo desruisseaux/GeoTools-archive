@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.geotools.TestData;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
@@ -48,16 +49,19 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.type.BasicFeatureTypes;
+import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.GeometryFilter;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.gml.GMLSchema;
-import org.geotools.TestData;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -541,7 +545,42 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             reader.close();
         }
     }
-    
+    /**
+     * Checks if feature reading optimizations still allow to execute the queries or not
+     * @throws Exception
+     */
+    public void testGetReaderOptimizations() throws Exception {
+    	URL url = TestData.url(STATE_POP);
+        ShapefileDataStore s = new ShapefileDataStore(url);
+        
+        // attributes other than geometry can be ignored here
+        Query q = new DefaultQuery(s.getSchema().getTypeName(), Filter.NONE, new String[] {"the_geom"});
+        FeatureReader fr = s.getFeatureReader(s.getSchema().getTypeName(), q);
+        assertEquals(1, fr.getFeatureType().getAttributeCount());
+        assertEquals("the_geom", fr.getFeatureType().getAttributeTypes()[0].getName());
+        
+        // here too, the filter is using the geometry only
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+        GeometryFactory gc = new GeometryFactory();
+        LinearRing ring = gc.createLinearRing(new Coordinate[] {new Coordinate(0,0), new Coordinate(10,0), new Coordinate(10,10), new Coordinate(0,10), new Coordinate(0,0)});
+        Polygon p = gc.createPolygon(ring, null);
+        GeometryFilter gf = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);
+        gf.addLeftGeometry(ff.createAttributeExpression("the_geom"));
+        gf.addRightGeometry(ff.createLiteralExpression(p));
+        q = new DefaultQuery(s.getSchema().getTypeName(), gf, new String[] {"the_geom"});
+        fr = s.getFeatureReader(s.getSchema().getTypeName(), q);
+        assertEquals(1, fr.getFeatureType().getAttributeCount());
+        assertEquals("the_geom", fr.getFeatureType().getAttributeTypes()[0].getName());
+        
+        // here not, we need state_name in the feature type, so open the dbf file please
+        CompareFilter cf = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+        cf.addLeftValue(ff.createAttributeExpression("STATE_NAME"));
+        cf.addRightValue(ff.createLiteralExpression("Illinois"));
+        q = new DefaultQuery(s.getSchema().getTypeName(), cf, new String[] {"the_geom"});
+        fr = s.getFeatureReader(s.getSchema().getTypeName(), q);
+        assertEquals(s.getSchema(), fr.getFeatureType());
+    }
+        
     public static void main(String[] args) throws Exception {
         verbose = true;
         junit.textui.TestRunner.run(suite(ShapefileDataStoreTest.class));

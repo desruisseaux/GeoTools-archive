@@ -85,6 +85,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -376,7 +377,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     /**
      * Just like the basic version, but adds a small optimization: if no
      * attributes are going to be read, don't uselessly open and read the dbf
-     * file.
+     * file. Makes sure to consider also attributes in the query.
      *
      * @see org.geotools.data.AbstractDataStore#getFeatureReader(java.lang.String,
      *      org.geotools.data.Query)
@@ -385,9 +386,18 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         throws IOException {
         String[] propertyNames = query.getPropertyNames();
         String defaultGeomName = schema.getDefaultGeometry().getName();
+        
+        // gather attributes needed by the query too, they will be used by the
+        // query filter
+        StyleAttributeExtractor extractor = new StyleAttributeExtractor();
+        query.getFilter().accept(extractor);
+        String[] filterAttnames = extractor.getAttributeNames();
 
+        // check if the geometry is the one and only attribute needed
+        // to return attribute _and_ to run the query filter
         if ((propertyNames != null) && (propertyNames.length == 1)
-                && propertyNames[0].equals(defaultGeomName)) {
+                && propertyNames[0].equals(defaultGeomName) && 
+                (filterAttnames.length == 0 || (filterAttnames.length == 1 && filterAttnames[0].equals(defaultGeomName)))) {
             try {
                 FeatureType newSchema = DataUtilities.createSubType(schema,
                         propertyNames);
