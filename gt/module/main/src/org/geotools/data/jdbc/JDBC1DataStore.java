@@ -1051,7 +1051,7 @@ public abstract class JDBC1DataStore implements DataStore {
      * @return Connection.TRANSACTION_* value
      * @since 2.2.0
      * @see setTransactionIsolation
-     * @see http://www.postgresql.org/docs/7.4/static/transaction-iso.html
+     * @see <a href="http://www.postgresql.org/docs/7.4/static/transaction-iso.html">This web page</a>
      */
     public int getTransactionIsolation() {
         return transactionIsolation;
@@ -1067,7 +1067,7 @@ public abstract class JDBC1DataStore implements DataStore {
      *            Connection.SERIALIZABLE, or Connection.TRANSACTION_NONE
      *            (for use default/do not set)
      * @since 2.2.0
-     * @see http://www.postgresql.org/docs/7.4/static/transaction-iso.html
+     * @see <a href="http://www.postgresql.org/docs/7.4/static/transaction-iso.html">This web page</a>
      */
     public void setTransactionIsolation(int value) {
         transactionIsolation = value;

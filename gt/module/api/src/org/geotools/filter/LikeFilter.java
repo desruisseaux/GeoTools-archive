@@ -42,7 +42,7 @@ public interface LikeFilter extends Filter, PropertyIsLike {
      *
      * @deprecated use one of
      *         {@link PropertyIsLike#setExpression(Expression)}
-     *         {@link PropertyIsLike#setWildCard(String)
+     *         {@link PropertyIsLike#setWildCard(String)}
      *         {@link PropertyIsLike#setSingleChar(String)}
      *         {@link PropertyIsLike#setEscape(String)}
      */
@@ -80,7 +80,7 @@ public interface LikeFilter extends Filter, PropertyIsLike {
      *
      * @deprecated use one of
      *         {@link PropertyIsLike#setExpression(Expression)}
-     *         {@link PropertyIsLike#setWildCard(String)
+     *         {@link PropertyIsLike#setWildCard(String)}
      *         {@link PropertyIsLike#setSingleChar(String)}
      *         {@link PropertyIsLike#setEscape(String)}
      *

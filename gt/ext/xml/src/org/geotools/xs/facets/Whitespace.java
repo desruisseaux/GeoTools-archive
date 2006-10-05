@@ -33,7 +33,7 @@ import java.util.List;
  * &lt;/simpleType&gt;
  * </code></pre>
  * @see a longing for Java 5 Enum construct
- * @see http://www.w3.org/TR/xmlschema-2/#rf-whiteSpace
+ * @see <a href="http://www.w3.org/TR/xmlschema-2/#rf-whiteSpace">This web page</a>
  * @author jgarnett
  * @since 1.0.0
  */

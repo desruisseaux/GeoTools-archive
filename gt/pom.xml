@@ -996,19 +996,19 @@
           <tags>
             <tag>
               <name>todo</name>
-              <placement>tfmc</placement>
+              <placement>a</placement>
               <head>TODO:</head>
             </tag>
             <tag>
               <name>TODO</name>
-              <placement>tfmc</placement>
+              <placement>a</placement>
               <head>TODO:</head>
             </tag>
-            <tag>
+            <!-- tag>
               <name>task</name>
               <placement>tfmc</placement>
               <head>TODO:</head>
-            </tag>
+            </tag -->
             <tag>
               <name>revisit</name>
               <placement>tfmc</placement>
@@ -1018,6 +1018,16 @@
               <name>generated</name>
               <placement>Xt</placement>
               <head>Generated</head>
+            </tag>
+            <tag>
+              <name>UML</name>
+              <placement>a</placement>
+              <head>UML:</head>
+            </tag>
+            <tag>
+              <name>uml.properties</name>
+              <placement>a</placement>
+              <head>UML property:</head>
             </tag>
           </tags>
 

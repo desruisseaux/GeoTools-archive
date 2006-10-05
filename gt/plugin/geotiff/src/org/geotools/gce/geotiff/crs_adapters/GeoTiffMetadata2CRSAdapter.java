@@ -344,7 +344,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * Create the grid to world (or raster to model) transformation for this
 	 * source.
 	 * 
-	 * @see http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html
+	 * @see <a href="http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html">this email post</a>
 	 * @task TODO add support for transformation
 	 * @param crs
 	 * @return

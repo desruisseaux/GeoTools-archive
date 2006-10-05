@@ -44,8 +44,8 @@ import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 
 /**
- * Wraps an instanceof of {@link org.geotools.filter.FilterVisitor in an 
- * {@link org.opengis.filter.FilterVisitor}.
+ * Wraps an instanceof of {@link org.geotools.filter.FilterVisitor} in an 
+ * {@link org.opengis.filter.FilterVisitorWrapper}.
  * 
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *

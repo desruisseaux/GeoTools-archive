@@ -166,7 +166,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
      * Retrieves the expression on the right side of the comparison.
      *
      * @return the expression on the right.
-     * @deprecated use {@link {@link org.opengis.filter.spatial.BinarySpatialOperator#getExpression2()}
+     * @deprecated use {@link org.opengis.filter.spatial.BinarySpatialOperator#getExpression2()}
      */
     public final Expression getRightGeometry() {
         return (Expression)getExpression2();
