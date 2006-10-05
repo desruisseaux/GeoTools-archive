@@ -152,35 +152,35 @@ public interface ResolveDelta {
         /**
          * Delta kind constant indicating no change.
          *
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind NO_CHANGE = new Kind();
 
         /**
          * The resource has been added to the catalog.
          *
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind ADDED = new Kind();
 
         /**
          * The resource has been removed from the catalog.
          *
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind REMOVED = new Kind();
 
         /**
          * The resource has been changed.
          *
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind CHANGED = new Kind();
 
         /**
          * The resource has been replaced with another entry in the catalog.
          *
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind REPLACED = new Kind();
     }

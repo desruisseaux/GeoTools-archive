@@ -187,7 +187,7 @@ public class MIFDataStoreFactory implements DataStoreFactorySpi {
      *
      * @throws IOException
      *
-     * @see createDataStore(Map);
+     * @see #createDataStore(Map);
      */
     public DataStore createNewDataStore(Map params) throws IOException {
         return createDataStore(params); // return null????

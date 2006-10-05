@@ -258,7 +258,7 @@ public interface Schema extends Factory {
      *
      * @return
      *
-     * @see getUris()
+     * @see #getUris()
      */
     public boolean includesURI(URI uri);
 

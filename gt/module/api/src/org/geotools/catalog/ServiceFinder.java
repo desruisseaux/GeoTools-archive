@@ -47,7 +47,7 @@ public interface ServiceFinder {
      *
      * @param target
      * @return List<IService>
-     * @see aquire(params)
+     * @see #aquire(params)
      */
     List aquire(URI target); // creates a map, may look up authentication
 

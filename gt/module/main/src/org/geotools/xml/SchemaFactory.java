@@ -204,7 +204,7 @@ public class SchemaFactory {
      *
      * @return
      *
-     * @see registerSchema(Strin,Schema)
+     * @see #registerSchema(Strin,Schema)
      */
     public synchronized static Schema getInstance(URI targetNamespace) {
         return getInstance().getRealInstance(targetNamespace);

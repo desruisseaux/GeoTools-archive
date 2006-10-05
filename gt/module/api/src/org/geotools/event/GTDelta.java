@@ -230,7 +230,7 @@ public interface GTDelta {
          * May be considered a touch if it occurs as the last delta,
          * usually just indicates that a child has undergone a change.
          * </p>
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind NO_CHANGE = new Kind();
 
@@ -244,7 +244,7 @@ public interface GTDelta {
          * <li>getPosition(): index in list, or NO_INDEX
          * </ul>
          * </p>
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind ADDED = new Kind();
 
@@ -263,7 +263,7 @@ public interface GTDelta {
          * getValue is still valid.
          * </p>
          *
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind REMOVED = new Kind();
 
@@ -277,7 +277,7 @@ public interface GTDelta {
          * <li>getPosition(): index in list, or NO_INDEX
          * </ul>
          * </p>
-         * @see getKind()
+         * @see #getKind()
          */
         public static final Kind CHANGED = new Kind();
     }
