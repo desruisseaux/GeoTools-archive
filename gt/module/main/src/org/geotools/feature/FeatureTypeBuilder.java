@@ -97,7 +97,7 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
     /**
      * An empty public constructor. Subclasses should not provide a
      * constructor.
-     * @depricated 
+     * @deprecated 
      */
     public FeatureTypeBuilder() {
     	this( Collections.EMPTY_MAP );

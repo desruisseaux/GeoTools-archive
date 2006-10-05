@@ -27,7 +27,6 @@ import org.xml.sax.Attributes;
  * interface extends the generic XML schema type interface to represent datum
  * within nested elements.
  * </p>
- * @
  *
  * @author dzwiers www.refractions.net
  * @source $URL$

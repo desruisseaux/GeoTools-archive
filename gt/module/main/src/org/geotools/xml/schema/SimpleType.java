@@ -26,7 +26,6 @@ import javax.naming.OperationNotSupportedException;
  * interface extends the generic XML schema type interface to represent datum
  * within a single element.
  * </p>
- * @
  *
  * @author dzwiers www.refractions.net
  * @source $URL$

@@ -23,7 +23,6 @@ package org.geotools.xml.schema;
  * flattening child Choices with the parent, creating a semantically
  * equivalent choice in it's place.
  * </p>
- * @
  *
  * @author dzwiers www.refractions.net
  * @source $URL$

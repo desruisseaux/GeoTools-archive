@@ -246,7 +246,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
      * @param graphic The graphic to repaint, or {@code null} if unknown.
      * @param objectiveArea The dirty region to repaint in terms of
      *        {@linkplain #getObjectiveCRS objective CRS}, or {@code null}.
-     * @paral displayArea The dirty region to repaint in terms of
+     * @param displayArea The dirty region to repaint in terms of
      *        {@linkplain #getDisplayCRS display CRS}, or {@code null}.
      */
     public abstract void repaint(Graphic graphic, Rectangle2D objectiveArea, Rectangle displayArea);

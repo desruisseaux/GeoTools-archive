@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
  * @author aaime
  * @author Ian Schneider
  * @source $URL$
- * @version
+ * 
  */
 public interface ShapeHandler {
   /** Get the ShapeType of this handler.

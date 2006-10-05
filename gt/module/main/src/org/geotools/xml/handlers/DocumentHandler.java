@@ -31,7 +31,6 @@ import org.xml.sax.SAXNotRecognizedException;
  * Represents the start of an XML document ... serves up elements wrapped in
  * handlers for a specified schema.
  * </p>
- * @
  *
  * @author dzwiers www.refractions.net
  * @source $URL$

@@ -397,8 +397,6 @@ public class GridSampleDimension implements SampleDimension, Serializable {
 	 *            The unit information for this sample dimension, or
 	 *            {@code null} if none. This is the value to be returned by
 	 *            {@link #getUnits}.
-	 * @param description
-	 *            Description for this Sample Dimension.
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if the range {@code [minimum..maximum]} is not valid.

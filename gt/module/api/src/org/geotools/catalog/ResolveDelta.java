@@ -107,8 +107,8 @@ public interface ResolveDelta {
     /**
      * Finds and returns the delta information for a given resource.
      *
-     * @kindMask Set of IDelta.Kind
-     * @return Array of IGeoResourceDelta
+     * @param kindMask Set of IDelta.Kind
+     * @return List of IGeoResourceDelta
      */
     List getChildren(Set kindMask);
 

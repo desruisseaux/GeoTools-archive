@@ -23,7 +23,6 @@ import java.net.URI;
  * An instance of this interface should represent an Attribute from an XML
  * schema.
  * </p>
- * @
  *
  * @author dzwiers www.refractions.net
  * @source $URL$

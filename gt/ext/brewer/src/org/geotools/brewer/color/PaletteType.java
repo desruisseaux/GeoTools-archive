@@ -18,8 +18,7 @@ package org.geotools.brewer.color;
 
 /**
  * This class doubles as a filter and an identifier for colour palettes.
- *
- * @author
+ * 
  * @source $URL$
  */
 public class PaletteType {

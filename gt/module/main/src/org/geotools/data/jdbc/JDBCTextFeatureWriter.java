@@ -54,6 +54,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *             See http://jira.codehaus.org/browse/GEOT-219 (close when done).
  *
  * @author Andrea Aime
+ * @authro chorner
  * @source $URL$
  * @version $Id$
  */
@@ -409,7 +410,6 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      * 
      * This method is called in a timer thread, to prevent blocking.
      * 
-     * @author chorner
      * @since 2.2.0
      * @param current
      * @return sql string or null

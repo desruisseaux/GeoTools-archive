@@ -125,7 +125,7 @@ public class SQLEncoderOracle extends SQLEncoder {
     /**
      * Creates a new SQLEncoderOracle with a specified SRID.
      *
-     * @param srids DOCUMENT ME!
+     * @param fidColumn DOCUMENT ME!
      * @param srids The Spatial Reference ID to use when generating SDO SQL
      *        statements.
      */

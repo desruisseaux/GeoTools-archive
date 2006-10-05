@@ -23,7 +23,6 @@ import java.net.URI;
  * Instances of this interface are intended to represent the 'any' construct in
  * an XML Schema.
  * </p>
- * @
  *
  * @author dzwiers www.refractions.net
  * @source $URL$

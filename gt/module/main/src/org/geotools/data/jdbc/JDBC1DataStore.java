@@ -1049,7 +1049,6 @@ public abstract class JDBC1DataStore implements DataStore {
      * Obtain the transaction isolation level for connections.
      * 
      * @return Connection.TRANSACTION_* value
-     * @author chorner
      * @since 2.2.0
      * @see setTransactionIsolation
      * @see http://www.postgresql.org/docs/7.4/static/transaction-iso.html
@@ -1067,7 +1066,6 @@ public abstract class JDBC1DataStore implements DataStore {
      *            Connection.TRANSACTION_REPEATABLE_READ,
      *            Connection.SERIALIZABLE, or Connection.TRANSACTION_NONE
      *            (for use default/do not set)
-     * @author chorner
      * @since 2.2.0
      * @see http://www.postgresql.org/docs/7.4/static/transaction-iso.html
      */
