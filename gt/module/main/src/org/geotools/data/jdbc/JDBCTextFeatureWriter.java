@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *             See http://jira.codehaus.org/browse/GEOT-219 (close when done).
  *
  * @author Andrea Aime
- * @authro chorner
+ * @author chorner
  * @source $URL$
  * @version $Id$
  */

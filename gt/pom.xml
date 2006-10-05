@@ -1004,11 +1004,11 @@
               <placement>a</placement>
               <head>TODO:</head>
             </tag>
-            <!-- tag>
+            <!tag>
               <name>task</name>
               <placement>tfmc</placement>
               <head>TODO:</head>
-            </tag -->
+            </tag>
             <tag>
               <name>revisit</name>
               <placement>tfmc</placement>
