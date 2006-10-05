@@ -85,6 +85,7 @@ final class GT30Header {
 	/**
 	 * A map for fast and convenient retrivial of the properties contained in
 	 * the header file
+	 * 
 	 */
 	private Map propertyMap;
 
