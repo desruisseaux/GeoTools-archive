@@ -17,10 +17,12 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.Filter;
@@ -232,6 +234,38 @@ public abstract class AbstractFeatureStore extends AbstractFeatureSource
         return addedFids;
     }
 
+    public Set addFeatures(FeatureCollection collection) throws IOException {
+    	Set addedFids = new HashSet();
+        String typeName = getSchema().getTypeName();
+        Feature feature = null;
+        SimpleFeature newFeature;
+        FeatureWriter writer = getDataStore().getFeatureWriterAppend(typeName,
+                getTransaction());
+
+        Iterator iterator = collection.iterator();
+        try {
+        	
+            while (iterator.hasNext()) {
+                feature = (Feature) iterator.next();
+                newFeature = (SimpleFeature)writer.next();
+                try {
+                    newFeature.setAttributes(feature.getAttributes(null));
+                } catch (IllegalAttributeException writeProblem) {
+                    throw new DataSourceException("Could not create "
+                        + typeName + " out of provided feature: "
+                        + feature.getID(), writeProblem);
+                }
+
+                writer.write();
+                addedFids.add(newFeature.getID());
+            }
+        } finally {
+            collection.close( iterator );
+            writer.close();
+        }
+        return addedFids;
+    }
+    
     /**
      * Removes features indicated by provided filter.
      * 

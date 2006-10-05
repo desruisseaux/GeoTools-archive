@@ -36,9 +36,10 @@ public class MutableFIDFeature extends DefaultFeature {
 
   }
 
-  /** Sets the FID.
+  /**
+   * Sets the FID, used by datastores only.
    * 
-   *  This is protected for safety reason, i.e. so client classes can't
+   * I would love to protect this for safety reason, i.e. so client classes can't
    *  use it by casting to it.
    * @param fid The fid to set.
    */

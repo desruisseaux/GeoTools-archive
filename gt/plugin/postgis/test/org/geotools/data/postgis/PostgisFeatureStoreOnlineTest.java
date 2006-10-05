@@ -34,7 +34,6 @@ public class PostgisFeatureStoreOnlineTest extends AbstractPostgisOnlineTestCase
         FeatureType ft = fs.getSchema();
         FeatureCollection fc = FeatureCollections.newCollection();
         Feature feature = ft.create(new Object[] {"test"});
-
         fc.add(feature);
         Set set = fs.addFeatures(fc);
         String id = (String) set.toArray()[0];

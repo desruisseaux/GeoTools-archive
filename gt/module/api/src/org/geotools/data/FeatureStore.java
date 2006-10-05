@@ -20,6 +20,9 @@ import org.geotools.filter.Filter;
 import java.io.IOException;
 import java.util.Set;
 
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.Filter;
 
 /**
  * Provides storage of data for Features.
@@ -43,16 +46,27 @@ import java.util.Set;
  */
 public interface FeatureStore extends FeatureSource {
     /**
-     * Adds all features from the passed feature collection to the datasource.
+     * Adds all features from the passed feature reader "stream".
      *
-     * @param reader The reader from which to add the features.
+     * @param redaer The reader from which to add the features.
      *
      * @return the FeatureIds of the newly added features.
-     *
+     * @deprecated Please use addFeatures( FeatureCollection )
      * @throws IOException if anything goes wrong.
      */
     Set addFeatures(FeatureReader reader) throws IOException;
 
+    /**
+     * Adds all features from the passed feature collection to the datasource.
+     *
+     * @param collection The collection of features to add.
+     * @return the FeatureIds of the newly added features.
+     *
+     * @throws IOException if anything goes wrong.
+     */
+        
+    Set addFeatures(FeatureCollection collection ) throws IOException;
+    
     /**
      * Removes all of the features specificed by the passed filter from the
      * collection.
