@@ -217,24 +217,29 @@ public interface Binding {
     /**
      * Specifies that a strategy should be executed after its direct parent
      */
-    public static final int AFTER = 0;
+    static final int AFTER = 0;
 
     /**
      * Specifes that a strategy should be executed before its direct parent.d
      */
-    public static final int BEFORE = 1;
+    static final int BEFORE = 1;
 
     /**
      * Specifies that a strategy should totally override the execution of its
      * direct parent.
      */
-    public static final int OVERRIDE = 2;
+    static final int OVERRIDE = 2;
 
     /**
      * @return The qualified name of the target type.
      */
-    public abstract QName getTarget();
-
+    QName getTarget();
+    
+    /**
+     * @return The java type this binding maps to.
+     */
+    Class getType();
+    
     /**
      * @return The execution mode of the strategy, one of the constants AFTER,
      * BEFORE, or OVERRIDE.
@@ -243,5 +248,5 @@ public interface Binding {
      * @see SimpleBinding#BEFORE
      * @see SimpleBinding#OVERRIDE
      */
-    public abstract int getExecutionMode();
+    int getExecutionMode();
 }
