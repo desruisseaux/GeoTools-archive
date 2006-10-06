@@ -42,45 +42,7 @@ public class OGCFilterTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new Configuration() {
-                public void configureBindings(MutablePicoContainer container) {
-                    // XS schema bindings
-                    new XSBindingConfiguration().configure(container);
-
-                    // SMIL 2.0 bindings (for GML 3.1)
-                    new SMIL20BindingConfiguration().configure(container);
-
-                    // GML 3.1.1 bindings
-                    new GMLBindingConfiguration().configure(container);
-
-                    // Filter 1.1 bindings
-                    new OGCBindingConfiguration().configure(container);
-                }
-
-                public void configureContext(MutablePicoContainer container) {
-                    //every time a FilterFactory is needed, use this one
-                    final FilterFactory filterFactory = FilterFactoryFinder
-                        .createFilterFactory();
-                    container.registerComponentInstance(filterFactory);
-
-                    container.registerComponentInstance(CoordinateArraySequenceFactory
-                        .instance());
-                    container.registerComponentImplementation(GeometryFactory.class);
-
-                    // Schema location resolver for XLink
-                    container.registerComponentImplementation(XLINKSchemaLocationResolver.class);
-
-                    // Schema location resolver for SMIL 2.0
-                    container.registerComponentImplementation(SMIL20SchemaLocationResolver.class);
-
-                    // Schema location resolver for GML 3.1.1
-                    container.registerComponentImplementation(GMLSchemaLocationResolver.class);
-
-                    // Schema location resolver for Filter 1.1
-                    container.registerComponentImplementation(OGCSchemaLocationResolver.class);
-                }
-            };
-
+        Configuration configuration = new OGCConfiguration();
         parser = new Parser(configuration);
     }
 

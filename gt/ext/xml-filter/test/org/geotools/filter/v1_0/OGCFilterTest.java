@@ -34,22 +34,7 @@ public class OGCFilterTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
 
-        Configuration configuration = new Configuration() {
-                public void configureBindings(MutablePicoContainer container) {
-                    container.registerComponentImplementation(LinkedList.class);
-
-                    new XSBindingConfiguration().configure(container);
-                    new org.geotools.filter.v1_0.OGCBindingConfiguration()
-                    .configure(container);
-                }
-
-                public void configureContext(MutablePicoContainer container) {
-                    container.registerComponentImplementation(GMLSchemaLocationResolver.class);
-                    container.registerComponentImplementation(OGCSchemaLocationResolver.class);
-                    container.registerComponentImplementation(FilterFactoryImpl.class);
-                }
-            };
-
+        Configuration configuration = new OGCConfiguration();
         parser = new Parser(configuration,
                 getClass().getResourceAsStream("test1.xml"));
     }
