@@ -181,7 +181,7 @@ public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
         if (fType == null) {
             FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
             ftBuilder.setName(decl.getName());
-            ftBuilder.setName(decl.getTargetNamespace());
+            ftBuilder.setNamespace(new URI(decl.getTargetNamespace()));
 
             //build the feaure type by walking through the elements of the 
             // actual xml schema type
@@ -191,9 +191,19 @@ public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
                 XSDElementDeclaration property = (XSDElementDeclaration) itr
                     .next();
 
-                if ("boundedBy".equals(property.getName())) {
-                    //ignore bounds, created lazily based on geometry
-                    continue;
+                //ignore the attributes provided by gml, change this for new feature model
+                if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
+                    if ("boundedBy".equals(property.getName())) {
+                        continue;
+                    }
+
+                    if ("name".equals(property.getName())) {
+                        continue;
+                    }
+
+                    if ("description".equals(property.getName())) {
+                        continue;
+                    }
                 }
 
                 XSDTypeDefinition type = property.getType();
