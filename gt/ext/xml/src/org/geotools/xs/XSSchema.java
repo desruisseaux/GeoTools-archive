@@ -21,6 +21,8 @@ import org.geotools.feature.type.SchemaImpl;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
+import java.util.Date;
+
 import javax.xml.namespace.QName;
 
 
@@ -1158,7 +1160,7 @@ public class XSSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType DATE_TYPE = AttributeTypeFactory
-        .newAttributeType("date", Calendar.class);
+        .newAttributeType("date", Date.class);
 
     /**
      * <p>
