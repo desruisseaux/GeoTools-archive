@@ -18,7 +18,11 @@ package org.geotools.xs.bindings;
 import com.sun.xml.bind.DatatypeConverterImpl;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
+
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
+
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 
@@ -77,13 +81,13 @@ public class XSDateBinding implements SimpleBinding {
 
     /**
      * <!-- begin-user-doc -->
-     * This binding returns objects of type {@link Calendar}.
+     * This binding returns objects of type {@link Date}.
      * <!-- end-user-doc -->
      *
      * @generated modifiable
      */
     public Class getType() {
-        return Calendar.class;
+        return Date.class;
     }
 
     /**
@@ -95,20 +99,9 @@ public class XSDateBinding implements SimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
-
-        return DatatypeConverter.parseDate((String) value);
+    	
+    	//check the context 
+    	return DateFormat.getInstance().parse( (String) value );
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public String encode(Object object, String value) {
-        Calendar date = (Calendar) object;
-
-        return DatatypeConverter.printDate(date);
-    }
 }
