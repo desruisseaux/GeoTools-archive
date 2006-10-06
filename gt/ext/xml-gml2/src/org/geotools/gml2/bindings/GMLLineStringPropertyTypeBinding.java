@@ -79,7 +79,7 @@ public class GMLLineStringPropertyTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return LineString.class;
     }
 
     /**
