@@ -15,6 +15,20 @@
  */
 package org.geotools.xml;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
+
+import javax.xml.namespace.QName;
+
+import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import org.eclipse.xsd.util.XSDSchemaLocator;
+import org.geotools.resources.Utilities;
+import org.geotools.xs.XSConfiguration;
 import org.picocontainer.MutablePicoContainer;
 
 /**
@@ -28,38 +42,42 @@ import org.picocontainer.MutablePicoContainer;
  *  <li>Configuration of context used by bindings.
  *  <li>Supplying specialized handlers for looking up schemas.
  *  <li>Supplying specialized handlers for parsing schemas.
+ *  <li>Declaring dependencies on other configurations
  * </ul>
  * </p>
- *
+ * <h3>Dependencies</h3>
+ * <p>
+ * Configurations have dependencies on one another, that result from teh fact that
+ * one schema imports another. Each configuration should declare all dependencies in
+ * the constructor using the {@link #addDependency(Configuration)} method.
+ * <code>
+ * 	<pre>
+ * 	class MyConfiguration extends Configuration {
+ *     public MyConfiguration() {
+ *       super();
+ *       
+ *       addDependency( new FooConfiguration() );
+ *       addDependency( new BarConfiguration() );
+ *     }
+ *     ...
+ *  }
+ * 	</pre>
+ * </code>
+ * </p>
  * <h3>Binding Configuration</h3>
  * <p>
  *  In able for a particular binding to be found during a parse, the
- *  configuration must first populate a container with said binding. A binding
- *  is stored in as a key value pair. The key is the qualified name of the type '
- *  being bound to. The value is the class of the binding. For instance, the
- *  following configures a container with a binding for type <b>xs:string</b>
- *
+ *  configuration must first populate a container with said binding. This 
+ *  can be done by returning the appropriate instance of 
+ *  {@link  org.geotools.xml.BindingConfiguration} in {@link #getBindingConfiguration()}:
  *  <pre>
  *          <code>
- *  void configureBindings( MutablePicoContainer container ) {
- *      container.registerComponentImplementation(XS.STRING,XSStringBinding.class);
+ *  BindingConfiguration getBindingConfiguration() {
+ *      return new MyBindingConfiguration();
  *  }
  *          </code>
  *  </pre>
- *
- *  Usually it is desirable to populate a container with a set of bindings from
- *  a specific schema. For instance, the following configuration populates the
- *  binding container with all the bindings for types defined in XML schema
- *  itself.
- *
- *  <pre>
- *          <code>
- *  void configureBindings(MutablePicoContainer container) {
- *           new XSBindingConfiguration().configure(container);
- *  }
- *          </code>
- *  </pre>
- *
+ *  
  *  Instances of type {@link org.geotools.xml.BindingConfiguration} are used to
  *  populate a container with all the bindings from a particular schema.
  * </p>
@@ -92,8 +110,8 @@ import org.picocontainer.MutablePicoContainer;
  *
  * <pre>
  *         <code>
- * class MyConfiguration implements Configuration {
- *
+ * class MyConfiguration extends Configuration {
+ *	....
  *                void configureContext(MutablePicoContainer container) {
  *                        container.registerComponentImplementation(ArrayList.class);
  *                }
@@ -125,9 +143,12 @@ import org.picocontainer.MutablePicoContainer;
  *         <code>
  * class MyConfiguration implements Configuration {
  *
- *                void configureContext(MutablePicoContainer container) {
- *                		  container.registerComponentImplemnetation(MySchemaLocationResolver.class);
- *                        container.registerComponentImplementation(MySchemaLocator.class);
+ *                XSDSchemaLocationResolver getSchemaLocationResolver() {
+ *                  return new MySchemaLocationResolver();
+ *                }
+ *                
+ *                XSDSchemaLocator getSchemaLocator() {
+ *                  return new MySchemaLocator();
  *                }
  * }
  *         </code>
@@ -135,7 +156,7 @@ import org.picocontainer.MutablePicoContainer;
  *
  * </p>
  * <p>
- * The XSDSchemaLocator and XSDSchemeLocationResolver implementations are used
+ * The XSDSchemaLocator and XSDSchemaLocationResolver implementations are used
  * in a couple of scenarios. The first is when the <b>schemaLocation</b>
  * attribute of the root element of the instance document is being parsed.
  * The schemaLocation attribute has the form:
@@ -176,19 +197,202 @@ import org.picocontainer.MutablePicoContainer;
  * @author Justin Deoliveira,Refractions Research Inc.,jdeolive@refractions.net
  * @see org.geotools.xml.BindingConfiguration
  */
-public interface Configuration {
-    /**
+public abstract class Configuration {
+	
+	/**
+	 * List of configurations depended on.
+	 */
+	private List dependencies;
+	
+	/**
+	 * Creates a new configuration. 
+	 * <p>
+	 * Any dependent schemas should be added in sublcass constructor. The xml schema
+	 * dependency does not have to be added.
+	 * </p>
+	 *
+	 */
+	public Configuration() {
+		dependencies = new ArrayList();
+		
+		//bootstrap check
+		if ( !( this instanceof XSConfiguration ) ) {
+			dependencies.add( new XSConfiguration() );
+		}
+	}
+	
+	/**
+	 * 	@return a list of direct dependencies of the configuration.
+	 * 
+	 */
+	public final List/*<Configuration>*/ getDependencies() {
+		return dependencies;
+	}
+
+	/**
+	 * Returns all dependencies in the configuration dependency tree.
+	 * <p>
+	 * The return list contains no duplicates.
+	 * </p>
+	 * @return All dependencies in teh configuration dependency tree.
+	 */
+	public final List allDependencies() {
+	
+		LinkedList unpacked = new LinkedList();
+		
+		Stack stack = new Stack();
+		stack.push( this );
+		
+		while( !stack.isEmpty() ) {
+			Configuration c = (Configuration) stack.pop();
+			if ( !unpacked.contains( c ) ) {
+				unpacked.addFirst( c );
+				stack.addAll( c.getDependencies() );
+			}
+		}
+		
+		return unpacked;
+	}
+	
+	/**
+	 * Adds a dependent configuration.
+	 * <p>
+	 * This method should only be called from the constructor.
+	 * </p>
+	 * @param dependency
+	 */
+	protected void addDependency( Configuration dependency ) {
+		if ( dependencies.contains( dependency ) )
+			return;
+		
+		dependencies.add( dependency );
+	}
+
+	
+	/**
+	 * @return The namespace of the configuration schema.
+	 */
+	abstract public String getNamespaceURI();
+	
+	/**
+	 * Returns the url to the file definiing hte schema.
+	 * <p>
+	 * For schema which are defined by multiple files, this method should return the base schema 
+	 * which includes all other files that define the schema.
+	 * </p>
+	 */
+	abstract public URL getSchemaFileURL() throws MalformedURLException;
+	
+	/**
+	 * @return The binding set for types, elements, attributes of the configuration schema.
+	 */
+	abstract public BindingConfiguration getBindingConfiguration();
+	
+	/**
+	 * Returns a schema location resolver instance used to override schema location
+	 * uri's encountered in an instance document.
+	 * <p>
+	 * This method should be overridden to return such an instance. The default 
+	 * implemntation returns <code>null</code>
+	 * </p>
+	 * @return The schema location resolver, or <code>null</code>
+	 */
+	abstract public XSDSchemaLocationResolver getSchemaLocationResolver();
+	
+	/**
+	 * Returns a schema locator, used to create imported and included schemas
+	 * when parsing an instance document.
+	 * <p>
+	 * This method may be overriden to return such an instance. The default 
+	 * implementations returns an instanceof {@link SchemaLocator}. This method 
+	 * may return <code>null</code> to indicate that no such locator should be used.
+	 * </p>
+	 * @return The schema locator, or <code>null</code>
+	 */
+	public XSDSchemaLocator getSchemaLocator() {
+		return new SchemaLocator( this );
+	}
+	
+	/**
      * Configures a container which houses all the bindings used during a parse.
      *
      * @param container The container housing the binding objects.
      */
-    void configureBindings(MutablePicoContainer container);
-
+    public final void setupBindings(MutablePicoContainer container) {
+    	
+    	//configure bindings of all dependencies
+    	for ( Iterator d = allDependencies().iterator(); d.hasNext(); ) {
+    		Configuration dependency = (Configuration) d.next();
+    		
+    		BindingConfiguration bindings = dependency.getBindingConfiguration();
+    		bindings.configure( container );
+    	}
+    	
+    }
+    
     /**
      * Configures the root context to be used when parsing elements.
      *
      * @param container The container representing the context.
      */
-    void configureContext(MutablePicoContainer container);
-
+    public final void setupContext(MutablePicoContainer container) {
+    	//configure bindings of all dependencies
+    	List dependencies = allDependencies();
+    	for ( Iterator d = dependencies.iterator(); d.hasNext(); ) {
+    		Configuration dependency = (Configuration) d.next();
+    		
+    		//throw locator and location resolver into context
+        	XSDSchemaLocationResolver resolver = dependency.getSchemaLocationResolver() ;
+        	if ( resolver != null ) {
+        		QName key = new QName( dependency.getNamespaceURI(), "schemaLocationResolver" );
+        		container.registerComponentInstance( key, resolver );
+        	}
+        	XSDSchemaLocator locator = dependency.getSchemaLocator();
+        	if ( locator != null ) {
+        		QName key = new QName( dependency.getNamespaceURI(), "schemaLocator" );
+        		container.registerComponentInstance( key, locator );	
+        	}
+        	
+        	//add any additional configuration, factories and such
+    		dependency.configureContext( container );
+    	}
+    	
+    	
+    }
+    
+    /**
+     * Configures the root context to be used when parsing elements.
+     * <p>
+     * The context satisifies any depenencencies needed by a binding. This is 
+     * often a factory used to create something. 
+     * </p>
+     * <p>
+     * This method should be overriden. The default implementation does nothing.
+     * </p>
+     *
+     * @param container The container representing the context.
+     */
+    protected void configureContext(MutablePicoContainer container) {
+    	
+    }
+    
+    /**
+     * Equals override, equality is based soley on {@link #getNamespaceURI()}.
+     */
+    public final boolean equals(Object obj) {
+    	if ( obj instanceof Configuration ) {
+    		Configuration other = (Configuration) obj;
+    		return Utilities.equals( getNamespaceURI(), other.getNamespaceURI() );
+    	}
+    	
+    	return false;
+    }
+    
+    public final int hashCode() {
+    	if ( getNamespaceURI() != null ) {
+    		return getNamespaceURI().hashCode();
+    	}
+    	
+    	return 0;
+    }
 }

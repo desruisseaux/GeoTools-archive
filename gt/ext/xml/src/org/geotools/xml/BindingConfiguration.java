@@ -65,10 +65,10 @@ import org.picocontainer.MutablePicoContainer;
  *
  * <pre>
  *         <code>
- *         class MyStrategy implements SimpleStrategy {
+ *         class MyBinding extends SimpleBinding {
  *                 List list;
  *
- *                 public MyStrategy(List list) {
+ *                 public MyBinding(List list) {
  *                         this.list = list;
  *                 }
  *
@@ -89,7 +89,7 @@ import org.picocontainer.MutablePicoContainer;
  *
  * <pre>
  *         <code>
- *         class MyStrategyConfiguration implements StrategyConfiguration {
+ *         class MyBindingConfiguration implements BindingConfiguration {
  *
  *                 public void configure(MutablePicoContainer container) {
  *                         //first register a concrete implemtnation of list
@@ -113,10 +113,10 @@ import org.picocontainer.MutablePicoContainer;
  */
 public interface BindingConfiguration {
     /**
-     * Configures the container which houses the strategy objects.
+     * Configures the container which houses the bindings.
      *
      * <p>
-     *  A strategy object is looked up in the container by its qualified name.
+     *  A binding is looked up in the container by its qualified name.
      *  The following code snippet illustrates how to register a strategy with
      *  the container.
      *  </p>
@@ -125,7 +125,7 @@ public interface BindingConfiguration {
      *          <code>
      *  void configure(MutablePicoContainer container) {
      *          QName qName = FOO.BARTYPE;
-     *          Class impl = F00BarStrategy.class;
+     *          Class impl = F00BarBinding.class;
      *          container.registerComponentImplementation(qName,impl);
      *  }
      *          </code>
