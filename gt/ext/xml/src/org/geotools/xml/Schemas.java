@@ -49,6 +49,7 @@ import org.geotools.xml.impl.TypeWalker;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -85,7 +86,7 @@ public class Schemas {
      */
     public static final XSDSchema parse(String location)
         throws IOException {
-        return parse(location, null, null);
+        return parse(location, (List)null, (List)null);
     }
 
     /**
@@ -105,6 +106,16 @@ public class Schemas {
     public static final XSDSchema parse(String location,
         XSDSchemaLocator[] locators, XSDSchemaLocationResolver[] resolvers)
         throws IOException {
+    	
+    	return parse( 
+    		location, locators != null ? Arrays.asList( locators ) : (List) null, 
+			resolvers != null ? Arrays.asList( resolvers ) : (List) null
+    	);
+    }
+    
+    public static final XSDSchema parse( String location, List locators, List resolvers )
+    	throws IOException {
+    	
         //check for case of file url, make sure it is an absolute reference
         if (new File(location).exists()) {
             location = new File(location).getCanonicalPath();
@@ -114,13 +125,13 @@ public class Schemas {
         final ResourceSet resourceSet = new ResourceSetImpl();
 
         //add the specialized schema location resolvers
-        if ((resolvers != null) && (resolvers.length > 0)) {
+        if ((resolvers != null) && !resolvers.isEmpty()) {
             AdapterFactory adapterFactory = new SchemaLocationResolverAdapterFactory(resolvers);
             resourceSet.getAdapterFactories().add(adapterFactory);
         }
 
         //add the specialized schema locators as adapters
-        if ((locators != null) && (locators.length > 0)) {
+        if ((locators != null) && !locators.isEmpty()) {
             AdapterFactory adapterFactory = new SchemaLocatorAdapterFactory(locators);
             resourceSet.getAdapterFactories().add(adapterFactory);
         }
@@ -665,6 +676,26 @@ public class Schemas {
     }
 
     /**
+     * Searches <code>schema</code> for an element which matches <code>name</code>.
+     * 
+     * @param schema The schema
+     * @param name The element to search for
+     * 
+     * @return The element declaration, or null if it could not be found.
+     */
+    public static XSDElementDeclaration getElementDeclaration( XSDSchema schema, QName name ) {
+    	for ( Iterator e = schema.getElementDeclarations().iterator(); e.hasNext(); ) {
+    		XSDElementDeclaration element = (XSDElementDeclaration) e.next();
+    		if ( element.getTargetNamespace().equals( name.getNamespaceURI() ) ) {
+    			if ( element.getName().equals( name.getLocalPart() ) )
+    				return element;
+    		}
+    	}
+    	
+    	return null;
+    }
+    
+    /**
      * Method for comparing the name of a schema component to a qualified name.
      * The component name and the qualified name match if both the namespaces
      * match, and the local parts match. Prefixes are ignored. Two strings will
@@ -748,7 +779,7 @@ public class Schemas {
     static class SchemaLocatorAdapterFactory extends AdapterFactoryImpl {
         SchemaLocatorAdapter adapter;
 
-        public SchemaLocatorAdapterFactory(XSDSchemaLocator[] locators) {
+        public SchemaLocatorAdapterFactory(List/*<XSDSchemaLocator>*/ locators) {
             adapter = new SchemaLocatorAdapter(locators);
         }
 
@@ -763,9 +794,10 @@ public class Schemas {
 
     static class SchemaLocatorAdapter extends AdapterImpl
         implements XSDSchemaLocator {
-        XSDSchemaLocator[] locators;
+    	
+        List/*<XSDSchemaLocator>*/ locators;
 
-        public SchemaLocatorAdapter(XSDSchemaLocator[] locators) {
+        public SchemaLocatorAdapter(List/*<XSDSchemaLocator>*/ locators) {
             this.locators = locators;
         }
 
@@ -775,10 +807,10 @@ public class Schemas {
 
         public XSDSchema locateSchema(XSDSchema xsdSchema, String namespaceURI,
             String rawSchemaLocationURI, String resolvedSchemaLocationURI) {
-            for (int i = 0; i < locators.length; i++) {
-                XSDSchema schema = locators[i].locateSchema(xsdSchema,
-                        namespaceURI, rawSchemaLocationURI,
-                        resolvedSchemaLocationURI);
+            for (int i = 0; i < locators.size(); i++) {
+            	XSDSchemaLocator locator = (XSDSchemaLocator) locators.get( i );
+                XSDSchema schema = 
+                	locator.locateSchema(xsdSchema, namespaceURI, rawSchemaLocationURI, resolvedSchemaLocationURI);
 
                 if (schema != null) {
                     return schema;
@@ -792,8 +824,7 @@ public class Schemas {
     static class SchemaLocationResolverAdapterFactory extends AdapterFactoryImpl {
         SchemaLocationResolverAdapter adapter;
 
-        public SchemaLocationResolverAdapterFactory(
-            XSDSchemaLocationResolver[] resolvers) {
+        public SchemaLocationResolverAdapterFactory( List/*<XSDSchemaLocationResolver>*/ resolvers) {
             adapter = new SchemaLocationResolverAdapter(resolvers);
         }
 
@@ -808,10 +839,10 @@ public class Schemas {
 
     static class SchemaLocationResolverAdapter extends AdapterImpl
         implements XSDSchemaLocationResolver {
-        XSDSchemaLocationResolver[] resolvers;
+    	
+    	List/*<XSDSchemaLocationResolver>*/ resolvers;
 
-        public SchemaLocationResolverAdapter(
-            XSDSchemaLocationResolver[] resolvers) {
+        public SchemaLocationResolverAdapter( List/*<XSDSchemaLocationResolver>*/ resolvers ) {
             this.resolvers = resolvers;
         }
 
@@ -819,11 +850,13 @@ public class Schemas {
             return type == XSDSchemaLocationResolver.class;
         }
 
-        public String resolveSchemaLocation(XSDSchema schema,
-            String namespaceURI, String rawSchemaLocationURI) {
-            for (int i = 0; i < resolvers.length; i++) {
-                String resolved = resolvers[i].resolveSchemaLocation(schema,
-                        namespaceURI, rawSchemaLocationURI);
+        public String resolveSchemaLocation(
+    		XSDSchema schema, String namespaceURI, String rawSchemaLocationURI
+		) {
+            for (int i = 0; i < resolvers.size(); i++) {
+            	XSDSchemaLocationResolver resolver = (XSDSchemaLocationResolver) resolvers.get( i );
+                String resolved = 
+                	resolver.resolveSchemaLocation(schema, namespaceURI, rawSchemaLocationURI);
 
                 if (resolved != null) {
                     return resolved;
