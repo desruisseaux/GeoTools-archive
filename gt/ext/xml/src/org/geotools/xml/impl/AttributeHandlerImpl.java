@@ -15,6 +15,9 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
@@ -56,7 +59,20 @@ public class AttributeHandlerImpl extends HandlerImpl
         //attributes do not support children
         return null;
     }
+    
+    public void addChildHandler(Handler child) {
+    	//attributes do not support children
+    }
+    
+    public void removeChildHandler(Handler child) {
+    	//attributes do not support children
+    }
 
+    public List getChildHandlers() {
+    	//attributes do not support children
+    	return Collections.EMPTY_LIST;
+    }
+    
     public Handler getParentHandler() {
         return parent;
     }

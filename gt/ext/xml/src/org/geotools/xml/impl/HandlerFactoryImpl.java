@@ -22,36 +22,31 @@ import javax.xml.namespace.QName;
 
 
 public class HandlerFactoryImpl implements HandlerFactory {
-    ParserHandler parser;
 
-    public HandlerFactoryImpl(ParserHandler parser) {
-        this.parser = parser;
+    public DocumentHandler createDocumentHandler( ParserHandler parser ) {
+        return new DocumentHandlerImpl(this, parser);
     }
 
-    public DocumentHandler createDocumentHandler() {
-        return new DocumentHandlerImpl(this);
-    }
-
-    public ElementHandler createElementHandler(QName qName, Handler parent) {
+    public ElementHandler createElementHandler(QName qName, Handler parent, ParserHandler parser ) {
         SchemaIndex index = parser.getSchemaIndex();
 
         //look up the element in the schema
         XSDElementDeclaration element = index.getElementDeclaration(qName);
 
         if (element != null) {
-            return createElementHandler(element, parent);
+            return createElementHandler(element, parent, parser);
         }
 
         return null;
     }
 
     public ElementHandler createElementHandler(XSDElementDeclaration element,
-        Handler parent) {
+        Handler parent, ParserHandler parser ) {
         return new ElementHandlerImpl(element, parent, parser);
     }
 
     public AttributeHandler createAttributeHandler(
-        XSDAttributeDeclaration attribute, Handler parent) {
+        XSDAttributeDeclaration attribute, Handler parent, ParserHandler parser ) {
         return new AttributeHandlerImpl(attribute, parent, parser);
     }
 }

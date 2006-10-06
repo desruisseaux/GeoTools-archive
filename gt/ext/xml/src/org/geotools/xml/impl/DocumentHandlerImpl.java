@@ -15,6 +15,10 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
 import javax.xml.namespace.QName;
@@ -27,8 +31,12 @@ public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler 
     /** handler for root element **/
     ElementHandler handler;
 
-    public DocumentHandlerImpl(HandlerFactory factory) {
+    /** the parser */
+    ParserHandler parser;
+    
+    public DocumentHandlerImpl(HandlerFactory factory, ParserHandler parser ) {
         this.factory = factory;
+        this.parser = parser;
     }
 
     public XSDSchemaContent getSchemaContent() {
@@ -49,11 +57,31 @@ public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler 
     }
 
     public Handler getChildHandler(QName qName) {
-        handler = factory.createElementHandler(qName, this);
+        handler = factory.createElementHandler(qName, this, parser );
 
         return handler;
     }
+    
+    public List getChildHandlers() {
+    	if ( handler == null ) {
+    		return Collections.EMPTY_LIST;
+    	}
+    	
+    	ArrayList list = new ArrayList();
+    	list.add( handler );
+    	
+    	return list;
+    }
+    
 
+    public void addChildHandler(Handler child) {
+    	//do nothing
+    }
+    
+    public void removeChildHandler(Handler child) {
+    	//do nothing
+    }
+    
     public Handler getParentHandler() {
         //always null, this is the root handler
         return null;

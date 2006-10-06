@@ -31,17 +31,18 @@ public interface HandlerFactory {
     /**
      * Creates a handler for the root element of a document.
      */
-    DocumentHandler createDocumentHandler();
+    DocumentHandler createDocumentHandler( ParserHandler parser );
 
     /**
      * Creates an element hander for a global or top level element in a document.
      *
      * @param qName The qualified name identifying the element.
      * @param parent The parent handler.
+     * @param parser The content handler driving the parser.
      *
      * @return A new element handler, or null if one could not be created.
      */
-    ElementHandler createElementHandler(QName qName, Handler parent);
+    ElementHandler createElementHandler(QName qName, Handler parent, ParserHandler parser );
 
     /**
      * Creates a handler for a particular element in a document.
@@ -49,11 +50,11 @@ public interface HandlerFactory {
      * @param element The schema component which represents the declaration
      * of the element.
      * @param parent The parent handler.
+     * @param parser The content handler driving the parser.
      *
      * @return A new element handler, or null if one could not be created.
      */
-    ElementHandler createElementHandler(XSDElementDeclaration element,
-        Handler parent);
+    ElementHandler createElementHandler(XSDElementDeclaration element, Handler parent, ParserHandler parser );
 
     /**
      * Creates a handler for a particular element in a document.
@@ -61,9 +62,9 @@ public interface HandlerFactory {
      * @param attribute The schema component which represents the declaration
      * of the attribute.
      * @param parent The parent handler.
+     * @param parser The content handler driving the parser.
      *
      * @return A new attribute handler, or null if one could not be created.
      */
-    AttributeHandler createAttributeHandler(XSDAttributeDeclaration attribute,
-        Handler parent);
+    AttributeHandler createAttributeHandler(XSDAttributeDeclaration attribute, Handler parent, ParserHandler parser );
 }

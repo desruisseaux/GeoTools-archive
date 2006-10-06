@@ -147,8 +147,7 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         element.addText(ch, start, length);
     }
 
-    public void endElement(String uri, String localName, String qName)
-        throws SAXException {
+    public void endElement( QName qName ) throws SAXException {
         //round up the children
         for (int i = 0; i < childHandlers.size(); i++) {
             Handler handler = (Handler) childHandlers.get(i);
@@ -187,7 +186,7 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         if (element != null) {
             //TODO: determine wether the element is complex or simple, and create
             ElementHandler handler = parser.getHandlerFactory()
-                                           .createElementHandler(element, this);
+                                           .createElementHandler(element, this, parser );
 
             return handler;
         }
@@ -208,8 +207,7 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
 
                 if (handler != null) {
                     //substituable
-                    handler = parser.getHandlerFactory()
-                                    .createElementHandler(element, this);
+                    handler = parser.getHandlerFactory().createElementHandler( element, this, parser );
 
                     return handler;
                 }
@@ -218,23 +216,20 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
 
         return null;
     }
-
+    
     public Handler getChildHandler(QName qName) {
-        Handler handler = getChildHandlerInternal(qName);
-
-        if (handler != null) {
-            childHandlers.add(handler);
-        }
-
-        return handler;
+        return getChildHandlerInternal(qName);
     }
 
     public List getChildHandlers() {
         return childHandlers;
     }
 
+    public void addChildHandler(Handler child) {
+    	childHandlers.add(child);
+    }
+    
     public void removeChildHandler(Handler child) {
-        // TODO Auto-generated method stub
         childHandlers.remove(child);
     }
 

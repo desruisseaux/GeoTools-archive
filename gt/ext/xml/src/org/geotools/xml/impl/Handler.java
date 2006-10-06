@@ -15,6 +15,8 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.List;
+
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
 import org.picocontainer.MutablePicoContainer;
@@ -70,6 +72,13 @@ public interface Handler {
     void setContext(MutablePicoContainer context);
 
     /**
+     * @return The parent handler.
+     *
+     * @see Handler#getChildHandler(QName, SchemaBuilder)
+     */
+    Handler getParentHandler();
+    
+    /**
      * Returns a handler for a component in the schema which is a child of
      * this component.
      * <p>
@@ -87,9 +96,21 @@ public interface Handler {
     Handler getChildHandler(QName qName);
 
     /**
-     * @return The parent handler.
-     *
-     * @see Handler#getChildHandler(QName, SchemaBuilder)
+     * @return The current list of child handlers executing.
      */
-    Handler getParentHandler();
+    List getChildHandlers();
+
+    /**
+     * Adds an executing child handler.
+     * 
+     * @param child The executing child handler.
+     */
+    void addChildHandler(Handler child);
+    
+    /**
+     * Removes an executing child handler.
+     * 
+     * @param child The executing child handler.
+     */
+    void removeChildHandler(Handler child);
 }

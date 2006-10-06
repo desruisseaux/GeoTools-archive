@@ -15,6 +15,7 @@
  */
 package org.geotools.xml.impl;
 
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
@@ -28,6 +29,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
@@ -109,11 +111,10 @@ public class ParserHandler extends DefaultHandler {
         configure(config);
 
         //create the document handler + root context
-        DocumentHandler docHandler = handlerFactory
-            .createDocumentHandler();
+        DocumentHandler docHandler = handlerFactory.createDocumentHandler( this );
 
         context = new DefaultPicoContainer();
-        config.configureContext(context);
+        config.setupContext(context);
 
         docHandler.setContext(context);
 
@@ -197,7 +198,7 @@ public class ParserHandler extends DefaultHandler {
                         } catch (Exception e) {
                             String msg = "Error parsing: " + location;
                             logger.warning(msg);
-                            throw new SAXException(msg, e);
+                            throw (SAXException) new SAXException(msg).initCause( e );
                         }
                     }
                 }
@@ -233,19 +234,44 @@ public class ParserHandler extends DefaultHandler {
         QName qualifiedName = new QName(uri, localName);
 
         //get the handler at top of the stack and lookup child
-        //TODO: this method of obtaining the element handler should only take place if validation
-        // is turned on
+        
+        //First ask teh parent handler for a child
         Handler parent = (Handler) handlers.peek();
         ElementHandler handler = (ElementHandler) parent.getChildHandler(qualifiedName);
 
+        if ( handler == null ) {
+        	//look for a global element
+        	for ( int i = 0; i < schemas.length && handler == null; i++ ) {
+        		XSDElementDeclaration element = 
+        			Schemas.getElementDeclaration( schemas[ i ], qualifiedName );	
+        		if ( element != null ) {
+        			handler = handlerFactory.createElementHandler( element, parent, this );
+        		}
+        	}
+        	
+        }
+        
+        if ( handler == null ) {
+        	//perform a lookup in the context for an element factory that create a child handler
+        	List handlerFactories = context.getComponentInstancesOfType( HandlerFactory.class );
+        	for ( Iterator hf = handlerFactories.iterator(); handler == null && hf.hasNext(); ) {
+        		HandlerFactory handlerFactory = (HandlerFactory) hf.next();
+        		handler = handlerFactory.createElementHandler( qualifiedName, parent, this );
+        	}
+        }
+        
         if (handler != null) {
-            //signal the handler to start the element, and place it on the stack
+        	//add the handler to teh list of children
+        	parent.addChildHandler( handler );
+        	
+        	//signal the handler to start the element, and place it on the stack
             handler.startElement(qualifiedName, attributes);
             handlers.push(handler);
-        } else {
-            String msg = "Handler for " + qName + " could not be found.";
+        } 
+        else {
+        	String msg = "Handler for " + qName + " could not be found.";
             throw new SAXException(msg);
-        }
+        }	
     }
 
     public void characters(char[] ch, int start, int length)
@@ -259,7 +285,11 @@ public class ParserHandler extends DefaultHandler {
         throws SAXException {
         //pop the last handler off of the stack
         ElementHandler handler = (ElementHandler) handlers.pop();
-        handler.endElement(uri, localName, qName);
+        
+        //create a qName object from the string
+        QName qualifiedName = new QName(uri, localName);
+        
+        handler.endElement( qualifiedName );
 
         endElementInternal(handler);
 
@@ -285,11 +315,11 @@ public class ParserHandler extends DefaultHandler {
     }
 
     protected void configure(Configuration config) {
-        handlerFactory = new HandlerFactoryImpl(this);
+        handlerFactory = new HandlerFactoryImpl();
         strategyFactory = new BindingFactoryImpl();
 
         //configure the strategy objects
-        config.configureBindings(strategyFactory.getContainer());
+        config.setupBindings(strategyFactory.getContainer());
     }
 
     protected XSDSchemaLocator[] findSchemaLocators() {
