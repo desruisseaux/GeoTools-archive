@@ -1360,6 +1360,12 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 			indexedFidWriter = new IndexedFidWriter(fidIndexChannel,
 						new IndexedFidReader(getCurrentTypeName(), temp!=0?getReadChannel(fixURL):fidIndexChannel));
+
+            if(attReader!=null && attReader.hasNext()){
+                shapeType=attReader.shp.getHeader().getShapeType();
+                handler = shapeType.getShapeHandler();
+                shpWriter.writeHeaders(bounds, shapeType, records, shapefileLength);
+            }
 		}
 
 		/**
@@ -1495,7 +1501,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			// if the attribute reader is here, that means we may have some
 			// additional tail-end file flushing to do if the Writer was closed
 			// before the end of the file
-			if (attReader != null) {
+			if (attReader != null && attReader.hasNext()) {
 				shapeType = attReader.shp.getHeader().getShapeType();
 				handler = shapeType.getShapeHandler();
 
