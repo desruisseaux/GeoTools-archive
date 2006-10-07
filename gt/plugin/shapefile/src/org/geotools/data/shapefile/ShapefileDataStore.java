@@ -1354,6 +1354,13 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                         temp));
             dbfHeader = createDbaseHeader(featureType);
             dbfWriter = new DbaseFileWriter(dbfHeader, dbfChannel);
+            
+            if(attReader!=null && attReader.hasNext()){
+                shapeType=attReader.shp.getHeader().getShapeType();
+                handler = shapeType.getShapeHandler();
+                shpWriter.writeHeaders(bounds, shapeType, records, shapefileLength);
+            }
+
         }
 
         /**
@@ -1428,7 +1435,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             // if the attribute reader is here, that means we may have some
             // additional tail-end file flushing to do if the Writer was closed
             // before the end of the file
-            if (attReader != null) {
+            if (attReader != null && attReader.hasNext()) {
                 shapeType = attReader.shp.getHeader().getShapeType();
                 handler = shapeType.getShapeHandler();
 

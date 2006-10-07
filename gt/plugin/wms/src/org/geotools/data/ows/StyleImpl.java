@@ -94,21 +94,35 @@ public class StyleImpl implements Style {
 	public void setTitle(InternationalString title) {
 		this.title = title;
 	}
-	
-	/**
-	 * Because the style's name is declared as unique identifier in the
-	 * interface javadocs, we will use that as our equals comparison.
-	 * 
-	 * So if two Styles have the same name, they are considered equal.
-	 * 
-	 */
-	public boolean equals(Object obj) {
-		if (obj instanceof Style) {
-			Style style2 = (Style) obj;
-			return style2.getName().equals(getName());
-		}
-		return super.equals(obj);
-	}
-	
-	
+
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+  /**
+   * Because the style's name is declared as unique identifier in the
+   * interface javadocs, we will use that as our equals comparison.
+   * 
+   * So if two Styles have the same name, they are considered equal.
+   * 
+   */
+    public boolean equals( Object obj ) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final StyleImpl other = (StyleImpl) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+    
 }
