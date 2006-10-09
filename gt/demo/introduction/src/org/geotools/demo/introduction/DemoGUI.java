@@ -183,7 +183,7 @@ public class DemoGUI {
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         //TODO: verify the file can be found
         java.net.URL imgURL = 
-            DemoGUI.class.getResource("/GeotoolsBoxLogo.png");
+            DemoGUI.class.getResource("/resources/GeotoolsBoxLogo.png");
 //        System.out.println(imgURL);
         ImageIcon icon = new ImageIcon(imgURL,"The Geotools Logo");
         JLabel iconLabel = new JLabel(icon);

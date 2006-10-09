@@ -1,24 +1,46 @@
+This Geotools module, demo/introduction, includes a simple graphical application 
+which introduces the Geotools library by using many of its sub-systems. The code 
+of the demonstration application is written to be easily legible in order to 
+serve as an introduction for new programmers wishing to understand Geotools.
 
-This is an introductory demonstration of the Geotools code library. 
+The functionality of the demonstration application is limited. The application 
+opens a graphical user interface window which contains a column of buttons on 
+the left hand side. The buttons can be clicked in sequence to perform a sequence
+of commands each of which illustrates the action of part of the Geotools library.
 
-The demo opens a window with a series of buttons on the left hand side. Pushing 
-each highlighted button in turn will step through the demonstration.
+The demonstration application can be run either 
+    * from a subversion directory obtained from the subversion repository
+    * from a source distribution which has subsequently been compiled
+    * from a binary distribution which contains the entire library as JAR files. 
+The latter is the easiest. The user needs a Java Runtime Environment (JRE) into 
+which both the JAI and Java Image IO extensions have been installed. The PATH
+variable must include the directory containing the java binary 'java'. The 
+demonstration application can then be run with the command:
 
-The gui can be run from this directory, as follows:
-  (Assume an SVN checkout where trunk/gt/ is at $GEOTOOLS_ROOT)
-Because Geotools is built with maven, we only need one jar in the classpath and 
-java will find all the other classes AS LONG AS they are in jars in the same 
-directory, in this example $GEOTOOLS_ROOT/target
+java -classpath gt2-demo-introduction-2.3.0.jar \       
+                                   org.geotools.demo.introduction.DemoBase
 
-java -classpath $GEOTOOLS_ROOT/target/gt2-demo-introduction-2.3-SNAPSHOT.jar \       
-                                   org.geotools.demo.introduction.QuickStartGUI
+for a binary distribution where the command is run in the directory containing 
+all of the Java archive (JAR) files. Alternatively, in a compiled subversion or 
+a source directory, the demonstration application can be run with the command:
 
-Known isssues:
-* Buttons are not all the same size
-* Text area doesn't scroll as new text is added
-* Countries.sld looks for a font that doesn't necessarily exist
-* Projection doesn't work
-* Lots of rountines are missing; some buttons do nothing.
+java -cp $GEOTOOLS_ROOT/target/gt2-demo-introduction-2.3.0.jar \       
+                                   org.geotools.demo.introduction.DemoBase
+
+assuming the variable $GEOTOOLS_ROOT is set to the absolute path to the root 
+directory of the subversion checkout or source distribution. The application can
+also be run by first moving to the target/ directory and omitting the path 
+before the name of the jar file. Note that the version number, '2.3.0' in this 
+case, will be different depending on the actual version of the Geotools library
+which is being used. 
+
+
+Known issues in the 2.3.0 release:
+  * Buttons are not all the same size
+  * Text area does not scroll as new text is added
+  * Countries.sld looks for a font that does not necessarily exist
+  * The projection cause certain geometries to disappear.
+  * Lots of routines are missing; some buttons do nothing.
 
 License:
 This code is placed in the public domain. Note that this is different from the 

@@ -60,11 +60,11 @@
         <directory>.</directory>
         <includes>
           <include>LICENSE*</include>
-          <include>README*</include>
+          <include>*README*</include>
         </includes>
       </resource>
       <resource>
-        <!-- targetPath>data</targetPath -->
+        <!-- targetPath>resources</targetPath -->
         <directory>resources</directory>
         <includes>
           <include>**</include>
