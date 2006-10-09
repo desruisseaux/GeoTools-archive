@@ -35,22 +35,40 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
     protected FIDMapper buildNoPKMapper(String schema, String tableName,
         Connection connection) {
-        return new OIDFidMapper();
+			 if (getDatabaseMajorVersion(connection) <= 7)
+			     return new OIDFidMapper();
+			 return super.buildNoPKMapper(schema, tableName, connection);
+    }
+
+   /**
+     * Retrieves Postgresql database major version number. This is used to see
+     * if OID are there or not.
+     *
+     * @param connection
+     * @return
+     */
+    private int getDatabaseMajorVersion(Connection connection) {
+        int major;
+        try {
+            major = connection.getMetaData().getDatabaseMajorVersion();
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Failed to retrieve Postgres "
+                    + "database version number, assuming 7. Error is: "
+                    + e.getMessage(), e);
+            major = 7;
+        }
+        return major;
     }
 
     protected FIDMapper buildLastResortFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo[] colInfos) {
 
-	int major;
-	try {
-		major = connection.getMetaData().getDatabaseMajorVersion();
-	} catch (SQLException e) {
-		major=7;
-	}
-        if( major>7 )
-            throw new IllegalArgumentException("Tables for postgis 8+ must have a primary key defined");
+        if (getDatabaseMajorVersion(connection) > 7)
+            throw new IllegalArgumentException(
+                    "Tables for postgis 8+ must have a primary key defined");
 
         return new OIDFidMapper();
+
     }
     
     protected FIDMapper buildSingleColumnFidMapper(String schema, String tableName, Connection connection, ColumnInfo ci) {
