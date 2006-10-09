@@ -1000,6 +1000,11 @@
               <head>TODO:</head>
             </tag>
             <tag>
+              <name>todo:</name>
+              <placement>a</placement>
+              <head>TODO:</head>
+            </tag>
+            <tag>
               <name>TODO</name>
               <placement>a</placement>
               <head>TODO:</head>
@@ -1025,7 +1030,7 @@
               <head>UML:</head>
             </tag>
             <tag>
-              <name>uml.properties</name>
+              <name>uml.property</name>
               <placement>a</placement>
               <head>UML property:</head>
             </tag>
