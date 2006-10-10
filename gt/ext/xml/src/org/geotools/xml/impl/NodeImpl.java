@@ -181,6 +181,42 @@ public class NodeImpl implements Node {
         return null;
     }
 
+    public boolean hasAttribute(Class clazz) {
+    	 if (clazz == null) {
+             return false;
+         }
+
+         for (Iterator itr = attributes.iterator(); itr.hasNext();) {
+             Node att = (Node) itr.next();
+
+             if (att.getValue() == null) {
+                 continue;
+             }
+
+             if (clazz.isAssignableFrom(att.getValue().getClass())) {
+                 return true;
+             }
+         }
+
+         return false;
+    }
+    
+    public boolean hasAttribute(String name) {
+    	if (name == null) {
+            return false;
+        }
+
+        for (Iterator itr = attributes.iterator(); itr.hasNext();) {
+            Node att = (Node) itr.next();
+
+            if (name.equals(att.getComponent().getName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     public List getAttributes() {
         return new ArrayList(attributes);
     }

@@ -185,6 +185,24 @@ public interface Node {
     List getChildValues(Class clazz);
 
     /**
+     * Determines if the node has an attribute with the specified name.
+     *
+     * @param name The name of an attribute
+     *
+     * @return <code>true</code> if am attribute exists with the name, otehrwise <code>false</code>.
+     */
+    boolean hasAttribute( String name );
+    
+    /**
+     * Determines if the node has an attribute whose value is of the specified class.
+     *
+     * @param clazz The class of the attribute value
+     *
+     * @return <code>true</code> if an attribute exists with the class, otherwise <code>false</code>.
+     */
+    boolean hasAttribute( Class clazz );
+    
+    /**
      * Returns all nodes corresponding to attributes.
      *
      * @return A list containing objects of type node.
