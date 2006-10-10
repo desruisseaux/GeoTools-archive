@@ -46,6 +46,8 @@ import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.impl.TypeWalker;
+import org.picocontainer.PicoContainer;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -760,6 +762,26 @@ public class Schemas {
         return null;
     }
 
+    /**
+     * Obtains all instances of a particular class from a container by navigating 
+     * up the container hierachy.
+     * 
+     * @param container The container.
+     * @param clazz The class.
+     * 
+     * @return A list of all instances of <code>clazz</code>, or the empty list if none found.
+     */
+    public static List getComponentInstancesOfType( PicoContainer container, Class clazz ) {
+    	List instances = new ArrayList();
+    	while( container != null ) {
+    		List l = container.getComponentInstancesOfType( clazz );
+    		instances.addAll( l );
+    		container = container.getParent();
+    	}
+    	
+    	return instances;
+    }
+    
     /**
      * Simple visitor interface for visiting elements which are part of
      * complex types. This interface is private api because there is probably

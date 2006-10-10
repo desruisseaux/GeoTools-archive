@@ -30,6 +30,7 @@ import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.geotools.resources.Utilities;
 import org.geotools.xs.XSConfiguration;
 import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
 
 /**
  * Responsible for configuring a parser runtime environment.
@@ -318,7 +319,7 @@ public abstract class Configuration {
      *
      * @param container The container housing the binding objects.
      */
-    public final void setupBindings(MutablePicoContainer container) {
+    public final MutablePicoContainer setupBindings(MutablePicoContainer container) {
     	
     	//configure bindings of all dependencies
     	for ( Iterator d = allDependencies().iterator(); d.hasNext(); ) {
@@ -327,7 +328,21 @@ public abstract class Configuration {
     		BindingConfiguration bindings = dependency.getBindingConfiguration();
     		bindings.configure( container );
     	}
+    
+    	//call template method, create a new container to allow subclass to override bindings
+    	MutablePicoContainer override = new DefaultPicoContainer( container );
+    	configureBindings( override );
     	
+    	return override;
+    }
+    
+    /**
+     * Template method allowing subclass to override any bindings.
+     * 
+     * @param container Container containing all bindings, keyed by {@link QName}.
+     */
+    protected void configureBindings( MutablePicoContainer container ) {
+    	//do nothing
     }
     
     /**
@@ -335,7 +350,7 @@ public abstract class Configuration {
      *
      * @param container The container representing the context.
      */
-    public final void setupContext(MutablePicoContainer container) {
+    public final MutablePicoContainer setupContext(MutablePicoContainer container) {
     	//configure bindings of all dependencies
     	List dependencies = allDependencies();
     	for ( Iterator d = dependencies.iterator(); d.hasNext(); ) {
@@ -352,11 +367,15 @@ public abstract class Configuration {
         		QName key = new QName( dependency.getNamespaceURI(), "schemaLocator" );
         		container.registerComponentInstance( key, locator );	
         	}
-        	
+
         	//add any additional configuration, factories and such
-    		dependency.configureContext( container );
+        	// create a new container to allow configurations to override factories in dependant
+        	// configurations
+        	container = new DefaultPicoContainer( container );
+            dependency.configureContext( container );
     	}
     	
+    	return container;
     	
     }
     

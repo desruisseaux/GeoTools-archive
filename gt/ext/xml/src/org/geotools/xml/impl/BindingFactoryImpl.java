@@ -59,4 +59,8 @@ public class BindingFactoryImpl implements BindingFactory {
     public MutablePicoContainer getContainer() {
         return container;
     }
+    
+    public void setContainer(MutablePicoContainer container) {
+		this.container = container;
+	}
 }

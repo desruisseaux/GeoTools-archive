@@ -114,7 +114,7 @@ public class ParserHandler extends DefaultHandler {
         DocumentHandler docHandler = handlerFactory.createDocumentHandler( this );
 
         context = new DefaultPicoContainer();
-        config.setupContext(context);
+        context = config.setupContext(context);
 
         docHandler.setContext(context);
 
@@ -193,8 +193,7 @@ public class ParserHandler extends DefaultHandler {
                     //if no schema override was found, parse location directly
                     if (schemas[i / 2] == null) {
                         try {
-                            schemas[i / 2] = Schemas.parse(location, locators,
-                                    resolvers);
+                            schemas[i / 2] = Schemas.parse(location, locators, resolvers);
                         } catch (Exception e) {
                             String msg = "Error parsing: " + location;
                             logger.warning(msg);
@@ -319,11 +318,14 @@ public class ParserHandler extends DefaultHandler {
         strategyFactory = new BindingFactoryImpl();
 
         //configure the strategy objects
-        config.setupBindings(strategyFactory.getContainer());
+        MutablePicoContainer container = strategyFactory.getContainer(); 
+        container = config.setupBindings( container );
+        strategyFactory.setContainer( container );
     }
 
     protected XSDSchemaLocator[] findSchemaLocators() {
-        List l = context.getComponentInstancesOfType(XSDSchemaLocator.class);
+    	List l = Schemas.getComponentInstancesOfType( context, XSDSchemaLocator.class );
+    	//List l = context.getComponentInstancesOfType(XSDSchemaLocator.class);
 
         if ((l == null) || l.isEmpty()) {
             return new XSDSchemaLocator[] {  };
@@ -333,8 +335,9 @@ public class ParserHandler extends DefaultHandler {
     }
 
     protected XSDSchemaLocationResolver[] findSchemaLocationResolvers() {
-        List l = context.getComponentInstancesOfType(XSDSchemaLocationResolver.class);
-
+        //List l = context.getComponentInstancesOfType(XSDSchemaLocationResolver.class);
+        List l = Schemas.getComponentInstancesOfType( context, XSDSchemaLocationResolver.class );
+       
         if ((l == null) || l.isEmpty()) {
             return new XSDSchemaLocationResolver[] {  };
         }

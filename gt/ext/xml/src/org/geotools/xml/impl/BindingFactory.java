@@ -40,17 +40,23 @@ public interface BindingFactory {
     Binding loadBinding(QName type, MutablePicoContainer context);
 
     /**
-     * Returns the class of the strategy object used to parse the type with the
+     * Returns the class of the binding  used to parse the type with the
      * specified qualified name.
      *
-     * @param type The qualified name of the type of the strategy.
+     * @param type The qualified name of the type of the binding.
      *
-     * @return The strategy class, or null if no such class exists.
+     * @return The binding class, or null if no such class exists.
      */
     Class getBinding(QName type);
 
     /**
-     * @return The container which houses the strategy objects.
+     * @return The container which houses the bindings.
      */
     MutablePicoContainer getContainer();
+    
+    /**
+     * Sets the container which houses bindings.
+     * 
+     */
+    void setContainer( MutablePicoContainer container );
 }
