@@ -87,7 +87,7 @@ public class DefaultMapLayer implements MapLayer {
 		}
 
 		// enable data source listening
-		featureSource.addFeatureListener(sourceListener);
+//		featureSource.addFeatureListener(sourceListener);
 
 		this.featureSource = featureSource;
 		this.style = style;
@@ -374,6 +374,10 @@ public class DefaultMapLayer implements MapLayer {
 			listenerList = new javax.swing.event.EventListenerList();
 		}
 
+		if (listenerList.getListenerCount() == 0) {
+			// enable data source listening
+			featureSource.addFeatureListener(sourceListener);
+		}
 		listenerList.add(org.geotools.map.event.MapLayerListener.class,
 				listener);
 	}
@@ -388,6 +392,9 @@ public class DefaultMapLayer implements MapLayer {
 			org.geotools.map.event.MapLayerListener listener) {
 		listenerList.remove(org.geotools.map.event.MapLayerListener.class,
 				listener);
+		if (listenerList.getListenerCount() == 0) {
+			featureSource.removeFeatureListener(sourceListener);
+		}
 	}
 
 	/**
