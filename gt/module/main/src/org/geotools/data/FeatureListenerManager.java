@@ -60,8 +60,13 @@ public class FeatureListenerManager {
      */
     public void removeFeatureListener(FeatureSource featureSource,
         FeatureListener featureListener) {
-        eventListenerList(featureSource).remove(FeatureListener.class,
-            featureListener);
+        EventListenerList list = eventListenerList(featureSource);
+        list.remove(FeatureListener.class, featureListener);
+        // don't keep references to feature sources if we have no
+        // more any listener. Since there's no way to know a feature source
+        // has ceased its existance, better remove references as soon as possible
+        if(list.getListenerCount() == 0)
+            cleanListenerList(featureSource);
     }
 
     public EventListenerList eventListenerList(FeatureSource featureSource) {
@@ -74,6 +79,12 @@ public class FeatureListenerManager {
 
                 return listenerList;
             }
+        }
+    }
+    
+    public void cleanListenerList(FeatureSource featureSource) {
+        synchronized (listenerMap) {
+            listenerMap.remove(featureSource);
         }
     }
 
