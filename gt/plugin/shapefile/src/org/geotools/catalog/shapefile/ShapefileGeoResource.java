@@ -169,9 +169,14 @@ public class ShapefileGeoResource extends AbstractGeoResource {
                             if (dataStore != null) {
                                 featureSource = dataStore.getFeatureSource(typeName);
                             }
-                        } catch (Throwable t) {
+                        } 
+                        catch( IOException ioe ) {
+                        	msg = ioe;
+                        	throw ioe;
+                        } 
+                    	catch (Throwable t) {
                             msg = t;
-                            new IOException().initCause(t);
+                            throw (IOException) new IOException().initCause(t);
                         }
                     }
                 }

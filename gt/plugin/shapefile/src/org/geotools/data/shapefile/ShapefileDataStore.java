@@ -292,9 +292,12 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                 file = new File(url.getFile());
             }
 
-            if (!file.exists() || !file.canRead()) {
-                throw new IOException(
-                    "File either doesn't exist or is unreadable : " + file);
+            if ( !file.exists() ) {
+            	throw new FileNotFoundException( file.toString() );
+            }
+            	
+            if (!file.canRead()) {
+                throw new IOException("File is unreadable : " + file);
             }
 
             FileInputStream in = new FileInputStream(file);
