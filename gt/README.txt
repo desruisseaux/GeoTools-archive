@@ -12,22 +12,21 @@ release.
 For this release the following modules comprise the geotools library:
 @REQUIRED@
 
-The following modules comprise the plug-ins and extentions:
+The following modules comprise the plug-ins and extensions:
 @PLUGIN@
 @EXTENTION@
 @DEMO@
 
-These optional jars typicaly provide support for specific data formats or
+These optional jars typically provide support for specific data formats or
 sources, or provide specific additional functionality.
-
-You can find out more about each of the major modules by going to:
-- http//modules.geotools.org
-
-Each module has its own homepage with full javadoc, test reports and source code.
 
 For more information, and documentation on the geotools library please see
 our community wiki at:
-- http://docs.codehaus.org/display/GEOTOOLS.
+- http://docs.codehaus.org/display/GEOTOOLS
+
+You can find out more about each of the major modules by going to:
+- http://maven.geotools.fr/reports/
+- http://javadoc.geotools.fr/
 
 NOTE
 ====
@@ -36,7 +35,7 @@ reference.
 
 For full details on requirements and build process please see
 the developers' guide at:
-- http://docs.codehaus.org/display/GEOTOOLS/Developers+Guide
+- http://docs.codehaus.org/display/GEOT/Home
 
 REQUIREMENTS
 ============
@@ -69,25 +68,25 @@ Please see the developers guide for more information.
 
 BUILDING
 ========
-In order to build GeoTools you will need a copy of Maven.  Maven is a project
+In order to build GeoTools you will need a copy of Maven 2.  Maven is a project
 management tool from the Apache group.  You can obtain a copy of maven from: 
-- http://maven.apache.org/start/download.html
+- http://maven.apache.org/download.html
 
-At the time of writing, the build process was known to work with the Maven 1.0
+At the time of writing, the build process was known to work with the Maven 2.0.4
 release.
 
 Once you have maven installed, you can perform a full build by moving to the
 geotools2 folder and typing:
 
-maven build
+mvn install
 
 Once again please read the developers guide for more information about maven:
-- http://docs.codehaus.org/display/GEOTOOLS/Using%2BMaven
+- http://docs.codehaus.org/display/GEOT/2.5+Using+Maven
 
 FUTURE CHANGES
 ==============
 This is a Release Candidate, whilst the API has stabilized, we are are
-int the process of removing deprecated classes, and finalizing documentation.
+in the process of removing deprecated classes, and finalizing documentation.
 
 GETTING INVOLVED
 ================
