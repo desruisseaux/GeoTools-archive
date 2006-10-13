@@ -102,7 +102,6 @@ public class WFSService extends AbstractService {
         if (members == null) {
             synchronized (getDS()) {
                 if (members == null) {
-                    getDS(); // load ds
                     members = new LinkedList();
 
                     String[] typenames = ds.getTypeNames();

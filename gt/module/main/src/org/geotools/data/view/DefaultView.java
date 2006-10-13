@@ -205,7 +205,8 @@ public class DefaultView implements FeatureSource {
                 handle = handle + "(" + constraintQuery.getHandle() + ")";
             }
 
-            return new DefaultQuery(typeName, namespace, filter, maxFeatures, propNames, handle);
+            DefaultQuery defaultQuery = new DefaultQuery(typeName, namespace, filter, maxFeatures, propNames, handle);
+            return defaultQuery;
         } catch (Exception ex) {
             throw new DataSourceException(
                     "Could not restrict the query to the definition criteria: " + ex.getMessage(),

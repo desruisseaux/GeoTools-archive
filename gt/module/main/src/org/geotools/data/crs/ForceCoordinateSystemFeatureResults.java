@@ -66,6 +66,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
     FeatureResults results;
     FeatureType schema;
+    private FeatureType startingType;
 
     public ForceCoordinateSystemFeatureResults(FeatureResults results,
         CoordinateReferenceSystem forcedCS) throws IOException, SchemaException {
@@ -73,8 +74,8 @@ public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
             throw new NullPointerException("CoordinateSystem required");
         }
 
-        FeatureType type = results.getSchema();
-        CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
+        startingType = results.getSchema();
+        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry()
                                                    .getCoordinateSystem();
 
         //make sure we have the real original 
@@ -88,12 +89,10 @@ public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
     			.getDefaultGeometry().getCoordinateSystem();
         }
         
-        if (forcedCS.equals(originalCs)) {
-            throw new IllegalArgumentException("CoordinateSystem " + forcedCS
-                + " already used (check before using wrapper)");
+        if (!forcedCS.equals(originalCs)) {
+            this.schema = FeatureTypes.transform(startingType, forcedCS);
         }
 
-        this.schema = FeatureTypes.transform(type, forcedCS);
         this.results = results;
 
         // Optimization: if the source is again a ForceCoordinateSystemFeatureResults,
@@ -105,10 +104,10 @@ public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
         }
     }
 
-    /**
-     * @see org.geotools.data.FeatureResults#getSchema()
-     */
+   
     public FeatureType getSchema(){
+        if( schema==null )
+            return startingType;
         return schema;
     }
 

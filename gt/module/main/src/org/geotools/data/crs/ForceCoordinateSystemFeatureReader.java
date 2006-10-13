@@ -94,11 +94,9 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
                                                    .getCoordinateSystem();
 
         if (cs.equals(originalCs)) {
-            throw new IllegalArgumentException("CoordinateSystem " + cs
-                + " already used (check before using wrapper)");
+            schema = FeatureTypes.transform(type, cs);
         }
 
-        schema = FeatureTypes.transform(type, cs);
         this.reader = reader;
     }
 
@@ -106,9 +104,12 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
      * @see org.geotools.data.FeatureReader#getFeatureType()
      */
     public FeatureType getFeatureType() {
-        if (schema == null) {
+        if (reader == null) {
             throw new IllegalStateException("Reader has already been closed");
         }
+        
+        if( schema==null )
+            return reader.getFeatureType();
 
         return schema;
     }
@@ -123,7 +124,8 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
         }
 
         Feature next = reader.next();
-
+        if( schema==null )
+            return next;
         return schema.create(next.getAttributes(null), next.getID());
     }
 

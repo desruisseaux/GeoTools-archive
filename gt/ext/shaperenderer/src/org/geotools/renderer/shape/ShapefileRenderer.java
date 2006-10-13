@@ -61,6 +61,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.geometry.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -809,37 +810,18 @@ public class ShapefileRenderer implements GTRenderer {
 				dupeStyleVisitor.visit(rule);
 				Rule clone = (Rule) dupeStyleVisitor.getCopy();
 
-				// Rule
-				// clone=StyleFactoryFinder.createStyleFactory().createRule();
-				// clone.setAbstract(rule.getAbstract());
-				// clone.setFilter(rule.getFilter());
-				// clone.setSymbolizers(rule.getSymbolizers());
-				// clone.setIsElseFilter(rule.hasElseFilter());
-				// clone.setLegendGraphic(rule.getLegendGraphic());
-				// clone.setMaxScaleDenominator(rule.getMaxScaleDenominator());
-				// clone.setMinScaleDenominator(rule.getMinScaleDenominator());
-				// clone.setName(rule.getName());
-				// clone.setTitle(rule.getTitle());
-				//                    
-				// if ((query != Query.ALL)
-				// && !query.getFilter().equals(Filter.NONE)) {
-				// if (clone.getFilter() == null) {
-				// clone.setFilter(query.getFilter());
-				// } else {
-				// clone.setFilter(clone.getFilter().and(query.getFilter()));
-				// }
-				// }
-
 				super.visit(clone);
 			}
 		};
 
 		sae.visit(style);
 
-		String[] ftsAttributes = sae.getAttributeNames();
-
-		return ftsAttributes;
-	}
+        FilterAttributeExtractor qae = new FilterAttributeExtractor();
+        query.getFilter().accept(qae);
+        Set ftsAttributes=new HashSet(sae.getAttributeNameSet());
+        ftsAttributes.addAll(qae.getAttributeNameSet());
+        return (String[]) ftsAttributes.toArray(new String[0]);
+    }
 
 	/**
 	 * DOCUMENT ME!
@@ -1370,7 +1352,7 @@ public class ShapefileRenderer implements GTRenderer {
 		CoordinateReferenceSystem dataCRS;
 		MathTransform mt;
 		MathTransform at;
-		Transaction transaction = null;
+		Transaction transaction = Transaction.AUTO_COMMIT;
 		for (int i = 0; i < length; i++) {
 			currLayer = layers[i];
 
@@ -1428,8 +1410,6 @@ public class ShapefileRenderer implements GTRenderer {
 				// graphics.setTransform(transform);
 				// extract the feature type stylers from the style object
 				// and process them
-
-				transaction = null;
 
 				if (currLayer.getFeatureSource() instanceof FeatureStore) {
 					transaction = ((FeatureStore) currLayer.getFeatureSource())

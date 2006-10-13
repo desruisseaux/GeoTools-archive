@@ -25,8 +25,10 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.geotools.data.AbstractAttributeIO;
@@ -52,7 +54,6 @@ import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.dbf.DbaseFileWriter;
 import org.geotools.data.shapefile.dbf.IndexedDbaseFileReader;
-import org.geotools.data.shapefile.prj.PrjFileReader;
 import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.JTSUtilities;
 import org.geotools.data.shapefile.shp.ShapeHandler;
@@ -61,7 +62,6 @@ import org.geotools.data.shapefile.shp.ShapefileException;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
@@ -71,9 +71,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
@@ -85,22 +83,7 @@ import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.rtree.FilterConsumer;
 import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.fs.FileSystemPageStore;
-import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.xml.gml.GMLSchema;
-import org.opengis.referencing.FactoryException;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -384,19 +367,27 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		if( query.getFilter()==Filter.ALL )
 			return new EmptyFeatureReader(getSchema());
 
-		String[] propertyNames = query.getPropertyNames();
+		String[] propertyNames = query.getPropertyNames()==null?new String[0]:query.getPropertyNames();
 		String defaultGeomName = schema.getDefaultGeometry().getName();
 
+        FilterAttributeExtractor fae= new FilterAttributeExtractor();
+        query.getFilter().accept(fae);
+        
+        Set attributes=new HashSet(Arrays.asList(propertyNames));
+        attributes.addAll(fae.getAttributeNameSet());
+        
 		FeatureType newSchema = schema;
 		boolean readDbf = true;
 		boolean readGeometry = true;
 
+        propertyNames=(String[]) attributes.toArray(new String[attributes.size()]);
+        
 		try {
-			if (((propertyNames != null) && (propertyNames.length == 1) && propertyNames[0]
+			if (((query.getPropertyNames() != null) && (propertyNames.length == 1) && propertyNames[0]
 					.equals(defaultGeomName))) {
 				readDbf = false;
 				newSchema = DataUtilities.createSubType(schema, propertyNames);
-			} else if ((propertyNames != null) && (propertyNames.length == 0)) {
+			} else if ((query.getPropertyNames() != null) && (propertyNames.length == 0)) {
 				readDbf = false;
 				readGeometry = false;
 				newSchema = DataUtilities.createSubType(schema, propertyNames);
