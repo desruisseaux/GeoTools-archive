@@ -460,15 +460,6 @@ public class DisjointLists extends JPanel {
     }
 
     /**
-     * Returns all elements in the list on the right side.
-     *
-     * @deprecated Use {@code getElements(true)} instead.
-     */
-    public Collection getSelectedElements() {
-        return getElements(true);
-    }
-
-    /**
      * Add the specified elements to the selection list (the one to appears on the right side). If
      * an element specified in the {@code selected} collection has not been previously {@linkplain
      * #addElements(Collection) added}, it will be ignored.
@@ -523,6 +514,6 @@ public class DisjointLists extends JPanel {
         final DisjointLists list = new DisjointLists();
         list.addElements(Locale.getAvailableLocales());
         list.showDialog(null, Utilities.getShortClassName(list));
-        System.out.println(list.getSelectedElements());
+        System.out.println(list.getElements(true));
     }
 }

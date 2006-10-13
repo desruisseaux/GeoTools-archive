@@ -77,6 +77,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.gui.swing.image.RegisteredOperationBrowser;
 
 
 /**
