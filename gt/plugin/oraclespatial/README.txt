@@ -9,38 +9,31 @@ to allow the Oracle data source to build, however the real jars will be required
 to run anything that uses the data source.  
 
 Note: It seems that a bug occurs when adding features to the database if you
-do not use the classes12.jar file that comes with your Oracle install.  If you
+do not use the ojdbc14.jar file that comes with your Oracle install.  If you
 get an error message to the effect of "Invalid logical handle" make sure you
 are using the JDBC driver from your Oracle installation.
 
-You can either just include these jars in your runtime or copy the jars to you 
-Maven repository under the oracle/jars directory.  If you choose the second 
-option, you can make maven use the real jars over the stub jar by commenting out this:
+To place the real jars into your maven repository:
 
-<!-- Use this when you dont have classes12 and sdoapi -->
-<dependency>
-  <artifactId>dummy_spatial</artifactId>
-  <groupId>oracle</groupId>
-  <version>8.1.7</version>
- </dependency>
- <!-- End -->
+C:> cd C:\oracle\product\10.2.0\jdbc\lib
+C:\oracle\product\10.2.0\jdbc\lib>mvn install:install-file -Dfile=ojdbc14.jar -DgroupId=com.oracle -DartifactId=ojdbc14 -Dversion=10.2.0 -Dpackaging=jar
 
-in the project.xml file and uncommenting this:
+You can make maven use the real jars over the stub jar by commenting out this, changing
+the dependency in the pom.xml file.
 
- <!-- Commented out so we can build using the dummy_spatial jar 
-<dependency>
-  <artifactId>sdoapi</artifactId>
-  <groupId>oracle</groupId>
-  <version>8.1.7</version>
-</dependency>
-<dependency>
-  <artifactId>classes</artifactId>
-  <groupId>oracle</groupId>
-  <version>12</version>
-</dependency>
--->
-
-This is also required for running the tests.
+BEFORE:
+    <!--dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>dummy_spatial</artifactId>
+      <version>8.1.8</version>
+      <scope>provided</scope>
+    </dependency-->
+AFTER
+	<dependency>
+          <artifactId>ojdbc14</artifactId>
+          <groupId>com.oracle</groupId>
+          <version>10.2.0</version>
+        </dependency>
 
 **  Running Tests **
 
