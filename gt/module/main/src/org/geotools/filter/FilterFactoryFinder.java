@@ -45,6 +45,8 @@ import com.vividsolutions.jts.geom.Envelope;
  *       cleanly with that, and should handle sax parsing without too much
  *       memory overhead.
  * @task REVISIT: resolve errors, should all throw errors?
+ *
+ * @deprecated Replaced by {@link org.geotools.factory.CommonFactoryFinder#getFilterFactory}.
  */
 public abstract class FilterFactoryFinder {
     /** A cached factory to create filters. */

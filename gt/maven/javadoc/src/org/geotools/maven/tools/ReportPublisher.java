@@ -176,10 +176,12 @@ public class ReportPublisher implements Runnable, FilenameFilter {
         // Now scan subdirectories.
         if (++depth <= maxDepth) {
             final File[] content = source.listFiles(this);
-            for (int i=0; i<content.length; i++) {
-                final File c = content[i];
-                if (c.isDirectory() && !c.isHidden()) {
-                    process(c, depth);
+            if (content != null) {
+                for (int i=0; i<content.length; i++) {
+                    final File c = content[i];
+                    if (c.isDirectory() && !c.isHidden()) {
+                        process(c, depth);
+                    }
                 }
             }
         }

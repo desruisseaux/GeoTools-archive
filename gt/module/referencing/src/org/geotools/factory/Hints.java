@@ -58,7 +58,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
  * creation), we also make use of other services.
  * 
  * @since 2.1
- * @source $URL:http://svn.geotools.org/geotools/trunk/gt/module/referencing/src/org/geotools/factory/Hints.java $
+ * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
@@ -166,6 +166,26 @@ public final class Hints extends RenderingHints {
      */
     public static final Key MATH_TRANSFORM_FACTORY = new Key(
             "org.opengis.referencing.operation.MathTransformFactory");
+
+    /**
+     * The {@link org.geotools.styling.StyleFactory} instance to use.
+     * 
+     * @see org.geotools.factory.CommonFactoryFinder#getStyleFactory
+     *
+     * @since 2.4
+     */
+    public static final Key STYLE_FACTORY = new Key(
+            "org.geotools.styling.StyleFactory");
+
+    /**
+     * The {@link org.opengis.filter.FilterFactory} instance to use.
+     * 
+     * @see org.geotools.factory.CommonFactoryFinder#getFilterFactory
+     *
+     * @since 2.4
+     */
+    public static final Key FILTER_FACTORY = new Key(
+            "org.opengis.filter.FilterFactory");
 
     /**
      * The {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.

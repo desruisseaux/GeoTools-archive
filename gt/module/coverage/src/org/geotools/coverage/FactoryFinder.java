@@ -85,12 +85,27 @@ public final class FactoryFinder {
     }
 
     /**
-     * Returns a set of all available implementations for the {@link GridCoverageFactory}.
+     * Returns a set of all available implementations for the {@link GridCoverageFactory} interface.
      *
      * @return Set of available grid coverage factory implementations.
+     *
+     * @deprecated Use {@link #getGridCoverageFactories(Hints)} instead.
      */
     public static synchronized Set getGridCoverageFactories() {
         return new LazySet(getServiceRegistry().getServiceProviders(GridCoverageFactory.class));
+    }
+
+    /**
+     * Returns a set of all available implementations for the {@link GridCoverageFactory} interface.
+     *
+     * @param  hints An optional map of hints, or {@code null} if none.
+     * @return Set of available grid coverage factory implementations.
+     *
+     * @since 2.4
+     */
+    public static synchronized Set getGridCoverageFactories(final Hints hints) {
+        return new LazySet(getServiceRegistry().getServiceProviders(
+                GridCoverageFactory.class, null, hints));
     }
 
     /**
@@ -103,7 +118,7 @@ public final class FactoryFinder {
      * sophisticated applications which dynamically make new plug-ins
      * available at runtime.
      */
-    public static void scanForPlugins() {
+    public static synchronized void scanForPlugins() {
         if (registry != null) {
             registry.scanForPlugins();
         }

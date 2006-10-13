@@ -16,13 +16,13 @@
 package org.geotools.data;
 
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.Filter;
 import org.geotools.filter.Filter;
 import java.io.IOException;
 import java.util.Set;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.Filter;
 
 /**
  * Provides storage of data for Features.
@@ -64,9 +64,8 @@ public interface FeatureStore extends FeatureSource {
      *
      * @throws IOException if anything goes wrong.
      */
-        
-    Set addFeatures(FeatureCollection collection ) throws IOException;
-    
+    Set addFeatures(FeatureCollection collection) throws IOException;
+
     /**
      * Removes all of the features specificed by the passed filter from the
      * collection.

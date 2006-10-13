@@ -88,8 +88,15 @@ public class FactoryRegistry extends ServiceRegistry {
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
 
     /**
-     * Categories under scanning. This is used by {@link #safeScanForPlugins}
-     * as a guard against infinite recursivity.
+     * Alternative scanning methods. This is used by {@link #scanForPlugins(Collection,Class)}
+     * in addition of the default lookup mechanism.
+     */
+    private final Collection/*<FactoryIteratorProvider>*/ iteratorProviders = new LinkedHashSet();
+
+    /**
+     * Categories under scanning. This is used by {@link #scanForPlugins(Collection,Class)}
+     * as a guard against infinite recursivity (i.e. when a factory to be scanned request
+     * an other dependency of the same category).
      */
     private final Set/*<Class>*/ scanningCategories = new HashSet();
 
@@ -106,7 +113,7 @@ public class FactoryRegistry extends ServiceRegistry {
     /**
      * Returns the providers in the registry for the specified category. Providers that are
      * not {@linkplain OptionalFactory#isAvailable available} will be ignored. This method
-     * will {@linkplain #scanForPlugins scan for plugins} the first time it is invoked for
+     * will {@linkplain #scanForPlugins() scan for plugins} the first time it is invoked for
      * the given category.
      *
      * @param category The category to look for. Usually an interface class
@@ -171,9 +178,7 @@ public class FactoryRegistry extends ServiceRegistry {
              * category, otherwise we should have found at least the Geotools implementation.
              * Scans the plugin now, but for this category only.
              */
-            for (final Iterator it=getClassLoaders().iterator(); it.hasNext();) {
-                safeScanForPlugins((ClassLoader) it.next(), category);
-            }
+            scanForPlugins(getClassLoaders(), category);
             iterator = getServiceProviders(category, hintsFilter, true);
         }
         return iterator;
@@ -518,26 +523,47 @@ public class FactoryRegistry extends ServiceRegistry {
         final Set loaders = getClassLoaders();
         for (final Iterator categories=getCategories(); categories.hasNext();) {
             final Class category = (Class) categories.next();
-            for (final Iterator it=loaders.iterator(); it.hasNext();) {
-                final ClassLoader loader = (ClassLoader) it.next();
-                safeScanForPlugins(loader, category);
-            }
+            scanForPlugins(loaders, category);
         }
     }
 
     /**
      * Scans for factory plug-ins of the given category, with guard against recursivities.
-     * This check make debugging easier than inspecting a {@link StackOverflowError}.
+     * The recursivity check make debugging easier than inspecting a {@link StackOverflowError}.
      *
      * @param loader The class loader to use.
      * @param category The category to scan for plug-ins.
      */
-    private void safeScanForPlugins(final ClassLoader loader, final Class category) {
+    private void scanForPlugins(final Collection/*<ClassLoader>*/ loaders, final Class category) {
         if (!scanningCategories.add(category)) {
             throw new RecursiveSearchException(category);
         }
         try {
-            scanForPlugins(loader, category);
+            final StringBuffer message = getLogHeader(category);
+            boolean newServices = false;
+            /*
+             * First, query the user-provider iterators, if any.
+             */
+            for (final Iterator ip=iteratorProviders.iterator(); ip.hasNext();) {
+                final Iterator it = ((FactoryIteratorProvider) ip.next()).iterator(category);
+                if (it != null) {
+                    newServices |= register(it, category, message);
+                }
+            }
+            /*
+             * Next, scan META-INF/services directories (the default mechanism).
+             */
+            for (final Iterator it=loaders.iterator(); it.hasNext();) {
+                final ClassLoader loader = (ClassLoader) it.next();
+                newServices |= register(lookupProviders(category, loader), category, message);
+                newServices |= registerFromSystemProperty(loader, category, message);
+            }
+            /*
+             * Finally, log the list of registered factories.
+             */
+            if (newServices) {
+                log("scanForPlugins", message);
+            }
         } finally {
             if (!scanningCategories.remove(category)) {
                 throw new AssertionError(category);
@@ -546,18 +572,19 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Scans for factory plug-ins of the given category.
+     * {@linkplain #registerServiceProvider Registers} all service providers given by the
+     * supplied iterator.
      *
-     * @param loader The class loader to use.
-     * @param category The category to scan for plug-ins.
+     * @param factories The service providers to register.
+     * @param category  the category under which to register the providers.
+     * @param message   A buffer where to write the logging message.
+     * @return {@code true} if at least one service provider has been registered.
      */
-    private void scanForPlugins(final ClassLoader loader, final Class category) {
-        final Iterator   factories = ServiceRegistry.lookupProviders(category, loader);
-        final String lineSeparator = System.getProperty("line.separator", "\n");
-        final StringBuffer message = new StringBuffer();
-        message.append(Logging.getResources(null).getString(LoggingKeys.FACTORY_IMPLEMENTATIONS_$1,
-                                                            Utilities.getShortName(category)));
+    private boolean register(final Iterator factories, final Class category,
+                             final StringBuffer message)
+    {
         boolean newServices = false;
+        final String lineSeparator = System.getProperty("line.separator", "\n");
         while (factories.hasNext()) {
             Object factory;
             try {
@@ -595,14 +622,13 @@ public class FactoryRegistry extends ServiceRegistry {
             final Object replacement = getServiceProviderByClass(factoryClass);
             if (replacement != null) {
                 factory = replacement;
-                // Need to register anyway, because the category is not the same.
+                // Need to register anyway, because the category may not be the same.
             }
             if (registerServiceProvider(factory, category)) {
                 /*
-                 * The factory is now registered. Add it to the message to be logged
-                 * at the end of this method. We log all factories together in order
-                 * to produces only one log entry, since some registration (e.g.
-                 * MathTransformProviders) may be quite extensive.
+                 * The factory is now registered. Add it to the message to be logged. We will log
+                 * all factories together in a single log event because some registration (e.g.
+                 * MathTransformProviders) would be otherwise quite verbose.
                  */
                 message.append(lineSeparator);
                 message.append("  ");
@@ -610,11 +636,23 @@ public class FactoryRegistry extends ServiceRegistry {
                 newServices = true;
             }
         }
-        /*
-         * If a system property was setup, load the class (if not already registered)
-         * and move it in front of any other factory. This is done for compatibility
-         * with legacy FactoryFinder implementation.
-         */
+        return newServices;
+    }
+
+    /**
+     * If a system property was setup, load the class (if not already registered)
+     * and move it in front of any other factory. This is done for compatibility
+     * with legacy {@code FactoryFinder} implementation.
+     *
+     * @param loader   The class loader to use.
+     * @param category The category to scan for plug-ins.
+     * @param message  A buffer where to write the logging message.
+     * @return {@code true} if at least one service provider has been registered.
+     */
+    private boolean registerFromSystemProperty(final ClassLoader loader, final Class category,
+                                               final StringBuffer message)
+    {
+        boolean newServices = false;
         try {
             final String classname = System.getProperty(category.getName());
             if (classname != null) try {
@@ -623,23 +661,23 @@ public class FactoryRegistry extends ServiceRegistry {
                 if (factory == null) try {
                     factory = factoryClass.newInstance();
                     if (registerServiceProvider(factory, category)) {
-                        message.append(lineSeparator);
+                        message.append(System.getProperty("line.separator", "\n"));
                         message.append("  ");
                         message.append(factoryClass.getName());
                         newServices = true;
                     }
                 } catch (IllegalAccessException exception) {
-                    throw new FactoryRegistryException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
-                                                                     classname), exception);
+                    throw new FactoryRegistryException(Errors.format(
+                            ErrorKeys.CANT_CREATE_FACTORY_$1, classname), exception);
                 } catch (InstantiationException exception) {
-                    throw new FactoryRegistryException(Errors.format(ErrorKeys.CANT_CREATE_FACTORY_$1,
-                                                                     classname), exception);
+                    throw new FactoryRegistryException(Errors.format(
+                            ErrorKeys.CANT_CREATE_FACTORY_$1, classname), exception);
                 }
                 /*
                  * Put this factory in front of every other factories (including the ones loaded
                  * in previous class loaders, which is why we don't inline this ordering in the
-                 * above loop). Note: if some factories were not yet registered, they will not
-                 * be properly ordered. Since this code exists more for compatibility reasons
+                 * 'register' loop). Note: if some factories were not yet registered, they will
+                 * not be properly ordered. Since this code exists more for compatibility reasons
                  * than as a commited API, we ignore this short comming for now.
                  */
                 for (final Iterator it=getServiceProviders(category, false); it.hasNext();) {
@@ -657,15 +695,7 @@ public class FactoryRegistry extends ServiceRegistry {
             // We are not allowed to read property, probably
             // because we are running in an applet. Ignore...
         }
-        /*
-         * Log the list of registered factories.
-         */
-        if (newServices) {
-            final LogRecord record = new LogRecord(Level.CONFIG, message.toString());
-            record.setSourceClassName(FactoryRegistry.class.getName());
-            record.setSourceMethodName("scanForPlugins");
-            LOGGER.log(record);
-        }
+        return newServices;
     }
 
     /**
@@ -689,6 +719,70 @@ public class FactoryRegistry extends ServiceRegistry {
         record.setSourceClassName("FactoryRegistry");
         record.setSourceMethodName("scanForPlugins");
         LOGGER.log(record);
+    }
+
+    /**
+     * Prepares a message to be logged if any provider has been registered.
+     */
+    private static StringBuffer getLogHeader(final Class category) {
+        return new StringBuffer(Logging.getResources(null).getString(
+                LoggingKeys.FACTORY_IMPLEMENTATIONS_$1, Utilities.getShortName(category)));
+    }
+
+    /**
+     * Log the specified message after all provider for a given category have been registered.
+     */
+    private static void log(final String method, final StringBuffer message) {
+        final LogRecord record = new LogRecord(Level.CONFIG, message.toString());
+        record.setSourceClassName("FactoryRegistry");
+        record.setSourceMethodName(method);
+        LOGGER.log(record);
+    }
+
+    /**
+     * Adds an alternative way to search for factory implementations. {@code FactoryRegistry} has
+     * a default mechanism bundled in it, which uses the content of all {@code META-INF/services}
+     * directories found on the classpath. This {@code addFactoryIteratorProvider} method allows
+     * to specify additional discovery algorithms. It may be useful in the context of some
+     * frameworks that use the <cite>constructor injection</cite> pattern, like the
+     * <a href="http://www.springframework.org/">Spring framework</a>.
+     *
+     * @since 2.4
+     */
+    public void addFactoryIteratorProvider(final FactoryIteratorProvider provider) {
+        iteratorProviders.add(provider);
+        for (final Iterator categories=getCategories(); categories.hasNext();) {
+            final Class category = (Class) categories.next();
+            if (getServiceProviders(category, false).hasNext()) {
+                /*
+                 * Register immediately the factories only if some other factories were already
+                 * registered for this category,  because in such case 'scanForPlugin' will not
+                 * be invoked automatically. If no factory are registered for this category, do
+                 * nothing - we will rely on the lazy invocation of 'scanForPlugins' when first
+                 * needed. We perform this check because getServiceProviders(category).hasNext()
+                 * is the criterion used by FactoryRegistry in order to decide if it should invoke
+                 * automatically scanForPlugins.
+                 */
+                final Iterator it = provider.iterator(category);
+                if (it != null) {
+                    final StringBuffer message = getLogHeader(category);
+                    if (register(it, category, message)) {
+                        log("addFactoryIteratorProvider", message);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes a provider that was previously {@linkplain #addFactoryIteratorProvider added}.
+     * Note that factories already obtained from the specified provider will not be
+     * {@linkplain #deregisterServiceProvider deregistered} by this method.
+     *
+     * @since 2.4
+     */
+    public void removeFactoryIteratorProvider(final FactoryIteratorProvider provider) {
+        iteratorProviders.remove(provider);
     }
 
     /**
