@@ -519,8 +519,8 @@ public class GeodeticCalculator {
      * Set the starting point in geographic coordinates.
      * The {@linkplain #getAzimuth() azimuth},
      * the {@linkplain #getOrthodromicDistance() orthodromic distance} and
-     * the {@linkplain #getDestinationPoint() destination point} are discarted.
-     * They will need to be specified again.
+     * the {@linkplain #getDestinationGeographicPoint() destination point}
+     * are discarted. They will need to be specified again.
      *
      * @param  longitude The longitude in decimal degrees between -180 and +180°
      * @param  latitude  The latitude  in decimal degrees between  -90 and  +90°
@@ -727,7 +727,7 @@ public class GeodeticCalculator {
     /**
      * Set the azimuth and the distance from the {@linkplain #getStartingGeographicPoint
      * starting point}. The destination point will be updated as a side effect of this call.
-     * It will be recomputed the next time {@link #getDestinationPoint()} is invoked.
+     * It will be recomputed the next time {@link #getDestinationGeographicPoint()} is invoked.
      *
      * @param  azimuth The azimuth in decimal degrees from -180° to 180°.
      * @param  distance The orthodromic distance in the same units as the
@@ -752,10 +752,10 @@ public class GeodeticCalculator {
     /**
      * Returns the azimuth. This method returns the value set by the last call to
      * <code>{@linkplain #setDirection(double,double) setDirection}(azimuth,distance)</code>,
-     * <strong>except</strong> if
-     * <code>{@linkplain #setDestinationPoint(double,double) setDestinationPoint}(...)</code>
-     * has been invoked after. In this later case, the azimuth will be computed from the
-     * {@linkplain #getStartingGeographicPoint starting point} to the destination point.
+     * <strong>except</strong> if <code>{@linkplain #setDestinationGeographicPoint(double,double)
+     * setDestinationGeographicPoint}(...)</code> has been invoked after. In this later case, the
+     * azimuth will be computed from the {@linkplain #getStartingGeographicPoint starting point}
+     * to the destination point.
      *
      * @return The azimuth, in decimal degrees from -180° to +180°.
      * @throws IllegalStateException if the destination point has not been set.
@@ -770,10 +770,10 @@ public class GeodeticCalculator {
     /**
      * Returns the orthodromic distance. This method returns the value set by the last call to
      * <code>{@linkplain #setDirection(double,double) setDirection}(azimuth,distance)</code>,
-     * <strong>except</strong> if
-     * <code>{@linkplain #setDestinationPoint(double,double) setDestinationPoint}(...)</code>
-     * has been invoked after. In this later case, the distance will be computed from the
-     * {@linkplain #getStartingGeographicPoint starting point} to the destination point.
+     * <strong>except</strong> if <code>{@linkplain #setDestinationGeographicPoint(double,double)
+     * setDestinationGeographicPoint}(...)</code> has been invoked after. In this later case, the
+     * distance will be computed from the {@linkplain #getStartingGeographicPoint starting point}
+     * to the destination point.
      *
      * @return The orthodromic distance, in the same units as the
      *         {@linkplain #getEllipsoid ellipsoid} axis.
@@ -811,7 +811,7 @@ public class GeodeticCalculator {
      *
      * @throws IllegalStateException if the azimuth and the distance have not been set.
      *
-     * @see #getDestinationPoint
+     * @see #getDestinationGeographicPoint
      */
     private void computeDestinationPoint() throws IllegalStateException {
         if (!directionValid) {
@@ -930,7 +930,7 @@ public class GeodeticCalculator {
     /**
      * Computes the azimuth and orthodromic distance from the
      * {@linkplain #getStartingGeographicPoint starting point} and the
-     * {@linkplain #getDestinationPoint destination point}.
+     * {@linkplain #getDestinationGeographicPoint destination point}.
      *
      * @throws IllegalStateException if the destination point has not been set.
      *

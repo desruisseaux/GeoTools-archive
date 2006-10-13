@@ -70,8 +70,7 @@ public class ProjectiveParamCalculator extends AbstractParamCalculator {
     /**
      * Checking of the Coordinate Reference System.
      *
-     * @throws CRSException - if the system is not the {@linkPlain
-     *         DefaultEngineeringCRS }
+     * @throws CRSException if the system is not the {@linkplain DefaultEngineeringCRS}.
      */
     protected void checkCRS() throws CRSException {
         if ((ptDst[0].getCoordinateReferenceSystem() != DefaultEngineeringCRS.CARTESIAN_2D)

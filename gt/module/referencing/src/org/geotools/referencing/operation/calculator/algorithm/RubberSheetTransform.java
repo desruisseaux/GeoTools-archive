@@ -40,8 +40,8 @@ import java.util.Iterator;
 public class RubberSheetTransform extends AbstractMathTransform
     implements MathTransform2D {
     /**
-     * The HashMap where the keys are the original {@linkPlain
-     * #Polygon} and values are {@linkPlain
+     * The HashMap where the keys are the original {@linkplain
+     * #Polygon} and values are {@linkplain
      * #org.opengis.referencing.operation.MathTransform}.
      */
     private HashMap trianglesToKeysMap;

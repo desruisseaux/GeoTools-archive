@@ -70,7 +70,7 @@ public class BursaWolfParamCalculator extends AbstractParamCalculator {
     /** Bursa Wolf scaling. */
     private double q = 1;
 
-/**
+    /**
      * Creates a BursaWolfParamCalculator.
      * @param ptsSrc List of source points (3D - geocentric)
      * @param ptsDst List of destination points (3D - geocentric)    
@@ -91,8 +91,8 @@ public class BursaWolfParamCalculator extends AbstractParamCalculator {
     }
 
     /**
-     * Checking of the Coordinate Reference System of the {@linkPlain
-     * AbstractParamCalculator#ptSrc} and the {@linkPlain
+     * Checking of the Coordinate Reference System of the {@linkplain
+     * AbstractParamCalculator#ptSrc} and the {@linkplain
      * AbstractParamCalculator#ptDst}.
      *
      * @throws CRSException - if the CRS is wrong.
