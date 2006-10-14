@@ -721,13 +721,8 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
      * @since 2.0
      * @version $Id$
      * @author Martin Desruisseaux
-     *
-     * @todo In Geotools 2.2, this class was a non-static inner class. It has been changed to
-     *       a static inner class in Geotools 2.3-M0 because Clover doesn't seem to support
-     *       inheritence in such class. This is not yet clear if this change in the Geotools
-     *       code base will be permanent or not.
      */
-    protected static abstract class Inverse extends AbstractMathTransform implements Serializable {
+    protected abstract class Inverse extends AbstractMathTransform implements Serializable {
         /**
          * Serial number for interoperability with different versions. This serial number is
          * especilly important for inner classes, since the default {@code serialVersionUID}
@@ -740,15 +735,9 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
         private static final long serialVersionUID = 3528274816628012283L;
 
         /**
-         * Reference to the enclosing class.
-         */
-		private AbstractMathTransform original;
-
-        /**
          * Constructs an inverse math transform.
          */
-        protected Inverse(AbstractMathTransform original) {
-        	this.original = original;
+        protected Inverse() {
         }
         
         /**
@@ -757,7 +746,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * points of the enclosing math transform.
          */
         public int getSourceDimensions() {
-            return original.getTargetDimensions();
+            return AbstractMathTransform.this.getTargetDimensions();
         }
         
         /**
@@ -766,7 +755,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * points of the enclosing math transform.
          */
         public int getTargetDimensions() {
-            return original.getSourceDimensions();
+            return AbstractMathTransform.this.getSourceDimensions();
         }
         
         /**
@@ -775,7 +764,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * the enclosing math transform.
          */
         public Matrix derivative(final Point2D point) throws TransformException {
-            return invert(original.derivative(this.transform(point, null)));
+            return invert(AbstractMathTransform.this.derivative(this.transform(point, null)));
         }
         
         /**
@@ -784,7 +773,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * the enclosing math transform.
          */
         public Matrix derivative(final DirectPosition point) throws TransformException {
-            return invert(original.derivative(this.transform(point, null)));
+            return invert(AbstractMathTransform.this.derivative(this.transform(point, null)));
         }
         
         /**
@@ -793,7 +782,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * of {@code this} is always {@code AbstractMathTransform.this}.
          */
         public final MathTransform inverse() {
-            return original;
+            return AbstractMathTransform.this;
         }
         
         /**
@@ -802,14 +791,14 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
          * enclosing math transform.
          */
         public boolean isIdentity() {
-            return original.isIdentity();
+            return AbstractMathTransform.this.isIdentity();
         }
         
         /**
          * Returns a hash code value for this math transform.
          */
         public int hashCode() {
-            return ~original.hashCode();
+            return ~AbstractMathTransform.this.hashCode();
         }
         
         /**
@@ -849,7 +838,7 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
                 formatter.append(parameters);
                 return "PARAM_MT";
             } else {
-                formatter.append((Formattable) original);
+                formatter.append((Formattable) AbstractMathTransform.this);
                 return "INVERSE_MT";
             }
         }

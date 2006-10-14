@@ -755,7 +755,7 @@ public abstract class MapProjection extends AbstractMathTransform
          * Default constructor.
          */
         public Inverse() {
-            super(MapProjection.this);
+            MapProjection.this.super();
         }
 
         /**

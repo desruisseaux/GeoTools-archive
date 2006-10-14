@@ -498,7 +498,7 @@ public class GeocentricTransform extends AbstractMathTransform implements Serial
          * Default constructor.
          */
         public Inverse() {
-            super(GeocentricTransform.this);
+            GeocentricTransform.this.super();
         }
     
         /**
