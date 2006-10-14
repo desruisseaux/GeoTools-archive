@@ -35,10 +35,12 @@ import java.util.Iterator;
  * tranformation can be seen <a href =
  * "http://planner.t.u-tokyo.ac.jp/member/fuse/rubber_sheeting.pdf">here</a>.
  *
- * @author jezekjan
+ * @author Jan Jezek
+ *
+ * @todo Consider moving this class to the {@link org.geotools.referencing.operation.transform}
+ *       package.
  */
-public class RubberSheetTransform extends AbstractMathTransform
-    implements MathTransform2D {
+public class RubberSheetTransform extends AbstractMathTransform implements MathTransform2D {
     /**
      * The HashMap where the keys are the original {@linkplain
      * #Polygon} and values are {@linkplain
@@ -46,27 +48,28 @@ public class RubberSheetTransform extends AbstractMathTransform
      */
     private HashMap trianglesToKeysMap;
 
-/**
- * Constructs the RubberSheetTransform.
- * 
- * @param trianglesToAffineTransform The HashMap where the keys are the original {@link org.geotools.referencing.operation.calculator.algorithm.TINTriangle} and values
- * are {@link org.opengis.referencing.operation.MathTransform}.
- */
+    /**
+     * Constructs the RubberSheetTransform.
+     * 
+     * @param trianglesToAffineTransform The HashMap where the keys are the original
+     *        {@link org.geotools.referencing.operation.calculator.algorithm.TINTriangle}
+     *        and values are {@link org.opengis.referencing.operation.MathTransform}.
+     */
     public RubberSheetTransform(HashMap trianglesToAffineTransform) {
         this.trianglesToKeysMap = trianglesToAffineTransform;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getSourceDimensions()
+    /**
+     * Gets the dimension of input points, which is 2.
      */
-    public int getSourceDimensions() {
+    public final int getSourceDimensions() {
         return 2;
     }
 
-    /* (non-Javadoc)
-     * @see org.geotools.referencing.operation.transform.AbstractMathTransform#getTargetDimensions()
+    /**
+     * Gets the dimension of output points, which is 2.
      */
-    public int getTargetDimensions() {
+    public final int getTargetDimensions() {
         return 2;
     }
 
@@ -122,12 +125,12 @@ public class RubberSheetTransform extends AbstractMathTransform
 
         HashMap trianglestoPoints = mapTrianglesToPoints((ArrayList) arraySrcPts);
 
-        // cicle  goes throught each triangle 
+        // Cicle goes throught each triangle
         for (Iterator k = trianglestoPoints.keySet().iterator(); k.hasNext();) {
             TINTriangle triangle = (TINTriangle) k.next();
             AffineTransform AT = (AffineTransform) trianglesToKeysMap.get(triangle);
 
-            // cicle for transforming points within this triangle
+            // Cicle for transforming points within this triangle
             for (Iterator j = ((ArrayList) trianglestoPoints.get(triangle))
                     .iterator(); j.hasNext();) {
                 MappedPosition co = (MappedPosition) j.next();
@@ -153,17 +156,21 @@ public class RubberSheetTransform extends AbstractMathTransform
      *
      * @return String expresion of the triangle and its affine transform
      *         parameters
+     *
+     * @todo This method doesn't meet the {@link MathTransform#toString} constract, which
+     *       should uses Well Known Text (WKT) format as much as possible.
      */
     public String toString() {
-        String theString = "";
-
-        for (Iterator i = trianglesToKeysMap.keySet().iterator(); i.hasNext();) {
+        final String lineSeparator = System.getProperty("line.separator", "\n");
+        final StringBuffer buffer = new StringBuffer();
+        for (final Iterator i=trianglesToKeysMap.keySet().iterator(); i.hasNext();) {
             TINTriangle trian = (TINTriangle) i.next();
             MathTransform mt = (MathTransform) trianglesToKeysMap.get(trian);
-            theString = theString + trian.toString() + "\n";
-            theString = theString + mt.toString() + "\n";
+            buffer.append(trian.toString());
+            buffer.append(lineSeparator);
+            buffer.append(mt.toString());
+            buffer.append(lineSeparator);
         }
-
-        return theString;
+        return buffer.toString();
     }
 }

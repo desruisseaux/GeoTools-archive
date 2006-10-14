@@ -51,17 +51,17 @@ public class RubberSheetCalculator extends AbstractParamCalculator {
      */
     private HashMap trianglesToKeysMap;
     
-/**
-         * Creates the transformation from specified pairs of points and
-         * quadrilateral that deffines the area of transformation.
-         * 
-         * @param ptSrc
-         *            Set of source points
-         * @param ptDst
-         *            Set of destination points
-         * @throws CalculationException 
-         * @throws TriangulationException
-         */
+    /**
+     * Creates the transformation from specified pairs of points and
+     * quadrilateral that deffines the area of transformation.
+     * 
+     * @param ptSrc
+     *            Set of source points
+     * @param ptDst
+     *            Set of destination points
+     * @throws CalculationException 
+     * @throws TriangulationException
+     */
     public RubberSheetCalculator(DirectPosition[] ptSrc,
         DirectPosition[] ptDst, Quadrilateral quad)
         throws CalculationException, TriangulationException, CRSException {

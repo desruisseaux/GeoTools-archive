@@ -46,7 +46,9 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>Java Developer</role>
         <role>Project Management Committee (PMC) Member</role>

@@ -42,18 +42,18 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * <pre><blockquote>
  *  m = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>x'  </blockquote> </pre>
  *
- * @author jezekjan
+ * @author Jan Jezek
  */
 public class AffineParamCalculator extends ProjectiveParamCalculator {
     protected AffineParamCalculator() {
     }
 
-/**
- * Creates AffineParamCalculator for the set of properties.
- * 
- * @param ptSrc Set of source points
- * @param ptDst Set of destination points
- */
+    /**
+     * Creates AffineParamCalculator for the set of properties.
+     * 
+     * @param ptSrc Set of source points
+     * @param ptDst Set of destination points
+     */
     public AffineParamCalculator(DirectPosition[] ptSrc, DirectPosition[] ptDst)
         throws CalculationException, CRSException {
         this.ptDst = ptDst;

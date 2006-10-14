@@ -34,19 +34,19 @@ class Circle {
     /** Tolerance for the cotains method. */
     private double tolerance = 0.0001;
 
-/**
- * Creates a circle with center [0,0] and radius = 0. 
- *
- */
+    /**
+     * Creates a circle with center [0,0] and radius = 0. 
+     *
+     */
     protected Circle() {
         this(new DirectPosition2D(0, 0), 0);
     }
 
-/**
- * Creates a circle using the specified center and radius.
- * @param center of the circle.
- * @param radius of the circle.
- */
+    /**
+     * Creates a circle using the specified center and radius.
+     * @param center of the circle.
+     * @param radius of the circle.
+     */
     protected Circle(DirectPosition center, double radius) {
         this.center = new DirectPosition2D(center);
         this.radius = radius;

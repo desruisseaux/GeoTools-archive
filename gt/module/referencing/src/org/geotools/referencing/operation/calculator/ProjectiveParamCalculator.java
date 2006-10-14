@@ -44,21 +44,21 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * <pre><blockquote>
  *  m = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>x'  </blockquote> </pre>
  *
- * @author jezekjan
+ * @author Jan Jezek
  */
 public class ProjectiveParamCalculator extends AbstractParamCalculator {
     protected ProjectiveParamCalculator() {
     }
 
-/**
-         * Creates ProjectiveParamCalculator for the set of properties.        
-         * @param ptSrc Set of source points
-         * @param ptDst Set of destination points
-         * @throws CalculationException -if the number or dimesion of properties is not set properly.
-         * @throws CRSException -if the CRS of {@link #ptSrt} and {@link #ptDst} have wrong Coordinate Reference System.
-         */
-    public ProjectiveParamCalculator(DirectPosition[] ptSrc,
-        DirectPosition[] ptDst) throws CalculationException, CRSException {
+    /**
+     * Creates ProjectiveParamCalculator for the set of properties.        
+     * @param ptSrc Set of source points
+     * @param ptDst Set of destination points
+     * @throws CalculationException -if the number or dimesion of properties is not set properly.
+     * @throws CRSException -if the CRS of {@link #ptSrt} and {@link #ptDst} have wrong Coordinate Reference System.
+     */
+    public ProjectiveParamCalculator(DirectPosition[] ptSrc, DirectPosition[] ptDst)
+        throws CalculationException, CRSException {
         this.ptDst = ptDst;
         this.ptSrc = ptSrc;
 

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2006, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,19 +22,28 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**
- * Provides a basic implementation ParamCalculators. {@link
- * AbstractParamCalculator} does not implements {@link #getMathTransform()}.
+ * Provides a basic implementation for parameter calculators. Subclasses must
+ * implement the {@link #getMathTransform()} method.
  *
- * @author jezekjan
+ * @since 2.4
+ * @source $URL$
+ * @version $Id$
+ * @author Jan Jezek
  */
 public abstract class AbstractParamCalculator {
-    /** Set of source points */
+    /**
+     * Set of source points.
+     */
     protected DirectPosition[] ptSrc;
 
-    /** Set of destination points */
+    /**
+     * Set of destination points.
+     */
     protected DirectPosition[] ptDst;
 
-    /** Coordinate Reference System of the points. */
+    /**
+     * Coordinate Reference System of the points.
+     */
     protected CoordinateReferenceSystem CRS;
 
     /**
@@ -118,41 +127,34 @@ public abstract class AbstractParamCalculator {
      * @throws TransformException
      */
     public double getStandardDeviation() throws TransformException {
-        double[] points = new double[ptSrc.length * ptSrc[0].getDimension()];
-        double[] pointsDst = new double[ptSrc.length * ptSrc[0].getDimension()];
-        double[] ptCalculated = new double[ptSrc.length * ptSrc[0].getDimension()];
+        final int dimension = ptSrc[0].getDimension();
+        double[] points       = new double[ptSrc.length * dimension];
+        double[] pointsDst    = new double[ptSrc.length * dimension];
+        double[] ptCalculated = new double[ptSrc.length * dimension];
 
         for (int i = 0; i < ptSrc.length; i++) {
+            final int base = i * dimension;
             for (int j = 0; j < ptSrc[i].getDimension(); j++) {
-                points[(i * ptSrc[0].getDimension()) + j] = ptSrc[i]
-                    .getCoordinates()[j];
-                pointsDst[(i * ptSrc[0].getDimension()) + j] = ptDst[i]
-                    .getCoordinates()[j];
+                points   [base + j] = ptSrc[i].getOrdinate(j);
+                pointsDst[base + j] = ptDst[i].getOrdinate(j);
             }
         }
-
         getMathTransform().transform(points, 0, ptCalculated, 0, ptSrc.length);
 
-        // calculation of the StandardDeviation
+        // Calculation of the standard deviation
         double sum = 0;
-
         for (int i = 0; i < pointsDst.length; i++) {
-            sum = sum
-                + ((pointsDst[i] - ptCalculated[i]) * (pointsDst[i]
-                - ptCalculated[i]));
+            sum += (pointsDst[i] - ptCalculated[i]) * (pointsDst[i] - ptCalculated[i]);
         }
-
-        double m = Math.sqrt(sum / (pointsDst.length / ptSrc[0].getDimension()));
-
-        return m;
+        return Math.sqrt(sum / (pointsDst.length / ptSrc[0].getDimension()));
     }
 
     /**
-     * Returns calculated MathTransform.
+     * Returns the calculated math transform.
      *
-     * @return MathTransform from the set of {@link #ptSrc} and {@link #ptDst}
+     * @return The math transform from the set of {@link #ptSrc} and {@link #ptDst}.
      *
      * @throws TransformException
      */
-    abstract public MathTransform getMathTransform() throws TransformException;
+    public abstract MathTransform getMathTransform() throws TransformException;
 }

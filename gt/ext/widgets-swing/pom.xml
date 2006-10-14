@@ -42,7 +42,9 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -53,6 +55,8 @@
     <contributor>
       <name>Cédric Briançon</name>
       <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -60,6 +64,8 @@
     <contributor>
       <name>Hoa Nguyen</name>
       <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>Java Developer</role>
       </roles>

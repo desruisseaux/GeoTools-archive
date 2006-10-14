@@ -43,7 +43,9 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
@@ -58,18 +60,24 @@
       </roles>
     </developer>
     <developer>
-      <name>Jody Garnett</name>
-      <id>jive</id>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research</organization>
+      <name>Jan Jezek</name>
+      <id>jezekjan</id>
       <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
-      
+
   <contributors>
-  <contributor>
+    <contributor>
+      <name>Jody Garnett</name>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+    <contributor>
       <name>Simone Giannecchinir</name>
       <email>simone.giannecchini@geo-solutions.it</email>
       <organization>GeoSolutions</organization>

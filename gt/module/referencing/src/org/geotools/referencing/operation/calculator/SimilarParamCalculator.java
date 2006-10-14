@@ -41,15 +41,14 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * <pre><blockquote>
  *  m = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>x'  </blockquote> </pre>
  *
- * @author jezekjan
+ * @author Jan Jezek
  */
 public class SimilarParamCalculator extends ProjectiveParamCalculator {
-/**
- * 
- * Creates SimilarParamCalculator for the set of properties.
- * @param ptSrc Set of source points
- * @param ptDst Set of destination points
- */
+    /**
+     * Creates SimilarParamCalculator for the set of properties.
+     * @param ptSrc Set of source points
+     * @param ptDst Set of destination points
+     */
     public SimilarParamCalculator(DirectPosition[] ptSrc, DirectPosition[] ptDst)
         throws CalculationException, CRSException {
         this.ptDst = ptDst;

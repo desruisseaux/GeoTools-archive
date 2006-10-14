@@ -22,6 +22,8 @@ import org.opengis.referencing.operation.TransformException;
  * Thrown when a calculation can't be performed because of the
  * configuration wrong configuration of the Coordinate Refernce System the
  * {@linkplain AbstractParamCalculator#ptSrc} and {@linkplain AbstractParamCalculator#ptDst}.
+ *
+ * @author Jan Jezek
  */
 public class CRSException extends TransformException {
     private static final long serialVersionUID = -6328524211656251233L;

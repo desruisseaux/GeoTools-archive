@@ -69,6 +69,7 @@
       <name>Didier Richard</name>
       <email>dgr@libertysurf.fr</email>
       <organization>Institut Géographique National - France</organization>
+      <timezone>+1</timezone>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -77,7 +78,9 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le Développement (IRD)</organization>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>

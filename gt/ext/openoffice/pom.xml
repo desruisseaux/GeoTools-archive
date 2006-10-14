@@ -43,20 +43,26 @@
       <name>Martin Desruisseaux</name>
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Institut de Recherche pour le développement</organization>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
       </roles>
     </developer>
-    <developer>
+  </developers>
+
+  <contributors>
+    <contributor>
       <name>Richard Deplanque</name>
       <organization>Université de Nouvelle-Calédonie</organization>
+      <timezone>+11</timezone>
       <roles>
         <role>Java Developer</role>
       </roles>
-    </developer>
-  </developers>
+    </contributor>
+  </contributors>
 
 
 

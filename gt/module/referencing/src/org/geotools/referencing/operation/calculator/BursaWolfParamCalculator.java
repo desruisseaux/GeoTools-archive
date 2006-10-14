@@ -38,6 +38,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * calculated from aproximate values. Using the least square method to
  * minimalize the errors we get this result:<pre>
  *  Dx = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>l  </pre></p>
+ *
+ * @author Jan Jezek
  */
 public class BursaWolfParamCalculator extends AbstractParamCalculator {
     /** The Geodetic Datum of target reference system */
@@ -319,7 +321,7 @@ public class BursaWolfParamCalculator extends AbstractParamCalculator {
     }
 
     /**
-     * Method fur addition matrix (3,3) with matrix of  coordintes (3
+     * Method for addition matrix (3,3) with matrix of coordintes (3
      * number of coordinates,1)
      *
      * @param R ratrix
@@ -464,7 +466,7 @@ public class BursaWolfParamCalculator extends AbstractParamCalculator {
      *
      * @return Angle is seconds
      */
-    private double radiansToSeconds(double rad) {
+    private static double radiansToSeconds(double rad) {
         return (rad * (180 / Math.PI) * (3600));
     }
 

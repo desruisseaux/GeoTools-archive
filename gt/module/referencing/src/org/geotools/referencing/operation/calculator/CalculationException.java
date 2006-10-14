@@ -22,18 +22,20 @@ import org.opengis.referencing.operation.TransformException;
  * Thrown when a calculation can't be performed because of the
  * configuration of the {@linkplain AbstractParamCalculator#ptSrc} and
  * {@linkplain AbstractParamCalculator#ptDst}.
+ *
+ * @author Jan Jezek
  */
 public class CalculationException extends TransformException {
     private static final long serialVersionUID = -4856595509487455629L;
 
-/**
+    /**
      * Constructs an exception with no detail message.
      */
     public CalculationException() {
         super();
     }
 
-/**
+    /**
      * Constructs an exception with the specified detail message.
      *
      * @param  message The cause for this exception. The cause is saved

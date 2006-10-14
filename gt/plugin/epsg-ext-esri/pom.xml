@@ -57,6 +57,8 @@
       <id>desruisseaux</id>
       <email>desruisseaux@users.sourceforge.net</email>
       <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
         <role>Java Developer</role>
         <role>Module Maintainer</role>
