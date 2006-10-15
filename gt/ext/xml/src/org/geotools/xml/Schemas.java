@@ -45,11 +45,14 @@ import org.eclipse.xsd.util.XSDResourceImpl;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.eclipse.xsd.util.XSDUtil;
+import org.geotools.xml.impl.SchemaIndexImpl;
 import org.geotools.xml.impl.TypeWalker;
 import org.picocontainer.PicoContainer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -60,6 +63,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
+
 import javax.xml.namespace.QName;
 
 
@@ -70,11 +75,59 @@ import javax.xml.namespace.QName;
  *
  */
 public class Schemas {
+    
+    private static final Logger LOGGER = Logger.getLogger(Schemas.class.getPackage().getName());
+    
     static {
         //need to register custom factory to load schema resources
         Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap()
                                           .put("xsd",
             new XSDResourceFactoryImpl());
+    }
+
+    /**
+     * Finds all the XSDSchemas used by the {@link Configuration configuration} 
+     * by looking at the configuration's schema locator and its dependencies.
+     * 
+     * @param configuration the {@link Configuration} for which to find all its
+     * related schemas
+     * 
+     * @return a {@link SchemaIndex} holding the schemas related to 
+     * <code>configuration</code>
+     */
+    public static final SchemaIndex findSchemas(Configuration configuration){
+        
+        Set configurations = new HashSet(configuration.allDependencies());
+        configurations.add(configuration);
+        
+        List resolvedSchemas = new ArrayList(configurations.size());
+        
+        for(Iterator it = configurations.iterator(); it.hasNext();){
+            Configuration conf = (Configuration) it.next();
+            LOGGER.fine("looking up schema for " + conf.getNamespaceURI());
+            
+            XSDSchemaLocator locator = conf.getSchemaLocator();
+            if(locator == null){
+                LOGGER.fine("No schema locator for " + conf.getNamespaceURI());
+                continue;
+            }
+            String namespaceURI = conf.getNamespaceURI();
+            String schemaLocation = null;
+            try{
+                URL location = conf.getSchemaFileURL();
+                schemaLocation = location.toExternalForm();
+            }catch(MalformedURLException e){
+                throw new RuntimeException(e);
+            }
+            LOGGER.fine("schema location: " + schemaLocation);
+            XSDSchema schema = locator.locateSchema(null, namespaceURI, schemaLocation, null);
+            resolvedSchemas.add(schema);
+        }
+        
+        XSDSchema []schemas = (XSDSchema[]) resolvedSchemas.toArray(new XSDSchema[resolvedSchemas.size()]);
+        SchemaIndex index = new SchemaIndexImpl(schemas);
+        
+        return index;
     }
 
     /**

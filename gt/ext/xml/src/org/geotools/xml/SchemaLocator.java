@@ -73,12 +73,16 @@ public final class SchemaLocator implements XSDSchemaLocator {
 	) {
 		
 		if ( configuration.getNamespaceURI().equals( namespaceURI ) ) {
-			if ( this.schema != null ) 
+			if ( this.schema != null ){
+                logger.finer("returning cached schema for " + namespaceURI);
 				return this.schema;
+            }
 
 			synchronized ( this ) {
-				if ( this.schema != null ) 
-					return this.schema;;
+				if ( this.schema != null ){
+                    logger.finer("returning cached schema for " + namespaceURI);
+					return this.schema;
+                }
 				
 				//add dependent location resolvers
 				List resolvers = new ArrayList();
@@ -93,7 +97,8 @@ public final class SchemaLocator implements XSDSchemaLocator {
 				
 				try {
 					String location = configuration.getSchemaFileURL().toString();
-					this.schema =  Schemas.parse( location, null, resolvers );
+					logger.fine("parsing schema " + namespaceURI);
+                    this.schema =  Schemas.parse( location, null, resolvers );
 	            } 
 				catch (IOException e) {
 					String msg = "Failed to create schema: " + namespaceURI;
