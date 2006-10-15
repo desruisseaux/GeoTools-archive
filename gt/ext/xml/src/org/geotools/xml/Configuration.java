@@ -205,6 +205,12 @@ public abstract class Configuration {
 	 */
 	private List dependencies;
 	
+    /**
+     * Holds the schema locator instance for this configuration, which
+     * in turn caches the parsed XSDSchema
+     */
+    private SchemaLocator schemaLocator;
+    
 	/**
 	 * Creates a new configuration. 
 	 * <p>
@@ -311,7 +317,10 @@ public abstract class Configuration {
 	 * @return The schema locator, or <code>null</code>
 	 */
 	public XSDSchemaLocator getSchemaLocator() {
-		return new SchemaLocator( this );
+        if(schemaLocator == null){
+            schemaLocator = new SchemaLocator( this );
+        }
+        return schemaLocator;
 	}
 	
 	/**
