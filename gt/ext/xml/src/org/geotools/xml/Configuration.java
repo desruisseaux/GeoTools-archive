@@ -318,7 +318,11 @@ public abstract class Configuration {
 	 */
 	public XSDSchemaLocator getSchemaLocator() {
         if(schemaLocator == null){
-            schemaLocator = new SchemaLocator( this );
+            synchronized(this){
+                if(schemaLocator == null){
+                    schemaLocator = new SchemaLocator( this );
+                }
+            }
         }
         return schemaLocator;
 	}
