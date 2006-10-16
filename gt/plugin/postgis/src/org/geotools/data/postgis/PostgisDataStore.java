@@ -260,7 +260,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         OPTIMIZE_MODE = optimizeMode;
 
         // use the specific postgis fid mapper factory
-        setFIDMapperFactory(new PostgisFIDMapperFactory());
+        setFIDMapperFactory( buildFIDMapperFactory( config ) );
     }
 
     /**
@@ -932,7 +932,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @see org.geotools.data.jdbc.JDBCDataStore#buildFIDMapperFactory(org.geotools.data.jdbc.JDBCDataStoreConfig)
      */
     protected FIDMapperFactory buildFIDMapperFactory(JDBCDataStoreConfig config) {
-        return new PostgisFIDMapperFactory();
+        return new PostgisFIDMapperFactory( config );
     }
 
     protected FIDMapper buildFIDMapper( String typeName, FIDMapperFactory factory ) throws IOException {
