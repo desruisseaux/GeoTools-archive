@@ -15,11 +15,13 @@
  */
 package org.geotools.referencing.operation.calculator;
 
+// J2SE and extensions
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.calculator.algorithm.MapTriangulationFactory;
@@ -32,6 +34,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 
 /**
@@ -41,7 +45,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  *
  * @author Jan Jezek
  */
-public class RubberSheetCalculator extends AbstractParamCalculator {
+public class RubberSheetCalculator extends MathTransformBuilder {
     /** trianglesMap Map of the original and destination triangles. */
     private HashMap trianglesMap;
 
@@ -59,12 +63,14 @@ public class RubberSheetCalculator extends AbstractParamCalculator {
      *            Set of source points
      * @param ptDst
      *            Set of destination points
-     * @throws CalculationException 
+     * @throws MismatchedSizeException
+     * @throws MismatchedDimensionException 
+     * @throws MismatchedReferenceSystemException
      * @throws TriangulationException
      */
     public RubberSheetCalculator(DirectPosition[] ptSrc,
         DirectPosition[] ptDst, Quadrilateral quad)
-        throws CalculationException, TriangulationException, CRSException {
+        throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException, TriangulationException {
         this.ptDst = ptDst;
         this.ptSrc = ptSrc;
 
@@ -88,20 +94,27 @@ public class RubberSheetCalculator extends AbstractParamCalculator {
     }
 
     /**
+     * Returns the minimum number of points required by this builder.
+     */
+    public int getMinimumPointCount() {
+        return 0;
+    }
+
+    /**
      * Checks the Coordinate Reference System of the quad.
      *
      * @param quad to be tested
      *
-     * @throws CRSException
+     * @throws MismatchedReferenceSystemException
      */
-    private void checkQuad(Quadrilateral quad) throws CRSException {
+    private void checkQuad(Quadrilateral quad) throws MismatchedReferenceSystemException {
         CoordinateReferenceSystem crs = ptSrc[0].getCoordinateReferenceSystem();
 
         if ((quad.p0.getCoordinateReferenceSystem() != crs)
                 || (quad.p1.getCoordinateReferenceSystem() != crs)
                 || (quad.p2.getCoordinateReferenceSystem() != crs)
                 || (quad.p3.getCoordinateReferenceSystem() != crs)) {
-            throw new CRSException(
+            throw new MismatchedReferenceSystemException(
                 "Wrong Coordinate Reference System of the quad.");
         }
     }

@@ -15,6 +15,9 @@
  */
 package org.geotools.referencing.operation.calculator;
 
+// J2SE and extensions
+import javax.vecmath.MismatchedSizeException;
+
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -23,6 +26,8 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 
 /**
@@ -41,7 +46,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  *
  * @author Jan Jezek
  */
-public class BursaWolfParamCalculator extends AbstractParamCalculator {
+public class BursaWolfParamCalculator extends MathTransformBuilder {
     /** The Geodetic Datum of target reference system */
     private GeodeticDatum targetDatum;
 
@@ -78,7 +83,7 @@ public class BursaWolfParamCalculator extends AbstractParamCalculator {
      * @param ptsDst List of destination points (3D - geocentric)    
      */
     public BursaWolfParamCalculator(DirectPosition[] ptsSrc,
-        DirectPosition[] ptsDst) throws CalculationException, CRSException {
+        DirectPosition[] ptsDst) throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
         this.ptSrc = ptsSrc;
         this.ptDst = ptsDst;
 
@@ -93,16 +98,23 @@ public class BursaWolfParamCalculator extends AbstractParamCalculator {
     }
 
     /**
-     * Checking of the Coordinate Reference System of the {@linkplain
-     * AbstractParamCalculator#ptSrc} and the {@linkplain
-     * AbstractParamCalculator#ptDst}.
-     *
-     * @throws CRSException - if the CRS is wrong.
+     * Returns the minimum number of points required by this builder, which is 3.
      */
-    protected void checkCRS() throws CRSException {
+    public int getMinimumPointCount() {
+        return 3;
+    }
+
+    /**
+     * Checking of the Coordinate Reference System of the {@linkplain
+     * MathTransformBuilder#ptSrc} and the {@linkplain
+     * MathTransformBuilder#ptDst}.
+     *
+     * @throws MismatchedReferenceSystemException if the CRS is wrong.
+     */
+    protected void checkCRS() throws MismatchedReferenceSystemException {
         if ((ptDst[0].getCoordinateReferenceSystem() != DefaultEngineeringCRS.CARTESIAN_3D)
                 && (ptDst[0].getCoordinateReferenceSystem() != null)) {
-            throw new CRSException(
+            throw new MismatchedReferenceSystemException(
                 "DefaultEngineeringCRS.CARTESIAN_3D is expected for this method");
         }
     }

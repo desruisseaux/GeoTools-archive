@@ -291,7 +291,7 @@ public class TableWriter extends FilterWriter {
             }
         }
         /*
-         * Obtient une chaéne contenant les lignes verticales ‡
+         * Obtient une chaine contenant les lignes verticales ‡
          * dessiner ‡ gauche, ‡ droite ou au centre de la table.
          */
         final String border;

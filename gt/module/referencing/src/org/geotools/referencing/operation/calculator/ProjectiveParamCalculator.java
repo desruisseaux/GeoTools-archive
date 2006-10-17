@@ -15,11 +15,16 @@
  */
 package org.geotools.referencing.operation.calculator;
 
+// J2SE and extensions
+import javax.vecmath.MismatchedSizeException;
+
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 
 /**
@@ -46,7 +51,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  *
  * @author Jan Jezek
  */
-public class ProjectiveParamCalculator extends AbstractParamCalculator {
+public class ProjectiveParamCalculator extends MathTransformBuilder {
     protected ProjectiveParamCalculator() {
     }
 
@@ -54,11 +59,13 @@ public class ProjectiveParamCalculator extends AbstractParamCalculator {
      * Creates ProjectiveParamCalculator for the set of properties.        
      * @param ptSrc Set of source points
      * @param ptDst Set of destination points
-     * @throws CalculationException -if the number or dimesion of properties is not set properly.
-     * @throws CRSException -if the CRS of {@link #ptSrt} and {@link #ptDst} have wrong Coordinate Reference System.
+     * @throws MismatchedSizeException if the number of properties is not set properly.
+     * @throws MismatchedDimensionException if the dimension of properties is not set properly.
+     * @throws MismatchedReferenceSystemException -if the CRS of {@link #ptSrt} and {@link #ptDst}
+     *         have wrong Coordinate Reference System.
      */
     public ProjectiveParamCalculator(DirectPosition[] ptSrc, DirectPosition[] ptDst)
-        throws CalculationException, CRSException {
+        throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
         this.ptDst = ptDst;
         this.ptSrc = ptSrc;
 
@@ -68,14 +75,24 @@ public class ProjectiveParamCalculator extends AbstractParamCalculator {
     }
 
     /**
+     * Returns the minimum number of points required by this builder, which is 4 by default.
+     * Subclasses like {@linkplain AffineParamCalculator affine transform builders} will reduce
+     * this minimum.
+     */
+    public int getMinimumPointCount() {
+        return 4;
+    }
+
+    /**
      * Checking of the Coordinate Reference System.
      *
-     * @throws CRSException if the system is not the {@linkplain DefaultEngineeringCRS}.
+     * @throws MismatchedReferenceSystemException if the system is not the
+     *         {@linkplain DefaultEngineeringCRS}.
      */
-    protected void checkCRS() throws CRSException {
+    protected void checkCRS() throws MismatchedReferenceSystemException {
         if ((ptDst[0].getCoordinateReferenceSystem() != DefaultEngineeringCRS.CARTESIAN_2D)
                 && (ptDst[0].getCoordinateReferenceSystem() != null)) {
-            throw new CRSException(
+            throw new MismatchedReferenceSystemException(
                 "DefaultEngineeringCRS.CARTESIAN_2D is expected for this method");
         }
     }

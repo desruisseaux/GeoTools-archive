@@ -15,6 +15,10 @@
  */
 package org.geotools.referencing.operation.calculator;
 
+// J2SE and extensions
+import java.util.Random;
+import javax.vecmath.MismatchedSizeException;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -23,7 +27,7 @@ import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.transform.GeocentricTranslation;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import java.util.Random;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
 public class BursaWolfParamCalculatorTest extends TestCase {
@@ -50,7 +54,7 @@ public class BursaWolfParamCalculatorTest extends TestCase {
     /**
      * Test {@link BursaWolfParamCalculator}.
      */
-    public void testBursaWolfParamCalculaterXrotation() {
+    public void testBursaWolfParamCalculaterXrotation() throws TransformException {
         Random random = new Random();
 
         double R = 6370000;
@@ -69,34 +73,27 @@ public class BursaWolfParamCalculatorTest extends TestCase {
         ptDst[1] = new GeneralDirectPosition(0, R, 0);
         ptDst[2] = new GeneralDirectPosition(0, 0, R);
 
-        try {
-            double[] points = new double[ptSrc.length * 3];
+        double[] points = new double[ptSrc.length * 3];
 
-            for (int i = 0; i < ptSrc.length; i++) {
-                points[i * 3] = ptSrc[i].getCoordinates()[0];
-                points[(i * 3) + 1] = ptSrc[i].getCoordinates()[1];
-                points[(i * 3) + 2] = ptSrc[i].getCoordinates()[2];
-            }
+        for (int i = 0; i < ptSrc.length; i++) {
+            points[i * 3] = ptSrc[i].getCoordinates()[0];
+            points[(i * 3) + 1] = ptSrc[i].getCoordinates()[1];
+            points[(i * 3) + 2] = ptSrc[i].getCoordinates()[2];
+        }
 
-            double[] dstPoints = new double[points.length];
+        double[] dstPoints = new double[points.length];
 
-            AbstractParamCalculator BWPT = new BursaWolfParamCalculator(ptSrc,
-                    ptDst);
-            BWPT.getMathTransform()
-                .transform(points, 0, dstPoints, 0, (points.length / 3));
+        MathTransformBuilder BWPT = new BursaWolfParamCalculator(ptSrc, ptDst);
+        BWPT.getMathTransform()
+            .transform(points, 0, dstPoints, 0, (points.length / 3));
 
-            for (int i = 0; i < ptDst.length; i++) {
-                assertEquals(dstPoints[i * 3], ptDst[i].getCoordinates()[0],
-                    1E-2);
-                assertEquals(dstPoints[(i * 3) + 1],
-                    ptDst[i].getCoordinates()[1], 1E-2);
-                assertEquals(dstPoints[(i * 3) + 2],
-                    ptDst[i].getCoordinates()[2], 1E-2);
-            }
-        } catch (CalculationException e) {
-            System.out.println(e.getMessage());
-        } catch (TransformException f) {
-            System.out.println(f.getMessage());
+        for (int i = 0; i < ptDst.length; i++) {
+            assertEquals(dstPoints[i * 3], ptDst[i].getCoordinates()[0],
+                1E-2);
+            assertEquals(dstPoints[(i * 3) + 1],
+                ptDst[i].getCoordinates()[1], 1E-2);
+            assertEquals(dstPoints[(i * 3) + 2],
+                ptDst[i].getCoordinates()[2], 1E-2);
         }
     }
 

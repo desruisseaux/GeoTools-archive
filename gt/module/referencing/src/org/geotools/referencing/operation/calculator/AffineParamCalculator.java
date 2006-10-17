@@ -15,8 +15,13 @@
  */
 package org.geotools.referencing.operation.calculator;
 
+// J2SE and extensions
+import javax.vecmath.MismatchedSizeException;
+
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 
 /**
@@ -55,12 +60,19 @@ public class AffineParamCalculator extends ProjectiveParamCalculator {
      * @param ptDst Set of destination points
      */
     public AffineParamCalculator(DirectPosition[] ptSrc, DirectPosition[] ptDst)
-        throws CalculationException, CRSException {
+        throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
         this.ptDst = ptDst;
         this.ptSrc = ptSrc;
 
         super.checkPoints(3, 2);
         super.checkCRS();
+    }
+
+    /**
+     * Returns the minimum number of points required by this builder, which is 3.
+     */
+    public int getMinimumPointCount() {
+        return 3;
     }
 
     /**

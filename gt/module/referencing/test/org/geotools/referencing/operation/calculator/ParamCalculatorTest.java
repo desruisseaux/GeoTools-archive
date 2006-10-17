@@ -15,7 +15,9 @@
  */
 package org.geotools.referencing.operation.calculator;
 
+// J2SE and extensions
 import java.util.Random;
+import javax.vecmath.MismatchedSizeException;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -31,6 +33,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 
 /**
@@ -107,7 +111,7 @@ public class ParamCalculatorTest extends TestCase {
     }
 
     public void testRubberCalculator()
-        throws CalculationException, TransformException, TriangulationException {
+        throws MismatchedSizeException, MismatchedDimensionException, TransformException, TriangulationException {
         DirectPosition[] ptSrc = generateCoords(7);
         DirectPosition[] ptDst = generateCoords(7);
 
@@ -117,7 +121,7 @@ public class ParamCalculatorTest extends TestCase {
                 new DirectPosition2D(crs, 0, 0),
                 new DirectPosition2D(crs, 0, 1000),
                 new DirectPosition2D(crs, 1000, 1000));
-        AbstractParamCalculator ppc = new RubberSheetCalculator(ptSrc, ptDst,
+        MathTransformBuilder ppc = new RubberSheetCalculator(ptSrc, ptDst,
                 quad);
         //System.out.println(ppc.getMMatrix());
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
@@ -125,30 +129,30 @@ public class ParamCalculatorTest extends TestCase {
     }
 
     public void testProjectiveCalculator()
-        throws CalculationException, TransformException {
+        throws MismatchedSizeException, MismatchedDimensionException, TransformException {
         DirectPosition[] ptSrc = generateCoords(4);
         DirectPosition[] ptDst = generateCoords(4);
-        AbstractParamCalculator ppc = new ProjectiveParamCalculator(ptSrc, ptDst);
+        MathTransformBuilder ppc = new ProjectiveParamCalculator(ptSrc, ptDst);
         //System.out.println(ppc.getMMatrix());
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
         assertTrue(ppc.getStandardDeviation() < 0.00001);
     }
 
     public void testAffineCalculator()
-        throws CalculationException, TransformException {
+        throws MismatchedSizeException, MismatchedDimensionException, TransformException {
         DirectPosition[] ptSrc = generateCoords(3);
         DirectPosition[] ptDst = generateCoords(3);
-        AbstractParamCalculator ppc = new AffineParamCalculator(ptSrc, ptDst);
+        MathTransformBuilder ppc = new AffineParamCalculator(ptSrc, ptDst);
         //System.out.println(ppc.getMMatrix());
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
         assertTrue(ppc.getStandardDeviation() < 0.00001);
     }
 
     public void testSimilarCalculator()
-        throws CalculationException, TransformException {
+        throws MismatchedSizeException, MismatchedDimensionException, TransformException {
         DirectPosition[] ptSrc = generateCoords(2);
         DirectPosition[] ptDst = generateCoords(2);
-        AbstractParamCalculator ppc = new SimilarParamCalculator(ptSrc, ptDst);
+        MathTransformBuilder ppc = new SimilarParamCalculator(ptSrc, ptDst);
         //System.out.println(ppc.getMMatrix());
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
         assertTrue(ppc.getStandardDeviation() < 0.00001);
@@ -161,16 +165,16 @@ public class ParamCalculatorTest extends TestCase {
         DirectPosition[] ptDst = generateCoords(3);       
           try {
             new SimilarParamCalculator(ptSrc, ptDst);
-            fail("Expected CalculationException");
-        } catch (CalculationException e) {
+            fail("Expected MismatchedSizeException");
+        } catch (MismatchedSizeException e) {
         }
         // The exception should be thrown when the number of points is less then neccesary
         ptSrc = generateCoords(2);
         ptDst = generateCoords(2);       
           try {
             new AffineParamCalculator(ptSrc, ptDst);
-            fail("Expected CalculationException");
-        } catch (CalculationException e) {
+            fail("Expected MismatchedSizeException");
+        } catch (MismatchedSizeException e) {
         }
         
         // The exception should be thrown when the CRS of all points is not the same
@@ -179,8 +183,8 @@ public class ParamCalculatorTest extends TestCase {
         ptDst = generateCoords(4);       
           try {
             new AffineParamCalculator(ptSrc, ptDst);
-            fail("Expected CRSException");
-        } catch (CRSException e) {
+            fail("Expected MismatchedReferenceSystemException");
+        } catch (MismatchedReferenceSystemException e) {
         }
         
         //The exception should be thrown when the CRS is not null or DefaultEngineeringCRS.CARTESIAN_2D
@@ -188,8 +192,8 @@ public class ParamCalculatorTest extends TestCase {
         ptDst = generateCoords(4);       
           try {
             new AffineParamCalculator(ptSrc, ptDst);
-            fail("Expected CRSException");
-        } catch (CRSException e) {
+            fail("Expected MismatchedReferenceSystemException");
+        } catch (MismatchedReferenceSystemException e) {
         }
     }
 }
