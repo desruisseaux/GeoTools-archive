@@ -251,7 +251,7 @@
     <imports>
       <grouping>
         <defaultDepth>0</defaultDepth>
-        <packages>*:0|gnu:2|java:2|javax:2</packages>
+        <packages>*:0|java:1|javax:1|gnu:1|com.vividsolutions:3|org.opengis:2|org.geotools:2</packages>
       </grouping>
       <policy>disabled</policy>
       <sort>true</sort>
@@ -407,7 +407,7 @@
       <general>
         <beforeOperator>true</beforeOperator>
         <enable>true</enable>
-        <lineLength>80</lineLength>
+        <lineLength>100</lineLength>
       </general>
       <ondemand>
         <after>
