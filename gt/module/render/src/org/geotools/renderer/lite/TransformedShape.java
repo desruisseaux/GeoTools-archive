@@ -198,7 +198,7 @@ public final class TransformedShape extends AffineTransform implements Shape {
 	 * Returns a high precision and more accurate bounding box of the
 	 * <code>Shape</code> than the <code>getBounds</code> method.
 	 * 
-	 * @todo: REVISIT: tranform currently results in a new rectangle being
+	 * @todo REVISIT: tranform currently results in a new rectangle being
 	 *        created, is this a memory overhead?
 	 */
 	public Rectangle2D getBounds2D() {

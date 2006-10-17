@@ -188,7 +188,7 @@ public interface GraphIterator {
    * used by the iterator.
    *  
    * @param graph The graph being whose components are being iterated over.
-   * @TODO: DOCUMENT ME! 
+   * @todo DOCUMENT ME! 
    */
   public void init(Graph graph, GraphTraversal traversal);  
   
@@ -198,7 +198,7 @@ public interface GraphIterator {
    *  
    * @return The next component in the iteration, or null if iteration is 
    * complete.
-   * @TODO: DOCUMENT ME!
+   * @todo DOCUMENT ME!
    * 
    */
   public Graphable next(GraphTraversal traversal);
@@ -208,7 +208,7 @@ public interface GraphIterator {
    * component in the traversal.
    * 
    * @param current The current component of the traversal.
-   * @TODO: DOCUMENT ME!
+   * @todo DOCUMENT ME!
    */
   public void cont(Graphable current, GraphTraversal traversal);
   
@@ -216,7 +216,7 @@ public interface GraphIterator {
    * Signals the iterator to kill the branch at the current component.
    * 
    * @param current The current component of the traversal.
-   * @TODO: DOCUMENT ME!
+   * @todo DOCUMENT ME!
    */
   public void killBranch(Graphable current, GraphTraversal traversal);
 }

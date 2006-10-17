@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * Geomedia data store implementation
  * 
- * @todo: really fix and test this datastore, for the moment it's just a way
+ * @todo really fix and test this datastore, for the moment it's just a way
  * to make it compile
  *
  * @author Julian J. Ray

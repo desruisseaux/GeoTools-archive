@@ -74,7 +74,7 @@ public class EnvironmentVariableResolver {
     }
     /**
      * Test supplied filter to see if it contains any EnvironmentVariable expressions
-     * @todo: supply implementation, currently always returns true!
+     * @todo supply implementation, currently always returns true!
      */
     public boolean needsResolving(Filter f){
         final java.util.List parts = new java.util.ArrayList();

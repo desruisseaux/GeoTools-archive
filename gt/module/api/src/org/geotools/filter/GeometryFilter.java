@@ -45,7 +45,7 @@ import org.opengis.filter.spatial.BinarySpatialOperator;
  * @source $URL$
  * @version $Id$
  *
- * @todo: REVISIT: make this class (and all filters) immutable, implement
+ * @todo REVISIT: make this class (and all filters) immutable, implement
  *       cloneable and return new filters when calling addLeftGeometry and
  *       addRightG Issues to think through: would be cleaner immutability to
  *       have constructor called with left and right Geometries, but this does
