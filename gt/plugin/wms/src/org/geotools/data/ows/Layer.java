@@ -16,6 +16,8 @@
 package org.geotools.data.ows;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +29,7 @@ import java.util.WeakHashMap;
 
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -379,7 +382,11 @@ public class Layer implements Comparable {
 			if( result!=null )
 				return result;
 		}
-		for (final Iterator i=crs.getIdentifiers().iterator(); i.hasNext();) {
+		Collection identifiers = crs.getIdentifiers();
+        if( crs==DefaultGeographicCRS.WGS84 || crs==DefaultGeographicCRS.WGS84_3D ){
+            identifiers=Arrays.asList(new String[]{"EPSG:4326"}); //$NON-NLS-1$
+        }
+        for (final Iterator i=identifiers.iterator(); i.hasNext();) {
             String epsgCode = i.next().toString();
 
             CRSEnvelope tempBBox = null;
