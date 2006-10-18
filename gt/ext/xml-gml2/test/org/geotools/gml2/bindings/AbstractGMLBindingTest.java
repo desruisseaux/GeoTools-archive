@@ -15,10 +15,6 @@
  */
 package org.geotools.gml2.bindings;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import junit.framework.TestCase;
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
@@ -27,6 +23,15 @@ import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
+import java.util.Iterator;
+import java.util.List;
+import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
@@ -44,11 +49,6 @@ import org.geotools.xml.Schemas;
 import org.geotools.xml.impl.AttributeImpl;
 import org.geotools.xml.impl.ElementImpl;
 import org.geotools.xml.impl.NodeImpl;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.defaults.DefaultPicoContainer;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 
 public class AbstractGMLBindingTest extends TestCase {
@@ -58,8 +58,7 @@ public class AbstractGMLBindingTest extends TestCase {
     AttributeTypeFactory attFactory;
 
     protected void setUp() throws Exception {
-        String loc = GMLSchemaLocationResolver.class.getResource("feature.xsd")
-                                                    .toString();
+        String loc = GMLSchemaLocationResolver.class.getResource("feature.xsd").toString();
 
         schema = Schemas.parse(loc, null,
                 new XSDSchemaLocationResolver[] { new GMLSchemaLocationResolver() });
@@ -79,9 +78,8 @@ public class AbstractGMLBindingTest extends TestCase {
         return (Binding) container.getComponentInstance(type);
     }
 
-    Node createNode(InstanceComponent instance, ElementInstance[] elements,
-        Object[] elementValues, AttributeInstance[] attributes,
-        Object[] attValues) {
+    Node createNode(InstanceComponent instance, ElementInstance[] elements, Object[] elementValues,
+        AttributeInstance[] attributes, Object[] attValues) {
         NodeImpl node = new NodeImpl(instance);
 
         if ((elements != null) && (elements.length > 0)) {
@@ -99,14 +97,11 @@ public class AbstractGMLBindingTest extends TestCase {
         return node;
     }
 
-    AttributeInstance createAtribute(String namespace, String name, QName type,
-        String text) {
-        XSDAttributeDeclaration declaration = XSDFactory.eINSTANCE
-            .createXSDAttributeDeclaration();
+    AttributeInstance createAtribute(String namespace, String name, QName type, String text) {
+        XSDAttributeDeclaration declaration = XSDFactory.eINSTANCE.createXSDAttributeDeclaration();
         declaration.setName(name);
         declaration.setTargetNamespace(namespace);
-        declaration.setTypeDefinition((XSDSimpleTypeDefinition) findTypeDefinition(
-                schema, type));
+        declaration.setTypeDefinition((XSDSimpleTypeDefinition) findTypeDefinition(schema, type));
 
         AttributeInstance attribute = new AttributeImpl(declaration);
         attribute.setName(name);
@@ -116,10 +111,8 @@ public class AbstractGMLBindingTest extends TestCase {
         return attribute;
     }
 
-    ElementInstance createElement(String namespace, String name, QName type,
-        String text) {
-        XSDElementDeclaration declaration = XSDFactory.eINSTANCE
-            .createXSDElementDeclaration();
+    ElementInstance createElement(String namespace, String name, QName type, String text) {
+        XSDElementDeclaration declaration = XSDFactory.eINSTANCE.createXSDElementDeclaration();
         declaration.setName(name);
         declaration.setTargetNamespace(namespace);
         declaration.setTypeDefinition(findTypeDefinition(schema, type));
@@ -138,8 +131,7 @@ public class AbstractGMLBindingTest extends TestCase {
     }
 
     public CoordinateSequence createCoordinateSequence(Coordinate[] c) {
-        CoordinateSequenceFactory csFactory = CoordinateArraySequenceFactory
-            .instance();
+        CoordinateSequenceFactory csFactory = CoordinateArraySequenceFactory.instance();
 
         return csFactory.create(c);
     }
@@ -148,8 +140,7 @@ public class AbstractGMLBindingTest extends TestCase {
         ftBuilder.setName("test");
 
         for (int i = 0; i < names.length; i++) {
-            ftBuilder.addType(attFactory.newAttributeType(names[i],
-                    values[i].getClass()));
+            ftBuilder.addType(attFactory.newAttributeType(names[i], values[i].getClass()));
         }
 
         try {

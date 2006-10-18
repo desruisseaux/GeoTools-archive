@@ -15,6 +15,10 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -22,10 +26,6 @@ import org.geotools.xml.*;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -97,8 +97,7 @@ public class GMLMultiLineStringTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**

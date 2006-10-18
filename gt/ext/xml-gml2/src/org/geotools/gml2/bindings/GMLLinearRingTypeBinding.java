@@ -15,6 +15,11 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.util.List;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -22,11 +27,6 @@ import org.geotools.xml.*;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -64,8 +64,7 @@ public class GMLLinearRingTypeBinding implements ComplexBinding {
     CoordinateSequenceFactory csFactory;
     GeometryFactory gFactory;
 
-    public GMLLinearRingTypeBinding(CoordinateSequenceFactory csFactory,
-        GeometryFactory gFactory) {
+    public GMLLinearRingTypeBinding(CoordinateSequenceFactory csFactory, GeometryFactory gFactory) {
         this.csFactory = csFactory;
         this.gFactory = gFactory;
     }
@@ -103,8 +102,7 @@ public class GMLLinearRingTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -118,8 +116,7 @@ public class GMLLinearRingTypeBinding implements ComplexBinding {
         List coordinates = node.getChildren("coord");
 
         if (!coordinates.isEmpty() && (coordinates.size() < 4)) {
-            throw new RuntimeException(
-                "LinearRing must have at least 4 coordinates");
+            throw new RuntimeException("LinearRing must have at least 4 coordinates");
         }
 
         if (!coordinates.isEmpty()) {
@@ -127,8 +124,7 @@ public class GMLLinearRingTypeBinding implements ComplexBinding {
             CoordinateSequence seq = (CoordinateSequence) cnode.getValue();
             int dimension = GMLUtil.getDimension(seq);
 
-            CoordinateSequence lineSeq = csFactory.create(coordinates.size(),
-                    dimension);
+            CoordinateSequence lineSeq = csFactory.create(coordinates.size(), dimension);
 
             for (int i = 0; i < coordinates.size(); i++) {
                 cnode = (Node) coordinates.get(i);
@@ -149,8 +145,7 @@ public class GMLLinearRingTypeBinding implements ComplexBinding {
             return gFactory.createLinearRing(lineSeq);
         }
 
-        throw new RuntimeException(
-            "Could not find coordinates to build linestring");
+        throw new RuntimeException("Could not find coordinates to build linestring");
     }
 
     /**

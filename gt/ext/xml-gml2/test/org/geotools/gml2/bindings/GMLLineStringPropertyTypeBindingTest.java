@@ -31,8 +31,7 @@ public class GMLLineStringPropertyTypeBindingTest extends AbstractGMLBindingTest
 
         association = createElement(GML.NAMESPACE, "myLineStringProperty",
                 GML.LINESTRINGPROPERTYTYPE, null);
-        geometry = createElement(GML.NAMESPACE, "myLineString",
-                GML.LINESTRINGTYPE, null);
+        geometry = createElement(GML.NAMESPACE, "myLineString", GML.LINESTRINGTYPE, null);
     }
 
     public void testWithGeometry() throws Exception {
@@ -40,14 +39,13 @@ public class GMLLineStringPropertyTypeBindingTest extends AbstractGMLBindingTest
                 new Object[] {
                     new GeometryFactory().createLinearRing(
                         new Coordinate[] {
-                            new Coordinate(0, 0), new Coordinate(1, 1),
-                            new Coordinate(2, 2), new Coordinate(0, 0),
+                            new Coordinate(0, 0), new Coordinate(1, 1), new Coordinate(2, 2),
+                            new Coordinate(0, 0),
                         })
                 }, null, null);
         GMLGeometryAssociationTypeBinding s = (GMLGeometryAssociationTypeBinding) getBinding(GML.GEOMETRYASSOCIATIONTYPE);
         GMLLineStringPropertyTypeBinding s1 = (GMLLineStringPropertyTypeBinding) getBinding(GML.LINESTRINGPROPERTYTYPE);
-        LineString p = (LineString) s1.parse(association, node,
-                s.parse(association, node, null));
+        LineString p = (LineString) s1.parse(association, node, s.parse(association, node, null));
         assertNotNull(p);
     }
 }

@@ -15,17 +15,17 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.util.List;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.xml.*;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -91,8 +91,7 @@ public class GMLBoxTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -116,8 +115,7 @@ public class GMLBoxTypeBinding implements ComplexBinding {
             CoordinateSequence c2 = (CoordinateSequence) n2.getValue();
 
             return new Envelope(c1.getOrdinate(0, CoordinateSequence.X),
-                c2.getOrdinate(0, CoordinateSequence.X),
-                c1.getOrdinate(0, CoordinateSequence.Y),
+                c2.getOrdinate(0, CoordinateSequence.X), c1.getOrdinate(0, CoordinateSequence.Y),
                 c2.getOrdinate(0, CoordinateSequence.Y));
         }
 
@@ -126,17 +124,14 @@ public class GMLBoxTypeBinding implements ComplexBinding {
         }
 
         if (node.getChild("coordinates") != null) {
-            CoordinateSequence cs = (CoordinateSequence) node.getChild(
-                    "coordinates").getValue();
+            CoordinateSequence cs = (CoordinateSequence) node.getChild("coordinates").getValue();
 
             if (cs.size() != 2) {
-                throw new RuntimeException(
-                    "Envelope can have only two coordinates");
+                throw new RuntimeException("Envelope can have only two coordinates");
             }
 
             return new Envelope(cs.getOrdinate(0, CoordinateSequence.X),
-                cs.getOrdinate(1, CoordinateSequence.X),
-                cs.getOrdinate(0, CoordinateSequence.Y),
+                cs.getOrdinate(1, CoordinateSequence.X), cs.getOrdinate(0, CoordinateSequence.Y),
                 cs.getOrdinate(1, CoordinateSequence.Y));
         }
 

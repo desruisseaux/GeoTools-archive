@@ -73,8 +73,7 @@ public interface GML {
             "MultiPolygonPropertyType");
 
     /** @generated */
-    public static final QName NULLTYPE = new QName("http://www.opengis.net/gml",
-            "NullType");
+    public static final QName NULLTYPE = new QName("http://www.opengis.net/gml", "NullType");
 
     /** @generated */
     public static final QName POINTPROPERTYTYPE = new QName("http://www.opengis.net/gml",
@@ -93,16 +92,14 @@ public interface GML {
             "AbstractGeometryType");
 
     /** @generated */
-    public static final QName BOXTYPE = new QName("http://www.opengis.net/gml",
-            "BoxType");
+    public static final QName BOXTYPE = new QName("http://www.opengis.net/gml", "BoxType");
 
     /** @generated */
     public static final QName COORDINATESTYPE = new QName("http://www.opengis.net/gml",
             "CoordinatesType");
 
     /** @generated */
-    public static final QName COORDTYPE = new QName("http://www.opengis.net/gml",
-            "CoordType");
+    public static final QName COORDTYPE = new QName("http://www.opengis.net/gml", "CoordType");
 
     /** @generated */
     public static final QName GEOMETRYASSOCIATIONTYPE = new QName("http://www.opengis.net/gml",
@@ -145,14 +142,12 @@ public interface GML {
             "PointMemberType");
 
     /** @generated */
-    public static final QName POINTTYPE = new QName("http://www.opengis.net/gml",
-            "PointType");
+    public static final QName POINTTYPE = new QName("http://www.opengis.net/gml", "PointType");
 
     /** @generated */
     public static final QName POLYGONMEMBERTYPE = new QName("http://www.opengis.net/gml",
             "PolygonMemberType");
 
     /** @generated */
-    public static final QName POLYGONTYPE = new QName("http://www.opengis.net/gml",
-            "PolygonType");
+    public static final QName POLYGONTYPE = new QName("http://www.opengis.net/gml", "PolygonType");
 }

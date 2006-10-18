@@ -29,25 +29,23 @@ public class GMLPolygonPropertyTypeBindingTest extends AbstractGMLBindingTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        association = createElement(GML.NAMESPACE, "myPolygonProperty",
-                GML.POLYGONPROPERTYTYPE, null);
-        geometry = createElement(GML.NAMESPACE, "myPolygon", GML.POLYGONTYPE,
+        association = createElement(GML.NAMESPACE, "myPolygonProperty", GML.POLYGONPROPERTYTYPE,
                 null);
+        geometry = createElement(GML.NAMESPACE, "myPolygon", GML.POLYGONTYPE, null);
     }
 
     public void testWithGeometry() throws Exception {
         Node node = createNode(association, new ElementInstance[] { geometry },
                 new Object[] {
-                    new GeometryFactory().createPolygon(new GeometryFactory()
-                        .createLinearRing(new Coordinate[] {
-                                new Coordinate(0, 0), new Coordinate(1, 1),
-                                new Coordinate(2, 2), new Coordinate(0, 0),
+                    new GeometryFactory().createPolygon(new GeometryFactory().createLinearRing(
+                            new Coordinate[] {
+                                new Coordinate(0, 0), new Coordinate(1, 1), new Coordinate(2, 2),
+                                new Coordinate(0, 0),
                             }), null)
                 }, null, null);
         GMLGeometryAssociationTypeBinding s = (GMLGeometryAssociationTypeBinding) getBinding(GML.GEOMETRYASSOCIATIONTYPE);
         GMLPolygonPropertyTypeBinding s1 = (GMLPolygonPropertyTypeBinding) getBinding(GML.POLYGONPROPERTYTYPE);
-        Polygon p = (Polygon) s1.parse(association, node,
-                s.parse(association, node, null));
+        Polygon p = (Polygon) s1.parse(association, node, s.parse(association, node, null));
         assertNotNull(p);
     }
 }

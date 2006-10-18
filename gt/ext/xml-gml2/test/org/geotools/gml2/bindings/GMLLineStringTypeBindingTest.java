@@ -15,14 +15,14 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.defaults.DefaultPicoContainer;
 
 
 public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {
@@ -36,18 +36,15 @@ public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        line = createElement(GML.NAMESPACE, "myLineString", GML.LINESTRINGTYPE,
-                null);
+        line = createElement(GML.NAMESPACE, "myLineString", GML.LINESTRINGTYPE, null);
         coord1 = createElement(GML.NAMESPACE, "coord", GML.COORDTYPE, null);
         coord2 = createElement(GML.NAMESPACE, "coord", GML.COORDTYPE, null);
         coord3 = createElement(GML.NAMESPACE, "coord", GML.COORDTYPE, null);
 
-        coords = createElement(GML.NAMESPACE, "coordinates",
-                GML.COORDINATESTYPE, null);
+        coords = createElement(GML.NAMESPACE, "coordinates", GML.COORDINATESTYPE, null);
 
         container = new DefaultPicoContainer();
-        container.registerComponentInstance(CoordinateArraySequenceFactory
-            .instance());
+        container.registerComponentInstance(CoordinateArraySequenceFactory.instance());
         container.registerComponentImplementation(GeometryFactory.class);
         container.registerComponentImplementation(GMLLineStringTypeBinding.class);
     }
@@ -59,8 +56,7 @@ public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {
                     createCoordinateSequence(new Coordinate(3, 4))
                 }, null, null);
 
-        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container
-            .getComponentInstanceOfType(GMLLineStringTypeBinding.class);
+        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container.getComponentInstanceOfType(GMLLineStringTypeBinding.class);
         LineString lineString = (LineString) s.parse(line, node, null);
 
         assertNotNull(lineString);
@@ -73,11 +69,9 @@ public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {
 
     public void testCoordSingle() throws Exception {
         Node node = createNode(line, new ElementInstance[] { coord1 },
-                new Object[] { createCoordinateSequence(new Coordinate(1, 2)), },
-                null, null);
+                new Object[] { createCoordinateSequence(new Coordinate(1, 2)), }, null, null);
 
-        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container
-            .getComponentInstanceOfType(GMLLineStringTypeBinding.class);
+        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container.getComponentInstanceOfType(GMLLineStringTypeBinding.class);
 
         try {
             LineString lineString = (LineString) s.parse(line, node, null);
@@ -88,16 +82,14 @@ public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {
     }
 
     public void testCoordMulti() throws Exception {
-        Node node = createNode(line,
-                new ElementInstance[] { coord1, coord2, coord3 },
+        Node node = createNode(line, new ElementInstance[] { coord1, coord2, coord3 },
                 new Object[] {
                     createCoordinateSequence(new Coordinate(1, 2)),
                     createCoordinateSequence(new Coordinate(3, 4)),
                     createCoordinateSequence(new Coordinate(5, 6))
                 }, null, null);
 
-        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container
-            .getComponentInstanceOfType(GMLLineStringTypeBinding.class);
+        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container.getComponentInstanceOfType(GMLLineStringTypeBinding.class);
         LineString lineString = (LineString) s.parse(line, node, null);
 
         assertNotNull(lineString);
@@ -114,13 +106,10 @@ public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {
         Node node = createNode(line, new ElementInstance[] { coords },
                 new Object[] {
                     createCoordinateSequence(
-                        new Coordinate[] {
-                            new Coordinate(1, 2), new Coordinate(3, 4)
-                        }),
+                        new Coordinate[] { new Coordinate(1, 2), new Coordinate(3, 4) }),
                 }, null, null);
 
-        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container
-            .getComponentInstanceOfType(GMLLineStringTypeBinding.class);
+        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container.getComponentInstanceOfType(GMLLineStringTypeBinding.class);
 
         LineString lineString = (LineString) s.parse(line, node, null);
         assertNotNull(lineString);
@@ -133,13 +122,10 @@ public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {
 
     public void testCoordinatesSingle() throws Exception {
         Node node = createNode(line, new ElementInstance[] { coords },
-                new Object[] {
-                    createCoordinateSequence(
-                        new Coordinate[] { new Coordinate(1, 2) }),
-                }, null, null);
+                new Object[] { createCoordinateSequence(new Coordinate[] { new Coordinate(1, 2) }), },
+                null, null);
 
-        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container
-            .getComponentInstanceOfType(GMLLineStringTypeBinding.class);
+        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container.getComponentInstanceOfType(GMLLineStringTypeBinding.class);
 
         try {
             LineString lineString = (LineString) s.parse(line, node, null);
@@ -154,13 +140,11 @@ public class GMLLineStringTypeBindingTest extends AbstractGMLBindingTest {
                 new Object[] {
                     createCoordinateSequence(
                         new Coordinate[] {
-                            new Coordinate(1, 2), new Coordinate(3, 4),
-                            new Coordinate(5, 6)
+                            new Coordinate(1, 2), new Coordinate(3, 4), new Coordinate(5, 6)
                         }),
                 }, null, null);
 
-        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container
-            .getComponentInstanceOfType(GMLLineStringTypeBinding.class);
+        GMLLineStringTypeBinding s = (GMLLineStringTypeBinding) container.getComponentInstanceOfType(GMLLineStringTypeBinding.class);
 
         LineString lineString = (LineString) s.parse(line, node, null);
         assertNotNull(lineString);

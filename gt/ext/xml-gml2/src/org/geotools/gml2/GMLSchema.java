@@ -87,8 +87,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NULLTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("NullType", java.lang.Object.class);
+    public static final AttributeType NULLTYPE_TYPE = AttributeTypeFactory.newAttributeType("NullType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -149,8 +149,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOXTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("BoxType", Envelope.class);
+    public static final AttributeType BOXTYPE_TYPE = AttributeTypeFactory.newAttributeType("BoxType",
+            Envelope.class);
 
     /**
      * <p>
@@ -180,8 +180,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIPOLYGONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiPolygonType", MultiPolygon.class);
+    public static final AttributeType MULTIPOLYGONTYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiPolygonType",
+            MultiPolygon.class);
 
     /**
      * <p>
@@ -238,8 +238,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POINTMEMBERTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PointMemberType", Point.class);
+    public static final AttributeType POINTMEMBERTYPE_TYPE = AttributeTypeFactory.newAttributeType("PointMemberType",
+            Point.class);
 
     /**
      * <p>
@@ -265,8 +265,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOUNDINGSHAPETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("BoundingShapeType", java.lang.Object.class);
+    public static final AttributeType BOUNDINGSHAPETYPE_TYPE = AttributeTypeFactory.newAttributeType("BoundingShapeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -296,8 +296,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIPOINTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiPointType", MultiPoint.class);
+    public static final AttributeType MULTIPOINTTYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiPointType",
+            MultiPoint.class);
 
     /**
      * <p>
@@ -358,8 +358,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POLYGONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PolygonType", Polygon.class);
+    public static final AttributeType POLYGONTYPE_TYPE = AttributeTypeFactory.newAttributeType("PolygonType",
+            Polygon.class);
 
     /**
      * <p>
@@ -418,8 +418,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POLYGONMEMBERTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PolygonMemberType", Polygon.class);
+    public static final AttributeType POLYGONMEMBERTYPE_TYPE = AttributeTypeFactory.newAttributeType("PolygonMemberType",
+            Polygon.class);
 
     /**
      * <p>
@@ -447,8 +447,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTFEATURECOLLECTIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractFeatureCollectionType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractFeatureCollectionType", java.lang.Object.class);
 
     /**
      * <p>
@@ -532,8 +531,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COORDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CoordType", java.lang.Object.class);
+    public static final AttributeType COORDTYPE_TYPE = AttributeTypeFactory.newAttributeType("CoordType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -596,8 +595,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTFEATURECOLLECTIONBASETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractFeatureCollectionBaseType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractFeatureCollectionBaseType", java.lang.Object.class);
 
     /**
      * <p>
@@ -722,8 +720,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COORDINATESTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CoordinatesType", java.lang.Object.class);
+    public static final AttributeType COORDINATESTYPE_TYPE = AttributeTypeFactory.newAttributeType("CoordinatesType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -754,8 +752,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINESTRINGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LineStringType", LineString.class);
+    public static final AttributeType LINESTRINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("LineStringType",
+            LineString.class);
 
     /**
      * <p>
@@ -840,8 +838,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POINTPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PointPropertyType", Point.class);
+    public static final AttributeType POINTPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("PointPropertyType",
+            Point.class);
 
     /**
      * <p>
@@ -898,8 +896,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTGEOMETRYCOLLECTIONBASETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGeometryCollectionBaseType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractGeometryCollectionBaseType", java.lang.Object.class);
 
     /**
      * <p>
@@ -929,8 +926,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POINTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PointType", Point.class);
+    public static final AttributeType POINTTYPE_TYPE = AttributeTypeFactory.newAttributeType("PointType",
+            Point.class);
 
     /**
      * <p>
@@ -993,8 +990,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINEARRINGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LinearRingType", LinearRing.class);
+    public static final AttributeType LINEARRINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("LinearRingType",
+            LinearRing.class);
 
     public GMLSchema() {
         super("http://www.opengis.net/gml");
@@ -1005,62 +1002,46 @@ public class GMLSchema extends SchemaImpl {
         put(new Name("http://www.opengis.net/gml", "LineStringPropertyType"),
             LINESTRINGPROPERTYTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "BoxType"), BOXTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "MultiPolygonType"),
-            MULTIPOLYGONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiPolygonType"), MULTIPOLYGONTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "MultiPolygonPropertyType"),
             MULTIPOLYGONPROPERTYTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "PointMemberType"),
-            POINTMEMBERTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "BoundingShapeType"),
-            BOUNDINGSHAPETYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "MultiPointType"),
-            MULTIPOINTTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PointMemberType"), POINTMEMBERTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "BoundingShapeType"), BOUNDINGSHAPETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiPointType"), MULTIPOINTTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "MultiPointPropertyType"),
             MULTIPOINTPROPERTYTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "PolygonType"),
-            POLYGONTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PolygonType"), POLYGONTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "FeatureAssociationType"),
             FEATUREASSOCIATIONTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "PolygonMemberType"),
-            POLYGONMEMBERTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml",
-                "AbstractFeatureCollectionType"),
+        put(new Name("http://www.opengis.net/gml", "PolygonMemberType"), POLYGONMEMBERTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractFeatureCollectionType"),
             ABSTRACTFEATURECOLLECTIONTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "GeometryPropertyType"),
             GEOMETRYPROPERTYTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "MultiLineStringPropertyType"),
             MULTILINESTRINGPROPERTYTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "CoordType"), COORDTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "AbstractFeatureType"),
-            ABSTRACTFEATURETYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml",
-                "AbstractFeatureCollectionBaseType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractFeatureType"), ABSTRACTFEATURETYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "AbstractFeatureCollectionBaseType"),
             ABSTRACTFEATURECOLLECTIONBASETYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "MultiLineStringType"),
-            MULTILINESTRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "MultiLineStringType"), MULTILINESTRINGTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "GeometryAssociationType"),
             GEOMETRYASSOCIATIONTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "GeometryCollectionType"),
             GEOMETRYCOLLECTIONTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "CoordinatesType"),
-            COORDINATESTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "LineStringType"),
-            LINESTRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "CoordinatesType"), COORDINATESTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LineStringType"), LINESTRINGTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "LineStringMemberType"),
             LINESTRINGMEMBERTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "MultiGeometryPropertyType"),
             MULTIGEOMETRYPROPERTYTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "PointPropertyType"),
-            POINTPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PointPropertyType"), POINTPROPERTYTYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "AbstractGeometryType"),
             ABSTRACTGEOMETRYTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml",
-                "AbstractGeometryCollectionBaseType"),
+        put(new Name("http://www.opengis.net/gml", "AbstractGeometryCollectionBaseType"),
             ABSTRACTGEOMETRYCOLLECTIONBASETYPE_TYPE);
         put(new Name("http://www.opengis.net/gml", "PointType"), POINTTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "PolygonPropertyType"),
-            POLYGONPROPERTYTYPE_TYPE);
-        put(new Name("http://www.opengis.net/gml", "LinearRingType"),
-            LINEARRINGTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "PolygonPropertyType"), POLYGONPROPERTYTYPE_TYPE);
+        put(new Name("http://www.opengis.net/gml", "LinearRingType"), LINEARRINGTYPE_TYPE);
     }
 }

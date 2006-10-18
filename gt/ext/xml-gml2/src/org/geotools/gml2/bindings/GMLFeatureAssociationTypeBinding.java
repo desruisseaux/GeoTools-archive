@@ -15,16 +15,16 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
-import org.opengis.feature.Feature;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.util.Iterator;
 import javax.xml.namespace.QName;
+import org.opengis.feature.Feature;
+import org.geotools.xml.*;
+import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -92,8 +92,7 @@ public class GMLFeatureAssociationTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -114,8 +113,7 @@ public class GMLFeatureAssociationTypeBinding implements ComplexBinding {
 
         //TODO: xlink and remoteSchema attributes, hard to do because of streaming
         //TODO: dont throw an exception here
-        throw new RuntimeException(
-            "Could not find feature in feature association");
+        throw new RuntimeException("Could not find feature in feature association");
     }
 
     /**

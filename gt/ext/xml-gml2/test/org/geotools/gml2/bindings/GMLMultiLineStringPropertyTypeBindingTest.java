@@ -15,17 +15,16 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.defaults.DefaultPicoContainer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.defaults.DefaultPicoContainer;
 
 
-public class GMLMultiLineStringPropertyTypeBindingTest
-    extends AbstractGMLBindingTest {
+public class GMLMultiLineStringPropertyTypeBindingTest extends AbstractGMLBindingTest {
     ElementInstance association;
     ElementInstance geometry;
 
@@ -34,8 +33,7 @@ public class GMLMultiLineStringPropertyTypeBindingTest
 
         association = createElement(GML.NAMESPACE, "myMultiLineStringProperty",
                 GML.MULTILINESTRINGPROPERTYTYPE, null);
-        geometry = createElement(GML.NAMESPACE, "myMultiLineString",
-                GML.MULTILINESTRINGTYPE, null);
+        geometry = createElement(GML.NAMESPACE, "myMultiLineString", GML.MULTILINESTRINGTYPE, null);
 
         container = new DefaultPicoContainer();
         container.registerComponentImplementation(GeometryFactory.class);
@@ -53,8 +51,7 @@ public class GMLMultiLineStringPropertyTypeBindingTest
 
         Node node = createNode(association, new ElementInstance[] { geometry },
                 new Object[] {
-                    new GeometryFactory().createMultiLineString(
-                        new LineString[] { p1, p2 })
+                    new GeometryFactory().createMultiLineString(new LineString[] { p1, p2 })
                 }, null, null);
 
         GMLGeometryAssociationTypeBinding s = (GMLGeometryAssociationTypeBinding) container

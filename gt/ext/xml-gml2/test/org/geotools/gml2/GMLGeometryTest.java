@@ -15,14 +15,14 @@
  */
 package org.geotools.gml2;
 
+import junit.framework.TestCase;
+import javax.xml.parsers.SAXParserFactory;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import junit.framework.TestCase;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
-import javax.xml.parsers.SAXParserFactory;
 
 
 public class GMLGeometryTest extends TestCase {
@@ -35,8 +35,7 @@ public class GMLGeometryTest extends TestCase {
 
         Configuration configuration = new GMLConfiguration();
 
-        parser = new Parser(configuration,
-                getClass().getResourceAsStream("geometry.xml"));
+        parser = new Parser(configuration, getClass().getResourceAsStream("geometry.xml"));
     }
 
     public void test() throws Exception {

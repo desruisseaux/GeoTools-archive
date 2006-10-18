@@ -15,17 +15,17 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.util.List;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import org.geotools.xml.*;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -96,8 +96,7 @@ public class GMLPolygonTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -108,8 +107,7 @@ public class GMLPolygonTypeBinding implements ComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        LinearRing shell = (LinearRing) node.getChild("outerBoundaryIs")
-                                            .getValue();
+        LinearRing shell = (LinearRing) node.getChild("outerBoundaryIs").getValue();
 
         List innerRings = node.getChildren("innerBoundaryIs");
         LinearRing[] holes = new LinearRing[innerRings.size()];

@@ -15,13 +15,13 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.defaults.DefaultPicoContainer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.defaults.DefaultPicoContainer;
 
 
 public class GMLMultiPointTypeBindingTest extends AbstractGMLBindingTest {
@@ -33,12 +33,9 @@ public class GMLMultiPointTypeBindingTest extends AbstractGMLBindingTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        point1 = createElement(GML.NAMESPACE, "myPoint", GML.POINTMEMBERTYPE,
-                null);
-        point2 = createElement(GML.NAMESPACE, "myPoint", GML.POINTMEMBERTYPE,
-                null);
-        mp = createElement(GML.NAMESPACE, "myMultiPoint", GML.MULTIPOINTTYPE,
-                null);
+        point1 = createElement(GML.NAMESPACE, "myPoint", GML.POINTMEMBERTYPE, null);
+        point2 = createElement(GML.NAMESPACE, "myPoint", GML.POINTMEMBERTYPE, null);
+        mp = createElement(GML.NAMESPACE, "myMultiPoint", GML.MULTIPOINTTYPE, null);
 
         container = new DefaultPicoContainer();
         container.registerComponentImplementation(GeometryFactory.class);
@@ -58,8 +55,7 @@ public class GMLMultiPointTypeBindingTest extends AbstractGMLBindingTest {
         GMLMultiPointTypeBinding s2 = (GMLMultiPointTypeBinding) container
             .getComponentInstanceOfType(GMLMultiPointTypeBinding.class);
 
-        MultiPoint mpoint = (MultiPoint) s2.parse(mp, node,
-                s1.parse(mp, node, null));
+        MultiPoint mpoint = (MultiPoint) s2.parse(mp, node, s1.parse(mp, node, null));
 
         assertNotNull(mpoint);
         assertEquals(mpoint.getNumGeometries(), 2);

@@ -15,6 +15,18 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDTypeDefinition;
+import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.net.URI;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -23,8 +35,6 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.Feature;
@@ -38,16 +48,6 @@ import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.bindings.XS;
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.net.URI;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -81,8 +81,9 @@ import javax.xml.namespace.QName;
  * @generated
  */
 public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
-    //TODO: This should be part of the framework, make it part of the binding
+    //JD: TODO: This should be part of the framework, make it part of the binding
     // class to publish the type of objects they create
+    //JD: Why not just use Binding#getType() ?
     /** map of xsd type to java class **/
     private static Map typeMap = new HashMap();
 
@@ -160,8 +161,7 @@ public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -188,8 +188,7 @@ public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
             List children = Schemas.getChildElementDeclarations(decl);
 
             for (Iterator itr = children.iterator(); itr.hasNext();) {
-                XSDElementDeclaration property = (XSDElementDeclaration) itr
-                    .next();
+                XSDElementDeclaration property = (XSDElementDeclaration) itr.next();
 
                 //ignore the attributes provided by gml, change this for new feature model
                 if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
@@ -208,19 +207,16 @@ public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
 
                 XSDTypeDefinition type = property.getType();
 
-                QName qName = new QName(type.getTargetNamespace(),
-                        type.getName());
+                QName qName = new QName(type.getTargetNamespace(), type.getName());
 
                 Class theClass = (Class) typeMap.get(qName);
 
                 if (theClass == null) {
-                    throw new RuntimeException("Could not find class for "
-                        + qName);
+                    throw new RuntimeException("Could not find class for " + qName);
                 }
 
                 //call method with most parameter
-                ftBuilder.addType(AttributeTypeFactory.newAttributeType(
-                        property.getName(), theClass));
+                ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));
             }
 
             fType = ftBuilder.getFeatureType();

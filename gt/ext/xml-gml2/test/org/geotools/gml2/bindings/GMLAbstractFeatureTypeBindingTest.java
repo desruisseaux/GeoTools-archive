@@ -15,13 +15,15 @@
  */
 package org.geotools.gml2.bindings;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import org.picocontainer.defaults.DefaultPicoContainer;
+import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
@@ -33,8 +35,6 @@ import org.geotools.xml.Schemas;
 import org.geotools.xml.impl.ElementImpl;
 import org.geotools.xml.impl.SchemaIndexImpl;
 import org.geotools.xs.bindings.XS;
-import org.picocontainer.defaults.DefaultPicoContainer;
-import javax.xml.namespace.QName;
 
 
 public class GMLAbstractFeatureTypeBindingTest extends AbstractGMLBindingTest {
@@ -58,8 +58,7 @@ public class GMLAbstractFeatureTypeBindingTest extends AbstractGMLBindingTest {
     public void testSimpleFeature() throws Exception {
         QName qName = new QName("http://www.geotools.org/my", "MyFeatureType");
 
-        XSDElementDeclaration decl = XSDFactory.eINSTANCE
-            .createXSDElementDeclaration();
+        XSDElementDeclaration decl = XSDFactory.eINSTANCE.createXSDElementDeclaration();
         decl.setName("myFeature");
         decl.setTargetNamespace("http://www.geotools.org/my");
         decl.setTypeDefinition(myIndex.getComplexTypeDefinition(qName));
@@ -70,15 +69,11 @@ public class GMLAbstractFeatureTypeBindingTest extends AbstractGMLBindingTest {
 
         Node node = createNode(feature,
                 new ElementInstance[] {
-                    createElement("http://www.geotools.org/my", "geom",
-                        GML.POINTPROPERTYTYPE, null),
-                    createElement("http://www.geotools.org/my", "count",
-                        XS.INTEGER, null)
+                    createElement("http://www.geotools.org/my", "geom", GML.POINTPROPERTYTYPE, null),
+                    createElement("http://www.geotools.org/my", "count", XS.INTEGER, null)
                 },
-                new Object[] {
-                    new GeometryFactory().createPoint(new Coordinate(1, 1)),
-                    new Integer(5)
-                }, null, null);
+                new Object[] { new GeometryFactory().createPoint(new Coordinate(1, 1)), new Integer(
+                        5) }, null, null);
 
         GMLAbstractFeatureTypeBinding s = (GMLAbstractFeatureTypeBinding) container
             .getComponentInstanceOfType(GMLAbstractFeatureTypeBinding.class);
@@ -90,8 +85,7 @@ public class GMLAbstractFeatureTypeBindingTest extends AbstractGMLBindingTest {
         assertNotNull(fType.getAttributeType("geom"));
         assertNotNull(fType.getAttributeType("count"));
 
-        assertEquals(((Point) f.getAttribute("geom")).getCoordinate(),
-            new Coordinate(1, 1));
+        assertEquals(((Point) f.getAttribute("geom")).getCoordinate(), new Coordinate(1, 1));
         assertEquals((Integer) f.getAttribute("count"), new Integer(5));
     }
 }

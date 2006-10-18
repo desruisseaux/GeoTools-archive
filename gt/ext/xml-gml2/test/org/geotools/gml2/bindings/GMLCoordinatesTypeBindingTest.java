@@ -15,6 +15,8 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
@@ -22,8 +24,6 @@ import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xs.bindings.XS;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.defaults.DefaultPicoContainer;
 
 
 public class GMLCoordinatesTypeBindingTest extends AbstractGMLBindingTest {
@@ -39,11 +39,9 @@ public class GMLCoordinatesTypeBindingTest extends AbstractGMLBindingTest {
         decimal = createAtribute(GML.NAMESPACE, "decimal", XS.STRING, ".");
         ts = createAtribute(GML.NAMESPACE, "ts", XS.STRING, null);
         cs = createAtribute(GML.NAMESPACE, "cs", XS.STRING, null);
-        coordinates = createElement(GML.NAMESPACE, "myCoordinates",
-                GML.COORDTYPE, null);
+        coordinates = createElement(GML.NAMESPACE, "myCoordinates", GML.COORDTYPE, null);
         container = new DefaultPicoContainer();
-        container.registerComponentInstance(CoordinateArraySequenceFactory
-            .instance());
+        container.registerComponentInstance(CoordinateArraySequenceFactory.instance());
         container.registerComponentImplementation(GMLCoordinatesTypeBinding.class);
     }
 
@@ -57,8 +55,7 @@ public class GMLCoordinatesTypeBindingTest extends AbstractGMLBindingTest {
         GMLCoordinatesTypeBinding strategy = (GMLCoordinatesTypeBinding) container
             .getComponentInstanceOfType(GMLCoordinatesTypeBinding.class);
 
-        CoordinateSequence c = (CoordinateSequence) strategy.parse(coordinates,
-                node, null);
+        CoordinateSequence c = (CoordinateSequence) strategy.parse(coordinates, node, null);
         assertNotNull(c);
         assertEquals(3, c.size());
         assertEquals(c.getCoordinate(0), new Coordinate(12.34, 56.78));
@@ -69,14 +66,13 @@ public class GMLCoordinatesTypeBindingTest extends AbstractGMLBindingTest {
     public void testParseNonDefaults() throws Exception {
         coordinates.setText("12.34:56.78;9.10:11.12;13.14:15.16");
 
-        Node node = createNode(coordinates, null, null,
-                new AttributeInstance[] { cs, ts }, new String[] { ":", ";" });
+        Node node = createNode(coordinates, null, null, new AttributeInstance[] { cs, ts },
+                new String[] { ":", ";" });
 
         GMLCoordinatesTypeBinding strategy = (GMLCoordinatesTypeBinding) container
             .getComponentInstanceOfType(GMLCoordinatesTypeBinding.class);
 
-        CoordinateSequence c = (CoordinateSequence) strategy.parse(coordinates,
-                node, null);
+        CoordinateSequence c = (CoordinateSequence) strategy.parse(coordinates, node, null);
         assertNotNull(c);
         assertEquals(3, c.size());
         assertEquals(c.getCoordinate(0), new Coordinate(12.34, 56.78));

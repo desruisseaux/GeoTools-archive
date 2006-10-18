@@ -30,19 +30,17 @@ public class GMLPolygonMemberTypeBindingTest extends AbstractGMLBindingTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        association = createElement(GML.NAMESPACE, "myAssociation",
-                GML.POLYGONMEMBERTYPE, null);
-        geometry = createElement(GML.NAMESPACE, "myGeometry", GML.POLYGONTYPE,
-                null);
+        association = createElement(GML.NAMESPACE, "myAssociation", GML.POLYGONMEMBERTYPE, null);
+        geometry = createElement(GML.NAMESPACE, "myGeometry", GML.POLYGONTYPE, null);
     }
 
     public void testWithGeometry() throws Exception {
         Node node = createNode(association, new ElementInstance[] { geometry },
                 new Object[] {
-                    new GeometryFactory().createPolygon(new GeometryFactory()
-                        .createLinearRing(new Coordinate[] {
-                                new Coordinate(0, 0), new Coordinate(1, 1),
-                                new Coordinate(2, 2), new Coordinate(0, 0)
+                    new GeometryFactory().createPolygon(new GeometryFactory().createLinearRing(
+                            new Coordinate[] {
+                                new Coordinate(0, 0), new Coordinate(1, 1), new Coordinate(2, 2),
+                                new Coordinate(0, 0)
                             }), null)
                 }, null, null);
         GMLGeometryAssociationTypeBinding s1 = (GMLGeometryAssociationTypeBinding) getBinding(GML.GEOMETRYASSOCIATIONTYPE);

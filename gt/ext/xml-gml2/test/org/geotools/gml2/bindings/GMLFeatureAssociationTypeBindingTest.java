@@ -30,10 +30,9 @@ public class GMLFeatureAssociationTypeBindingTest extends AbstractGMLBindingTest
     protected void setUp() throws Exception {
         super.setUp();
 
-        featureAssociation = createElement(GML.NAMESPACE,
-                "myFeatureAssociation", GML.FEATUREASSOCIATIONTYPE, null);
-        feature = createElement(GML.NAMESPACE, "myFeature",
-                GML.ABSTRACTFEATURETYPE, null);
+        featureAssociation = createElement(GML.NAMESPACE, "myFeatureAssociation",
+                GML.FEATUREASSOCIATIONTYPE, null);
+        feature = createElement(GML.NAMESPACE, "myFeature", GML.ABSTRACTFEATURETYPE, null);
     }
 
     //	public void testWithFeature() throws Exception {

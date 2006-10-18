@@ -30,34 +30,30 @@ public class GMLSchemaLocationResolver implements XSDSchemaLocationResolver {
      *
      *        @generated modifiable
      */
-    public String resolveSchemaLocation(XSDSchema xsdSchema,
-        String namespaceURI, String schemaLocationURI) {
+    public String resolveSchemaLocation(XSDSchema xsdSchema, String namespaceURI,
+        String schemaLocationURI) {
         if (schemaLocationURI == null) {
             return null;
         }
 
         //if no namespace given, assume default for the current schema
-        if (((namespaceURI == null) || "".equals(namespaceURI))
-                && (xsdSchema != null)) {
+        if (((namespaceURI == null) || "".equals(namespaceURI)) && (xsdSchema != null)) {
             namespaceURI = xsdSchema.getTargetNamespace();
         }
 
-        if ("http://www.opengis.net/gml".equals(namespaceURI)
-                && (schemaLocationURI != null)) {
+        if ("http://www.opengis.net/gml".equals(namespaceURI) && (schemaLocationURI != null)) {
             if (schemaLocationURI.endsWith("feature.xsd")) {
                 return getClass().getResource("feature.xsd").toString();
             }
         }
 
-        if ("http://www.opengis.net/gml".equals(namespaceURI)
-                && (schemaLocationURI != null)) {
+        if ("http://www.opengis.net/gml".equals(namespaceURI) && (schemaLocationURI != null)) {
             if (schemaLocationURI.endsWith("geometry.xsd")) {
                 return getClass().getResource("geometry.xsd").toString();
             }
         }
 
-        if ("http://www.w3.org/1999/xlink".equals(namespaceURI)
-                && (schemaLocationURI != null)) {
+        if ("http://www.w3.org/1999/xlink".equals(namespaceURI) && (schemaLocationURI != null)) {
             if (schemaLocationURI.endsWith("xlinks.xsd")) {
                 return getClass().getResource("xlinks.xsd").toString();
             }

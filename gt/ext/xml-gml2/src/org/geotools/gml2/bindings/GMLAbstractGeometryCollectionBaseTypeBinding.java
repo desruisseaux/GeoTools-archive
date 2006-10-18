@@ -15,14 +15,14 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
+import org.geotools.xml.*;
+import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -51,8 +51,7 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public class GMLAbstractGeometryCollectionBaseTypeBinding
-    implements ComplexBinding {
+public class GMLAbstractGeometryCollectionBaseTypeBinding implements ComplexBinding {
     /**
      * @generated
      */
@@ -86,8 +85,7 @@ public class GMLAbstractGeometryCollectionBaseTypeBinding
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**

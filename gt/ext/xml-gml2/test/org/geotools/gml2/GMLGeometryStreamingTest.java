@@ -15,10 +15,10 @@
  */
 package org.geotools.gml2;
 
+import junit.framework.TestCase;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import junit.framework.TestCase;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.StreamingParser;
 
@@ -28,8 +28,8 @@ public class GMLGeometryStreamingTest extends TestCase {
 
     protected void setUp() throws Exception {
         Configuration configuration = new GMLConfiguration();
-        parser = new StreamingParser(configuration,
-                getClass().getResourceAsStream("geometry.xml"), "/child::*");
+        parser = new StreamingParser(configuration, getClass().getResourceAsStream("geometry.xml"),
+                "/child::*");
     }
 
     public void test() throws Exception {

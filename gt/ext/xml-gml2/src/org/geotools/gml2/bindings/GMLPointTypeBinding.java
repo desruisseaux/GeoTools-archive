@@ -15,16 +15,16 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geotools.xml.*;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -96,8 +96,7 @@ public class GMLPointTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -109,15 +108,13 @@ public class GMLPointTypeBinding implements ComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         if (node.getChild("coord") != null) {
-            CoordinateSequence seq = (CoordinateSequence) node.getChild("coord")
-                                                              .getValue();
+            CoordinateSequence seq = (CoordinateSequence) node.getChild("coord").getValue();
 
             return gFactory.createPoint(seq);
         }
 
         if (node.getChild("coordinates") != null) {
-            CoordinateSequence seq = (CoordinateSequence) node.getChild(
-                    "coordinates").getValue();
+            CoordinateSequence seq = (CoordinateSequence) node.getChild("coordinates").getValue();
 
             return gFactory.createPoint(seq);
         }

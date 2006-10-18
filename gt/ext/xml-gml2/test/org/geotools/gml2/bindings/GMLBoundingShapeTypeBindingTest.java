@@ -28,8 +28,7 @@ public class GMLBoundingShapeTypeBindingTest extends AbstractGMLBindingTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        boundingShape = createElement(GML.NAMESPACE, "myBoundingShape",
-                GML.BOUNDINGSHAPETYPE, null);
+        boundingShape = createElement(GML.NAMESPACE, "myBoundingShape", GML.BOUNDINGSHAPETYPE, null);
         box = createElement(GML.NAMESPACE, "Box", GML.BOXTYPE, null);
         nil = createElement(GML.NAMESPACE, "null", GML.NULLTYPE, null);
     }
@@ -38,8 +37,8 @@ public class GMLBoundingShapeTypeBindingTest extends AbstractGMLBindingTest {
         Envelope e = new Envelope();
         e.expandToInclude(1, 2);
 
-        Node node = createNode(boundingShape, new ElementInstance[] { box },
-                new Object[] { e }, null, null);
+        Node node = createNode(boundingShape, new ElementInstance[] { box }, new Object[] { e },
+                null, null);
 
         GMLBoundingShapeTypeBinding s = (GMLBoundingShapeTypeBinding) getBinding(GML.BOUNDINGSHAPETYPE);
 

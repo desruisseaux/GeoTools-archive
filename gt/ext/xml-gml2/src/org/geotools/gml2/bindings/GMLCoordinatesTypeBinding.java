@@ -15,17 +15,17 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.util.StringTokenizer;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import org.geotools.xml.*;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.util.StringTokenizer;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -99,8 +99,7 @@ public class GMLCoordinatesTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -155,18 +154,15 @@ public class GMLCoordinatesTypeBinding implements ComplexBinding {
             String z = null;
 
             //must be at least 1D			
-            x = ".".equals(decimal) ? oords[0] : oords[0].replaceAll(decimal,
-                    ".");
+            x = ".".equals(decimal) ? oords[0] : oords[0].replaceAll(decimal, ".");
 
             //check for 2 and 3 D
             if (oords.length > 1) {
-                y = ".".equals(decimal) ? oords[1]
-                                        : oords[1].replaceAll(decimal, ".");
+                y = ".".equals(decimal) ? oords[1] : oords[1].replaceAll(decimal, ".");
             }
 
             if (oords.length > 2) {
-                z = ".".equals(decimal) ? oords[2]
-                                        : oords[2].replaceAll(decimal, ".");
+                z = ".".equals(decimal) ? oords[2] : oords[2].replaceAll(decimal, ".");
             }
 
             if (seq == null) {

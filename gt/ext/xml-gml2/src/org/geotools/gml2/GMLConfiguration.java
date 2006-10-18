@@ -15,19 +15,19 @@
  */
 package org.geotools.gml2;
 
+import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import org.picocontainer.MutablePicoContainer;
+import java.net.MalformedURLException;
+import java.net.URL;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.geotools.gml2.bindings.GML;
 import org.geotools.gml2.bindings.GMLBindingConfiguration;
 import org.geotools.gml2.bindings.GMLSchemaLocationResolver;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
-import org.picocontainer.MutablePicoContainer;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 /**
@@ -74,14 +74,13 @@ public class GMLConfiguration extends Configuration {
      */
     public URL getSchemaFileURL() throws MalformedURLException {
         return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(),
-                "feature.xsd"));
+                           .resolveSchemaLocation(null, getNamespaceURI(), "feature.xsd"));
     }
 
     /**
      * Configures the gml2 context.
      * <p>
-     * The following factories are registered:
+     * The following classes are registered:
      * <ul>
      * <li>{@link CoordinateArraySequenceFactory} under {@link CoordinateSequenceFactory}
      * <li>{@link GeometryFactory}
@@ -92,9 +91,9 @@ public class GMLConfiguration extends Configuration {
     public void configureContext(MutablePicoContainer container) {
         super.configureContext(container);
 
+        container.registerComponentInstance(new FeatureTypeCache());
         container.registerComponentInstance(CoordinateSequenceFactory.class,
             CoordinateArraySequenceFactory.instance());
-        container.registerComponentImplementation(FeatureTypeCache.class);
         container.registerComponentImplementation(GeometryFactory.class);
     }
 }

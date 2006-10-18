@@ -29,20 +29,16 @@ public class GMLPointPropertyTypeBindingTest extends AbstractGMLBindingTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        association = createElement(GML.NAMESPACE, "myPointProperty",
-                GML.POINTPROPERTYTYPE, null);
+        association = createElement(GML.NAMESPACE, "myPointProperty", GML.POINTPROPERTYTYPE, null);
         geometry = createElement(GML.NAMESPACE, "myPoint", GML.POINTTYPE, null);
     }
 
     public void testWithGeometry() throws Exception {
         Node node = createNode(association, new ElementInstance[] { geometry },
-                new Object[] {
-                    new GeometryFactory().createPoint(new Coordinate(0, 0))
-                }, null, null);
+                new Object[] { new GeometryFactory().createPoint(new Coordinate(0, 0)) }, null, null);
         GMLGeometryAssociationTypeBinding s = (GMLGeometryAssociationTypeBinding) getBinding(GML.GEOMETRYASSOCIATIONTYPE);
         GMLPointPropertyTypeBinding s1 = (GMLPointPropertyTypeBinding) getBinding(GML.POINTPROPERTYTYPE);
-        Point p = (Point) s1.parse(association, node,
-                s.parse(association, node, null));
+        Point p = (Point) s1.parse(association, node, s.parse(association, node, null));
         assertNotNull(p);
     }
 }

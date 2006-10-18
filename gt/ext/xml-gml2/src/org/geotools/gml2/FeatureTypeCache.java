@@ -15,8 +15,8 @@
  */
 package org.geotools.gml2;
 
-import org.geotools.feature.FeatureType;
 import java.util.HashMap;
+import org.geotools.feature.FeatureType;
 
 
 public class FeatureTypeCache {

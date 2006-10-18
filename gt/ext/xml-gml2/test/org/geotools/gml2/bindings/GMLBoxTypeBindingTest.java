@@ -35,8 +35,7 @@ public class GMLBoxTypeBindingTest extends AbstractGMLBindingTest {
         coord1 = createElement(GML.NAMESPACE, "coord", GML.COORDTYPE, null);
         coord2 = createElement(GML.NAMESPACE, "coord", GML.COORDTYPE, null);
         coord3 = createElement(GML.NAMESPACE, "coord", GML.COORDTYPE, null);
-        coords = createElement(GML.NAMESPACE, "coordinates",
-                GML.COORDINATESTYPE, null);
+        coords = createElement(GML.NAMESPACE, "coordinates", GML.COORDINATESTYPE, null);
     }
 
     public void testTwoCoord() throws Exception {
@@ -57,8 +56,7 @@ public class GMLBoxTypeBindingTest extends AbstractGMLBindingTest {
 
     public void testSingleCoord() throws Exception {
         Node node = createNode(box, new ElementInstance[] { coord1 },
-                new Object[] { createCoordinateSequence(new Coordinate(1, 2)) },
-                null, null);
+                new Object[] { createCoordinateSequence(new Coordinate(1, 2)) }, null, null);
 
         GMLBoxTypeBinding s = (GMLBoxTypeBinding) getBinding(GML.BOXTYPE);
 
@@ -71,8 +69,7 @@ public class GMLBoxTypeBindingTest extends AbstractGMLBindingTest {
     }
 
     public void testMultiCoord() throws Exception {
-        Node node = createNode(box,
-                new ElementInstance[] { coord1, coord2, coord3 },
+        Node node = createNode(box, new ElementInstance[] { coord1, coord2, coord3 },
                 new Object[] {
                     createCoordinateSequence(new Coordinate(1, 2)),
                     createCoordinateSequence(new Coordinate(3, 4)),
@@ -93,9 +90,7 @@ public class GMLBoxTypeBindingTest extends AbstractGMLBindingTest {
         Node node = createNode(box, new ElementInstance[] { coords },
                 new Object[] {
                     createCoordinateSequence(
-                        new Coordinate[] {
-                            new Coordinate(1, 2), new Coordinate(3, 4)
-                        })
+                        new Coordinate[] { new Coordinate(1, 2), new Coordinate(3, 4) })
                 }, null, null);
 
         GMLBoxTypeBinding s = (GMLBoxTypeBinding) getBinding(GML.BOXTYPE);
@@ -109,8 +104,7 @@ public class GMLBoxTypeBindingTest extends AbstractGMLBindingTest {
 
     public void testSingleCoordinates() throws Exception {
         Node node = createNode(box, new ElementInstance[] { coords },
-                new Object[] { createCoordinateSequence(new Coordinate(1, 2)) },
-                null, null);
+                new Object[] { createCoordinateSequence(new Coordinate(1, 2)) }, null, null);
 
         GMLBoxTypeBinding s = (GMLBoxTypeBinding) getBinding(GML.BOXTYPE);
 
@@ -127,8 +121,7 @@ public class GMLBoxTypeBindingTest extends AbstractGMLBindingTest {
                 new Object[] {
                     createCoordinateSequence(
                         new Coordinate[] {
-                            new Coordinate(1, 2), new Coordinate(3, 4),
-                            new Coordinate(5, 6)
+                            new Coordinate(1, 2), new Coordinate(3, 4), new Coordinate(5, 6)
                         })
                 }, null, null);
 

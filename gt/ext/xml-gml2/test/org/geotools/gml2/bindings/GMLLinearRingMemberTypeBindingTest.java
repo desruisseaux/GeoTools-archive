@@ -30,10 +30,8 @@ public class GMLLinearRingMemberTypeBindingTest extends AbstractGMLBindingTest {
     protected void setUp() throws Exception {
         super.setUp();
 
-        association = createElement(GML.NAMESPACE, "myAssociation",
-                GML.LINEARRINGMEMBERTYPE, null);
-        geometry = createElement(GML.NAMESPACE, "myGeometry",
-                GML.LINEARRINGTYPE, null);
+        association = createElement(GML.NAMESPACE, "myAssociation", GML.LINEARRINGMEMBERTYPE, null);
+        geometry = createElement(GML.NAMESPACE, "myGeometry", GML.LINEARRINGTYPE, null);
     }
 
     public void testWithGeometry() throws Exception {
@@ -41,8 +39,8 @@ public class GMLLinearRingMemberTypeBindingTest extends AbstractGMLBindingTest {
                 new Object[] {
                     new GeometryFactory().createLinearRing(
                         new Coordinate[] {
-                            new Coordinate(0, 0), new Coordinate(1, 1),
-                            new Coordinate(2, 2), new Coordinate(0, 0)
+                            new Coordinate(0, 0), new Coordinate(1, 1), new Coordinate(2, 2),
+                            new Coordinate(0, 0)
                         })
                 }, null, null);
         GMLGeometryAssociationTypeBinding s1 = (GMLGeometryAssociationTypeBinding) getBinding(GML.GEOMETRYASSOCIATIONTYPE);

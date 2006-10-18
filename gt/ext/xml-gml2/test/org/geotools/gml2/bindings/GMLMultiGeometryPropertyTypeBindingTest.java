@@ -24,8 +24,7 @@ import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
 
-public class GMLMultiGeometryPropertyTypeBindingTest
-    extends AbstractGMLBindingTest {
+public class GMLMultiGeometryPropertyTypeBindingTest extends AbstractGMLBindingTest {
     ElementInstance association;
     ElementInstance geometry;
 
@@ -34,8 +33,8 @@ public class GMLMultiGeometryPropertyTypeBindingTest
 
         association = createElement(GML.NAMESPACE, "myMultiGeometryProperty",
                 GML.GEOMETRYPROPERTYTYPE, null);
-        geometry = createElement(GML.NAMESPACE, "myGeometryCollection",
-                GML.GEOMETRYCOLLECTIONTYPE, null);
+        geometry = createElement(GML.NAMESPACE, "myGeometryCollection", GML.GEOMETRYCOLLECTIONTYPE,
+                null);
     }
 
     public void testWithGeometry() throws Exception {
@@ -44,8 +43,7 @@ public class GMLMultiGeometryPropertyTypeBindingTest
 
         Node node = createNode(association, new ElementInstance[] { geometry },
                 new Object[] {
-                    new GeometryFactory()
-                    .createGeometryCollection(new Geometry[] { p1, p2 })
+                    new GeometryFactory().createGeometryCollection(new Geometry[] { p1, p2 })
                 }, null, null);
 
         GMLGeometryAssociationTypeBinding s = (GMLGeometryAssociationTypeBinding) getBinding(GML.GEOMETRYASSOCIATIONTYPE);
