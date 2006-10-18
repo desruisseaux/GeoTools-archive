@@ -15,20 +15,20 @@
  */
 package org.geotools.filter.v1_0;
 
+import org.picocontainer.MutablePicoContainer;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.geotools.filter.FilterFactory;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BinarySpatialOperator;
-import org.picocontainer.MutablePicoContainer;
-import javax.xml.namespace.QName;
+import org.geotools.filter.FilterFactory;
+import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -61,8 +61,7 @@ public class OGCBinarySpatialOpTypeBinding implements ComplexBinding {
     private FilterFactory factory;
     private GeometryFactory gFactory;
 
-    public OGCBinarySpatialOpTypeBinding(FilterFactory factory,
-        GeometryFactory gFactory) {
+    public OGCBinarySpatialOpTypeBinding(FilterFactory factory, GeometryFactory gFactory) {
         this.factory = factory;
         this.gFactory = gFactory;
     }
@@ -101,8 +100,7 @@ public class OGCBinarySpatialOpTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -124,8 +122,7 @@ public class OGCBinarySpatialOpTypeBinding implements ComplexBinding {
             //TODO: not sure if this should be done here but I am pretty sure filter 
             // implementation expect this to be a geometry
             Envelope bbox = (Envelope) node.getChildValue(Envelope.class);
-            e2 = factory.literal(gFactory.createPolygon(
-                        gFactory.createLinearRing(
+            e2 = factory.literal(gFactory.createPolygon(gFactory.createLinearRing(
                             new Coordinate[] {
                                 new Coordinate(bbox.getMinX(), bbox.getMinY()),
                                 new Coordinate(bbox.getMinX(), bbox.getMaxY()),

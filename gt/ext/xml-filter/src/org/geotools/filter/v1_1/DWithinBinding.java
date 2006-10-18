@@ -15,12 +15,12 @@
  */
 package org.geotools.filter.v1_1;
 
+import javax.xml.namespace.QName;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.spatial.DWithin;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.Filters;
 import org.geotools.xml.*;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.spatial.DWithin;
-import javax.xml.namespace.QName;
 
 
 /**

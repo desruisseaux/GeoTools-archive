@@ -15,9 +15,16 @@
  */
 package org.geotools.filter.v1_1;
 
+import junit.framework.TestCase;
+import org.picocontainer.MutablePicoContainer;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
-import junit.framework.TestCase;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.gml3.bindings.GMLBindingConfiguration;
 import org.geotools.gml3.bindings.GMLSchemaLocationResolver;
@@ -27,13 +34,6 @@ import org.geotools.xlink.bindings.XLINKSchemaLocationResolver;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
 import org.geotools.xs.bindings.XSBindingConfiguration;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
-import org.picocontainer.MutablePicoContainer;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 
 public class OGCFilterTest extends TestCase {
@@ -50,8 +50,7 @@ public class OGCFilterTest extends TestCase {
         InputStream in = getClass().getResourceAsStream("test1.xml");
 
         if (in == null) {
-            throw new FileNotFoundException(getClass().getResource("test1.xml")
-                                                .toExternalForm());
+            throw new FileNotFoundException(getClass().getResource("test1.xml").toExternalForm());
         }
 
         Object thing = parser.parse(in);

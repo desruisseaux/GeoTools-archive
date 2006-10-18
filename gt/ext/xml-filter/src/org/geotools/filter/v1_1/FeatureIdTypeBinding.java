@@ -15,11 +15,11 @@
  */
 package org.geotools.filter.v1_1;
 
-import org.geotools.xml.*;
-import org.opengis.filter.FeatureId;
-import org.opengis.filter.FilterFactory;
 import java.util.HashSet;
 import javax.xml.namespace.QName;
+import org.opengis.filter.FeatureId;
+import org.opengis.filter.FilterFactory;
+import org.geotools.xml.*;
 
 
 /**

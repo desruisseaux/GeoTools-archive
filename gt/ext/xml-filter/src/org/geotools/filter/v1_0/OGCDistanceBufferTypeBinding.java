@@ -15,18 +15,18 @@
  */
 package org.geotools.filter.v1_0;
 
+import org.picocontainer.MutablePicoContainer;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
-import org.picocontainer.MutablePicoContainer;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -93,8 +93,7 @@ public class OGCDistanceBufferTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -116,14 +115,12 @@ public class OGCDistanceBufferTypeBinding implements ComplexBinding {
         //<xsd:element name="DWithin" substitutionGroup="ogc:spatialOps" type="ogc:DistanceBufferType"/>
         if ("DWithin".equals(name)) {
             //TOOD: units
-            return factory.dwithin(propertyName, geometry,
-                distance.doubleValue(), null);
+            return factory.dwithin(propertyName, geometry, distance.doubleValue(), null);
         }
         //<xsd:element name="Beyond" substitutionGroup="ogc:spatialOps" type="ogc:DistanceBufferType"/>
         else if ("Beyond".equals(name)) {
             //TODO: units
-            return factory.beyond(propertyName, geometry,
-                distance.doubleValue(), null);
+            return factory.beyond(propertyName, geometry, distance.doubleValue(), null);
         } else {
             throw new IllegalArgumentException("Unknown - " + name);
         }

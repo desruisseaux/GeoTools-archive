@@ -15,11 +15,11 @@
  */
 package org.geotools.filter.v1_1;
 
-import org.geotools.xml.*;
+import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.expression.Expression;
-import javax.xml.namespace.QName;
+import org.geotools.xml.*;
 
 
 /**
@@ -37,8 +37,7 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public class PropertyIsGreaterThanOrEqualToBinding
-    extends AbstractComplexBinding {
+public class PropertyIsGreaterThanOrEqualToBinding extends AbstractComplexBinding {
     FilterFactory filterfactory;
 
     public PropertyIsGreaterThanOrEqualToBinding(FilterFactory filterfactory) {

@@ -15,13 +15,13 @@
  */
 package org.geotools.filter.v1_1;
 
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.xml.*;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
-import javax.xml.namespace.QName;
+import org.geotools.xml.*;
 
 
 /**

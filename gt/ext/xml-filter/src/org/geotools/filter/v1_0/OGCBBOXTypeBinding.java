@@ -15,15 +15,15 @@
  */
 package org.geotools.filter.v1_0;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.xml.*;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.filter.spatial.BBOX;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.BBOX;
+import org.geotools.xml.*;
 
 
 /**
@@ -89,8 +89,7 @@ public class OGCBBOXTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -102,12 +101,11 @@ public class OGCBBOXTypeBinding implements ComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         //TODO: crs
-        PropertyName propertyName = (PropertyName) node
-            .getChildValue(PropertyName.class);
+        PropertyName propertyName = (PropertyName) node.getChildValue(PropertyName.class);
         Envelope box = (Envelope) node.getChildValue(Envelope.class);
 
-        return factory.bbox(propertyName.getPropertyName(), box.getMinX(),
-            box.getMinY(), box.getMaxX(), box.getMaxY(), null);
+        return factory.bbox(propertyName.getPropertyName(), box.getMinX(), box.getMinY(),
+            box.getMaxX(), box.getMaxY(), null);
     }
 
     /**

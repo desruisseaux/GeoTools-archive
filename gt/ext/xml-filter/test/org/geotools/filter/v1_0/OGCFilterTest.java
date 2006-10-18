@@ -16,16 +16,16 @@
 package org.geotools.filter.v1_0;
 
 import junit.framework.TestCase;
+import org.picocontainer.MutablePicoContainer;
+import java.util.LinkedList;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.gml2.bindings.GMLSchemaLocationResolver;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
 import org.geotools.xs.bindings.XSBindingConfiguration;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
-import org.picocontainer.MutablePicoContainer;
-import java.util.LinkedList;
 
 
 public class OGCFilterTest extends TestCase {
@@ -35,8 +35,7 @@ public class OGCFilterTest extends TestCase {
         super.setUp();
 
         Configuration configuration = new OGCConfiguration();
-        parser = new Parser(configuration,
-                getClass().getResourceAsStream("test1.xml"));
+        parser = new Parser(configuration, getClass().getResourceAsStream("test1.xml"));
     }
 
     public void testRun() throws Exception {

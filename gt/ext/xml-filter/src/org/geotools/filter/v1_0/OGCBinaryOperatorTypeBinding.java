@@ -15,15 +15,15 @@
  */
 package org.geotools.filter.v1_0;
 
-import org.geotools.xml.*;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Literal;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.math.BigDecimal;
 import javax.xml.namespace.QName;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
+import org.geotools.xml.*;
 
 
 /**
@@ -89,8 +89,7 @@ public class OGCBinaryOperatorTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -127,7 +126,6 @@ public class OGCBinaryOperatorTypeBinding implements ComplexBinding {
             return factory.divide(e1, e2);
         }
 
-        throw new IllegalStateException(
-            "BinaryOpperatorType supports Add, Sub, Mul, Div");
+        throw new IllegalStateException("BinaryOpperatorType supports Add, Sub, Mul, Div");
     }
 }

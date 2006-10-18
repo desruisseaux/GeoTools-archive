@@ -15,12 +15,12 @@
  */
 package org.geotools.filter.v1_1;
 
-import org.geotools.filter.FilterFactory;
-import org.geotools.xml.*;
+import javax.xml.namespace.QName;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import javax.xml.namespace.QName;
+import org.geotools.filter.FilterFactory;
+import org.geotools.xml.*;
 
 
 /**
@@ -88,7 +88,6 @@ public class PropertyIsLikeTypeBinding extends AbstractComplexBinding {
         String single = (String) node.getAttributeValue("singleChar");
         String escape = (String) node.getAttributeValue("escapeChar");
 
-        return filterfactory.like(name, literal.toString(), wildcard, single,
-            escape);
+        return filterfactory.like(name, literal.toString(), wildcard, single, escape);
     }
 }

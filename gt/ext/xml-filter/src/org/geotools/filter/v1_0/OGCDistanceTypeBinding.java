@@ -15,11 +15,11 @@
  */
 package org.geotools.filter.v1_0;
 
-import org.geotools.xml.*;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
+import org.geotools.xml.*;
 
 
 /**
@@ -72,8 +72,7 @@ public class OGCDistanceTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**

@@ -15,12 +15,12 @@
  */
 package org.geotools.filter.v1_1;
 
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.xml.*;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
-import javax.xml.namespace.QName;
+import org.geotools.xml.*;
 
 
 /**
@@ -88,8 +88,7 @@ public class DistanceBufferTypeBinding extends AbstractComplexBinding {
         Double distance = (Double) node.getChildValue(Double.class);
 
         return new Expression[] {
-            name, filterfactory.literal(geometry),
-            filterfactory.literal(distance)
+            name, filterfactory.literal(geometry), filterfactory.literal(distance)
         };
     }
 }

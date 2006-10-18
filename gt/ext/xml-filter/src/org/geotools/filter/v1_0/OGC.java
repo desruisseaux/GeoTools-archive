@@ -38,12 +38,10 @@ public interface OGC {
             "ExpressionType");
 
     /** @generated */
-    public static final QName FUNCTIONTYPE = new QName("http://www.opengis.net/ogc",
-            "FunctionType");
+    public static final QName FUNCTIONTYPE = new QName("http://www.opengis.net/ogc", "FunctionType");
 
     /** @generated */
-    public static final QName LITERALTYPE = new QName("http://www.opengis.net/ogc",
-            "LiteralType");
+    public static final QName LITERALTYPE = new QName("http://www.opengis.net/ogc", "LiteralType");
 
     /** @generated */
     public static final QName PROPERTYNAMETYPE = new QName("http://www.opengis.net/ogc",
@@ -51,8 +49,7 @@ public interface OGC {
 
     //filter.xsd
     /** @generated */
-    public static final QName BBOXTYPE = new QName("http://www.opengis.net/ogc",
-            "BBOXType");
+    public static final QName BBOXTYPE = new QName("http://www.opengis.net/ogc", "BBOXType");
 
     /** @generated */
     public static final QName BINARYCOMPARISONOPTYPE = new QName("http://www.opengis.net/ogc",
@@ -75,20 +72,17 @@ public interface OGC {
             "DistanceBufferType");
 
     /** @generated */
-    public static final QName DISTANCETYPE = new QName("http://www.opengis.net/ogc",
-            "DistanceType");
+    public static final QName DISTANCETYPE = new QName("http://www.opengis.net/ogc", "DistanceType");
 
     /** @generated */
     public static final QName FEATUREIDTYPE = new QName("http://www.opengis.net/ogc",
             "FeatureIdType");
 
     /** @generated */
-    public static final QName FILTERTYPE = new QName("http://www.opengis.net/ogc",
-            "FilterType");
+    public static final QName FILTERTYPE = new QName("http://www.opengis.net/ogc", "FilterType");
 
     /** @generated */
-    public static final QName LOGICOPSTYPE = new QName("http://www.opengis.net/ogc",
-            "LogicOpsType");
+    public static final QName LOGICOPSTYPE = new QName("http://www.opengis.net/ogc", "LogicOpsType");
 
     /** @generated */
     public static final QName LOWERBOUNDARYTYPE = new QName("http://www.opengis.net/ogc",

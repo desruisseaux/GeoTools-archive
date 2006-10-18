@@ -15,13 +15,13 @@
  */
 package org.geotools.filter.v1_0;
 
-import org.geotools.xml.*;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.geotools.xml.*;
 
 
 /**
@@ -79,8 +79,7 @@ public class OGCExpressionTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**

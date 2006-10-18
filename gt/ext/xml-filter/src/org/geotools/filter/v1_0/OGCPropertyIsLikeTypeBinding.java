@@ -15,16 +15,16 @@
  */
 package org.geotools.filter.v1_0;
 
-import org.geotools.filter.Filters;
-import org.geotools.xml.*;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.PropertyIsBetween;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.geotools.filter.Filters;
+import org.geotools.xml.*;
 
 
 /**
@@ -93,8 +93,7 @@ public class OGCPropertyIsLikeTypeBinding implements ComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context) {
+    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -105,8 +104,7 @@ public class OGCPropertyIsLikeTypeBinding implements ComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        PropertyName propertyName = (PropertyName) node
-            .getChildValue(PropertyName.class);
+        PropertyName propertyName = (PropertyName) node.getChildValue(PropertyName.class);
         Literal literal = (Literal) node.getChildValue(Literal.class);
 
         String wildCard = (String) node.getAttribute("wildCard").getValue();
@@ -115,7 +113,6 @@ public class OGCPropertyIsLikeTypeBinding implements ComplexBinding {
 
         //TODO: should the factory method take a literal object instead of a 
         // string
-        return factory.like(propertyName, Filters.asString(literal), wildCard,
-            singleChar, escape);
+        return factory.like(propertyName, Filters.asString(literal), wildCard, singleChar, escape);
     }
 }

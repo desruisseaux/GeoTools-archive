@@ -16,14 +16,14 @@
 package org.geotools.filter.v1_0;
 
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import org.picocontainer.MutablePicoContainer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.opengis.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.gml2.GMLConfiguration;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
-import org.opengis.filter.FilterFactory;
-import org.picocontainer.MutablePicoContainer;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 /**
@@ -53,8 +53,7 @@ public class OGCConfiguration extends Configuration {
      */
     public URL getSchemaFileURL() throws MalformedURLException {
         return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(),
-                "filter.xsd"));
+                           .resolveSchemaLocation(null, getNamespaceURI(), "filter.xsd"));
     }
 
     /**
@@ -83,7 +82,6 @@ public class OGCConfiguration extends Configuration {
     public void configureContext(MutablePicoContainer container) {
         super.configureContext(container);
 
-        container.registerComponentImplementation(FilterFactory.class,
-            FilterFactoryImpl.class);
+        container.registerComponentImplementation(FilterFactory.class, FilterFactoryImpl.class);
     }
 }
