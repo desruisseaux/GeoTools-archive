@@ -25,7 +25,7 @@ import org.geotools.xml.Binding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Schemas;
 import org.geotools.xml.SimpleBinding;
-import org.geotools.xml.impl.BindingFactoryImpl;
+import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.ElementImpl;
 import org.geotools.xs.bindings.XS;
 import org.geotools.xs.bindings.XSBindingConfiguration;
@@ -45,7 +45,7 @@ public abstract class TestSchema extends TestCase {
     public static URL url;
     public static XSDSchema schema;
     public static XSDSchema xsd;
-    public static BindingFactoryImpl factory;
+    public static BindingLoader factory;
 
     static {
         url = TestSchema.class.getResource("sample.xsd");
@@ -57,7 +57,7 @@ public abstract class TestSchema extends TestCase {
         }
 
         xsd = schema.getSchemaForSchema();
-        factory = new BindingFactoryImpl();
+        factory = new BindingLoader();
         new XSBindingConfiguration().configure(factory.getContainer());
     }
 
