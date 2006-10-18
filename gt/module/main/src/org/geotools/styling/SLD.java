@@ -1517,9 +1517,10 @@ public class SLD {
     /**
      * Retrieve the first SYMBOLIZER from the provided FeatureTypeStyle.
      *
-     * @param style SLD style information.
+     * @param fts        the FeatureTypeStyle SLD style information.
      * @param SYMBOLIZER LineSymbolizer.class, PointSymbolizer.class, 
-     *        PolygonSymbolizer.class, RasterSymbolizer.class, or TextSymbolizer.class
+     *                   PolygonSymbolizer.class, RasterSymbolizer.class, 
+     *                   or TextSymbolizer.class
      *        
      * @return symbolizer instance from fts, or null if not found.
      */
@@ -1622,7 +1623,8 @@ SYMBOLIZER:
 	/**
 	 * Climbs the style hierarchy until null or an SLD is found.
 	 * 
-	 * @param object
+	 * @param gtComponent object
+	 * 
 	 * @return SLD
 	 */
 	public static StyledLayerDescriptor styledLayerDescriptor(Object gtComponent) {

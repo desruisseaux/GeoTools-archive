@@ -206,8 +206,8 @@ public abstract class AbstractGenerator {
      * <code>org.geotools.xml.codegen.</code> to <code>name</code>.
      * <p>
      *
-     * @param The non-qualified class name of the template.
-     * @param The input to the template.
+     * @param templateName The non-qualified class name of the template.
+     * @param input        The input to the template.
      *
      * @return The result of the code generator
      *

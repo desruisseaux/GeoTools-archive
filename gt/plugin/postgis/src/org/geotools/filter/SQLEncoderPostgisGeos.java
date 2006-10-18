@@ -31,7 +31,7 @@ public class SQLEncoderPostgisGeos extends SQLEncoderPostgis
      * Constructor for SQLEncoderPostgis with GEOS support
      * 
      * @deprecated use SQLEncoderPostgis with setSupportsGEOS(true)
-     * @param srid
+     * 
      */
     public SQLEncoderPostgisGeos() {
         super();

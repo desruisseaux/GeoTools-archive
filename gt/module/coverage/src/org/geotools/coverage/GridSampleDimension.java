@@ -212,16 +212,16 @@ public class GridSampleDimension implements SampleDimension, Serializable {
 	 * [3]="Urban". The created sample dimension will have no unit and a default
 	 * set of colors.
 	 * 
-	 * @param names
+	 * @param description
+	 *            Description for this Sample Dimension.
+	 * @param categoriesNames
 	 *            Sequence of category names for the values contained in a
 	 *            sample dimension, as {@link String} or
 	 *            {@link InternationalString} objects.
-	 * @param description
-	 *            Description for this Sample Dimension.
 	 * 
 	 */
 	public GridSampleDimension(final CharSequence description,
-			final CharSequence[] categoriesNames) {
+			                       final CharSequence[] categoriesNames) {
 		// TODO: 'list(...)' should be inlined there if only Sun was to fix RFE
 		// #4093999
 		// ("Relax constraint on placement of this()/super() call in
@@ -238,7 +238,7 @@ public class GridSampleDimension implements SampleDimension, Serializable {
 	 * [3]="Urban". The created sample dimension will have no unit and a default
 	 * set of colors.
 	 * 
-	 * @param names
+	 * @param categoriesNames
 	 *            Sequence of category names for the values contained in a
 	 *            sample dimension, as {@link String} or
 	 *            {@link InternationalString} objects.

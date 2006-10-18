@@ -87,7 +87,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * allowing applications to customize any generated collections.
      * </p>
      * @param id may be null ... feature id
-     * @param FeatureType optional, may be null
+     * @param featureType optional, may be null
      */
     protected DefaultFeatureCollection(String id, FeatureType featureType) {
     	this.id = id;
@@ -799,11 +799,12 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * This method should also be able to handle GeoTools specific
      * sorting through detecting order as a SortBy2 instance.
      * </p>
-     * @param SortBy Construction of a Sort
+     * 
      * @since GeoTools 2.2, Filter 1.1
-     * @param order Filter 1.1 SortBy
+     * @param order Filter 1.1 SortBy Construction of a Sort
+     * 
      * @return FeatureList sorted according to provided order
-
+     * 
      */
     public FeatureList sort(SortBy order) {
     	if( order == SortBy.NATURAL_ORDER ){

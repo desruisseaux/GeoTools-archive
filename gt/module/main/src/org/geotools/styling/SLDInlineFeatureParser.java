@@ -531,8 +531,8 @@ public class SLDInlineFeatureParser
 	 *   Give a node and the name of a child of that node, find its (string) value.
 	 *   This doesnt do anything complex.
 	 *  
-	 * @param node
-	 * @param childName
+	 * @param parentNode
+	 * @param wantedChildName
 	 * @return
 	 */
 	public Node getNode(Node parentNode, String wantedChildName)

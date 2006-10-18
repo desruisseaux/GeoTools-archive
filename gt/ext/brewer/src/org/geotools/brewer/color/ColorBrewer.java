@@ -69,7 +69,7 @@ public class ColorBrewer {
     /**
      * Creates a static instance of ColorBrewer containing all default palettes
      *
-     * @return
+     * @return The ColorBrewer instance with all the default palettes.
      * @throws IOException
      */
     public static ColorBrewer instance() {
@@ -80,9 +80,12 @@ public class ColorBrewer {
     }
 
     /**
-     * Creates a static instance of ColorBrewer containing a subset of the default palettes
+     * Creates a static instance of ColorBrewer containing a subset of the 
+     * default palettes.
      *
-     * @return
+     * @param  type A PaletteType object which will be used to configure the 
+     *              returned ColorBrewer.
+     * @return The ColorBrewer instance with the palette from the parameter.
      * @throws IOException
      */
     public static ColorBrewer instance(PaletteType type)
@@ -99,8 +102,10 @@ public class ColorBrewer {
 
     /**
      * Returns true if the palette exists in this ColorBrewer
-     * @param paletteName
-     * @return
+     * 
+     * @param paletteName A String with the name of the palette 
+     * @return A boolean, true if the ColorBrewer has a palette of the name 
+     *         given.
      */
     public boolean hasPalette(String paletteName) {
         return palettes.containsKey(paletteName);
@@ -204,8 +209,11 @@ public class ColorBrewer {
     }
 
     /**
-     *
-     * @return
+     * Generates a String array with the names of the palettes in the 
+     * ColorBrewer instance.
+     * 
+     * @return A String array with the names of the palettes in the ColorBrewer
+     *         instance.
      */
     public String[] getPaletteNames() {
         Object[] keys = palettes.keySet().toArray();
@@ -225,7 +233,7 @@ public class ColorBrewer {
      * @param minClasses x
      * @param maxClasses y
      *
-     * @return filtered string array of palette names
+     * @return A string array of palette names filtered by number of classes.
      */
     public String[] getPaletteNames(int minClasses, int maxClasses) {
         Object[] keys = palettes.keySet().toArray();
@@ -258,8 +266,8 @@ public class ColorBrewer {
 
     /**
      * Loads the default ColorBrewer palettes.
+     * 
      * @throws IOException
-     *
      */
     public void loadPalettes() {
         loadPalettes(SEQUENTIAL);
@@ -268,8 +276,10 @@ public class ColorBrewer {
     }
 
     /**
-     * Loads one set of ColorBrewer palettes.
-     * @param type
+     * Loads into the ColorBrewer instance the set of palettes which have the 
+     * PaletteType matching that of the parameter. 
+     * 
+     * @param type The PaletteType for the palettes to load.
      * @throws IOException
      */
     public void loadPalettes(PaletteType type) {
@@ -309,6 +319,8 @@ public class ColorBrewer {
     }
 
     /**
+     * Loads into the ColorBrewer instance the set of palettes matching the 
+     * given parameters.
      *
      * @param XMLinput
      * @param type identifier for palettes. use "new PaletteType();"
@@ -442,9 +454,9 @@ public class ColorBrewer {
      * "[#text: 1,2,3]".
      * </p>
      *
-     * @param input
+     * @param input A String with the input.
      *
-     * @return
+     * @return A String with the modified input.
      */
     private String fixToString(String input) {
         if (input.startsWith("[") && input.endsWith("]")) {

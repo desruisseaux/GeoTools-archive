@@ -145,7 +145,7 @@ public class SLDParser {
 	 * 
 	 * @param factory
 	 *            The StyleFactory to use to read the file
-	 * @param s
+	 * @param r
 	 *            The inputstream to be read
 	 */
 	public SLDParser(StyleFactory factory, java.io.Reader r) {

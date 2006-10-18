@@ -151,8 +151,9 @@ public interface GetMapRequest extends Request{
     /**
      * Adds a Layer to the list of layers to be requested. This layer will be drawn
      * below any previously added layers. 
-     * @param layer the Layer to use
-     * @param style the style to use. If it is null, the default style is used.
+     * 
+     * @param layerName the Layer to use
+     * @param style     the style to use. If it is null, the default style is used.
      */
     public void addLayer(String layerName, Style style);
 

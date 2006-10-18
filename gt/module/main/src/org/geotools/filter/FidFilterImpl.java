@@ -179,7 +179,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
 	/** 
 	 * Removes a collection of feature IDs from the filter. 
 	 * 
-	 * @param fids A collection of feature IDs. 
+	 * @param fidsToRemove A collection of feature IDs. 
 	 */ 
 	public void removeAllFids(Collection fidsToRemove) { 	    
 	   fids.removeAll(fidsToRemove); 
@@ -188,7 +188,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
 	/** 
 	 * Adds a collection of feature IDs to the filter. 
 	 * 
-	 * @param fids A collection of feature IDs. 
+	 * @param fidsToAdd A collection of feature IDs. 
 	 */ 
 	public void addAllFids(Collection fidsToAdd) { 
 	   fids.addAll(fidsToAdd); 

@@ -129,7 +129,7 @@ public class VPFLibrary extends AbstractDataStore implements FileConstants, VPFL
      * 
      * @param libraryFeature a feature from the library attribute table
      * @param dir the containing directory
-     *  
+     * 
      * @throws IOException
      * @throws SchemaException For problems making one of the feature classes as a FeatureType.
      */

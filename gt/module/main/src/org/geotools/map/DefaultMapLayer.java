@@ -154,12 +154,13 @@ public class DefaultMapLayer implements MapLayer {
 	}
 
 	/**
-	 * * Add a new layer and trigger a {@link LayerListEvent}.
+	 * Constructor which adds a new layer and trigger a {@link LayerListEvent}.
 	 * 
-	 * @param coverage
-	 *            The new layer that has been added.
+	 * @param reader
+	 *            a reader with the new layer that will be added.
 	 * @param style
 	 * @param title
+	 * 
 	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
 	 * @throws FactoryConfigurationError 
@@ -174,17 +175,22 @@ public class DefaultMapLayer implements MapLayer {
 
 	
 	/**
-	 * * Add a new layer and trigger a {@link LayerListEvent}.
+	 * Constructor which adds a new layer and triggers a {@link LayerListEvent}.
 	 * 
-	 * @param coverage
-	 *            The new layer that has been added.
+	 * @param reader
+	 *            a reader with the new layer that will be added
 	 * @param style
+	 * 
 	 * @throws IllegalAttributeException 
 	 * @throws SchemaException 
 	 * @throws FactoryConfigurationError 
 	 * @throws TransformException 
 	 */
-	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style) throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
+	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style) 
+	  throws TransformException, 
+	         FactoryConfigurationError, 
+	         SchemaException, 
+	         IllegalAttributeException {
 
 		this(DataUtilities.wrapGcReader(reader), style, "");
 

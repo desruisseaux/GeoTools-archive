@@ -81,8 +81,7 @@ public final class LineIterator2 implements PathIterator {
     /**
 	 * @param ls
 	 * @param at
-	 * @param generalize
-	 * @param maxDistance
+	 * 
 	 */
 	public void init(LineString ls, AffineTransform at) 
 	{

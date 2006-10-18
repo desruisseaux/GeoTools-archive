@@ -107,8 +107,7 @@ public class GeometryCoordinateSequenceTransformer {
 
 
     /**
-     * @param string
-     * @return
+     * 
      * @throws TransformException
      */
     public LineString transformLineString(LineString ls, GeometryFactory gf) throws TransformException {
@@ -122,7 +121,7 @@ public class GeometryCoordinateSequenceTransformer {
 
     /**
      * @param point
-     * @return
+     * 
      * @throws TransformException
      */
     public Point transformPoint(Point point, GeometryFactory gf) throws TransformException {
@@ -132,8 +131,8 @@ public class GeometryCoordinateSequenceTransformer {
 
 
     /**
-     * @param coordinateSequence
-     * @return
+     * @param cs a CoordinateSequence
+     * 
      * @throws TransformException
      */
     public CoordinateSequence projectCoordinateSequence(CoordinateSequence cs) throws TransformException {

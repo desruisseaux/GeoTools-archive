@@ -62,7 +62,7 @@ public interface CSBuilder {
 	
 	/**
 	 * Gets an ordinate in the specified coordinate
-	 * @param value
+	 * 
 	 * @param ordinateIndex
 	 * @param coordinateIndex
 	 */

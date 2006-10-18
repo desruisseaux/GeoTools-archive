@@ -111,9 +111,23 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	/**
 	 * Creates a new instance of GeoTiffReader
 	 * 
-	 * @param source
+	 * @param input
 	 *            the GeoTiff file
-	 * @param hints
+	 * 
+	 * @throws DataSourceException
+	 */
+	public GeoTiffReader(Object input) throws DataSourceException {
+		this(input, new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
+				Boolean.TRUE));
+
+	}
+
+	/**
+	 * Creates a new instance of GeoTiffReader
+	 * 
+	 * @param input
+	 *            the GeoTiff file
+	 * @param uHints
 	 *            user-supplied hints TODO currently are unused
 	 * @throws DataSourceException
 	 */

@@ -64,7 +64,8 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * DiffFeatureWriter construction.
      *
      * @param reader
-     * @param diff.features
+     * @param diff
+     * @param filter
      */
     public DiffFeatureWriter(FeatureReader reader, Diff diff, Filter filter) {
         this.reader = new DiffFeatureReader(reader, diff, filter);

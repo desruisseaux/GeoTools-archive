@@ -60,7 +60,7 @@ public class Crop extends Operation2D {
 			false); // Parameter is optional
 
 	/**
-	 * @param operation
+	 * 
 	 * @throws OperationNotFoundException
 	 */
 	public Crop() {

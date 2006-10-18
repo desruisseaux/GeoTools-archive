@@ -74,9 +74,11 @@ public final class LiteShape2 implements Shape, Cloneable {
 	 * 
 	 * @param geom -
 	 *            the wrapped geometry
-	 * @param at -
+	 * @param mathTransform -
 	 *            the transformation applied to the geometry in order to get to
 	 *            the shape points
+	 * @param decimator -
+	 *            
 	 * @param generalize -
 	 *            set to true if the geometry need to be generalized during
 	 *            rendering
@@ -97,14 +99,15 @@ public final class LiteShape2 implements Shape, Cloneable {
 	 * 
 	 * @param geom -
 	 *            the wrapped geometry
-	 * @param at -
+	 * @param mathTransform -
 	 *            the transformation applied to the geometry in order to get to
 	 *            the shape points
+	 * @param decimator -
+	 *            
 	 * @param generalize -
 	 *            set to true if the geometry need to be generalized during
 	 *            rendering
-	 * @param maxDistance -
-	 *            distance used in the generalization process
+	 * 
 	 * @throws TransformException
 	 * @throws FactoryException
 	 */

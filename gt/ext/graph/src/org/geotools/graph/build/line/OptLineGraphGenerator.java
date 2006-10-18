@@ -83,9 +83,10 @@ public class OptLineGraphGenerator implements LineGraphGenerator {
    * Adds a line to the graph. Note that this method returns null since actual
    * building of the graph components is delayed until generate() is called.
    * 
-   * @param line A LineSegment object.
+   * @param obj A LineSegment object.
    * 
-   * @return null
+   * @return null because the actual building of the graph components is delayed 
+   *         until generate() is called.
    */
   public Graphable add(Object obj) {
     LineSegment line = (LineSegment)obj;

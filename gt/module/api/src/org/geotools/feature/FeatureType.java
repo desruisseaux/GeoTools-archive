@@ -362,9 +362,10 @@ public interface FeatureType {
      * </ul>
      * </p>
      *
-     * @param index Index into the complete schema represented by this FeatureType and its
-     *        ancestors.
-     * @return The attribute type at the specified position.
+     * @param position a integer index into the complete schema represented by 
+     *                 this FeatureType and its ancestors
+     * 
+     * @return the attribute type at the specified position
      */
     AttributeType getAttributeType(int position);
 

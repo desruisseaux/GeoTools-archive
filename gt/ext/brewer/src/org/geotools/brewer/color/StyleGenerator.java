@@ -652,12 +652,14 @@ public class StyleGenerator {
      * @param styleExpression
      *            strings of ranged expressions "lowValue..highValue" or
      *            explicit values "value1, value2"
-     * @param attribute
-     * @return all the filters
+     * @param featureType
+     * @param attributeTypeName
+     * @return an array with all the filters
      * @throws IllegalFilterException
      */
     public static Filter[] toFilter(String[] styleExpression,
-        FeatureType[] featureType, String[] attributeTypeName)
+                                    FeatureType[] featureType, 
+                                    String[] attributeTypeName)
         throws IllegalFilterException {
         Filter[] filter = new Filter[styleExpression.length];
 
@@ -715,8 +717,10 @@ public class StyleGenerator {
      *
      * @param styleExpression
      *            the ranged style expression (minValue..maxValue)
-     * @param attribute
-     *            the attributeType the values correspond to
+     * @param featureType
+     *            the featureType
+     * @param attributeTypeName
+     *            the attributeTypeName whose values correspond to
      * @param upperBoundClosed
      *            does the upper bound include the max value? (true: <=, false: <)
      * @return a filter
@@ -859,13 +863,14 @@ public class StyleGenerator {
      * @param styleExpression
      *            the list of attribute values, separated by commas (and
      *            optional spaces)
-     * @param attribute
-     *            the attributeType the values correspond to
+     * @param attributeTypeName
+     *            A Sting with the attributeTypeName whose values correspond to
      * @return a filter
      * @throws IllegalFilterException
      */
     public static Filter toExplicitFilter(String styleExpression,
-        FeatureType featureType, String attributeTypeName)
+                                          FeatureType featureType, 
+                                          String attributeTypeName)
         throws IllegalFilterException {
         // eliminate spaces after commas
         String expr = styleExpression.replaceAll(",\\s+", ","); //$NON-NLS-1$//$NON-NLS-2$

@@ -370,13 +370,14 @@ public class TextRecordImageReader extends TextImageReader {
      * Returns the range of values for the specified band.
      *
      * @param  imageIndex The image index.
-     * @param  bandIndex The band index. Valid index goes from {@code 0} inclusive
+     * @param  band       The band index. Valid index goes from {@code 0} inclusive
      *         to {@code getNumBands(imageIndex)} exclusive. Index are independent
      *         of any {@link ImageReadParam#setSourceBands} setting.
      * @return The expected range of values, or {@code null} if unknow.
      * @throws IOException If an error occurs reading the data information from the input source.
      */
-    public Range getExpectedRange(final int imageIndex, final int band) throws IOException {
+    public Range getExpectedRange(final int imageIndex, 
+                                  final int band) throws IOException {
         final int         column = getColumn(imageIndex, band);
         final RecordList records = getRecords(imageIndex);
         return new NumberRange(records.getMinimum(column), records.getMaximum(column));

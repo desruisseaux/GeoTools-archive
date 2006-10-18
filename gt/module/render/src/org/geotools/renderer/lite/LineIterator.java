@@ -122,12 +122,12 @@ public final class LineIterator extends AbstractLiteIterator {
 //    }
 
     /**
-	 * @param string
-	 * @param combined
-	 * @param generalize2
-	 * @param f
-	 * @param scale
-	 * @param scale2
+	 * @param ls           a LineString
+	 * @param at
+	 * @param generalize
+	 * @param maxDistance
+	 * @param xScale
+	 * @param yScale
 	 */
 	public void init(LineString ls, AffineTransform at, boolean generalize, float maxDistance, float xScale, float yScale) {
 		this.xScale = xScale;

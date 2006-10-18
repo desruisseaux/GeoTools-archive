@@ -73,9 +73,9 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      * or FeatureType.
      * </p>
      *
-     * @param encoder an SQLEncoder
+     * @param encoder     an SQLEncoder
      * @param tableSchema table schema to qualify table names
-     * @param tableName the table name to be used by this SQL builder
+     * @param featureType the table name to be used by this SQL builder
      */
     public DB2SQLBuilder(SQLEncoder encoder, String tableSchema, FeatureType featureType) {
         super(encoder, featureType, null);

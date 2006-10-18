@@ -75,8 +75,10 @@ public class DefaultAttributeType implements AttributeType {
      * @param name Name of this attribute.
      * @param type Class type of this attribute.
      * @param nillable If nulls are allowed for the attribute of this type.
-     * @param fieldLength DOCUMENT ME!
+     * @param min
+     * @param max
      * @param defaultValue default value when none is suppled
+     * @param f
      *
      * @task REVISIT: make this protected?  I think it's only used by facotries
      *       at this time.

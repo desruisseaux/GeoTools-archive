@@ -69,14 +69,15 @@ public class FileSystemNode extends Node {
     
 
 	/**
-	 * @param maxNodeEntries
+	 * @param params 
 	 */
 	public FileSystemNode(Parameters params) {
         this(params, true);
 	}
     
     /**
-     * @param maxNodeEntries
+     * @param params
+     * @param offset
      */
     public FileSystemNode(Parameters params, long offset)
     throws IOException, TreeException

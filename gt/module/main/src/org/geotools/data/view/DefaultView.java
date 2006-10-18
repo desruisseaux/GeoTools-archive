@@ -99,10 +99,8 @@ public class DefaultView implements FeatureSource {
      * </p>
      * 
      * @param source
-     *            GeoTools2 FeatureSource
-     * @param schema
-     *            FeatureType returned by this FeatureSource
-     * @param definitionQuery
+     *            a FeatureSource
+     * @param query
      *            Filter used to limit results
      * @throws SchemaException
      */
@@ -134,11 +132,8 @@ public class DefaultView implements FeatureSource {
      * TODO: revisit this - I am not sure I want write access to views
      * (especially if they do reprojection).
      * 
-     * @param featureSource
-     * @param schema
-     *            DOCUMENT ME!
-     * @param definitionQuery
-     *            DOCUMENT ME!
+     * @param source
+     * @param query
      * 
      * @return @throws
      *         SchemaException

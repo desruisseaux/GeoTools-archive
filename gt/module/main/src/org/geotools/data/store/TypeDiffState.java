@@ -239,8 +239,6 @@ public class TypeDiffState implements State {
      * Constructs a DiffFeatureWriter that works against this Transaction.
      * </p>
      *
-     * @param typeName Type Name to record differences against
-     *
      * @return A FeatureWriter that records Differences against a FeatureReader
      *
      * @throws IOException If a FeatureRader could not be constucted to record

@@ -102,9 +102,9 @@ public abstract class AbstractGTComponent implements GTComponent {
      * Use this for changes to simple types like int and Color.
      * </p>
      *
-     * @param childName used to the child (often bean propertyName or map key)
+     * @param name     the String used to name the child (often bean propertyName or map key)
      * @param child
-     * @param oldValue DOCUMENT ME!
+     * @param oldValue 
      */
     protected synchronized void fireChildChanged( String name, Object child, Object oldValue) {
     	GTNote here = new GTNoteImpl( this, name, GTDelta.NO_INDEX );

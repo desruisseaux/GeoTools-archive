@@ -37,7 +37,7 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
      * Builds a new packed coordinate sequence
      *
      * @param coords
-     * @param dimensions
+     * 
      */
     public LiteCoordinateSequence(double[] coords) {
     	this.dimension=2;
@@ -81,9 +81,10 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
 
     /**
      * Builds a new empty packed coordinate sequence of a given size and dimension
+     * 
+     * @param size
      * @param dimension
-     *
-     * @param coordinates
+     * 
      */
     public LiteCoordinateSequence(int size, int dimension) {
     	if( dimension!=2 )

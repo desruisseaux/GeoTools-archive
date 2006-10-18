@@ -41,8 +41,9 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
- * Basic reading abilities demo: open a file, get the feature type, read the
- * features and output their contents to the standard output
+ * A demo of basic reading abilities exemplified by the shapefile access system. 
+ * The demo opens a file, gets the feature type, reads the first ten features
+ * and outputs their contents to the standard output.
  *
  * @author aaime
  * @source $URL$
@@ -173,9 +174,9 @@ public class ShapeReader {
 	 * <p>
 	 * Please note this is "wrong" and limits your code to working with
 	 * shapefiles for no reason. Look at openShapefile2 for a better example.
-	 * @see openShapefile2
-	 * @param shapeURL
-	 * @return
+	 * @see #openShapefile2
+	 * @param shapeURL An URL for the shapefile
+	 * @return the ShapefileDataStore which contains the shapefile data.
 	 * @throws MalformedURLException
 	 */
     public static ShapefileDataStore openShapefile( URL shapeURL ) throws MalformedURLException{

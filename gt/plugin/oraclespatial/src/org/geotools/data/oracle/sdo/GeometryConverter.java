@@ -77,7 +77,7 @@ public class GeometryConverter {
      * <p>
      * This Converter does not support SpatialCoordinates</p>
      * 
-     * @param obj Object to be converted
+     * @param geom    the Geometry to be converted
      * @return <code>true</code> if <code>obj</code> is a JTS Geometry
      * @see net.refractions.jspatial.Converter#isCapable(java.lang.Object)
      */
@@ -100,7 +100,9 @@ public class GeometryConverter {
      * <p>
      * Will return <code>null</code> as <code>null</code>.
      * </p>
-     * @param datum STRUCT to be converted to a double[]
+     * 
+     * @param sdoGeometry datum STRUCT to be converted to a double[]
+     * 
      * @return JTS <code>Geometry</code> representing the provided <code>datum</code>
      * @throws SQLException
      * 
@@ -131,7 +133,7 @@ public class GeometryConverter {
      * <p>
      * Will return <code>null</code> as an empty <code>SDO_GEOMETRY</code></p>
      * 
-     * @param obj Map to be represented as a STRUCT
+     * @param geom Map to be represented as a STRUCT
      * @return STRUCT representing provided Map
      * @see net.refractions.jspatial.Converter#toDataType(java.lang.Object)
      */

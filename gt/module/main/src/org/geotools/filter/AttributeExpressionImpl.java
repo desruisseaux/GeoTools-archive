@@ -54,9 +54,8 @@ public class AttributeExpressionImpl extends DefaultExpression
 
     /**
      * Constructor with schema and path to the attribute.
-     *
-     * @param schema The initial (required) sub filter.
-     * @param attPath the xpath to the attribute.
+     * 
+     * @param xpath the String xpath to the attribute.
      */
     protected AttributeExpressionImpl( String xpath ){
     	attPath = xpath;

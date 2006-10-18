@@ -77,8 +77,9 @@ public class XSNonPositiveIntegerBinding implements SimpleBinding {
 
     /**
      * <!-- begin-user-doc -->
-     * @param value a BigInteger (after processing by parent)
-     * @param a Number that is not positive
+     * @param instance 
+     * @param value    a BigInteger (after processing by parent)
+     * @return a Number that is not positive
      * <!-- end-user-doc -->
      *
      * @generated modifiable

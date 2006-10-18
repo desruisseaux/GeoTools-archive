@@ -381,7 +381,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 *            The graphics object to draw to.
 	 * @param paintArea
 	 *            The size of the output area in output units (eg: pixels).
-	 * @param envelope
+	 * @param mapArea
 	 *            the map's visible area (viewport) in map coordinates.
 	 * @deprecated Use paint(Graphics2D graphics, Rectangle paintArea,
 	 *             ReferencedEnvelope mapArea) or paint(Graphics2D graphics,
@@ -408,7 +408,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 *            The graphics object to draw to.
 	 * @param paintArea
 	 *            The size of the output area in output units (eg: pixels).
-	 * @param envelope
+	 * @param mapArea
 	 *            the map's visible area (viewport) in map coordinates.
 	 */
 	public void paint(Graphics2D graphics, Rectangle paintArea,
@@ -432,7 +432,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 *            The graphics object to draw to.
 	 * @param paintArea
 	 *            The size of the output area in output units (eg: pixels).
-	 * @param envelope
+	 * @param mapArea
 	 *            the map's visible area (viewport) in map coordinates.
 	 * @param worldToScreen
 	 *            A transform which converts World coordinates to Screen
@@ -567,7 +567,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 *            The graphics object to draw to.
 	 * @param paintArea
 	 *            The size of the output area in output units (eg: pixels).
-	 * @param envelope
+	 * @param mapArea
 	 *            the map's visible area (viewport) in map coordinates. Its
 	 *            associate CRS is ALWAYS 2D
 	 * @param worldToScreen

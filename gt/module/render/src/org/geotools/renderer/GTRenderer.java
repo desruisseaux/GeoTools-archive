@@ -89,9 +89,9 @@ public interface GTRenderer {
      * of the map and the size of the output area are known. The transform
      * between the two is calculated internally.
      *
-     * @param graphics The graphics object to draw to.
+     * @param graphics  The graphics object to draw to.
      * @param paintArea The size of the output area in output units (eg: pixels).
-     * @param envelope the map's visible area (viewport) in map coordinates.
+     * @param mapArea   the map's visible area (viewport) in map coordinates.
      */
     public void paint( Graphics2D graphics, Rectangle paintArea, Envelope mapArea );
     
@@ -106,7 +106,7 @@ public interface GTRenderer {
 	 *            The graphics object to draw to.
 	 * @param paintArea
 	 *            The size of the output area in output units (eg: pixels).
-	 * @param envelope
+	 * @param mapArea
 	 *            the map's visible area (viewport) in map coordinates.
 	 */
 	public void paint(Graphics2D graphics, Rectangle paintArea,
@@ -123,7 +123,7 @@ public interface GTRenderer {
      *
      * @param graphics The graphics object to draw to.
      * @param paintArea The size of the output area in output units (eg: pixels).
-     * @param envelope the map's visible area (viewport) in map coordinates.
+     * @param mapArea the map's visible area (viewport) in map coordinates.
      * @param worldToScreen A transform which converts World coordinates to Screen coordinates.
      */
     public void paint( Graphics2D graphics, Rectangle paintArea,
@@ -141,7 +141,7 @@ public interface GTRenderer {
 	 *            The graphics object to draw to.
 	 * @param paintArea
 	 *            The size of the output area in output units (eg: pixels).
-	 * @param envelope
+	 * @param mapArea
 	 *            the map's visible area (viewport) in map coordinates.
 	 * @param worldToScreen
 	 *            A transform which converts World coordinates to Screen

@@ -44,7 +44,7 @@ public class CSBuilderFactory {
 	}
 
 	/**
-	 * @param class1
+	 * @param builderClass
 	 */
 	public static void setDefaultBuilderClass(Class builderClass) {
 		if(!CSBuilder.class.isAssignableFrom(builderClass))

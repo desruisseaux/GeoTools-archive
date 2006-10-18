@@ -60,7 +60,7 @@ public class MySQLSQLBuilder extends DefaultSQLBuilder {
      * </p>
      *
      * @param sql
-     * @param fidColumnName
+     * @param mapper     
      * @param attributes
      */
     public void sqlColumns(StringBuffer sql, FIDMapper mapper, AttributeType[] attributes) {

@@ -436,7 +436,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 * 
 	 * @param graphics
 	 * @param paintArea
-	 * @param transform
 	 * @param envelope
 	 */
 	public void paint(Graphics2D graphics, Rectangle paintArea,

@@ -432,7 +432,6 @@ public abstract class AbstractResourceCollection implements ResourceCollection {
      * note <code>iterator()</code> is implemented to call <code>open()</code>
      * and track the results in for later <code>purge()</code>.
      * 
-     * @param close
      * @return Iterator based on resource use
      */
     abstract protected Iterator openIterator();

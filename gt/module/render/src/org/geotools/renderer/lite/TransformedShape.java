@@ -93,8 +93,7 @@ public final class TransformedShape extends AffineTransform implements Shape {
 	 * 
 	 * @param matrix
 	 *            The flat matrix.
-	 * @param offset
-	 *            The index of the first element to use in <code>matrix</code>.
+	 * 
 	 */
 	public void setTransform(final double[] matrix) {
 		setTransform(matrix[0], matrix[1], matrix[2], matrix[3], matrix[4],

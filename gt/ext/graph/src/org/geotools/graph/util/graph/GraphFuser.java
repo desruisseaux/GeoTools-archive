@@ -87,7 +87,7 @@ public class GraphFuser {
    * Constructs a GraphFuser.
    * 
    * @param graph Graph to fuse.
-   * @param generator GraphGenerator used to fuse graph.
+   * @param builder GraphBuilder used to fuse graph.
    * @param merger Used to merge edges.
    */
   public GraphFuser(Graph graph, GraphBuilder builder, EdgeMerger merger) {

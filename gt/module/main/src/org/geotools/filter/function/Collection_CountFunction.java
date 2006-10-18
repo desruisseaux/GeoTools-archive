@@ -71,8 +71,6 @@ public class Collection_CountFunction extends FunctionExpressionImpl implements
 	 * 
 	 * @param collection
 	 *            collection to calculate the count
-	 * @param expression
-	 *            Single Expression argument
 	 * 
 	 * @return An object containing the count value of the attributes
 	 * 

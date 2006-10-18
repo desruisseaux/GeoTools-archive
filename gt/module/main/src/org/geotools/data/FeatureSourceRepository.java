@@ -220,7 +220,9 @@ public class FeatureSourceRepository implements Repository {
      * </p>
      * @see org.geotools.data.Catalog#registerDataStore(org.geotools.data.DataStore)
      * 
-     * @param dataStore
+     * @param id
+     * @param featureSource
+     * 
      * @throws IOException
      */
     public void register(String id, FeatureSource featureSource) throws IOException {
@@ -234,7 +236,7 @@ public class FeatureSourceRepository implements Repository {
      * </p>
      * @see org.geotools.data.Catalog#getDataStores(java.lang.String)
      * 
-     * @param namespace
+     * @param id
      * @return
      */
     public DataStore datastore(String id ) {    	
@@ -258,8 +260,7 @@ public class FeatureSourceRepository implements Repository {
      * </p>
      * @see org.geotools.data.Catalog#getDataStores(java.lang.String)
      * 
-     * @param namespace
-     * @return
+     * 
      */
     public Map getDataStores() {
     	return Collections.unmodifiableMap( dataStores() );

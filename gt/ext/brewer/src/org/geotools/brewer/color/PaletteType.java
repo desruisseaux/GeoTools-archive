@@ -69,8 +69,9 @@ public class PaletteType {
     }
 
     /**
-     * Is this set of palettes
-     * @return
+     * Deterines if this PaletteType instance is suitable ranged.
+     * 
+     * @return a boolean, true if the paletteType is sutableRanged.
      */
     public boolean isSuitableRanged() {
         return suitableRanged;

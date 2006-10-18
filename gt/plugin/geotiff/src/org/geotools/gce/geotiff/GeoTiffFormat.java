@@ -241,7 +241,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 * 
 	 * This file does not use hints in the construction of the geotiff reader.
 	 * 
-	 * @param source
+	 * @param destination
 	 *            must be a GeoTiff File
 	 * @param hints
 	 *            Hints to pass the hypothetic {@link GridCoverageReader} to
@@ -264,11 +264,8 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 * 
 	 * This file does not use hints in the construction of the geotiff reader.
 	 * 
-	 * @param source
+	 * @param destination
 	 *            must be a GeoTiff File
-	 * @param hints
-	 *            Hints to pass the hypothetic {@link GridCoverageReader} to
-	 *            control its behaviour.
 	 * 
 	 * @return a GeoTiffReader object initialized to the specified File.
 	 */

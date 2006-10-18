@@ -69,7 +69,7 @@ public class PolygonStyle2D extends LineStyle2D {
      * Sets the fill Composite for the {@linkplain org.geotools.renderer.geom.Polyline polyline} to
      * be rendered. Set it to <code>null</code> if the contour is to be opaque
      *
-     * @param contourComposite
+     * @param fillComposite
      */
     public void setFillComposite(Composite fillComposite) {
         this.fillComposite = fillComposite;

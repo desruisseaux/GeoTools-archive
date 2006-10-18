@@ -323,7 +323,7 @@ public class GroupHandler extends ElementGroupingHandler {
          * TODO summary sentence for findChildElement ...
          * 
          * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
-         * @param name
+         * @param arg1
          * @return
          */
         public Element findChildElement( String arg1 ) {

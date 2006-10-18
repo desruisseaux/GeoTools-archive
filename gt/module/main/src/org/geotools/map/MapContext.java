@@ -71,23 +71,24 @@ public interface MapContext {
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}.
 	 * 
-	 * @param layer
-	 *            Then new layer that has been added.
+	 * @param featureSource
+	 *            a FeatureSource with the new layer that will be added.
 	 */
 	void addLayer(FeatureSource featureSource, Style style);
 
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}.
 	 * 
-	 * @param layer
-	 *            Then new layer that has been added.
+	 * @param collection
+	 *            a FeatureCollection with the new layer that will be added.
 	 */
 	void addLayer(FeatureCollection collection, Style style);
 
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}
 	 * 
-	 * @param layer
+	 * @param gridCoverage
+	 *            a GridCoverage with the new layer that will be added.
 	 * 
 	 */
 	void addLayer(GridCoverage gridCoverage, Style style);
@@ -95,7 +96,8 @@ public interface MapContext {
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}
 	 * 
-	 * @param layer
+	 * @param gridCoverage
+	 *            an AbstractGridCoverage2DReader with the new layer that will be added.
 	 * 
 	 */
 	void addLayer(AbstractGridCoverage2DReader gridCoverage, Style style);
@@ -103,7 +105,8 @@ public interface MapContext {
 	/**
 	 * Remove a layer, if present, and trigger a {@link LayerListEvent}.
 	 * 
-	 * @param MapLayer
+	 * @param layer
+	 *            a MapLayer that will be added.
 	 * 
 	 * @return true if the layer has been removed
 	 */
@@ -184,8 +187,8 @@ public interface MapContext {
 	 * Returns the index of the first occurrence of the specified layer, or -1
 	 * if this list does not contain this element.
 	 * 
-	 * @param the
-	 *            layer to search for
+	 * @param layer
+	 *            the MapLayer to search for
 	 * 
 	 * @return DOCUMENT ME!
 	 */
@@ -237,7 +240,7 @@ public interface MapContext {
 	 * 
 	 * @param areaOfInterest
 	 *            The new areaOfInterest.
-	 * @param CoordinateReferenceSystem
+	 * @param coordinateReferenceSystem
 	 *            The coordinate system being using by this model.
 	 * 
 	 * @throws IllegalArgumentException

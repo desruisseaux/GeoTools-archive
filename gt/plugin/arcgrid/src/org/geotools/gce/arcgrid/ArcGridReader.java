@@ -274,6 +274,20 @@ public class ArcGridReader implements GridCoverageReader {
 	 * GridCoverage Interface so this method shows an error. All other methods
 	 * are using the geotools GridCoverage class
 	 * 
+<<<<<<< .working
+=======
+	 * <p>
+	 * To have an idea about the possible read parameters take a look at
+	 * {@link AbstractGridFormat} class and {@link ArcGridFormat} class.
+	 * 
+	 * @param params an array of {@link GeneralParameterValue}
+	 *               containing the parameters to control this read process.
+	 * 
+	 * @return a {@link GridCoverage2D}.
+	 * 
+	 * @see AbstractGridFormat
+	 * @see ArcGridFormat
+>>>>>>> .merge-right.r22225
 	 * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
 	 */
 	public GridCoverage read(GeneralParameterValue[] params)

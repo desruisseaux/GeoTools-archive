@@ -425,12 +425,11 @@ public final class RendererUtilities {
 	 * NOTE from simboss: I added soe minor fixes. See below.
 	 * 
 	 * @param envelope
-	 * @param coordinateReferenceSystem
 	 * @param imageWidth
 	 * @param imageHeight
 	 * @param DPI
 	 *            screen dots per inch (OGC standard is 90)
-	 * @return
+	 * 
 	 * 
 	 * TODO should I take into account also the destination CRS? Otherwise I am
 	 * just assuming that the final crs is lon,lat that is it maps lon to x (n

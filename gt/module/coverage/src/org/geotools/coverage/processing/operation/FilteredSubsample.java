@@ -108,7 +108,7 @@ public class FilteredSubsample extends Operation2D {
 			null, // Unit of measure
 			true); // Parameter is optional
 	/**
-	 * @param descriptor
+	 * 
 	 */
 	public FilteredSubsample() {
 		super(new DefaultParameterDescriptorGroup(Citations.OGC,

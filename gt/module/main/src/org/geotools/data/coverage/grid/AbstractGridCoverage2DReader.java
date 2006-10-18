@@ -732,9 +732,9 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * <p>
 	 * TODO use orthodromic distance?
 	 * 
-	 * @param requestedEnvelope
+	 * @param envelope the GeneralEnvelope
 	 * @param dim
-	 * @param requestedRes
+	 * @param crs
 	 * @throws DataSourceException
 	 */
 	protected final double[] getResolution(GeneralEnvelope envelope,

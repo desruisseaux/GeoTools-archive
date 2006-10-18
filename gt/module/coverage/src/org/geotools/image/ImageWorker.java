@@ -169,7 +169,7 @@ public class ImageWorker {
     /**
      * Creates a new builder for an image read from the specified file.
      *
-     * @param  image The file to read.
+     * @param  input The file to read.
      * @throws IOException if the file can't be read.
      */
     public ImageWorker(final File input) throws IOException {
@@ -178,8 +178,7 @@ public class ImageWorker {
     
     /**
      * Creates a new uninitialized builder for an image read.
-     *
-     * @param  image The file to read.
+     * 
      * @throws IOException if the file can't be read.
      */
     public ImageWorker()  {

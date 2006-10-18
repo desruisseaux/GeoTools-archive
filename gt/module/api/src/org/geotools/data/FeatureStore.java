@@ -48,7 +48,7 @@ public interface FeatureStore extends FeatureSource {
     /**
      * Adds all features from the passed feature reader "stream".
      *
-     * @param redaer The reader from which to add the features.
+     * @param reader The reader from which to add the features.
      *
      * @return the FeatureIds of the newly added features.
      * @deprecated Please use addFeatures( FeatureCollection )

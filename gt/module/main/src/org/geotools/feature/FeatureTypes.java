@@ -65,8 +65,9 @@ public class FeatureTypes {
      * Cholmes is providing documentation.
      * </p>
      * 
-     * @param attributeType
-     * @return max length of field in characters, or ANY_LENGTH
+     * @param type the AttributeType
+     * 
+     * @return an int indicating the max length of field in characters, or ANY_LENGTH
      */
     public static int getFieldLength( AttributeType type ) {
 

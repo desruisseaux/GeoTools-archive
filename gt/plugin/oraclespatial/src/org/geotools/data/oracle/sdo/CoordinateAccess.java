@@ -222,10 +222,10 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
      * <b>attributes</b>:[ [ m1, m2,...,mN], [ g1, g2,..., gN] ]
      * </code></pre>
      *
-     * @param dimensions column major ordinate arrays (these are spatially
-     *        significant)
+     * @param ordinateArrays  dimensions column major ordinate arrays 
+     *                        (these are spatially significant)
      * @param attributeArrays Indiviual attribute arrays may be primative or
-     *        object arrays
+     *                        object arrays
      */
      void setCoordinateArrays(double[][] ordinateArrays,
         Object[] attributeArrays);

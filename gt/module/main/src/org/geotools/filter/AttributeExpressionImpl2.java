@@ -46,7 +46,7 @@ public class AttributeExpressionImpl2 extends DefaultExpression
     /**
      * Constructor with the schema for this attribute.
      *
-     * @param schema The schema for this attribute.
+     * @param at the AttributeType schema for this attribute.
      */
     protected AttributeExpressionImpl2(AttributeType at) {
         this.at = at;

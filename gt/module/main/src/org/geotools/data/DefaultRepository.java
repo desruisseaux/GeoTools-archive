@@ -303,8 +303,9 @@ public class DefaultRepository implements Repository {
      * </p>
      * @see org.geotools.data.Catalog#getDataStores(java.lang.String)
      * 
-     * @param namespace
-     * @return
+     * @param id a String giving the name of the DataStore
+     * 
+     * @return the DataStore with the given name
      */
     public DataStore datastore(String id ) {
         return (DataStore) datastores.get( id );
@@ -317,8 +318,8 @@ public class DefaultRepository implements Repository {
      * </p>
      * @see org.geotools.data.Catalog#getDataStores(java.lang.String)
      * 
-     * @param namespace
-     * @return
+     * 
+     * 
      */
     public Map getDataStores() {
     	return Collections.unmodifiableMap( datastores );

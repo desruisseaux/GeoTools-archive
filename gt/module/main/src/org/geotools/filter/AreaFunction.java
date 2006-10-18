@@ -82,10 +82,7 @@ public class AreaFunction extends FunctionExpressionImpl
      * It is importatant that this is not left to a parent class unless the parents
      * API is identical.
      *
-     * @param visitor The visitor which requires access to this filter,
-     *                the method must call visitor.visit(this);
-     *
-     *
+     * 
      */
 
     public Expression[] getArgs() {

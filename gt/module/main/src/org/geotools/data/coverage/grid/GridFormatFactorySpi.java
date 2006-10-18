@@ -54,20 +54,13 @@ import org.opengis.coverage.grid.Format;
  */
 public interface GridFormatFactorySpi extends org.geotools.factory.Factory {
     /**
-     * Construct a live grid format using the params specifed.
+     * Construct a live grid format.
      *
-     * @param params The full set of information needed to construct a live
-     *        data store. Typical key values for the map include: url -
-     *        location of a resource, used by file reading datasources. dbtype
-     *        - the type of the database to connect to, e.g. postgis, mysql
+     * @return 
      *
-     * @return The created DataSource, this may be null if the required
-     *         resource was not found or if insufficent parameters were given.
-     *         Note that canProcess() should have returned false if the
-     *         problem is to do with insuficent parameters.
-     *
-     * @throws IOException if there were any problems creating or connecting
-     *         the datasource.
+     * @throws IOException (Warning: the rest of the javadoc comment was wrong) 
+     *                     if there were any problems creating or connecting
+     *                     the datasource.
      */
     Format createFormat();
 

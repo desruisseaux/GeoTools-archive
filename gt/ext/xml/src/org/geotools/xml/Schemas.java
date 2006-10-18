@@ -254,13 +254,14 @@ public class Schemas {
      *         The <code>includeParents</code> flag controls if this method should
      * returns those elements defined on parent types.
      * </p>
-     * @param element The parent element.
-     * @param includeParents Flag indicating if parent types should be processed.
+     * @param type           The parent element
+     * @param includeParents flag indicating if parent types should be processed
+     * 
      * @return A list of @link XSDElementDeclaration objects, one for each
      * child element.
      */
-    public static final List getChildElementDeclarations(
-        XSDTypeDefinition type, boolean includeParents) {
+    public static final List getChildElementDeclarations( XSDTypeDefinition type, 
+                                                          boolean includeParents) {
         final ArrayList elements = new ArrayList();
 
         TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
@@ -518,8 +519,8 @@ public class Schemas {
      *  immediate children are examined.
      * </ol>
      *
-     * @param element The containing element declaration.
-     * @param qName The qualified name of the contained element.
+     * @param parent the containing element declaration
+     * @param qName  the qualified name of the contained element
      *
      * @return The contained element declaration, or false if containment is
      * not satisfied.

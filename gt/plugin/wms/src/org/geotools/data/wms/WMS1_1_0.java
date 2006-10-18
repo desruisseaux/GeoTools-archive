@@ -157,8 +157,7 @@ public class WMS1_1_0 extends WMS1_0_0 {
         /**
          * @param onlineResource
          * @param request
-         * @param queryableLayers
-         * @param infoFormats
+         * 
          */
         public GetFeatureInfoRequest( URL onlineResource, org.geotools.data.wms.request.GetMapRequest request) {
             super(onlineResource, request);

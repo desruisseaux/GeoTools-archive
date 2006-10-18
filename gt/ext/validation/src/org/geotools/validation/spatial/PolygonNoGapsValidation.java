@@ -55,9 +55,9 @@ public class PolygonNoGapsValidation extends DefaultFeatureValidation {
      * 
      * <p></p>
      *
-     * wasparam layers a HashMap of key="TypeName" value="FeatureSource"
-     * wasparam envelope The bounding box of modified features
-     * @param results Storage for the error and warning messages
+     * @param feature the Feature to be validated
+     * @param type    the FeatureType of the feature
+     * @param results storage for the error and warning messages
      *
      * @return True if no features intersect. If they do then the validation
      *         failed.
@@ -68,8 +68,9 @@ public class PolygonNoGapsValidation extends DefaultFeatureValidation {
      *      com.vividsolutions.jts.geom.Envelope,
      *      org.geotools.validation.ValidationResults)
      */
-    public boolean validate(Feature feature, FeatureType type,
-	ValidationResults results){
+    public boolean validate(Feature feature, 
+                            FeatureType type,
+	                          ValidationResults results){
 		
         if(feature != null){
         	Geometry layer = feature.getDefaultGeometry();

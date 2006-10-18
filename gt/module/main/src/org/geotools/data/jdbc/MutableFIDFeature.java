@@ -41,7 +41,8 @@ public class MutableFIDFeature extends DefaultFeature {
    * 
    * I would love to protect this for safety reason, i.e. so client classes can't
    *  use it by casting to it.
-   * @param fid The fid to set.
+   * 
+   * @param id The fid to set.
    */
   public void setID(String id) {
     this.featureId = id;

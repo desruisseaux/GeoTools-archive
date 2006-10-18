@@ -305,8 +305,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 * return a list with all the values in priority order. Both grouped and
 	 * non-grouped
 	 * 
-	 * @param labelCache
-	 * @return
+	 * 
 	 */
 	public List orderedLabels() {
 		Collection c = labelCache.values();
@@ -1120,9 +1119,11 @@ public final class LabelCacheDefault implements LabelCache {
 	 * might return the orginal polygon if it cannot clip TODO: this is a bit
 	 * simplistic, there's lots more to do.
 	 * 
-	 * @param poy
+	 * @param poly
 	 * @param bbox
-	 * @return
+	 * @param displayGeomEnv
+	 * 
+	 * @return a MutliPolygon
 	 */
 	public MultiPolygon clipPolygon(Polygon poly, Polygon bbox,
 			Envelope displayGeomEnv) {
@@ -1316,7 +1317,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param edges
 	 * @param nodes
 	 * @param result
-	 * @param goAgain
+	 * 
 	 */
 	public void processNodes(List edges, Hashtable nodes, ArrayList result) {
 		int index = 0; // index into edges

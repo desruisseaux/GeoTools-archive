@@ -173,13 +173,7 @@ public class DataUtilities {
         return names;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     */
+
     public static String[] attributeNames(Expression expression) {
         if (expression == null) {
             return new String[0];
@@ -216,7 +210,7 @@ public class DataUtilities {
     }
     /**
      *
-     * @param filter DOCUMENT ME!
+     * @param expression DOCUMENT ME!
      * @param visitor DOCUMENT ME!
      */
     public static void traverse(Expression expression, FilterVisitor visitor) {
@@ -293,7 +287,7 @@ public class DataUtilities {
     /**
      * Performs a depth first traversal of Filter.
      *
-     * @param filter
+     * @param expression
      *
      * @return Set of Filters in traversing filter
      */
@@ -1562,7 +1556,7 @@ public class DataUtilities {
 	 * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
 	 * (temporary).
 	 * 
-	 * @param gc
+	 * @param gridCoverage
 	 *            the grid coverage
 	 * 
 	 * @return a feature with the grid coverage envelope as the geometry and the
@@ -1630,8 +1624,8 @@ public class DataUtilities {
 	 * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
 	 * (temporary).
 	 * 
-	 * @param gc
-	 *            the grid coverage
+	 * @param gridCoverageReader
+	 *            the grid coverage 
 	 * 
 	 * @return a feature with the grid coverage envelope as the geometry and the
 	 *         grid coverage itself in the "grid" attribute

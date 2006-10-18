@@ -41,7 +41,7 @@ public final class PointIterator extends AbstractLiteIterator {
     /**
      * Creates a new PointIterator object.
      *
-     * @param p The polygon
+     * @param point The point
      * @param at The affine transform applied to coordinates during iteration
      */
     public PointIterator(Point point, AffineTransform at) {

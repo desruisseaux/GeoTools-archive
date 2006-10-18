@@ -412,8 +412,8 @@ public class DefaultCatalog extends AbstractCatalog {
     /**
      * Fire a resource changed event, these may be batched into one delta for performance.
      * 
-     * @param resoruce IGeoResource undergoing change
-     * @param mask of IDelta constants indicating change
+     * @param event the event to be fired
+     * 
      * @throws IOException protected void fireResourceEvent( IGeoResource resource,
      *         IResolveDelta.Kind kind ) throws IOException { Object[] listeners =
      *         catalogListeners.getListeners(); if( listeners.length == 0 ) return;

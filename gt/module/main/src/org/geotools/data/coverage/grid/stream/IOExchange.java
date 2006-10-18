@@ -272,7 +272,7 @@ public class IOExchange {
      * is a PrintWriter or a Writer it assumes that stream is of the correct
      * type. There is no way to be certain aside from trying to write the data.
      * 
-     * @param source
+     * @param destination
      *            An object that identifies an input Current Implementation.
      *            accepts: Writer, URL, String, File, OutputStream Note: if
      *            source is a Writer it MUST already wrap a GZIPOutputStream.

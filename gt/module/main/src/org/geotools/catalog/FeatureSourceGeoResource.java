@@ -199,8 +199,8 @@ public abstract class FeatureSourceGeoResource extends AbstractGeoResource {
 	 * </ul>
 	 * </p>
 	 * 
-	 * @param featureSource The underlying feature source.
-	 * @param monitor Progress monitor for blocking calls.  
+	 * @param source  the underlying FeatureSource
+	 * @param monitor a ProgressListener for blocking calls.  
 	 * 
 	 * @return The resource info.
 	 */

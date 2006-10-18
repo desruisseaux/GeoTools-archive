@@ -37,7 +37,7 @@ public class GeometryExpressionImpl extends DefaultExpression {
     /**
      * Constructor with the schema for this attribute.
      *
-     * @param schema The schema for this attribute.
+     * @param colName a String with the schema for this attribute.
      */
     protected GeometryExpressionImpl(String colName) {
         this.colName = colName;

@@ -62,7 +62,7 @@ public interface Catalog extends Resolve {
      * An IService may belong to more than one Catalog.
      * </p>
      *
-     * @param entry
+     * @param service the Service to add to the catalog
      * @throws UnsupportedOperationException
      */
     void add(Service service) throws UnsupportedOperationException;
@@ -100,10 +100,10 @@ public interface Catalog extends Resolve {
     /**
      * Find Service matching this id directly from this Catalog.  This method is guaranteed to be non-blocking.
      *
-     * @param id used to match resolves
+     * @param query   a URI used to match resolves
      * @param monitor monitor used to watch progress
      *
-     * @return List (possibly empty) of matching services (objects of type
+     * @return a List (possibly empty) of matching services (objects of type
      * Service).
      */
     List findService(URI query, ProgressListener monitor);

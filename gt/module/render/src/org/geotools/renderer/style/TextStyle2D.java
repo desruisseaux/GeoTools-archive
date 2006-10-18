@@ -172,14 +172,14 @@ public class TextStyle2D extends Style2D {
     }
 
     /**
-     * @param i
+     * @param f
      */
     public void setAnchorX(double f) {
         anchorX = f;
     }
 
     /**
-     * @param i
+     * @param f
      */
     public void setAnchorY(double f) {
         anchorY = f;

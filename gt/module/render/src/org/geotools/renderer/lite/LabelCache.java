@@ -42,8 +42,11 @@ public interface LabelCache {
 	void startLayer();
 	/**
 	 * Puts a TextStyle and its associated shape in the cache. 
-	 * @param textStyle The TextStyle2D containing the style information 
-	 * @param shape the shape to be labeled
+	 * 
+	 * @param symbolizer the TextSymbolizer containing the style information 
+	 * @param feature
+	 * @param shape      the shape to be labeled
+	 * @param scaleRange
 	 */
 	void put(TextSymbolizer symbolizer, Feature feature, LiteShape2 shape, Range scaleRange) ;
 	/**

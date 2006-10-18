@@ -32,9 +32,9 @@ public class HsqlFilterFactoryImpl extends FilterFactoryImpl {
     /**
      * Creates a Geometry Expression with an initial schema.
      *
-     * @param schema the schema to create with.
+     * @param colName a Strint with the schema to create with
      *
-     * @return The new Attribute Expression.
+     * @return the new Attribute Expression
      */
     public GeometryExpressionImpl createGeometryExpression(String colName) {
         return new GeometryExpressionImpl(colName);

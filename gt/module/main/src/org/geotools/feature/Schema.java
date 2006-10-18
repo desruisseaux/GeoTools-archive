@@ -58,7 +58,8 @@ public class Schema {
      * on attribute facets). It is only used to get a list of the unique attribtues in
      * the resulting schema.
      * </p>
-     * @param FeatureType
+     * @param featureType
+     * 
      * @return Set of unique attribute names
      */
     public static List names( FeatureType featureType ) {
@@ -229,7 +230,9 @@ public class Schema {
     /**
      * Look up based on name in the provided position.
      * 
-     * @param position
+     * @param type  the FeatureType
+     * @param index the position
+     * 
      * @return
      */
     public static AttributeType attribute( FeatureType type, int index ) {
@@ -249,7 +252,9 @@ public class Schema {
      * <p>
      * AttributeType needs a xpath based access
      * </p>
-     * @param position
+     * @param type
+     * @param xpath
+     * 
      * @return
      */
     public static AttributeType xpath( FeatureType type, String xpath) {

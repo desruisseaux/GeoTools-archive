@@ -60,7 +60,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
     /**
      * 
      * @param ds
-     * @param ft
+     * @param typeName
      */
     public WFSFeatureStore(WFSDataStore ds, String typeName) {
         super(ds, typeName);

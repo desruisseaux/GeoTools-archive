@@ -68,7 +68,6 @@ public class Collection_BoundsFunction extends FunctionExpressionImpl
      * Calculate unique (using FeatureCalc) - only one parameter is used.
      *
      * @param collection collection to calculate the unique
-     * @param expression Single Expression argument
      *
      * @return An object containing the unique value of the attributes
      *

@@ -413,14 +413,18 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
 	 * @param userRange
 	 * @param reverse
 	 * @param swapXY
-	 * @param b
-	 * @return
+	 * @param halfPix
+	 * 
+	 * @return a MathTransform
+	 * 
 	 * @throws MismatchedDimensionException
 	 */
 	public static MathTransform getTransform(final GridRange gridRange,
-			final Envelope userRange, final boolean[] reverse,
-			final boolean swapXY, boolean halfPix)
-			throws MismatchedDimensionException {
+                                    			final Envelope userRange, 
+                                    			final boolean[] reverse,
+                                    			final boolean swapXY, 
+                                    			boolean halfPix)
+                                    			throws MismatchedDimensionException {
 		/*
          * Checks arguments validity. Grid range and envelope dimensions must match.
          * We are more tolerant for the coordinate system dimension (if any), since

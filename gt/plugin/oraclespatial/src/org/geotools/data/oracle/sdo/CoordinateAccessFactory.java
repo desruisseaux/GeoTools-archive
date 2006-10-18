@@ -41,8 +41,8 @@ public interface CoordinateAccessFactory extends CoordinateSequenceFactory {
      * <b>xyz</b>:[ [ x1, x2,...,xN], [ y1, y2,...,yN] ]
      * <b>attributes</b>:[ [ z1, z2,...,zN], [ t1, t2,..., tN] ]
      * </code></pre>
-     * @param ordinates column major ordinate arrays where xyz.length == getDimension()
-     * @param can be null. Column major measure arrays where attributes.length == getNumAttributes()
+     * @param xyz        an array of doubles in column major order where xyz.length == getDimension()
+     * @param attributes an array of Objects which can be null. Column major measure arrays where attributes.length == getNumAttributes()
      */    
     public CoordinateAccess create(double[] xyz[], Object[] attributes );
 

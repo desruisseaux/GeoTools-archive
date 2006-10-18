@@ -173,7 +173,8 @@ public class FilterCapabilities {
     /**
      * Adds a new support type to capabilities.  For 2.2 only function expression support is added this way.
      * As of geotools 2.3 this will be the supported way of adding to Filtercapabilities.
-     *  @param the class that indicates the new support.
+     * 
+     * @param type the Class that indicates the new support.
      */
     public void addType( Class type ){
     	if( FunctionExpression.class.isAssignableFrom(type) ){
@@ -314,7 +315,8 @@ public class FilterCapabilities {
     /**
      * Translates a String into an object that represents the operation
      * 
-     * @param s String, operation name
+     * @param name String, operation name
+     * 
      * @return one of the {@link FilterCapabilities} constants
      */
 	public static FilterCapabilities findOperation(String name) {
@@ -323,7 +325,8 @@ public class FilterCapabilities {
     /**
      * Translates a String into  an object that represents function expression
      * 
-     * @param s String, expression name
+     * @param name String, expression name
+     * 
      * @return one of the {@link FilterCapabilities} constants
      */
 	public static FilterCapabilities findFunction(String name) {

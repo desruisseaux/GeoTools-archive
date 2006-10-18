@@ -152,7 +152,7 @@ public class NullZeroValidation extends DefaultFeatureValidation {
     /**
      * set AttributeName to xpath expression.
      *
-     * @param name
+     * @param xpath A String
      */
     public void setAttribute(String xpath) {
         attribute = xpath;

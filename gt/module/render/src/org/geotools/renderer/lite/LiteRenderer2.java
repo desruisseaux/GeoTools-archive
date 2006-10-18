@@ -415,11 +415,11 @@ public class LiteRenderer2 implements Renderer, Renderer2D {
 	 * 
 	 * @param graphics
 	 * @param paintArea
-	 * @param transform
 	 * @param envelope
 	 */
-	public void paint(Graphics2D graphics, Rectangle paintArea,
-			Envelope envelope) {
+	public void paint(Graphics2D graphics, 
+	                  Rectangle paintArea,
+			              Envelope envelope) {
 		AffineTransform transform = worldToScreenTransform(envelope, paintArea);
 		error = 0;
 		if (hints != null)

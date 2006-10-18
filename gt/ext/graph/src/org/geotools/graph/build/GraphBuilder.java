@@ -126,7 +126,7 @@ public interface GraphBuilder {
      * of the existing graph are imported into the builder. Relationships between
      * nodes and edges are assummed to be preexistant. 
      * 
-     * @param graph A pre built graph.
+     * @param g A pre built graph.
      */
     public void importGraph(Graph g);
     

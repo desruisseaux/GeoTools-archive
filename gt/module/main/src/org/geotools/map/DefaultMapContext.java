@@ -295,8 +295,8 @@ public class DefaultMapContext implements MapContext {
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}.
 	 * 
-	 * @param gc
-	 *            Then new layer that has been added.
+	 * @param reader
+	 *            a reader with the new layer to be added.
 	 * @param style
 	 *            DOCUMENT ME!
 	 */

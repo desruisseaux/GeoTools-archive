@@ -96,7 +96,7 @@ public class SubsampleAverage extends Operation2D {
 			true); // Parameter is optional
 
 	/**
-	 * @param descriptor
+	 * 
 	 */
 	public SubsampleAverage() {
 		super(new DefaultParameterDescriptorGroup(Citations.OGC,

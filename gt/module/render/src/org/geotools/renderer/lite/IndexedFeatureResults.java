@@ -154,7 +154,7 @@ public final class IndexedFeatureResults implements FeatureResults {
 	}
 
 	/**
-	 * @param envelope
+	 * @param queryBounds an Envelope defining the boundary of the query
 	 * 
 	 */
 	public void setQueryBounds(Envelope queryBounds) {

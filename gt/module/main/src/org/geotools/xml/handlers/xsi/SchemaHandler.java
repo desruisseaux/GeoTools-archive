@@ -627,7 +627,7 @@ public class SchemaHandler extends XSIElementHandler {
      * convinience method for package classes
      * </p>
      * 
-     * @param qName
+     * @param qname
      * @return
      */
     protected SimpleType lookUpSimpleType( String qname ) {
@@ -739,7 +739,7 @@ public class SchemaHandler extends XSIElementHandler {
      * convinience method for package
      * </p>
      * 
-     * @param qName
+     * @param qname
      * @return
      * @throws SAXException
      */
@@ -849,7 +849,7 @@ public class SchemaHandler extends XSIElementHandler {
      * convinience method for package
      * </p>
      * 
-     * @param qName
+     * @param qname
      * @return
      * @throws SAXException
      */
@@ -966,7 +966,7 @@ public class SchemaHandler extends XSIElementHandler {
      * convinience method for package
      * </p>
      * 
-     * @param qName
+     * @param qname
      * @return
      * @throws SAXException
      */
@@ -1072,7 +1072,7 @@ public class SchemaHandler extends XSIElementHandler {
      * convinience method for the package
      * </p>
      * 
-     * @param qName
+     * @param qname
      * @return
      * @throws SAXException
      */
@@ -1180,7 +1180,7 @@ public class SchemaHandler extends XSIElementHandler {
      * convinience method for package
      * </p>
      * 
-     * @param qName
+     * @param qname
      * @return
      * @throws SAXException
      */
@@ -1249,7 +1249,7 @@ public class SchemaHandler extends XSIElementHandler {
      * convinience method for package
      * </p>
      * 
-     * @param qName
+     * @param qname
      * @return
      * @throws SAXException
      */

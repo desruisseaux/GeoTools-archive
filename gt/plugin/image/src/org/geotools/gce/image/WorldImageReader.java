@@ -395,7 +395,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	 * do not look for a world fiel but we suppose those information comes from
 	 * a different way (xml, gml, pigeon?)
 	 * 
-	 * @param parameters
+	 * @param params
 	 *            WorldImageReader supports no parameters, it just ignores them.
 	 * 
 	 * @return a new GridCoverage read from the source.

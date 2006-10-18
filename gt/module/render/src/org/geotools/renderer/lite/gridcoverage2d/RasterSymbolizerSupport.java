@@ -49,9 +49,9 @@ public final class RasterSymbolizerSupport {
 	private final RasterSymbolizer symbolizer;
 
 	/**
-	 * Creates a new GridCoverageRenderer object.
+	 * Constructor
 	 * 
-	 * @param gridCoverage
+	 * @param symbolizer
 	 * 
 	 */
 	public RasterSymbolizerSupport(final RasterSymbolizer symbolizer) {

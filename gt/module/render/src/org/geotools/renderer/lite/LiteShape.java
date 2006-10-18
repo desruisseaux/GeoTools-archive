@@ -83,7 +83,7 @@ public class LiteShape implements Shape, Cloneable {
      * @param at - the transformation applied to the geometry in order to get to the shape points
      * @param generalize - set to true if the geometry need to be generalized
      *        during rendering
-     * @param maxDistance - distance used in the generalization process
+     * 
      */
     public LiteShape(Geometry geom, AffineTransform at, boolean generalize) {
         if( geom!=null)

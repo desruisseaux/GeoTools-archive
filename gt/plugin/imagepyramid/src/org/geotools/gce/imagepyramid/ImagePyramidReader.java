@@ -144,7 +144,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	 * 
 	 * @param source
 	 *            The source object.
-	 * @param hints
+	 * @param uHints
 	 *            {@link Hints} to control the behaviour of this reader.
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException

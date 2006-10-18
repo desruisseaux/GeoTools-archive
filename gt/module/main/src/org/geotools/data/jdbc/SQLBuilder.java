@@ -41,12 +41,12 @@ public interface SQLBuilder {
      * since this requires DB dependant SQL.  Subclasses can override this to provide 
      * the maxFeatures functionality specific to their DB.
      *
-     * @param attrTypes The Attribute types for the select statement
-     * @param filter The filter to convert to a where statement.
-     * @param maxFeatures The max amount of features to return.
-     * @param useMax True if we are to use the maxFeature as the max.
+     * @param typeName  a String with the typeName used as the table to query
+     * @param mapper    an FIDMapper
+     * @param attrTypes the array of AttributeType elements for the select statement
+     * @param filter    the filter to convert to a where statement
      *
-     * @return An SQL statement.
+     * @return a String representing an SQL statement
      *
      * @throws SQLEncoderException If an error occurs encoding the SQL
      */
@@ -82,7 +82,7 @@ public interface SQLBuilder {
      * so they can request a wrapper function.
      * </p>
      * @param sql
-     * @param typeName
+     * @param mapper
      * @param attributes
      */
     public void sqlColumns( StringBuffer sql, FIDMapper mapper, AttributeType attributes[] );
@@ -93,7 +93,7 @@ public interface SQLBuilder {
      * sql: <code>FROM typeName</code>
      * </p>
      * @param sql
-     * @param featureType
+     * @param typeName
      */
     public void sqlFrom( StringBuffer sql, String typeName);
     

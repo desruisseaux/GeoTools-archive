@@ -91,8 +91,8 @@ public abstract class FeatureLockFactory implements Factory {
      * <p>
      * To aid in tracing your may wish to supply your own name,
      * rather than <code>LockID<code>, for use in lock generation.
-     * @param name User supplied name used in lock generation.
-     * @param date Date lock expires on.
+     * @param name     User supplied name used in lock generation.
+     * @param duration Date lock expires on.
      */
     public static FeatureLock generate(String name, long duration){
         return getInstance().createLock(name, duration);

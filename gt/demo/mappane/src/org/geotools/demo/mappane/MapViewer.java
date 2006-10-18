@@ -116,7 +116,8 @@ public class MapViewer {
     
     /**
      * Method used to set the current map projection.
-     * @param newCRS
+     * 
+     * @param crs A new CRS for the mappnae.
      */
     public void setCRS(CoordinateReferenceSystem crs){
     	mp.getContext().setAreaOfInterest(mp.getContext().getAreaOfInterest(),crs);

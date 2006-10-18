@@ -36,17 +36,22 @@ public class NumericAttributeType extends DefaultAttributeType implements Primat
      * @param name Name of this attribute.
      * @param type Class type of this attribute.
      * @param nillable If nulls are allowed for the attribute of this type.
-     * @param min DOCUMENT ME!
-     * @param max DOCUMENT ME!
-     * @param fieldLength DOCUMENT ME!
+     * @param min 
+     * @param max 
      * @param defaultValue default value when none is suppled
+     * @param filter
      *
      * @throws IllegalArgumentException is type is not a Number.
      *
      * @task REVISIT: protected?
      */
-    public NumericAttributeType(String name, Class type, boolean nillable,
-        int min, int max, Object defaultValue, Filter filter)
+    public NumericAttributeType(String name, 
+                                Class type, 
+                                boolean nillable,
+                                int min, 
+                                int max, 
+                                Object defaultValue, 
+                                Filter filter)
         throws IllegalArgumentException {
         super(name, type, nillable, min, max,  defaultValue);
         this.filter = filter;

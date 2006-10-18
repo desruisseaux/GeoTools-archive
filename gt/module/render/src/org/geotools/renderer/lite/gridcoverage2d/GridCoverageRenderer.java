@@ -128,16 +128,17 @@ public final class GridCoverageRenderer {
 	/**
 	 * Creates a new GridCoverageRenderer object.
 	 * 
-	 * @param gridCoverage
+	 * @param destinationCRS
 	 * @param envelope
 	 * @param screenSize
-	 * @param scaleDenominator
+	 * 
 	 * @throws TransformException
 	 * @throws NoninvertibleTransformException
 	 * 
 	 */
 	public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
-			final Envelope envelope, Rectangle screenSize)
+			                        final Envelope envelope, 
+			                        Rectangle screenSize)
 			throws TransformException, NoninvertibleTransformException {
 
 		this(destinationCRS, envelope, screenSize, null);

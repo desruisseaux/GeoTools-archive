@@ -71,8 +71,8 @@ public abstract class AbstractResourceList extends AbstractResourceCollection
      * <tt>UnsupportedOperationException</tt> unless <tt>add(int, Object)</tt>
      * is overridden.
      * 
-     * @param o
-     *            element to be appended to this list.
+     * @param item
+     *            the Object element to be appended to this list.
      * @return <tt>true</tt> (as per the general contract of
      *         <tt>Collection.add</tt>).
      * @throws UnsupportedOperationException
@@ -108,9 +108,11 @@ public abstract class AbstractResourceList extends AbstractResourceCollection
      * 
      * @param index
      *            index of element to replace.
-     * @param element
-     *            element to be stored at the specified position.
+     * @param item
+     *            the Object element to be stored at the specified position.
+     * 
      * @return the element previously at the specified position.
+     * 
      * @throws UnsupportedOperationException
      *             if the <tt>set</tt> method is not supported by this List.
      * @throws ClassCastException

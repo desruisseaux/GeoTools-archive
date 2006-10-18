@@ -89,8 +89,8 @@ public final class LiteFeatureTypeStyle {
 	 *   WATCH OUT FOR THIS.
 	 *   NOTE: image=null in this case
 	 * 
-	 * @param graphics2
-	 * @param ruleList2
+	 * @param graphics
+	 * @param ruleList
 	 * @param elseRuleList
 	 */
 	public LiteFeatureTypeStyle(Graphics2D graphics, ArrayList ruleList, ArrayList elseRuleList) 

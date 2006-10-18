@@ -160,7 +160,8 @@ public interface Feature {
      * Sets the parent collection this feature is stored in, if it is not
      * already set.  If it is set then this method does nothing.
      *
-     * @param Please don't use, a Feature can be in more then on collection
+     * NOTE: Please don't use, a Feature can be in more then on collection
+     * 
      * @param collection the collection to be set as parent.
      */
     void setParent(FeatureCollection collection);

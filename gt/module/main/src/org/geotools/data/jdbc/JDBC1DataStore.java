@@ -262,8 +262,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	/**
 	 * Construct a JDBCDataStore with ConnectionPool and associated
 	 * configuration.
-	 *
-	 * @param connectionPool
+	 * 
 	 * @param config
 	 *
 	 * @throws IOException

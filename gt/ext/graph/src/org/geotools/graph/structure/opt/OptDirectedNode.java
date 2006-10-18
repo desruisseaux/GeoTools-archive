@@ -291,7 +291,7 @@ public class OptDirectedNode extends OptGraphable implements DirectedNode {
    * Sets the out degree of the node. This method builds the out edge adjacency 
    * list of the node.
    * 
-   * @param indegree The out degree / size of out edge array of the node.
+   * @param outdegree The out degree / size of out edge array of the node.
    */
   public void setOutDegree(int outdegree) {
     m_out = new DirectedEdge[outdegree];

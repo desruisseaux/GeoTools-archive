@@ -36,7 +36,6 @@ public class GraphicStyle2D extends Style2D {
      * Creates a new GraphicStyle2D object.
      *
      * @param image The image that will be used to depict the centroid/point/...
-     * @param size The image size, in pixels
      * @param rotation The image rotation
      * @param opacity The image opacity
      */

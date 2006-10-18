@@ -425,7 +425,7 @@ public class DemoBase {
     /**
      * Loads a Web Feature Service into the catalog.
      * 
-     * @param a string URL for the Web Feature Service location.
+     * @param wfsurl a string URL for the Web Feature Service location.
      */
     public void loadWebFeatureServiceIntoCatalog(String wfsurl){
     
@@ -520,7 +520,7 @@ public class DemoBase {
     /**
      * Gets a FeatureCollection with the shapefile from the catalog.
      * <p>
-     * This method <b>must</b> be called after {@link #loadShapefileIntoCatalog()}.
+     * This method <b>must</b> be called after {@link #loadShapefileIntoCatalog(String)}.
      * </p>
      * @return The shapefile feature source.
      * 
@@ -617,7 +617,7 @@ public class DemoBase {
      * <p>
      * This method <b>must</b> be called 
      * </p>
-     * @return
+     * @return a java List of FeatureSources. 
      * @throws IOException
      */
     public List getListOfFeatureSourcesForWebFeatureService() throws IOException {
