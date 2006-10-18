@@ -1,44 +1,67 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
+  
 
-
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-validation</artifactId>
   <packaging>jar</packaging>
   <name>Validation Processor and Framework</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/validation/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/validation/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/validation/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/validation/</url>
   </scm>
+  
   <description>
     Validation module (and validator batch tool) for use with geotools2.
     This library has been ported to geotools2 as part of the VWFS project
     sponcered by Geo Innovations.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Jody Garnett</name>
@@ -72,10 +95,9 @@
   </developers>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -106,7 +128,25 @@
     </dependency>
   </dependencies>
 
-
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- The following test fails with the following exception:
+                 org.geotools.data.DataSourceException: Connection failed -->
+            <exclude>**/MemoryLeakOnlineTest.java</exclude>
+          </excludes>
+          
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 
 </project>

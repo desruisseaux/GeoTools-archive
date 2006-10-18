@@ -1,42 +1,65 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
+  
 
-
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-tiger</artifactId>
   <packaging>jar</packaging>
   <name>TIGER/Line 2000 datastore implementation</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/tiger/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/tiger/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/tiger/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/tiger/</url>
   </scm>
+  
   <description>
     U.S. Census TIGER/Line 2000 Datastore implementation.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Julian Ray</name>
@@ -51,10 +74,9 @@
   </developers>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -62,5 +84,6 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+
 
 </project>

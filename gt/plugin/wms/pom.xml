@@ -1,45 +1,68 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
+  
 
-
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-wms</artifactId>
   <packaging>jar</packaging>
   <name>Web Map Server client</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/wms/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/wms/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/wms/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/wms/</url>
   </scm>
+  
   <description>
     An OGC Web Map Server client implementation that can be used directly or as 
     through the GridCoverageExchange API. Direct usage is recommended, as the
     GridCoverageExchange access for WMS is not well tested and is complicated to
     use. It supports WMS versions 1.0.0, 1.1.0, 1.1.1, and 1.3.0.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Richard Gould</name>
@@ -55,10 +78,9 @@
   </developers>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -89,21 +111,23 @@
   </dependencies>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Plugins configuration                            -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <skip>true</skip>  <!-- Set this to 'true' to bypass unit tests entirely. -->
-          <!-- Surefile 2.1.2 fails for a mysterious reason before to run any test! -->
+          <!-- Set this to 'true' to bypass unit tests entirely.   -->
+          <skip>true</skip>  
+          <!-- Surefire 2.1.2 fails for a mysterious reason before -->
+          <!-- it runs any test!                                   -->
         </configuration>
       </plugin>
     </plugins>
   </build>
+
 
 </project>

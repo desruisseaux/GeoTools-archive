@@ -1,14 +1,18 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-ext</artifactId>
@@ -16,22 +20,35 @@
   </parent>
 
 
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-go</artifactId>
   <packaging>jar</packaging>
   <name>GO-1 implementation</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/go/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/go/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/go/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/go/</url>
   </scm>
+  
   <description>
     Provides a GO-1 (Geospatial Object) implementation. This module contains
     geometry implementations optimized for rendering, as well as a renderer.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
   <licenses>
     <license>
       <name>Lesser General Public License (LGPL)</name>
@@ -41,10 +58,9 @@
   </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Martin Desruisseaux</name>
@@ -63,7 +79,7 @@
   <contributors>
     <contributor>
       <name>Antoine Hnawia</name>
-      <organization>Institut de Recherche pour le développement</organization>
+      <organization>Institut de Recherche pour le dÃ©veloppement</organization>
       <timezone>+11</timezone>
       <roles>
         <role>Java Developer</role>
@@ -72,10 +88,9 @@
   </contributors>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>

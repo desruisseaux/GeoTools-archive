@@ -1,42 +1,65 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
+  
 
-
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-widgets-swing</artifactId>
   <packaging>jar</packaging>
   <name>Swing widgets</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/widgets-swing/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/widgets-swing/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/widgets-swing/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/widgets-swing/</url>
   </scm>
+  
   <description>
     Provides dialog box, status bar, etc. using Swing framework.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Martin Desruisseaux</name>
@@ -53,7 +76,7 @@
 
   <contributors>
     <contributor>
-      <name>Cédric Briançon</name>
+      <name>CÃ©dric BrianÃ§on</name>
       <organization>Geomatys</organization>
       <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <timezone>+1</timezone>
@@ -73,10 +96,9 @@
   </contributors>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -88,9 +110,10 @@
       <artifactId>gt2-coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
+      <!-- api used for ProgressListener, Feature and FeatureType. -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId> <!-- Used for ProgressListener, Feature and FeatureType. -->
+      <artifactId>gt2-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -99,11 +122,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+      <!-- We are not allowed to distribute javax.mail. -->
+      <!-- Furthermore, it is part of J2EE anyway. -->
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.3.2</version>
-      <scope>provided</scope>  <!-- We are not allowed to distribute it. Furthermore, it is part of J2EE anyway. -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.sun</groupId>
@@ -112,5 +137,6 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+
 
 </project>

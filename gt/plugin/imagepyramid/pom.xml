@@ -1,118 +1,144 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
+  
 
-
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-imagepyramid</artifactId>
   <packaging>jar</packaging>
   <name>imagepyramid datasource module</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/arcgrid/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/</url>
   </scm>
-  <description>Datasource created to read a pyramid of georeferenced images or geotiff (and in future also JPEG2K).</description>
+  
+  <description>
+    Datasource created to read a pyramid of georeferenced images or geotiff 
+    (and in future also JPEG2K).
+  </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
-  <developer>
-   <name>Simone Giannecchini</name>
-   <id>simboss</id>
-   <email>simboss1@gmail.com</email>
-   <roles>
-    <role>Java Developer</role>
-    <role>Module Maintainer</role>
-   </roles>
-  </developer>
- </developers>
+    <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+      <email>simboss1@gmail.com</email>
+      <roles>
+       <role>Java Developer</role>
+       <role>Module Maintainer</role>
+      </roles>
+   </developer>
+  </developers>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
-  <!-- ==================================================== -->
- <dependencies>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-api</artifactId>
-    <version>${project.version}</version>
-  </dependency>
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-imagemosaic</artifactId>
+      <artifactId>gt2-api</artifactId>
       <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-main</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-referencing</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-coverage</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>com.vividsolutions</groupId>
-    <artifactId>jts</artifactId>
-    <!-- The version number is specified in the parent POM. -->
-  </dependency>
-  <dependency>
-    <groupId>javax.units</groupId>
-    <artifactId>jsr108</artifactId>
-    <!-- The version number is specified in the parent POM. -->
-  </dependency>
-  <dependency>
-    <groupId>java3d</groupId>
-    <artifactId>vecmath</artifactId>
-    <!-- The version number is specified in the parent POM. -->
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-epsg-hsql</artifactId>
-    <version>${project.version}</version>
-  </dependency>
-  <dependency>
-    <groupId>hsqldb</groupId>
-    <artifactId>hsqldb</artifactId>
-    <!-- The version number is specified in the parent POM. -->
-  </dependency>
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-indexed-shapefile</artifactId>
-    <version>${project.version}</version>
-  </dependency> 
-  <dependency>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2-shapefile</artifactId>
-    <version>${project.version}</version>
-  </dependency>  
- </dependencies>
+    </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt2-imagemosaic</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>javax.units</groupId>
+      <artifactId>jsr108</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>java3d</groupId>
+      <artifactId>vecmath</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-epsg-hsql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-indexed-shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency> 
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>  
+  </dependencies>
+
 
 </project>

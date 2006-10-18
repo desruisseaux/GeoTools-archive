@@ -1,28 +1,63 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
 
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-xml-gml3</artifactId>
   <packaging>jar</packaging>
   <name>GML3 XML module</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/xml-gml2/</url>
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml3/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml3/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml3/</url>
   </scm>
   <description>
-	GML3 XML support for Geotools.
+    GML3 XML support for Geotools.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
 
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Justin Deoliveira</name>
@@ -35,6 +70,9 @@
     </developer>
   </developers>
 
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -68,6 +106,10 @@
     </dependency>    
   </dependencies>
 
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
   <build>
     <plugins>
       <plugin>

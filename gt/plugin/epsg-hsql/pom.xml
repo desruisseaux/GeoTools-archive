@@ -1,40 +1,58 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
+  
 
-
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-epsg-hsql</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using HSQL database</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/epsg-hsql/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-hsql/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-hsql/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-hsql/</url>
   </scm>
+  
   <description>
     Connection to an embedded EPSG database in HSQL format.
     This database is built from the SQL scripts delivered by EPSG.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
   <licenses>
     <license>
       <name>Lesser General Public License (LGPL)</name>
+      <!-- url>http://www.gnu.org/copyleft/lesser.txt</url -->
       <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-hsql/LICENSE.html</url>
       <distribution>repo</distribution>
     </license>
@@ -60,15 +78,14 @@
   </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Didier Richard</name>
       <email>dgr@libertysurf.fr</email>
-      <organization>Institut Géographique National - France</organization>
+      <organization>Institut GÃ©ographique National - France</organization>
       <timezone>+1</timezone>
       <roles>
         <role>Java Developer</role>
@@ -89,10 +106,9 @@
   </developers>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Dependencies                                     -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -111,5 +127,6 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
+
 
 </project>

@@ -1,38 +1,69 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Project configuration file for the Geotools 2 project
-         http://www.geotools.org/
-
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-maven</artifactId>
-    <version>2.4-SNAPSHOT</version>
+    <version>2.3.0-RC1-SNAPSHOT</version>
   </parent>
+  
 
-
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-javadoc</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Cross-modules javadoc</name>
+  <!-- <version></version> -->
   <url>http://modules.geotools.org/javadoc/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/javadoc/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/javadoc/</url>
+    <!-- <developerConnection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/
+    </developerConnection> -->
+  </scm>
+  
   <description>
-    Defines custom taglet for 'source' and 'tutorial' javadoc tags.
+    Defines custom taglet for 'source' and 'tutorial' javadoc tags and for the 
+    'code' javadoc inline tag.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Martin Desruisseaux</name>
@@ -50,9 +81,9 @@
 
 
 
-  <!-- ==================================================== -->
-  <!--     Sun's tools dependency   (from Maven FAQ)        -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Sun's tools dependency   (from Maven FAQ)               -->
+  <!-- =========================================================== -->
   <profiles>
     <profile>
       <id>default-tools.jar</id>
@@ -74,5 +105,6 @@
       </dependencies>
     </profile>
   </profiles>
+
 
 </project>

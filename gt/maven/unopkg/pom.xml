@@ -1,47 +1,66 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-     Maven 2 project configuration file
-     http://maven.apache.org/maven2/
-
-     Configuration file for Maven plugins specific to the the Geotools 2 project
-     http://www.geotools.org
-
-     Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-maven</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
+  
 
-
-
-  <!-- ==================================================== -->
-  <!--     Module description                               -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-unopkg</artifactId>
   <packaging>maven-plugin</packaging>
   <name>UNO packager for OpenOffice addins</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/unopkg/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/unopkg/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/unopkg/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/maven/unopkg/</url>
   </scm>
+  
   <description>
     Creates a uno.pkg file for OpenOffice, which is basically a ZIP file with
     a META-INF/manifest.xml file. The principle is similar to Java JAR files.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     Developers and contributors                      -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <name>Martin Desruisseaux</name>
@@ -56,5 +75,6 @@
       </roles>
     </developer>
   </developers>
+
 
 </project>

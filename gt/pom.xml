@@ -1,39 +1,48 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- ===========================================================================
-         Maven 2 Project configuration file for the Geotools project.
-         Version: $Id$
-     =========================================================================== -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
 
-  <!-- ===================================================================== -->
-  <!--     Profiles: modify the build process in certain conditions.         -->
-  <!--     Available profiles are:                                           -->
-  <!--                                                                       -->
-  <!--     extensive.tests   -  Performs more extensive tests than the       -->
-  <!--                          default. Only a few modules check for        -->
-  <!--                          this profile.                                -->
-  <!--                                                                       -->
-  <!--     interactive.tests -  Performs more extensive tests than the       -->
-  <!--                          default. Only a few modules check for        -->
-  <!--                          this profile.                                -->
-  <!--                                                                       -->
-  <!--     site.build      -  The main purpose of this build is to create    -->
-  <!--                        reports. Consequently, a JUnit test failure    -->
-  <!--                        will not stop the build. The failure should    -->
-  <!--                        be reported by the surefire report plugin.     -->
-  <!--                                                                       -->
-  <!--     Example:           mvn -Pextensive.tests install                  -->
-  <!--                        mvn -Psite.build site                          -->
-  <!--                                                                       -->
-  <!--     Note that profiles like "site.build" are not mandatory for        -->
-  <!--     using the "site" goal. Such profiles just modify the build        -->
-  <!--     process prior the "site" goal execution in a manner relevant      -->
-  <!--     to the purpose of the "site" goal.                                -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--   Properties and Profiles                                   -->
+  <!--       modify the build process in certain conditions.       -->
+  <!--                                                             -->
+  <!--   Available profiles are:                                   -->
+  <!--                                                             -->
+  <!--     extensive.tests    Performs more extensive tests than   -->
+  <!--                        the default. Only a few modules      -->
+  <!--                        check for this profile.              -->
+  <!--                                                             -->
+  <!--     interactive.tests  Performs more extensive tests than   -->
+  <!--                        the default. Only a few modules      -->
+  <!--                        check for this profile.              -->
+  <!--                                                             -->
+  <!--     site.build         The main purpose of this build is to -->
+  <!--                        create reports. Consequently, a      -->
+  <!--                        JUnit test failure will not stop the -->
+  <!--                        build. The failure should be         -->
+  <!--                        reported by the surefire report      -->
+  <!--                        plugin.                              -->
+  <!--                                                             -->
+  <!--     Example:           mvn -Pextensive.tests install        -->
+  <!--                        mvn -Psite.build site                -->
+  <!--                                                             -->
+  <!--     Note that profiles like "site.build" are not mandatory  -->
+  <!--     for using the "site" goal. Such profiles just modify    -->
+  <!--     the build process prior the "site" goal execution in a  -->
+  <!--     manner relevant to the purpose of the "site" goal.      -->
+  <!-- =========================================================== -->
   <properties>
     <allow.test.skip>true</allow.test.skip>
     <allow.test.failure.ignore>false</allow.test.failure.ignore>
@@ -41,7 +50,7 @@
     <interactive.tests>false</interactive.tests>
   </properties>
 
-  <!-- Overwrite the above default properties according command-line parameters. -->
+  <!-- Profiles set on the command-line overwrite default properties. -->
   <profiles>
     <profile>
       <id>extensive.tests</id>
@@ -64,22 +73,25 @@
       </properties>
     </profile>
   </profiles>
+  
 
-
-
-  <!-- ===================================================================== -->
-  <!--     Project description (including license).                          -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Project Description                                     -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2</artifactId>
   <packaging>pom</packaging>
   <version>2.4-SNAPSHOT</version>
   <name>Geotools</name>
   <url>http://maven.geotools.fr/reports/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/</url>
   </scm>
+  
   <description>
     Welcome to the homepage of the GeoTool2 build process
     In the left side bar you should see a list of active modules,
@@ -101,10 +113,9 @@
   </licenses>
 
 
-
-  <!-- ===================================================================== -->
-  <!--     Issue managements and mailing lists.                              -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Issue managements and mailing lists.                    -->
+  <!-- =========================================================== -->
   <issueManagement>
     <system>JIRA</system>
     <url>http://jira.codehaus.org/browse/GEOT</url>
@@ -113,51 +124,76 @@
   <mailingLists>
     <mailingList>
       <name>geotools-gt2-users</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-users</subscribe>
-      <post>geotools-geotools-gt2-users@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-users</archive>
+      <subscribe>
+        http://lists.sourceforge.net/lists/listinfo/geotools-gt2-users
+      </subscribe>
+      <post>
+        geotools-geotools-gt2-users@lists.sourceforge.net
+      </post>
+      <archive>
+        http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-users
+      </archive>
     </mailingList>
     <mailingList>
       <name>geotools-devel</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-devel</subscribe>
-      <post>geotools-devel@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-devel</archive>
+      <subscribe>
+        http://lists.sourceforge.net/lists/listinfo/geotools-devel
+      </subscribe>
+      <post>
+        geotools-devel@lists.sourceforge.net
+      </post>
+      <archive>
+        http://sourceforge.net/mailarchive/forum.php?forum=geotools-devel
+      </archive>
     </mailingList>
     <mailingList>
       <name>geotools-gt2-i18n</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-i18n</subscribe>
-      <post>geotools-geotools-gt2-i18n@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-i18n</archive>
+      <subscribe>
+        http://lists.sourceforge.net/lists/listinfo/geotools-gt2-i18n
+      </subscribe>
+      <post>
+        geotools-geotools-gt2-i18n@lists.sourceforge.net
+      </post>
+      <archive>
+        http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-i18n
+      </archive>
     </mailingList>
     <mailingList>
       <name>geotools-gt2-commits</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/geotools-gt2-commits</subscribe>
-      <post>geotools-geotools-gt2-commits@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-commits</archive>
+      <subscribe>
+        http://lists.sourceforge.net/lists/listinfo/geotools-gt2-commits
+      </subscribe>
+      <post>
+        geotools-geotools-gt2-commits@lists.sourceforge.net
+      </post>
+      <archive>
+        http://sourceforge.net/mailarchive/forum.php?forum=geotools-gt2-commits
+      </archive>
     </mailingList>
   </mailingLists>
 
 
-
-  <!-- ===================================================================== -->
-  <!--     Developers and contributors.                                      -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!--       TODO: Change this to the PMC list                     -->
+  <!-- =========================================================== -->
   <developers>
-    <developer>
-      <name>Ian Turton</name>
-      <id>ianturton</id>
-      <email>ianturton@users.sourceforge.net</email>
-      <organization>CCG</organization>
-      <roles>
-        <role>Java Developer</role>
-        <role>Project Management Committee (PMC) Member</role>
-      </roles>
-    </developer>
     <developer>
       <name>James Macgill</name>
       <id>jmacgill</id>
       <email>jmacgill@users.sourceforge.net</email>
       <organization>PennState</organization>
+      <roles>
+        <role>Exhalted Leader</role>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Ian Turton</name>
+      <id>ianturton</id>
+      <email>ianturton@users.sourceforge.net</email>
+      <organization>CCG</organization>
       <roles>
         <role>Java Developer</role>
         <role>Project Management Committee (PMC) Member</role>
@@ -251,7 +287,7 @@
       <organization>Refractions Research</organization>
       <roles>
         <role>Java Developer</role>
-        <role>Module Maintainer</role>				
+        <role>Module Maintainer</role>
       </roles>
     </developer>
     <developer>
@@ -261,7 +297,7 @@
       <organization>Refractions Research, Inc.</organization>
       <roles>
         <role>Java Developer</role>
-        <role>Module Maintainer</role>				
+        <role>Module Maintainer</role>
         <role>Project Management Committee (PMC) Member</role>
       </roles>
     </developer>
@@ -360,7 +396,7 @@
         <role>Java Developer</role>
         <role>Module Maintainer</role>
       </roles>
-    </developer> 		
+    </developer>
     <developer>
       <name>Rueben Schulz</name>
       <id>rschulz</id>
@@ -398,13 +434,12 @@
   </contributors>
 
 
-
-  <!-- ===================================================================== -->
-  <!--     Dependencies management.                                          -->
-  <!--     If a POM declares one of those dependencies, then it will use     -->
-  <!--     the version specified here. Otherwise, those dependencies are     -->
-  <!--     ignored.                                                          -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!--     If a POM declares one of those dependencies, then it    -->
+  <!--     will use the version specified here. Otherwise, those   -->
+  <!--     dependencies are ignored.                               -->
+  <!-- =========================================================== -->
   <dependencyManagement>
     <dependencies>
 
@@ -629,14 +664,13 @@
   </dependencyManagement>
 
 
-
-  <!-- ===================================================================== -->
-  <!--     Dependencies to be inherited by all modules.                      -->
-  <!--     In some previous Geotools version, those dependencies were        -->
-  <!--     specified in module pom.xml. However, experience show that        -->
-  <!--     aggregated javadoc fails if the GeoAPI dependency is not          -->
-  <!--     specified at this level.                                          -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependencies to be inherited by all modules.            -->
+  <!--     In some previous Geotools version, those dependencies   -->
+  <!--     were specified in module pom.xml. However, experience   -->
+  <!--     that aggregated javadoc fails if the GeoAPI dependency  -->
+  <!--     is not specified at this level.                         -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.opengis</groupId>
@@ -657,10 +691,9 @@
   </dependencies>
 
 
-
-  <!-- ===================================================================== -->
-  <!--     Build configuration (resources, ...).                             -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
   <build>
     <sourceDirectory>src</sourceDirectory>
     <scriptSourceDirectory>scripts</scriptSourceDirectory>
@@ -712,15 +745,17 @@
 
 
 
-    <!-- =================================================================== -->
-    <!--   Maven plugins dependencies management.                            -->
-    <!--   It should not be needed since Maven select by default the latest  -->
-    <!--   plugins. Unfortunatly, experience shows that new plugin releases  -->
-    <!--   sometime introduce new bugs that break our build. So it is safer  -->
-    <!--   to specify plugin versions that are known to work.  This list is  -->
-    <!--   in alphabetical order for easier comparaison with latest plugins  -->
-    <!--   at http://www.ibiblio.org/maven2/org/apache/maven/plugins/.       -->
-    <!-- =================================================================== -->
+    <!-- ========================================================= -->
+    <!--   Maven plugins dependencies management.                  -->
+    <!--   It should not be needed since Maven select by default   -->
+    <!--   the latest plugins. Unfortunatly, experience shows that -->
+    <!--   new plugin releases sometime introduce new bugs that    -->
+    <!--   break our build. So it is saferto specify plugin        -->
+    <!--   versions that are known to work.  This list is in       -->
+    <!--   alphabetical order for easier comparaison with latest   -->
+    <!--   plugins at                                              -->
+    <!--   http://www.ibiblio.org/maven2/org/apache/maven/plugins/ -->
+    <!-- ========================================================= -->
     <pluginManagement>
       <plugins>
         <plugin>
@@ -841,10 +876,11 @@
 
 
     <plugins>
-      <!-- =================================================================== -->
-      <!--     Source reformat (activated only on request, jalopy:format)      -->
-      <!--     See developer's guide for automated activation                  -->
-      <!-- =================================================================== -->
+      <!-- ======================================================= -->
+      <!--     Source reformat                                     -->
+      <!--       (activated only on request, jalopy:format)        -->
+      <!--     See developer's guide for automated activation      -->
+      <!-- ======================================================= -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jalopy-maven-plugin</artifactId>
@@ -863,9 +899,9 @@
 
 
 
-      <!-- =================================================================== -->
-      <!--     Compilation.                                                    -->
-      <!-- =================================================================== -->
+      <!-- ======================================================= -->
+      <!--     Compilation.                                        -->
+      <!-- ======================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -879,9 +915,9 @@
 
 
 
-      <!-- ================================================================= -->
-      <!--     Tests.                                                        -->
-      <!-- ================================================================= -->
+      <!-- ======================================================= -->
+      <!--     Tests.                                              -->
+      <!-- ======================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -894,8 +930,9 @@
           </excludes>
           <forkMode>once</forkMode>
           <argLine>-Xmx512M -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests}</argLine>
-          <!-- Ignores test failure only if we are generating a report for publication on
-            the web site. See the profiles section at the begining of this pom.xml file. -->
+          <!-- Ignores test failure only if we are generating a       -->
+          <!-- report for publication on the web site. See the        -->
+          <!-- profiles section at the begining of this pom.xml file. -->
           <testFailureIgnore>
             ${allow.test.failure.ignore}
           </testFailureIgnore>
@@ -904,9 +941,9 @@
 
 
 
-      <!-- ================================================================= -->
-      <!--     Code coverage                                                 -->
-      <!-- ================================================================= -->
+      <!-- ======================================================= -->
+      <!--     Code coverage                                       -->
+      <!-- ======================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clover-plugin</artifactId>
@@ -920,7 +957,8 @@
             <phase>pre-site</phase>
             <goals>
               <goal>instrument</goal>
-              <!-- aggregation is disabled due to http://jira.codehaus.org/browse/MCLOVER-34 -->
+              <!-- aggregation is disabled due to the bug:     -->
+              <!-- http://jira.codehaus.org/browse/MCLOVER-34  -->
             </goals>
           </execution>
         </executions>
@@ -935,9 +973,9 @@
 
 
 
-      <!-- ================================================================= -->
-      <!--     JAR packaging.                                                -->
-      <!-- ================================================================= -->
+      <!-- ======================================================= -->
+      <!--     JAR packaging.                                      -->
+      <!-- ======================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -956,33 +994,44 @@
 
   <reporting>
     <plugins>
-      <!-- ================================================================= -->
-      <!--     Javadoc generation.                                           -->
-      <!--     Notes:                                                        -->
-      <!--                                                                   -->
-      <!--       - Do NOT enable deep copying of "doc-files" directories     -->
-      <!--         ("-docfilessubdirs" option), because it has the unwanted  -->
-      <!--         side effect to copy .svn directories as well.             -->
-      <!--                                                                   -->
-      <!--       - Do NOT link source code, because it duplicates            -->
-      <!--         jxr-maven-plugin.                                         -->
-      <!--                                                                   -->
-      <!--       - <sourcepath/> and <subpackages/> elements doesn't seem    -->
-      <!--         to work with aggregated javadoc.                          -->
-      <!--                                                                   -->
-      <!-- ================================================================= -->
+      <!-- ======================================================= -->
+      <!--     Javadoc generation.                                 -->
+      <!--                                                         -->
+      <!--     Notes:                                              -->
+      <!--       Do NOT enable deep copying of "doc-files"         -->
+      <!--       directories ("-docfilessubdirs" option), because  -->
+      <!--       it has the unwanted side effect to copy .svn      -->
+      <!--       directories as well.                              -->
+      <!--                                                         -->
+      <!--       Do NOT link source code, because it duplicates    -->
+      <!--       jxr-maven-plugin.                                 -->
+      <!--                                                         -->
+      <!--       <sourcepath/> and <subpackages/> elements do not  -->
+      <!--       seem to work with aggregated javadoc.             -->
+      <!--                                                         -->
+      <!-- ======================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        
         <configuration>
-          <source>1.4</source>            <!-- Necessary to enable javadoc to handle J2SE 1.4 features.           -->
-          <version>false</version>        <!-- Specifies whether or not the version text is included.             -->
-          <noqualifier>all</noqualifier>  <!-- Omits qualifying package name from ahead of class names in output. -->
-          <quiet>true</quiet>             <!-- Shuts off non-error and non-warning messages.                      -->
-          <maxmemory>512M</maxmemory>     <!-- The maximum Java heap size to be used when launching the javadoc.  -->
-          <encoding>ISO-8859-1</encoding> <!-- Specifies the encoding name of the source files.                   -->
-          <aggregate>true</aggregate>     <!-- Whether to build an aggregated report at the root.                 -->
-          <additionalparam>-keywords</additionalparam> <!-- Set an additional parameter on the command line.      -->
+            <!-- Necessary to enable javadoc to handle J2SE 1.4 features. -->
+          <source>1.4</source>
+            <!-- Specifies whether or not the version text is included.-->
+          <version>false</version>
+            <!-- Omit qualifying package name before class names in output.-->
+          <noqualifier>all</noqualifier>
+            <!-- Shuts off non-error and non-warning messages.-->
+          <quiet>true</quiet>
+            <!-- The maximum Java heap size to be used to run javadoc. -->
+          <maxmemory>512M</maxmemory>
+            <!-- Specifies the encoding name of the source files.-->
+          <encoding>ISO-8859-1</encoding>
+            <!-- Whether to build an aggregated report at the root.-->
+          <aggregate>true</aggregate>
+          
+            <!-- Set an additional parameter for the command line. -->
+          <additionalparam>-keywords</additionalparam> 
           <breakiterator>true</breakiterator>
           <excludePackageNames>
             org.geotools.resources:org.geotools.maven:com
@@ -1054,7 +1103,8 @@
             </tag>
           </tags>
 
-          <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
+          <!-- Creates links to existing javadoc-generated         --> 
+          <!-- documentation of external referenced classes.       -->
           <links>
             <link>http://java.sun.com/j2se/1.4/docs/api</link>
             <link>http://java.sun.com/j2ee/1.4/docs/api</link>
@@ -1065,7 +1115,8 @@
             <link>http://www.jump-project.org/docs/jts/1.7/api</link>
           </links>
 
-          <!-- Separates packages on the overview page into whatever groups is specified. -->
+          <!-- Separates packages on the overview page into the    -->
+          <!-- groups  specified.                                  -->
           <groups>
             <group>
               <title>Spatial Referencing by Coordinates</title>
@@ -1139,25 +1190,28 @@
 
 
 
-      <!-- ================================================================= -->
-      <!--     Web site generation.                                          -->
-      <!-- ================================================================= -->
+      <!-- ======================================================= -->
+      <!--     Web site generation.                                -->
+      <!-- ======================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <configuration>
           <siteDirectory>site</siteDirectory>
-<!-- TODO The following is disabled for now because of a bug in French resources
-          <locales>en,fr</locales>   <! Generates the site in English and French -->
+          <!-- Generates the site in English and French -->
+          <!-- Set to English only for now because of a bug 
+               in French resources
+          <locales>en,fr</locales>
+          -->
           <locales>en</locales>
         </configuration>
       </plugin>
 
 
 
-      <!-- ================================================================= -->
-      <!--     Reports configuration for the web site.                       -->
-      <!-- ================================================================= -->
+      <!-- ======================================================= -->
+      <!--     Reports configuration for the web site.             -->
+      <!-- ======================================================= -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -1175,7 +1229,8 @@
         <artifactId>maven-clover-plugin</artifactId>
       </plugin>
       
-      <!-- Verification of coding rules. Disabled, nobody is using it at the moment
+      <!-- Verification of coding rules. -->
+      <!-- Disabled, nobody is using it at the moment
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
@@ -1196,7 +1251,8 @@
       
       
       <!-- SVN activities during the last 30 days -->
-      <!-- Disabled for now, because this plugin crash with a NullPointerException
+      <!-- Disabled for now, because this plugin crash with a 
+           NullPointerException.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>changelog-maven-plugin</artifactId>
@@ -1226,10 +1282,10 @@
 
 
 
-  <!-- ===================================================================== -->
-  <!--     Repositories (ibiblio, refractions...).                           -->
-  <!--     This is where Maven looks for dependencies.                       -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Repositories (ibiblio, refractions...).                 -->
+  <!--     This is where Maven looks for dependencies.             -->
+  <!-- =========================================================== -->
   <repositories>
     <repository>
       <snapshots>
@@ -1266,11 +1322,10 @@
   </repositories>
 
 
-
-  <!-- ===================================================================== -->
-  <!--     Plugin repositories.                                              -->
-  <!--     This is where Maven looks for plugin dependencies.                -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Plugin repositories.                                    -->
+  <!--     This is where Maven looks for plugin dependencies.      -->
+  <!-- =========================================================== -->
   <pluginRepositories>
     <pluginRepository>
       <id>codehaus-snapshot-plugins</id>
@@ -1286,10 +1341,9 @@
   </pluginRepositories>
 
 
-
-  <!-- ===================================================================== -->
-  <!--     Modules included in the build in approximative dependency order   -->
-  <!-- ===================================================================== -->
+  <!-- =========================================================== -->
+  <!--     Modules for the build in approximate dependency order   -->
+  <!-- =========================================================== -->
   <modules>
     <module>maven</module>
     <module>module</module>
@@ -1297,5 +1351,6 @@
     <module>ext</module>
     <module>demo</module>
   </modules>
+  
   
 </project>

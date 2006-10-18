@@ -1,45 +1,65 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- =======================================================================
-         Maven 2 project configuration file
-         http://maven.apache.org/maven2/
-
-         Maven plugins specific to the the Geotools 2 project
-         http://www.geotools.org
-
-         Version: $Id$
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
      ======================================================================= -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.geotools</groupId>
     <artifactId>gt2</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
+  
 
-
-  <!-- ==================================================== -->
-  <!--     Project description                              -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-maven</artifactId>
   <packaging>pom</packaging>
   <name>Maven plugins for Geotools 2</name>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/maven/</url>
+  
   <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/</connection>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/
+    </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/maven/</url>
   </scm>
+  
   <description>
     Maven plugins specific to the the Geotools 2 project.
   </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
 
-
-  <!-- ==================================================== -->
-  <!--     External dependencies                            -->
-  <!-- ==================================================== -->
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -57,12 +77,11 @@
       <version>1.2</version>
     </dependency>
   </dependencies>
-
-
-
-  <!-- ==================================================== -->
-  <!--     All Geotools 2 plugins included in the build     -->
-  <!-- ==================================================== -->
+  
+  
+  <!-- =========================================================== -->
+  <!--     Modules included in the build                           -->
+  <!-- =========================================================== -->
   <modules>
     <module>build-configs</module>
     <module>jar-collector</module>
@@ -72,5 +91,6 @@
     <module>rmic</module>
     <module>unopkg</module>
   </modules>
+  
 
 </project>

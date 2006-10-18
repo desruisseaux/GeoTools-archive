@@ -1,31 +1,73 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
   <parent>
     <artifactId>gt2-ext</artifactId>
     <groupId>org.geotools</groupId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+  
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-mappane</artifactId>
   <name>JMapPane Implementation</name>
-  <description>Provides an implementation of JMapPane (a swing widget capable of
-  displaying a map) as used in demos.</description>
+  <!-- <version></version> -->
   <url>http://maven.geotools.fr/reports/mappane</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/ext/mappane
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/ext/mappane</url>
+    <developerConnection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt2-ext/gt2-mappane
+    </developerConnection>
+  </scm>
+  
+  <description>
+    Provides an implementation of JMapPane (a swing widget capable of
+    displaying a map) as used in demos.
+  </description>
+   
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
   <developers>
     <developer>
       <id>ianturton</id>
       <name>Ian Turton</name>
       <email>ianturton@users.sourceforge.net</email>
       <organization>CCG</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>jive</id>
-      <name>Jody Garnett</name>
-      <email>jive@users.sourceforge.net</email>
-      <organization>Refractions Research, Inc.</organization>
       <roles>
         <role>Java Developer</role>
       </roles>
@@ -49,11 +91,11 @@
       </roles>
     </developer>
   </developers>
-  <scm>
-    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/ext/mappane</connection>
-    <url>http://svn.geotools.org/geotools/trunk/ext/mappane</url>
-    <developerConnection>scm:svn:http://svn.geotools.org/geotools/trunk/gt2-ext/gt2-mappane</developerConnection>
-  </scm>
+  
+  
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -81,16 +123,22 @@
       <version>1.0-M1</version>
     </dependency>
   </dependencies>
+  
+  
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
   <build>
     <resources>
-      <resource>	
+      <resource>
         <directory>src</directory>
         <includes>
           <include>**/resources/**</include>
         </includes>
       </resource>
-
     </resources>
   </build>
+  
+  
 </project>
 

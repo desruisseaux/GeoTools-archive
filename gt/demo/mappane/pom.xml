@@ -1,17 +1,100 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id$              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>gt2-demo</artifactId>
     <groupId>org.geotools</groupId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+  
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-demo-mappane</artifactId>
   <packaging>jar</packaging>
   <name>Demos of the JMapPane</name>
   <version>2.4-SNAPSHOT</version>
-  <description>Demos for Geotools 2.</description>
   <url>http://maven.geotools.fr/reports/demo/property</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/mappane
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/mappane/</url>
+    <!-- 
+    <developerConnection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt2-demo/gt2-demo-mappane
+    </developerConnection>
+    -->
+  </scm>
+  
+  <description>
+    Demos for Geotools 2.
+  </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <!--
+  <developers>
+    <developer>
+      <name></name>
+      <id></id>
+      <email></email>
+      <organization></organization>
+      <roles>
+        <role></role>
+      </roles>
+    </developer>
+  </developers>
+  
+  <contributors>
+    <contributor>
+      <name></name>
+      <id></id>
+      <email></email>
+      <organization></organization>
+      <roles>
+        <role></role>
+      </roles>
+    </contributor>
+  </contributors>
+  -->
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -39,10 +122,11 @@
       <version>2.4-SNAPSHOT</version>
     </dependency>
   </dependencies>
-  
-  <!-- ==================================================== -->
-  <!--     Compilation (including resources)                -->
-  <!-- ==================================================== -->
+
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
   <build>
     <resources>
       <resource>
@@ -53,4 +137,6 @@
       </resource>
     </resources>
   </build>
+  
+  
 </project>

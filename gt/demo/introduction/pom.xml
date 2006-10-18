@@ -1,17 +1,101 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- =======================================================================    
+        Maven Project Configuration File                                        
+                                                                                
+        The Geotools Project                                                    
+            http://www.geotools.org/                                            
+                                                                                
+        Version: $Id: pom.xml 21768 2006-10-03 13:04:43Z acuster $              
+     ======================================================================= -->
+  <project xmlns="http://maven.apache.org/POM/4.0.0" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                               http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>gt2-demo</artifactId>
     <groupId>org.geotools</groupId>
-    <version>2.4-SNAPSHOT</version>
+    <version>2.3.0-RC1-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+  
+
+  <!-- =========================================================== -->
+  <!--     Module Description                                      -->
+  <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
   <artifactId>gt2-demo-introduction</artifactId>
   <packaging>jar</packaging>
-  <name>Geotools Introductory Demo</name>
-  <version>2.4-SNAPSHOT</version>
-  <description>Demos for Geotools 2.</description>
+  <name>Demo Introduction to Geotools</name>
+  <version>2.3.0-RC1-SNAPSHOT</version>
   <url>http://maven.geotools.fr/reports/demo/introduction</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/introduction/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml2/</url>
+    <!-- 
+    <developerConnection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt2-demo/gt2-demo-introduction
+    </developerConnection>
+    -->
+  </scm>
+  
+  <description>
+    An introductory demonstration application.
+  </description>
+  
+  <organization>
+    <name>Geotools</name>
+    <url>http://www.geotools.org</url>
+  </organization>
+  
+  <inceptionYear>1996</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>Public Domain</name>
+      <url>
+        http://svn.geotools.org/geotools/trunk/gt/demo/introduction/LICENSE.txt
+      </url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Adrian Custer</name>
+      <id>acuster</id>
+      <email>acuster@gmail.com</email>
+      <organization>The gnuGIS Project</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Documentation Writer</role>
+      </roles>
+    </developer>
+  </developers>
+  
+  <!--
+  <contributors>
+    <contributor>
+      <name></name>
+      <organization></organization>
+      <roles>
+        <role></role>
+      </roles>
+    </contributor>
+  </contributors>
+  -->
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -21,40 +105,45 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-api</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-mappane</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-demo-mappane</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-wfs</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-postgis</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
-   <build>
+
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
     <resources>
       <resource>
         <directory>.</directory>
@@ -64,7 +153,7 @@
         </includes>
       </resource>
       <resource>
-        <!-- targetPath>resources</targetPath -->
+        <!-- targetPath>data</targetPath -->
         <directory>resources</directory>
         <includes>
           <include>**</include>
@@ -72,4 +161,6 @@
       </resource>
     </resources>
   </build>
+  
+  
 </project>
