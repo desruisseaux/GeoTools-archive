@@ -178,7 +178,7 @@ import javax.xml.namespace.QName;
  *
  *  <pre>
  *          <code>
- *class CollectionStrategy implements ComplexStrategy {
+ *class CollectionStrategy implements ComplexBinding {
  *
  *          Collection collection;
  *          <b>
@@ -215,17 +215,17 @@ import javax.xml.namespace.QName;
  */
 public interface Binding {
     /**
-     * Specifies that a strategy should be executed after its direct parent
+     * Specifies that a binding should be executed after its direct parent
      */
     static final int AFTER = 0;
 
     /**
-     * Specifes that a strategy should be executed before its direct parent.d
+     * Specifes that a binding should be executed before its direct parent.d
      */
     static final int BEFORE = 1;
 
     /**
-     * Specifies that a strategy should totally override the execution of its
+     * Specifies that a binding should totally override the execution of its
      * direct parent.
      */
     static final int OVERRIDE = 2;
@@ -241,7 +241,7 @@ public interface Binding {
     Class getType();
     
     /**
-     * @return The execution mode of the strategy, one of the constants AFTER,
+     * @return The execution mode of the binding, one of the constants AFTER,
      * BEFORE, or OVERRIDE.
      *
      * @see SimpleBinding#AFTER
