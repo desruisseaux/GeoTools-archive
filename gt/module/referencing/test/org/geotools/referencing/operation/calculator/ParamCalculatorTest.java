@@ -73,7 +73,7 @@ public class ParamCalculatorTest extends TestCase {
     private DirectPosition[] generateCoords(int countOfVertices) {
         CoordinateReferenceSystem crs = DefaultEngineeringCRS.CARTESIAN_2D;
         DirectPosition[] vert = new DirectPosition[countOfVertices];
-        Random randomCoord = new Random();
+        Random randomCoord = new Random(460335194);
 
         for (int i = 0; i < countOfVertices; i++) {
             double x = randomCoord.nextDouble() * 1000;

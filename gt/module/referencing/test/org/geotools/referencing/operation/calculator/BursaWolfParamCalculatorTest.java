@@ -55,7 +55,7 @@ public class BursaWolfParamCalculatorTest extends TestCase {
      * Test {@link BursaWolfParamCalculator}.
      */
     public void testBursaWolfParamCalculaterXrotation() throws TransformException {
-        Random random = new Random();
+        Random random = new Random(773418718);
 
         double R = 6370000;
         double angle = (((random.nextDouble() * 10) / 3600) * Math.PI) / 180;
@@ -107,7 +107,7 @@ public class BursaWolfParamCalculatorTest extends TestCase {
      */
     public void test2BursaWolfParamCalculater() throws TransformException {
         double R = 6370000;
-        Random random = new Random();
+        Random random = new Random(143477662);
         int numberOfPoints = 3 * 10;
 
         //double[] points = new double[numberOfPoints];

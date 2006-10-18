@@ -94,7 +94,7 @@ public class TriangulationFactoryTest extends TestCase {
         // ArrayList vertices = new ArrayList();
 
         // generator for points within the quadrilateral:        
-        Random randomCoord = new Random();
+        Random randomCoord = new Random(872066443);
 
         // number of points
         int number = 5;
