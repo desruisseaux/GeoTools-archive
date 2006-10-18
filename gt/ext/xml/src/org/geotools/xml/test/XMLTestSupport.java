@@ -39,23 +39,15 @@ public abstract class XMLTestSupport extends TestCase {
     protected Document document;
 
     /**
-     *
+     * Creates an empty xml document.
      */
     protected void setUp() throws Exception {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory
-            .newInstance();
-        docFactory.setNamespaceAware(true);
-
-        document = docFactory.newDocumentBuilder().newDocument();
-
-        Element root = createRootElement(document);
-
-        document.appendChild(root);
-
-        registerNamespaces(root);
-        registerSchemaLocation(root);
+    	DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+   	 	docFactory.setNamespaceAware(true);
+   	 
+    	document = docFactory.newDocumentBuilder().newDocument();
     }
-
+    
     /**
      * Creates the root element for the document.
      * <p>
@@ -65,7 +57,7 @@ public abstract class XMLTestSupport extends TestCase {
      *
      * @return the root element of the instnace document.
      */
-    protected abstract Element createRootElement(Document doc);
+    //protected abstract Element createRootElement(Document doc);
 
     /**
      * Template method for subclasses to register namespace mappings on the
@@ -74,11 +66,13 @@ public abstract class XMLTestSupport extends TestCase {
      * Namespace mappings should be set as follows:
      * <pre>
      * <code>
-     *         root.setAttribute( "xmlns:gml", http://www.opengis.net/gml" );
-     *         ....
-     *  root.setAttribute( "xmlns", "http://www.opengis.net/sld" ); //default
+     *	root.setAttribute( "xmlns:gml", http://www.opengis.net/gml" );
      * </code>
      * </pre>
+     * </p>
+     * <p>
+     * Subclasses of this method should register the default namespace, the 
+     * default namesapce is the one returned by the configuration.
      * </p>
      * <p>
      * This method is intended to be extended or overiden. This implementation
@@ -93,25 +87,7 @@ public abstract class XMLTestSupport extends TestCase {
             "http://www.w3.org/2001/XMLSchema-instance");
     }
 
-    /**
-     * Template method for subclasses to register schema locatoins on the root
-     * element of an instance document.
-     * <p>
-     * <pre>
-     * <code>
-     *         root.setAttribute(
-     *                 "xsi:schemaLocation",
-     *                 "http://www.opengis.net/gml gml.xsd "http://www.opengis.net/sld" sld.xsd
-     *         );
-     * </code>
-     * </pre>
-     * </p>
-     *
-     * @param root The root node of the instance document.
-     */
-    protected abstract void registerSchemaLocation(Element root);
-
-    /**
+      /**
      * Tempalte method for subclasses to create the configuration to be used by
      * the parser.
      *
@@ -129,9 +105,22 @@ public abstract class XMLTestSupport extends TestCase {
      * @throws Exception
      */
     protected Object parse() throws Exception {
-        Configuration config = createConfiguration();
+    	 
+    	Element root = document.getDocumentElement();
+    	if ( root == null ) {
+    		throw new IllegalStateException( "Document has no root element" );
+    	}
 
-        DOMParser parser = new DOMParser(config, document);
+    	Configuration config = createConfiguration();
+        
+    	registerNamespaces(root);
+    	
+    	//default
+    	root.setAttribute( 
+			"xsi:schemaLocation", config.getNamespaceURI() + " " + config.getSchemaFileURL() 
+		);
+     
+	    DOMParser parser = new DOMParser(config, document);
 
         return parser.parse();
     }
