@@ -17,8 +17,10 @@
 package org.geotools.graph.build.feature;
 
 import org.geotools.feature.Feature;
+import org.geotools.graph.build.GraphBuilder;
 import org.geotools.graph.build.GraphGenerator;
 import org.geotools.graph.build.basic.BasicGraphGenerator;
+import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.Graphable;
 
 /**
@@ -39,6 +41,14 @@ public class FeatureGraphGenerator extends BasicGraphGenerator {
 	
 	public FeatureGraphGenerator( GraphGenerator decorated ) {
 		this.decorated = decorated;
+	}
+	
+	public Graph getGraph() {
+		return decorated.getGraph();
+	}
+	
+	public GraphBuilder getGraphBuilder() {
+		return decorated.getGraphBuilder();
 	}
 	
 	public Graphable add( Object obj ) {
