@@ -15,23 +15,19 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gml3.GML3TestSupport;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 public class DirectPositionListTypeBindingTest extends GML3TestSupport {
-    protected Element createRootElement(Document doc) {
-        return doc.createElementNS(GML.NAMESPACE, GML.POSLIST.getLocalPart());
-    }
-
     public void test1D() throws Exception {
+        GML3MockData.element(GML.posList, document, document);
         document.getDocumentElement().setAttribute("count", "2");
-        document.getDocumentElement()
-                .appendChild(document.createTextNode("1.0 2.0 "));
+        document.getDocumentElement().appendChild(document.createTextNode("1.0 2.0 "));
 
         DirectPosition[] dps = (DirectPosition[]) parse();
         assertNotNull(dps);
@@ -45,9 +41,9 @@ public class DirectPositionListTypeBindingTest extends GML3TestSupport {
     }
 
     public void test2D() throws Exception {
+        GML3MockData.element(GML.posList, document, document);
         document.getDocumentElement().setAttribute("count", "1");
-        document.getDocumentElement()
-                .appendChild(document.createTextNode("1.0 2.0 "));
+        document.getDocumentElement().appendChild(document.createTextNode("1.0 2.0 "));
 
         DirectPosition[] dps = (DirectPosition[]) parse();
         assertNotNull(dps);

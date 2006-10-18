@@ -15,40 +15,17 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import org.geotools.gml3.GML3TestSupport;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 public class LinearRingTypeBindingTest extends GML3TestSupport {
-    protected Element createRootElement(Document doc) {
-        return document.createElementNS(GML.LINEARRING.getNamespaceURI(),
-            GML.LINEARRING.getLocalPart());
-    }
-
     public void testPos() throws Exception {
-        Element pos = document.createElementNS(GML.POS.getNamespaceURI(),
-                GML.POS.getLocalPart());
-        pos.appendChild(document.createTextNode("1.0 2.0"));
-        document.getDocumentElement().appendChild(pos);
-
-        pos = document.createElementNS(GML.POS.getNamespaceURI(),
-                GML.POS.getLocalPart());
-        pos.appendChild(document.createTextNode("3.0 4.0"));
-        document.getDocumentElement().appendChild(pos);
-
-        pos = document.createElementNS(GML.POS.getNamespaceURI(),
-                GML.POS.getLocalPart());
-        pos.appendChild(document.createTextNode("5.0 6.0"));
-        document.getDocumentElement().appendChild(pos);
-
-        pos = document.createElementNS(GML.POS.getNamespaceURI(),
-                GML.POS.getLocalPart());
-        pos.appendChild(document.createTextNode("1.0 2.0"));
-        document.getDocumentElement().appendChild(pos);
+        document.appendChild(GML3MockData.linearRingWithPos(document, null));
 
         LinearRing line = (LinearRing) parse();
         assertNotNull(line);
@@ -60,11 +37,7 @@ public class LinearRingTypeBindingTest extends GML3TestSupport {
     }
 
     public void testPosList() throws Exception {
-        Element posList = document.createElementNS(GML.POSLIST.getNamespaceURI(),
-                GML.POSLIST.getLocalPart());
-        posList.appendChild(document.createTextNode(
-                "1.0 2.0 3.0 4.0 5.0 6.0 1.0 2.0"));
-        document.getDocumentElement().appendChild(posList);
+        document.appendChild(GML3MockData.linearRingWithPosList(document, null));
 
         LinearRing line = (LinearRing) parse();
         assertNotNull(line);

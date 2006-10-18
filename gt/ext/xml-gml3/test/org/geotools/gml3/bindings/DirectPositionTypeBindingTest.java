@@ -15,20 +15,17 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.gml3.GML3TestSupport;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 public class DirectPositionTypeBindingTest extends GML3TestSupport {
-    protected Element createRootElement(Document doc) {
-        return doc.createElementNS(GML.NAMESPACE, GML.POS.getLocalPart());
-    }
-
     public void test1D() throws Exception {
+        GML3MockData.element(GML.pos, document, document);
         document.getDocumentElement().appendChild(document.createTextNode("1.0"));
 
         DirectPosition pos = (DirectPosition) parse();
@@ -40,8 +37,8 @@ public class DirectPositionTypeBindingTest extends GML3TestSupport {
     }
 
     public void test2D() throws Exception {
-        document.getDocumentElement()
-                .appendChild(document.createTextNode("1.0 2.0"));
+        GML3MockData.element(GML.pos, document, document);
+        document.getDocumentElement().appendChild(document.createTextNode("1.0 2.0"));
 
         DirectPosition pos = (DirectPosition) parse();
 
