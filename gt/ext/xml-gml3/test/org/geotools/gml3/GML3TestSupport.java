@@ -15,20 +15,15 @@
  */
 package org.geotools.gml3;
 
+import org.w3c.dom.Element;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.test.XMLTestSupport;
-import org.w3c.dom.Element;
 
 
 public abstract class GML3TestSupport extends XMLTestSupport {
     protected void registerNamespaces(Element root) {
         super.registerNamespaces(root);
-        root.setAttribute("xmlns", "http://www.opengis.net/gml");
-    }
-
-    protected void registerSchemaLocation(Element root) {
-        root.setAttribute("xsi:schemaLocation",
-            "http://www.opengis.net/gml gml.xsd ");
+        root.setAttribute("xmlns:gml", "http://www.opengis.net/gml");
     }
 
     protected Configuration createConfiguration() {
