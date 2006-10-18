@@ -20,10 +20,12 @@ import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
+import org.geotools.xml.BindingFactory;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.picocontainer.defaults.DefaultPicoContainer;
+import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import java.util.ArrayList;
@@ -121,8 +123,8 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         for (int i = 0; i < element.getAttributes().length; i++) {
             AttributeInstance attribute = element.getAttributes()[i];
             ParseExecutor executor = new ParseExecutor(attribute, null,
-                    parent.getContext());
-            BindingWalker walker = new BindingWalker(parser.getBindingFactory(),
+                    parent.getContext(), parser );
+            BindingWalker walker = new BindingWalker(parser.getBindingLoader(), 
                     parent.getContext());
             walker.walk(attribute.getAttributeDeclaration(), executor);
 
@@ -134,10 +136,12 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         //TODO: this should only be done if the element is complex, this class
         // needs to be split into two, one for complex, other for simple
         setContext(new DefaultPicoContainer(parent.getContext()));
-
+        
+        //set the context on the binding factory
+        ((BindingFactoryImpl)parser.getBindingFactory()).setContext( getContext() );
         ContextInitializer initer = new ContextInitializer(element, node,
                 getContext());
-        new BindingWalker(parser.getBindingFactory(), getContext()).walk(element
+        new BindingWalker( parser.getBindingLoader(), getContext()).walk(element
             .getElementDeclaration(), initer);
     }
 
@@ -156,8 +160,8 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         }
 
         ParseExecutor executor = new ParseExecutor(element, node,
-                getParentHandler().getContext());
-        new BindingWalker(parser.getBindingFactory(),
+                getParentHandler().getContext(), parser );
+        new BindingWalker( parser.getBindingLoader(), 
             getParentHandler().getContext()).walk(element.getElementDeclaration(),
             executor);
 
