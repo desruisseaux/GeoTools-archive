@@ -19,6 +19,7 @@ import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
+import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
@@ -62,9 +63,14 @@ public class ParserHandler extends DefaultHandler {
     /** handler factory **/
     HandlerFactory handlerFactory;
 
-    /** strategy factory **/
-    BindingFactory strategyFactory;
+    /** binding loader */
+    BindingLoader bindingLoader;
 
+    /**
+     * binding factory
+     */
+    BindingFactory bindingFactory;
+    
     /** the document handler **/
     DocumentHandler documentHandler;
 
@@ -85,10 +91,14 @@ public class ParserHandler extends DefaultHandler {
         return handlerFactory;
     }
 
-    public BindingFactory getBindingFactory() {
-        return strategyFactory;
+    public BindingLoader getBindingLoader() {
+    	return bindingLoader;
     }
 
+    public BindingFactory getBindingFactory() {
+		return bindingFactory;
+	}
+    
     public XSDSchema[] getSchemas() {
         return schemas;
     }
@@ -134,6 +144,10 @@ public class ParserHandler extends DefaultHandler {
         //setup the namespace support
         namespaces = new NamespaceSupport();
         context.registerComponentInstance(namespaces);
+        
+        //binding factory support
+        bindingFactory = new BindingFactoryImpl( bindingLoader );
+        context.registerComponentInstance( bindingFactory );
     }
 
     public void startElement(String uri, String localName, String qName,
@@ -315,12 +329,12 @@ public class ParserHandler extends DefaultHandler {
 
     protected void configure(Configuration config) {
         handlerFactory = new HandlerFactoryImpl();
-        strategyFactory = new BindingFactoryImpl();
+        bindingLoader = new BindingLoader();
 
         //configure the strategy objects
-        MutablePicoContainer container = strategyFactory.getContainer(); 
+        MutablePicoContainer container = bindingLoader.getContainer(); 
         container = config.setupBindings( container );
-        strategyFactory.setContainer( container );
+        bindingLoader.setContainer( container );
     }
 
     protected XSDSchemaLocator[] findSchemaLocators() {
