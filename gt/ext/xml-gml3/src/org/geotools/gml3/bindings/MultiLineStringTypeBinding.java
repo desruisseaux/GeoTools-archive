@@ -15,13 +15,13 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.Iterator;
+import java.util.List;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import org.geotools.xml.*;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -60,7 +60,7 @@ public class MultiLineStringTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.MULTILINESTRINGTYPE;
+        return GML.MultiLineStringType;
     }
 
     /**

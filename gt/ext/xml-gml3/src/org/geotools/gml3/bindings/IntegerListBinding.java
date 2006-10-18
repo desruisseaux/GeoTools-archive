@@ -15,8 +15,8 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.geotools.xml.*;
 import javax.xml.namespace.QName;
+import org.geotools.xml.*;
 
 
 /**
@@ -43,7 +43,7 @@ public class IntegerListBinding extends AbstractSimpleBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.INTEGERLIST;
+        return GML.integerList;
     }
 
     /**
@@ -53,7 +53,7 @@ public class IntegerListBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return int[].class;
     }
 
     /**
@@ -64,7 +64,13 @@ public class IntegerListBinding extends AbstractSimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        String[] values = ((String) value).split(" +");
+        int[] integers = new int[values.length];
+
+        for (int i = 0; i < values.length; i++) {
+            integers[i] = Integer.parseInt(values[i]);
+        }
+
+        return integers;
     }
 }

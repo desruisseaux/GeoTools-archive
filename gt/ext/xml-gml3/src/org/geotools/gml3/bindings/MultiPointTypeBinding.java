@@ -15,12 +15,12 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.ArrayList;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.xml.*;
-import java.util.ArrayList;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -64,7 +64,7 @@ public class MultiPointTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.MULTIPOINTTYPE;
+        return GML.MultiPointType;
     }
 
     /**
@@ -98,7 +98,6 @@ public class MultiPointTypeBinding extends AbstractComplexBinding {
                 points.add(p[i]);
         }
 
-        return gFactory.createMultiPoint((Point[]) points.toArray(
-                new Point[points.size()]));
+        return gFactory.createMultiPoint((Point[]) points.toArray(new Point[points.size()]));
     }
 }

@@ -16,13 +16,13 @@
 package org.geotools.gml3.smil;
 
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.geotools.gml3.bindings.smil.SMIL20LANG;
 import org.geotools.gml3.bindings.smil.SMIL20LANGBindingConfiguration;
 import org.geotools.gml3.bindings.smil.SMIL20SchemaLocationResolver;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 public class SMIL20LANGConfiguration extends Configuration {
@@ -38,8 +38,7 @@ public class SMIL20LANGConfiguration extends Configuration {
      */
     public URL getSchemaFileURL() throws MalformedURLException {
         return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(),
-                "smil20-language.xsd"));
+                           .resolveSchemaLocation(null, getNamespaceURI(), "smil20-language.xsd"));
     }
 
     /**

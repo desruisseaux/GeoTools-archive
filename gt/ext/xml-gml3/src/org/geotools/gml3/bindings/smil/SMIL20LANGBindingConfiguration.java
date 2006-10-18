@@ -15,8 +15,8 @@
  */
 package org.geotools.gml3.bindings.smil;
 
-import org.geotools.xml.BindingConfiguration;
 import org.picocontainer.MutablePicoContainer;
+import org.geotools.xml.BindingConfiguration;
 
 
 /**
@@ -24,8 +24,7 @@ import org.picocontainer.MutablePicoContainer;
  *
  * @generated
  */
-public final class SMIL20LANGBindingConfiguration
-    implements BindingConfiguration {
+public final class SMIL20LANGBindingConfiguration implements BindingConfiguration {
     /**
      * @generated modifiable
      */

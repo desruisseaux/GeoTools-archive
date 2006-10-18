@@ -15,16 +15,16 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.List;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -77,7 +77,7 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.ENVELOPETYPE;
+        return GML.EnvelopeType;
     }
 
     /**
@@ -101,13 +101,11 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
         CoordinateReferenceSystem crs = GML3ParsingUtils.crs(node);
 
         if (node.getChild("lowerCorner") != null) {
-            DirectPosition l = (DirectPosition) node.getChildValue(
-                    "lowerCorner");
-            DirectPosition u = (DirectPosition) node.getChildValue(
-                    "upperCorner");
+            DirectPosition l = (DirectPosition) node.getChildValue("lowerCorner");
+            DirectPosition u = (DirectPosition) node.getChildValue("upperCorner");
 
-            return new ReferencedEnvelope(l.getOrdinate(0), l.getOrdinate(1),
-                u.getOrdinate(0), u.getOrdinate(1), crs);
+            return new ReferencedEnvelope(l.getOrdinate(0), l.getOrdinate(1), u.getOrdinate(0),
+                u.getOrdinate(1), crs);
         }
 
         if (node.hasChild(Coordinate.class)) {
@@ -123,15 +121,14 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
             DirectPosition dp1 = (DirectPosition) dp.get(0);
             DirectPosition dp2 = (DirectPosition) dp.get(1);
 
-            return new ReferencedEnvelope(dp1.getOrdinate(0),
-                dp1.getOrdinate(1), dp2.getOrdinate(0), dp2.getOrdinate(1), crs);
+            return new ReferencedEnvelope(dp1.getOrdinate(0), dp1.getOrdinate(1),
+                dp2.getOrdinate(0), dp2.getOrdinate(1), crs);
         }
 
         if (node.hasChild(CoordinateSequence.class)) {
             CoordinateSequence seq = (CoordinateSequence) node.getChildValue(CoordinateSequence.class);
 
-            return new ReferencedEnvelope(seq.getX(0), seq.getY(0),
-                seq.getX(1), seq.getY(1), crs);
+            return new ReferencedEnvelope(seq.getX(0), seq.getY(0), seq.getX(1), seq.getY(1), crs);
         }
 
         return null;

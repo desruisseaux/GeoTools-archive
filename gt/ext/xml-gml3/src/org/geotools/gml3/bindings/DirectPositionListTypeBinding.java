@@ -15,12 +15,12 @@
  */
 package org.geotools.gml3.bindings;
 
+import javax.xml.namespace.QName;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.xml.*;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -58,7 +58,7 @@ public class DirectPositionListTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.DIRECTPOSITIONLISTTYPE;
+        return GML.DirectPositionListType;
     }
 
     public int getExecutionMode() {

@@ -15,13 +15,13 @@
  */
 package org.geotools.gml3.bindings;
 
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.xml.*;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import javax.xml.namespace.QName;
+import org.geotools.xml.*;
 
 
 /**
@@ -79,7 +79,7 @@ public class PointTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.POINTTYPE;
+        return GML.PointType;
     }
 
     /**
@@ -101,16 +101,13 @@ public class PointTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         if (node.hasChild(DirectPosition.class)) {
-            DirectPosition dp = (DirectPosition) node
-                .getChildValue(DirectPosition.class);
+            DirectPosition dp = (DirectPosition) node.getChildValue(DirectPosition.class);
 
-            return gFactory.createPoint(new Coordinate(dp.getOrdinate(0),
-                    dp.getOrdinate(1)));
+            return gFactory.createPoint(new Coordinate(dp.getOrdinate(0), dp.getOrdinate(1)));
         }
 
         if (node.hasChild(Coordinate.class)) {
-            return gFactory.createPoint((Coordinate) node.getChildValue(
-                    Coordinate.class));
+            return gFactory.createPoint((Coordinate) node.getChildValue(Coordinate.class));
         }
 
         if (node.hasChild(CoordinateSequence.class)) {

@@ -15,9 +15,9 @@
  */
 package org.geotools.gml3.bindings;
 
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.xml.*;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -53,7 +53,7 @@ public class PolygonPropertyTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.POLYGONPROPERTYTYPE;
+        return GML.PolygonPropertyType;
     }
 
     /**

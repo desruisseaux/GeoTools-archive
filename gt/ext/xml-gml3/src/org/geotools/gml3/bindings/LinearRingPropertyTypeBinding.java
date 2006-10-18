@@ -15,8 +15,9 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.geotools.xml.*;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.LinearRing;
+import org.geotools.xml.*;
 
 
 /**
@@ -45,7 +46,7 @@ public class LinearRingPropertyTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.LINEARRINGPROPERTYTYPE;
+        return GML.LinearRingPropertyType;
     }
 
     /**
@@ -55,7 +56,7 @@ public class LinearRingPropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return LinearRing.class;
     }
 
     /**
@@ -66,7 +67,6 @@ public class LinearRingPropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        return node.getChildValue(LinearRing.class);
     }
 }

@@ -23,6 +23,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.type.SchemaImpl;
 import org.geotools.xml.gml.GMLComplexTypes.PolygonPropertyType;
 import org.geotools.xml.gml.GMLComplexTypes.PolygonType;
@@ -74,8 +76,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType VOLUMETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("VolumeType", java.lang.Object.class);
+    public static final AttributeType VOLUMETYPE_TYPE = AttributeTypeFactory.newAttributeType("VolumeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -96,8 +98,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTSOLIDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractSolidType", java.lang.Object.class);
+    public static final AttributeType ABSTRACTSOLIDTYPE_TYPE = AttributeTypeFactory.newAttributeType("AbstractSolidType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -118,8 +120,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ELLIPSOIDALCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("EllipsoidalCSType", java.lang.Object.class);
+    public static final AttributeType ELLIPSOIDALCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("EllipsoidalCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -141,8 +143,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POLARCSREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PolarCSRefType", java.lang.Object.class);
+    public static final AttributeType POLARCSREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("PolarCSRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -161,8 +163,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NAMEORNULL_TYPE = AttributeTypeFactory
-        .newAttributeType("NameOrNull", java.lang.Object.class);
+    public static final AttributeType NAMEORNULL_TYPE = AttributeTypeFactory.newAttributeType("NameOrNull",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -214,8 +216,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRIDLENGTHTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GridLengthType", java.lang.Object.class);
+    public static final AttributeType GRIDLENGTHTYPE_TYPE = AttributeTypeFactory.newAttributeType("GridLengthType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -275,8 +277,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIGEOMETRYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiGeometryType", java.lang.Object.class);
+    public static final AttributeType MULTIGEOMETRYTYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiGeometryType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -322,8 +324,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FORMULATYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("FormulaType", java.lang.Object.class);
+    public static final AttributeType FORMULATYPE_TYPE = AttributeTypeFactory.newAttributeType("FormulaType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -348,8 +350,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SYMBOLTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SymbolType", java.lang.Object.class);
+    public static final AttributeType SYMBOLTYPE_TYPE = AttributeTypeFactory.newAttributeType("SymbolType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -416,8 +418,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POINTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PointType", Point.class);
+    public static final AttributeType POINTTYPE_TYPE = AttributeTypeFactory.newAttributeType("PointType",
+            Point.class);
 
     /**
      * <p>
@@ -469,8 +471,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType VERTICALCSREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("VerticalCSRefType", java.lang.Object.class);
+    public static final AttributeType VERTICALCSREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("VerticalCSRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -491,8 +493,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RINGPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("RingPropertyType", java.lang.Object.class);
+    public static final AttributeType RINGPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("RingPropertyType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -568,8 +570,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType VALUEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ValuePropertyType", java.lang.Object.class);
+    public static final AttributeType VALUEPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("ValuePropertyType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -617,8 +619,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BASEUNITTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("BaseUnitType", java.lang.Object.class);
+    public static final AttributeType BASEUNITTYPE_TYPE = AttributeTypeFactory.newAttributeType("BaseUnitType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -653,8 +655,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTGENERALCONVERSIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGeneralConversionType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractGeneralConversionType", java.lang.Object.class);
 
     /**
      * <p>
@@ -725,8 +726,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINETYPETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LineTypeType", java.lang.Object.class);
+    public static final AttributeType LINETYPETYPE_TYPE = AttributeTypeFactory.newAttributeType("LineTypeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -752,8 +753,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DERIVEDCRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DerivedCRSType", java.lang.Object.class);
+    public static final AttributeType DERIVEDCRSTYPE_TYPE = AttributeTypeFactory.newAttributeType("DerivedCRSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -791,8 +792,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTDATUMTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractDatumType", java.lang.Object.class);
+    public static final AttributeType ABSTRACTDATUMTYPE_TYPE = AttributeTypeFactory.newAttributeType("AbstractDatumType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -811,8 +812,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INTEGERLIST_TYPE = AttributeTypeFactory
-        .newAttributeType("integerList", java.lang.Object.class);
+    public static final AttributeType INTEGERLIST_TYPE = AttributeTypeFactory.newAttributeType("integerList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -866,8 +867,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMECALENDARTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeCalendarType", java.lang.Object.class);
+    public static final AttributeType TIMECALENDARTYPE_TYPE = AttributeTypeFactory.newAttributeType("TimeCalendarType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -906,8 +907,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRIDLIMITSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GridLimitsType", java.lang.Object.class);
+    public static final AttributeType GRIDLIMITSTYPE_TYPE = AttributeTypeFactory.newAttributeType("GridLimitsType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1112,8 +1113,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CONETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ConeType", java.lang.Object.class);
+    public static final AttributeType CONETYPE_TYPE = AttributeTypeFactory.newAttributeType("ConeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1133,8 +1134,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType REFERENCETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ReferenceType", java.lang.Object.class);
+    public static final AttributeType REFERENCETYPE_TYPE = AttributeTypeFactory.newAttributeType("ReferenceType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1157,8 +1158,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType OPERATIONPARAMETERGROUPREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("OperationParameterGroupRefType",
-            java.lang.Object.class);
+        .newAttributeType("OperationParameterGroupRefType", java.lang.Object.class);
 
     /**
      * <p>
@@ -1205,9 +1205,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTGENERALOPERATIONPARAMETERREFTYPE_TYPE =
-        AttributeTypeFactory.newAttributeType("AbstractGeneralOperationParameterRefType",
-            java.lang.Object.class);
+    public static final AttributeType ABSTRACTGENERALOPERATIONPARAMETERREFTYPE_TYPE = AttributeTypeFactory
+        .newAttributeType("AbstractGeneralOperationParameterRefType", java.lang.Object.class);
 
     /**
      * <p>
@@ -1255,8 +1254,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COUNTPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CountPropertyType", java.lang.Object.class);
+    public static final AttributeType COUNTPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("CountPropertyType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1340,8 +1339,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GEOCENTRICCRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GeocentricCRSType", java.lang.Object.class);
+    public static final AttributeType GEOCENTRICCRSTYPE_TYPE = AttributeTypeFactory.newAttributeType("GeocentricCRSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1413,8 +1412,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOOLEANORNULL_TYPE = AttributeTypeFactory
-        .newAttributeType("booleanOrNull", java.lang.Object.class);
+    public static final AttributeType BOOLEANORNULL_TYPE = AttributeTypeFactory.newAttributeType("booleanOrNull",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1452,8 +1451,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType LINESTRINGSEGMENTARRAYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LineStringSegmentArrayPropertyType",
-            java.lang.Object.class);
+        .newAttributeType("LineStringSegmentArrayPropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -1621,8 +1619,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COORDINATESTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CoordinatesType", java.lang.Object.class);
+    public static final AttributeType COORDINATESTYPE_TYPE = AttributeTypeFactory.newAttributeType("CoordinatesType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1669,8 +1667,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NULLENUMERATION_TYPE = AttributeTypeFactory
-        .newAttributeType("NullEnumeration", java.lang.Object.class);
+    public static final AttributeType NULLENUMERATION_TYPE = AttributeTypeFactory.newAttributeType("NullEnumeration",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1848,8 +1846,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType KNOTPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("KnotPropertyType", java.lang.Object.class);
+    public static final AttributeType KNOTPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("KnotPropertyType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1871,8 +1869,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType IMAGEDATUMREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ImageDatumRefType", java.lang.Object.class);
+    public static final AttributeType IMAGEDATUMREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("ImageDatumRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1913,8 +1911,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DEGREEVALUETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DegreeValueType", java.lang.Object.class);
+    public static final AttributeType DEGREEVALUETYPE_TYPE = AttributeTypeFactory.newAttributeType("DegreeValueType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1968,8 +1966,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GEODESICTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GeodesicType", java.lang.Object.class);
+    public static final AttributeType GEODESICTYPE_TYPE = AttributeTypeFactory.newAttributeType("GeodesicType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -1990,8 +1988,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SCALETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ScaleType", java.lang.Object.class);
+    public static final AttributeType SCALETYPE_TYPE = AttributeTypeFactory.newAttributeType("ScaleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2019,8 +2017,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType TIMEORDINALREFERENCESYSTEMTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeOrdinalReferenceSystemType",
-            java.lang.Object.class);
+        .newAttributeType("TimeOrdinalReferenceSystemType", java.lang.Object.class);
 
     /**
      * <p>
@@ -2047,8 +2044,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTGENERALDERIVEDCRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGeneralDerivedCRSType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractGeneralDerivedCRSType", java.lang.Object.class);
 
     /**
      * <p>
@@ -2074,8 +2070,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTCONTINUOUSCOVERAGETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractContinuousCoverageType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractContinuousCoverageType", java.lang.Object.class);
 
     /**
      * <p>
@@ -2143,8 +2138,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMECLOCKTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeClockType", java.lang.Object.class);
+    public static final AttributeType TIMECLOCKTYPE_TYPE = AttributeTypeFactory.newAttributeType("TimeClockType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2163,8 +2158,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NAMEORNULLLIST_TYPE = AttributeTypeFactory
-        .newAttributeType("NameOrNullList", java.lang.Object.class);
+    public static final AttributeType NAMEORNULLLIST_TYPE = AttributeTypeFactory.newAttributeType("NameOrNullList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2230,8 +2225,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TOPOLOGYSTYLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TopologyStyleType", java.lang.Object.class);
+    public static final AttributeType TOPOLOGYSTYLETYPE_TYPE = AttributeTypeFactory.newAttributeType("TopologyStyleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2278,9 +2273,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSOLUTEEXTERNALPOSITIONALACCURACYTYPE_TYPE =
-        AttributeTypeFactory.newAttributeType("AbsoluteExternalPositionalAccuracyType",
-            java.lang.Object.class);
+    public static final AttributeType ABSOLUTEEXTERNALPOSITIONALACCURACYTYPE_TYPE = AttributeTypeFactory
+        .newAttributeType("AbsoluteExternalPositionalAccuracyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -2308,8 +2302,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DMSANGLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DMSAngleType", java.lang.Object.class);
+    public static final AttributeType DMSANGLETYPE_TYPE = AttributeTypeFactory.newAttributeType("DMSAngleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2350,8 +2344,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRAPHTYPETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GraphTypeType", java.lang.Object.class);
+    public static final AttributeType GRAPHTYPETYPE_TYPE = AttributeTypeFactory.newAttributeType("GraphTypeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2373,8 +2367,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType OPERATIONREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("OperationRefType", java.lang.Object.class);
+    public static final AttributeType OPERATIONREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("OperationRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2401,8 +2395,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FACETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("FaceType", java.lang.Object.class);
+    public static final AttributeType FACETYPE_TYPE = AttributeTypeFactory.newAttributeType("FaceType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2421,8 +2415,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType STRINGORNULL_TYPE = AttributeTypeFactory
-        .newAttributeType("stringOrNull", java.lang.Object.class);
+    public static final AttributeType STRINGORNULL_TYPE = AttributeTypeFactory.newAttributeType("stringOrNull",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2496,8 +2490,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType POLYGONPATCHARRAYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PolygonPatchArrayPropertyType",
-            java.lang.Object.class);
+        .newAttributeType("PolygonPatchArrayPropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -2521,8 +2514,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType UNITOFMEASURETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("UnitOfMeasureType", java.lang.Object.class);
+    public static final AttributeType UNITOFMEASURETYPE_TYPE = AttributeTypeFactory.newAttributeType("UnitOfMeasureType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2581,8 +2574,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CONVERSIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ConversionType", java.lang.Object.class);
+    public static final AttributeType CONVERSIONTYPE_TYPE = AttributeTypeFactory.newAttributeType("ConversionType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2604,8 +2597,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CRSREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CRSRefType", java.lang.Object.class);
+    public static final AttributeType CRSREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("CRSRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2624,8 +2617,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INTEGERORNULLLIST_TYPE = AttributeTypeFactory
-        .newAttributeType("integerOrNullList", java.lang.Object.class);
+    public static final AttributeType INTEGERORNULLLIST_TYPE = AttributeTypeFactory.newAttributeType("integerOrNullList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2671,8 +2664,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType COORDINATEREFERENCESYSTEMREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CoordinateReferenceSystemRefType",
-            java.lang.Object.class);
+        .newAttributeType("CoordinateReferenceSystemRefType", java.lang.Object.class);
 
     /**
      * <p>
@@ -2825,8 +2817,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType TRIANGLEPATCHARRAYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TrianglePatchArrayPropertyType",
-            java.lang.Object.class);
+        .newAttributeType("TrianglePatchArrayPropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -2852,8 +2843,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CODELISTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CodeListType", java.lang.Object.class);
+    public static final AttributeType CODELISTTYPE_TYPE = AttributeTypeFactory.newAttributeType("CodeListType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2900,8 +2891,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEEDGETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeEdgeType", java.lang.Object.class);
+    public static final AttributeType TIMEEDGETYPE_TYPE = AttributeTypeFactory.newAttributeType("TimeEdgeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -2977,8 +2968,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TEMPORALCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TemporalCSType", java.lang.Object.class);
+    public static final AttributeType TEMPORALCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("TemporalCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3000,8 +2991,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType CURVESEGMENTARRAYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CurveSegmentArrayPropertyType",
-            java.lang.Object.class);
+        .newAttributeType("CurveSegmentArrayPropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -3032,8 +3022,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType IDENTIFIERTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("IdentifierType", java.lang.Object.class);
+    public static final AttributeType IDENTIFIERTYPE_TYPE = AttributeTypeFactory.newAttributeType("IdentifierType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3062,8 +3052,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COMPOUNDCRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CompoundCRSType", java.lang.Object.class);
+    public static final AttributeType COMPOUNDCRSTYPE_TYPE = AttributeTypeFactory.newAttributeType("CompoundCRSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3087,8 +3077,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INCREMENTORDER_TYPE = AttributeTypeFactory
-        .newAttributeType("IncrementOrder", java.lang.Object.class);
+    public static final AttributeType INCREMENTORDER_TYPE = AttributeTypeFactory.newAttributeType("IncrementOrder",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3156,8 +3146,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType DIRECTEDTOPOSOLIDPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DirectedTopoSolidPropertyType",
-            java.lang.Object.class);
+        .newAttributeType("DirectedTopoSolidPropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -3206,8 +3195,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType VERTICALCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("VerticalCSType", java.lang.Object.class);
+    public static final AttributeType VERTICALCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("VerticalCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3229,8 +3218,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DATUMREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DatumRefType", java.lang.Object.class);
+    public static final AttributeType DATUMREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("DatumRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3271,8 +3260,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType AREATYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AreaType", java.lang.Object.class);
+    public static final AttributeType AREATYPE_TYPE = AttributeTypeFactory.newAttributeType("AreaType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3327,8 +3316,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MEASURELISTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MeasureListType", java.lang.Object.class);
+    public static final AttributeType MEASURELISTTYPE_TYPE = AttributeTypeFactory.newAttributeType("MeasureListType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3373,8 +3362,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTCOORDINATEOPERATIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractCoordinateOperationType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractCoordinateOperationType", java.lang.Object.class);
 
     /**
      * <p>
@@ -3397,8 +3385,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType KNOTTYPESTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("KnotTypesType", java.lang.Object.class);
+    public static final AttributeType KNOTTYPESTYPE_TYPE = AttributeTypeFactory.newAttributeType("KnotTypesType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3476,8 +3464,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANGLECHOICETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AngleChoiceType", java.lang.Object.class);
+    public static final AttributeType ANGLECHOICETYPE_TYPE = AttributeTypeFactory.newAttributeType("AngleChoiceType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3506,8 +3494,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DEFINITIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DefinitionType", java.lang.Object.class);
+    public static final AttributeType DEFINITIONTYPE_TYPE = AttributeTypeFactory.newAttributeType("DefinitionType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3589,8 +3577,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NULLTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("NullType", java.lang.Object.class);
+    public static final AttributeType NULLTYPE_TYPE = AttributeTypeFactory.newAttributeType("NullType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3653,8 +3641,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTICURVETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiCurveType", java.lang.Object.class);
+    public static final AttributeType MULTICURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiCurveType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3680,8 +3668,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType STYLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("StyleType", java.lang.Object.class);
+    public static final AttributeType STYLETYPE_TYPE = AttributeTypeFactory.newAttributeType("StyleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3750,8 +3738,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TOPOVOLUMETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TopoVolumeType", java.lang.Object.class);
+    public static final AttributeType TOPOVOLUMETYPE_TYPE = AttributeTypeFactory.newAttributeType("TopoVolumeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3773,8 +3761,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTPOSITIONALACCURACYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractPositionalAccuracyType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractPositionalAccuracyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -3808,8 +3795,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TRIANGLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TriangleType", java.lang.Object.class);
+    public static final AttributeType TRIANGLETYPE_TYPE = AttributeTypeFactory.newAttributeType("TriangleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3906,8 +3893,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType IMAGEDATUMTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ImageDatumType", java.lang.Object.class);
+    public static final AttributeType IMAGEDATUMTYPE_TYPE = AttributeTypeFactory.newAttributeType("ImageDatumType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3951,8 +3938,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DERIVEDCRSREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DerivedCRSRefType", java.lang.Object.class);
+    public static final AttributeType DERIVEDCRSREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("DerivedCRSRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -3997,8 +3984,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ENVELOPETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("EnvelopeType", java.lang.Object.class);
+    public static final AttributeType ENVELOPETYPE_TYPE = AttributeTypeFactory.newAttributeType("EnvelopeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4023,8 +4010,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INDEXMAPTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("IndexMapType", java.lang.Object.class);
+    public static final AttributeType INDEXMAPTYPE_TYPE = AttributeTypeFactory.newAttributeType("IndexMapType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4044,8 +4031,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SEQUENCERULETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SequenceRuleType", java.lang.Object.class);
+    public static final AttributeType SEQUENCERULETYPE_TYPE = AttributeTypeFactory.newAttributeType("SequenceRuleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4093,9 +4080,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RELATIVEINTERNALPOSITIONALACCURACYTYPE_TYPE =
-        AttributeTypeFactory.newAttributeType("RelativeInternalPositionalAccuracyType",
-            java.lang.Object.class);
+    public static final AttributeType RELATIVEINTERNALPOSITIONALACCURACYTYPE_TYPE = AttributeTypeFactory
+        .newAttributeType("RelativeInternalPositionalAccuracyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -4185,8 +4171,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType OBSERVATIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ObservationType", java.lang.Object.class);
+    public static final AttributeType OBSERVATIONTYPE_TYPE = AttributeTypeFactory.newAttributeType("ObservationType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4208,8 +4194,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ELLIPSOIDREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("EllipsoidRefType", java.lang.Object.class);
+    public static final AttributeType ELLIPSOIDREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("EllipsoidRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4230,8 +4216,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeType", java.lang.Object.class);
+    public static final AttributeType TIMETYPE_TYPE = AttributeTypeFactory.newAttributeType("TimeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4279,8 +4265,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FILETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("FileType", java.lang.Object.class);
+    public static final AttributeType FILETYPE_TYPE = AttributeTypeFactory.newAttributeType("FileType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4350,8 +4336,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType DIRECTEDOBSERVATIONATDISTANCETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DirectedObservationAtDistanceType",
-            java.lang.Object.class);
+        .newAttributeType("DirectedObservationAtDistanceType", java.lang.Object.class);
 
     /**
      * <p>
@@ -4374,8 +4359,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRIDDOMAINTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GridDomainType", java.lang.Object.class);
+    public static final AttributeType GRIDDOMAINTYPE_TYPE = AttributeTypeFactory.newAttributeType("GridDomainType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4434,8 +4419,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RECTANGLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("RectangleType", java.lang.Object.class);
+    public static final AttributeType RECTANGLETYPE_TYPE = AttributeTypeFactory.newAttributeType("RectangleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4485,8 +4470,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEPERIODTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimePeriodType", java.lang.Object.class);
+    public static final AttributeType TIMEPERIODTYPE_TYPE = AttributeTypeFactory.newAttributeType("TimePeriodType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4539,8 +4524,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DERIVEDUNITTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DerivedUnitType", java.lang.Object.class);
+    public static final AttributeType DERIVEDUNITTYPE_TYPE = AttributeTypeFactory.newAttributeType("DerivedUnitType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4562,8 +4547,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CONVERSIONREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ConversionRefType", java.lang.Object.class);
+    public static final AttributeType CONVERSIONREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("ConversionRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4650,8 +4635,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CLOTHOIDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ClothoidType", java.lang.Object.class);
+    public static final AttributeType CLOTHOIDTYPE_TYPE = AttributeTypeFactory.newAttributeType("ClothoidType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4705,8 +4690,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTCOORDINATEOPERATIONBASETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractCoordinateOperationBaseType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractCoordinateOperationBaseType", java.lang.Object.class);
 
     /**
      * <p>
@@ -4826,8 +4810,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DOUBLEORNULLLIST_TYPE = AttributeTypeFactory
-        .newAttributeType("doubleOrNullList", java.lang.Object.class);
+    public static final AttributeType DOUBLEORNULLLIST_TYPE = AttributeTypeFactory.newAttributeType("doubleOrNullList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4851,8 +4835,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SIGNTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SignType", java.lang.Object.class);
+    public static final AttributeType SIGNTYPE_TYPE = AttributeTypeFactory.newAttributeType("SignType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4875,8 +4859,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType VALUEARRAYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ValueArrayType", java.lang.Object.class);
+    public static final AttributeType VALUEARRAYTYPE_TYPE = AttributeTypeFactory.newAttributeType("ValueArrayType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -4960,8 +4944,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTGENERALTRANSFORMATIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGeneralTransformationType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractGeneralTransformationType", java.lang.Object.class);
 
     /**
      * <p>
@@ -4987,8 +4970,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TOPOCURVETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TopoCurveType", java.lang.Object.class);
+    public static final AttributeType TOPOCURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("TopoCurveType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5080,8 +5063,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POLARCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PolarCSType", java.lang.Object.class);
+    public static final AttributeType POLARCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("PolarCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5274,8 +5257,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTCURVETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractCurveType", java.lang.Object.class);
+    public static final AttributeType ABSTRACTCURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("AbstractCurveType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5337,8 +5320,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SPHERICALCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SphericalCSType", java.lang.Object.class);
+    public static final AttributeType SPHERICALCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("SphericalCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5362,8 +5345,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGeometricPrimitiveType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractGeometricPrimitiveType", java.lang.Object.class);
 
     /**
      * <p>
@@ -5442,8 +5424,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POLYGONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PolygonType", PolygonType.class);
+    public static final AttributeType POLYGONTYPE_TYPE = AttributeTypeFactory.newAttributeType("PolygonType",
+            PolygonType.class);
 
     /**
      * <p>
@@ -5470,8 +5452,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ELLIPSOIDBASETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("EllipsoidBaseType", java.lang.Object.class);
+    public static final AttributeType ELLIPSOIDBASETYPE_TYPE = AttributeTypeFactory.newAttributeType("EllipsoidBaseType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5525,8 +5507,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTFEATURECOLLECTIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractFeatureCollectionType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractFeatureCollectionType", FeatureCollection.class);
 
     /**
      * <p>
@@ -5634,8 +5615,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINEARCSREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LinearCSRefType", java.lang.Object.class);
+    public static final AttributeType LINEARCSREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("LinearCSRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5661,8 +5642,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TEMPORALCRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TemporalCRSType", java.lang.Object.class);
+    public static final AttributeType TEMPORALCRSTYPE_TYPE = AttributeTypeFactory.newAttributeType("TemporalCRSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5709,8 +5690,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RECTIFIEDGRIDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("RectifiedGridType", java.lang.Object.class);
+    public static final AttributeType RECTIFIEDGRIDTYPE_TYPE = AttributeTypeFactory.newAttributeType("RectifiedGridType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5772,8 +5753,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType PRIMEMERIDIANTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PrimeMeridianType", java.lang.Object.class);
+    public static final AttributeType PRIMEMERIDIANTYPE_TYPE = AttributeTypeFactory.newAttributeType("PrimeMeridianType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5800,8 +5781,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SOLIDPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SolidPropertyType", java.lang.Object.class);
+    public static final AttributeType SOLIDPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("SolidPropertyType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5823,8 +5804,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRIDENVELOPETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GridEnvelopeType", java.lang.Object.class);
+    public static final AttributeType GRIDENVELOPETYPE_TYPE = AttributeTypeFactory.newAttributeType("GridEnvelopeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5890,8 +5871,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRAPHSTYLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GraphStyleType", java.lang.Object.class);
+    public static final AttributeType GRAPHSTYLETYPE_TYPE = AttributeTypeFactory.newAttributeType("GraphStyleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -5948,8 +5929,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CYLINDERTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CylinderType", java.lang.Object.class);
+    public static final AttributeType CYLINDERTYPE_TYPE = AttributeTypeFactory.newAttributeType("CylinderType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6025,8 +6006,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FEATURESTYLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("FeatureStyleType", java.lang.Object.class);
+    public static final AttributeType FEATURESTYLETYPE_TYPE = AttributeTypeFactory.newAttributeType("FeatureStyleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6153,8 +6134,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ASSOCIATIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AssociationType", java.lang.Object.class);
+    public static final AttributeType ASSOCIATIONTYPE_TYPE = AttributeTypeFactory.newAttributeType("AssociationType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6176,8 +6157,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ARCSECONDSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ArcSecondsType", java.lang.Object.class);
+    public static final AttributeType ARCSECONDSTYPE_TYPE = AttributeTypeFactory.newAttributeType("ArcSecondsType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6239,8 +6220,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DEGREESTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DegreesType", java.lang.Object.class);
+    public static final AttributeType DEGREESTYPE_TYPE = AttributeTypeFactory.newAttributeType("DegreesType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6286,8 +6267,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LABELTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LabelType", java.lang.Object.class);
+    public static final AttributeType LABELTYPE_TYPE = AttributeTypeFactory.newAttributeType("LabelType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6364,8 +6345,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType OFFSETCURVETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("OffsetCurveType", java.lang.Object.class);
+    public static final AttributeType OFFSETCURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("OffsetCurveType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6393,8 +6374,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType TOPOPRIMITIVEARRAYASSOCIATIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TopoPrimitiveArrayAssociationType",
-            java.lang.Object.class);
+        .newAttributeType("TopoPrimitiveArrayAssociationType", java.lang.Object.class);
 
     /**
      * <p>
@@ -6463,8 +6443,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CUBICSPLINETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CubicSplineType", java.lang.Object.class);
+    public static final AttributeType CUBICSPLINETYPE_TYPE = AttributeTypeFactory.newAttributeType("CubicSplineType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6488,8 +6468,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COORDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CoordType", java.lang.Object.class);
+    public static final AttributeType COORDTYPE_TYPE = AttributeTypeFactory.newAttributeType("CoordType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6542,8 +6522,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRIDCOVERAGETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GridCoverageType", java.lang.Object.class);
+    public static final AttributeType GRIDCOVERAGETYPE_TYPE = AttributeTypeFactory.newAttributeType("GridCoverageType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6587,8 +6567,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANGLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AngleType", java.lang.Object.class);
+    public static final AttributeType ANGLETYPE_TYPE = AttributeTypeFactory.newAttributeType("AngleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6610,8 +6590,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTGEOMETRICAGGREGATETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGeometricAggregateType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractGeometricAggregateType", java.lang.Object.class);
 
     /**
      * <p>
@@ -6639,8 +6618,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractTimeGeometricPrimitiveType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractTimeGeometricPrimitiveType", java.lang.Object.class);
 
     /**
      * <p>
@@ -6744,8 +6722,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEPOSITIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimePositionType", java.lang.Object.class);
+    public static final AttributeType TIMEPOSITIONTYPE_TYPE = AttributeTypeFactory.newAttributeType("TimePositionType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6797,8 +6775,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTISURFACETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiSurfaceType", java.lang.Object.class);
+    public static final AttributeType MULTISURFACETYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiSurfaceType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6829,8 +6807,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DOMAINSETTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DomainSetType", java.lang.Object.class);
+    public static final AttributeType DOMAINSETTYPE_TYPE = AttributeTypeFactory.newAttributeType("DomainSetType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6849,8 +6827,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DOUBLEORNULL_TYPE = AttributeTypeFactory
-        .newAttributeType("doubleOrNull", java.lang.Object.class);
+    public static final AttributeType DOUBLEORNULL_TYPE = AttributeTypeFactory.newAttributeType("doubleOrNull",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6968,8 +6946,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINEARCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LinearCSType", java.lang.Object.class);
+    public static final AttributeType LINEARCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("LinearCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -6998,8 +6976,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType IMAGECRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ImageCRSType", java.lang.Object.class);
+    public static final AttributeType IMAGECRSTYPE_TYPE = AttributeTypeFactory.newAttributeType("ImageCRSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7020,8 +6998,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INDIRECTENTRYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("IndirectEntryType", java.lang.Object.class);
+    public static final AttributeType INDIRECTENTRYTYPE_TYPE = AttributeTypeFactory.newAttributeType("IndirectEntryType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7084,8 +7062,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType CONVERSIONTOPREFERREDUNITTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ConversionToPreferredUnitType",
-            java.lang.Object.class);
+        .newAttributeType("ConversionToPreferredUnitType", java.lang.Object.class);
 
     /**
      * <p>
@@ -7134,8 +7111,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TOPOPOINTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TopoPointType", java.lang.Object.class);
+    public static final AttributeType TOPOPOINTTYPE_TYPE = AttributeTypeFactory.newAttributeType("TopoPointType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7218,8 +7195,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ARCBYBULGETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ArcByBulgeType", java.lang.Object.class);
+    public static final AttributeType ARCBYBULGETYPE_TYPE = AttributeTypeFactory.newAttributeType("ArcByBulgeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7245,8 +7222,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType VERTICALCRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("VerticalCRSType", java.lang.Object.class);
+    public static final AttributeType VERTICALCRSTYPE_TYPE = AttributeTypeFactory.newAttributeType("VerticalCRSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7393,8 +7370,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTREFERENCESYSTEMBASETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractReferenceSystemBaseType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractReferenceSystemBaseType", java.lang.Object.class);
 
     /**
      * <p>
@@ -7503,8 +7479,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTCOORDINATESYSTEMBASETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractCoordinateSystemBaseType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractCoordinateSystemBaseType", java.lang.Object.class);
 
     /**
      * <p>
@@ -7525,8 +7500,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTSTYLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractStyleType", java.lang.Object.class);
+    public static final AttributeType ABSTRACTSTYLETYPE_TYPE = AttributeTypeFactory.newAttributeType("AbstractStyleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7568,8 +7543,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NCNAMELIST_TYPE = AttributeTypeFactory
-        .newAttributeType("NCNameList", java.lang.Object.class);
+    public static final AttributeType NCNAMELIST_TYPE = AttributeTypeFactory.newAttributeType("NCNameList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7594,8 +7569,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType PROJECTEDCRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ProjectedCRSType", java.lang.Object.class);
+    public static final AttributeType PROJECTEDCRSTYPE_TYPE = AttributeTypeFactory.newAttributeType("ProjectedCRSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7655,7 +7630,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTFEATURETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractFeatureType", java.lang.Object.class);
+        .newAttributeType("AbstractFeatureType", Feature.class);
 
     /**
      * <p>
@@ -7706,8 +7681,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ARCTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ArcType", java.lang.Object.class);
+    public static final AttributeType ARCTYPE_TYPE = AttributeTypeFactory.newAttributeType("ArcType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7726,8 +7701,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType INTEGERORNULL_TYPE = AttributeTypeFactory
-        .newAttributeType("integerOrNull", java.lang.Object.class);
+    public static final AttributeType INTEGERORNULL_TYPE = AttributeTypeFactory.newAttributeType("integerOrNull",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7757,8 +7732,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRIDFUNCTIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GridFunctionType", java.lang.Object.class);
+    public static final AttributeType GRIDFUNCTIONTYPE_TYPE = AttributeTypeFactory.newAttributeType("GridFunctionType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7804,8 +7779,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType SURFACEPATCHARRAYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SurfacePatchArrayPropertyType",
-            java.lang.Object.class);
+        .newAttributeType("SurfacePatchArrayPropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -7883,8 +7857,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEPOSITIONUNION_TYPE = AttributeTypeFactory
-        .newAttributeType("TimePositionUnion", java.lang.Object.class);
+    public static final AttributeType TIMEPOSITIONUNION_TYPE = AttributeTypeFactory.newAttributeType("TimePositionUnion",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7920,8 +7894,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GEOMETRYSTYLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GeometryStyleType", java.lang.Object.class);
+    public static final AttributeType GEOMETRYSTYLETYPE_TYPE = AttributeTypeFactory.newAttributeType("GeometryStyleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -7966,8 +7940,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType COUNTEXTENTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CountExtentType", java.lang.Object.class);
+    public static final AttributeType COUNTEXTENTTYPE_TYPE = AttributeTypeFactory.newAttributeType("CountExtentType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8048,8 +8022,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractTimeTopologyPrimitiveType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractTimeTopologyPrimitiveType", java.lang.Object.class);
 
     /**
      * <p>
@@ -8091,8 +8064,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NAMELIST_TYPE = AttributeTypeFactory
-        .newAttributeType("NameList", java.lang.Object.class);
+    public static final AttributeType NAMELIST_TYPE = AttributeTypeFactory.newAttributeType("NameList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8117,8 +8090,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEINSTANTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeInstantType", java.lang.Object.class);
+    public static final AttributeType TIMEINSTANTTYPE_TYPE = AttributeTypeFactory.newAttributeType("TimeInstantType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8146,8 +8119,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractTimeReferenceSystemType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractTimeReferenceSystemType", java.lang.Object.class);
 
     /**
      * <p>
@@ -8167,8 +8139,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType TIMEGEOMETRICPRIMITIVEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeGeometricPrimitivePropertyType",
-            java.lang.Object.class);
+        .newAttributeType("TimeGeometricPrimitivePropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -8227,8 +8198,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTGMLTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGMLType", java.lang.Object.class);
+    public static final AttributeType ABSTRACTGMLTYPE_TYPE = AttributeTypeFactory.newAttributeType("AbstractGMLType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8317,8 +8288,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RELATEDTIMETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("RelatedTimeType", java.lang.Object.class);
+    public static final AttributeType RELATEDTIMETYPE_TYPE = AttributeTypeFactory.newAttributeType("RelatedTimeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8355,8 +8326,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RANGESETTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("RangeSetType", java.lang.Object.class);
+    public static final AttributeType RANGESETTYPE_TYPE = AttributeTypeFactory.newAttributeType("RangeSetType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8392,8 +8363,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DICTIONARYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DictionaryType", java.lang.Object.class);
+    public static final AttributeType DICTIONARYTYPE_TYPE = AttributeTypeFactory.newAttributeType("DictionaryType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8494,8 +8465,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CURVETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CurveType", java.lang.Object.class);
+    public static final AttributeType CURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("CurveType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8544,8 +8515,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GEODETICDATUMTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GeodeticDatumType", java.lang.Object.class);
+    public static final AttributeType GEODETICDATUMTYPE_TYPE = AttributeTypeFactory.newAttributeType("GeodeticDatumType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8603,8 +8574,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINESTRINGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LineStringType", LineString.class);
+    public static final AttributeType LINESTRINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("LineStringType",
+            LineString.class);
 
     /**
      * <p>
@@ -8702,8 +8673,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType EXTENTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ExtentType", java.lang.Object.class);
+    public static final AttributeType EXTENTTYPE_TYPE = AttributeTypeFactory.newAttributeType("ExtentType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8786,8 +8757,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LINEARRINGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LinearRingType", java.lang.Object.class);
+    public static final AttributeType LINEARRINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("LinearRingType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8846,8 +8817,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ELLIPSOIDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("EllipsoidType", java.lang.Object.class);
+    public static final AttributeType ELLIPSOIDTYPE_TYPE = AttributeTypeFactory.newAttributeType("EllipsoidType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -8877,8 +8848,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTISOLIDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiSolidType", java.lang.Object.class);
+    public static final AttributeType MULTISOLIDTYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiSolidType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9009,8 +8980,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TRACKTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TrackType", java.lang.Object.class);
+    public static final AttributeType TRACKTYPE_TYPE = AttributeTypeFactory.newAttributeType("TrackType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9034,8 +9005,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOUNDINGSHAPETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("BoundingShapeType", java.lang.Object.class);
+    public static final AttributeType BOUNDINGSHAPETYPE_TYPE = AttributeTypeFactory.newAttributeType("BoundingShapeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9057,8 +9028,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType IMAGECRSREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ImageCRSRefType", java.lang.Object.class);
+    public static final AttributeType IMAGECRSREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("ImageCRSRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9115,8 +9086,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ARCSTRINGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ArcStringType", java.lang.Object.class);
+    public static final AttributeType ARCSTRINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("ArcStringType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9146,8 +9117,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIPOINTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiPointType", MultiPoint.class);
+    public static final AttributeType MULTIPOINTTYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiPointType",
+            MultiPoint.class);
 
     /**
      * <p>
@@ -9182,8 +9153,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType GEOMETRICPRIMITIVEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GeometricPrimitivePropertyType",
-            java.lang.Object.class);
+        .newAttributeType("GeometricPrimitivePropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -9205,8 +9175,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTPARAMETRICCURVESURFACETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractParametricCurveSurfaceType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractParametricCurveSurfaceType", java.lang.Object.class);
 
     /**
      * <p>
@@ -9230,8 +9199,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CALDATE_TYPE = AttributeTypeFactory
-        .newAttributeType("CalDate", java.lang.Object.class);
+    public static final AttributeType CALDATE_TYPE = AttributeTypeFactory.newAttributeType("CalDate",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9256,8 +9225,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TEMPORALDATUMTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TemporalDatumType", java.lang.Object.class);
+    public static final AttributeType TEMPORALDATUMTYPE_TYPE = AttributeTypeFactory.newAttributeType("TemporalDatumType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9276,8 +9245,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOOLEANORNULLLIST_TYPE = AttributeTypeFactory
-        .newAttributeType("booleanOrNullList", java.lang.Object.class);
+    public static final AttributeType BOOLEANORNULLLIST_TYPE = AttributeTypeFactory.newAttributeType("booleanOrNullList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9446,8 +9415,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LABELSTYLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LabelStyleType", java.lang.Object.class);
+    public static final AttributeType LABELSTYLETYPE_TYPE = AttributeTypeFactory.newAttributeType("LabelStyleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9474,8 +9443,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType EDGETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("EdgeType", java.lang.Object.class);
+    public static final AttributeType EDGETYPE_TYPE = AttributeTypeFactory.newAttributeType("EdgeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9502,8 +9471,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType VECTORTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("VectorType", java.lang.Object.class);
+    public static final AttributeType VECTORTYPE_TYPE = AttributeTypeFactory.newAttributeType("VectorType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9549,8 +9518,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CIRCLETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CircleType", java.lang.Object.class);
+    public static final AttributeType CIRCLETYPE_TYPE = AttributeTypeFactory.newAttributeType("CircleType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9645,8 +9614,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BSPLINETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("BSplineType", java.lang.Object.class);
+    public static final AttributeType BSPLINETYPE_TYPE = AttributeTypeFactory.newAttributeType("BSplineType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9681,8 +9650,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType KNOTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("KnotType", java.lang.Object.class);
+    public static final AttributeType KNOTTYPE_TYPE = AttributeTypeFactory.newAttributeType("KnotType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9801,8 +9770,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BEZIERTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("BezierType", java.lang.Object.class);
+    public static final AttributeType BEZIERTYPE_TYPE = AttributeTypeFactory.newAttributeType("BezierType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9904,8 +9873,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TEMPORALCSREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TemporalCSRefType", java.lang.Object.class);
+    public static final AttributeType TEMPORALCSREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("TemporalCSRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9926,8 +9895,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CARTESIANCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CartesianCSType", java.lang.Object.class);
+    public static final AttributeType CARTESIANCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("CartesianCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9954,8 +9923,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType NODETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("NodeType", java.lang.Object.class);
+    public static final AttributeType NODETYPE_TYPE = AttributeTypeFactory.newAttributeType("NodeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9974,8 +9943,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DOUBLELIST_TYPE = AttributeTypeFactory
-        .newAttributeType("doubleList", java.lang.Object.class);
+    public static final AttributeType DOUBLELIST_TYPE = AttributeTypeFactory.newAttributeType("doubleList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -9994,8 +9963,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BOOLEANLIST_TYPE = AttributeTypeFactory
-        .newAttributeType("booleanList", java.lang.Object.class);
+    public static final AttributeType BOOLEANLIST_TYPE = AttributeTypeFactory.newAttributeType("booleanList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10020,8 +9989,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ARRAYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ArrayType", java.lang.Object.class);
+    public static final AttributeType ARRAYTYPE_TYPE = AttributeTypeFactory.newAttributeType("ArrayType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10070,8 +10039,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SOLIDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SolidType", java.lang.Object.class);
+    public static final AttributeType SOLIDTYPE_TYPE = AttributeTypeFactory.newAttributeType("SolidType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10154,8 +10123,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TINTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TinType", java.lang.Object.class);
+    public static final AttributeType TINTYPE_TYPE = AttributeTypeFactory.newAttributeType("TinType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10275,8 +10244,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType USERDEFINEDCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("UserDefinedCSType", java.lang.Object.class);
+    public static final AttributeType USERDEFINEDCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("UserDefinedCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10326,8 +10295,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DATABLOCKTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DataBlockType", java.lang.Object.class);
+    public static final AttributeType DATABLOCKTYPE_TYPE = AttributeTypeFactory.newAttributeType("DataBlockType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10361,8 +10330,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMEUNITTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeUnitType", java.lang.Object.class);
+    public static final AttributeType TIMEUNITTYPE_TYPE = AttributeTypeFactory.newAttributeType("TimeUnitType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10410,8 +10379,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType TIMETOPOLOGYCOMPLEXPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeTopologyComplexPropertyType",
-            java.lang.Object.class);
+        .newAttributeType("TimeTopologyComplexPropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -10444,8 +10412,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CURVEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CurvePropertyType", java.lang.Object.class);
+    public static final AttributeType CURVEPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("CurvePropertyType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10470,8 +10438,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TOPOSOLIDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TopoSolidType", java.lang.Object.class);
+    public static final AttributeType TOPOSOLIDTYPE_TYPE = AttributeTypeFactory.newAttributeType("TopoSolidType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10524,8 +10492,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CODETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CodeType", java.lang.Object.class);
+    public static final AttributeType CODETYPE_TYPE = AttributeTypeFactory.newAttributeType("CodeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10548,8 +10516,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType STRINGORREFTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("StringOrRefType", java.lang.Object.class);
+    public static final AttributeType STRINGORREFTYPE_TYPE = AttributeTypeFactory.newAttributeType("StringOrRefType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10574,8 +10542,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MULTIPOLYGONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiPolygonType", MultiPolygon.class);
+    public static final AttributeType MULTIPOLYGONTYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiPolygonType",
+            MultiPolygon.class);
 
     /**
      * <p>
@@ -10779,8 +10747,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTRINGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractRingType", java.lang.Object.class);
+    public static final AttributeType ABSTRACTRINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("AbstractRingType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -10852,8 +10820,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType OPERATIONPARAMETERGROUPBASETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("OperationParameterGroupBaseType",
-            java.lang.Object.class);
+        .newAttributeType("OperationParameterGroupBaseType", java.lang.Object.class);
 
     /**
      * <p>
@@ -10951,8 +10918,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTGENERALPARAMETERVALUETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGeneralParameterValueType",
-            java.lang.Object.class);
+        .newAttributeType("AbstractGeneralParameterValueType", java.lang.Object.class);
 
     /**
      * <p>
@@ -11039,8 +11005,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POLYGONPATCHTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PolygonPatchType", java.lang.Object.class);
+    public static final AttributeType POLYGONPATCHTYPE_TYPE = AttributeTypeFactory.newAttributeType("PolygonPatchType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11062,8 +11028,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType DRAWINGTYPETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("DrawingTypeType", java.lang.Object.class);
+    public static final AttributeType DRAWINGTYPETYPE_TYPE = AttributeTypeFactory.newAttributeType("DrawingTypeType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11121,8 +11087,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SPHERETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SphereType", java.lang.Object.class);
+    public static final AttributeType SPHERETYPE_TYPE = AttributeTypeFactory.newAttributeType("SphereType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11143,8 +11109,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ARCMINUTESTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("ArcMinutesType", java.lang.Object.class);
+    public static final AttributeType ARCMINUTESTYPE_TYPE = AttributeTypeFactory.newAttributeType("ArcMinutesType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11177,8 +11143,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType POINTPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PointPropertyType", Point.class);
+    public static final AttributeType POINTPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("PointPropertyType",
+            Point.class);
 
     /**
      * <p>
@@ -11210,8 +11176,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RINGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("RingType", java.lang.Object.class);
+    public static final AttributeType RINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("RingType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11266,8 +11232,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GRIDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GridType", java.lang.Object.class);
+    public static final AttributeType GRIDTYPE_TYPE = AttributeTypeFactory.newAttributeType("GridType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11387,9 +11353,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE =
-        AttributeTypeFactory.newAttributeType("AbstractGeneralOperationParameterType",
-            java.lang.Object.class);
+    public static final AttributeType ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE = AttributeTypeFactory
+        .newAttributeType("AbstractGeneralOperationParameterType", java.lang.Object.class);
 
     /**
      * <p>
@@ -11473,8 +11438,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TOPOCOMPLEXTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TopoComplexType", java.lang.Object.class);
+    public static final AttributeType TOPOCOMPLEXTYPE_TYPE = AttributeTypeFactory.newAttributeType("TopoComplexType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11517,8 +11482,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType QNAMELIST_TYPE = AttributeTypeFactory
-        .newAttributeType("QNameList", java.lang.Object.class);
+    public static final AttributeType QNAMELIST_TYPE = AttributeTypeFactory.newAttributeType("QNameList",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11580,8 +11545,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType BAGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("BagType", java.lang.Object.class);
+    public static final AttributeType BAGTYPE_TYPE = AttributeTypeFactory.newAttributeType("BagType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11605,8 +11570,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType MEASURETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MeasureType", java.lang.Object.class);
+    public static final AttributeType MEASURETYPE_TYPE = AttributeTypeFactory.newAttributeType("MeasureType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11627,8 +11592,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SPEEDTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SpeedType", java.lang.Object.class);
+    public static final AttributeType SPEEDTYPE_TYPE = AttributeTypeFactory.newAttributeType("SpeedType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11654,8 +11619,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SEQUENCERULENAMES_TYPE = AttributeTypeFactory
-        .newAttributeType("SequenceRuleNames", java.lang.Object.class);
+    public static final AttributeType SEQUENCERULENAMES_TYPE = AttributeTypeFactory.newAttributeType("SequenceRuleNames",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11802,8 +11767,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType GEOGRAPHICCRSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GeographicCRSType", java.lang.Object.class);
+    public static final AttributeType GEOGRAPHICCRSTYPE_TYPE = AttributeTypeFactory.newAttributeType("GeographicCRSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11824,8 +11789,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType CYLINDRICALCSTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CylindricalCSType", java.lang.Object.class);
+    public static final AttributeType CYLINDRICALCSTYPE_TYPE = AttributeTypeFactory.newAttributeType("CylindricalCSType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11854,8 +11819,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SUCCESSIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SuccessionType", java.lang.Object.class);
+    public static final AttributeType SUCCESSIONTYPE_TYPE = AttributeTypeFactory.newAttributeType("SuccessionType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11910,8 +11875,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType VERTICALDATUMTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("VerticalDatumType", java.lang.Object.class);
+    public static final AttributeType VERTICALDATUMTYPE_TYPE = AttributeTypeFactory.newAttributeType("VerticalDatumType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11958,8 +11923,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType PIXELINCELLTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("PixelInCellType", java.lang.Object.class);
+    public static final AttributeType PIXELINCELLTYPE_TYPE = AttributeTypeFactory.newAttributeType("PixelInCellType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -11989,8 +11954,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SURFACETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SurfaceType", java.lang.Object.class);
+    public static final AttributeType SURFACETYPE_TYPE = AttributeTypeFactory.newAttributeType("SurfaceType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -12011,8 +11976,8 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType LENGTHTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LengthType", java.lang.Object.class);
+    public static final AttributeType LENGTHTYPE_TYPE = AttributeTypeFactory.newAttributeType("LengthType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -12110,8 +12075,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType TIMETOPOLOGYPRIMITIVEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeTopologyPrimitivePropertyType",
-            java.lang.Object.class);
+        .newAttributeType("TimeTopologyPrimitivePropertyType", java.lang.Object.class);
 
     /**
      * <p>
@@ -12140,906 +12104,832 @@ public class GMLSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType TIMENODETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("TimeNodeType", java.lang.Object.class);
+    public static final AttributeType TIMENODETYPE_TYPE = AttributeTypeFactory.newAttributeType("TimeNodeType",
+            java.lang.Object.class);
 
     public GMLSchema() {
         super("http://www.opengis.net/gml");
 
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoSurfaceType"),
+            TOPOSURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VolumeType"),
+            VOLUMETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractSolidType"),
+            ABSTRACTSOLIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EllipsoidalCSType"),
+            ELLIPSOIDALCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PolarCSRefType"),
+            POLARCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "NameOrNull"),
+            NAMEORNULL_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompositeCurveType"),
+            COMPOSITECURVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GridLengthType"),
+            GRIDLENGTHTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiSolidCoverageType"),
+            MULTISOLIDCOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiGeometryType"),
+            MULTIGEOMETRYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractRingPropertyType"),
+            ABSTRACTRINGPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FormulaType"),
+            FORMULATYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SymbolType"),
+            SYMBOLTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EllipsoidalCSRefType"),
+            ELLIPSOIDALCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PointType"), POINTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiCurveCoverageType"),
+            MULTICURVECOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VerticalCSRefType"),
+            VERTICALCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RingPropertyType"),
+            RINGPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeodeticDatumRefType"),
+            GEODETICDATUMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompositeSurfaceType"),
+            COMPOSITESURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ValuePropertyType"),
+            VALUEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeneralConversionRefType"),
+            GENERALCONVERSIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "BaseUnitType"),
+            BASEUNITTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoSurfaceType"), TOPOSURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VolumeType"), VOLUMETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractSolidType"), ABSTRACTSOLIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EllipsoidalCSType"), ELLIPSOIDALCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PolarCSRefType"), POLARCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "NameOrNull"), NAMEORNULL_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompositeCurveType"), COMPOSITECURVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GridLengthType"), GRIDLENGTHTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiSolidCoverageType"), MULTISOLIDCOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiGeometryType"), MULTIGEOMETRYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractRingPropertyType"), ABSTRACTRINGPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FormulaType"), FORMULATYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SymbolType"), SYMBOLTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EllipsoidalCSRefType"), ELLIPSOIDALCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PointType"), POINTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiCurveCoverageType"), MULTICURVECOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VerticalCSRefType"), VERTICALCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RingPropertyType"), RINGPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeodeticDatumRefType"), GEODETICDATUMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompositeSurfaceType"), COMPOSITESURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ValuePropertyType"), VALUEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeneralConversionRefType"), GENERALCONVERSIONREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "BaseUnitType"), BASEUNITTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGeneralConversionType"),
-            ABSTRACTGENERALCONVERSIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeIndeterminateValueType"), TIMEINDETERMINATEVALUETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "QueryGrammarEnumeration"), QUERYGRAMMARENUMERATION_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LineTypeType"), LINETYPETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DerivedCRSType"), DERIVEDCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractDatumType"), ABSTRACTDATUMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "integerList"), INTEGERLIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectedObservationType"), DIRECTEDOBSERVATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeCalendarType"), TIMECALENDARTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "IsolatedPropertyType"), ISOLATEDPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GridLimitsType"), GRIDLIMITSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompositeSolidType"), COMPOSITESOLIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationParameterRefType"), OPERATIONPARAMETERREFTYPE_TYPE);
+                "AbstractGeneralConversionType"), ABSTRACTGENERALCONVERSIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeIndeterminateValueType"),
+            TIMEINDETERMINATEVALUETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "QueryGrammarEnumeration"),
+            QUERYGRAMMARENUMERATION_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LineTypeType"),
+            LINETYPETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DerivedCRSType"),
+            DERIVEDCRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractDatumType"),
+            ABSTRACTDATUMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "integerList"),
+            INTEGERLIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DirectedObservationType"),
+            DIRECTEDOBSERVATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeCalendarType"),
+            TIMECALENDARTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "IsolatedPropertyType"),
+            ISOLATEDPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GridLimitsType"),
+            GRIDLIMITSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompositeSolidType"),
+            COMPOSITESOLIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OperationParameterRefType"),
+            OPERATIONPARAMETERREFTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "SecondDefiningParameterType"), SECONDDEFININGPARAMETERTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OrientableSurfaceType"),
+            ORIENTABLESURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CategoryPropertyType"),
+            CATEGORYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EngineeringCRSRefType"),
+            ENGINEERINGCRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ConeType"), CONETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ReferenceType"),
+            REFERENCETYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OrientableSurfaceType"), ORIENTABLESURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CategoryPropertyType"), CATEGORYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EngineeringCRSRefType"), ENGINEERINGCRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ConeType"), CONETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ReferenceType"), REFERENCETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationParameterGroupRefType"),
-            OPERATIONPARAMETERGROUPREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeNodePropertyType"), TIMENODEPROPERTYTYPE_TYPE);
+                "OperationParameterGroupRefType"), OPERATIONPARAMETERGROUPREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeNodePropertyType"),
+            TIMENODEPROPERTYTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "AbstractGeneralOperationParameterRefType"),
             ABSTRACTGENERALOPERATIONPARAMETERREFTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "CoordinateSystemAxisRefType"), COORDINATESYSTEMAXISREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CountPropertyType"),
+            COUNTPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MeasureOrNullListType"),
+            MEASUREORNULLLISTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PrimeMeridianBaseType"),
+            PRIMEMERIDIANBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeocentricCRSType"),
+            GEOCENTRICCRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ConventionalUnitType"),
+            CONVENTIONALUNITTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "UserDefinedCSRefType"),
+            USERDEFINEDCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "booleanOrNull"),
+            BOOLEANORNULL_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoPointPropertyType"),
+            TOPOPOINTPROPERTYTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CountPropertyType"), COUNTPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MeasureOrNullListType"), MEASUREORNULLLISTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PrimeMeridianBaseType"), PRIMEMERIDIANBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeocentricCRSType"), GEOCENTRICCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ConventionalUnitType"), CONVENTIONALUNITTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "UserDefinedCSRefType"), USERDEFINEDCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "booleanOrNull"), BOOLEANORNULL_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoPointPropertyType"), TOPOPOINTPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LineStringSegmentArrayPropertyType"),
-            LINESTRINGSEGMENTARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractSurfaceType"), ABSTRACTSURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiLineStringType"), MULTILINESTRINGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PrimeMeridianRefType"), PRIMEMERIDIANREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoComplexMemberType"), TOPOCOMPLEXMEMBERTYPE_TYPE);
+                "LineStringSegmentArrayPropertyType"), LINESTRINGSEGMENTARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractSurfaceType"),
+            ABSTRACTSURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiLineStringType"),
+            MULTILINESTRINGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PrimeMeridianRefType"),
+            PRIMEMERIDIANREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoComplexMemberType"),
+            TOPOCOMPLEXMEMBERTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "PassThroughOperationRefType"), PASSTHROUGHOPERATIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoSurfacePropertyType"),
+            TOPOSURFACEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CoordinatesType"),
+            COORDINATESTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "NullEnumeration"),
+            NULLENUMERATION_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeCoordinateSystemType"),
+            TIMECOORDINATESYSTEMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DefinitionProxyType"),
+            DEFINITIONPROXYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeCalendarPropertyType"),
+            TIMECALENDARPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PassThroughOperationType"),
+            PASSTHROUGHOPERATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoPrimitiveMemberType"),
+            TOPOPRIMITIVEMEMBERTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoSurfacePropertyType"), TOPOSURFACEPROPERTYTYPE_TYPE);
+                "ConcatenatedOperationRefType"), CONCATENATEDOPERATIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "KnotPropertyType"),
+            KNOTPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ImageDatumRefType"),
+            IMAGEDATUMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractSurfacePatchType"),
+            ABSTRACTSURFACEPATCHTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DegreeValueType"),
+            DEGREEVALUETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GenericMetaDataType"),
+            GENERICMETADATATYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeodesicType"),
+            GEODESICTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ScaleType"), SCALETYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CoordinatesType"), COORDINATESTYPE_TYPE);
+                "TimeOrdinalReferenceSystemType"), TIMEORDINALREFERENCESYSTEMTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "NullEnumeration"), NULLENUMERATION_TYPE);
+                "AbstractGeneralDerivedCRSType"), ABSTRACTGENERALDERIVEDCRSTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeCoordinateSystemType"), TIMECOORDINATESYSTEMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DefinitionProxyType"), DEFINITIONPROXYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeCalendarPropertyType"), TIMECALENDARPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PassThroughOperationType"), PASSTHROUGHOPERATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoPrimitiveMemberType"), TOPOPRIMITIVEMEMBERTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ConcatenatedOperationRefType"),
-            CONCATENATEDOPERATIONREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "KnotPropertyType"), KNOTPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ImageDatumRefType"), IMAGEDATUMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractSurfacePatchType"), ABSTRACTSURFACEPATCHTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DegreeValueType"), DEGREEVALUETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GenericMetaDataType"), GENERICMETADATATYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeodesicType"), GEODESICTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ScaleType"), SCALETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeOrdinalReferenceSystemType"),
-            TIMEORDINALREFERENCESYSTEMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGeneralDerivedCRSType"),
-            ABSTRACTGENERALDERIVEDCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractContinuousCoverageType"),
-            ABSTRACTCONTINUOUSCOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompoundCRSRefType"), COMPOUNDCRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeClockType"), TIMECLOCKTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "NameOrNullList"), NAMEORNULLLIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiSurfaceCoverageType"), MULTISURFACECOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopologyStyleType"), TOPOLOGYSTYLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LinearRingPropertyType"), LINEARRINGPROPERTYTYPE_TYPE);
+                "AbstractContinuousCoverageType"), ABSTRACTCONTINUOUSCOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompoundCRSRefType"),
+            COMPOUNDCRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeClockType"),
+            TIMECLOCKTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "NameOrNullList"),
+            NAMEORNULLLIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiSurfaceCoverageType"),
+            MULTISURFACECOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopologyStyleType"),
+            TOPOLOGYSTYLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LinearRingPropertyType"),
+            LINEARRINGPROPERTYTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "AbsoluteExternalPositionalAccuracyType"),
             ABSOLUTEEXTERNALPOSITIONALACCURACYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DMSAngleType"), DMSANGLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoCurvePropertyType"), TOPOCURVEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GraphTypeType"), GRAPHTYPETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationRefType"), OPERATIONREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FaceType"), FACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "stringOrNull"), STRINGORNULL_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ObliqueCartesianCSType"), OBLIQUECARTESIANCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "StyleVariationType"), STYLEVARIATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PolygonPatchArrayPropertyType"),
-            POLYGONPATCHARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "UnitOfMeasureType"), UNITOFMEASURETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RectifiedGridCoverageType"), RECTIFIEDGRIDCOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ConversionType"), CONVERSIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CRSRefType"), CRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "integerOrNullList"), INTEGERORNULLLIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CartesianCSRefType"), CARTESIANCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CoordinateReferenceSystemRefType"),
-            COORDINATEREFERENCESYSTEMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompositeSurfacePropertyType"),
-            COMPOSITESURFACEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CovarianceElementType"), COVARIANCEELEMENTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiSolidDomainType"), MULTISOLIDDOMAINTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CylindricalCSRefType"), CYLINDRICALCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationParameterType"), OPERATIONPARAMETERTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TrianglePatchArrayPropertyType"),
-            TRIANGLEPATCHARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CodeListType"), CODELISTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompositeCurvePropertyType"), COMPOSITECURVEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeEdgeType"), TIMEEDGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectPositionListType"), DIRECTPOSITIONLISTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DynamicFeatureCollectionType"),
-            DYNAMICFEATURECOLLECTIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TemporalCSType"), TEMPORALCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CurveSegmentArrayPropertyType"),
-            CURVESEGMENTARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "IdentifierType"), IDENTIFIERTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompoundCRSType"), COMPOUNDCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "IncrementOrder"), INCREMENTORDER_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopologyStylePropertyType"), TOPOLOGYSTYLEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ReferenceSystemRefType"), REFERENCESYSTEMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectedTopoSolidPropertyType"),
-            DIRECTEDTOPOSOLIDPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractDatumBaseType"), ABSTRACTDATUMBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VerticalCSType"), VERTICALCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DatumRefType"), DATUMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractMetaDataType"), ABSTRACTMETADATATYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AreaType"), AREATYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiPointCoverageType"), MULTIPOINTCOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MeasureListType"), MEASURELISTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractCoordinateOperationType"),
-            ABSTRACTCOORDINATEOPERATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "KnotTypesType"), KNOTTYPESTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeCalendarEraType"), TIMECALENDARERATYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AngleChoiceType"), ANGLECHOICETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DefinitionType"), DEFINITIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "BaseStyleDescriptorType"), BASESTYLEDESCRIPTORTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TemporalDatumBaseType"), TEMPORALDATUMBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "NullType"), NULLTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AesheticCriteriaType"), AESHETICCRITERIATYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiCurveType"), MULTICURVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "StyleType"), STYLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DerivationUnitTermType"), DERIVATIONUNITTERMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeOrdinalEraPropertyType"), TIMEORDINALERAPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoVolumeType"), TOPOVOLUMETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractPositionalAccuracyType"),
-            ABSTRACTPOSITIONALACCURACYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TriangleType"), TRIANGLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TemporalDatumRefType"), TEMPORALDATUMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectedEdgePropertyType"), DIRECTEDEDGEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VerticalDatumTypeType"), VERTICALDATUMTYPETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ImageDatumType"), IMAGEDATUMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FeatureCollectionType"), FEATURECOLLECTIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DerivedCRSRefType"), DERIVEDCRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EnvelopeType"), ENVELOPETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "IndexMapType"), INDEXMAPTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SequenceRuleType"), SEQUENCERULETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ProjectedCRSRefType"), PROJECTEDCRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DMSAngleType"),
+            DMSANGLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoCurvePropertyType"),
+            TOPOCURVEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GraphTypeType"),
+            GRAPHTYPETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OperationRefType"),
+            OPERATIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FaceType"), FACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "stringOrNull"),
+            STRINGORNULL_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ObliqueCartesianCSType"),
+            OBLIQUECARTESIANCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "StyleVariationType"),
+            STYLEVARIATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "PolygonPatchArrayPropertyType"), POLYGONPATCHARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "UnitOfMeasureType"),
+            UNITOFMEASURETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RectifiedGridCoverageType"),
+            RECTIFIEDGRIDCOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ConversionType"),
+            CONVERSIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CRSRefType"),
+            CRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "integerOrNullList"),
+            INTEGERORNULLLIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CartesianCSRefType"),
+            CARTESIANCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "CoordinateReferenceSystemRefType"), COORDINATEREFERENCESYSTEMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "CompositeSurfacePropertyType"), COMPOSITESURFACEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CovarianceElementType"),
+            COVARIANCEELEMENTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiSolidDomainType"),
+            MULTISOLIDDOMAINTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CylindricalCSRefType"),
+            CYLINDRICALCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OperationParameterType"),
+            OPERATIONPARAMETERTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "TrianglePatchArrayPropertyType"), TRIANGLEPATCHARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CodeListType"),
+            CODELISTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompositeCurvePropertyType"),
+            COMPOSITECURVEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeEdgeType"),
+            TIMEEDGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DirectPositionListType"),
+            DIRECTPOSITIONLISTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "DynamicFeatureCollectionType"), DYNAMICFEATURECOLLECTIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TemporalCSType"),
+            TEMPORALCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "CurveSegmentArrayPropertyType"), CURVESEGMENTARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "IdentifierType"),
+            IDENTIFIERTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompoundCRSType"),
+            COMPOUNDCRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "IncrementOrder"),
+            INCREMENTORDER_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopologyStylePropertyType"),
+            TOPOLOGYSTYLEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ReferenceSystemRefType"),
+            REFERENCESYSTEMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "DirectedTopoSolidPropertyType"), DIRECTEDTOPOSOLIDPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractDatumBaseType"),
+            ABSTRACTDATUMBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VerticalCSType"),
+            VERTICALCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DatumRefType"),
+            DATUMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractMetaDataType"),
+            ABSTRACTMETADATATYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AreaType"), AREATYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiPointCoverageType"),
+            MULTIPOINTCOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MeasureListType"),
+            MEASURELISTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractCoordinateOperationType"), ABSTRACTCOORDINATEOPERATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "KnotTypesType"),
+            KNOTTYPESTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeCalendarEraType"),
+            TIMECALENDARERATYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AngleChoiceType"),
+            ANGLECHOICETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DefinitionType"),
+            DEFINITIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "BaseStyleDescriptorType"),
+            BASESTYLEDESCRIPTORTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TemporalDatumBaseType"),
+            TEMPORALDATUMBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "NullType"), NULLTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AesheticCriteriaType"),
+            AESHETICCRITERIATYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiCurveType"),
+            MULTICURVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "StyleType"), STYLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DerivationUnitTermType"),
+            DERIVATIONUNITTERMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeOrdinalEraPropertyType"),
+            TIMEORDINALERAPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoVolumeType"),
+            TOPOVOLUMETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractPositionalAccuracyType"), ABSTRACTPOSITIONALACCURACYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TriangleType"),
+            TRIANGLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TemporalDatumRefType"),
+            TEMPORALDATUMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DirectedEdgePropertyType"),
+            DIRECTEDEDGEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VerticalDatumTypeType"),
+            VERTICALDATUMTYPETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ImageDatumType"),
+            IMAGEDATUMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FeatureCollectionType"),
+            FEATURECOLLECTIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DerivedCRSRefType"),
+            DERIVEDCRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EnvelopeType"),
+            ENVELOPETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "IndexMapType"),
+            INDEXMAPTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SequenceRuleType"),
+            SEQUENCERULETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ProjectedCRSRefType"),
+            PROJECTEDCRSREFTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "RelativeInternalPositionalAccuracyType"),
             RELATIVEINTERNALPOSITIONALACCURACYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DerivedCRSTypeType"), DERIVEDCRSTYPETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DerivedCRSTypeType"),
+            DERIVEDCRSTYPETYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "AbstractReferenceSystemType"), ABSTRACTREFERENCESYSTEMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ObservationType"),
+            OBSERVATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EllipsoidRefType"),
+            ELLIPSOIDREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeType"), TIMETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DirectionVectorType"),
+            DIRECTIONVECTORTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FileType"), FILETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CurveArrayPropertyType"),
+            CURVEARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FeatureStylePropertyType"),
+            FEATURESTYLEPROPERTYTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ObservationType"), OBSERVATIONTYPE_TYPE);
+                "DirectedObservationAtDistanceType"), DIRECTEDOBSERVATIONATDISTANCETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GridDomainType"),
+            GRIDDOMAINTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArrayAssociationType"),
+            ARRAYASSOCIATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RectangleType"),
+            RECTANGLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeClockPropertyType"),
+            TIMECLOCKPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimePeriodType"),
+            TIMEPERIODTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiCurvePropertyType"),
+            MULTICURVEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DerivedUnitType"),
+            DERIVEDUNITTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ConversionRefType"),
+            CONVERSIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ClothoidType"),
+            CLOTHOIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TargetPropertyType"),
+            TARGETPROPERTYTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EllipsoidRefType"), ELLIPSOIDREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeType"), TIMETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectionVectorType"), DIRECTIONVECTORTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FileType"), FILETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CurveArrayPropertyType"), CURVEARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FeatureStylePropertyType"), FEATURESTYLEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectedObservationAtDistanceType"),
-            DIRECTEDOBSERVATIONATDISTANCETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GridDomainType"), GRIDDOMAINTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArrayAssociationType"), ARRAYASSOCIATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RectangleType"), RECTANGLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeClockPropertyType"), TIMECLOCKPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimePeriodType"), TIMEPERIODTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiCurvePropertyType"), MULTICURVEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DerivedUnitType"), DERIVEDUNITTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ConversionRefType"), CONVERSIONREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ClothoidType"), CLOTHOIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TargetPropertyType"), TARGETPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractCoordinateOperationBaseType"),
-            ABSTRACTCOORDINATEOPERATIONBASETYPE_TYPE);
+                "AbstractCoordinateOperationBaseType"), ABSTRACTCOORDINATEOPERATIONBASETYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "MultiLineStringPropertyType"), MULTILINESTRINGPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeEdgePropertyType"), TIMEEDGEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ValueArrayPropertyType"), VALUEARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RangeParametersType"), RANGEPARAMETERSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "doubleOrNullList"), DOUBLEORNULLLIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SignType"), SIGNTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ValueArrayType"), VALUEARRAYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeInstantPropertyType"), TIMEINSTANTPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractDiscreteCoverageType"),
-            ABSTRACTDISCRETECOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGeneralTransformationType"),
-            ABSTRACTGENERALTRANSFORMATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoCurveType"), TOPOCURVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OrientableCurveType"), ORIENTABLECURVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LineStringPropertyType"), LINESTRINGPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PolarCSType"), POLARCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AffinePlacementType"), AFFINEPLACEMENTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CategoryExtentType"), CATEGORYEXTENTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EngineeringDatumRefType"), ENGINEERINGDATUMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimePeriodPropertyType"), TIMEPERIODPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ConcatenatedOperationType"), CONCATENATEDOPERATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractCurveType"), ABSTRACTCURVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeodesicStringType"), GEODESICSTRINGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SphericalCSType"), SPHERICALCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGeometricPrimitiveType"),
-            ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTimePrimitiveType"), ABSTRACTTIMEPRIMITIVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeometricComplexType"), GEOMETRICCOMPLEXTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PolygonType"), POLYGONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EllipsoidBaseType"), ELLIPSOIDBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ScalarValuePropertyType"), SCALARVALUEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractFeatureCollectionType"),
-            ABSTRACTFEATURECOLLECTIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeometryPropertyType"), GEOMETRYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EngineeringCRSType"), ENGINEERINGCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectedNodePropertyType"), DIRECTEDNODEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LinearCSRefType"), LINEARCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TemporalCRSType"), TEMPORALCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectedFacePropertyType"), DIRECTEDFACEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RectifiedGridType"), RECTIFIEDGRIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EnvelopeWithTimePeriodType"), ENVELOPEWITHTIMEPERIODTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PrimeMeridianType"), PRIMEMERIDIANTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SolidPropertyType"), SOLIDPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GridEnvelopeType"), GRIDENVELOPETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CoordinateSystemAxisBaseType"),
-            COORDINATESYSTEMAXISBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GraphStyleType"), GRAPHSTYLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "BooleanPropertyType"), BOOLEANPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CylinderType"), CYLINDERTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DecimalMinutesType"), DECIMALMINUTESTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FeatureArrayPropertyType"), FEATUREARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FeatureStyleType"), FEATURESTYLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TemporalCRSRefType"), TEMPORALCRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArcStringByBulgeType"), ARCSTRINGBYBULGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AssociationType"), ASSOCIATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArcSecondsType"), ARCSECONDSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VerticalCRSRefType"), VERTICALCRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DegreesType"), DEGREESTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PointArrayPropertyType"), POINTARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LabelType"), LABELTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OffsetCurveType"), OFFSETCURVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoPrimitiveArrayAssociationType"),
-            TOPOPRIMITIVEARRAYASSOCIATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CubicSplineType"), CUBICSPLINETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CoordType"), COORDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectPositionType"), DIRECTPOSITIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GridCoverageType"), GRIDCOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ContainerPropertyType"), CONTAINERPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AngleType"), ANGLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGeometricAggregateType"),
-            ABSTRACTGEOMETRICAGGREGATETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTimeGeometricPrimitiveType"),
-            ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MovingObjectStatusType"), MOVINGOBJECTSTATUSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractCoordinateSystemType"),
-            ABSTRACTCOORDINATESYSTEMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimePositionType"), TIMEPOSITIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "HistoryPropertyType"), HISTORYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiSurfaceType"), MULTISURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DomainSetType"), DOMAINSETTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "doubleOrNull"), DOUBLEORNULL_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DictionaryEntryType"), DICTIONARYENTRYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CovarianceMatrixType"), COVARIANCEMATRIXTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PolygonPropertyType"), POLYGONPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LinearCSType"), LINEARCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ImageCRSType"), IMAGECRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "IndirectEntryType"), INDIRECTENTRYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiSurfacePropertyType"), MULTISURFACEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ConversionToPreferredUnitType"),
-            CONVERSIONTOPREFERREDUNITTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiCurveDomainType"), MULTICURVEDOMAINTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoPointType"), TOPOPOINTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTopologyType"), ABSTRACTTOPOLOGYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArcByBulgeType"), ARCBYBULGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VerticalCRSType"), VERTICALCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArcByCenterPointType"), ARCBYCENTERPOINTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FileValueModelType"), FILEVALUEMODELTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ObliqueCartesianCSRefType"), OBLIQUECARTESIANCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractReferenceSystemBaseType"),
-            ABSTRACTREFERENCESYSTEMBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimePrimitivePropertyType"), TIMEPRIMITIVEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractCoverageType"), ABSTRACTCOVERAGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "BoundedFeatureType"), BOUNDEDFEATURETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractCoordinateSystemBaseType"),
-            ABSTRACTCOORDINATESYSTEMBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractStyleType"), ABSTRACTSTYLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeneralTransformationRefType"),
-            GENERALTRANSFORMATIONREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "NCNameList"), NCNAMELIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ProjectedCRSType"), PROJECTEDCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "UnitDefinitionType"), UNITDEFINITIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractFeatureType"), ABSTRACTFEATURETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArcType"), ARCTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "integerOrNull"), INTEGERORNULL_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GridFunctionType"), GRIDFUNCTIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SymbolTypeEnumeration"), SYMBOLTYPEENUMERATION_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SurfacePatchArrayPropertyType"),
-            SURFACEPATCHARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GraphStylePropertyType"), GRAPHSTYLEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationMethodRefType"), OPERATIONMETHODREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimePositionUnion"), TIMEPOSITIONUNION_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeometryStyleType"), GEOMETRYSTYLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeometryStylePropertyType"), GEOMETRYSTYLEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CountExtentType"), COUNTEXTENTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeIntervalLengthType"), TIMEINTERVALLENGTHTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiPointDomainType"), MULTIPOINTDOMAINTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTimeTopologyPrimitiveType"),
-            ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeometryArrayPropertyType"), GEOMETRYARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "NameList"), NAMELIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeInstantType"), TIMEINSTANTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTimeReferenceSystemType"),
-            ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeGeometricPrimitivePropertyType"),
-            TIMEGEOMETRICPRIMITIVEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PolyhedralSurfaceType"), POLYHEDRALSURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGMLType"), ABSTRACTGMLTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "FeaturePropertyType"), FEATUREPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiPointPropertyType"), MULTIPOINTPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RelatedTimeType"), RELATEDTIMETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RangeSetType"), RANGESETTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DictionaryType"), DICTIONARYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGriddedSurfaceType"), ABSTRACTGRIDDEDSURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CurveType"), CURVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VerticalDatumRefType"), VERTICALDATUMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeodeticDatumType"), GEODETICDATUMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LineStringType"), LINESTRINGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiSurfaceDomainType"), MULTISURFACEDOMAINTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RectifiedGridDomainType"), RECTIFIEDGRIDDOMAINTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ExtentType"), EXTENTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SurfaceInterpolationType"), SURFACEINTERPOLATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LinearRingType"), LINEARRINGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CoordinateSystemRefType"), COORDINATESYSTEMREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EllipsoidType"), ELLIPSOIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiSolidType"), MULTISOLIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTopoPrimitiveType"), ABSTRACTTOPOPRIMITIVETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TransformationRefType"), TRANSFORMATIONREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeTopologyComplexType"), TIMETOPOLOGYCOMPLEXTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TransformationType"), TRANSFORMATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TrackType"), TRACKTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "BoundingShapeType"), BOUNDINGSHAPETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ImageCRSRefType"), IMAGECRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArcStringType"), ARCSTRINGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiPointType"), MULTIPOINTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeometricPrimitivePropertyType"),
-            GEOMETRICPRIMITIVEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractParametricCurveSurfaceType"),
-            ABSTRACTPARAMETRICCURVESURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CalDate"), CALDATE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TemporalDatumType"), TEMPORALDATUMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "booleanOrNullList"), BOOLEANORNULLLIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeEdgePropertyType"),
+            TIMEEDGEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ValueArrayPropertyType"),
+            VALUEARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RangeParametersType"),
+            RANGEPARAMETERSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "doubleOrNullList"),
+            DOUBLEORNULLLIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SignType"), SIGNTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ValueArrayType"),
+            VALUEARRAYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeInstantPropertyType"),
+            TIMEINSTANTPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractDiscreteCoverageType"), ABSTRACTDISCRETECOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractGeneralTransformationType"), ABSTRACTGENERALTRANSFORMATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoCurveType"),
+            TOPOCURVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OrientableCurveType"),
+            ORIENTABLECURVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LineStringPropertyType"),
+            LINESTRINGPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PolarCSType"),
+            POLARCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AffinePlacementType"),
+            AFFINEPLACEMENTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CategoryExtentType"),
+            CATEGORYEXTENTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EngineeringDatumRefType"),
+            ENGINEERINGDATUMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimePeriodPropertyType"),
+            TIMEPERIODPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ConcatenatedOperationType"),
+            CONCATENATEDOPERATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractCurveType"),
+            ABSTRACTCURVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeodesicStringType"),
+            GEODESICSTRINGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SphericalCSType"),
+            SPHERICALCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractGeometricPrimitiveType"), ABSTRACTGEOMETRICPRIMITIVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractTimePrimitiveType"),
+            ABSTRACTTIMEPRIMITIVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeometricComplexType"),
+            GEOMETRICCOMPLEXTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PolygonType"),
+            POLYGONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EllipsoidBaseType"),
+            ELLIPSOIDBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ScalarValuePropertyType"),
+            SCALARVALUEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractFeatureCollectionType"), ABSTRACTFEATURECOLLECTIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeometryPropertyType"),
+            GEOMETRYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EngineeringCRSType"),
+            ENGINEERINGCRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DirectedNodePropertyType"),
+            DIRECTEDNODEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LinearCSRefType"),
+            LINEARCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TemporalCRSType"),
+            TEMPORALCRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DirectedFacePropertyType"),
+            DIRECTEDFACEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RectifiedGridType"),
+            RECTIFIEDGRIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EnvelopeWithTimePeriodType"),
+            ENVELOPEWITHTIMEPERIODTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PrimeMeridianType"),
+            PRIMEMERIDIANTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SolidPropertyType"),
+            SOLIDPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GridEnvelopeType"),
+            GRIDENVELOPETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "CoordinateSystemAxisBaseType"), COORDINATESYSTEMAXISBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GraphStyleType"),
+            GRAPHSTYLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "BooleanPropertyType"),
+            BOOLEANPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CylinderType"),
+            CYLINDERTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DecimalMinutesType"),
+            DECIMALMINUTESTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FeatureArrayPropertyType"),
+            FEATUREARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FeatureStyleType"),
+            FEATURESTYLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TemporalCRSRefType"),
+            TEMPORALCRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArcStringByBulgeType"),
+            ARCSTRINGBYBULGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AssociationType"),
+            ASSOCIATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArcSecondsType"),
+            ARCSECONDSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VerticalCRSRefType"),
+            VERTICALCRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DegreesType"),
+            DEGREESTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PointArrayPropertyType"),
+            POINTARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LabelType"), LABELTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OffsetCurveType"),
+            OFFSETCURVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "TopoPrimitiveArrayAssociationType"), TOPOPRIMITIVEARRAYASSOCIATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CubicSplineType"),
+            CUBICSPLINETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CoordType"), COORDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DirectPositionType"),
+            DIRECTPOSITIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GridCoverageType"),
+            GRIDCOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ContainerPropertyType"),
+            CONTAINERPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AngleType"), ANGLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractGeometricAggregateType"), ABSTRACTGEOMETRICAGGREGATETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractTimeGeometricPrimitiveType"), ABSTRACTTIMEGEOMETRICPRIMITIVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MovingObjectStatusType"),
+            MOVINGOBJECTSTATUSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractCoordinateSystemType"), ABSTRACTCOORDINATESYSTEMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimePositionType"),
+            TIMEPOSITIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "HistoryPropertyType"),
+            HISTORYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiSurfaceType"),
+            MULTISURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DomainSetType"),
+            DOMAINSETTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "doubleOrNull"),
+            DOUBLEORNULL_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DictionaryEntryType"),
+            DICTIONARYENTRYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CovarianceMatrixType"),
+            COVARIANCEMATRIXTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PolygonPropertyType"),
+            POLYGONPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LinearCSType"),
+            LINEARCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ImageCRSType"),
+            IMAGECRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "IndirectEntryType"),
+            INDIRECTENTRYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiSurfacePropertyType"),
+            MULTISURFACEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "ConversionToPreferredUnitType"), CONVERSIONTOPREFERREDUNITTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiCurveDomainType"),
+            MULTICURVEDOMAINTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoPointType"),
+            TOPOPOINTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractTopologyType"),
+            ABSTRACTTOPOLOGYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArcByBulgeType"),
+            ARCBYBULGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VerticalCRSType"),
+            VERTICALCRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArcByCenterPointType"),
+            ARCBYCENTERPOINTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FileValueModelType"),
+            FILEVALUEMODELTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ObliqueCartesianCSRefType"),
+            OBLIQUECARTESIANCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractReferenceSystemBaseType"), ABSTRACTREFERENCESYSTEMBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimePrimitivePropertyType"),
+            TIMEPRIMITIVEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractCoverageType"),
+            ABSTRACTCOVERAGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "BoundedFeatureType"),
+            BOUNDEDFEATURETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractCoordinateSystemBaseType"), ABSTRACTCOORDINATESYSTEMBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractStyleType"),
+            ABSTRACTSTYLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "GeneralTransformationRefType"), GENERALTRANSFORMATIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "NCNameList"),
+            NCNAMELIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ProjectedCRSType"),
+            PROJECTEDCRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "UnitDefinitionType"),
+            UNITDEFINITIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractFeatureType"),
+            ABSTRACTFEATURETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArcType"), ARCTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "integerOrNull"),
+            INTEGERORNULL_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GridFunctionType"),
+            GRIDFUNCTIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SymbolTypeEnumeration"),
+            SYMBOLTYPEENUMERATION_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "SurfacePatchArrayPropertyType"), SURFACEPATCHARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GraphStylePropertyType"),
+            GRAPHSTYLEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OperationMethodRefType"),
+            OPERATIONMETHODREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimePositionUnion"),
+            TIMEPOSITIONUNION_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeometryStyleType"),
+            GEOMETRYSTYLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeometryStylePropertyType"),
+            GEOMETRYSTYLEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CountExtentType"),
+            COUNTEXTENTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeIntervalLengthType"),
+            TIMEINTERVALLENGTHTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiPointDomainType"),
+            MULTIPOINTDOMAINTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractTimeTopologyPrimitiveType"), ABSTRACTTIMETOPOLOGYPRIMITIVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeometryArrayPropertyType"),
+            GEOMETRYARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "NameList"), NAMELIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeInstantType"),
+            TIMEINSTANTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractTimeReferenceSystemType"), ABSTRACTTIMEREFERENCESYSTEMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "TimeGeometricPrimitivePropertyType"), TIMEGEOMETRICPRIMITIVEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PolyhedralSurfaceType"),
+            POLYHEDRALSURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractGMLType"),
+            ABSTRACTGMLTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "FeaturePropertyType"),
+            FEATUREPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiPointPropertyType"),
+            MULTIPOINTPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RelatedTimeType"),
+            RELATEDTIMETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RangeSetType"),
+            RANGESETTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DictionaryType"),
+            DICTIONARYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractGriddedSurfaceType"),
+            ABSTRACTGRIDDEDSURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CurveType"), CURVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VerticalDatumRefType"),
+            VERTICALDATUMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeodeticDatumType"),
+            GEODETICDATUMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LineStringType"),
+            LINESTRINGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiSurfaceDomainType"),
+            MULTISURFACEDOMAINTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RectifiedGridDomainType"),
+            RECTIFIEDGRIDDOMAINTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ExtentType"),
+            EXTENTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SurfaceInterpolationType"),
+            SURFACEINTERPOLATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LinearRingType"),
+            LINEARRINGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CoordinateSystemRefType"),
+            COORDINATESYSTEMREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EllipsoidType"),
+            ELLIPSOIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiSolidType"),
+            MULTISOLIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractTopoPrimitiveType"),
+            ABSTRACTTOPOPRIMITIVETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TransformationRefType"),
+            TRANSFORMATIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeTopologyComplexType"),
+            TIMETOPOLOGYCOMPLEXTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TransformationType"),
+            TRANSFORMATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TrackType"), TRACKTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "BoundingShapeType"),
+            BOUNDINGSHAPETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ImageCRSRefType"),
+            IMAGECRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArcStringType"),
+            ARCSTRINGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiPointType"),
+            MULTIPOINTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "GeometricPrimitivePropertyType"), GEOMETRICPRIMITIVEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractParametricCurveSurfaceType"), ABSTRACTPARAMETRICCURVESURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CalDate"), CALDATE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TemporalDatumType"),
+            TEMPORALDATUMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "booleanOrNullList"),
+            BOOLEANORNULLLIST_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "TimeCalendarEraPropertyType"), TIMECALENDARERAPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ParameterValueGroupType"),
+            PARAMETERVALUEGROUPTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompassPointEnumeration"),
+            COMPASSPOINTENUMERATION_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ParameterValueType"),
+            PARAMETERVALUETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CircleByCenterPointType"),
+            CIRCLEBYCENTERPOINTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LabelStyleType"),
+            LABELSTYLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EdgeType"), EDGETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VectorType"),
+            VECTORTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ParameterValueGroupType"), PARAMETERVALUEGROUPTYPE_TYPE);
+                "PriorityLocationPropertyType"), PRIORITYLOCATIONPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CircleType"),
+            CIRCLETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractTimeComplexType"),
+            ABSTRACTTIMECOMPLEXTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "BSplineType"),
+            BSPLINETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "KnotType"), KNOTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DefaultStylePropertyType"),
+            DEFAULTSTYLEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CoordinateOperationRefType"),
+            COORDINATEOPERATIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "BezierType"),
+            BEZIERTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DirectionPropertyType"),
+            DIRECTIONPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LineStringSegmentType"),
+            LINESTRINGSEGMENTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TemporalCSRefType"),
+            TEMPORALCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CartesianCSType"),
+            CARTESIANCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "NodeType"), NODETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "doubleList"),
+            DOUBLELIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "booleanList"),
+            BOOLEANLIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArrayType"), ARRAYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SolidType"), SOLIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TinType"), TINTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DynamicFeatureType"),
+            DYNAMICFEATURETYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompassPointEnumeration"), COMPASSPOINTENUMERATION_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ParameterValueType"), PARAMETERVALUETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CircleByCenterPointType"), CIRCLEBYCENTERPOINTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LabelStyleType"), LABELSTYLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EdgeType"), EDGETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VectorType"), VECTORTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PriorityLocationPropertyType"),
-            PRIORITYLOCATIONPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CircleType"), CIRCLETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTimeComplexType"), ABSTRACTTIMECOMPLEXTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "BSplineType"), BSPLINETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "KnotType"), KNOTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DefaultStylePropertyType"), DEFAULTSTYLEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CoordinateOperationRefType"), COORDINATEOPERATIONREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "BezierType"), BEZIERTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DirectionPropertyType"), DIRECTIONPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LineStringSegmentType"), LINESTRINGSEGMENTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TemporalCSRefType"), TEMPORALCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CartesianCSType"), CARTESIANCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "NodeType"), NODETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "doubleList"), DOUBLELIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "booleanList"), BOOLEANLIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArrayType"), ARRAYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SolidType"), SOLIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TinType"), TINTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DynamicFeatureType"), DYNAMICFEATURETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeometricComplexPropertyType"),
-            GEOMETRICCOMPLEXPROPERTYTYPE_TYPE);
+                "GeometricComplexPropertyType"), GEOMETRICCOMPLEXPROPERTYTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.opengis.net/gml",
                 "OperationParameterGroupType"), OPERATIONPARAMETERGROUPTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "UserDefinedCSType"), USERDEFINEDCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiGeometryPropertyType"), MULTIGEOMETRYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DataBlockType"), DATABLOCKTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeUnitType"), TIMEUNITTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTimeObjectType"), ABSTRACTTIMEOBJECTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeTopologyComplexPropertyType"),
-            TIMETOPOLOGYCOMPLEXPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CurvePropertyType"), CURVEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoSolidType"), TOPOSOLIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "QuantityPropertyType"), QUANTITYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CodeType"), CODETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "StringOrRefType"), STRINGORREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiPolygonType"), MULTIPOLYGONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompositeValueType"), COMPOSITEVALUETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationParameterBaseType"), OPERATIONPARAMETERBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "EngineeringDatumType"), ENGINEERINGDATUMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CurveInterpolationType"), CURVEINTERPOLATIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoVolumePropertyType"), TOPOVOLUMEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeOrdinalEraType"), TIMEORDINALERATYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractRingType"), ABSTRACTRINGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationMethodType"), OPERATIONMETHODTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationParameterGroupBaseType"),
-            OPERATIONPARAMETERGROUPBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CoordinateSystemAxisType"), COORDINATESYSTEMAXISTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractCurveSegmentType"), ABSTRACTCURVESEGMENTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGeneralParameterValueType"),
-            ABSTRACTGENERALPARAMETERVALUETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "OperationMethodBaseType"), OPERATIONMETHODBASETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiSolidPropertyType"), MULTISOLIDPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PolygonPatchType"), POLYGONPATCHTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "DrawingTypeType"), DRAWINGTYPETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SphereType"), SPHERETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "ArcMinutesType"), ARCMINUTESTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PointPropertyType"), POINTPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "RingType"), RINGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SurfacePropertyType"), SURFACEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GridType"), GRIDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeocentricCRSRefType"), GEOCENTRICCRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CodeOrNullListType"), CODEORNULLLISTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SurfaceArrayPropertyType"), SURFACEARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SolidArrayPropertyType"), SOLIDARRAYPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGeneralOperationParameterType"),
-            ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LocationPropertyType"), LOCATIONPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SphericalCSRefType"), SPHERICALCSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TopoComplexType"), TOPOCOMPLEXTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LabelStylePropertyType"), LABELSTYLEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "QNameList"), QNAMELIST_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CoverageFunctionType"), COVERAGEFUNCTIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "BagType"), BAGTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MeasureType"), MEASURETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SpeedType"), SPEEDTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SequenceRuleNames"), SEQUENCERULENAMES_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractTimeSliceType"), ABSTRACTTIMESLICETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "AbstractGeometryType"), ABSTRACTGEOMETRYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SingleOperationRefType"), SINGLEOPERATIONREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TriangulatedSurfaceType"), TRIANGULATEDSURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeographicCRSType"), GEOGRAPHICCRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CylindricalCSType"), CYLINDRICALCSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SuccessionType"), SUCCESSIONTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MultiPolygonPropertyType"), MULTIPOLYGONPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "VerticalDatumType"), VERTICALDATUMTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "CompositeSolidPropertyType"), COMPOSITESOLIDPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "PixelInCellType"), PIXELINCELLTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "SurfaceType"), SURFACETYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "LengthType"), LENGTHTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "MetaDataPropertyType"), METADATAPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "QuantityExtentType"), QUANTITYEXTENTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "GeographicCRSRefType"), GEOGRAPHICCRSREFTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeTopologyPrimitivePropertyType"),
-            TIMETOPOLOGYPRIMITIVEPROPERTYTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
-                "TimeNodeType"), TIMENODETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "UserDefinedCSType"),
+            USERDEFINEDCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiGeometryPropertyType"),
+            MULTIGEOMETRYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DataBlockType"),
+            DATABLOCKTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeUnitType"),
+            TIMEUNITTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractTimeObjectType"),
+            ABSTRACTTIMEOBJECTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "TimeTopologyComplexPropertyType"), TIMETOPOLOGYCOMPLEXPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CurvePropertyType"),
+            CURVEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoSolidType"),
+            TOPOSOLIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "QuantityPropertyType"),
+            QUANTITYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CodeType"), CODETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "StringOrRefType"),
+            STRINGORREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiPolygonType"),
+            MULTIPOLYGONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompositeValueType"),
+            COMPOSITEVALUETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OperationParameterBaseType"),
+            OPERATIONPARAMETERBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "EngineeringDatumType"),
+            ENGINEERINGDATUMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CurveInterpolationType"),
+            CURVEINTERPOLATIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoVolumePropertyType"),
+            TOPOVOLUMEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeOrdinalEraType"),
+            TIMEORDINALERATYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractRingType"),
+            ABSTRACTRINGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OperationMethodType"),
+            OPERATIONMETHODTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "OperationParameterGroupBaseType"), OPERATIONPARAMETERGROUPBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CoordinateSystemAxisType"),
+            COORDINATESYSTEMAXISTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractCurveSegmentType"),
+            ABSTRACTCURVESEGMENTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractGeneralParameterValueType"), ABSTRACTGENERALPARAMETERVALUETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "OperationMethodBaseType"),
+            OPERATIONMETHODBASETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiSolidPropertyType"),
+            MULTISOLIDPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PolygonPatchType"),
+            POLYGONPATCHTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "DrawingTypeType"),
+            DRAWINGTYPETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SphereType"),
+            SPHERETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "ArcMinutesType"),
+            ARCMINUTESTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PointPropertyType"),
+            POINTPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "RingType"), RINGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SurfacePropertyType"),
+            SURFACEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GridType"), GRIDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeocentricCRSRefType"),
+            GEOCENTRICCRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CodeOrNullListType"),
+            CODEORNULLLISTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SurfaceArrayPropertyType"),
+            SURFACEARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SolidArrayPropertyType"),
+            SOLIDARRAYPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "AbstractGeneralOperationParameterType"), ABSTRACTGENERALOPERATIONPARAMETERTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LocationPropertyType"),
+            LOCATIONPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SphericalCSRefType"),
+            SPHERICALCSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TopoComplexType"),
+            TOPOCOMPLEXTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LabelStylePropertyType"),
+            LABELSTYLEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "QNameList"), QNAMELIST_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CoverageFunctionType"),
+            COVERAGEFUNCTIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "BagType"), BAGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MeasureType"),
+            MEASURETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SpeedType"), SPEEDTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SequenceRuleNames"),
+            SEQUENCERULENAMES_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractTimeSliceType"),
+            ABSTRACTTIMESLICETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "AbstractGeometryType"),
+            ABSTRACTGEOMETRYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SingleOperationRefType"),
+            SINGLEOPERATIONREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TriangulatedSurfaceType"),
+            TRIANGULATEDSURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeographicCRSType"),
+            GEOGRAPHICCRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CylindricalCSType"),
+            CYLINDRICALCSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SuccessionType"),
+            SUCCESSIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MultiPolygonPropertyType"),
+            MULTIPOLYGONPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "VerticalDatumType"),
+            VERTICALDATUMTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "CompositeSolidPropertyType"),
+            COMPOSITESOLIDPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "PixelInCellType"),
+            PIXELINCELLTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "SurfaceType"),
+            SURFACETYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "LengthType"),
+            LENGTHTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "MetaDataPropertyType"),
+            METADATAPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "QuantityExtentType"),
+            QUANTITYEXTENTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "GeographicCRSRefType"),
+            GEOGRAPHICCRSREFTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml",
+                "TimeTopologyPrimitivePropertyType"), TIMETOPOLOGYPRIMITIVEPROPERTYTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.opengis.net/gml", "TimeNodeType"),
+            TIMENODETYPE_TYPE);
     }
 }

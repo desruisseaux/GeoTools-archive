@@ -30,15 +30,14 @@ public class GMLSchemaLocationResolver implements XSDSchemaLocationResolver {
      *
      *        @generated modifiable
      */
-    public String resolveSchemaLocation(XSDSchema xsdSchema,
-        String namespaceURI, String schemaLocationURI) {
+    public String resolveSchemaLocation(XSDSchema xsdSchema, String namespaceURI,
+        String schemaLocationURI) {
         if (schemaLocationURI == null) {
             return null;
         }
 
         //if no namespace given, assume default for the current schema
-        if (((namespaceURI == null) || "".equals(namespaceURI))
-                && (xsdSchema != null)) {
+        if (((namespaceURI == null) || "".equals(namespaceURI)) && (xsdSchema != null)) {
             namespaceURI = xsdSchema.getTargetNamespace();
         }
 
@@ -68,8 +67,7 @@ public class GMLSchemaLocationResolver implements XSDSchemaLocationResolver {
 
         if ("http://www.opengis.net/gml".equals(namespaceURI)) {
             if (schemaLocationURI.endsWith("coordinateReferenceSystems.xsd")) {
-                return getClass().getResource("coordinateReferenceSystems.xsd")
-                           .toString();
+                return getClass().getResource("coordinateReferenceSystems.xsd").toString();
             }
         }
 
@@ -87,8 +85,7 @@ public class GMLSchemaLocationResolver implements XSDSchemaLocationResolver {
 
         if ("http://www.opengis.net/gml".equals(namespaceURI)) {
             if (schemaLocationURI.endsWith("temporalReferenceSystems.xsd")) {
-                return getClass().getResource("temporalReferenceSystems.xsd")
-                           .toString();
+                return getClass().getResource("temporalReferenceSystems.xsd").toString();
             }
         }
 
@@ -124,8 +121,7 @@ public class GMLSchemaLocationResolver implements XSDSchemaLocationResolver {
 
         if ("http://www.opengis.net/gml".equals(namespaceURI)) {
             if (schemaLocationURI.endsWith("geometryAggregates.xsd")) {
-                return getClass().getResource("geometryAggregates.xsd")
-                           .toString();
+                return getClass().getResource("geometryAggregates.xsd").toString();
             }
         }
 
@@ -143,8 +139,7 @@ public class GMLSchemaLocationResolver implements XSDSchemaLocationResolver {
 
         if ("http://www.opengis.net/gml".equals(namespaceURI)) {
             if (schemaLocationURI.endsWith("coordinateOperations.xsd")) {
-                return getClass().getResource("coordinateOperations.xsd")
-                           .toString();
+                return getClass().getResource("coordinateOperations.xsd").toString();
             }
         }
 
@@ -186,8 +181,7 @@ public class GMLSchemaLocationResolver implements XSDSchemaLocationResolver {
 
         if ("http://www.opengis.net/gml".equals(namespaceURI)) {
             if (schemaLocationURI.endsWith("geometryPrimitives.xsd")) {
-                return getClass().getResource("geometryPrimitives.xsd")
-                           .toString();
+                return getClass().getResource("geometryPrimitives.xsd").toString();
             }
         }
 

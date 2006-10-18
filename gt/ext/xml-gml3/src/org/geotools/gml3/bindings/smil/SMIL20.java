@@ -75,8 +75,7 @@ public interface SMIL20 {
 
     /* Elements */
     /** @generated */
-    public static final QName ANIMATE = new QName("http://www.w3.org/2001/SMIL20/",
-            "animate");
+    public static final QName ANIMATE = new QName("http://www.w3.org/2001/SMIL20/", "animate");
 
     /** @generated */
     public static final QName ANIMATECOLOR = new QName("http://www.w3.org/2001/SMIL20/",
@@ -87,8 +86,7 @@ public interface SMIL20 {
             "animateMotion");
 
     /** @generated */
-    public static final QName SET = new QName("http://www.w3.org/2001/SMIL20/",
-            "set");
+    public static final QName SET = new QName("http://www.w3.org/2001/SMIL20/", "set");
 
     /* Attributes */
 }

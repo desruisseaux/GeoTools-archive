@@ -15,9 +15,9 @@
  */
 package org.geotools.gml3.bindings;
 
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.LineString;
 import org.geotools.xml.*;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -59,7 +59,7 @@ public class LineStringPropertyTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.LINESTRINGPROPERTYTYPE;
+        return GML.LineStringPropertyType;
     }
 
     /**

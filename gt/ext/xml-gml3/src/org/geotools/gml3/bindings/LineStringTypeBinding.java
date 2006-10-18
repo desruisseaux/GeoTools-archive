@@ -15,16 +15,16 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.List;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.xml.*;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import java.util.List;
-import javax.xml.namespace.QName;
+import org.geotools.xml.*;
 
 
 /**
@@ -89,8 +89,7 @@ public class LineStringTypeBinding extends AbstractComplexBinding {
     GeometryFactory gFactory;
     CoordinateSequenceFactory csFactory;
 
-    public LineStringTypeBinding(GeometryFactory gFactory,
-        CoordinateSequenceFactory csFactory) {
+    public LineStringTypeBinding(GeometryFactory gFactory, CoordinateSequenceFactory csFactory) {
         this.gFactory = gFactory;
         this.csFactory = csFactory;
     }
@@ -99,7 +98,7 @@ public class LineStringTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.LINESTRINGTYPE;
+        return GML.LineStringType;
     }
 
     /**

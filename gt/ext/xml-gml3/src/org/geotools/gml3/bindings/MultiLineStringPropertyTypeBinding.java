@@ -15,8 +15,9 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.geotools.xml.*;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.MultiLineString;
+import org.geotools.xml.*;
 
 
 /**
@@ -52,7 +53,7 @@ public class MultiLineStringPropertyTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.MULTILINESTRINGPROPERTYTYPE;
+        return GML.MultiLineStringPropertyType;
     }
 
     /**
@@ -62,7 +63,7 @@ public class MultiLineStringPropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return MultiLineString.class;
     }
 
     /**
@@ -73,7 +74,6 @@ public class MultiLineStringPropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        return node.getChildValue(MultiLineString.class);
     }
 }

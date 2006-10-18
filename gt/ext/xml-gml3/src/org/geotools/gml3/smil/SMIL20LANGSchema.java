@@ -46,8 +46,8 @@ public class SMIL20LANGSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SETTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("setType", java.lang.Object.class);
+    public static final AttributeType SETTYPE_TYPE = AttributeTypeFactory.newAttributeType("setType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -75,8 +75,8 @@ public class SMIL20LANGSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANIMATEMOTIONTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("animateMotionType", java.lang.Object.class);
+    public static final AttributeType ANIMATEMOTIONTYPE_TYPE = AttributeTypeFactory.newAttributeType("animateMotionType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -104,8 +104,8 @@ public class SMIL20LANGSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANIMATETYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("animateType", java.lang.Object.class);
+    public static final AttributeType ANIMATETYPE_TYPE = AttributeTypeFactory.newAttributeType("animateType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -133,23 +133,19 @@ public class SMIL20LANGSchema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANIMATECOLORTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("animateColorType", java.lang.Object.class);
+    public static final AttributeType ANIMATECOLORTYPE_TYPE = AttributeTypeFactory.newAttributeType("animateColorType",
+            java.lang.Object.class);
 
     public SMIL20LANGSchema() {
         super("http://www.w3.org/2001/SMIL20/Language");
 
-        put(new org.geotools.feature.Name(
-                "http://www.w3.org/2001/SMIL20/Language", "setType"),
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/Language", "setType"),
             SETTYPE_TYPE);
-        put(new org.geotools.feature.Name(
-                "http://www.w3.org/2001/SMIL20/Language", "animateMotionType"),
-            ANIMATEMOTIONTYPE_TYPE);
-        put(new org.geotools.feature.Name(
-                "http://www.w3.org/2001/SMIL20/Language", "animateType"),
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/Language",
+                "animateMotionType"), ANIMATEMOTIONTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/Language", "animateType"),
             ANIMATETYPE_TYPE);
-        put(new org.geotools.feature.Name(
-                "http://www.w3.org/2001/SMIL20/Language", "animateColorType"),
-            ANIMATECOLORTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/Language",
+                "animateColorType"), ANIMATECOLORTYPE_TYPE);
     }
 }

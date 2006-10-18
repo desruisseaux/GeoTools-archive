@@ -59,8 +59,7 @@ public interface SMIL20LANG {
             "animateMotion");
 
     /** @generated */
-    public static final QName SET = new QName("http://www.w3.org/2001/SMIL20/Language",
-            "set");
+    public static final QName SET = new QName("http://www.w3.org/2001/SMIL20/Language", "set");
 
     /* Attributes */
 }

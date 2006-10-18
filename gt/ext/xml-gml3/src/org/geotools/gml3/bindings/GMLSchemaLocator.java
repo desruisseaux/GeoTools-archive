@@ -18,10 +18,10 @@ package org.geotools.gml3.bindings;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
+import java.io.IOException;
 import org.geotools.gml3.bindings.smil.SMIL20SchemaLocationResolver;
 import org.geotools.xlink.bindings.XLINKSchemaLocationResolver;
 import org.geotools.xml.Schemas;
-import java.io.IOException;
 
 
 public class GMLSchemaLocator implements XSDSchemaLocator {
@@ -31,8 +31,7 @@ public class GMLSchemaLocator implements XSDSchemaLocator {
             String location = getClass().getResource("gml.xsd").toString();
 
             XSDSchemaLocationResolver[] locators = new XSDSchemaLocationResolver[] {
-                    new XLINKSchemaLocationResolver(),
-                    new SMIL20SchemaLocationResolver(),
+                    new XLINKSchemaLocationResolver(), new SMIL20SchemaLocationResolver(),
                     new GMLSchemaLocationResolver()
                 };
 

@@ -15,6 +15,8 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.net.URI;
+import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
@@ -22,12 +24,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.referencing.CRS;
-import org.geotools.xml.Node;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import java.net.URI;
-import java.util.List;
+import org.geotools.referencing.CRS;
+import org.geotools.xml.Node;
 
 
 /**
@@ -52,18 +52,16 @@ public class GML3ParsingUtils {
         return null;
     }
 
-    static LineString lineString(Node node, GeometryFactory gf,
-        CoordinateSequenceFactory csf) {
+    static LineString lineString(Node node, GeometryFactory gf, CoordinateSequenceFactory csf) {
         return line(node, gf, csf, false);
     }
 
-    static LinearRing linearRing(Node node, GeometryFactory gf,
-        CoordinateSequenceFactory csf) {
+    static LinearRing linearRing(Node node, GeometryFactory gf, CoordinateSequenceFactory csf) {
         return (LinearRing) line(node, gf, csf, true);
     }
 
-    static LineString line(Node node, GeometryFactory gf,
-        CoordinateSequenceFactory csf, boolean ring) {
+    static LineString line(Node node, GeometryFactory gf, CoordinateSequenceFactory csf,
+        boolean ring) {
         if (node.hasChild(DirectPosition.class)) {
             List dps = node.getChildValues(DirectPosition.class);
             DirectPosition dp = (DirectPosition) dps.get(0);
@@ -89,17 +87,14 @@ public class GML3ParsingUtils {
                 coordinates[i] = ((Point) points.get(0)).getCoordinate();
             }
 
-            return ring ? gf.createLinearRing(coordinates)
-                        : gf.createLineString(coordinates);
+            return ring ? gf.createLinearRing(coordinates) : gf.createLineString(coordinates);
         }
 
         if (node.hasChild(Coordinate.class)) {
             List list = node.getChildValues(Coordinate.class);
-            Coordinate[] coordinates = (Coordinate[]) list.toArray(new Coordinate[list
-                    .size()]);
+            Coordinate[] coordinates = (Coordinate[]) list.toArray(new Coordinate[list.size()]);
 
-            return ring ? gf.createLinearRing(coordinates)
-                        : gf.createLineString(coordinates);
+            return ring ? gf.createLinearRing(coordinates) : gf.createLineString(coordinates);
         }
 
         if (node.hasChild(DirectPosition[].class)) {

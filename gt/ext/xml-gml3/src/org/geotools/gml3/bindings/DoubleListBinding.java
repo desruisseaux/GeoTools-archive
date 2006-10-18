@@ -15,9 +15,9 @@
  */
 package org.geotools.gml3.bindings;
 
+import javax.xml.namespace.QName;
 import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -44,7 +44,7 @@ public class DoubleListBinding extends AbstractSimpleBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.DOUBLELIST;
+        return GML.doubleList;
     }
 
     /**

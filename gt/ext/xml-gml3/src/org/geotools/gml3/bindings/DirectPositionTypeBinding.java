@@ -15,15 +15,15 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.net.URI;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition1D;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.*;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import java.net.URI;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -63,7 +63,7 @@ public class DirectPositionTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.DIRECTPOSITIONTYPE;
+        return GML.DirectPositionType;
     }
 
     public int getExecutionMode() {
@@ -94,12 +94,10 @@ public class DirectPositionTypeBinding extends AbstractComplexBinding {
         DirectPosition dp = null;
 
         if (position.length < 2) {
-            dp = (crs != null) ? new DirectPosition1D(crs)
-                               : new DirectPosition1D();
+            dp = (crs != null) ? new DirectPosition1D(crs) : new DirectPosition1D();
             dp.setOrdinate(0, position[0]);
         } else {
-            dp = (crs != null) ? new DirectPosition2D(crs)
-                               : new DirectPosition2D();
+            dp = (crs != null) ? new DirectPosition2D(crs) : new DirectPosition2D();
             dp.setOrdinate(0, position[0]);
             dp.setOrdinate(1, position[1]);
         }

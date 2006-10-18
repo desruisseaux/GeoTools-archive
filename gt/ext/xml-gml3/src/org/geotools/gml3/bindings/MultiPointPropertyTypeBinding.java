@@ -15,8 +15,9 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.geotools.xml.*;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.MultiPoint;
+import org.geotools.xml.*;
 
 
 /**
@@ -51,7 +52,7 @@ public class MultiPointPropertyTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.MULTIPOINTPROPERTYTYPE;
+        return GML.MultiPointPropertyType;
     }
 
     /**
@@ -61,7 +62,7 @@ public class MultiPointPropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return MultiPoint.class;
     }
 
     /**
@@ -72,7 +73,6 @@ public class MultiPointPropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        return node.getChildValue(MultiPoint.class);
     }
 }

@@ -61,8 +61,8 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType FILLDEFAULTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("fillDefaultType", java.lang.Object.class);
+    public static final AttributeType FILLDEFAULTTYPE_TYPE = AttributeTypeFactory.newAttributeType("fillDefaultType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -80,8 +80,8 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType ANIMATEPROTOTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("animatePrototype", java.lang.Object.class);
+    public static final AttributeType ANIMATEPROTOTYPE_TYPE = AttributeTypeFactory.newAttributeType("animatePrototype",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -98,8 +98,8 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SETPROTOTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("setPrototype", java.lang.Object.class);
+    public static final AttributeType SETPROTOTYPE_TYPE = AttributeTypeFactory.newAttributeType("setPrototype",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -120,8 +120,8 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType SYNCBEHAVIORTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("syncBehaviorType", java.lang.Object.class);
+    public static final AttributeType SYNCBEHAVIORTYPE_TYPE = AttributeTypeFactory.newAttributeType("syncBehaviorType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -207,8 +207,8 @@ public class SMIL20Schema extends SchemaImpl {
      *
      * @generated
      */
-    public static final AttributeType RESTARTTIMINGTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("restartTimingType", java.lang.Object.class);
+    public static final AttributeType RESTARTTIMINGTYPE_TYPE = AttributeTypeFactory.newAttributeType("restartTimingType",
+            java.lang.Object.class);
 
     /**
      * <p>
@@ -254,27 +254,27 @@ public class SMIL20Schema extends SchemaImpl {
     public SMIL20Schema() {
         super("http://www.w3.org/2001/SMIL20/");
 
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "animateColorPrototype"), ANIMATECOLORPROTOTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "fillDefaultType"), FILLDEFAULTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "animatePrototype"), ANIMATEPROTOTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "setPrototype"), SETPROTOTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "syncBehaviorType"), SYNCBEHAVIORTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "nonNegativeDecimalType"), NONNEGATIVEDECIMALTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "restartDefaultType"), RESTARTDEFAULTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "fillTimingAttrsType"), FILLTIMINGATTRSTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "restartTimingType"), RESTARTTIMINGTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "animateColorPrototype"),
+            ANIMATECOLORPROTOTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "fillDefaultType"),
+            FILLDEFAULTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "animatePrototype"),
+            ANIMATEPROTOTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "setPrototype"),
+            SETPROTOTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "syncBehaviorType"),
+            SYNCBEHAVIORTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "nonNegativeDecimalType"),
+            NONNEGATIVEDECIMALTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "restartDefaultType"),
+            RESTARTDEFAULTTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "fillTimingAttrsType"),
+            FILLTIMINGATTRSTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "restartTimingType"),
+            RESTARTTIMINGTYPE_TYPE);
         put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
                 "syncBehaviorDefaultType"), SYNCBEHAVIORDEFAULTTYPE_TYPE);
-        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/",
-                "animateMotionPrototype"), ANIMATEMOTIONPROTOTYPE_TYPE);
+        put(new org.geotools.feature.Name("http://www.w3.org/2001/SMIL20/", "animateMotionPrototype"),
+            ANIMATEMOTIONPROTOTYPE_TYPE);
     }
 }

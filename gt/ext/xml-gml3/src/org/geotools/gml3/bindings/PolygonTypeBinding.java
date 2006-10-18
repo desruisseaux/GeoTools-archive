@@ -15,12 +15,12 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.util.List;
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.xml.*;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -60,7 +60,7 @@ public class PolygonTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.POLYGONTYPE;
+        return GML.PolygonType;
     }
 
     /**

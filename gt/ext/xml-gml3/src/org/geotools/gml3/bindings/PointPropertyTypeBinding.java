@@ -15,9 +15,9 @@
  */
 package org.geotools.gml3.bindings;
 
+import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.xml.*;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -58,7 +58,7 @@ public class PointPropertyTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.POINTPROPERTYTYPE;
+        return GML.PointPropertyType;
     }
 
     /**
