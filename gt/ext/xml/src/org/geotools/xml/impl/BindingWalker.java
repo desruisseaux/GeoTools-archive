@@ -29,12 +29,12 @@ import javax.xml.namespace.QName;
 
 
 public class BindingWalker implements TypeWalker.Visitor {
-    BindingFactory factory;
+    BindingLoader loader;
     MutablePicoContainer context;
     ArrayList bindings;
 
-    public BindingWalker(BindingFactory factory, MutablePicoContainer context) {
-        this.factory = factory;
+    public BindingWalker(BindingLoader factory, MutablePicoContainer context) {
+        this.loader = factory;
         this.context = context;
     }
 
@@ -46,7 +46,7 @@ public class BindingWalker implements TypeWalker.Visitor {
             QName qName = new QName(type.getTargetNamespace(), type.getName());
 
             //load the binding into the current context
-            binding = factory.loadBinding(qName, context);
+            binding = loader.loadBinding(qName, context);
         } else {
             //special case check, look for an anonymous complex type 
             // with simple content
@@ -97,7 +97,7 @@ public class BindingWalker implements TypeWalker.Visitor {
         if (component.getName() != null) {
             QName qName = new QName(component.getTargetNamespace(),
                     component.getName());
-            Binding binding = factory.loadBinding(qName, context);
+            Binding binding = loader.loadBinding(qName, context);
 
             if (binding != null) {
                 bindings.add(0, binding);
