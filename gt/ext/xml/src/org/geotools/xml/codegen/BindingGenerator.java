@@ -25,8 +25,10 @@ import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.Schemas;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,6 +60,8 @@ public class BindingGenerator extends AbstractGenerator {
     boolean generateElements = true;
     boolean generateTypes = true;
 
+    Set includedTypes = new HashSet();
+    
     public void setGeneratingBindingConfiguration(
         boolean generatingBindingConfiguration) {
         this.generatingBindingConfiguration = generatingBindingConfiguration;
@@ -80,6 +84,10 @@ public class BindingGenerator extends AbstractGenerator {
         this.generateTypes = generateTypes;
     }
 
+    public void setIncludedTypes(Set includedTypes) {
+		this.includedTypes = includedTypes;
+	}
+    
     public void generate(XSDSchema schema) {
         List components = new ArrayList();
 
@@ -101,7 +109,15 @@ public class BindingGenerator extends AbstractGenerator {
 
             for (Iterator t = types.iterator(); t.hasNext();) {
                 XSDTypeDefinition type = (XSDTypeDefinition) t.next();
-                generate(type, schema);
+                if ( !includedTypes.isEmpty() ) {
+                	if ( includedTypes.contains( type.getName() ) ) {
+                		generate( type, schema );
+                	}
+                }
+                else {
+                	generate(type, schema);	
+                }
+                
 
                 if (target(type, schema)) {
                     components.add(type);
@@ -173,7 +189,7 @@ public class BindingGenerator extends AbstractGenerator {
     public static void main(String[] args) throws Exception {
         XSDSchema schema = null;
         ArrayList cargList = new ArrayList();
-
+        HashSet includedTypes = new HashSet();
         BindingGenerator g = new BindingGenerator();
 
         if (args.length == 0) {
@@ -195,6 +211,8 @@ public class BindingGenerator extends AbstractGenerator {
                 g.setLocation(args[++i]);
             } else if ("--package".equals(arg)) {
                 g.setPackageBase(args[++i]);
+            } else if ("--include-type".equals(arg)) {
+            	includedTypes.add(args[++i]);
             } else if ("--carg".equals(arg)) {
                 try {
                     cargList.add(Class.forName(args[++i]));
@@ -209,7 +227,12 @@ public class BindingGenerator extends AbstractGenerator {
                 g.setGenerateAttributes(false);
             } else if ("--notypes".equals(arg)) {
                 g.setGenerateTypes(false);
+            } else if ("--no-binding-interface".equals(arg)) {
+            	g.setGeneratingBindingInterface( false );
+            } else if ("--no-binding-configuration".equals(arg)) {
+            	g.setGeneratingBindingConfiguration( false );
             }
+            
         }
 
         Class[] cargs = null;
@@ -229,6 +252,7 @@ public class BindingGenerator extends AbstractGenerator {
             g.setLocation(System.getProperty("user.dir"));
         }
 
+        g.setIncludedTypes(includedTypes);
         g.setBindingConstructorArguments(cargs);
         g.generate(schema);
     }
@@ -239,6 +263,7 @@ public class BindingGenerator extends AbstractGenerator {
         System.out.println("\t\t--schema <path>: Path to schema file");
         System.out.println("\t\t--output <path>: Path to output directory");
         System.out.println("\t\t--package <package>: Package out writen files");
+        System.out.println("\t\t--include-type <type>: Include a single type" );
         System.out.println(
             "\t\t--carg <class>: Qualified class name of binding constructor argument");
         System.out.println(
@@ -246,5 +271,7 @@ public class BindingGenerator extends AbstractGenerator {
         System.out.println(
             "\t\t--noattributes: Turn off attribute binding generation");
         System.out.println("\t\t--notypes: Turn off type binding generation");
+        System.out.println("\t\t--no-binding-interface: Turn off binding interface generation");
+        System.out.println("\t\t--no-binding-configuration: Turn off binding configuration generation");
     }
 }
