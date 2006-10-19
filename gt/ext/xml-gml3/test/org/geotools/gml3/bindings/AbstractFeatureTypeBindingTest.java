@@ -22,6 +22,7 @@ import org.w3c.dom.Element;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.Feature;
 import org.geotools.gml3.GML3TestSupport;
 import org.geotools.gml3.GMLConfiguration;
@@ -40,63 +41,21 @@ public class AbstractFeatureTypeBindingTest extends GML3TestSupport {
     }
 
     public void testWithoutGmlProperties() throws Exception {
-        if (true) {
-            return;
-        }
+        Element feature = GML3MockData.feature(document, document);
+        feature.setAttributeNS(GML.NAMESPACE, "id", "fid.1");
 
-        Element testFeature = GML3MockData.element(new QName(TEST.NAMESPACE, "TestFeature"),
-                document, document);
-        Element geom = GML3MockData.element(new QName(TEST.NAMESPACE, "geom"), document, testFeature);
-        GML3MockData.point(document, geom);
-
-        Element count = GML3MockData.element(new QName(TEST.NAMESPACE, "count"), document,
-                testFeature);
-        count.appendChild(document.createTextNode("1"));
-
-        Feature feature = (Feature) parse();
+        Feature f = (Feature) parse();
         assertNotNull(feature);
-    }
 
-    static class TEST {
-        public static String NAMESPACE = "http://www.geotools.org/test";
-    }
+        assertEquals("fid.1", f.getID());
 
-    static class TestConfiguration extends Configuration {
-        public TestConfiguration() {
-            addDependency(new GMLConfiguration());
-        }
+        Point p = (Point) f.getDefaultGeometry();
+        assertNotNull(p);
+        assertEquals(1.0, p.getX(), 0d);
+        assertEquals(2.0, p.getY(), 0d);
 
-        public String getNamespaceURI() {
-            return TEST.NAMESPACE;
-        }
-
-        public URL getSchemaFileURL() throws MalformedURLException {
-            return getClass().getResource("AbstractFeatureTypeBindingTest.xsd");
-        }
-
-        public BindingConfiguration getBindingConfiguration() {
-            return new BindingConfiguration() {
-                    public void configure(MutablePicoContainer container) {
-                        //no bindings
-                    }
-                };
-        }
-
-        public XSDSchemaLocationResolver getSchemaLocationResolver() {
-            return new XSDSchemaLocationResolver() {
-                    public String resolveSchemaLocation(XSDSchema schema, String namespaceURI,
-                        String schemaLocationURI) {
-                        if (getNamespaceURI().equals(namespaceURI)) {
-                            try {
-                                return getSchemaFileURL().toString();
-                            } catch (MalformedURLException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-
-                        return null;
-                    }
-                };
-        }
+        Integer i = (Integer) f.getAttribute("count");
+        assertNotNull(i);
+        assertEquals(1, i.intValue());
     }
 }
