@@ -32,10 +32,12 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
      */
     public void configure(MutablePicoContainer container) {
         //Types
-        // container.registerComponentImplementation(GML.AbstractFeatureType,
-        //    AbstractFeatureTypeBinding.class);
-        // container.registerComponentImplementation(GML.AbstractFeatureCollectionType,
-        //   AbstractFeatureCollectionTypeBinding.class);
+        container.registerComponentImplementation(GML.AbstractFeatureType,
+            AbstractFeatureTypeBinding.class);
+        container.registerComponentImplementation(GML.AbstractFeatureCollectionType,
+            AbstractFeatureCollectionTypeBinding.class);
+        container.registerComponentImplementation(GML.AbstractRingPropertyType,
+            AbstractRingPropertyTypeBinding.class);
         //container.registerComponentImplementation(GML.COORDINATESTYPE,CoordinatesTypeBinding.class);
         container.registerComponentImplementation(GML.CoordinatesType,
             GMLCoordinatesTypeBinding.class);
@@ -47,6 +49,10 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
             DirectPositionTypeBinding.class);
         container.registerComponentImplementation(GML.doubleList, DoubleListBinding.class);
         container.registerComponentImplementation(GML.EnvelopeType, EnvelopeTypeBinding.class);
+        container.registerComponentImplementation(GML.FeatureArrayPropertyType,
+            FeatureArrayPropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.FeaturePropertyType,
+            FeaturePropertyTypeBinding.class);
         container.registerComponentImplementation(GML.integerList, IntegerListBinding.class);
         container.registerComponentImplementation(GML.LinearRingPropertyType,
             LinearRingPropertyTypeBinding.class);
