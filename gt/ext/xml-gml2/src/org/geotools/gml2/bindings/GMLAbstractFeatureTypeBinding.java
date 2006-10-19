@@ -43,10 +43,6 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
-import org.geotools.xml.Schemas;
 import org.geotools.xs.bindings.XS;
 
 
@@ -223,8 +219,10 @@ public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
             ftCache.put(fType);
         }
 
+        String fid = (String) node.getAttributeValue("fid");
+
         //create the feature
-        Feature f = fType.create(new Object[fType.getAttributeCount()]);
+        Feature f = fType.create(new Object[fType.getAttributeCount()], fid);
 
         for (Iterator itr = node.getChildren().iterator(); itr.hasNext();) {
             Node child = (Node) itr.next();
