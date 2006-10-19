@@ -764,8 +764,8 @@
           <version>2.1</version>
           <configuration>
             <descriptors>
-              <descriptor>src/main/assembly/binaryDist.xml</descriptor>
-              <descriptor>src/main/assembly/sourceDist.xml</descriptor>
+              <descriptor>maven/assembly/binaryDist.xml</descriptor>
+              <descriptor>maven/assembly/sourceDist.xml</descriptor>
             </descriptors>
           </configuration>
         </plugin>
