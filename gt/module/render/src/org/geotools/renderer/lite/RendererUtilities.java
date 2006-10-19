@@ -269,7 +269,6 @@ public final class RendererUtilities {
 	 * @param imageHeight
 	 * @param DPI
 	 *            screen dots per inch (OGC standard is 90)
-	 * @return
 	 * @throws TransformException
 	 * @throws FactoryException
 	 * 

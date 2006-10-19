@@ -43,7 +43,6 @@ public class Parameters {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public FileChannel getChannel() {
         return channel;
@@ -52,7 +51,6 @@ public class Parameters {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public DataDefinition getDataDef() {
         return dataDef;
@@ -61,7 +59,6 @@ public class Parameters {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public int getMaxNodeEntries() {
         return maxNodeEntries;
@@ -70,7 +67,6 @@ public class Parameters {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public int getMinNodeEntries() {
         return minNodeEntries;
@@ -79,7 +75,6 @@ public class Parameters {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public short getSplitAlg() {
         return splitAlg;
@@ -133,7 +128,6 @@ public class Parameters {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public boolean getForceChannel() {
         return forceChannel;
@@ -151,7 +145,6 @@ public class Parameters {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public Stack getFreePages() {
         return freePages;

@@ -80,7 +80,6 @@ public class MIFFileTokenizer extends MIFStringTokenizer {
     /**
      * Returns the current line number
      *
-     * @return
      */
     public int getLineNumber() {
         return lineNumber;

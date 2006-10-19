@@ -309,7 +309,6 @@ public class ElementTypeHandler extends ElementGroupingHandler {
      * returns the element name
      * </p>
      *
-     * @return
      */
     public String getName() {
         return name;

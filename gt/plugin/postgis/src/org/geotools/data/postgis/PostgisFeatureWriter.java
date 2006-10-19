@@ -91,7 +91,6 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
      * Returns true if the WKB format is used to transfer geometries, false
      * otherwise
      *
-     * @return
      */
     public boolean isWKBEnabled() {
         return WKBEnabled;

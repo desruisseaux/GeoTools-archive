@@ -111,7 +111,6 @@ public class ReprojectFeatureReader implements FeatureReader {
      * Description ...
      * </p>
      *
-     * @return
      *
      * @throws IllegalStateException DOCUMENT ME!
      *
@@ -132,7 +131,6 @@ public class ReprojectFeatureReader implements FeatureReader {
      * Description ...
      * </p>
      *
-     * @return
      *
      * @throws IOException
      * @throws IllegalAttributeException
@@ -172,7 +170,6 @@ public class ReprojectFeatureReader implements FeatureReader {
      * Description ...
      * </p>
      *
-     * @return
      *
      * @throws IOException
      * @throws IllegalStateException DOCUMENT ME!

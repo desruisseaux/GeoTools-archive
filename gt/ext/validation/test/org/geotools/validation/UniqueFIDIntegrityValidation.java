@@ -88,7 +88,6 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 	 * @see org.geotools.validation.Validation#setName(java.lang.String)
 	 * 
 	 * @param name
-	 * @return
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -101,7 +100,6 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 	 * </p>
 	 * @see org.geotools.validation.Validation#getName()
 	 * 
-	 * @return
 	 */
 	public String getName() {
 		return name;
@@ -127,7 +125,6 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 	 * </p>
 	 * @see org.geotools.validation.Validation#getDescription()
 	 * 
-	 * @return
 	 */
 	public String getDescription() {
 		return description;
@@ -140,7 +137,6 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 	 * </p>
 	 * @see org.geotools.validation.Validation#getPriority()
 	 * 
-	 * @return
 	 */
 	public int getPriority() {
 		return 10;
@@ -166,7 +162,6 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 	 * </p>
 	 * @see org.geotools.validation.Validation#getTypeNames()
 	 * 
-	 * @return
 	 */
 	public String[] getTypeRefs() {
 		return typeNames;
@@ -183,7 +178,6 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 	 * @param layers
 	 * @param envelope
 	 * @param results
-	 * @return
 	 */
 	public boolean validate(Map layers, Envelope envelope, ValidationResults results) throws Exception{
 		

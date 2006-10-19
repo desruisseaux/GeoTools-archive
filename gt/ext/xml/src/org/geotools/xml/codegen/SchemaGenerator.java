@@ -304,7 +304,6 @@ public class SchemaGenerator extends AbstractGenerator {
      * of B, then A appears in the list before B.
      *         </ul>
      *  </p>
-     * @return
      */
 
     //	public List sort() {

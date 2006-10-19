@@ -180,7 +180,6 @@ public abstract class AbstractGenerator {
     /**
      * Convenience method for generating the output location of generated files based on
      * {@link #getLocation()}
-     * @return
      */
     protected File outputLocation() {
         File location = null;

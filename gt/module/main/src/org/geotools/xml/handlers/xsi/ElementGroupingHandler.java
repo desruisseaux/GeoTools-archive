@@ -37,7 +37,6 @@ public abstract class ElementGroupingHandler extends XSIElementHandler {
      *
      * @param parent
      *
-     * @return
      *
      * @throws SAXException
      */

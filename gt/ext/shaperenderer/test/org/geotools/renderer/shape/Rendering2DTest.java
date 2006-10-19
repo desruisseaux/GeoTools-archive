@@ -337,7 +337,6 @@ public class Rendering2DTest extends TestCase {
      *
      * @param ds DOCUMENT ME!
      *
-     * @return
      *
      * @throws Exception
      */

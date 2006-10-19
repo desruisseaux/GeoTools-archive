@@ -80,7 +80,6 @@ public class AnyAttributeHandler extends XSIElementHandler {
     /**
      * Returns the values of the namespace attribute
      *
-     * @return
      */
     public String getNamespace() {
         return namespace;

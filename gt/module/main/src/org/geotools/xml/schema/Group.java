@@ -41,7 +41,6 @@ public interface Group extends ElementGrouping {
      * element sequences for this group.
      * </p>
      *
-     * @return
      */
     public ElementGrouping getChild();
 
@@ -50,7 +49,6 @@ public interface Group extends ElementGrouping {
      * The Group's declaration object id.
      * </p>
      *
-     * @return
      */
     public String getId();
 
@@ -60,7 +58,6 @@ public interface Group extends ElementGrouping {
      * document.
      * </p>
      *
-     * @return
      */
     public int getMaxOccurs();
 
@@ -70,7 +67,6 @@ public interface Group extends ElementGrouping {
      * document.
      * </p>
      *
-     * @return
      */
     public int getMinOccurs();
 
@@ -79,14 +75,12 @@ public interface Group extends ElementGrouping {
      * The group's name in the Schema document
      * </p>
      *
-     * @return
      */
     public String getName();
 
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public URI getNamespace();
 }

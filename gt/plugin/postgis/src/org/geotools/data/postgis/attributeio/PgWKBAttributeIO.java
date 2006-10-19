@@ -50,7 +50,6 @@ public class PgWKBAttributeIO implements AttributeIO {
      *
      * @param c
      *
-     * @return
      */
     public static byte getFromChar(char c) {
         if (c <= '9') {

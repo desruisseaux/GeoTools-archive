@@ -80,7 +80,6 @@ public interface FIDMapper extends Serializable {
      *
      * @param attributes DOCUMENT ME!
      *
-     * @return
      */
     public String getID(Object[] attributes);
 
@@ -92,7 +91,6 @@ public interface FIDMapper extends Serializable {
      *
      * @param FID The feature ID is going to be parsed
      *
-     * @return
      *
      * @throws IOException
      */
@@ -110,7 +108,6 @@ public interface FIDMapper extends Serializable {
      * @param statement - the statement used to insert the feature into the
      *        database
      *
-     * @return
      *
      * @throws IOException
      */
@@ -121,14 +118,12 @@ public interface FIDMapper extends Serializable {
      * If true the primary key columns will be returned as attributes. This is
      * fundamental for primary key with businnes meaning.
      *
-     * @return
      */
     public boolean returnFIDColumnsAsAttributes();
 
     /**
      * Returns the number of columns in the primary keys handled by this mapper
      *
-     * @return
      */
     public int getColumnCount();
 
@@ -137,7 +132,6 @@ public interface FIDMapper extends Serializable {
      *
      * @param colIndex
      *
-     * @return
      */
     public String getColumnName(int colIndex);
 
@@ -147,7 +141,6 @@ public interface FIDMapper extends Serializable {
      *
      * @param colIndex
      *
-     * @return
      */
     public int getColumnType(int colIndex);
 
@@ -159,7 +152,6 @@ public interface FIDMapper extends Serializable {
      *
      * @param colIndex
      *
-     * @return
      */
     public int getColumnSize(int colIndex);
 
@@ -170,7 +162,6 @@ public interface FIDMapper extends Serializable {
      *
      * @param colIndex
      *
-     * @return
      */
     public int getColumnDecimalDigits(int colIndex);
 
@@ -181,14 +172,12 @@ public interface FIDMapper extends Serializable {
      *
      * @param colIndex
      *
-     * @return
      */
     public boolean isAutoIncrement(int colIndex);
 
     /**
      * Returns true if at least one column is of auto-increment type
      *
-     * @return
      */
     public boolean hasAutoIncrementColumns();
 
@@ -206,7 +195,6 @@ public interface FIDMapper extends Serializable {
      * to do, but a sane policy may be to prevent Feature writing
      * </p>
      *
-     * @return
      */
     public boolean isVolatile();
 }

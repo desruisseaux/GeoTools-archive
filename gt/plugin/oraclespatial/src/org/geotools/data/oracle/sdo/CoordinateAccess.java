@@ -81,7 +81,6 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
      * @param coordinate
      * @param attribute is between 0 and getNumAttributes()
      *
-     * @return
      */
      Object getAttribute(int coordinate, int attribute);
 

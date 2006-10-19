@@ -427,7 +427,6 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      *
      * @param readDbf - if true, the dbf fill will be opened and read
      *
-     * @return
      *
      * @throws IOException
      */

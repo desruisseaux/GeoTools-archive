@@ -150,7 +150,6 @@ public final class LiteCoordinateSequence extends PackedCoordinateSequence{
     }
 
 	/**
-	 * @return
 	 */
 	public double[] getArray() {
 		return coords;

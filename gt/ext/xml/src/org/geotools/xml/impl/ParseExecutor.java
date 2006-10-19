@@ -102,7 +102,6 @@ public class ParseExecutor implements Visitor {
      * 
      * </p>
      * @param instance
-     * @return
      */
     protected Object preParse( InstanceComponent instance ) {
     	// we only preparse text, so simple types

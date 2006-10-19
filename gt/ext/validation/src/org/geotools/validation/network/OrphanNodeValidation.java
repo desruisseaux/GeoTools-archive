@@ -64,7 +64,6 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
      * 
      * @see org.geotools.validation.Validation#getTypeRefs()
      * 
-     * @return
      */
     public String[] getTypeRefs() {
     	return new String[] {typeName};

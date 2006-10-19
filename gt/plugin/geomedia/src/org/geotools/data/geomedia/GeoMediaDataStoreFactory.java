@@ -160,7 +160,6 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
      *
      * @param params
      *
-     * @return
      *
      * @throws IOException DOCUMENT ME!
      * @throws UnsupportedOperationException Cannot create new database
@@ -220,7 +219,6 @@ public class GeoMediaDataStoreFactory implements DataStoreFactorySpi {
     /**
      * Describe parameters.
      *
-     * @return
      *
      * @see org.geolbs.data.DataStoreFactorySpi#getParametersInfo()
      */

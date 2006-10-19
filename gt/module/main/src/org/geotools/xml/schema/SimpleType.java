@@ -67,7 +67,6 @@ public interface SimpleType extends Type {
      * may be extended/restricted ... through Schema declared derivations.
      * </p>
      *
-     * @return
      */
     public int getFinal();
 
@@ -76,7 +75,6 @@ public interface SimpleType extends Type {
      * The Schema ID for this simpleType definition.
      * </p>
      *
-     * @return
      */
     public String getId();
 
@@ -89,7 +87,6 @@ public interface SimpleType extends Type {
      * @param value
      * @param hints
      *
-     * @return
      */
     public AttributeValue toAttribute(Attribute attribute, Object value,
         Map hints) throws OperationNotSupportedException;
@@ -101,7 +98,6 @@ public interface SimpleType extends Type {
      * @param value DOCUMENT ME!
      * @param hints DOCUMENT ME!
      *
-     * @return
      */
     public boolean canCreateAttributes(Attribute attribute, Object value,
         Map hints);
@@ -109,7 +105,6 @@ public interface SimpleType extends Type {
     /**
      * Returns an int of either List, Union or Restriction
      *
-     * @return
      */
     public int getChildType();
 
@@ -117,7 +112,6 @@ public interface SimpleType extends Type {
      * A simple simpleType when either a List or Restriction ... A set when a
      * Union
      *
-     * @return
      */
     public SimpleType[] getParents();
 
@@ -125,7 +119,6 @@ public interface SimpleType extends Type {
      * The list of facets for this Restriction ... Null if another type (List,
      * Union)
      *
-     * @return
      */
     public Facet[] getFacets();
 }

@@ -77,7 +77,6 @@ public class CustomClassifierFunction extends ClassificationFunction {
 	/**
 	 * Returns the ranged value minimum, or null if not defined.
 	 * @param index
-	 * @return
 	 */
 	public Object getMin(int index) {
 		return min.get(index);
@@ -86,7 +85,6 @@ public class CustomClassifierFunction extends ClassificationFunction {
 	/**
 	 * Returns the ranged value maximum, or null if not defined.
 	 * @param index
-	 * @return
 	 */
 	public Object getMax(int index) {
 		return max.get(index);

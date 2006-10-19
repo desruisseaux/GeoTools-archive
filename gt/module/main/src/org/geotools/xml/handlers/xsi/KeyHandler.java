@@ -126,7 +126,6 @@ public class KeyHandler extends XSIElementHandler {
      * Returns a list of fields child declarations
      * </p>
      *
-     * @return
      */
     public List getFields() {
         return fields;
@@ -139,7 +138,6 @@ public class KeyHandler extends XSIElementHandler {
      * returns the id attribute
      * </p>
      *
-     * @return
      */
     public String getId() {
         return id;
@@ -152,7 +150,6 @@ public class KeyHandler extends XSIElementHandler {
      * returns the name attribute
      * </p>
      *
-     * @return
      */
     public String getName() {
         return name;
@@ -165,7 +162,6 @@ public class KeyHandler extends XSIElementHandler {
      * returns the child selector element
      * </p>
      *
-     * @return
      */
     public SelectorHandler getSelector() {
         return selector;

@@ -47,7 +47,6 @@ public class LineNoSelfIntersectValidationBeanInfo extends DefaultFeatureValidat
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

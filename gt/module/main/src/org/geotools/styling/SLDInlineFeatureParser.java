@@ -155,7 +155,6 @@ public class SLDInlineFeatureParser
 	 *  in general, this will find the 1st element node inside the node.
 	 * 
 	 * @param child
-	 * @return
 	 */
 	private Node descend(Node root) 
 	{
@@ -182,7 +181,6 @@ public class SLDInlineFeatureParser
 	 * 
 	 * @param feature - points to the actual feature ie. "<Person>"
 	 * @param featureType
-	 * @return
 	 */
 	private Feature parseFeature(Node feature, FeatureType featureType) throws Exception
 	{
@@ -218,7 +216,6 @@ public class SLDInlineFeatureParser
 	 *  Given a node, determine if its a geometry or a string attribute
 	 *  return the corresponding value.
 	 * @param child
-	 * @return
 	 */
 	private Object getValue(Node root) 
 	{
@@ -262,7 +259,6 @@ public class SLDInlineFeatureParser
 	 *  TODO: handle more than just epsg for CRS
 	 * 
 	 * @param root  -- points to "<gml:Point>"
-	 * @return
 	 */
 	private Geometry parseGeometry(Node root) 
 	{
@@ -510,7 +506,6 @@ public class SLDInlineFeatureParser
 	 *  looks for a nested attribute - assumes that this is a geometry.
 	 *  TODO: be much smarter
 	 * @param child
-	 * @return
 	 */
 	private boolean isGeometry(Node root) 
 	{
@@ -533,7 +528,6 @@ public class SLDInlineFeatureParser
 	 *  
 	 * @param parentNode
 	 * @param wantedChildName
-	 * @return
 	 */
 	public Node getNode(Node parentNode, String wantedChildName)
 	{
@@ -569,7 +563,6 @@ public class SLDInlineFeatureParser
      *   I cannot image a system with more than a dozen CRSs in it...
      * 
      * @param epsg
-     * @return
      */
     private CoordinateReferenceSystem getSRS(int epsg) throws Exception
     {

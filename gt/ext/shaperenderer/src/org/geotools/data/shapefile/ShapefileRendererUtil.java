@@ -53,7 +53,6 @@ public class ShapefileRendererUtil {
      * @param mt The transform used to transform from data->world coordinates->screen coordinates
      * @param hasOpacity the transform from screen coordinates to world coordinates. Used for
      *        decimation.
-     * @return
      * @throws IOException
      * @throws TransformException
      */

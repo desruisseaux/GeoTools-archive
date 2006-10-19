@@ -162,7 +162,6 @@ public class HsqlFIDMapper extends AbstractFIDMapper {
     /**
      * Returns the base mapper wrapped by this TypedFIDMapper
      *
-     * @return
      */
     public FIDMapper getWrappedMapper() {
         return wrappedMapper;

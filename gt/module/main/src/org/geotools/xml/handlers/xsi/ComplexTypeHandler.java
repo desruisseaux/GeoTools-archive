@@ -346,7 +346,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
      *
      * @param block
      *
-     * @return
      */
     public static String writeBlock(int block) {
         switch (block) {
@@ -371,7 +370,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
      *
      * @param finaL
      *
-     * @return
      *
      * @throws SAXException
      */
@@ -391,7 +389,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
      *
      * @param finaL
      *
-     * @return
      */
     public static String writeFinal(int finaL) {
         return writeBlock(finaL); // same enum
@@ -402,7 +399,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
      * returns the complexType's name
      * </p>
      *
-     * @return
      */
     public String getName() {
         return name;
@@ -415,7 +411,6 @@ public class ComplexTypeHandler extends XSIElementHandler {
      *
      * @param parent
      *
-     * @return
      *
      * @throws SAXException
      * @throws NullPointerException

@@ -97,7 +97,6 @@ public interface Schema extends Factory {
      * instance document, extending the schema, or importing the schema.
      * </p>
      *
-     * @return
      *
      * @see Attribute
      */
@@ -124,7 +123,6 @@ public interface Schema extends Factory {
      * instance document, extending the schema, or importing the schema.
      * </p>
      *
-     * @return
      *
      * @see ComplexType
      */
@@ -138,7 +136,6 @@ public interface Schema extends Factory {
      * extending the schema, or importing the schema.
      * </p>
      *
-     * @return
      *
      * @see Element
      */
@@ -165,7 +162,6 @@ public interface Schema extends Factory {
      * extending the schema, or importing the schema.
      * </p>
      *
-     * @return
      *
      * @see Group
      */
@@ -176,7 +172,6 @@ public interface Schema extends Factory {
      * This method is intended to provide the ID of this Schema.
      * </p>
      *
-     * @return
      */
     public String getId();
 
@@ -188,7 +183,6 @@ public interface Schema extends Factory {
      * extending the schema, or importing the schema.
      * </p>
      *
-     * @return
      *
      * @see Schema
      */
@@ -199,7 +193,6 @@ public interface Schema extends Factory {
      * Gets the recommended prefix for this schema.
      * </p>
      *
-     * @return
      */
     public String getPrefix();
 
@@ -211,7 +204,6 @@ public interface Schema extends Factory {
      * instance document, extending the schema, or importing the schema.
      * </p>
      *
-     * @return
      *
      * @see SimpleType
      */
@@ -223,7 +215,6 @@ public interface Schema extends Factory {
      * a better definition see the XML Schema Specification).
      * </p>
      *
-     * @return
      */
     public URI getTargetNamespace();
 
@@ -235,7 +226,6 @@ public interface Schema extends Factory {
      * This returns the Schema version ...
      * </p>
      *
-     * @return
      */
 
     //TODO Use the Version in the merge + parsing portion for comparisons
@@ -256,7 +246,6 @@ public interface Schema extends Factory {
      *
      * @param uri
      *
-     * @return
      *
      * @see #getUris()
      */
@@ -268,7 +257,6 @@ public interface Schema extends Factory {
      * otherwise.
      * </p>
      *
-     * @return
      */
     public boolean isAttributeFormDefault();
 
@@ -278,7 +266,6 @@ public interface Schema extends Factory {
      * otherwise.
      * </p>
      *
-     * @return
      */
     public boolean isElementFormDefault();
 }

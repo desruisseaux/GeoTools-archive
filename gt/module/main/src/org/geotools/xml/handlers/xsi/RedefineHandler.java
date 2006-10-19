@@ -152,7 +152,6 @@ public class RedefineHandler extends XSIElementHandler {
      * Returns a list of AttributeGroupHandlers
      * </p>
      *
-     * @return
      */
     public List getAttributeGroups() {
         return attributeGroups;
@@ -163,7 +162,6 @@ public class RedefineHandler extends XSIElementHandler {
      * Returns a list of ComplexTypeHandlers
      * </p>
      *
-     * @return
      */
     public List getComplexTypes() {
         return complexTypes;
@@ -174,7 +172,6 @@ public class RedefineHandler extends XSIElementHandler {
      * Returns a list of GroupHandlers
      * </p>
      *
-     * @return
      */
     public List getGroups() {
         return groups;
@@ -185,7 +182,6 @@ public class RedefineHandler extends XSIElementHandler {
      * Returns the id attribute
      * </p>
      *
-     * @return
      */
     public String getId() {
         return id;
@@ -196,7 +192,6 @@ public class RedefineHandler extends XSIElementHandler {
      * Returns the schemaLocation attribute
      * </p>
      *
-     * @return
      */
     public String getSchemaLocation() {
         return schemaLocation;
@@ -207,7 +202,6 @@ public class RedefineHandler extends XSIElementHandler {
      * Returns a list of SimpleTypeHandlers
      * </p>
      *
-     * @return
      */
     public List getSimpleTypes() {
         return simpleTypes;

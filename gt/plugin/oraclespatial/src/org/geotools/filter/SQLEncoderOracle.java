@@ -323,7 +323,6 @@ public class SQLEncoderOracle extends SQLEncoder {
      * TODO: Encode more then 1
      * @param line
      * @param srid
-     * @return
      */
     private static String toSDOGeom(MultiLineString line, int srid) {
          if( line.getNumGeometries() == 1 ){
@@ -335,7 +334,6 @@ public class SQLEncoderOracle extends SQLEncoder {
      * TODO: Encode more then 1
      * @param line
      * @param srid
-     * @return
      */
     private static String toSDOGeom(MultiPolygon polygon, int srid) {
         if( polygon.getNumGeometries() == 1 ){

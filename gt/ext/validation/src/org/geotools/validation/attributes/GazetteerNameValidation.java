@@ -98,7 +98,6 @@ public class GazetteerNameValidation extends DefaultFeatureValidation {
      * @param type
      * @param results
      *
-     * @return
      *
      * @see org.geotools.validation.FeatureValidation#validate(org.geotools.feature.Feature,
      *      org.geotools.feature.FeatureType,
@@ -175,7 +174,6 @@ public class GazetteerNameValidation extends DefaultFeatureValidation {
     /**
      * Implementation of getPriority.
      *
-     * @return
      *
      * @see org.geotools.validation.Validation#getPriority()
      */

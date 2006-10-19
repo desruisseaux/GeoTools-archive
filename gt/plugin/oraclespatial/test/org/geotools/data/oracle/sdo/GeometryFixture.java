@@ -215,7 +215,6 @@ public class GeometryFixture {
    *   MDSYS.SDO_ORDINATE_ARRAY(9,5, 13,5, 11,8, 9,5)
    * )
    * </pre></code>
-   * @return
    */ 
   protected Polygon createPolygon(){
       Polygon poly = gf.createPolygon( ring( new double[]{9,5, 13,5, 11,8, 9,5}), null );
@@ -276,7 +275,6 @@ public class GeometryFixture {
    *       7,5, 7,10, 10,10, 10,5, 7,5)
    * )
    * </pre></code> 
-   * @return
    */
   protected Polygon createPolygonWithHole(){
       Polygon poly = gf.createPolygon(
@@ -514,7 +512,6 @@ public class GeometryFixture {
    *         9,5, 13,5, 11,5, 9,5)
    * )
    * </pre></code> 
-   * @return
    */
   protected MultiPolygon createMultiPolygon(){
       Polygon poly1 = gf.createPolygon(
@@ -591,7 +588,6 @@ public class GeometryFixture {
    *         9,5, 13,5, 11,8, 9,5)
    * )
    * </pre></code> 
-   * @return
    */    
   protected MultiPolygon createMultiPolygonWithHole(){
       Polygon poly1 = gf.createPolygon(
@@ -675,7 +671,6 @@ public class GeometryFixture {
    *   )
    * )
    * </pre></code> 
-   * @return
    */
   protected GeometryCollection createGeometryCollection(){
       return gf.createGeometryCollection(

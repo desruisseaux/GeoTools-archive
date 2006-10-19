@@ -43,7 +43,6 @@ public class WKTAttributeIO implements AttributeIO {
     /**
      * Lazily initialize the WKTReader
      *
-     * @return
      */
     private WKTReader getWKTReader() {
         if (reader == null) {
@@ -56,7 +55,6 @@ public class WKTAttributeIO implements AttributeIO {
     /**
      * Lazily initialize the WKTWriter
      *
-     * @return
      */
     private WKTWriter getWKTWriter() {
         if (writer == null) {

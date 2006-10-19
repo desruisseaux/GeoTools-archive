@@ -67,7 +67,6 @@ public class RTree {
      *
      * @param filter
      *
-     * @return
      *
      * @throws TreeException
      * @throws UnsupportedFilterException
@@ -311,7 +310,6 @@ public class RTree {
      * @param node
      * @param newEntry
      *
-     * @return
      *
      * @throws TreeException DOCUMENT ME!
      */
@@ -359,7 +357,6 @@ public class RTree {
      *
      * @param node
      *
-     * @return
      *
      * @throws TreeException
      */
@@ -477,7 +474,6 @@ public class RTree {
      *
      * @param entries
      *
-     * @return
      */
     private Entry[] quadraticPickSeeds(Entry[] entries) {
         Entry[] ret = new Entry[2];
@@ -518,7 +514,6 @@ public class RTree {
      * @param nodes
      * @param entries
      *
-     * @return
      */
     private Entry quadraticPickNext(Node[] nodes, ArrayList entries) {
         Entry ret = null;
@@ -550,7 +545,6 @@ public class RTree {
      * @param nodes
      * @param entries
      *
-     * @return
      */
     private Entry linearPickNext(Node[] nodes, ArrayList entries) {
         //TODO implement
@@ -793,7 +787,6 @@ public class RTree {
      *
      * @param node
      *
-     * @return
      *
      * @throws TreeException
      */

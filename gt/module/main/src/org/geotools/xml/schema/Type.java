@@ -74,7 +74,6 @@ public interface Type {
      * and simple types have names ...)
      * </p>
      * 
-     * @return
      */
     public String getName();
 
@@ -84,7 +83,6 @@ public interface Type {
      * targetNamespace of that this type resides in.
      * </p>
      * 
-     * @return
      */
     public URI getNamespace();
 
@@ -96,7 +94,6 @@ public interface Type {
      * appropriate class value.
      * </p>
      * 
-     * @return
      */
     public Class getInstanceType();
 
@@ -135,7 +132,6 @@ public interface Type {
      *
      * @param name the element's localName to search for.
      *
-     * @return
      */
     public Element findChildElement(String name);
 }

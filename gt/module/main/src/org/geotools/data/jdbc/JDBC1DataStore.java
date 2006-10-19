@@ -346,7 +346,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	/**
 	 * Allows subclass to create LockingManager to support their needs.
 	 *
-	 * @return
 	 */
 	protected LockingManager createLockingManager() {
 		return new InProcessLockingManager();
@@ -715,7 +714,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param query
 	 * @param attrTypes
 	 *
-	 * @return
 	 *
 	 * @throws IOException
 	 * @throws DataSourceException
@@ -785,7 +783,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param queryData
 	 *            Holds a ResultSet for attribute Readers
 	 *
-	 * @return
 	 *
 	 * @throws IOException
 	 */
@@ -830,7 +827,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @param type
 	 *
-	 * @return
 	 */
 	protected AttributeIO getAttributeIO(AttributeType type) {
 		if (basicAttributeIO == null) {
@@ -1107,7 +1103,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param typeName
 	 * @param factory
 	 *
-	 * @return
 	 *
 	 * @throws IOException
 	 */
@@ -1432,7 +1427,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param typeName
 	 * @param transaction
 	 *
-	 * @return
 	 *
 	 * @throws IOException
 	 *
@@ -1466,7 +1460,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param typeName
 	 * @param transaction
 	 *
-	 * @return
 	 *
 	 * @throws IOException
 	 *
@@ -1502,7 +1495,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @param filter
 	 * @param transaction
 	 *
-	 * @return
 	 *
 	 * @throws IOException
 	 *             If typeName could not be located
@@ -1589,7 +1581,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @param query
 	 *
-	 * @return
 	 *
 	 * @throws IOException
 	 */
@@ -1652,7 +1643,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * By default AbstractDataStore makes use of InProcessLockingManager.
 	 * </p>
 	 *
-	 * @return
 	 *
 	 * @see org.geotools.data.DataStore#getLockingManager()
 	 */
@@ -1673,7 +1663,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	/**
 	 * Returns the FIDMapperFactory used for this data store
 	 *
-	 * @return
 	 */
 	public FIDMapperFactory getFIDMapperFactory() {
 		return typeHandler.getFIDMapperFactory();
@@ -1703,7 +1692,6 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @param requestedNames
 	 * @param ft
-	 * @return
 	 */
 	public boolean allSameOrder(String[] requestedNames, FeatureType ft) {
 		if (requestedNames.length != ft.getAttributeCount())

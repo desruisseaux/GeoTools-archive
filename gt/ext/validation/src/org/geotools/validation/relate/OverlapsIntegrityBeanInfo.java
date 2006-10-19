@@ -39,7 +39,6 @@ public class OverlapsIntegrityBeanInfo extends RelationIntegrityBeanInfo
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

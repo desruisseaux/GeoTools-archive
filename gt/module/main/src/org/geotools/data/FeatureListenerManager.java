@@ -100,7 +100,6 @@ public class FeatureListenerManager {
      * @param typeName typeName to match against
      * @param transaction Transaction to match against (may be AUTO_COMMIT)
      *
-     * @return
      */
     Map getListeners(String typeName, Transaction transaction) {
         Map map = new HashMap();

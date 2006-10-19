@@ -177,7 +177,6 @@ public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
      *
      * @param params
      *
-     * @return
      *
      * @throws IOException DOCUMENT ME!
      * @throws UnsupportedOperationException Cannot create new database
@@ -277,7 +276,6 @@ public class OracleOCIDataStoreFactory implements DataStoreFactorySpi {
      * Describe parameters.
      * 
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
-     * @return
      */
     public Param[] getParametersInfo() {
         return new Param[]{

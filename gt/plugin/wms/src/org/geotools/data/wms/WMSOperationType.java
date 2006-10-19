@@ -36,7 +36,6 @@ public class WMSOperationType extends OperationType {
 
     /**
      * 
-     * @return
      * @deprecated Use OperationType.getFormats();
      */
     public String[] getFormatStrings() {

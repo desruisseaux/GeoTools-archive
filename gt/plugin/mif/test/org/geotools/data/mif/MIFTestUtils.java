@@ -224,7 +224,6 @@ public class MIFTestUtils {
      * @param inFeatureType
      * @param typeName
      *
-     * @return
      *
      * @throws SchemaException
      */

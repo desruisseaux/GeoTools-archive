@@ -53,7 +53,6 @@ public class Lock {
      * If the lock can be read locked the lock will be read and default
      * visibility for tests
      * 
-     * @return
      * @throws IOException
      */
     synchronized boolean canRead() throws IOException {
@@ -73,7 +72,6 @@ public class Lock {
      * If the lock can be read locked the lock will be read and default
      * visibility for tests
      * 
-     * @return
      * @throws IOException
      */
     synchronized boolean canWrite() throws IOException {

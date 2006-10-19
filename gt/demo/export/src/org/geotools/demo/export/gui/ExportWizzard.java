@@ -115,7 +115,6 @@ public class ExportWizzard extends JFrame implements CardListener {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     private JPanel createButtonsPanel() {
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 10));

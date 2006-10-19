@@ -78,7 +78,6 @@ public interface Request {
      * 
      * @param contentType the MIME type of the data in the inputStream
      * @param inputStream contains the data from the response
-     * @return
      * @throws ServiceException
      * @throws IOException
      */

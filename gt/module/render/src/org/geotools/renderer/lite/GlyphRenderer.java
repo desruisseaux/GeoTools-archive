@@ -40,7 +40,6 @@ public interface GlyphRenderer {
      * @param eg
      * @param feature
      * @param height use <=0 if you dont want any scaling done.  THIS MIGHT BE IGNORED by the renderer!
-     * @return
      */
     public BufferedImage render(Graphic graphic, ExternalGraphic eg, Feature feature, int height);
     

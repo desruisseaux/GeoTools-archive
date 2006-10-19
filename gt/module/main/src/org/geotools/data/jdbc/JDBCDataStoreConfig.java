@@ -92,7 +92,6 @@ public class JDBCDataStoreConfig {
      * 
      * @param namespace
      * @param schemaName
-     * @return
      */
     public static JDBCDataStoreConfig createWithNameSpaceAndSchemaName(
         String namespace, String schemaName) {
@@ -124,7 +123,6 @@ public class JDBCDataStoreConfig {
         return namespace;
     }
     /**
-     * @return
      */
     public long getTypeHandlerTimeout() {
         return typeHandlerCacheTimout;

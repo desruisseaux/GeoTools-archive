@@ -88,7 +88,6 @@ public final class ExpressionDOMParser {
      * 
      * @deprecated Please use ExpressionDOMParser.expression
      * @param root
-     * @return
      */
     public static Expression parseExpression( Node root ){
     	ExpressionDOMParser parser = new ExpressionDOMParser();

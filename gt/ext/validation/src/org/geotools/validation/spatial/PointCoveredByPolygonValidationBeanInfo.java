@@ -47,7 +47,6 @@ public class PointCoveredByPolygonValidationBeanInfo extends PointPolygonAbstrac
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

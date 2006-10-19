@@ -526,7 +526,6 @@ public class DbaseFileReader {
 	 * @param charBuffer2 TODO
 	 * @param fieldOffset
 	 * @param fieldLen
-	 * @return
 	 */
 	private final String extractNumberString(final CharBuffer charBuffer2, final int fieldOffset, final int fieldLen) {
 		String thing = charBuffer2.subSequence(fieldOffset, fieldOffset + fieldLen).toString().trim();

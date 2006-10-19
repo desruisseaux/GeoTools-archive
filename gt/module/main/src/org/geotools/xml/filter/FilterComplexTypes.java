@@ -1938,7 +1938,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getAttributes ...
          * 
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
-         * @return
          */
         public Attribute[] getAttributes() {
             return attrs;
@@ -2020,7 +2019,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getFinal ...
          * 
          * @see org.geotools.xml.schema.SimpleType#getFinal()
-         * @return
          */
         public int getFinal() {
             return 0;
@@ -2029,7 +2027,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getId ...
          * 
          * @see org.geotools.xml.schema.SimpleType#getId()
-         * @return
          */
         public String getId() {
             return null;
@@ -2041,7 +2038,6 @@ public class FilterComplexTypes {
          * @param attribute
          * @param value
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public AttributeValue toAttribute( Attribute attribute, Object value, Map hints ) throws OperationNotSupportedException {
@@ -2054,7 +2050,6 @@ public class FilterComplexTypes {
          * @param attribute
          * @param value
          * @param hints
-         * @return
          */
         public boolean canCreateAttributes( Attribute attribute, Object value, Map hints ) {
             return false;
@@ -2063,7 +2058,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getChildType ...
          * 
          * @see org.geotools.xml.schema.SimpleType#getChildType()
-         * @return
          */
         public int getChildType() {
             return RESTRICTION;
@@ -2072,7 +2066,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getParents ...
          * 
          * @see org.geotools.xml.schema.SimpleType#getParents()
-         * @return
          */
         public SimpleType[] getParents() {
             return parents;
@@ -2084,7 +2077,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getFacets ...
          * 
          * @see org.geotools.xml.schema.SimpleType#getFacets()
-         * @return
          */
         public Facet[] getFacets() {
             return facets;
@@ -2101,7 +2093,6 @@ public class FilterComplexTypes {
          * @param value
          * @param attrs
          * @param hints
-         * @return
          * @throws SAXException
          * @throws OperationNotSupportedException
          */
@@ -2112,7 +2103,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getName ...
          * 
          * @see org.geotools.xml.schema.Type#getName()
-         * @return
          */
         public String getName() {
             return "SortOrderType";
@@ -2121,7 +2111,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getNamespace ...
          * 
          * @see org.geotools.xml.schema.Type#getNamespace()
-         * @return
          */
         public URI getNamespace() {
             return FilterSchema.NAMESPACE;
@@ -2130,7 +2119,6 @@ public class FilterComplexTypes {
          * TODO summary sentence for getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return String.class;
@@ -2142,7 +2130,6 @@ public class FilterComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return false;
@@ -2166,7 +2153,6 @@ public class FilterComplexTypes {
          * 
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          * @param name
-         * @return
          */
         public Element findChildElement( String name ) {
             return null;

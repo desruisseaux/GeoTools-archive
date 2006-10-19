@@ -287,7 +287,6 @@ public final class GeoTiffIIOMetadataDecoder {
 	/**
 	 * Gets the model pixel scales from the correct TIFFField
 	 * 
-	 * @return
 	 */
 	public PixelScale getModelPixelScales() {
 		final double[] pixScales = getTiffDoubles(getTiffField(GeoTIFFTagSet.TAG_MODEL_PIXEL_SCALE));

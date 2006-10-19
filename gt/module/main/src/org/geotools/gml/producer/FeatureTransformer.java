@@ -261,7 +261,6 @@ public class FeatureTransformer extends TransformerBase {
 
     /**
      * Template method for creating the translator.
-     * @return
      */
     protected FeatureTranslator createTranslator( 
 		ContentHandler handler, String prefix, String ns, 

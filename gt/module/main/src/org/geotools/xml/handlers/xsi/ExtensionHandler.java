@@ -174,7 +174,6 @@ public class ExtensionHandler extends XSIElementHandler {
      * gets a list of AttributeHandlers
      * </p>
      *
-     * @return
      */
     public List getAttributeDeclarations() {
         return attributeDec;
@@ -185,7 +184,6 @@ public class ExtensionHandler extends XSIElementHandler {
      * Returns the 'base' attribute
      * </p>
      *
-     * @return
      */
     public String getBase() {
         return base;
@@ -196,7 +194,6 @@ public class ExtensionHandler extends XSIElementHandler {
      * Returns the child handler
      * </p>
      *
-     * @return
      */
     public Object getChild() {
         return child;

@@ -157,7 +157,6 @@ public interface Node {
      * @return the value of the child which is an instance of <code>clazz</code>,
      * or null if no such child exists.
      * @param clazz
-     * @return
      */
     Object getChildValue(Class clazz);
 

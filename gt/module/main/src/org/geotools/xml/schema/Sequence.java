@@ -36,7 +36,6 @@ public interface Sequence extends ElementGrouping {
      * list may be singular elements, sequences, choices, ... , or groups.
      * </p>
      *
-     * @return
      */
     public ElementGrouping[] getChildren();
 
@@ -45,7 +44,6 @@ public interface Sequence extends ElementGrouping {
      * The Schema ID for this sequence definition.
      * </p>
      *
-     * @return
      */
     public String getId();
 

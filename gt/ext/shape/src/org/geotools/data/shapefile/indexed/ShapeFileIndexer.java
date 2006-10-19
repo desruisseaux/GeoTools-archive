@@ -350,7 +350,6 @@ public class ShapeFileIndexer {
      * @param rtreeFile
      * @param verbose
      *
-     * @return
      *
      * @throws TreeException
      * @throws LockTimeoutException

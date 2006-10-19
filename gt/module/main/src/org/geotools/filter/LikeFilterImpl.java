@@ -90,7 +90,6 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 	 * @param single
 	 * @param pattern
 	 * 
-	 * @return
 	 */
 	public static String convertToSQL92(char escape, char multi,char single, String pattern)
 	   throws IllegalArgumentException
@@ -134,7 +133,6 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
 	/**
 	 * see convertToSQL92
 	 * 
-	 * @return
 	 * @throws IllegalArgumentException
 	 */
     public String getSQL92LikePattern() throws IllegalArgumentException

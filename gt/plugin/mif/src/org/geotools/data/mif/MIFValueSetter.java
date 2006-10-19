@@ -73,7 +73,6 @@ public abstract class MIFValueSetter {
     /**
      * <p>Returns the string value.</p>
      *
-     * @return
      */
     public final String getString() {
         return strValue;
@@ -92,7 +91,6 @@ public abstract class MIFValueSetter {
     /**
      * <p>Gets the object value.</p>
      *
-     * @return
      */
     public final Object getValue() {
         return objValue;

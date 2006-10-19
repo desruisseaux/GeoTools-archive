@@ -51,7 +51,6 @@ public class DefaultFeatureValidationBeanInfo extends ValidationBeanInfo {
      * by all overriding sub-class methods.  Property names 'name',
      * 'description', 'typeNames'
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

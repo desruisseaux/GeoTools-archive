@@ -93,7 +93,6 @@ public interface MapLayer {
      * Returns the definition query (filter) for this layer. If no definition
      * query has  been defined {@link Query.ALL} is returned.
      *
-     * @return
      */
     Query getQuery();
 

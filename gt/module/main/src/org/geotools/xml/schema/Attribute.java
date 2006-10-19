@@ -72,7 +72,6 @@ public interface Attribute {
      * return True when the attribute is "qualified".
      * </p>
      *
-     * @return
      */
     public boolean isForm();
 
@@ -81,7 +80,6 @@ public interface Attribute {
      * The Schema ID for this attribute definition.
      * </p>
      *
-     * @return
      */
     public String getId();
 
@@ -91,14 +89,12 @@ public interface Attribute {
      * declaration
      * </p>
      *
-     * @return
      */
     public String getName();
 
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public URI getNamespace();
 
@@ -109,7 +105,6 @@ public interface Attribute {
      * the use of this attribute.
      * </p>
      *
-     * @return
      */
     public int getUse();
 
@@ -119,7 +114,6 @@ public interface Attribute {
      * this attribute.
      * </p>
      *
-     * @return
      */
     public SimpleType getSimpleType();
 }

@@ -179,7 +179,6 @@ public class OracleDataStore extends JDBCDataStore {
      * @param tableName
      * @param columnName
      * @param isNillable 
-     * @return
      */
     private AttributeType getSDOGeometryAttribute(String tableName, String columnName, boolean isNullable ) {
 	    // HACK! Assume SRID matches EPSG number? No but it will do something for now ...

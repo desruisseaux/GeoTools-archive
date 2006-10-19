@@ -102,7 +102,6 @@ public abstract class Node implements EntryBoundsChangeListener {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public boolean isLeaf() {
         return leaf;
@@ -120,7 +119,6 @@ public abstract class Node implements EntryBoundsChangeListener {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public int getEntriesCount() {
         return this.entriesCount;
@@ -131,7 +129,6 @@ public abstract class Node implements EntryBoundsChangeListener {
      *
      * @param n
      *
-     * @return
      */
     public Entry getEntry(int n) {
         return (Entry) this.entries[n];
@@ -180,7 +177,6 @@ public abstract class Node implements EntryBoundsChangeListener {
     /**
      * DOCUMENT ME!
      *
-     * @return
      *
      * @throws TreeException DOCUMENT ME!
      */

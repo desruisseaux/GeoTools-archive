@@ -274,7 +274,6 @@ public interface TextSymbolizer extends Symbolizer {
      *
      * @param key
      *
-     * @return
      */
     String getOption(String key);
 

@@ -361,7 +361,6 @@ public class XMLReader {
      *
      * @param plugInDir
      *
-     * @return
      *
      * @throws ValidationException DOCUMENT ME!
      */
@@ -397,7 +396,6 @@ public class XMLReader {
      * @param validationDir
      * @param plugInDTOs Already loaded list of plug-ins to link.
      *
-     * @return
      *
      * @throws ValidationException DOCUMENT ME!
      */

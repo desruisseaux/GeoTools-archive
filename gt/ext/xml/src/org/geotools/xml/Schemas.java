@@ -767,7 +767,6 @@ public class Schemas {
      * @param component The component in question.
      * @param qName The qualifined name.
      *
-     * @return
      */
     private static final boolean nameMatches(XSDNamedComponent component,
         QName qName) {

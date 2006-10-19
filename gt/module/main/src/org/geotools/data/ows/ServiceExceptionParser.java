@@ -42,7 +42,6 @@ public class ServiceExceptionParser {
 	 * ServiceException.next();
 	 * 
 	 * @param inputStream
-	 * @return
 	 * @throws JDOMException
 	 * @throws IOException
 	 */

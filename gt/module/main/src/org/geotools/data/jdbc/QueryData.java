@@ -119,7 +119,6 @@ public class QueryData implements AttributeReader, AttributeWriter {
      * Returns the AttributeIO objects used to parse and encode the column values
      * stored in the database 
      *
-     * @return
      */
     public AttributeIO[] getAttributeHandlers() {
         return attributeHandlers;
@@ -128,7 +127,6 @@ public class QueryData implements AttributeReader, AttributeWriter {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public Connection getConnection() {
         return connection;
@@ -137,7 +135,6 @@ public class QueryData implements AttributeReader, AttributeWriter {
     /**
      * Returns the FID mapper to be used when reading/writing features
      *
-     * @return
      */
     public FIDMapper getMapper() {
         return mapper;
@@ -146,7 +143,6 @@ public class QueryData implements AttributeReader, AttributeWriter {
     /**
      * Returns the current transation
      *
-     * @return
      */
     public Transaction getTransaction() {
         return transaction;
@@ -235,7 +231,6 @@ public class QueryData implements AttributeReader, AttributeWriter {
     /**
      * Returns the current feature type
      *
-     * @return
      */
     public FeatureType getFeatureType() {
         return featureTypeInfo.getSchema();
@@ -281,7 +276,6 @@ public class QueryData implements AttributeReader, AttributeWriter {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public FeatureTypeInfo getFeatureTypeInfo() {
         return featureTypeInfo;

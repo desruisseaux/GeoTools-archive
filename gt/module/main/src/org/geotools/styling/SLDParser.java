@@ -280,7 +280,6 @@ public class SLDParser {
 	/**
 	 * @param document
 	 * @param name
-	 * @return
 	 */
 	private NodeList findElements(final org.w3c.dom.Document document,
 			final String name) {
@@ -461,7 +460,6 @@ public class SLDParser {
 	 * </code></pre>
 	 * </p>
 	 * @param root
-	 * @return
 	 */
 	private NamedLayer parseNamedLayer(Node root) {
 		NamedLayer layer = new NamedLayerImpl();
@@ -518,7 +516,6 @@ public class SLDParser {
 	 * </code></pre>
 	 * </p>
 	 * @param n
-	 * @return
 	 */
 	public NamedStyle parseNamedStyle(Node n) {
 		if (dom == null) {
@@ -564,7 +561,6 @@ public class SLDParser {
 	/**
 	 * 
 	 * @param root
-	 * @return
 	 * @deprecated this method is not being used
 	 */
 	private StyledLayerImpl parseLayer(Node root) {
@@ -2004,7 +2000,6 @@ public class SLDParser {
 	 * 
 	 * @param root
 	 * 
-	 * @return
 	 */
 	private Halo parseHalo(Node root) {
 		if (LOGGER.isLoggable(Level.FINEST)) {

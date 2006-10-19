@@ -102,7 +102,6 @@ public class DB2TestCase extends TestCase {
     /**
      * Common local method to get a Connection for testing
      *
-     * @return
      *
      * @throws Exception
      */
@@ -125,7 +124,6 @@ public class DB2TestCase extends TestCase {
     /**
      * Common local method to get a ConnectionPool for testing
      *
-     * @return
      *
      * @throws Exception
      */

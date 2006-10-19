@@ -289,7 +289,6 @@ class ArcSDEQuery {
      * Returns the stream used to fetch rows, creating it if it was not yet
      * created.
      *
-     * @return
      *
      * @throws SeException
      * @throws IOException
@@ -447,7 +446,6 @@ class ArcSDEQuery {
      * @param ds
      * @param query
      *
-     * @return
      *
      * @throws IOException
      */

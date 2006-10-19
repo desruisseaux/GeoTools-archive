@@ -311,7 +311,6 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults,
      * collection.subCollection( myFilter ).sort( {"foo","bar"} );
      * collection.subCollection( myFilter ).sort( "bar" ).sort("foo")
      * @param order
-     * @return
      */
     public FeatureList sort(SortBy order);
 }

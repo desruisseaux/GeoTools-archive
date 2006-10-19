@@ -39,7 +39,6 @@ public class Entry implements Cloneable {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public Envelope getBounds() {
         return bounds;
@@ -48,7 +47,6 @@ public class Entry implements Cloneable {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public Object getData() {
         return data;

@@ -107,7 +107,6 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
 	 * (public for testing purposes only).
 	 * 
 	 * @param slotWidth
-	 * @return
 	 */
     protected int decimalPlaces(double slotWidth) {
     	int val = (new Double(Math.log(1.0/slotWidth)/2.0)).intValue();
@@ -140,7 +139,6 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
 	 * @param value
 	 * @param decimalPlaces
 	 * @param up
-	 * @return
 	 */
     protected double fixRound(double value, int decimalPlaces, boolean up) {
     	double divisor = Math.pow(10, decimalPlaces);

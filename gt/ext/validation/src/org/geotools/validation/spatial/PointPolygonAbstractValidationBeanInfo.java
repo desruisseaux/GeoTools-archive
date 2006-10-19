@@ -51,7 +51,6 @@ public class PointPolygonAbstractValidationBeanInfo extends DefaultIntegrityVali
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

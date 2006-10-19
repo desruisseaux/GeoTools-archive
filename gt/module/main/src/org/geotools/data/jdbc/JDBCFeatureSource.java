@@ -98,7 +98,6 @@ public class JDBCFeatureSource implements FeatureSource {
     /**
      * Retrieve DataStore for this FetureSource.
      *
-     * @return
      *
      * @see org.geotools.data.FeatureSource#getDataStore()
      */
@@ -165,7 +164,6 @@ public class JDBCFeatureSource implements FeatureSource {
      *
      * @param request
      *
-     * @return
      *
      * @throws IOException
      *

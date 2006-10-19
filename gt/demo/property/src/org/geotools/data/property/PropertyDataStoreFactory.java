@@ -176,7 +176,6 @@ public class PropertyDataStoreFactory implements DataStoreFactorySpi {
      * system property <code>"user.dir"</code> as the base.
      * </p>
      * @param params
-     * @return
      * @throws IllegalArgumentException if directory is not a directory.
      * @throws FileNotFoundException if directory does not exists
      * @throws IOException if {@linkplain #DIRECTORY} doesn't find parameter in <code>params</code>

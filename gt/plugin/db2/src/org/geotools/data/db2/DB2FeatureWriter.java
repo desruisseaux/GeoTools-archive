@@ -68,7 +68,6 @@ public class DB2FeatureWriter extends JDBCTextFeatureWriter {
      *
      * @param feature
      *
-     * @return
      *
      * @throws IOException
      * @throws UnsupportedOperationException DOCUMENT ME!

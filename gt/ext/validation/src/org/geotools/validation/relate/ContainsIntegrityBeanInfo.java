@@ -39,7 +39,6 @@ public class ContainsIntegrityBeanInfo extends RelationIntegrityBeanInfo {
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

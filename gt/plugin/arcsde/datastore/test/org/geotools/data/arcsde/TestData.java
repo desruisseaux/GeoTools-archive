@@ -738,7 +738,6 @@ public class TestData {
      * @param jtsGeomType class of JTS geometry to create
      * @param numFeatures number of features to create.
      *
-     * @return
      *
      * @throws IOException if the schema for te test table cannot be fetched
      *         from the database.

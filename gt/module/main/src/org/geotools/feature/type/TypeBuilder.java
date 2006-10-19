@@ -1268,7 +1268,7 @@ public class TypeBuilder {
 	 * <li>Well Known Text
 	 * </ul>
 	 * 
-	 * @param srs
+	 * @param SRS
 	 * @return TypeBuilder ready for chaining
 	 * @throws IllegalArgumentException
 	 *             When SRS not understood
@@ -1332,7 +1332,7 @@ public class TypeBuilder {
 	 * </p>
 	 * 
 	 * @param name
-	 * @param type
+	 * @param memberType
 	 */
 	public void addMemberType(String name, AssociationType memberType) {
 		addMemberType(getNamespaceURI(), name, memberType);
@@ -1344,8 +1344,9 @@ public class TypeBuilder {
 	 * Calls clear to reset cardinality after use.
 	 * </p>
 	 * 
+	 * @param namespaceURI
 	 * @param name
-	 * @param type
+	 * @param memberType
 	 */
 	public void addMemberType(String namespaceURI, String name,
 			AssociationType memberType) {
@@ -1359,7 +1360,7 @@ public class TypeBuilder {
 	 * </p>
 	 * 
 	 * @param name
-	 * @param type
+	 * @param memberType
 	 */
 	public void addMemberType(Name name,
 			AssociationType/* <FeatureType> */memberType) {

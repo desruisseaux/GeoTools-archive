@@ -1066,7 +1066,6 @@ public class SLDStyleFactory {
      * @param fill
      * @param feature
      *
-     * @return
      */
     protected Composite getComposite(Fill fill, Feature feature) {
         if (fill == null) {
@@ -1326,7 +1325,6 @@ public class SLDStyleFactory {
      * @param feature
      * @param defaultValue
      *
-     * @return
      */
     private String evaluateExpression(Expression e, Feature feature, String defaultValue) {
         String result = defaultValue;

@@ -55,8 +55,7 @@ import org.opengis.coverage.grid.Format;
 public interface GridFormatFactorySpi extends org.geotools.factory.Factory {
     /**
      * Construct a live grid format.
-     *
-     * @return 
+     * 
      *
      * @throws IOException (Warning: the rest of the javadoc comment was wrong) 
      *                     if there were any problems creating or connecting

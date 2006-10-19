@@ -58,7 +58,6 @@ public class ExpressionBuilder {
      * @deprecated please use parser
      * @param schema
      * @param input
-     * @return
      * @throws ParseException
      */
     public static Object parse(FeatureType schema, String input) throws ParseException {

@@ -49,7 +49,6 @@ public class PolygonCoveredByFeaturePolygonValidationBeanInfo extends DefaultInt
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

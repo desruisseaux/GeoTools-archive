@@ -47,7 +47,6 @@ public class LineNotTouchingPolygonValidationBeanInfo extends LinePolygonAbstrac
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

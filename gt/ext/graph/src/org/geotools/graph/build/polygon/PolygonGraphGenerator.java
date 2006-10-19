@@ -84,7 +84,6 @@ public class PolygonGraphGenerator implements GraphGenerator {
 		 * Determines if two polygons are related in any way. Rel
 		 * @param p1
 		 * @param p2
-		 * @return
 		 */
 		boolean related(Polygon p1, Polygon p2);
 		

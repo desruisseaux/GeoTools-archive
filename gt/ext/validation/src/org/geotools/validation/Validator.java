@@ -149,7 +149,6 @@ public class Validator
 	 * Author: bowens<br>
 	 * Created on: Jun 26, 2004<br>
 	 * @param failed
-	 * @return
 	 */
 	private ValidationResults makeFeatureValidationResults(final Map failed)
 	{
@@ -311,7 +310,6 @@ public class Validator
 	 * Author: bowens<br>
 	 * Created on: Jun 26, 2004<br>
 	 * @param failed the map of failed features
-	 * @return
 	 */
 	private ValidationResults makeIntegrityValidationResults(final Map failed)
 	{

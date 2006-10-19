@@ -190,7 +190,6 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      *
      * @param params
      *
-     * @return
      */
     public boolean canProcess(Map params) {
         boolean canProcess = true;

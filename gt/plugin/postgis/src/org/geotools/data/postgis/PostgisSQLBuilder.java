@@ -162,7 +162,6 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      * Returns true if the WKB format is used to transfer geometries, false
      * otherwise
      *
-     * @return
      */
     public boolean isWKBEnabled() {
         return WKBEnabled;
@@ -179,7 +178,6 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
     
     /**
      * Enables the use of the bytea function to transfer faster WKB geometries
-     * @return
      */
     public boolean isByteaEnabled() {
         return byteaEnabled;

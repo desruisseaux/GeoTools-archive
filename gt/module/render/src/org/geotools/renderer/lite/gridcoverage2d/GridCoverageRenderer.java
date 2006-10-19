@@ -145,6 +145,21 @@ public final class GridCoverageRenderer {
 
 	}
 
+	/**
+	 * /** Creates a new {@link GridCoverageRenderer} object.
+	 * 
+	 * @param destinationCRS
+	 *            the CRS of the {@link GridCoverage2D} to render.
+	 * @param envelope
+	 *            delineating the area to be rendered.
+	 * @param screenSize
+	 *            at which we want to rendere the source {@link GridCoverage2D}.
+	 * @param java2dHints
+	 *            to control this rendering process.
+	 * 
+	 * @throws TransformException
+	 * @throws NoninvertibleTransformException
+	 */
 	public GridCoverageRenderer(final CoordinateReferenceSystem destinationCRS,
 			final Envelope envelope, Rectangle screenSize,
 			RenderingHints java2dHints) throws TransformException,

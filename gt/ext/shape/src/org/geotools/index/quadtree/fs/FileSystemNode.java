@@ -147,7 +147,6 @@ public class FileSystemNode extends Node {
      * @param channel
      * @param order DOCUMENT ME!
      *
-     * @return
      *
      * @throws IOException
      */

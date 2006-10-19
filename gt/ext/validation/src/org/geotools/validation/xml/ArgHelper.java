@@ -287,7 +287,6 @@ public class ArgHelper {
          * This is the name of the element represented.
          * </p>
          *
-         * @return
          */
         public abstract String getElementName();
     }

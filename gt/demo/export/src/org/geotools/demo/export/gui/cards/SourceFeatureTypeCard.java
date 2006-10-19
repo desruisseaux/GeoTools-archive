@@ -188,7 +188,6 @@ public class SourceFeatureTypeCard extends WizzardCard {
     }
     
     /**
-     * @return
      */
     private FeatureType getSchema() {
         FeatureTypeTableModel model = (FeatureTypeTableModel) propsTable

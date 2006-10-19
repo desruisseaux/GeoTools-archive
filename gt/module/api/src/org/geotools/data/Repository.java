@@ -92,7 +92,6 @@ public interface Repository {
      * </p>
      * @param dataStoreId
      * @param typeName
-     * @return
      */
     FeatureSource source(String dataStoreId, String typeName)
         throws IOException;

@@ -376,7 +376,6 @@ public class MIFFile {
      * @param required
      * @param params
      *
-     * @return
      *
      * @throws IOException if required parameter is missing
      */
@@ -457,7 +456,6 @@ public class MIFFile {
      *
      * @param clause
      *
-     * @return
      */
     public String getHeaderClause(String clause) {
         try {
@@ -528,7 +526,6 @@ public class MIFFile {
      *
      * @param append
      *
-     * @return
      *
      * @throws IOException
      */

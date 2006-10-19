@@ -38,7 +38,6 @@ public class MarkStyle2D extends PolygonStyle2D {
     /**
      * Returns the shape rotation, in radians
      *
-     * @return
      */
     public float getRotation() {
         return rotation;
@@ -47,7 +46,6 @@ public class MarkStyle2D extends PolygonStyle2D {
     /**
      * Returns the shape to be used to render the mark
      *
-     * @return
      */
     public Shape getShape() {
         return shape;
@@ -82,7 +80,6 @@ public class MarkStyle2D extends PolygonStyle2D {
     /**
      * Returns the size of the shape, in pixels
      *
-     * @return
      */
     public int getSize() {
         return size;

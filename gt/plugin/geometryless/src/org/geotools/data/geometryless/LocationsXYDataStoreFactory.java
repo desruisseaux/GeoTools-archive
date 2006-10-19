@@ -297,7 +297,6 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
      *
      * @param params
      *
-     * @return
      *
      * @throws IOException See UnsupportedOperationException
      * @throws UnsupportedOperationException Cannot create new database
@@ -350,7 +349,6 @@ public class LocationsXYDataStoreFactory extends AbstractFactory
     /**
      * Describe parameters.
      *
-     * @return
      *
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */

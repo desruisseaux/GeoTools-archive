@@ -157,7 +157,6 @@ public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
      * Returns the feature results wrapped by this
      * ForceCoordinateSystemFeatureResults
      *
-     * @return
      */
     public FeatureResults getOrigin() {
         return results;

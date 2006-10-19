@@ -237,7 +237,6 @@ public class FeatureSourceRepository implements Repository {
      * @see org.geotools.data.Catalog#getDataStores(java.lang.String)
      * 
      * @param id
-     * @return
      */
     public DataStore datastore(String id ) {    	
     	Set prefix = new HashSet();

@@ -47,7 +47,6 @@ public class LineEndPointCoveredByLineValidationBeanInfo extends LineLineAbstrac
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

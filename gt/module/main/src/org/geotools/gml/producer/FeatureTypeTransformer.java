@@ -521,7 +521,6 @@ public class FeatureTypeTransformer extends TransformerBase {
          *
          * @param attribute
          *
-         * @return
          */
 
         /*protected void encodeFeature(AttributeType attribute) throws SAXException {

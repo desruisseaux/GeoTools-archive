@@ -108,7 +108,6 @@ public class RootHandler extends XSIElementHandler {
      * from the schema which was parsed in.
      * </p>
      *
-     * @return
      *
      * @throws SAXException
      */

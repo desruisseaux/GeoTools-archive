@@ -160,7 +160,6 @@ public class AnyHandler extends ElementGroupingHandler {
      *
      * @param process
      *
-     * @return
      *
      * @throws SAXException
      */
@@ -192,7 +191,6 @@ public class AnyHandler extends ElementGroupingHandler {
      *
      * @param process
      *
-     * @return
      */
     public static String writeProcess(int process) {
         switch (process) {

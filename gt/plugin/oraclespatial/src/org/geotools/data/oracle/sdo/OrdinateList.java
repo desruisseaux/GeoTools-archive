@@ -71,7 +71,6 @@ public class OrdinateList extends AbstractList
      * Description of get.
      * </p>
      * @param index
-     * @return
      * 
      * @see java.util.List#get(int)
      */
@@ -107,7 +106,6 @@ public class OrdinateList extends AbstractList
      * <p>
      * Description of size.
      * </p>
-     * @return
      * 
      * @see java.util.Collection#size()
      */

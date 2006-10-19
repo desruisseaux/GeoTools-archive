@@ -162,7 +162,6 @@ public final class LineIterator extends AbstractLiteIterator {
 	 * @param at
 	 * @param generalize
 	 * @param maxDistance
-	 * @return
 	 */
 	private void _init(LineString ls, AffineTransform at, boolean generalize, float maxDistance) {
 		if (at == null) {

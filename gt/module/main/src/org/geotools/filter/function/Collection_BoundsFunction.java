@@ -164,7 +164,6 @@ public class Collection_BoundsFunction extends FunctionExpressionImpl
     /**
      * Should be an xPath of the form: featureMembers/asterisk/NAME
      *
-     * @return
      */
     public Expression[] getArgs() {
         Expression[] ret = new Expression[1];

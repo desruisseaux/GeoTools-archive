@@ -47,7 +47,6 @@ public class FeatureTypeInfo {
 	/**
 	 * DOCUMENT ME!
 	 *
-	 * @return
 	 */
 	public String getFeatureTypeName() {
 		return featureTypeName;
@@ -56,7 +55,6 @@ public class FeatureTypeInfo {
 	/**
 	 * DOCUMENT ME!
 	 *
-	 * @return
 	 */
 	public FeatureType getSchema() {
 		return schema;
@@ -102,7 +100,6 @@ public class FeatureTypeInfo {
 		schema + "srids: " + sridMap;
 	}
     /**
-     * @return
      */
     public FIDMapper getFIDMapper() {
         return mapper;

@@ -100,49 +100,42 @@ public class TextStyle2D extends Style2D {
     private Composite composite;
 
     /**
-     * @return
      */
     public double getAnchorX() {
         return anchorX;
     }
 
     /**
-     * @return
      */
     public double getAnchorY() {
         return anchorY;
     }
 
     /**
-     * @return
      */
     public Font getFont() {
         return font;
     }
 
     /**
-     * @return
      */
     public Composite getHaloComposite() {
         return haloComposite;
     }
 
     /**
-     * @return
      */
     public Paint getHaloFill() {
         return haloFill;
     }
 
     /**
-     * @return
      */
     public float getHaloRadius() {
         return haloRadius;
     }
 
     /**
-     * @return
      */
     public double getRotation() {
         return rotation;
@@ -150,7 +143,6 @@ public class TextStyle2D extends Style2D {
 
     /**
      * recompute each time
-     * @return
      */
     public GlyphVector getTextGlyphVector(Graphics2D graphics) {
        
@@ -161,7 +153,6 @@ public class TextStyle2D extends Style2D {
     }
 
     /**
-     * @return
      */
     public Shape getHaloShape(Graphics2D graphics) 
     {

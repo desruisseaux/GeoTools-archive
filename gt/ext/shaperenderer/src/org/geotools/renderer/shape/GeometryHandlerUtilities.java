@@ -38,7 +38,6 @@ public class GeometryHandlerUtilities {
      *
      * @param buffer
      *
-     * @return
      */
     public static Envelope readBounds(ByteBuffer buffer) {
         double[] tmpbbox = new double[4];
@@ -114,7 +113,6 @@ public class GeometryHandlerUtilities {
      * @param env
      * @param mt
      * @param hasOpacity
-     * @return
      * @throws TransformException
      * @throws NoninvertibleTransformException
      */

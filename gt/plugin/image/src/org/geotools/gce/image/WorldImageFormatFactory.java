@@ -54,7 +54,6 @@ public final class WorldImageFormatFactory implements GridFormatFactorySpi {
 	 * Returns the implementation hints. The default implementation returns en
 	 * empty map.
 	 * 
-	 * @return
 	 */
 	public Map getImplementationHints() {
 		return Collections.EMPTY_MAP;

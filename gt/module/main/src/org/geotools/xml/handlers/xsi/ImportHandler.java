@@ -118,7 +118,6 @@ public class ImportHandler extends XSIElementHandler {
      * gets the namespace attribute
      * </p>
      *
-     * @return
      */
     public URI getNamespace() {
         return namespace;
@@ -129,7 +128,6 @@ public class ImportHandler extends XSIElementHandler {
      * gets the schemaLocation attribute
      * </p>
      *
-     * @return
      */
     public URI getSchemaLocation() {
         return schemaLocation;

@@ -47,7 +47,6 @@ public class LineCoveredByPolygonBoundaryValidationBeanInfo extends LinePolygonA
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

@@ -388,7 +388,7 @@ public class SimpleTypeBuilder {
 	 * 
 	 * @param name
 	 * @param bind
-	 * @return SimpleTypeBuilder for use with chaining
+	 * 
 	 */
 	public void addAttribute(String name, Class bind) {
 		org.geotools.feature.AttributeType prototype = getBinding( bind );
@@ -431,7 +431,7 @@ public class SimpleTypeBuilder {
 	 * A GeometryAttribute will be created in the same manner
 	 * as for addAttribute with the addition of the CRS.
 	 * @param name
-	 * @param binding
+	 * @param bind
 	 */
 	public void addGeometry(String name, Class bind ){
 		org.geotools.feature.AttributeType prototype = getBinding( bind );
@@ -511,7 +511,8 @@ public class SimpleTypeBuilder {
 	 * <li>Well Known Text
 	 * </ul>
 	 * 
-	 * @param srs
+	 * @param SRS
+	 * 
 	 * @return TypeBuilder ready for chaining
 	 * @throws IllegalArgumentException
 	 *             When SRS not understood
@@ -702,9 +703,8 @@ public class SimpleTypeBuilder {
 	 * Subclass may override.
 	 * @param typeName Name of attribute type to create
 	 * @param bind
-	 * @return
+	 * 
 	 */
-	
 	protected org.geotools.feature.AttributeType createType( TypeName typeName, Class bind ){
 		return factory.createAttributeType( 
 			typeName, bind, false, false, Collections.EMPTY_SET, 

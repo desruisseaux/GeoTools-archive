@@ -107,7 +107,6 @@ public class ListHandler extends XSIElementHandler {
      * returns the itemType attribute
      * </p>
      *
-     * @return
      */
     public String getItemType() {
         return itemType;
@@ -118,7 +117,6 @@ public class ListHandler extends XSIElementHandler {
      * returns the nested simpleType if one exists
      * </p>
      *
-     * @return
      */
     public SimpleTypeHandler getSimpleType() {
         return simpleType;

@@ -89,7 +89,6 @@ public abstract class PageStore {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public abstract Node getRoot();
 
@@ -107,7 +106,6 @@ public abstract class PageStore {
      *
      * @param isLeaf
      *
-     * @return
      */
     public abstract Node getEmptyNode(boolean isLeaf);
 
@@ -117,7 +115,6 @@ public abstract class PageStore {
      * @param parentEntry
      * @param parent
      *
-     * @return
      *
      * @throws TreeException DOCUMENT ME!
      */
@@ -129,7 +126,6 @@ public abstract class PageStore {
      *
      * @param node
      *
-     * @return
      */
     public abstract Entry createEntryPointingNode(Node node);
 
@@ -163,7 +159,6 @@ public abstract class PageStore {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public DataDefinition getDataDefinition() {
         return this.def;

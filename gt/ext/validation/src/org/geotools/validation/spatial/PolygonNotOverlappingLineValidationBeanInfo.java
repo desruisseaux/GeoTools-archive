@@ -47,7 +47,6 @@ public class PolygonNotOverlappingLineValidationBeanInfo extends PolygonLineAbst
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

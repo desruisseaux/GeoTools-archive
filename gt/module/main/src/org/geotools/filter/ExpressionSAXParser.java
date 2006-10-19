@@ -429,7 +429,6 @@ public class ExpressionSAXParser {
      * NOTE: if someone uses <Function name="geomLength">  or <Function ogc:name="geomLength"> this will work,
      * if they use a different prefix, it will not. 
      * @param map
-     * @return
      */
     public String getFunctionName(Attributes map)
     {

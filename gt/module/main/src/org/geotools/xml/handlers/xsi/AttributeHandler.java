@@ -182,7 +182,6 @@ public class AttributeHandler extends XSIElementHandler {
      *
      * @param use
      *
-     * @return
      */
     public static int findUse(String use) {
         if ("optional".equalsIgnoreCase(use)) {
@@ -207,7 +206,6 @@ public class AttributeHandler extends XSIElementHandler {
      *
      * @param use
      *
-     * @return
      */
     public static String writeUse(int use) {
         switch (use) {
@@ -230,7 +228,6 @@ public class AttributeHandler extends XSIElementHandler {
      * Returns the attribute name
      * </p>
      *
-     * @return
      */
     public String getName() {
         return name;
@@ -243,7 +240,6 @@ public class AttributeHandler extends XSIElementHandler {
      *
      * @param parent
      *
-     * @return
      *
      * @throws SAXException
      */

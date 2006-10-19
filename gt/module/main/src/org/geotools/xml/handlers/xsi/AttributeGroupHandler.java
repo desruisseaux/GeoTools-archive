@@ -155,7 +155,6 @@ public class AttributeGroupHandler extends XSIElementHandler {
     /**
      * returns the 'name' attribute
      *
-     * @return
      */
     public String getName() {
         return name;
@@ -168,7 +167,6 @@ public class AttributeGroupHandler extends XSIElementHandler {
      *
      * @param parent
      *
-     * @return
      *
      * @throws SAXException
      */

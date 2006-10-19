@@ -87,7 +87,6 @@ public class FieldHandler extends XSIElementHandler {
      * </p>
      * TODO Is this method required?
      *
-     * @return
      */
     public String getId() {
         return id;
@@ -99,7 +98,6 @@ public class FieldHandler extends XSIElementHandler {
      * </p>
      * TODO Is this method required?
      *
-     * @return
      */
     public String getXpath() {
         return xpath;

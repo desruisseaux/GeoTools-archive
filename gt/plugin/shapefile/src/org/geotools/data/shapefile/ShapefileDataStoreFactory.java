@@ -107,7 +107,6 @@ public class ShapefileDataStoreFactory
      *
      * @param params
      *
-     * @return
      * @throws IOException 
      *
      * @throws IOException DOCUMENT ME!
@@ -185,7 +184,6 @@ public class ShapefileDataStoreFactory
     /**
      * Describe parameters.
      *
-     * @return
      *
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */

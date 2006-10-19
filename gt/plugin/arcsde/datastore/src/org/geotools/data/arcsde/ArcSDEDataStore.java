@@ -373,7 +373,6 @@ class ArcSDEDataStore extends AbstractDataStore {
      * @param qualifiedName
      * @param hackColName DOCUMENT ME!
      *
-     * @return
      *
      * @throws SeException
      */

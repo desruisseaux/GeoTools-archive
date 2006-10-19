@@ -43,7 +43,6 @@ public class Data {
      * Check to see if a <code>Data</code> respects its
      * <code>DataDefinition</code>
      *
-     * @return
      */
     public final boolean isValid() {
         if (this.getValuesCount() != this.def.getFieldsCount()) {
@@ -93,7 +92,6 @@ public class Data {
     /**
      * Return the KeyDefinition
      *
-     * @return
      */
     public DataDefinition getDefinition() {
         return this.def;
@@ -102,7 +100,6 @@ public class Data {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public int getValuesCount() {
         return this.values.size();
@@ -113,7 +110,6 @@ public class Data {
      *
      * @param i
      *
-     * @return
      */
     public Object getValue(int i) {
         return this.values.get(i);

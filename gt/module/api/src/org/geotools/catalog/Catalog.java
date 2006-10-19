@@ -48,7 +48,6 @@ public interface Catalog extends Resolve {
      *
      * @param adaptee
      * @param monitor May Be Null
-     * @return
      * @see CatalogInfo
      * @see IService
      */

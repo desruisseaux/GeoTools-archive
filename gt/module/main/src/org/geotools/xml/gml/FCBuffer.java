@@ -170,7 +170,6 @@ public class FCBuffer extends Thread implements FeatureReader {
      * @param document URL to parse
      * @param capacity
      *
-     * @return
      *
      * @throws SAXException
      */

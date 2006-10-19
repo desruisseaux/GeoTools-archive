@@ -130,7 +130,6 @@ public class SQLEncoderDB2Test extends DB2TestCase {
      * @param left
      * @param right
      *
-     * @return
      *
      * @throws IllegalFilterException
      */
@@ -153,7 +152,6 @@ public class SQLEncoderDB2Test extends DB2TestCase {
      * @param right
      * @param distance
      *
-     * @return
      *
      * @throws IllegalFilterException
      */

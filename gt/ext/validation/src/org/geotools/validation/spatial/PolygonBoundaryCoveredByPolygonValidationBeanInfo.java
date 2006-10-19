@@ -47,7 +47,6 @@ public class PolygonBoundaryCoveredByPolygonValidationBeanInfo extends PolygonPo
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

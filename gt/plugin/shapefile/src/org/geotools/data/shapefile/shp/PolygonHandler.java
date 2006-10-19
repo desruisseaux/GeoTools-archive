@@ -217,7 +217,6 @@ public class PolygonHandler implements ShapeHandler {
   /**
    * @param buffer
    * @param numPoints
-   * @return
    */
   private Coordinate[] readCoordinates(final ByteBuffer buffer, final int numPoints) {
       Coordinate[] coords = new Coordinate[numPoints];
@@ -233,7 +232,6 @@ public class PolygonHandler implements ShapeHandler {
    * @param shells
    * @param holes
    * @param holesForShells
-   * @return
    */
   private Geometry buildGeometries(final List shells, final List holes, final List holesForShells) {
       Polygon[] polygons;
@@ -273,7 +271,6 @@ public class PolygonHandler implements ShapeHandler {
    * <b>Package private for testing</b>
    * @param shells
    * @param holes
-   * @return
    */
   ArrayList assignHolesToShells(final ArrayList shells, final ArrayList holes) {
       ArrayList holesForShells = new ArrayList(shells.size());

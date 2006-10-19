@@ -340,7 +340,6 @@ public class DataUtilities {
      * @param typeA FeatureType beind compared
      * @param typeB FeatureType being compared against
      *
-     * @return
      */
     public static int compare(FeatureType typeA, FeatureType typeB) {
         if (typeA == typeB) {
@@ -837,7 +836,6 @@ public class DataUtilities {
      * @param properties - if null, every property of the feature type in input will be used
      * @param override
      *
-     * @return
      *
      * @throws SchemaException
      */
@@ -959,7 +957,6 @@ public class DataUtilities {
      *        (<i>namesapce</i>).<i>typeName</i>
      * @param typeSpec Specification for FeatureType
      *
-     * @return
      *
      * @throws SchemaException
      */
@@ -1241,7 +1238,6 @@ public class DataUtilities {
      *
      * @param typeSpec
      *
-     * @return
      *
      * @throws SchemaException If typeSpect could not be interpreted
      */

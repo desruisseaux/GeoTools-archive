@@ -339,7 +339,6 @@ public class SchemaHandler extends XSIElementHandler {
      * </p>
      * 
      * @param thisURI
-     * @return
      * @throws SAXException
      */
     protected Schema compress( URI thisURI ) throws SAXException {
@@ -628,7 +627,6 @@ public class SchemaHandler extends XSIElementHandler {
      * </p>
      * 
      * @param qname
-     * @return
      */
     protected SimpleType lookUpSimpleType( String qname ) {
         int index = qname.indexOf(":");
@@ -740,7 +738,6 @@ public class SchemaHandler extends XSIElementHandler {
      * </p>
      * 
      * @param qname
-     * @return
      * @throws SAXException
      */
     protected ComplexType lookUpComplexType( String qname ) throws SAXException {
@@ -850,7 +847,6 @@ public class SchemaHandler extends XSIElementHandler {
      * </p>
      * 
      * @param qname
-     * @return
      * @throws SAXException
      */
     protected Element lookUpElement( String qname ) throws SAXException {
@@ -967,7 +963,6 @@ public class SchemaHandler extends XSIElementHandler {
      * </p>
      * 
      * @param qname
-     * @return
      * @throws SAXException
      */
     protected Group lookUpGroup( String qname ) throws SAXException {
@@ -1073,7 +1068,6 @@ public class SchemaHandler extends XSIElementHandler {
      * </p>
      * 
      * @param qname
-     * @return
      * @throws SAXException
      */
     protected AttributeGroup lookUpAttributeGroup( String qname ) throws SAXException {
@@ -1181,7 +1175,6 @@ public class SchemaHandler extends XSIElementHandler {
      * </p>
      * 
      * @param qname
-     * @return
      * @throws SAXException
      */
     protected Attribute lookUpAttribute( String qname ) throws SAXException {
@@ -1250,7 +1243,6 @@ public class SchemaHandler extends XSIElementHandler {
      * </p>
      * 
      * @param qname
-     * @return
      * @throws SAXException
      */
     protected Type lookUpType( String qname ) throws SAXException {

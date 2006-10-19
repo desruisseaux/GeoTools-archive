@@ -354,7 +354,6 @@ public class MultiLineHandler implements ShapeHandler {
     }
 
     //	/**
-    //	 * @return
     //	 */
     //	private SimpleGeometry decimateBasedOnEnvelope(Envelope geomBBox) {
     //		if (geomBBox.getWidth() <= span.getX() && geomBBox.getHeight() <= span.getY()) {

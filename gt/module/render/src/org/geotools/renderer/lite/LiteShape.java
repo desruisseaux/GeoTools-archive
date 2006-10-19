@@ -588,7 +588,6 @@ public class LiteShape implements Shape, Cloneable {
     
     /**
      * Returns the affine transform for this lite shape
-     * @return
      */
     public AffineTransform getAffineTransform() {
         return affineTransform;

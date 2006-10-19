@@ -80,7 +80,6 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
      * if OID are there or not.
      *
      * @param connection
-     * @return
      */
     private int getDatabaseMajorVersion(Connection connection) {
         int major;

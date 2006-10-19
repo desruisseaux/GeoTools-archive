@@ -85,7 +85,6 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @param query
      *
-     * @return
      *
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */

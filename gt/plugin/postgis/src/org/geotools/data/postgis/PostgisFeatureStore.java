@@ -641,7 +641,6 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
      * @param unpacker the object to get the encodable filter.
      * @param query the getFeature query - for the tableName, properties and
      *        maxFeatures.
-     * @return
      * @throws IOException if there are problems encoding the sql.
      */
     public String makeSql(SQLUnpacker unpacker, Query query) throws IOException {

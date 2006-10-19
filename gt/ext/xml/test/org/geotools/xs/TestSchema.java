@@ -165,7 +165,6 @@ public abstract class TestSchema extends TestCase {
 
     /**
      * Each subclass must indicate which kind of QName they wish to operate against.
-     * @return
      */
     protected abstract QName getQName();
 

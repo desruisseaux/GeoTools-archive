@@ -378,7 +378,6 @@ public class FeatureTypes {
      * 
      * @param typeA
      * @param typeB
-     * @return
      */
     public static boolean equalsAncestors( FeatureType typeA, FeatureType typeB ) {
         return ancestors( typeA ).equals( typeB );

@@ -79,7 +79,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -94,7 +93,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -123,7 +121,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -163,7 +160,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return ContrastEnhancement.class;
@@ -177,7 +173,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -206,7 +201,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -244,7 +238,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -279,7 +272,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -308,7 +300,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -341,7 +332,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -356,7 +346,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -385,7 +374,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -439,7 +427,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -454,7 +441,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -483,7 +469,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -515,7 +500,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -530,7 +514,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -559,7 +542,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -597,7 +579,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -612,7 +593,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -641,7 +621,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -680,7 +659,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return Graphic.class;
@@ -710,7 +688,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -739,7 +716,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -796,7 +772,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return _Graphic.getInstance().getInstanceType();
@@ -810,7 +785,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -839,7 +813,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          * @throws SAXException 
          */
@@ -879,7 +852,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return Stroke.class;
@@ -893,7 +865,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -922,7 +893,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -980,7 +950,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -995,7 +964,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1024,7 +992,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1052,7 +1019,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1067,7 +1033,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1096,7 +1061,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1135,7 +1099,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1150,7 +1113,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1179,7 +1141,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1217,7 +1178,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1232,7 +1192,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1261,7 +1220,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1312,7 +1270,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1327,7 +1284,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1356,7 +1312,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1390,7 +1345,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1405,7 +1359,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1434,7 +1387,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1462,7 +1414,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1477,7 +1428,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1506,7 +1456,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1550,7 +1499,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1565,7 +1513,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1594,7 +1541,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1634,7 +1580,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1649,7 +1594,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1678,7 +1622,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1706,7 +1649,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1721,7 +1663,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1750,7 +1691,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1790,7 +1730,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1805,7 +1744,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1834,7 +1772,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1873,7 +1810,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1888,7 +1824,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1917,7 +1852,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -1945,7 +1879,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -1960,7 +1893,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -1989,7 +1921,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -2029,7 +1960,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -2044,7 +1974,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -2073,7 +2002,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )
@@ -2107,7 +2035,6 @@ public class sldComplexTypes {
          *  getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;
@@ -2122,7 +2049,6 @@ public class sldComplexTypes {
          * @param element
          * @param value
          * @param hints
-         * @return
          */
         public boolean canEncode( Element element, Object value, Map hints ) {
             return super.canEncode(element, value, hints);
@@ -2151,7 +2077,6 @@ public class sldComplexTypes {
          * @param value
          * @param attrs1
          * @param hints
-         * @return
          * @throws OperationNotSupportedException
          */
         public Object getValue( Element element, ElementValue[] value, Attributes attrs1, Map hints )

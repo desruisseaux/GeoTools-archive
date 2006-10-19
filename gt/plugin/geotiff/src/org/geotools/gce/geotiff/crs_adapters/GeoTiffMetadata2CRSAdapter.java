@@ -347,7 +347,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 * @see <a href="http://lists.maptools.org/pipermail/geotiff/2006-January/000213.html">this email post</a>
 	 * @task TODO add support for transformation
 	 * @param metadata
-	 * @return
+	 * 
 	 * @throws GeoTiffException
 	 */
 	public MathTransform getRasterToModel(

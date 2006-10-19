@@ -239,7 +239,6 @@ public class WMS1_0_0_OnlineTest extends ServerTestCase {
     
     /**
      * @param featureURL
-     * @return
      * @throws IOException
      * @throws URISyntaxException
      * @throws SAXException

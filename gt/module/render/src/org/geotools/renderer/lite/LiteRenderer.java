@@ -559,7 +559,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 * @param imageHeight
 	 * @param DPI
 	 *            screen dots per inch (OGC standard is 90)
-	 * @return
 	 */
 	public static double calculateScale(Envelope envelope,
 			CoordinateReferenceSystem coordinateReferenceSystem,
@@ -1336,7 +1335,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 * 
 	 * @param g
 	 * @param transform
-	 * @return
 	 * @throws TransformException
 	 * @throws FactoryException
 	 */
@@ -1351,7 +1349,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	HashMap decimators = new HashMap();
 
 	/**
-	 * @return
 	 * @throws org.opengis.referencing.operation.NoninvertibleTransformException
 	 */
 	private Decimator getDecimator(MathTransform2D mathTransform)
@@ -1377,7 +1374,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 * @param destinationCrs
 	 * @param at
 	 *            DOCUMENT ME!
-	 * @return
 	 * @throws CannotCreateTransformException
 	 * @throws FactoryException
 	 * @throws OperationNotFoundException
@@ -1505,7 +1501,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 * of each sub-geom
 	 * 
 	 * @param g
-	 * @return
 	 */
 	public Geometry getCentroid(Geometry g) {
 		if (g instanceof GeometryCollection) {
@@ -1609,7 +1604,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 * painting
 	 * </p>
 	 * 
-	 * @return
 	 */
 	public boolean isOptimizedDataLoadingEnabled() {
 		return optimizedDataLoadingEnabled;
@@ -1627,7 +1621,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	/**
 	 * Returns the generalization distance in the screen space.
 	 * 
-	 * @return
 	 */
 	public double getGeneralizationDistance() {
 		return generalizationDistance;
@@ -1914,7 +1907,6 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	/**
 	 * Returns the set of supported graphics formats and lazy loads it as needed
 	 * 
-	 * @return
 	 */
 	private static Set getSupportedGraphicFormats() {
 		if (supportedGraphicFormats == null) {

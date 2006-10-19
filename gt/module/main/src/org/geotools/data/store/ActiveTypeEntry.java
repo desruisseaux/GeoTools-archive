@@ -122,7 +122,6 @@ final class ActiveTypeEntry implements TypeEntry {
      * TODO summary sentence for getDisplayName ...
      * 
      * @see org.geotools.data.TypeEntry#getDisplayName()
-     * @return
      */
     public InternationalString getDisplayName() {
         return new SimpleInternationalString( schema.getTypeName() );
@@ -133,7 +132,6 @@ final class ActiveTypeEntry implements TypeEntry {
      * TODO summary sentence for getDescription ...
      * 
      * @see org.geotools.data.TypeEntry#getDescription()
-     * @return
      */
     public InternationalString getDescription() {
         return null;
@@ -143,7 +141,6 @@ final class ActiveTypeEntry implements TypeEntry {
      * TODO summary sentence for getFeatureType ...
      * 
      * @see org.geotools.data.TypeEntry#getFeatureType()
-     * @return
      * @throws IOException
      */
     public FeatureType getFeatureType() {
@@ -194,7 +191,6 @@ final class ActiveTypeEntry implements TypeEntry {
      * TODO summary sentence for getCount ...
      * 
      * @see org.geotools.data.TypeEntry#getCount()
-     * @return
      */
     public int getCount() {
         if( count != -1 ) return count;

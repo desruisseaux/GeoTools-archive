@@ -1816,7 +1816,6 @@ public class StyleBuilder {
 
     /**
      * Creates the default raster symbolizer
-     * @return
      */
     public RasterSymbolizer createRasterSymbolizer() {
         return sf.getDefaultRasterSymbolizer();
@@ -1826,7 +1825,7 @@ public class StyleBuilder {
      * Creates a raster symbolizer
      * @param colorMap The symbolizer color map
      * @param opacity The whole layer opacity
-     * @return 
+     *  
      */
     public RasterSymbolizer createRasterSymbolizer(ColorMap colorMap, double opacity) {
         RasterSymbolizer rs = sf.getDefaultRasterSymbolizer();
@@ -1863,7 +1862,6 @@ public class StyleBuilder {
      * The color alpha will be used as the entry's opacity
      * @param quantity The entry's quantity
      * @param color The entry's color. 
-     * @return
      */
     private ColorMapEntry createColorMapEntry(String label, double quantity, Color color) {
         ColorMapEntry entry = sf.createColorMapEntry();

@@ -235,7 +235,6 @@ public class ASTFactory {
          *
          * @param datum
          *
-         * @return
          *
          * @see net.refractions.udig.catalog.internal.DefaultCatalog.AST#accept(java.lang.String)
          */
@@ -247,7 +246,6 @@ public class ASTFactory {
         /**
          * TODO summary sentence for type ...
          *
-         * @return
          *
          * @see net.refractions.udig.catalog.internal.DefaultCatalog.AST#type()
          */
@@ -291,7 +289,6 @@ public class ASTFactory {
          *
          * @param datum
          *
-         * @return
          *
          * @see net.refractions.udig.catalog.internal.DefaultCatalog.AST#accept(java.lang.String)
          */
@@ -303,7 +300,6 @@ public class ASTFactory {
         /**
          * TODO summary sentence for type ...
          *
-         * @return
          *
          * @see net.refractions.udig.catalog.internal.DefaultCatalog.AST#type()
          */
@@ -345,7 +341,6 @@ public class ASTFactory {
          *
          * @param datum
          *
-         * @return
          *
          * @see net.refractions.udig.catalog.internal.DefaultCatalog.AST#accept(java.lang.String)
          */
@@ -356,7 +351,6 @@ public class ASTFactory {
         /**
          * TODO summary sentence for type ...
          *
-         * @return
          *
          * @see net.refractions.udig.catalog.internal.DefaultCatalog.AST#type()
          */
@@ -398,7 +392,6 @@ public class ASTFactory {
          *
          * @param datum
          *
-         * @return
          *
          * @see net.refractions.udig.catalog.internal.DefaultCatalog.AST#accept(java.lang.String)
          */
@@ -411,7 +404,6 @@ public class ASTFactory {
         /**
          * TODO summary sentence for type ...
          *
-         * @return
          *
          * @see net.refractions.udig.catalog.internal.DefaultCatalog.AST#type()
          */

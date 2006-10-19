@@ -75,7 +75,6 @@ public class SampleFeatureFixtures {
     /**
      * creates and returns an array of sample attributes.
      *
-     * @return
      */
     public static Object[] createAttributes() {
         Object[] attributes = new Object[10];
@@ -161,7 +160,6 @@ public class SampleFeatureFixtures {
     /**
      * DOCUMENT ME!
      *
-     * @return
      *
      * @throws SchemaException
      */

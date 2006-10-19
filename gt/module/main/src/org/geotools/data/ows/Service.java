@@ -129,7 +129,6 @@ public class Service {
      * 
      * The Role field is not used.
      * 
-     * @return
      */
 	public ResponsibleParty getContactInformation() {
 		return contactInformation;

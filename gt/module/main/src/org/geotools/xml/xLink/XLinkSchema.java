@@ -228,7 +228,6 @@ public class XLinkSchema implements Schema {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public String getPrefix() {
         return "xLink";
@@ -799,7 +798,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the default singleton instance
          *
-         * @return
          */
         public static Attribute getInstance() {
             if (instance1 == null) {
@@ -853,7 +851,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton instance
          *
-         * @return
          */
         public static Attribute getInstance() {
             return instance1;
@@ -903,7 +900,6 @@ public class XLinkSchema implements Schema {
         /**
          * Return a singleton of an Actuate
          *
-         * @return
          */
         public static Attribute getInstance() {
             if (instance1 == null) {
@@ -954,7 +950,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns a singleton of Label
          *
-         * @return
          */
         public static Attribute getInstance() {
             return instance1;
@@ -1001,7 +996,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton From instance
          *
-         * @return
          */
         public static Attribute getInstance() {
             if (instance1 == null) {
@@ -1052,7 +1046,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton To instance
          *
-         * @return
          */
         public static Attribute getInstance() {
             if (instance1 == null) {
@@ -1206,7 +1199,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton SimpleLink instance
          *
-         * @return
          */
         public static AttributeGroup getInstance() {
             if (instance1 == null) {
@@ -1249,7 +1241,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton ExtendedLink instance
          *
-         * @return
          */
         public static AttributeGroup getInstance() {
             if (instance1 == null) {
@@ -1292,7 +1283,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton LocatorLink instance
          *
-         * @return
          */
         public static AttributeGroup getInstance() {
             if (instance1 == null) {
@@ -1335,7 +1325,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton ArcLink instance
          *
-         * @return
          */
         public static AttributeGroup getInstance() {
             if (instance1 == null) {
@@ -1379,7 +1368,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton ResourceLink instance
          *
-         * @return
          */
         public static AttributeGroup getInstance() {
             if (instance1 == null) {
@@ -1419,7 +1407,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton TitleLink instance
          *
-         * @return
          */
         public static AttributeGroup getInstance() {
             if (instance1 == null) {
@@ -1459,7 +1446,6 @@ public class XLinkSchema implements Schema {
         /**
          * Returns the singleton EmptyLink instance
          *
-         * @return
          */
         public static AttributeGroup getInstance() {
             if (instance1 == null) {

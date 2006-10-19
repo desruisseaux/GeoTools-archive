@@ -47,7 +47,6 @@ public class PointCoveredByPolygonBoundaryValidationBeanInfo extends PointPolygo
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

@@ -88,7 +88,6 @@ public class CollectionDataStore extends AbstractDataStore {
      *
      * @param typeName
      *
-     * @return
      *
      * @throws IOException If typeName could not be found
      * @throws DataSourceException See IOException
@@ -103,7 +102,6 @@ public class CollectionDataStore extends AbstractDataStore {
     /**
      * Returns the feature collection held by this data store
      *
-     * @return
      */
     public FeatureCollection getCollection() {
         return collection;

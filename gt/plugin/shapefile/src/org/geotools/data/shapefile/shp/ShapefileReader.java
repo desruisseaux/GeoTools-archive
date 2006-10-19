@@ -528,7 +528,6 @@ public class ShapefileReader {
 	 * TODO needs better java docs!!! What is offset?
 	 * 
 	 * @param offset
-	 * @return
 	 * @throws IOException
 	 * @throws UnsupportedOperationException
 	 */

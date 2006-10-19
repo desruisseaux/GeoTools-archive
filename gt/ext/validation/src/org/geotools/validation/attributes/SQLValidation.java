@@ -56,7 +56,6 @@ public class SQLValidation extends DefaultFeatureValidation {
      * @param type FeatureTypeInfo schema of feature
      * @param results coallate results information
      *
-     * @return
      *
      * @see org.geotools.validation.FeatureValidation#validate(org.geotools.feature.Feature,
      *      org.geotools.feature.FeatureType,

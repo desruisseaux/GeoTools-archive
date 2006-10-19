@@ -101,7 +101,6 @@ public abstract class XMLTestSupport extends TestCase {
      * This method should be called after building the entire document.
      *
      * </p>
-     * @return
      * @throws Exception
      */
     protected Object parse() throws Exception {

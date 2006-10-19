@@ -316,7 +316,6 @@ public class DefaultTransaction implements Transaction {
      * @see org.geotools.data.Transaction#getProperty(java.lang.Object)
      * 
      * @param key
-     * @return
      */
     public Object getProperty(Object key) {
         if( propertyLookup == null){

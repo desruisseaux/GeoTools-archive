@@ -35,7 +35,6 @@ public interface Any extends ElementGrouping {
      * Returns the element declaration's id for this schema element.
      * </p>
      *
-     * @return
      */
     public String getId();
 
@@ -55,7 +54,6 @@ public interface Any extends ElementGrouping {
      * of this interface is representing within an XML Schema.
      * </p>
      *
-     * @return
      */
     public URI getNamespace();
 }

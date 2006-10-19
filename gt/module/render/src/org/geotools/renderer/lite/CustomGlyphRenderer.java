@@ -96,7 +96,6 @@ public class CustomGlyphRenderer implements GlyphRenderer {
      * @param eg
      * @param feature
      * @param height
-     * @return
      */
     public BufferedImage render(Graphic graphic, ExternalGraphic eg, Feature feature, int height) {
         Map props = eg.getCustomProperties();

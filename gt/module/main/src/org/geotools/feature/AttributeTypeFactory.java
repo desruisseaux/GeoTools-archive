@@ -87,7 +87,6 @@ public abstract class AttributeTypeFactory implements Factory {
      * @param fieldLength
      * @param defaultValue
      * @param metaData
-     * @return
      */
     public static AttributeType newAttributeType(String name, Class clazz,
         boolean isNillable,int fieldLength,Object defaultValue, Object metaData) {

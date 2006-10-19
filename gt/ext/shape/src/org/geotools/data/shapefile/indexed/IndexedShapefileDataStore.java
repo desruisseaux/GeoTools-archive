@@ -407,7 +407,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @param r
 	 * @param readerSchema
 	 *
-	 * @return
 	 *
 	 * @throws SchemaException
 	 * @throws IOException
@@ -443,7 +442,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @param filter -
 	 *            a Filter to use
 	 *
-	 * @return
 	 *
 	 * @throws IOException
 	 */
@@ -583,7 +581,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 *
 	 * @param bbox
 	 *
-	 * @return
 	 *
 	 * @throws DataSourceException
 	 * @throws IOException
@@ -612,7 +609,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 *
 	 * @param bbox
 	 *
-	 * @return
 	 *
 	 * @throws DataSourceException
 	 * @throws IOException

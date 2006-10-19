@@ -50,7 +50,6 @@ public class AddressOverlapValidationBeanInfo
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

@@ -627,7 +627,6 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     protected abstract FeatureType createFeatureType()
         throws SchemaException;
@@ -647,7 +646,6 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
      *
      * @param type
      *
-     * @return
      */
     protected abstract AttributeType remove(AttributeType type);
 
@@ -668,7 +666,6 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
      *
      * @param idx
      *
-     * @return
      *
      * @throws ArrayIndexOutOfBoundsException
      */
@@ -680,7 +677,6 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
      *
      * @param idx
      *
-     * @return
      *
      * @throws ArrayIndexOutOfBoundsException
      */
@@ -693,7 +689,6 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
      * @param idx
      * @param type
      *
-     * @return
      *
      * @throws ArrayIndexOutOfBoundsException
      * @throws IllegalArgumentException
@@ -704,7 +699,6 @@ public abstract class FeatureTypeBuilder extends FeatureTypes implements Factory
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public abstract int getAttributeCount();
 

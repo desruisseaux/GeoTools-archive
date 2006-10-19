@@ -149,7 +149,6 @@ public class ElementHandlerFactory {
      * @param namespaceURI
      * @param localName
      *
-     * @return
      *
      * @throws SAXException
      *
@@ -201,7 +200,6 @@ public class ElementHandlerFactory {
      *
      * @param eth Element
      *
-     * @return
      *
      * @throws SAXException
      */

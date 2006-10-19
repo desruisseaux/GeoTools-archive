@@ -59,7 +59,6 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
      * Creates a new instance of the datastore.  The datastore must not have a
      * roads or rivers type.
      *
-     * @return
      *
      * @throws Exception
      */
@@ -72,7 +71,6 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
      *
      * @param data DOCUMENT ME!
      *
-     * @return
      *
      * @throws Exception
      */

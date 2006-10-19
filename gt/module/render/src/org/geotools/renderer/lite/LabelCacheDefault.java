@@ -161,7 +161,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * 
 	 * @param symbolizer
 	 * @param feature
-	 * @return
 	 */
 	public double getPriority(TextSymbolizer symbolizer, Feature feature) {
 		if (symbolizer.getPriority() == null)
@@ -266,7 +265,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * <0 means "I can overlap other labels" be careful with this.
 	 * 
 	 * @param symbolizer
-	 * @return
 	 */
 	private int getSpaceAround(TextSymbolizer symbolizer) {
 		String value = symbolizer.getOption("spaceAround");
@@ -284,7 +282,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * not present, return "DEFAULT_GROUP"
 	 * 
 	 * @param symbolizer
-	 * @return
 	 */
 	private boolean isGrouping(TextSymbolizer symbolizer) {
 		String value = symbolizer.getOption("group");
@@ -524,7 +521,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param glyphVector
 	 * @param tempTransform
 	 * @param representativeGeom
-	 * @return
 	 */
 	private double goodnessOfFit(GlyphVector glyphVector,
 			AffineTransform tempTransform, Geometry representativeGeom) {
@@ -578,7 +574,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * Remove holes from a polygon
 	 * 
 	 * @param polygon
-	 * @return
 	 */
 	private Polygon simplifyPoly(Polygon polygon) {
 		LineString outer = polygon.getExteriorRing();
@@ -598,7 +593,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * 
 	 * @param glyphVector
 	 * @param tempTransform
-	 * @return
 	 */
 	private boolean offscreen(GlyphVector glyphVector,
 			AffineTransform tempTransform, Rectangle screen) {
@@ -986,7 +980,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param line
 	 * @param bbox
 	 *            MUST BE A BOUNDING BOX
-	 * @return
 	 */
 	public MultiLineString clipLineString(LineString line, Polygon bbox,
 			Envelope displayGeomEnv) {
@@ -1048,7 +1041,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * 
 	 * @param geoms
 	 * @param displayGeometry
-	 * @return
 	 */
 	Polygon getPolySetRepresentativeLocation(List geoms,
 			Geometry displayGeometry) {
@@ -1190,7 +1182,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * 
 	 * @param l
 	 * @param percent
-	 * @return
 	 */
 	double middleTheta(LineString l, double percent) {
 		if (percent >= 1.0)
@@ -1231,7 +1222,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * @param l
 	 * @param percent
 	 *            0=start, 0.5=middle, 1.0=end
-	 * @return
 	 */
 	Point middleLine(LineString l, double percent) {
 		if (percent >= 1.0)
@@ -1432,7 +1422,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * NOTE: this is O(N^2), but N tends to be <10
 	 * 
 	 * @param lines
-	 * @return
 	 */
 	Collection mergeLines2(Collection lines) {
 		LineMerger lm = new LineMerger();
@@ -1519,7 +1508,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * null values in it.
 	 * 
 	 * @param l
-	 * @return
 	 */
 	ArrayList removeNulls(List l) {
 		ArrayList al = new ArrayList();
@@ -1550,7 +1538,6 @@ public final class LabelCacheDefault implements LabelCache {
 	 * 
 	 * @param major
 	 * @param minor
-	 * @return
 	 */
 	LineString merge(LineString major, LineString minor) {
 		Coordinate major_s = major.getCoordinateN(0);

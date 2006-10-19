@@ -49,7 +49,6 @@ public class WFSCapabilities extends Capabilities {
      * 
      * @param capabilities
      * @param typename
-     * @return
      */
     public static FeatureSetDescription getFeatureSetDescription(WFSCapabilities capabilities, String typename){
         List l = capabilities.getFeatureTypes();

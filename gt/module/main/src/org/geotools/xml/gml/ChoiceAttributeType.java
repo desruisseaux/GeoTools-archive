@@ -32,7 +32,6 @@ interface ChoiceAttributeType extends AttributeType{
 	 *  this make the FeatureType a little more accurate.  It is not perfect of course since
 	 *  The choice Line, Polygon and MultiPolygon still has to be of Type Geometry but it is a little better.
 	 *  </p>
-	 * @return
 	 */
 	public Object convert(Object obj);
 	interface Geometry extends ChoiceAttributeType, GeometryAttributeType{

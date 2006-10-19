@@ -444,7 +444,6 @@ public class DefaultQuery implements Query {
      * <p>
      * Description ...
      * </p>
-     * @return
      */
     public CoordinateReferenceSystem getCoordinateSystem() {
         return coordinateSystem;
@@ -455,7 +454,6 @@ public class DefaultQuery implements Query {
      * <p>
      * Description ...
      * </p>
-     * @return
      */
     public CoordinateReferenceSystem getCoordinateSystemReproject() {
         return coordinateSystemReproject;

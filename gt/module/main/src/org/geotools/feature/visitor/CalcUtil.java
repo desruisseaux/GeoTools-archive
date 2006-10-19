@@ -120,7 +120,6 @@ public class CalcUtil {
     /**
      * Calculates the average, and returns it in the correct class.
      * @param numbers
-     * @return
      */
     static Number average(Number[] numbers) {
         Number sum = sum(numbers);
@@ -176,7 +175,6 @@ public class CalcUtil {
      * @param var
      * @param type
      *
-     * @return
      */
     static Object convert(Object var, Class type) {
         if (var instanceof Number) { //use number conversion
@@ -244,7 +242,6 @@ public class CalcUtil {
      *
      * @param objects
      *
-     * @return
      */
     static Object getObject(Object[] objects) {
     	Class bestClass = bestClass(objects);
@@ -271,7 +268,6 @@ public class CalcUtil {
      * @param val1
      * @param val2
      *
-     * @return
      */
     static int compare(Comparable val1, Comparable val2) {
         if (val1.getClass() == val2.getClass()) {

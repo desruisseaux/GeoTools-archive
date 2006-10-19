@@ -51,7 +51,6 @@ public class LineLineAbstractValidationBeanInfo extends DefaultIntegrityValidati
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

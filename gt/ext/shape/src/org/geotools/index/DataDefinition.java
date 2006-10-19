@@ -107,7 +107,6 @@ public class DataDefinition {
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public Charset getCharset() {
         return charset;
@@ -116,7 +115,6 @@ public class DataDefinition {
     /**
      * Gets the max len of the data
      *
-     * @return
      */
     public int getLen() {
         int len = 0;
@@ -135,7 +133,6 @@ public class DataDefinition {
      * Gets the len of this field after the encoding, this method may be
      * different from getLen() only if exists strings in the definition
      *
-     * @return
      */
     public int getEncodedLen() {
         int len = 0;
@@ -167,7 +164,6 @@ public class DataDefinition {
         /**
          * DOCUMENT ME!
          *
-         * @return
          */
         public Class getFieldClass() {
             return clazz;
@@ -176,7 +172,6 @@ public class DataDefinition {
         /**
          * DOCUMENT ME!
          *
-         * @return
          */
         public int getLen() {
             return len;
@@ -185,7 +180,6 @@ public class DataDefinition {
         /**
          * DOCUMENT ME!
          *
-         * @return
          */
         public int getEncodedLen() {
             int ret = this.len;

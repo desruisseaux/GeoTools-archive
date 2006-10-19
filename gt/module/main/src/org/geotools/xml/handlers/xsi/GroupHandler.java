@@ -183,7 +183,6 @@ public class GroupHandler extends ElementGroupingHandler {
      * returns the group's name
      * </p>
      *
-     * @return
      */
     public String getName() {
         return name;
@@ -253,7 +252,6 @@ public class GroupHandler extends ElementGroupingHandler {
          * TODO summary sentence for getChild ...
          * 
          * @see org.geotools.xml.schema.Group#getChild()
-         * @return
          */
         public ElementGrouping getChild() {
             return child;
@@ -263,7 +261,6 @@ public class GroupHandler extends ElementGroupingHandler {
          * TODO summary sentence for getId ...
          * 
          * @see org.geotools.xml.schema.Group#getId()
-         * @return
          */
         public String getId() {
             return id;
@@ -273,7 +270,6 @@ public class GroupHandler extends ElementGroupingHandler {
          * TODO summary sentence for getMaxOccurs ...
          * 
          * @see org.geotools.xml.schema.Group#getMaxOccurs()
-         * @return
          */
         public int getMaxOccurs() {
             return max;
@@ -283,7 +279,6 @@ public class GroupHandler extends ElementGroupingHandler {
          * TODO summary sentence for getMinOccurs ...
          * 
          * @see org.geotools.xml.schema.Group#getMinOccurs()
-         * @return
          */
         public int getMinOccurs() {
             return min;
@@ -293,7 +288,6 @@ public class GroupHandler extends ElementGroupingHandler {
          * TODO summary sentence for getName ...
          * 
          * @see org.geotools.xml.schema.Group#getName()
-         * @return
          */
         public String getName() {
             return name;
@@ -303,7 +297,6 @@ public class GroupHandler extends ElementGroupingHandler {
          * TODO summary sentence for getNamespace ...
          * 
          * @see org.geotools.xml.schema.Group#getNamespace()
-         * @return
          */
         public URI getNamespace() {
             return namespace;
@@ -313,7 +306,6 @@ public class GroupHandler extends ElementGroupingHandler {
          * TODO summary sentence for getGrouping ...
          * 
          * @see org.geotools.xml.schema.ElementGrouping#getGrouping()
-         * @return
          */
         public int getGrouping() {
             return GROUP;
@@ -324,7 +316,6 @@ public class GroupHandler extends ElementGroupingHandler {
          * 
          * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
          * @param arg1
-         * @return
          */
         public Element findChildElement( String arg1 ) {
             return child==null?null:child.findChildElement(arg1);

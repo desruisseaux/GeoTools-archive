@@ -33,7 +33,6 @@ public interface Choice extends ElementGrouping {
      * The Schema ID for this choice definition.
      * </p>
      *
-     * @return
      */
     public String getId();
 
@@ -56,7 +55,6 @@ public interface Choice extends ElementGrouping {
      * the search order.
      * </p>
      *
-     * @return
      */
     public ElementGrouping[] getChildren();
 }

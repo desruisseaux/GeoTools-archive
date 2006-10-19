@@ -248,7 +248,6 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      * @param filter
      * @param transaction
      *
-     * @return
      *
      * @throws IOException If typeName could not be located
      * @throws NullPointerException If the provided filter is null

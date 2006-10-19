@@ -136,7 +136,6 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      *
      * @param colInfos
      *
-     * @return
      */
     protected List getColumnInfoList(ColumnInfo[] colInfos) {
         ArrayList list = new ArrayList();
@@ -159,7 +158,6 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      * @param connection
      * @param colInfos
      *
-     * @return
      */
     protected FIDMapper buildLastResortFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo[] colInfos) {
@@ -199,7 +197,6 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      * @param tableName
      * @param connection
      *
-     * @return
      */
     protected FIDMapper buildNoPKMapper(String schema, String tableName,
         Connection connection) {
@@ -217,7 +214,6 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      * @param connection
      * @param colInfos
      *
-     * @return
      */
     protected FIDMapper buildMultiColumnFIDMapper(String schema,
         String tableName, Connection connection, ColumnInfo[] colInfos) {
@@ -320,7 +316,6 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      * @param columnName
      * @param dataType
      *
-     * @return
      *
      * @throws SQLException
      */

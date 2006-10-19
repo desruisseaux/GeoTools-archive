@@ -167,7 +167,6 @@ public abstract class AbstractService implements Service {
      *
      * @param other
      *
-     * @return
      *
      * @see Object#equals(java.lang.Object)
      */
@@ -216,7 +215,6 @@ public abstract class AbstractService implements Service {
     /**
      * This should represent the identified
      *
-     * @return
      *
      * @see Object#hashCode()
      */

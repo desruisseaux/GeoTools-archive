@@ -94,7 +94,6 @@ public class FileDataStoreFinder {
      * Returns an iterator of FileDataStoreFactorySpi to allow for the easy
      * creation of a FileDataStore
      *
-     * @return
      *
      * @see FileDataStoreFactorySpi
      * @see FileDataStore

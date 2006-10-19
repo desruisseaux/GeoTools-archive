@@ -40,7 +40,6 @@ public interface ComplexType extends Type {
      * more information see getValue.
      * </p>
      *
-     * @return
      *
      * @see Type#getValue(Element, ElementValue[], Attributes)
      */
@@ -51,7 +50,6 @@ public interface ComplexType extends Type {
      * defined by the XML schema of which this complex type definition is a
      * part.
      *
-     * @return
      */
     public boolean isAbstract();
 
@@ -59,7 +57,6 @@ public interface ComplexType extends Type {
      * This methos represents the potential 'anyAttribute' declaration's
      * namespace attribute which may occur within a complex type definition.
      *
-     * @return
      */
     public String getAnyAttributeNameSpace();
 
@@ -69,7 +66,6 @@ public interface ComplexType extends Type {
      * attributes. For performance reasons an implementor may wich to order
      * the attributes from most common to least commonly used attributes.
      *
-     * @return
      */
     public Attribute[] getAttributes();
 
@@ -77,7 +73,6 @@ public interface ComplexType extends Type {
      * Specifies a mask which denotes which substitution mechanisms may be used
      * for this complex type definition.
      *
-     * @return
      *
      * @see Schema#EXTENSION
      * @see Schema#RESTRICTION
@@ -89,7 +84,6 @@ public interface ComplexType extends Type {
      * Returns the child element representing the structure of nested  child
      * nodes (if any are allowed).
      *
-     * @return
      *
      * @see ElementGrouping
      */
@@ -101,7 +95,6 @@ public interface ComplexType extends Type {
      * Specifies a mask which denotes which substitution mechanisms prohibited
      * for use by child definitions of this complex type.
      *
-     * @return
      *
      * @see Schema#EXTENSION
      * @see Schema#RESTRICTION
@@ -113,7 +106,6 @@ public interface ComplexType extends Type {
      * Returns the xml schema id of this complexType if one  exists, null
      * otherwise.
      *
-     * @return
      */
     public String getId();
 
@@ -121,7 +113,6 @@ public interface ComplexType extends Type {
      * Returns true if this complexType allows mixed content (Child elements
      * and a String value).
      *
-     * @return
      */
     public boolean isMixed();
 
@@ -131,7 +122,6 @@ public interface ComplexType extends Type {
      * method should return true when the complexType is not a root of an
      * inheritance  tree.
      *
-     * @return
      */
     public boolean isDerived();
 

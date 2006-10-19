@@ -131,7 +131,6 @@ public class KeyrefHandler extends XSIElementHandler {
      * returns a list of child field elements
      * </p>
      *
-     * @return
      */
     public List getFields() {
         return fields;
@@ -142,7 +141,6 @@ public class KeyrefHandler extends XSIElementHandler {
      * returns the id attribute
      * </p>
      *
-     * @return
      */
     public String getId() {
         return id;
@@ -153,7 +151,6 @@ public class KeyrefHandler extends XSIElementHandler {
      * returns the name attribute
      * </p>
      *
-     * @return
      */
     public String getName() {
         return name;
@@ -164,7 +161,6 @@ public class KeyrefHandler extends XSIElementHandler {
      * returns the refer attribute
      * </p>
      *
-     * @return
      */
     public String getRefer() {
         return refer;
@@ -175,7 +171,6 @@ public class KeyrefHandler extends XSIElementHandler {
      * returns the child selector element
      * </p>
      *
-     * @return
      */
     public SelectorHandler getSelector() {
         return selector;

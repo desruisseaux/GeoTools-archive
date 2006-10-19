@@ -1005,7 +1005,6 @@ public final class ImageUtilities {
      * 
      * @param image
      * @param cache
-     * @return
      *
      * @since 2.3
      *
@@ -1058,7 +1057,6 @@ public final class ImageUtilities {
      * @param alphaChannel
      * @param pb
      * 
-     * @return
      *
      * @since 2.3
      */
@@ -1270,7 +1268,6 @@ public final class ImageUtilities {
      * @param surrogateImage
      * @param numBands
      * 
-     * @return
      *
      * @since 2.3
      */
@@ -1305,7 +1302,6 @@ public final class ImageUtilities {
      * @todo Extensive testing is required.
      * @param surrogateImage
      * 
-     * @return
      *
      * @since 2.3
      */
@@ -1400,7 +1396,6 @@ public final class ImageUtilities {
      * 
      * @param surrogateImage
      * 
-     * @return
      * 
      * @throws IllegalArgumentException
      *

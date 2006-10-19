@@ -144,7 +144,6 @@ public class AverageVisitor implements FeatureCalc {
     /**
      * Returns a CalcResult object (containing the Average)
      *
-     * @return
      */
     public CalcResult getResult() {
         return new AverageResult(strategy, isOptimized);
@@ -349,7 +348,6 @@ public class AverageVisitor implements FeatureCalc {
         /**
          * The sum used to calculate the average
          *
-         * @return
          */
         public Object getSum() {
             if (isOptimized) {

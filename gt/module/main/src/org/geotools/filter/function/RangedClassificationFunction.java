@@ -27,14 +27,12 @@ public abstract class RangedClassificationFunction extends
 	/**
 	 * Returns the lower bound value for the bin.
 	 * @param index
-	 * @return
 	 */
 	abstract public Object getMin(int index);
 	
 	/**
 	 * Returns the upper bound value for the bin.
 	 * @param index
-	 * @return
 	 */
 	abstract public Object getMax(int index);
 	

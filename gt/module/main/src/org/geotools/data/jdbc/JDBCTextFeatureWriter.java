@@ -255,7 +255,6 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      * @param geom
      * @param srid
      *
-     * @return
      */
     protected abstract String getGeometryInsertText(Geometry geom, int srid) throws IOException;
 
@@ -306,7 +305,6 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      *
      * @param feature
      *
-     * @return
      *
      * @throws IOException
      */
@@ -424,7 +422,6 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
      * @param live
      * @param current
      *
-     * @return
      *
      * @throws IOException
      */

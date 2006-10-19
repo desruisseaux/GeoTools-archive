@@ -186,7 +186,6 @@ public class StyleGenerator {
      * created from the colour palette, the appropriate offset is applied.
      *
      * @param index
-     * @return
      */
     private Color getColor(int index) {
         if (elseMode == ELSEMODE_IGNORE) {
@@ -312,7 +311,6 @@ public class StyleGenerator {
      * @param opacity
      * @param defaultStroke stroke used for borders
      *
-     * @return
      */
     private Symbolizer createSymbolizer(StyleBuilder sb,
         GeometryAttributeType geometryAttrType, Color color, double opacity,
@@ -370,7 +368,6 @@ public class StyleGenerator {
      *
      * @param count
      *
-     * @return
      */
     private String getRuleName(int count) {
         String strVal = new Integer(count).toString();
@@ -959,7 +956,6 @@ public class StyleGenerator {
      * </p>
      *
      * @param filter
-     * @return
      */
     private static String toExplicitStyleExpression(Filter filter) {
         short filterType = filter.getFilterType();

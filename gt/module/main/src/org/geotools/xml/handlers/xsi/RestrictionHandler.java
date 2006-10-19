@@ -346,7 +346,6 @@ public class RestrictionHandler extends XSIElementHandler {
      * </p>
      * TODO use this !
      *
-     * @return
      */
     public AnyAttributeHandler getAnyAttribute() {
         return anyAttribute;
@@ -357,7 +356,6 @@ public class RestrictionHandler extends XSIElementHandler {
      * returns the list of attribute declarations
      * </p>
      *
-     * @return
      */
     public List getAttributeDeclarations() {
         return attrDecs;
@@ -368,7 +366,6 @@ public class RestrictionHandler extends XSIElementHandler {
      * Retusn the 'base' attribute
      * </p>
      *
-     * @return
      */
     public String getBase() {
         return base;
@@ -379,7 +376,6 @@ public class RestrictionHandler extends XSIElementHandler {
      * Returns a list of Facets
      * </p>
      *
-     * @return
      */
     public List getConstraints() {
         return constraints;
@@ -390,7 +386,6 @@ public class RestrictionHandler extends XSIElementHandler {
      * Returns the id attribute
      * </p>
      *
-     * @return
      */
     public String getId() {
         return id;

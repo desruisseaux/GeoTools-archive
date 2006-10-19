@@ -46,28 +46,24 @@ public interface ServiceInfo {
     /**
      * Returns the service keywords. Maps to the Dublin Core Subject element.
      *
-     * @return
      */
     String[] getKeywords();
 
     /**
      * Returns the service description
      *
-     * @return
      */
     String getDescription();
 
     /**
      * Return the service abstract
      *
-     * @return
      */
     String getAbstract();
 
     /**
      * Return the service publisher
      *
-     * @return
      */
     URI getPublisher();
 
@@ -75,14 +71,12 @@ public interface ServiceInfo {
      * Returns the xml schema namespace for this service type. Maps to the Dublin Code Format
      * element
      *
-     * @return
      */
     URI getSchema();
 
     /**
      * Returns the service source. Maps to the Dublin Core Server Element
      *
-     * @return
      */
     URI getSource();
 

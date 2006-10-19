@@ -49,7 +49,6 @@ public class LineCoveredByFeatureLineValidationBeanInfo extends DefaultIntegrity
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

@@ -61,7 +61,6 @@ public class GeometryCoordinateSequenceTransformer {
     /**
      * Applies the transform to the provided geometry, given
      * @param g
-     * @return
      * @throws TransformException
      */
     public Geometry transform(Geometry g) throws TransformException {
@@ -142,7 +141,6 @@ public class GeometryCoordinateSequenceTransformer {
 
     /**
      * @param polygon
-     * @return
      * @throws TransformException
      */
     public Polygon transformPolygon(Polygon polygon, GeometryFactory gf) throws TransformException {

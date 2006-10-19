@@ -190,7 +190,6 @@ public class Coordinates {
      * @param factory
      * @param sequence
      *
-     * @return
      */
     public static CoordinateSequence reverse(
         CoordinateSequenceFactory factory, CoordinateSequence sequence) {

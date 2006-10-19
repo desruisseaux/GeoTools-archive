@@ -56,7 +56,6 @@ public interface AttributeWriter {
     
     /** Query whether there are other rows in the attribute writer.
      * 
-     * @return
      * @throws IOException
      * @see FeatureWriter#hasNext()
      */

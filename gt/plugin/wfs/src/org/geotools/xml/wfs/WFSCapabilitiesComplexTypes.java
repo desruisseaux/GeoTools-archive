@@ -688,7 +688,6 @@ public class WFSCapabilitiesComplexTypes {
         }
         /**
          * @see org.geotools.xml.schema.ComplexType#isMixed()
-         * @return
          */
         public boolean isMixed() {
             return true;

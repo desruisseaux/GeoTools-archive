@@ -206,7 +206,6 @@ public class QuadTree {
     
     /**
      * 
-     * @return
      */
     public boolean trim() throws StoreException {
         LOGGER.fine("Trimming the tree...");

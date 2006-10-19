@@ -147,7 +147,6 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
     }
 
 	/**
-	 * @return
 	 */
 	public double[] getArray() {
 		return coords;
@@ -163,7 +162,6 @@ public class LiteCoordinateSequence extends PackedCoordinateSequence{
 	/**
 	 *  if this is a dimension=2 seq, then this is the same as getArray().
 	 *  If its >2 dims this will make a new array with dim=2
-	 * @return
 	 */
 	public double[] getXYArray()
 	{

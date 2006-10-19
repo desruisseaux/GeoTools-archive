@@ -91,7 +91,6 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
     /**
      * Performs optimized count if possible.
      *
-     * @return
      *
      * @throws IOException
      *

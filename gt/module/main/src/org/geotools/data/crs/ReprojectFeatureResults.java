@@ -215,7 +215,6 @@ public class ReprojectFeatureResults extends DataFeatureCollection implements Fe
     /**
      * Returns the feature results wrapped by this reprojecting feature results
      *
-     * @return
      */
     public FeatureResults getOrigin() {
         return results;

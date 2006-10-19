@@ -165,7 +165,6 @@ public class SimpleTypeHandler extends XSIElementHandler {
      *
      * @param finaL
      *
-     * @return
      */
     public static int findFinal(String finaL) {
         if ((finaL == null) || "".equalsIgnoreCase(finaL)) {
@@ -209,7 +208,6 @@ public class SimpleTypeHandler extends XSIElementHandler {
      * returns the simpletype's name
      * </p>
      *
-     * @return
      */
     public String getName() {
         return name;
@@ -222,7 +220,6 @@ public class SimpleTypeHandler extends XSIElementHandler {
      *
      * @param parent
      *
-     * @return
      */
     protected SimpleType compress(SchemaHandler parent) {
         logger.info("Start compressing SimpleType " + getName());

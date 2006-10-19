@@ -47,7 +47,6 @@ public class LineNoDanglesValidationBeanInfo extends LineAbstractValidationBeanI
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

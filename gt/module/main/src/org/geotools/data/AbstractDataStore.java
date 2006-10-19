@@ -542,7 +542,6 @@ public abstract class AbstractDataStore implements DataStore {
      * By default AbstractDataStore makes use of InProcessLockingManager.
      * </p>
      *
-     * @return
      *
      * @see org.geotools.data.DataStore#getLockingManager()
      */

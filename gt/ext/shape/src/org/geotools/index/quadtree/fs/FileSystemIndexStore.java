@@ -166,7 +166,6 @@ public class FileSystemIndexStore implements IndexStore {
      *
      * @param node
      *
-     * @return
      *
      * @throws StoreException DOCUMENT ME!
      */
@@ -247,7 +246,6 @@ public class FileSystemIndexStore implements IndexStore {
      *
      * @param order
      *
-     * @return
      */
     private static ByteOrder byteToOrder(byte order) {
         ByteOrder ret = null;

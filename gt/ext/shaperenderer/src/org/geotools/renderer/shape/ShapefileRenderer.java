@@ -695,7 +695,6 @@ public class ShapefileRenderer implements GTRenderer {
 	 * @param dbfreader
 	 * @param id
 	 *            DOCUMENT ME!
-	 * @return
 	 * @throws Exception
 	 */
 	Feature createFeature(FeatureType type, Record record,
@@ -727,7 +726,6 @@ public class ShapefileRenderer implements GTRenderer {
 	 * DOCUMENT ME!
 	 * 
 	 * @param defaultGeometry
-	 * @return
 	 */
 	private Object getGeom(GeometryAttributeType defaultGeometry) {
 		if (defaultGeom == null) {
@@ -754,7 +752,6 @@ public class ShapefileRenderer implements GTRenderer {
 	 * @param style
 	 * @param schema
 	 *            DOCUMENT ME!
-	 * @return
 	 * @throws FactoryConfigurationError
 	 * @throws SchemaException
 	 */
@@ -926,7 +923,6 @@ public class ShapefileRenderer implements GTRenderer {
 	 * 
 	 * @param mathTransform
 	 *            DOCUMENT ME!
-	 * @return
 	 * @throws org.opengis.referencing.operation.NoninvertibleTransformException
 	 */
 	private Decimator getDecimator(MathTransform mathTransform)
@@ -953,7 +949,6 @@ public class ShapefileRenderer implements GTRenderer {
 	 * 
 	 * @param geom
 	 *            the geometry to wrap
-	 * @return
 	 * @throws TransformException
 	 * @throws FactoryException
 	 * @throws RuntimeException
@@ -1008,7 +1003,6 @@ public class ShapefileRenderer implements GTRenderer {
 	 * @param geom
 	 * @param isPolygon
 	 *            DOCUMENT ME!
-	 * @return
 	 */
 	private double[] getPointSample(SimpleGeometry geom, boolean isPolygon) {
 		int largestPart = 0;
@@ -1027,7 +1021,6 @@ public class ShapefileRenderer implements GTRenderer {
 	 * DOCUMENT ME!
 	 * 
 	 * @param geom
-	 * @return
 	 */
 	private Shape getShape(SimpleGeometry geom) {
 		if ((geom.type == ShapeType.ARC) || (geom.type == ShapeType.ARCM)

@@ -66,7 +66,6 @@ public class VPFFeatureReader
      * 
      * @param file
      * @param row
-     * @return
      */
     private Map generateFileRowMap(VPFFile file, Feature row)
             throws IOException{

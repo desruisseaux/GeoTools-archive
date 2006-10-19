@@ -49,7 +49,6 @@ public class DomainValidationBeanInfo extends DefaultFeatureValidationBeanInfo {
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

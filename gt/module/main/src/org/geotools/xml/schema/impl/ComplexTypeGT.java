@@ -89,7 +89,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getParent ...
      * 
      * @see org.geotools.xml.schema.ComplexType#getParent()
-     * @return
      */
     public Type getParent() {
         return parent;
@@ -99,7 +98,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for isAbstract ...
      * 
      * @see org.geotools.xml.schema.ComplexType#isAbstract()
-     * @return
      */
     public boolean isAbstract() {
         return _abstract;
@@ -109,7 +107,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getAnyAttributeNameSpace ...
      * 
      * @see org.geotools.xml.schema.ComplexType#getAnyAttributeNameSpace()
-     * @return
      */
     public String getAnyAttributeNameSpace() {
         return anyAtrNS;
@@ -119,7 +116,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getAttributes ...
      * 
      * @see org.geotools.xml.schema.ComplexType#getAttributes()
-     * @return
      */
     public Attribute[] getAttributes() {
         return attrs;
@@ -129,7 +125,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getBlock ...
      * 
      * @see org.geotools.xml.schema.ComplexType#getBlock()
-     * @return
      */
     public int getBlock() {
         return Schema.NONE;
@@ -139,7 +134,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getChild ...
      * 
      * @see org.geotools.xml.schema.ComplexType#getChild()
-     * @return
      */
     public ElementGrouping getChild() {
         return child;
@@ -149,7 +143,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getChildElements ...
      * 
      * @see org.geotools.xml.schema.ComplexType#getChildElements()
-     * @return
      */
     public Element[] getChildElements() {
         return elems;
@@ -159,7 +152,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getFinal ...
      * 
      * @see org.geotools.xml.schema.ComplexType#getFinal()
-     * @return
      */
     public int getFinal() {
         return Schema.NONE;
@@ -169,7 +161,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getId ...
      * 
      * @see org.geotools.xml.schema.ComplexType#getId()
-     * @return
      */
     public String getId() {
         return id;
@@ -179,7 +170,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for isMixed ...
      * 
      * @see org.geotools.xml.schema.ComplexType#isMixed()
-     * @return
      */
     public boolean isMixed() {
         return mixed;
@@ -189,7 +179,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for isDerived ...
      * 
      * @see org.geotools.xml.schema.ComplexType#isDerived()
-     * @return
      */
     public boolean isDerived() {
         return derived;
@@ -201,7 +190,6 @@ public class ComplexTypeGT implements ComplexType {
      * @see org.geotools.xml.schema.ComplexType#cache(org.geotools.xml.schema.Element, java.util.Map)
      * @param element
      * @param hints
-     * @return
      */
     public boolean cache( Element element, Map hints ) {
         return true;
@@ -215,7 +203,6 @@ public class ComplexTypeGT implements ComplexType {
      * @param value
      * @param attrs1
      * @param hints
-     * @return
      * @throws SAXException
      * @throws OperationNotSupportedException
      * @throws SAXException 
@@ -229,7 +216,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getName ...
      * 
      * @see org.geotools.xml.schema.Type#getName()
-     * @return
      */
     public String getName() {
         return name;
@@ -239,7 +225,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getNamespace ...
      * 
      * @see org.geotools.xml.schema.Type#getNamespace()
-     * @return
      */
     public URI getNamespace() {
         return ns;
@@ -249,7 +234,6 @@ public class ComplexTypeGT implements ComplexType {
      * TODO summary sentence for getInstanceType ...
      * 
      * @see org.geotools.xml.schema.Type#getInstanceType()
-     * @return
      */
     public Class getInstanceType() {
         return null;
@@ -262,7 +246,6 @@ public class ComplexTypeGT implements ComplexType {
      * @param element
      * @param value
      * @param hints
-     * @return
      */
     public boolean canEncode( Element element, Object value, Map hints ) {
         return false;
@@ -289,7 +272,6 @@ public class ComplexTypeGT implements ComplexType {
      * 
      * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
      * @param name1
-     * @return
      */
     public Element findChildElement( String name1 ) {
         return getChild()!=null?getChild().findChildElement(name1):null;

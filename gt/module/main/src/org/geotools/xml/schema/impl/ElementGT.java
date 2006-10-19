@@ -80,7 +80,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for isAbstract ...
      * 
      * @see org.geotools.xml.schema.Element#isAbstract()
-     * @return
      */
     public boolean isAbstract() {
         return _abstract;
@@ -90,7 +89,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getBlock ...
      * 
      * @see org.geotools.xml.schema.Element#getBlock()
-     * @return
      */
     public int getBlock() {
         return Schema.NONE;
@@ -100,7 +98,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getDefault ...
      * 
      * @see org.geotools.xml.schema.Element#getDefault()
-     * @return
      */
     public String getDefault() {
         return null;
@@ -110,7 +107,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getFinal ...
      * 
      * @see org.geotools.xml.schema.Element#getFinal()
-     * @return
      */
     public int getFinal() {
         return Schema.NONE;
@@ -120,7 +116,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getFixed ...
      * 
      * @see org.geotools.xml.schema.Element#getFixed()
-     * @return
      */
     public String getFixed() {
         return null;
@@ -130,7 +125,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for isForm ...
      * 
      * @see org.geotools.xml.schema.Element#isForm()
-     * @return
      */
     public boolean isForm() {
         return false;
@@ -140,7 +134,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getId ...
      * 
      * @see org.geotools.xml.schema.Element#getId()
-     * @return
      */
     public String getId() {
         return id;
@@ -150,7 +143,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getMaxOccurs ...
      * 
      * @see org.geotools.xml.schema.ElementGrouping#getMaxOccurs()
-     * @return
      */
     public int getMaxOccurs() {
         return max;
@@ -160,7 +152,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getMinOccurs ...
      * 
      * @see org.geotools.xml.schema.ElementGrouping#getMinOccurs()
-     * @return
      */
     public int getMinOccurs() {
         return min;
@@ -170,7 +161,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getName ...
      * 
      * @see org.geotools.xml.schema.Element#getName()
-     * @return
      */
     public String getName() {
         return name;
@@ -180,7 +170,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getNamespace ...
      * 
      * @see org.geotools.xml.schema.Element#getNamespace()
-     * @return
      */
     public URI getNamespace() {
         return ns;
@@ -190,7 +179,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for isNillable ...
      * 
      * @see org.geotools.xml.schema.Element#isNillable()
-     * @return
      */
     public boolean isNillable() {
         return nillable;
@@ -200,7 +188,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getSubstitutionGroup ...
      * 
      * @see org.geotools.xml.schema.Element#getSubstitutionGroup()
-     * @return
      */
     public Element getSubstitutionGroup() {
         return sub;
@@ -210,7 +197,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getType ...
      * 
      * @see org.geotools.xml.schema.Element#getType()
-     * @return
      */
     public Type getType() {
         return type;
@@ -220,7 +206,6 @@ public class ElementGT implements Element {
      * TODO summary sentence for getGrouping ...
      * 
      * @see org.geotools.xml.schema.ElementGrouping#getGrouping()
-     * @return
      */
     public int getGrouping() {
         return ElementGrouping.ELEMENT;
@@ -231,7 +216,6 @@ public class ElementGT implements Element {
      * 
      * @see org.geotools.xml.schema.ElementGrouping#findChildElement(java.lang.String)
      * @param name1
-     * @return
      */
     public Element findChildElement( String name1 ) {
         return (getName()!=null && getName().equals(name1))?this:null;

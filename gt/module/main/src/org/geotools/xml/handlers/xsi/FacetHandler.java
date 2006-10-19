@@ -88,7 +88,6 @@ public abstract class FacetHandler extends XSIElementHandler {
      * Return the int mask for the facet type.
      * </p>
      *
-     * @return
      */
     public abstract int getType();
 
@@ -127,7 +126,6 @@ public abstract class FacetHandler extends XSIElementHandler {
      * Returns the Facet Value
      * </p>
      *
-     * @return
      */
     public String getValue() {
         return value;

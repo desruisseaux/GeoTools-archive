@@ -84,7 +84,6 @@ public class DefaultServiceFinder implements ServiceFinder {
      *
      * @param target
      *
-     * @return
      *
      * @see net.refractions.udig.catalog.IServiceFactory#aquire(java.net.URL)
      */

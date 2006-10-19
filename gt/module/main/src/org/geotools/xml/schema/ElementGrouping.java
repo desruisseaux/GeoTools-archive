@@ -81,7 +81,6 @@ public interface ElementGrouping {
      * dealing with.
      * </p>
      *
-     * @return
      */
     public int getGrouping();
 
@@ -106,7 +105,6 @@ public interface ElementGrouping {
      * this construct.
      * </p>
      *
-     * @return
      */
     public int getMaxOccurs();
 
@@ -116,7 +114,6 @@ public interface ElementGrouping {
      * this construct.
      * </p>
      *
-     * @return
      */
     public int getMinOccurs();
 

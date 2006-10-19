@@ -70,7 +70,6 @@ public class IndexInfo {
      * RTree query
      * 
      * @param bbox
-     * @return
      * @throws DataSourceException
      * @throws IOException
      */
@@ -99,7 +98,6 @@ public class IndexInfo {
      * QuadTree Query
      * 
      * @param bbox
-     * @return
      * @throws DataSourceException
      * @throws IOException
      * @throws TreeException DOCUMENT ME!

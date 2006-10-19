@@ -202,7 +202,6 @@ public class SchemaFactory {
      *
      * @param targetNamespace
      *
-     * @return
      *
      * @see #registerSchema(Strin,Schema)
      */

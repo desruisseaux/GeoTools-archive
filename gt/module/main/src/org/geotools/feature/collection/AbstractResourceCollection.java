@@ -379,7 +379,6 @@ public abstract class AbstractResourceCollection implements ResourceCollection {
      * Note: If you return a ResourceIterator, the default implemntation of close( Iterator )
      * will know what to do.
      * 
-     * @return
      */
     final public Iterator iterator(){    	
     	Iterator iterator = openIterator();

@@ -166,7 +166,6 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * </p>
      * If the feature has no geometry, then an empty envelope is returned.
      *
-     * @return
      *
      * @throws DataSourceException See IOException
      *
@@ -216,7 +215,6 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * FeatureSource.getCount( Query ).
      * </p>
      *
-     * @return
      *
      * @throws IOException If feature could not be read
      * @throws DataSourceException See IOException

@@ -89,7 +89,6 @@ public class IncludeHandler extends XSIElementHandler {
      * returns the schemaLocation attribute
      * </p>
      *
-     * @return
      */
     public String getSchemaLocation() {
         return schemaLocation;

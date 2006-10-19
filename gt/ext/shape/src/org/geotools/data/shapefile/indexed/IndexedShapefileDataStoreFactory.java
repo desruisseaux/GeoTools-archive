@@ -153,7 +153,6 @@ public class IndexedShapefileDataStoreFactory
      *
      * @param params
      *
-     * @return
      *
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException
@@ -256,7 +255,6 @@ public class IndexedShapefileDataStoreFactory
     /**
      * Describe parameters.
      *
-     * @return
      *
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */

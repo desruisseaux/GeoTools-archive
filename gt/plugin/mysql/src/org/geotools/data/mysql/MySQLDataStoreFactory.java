@@ -202,7 +202,6 @@ public class MySQLDataStoreFactory
      *
      * @param params
      *
-     * @return
      *
      * @throws IOException See UnsupportedOperationException
      * @throws UnsupportedOperationException Cannot create new database
@@ -262,7 +261,6 @@ public class MySQLDataStoreFactory
     /**
      * Describe parameters.
      *
-     * @return
      *
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */

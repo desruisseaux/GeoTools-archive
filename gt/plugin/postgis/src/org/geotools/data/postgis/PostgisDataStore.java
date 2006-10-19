@@ -266,7 +266,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /**
      * Allows subclass to create LockingManager to support their needs.
      *
-     * @return
      */
     protected LockingManager createLockingManager() {
         return new InProcessLockingManager();
@@ -794,7 +793,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @param tableName
      * @param geometryColumnName
      *
-     * @return
      *
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException DOCUMENT ME!
@@ -1301,7 +1299,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 //     *
 //     * @param typeCode
 //     *
-//     * @return
 //     *
 //     * @throws RuntimeException DOCUMENT ME!
 //     */
@@ -1398,7 +1395,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @param table
      * @param con
      *
-     * @return
      *
      * @throws IOException DOCUMENT ME!
      * @throws DataSourceException DOCUMENT ME!
@@ -1444,7 +1440,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @param query
      *
-     * @return
      *
      * @throws IOException DOCUMENT ME!
      */
@@ -1459,7 +1454,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @param query
      *
-     * @return
      *
      * @throws IOException
      */
@@ -1545,7 +1539,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @param fReader
      * @param queryData
      *
-     * @return
      *
      * @throws IOException DOCUMENT ME!
      */
@@ -1584,7 +1577,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @param typeName
      * @param transaction
      *
-     * @return
      *
      * @throws IOException
      *
@@ -1625,7 +1617,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @param typeName
      * @param transaction
      *
-     * @return
      *
      * @throws IOException
      *
@@ -1672,7 +1663,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * Returns true if the WKB format is used to transfer geometries, false
      * otherwise
      *
-     * @return
      */
     public boolean isWKBEnabled() {
         return WKBEnabled;
@@ -1715,7 +1705,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * Returns true if the data store is using the bytea function to fasten WKB
      * data transfer, false otherwise
      *
-     * @return
      */
     public boolean isByteaEnabled() {
         return byteaEnabled;

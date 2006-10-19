@@ -388,7 +388,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @param readP
 	 * @param requestedEnvelope
 	 * @param dim
-	 * @param source
+	 * 
 	 * @throws IOException
 	 * @throws TransformException
 	 */
@@ -505,8 +505,7 @@ public abstract class AbstractGridCoverage2DReader implements
 	 * @param imageChoice
 	 * @param readP
 	 * @param requestedRes
-	 * @param hrHeight2
-	 * @param hrWidth2
+	 * 
 	 */
 	protected final void decimationOnReadingControl(Integer imageChoice,
 			ImageReadParam readP, double[] requestedRes) {
@@ -569,10 +568,8 @@ public abstract class AbstractGridCoverage2DReader implements
 
 	/**
 	 * @param image
-	 * @param crs
-	 * @param r2m
-	 * @param string
-	 * @return
+	 * 
+	 * 
 	 * @throws IOException
 	 */
 	protected final GridCoverage createImageCoverage(PlanarImage image)

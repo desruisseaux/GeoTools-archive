@@ -307,7 +307,6 @@ public class MemoryDataStore extends AbstractDataStore {
      *
      * @param typeName
      *
-     * @return
      *
      * @throws IOException If typeName could not be found
      * @throws DataSourceException See IOException

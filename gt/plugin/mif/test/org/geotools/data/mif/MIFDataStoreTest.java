@@ -436,7 +436,6 @@ public class MIFDataStoreTest extends TestCase {
      * @param featureTypeName
      * @param filter
      *
-     * @return
      *
      * @throws Exception
      */
@@ -453,7 +452,6 @@ public class MIFDataStoreTest extends TestCase {
      *
      * @param featureTypeName
      *
-     * @return
      *
      * @throws Exception
      */

@@ -917,7 +917,6 @@ public final class StreamingRenderer implements GTRenderer {
 	 * --> false if no fid filter --> true
 	 * 
 	 * @param query
-	 * @return
 	 */
 	private boolean doesntHaveFIDFilter(Query query) {
 		FIDFilterFinder finder = new FIDFilterFinder();
@@ -1034,7 +1033,6 @@ public final class StreamingRenderer implements GTRenderer {
 	 * find out the maximum number of filters we're going to send off to the
 	 * datastore. See processRuleForQuery() for details.
 	 * 
-	 * @return
 	 */
 	private int getMaxFiltersToSendToDatastore() {
 		try {
@@ -1051,7 +1049,6 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	/**
-	 * @return
 	 */
 	private boolean isMemoryPreloadingEnabled() {
 		if (rendererHints == null)
@@ -1240,7 +1237,6 @@ public final class StreamingRenderer implements GTRenderer {
 	 * 
 	 * @param featureStylers
 	 * @param features
-	 * @return
 	 * @throws Exception
 	 */
 	private ArrayList createLiteFeatureTypeStyles(
@@ -1655,7 +1651,6 @@ public final class StreamingRenderer implements GTRenderer {
 	 * 
 	 * @param g
 	 * @param transform
-	 * @return
 	 * @throws TransformException
 	 * @throws FactoryException
 	 */
@@ -1669,7 +1664,6 @@ public final class StreamingRenderer implements GTRenderer {
 	private HashMap decimators = new HashMap();
 
 	/**
-	 * @return
 	 * @throws org.opengis.referencing.operation.NoninvertibleTransformException
 	 */
 	private Decimator getDecimator(MathTransform2D mathTransform)
@@ -1809,7 +1803,6 @@ public final class StreamingRenderer implements GTRenderer {
 	 * of each sub-geom
 	 * 
 	 * @param g
-	 * @return
 	 */
 	private Geometry getCentroid(Geometry g) {
 		if (g instanceof GeometryCollection) {
@@ -1898,7 +1891,6 @@ public final class StreamingRenderer implements GTRenderer {
 	 * painting
 	 * </p>
 	 * 
-	 * @return
 	 */
 	private boolean isOptimizedDataLoadingEnabled() {
 		if (rendererHints == null)
@@ -1913,7 +1905,6 @@ public final class StreamingRenderer implements GTRenderer {
 	/**
 	 * Returns the generalization distance in the screen space.
 	 * 
-	 * @return
 	 */
 	public double getGeneralizationDistance() {
 		return generalizationDistance;

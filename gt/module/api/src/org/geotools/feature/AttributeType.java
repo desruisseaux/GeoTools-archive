@@ -116,14 +116,12 @@ public interface AttributeType {
     /**
      * Returns the Min number of occurences ...
      *
-     * @return
      */
     int getMinOccurs();
 
     /**
      * Returns the Max number of occurences ...
      *
-     * @return
      */
     int getMaxOccurs();
 

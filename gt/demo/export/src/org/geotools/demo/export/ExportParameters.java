@@ -75,7 +75,6 @@ public class ExportParameters {
      * needed schema/query
      * </p>
      *
-     * @return
      *
      * @throws IllegalStateException if:<br>
      *         1- Some of the mandatory parameters (featureSource and

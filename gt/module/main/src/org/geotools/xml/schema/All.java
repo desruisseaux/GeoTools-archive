@@ -35,7 +35,6 @@ public interface All extends ElementGrouping {
      * document.
      * </p>
      *
-     * @return
      */
     public Element[] getElements();
 
@@ -44,7 +43,6 @@ public interface All extends ElementGrouping {
      * Returns the element declaration's id for this schema element.
      * </p>
      *
-     * @return
      */
     public String getId();
 

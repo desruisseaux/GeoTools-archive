@@ -107,7 +107,6 @@ public final class SDO {
      *
      * @param geom
      *
-     * @return
      */
     public static int gType(Geometry geom) {
         int d = D(geom) * 1000;
@@ -263,7 +262,6 @@ public final class SDO {
      *
      * @param geom
      *
-     * @return
      */
     public static double[] point(Geometry geom) {
         if (geom instanceof Point && (L(geom) == 0)) {
@@ -662,7 +660,6 @@ public final class SDO {
      *
      * @param geom
      *
-     * @return
      */
     public static int elemInfoInterpretation(Geometry geom) {
         return elemInfoInterpretation(geom, elemInfoEType(geom));
@@ -799,7 +796,6 @@ public final class SDO {
      *
      * @param geom
      *
-     * @return
      */
     public static double[] ordinates(Geometry geom) {
         List list = new ArrayList();
@@ -865,7 +861,6 @@ public final class SDO {
 	 * Description ...
 	 * </p>
 	 * @param string
-	 * @return
 	 */
 	private static CoordinateSequence getLineStringCS(LineString ls) {
 		if (ls.getCoordinateSequence() instanceof CoordinateAccess)
@@ -987,7 +982,6 @@ public final class SDO {
      * </p>
      * @param access
      * @param index
-     * @return
      */
 	private static double[] doubleOrdinateArray(CoordinateAccess access, int index) {
 		final int D = access.getDimension();
@@ -1173,7 +1167,6 @@ public final class SDO {
      * @param coords
      * @param ordinate
      *
-     * @return
      */
     public static double[] ordinateArray(CoordinateSequence coords, int ordinate) {
         if (coords instanceof CoordinateAccess) {
@@ -1241,7 +1234,6 @@ public final class SDO {
      * @param array
      * @param ordinate
      *
-     * @return
      */
     public static double[] ordinateArray(Coordinate[] array, int ordinate) {
         if (array == null) {
@@ -1321,7 +1313,6 @@ public final class SDO {
      * @deprecated Do not use me, I am broken
      * @param list
      * @param ordinate
-     * @return
      */
     /*
     //TODO: check if I am correct
@@ -1394,7 +1385,6 @@ public final class SDO {
      * @param list
      * @param geom
      *
-     * @return
      */
     public static double[] ordinates(List list, Geometry geom) {
         LOGGER.finest( "ordinates D:" + D(geom));
@@ -1720,7 +1710,6 @@ public final class SDO {
      * @param elemInfo
      * @param triplet
      *
-     * @return
      */
     private static CoordinateSequence subList(
         CoordinateSequenceFactory factory, CoordinateSequence coords,
@@ -1821,7 +1810,6 @@ public final class SDO {
      * @param list
      * @param type
      *
-     * @return
      */
     private static Object toArray(List list, Class type) {
         if (list == null) {
@@ -1965,7 +1953,6 @@ public final class SDO {
      * </p>
      * @param coords
      * @param GTYPE
-     * @return
      */
     private static int ordinateSize( CoordinateSequence coords, int GTYPE ){
         if( coords == null ){
@@ -2058,7 +2045,6 @@ public final class SDO {
      * @param GTYPE Encoding of <b>D</b>imension, <b>L</b>RS and <b>TT</b>ype
      * @param ordinates
      *
-     * @return
      *
      * @throws IllegalArgumentException DOCUMENT ME!
      */
@@ -2404,7 +2390,6 @@ public final class SDO {
      * @param triplet
      * @param coords
      *
-     * @return
      *
      * @throws IllegalArgumentException If asked to create a curve
      */
@@ -2678,7 +2663,6 @@ HOLES:
      * @param triplet Triplet in elemInfo to process as a Polygon
      * @param coords Coordinates to interpret using elemInfo
      *
-     * @return
      */
     private static MultiPoint createMultiPoint(GeometryFactory gf,
         final int GTYPE, final int SRID, final int[] elemInfo,
@@ -2740,7 +2724,6 @@ HOLES:
      * @param coords Coordinates to interpret using elemInfo
      * @param N Number of triplets (or -1 for rest)
      *
-     * @return
      */
     private static MultiLineString createMultiLine(GeometryFactory gf,
         final int GTYPE, final int SRID, final int[] elemInfo,
@@ -2813,7 +2796,6 @@ LINES: 		// bad bad gotos jody
      * @param coords Coordinates to interpret using elemInfo
      * @param N Number of triplets (or -1 for rest)
      *
-     * @return
      */
     private static MultiPolygon createMultiPolygon(GeometryFactory gf,
         final int GTYPE, final int SRID, final int[] elemInfo,

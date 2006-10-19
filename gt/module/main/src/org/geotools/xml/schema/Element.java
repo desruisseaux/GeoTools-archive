@@ -33,7 +33,6 @@ public interface Element extends ElementGrouping {
      * false otherwise
      * </p>
      *
-     * @return
      */
     public boolean isAbstract();
 
@@ -47,7 +46,6 @@ public interface Element extends ElementGrouping {
      * This returns the default value for the Element as a String
      * </p>
      *
-     * @return
      */
     public String getDefault();
 
@@ -61,7 +59,6 @@ public interface Element extends ElementGrouping {
      * This returns the fixed value for the Element as a String
      * </p>
      *
-     * @return
      */
     public String getFixed();
 
@@ -75,7 +72,6 @@ public interface Element extends ElementGrouping {
      * The Schema ID for this element definition.
      * </p>
      *
-     * @return
      */
     public String getId();
 
@@ -95,14 +91,12 @@ public interface Element extends ElementGrouping {
      * element name in the instance document.
      * </p>
      *
-     * @return
      */
     public String getName();
 
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public URI getNamespace();
 
@@ -111,7 +105,6 @@ public interface Element extends ElementGrouping {
      * Returns true when the element is nillable, false otherwise
      * </p>
      *
-     * @return
      */
     public boolean isNillable();
 
@@ -122,7 +115,6 @@ public interface Element extends ElementGrouping {
      * instance document's value.
      * </p>
      *
-     * @return
      */
     public Element getSubstitutionGroup();
 
@@ -131,7 +123,6 @@ public interface Element extends ElementGrouping {
      * Returns the declared type for this Element in the given Schema.
      * </p>
      *
-     * @return
      *
      * @see Type
      */

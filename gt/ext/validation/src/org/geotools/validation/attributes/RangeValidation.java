@@ -92,7 +92,6 @@ public class RangeValidation extends DefaultFeatureValidation {
      * @param type
      * @param results
      *
-     * @return
      *
      * @see org.geotools.validation.FeatureValidation#validate(org.geotools.feature.Feature,
      *      org.geotools.feature.FeatureType,
@@ -129,7 +128,6 @@ public class RangeValidation extends DefaultFeatureValidation {
      * Description ...
      * </p>
      *
-     * @return
      *
      * @see org.geotools.validation.Validation#getPriority()
      */
@@ -144,7 +142,6 @@ public class RangeValidation extends DefaultFeatureValidation {
      * Description ...
      * </p>
      *
-     * @return
      */
     public int getMax() {
         return max;
@@ -157,7 +154,6 @@ public class RangeValidation extends DefaultFeatureValidation {
      * Description ...
      * </p>
      *
-     * @return
      */
     public int getMin() {
         return min;
@@ -170,7 +166,6 @@ public class RangeValidation extends DefaultFeatureValidation {
      * Description ...
      * </p>
      *
-     * @return
      * @task REVISIT: This wasn't compiling for me, as its parent sets
      * this as final.  If needed for some reason then fix it.  But it
      * looks like it should inherit ok... ch

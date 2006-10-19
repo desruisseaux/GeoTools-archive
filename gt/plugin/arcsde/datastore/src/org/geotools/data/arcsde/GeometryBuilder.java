@@ -433,7 +433,6 @@ public abstract class GeometryBuilder {
 	 * 
 	 * @param jtsGeometryClass
 	 * 
-	 * @return
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if <code>jtsGeometryClass</code> is not a concrete JTS
@@ -860,7 +859,6 @@ public abstract class GeometryBuilder {
 		 * 
 		 * @param coords
 		 * 
-		 * @return
 		 * 
 		 * @throws DataSourceException
 		 */

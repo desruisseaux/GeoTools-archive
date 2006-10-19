@@ -113,7 +113,6 @@ public class RoadNetworkValidationResults implements ValidationResults {
 	 * <p>
 	 * Description ...
 	 * </p>
-	 * @return
 	 */
 	public String[] getFailedMessages()
 	{
@@ -132,7 +131,6 @@ public class RoadNetworkValidationResults implements ValidationResults {
 	 * <p>
 	 * Description ...
 	 * </p>
-	 * @return
 	 */
 	public String[] getWarningMessages()
 	{

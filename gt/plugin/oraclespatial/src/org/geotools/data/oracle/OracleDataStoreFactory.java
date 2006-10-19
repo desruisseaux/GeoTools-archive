@@ -184,7 +184,6 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
     /**
      * Oracle cannot create a new database.
      * @param params
-     * @return
      * @throws UnsupportedOperationException Cannot create new database
      */
     public DataStore createNewDataStore(Map params) throws IOException {
@@ -276,7 +275,6 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
      * Describe parameters.
      * 
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
-     * @return
      */
     public Param[] getParametersInfo() {
         return new Param[]{

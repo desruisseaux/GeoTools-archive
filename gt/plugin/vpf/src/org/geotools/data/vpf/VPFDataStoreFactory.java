@@ -110,7 +110,6 @@ public class VPFDataStoreFactory implements DataStoreFactorySpi {
     /**
      * Creates a data store.
      * @param params A <code>Map</code> of parameters which must be verified and 
-     * @return
      * @throws IOException
      */
     private DataStore create(Map params) throws IOException {

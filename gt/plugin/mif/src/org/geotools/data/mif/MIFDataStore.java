@@ -199,7 +199,6 @@ public class MIFDataStore extends AbstractDataStore {
      *
      * @param typeName
      *
-     * @return
      *
      * @throws IOException
      */
@@ -226,7 +225,6 @@ public class MIFDataStore extends AbstractDataStore {
      *
      * @param typeName
      *
-     * @return
      *
      * @throws IOException
      */
@@ -258,7 +256,6 @@ public class MIFDataStore extends AbstractDataStore {
      *
      * @param typeName
      *
-     * @return
      */
     private MIFFile getMIFFile(String typeName) {
         MIFFileHolder mifHolder = (MIFFileHolder) mifFileHolders.get(typeName);

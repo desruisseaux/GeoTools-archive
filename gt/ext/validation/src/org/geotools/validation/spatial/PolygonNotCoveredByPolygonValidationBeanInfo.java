@@ -47,7 +47,6 @@ public class PolygonNotCoveredByPolygonValidationBeanInfo extends PolygonPolygon
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

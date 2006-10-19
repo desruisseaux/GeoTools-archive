@@ -63,14 +63,12 @@ public interface Facet {
     /**
      * The Facet Type -- selected from one of the above constant values
      *
-     * @return
      */
     public int getFacetType();
 
     /**
      * The facet's constraint
      *
-     * @return
      */
     public String getValue();
 }

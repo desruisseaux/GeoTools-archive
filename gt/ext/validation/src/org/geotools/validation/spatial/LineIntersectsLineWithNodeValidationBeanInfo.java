@@ -47,7 +47,6 @@ public class LineIntersectsLineWithNodeValidationBeanInfo extends LineLineAbstra
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

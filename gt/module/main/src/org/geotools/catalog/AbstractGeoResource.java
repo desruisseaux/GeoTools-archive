@@ -89,7 +89,6 @@ public abstract class AbstractGeoResource implements GeoResource {
      *
      * @param other
      *
-     * @return
      *
      * @see Object#equals(java.lang.Object)
      */
@@ -138,7 +137,6 @@ public abstract class AbstractGeoResource implements GeoResource {
     /**
      * This should represent the identified
      *
-     * @return
      *
      * @see Object#hashCode()
      */

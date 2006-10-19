@@ -45,7 +45,6 @@ public class Schema {
      * Walk the provided FeatureType and produce a count of distinct attribtues.
      * 
      * @param featureType
-     * @return
      */
     public static int attribtueCount( FeatureType featureType ) {
 //      used to detect duplicate attributes names (ie override)
@@ -175,7 +174,6 @@ public class Schema {
      * 
      * @param featureType
      * @param name
-     * @return
      */
     public static Filter restriction( FeatureType featureType, String name ){
         if( featureType == null || featureType.getAttributeTypes() == null ) return Filter.ALL;
@@ -221,7 +219,6 @@ public class Schema {
      * Lookup can only really be by name.
      * 
      * @param type
-     * @return
      */
     public static int find( FeatureType type, String name ) {
         List names = names( type );
@@ -233,7 +230,6 @@ public class Schema {
      * @param type  the FeatureType
      * @param index the position
      * 
-     * @return
      */
     public static AttributeType attribute( FeatureType type, int index ) {
         String name = (String) names( type ).get( index );
@@ -255,7 +251,6 @@ public class Schema {
      * @param type
      * @param xpath
      * 
-     * @return
      */
     public static AttributeType xpath( FeatureType type, String xpath) {
         return attribute( type, xpath ); // for now, use JXPath later

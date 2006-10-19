@@ -109,7 +109,6 @@ public class ComplexContentHandler extends XSIElementHandler {
      * getter for the complexContent's child
      * </p>
      *
-     * @return
      */
     public Object getChild() {
         return child;

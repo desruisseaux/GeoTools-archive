@@ -134,7 +134,6 @@ public class LineIntersectsLineWithNodeValidation
      * </p>
      * @param a1
      * @param a2
-     * @return
      */
     private boolean hasPair(CoordinateSequence a1, CoordinateSequence a2){
     	int i = 0;

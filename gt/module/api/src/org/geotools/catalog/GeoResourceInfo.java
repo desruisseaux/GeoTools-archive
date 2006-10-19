@@ -44,7 +44,6 @@ public interface GeoResourceInfo {
     /**
      * Returns the resource's title
      *
-     * @return
      */
     String getTitle();
 

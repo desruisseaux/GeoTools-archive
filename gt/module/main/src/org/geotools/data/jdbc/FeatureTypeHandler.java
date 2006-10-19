@@ -70,7 +70,6 @@ public class FeatureTypeHandler {
     /**
      * Returns a list of FeatureType names contained in the parent JDBCDataStore
      *
-     * @return
      *
      * @throws IOException
      */
@@ -115,7 +114,6 @@ public class FeatureTypeHandler {
     /**
      * Really loads the list of FeatureType names from the database
      *
-     * @return
      *
      * @throws IOException
      * @throws DataSourceException DOCUMENT ME!
@@ -159,8 +157,7 @@ public class FeatureTypeHandler {
      * Performance warning: this request will always hit the database for unknown types
      *
      * @param typeName 
-     *
-     * @return 
+     * 
      *
      * @throws IOException 
      */
@@ -257,7 +254,6 @@ public class FeatureTypeHandler {
     /**
      * Returns the FIDMapperFactory used by this FeatureTypeHandler
      *
-     * @return
      */
     public FIDMapperFactory getFIDMapperFactory() {
         return fmFactory;

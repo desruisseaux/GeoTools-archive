@@ -87,7 +87,6 @@ public class JDBCFeatureReader implements FeatureReader {
 
     /**
      * Really reads the feature from the QueryData object
-     * @return
      * @throws IllegalAttributeException
      * @throws IOException
      */

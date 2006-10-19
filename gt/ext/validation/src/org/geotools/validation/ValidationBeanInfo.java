@@ -54,7 +54,6 @@ public class ValidationBeanInfo extends SimpleBeanInfo {
      * by all overriding sub-class methods.  Property names 'name',
      * 'description', 'typeNames'
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */
@@ -148,7 +147,6 @@ public class ValidationBeanInfo extends SimpleBeanInfo {
         /**
          * Implementation of getAsText.
          *
-         * @return
          *
          * @see java.beans.PropertyEditor#getAsText()
          */
@@ -176,7 +174,6 @@ public class ValidationBeanInfo extends SimpleBeanInfo {
         /**
          * Implementation of supportsCustomEditor.
          *
-         * @return
          *
          * @see java.beans.PropertyEditor#supportsCustomEditor()
          */
@@ -187,7 +184,6 @@ public class ValidationBeanInfo extends SimpleBeanInfo {
         /**
          * Implementation of getJavaInitializationString.
          *
-         * @return
          *
          * @see java.beans.PropertyEditor#getJavaInitializationString()
          */
@@ -198,7 +194,6 @@ public class ValidationBeanInfo extends SimpleBeanInfo {
         /**
          * Implementation of isPaintable.
          *
-         * @return
          *
          * @see java.beans.PropertyEditor#isPaintable()
          */
@@ -209,7 +204,6 @@ public class ValidationBeanInfo extends SimpleBeanInfo {
         /**
          * Implementation of toString.
          *
-         * @return
          *
          * @see java.lang.Object#toString()
          */
@@ -236,7 +230,6 @@ public class ValidationBeanInfo extends SimpleBeanInfo {
         /**
          * Implementation of getValue.
          *
-         * @return
          *
          * @see java.beans.PropertyEditor#getValue()
          */

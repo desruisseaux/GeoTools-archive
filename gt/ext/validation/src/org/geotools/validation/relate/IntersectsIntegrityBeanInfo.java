@@ -43,7 +43,6 @@ public class IntersectsIntegrityBeanInfo
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

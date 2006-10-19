@@ -51,7 +51,6 @@ public class PointLineAbstractValidationBeanInfo extends DefaultIntegrityValidat
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

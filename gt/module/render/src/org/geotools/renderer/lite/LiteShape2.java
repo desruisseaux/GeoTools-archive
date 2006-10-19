@@ -149,7 +149,6 @@ public final class LiteShape2 implements Shape, Cloneable {
 	/**
 	 *  changes this to a new CSF -- more efficient than the JTS way
 	 * @param geom
-	 * @return
 	 */
 	private final Geometry cloneGeometryLCS(Polygon geom) 
 	{
@@ -206,7 +205,6 @@ public final class LiteShape2 implements Shape, Cloneable {
 	/**
 	 *  changes this to a new CSF -- more efficient than the JTS way
 	 * @param geom
-	 * @return
 	 */
 	private final Geometry cloneGeometry(Polygon geom) 
 	{

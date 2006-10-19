@@ -172,7 +172,6 @@ public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
      *
      * @param params
      *
-     * @return
      *
      * @throws IOException See UnsupportedOperationException
      */
@@ -262,7 +261,6 @@ public class HsqlDataStoreFactory  implements DataStoreFactorySpi{
     /**
      * Describe parameters.
      *
-     * @return
      *
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */

@@ -49,7 +49,6 @@ public class IsValidGeometryValidationBeanInfo extends DefaultFeatureValidationB
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

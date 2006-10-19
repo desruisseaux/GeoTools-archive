@@ -37,7 +37,6 @@ public interface CSBuilder {
 	
 	/**
 	 * Stops the coordinate sequence building and returns the result
-	 * @return
 	 */
 	public CoordinateSequence end();
 
@@ -70,13 +69,11 @@ public interface CSBuilder {
 	
 	/**
 	 * Returns the size of the coordinate sequence we are building, -1 if there is none
-	 * @return
 	 */
 	public int getSize();
 	
 	/**
 	 * Returns the dimension of the coordinate sequence we are building, -1 if there is none
-	 * @return
 	 */
 	public int getDimension();
 }

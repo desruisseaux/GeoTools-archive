@@ -149,7 +149,6 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @param conn
      * @param featureType
      *
-     * @return
      *
      * @throws SQLException
      */
@@ -210,7 +209,6 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      *
      * @param type
      *
-     * @return
      */
     protected abstract String getGeometryPlaceHolder(AttributeType type);
 
@@ -262,7 +260,6 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @param feature
      * @param baseIndex
      *
-     * @return
      *
      * @throws IOException
      * @throws SQLException
@@ -291,7 +288,6 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @param conn
      * @param featureType
      *
-     * @return
      *
      * @throws SQLException
      */
@@ -368,7 +364,6 @@ public abstract class JDBCPSFeatureWriter extends JDBCFeatureWriter {
      * @param conn
      * @param featureType
      *
-     * @return
      *
      * @throws SQLException
      */

@@ -48,7 +48,6 @@ public class LockManager {
     /**
      * DOCUMENT ME!
      *
-     * @return
      *
      * @throws LockTimeoutException DOCUMENT ME!
      */
@@ -78,7 +77,6 @@ public class LockManager {
     /**
      * DOCUMENT ME!
      *
-     * @return
      *
      * @throws LockTimeoutException DOCUMENT ME!
      */

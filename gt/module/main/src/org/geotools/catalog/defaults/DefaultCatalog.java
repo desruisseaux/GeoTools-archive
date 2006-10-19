@@ -279,7 +279,6 @@ public class DefaultCatalog extends AbstractCatalog {
      *      com.vividsolutions.jts.geom.Envelope)
      * @param pattern
      * @param bbox used for an intersection test
-     * @return
      */
     public synchronized List search( String pattern, Envelope bbox,
             ProgressListener monitor ) {

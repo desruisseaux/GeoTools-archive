@@ -126,7 +126,6 @@ public class JDBCFeatureWriter implements FeatureWriter {
      * Returns true if QueryData is used to insert rows, false if some other
      * means is used
      *
-     * @return
      */
     protected boolean useQueryDataForInsert() {
         return true;

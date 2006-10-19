@@ -35,7 +35,6 @@ public interface CatalogInfo {
     /**
      * returns the catalog title May Not Block.
      *
-     * @return
      */
     String getTitle();
 
@@ -43,14 +42,12 @@ public interface CatalogInfo {
      * returns the keywords assocaited with this catalog May Not Block. Maps to
      * Dublin Core's Subject element
      *
-     * @return
      */
     String[] getKeywords();
 
     /**
      * returns the catalog description.
      *
-     * @return
      */
     String getDescription();
 
@@ -58,7 +55,6 @@ public interface CatalogInfo {
      * Returns the catalog source. May Not Block. Maps to the Dublin Core
      * Server Element
      *
-     * @return
      */
     URI getSource();
 }

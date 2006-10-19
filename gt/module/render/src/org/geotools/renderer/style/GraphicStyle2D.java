@@ -46,21 +46,18 @@ public class GraphicStyle2D extends Style2D {
     }
 
     /**
-     * @return
      */
     public BufferedImage getImage() {
         return image;
     }
 
     /**
-     * @return
      */
     public float getOpacity() {
         return opacity;
     }
 
     /**
-     * @return
      */
     public float getRotation() {
         return rotation;

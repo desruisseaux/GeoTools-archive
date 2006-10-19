@@ -37,7 +37,6 @@ public interface FIDMapperFactory {
      * @param typeName DOCUMENT ME!
      * @param connection DOCUMENT ME!
      *
-     * @return
      *
      * @throws IOException
      */
@@ -50,7 +49,6 @@ public interface FIDMapperFactory {
      *
      * @param featureType
      *
-     * @return
      */
     FIDMapper getMapper(FeatureType featureType);
 }

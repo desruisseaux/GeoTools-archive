@@ -37,7 +37,6 @@ public interface AttributeGroup {
      * within this attributeGroup.
      * </p>
      *
-     * @return
      */
     public String getAnyAttributeNameSpace();
 
@@ -48,7 +47,6 @@ public interface AttributeGroup {
      * were declared in, there is no such requirement.
      * </p>
      *
-     * @return
      */
     public Attribute[] getAttributes();
 
@@ -57,7 +55,6 @@ public interface AttributeGroup {
      * The Schema ID for this attributeGroup definition.
      * </p>
      *
-     * @return
      */
     public String getId();
 
@@ -66,14 +63,12 @@ public interface AttributeGroup {
      * The name of this Attribute Group declaration within the XML Schema
      * </p>
      *
-     * @return
      */
     public String getName();
 
     /**
      * DOCUMENT ME!
      *
-     * @return
      */
     public URI getNamespace();
 }

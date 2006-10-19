@@ -307,7 +307,6 @@ public class Filters {
      * 
      * @param text
      * @param TYPE
-     * @return
      * @throws open set of Throwable reflection for TYPE( String ) 
      */
     public static Object gets( String text, Class TYPE ) throws Throwable {

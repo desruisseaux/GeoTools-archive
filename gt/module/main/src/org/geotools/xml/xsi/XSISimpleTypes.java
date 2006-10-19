@@ -236,7 +236,7 @@ public class XSISimpleTypes {
     protected static abstract class XSISimpleType implements SimpleType {
         /**
          * @param name 
-         * @return 
+         *  
          * @see org.geotools.xml.schema.Type#findChildElement(java.lang.String)
          */
         public Element findChildElement(String name) {
@@ -389,7 +389,6 @@ public class XSISimpleTypes {
          * @param value
          * @param attrsgetValue
          * @param hints
-         * @return
          * @throws SAXException
          * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element,
          *      org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
@@ -448,7 +447,6 @@ public class XSISimpleTypes {
          * @param value
          * @param attrs
          * @param hints
-         * @return
          * @throws SAXException
          * @see org.geotools.xml.xsi.Type#getValue(org.geotools.xml.xsi.Element,
          *      org.geotools.xml.xsi.ElementValue[], org.xml.sax.Attributes)
@@ -2687,7 +2685,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for isAbstract ...
          * 
          * @see org.geotools.xml.schema.ComplexType#isAbstract()
-         * @return
          */
         public boolean isAbstract() {
             return false;
@@ -2697,7 +2694,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for getAnyAttributeNameSpace ...
          * 
          * @see org.geotools.xml.schema.ComplexType#getAnyAttributeNameSpace()
-         * @return
          */
         public java.lang.String getAnyAttributeNameSpace() {
             return null;
@@ -2707,7 +2703,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for getAttributes ...
          * 
          * @see org.geotools.xml.schema.ComplexType#getAttributes()
-         * @return
          */
         public Attribute[] getAttributes() {
             return null;
@@ -2717,7 +2712,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for getBlock ...
          * 
          * @see org.geotools.xml.schema.ComplexType#getBlock()
-         * @return
          */
         public int getBlock() {
             return 0;
@@ -2727,7 +2721,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for getChild ...
          * 
          * @see org.geotools.xml.schema.ComplexType#getChild()
-         * @return
          */
         public ElementGrouping getChild() {
             return null;
@@ -2737,7 +2730,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for getChildElements ...
          * 
          * @see org.geotools.xml.schema.ComplexType#getChildElements()
-         * @return
          */
         public Element[] getChildElements() {
             return null;
@@ -2747,7 +2739,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for isMixed ...
          * 
          * @see org.geotools.xml.schema.ComplexType#isMixed()
-         * @return
          */
         public boolean isMixed() {
             return false;
@@ -2757,7 +2748,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for isDerived ...
          * 
          * @see org.geotools.xml.schema.ComplexType#isDerived()
-         * @return
          */
         public boolean isDerived() {
             return false;
@@ -2769,7 +2759,6 @@ public class XSISimpleTypes {
          * @see org.geotools.xml.schema.ComplexType#cache(org.geotools.xml.schema.Element, java.util.Map)
          * @param element
          * @param hints
-         * @return
          */
         public boolean cache( Element element, Map hints ) {
             return false;
@@ -2783,7 +2772,6 @@ public class XSISimpleTypes {
          * @param value
          * @param attrs
          * @param hints
-         * @return
          * @throws SAXException
          * @throws OperationNotSupportedException
          */
@@ -2803,7 +2791,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for getName ...
          * 
          * @see org.geotools.xml.schema.Type#getName()
-         * @return
          */
         public java.lang.String getName() {
             return "AnyType";
@@ -2813,7 +2800,6 @@ public class XSISimpleTypes {
          * TODO summary sentence for getInstanceType ...
          * 
          * @see org.geotools.xml.schema.Type#getInstanceType()
-         * @return
          */
         public Class getInstanceType() {
             return null;

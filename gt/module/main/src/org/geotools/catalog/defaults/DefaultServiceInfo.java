@@ -72,7 +72,6 @@ public class DefaultServiceInfo implements ServiceInfo {
     /**
      * Returns the service keywords. Maps to the Dublin Core Subject element.
      * 
-     * @return
      */
     public String[] getKeywords() { // aka Subject
         return keywords;
@@ -85,7 +84,6 @@ public class DefaultServiceInfo implements ServiceInfo {
 	/**
      * Returns the service description
      * 
-     * @return
      */
     public String getDescription() {
         return description;
@@ -98,7 +96,6 @@ public class DefaultServiceInfo implements ServiceInfo {
     /**
      * Return the service abstract
      * 
-     * @return
      */
     public String getAbstract() {
         return _abstract;
@@ -111,7 +108,6 @@ public class DefaultServiceInfo implements ServiceInfo {
     /**
      * Return the service publisher
      * 
-     * @return
      */
     public URI getPublisher() {
         return publisher;
@@ -125,7 +121,6 @@ public class DefaultServiceInfo implements ServiceInfo {
      * Returns the xml schema namespace for this service type. Maps to the Dublin Code Format
      * element
      * 
-     * @return
      */
     public URI getSchema() { // aka format
         return schema;
@@ -138,7 +133,6 @@ public class DefaultServiceInfo implements ServiceInfo {
     /**
      * Returns the service source. Maps to the Dublin Core Server Element
      * 
-     * @return
      */
     public URI getSource() { // aka server
         return source;

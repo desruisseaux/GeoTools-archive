@@ -47,7 +47,6 @@ public class LineMustBeASinglePartValidationBeanInfo extends LineAbstractValidat
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

@@ -47,7 +47,6 @@ public class PolygonNotOverlappingPolygonValidationBeanInfo extends PolygonPolyg
     /**
      * Implementation of getPropertyDescriptors.
      *
-     * @return
      *
      * @see java.beans.BeanInfo#getPropertyDescriptors()
      */

@@ -170,7 +170,6 @@ public final class Decimator {
 	/**
 	 * @param geom
 	 * @param seq
-	 * @return
 	 */
 	private boolean decimateOnEnvelope(Geometry geom, LiteCoordinateSequence seq) {
 		Envelope env = geom.getEnvelopeInternal();
@@ -328,7 +327,6 @@ public final class Decimator {
 	 * @param dimension
 	 * @param readDoubles
 	 * @param currentDoubles
-	 * @return
 	 */
 	private int copyCoordinate(double[] coords, int dimension, int readDoubles,
 			int currentDoubles) {
