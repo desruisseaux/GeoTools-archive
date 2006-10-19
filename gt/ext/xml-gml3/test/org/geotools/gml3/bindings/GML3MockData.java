@@ -19,8 +19,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -145,6 +143,24 @@ public class GML3MockData {
         polygonWithNoInterior(document, polygonMember);
 
         return multiPolygon;
+    }
+
+    static Element feature(Document document, Node parent) {
+        Element feature = element(TEST.TestFeature, document, parent);
+        Element geom = element(new QName(TEST.NAMESPACE, "geom"), document, feature);
+        point(document, geom);
+
+        Element count = GML3MockData.element(new QName(TEST.NAMESPACE, "count"), document, feature);
+        count.appendChild(document.createTextNode("1"));
+
+        return feature;
+    }
+
+    static Element featureMember(Document document, Node parent) {
+        Element featureMember = element(GML.featureMember, document, parent);
+        feature(document, featureMember);
+
+        return featureMember;
     }
 
     static Element element(QName name, Document document, Node parent) {
