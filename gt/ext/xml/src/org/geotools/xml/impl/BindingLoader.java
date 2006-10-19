@@ -34,7 +34,7 @@ public class BindingLoader {
     /**
      * Loads a binding with a specifc QName into a context.
      *
-     * @param type The qualified name of the type of the binding object.
+     * @param qName The qualified name of the type of the binding object.
      * @param context The context which is to contain the binding.
      *
      * @return The binding object of the associated type, otherwise null if
