@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+  Configuration du module "experimental".
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>root</artifactId>
+    <version>1.1-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Description du module.
+  -->
+  <groupId>org.geotools</groupId>
+  <artifactId>experimental</artifactId>
+  <packaging>jar</packaging>
+  <name>Projets expérimentaux</name>
+  <description>
+    Projets expérimentaux qui n'ont pas encore gradués vers un des modules
+    stables. Ce modules est habituellement exclu de la compilation du projet
+    parent.
+  </description>
+
+  <!--
+    Dépendences directes.
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>org.opengis</groupId>
+      <artifactId>geoapi-nogenerics</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverage</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-epsg-hsql</artifactId>
+    </dependency>
+  </dependencies>
+
+
+
+  <!--
+    Liste des développeurs et des contributeurs.
+  -->
+  <developers>
+    <developer>
+      <id>cedric</id>
+      <name>Cédric Briançon</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <roles>
+        <role>Développeur Java</role>
+      </roles>
+    </developer>
+  </developers>
+</project>
