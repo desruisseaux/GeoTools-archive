@@ -15,11 +15,11 @@
  */
 package org.geotools.data;
 
-import org.geotools.factory.Factory;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import org.geotools.factory.Factory;
 
 
 /**
@@ -341,8 +341,7 @@ public interface DataStoreFactorySpi extends Factory {
          * @param description User description of Param (40 chars or less)
          * @param required <code>true</code> is param is required
          */
-        public Param(String key, Class type, String description,
-            boolean required) {
+        public Param(String key, Class type, String description, boolean required) {
             this(key, type, description, required, null);
         }
 
@@ -356,8 +355,7 @@ public interface DataStoreFactorySpi extends Factory {
          * @param required <code>true</code> is param is required
          * @param sample Sample value as an example for user input
          */
-        public Param(String key, Class type, String description,
-            boolean required, Object sample) {
+        public Param(String key, Class type, String description, boolean required, Object sample) {
             this.key = key;
             this.type = type;
             this.description = description;
@@ -387,8 +385,7 @@ public interface DataStoreFactorySpi extends Factory {
         public Object lookUp(Map map) throws IOException {
             if (!map.containsKey(key)) {
                 if (required) {
-                    throw new IOException("Parameter " + key + " is required:"
-                        + description);
+                    throw new IOException("Parameter " + key + " is required:" + description);
                 } else {
                     return null;
                 }
@@ -409,8 +406,7 @@ public interface DataStoreFactorySpi extends Factory {
             }
 
             if (!type.isInstance(value)) {
-                throw new IOException(type.getName()
-                    + " required for parameter " + key + ": not "
+                throw new IOException(type.getName() + " required for parameter " + key + ": not "
                     + value.getClass().getName());
             }
 
@@ -476,8 +472,8 @@ public interface DataStoreFactorySpi extends Factory {
             } catch (IOException ioException) {
                 throw ioException;
             } catch (Throwable throwable) {
-                throw new DataSourceException("Problem creating "
-                    + type.getName() + " from '" + text + "'", throwable);
+                throw new DataSourceException("Problem creating " + type.getName() + " from '"
+                    + text + "'", throwable);
             }
         }
 
@@ -508,28 +504,23 @@ public interface DataStoreFactorySpi extends Factory {
                 constructor = type.getConstructor(new Class[] { String.class });
             } catch (SecurityException e) {
                 //  type( String ) constructor is not public
-                throw new IOException("Could not create " + type.getName()
-                    + " from text");
+                throw new IOException("Could not create " + type.getName() + " from text");
             } catch (NoSuchMethodException e) {
                 // No type( String ) constructor
-                throw new IOException("Could not create " + type.getName()
-                    + " from text");
+                throw new IOException("Could not create " + type.getName() + " from text");
             }
 
             try {
                 return constructor.newInstance(new Object[] { text, });
             } catch (IllegalArgumentException illegalArgumentException) {
-                throw new DataSourceException("Could not create "
-                    + type.getName() + ": from '" + text + "'",
-                    illegalArgumentException);
+                throw new DataSourceException("Could not create " + type.getName() + ": from '"
+                    + text + "'", illegalArgumentException);
             } catch (InstantiationException instantiaionException) {
-                throw new DataSourceException("Could not create "
-                    + type.getName() + ": from '" + text + "'",
-                    instantiaionException);
+                throw new DataSourceException("Could not create " + type.getName() + ": from '"
+                    + text + "'", instantiaionException);
             } catch (IllegalAccessException illegalAccessException) {
-                throw new DataSourceException("Could not create "
-                    + type.getName() + ": from '" + text + "'",
-                    illegalAccessException);
+                throw new DataSourceException("Could not create " + type.getName() + ": from '"
+                    + text + "'", illegalAccessException);
             } catch (InvocationTargetException targetException) {
                 throw targetException.getCause();
             }

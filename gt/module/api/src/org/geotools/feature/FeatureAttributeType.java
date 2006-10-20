@@ -43,8 +43,7 @@ import org.geotools.filter.Filter;
  * @since 2.1.M5
  * @source $URL$
  */
-public interface FeatureAttributeType extends AttributeType,
-    PrimativeAttributeType {
+public interface FeatureAttributeType extends AttributeType, PrimativeAttributeType {
     /**
      * Method should delegate responsibility to a FeatureFactory.
      *

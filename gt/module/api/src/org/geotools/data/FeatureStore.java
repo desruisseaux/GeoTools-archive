@@ -15,13 +15,13 @@
  */
 package org.geotools.data;
 
+import java.io.IOException;
+import java.util.Set;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Filter;
 import org.geotools.filter.Filter;
-import java.io.IOException;
-import java.util.Set;
 
 
 /**

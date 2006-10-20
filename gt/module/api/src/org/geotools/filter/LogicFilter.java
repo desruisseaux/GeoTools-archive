@@ -15,9 +15,9 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
-import org.opengis.filter.BinaryLogicOperator;
 import java.util.Iterator;
+import org.opengis.filter.BinaryLogicOperator;
+import org.geotools.feature.Feature;
 
 
 /**

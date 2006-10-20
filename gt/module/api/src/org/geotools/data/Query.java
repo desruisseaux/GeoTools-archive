@@ -15,10 +15,10 @@
  */
 package org.geotools.data;
 
-import org.geotools.filter.Filter;
+import java.net.URI;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import java.net.URI;
+import org.geotools.filter.Filter;
 
 
 /**

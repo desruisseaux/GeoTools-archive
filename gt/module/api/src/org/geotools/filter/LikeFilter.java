@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.PropertyIsLike;
+import org.geotools.feature.Feature;
 
 
 /**
@@ -46,8 +46,7 @@ public interface LikeFilter extends Filter, PropertyIsLike {
      *         {@link PropertyIsLike#setSingleChar(String)}
      *         {@link PropertyIsLike#setEscape(String)}
      */
-    void setPattern(String pattern, String wildcardMulti,
-        String wildcardSingle, String escape);
+    void setPattern(String pattern, String wildcardMulti, String wildcardSingle, String escape);
 
     /**
      * Getter for property wildcardMulti.
@@ -85,8 +84,7 @@ public interface LikeFilter extends Filter, PropertyIsLike {
      *         {@link PropertyIsLike#setEscape(String)}
      *
      */
-    void setPattern(Expression p, String wildcardMulti, String wildcardSingle,
-        String escape);
+    void setPattern(Expression p, String wildcardMulti, String wildcardSingle, String escape);
 
     /**
      * Accessor method to retrieve the pattern.

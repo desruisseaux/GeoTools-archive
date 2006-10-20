@@ -16,9 +16,6 @@
 package org.geotools.filter;
 
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.factory.Factory;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
@@ -31,6 +28,9 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
+import org.geotools.factory.Factory;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 
 
 /**
@@ -69,8 +69,8 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      *         {@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
      *         {@link org.opengis.filter.FilterFactory#not(Filter)}
      */
-    public LogicFilter createLogicFilter(Filter filter1, Filter filter2,
-        short filterType) throws IllegalFilterException;
+    public LogicFilter createLogicFilter(Filter filter1, Filter filter2, short filterType)
+        throws IllegalFilterException;
 
     /**
      * Creates an empty logic filter from a type.
@@ -181,8 +181,8 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
      * @deprecated use createAttributeExpression( xpath ), will be removed for
      *             GeoTools 2.3
      */
-    public AttributeExpression createAttributeExpression(FeatureType schema,
-        String xpath) throws IllegalFilterException;
+    public AttributeExpression createAttributeExpression(FeatureType schema, String xpath)
+        throws IllegalFilterException;
 
     /**
      * Shortcut the process - will only grab values matching AttributeType.
@@ -398,12 +398,10 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
     //////////////////////////////////////////////////////////////////////////////    //
 
     /** Checks if the geometry expression overlaps the specified bounding box. */
-    BBOX bbox(Expression geometry, double minx, double miny, double maxx,
-        double maxy, String srs);
+    BBOX bbox(Expression geometry, double minx, double miny, double maxx, double maxy, String srs);
 
     /** Check if all of a geometry is more distant than the given distance from this object's geometry. */
-    Beyond beyond(Expression geometry1, Expression geometry2, double distance,
-        String units);
+    Beyond beyond(Expression geometry1, Expression geometry2, double distance, String units);
 
     /** Checks if the the first geometric operand contains the second. */
     Contains contains(Expression geometry1, Expression geometry2);
@@ -415,8 +413,7 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
     Disjoint disjoint(Expression geometry1, Expression geometry2);
 
     /** Checks if any part of the first geometry lies within the given distance of the second geometry. */
-    DWithin dwithin(Expression geometry1, Expression geometry2,
-        double distance, String units);
+    DWithin dwithin(Expression geometry1, Expression geometry2, double distance, String units);
 
     /** Checks if the geometry of the two operands are equal.
      * @todo should be equals, resolve conflict with PropertyIsEqualTo equals( Expression, Expression )

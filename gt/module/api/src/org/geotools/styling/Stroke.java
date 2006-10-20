@@ -16,12 +16,12 @@
  */
 package org.geotools.styling;
 
+import java.awt.Color;
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTConstant;
 import org.geotools.feature.Feature;
 import org.geotools.filter.ConstantExpression;
 import org.geotools.filter.Expression;
-import java.awt.Color;
 
 
 /**
@@ -391,8 +391,7 @@ public interface Stroke extends GTComponent {
 
 abstract class ConstantStroke extends GTConstant implements Stroke {
     private void cannotModifyConstant() {
-        throw new UnsupportedOperationException(
-            "Constant Stroke may not be modified");
+        throw new UnsupportedOperationException("Constant Stroke may not be modified");
     }
 
     public void setColor(Expression color) {

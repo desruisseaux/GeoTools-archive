@@ -29,8 +29,7 @@ import org.geotools.feature.Feature;
  *
  * @deprecated use {@link org.opengis.filter.expression.Expression}
  */
-public interface Expression extends ExpressionType,
-    org.opengis.filter.expression.Expression {
+public interface Expression extends ExpressionType, org.opengis.filter.expression.Expression {
     /**
      * Gets the type of this expression.
      *

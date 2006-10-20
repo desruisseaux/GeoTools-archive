@@ -36,13 +36,11 @@ public class GTConstant implements GTComponent {
     }
 
     public void removed(GTDelta delta) {
-        throw new IllegalStateException(
-            "A child has changed in an immutable Default!");
+        throw new IllegalStateException("A child has changed in an immutable Default!");
     }
 
     public void changed(GTDelta delta) {
-        throw new IllegalStateException(
-            "A child has changed in an immutable Default!");
+        throw new IllegalStateException("A child has changed in an immutable Default!");
     }
 
     public GTNote getNote() {

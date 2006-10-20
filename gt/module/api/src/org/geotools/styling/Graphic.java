@@ -303,8 +303,7 @@ public interface Graphic extends GTComponent {
 
 abstract class ConstantGraphic extends GTConstant implements Graphic {
     private void cannotModifyConstant() {
-        throw new UnsupportedOperationException(
-            "Constant Graphic may not be modified");
+        throw new UnsupportedOperationException("Constant Graphic may not be modified");
     }
 
     public void setExternalGraphics(ExternalGraphic[] externalGraphics) {

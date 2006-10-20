@@ -15,8 +15,8 @@
  */
 package org.geotools.data;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.EventObject;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -160,8 +160,7 @@ public class FeatureEvent extends EventObject {
      *        FEATURE_ADDED
      * @param bounds The area modified by this change
      */
-    public FeatureEvent(FeatureSource featureSource, int eventType,
-        Envelope bounds) {
+    public FeatureEvent(FeatureSource featureSource, int eventType, Envelope bounds) {
         super(featureSource);
         this.type = eventType;
         this.bounds = bounds;

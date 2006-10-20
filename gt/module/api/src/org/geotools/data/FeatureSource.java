@@ -15,11 +15,11 @@
  */
 package org.geotools.data;
 
+import java.io.IOException;
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
-import java.io.IOException;
 
 
 /**

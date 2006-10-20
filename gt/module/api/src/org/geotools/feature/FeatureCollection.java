@@ -15,14 +15,14 @@
  */
 package org.geotools.feature;
 
+import java.io.IOException;
+import java.util.Iterator;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SortBy;
 import org.geotools.util.ProgressListener;
-import java.io.IOException;
-import java.util.Iterator;
 
 
 /**
@@ -91,8 +91,7 @@ import java.util.Iterator;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureCollection extends ResourceCollection, FeatureResults,
-    Feature {
+public interface FeatureCollection extends ResourceCollection, FeatureResults, Feature {
     /**
      * Obtain a FeatureIterator of the Features within this collection.
      * <p>
@@ -192,8 +191,7 @@ public interface FeatureCollection extends ResourceCollection, FeatureResults,
      * @param listener The listener to remove
      * @throws NullPointerException If the listener is null.
      */
-    void removeListener(CollectionListener listener)
-        throws NullPointerException;
+    void removeListener(CollectionListener listener) throws NullPointerException;
 
     /**
      * Gets a reference to the type of this feature collection.

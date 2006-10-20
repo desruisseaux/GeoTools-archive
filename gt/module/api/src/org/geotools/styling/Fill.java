@@ -19,11 +19,11 @@
  */
 package org.geotools.styling;
 
+import java.awt.Color;
 import org.geotools.event.GTComponent;
 import org.geotools.event.GTConstant;
 import org.geotools.filter.ConstantExpression;
 import org.geotools.filter.Expression;
-import java.awt.Color;
 
 
 /**
@@ -81,10 +81,8 @@ import java.awt.Color;
  */
 public interface Fill extends GTComponent {
     static final Fill DEFAULT = new ConstantFill() {
-            final Expression COLOR = ConstantExpression.constant(new Color(
-                        128, 128, 128));
-            final Expression BGCOLOR = ConstantExpression.constant(new Color(
-                        255, 255, 255, 0));
+            final Expression COLOR = ConstantExpression.constant(new Color(128, 128, 128));
+            final Expression BGCOLOR = ConstantExpression.constant(new Color(255, 255, 255, 0));
             final Expression OPACITY = ConstantExpression.ONE;
 
             public Expression getColor() {
@@ -223,8 +221,7 @@ public interface Fill extends GTComponent {
 
 abstract class ConstantFill extends GTConstant implements Fill {
     private void cannotModifyConstant() {
-        throw new UnsupportedOperationException(
-            "Constant Fill may not be modified");
+        throw new UnsupportedOperationException("Constant Fill may not be modified");
     }
 
     public void setColor(Expression color) {

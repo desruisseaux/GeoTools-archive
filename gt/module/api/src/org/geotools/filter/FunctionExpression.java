@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
-import org.geotools.factory.Factory;
 import org.opengis.filter.expression.Function;
+import org.geotools.factory.Factory;
 
 
 /**

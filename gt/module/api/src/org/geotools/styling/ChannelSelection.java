@@ -59,8 +59,7 @@ public interface ChannelSelection extends GTComponent {
      * @param green the green channel
      * @param blue the blue channel
      */
-    void setRGBChannels(SelectedChannelType red, SelectedChannelType green,
-        SelectedChannelType blue);
+    void setRGBChannels(SelectedChannelType red, SelectedChannelType green, SelectedChannelType blue);
 
     /**
      * set the RGB channels to be used

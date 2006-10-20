@@ -56,8 +56,7 @@ public class CollectionEvent extends EventObject {
      * @param involvedFeatures DOCUMENT ME!
      * @param type DOCUMENT ME!
      */
-    public CollectionEvent(FeatureCollection source,
-        Feature[] involvedFeatures, int type) {
+    public CollectionEvent(FeatureCollection source, Feature[] involvedFeatures, int type) {
         super(source);
         this.type = type;
         this.features = involvedFeatures;

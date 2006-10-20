@@ -15,8 +15,8 @@
  */
 package org.geotools.catalog;
 
-import org.geotools.util.ProgressListener;
 import java.io.IOException;
+import org.geotools.util.ProgressListener;
 
 
 /**

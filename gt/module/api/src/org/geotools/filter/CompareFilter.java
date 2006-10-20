@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.BinaryComparisonOperator;
+import org.geotools.feature.Feature;
 
 
 /**

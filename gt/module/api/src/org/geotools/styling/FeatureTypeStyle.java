@@ -15,8 +15,8 @@
  */
 package org.geotools.styling;
 
-import org.geotools.event.GTComponent;
 import java.util.List;
+import org.geotools.event.GTComponent;
 
 
 /**

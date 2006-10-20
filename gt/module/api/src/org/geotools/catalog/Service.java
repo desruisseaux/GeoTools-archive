@@ -16,10 +16,10 @@
  */
 package org.geotools.catalog;
 
-import org.geotools.util.ProgressListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.geotools.util.ProgressListener;
 
 
 /**

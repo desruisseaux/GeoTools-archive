@@ -16,10 +16,10 @@
  */
 package org.geotools.catalog;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import javax.swing.Icon;
+import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**

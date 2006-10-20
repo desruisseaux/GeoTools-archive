@@ -15,10 +15,10 @@
  */
 package org.geotools.styling;
 
+import java.net.URL;
 import org.geotools.factory.Factory;
 import org.geotools.filter.Expression;
 import org.geotools.filter.Filter;
-import java.net.URL;
 
 
 /**
@@ -26,9 +26,8 @@ import java.net.URL;
  * @source $URL$
  */
 public interface StyleFactory extends Factory {
-    public TextSymbolizer createTextSymbolizer(Fill fill, Font[] fonts,
-        Halo halo, Expression label, LabelPlacement labelPlacement,
-        String geometryPropertyName);
+    public TextSymbolizer createTextSymbolizer(Fill fill, Font[] fonts, Halo halo,
+        Expression label, LabelPlacement labelPlacement, String geometryPropertyName);
 
     public ExternalGraphic createExternalGraphic(URL url, String format);
 
@@ -42,8 +41,8 @@ public interface StyleFactory extends Factory {
     public PointSymbolizer createPointSymbolizer();
 
     //    public  PointPlacement createPointPlacement();
-    public Mark createMark(Expression wellKnownName, Stroke stroke, Fill fill,
-        Expression size, Expression rotation);
+    public Mark createMark(Expression wellKnownName, Stroke stroke, Fill fill, Expression size,
+        Expression rotation);
 
     /**
      * Convinence method for obtaining a mark of a fixed shape
@@ -106,8 +105,8 @@ public interface StyleFactory extends Factory {
      *
      * @return The new feature type constaint.
      */
-    public FeatureTypeConstraint createFeatureTypeConstraint(
-        String featureTypeName, Filter filter, Extent[] extents);
+    public FeatureTypeConstraint createFeatureTypeConstraint(String featureTypeName, Filter filter,
+        Extent[] extents);
 
     public LayerFeatureConstraints createLayerFeatureConstraints(
         FeatureTypeConstraint[] featureTypeConstraints);
@@ -129,13 +128,12 @@ public interface StyleFactory extends Factory {
 
     public Halo createHalo(Fill fill, Expression radius);
 
-    public Fill createFill(Expression color, Expression backgroundColor,
-        Expression opacity, Graphic graphicFill);
+    public Fill createFill(Expression color, Expression backgroundColor, Expression opacity,
+        Graphic graphicFill);
 
     public LineSymbolizer createLineSymbolizer();
 
-    public PointSymbolizer createPointSymbolizer(Graphic graphic,
-        String geometryPropertyName);
+    public PointSymbolizer createPointSymbolizer(Graphic graphic, String geometryPropertyName);
 
     public Style createStyle();
 
@@ -147,8 +145,8 @@ public interface StyleFactory extends Factory {
 
     public TextSymbolizer createTextSymbolizer();
 
-    public PointPlacement createPointPlacement(AnchorPoint anchorPoint,
-        Displacement displacement, Expression rotation);
+    public PointPlacement createPointPlacement(AnchorPoint anchorPoint, Displacement displacement,
+        Expression rotation);
 
     /**
      * A convienice method to make a simple stroke
@@ -173,8 +171,7 @@ public interface StyleFactory extends Factory {
      *
      * @see org.geotools.stroke
      */
-    public Stroke createStroke(Expression color, Expression width,
-        Expression opacity);
+    public Stroke createStroke(Expression color, Expression width, Expression opacity);
 
     /**
      * creates a stroke
@@ -193,24 +190,21 @@ public interface StyleFactory extends Factory {
      *
      * @see org.geotools.stroke
      */
-    public Stroke createStroke(Expression color, Expression width,
-        Expression opacity, Expression lineJoin, Expression lineCap,
-        float[] dashArray, Expression dashOffset, Graphic graphicFill,
-        Graphic graphicStroke);
+    public Stroke createStroke(Expression color, Expression width, Expression opacity,
+        Expression lineJoin, Expression lineCap, float[] dashArray, Expression dashOffset,
+        Graphic graphicFill, Graphic graphicStroke);
 
     public Rule createRule();
 
-    public LineSymbolizer createLineSymbolizer(Stroke stroke,
-        String geometryPropertyName);
+    public LineSymbolizer createLineSymbolizer(Stroke stroke, String geometryPropertyName);
 
     public FeatureTypeStyle createFeatureTypeStyle();
 
-    public Graphic createGraphic(ExternalGraphic[] externalGraphics,
-        Mark[] marks, Symbol[] symbols, Expression opacity, Expression size,
-        Expression rotation);
+    public Graphic createGraphic(ExternalGraphic[] externalGraphics, Mark[] marks,
+        Symbol[] symbols, Expression opacity, Expression size, Expression rotation);
 
-    public Font createFont(Expression fontFamily, Expression fontStyle,
-        Expression fontWeight, Expression fontSize);
+    public Font createFont(Expression fontFamily, Expression fontStyle, Expression fontWeight,
+        Expression fontSize);
 
     public Mark createMark();
 
@@ -219,15 +213,13 @@ public interface StyleFactory extends Factory {
 
     public RasterSymbolizer createRasterSymbolizer();
 
-    public RasterSymbolizer createRasterSymbolizer(
-        String geometryPropertyName, Expression opacity,
-        ChannelSelection channel, Expression overlap, ColorMap colorMap,
-        ContrastEnhancement ce, ShadedRelief relief, Symbolizer outline);
+    public RasterSymbolizer createRasterSymbolizer(String geometryPropertyName, Expression opacity,
+        ChannelSelection channel, Expression overlap, ColorMap colorMap, ContrastEnhancement ce,
+        ShadedRelief relief, Symbolizer outline);
 
     public RasterSymbolizer getDefaultRasterSymbolizer();
 
-    public ChannelSelection createChannelSelection(
-        SelectedChannelType[] channels);
+    public ChannelSelection createChannelSelection(SelectedChannelType[] channels);
 
     public ContrastEnhancement createContrastEnhancement();
 
@@ -239,8 +231,7 @@ public interface StyleFactory extends Factory {
     /**
      * @deprecated Use {@link #createSelectedChannelType(String, ContrastEnhancement)}
      */
-    public SelectedChannelType createSelectedChannelType(String name,
-        Expression gammaValue);
+    public SelectedChannelType createSelectedChannelType(String name, Expression gammaValue);
 
     public ColorMap createColorMap();
 

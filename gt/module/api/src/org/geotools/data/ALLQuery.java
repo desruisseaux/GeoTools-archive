@@ -15,11 +15,11 @@
  */
 package org.geotools.data;
 
-import org.geotools.filter.Filter;
-import org.opengis.filter.sort.SortBy;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.net.URI;
 import java.util.Arrays;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.filter.Filter;
 
 
 /**
@@ -79,16 +79,12 @@ class ALLQuery implements Query {
     public int hashCode() {
         String[] n = getPropertyNames();
 
-        return ((n == null) ? (-1)
-                            : ((n.length == 0) ? 0 : (n.length
-        | n[0].hashCode()))) | getMaxFeatures()
-        | ((getFilter() == null) ? 0 : getFilter().hashCode())
+        return ((n == null) ? (-1) : ((n.length == 0) ? 0 : (n.length | n[0].hashCode())))
+        | getMaxFeatures() | ((getFilter() == null) ? 0 : getFilter().hashCode())
         | ((getTypeName() == null) ? 0 : getTypeName().hashCode())
         | ((getVersion() == null) ? 0 : getVersion().hashCode())
         | ((getCoordinateSystem() == null) ? 0 : getCoordinateSystem().hashCode())
-        | ((getCoordinateSystemReproject() == null) ? 0
-                                                    : getCoordinateSystemReproject()
-                                                          .hashCode());
+        | ((getCoordinateSystemReproject() == null) ? 0 : getCoordinateSystemReproject().hashCode());
     }
 
     /**
@@ -123,13 +119,13 @@ class ALLQuery implements Query {
                                     : getTypeName().equals(other.getTypeName()))
         && ((getVersion() == null) ? (other.getVersion() == null)
                                    : getVersion().equals(other.getVersion()))
-        && ((getCoordinateSystem() == null)
-        ? (other.getCoordinateSystem() == null)
-        : getCoordinateSystem().equals(other.getCoordinateSystem()))
-        && ((getCoordinateSystemReproject() == null)
-        ? (other.getCoordinateSystemReproject() == null)
-        : getCoordinateSystemReproject()
-              .equals(other.getCoordinateSystemReproject()));
+        && ((getCoordinateSystem() == null) ? (other.getCoordinateSystem() == null)
+                                            : getCoordinateSystem()
+                                                  .equals(other.getCoordinateSystem()))
+        && ((getCoordinateSystemReproject() == null) ? (other.getCoordinateSystemReproject() == null)
+                                                     : getCoordinateSystemReproject()
+                                                           .equals(other
+            .getCoordinateSystemReproject()));
     }
 
     public String toString() {

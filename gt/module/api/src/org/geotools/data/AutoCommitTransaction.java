@@ -138,8 +138,7 @@ class AutoCommitTransaction implements Transaction {
      * @throws IOException if Rollback fails
      */
     public void rollback() throws IOException {
-        throw new IOException(
-            "AutoCommit cannot support the rollback opperation");
+        throw new IOException("AutoCommit cannot support the rollback opperation");
     }
 
     /**
@@ -154,8 +153,7 @@ class AutoCommitTransaction implements Transaction {
      * @throws IOException If set authorization fails
      */
     public void addAuthorization(String authID) throws IOException {
-        throw new IOException(
-            "Authorization IDs are not valid for AutoCommit Transaction");
+        throw new IOException("Authorization IDs are not valid for AutoCommit Transaction");
     }
 
     /**

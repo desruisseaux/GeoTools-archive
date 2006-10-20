@@ -100,8 +100,7 @@ public interface Displacement extends GTComponent {
 
 abstract class ConstantDisplacement extends GTConstant implements Displacement {
     private void cannotModifyConstant() {
-        throw new UnsupportedOperationException(
-            "Constant Displacement may not be modified");
+        throw new UnsupportedOperationException("Constant Displacement may not be modified");
     }
 
     public void setDisplacementX(Expression x) {

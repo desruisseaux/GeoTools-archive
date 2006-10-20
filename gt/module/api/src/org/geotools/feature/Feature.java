@@ -161,7 +161,7 @@ public interface Feature {
      * already set.  If it is set then this method does nothing.
      *
      * NOTE: Please don't use, a Feature can be in more then on collection
-     * 
+     *
      * @param collection the collection to be set as parent.
      */
     void setParent(FeatureCollection collection);
@@ -279,8 +279,7 @@ public interface Feature {
      * @throws IllegalAttributeException If the attribute is illegal for the
      *         path specified.
      */
-    void setAttribute(String xPath, Object attribute)
-        throws IllegalAttributeException;
+    void setAttribute(String xPath, Object attribute) throws IllegalAttributeException;
 
     /**
      * Gets the default geometry for this feature.

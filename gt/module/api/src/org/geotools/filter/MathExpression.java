@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.expression.BinaryExpression;
+import org.geotools.feature.Feature;
 
 
 /**

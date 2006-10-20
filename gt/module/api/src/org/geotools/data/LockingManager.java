@@ -96,9 +96,8 @@ public interface LockingManager {
      *
      * @throws IOException DOCUMENT ME!
      */
-    void unLockFeatureID(String typeName, String authID,
-        Transaction transaction, FeatureLock featureLock)
-        throws IOException;
+    void unLockFeatureID(String typeName, String authID, Transaction transaction,
+        FeatureLock featureLock) throws IOException;
 
     /**
      * FeatureID based locking.

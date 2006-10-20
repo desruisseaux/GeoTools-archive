@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.geotools.feature.Feature;
 
 
 /**
@@ -69,8 +69,7 @@ public interface GeometryFilter extends Filter, BinarySpatialOperator {
      *
      * @deprecated use {@link BinarySpatialOperator#setExpression2(Expression)}
      */
-    void addRightGeometry(Expression rightGeometry)
-        throws IllegalFilterException;
+    void addRightGeometry(Expression rightGeometry) throws IllegalFilterException;
 
     /**
      * Adds the 'left' value to this filter.

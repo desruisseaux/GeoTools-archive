@@ -16,11 +16,11 @@
  */
 package org.geotools.catalog;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.util.ProgressListener;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import com.vividsolutions.jts.geom.Envelope;
+import org.geotools.util.ProgressListener;
 
 
 /**

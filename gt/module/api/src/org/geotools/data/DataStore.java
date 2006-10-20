@@ -15,10 +15,10 @@
  */
 package org.geotools.data;
 
+import java.io.IOException;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.Filter;
-import java.io.IOException;
 
 
 /**
@@ -367,8 +367,8 @@ public interface DataStore {
      *
      * @return FeatureWriter Allows Sequential Modification of featureType
      */
-    FeatureWriter getFeatureWriter(String typeName, Filter filter,
-        Transaction transaction) throws IOException;
+    FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
+        throws IOException;
 
     /**
      * Access FeatureWriter for modification of the DataStore typeName.
@@ -408,8 +408,8 @@ public interface DataStore {
      *
      * @throws IOException
      */
-    FeatureWriter getFeatureWriterAppend(String typeName,
-        Transaction transaction) throws IOException;
+    FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+        throws IOException;
 
     /**
      * Retrieve a per featureID based locking service from this DataStore.

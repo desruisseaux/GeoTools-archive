@@ -58,8 +58,7 @@ public class IllegalAttributeException extends Exception {
      * @param invalid the attribute that does not validate against expected.
      * @param cause the root cause of the error.
      */
-    public IllegalAttributeException(AttributeType expected, Object invalid,
-        Throwable cause) {
+    public IllegalAttributeException(AttributeType expected, Object invalid, Throwable cause) {
         super(errorMessage(expected, invalid), cause);
         this.expected = expected;
         this.invalid = invalid;
@@ -69,8 +68,7 @@ public class IllegalAttributeException extends Exception {
         String message = "IllegalAttribute: "
             + ((expected == null) ? "null" : expected.getType().getName());
 
-        message += (" , but got "
-        + ((invalid == null) ? "null" : invalid.getClass().getName()));
+        message += (" , but got " + ((invalid == null) ? "null" : invalid.getClass().getName()));
 
         return message;
     }
@@ -84,10 +82,8 @@ public class IllegalAttributeException extends Exception {
      * @return an error message reporting the problem.
      */
     static String errorMessage(AttributeType expected, Object invalid) {
-        String message = "expected "
-            + ((expected == null) ? "null" : expected.getType().getName());
-        message += (" , but got "
-        + ((invalid == null) ? "null" : invalid.getClass().getName()));
+        String message = "expected " + ((expected == null) ? "null" : expected.getType().getName());
+        message += (" , but got " + ((invalid == null) ? "null" : invalid.getClass().getName()));
 
         return message;
     }

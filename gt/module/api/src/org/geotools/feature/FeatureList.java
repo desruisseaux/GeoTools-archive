@@ -15,8 +15,8 @@
  */
 package org.geotools.feature;
 
-import org.geotools.filter.Filter;
 import java.util.List;
+import org.geotools.filter.Filter;
 
 
 /**

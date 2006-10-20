@@ -15,8 +15,8 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.spatial.DistanceBufferOperator;
+import org.geotools.feature.Feature;
 
 
 /**
@@ -52,8 +52,7 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
  * @deprecated use {@link org.opengis.filter.spatial.DistanceBufferOperator}
  *
  */
-public interface GeometryDistanceFilter extends GeometryFilter,
-    DistanceBufferOperator {
+public interface GeometryDistanceFilter extends GeometryFilter, DistanceBufferOperator {
     /**
      * Returns true if the passed in object is the same as this filter.  Checks
      * to make sure the filter types are the same as well as all three of the

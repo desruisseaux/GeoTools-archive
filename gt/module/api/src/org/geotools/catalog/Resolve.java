@@ -16,10 +16,10 @@
  */
 package org.geotools.catalog;
 
-import org.geotools.util.ProgressListener;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import org.geotools.util.ProgressListener;
 
 
 /**
@@ -170,8 +170,7 @@ public interface Resolve {
      * @throws UnsupportedOperationException When event notification is not
      *         supported.
      */
-    void addListener(ResolveChangeListener listener)
-        throws UnsupportedOperationException;
+    void addListener(ResolveChangeListener listener) throws UnsupportedOperationException;
 
     /**
      * Removes a listener from the Resolve. Support for event notification is

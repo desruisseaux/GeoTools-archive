@@ -73,8 +73,7 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
                 v.visit(this);
             }
 
-            public Object accept(org.opengis.filter.FilterVisitor visitor,
-                Object extraData) {
+            public Object accept(org.opengis.filter.FilterVisitor visitor, Object extraData) {
                 return extraData;
             }
 
@@ -128,8 +127,7 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
                 v.visit(this);
             }
 
-            public Object accept(org.opengis.filter.FilterVisitor visitor,
-                Object extraData) {
+            public Object accept(org.opengis.filter.FilterVisitor visitor, Object extraData) {
                 return extraData;
             }
 

@@ -15,8 +15,10 @@
  */
 package org.geotools.filter;
 
+import java.awt.Color;
+import java.math.BigDecimal;
+import java.util.Date;
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.feature.Feature;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.ExpressionVisitor;
@@ -25,9 +27,7 @@ import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
-import java.awt.Color;
-import java.math.BigDecimal;
-import java.util.Date;
+import org.geotools.feature.Feature;
 
 
 /**
