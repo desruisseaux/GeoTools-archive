@@ -160,6 +160,15 @@ public class ScriptTest extends TestCase {
     }
     
     /**
+     * Run "LambertAzimuthalEqualArea.txt".
+     *
+     * @throws Exception If a test failed.
+     */
+    public void testLambertAzimuthalEqualArea() throws Exception {
+        runScript("scripts/LambertAzimuthalEqualArea.txt");
+    }
+    
+    /**
      * Run "LambertConic.txt".
      *
      * @throws Exception If a test failed.

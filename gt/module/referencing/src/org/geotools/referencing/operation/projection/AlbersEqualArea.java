@@ -72,8 +72,8 @@ import org.geotools.resources.i18n.Errors;
  *        EPSG Guidence Note Number 7, Version 19.</li>
  * </ul>
  *
- * @see <A HREF="http://mathworld.wolfram.com/AlbersEqual-AreaConicProjection.html/">Albers Equal-Area Conic Projection on MathWorld</A>
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html"> "Albers_Conic_Equal_Area" on www.remotesensing.org</A>
+ * @see <A HREF="http://mathworld.wolfram.com/AlbersEqual-AreaConicProjection.html">Albers Equal-Area Conic Projection on MathWorld</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html">"Albers_Conic_Equal_Area" on RemoteSensing.org</A>
  * @see <A HREF="http://srmwww.gov.bc.ca/gis/bceprojection.html">British Columbia Albers Standard Projection</A>
  *
  * @since 2.1
@@ -177,8 +177,9 @@ public class AlbersEqualArea extends MapProjection {
     }
 
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
+     * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+     * (units in radians) and stores the result in {@code ptDst} (linear distance
+     * on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, Point2D ptDst) 
             throws ProjectionException 
@@ -211,7 +212,7 @@ public class AlbersEqualArea extends MapProjection {
     }
 
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+     * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst) 

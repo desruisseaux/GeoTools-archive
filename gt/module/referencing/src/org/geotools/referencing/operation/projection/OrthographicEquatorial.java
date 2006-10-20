@@ -48,7 +48,6 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Rueben Schulz
  */
 public class OrthographicEquatorial extends OrthographicOblique {
-    
     /**
      * Constructs an equatorial orthographic projection.
      *
@@ -63,39 +62,40 @@ public class OrthographicEquatorial extends OrthographicOblique {
         assert (latitudeOfOrigin < EPS) : latitudeOfOrigin;
         latitudeOfOrigin = 0.0;
     }
-    
+
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
+     * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+     * (units in radians) and stores the result in {@code ptDst} (linear distance
+     * on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, Point2D ptDst)
             throws ProjectionException
     {
         // Compute using oblique formulas, for comparaison later.
         assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
-        
+
         double cosphi = Math.cos(y);
-	double coslam = Math.cos(x);
-        
+        double coslam = Math.cos(x);
+
         if (cosphi * coslam < -EPS) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
-        
-	y = Math.sin(y);
+
+        y = Math.sin(y);
         x = cosphi * Math.sin(x);   
-      
+
         assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
         assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
-        
+
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+     * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
@@ -103,7 +103,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
     {
         // Compute using oblique formulas, for comparaison later.
         assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
-            
+
         final double rho = Math.sqrt(x*x + y*y);
         double sinc = rho;
         if (sinc > 1.0) {
@@ -112,7 +112,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
             }
             sinc = 1.0;
         }
-        
+
         double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
         if (rho <= EPS) {
             y = latitudeOfOrigin;
@@ -121,7 +121,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
             double phi = y * sinc / rho;
             x *= sinc;
             y = cosc * rho;
-            
+
             //begin sinchk
             if (Math.abs(phi) >= 1.0) {
                 phi = (phi < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
@@ -130,7 +130,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
                 phi = Math.asin(phi);
             }
             //end sinchk
-            
+
             if (y == 0.0) {
                 if(x == 0.0) {
                     x = 0.0;
@@ -142,7 +142,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
             }
             y = phi;
         }
-        
+
         assert Math.abs(ptDst.getX()-x) <= EPS : x;
         assert Math.abs(ptDst.getY()-y) <= EPS : y;
         if (ptDst != null) {

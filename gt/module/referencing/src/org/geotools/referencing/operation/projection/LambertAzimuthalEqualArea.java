@@ -1,0 +1,591 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *
+ *   (C) 2006, Geotools Project Managment Committee (PMC)
+ *   (C) 2000, Frank Warmerdam
+ *   (C) 1995, Gerald Evenden
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    This package contains formulas from the PROJ package of USGS.
+ *    USGS's work is fully acknowledged here. This derived work has
+ *    been relicensed under LGPL with Frank Warmerdam's permission.
+ */
+package org.geotools.referencing.operation.projection;
+
+// J2SE dependencies and extensions
+import java.awt.geom.Point2D;
+import java.util.Collection;
+import javax.units.NonSI;
+
+// OpenGIS dependencies
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.ConicProjection;
+import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.measure.Latitude;
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.resources.i18n.Vocabulary;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.XMath;
+
+
+/**
+ * Lambert Azimuthal Equal Area (EPSG code 9820).
+ *
+ * <strong>References:</strong><ul>
+ *   <li> A. Annoni, C. Luzet, E.Gubler and J. Ihde - Map Projections for Europe</li>
+ *   <li> John P. Snyder (Map Projections - A Working Manual,
+ *        U.S. Geological Survey Professional Paper 1395)</li>
+ * </ul>
+ *
+ * @since 2.4
+ * @version $Id$
+ * @source $URL$
+ * @author Gerald Evenden
+ * @author Beate Stollberg
+ * @author Martin Desruisseaux
+ *
+ * @see <A HREF="http://mathworld.wolfram.com/LambertAzimuthalEqual-AreaProjection.html">Lambert Azimuthal Equal-Area Projection on MathWorld</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_azimuthal_equal_area.html">"Lambert_Azimuthal_Equal_Area" on RemoteSensing.org</A>
+ */
+public class LambertAzimuthalEqualArea extends MapProjection {
+    /** Maximum difference allowed when comparing real numbers. */
+    private static final double EPSILON = 1e-7;
+
+    /** Epsilon for the comparaison of latitudes. */
+    private static final double EPS10 = 1e-10;
+
+    /** Constants for authalic latitude. */
+    private static final double P00 = 0.33333333333333333333,
+                                P01 = 0.17222222222222222222,
+                                P02 = 0.10257936507936507936,
+                                P10 = 0.06388888888888888888,
+                                P11 = 0.06640211640211640211,
+                                P20 = 0.01641501294219154443;
+
+    /** The projection mode. */
+    static final int OBLIQUE=0, EQUATORIAL=1, NORTH_POLE=2, SOUTH_POLE=3;
+
+    /** The projection mode for this particular instance. */
+    final int mode;
+
+    /** Constant parameters. */
+    final double sinb1, cosb1, xmf, ymf, mmf, qp, dd, rq;
+
+    /** Coefficients for authalic latitude. */
+    private final double APA0, APA1, APA2;
+
+    /**
+     * Constructs a new map projection from the supplied parameters.
+     *
+     * @param  parameters The parameter values in standard units.
+     * @throws ParameterNotFoundException if a mandatory parameter is missing.
+     */
+    protected LambertAzimuthalEqualArea(final ParameterValueGroup parameters)
+            throws ParameterNotFoundException
+    {
+        // Fetch parameters
+        super(parameters);
+        final Collection expected = getParameterDescriptors().descriptors();
+        latitudeOfOrigin = doubleValue(expected, Provider.LATITUDE_OF_CENTRE,  parameters);
+        centralMeridian  = doubleValue(expected, Provider.LONGITUDE_OF_CENTRE, parameters);
+        ensureLatitudeInRange (Provider.LONGITUDE_OF_CENTRE, latitudeOfOrigin, true);
+        ensureLongitudeInRange(Provider.LONGITUDE_OF_CENTRE, centralMeridian,  true);
+        /*
+         * Detects the mode (oblique, etc.).
+         */
+        double t = Math.abs(latitudeOfOrigin);
+        if (Math.abs(t - Math.PI/2) < EPS10) {
+            mode = latitudeOfOrigin < 0.0 ? SOUTH_POLE : NORTH_POLE;
+        } else if (Math.abs(t) < EPS10) {
+            mode = EQUATORIAL;
+        } else {
+            mode = OBLIQUE;
+        }
+        /*
+         * Computes the constants for authalic latitude.
+         */
+        final double es2 = excentricitySquared * excentricitySquared;
+        final double es3 = excentricitySquared * es2;
+        APA0 = P02 * es3 + P01 * es2 + P00 * excentricitySquared;
+        APA1 = P11 * es3 + P10 * es2;
+        APA2 = P20 * es3;
+
+        qp   = qsfn(1);
+        rq   = Math.sqrt(0.5 * qp);
+        mmf  = 0.5 / (1 - excentricitySquared);
+        if (excentricitySquared != 0) {
+            final double sinphi;
+            sinphi = Math.sin(latitudeOfOrigin);
+            sinb1  = qsfn(sinphi) / qp;
+            cosb1  = Math.sqrt(1.0 - sinb1 * sinb1);
+            switch (mode) {
+                case NORTH_POLE:  // Fall through
+                case SOUTH_POLE: {
+                    dd = 1.0;
+                    xmf = ymf = Double.NaN; // Not used.
+                    break;
+                }
+                case EQUATORIAL: {
+                    dd  = 1.0 / rq;
+                    xmf = 1.0;
+                    ymf = 0.5 * qp;
+                    break;
+                }
+                case OBLIQUE: {
+                    dd  = Math.cos(latitudeOfOrigin) /
+                            (Math.sqrt(1.0 - excentricitySquared * sinphi * sinphi) * rq * cosb1);
+                    xmf = rq * dd;
+                    ymf = rq / dd;
+                    break;
+                }
+                default: {
+                    throw new AssertionError(mode);
+                }
+            }
+        } else {
+            sinb1 = Math.sin(latitudeOfOrigin);
+            cosb1 = Math.cos(latitudeOfOrigin);
+            dd = xmf = ymf = Double.NaN; // Not used.
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ParameterDescriptorGroup getParameterDescriptors() {
+        return Provider.PARAMETERS;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ParameterValueGroup getParameterValues() {
+        final ParameterValueGroup values = super.getParameterValues();
+        final Collection expected = getParameterDescriptors().descriptors();
+        set(expected, Provider.LATITUDE_OF_CENTRE,  values, latitudeOfOrigin);
+        set(expected, Provider.LONGITUDE_OF_CENTRE, values, centralMeridian);
+        return values;
+    }
+
+    /**
+     * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+     * (units in radians) and stores the result in {@code ptDst} (linear distance
+     * on a unit sphere).
+     */
+    protected Point2D transformNormalized(final double lambda, final double phi, Point2D ptDst)
+            throws ProjectionException
+    {
+        final double coslam = Math.cos(lambda);
+        final double sinlam = Math.sin(lambda);
+        final double sinphi = Math.sin(phi);
+        double q = qsfn(sinphi);
+        final double sinb, cosb, b, c, x, y;
+        switch (mode) {
+            case OBLIQUE: {
+                sinb = q / qp;
+                cosb = Math.sqrt(1.0 - sinb * sinb);
+                c    = 1.0 + sinb1 * sinb + cosb1 * cosb * coslam;
+                b    = Math.sqrt(2.0 / c);
+                y    = ymf * b * (cosb1 * sinb - sinb1 * cosb * coslam);
+                x    = xmf * b * cosb * sinlam;
+                break;
+            }
+            case EQUATORIAL: {
+                sinb = q / qp;
+                cosb = Math.sqrt(1.0 - sinb * sinb);
+                c    = 1.0 + cosb * coslam;
+                b    = Math.sqrt(2. / (1. + cosb * coslam));
+                y    = b * sinb * ymf; 
+                x    = xmf * b * cosb * sinlam;
+                break;
+            }
+            case NORTH_POLE: {
+                c = (Math.PI / 2) + phi;
+                q = qp - q;
+                if (q >= 0.0) {
+                    b = Math.sqrt(q);
+                    x = b * sinlam;
+                    y = coslam * -b;
+                } else {
+                    x = y = 0.;
+                }
+                break;
+            }
+            case SOUTH_POLE: {
+                c = phi - (Math.PI / 2);
+                q = qp + q;
+                if (q >= 0.0) {
+                    b = Math.sqrt(q);
+                    x = b * sinlam;
+                    y = coslam * +b;
+                } else {
+                    x = y = 0.;
+                }
+                break;
+            }
+            default: {
+                throw new AssertionError(mode);
+            }
+        }
+        if (Math.abs(c) < EPS10) {
+            throw toleranceError();
+        }
+        if (ptDst != null) {
+            ptDst.setLocation(x,y);
+            return ptDst;
+        }
+        return new Point2D.Double(x,y);
+    }
+
+    /**
+     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+     * and stores the result in {@code ptDst}.
+     */
+    protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+            throws ProjectionException
+    {
+        final double lambda, phi;
+        switch (mode) {
+            case EQUATORIAL: // Fall through
+            case OBLIQUE: {
+                x /= dd;
+                y *= dd;
+                final double rho = XMath.hypot(x, y);
+                if (rho < EPS10) {
+                    lambda = 0.0;
+                    phi = latitudeOfOrigin;
+                } else {
+                    double sCe, cCe, q, ab;
+                    sCe = 2.0 * Math.asin(0.5 * rho / rq);
+                    cCe = Math.cos(sCe);
+                    sCe = Math.sin(sCe);
+                    x *= sCe;
+                    if (mode == OBLIQUE) {
+                        ab = cCe * sinb1 + y * sCe * cosb1 / rho;
+                        q  = qp * ab;
+                        y  = rho * cosb1 * cCe - y * sinb1 * sCe;
+                    } else {
+                        ab = y * sCe / rho;
+                        q  = qp * ab;
+                        y  = rho * cCe;
+                    }
+                    lambda = Math.atan2(x, y);
+                    phi = authlat(Math.asin(ab));
+                }
+                break;
+            }
+            case NORTH_POLE: {
+                y = -y;
+                // Fall through
+            }
+            case SOUTH_POLE: {
+                final double q = x*x + y*y;
+                if (q == 0) {
+                    lambda = 0.;
+                    phi = latitudeOfOrigin;
+                } else {
+                    double ab = 1.0 - q / qp;
+                    if (mode == SOUTH_POLE) {
+                        ab = -ab;
+                    }
+                    lambda = Math.atan2(x, y);
+                    phi = authlat(Math.asin(ab));
+                }
+                break;
+            }
+            default: {
+                throw new AssertionError(mode);
+            }
+        }
+        if (ptDst != null) {
+            ptDst.setLocation(lambda, phi);
+            return ptDst;
+        }
+        return new Point2D.Double(lambda, phi);
+    }
+
+
+    /**
+     * Provides the transform equations for the spherical case.
+     *
+     * @version $Id$
+     * @author Martin Desruisseaux
+     */
+    private static final class Spherical extends LambertAzimuthalEqualArea {
+        /**
+         * Constructs a new map projection from the suplied parameters.
+         *
+         * @param  parameters The parameter values in standard units.
+         * @throws ParameterNotFoundException if a mandatory parameter is missing.
+         */
+        protected Spherical(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
+            super(parameters);
+            assert isSpherical;
+        }
+
+        /**
+         * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+         * (units in radians) and stores the result in {@code ptDst} (linear distance
+         * on a unit sphere).
+         */
+        protected Point2D transformNormalized(final double lambda, final double phi, Point2D ptDst)
+                throws ProjectionException
+        {
+            // Compute using ellipsoidal formulas, for comparaison later.
+            assert (ptDst = super.transformNormalized(lambda, phi, ptDst)) != null;
+
+            final double sinphi = Math.sin(phi);
+            final double cosphi = Math.cos(phi);
+            final double coslam = Math.cos(lambda);
+            double x,y;
+            switch (mode) {
+                case EQUATORIAL: {
+                    y = 1.0 + cosphi * coslam;
+                    if (y <= EPS10) {
+                        throw toleranceError();
+                    }
+                    y  = Math.sqrt(2.0 / y);
+                    x  = y * cosphi * Math.sin(lambda);
+                    y *= sinphi;
+                    break;
+                }
+                case OBLIQUE: {
+                    y = 1.0 + sinb1 * sinphi + cosb1 * cosphi * coslam;
+                    if (y <= EPS10) {
+                        throw toleranceError();
+                    }
+                    y  = Math.sqrt(2.0 / y);
+                    x  = y * cosphi * Math.sin(lambda);
+                    y *= cosb1 * sinphi - sinb1 * cosphi * coslam;
+                    break;
+                }
+                case NORTH_POLE: {
+                    if (Math.abs(phi + latitudeOfOrigin) < EPS10) {
+                        throw toleranceError();
+                    }
+                    y = (Math.PI/4) - phi * 0.5;
+                    y = 2.0 * Math.sin(y);
+                    x = y * Math.sin(lambda);
+                    y *= -coslam;
+                    break;
+                }
+                case SOUTH_POLE: {
+                    if (Math.abs(phi + latitudeOfOrigin) < EPS10) {
+                        throw toleranceError();
+                    }
+                    y = (Math.PI/4) - phi * 0.5;
+                    y = 2.0 * Math.cos(y);
+                    x = y * Math.sin(lambda);
+                    y *= +coslam;
+                    break;
+                }
+                default: {
+                    throw new AssertionError(mode);
+                }
+            }
+            assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
+            assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
+            if (ptDst != null) {
+                ptDst.setLocation(x,y);
+                return ptDst;
+            }
+            return new Point2D.Double(x,y);
+        }
+
+        /**
+         * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+         * and stores the result in {@code ptDst} using equations for a sphere.
+         */
+        protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
+                throws ProjectionException
+        {
+            // Compute using ellipsoidal formulas, for comparaison later.
+            assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
+
+            double lambda, phi;
+            final double rh = XMath.hypot(x, y);
+            phi = rh * 0.5;
+            if (phi > 1.0) {
+                throw toleranceError();
+            }
+            phi = 2.0 * Math.asin(phi);
+            switch (mode) {
+                case EQUATORIAL: {
+                    final double sinz = Math.sin(phi);
+                    final double cosz = Math.cos(phi);
+                    phi = Math.abs(rh) <= EPS10 ? 0.0 : Math.asin(y * sinz / rh);
+                    x *= sinz;
+                    y = cosz * rh;
+                    lambda = (y == 0) ? 0.0 : Math.atan2(x, y);
+                    break;
+                }
+                case OBLIQUE: {
+                    final double sinz = Math.sin(phi);
+                    final double cosz = Math.cos(phi);
+                    phi = Math.abs(rh) <= EPS10 ? latitudeOfOrigin :
+                            Math.asin(cosz * sinb1 + y * sinz * cosb1 / rh);
+                    x *= sinz * cosb1;
+                    y = (cosz - Math.sin(phi) * sinb1) * rh;
+                    lambda = (y == 0) ? 0.0 : Math.atan2(x, y);
+                    break;
+                }
+                case NORTH_POLE: {
+                    y = -y;
+                    phi = (Math.PI / 2) - phi;
+                    lambda = Math.atan2(x, y);
+                    break;
+                }
+                case SOUTH_POLE: {
+                    phi -= (Math.PI / 2);
+                    lambda = Math.atan2(x, y);
+                    break;
+                }
+            }
+
+            assert Math.abs(ptDst.getX()-x) <= EPS : x;
+            assert Math.abs(ptDst.getY()-y) <= EPS : y;
+            if (ptDst != null) {
+                ptDst.setLocation(x,y);
+                return ptDst;
+            }
+            return new Point2D.Double(x,y);
+        }      
+    }
+
+    /**
+     * Calculates <var>q</var>, Snyder equation (3-12)
+     *
+     * @param sinphi sin of the latitude <var>q</var> is calculated for.
+     * @return <var>q</var> from Snyder equation (3-12).
+     */
+    private double qsfn(final double sinphi) {
+        if (excentricity >= EPSILON) {
+            final double con = excentricity * sinphi;
+            return ((1.0 - excentricitySquared) * (sinphi / (1.0 - con*con) -
+                    (0.5 / excentricity) * Math.log((1.0 - con) / (1.0 + con))));
+        } else {
+            return sinphi + sinphi;
+        }
+    }
+
+    /**
+     * Determines latitude from authalic latitude.
+     */
+    private double authlat(final double beta) {
+        final double t = beta + beta;
+        return beta + APA0 * Math.sin(t) + APA1 * Math.sin(t+t) + APA2 * Math.sin(t+t+t);
+    }
+
+    /**
+     * Returns an exception for a tolerance error (error code -20 in Proj4).
+     *
+     * @todo Provide a message.
+     */
+    private static ProjectionException toleranceError() {
+        return new ProjectionException();
+    }
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDER                                 ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The {@link org.geotools.referencing.operation.MathTransformProvider}
+     * for an {@linkplain LambertAzimuthalEqualArea Lambert Equal Area} projection.
+     *
+     * @since 2.4
+     * @version $Id$
+     * @source $URL$
+     * @author Beate Stollberg
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     */
+    public static class Provider extends AbstractProvider {
+        /**
+         * The operation parameter descriptor for the {@link #latitudeOfOrigin}
+         * parameter value. Valid values range is from -90 to 90°. Default value is 0.
+         */
+        public static final ParameterDescriptor LATITUDE_OF_CENTRE = createDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(Citations.OGC,      "latitude_of_center"),
+                    new NamedIdentifier(Citations.EPSG,     "Latitude of natural origin"),
+//(TODO:need check) new NamedIdentifier(Citations.ESRI,     "Latitude_Of_Center"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "ProjCenterLat")
+                },
+                0, -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The operation parameter descriptor for the {@link #centralMeridian}
+         * parameter value. Valid values range is from -180 to 180°. Default value is 0.
+         */
+        public static final ParameterDescriptor LONGITUDE_OF_CENTRE = createDescriptor(
+                new NamedIdentifier[] {
+                    new NamedIdentifier(Citations.OGC,      "longitude_of_center"),
+                    new NamedIdentifier(Citations.EPSG,     "Longitude of natural origin"),
+//(TODO:need check) new NamedIdentifier(Citations.ESRI,     "Longitude_Of_Center"),
+                    new NamedIdentifier(Citations.GEOTIFF,  "ProjCenterLong")
+                },
+                0, -180, 180, NonSI.DEGREE_ANGLE);
+
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+            new NamedIdentifier(Citations.OGC,     "Lambert_Azimuthal_Equal_Area"),
+            new NamedIdentifier(Citations.EPSG,    "Lambert Azimuthal Equal Area"),
+            new NamedIdentifier(Citations.GEOTIFF, "CT_LambertAzimEqualArea"),
+            new NamedIdentifier(Citations.EPSG,    "9820"),
+        },  new ParameterDescriptor[] {
+                SEMI_MAJOR,         SEMI_MINOR,
+                LATITUDE_OF_CENTRE, LONGITUDE_OF_CENTRE,
+                FALSE_EASTING,      FALSE_NORTHING
+        });
+
+        /**
+         * Constructs a new provider.
+         */
+        public Provider() {
+            super(PARAMETERS);
+        }
+
+        /**
+         * Creates a transform from the specified group of parameter values.
+         *
+         * @param  parameters The group of parameter values.
+         * @return The created math transform.
+         * @throws ParameterNotFoundException if a required parameter was not found.
+         */
+        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+                throws ParameterNotFoundException
+        {
+            return new LambertAzimuthalEqualArea(parameters);
+        }
+    }
+}

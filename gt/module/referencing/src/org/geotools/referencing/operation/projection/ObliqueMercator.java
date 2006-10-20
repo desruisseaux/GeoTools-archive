@@ -142,8 +142,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </ul>
  * 
  * @see <A HREF="http://mathworld.wolfram.com/MercatorProjection.html">Oblique Mercator projection on MathWorld</A>
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/hotine_oblique_mercator.html">hotine_oblique_mercator on Remote Sensing</A>
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/oblique_mercator.html">oblique_mercator on Remote Sensing</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/hotine_oblique_mercator.html">"hotine_oblique_mercator" on RemoteSensing.org</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/oblique_mercator.html">"oblique_mercator" on RemoteSensing.org</A>
  *
  * @since 2.1
  * @source $URL$
@@ -233,13 +233,13 @@ public class ObliqueMercator extends MapProjection {
     private final double sinrot, cosrot;
     
     /**
-     * u value (in (U,V) coordinate system) of the central point. Used in the 
-     * oblique mercater case. The v value of the central point is 0.0.
+     * <var>u</var> value (in (U,V) coordinate system) of the central point. Used in
+     * the oblique mercator case. The <var>v</var> value of the central point is 0.0.
      */
     private double u_c;
     
     /**
-     * {@code true} if using two points on the central line to specify 
+     * {@code true} if using two points on the central line to specify
      * the azimuth.
      */
     private final boolean twoPoint;
@@ -271,10 +271,10 @@ public class ObliqueMercator extends MapProjection {
         latitudeOfOrigin = Double.NaN;
         centralMeridian  = Double.NaN;
 
-        latitudeOfCentre = doubleValue(expected, Provider.LAT_OF_CENTRE, parameters);
+        latitudeOfCentre = doubleValue(expected, Provider.LATITUDE_OF_CENTRE, parameters);
         //checks that latitudeOfCentre is not +- 90 degrees
         //not checking if latitudeOfCentere is 0, since equations behave correctly
-        ensureLatitudeInRange(Provider.LAT_OF_CENTRE, latitudeOfCentre, false);
+        ensureLatitudeInRange(Provider.LATITUDE_OF_CENTRE, latitudeOfCentre, false);
         
         if (twoPoint) {
             longitudeOfCentre  = Double.NaN;
@@ -304,8 +304,8 @@ public class ObliqueMercator extends MapProjection {
             latitudeOf2ndPoint  = Double.NaN;
             longitudeOf2ndPoint = Double.NaN;
                        
-            longitudeOfCentre = doubleValue(expected, Provider.LONG_OF_CENTRE, parameters);
-            ensureLongitudeInRange(Provider.LONG_OF_CENTRE, longitudeOfCentre, true);
+            longitudeOfCentre = doubleValue(expected, Provider.LONGITUDE_OF_CENTRE, parameters);
+            ensureLongitudeInRange(Provider.LONGITUDE_OF_CENTRE, longitudeOfCentre, true);
             
             alpha_c = doubleValue(expected, Provider.AZIMUTH, parameters);
             //already checked for +-360 deg. above. 
@@ -418,15 +418,15 @@ public class ObliqueMercator extends MapProjection {
         final ParameterValueGroup values = super.getParameterValues();
         final Collection expected = getParameterDescriptors().descriptors();
         if (twoPoint) {
-            set(expected, Provider_TwoPoint.LAT_OF_CENTRE, values, latitudeOfCentre);
-            set(expected, Provider_TwoPoint.LAT_OF_1ST_POINT, values, latitudeOf1stPoint);
+            set(expected, Provider_TwoPoint.LAT_OF_CENTRE,     values, latitudeOfCentre);
+            set(expected, Provider_TwoPoint.LAT_OF_1ST_POINT,  values, latitudeOf1stPoint);
             set(expected, Provider_TwoPoint.LONG_OF_1ST_POINT, values, longitudeOf1stPoint);
-            set(expected, Provider_TwoPoint.LAT_OF_2ND_POINT, values, latitudeOf2ndPoint);
+            set(expected, Provider_TwoPoint.LAT_OF_2ND_POINT,  values, latitudeOf2ndPoint);
             set(expected, Provider_TwoPoint.LONG_OF_2ND_POINT, values, longitudeOf2ndPoint);
         } else {
-            set(expected, Provider.LAT_OF_CENTRE, values, latitudeOfCentre);
-            set(expected, Provider.LONG_OF_CENTRE, values, longitudeOfCentre);
-            set(expected, Provider.AZIMUTH, values, alpha_c );
+            set(expected, Provider.LATITUDE_OF_CENTRE,        values, latitudeOfCentre);
+            set(expected, Provider.LONGITUDE_OF_CENTRE,       values, longitudeOfCentre);
+            set(expected, Provider.AZIMUTH,              values, alpha_c);
             set(expected, Provider.RECTIFIED_GRID_ANGLE, values, rectGridAngle);
         }
         return values;
@@ -581,7 +581,7 @@ public class ObliqueMercator extends MapProjection {
          * The operation parameter descriptor for the {@link #latitudeOfCentre}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
-        public static final ParameterDescriptor LAT_OF_CENTRE = createDescriptor(
+        public static final ParameterDescriptor LATITUDE_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,      "latitude_of_center"),
                     new NamedIdentifier(Citations.EPSG,     "Latitude of projection centre"),
@@ -589,12 +589,17 @@ public class ObliqueMercator extends MapProjection {
                     new NamedIdentifier(Citations.GEOTIFF,  "CenterLat")
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
+
+        /**
+         * @deprecated Renamed {@link #LATITUDE_OF_CENTRE}.
+         */
+        public static final ParameterDescriptor LAT_OF_CENTRE = LATITUDE_OF_CENTRE;
         
         /**
          * The operation parameter descriptor for the {@link #longitudeOfCentre}
          * parameter value. Valid values range is from -180 to 180°. Default value is 0.
          */
-        public static final ParameterDescriptor LONG_OF_CENTRE = createDescriptor(
+        public static final ParameterDescriptor LONGITUDE_OF_CENTRE = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,      "longitude_of_center"),
                     new NamedIdentifier(Citations.EPSG,     "Longitude of projection centre"),
@@ -602,7 +607,12 @@ public class ObliqueMercator extends MapProjection {
                     new NamedIdentifier(Citations.GEOTIFF,  "CenterLong")
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
-                
+
+        /**
+         * @deprecated Renamed {@link #LONGITUDE_OF_CENTRE}.
+         */
+        public static final ParameterDescriptor LONG_OF_CENTRE = LONGITUDE_OF_CENTRE;
+
         /**
          * The operation parameter descriptor for the {@link #alpha_c}
          * parameter value. Valid values range is from -360 to -270, -90 to 90, 
@@ -645,7 +655,7 @@ public class ObliqueMercator extends MapProjection {
                                                         VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
-                LONG_OF_CENTRE,      LAT_OF_CENTRE,
+                LONGITUDE_OF_CENTRE, LATITUDE_OF_CENTRE,
                 AZIMUTH,             RECTIFIED_GRID_ANGLE,
                 SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
@@ -711,7 +721,7 @@ public class ObliqueMercator extends MapProjection {
                                                         VocabularyKeys.OBLIQUE_MERCATOR_PROJECTION))
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
-                LONG_OF_CENTRE,      LAT_OF_CENTRE,
+                LONGITUDE_OF_CENTRE,      LATITUDE_OF_CENTRE,
                 AZIMUTH,             RECTIFIED_GRID_ANGLE,
                 SCALE_FACTOR,
                 FALSE_EASTING,       FALSE_NORTHING
@@ -757,7 +767,7 @@ public class ObliqueMercator extends MapProjection {
      * @author Rueben Schulz
      */
     public static class Provider_TwoPoint extends Provider {
-    		/**
+        /**
          * The operation parameter descriptor for the {@link #latitudeOfCentre}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */
@@ -770,7 +780,7 @@ public class ObliqueMercator extends MapProjection {
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
         
-    	    /**
+        /**
          * The operation parameter descriptor for the {@link #latitudeOf1stPoint}
          * parameter value. Valid values range is from -90 to 90°. Default value is 0.
          */

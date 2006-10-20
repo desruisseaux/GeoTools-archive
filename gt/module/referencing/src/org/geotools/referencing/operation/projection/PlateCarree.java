@@ -37,7 +37,7 @@ import org.geotools.resources.i18n.Errors;
  * {@linkplain EquidistantCylindrical Equidistant Cylindrical} projection where the
  * {@code standard_parallel_1} is 0°.
  *
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">"Equirectangular" on Remote Sensing</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">"Equirectangular" on RemoteSensing.org</A>
  *
  * @since 2.2
  * @source $URL$

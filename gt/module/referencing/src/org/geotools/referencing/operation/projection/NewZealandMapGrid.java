@@ -35,7 +35,7 @@ import org.geotools.metadata.iso.citation.Citations;
 
 
 /**
- * Implementation of the NZMG (New Zealand Map Grid) projection.
+ * The NZMG (New Zealand Map Grid) projection.
  * <p>
  * This is an implementation of algorithm published by
  * <a href="http://www.govt.nz/record?recordid=28">Land Information New Zealand</a>.
@@ -168,8 +168,9 @@ public class NewZealandMapGrid extends MapProjection {
     }
 
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
+     * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+     * (units in radians) and stores the result in {@code ptDst} (linear distance
+     * on a unit sphere).
      */
     protected synchronized Point2D transformNormalized(final double x, final double y,
                                                        final Point2D ptDst)
@@ -197,7 +198,7 @@ public class NewZealandMapGrid extends MapProjection {
     }
 
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+     * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
     protected synchronized Point2D inverseTransformNormalized(final double x, final double y,

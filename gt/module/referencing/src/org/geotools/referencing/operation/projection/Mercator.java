@@ -61,8 +61,8 @@ import org.geotools.resources.i18n.ErrorKeys;
  * </ul>
  *
  * @see <A HREF="http://mathworld.wolfram.com/MercatorProjection.html">Mercator projection on MathWorld</A>
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on Remote Sensing</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on RemoteSensing.org</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html">"mercator_2sp" on RemoteSensing.org</A>
  * 
  * @since 2.1
  * @source $URL$
@@ -125,8 +125,9 @@ public abstract class Mercator extends MapProjection {
     }
 
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in {@code ptDst} (linear distance on a unit sphere).
+     * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+     * (units in radians) and stores the result in {@code ptDst} (linear distance
+     * on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
@@ -146,7 +147,7 @@ public abstract class Mercator extends MapProjection {
     }
     
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+     * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
@@ -185,8 +186,9 @@ public abstract class Mercator extends MapProjection {
         }
 
         /**
-         * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
-         * and stores the result in {@code ptDst} using equations for a Sphere.
+         * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+         * (units in radians) and stores the result in {@code ptDst} (linear distance
+         * on a unit sphere).
          */
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
@@ -210,7 +212,7 @@ public abstract class Mercator extends MapProjection {
         }
 
         /**
-         * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+         * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
          * and stores the result in {@code ptDst} using equations for a sphere.
          */
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)

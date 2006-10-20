@@ -423,6 +423,8 @@ public class DefaultDataSourceTest extends TestCase {
     public void testValidArea() throws FactoryException, TransformException {
         final CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem("7400");
         final GeographicBoundingBox bbox = CRS.getGeographicBoundingBox(crs);
+        assertNotNull("No bounding box. Maybe an older EPSG database is running? " +
+                      "Try to clear the tmp/Geotools directory.", bbox);
         assertEquals(42.25, bbox.getSouthBoundLatitude(), EPS);
         assertEquals(51.10, bbox.getNorthBoundLatitude(), EPS);
         assertEquals(-5.20, bbox.getWestBoundLongitude(), EPS);

@@ -1095,8 +1095,10 @@ public abstract class MapProjection extends AbstractMathTransform
                     new NamedIdentifier(Citations.EPSG,    "Longitude of natural origin"),
                     new NamedIdentifier(Citations.EPSG,    "Longitude of false origin"),
                     new NamedIdentifier(Citations.ESRI,    "Longitude_Of_Origin"),
-                    new NamedIdentifier(Citations.ESRI,    "Longitude_Of_Center"),  //ESRI uses this in orthographic (not to be confused with Longitude_Of_Center in oblique mercator)
+                    new NamedIdentifier(Citations.ESRI,    "Longitude_Of_Center"),
                     new NamedIdentifier(Citations.GEOTIFF, "NatOriginLong")
+                    // ESRI uses "Longitude_Of_Origin" in orthographic (not to
+                    // be confused with "Longitude_Of_Center" in oblique mercator).
                 },
                 0, -180, 180, NonSI.DEGREE_ANGLE);
 
@@ -1106,11 +1108,12 @@ public abstract class MapProjection extends AbstractMathTransform
          */
         public static final ParameterDescriptor LATITUDE_OF_ORIGIN = createDescriptor(
                 new NamedIdentifier[] {
-                    new NamedIdentifier(Citations.OGC,  "latitude_of_origin"),
-                    new NamedIdentifier(Citations.EPSG, "Latitude of false origin"),
-                    new NamedIdentifier(Citations.EPSG, "Latitude of natural origin"),
-                    new NamedIdentifier(Citations.ESRI, "Latitude_Of_Center"),  //ESRI uses this in orthographic 
-                    new NamedIdentifier(Citations.GEOTIFF,  "NatOriginLat")
+                    new NamedIdentifier(Citations.OGC,     "latitude_of_origin"),
+                    new NamedIdentifier(Citations.EPSG,    "Latitude of false origin"),
+                    new NamedIdentifier(Citations.EPSG,    "Latitude of natural origin"),
+                    new NamedIdentifier(Citations.ESRI,    "Latitude_Of_Center"),
+                    new NamedIdentifier(Citations.GEOTIFF, "NatOriginLat")
+                    // ESRI uses "Latitude_Of_Center" in orthographic.
                 },
                 0, -90, 90, NonSI.DEGREE_ANGLE);
 

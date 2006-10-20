@@ -344,7 +344,7 @@ public class Preprocessor extends Format {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.MISSING_WKT_DEFINITION));
         }
         if (!isIdentifier(name)) {
-            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_IDENTIFIER_$1));
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ILLEGAL_IDENTIFIER_$1, name));
         }
         value = substitute(value);
         final Definition newDef = new Definition(value, forwardParse(value));

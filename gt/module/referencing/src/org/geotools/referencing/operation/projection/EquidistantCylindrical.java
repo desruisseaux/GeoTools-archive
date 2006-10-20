@@ -53,7 +53,7 @@ import org.geotools.resources.i18n.Errors;
  * </ul>
  *
  * @see <A HREF="http://mathworld.wolfram.com/CylindricalEquidistantProjection.html">Cylindrical Equidistant projection on MathWorld</A>
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">"Equirectangular" on Remote Sensing</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/equirectangular.html">"Equirectangular" on RemoteSensing.org</A>
  *
  * @since 2.2
  * @source $URL$
@@ -118,8 +118,9 @@ public class EquidistantCylindrical extends MapProjection {
     }
 
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in <code>ptDst</code> (linear distance on a unit sphere).
+     * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+     * (units in radians) and stores the result in {@code ptDst} (linear distance
+     * on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
@@ -133,7 +134,7 @@ public class EquidistantCylindrical extends MapProjection {
     }
 
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+     * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in <code>ptDst</code>.
      */
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)

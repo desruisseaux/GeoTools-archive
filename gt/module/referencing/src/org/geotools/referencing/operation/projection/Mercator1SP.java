@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.Vocabulary;
 /**
  * Mercator Cylindrical 1SP Projection.
  *
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on RemoteSensing.org</A>
  * 
  * @since 2.2
  * @source $URL$
@@ -96,7 +96,7 @@ public class Mercator1SP extends Mercator {
      * The {@link org.geotools.referencing.operation.MathTransformProvider} for a
      * {@linkplain Mercator1SP Mercator 1SP} projection.
      *
-     * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on Remote Sensing</A>
+     * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on RemoteSensing.org</A>
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      *
      * @version $Id$

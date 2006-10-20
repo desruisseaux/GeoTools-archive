@@ -49,7 +49,7 @@ public class OrthographicPolar extends Orthographic {
      * if it is for the south pole.
      */
     private final boolean northPole;
-    
+
     /**
      * Constructs a polar orthographic projection.
      *
@@ -66,42 +66,40 @@ public class OrthographicPolar extends Orthographic {
         latitudeOfOrigin = (northPole) ? Math.PI/2.0 : -Math.PI/2.0;
         assert isSpherical;
     }
-    
+
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate (units in radians)
-     * and stores the result in {@code ptDst} (linear distance on a unit sphere). 
+     * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
+     * (units in radians) and stores the result in {@code ptDst} (linear distance
+     * on a unit sphere).
      */
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
         if (Math.abs(y - latitudeOfOrigin) - EPS > Math.PI/2.0) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
-
         }
-        
-	double cosphi = Math.cos(y);
-	double coslam = Math.cos(x);
+        double cosphi = Math.cos(y);
+        double coslam = Math.cos(x);
         if (northPole) {
             coslam = -coslam;
         }
-	y = cosphi * coslam;
+        y = cosphi * coslam;
         x = cosphi * Math.sin(x);
-        
+
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
-     * Transforms the specified (<var>x</var>,<var>y</var>) coordinate
+     * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-         
         final double rho = Math.sqrt(x*x + y*y);
         double sinc = rho;
         if (sinc > 1.0) {
@@ -110,7 +108,6 @@ public class OrthographicPolar extends Orthographic {
             }
             sinc = 1.0;
         }
-        
         if (rho <= EPS) {
             y = latitudeOfOrigin;
             x = 0.0;
@@ -125,7 +122,6 @@ public class OrthographicPolar extends Orthographic {
             x = Math.atan2(x, y);
             y = phi;
         }
-        
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
