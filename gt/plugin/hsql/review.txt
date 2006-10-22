@@ -4,7 +4,7 @@ Module Maintainer Amr
 IP Review Jody Garnett, July 10th, 2007
 
 This module was created by Refractions Research for a uDig based project,
-based on a mysterious LICENSE.TXT incldued in the epsh-hsql project I am
+based on a mysterious LICENSE.TXT included in the epsg-hsql project I am
 wondering if we need to look into distribution requirements of the hsql
 jdbc driver.
 

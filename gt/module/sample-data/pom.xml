@@ -88,19 +88,4 @@
   </dependencies>
 
 
-  <!-- =========================================================== -->
-  <!--     Build Configuration                                     -->
-  <!-- =========================================================== -->
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/java</directory>
-        <includes>
-          <include>org/geotools/test-data/**</include>
-        </includes>
-      </resource>
-    </resources>
-  </build>
-
-
 </project>

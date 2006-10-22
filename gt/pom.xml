@@ -697,26 +697,6 @@
   <build>
     <scriptSourceDirectory>scripts</scriptSourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
-    <resources>
-      <resource>
-        <directory>src/main/java</directory>
-        <includes>
-          <include>**/*.txt</include>
-          <include>**/*.sql</include>
-          <include>**/*.xml</include>
-          <include>**/*.xsd</include>
-          <include>**/*.utf</include>
-          <include>**/*.properties</include>
-          <include>**/*.serialized</include>
-          <include>META-INF/*.jai</include>
-          <include>META-INF/services/**</include>
-        </includes>
-        <excludes>
-          <exclude>**/doc-files/**</exclude>
-          <exclude>org/geotools/resources/i18n/**/*.properties</exclude>
-        </excludes>
-      </resource>
-    </resources>
     <testResources>
       <testResource>
         <directory>test</directory>
