@@ -141,23 +141,6 @@
     <scriptSourceDirectory>scripts</scriptSourceDirectory>
     -->
     
-    <!--
-    <testResources>
-      <testResource>
-        <directory>src/test/java</directory>
-        <includes>
-          <include>META-INF/services/**</include>
-          <include>**/test-data/**</include>
-          <include>**/*.asc</include>
-          <include>**/*.ecw</include>
-          </includes>
-        <excludes>
-          <exclude>**/doc-files/**</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
-    -->
-    
     <plugins>
       <!-- ====    Compilation      ============================== -->
       <plugin>

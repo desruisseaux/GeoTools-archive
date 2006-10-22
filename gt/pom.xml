@@ -696,30 +696,6 @@
   <!-- =========================================================== -->
   <build>
     <scriptSourceDirectory>scripts</scriptSourceDirectory>
-    <testResources>
-      <testResource>
-        <directory>src/test/java</directory>
-        <includes>
-          <include>META-INF/services/**</include>
-          <include>**/test-data/**</include>
-          <include>**/*.xml</include>
-          <include>**/*.xsd</include>
-          <include>**/*.csv</include>
-          <include>**/*.sld</include>
-          <include>**/*.svg</include>
-          <include>**/*.gml</include>
-          <include>**/*.wkt</include>
-          <include>**/*.txt</include>
-          <include>**/*.sql</include>
-          <include>**/*.png</include>
-          <include>**/*.properties</include>
-          <include>**/*.serialized</include>
-        </includes>
-        <excludes>
-          <exclude>**/doc-files/**</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
 
 
 
