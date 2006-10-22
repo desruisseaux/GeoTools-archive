@@ -104,7 +104,7 @@
   <build>
     <resources>
       <resource>
-        <directory>src</directory>
+        <directory>src/main/java</directory>
         <includes>
           <include>**/*.nor</include>
           <include>META-INF/services/**</include>

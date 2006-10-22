@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 21768 2006-10-03 13:04:43Z acuster $              
+        Version: $Id$              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -138,7 +138,6 @@
   <!-- =========================================================== -->
   <build>
     <!--
-    <sourceDirectory>src</sourceDirectory>
     <scriptSourceDirectory>scripts</scriptSourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     -->
@@ -146,7 +145,7 @@
     <!--
     <resources>
       <resource>
-        <directory>src</directory>
+        <directory>src/main/java</directory>
         <includes>
           <include>**/*.ecw</include>
           <include>**/*.arc</include>

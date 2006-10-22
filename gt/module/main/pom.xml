@@ -278,7 +278,7 @@
         <artifactId>gt2-jjtree-javacc</artifactId>
         <version>${project.version}</version>
         <configuration>
-          <sourceDirectory>${basedir}/src</sourceDirectory>       <!-- Where to search for .jjt files -->
+          <sourceDirectory>${basedir}/src/main/java</sourceDirectory> <!-- Where to search for .jjt files -->
           <nodeDirectory>${basedir}/modified-src</nodeDirectory>  <!-- Where to search for Node.java  -->
           <nodePackage>org.geotools.filter.parser</nodePackage>
         </configuration>

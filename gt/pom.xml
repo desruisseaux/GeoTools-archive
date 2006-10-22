@@ -695,12 +695,11 @@
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
-    <sourceDirectory>src</sourceDirectory>
     <scriptSourceDirectory>scripts</scriptSourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <resources>
       <resource>
-        <directory>src</directory>
+        <directory>src/main/java</directory>
         <includes>
           <include>**/*.txt</include>
           <include>**/*.sql</include>
