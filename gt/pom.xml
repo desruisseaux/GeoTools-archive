@@ -696,10 +696,9 @@
   <!-- =========================================================== -->
   <build>
     <scriptSourceDirectory>scripts</scriptSourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
     <testResources>
       <testResource>
-        <directory>test</directory>
+        <directory>src/test/java</directory>
         <includes>
           <include>META-INF/services/**</include>
           <include>**/test-data/**</include>
