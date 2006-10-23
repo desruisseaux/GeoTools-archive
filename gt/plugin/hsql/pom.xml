@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-hsql</artifactId>
+  <artifactId>hsql</artifactId>
   <packaging>jar</packaging>
   <name>HSQL datasource module</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/hsql/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/hsql/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/hsql/</url>
-  </scm>
   
   <description>
     HSQL is a lightweight (about 600k) JAVA database that
@@ -82,12 +73,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

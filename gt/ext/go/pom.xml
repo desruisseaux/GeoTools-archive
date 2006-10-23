@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-ext</artifactId>
+    <artifactId>ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
 
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-go</artifactId>
+  <artifactId>go</artifactId>
   <packaging>jar</packaging>
   <name>GO-1 implementation</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/go/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/go/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/go/</url>
-  </scm>
   
   <description>
     Provides a GO-1 (Geospatial Object) implementation. This module contains
@@ -94,7 +85,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

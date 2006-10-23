@@ -14,7 +14,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>gt2-demo</artifactId>
+    <artifactId>demo</artifactId>
     <groupId>org.geotools</groupId>
     <version>2.4-SNAPSHOT</version>
   </parent>
@@ -24,23 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-demo-mappane</artifactId>
+  <artifactId>demo-mappane</artifactId>
   <packaging>jar</packaging>
   <name>Demos of the JMapPane</name>
-  <version>2.4-SNAPSHOT</version>
-  <url>http://maven.geotools.fr/reports/demo/property</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/mappane
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/demo/mappane/</url>
-    <!-- 
-    <developerConnection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt2-demo/gt2-demo-mappane
-    </developerConnection>
-    -->
-  </scm>
   
   <description>
     Demos for Geotools 2.
@@ -103,22 +89,22 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-mappane</artifactId>
+      <artifactId>mappane</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
   </dependencies>

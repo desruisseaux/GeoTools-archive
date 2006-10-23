@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-arcsde-plugin</artifactId>
+    <artifactId>arcsde-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-arcsde</artifactId>
+  <artifactId>arcsde</artifactId>
   <packaging>jar</packaging>
   <name>ArcSDE DataStore plugin</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/arcsde/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/arcsde/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/arcsde/</url>
-  </scm>
   
   <description>
     ArcSDE DataStore plugin.
@@ -98,7 +89,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -108,7 +99,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sde-dummy</artifactId>
+      <artifactId>sde-dummy</artifactId>
       <version>2.4-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-arcgrid</artifactId>
+  <artifactId>arcgrid</artifactId>
   <packaging>jar</packaging>
   <name>ArcGrid datasource module</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/arcgrid/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/arcgrid/</url>
-  </scm>
   
   <description>
     Datasource created to read ArcGrid raster format. Currently Serving
@@ -98,12 +89,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-image</artifactId>
+      <artifactId>image</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-maven</artifactId>
+    <artifactId>maven</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-javamaker</artifactId>
+  <artifactId>javamaker</artifactId>
   <packaging>maven-plugin</packaging>
   <name>OpenOffice IDL to Java</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/javamaker/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/javamaker/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/maven/javamaker/</url>
-  </scm>
   
   <description>
     Compiles Java interfaces from OpenOffice IDL files. In an ideal world,

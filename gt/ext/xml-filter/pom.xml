@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-ext</artifactId>
+    <artifactId>ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,10 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-xml-filter</artifactId>
+  <artifactId>xml-filter</artifactId>
   <packaging>jar</packaging>
   <name>Filter XML Bindings</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/xml-filter/</url>
   
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/xml-filter/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/xml-filter/</url>
-  </scm>
   <description>
     Filter XML support for Geotools.
   </description>
@@ -78,37 +70,37 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml</artifactId>
+      <artifactId>xml</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml-gml2</artifactId>
+      <artifactId>xml-gml2</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-xml-gml3</artifactId>
+      <artifactId>xml-gml3</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>    
   </dependencies>

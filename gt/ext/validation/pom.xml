@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-ext</artifactId>
+    <artifactId>ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-validation</artifactId>
+  <artifactId>validation</artifactId>
   <packaging>jar</packaging>
   <name>Validation Processor and Framework</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/validation/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/validation/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/validation/</url>
-  </scm>
   
   <description>
     Validation module (and validator batch tool) for use with geotools2.
@@ -101,22 +92,22 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-directory</artifactId>
+      <artifactId>directory</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-graph</artifactId>
+      <artifactId>graph</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis</artifactId>
+      <artifactId>postgis</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-shapefile</artifactId>
+      <artifactId>shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
 

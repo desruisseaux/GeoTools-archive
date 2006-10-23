@@ -5,7 +5,7 @@
         The Geotools Project                                                    
             http://www.geotools.org/                                            
                                                                                 
-        Version: $Id: pom.xml 21768 2006-10-03 13:04:43Z acuster $              
+        Version: $Id$              
      ======================================================================= -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -14,7 +14,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>gt2-demo</artifactId>
+    <artifactId>demo</artifactId>
     <groupId>org.geotools</groupId>
     <version>2.4-SNAPSHOT</version>
   </parent>
@@ -24,23 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-demo-introduction</artifactId>
+  <artifactId>demo-introduction</artifactId>
   <packaging>jar</packaging>
   <name>Demo Introduction to Geotools</name>
-  <version>2.4-SNAPSHOT</version>
-  <url>http://maven.geotools.fr/reports/demo/introduction</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/introduction/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/xml-gml2/</url>
-    <!-- 
-    <developerConnection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt2-demo/gt2-demo-introduction
-    </developerConnection>
-    -->
-  </scm>
   
   <description>
     An introductory demonstration application.
@@ -104,37 +90,37 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-mappane</artifactId>
+      <artifactId>mappane</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-demo-mappane</artifactId>
+      <artifactId>demo-mappane</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-wfs</artifactId>
+      <artifactId>wfs</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis</artifactId>
+      <artifactId>postgis</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

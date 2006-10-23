@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-demo</artifactId>
+  <artifactId>demo</artifactId>
   <packaging>pom</packaging>
   <name>Geotools demos and examples</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/demo/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/demo/</url>
-  </scm>
   
   <description>
     Demos and Examples for Geotools 2, discussion in wiki
@@ -69,19 +60,19 @@
       <!-- GeoTools Library -->
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-main</artifactId>
+        <artifactId>main</artifactId>
         <version>${project.version}</version>
       </dependency>
     
      <!-- GeoTools Plugin -->
      <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-epsg-wkt</artifactId>
+        <artifactId>epsg-wkt</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-shapefile</artifactId>
+        <artifactId>shapefile</artifactId>
         <version>${project.version}</version>
       </dependency>
       
@@ -97,7 +88,7 @@
     <plugins>
       <plugin>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-jar-collector</artifactId>
+        <artifactId>jar-collector</artifactId>
         <version>${project.version}</version>
         <executions>
           <execution>

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-tiger</artifactId>
+  <artifactId>tiger</artifactId>
   <packaging>jar</packaging>
   <name>TIGER/Line 2000 datastore implementation</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/tiger/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/tiger/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/tiger/</url>
-  </scm>
   
   <description>
     U.S. Census TIGER/Line 2000 Datastore implementation.
@@ -80,7 +71,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

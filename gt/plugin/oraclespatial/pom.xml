@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-oracle-spatial</artifactId>
+  <artifactId>oracle-spatial</artifactId>
   <packaging>jar</packaging>
   <name>Oracle Spatial Module</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/oracle-spatial/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/oraclespatial/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/oraclespatial/</url>
-  </scm>
   
   <description>
     (todo)
@@ -87,7 +78,7 @@
   
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-ext</artifactId>
+    <artifactId>ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
 
@@ -24,17 +24,10 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-xml</artifactId>
+  <artifactId>xml</artifactId>
   <packaging>jar</packaging>
   <name>XML Parsing</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/xml/</url>
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/xml/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/xml/</url>
-  </scm>
+  
   <description>
     Schema based xml parsing. This module contains tools for creating 
     bindings from xml types to java types. Schema modelling is based 
@@ -89,7 +82,7 @@
   <dependencies> 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-graph</artifactId>
+      <artifactId>graph</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>

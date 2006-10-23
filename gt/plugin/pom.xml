@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-plugin</artifactId>
+  <artifactId>plugin</artifactId>
   <packaging>pom</packaging>
   <name>Geotools plugins</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/plugin/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/</url>
-  </scm>
   
   <description>
     Geotools plugins.
@@ -65,7 +56,7 @@
     <plugins>
       <plugin>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-jar-collector</artifactId>
+        <artifactId>jar-collector</artifactId>
         <version>${project.version}</version>
         <executions>
           <execution>

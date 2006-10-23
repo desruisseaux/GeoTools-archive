@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-directory</artifactId>
+  <artifactId>directory</artifactId>
   <packaging>jar</packaging>
   <name>Directory module</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/directory/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/directory/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/directory/</url>
-  </scm>
   
   <description>
     Used to represent a directory and propagates to the 
@@ -91,12 +82,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-shapefile</artifactId>
+      <artifactId>shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-gml</artifactId>
+      <artifactId>gml</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

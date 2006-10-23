@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-ext</artifactId>
+    <artifactId>ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,10 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-brewer</artifactId>
+  <artifactId>brewer</artifactId>
   <packaging>jar</packaging>
   <name>Brewer module</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/brewer/</url>
   
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/brewer/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/brewer/</url>
-  </scm>
   <description>
     Brewer module, which contains ColorBrewer, etc.
   </description>
@@ -87,17 +79,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-postgis</artifactId>
+      <artifactId>postgis</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

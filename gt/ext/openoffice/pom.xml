@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-ext</artifactId>
+    <artifactId>ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-openoffice</artifactId>
+  <artifactId>openoffice</artifactId>
   <packaging>jar</packaging>
   <name>Bridges to OpenOffice suite</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/openoffice/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/openoffice/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/openoffice/</url>
-  </scm>
   
   <description>
     Provides some Geotools's fonctionalities as OpenOffice plugins. For 
@@ -95,17 +86,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>hsqldb</groupId>        <!-- Overrides the HSQL dependency (from gt2-epsg-hsql) with -->
+      <groupId>hsqldb</groupId>        <!-- Overrides the HSQL dependency (from epsg-hsql) with     -->
       <artifactId>hsqldb</artifactId>  <!-- "provided" scope instead of "runtime", because the HSQL -->
       <scope>provided</scope>          <!-- engine is already included in OpenOffice environment.   -->
       <!-- The version number is specified in the parent POM. -->
@@ -145,7 +136,7 @@
       <!-- Copies the OpenOffice-generated .class files -->
       <plugin>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-javamaker</artifactId>
+        <artifactId>javamaker</artifactId>
         <version>${project.version}</version>
         <executions>
           <execution>
@@ -175,7 +166,7 @@
       <!-- Creates the uno.pkg file -->
       <plugin>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-unopkg</artifactId>
+        <artifactId>unopkg</artifactId>
         <version>${project.version}</version>
         <configuration>
           <finalName>geotools</finalName>

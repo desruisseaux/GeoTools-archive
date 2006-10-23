@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-ext</artifactId>
+  <artifactId>ext</artifactId>
   <packaging>pom</packaging>
   <name>Geotools extensions</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/ext/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/</url>
-  </scm>
   
   <description>
     Extensions to Geotools 2.
@@ -65,7 +56,7 @@
     <plugins>
       <plugin>
         <groupId>org.geotools</groupId>
-        <artifactId>gt2-jar-collector</artifactId>
+        <artifactId>jar-collector</artifactId>
         <version>${project.version}</version>
         <executions>
           <execution>

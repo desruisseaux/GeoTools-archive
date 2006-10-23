@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-gtopo30</artifactId>
+  <artifactId>gtopo30</artifactId>
   <packaging>jar</packaging>
   <name>GTopo30 datasource module</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/gtopo30/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/</url>
-  </scm>
   
   <description>
     This datasource reads the GTOPO30 DEM format.
@@ -88,17 +79,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-hsql</artifactId>
+      <artifactId>epsg-hsql</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

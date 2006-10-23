@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-geomedia</artifactId>
+  <artifactId>geomedia</artifactId>
   <packaging>jar</packaging>
   <name>GeoMedia datastore implementation</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/geomedia/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/geomedia/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/geomedia/</url>
-  </scm>
   
   <description>
     (todo)
@@ -80,7 +71,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -93,7 +93,7 @@
   </scm>
   
   <description>
-    Welcome to the homepage of the GeoTool2 build process
+    Welcome to the homepage of the GeoTool build process
     In the left side bar you should see a list of active modules,
     visit each for more details on the status of each module.
   </description>
@@ -695,8 +695,7 @@
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
-    <scriptSourceDirectory>scripts</scriptSourceDirectory>
-
+    <finalName>gt-${artifactId}-${version}</finalName>
 
 
     <!-- ========================================================= -->
@@ -845,7 +844,7 @@
         <dependencies>
           <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt2-build-configs</artifactId>
+            <artifactId>build-configs</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>
@@ -919,7 +918,7 @@
         <dependencies>
           <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt2-build-configs</artifactId>
+            <artifactId>build-configs</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>
@@ -997,7 +996,7 @@
               <tagletClass>org.geotools.maven.taglet.Tutorial</tagletClass>
               <tagletArtifact>
                 <groupId>org.geotools</groupId>
-                <artifactId>gt2-javadoc</artifactId>
+                <artifactId>javadoc</artifactId>
                 <version>${project.version}</version>
               </tagletArtifact>
             </taglet>
@@ -1005,7 +1004,7 @@
               <tagletClass>org.geotools.maven.taglet.Source</tagletClass>
               <tagletArtifact>
                 <groupId>org.geotools</groupId>
-                <artifactId>gt2-javadoc</artifactId>
+                <artifactId>javadoc</artifactId>
                 <version>${project.version}</version>
               </tagletArtifact>
             </taglet>
@@ -1151,7 +1150,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <configuration>
-          <siteDirectory>site</siteDirectory>
           <!-- Generates the site in English and French -->
           <!-- Set to English only for now because of a bug 
                in French resources

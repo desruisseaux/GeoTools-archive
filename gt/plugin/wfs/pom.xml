@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-plugin</artifactId>
+    <artifactId>plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-wfs</artifactId>
+  <artifactId>wfs</artifactId>
   <packaging>jar</packaging>
   <name>WFS client module</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/wfs/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/plugin/wfs/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/plugin/wfs/</url>
-  </scm>
   
   <description>
     (todo)
@@ -80,17 +71,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-wms</artifactId>
+      <artifactId>wms</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-sample-data</artifactId>
+      <artifactId>sample-data</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

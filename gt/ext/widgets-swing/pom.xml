@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-ext</artifactId>
+    <artifactId>ext</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,18 +24,9 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-widgets-swing</artifactId>
+  <artifactId>widgets-swing</artifactId>
   <packaging>jar</packaging>
   <name>Swing widgets</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/widgets-swing/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/ext/widgets-swing/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/ext/widgets-swing/</url>
-  </scm>
   
   <description>
     Provides dialog box, status bar, etc. using Swing framework.
@@ -102,23 +93,23 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-coverage</artifactId>
+      <artifactId>coverage</artifactId>
       <version>${project.version}</version>
     </dependency>
       <!-- api used for ProgressListener, Feature and FeatureType. -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-api</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-main</artifactId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

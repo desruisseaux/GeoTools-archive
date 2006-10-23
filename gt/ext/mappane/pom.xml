@@ -14,7 +14,7 @@
   <modelVersion>4.0.0</modelVersion>
   
   <parent>
-    <artifactId>gt2-ext</artifactId>
+    <artifactId>ext</artifactId>
     <groupId>org.geotools</groupId>
     <version>2.4-SNAPSHOT</version>
   </parent>
@@ -23,20 +23,8 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-mappane</artifactId>
+  <artifactId>mappane</artifactId>
   <name>JMapPane Implementation</name>
-  <!-- <version></version> -->
-  <url>http://maven.geotools.fr/reports/mappane</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/ext/mappane
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/ext/mappane</url>
-    <developerConnection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt2-ext/gt2-mappane
-    </developerConnection>
-  </scm>
   
   <description>
     Provides an implementation of JMapPane (a swing widget capable of
@@ -99,22 +87,22 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-render</artifactId>
+      <artifactId>render</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-wms</artifactId>
+      <artifactId>wms</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-shapefile</artifactId>
+      <artifactId>shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-epsg-wkt</artifactId>
+      <artifactId>epsg-wkt</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
