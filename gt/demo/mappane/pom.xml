@@ -14,8 +14,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
+    <groupId>org.geotools.demo</groupId>
     <artifactId>demo</artifactId>
-    <groupId>org.geotools</groupId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -23,8 +23,8 @@
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-  <groupId>org.geotools</groupId>
-  <artifactId>demo-mappane</artifactId>
+  <groupId>org.geotools.demo</groupId>
+  <artifactId>mappane</artifactId>
   <packaging>jar</packaging>
   <name>Demos of the JMapPane</name>
   

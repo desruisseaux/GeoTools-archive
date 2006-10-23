@@ -23,7 +23,7 @@
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-  <groupId>org.geotools</groupId>
+  <groupId>org.geotools.demo</groupId>
   <artifactId>demo</artifactId>
   <packaging>pom</packaging>
   <name>Geotools demos and examples</name>

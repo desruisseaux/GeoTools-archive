@@ -71,8 +71,8 @@
     <module>graph</module>
     <module>go</module>
     <module>openoffice</module>
-    <module>shape</module>
-    <module>shaperenderer</module>
+    <module>indexed-shapefile</module>
+    <module>shapefile-renderer</module>
     <module>validation</module>
     <module>widgets-swing</module>
     <module>xml</module>

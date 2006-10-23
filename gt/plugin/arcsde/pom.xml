@@ -80,7 +80,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>api_dummy</module>
+    <module>sde-dummy</module>
     <module>datastore</module>
   </modules>
   
