@@ -12,24 +12,23 @@
            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
+  
   <parent>
+    <artifactId>extension</artifactId>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
-
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
-  <packaging>jar</packaging>
-  <name>SVG support</name>
+  <artifactId>mappane</artifactId>
+  <name>JMapPane Implementation</name>
   
   <description>
-    (todo)
+    Provides an implementation of JMapPane (a swing widget capable of
+    displaying a map) as used in demos.
   </description>
 
   <licenses>
@@ -40,24 +39,41 @@
     </license>
   </licenses>
 
-
+  
   <!-- =========================================================== -->
   <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
+      <id>ianturton</id>
+      <name>Ian Turton</name>
+      <email>ianturton@users.sourceforge.net</email>
       <organization>CCG</organization>
       <roles>
-        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>jive</id>
+      <name>Jody Garnett</name>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research, Inc.</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Andrea Aime</name>
+      <id>aaime</id>
+      <email>aaime@users.sourceforge.net</email>
+      <organization>University of Modena and Reggio Emilia</organization>
+      <roles>
         <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
-
-
+  
+  
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
@@ -68,16 +84,27 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <groupId>org.geotools</groupId>
+      <artifactId>wms</artifactId>
+      <version>${project.version}</version>
     </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>epsg-wkt</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geowidgets</groupId>
+      <artifactId>geowidgets</artifactId>
+      <version>1.0-M1</version>
     </dependency>
   </dependencies>
-
-
+  
+  
 </project>
+

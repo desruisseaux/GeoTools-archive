@@ -24,12 +24,14 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
+  <artifactId>api</artifactId>
   <packaging>jar</packaging>
-  <name>SVG support</name>
+  <name>API interfaces</name>
   
   <description>
-    (todo)
+    The api module contains key geotools interfaces that are used by
+    other GeoTools modules (and geotools applications). Where possible
+    we make use of standard interfaces from projects such as GeoAPI.
   </description>
 
   <licenses>
@@ -46,13 +48,24 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jgarnett@refractions.net</email>
+      <organization>Refractions Research, Inc.</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
+        <role>Documentation</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Cory Horner</name>
+      <id>chorner</id>
+      <email>chorner@refractions.net</email>
+      <organization>Refractions Research, Inc.</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
   </developers>
@@ -63,21 +76,38 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
-      <version>${project.version}</version>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
+      <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <groupId>org.geotools</groupId>
+      <artifactId>referencing</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
 
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <plugins>
+      <!-- ====    Code Formatting  ============================== -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jalopy-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  
 </project>

@@ -15,21 +15,21 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>extension</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
+  <artifactId>xml-gml3</artifactId>
   <packaging>jar</packaging>
-  <name>SVG support</name>
+  <name>GML3 XML module</name>
   
   <description>
-    (todo)
+    GML3 XML support for Geotools.
   </description>
 
   <licenses>
@@ -46,17 +46,15 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
+      <name>Justin Deoliveira</name>
+      <id>jdeolive</id>
+      <email>jdeolive@openplans.org</email>
+      <organization>The Open Planning Project</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
-
 
   <!-- =========================================================== -->
   <!--     Dependency Management                                   -->
@@ -64,20 +62,55 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
-      <version>${project.version}</version>
+      <artifactId>api</artifactId>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <groupId>org.geotools</groupId>
+      <artifactId>referencing</artifactId>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>coverage</artifactId>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>main</artifactId>
+      <version>2.4-SNAPSHOT</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>xml</artifactId>
+      <version>2.4-SNAPSHOT</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>xml-gml2</artifactId>
+      <version>2.4-SNAPSHOT</version>
+    </dependency>    
   </dependencies>
+
+
+  <!-- =========================================================== -->
+  <!--     Build Configuration                                     -->
+  <!-- =========================================================== -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jalopy-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 
 </project>

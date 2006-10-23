@@ -15,27 +15,28 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>extension</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
+  <artifactId>go</artifactId>
   <packaging>jar</packaging>
-  <name>SVG support</name>
+  <name>GO-1 implementation</name>
   
   <description>
-    (todo)
+    Provides a GO-1 (Geospatial Object) implementation. This module contains
+    geometry implementations optimized for rendering, as well as a renderer.
   </description>
 
   <licenses>
     <license>
       <name>Lesser General Public License (LGPL)</name>
-      <url>http://www.gnu.org/copyleft/lesser.txt</url>
+      <url>http://svn.geotools.org/geotools/trunk/gt/ext/go/LICENSE.html</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -46,16 +47,29 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
   </developers>
+
+  <contributors>
+    <contributor>
+      <name>Antoine Hnawia</name>
+      <organization>Institut de Recherche pour le développement</organization>
+      <timezone>+11</timezone>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
 
 
   <!-- =========================================================== -->
@@ -64,20 +78,14 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
-
 
 </project>

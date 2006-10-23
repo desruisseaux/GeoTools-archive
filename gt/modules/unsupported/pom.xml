@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>modules</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,12 +24,12 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
-  <packaging>jar</packaging>
-  <name>SVG support</name>
+  <artifactId>unsupported</artifactId>
+  <packaging>pom</packaging>
+  <name>Geotools Unsupported</name>
   
   <description>
-    (todo)
+    Unsupported modules for GeoTools.
   </description>
 
   <licenses>
@@ -39,45 +39,13 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-
+  
+  
   <!-- =========================================================== -->
-  <!--     Developers and Contributors                             -->
+  <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
-  <developers>
-    <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
-      <roles>
-        <role>Module Maintainer</role>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-  </developers>
-
-
-  <!-- =========================================================== -->
-  <!--     Dependency Management                                   -->
-  <!-- =========================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-  </dependencies>
-
-
+  <modules>
+    <module>jpox</module>
+  </modules>
+  
 </project>

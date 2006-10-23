@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>modules</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,12 +24,12 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
-  <packaging>jar</packaging>
-  <name>SVG support</name>
+  <artifactId>plugin</artifactId>
+  <packaging>pom</packaging>
+  <name>Geotools plugins</name>
   
   <description>
-    (todo)
+    Geotools plugins.
   </description>
 
   <licenses>
@@ -39,45 +39,40 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-
+  
+  
   <!-- =========================================================== -->
-  <!--     Developers and Contributors                             -->
+  <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
-  <developers>
-    <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
-      <roles>
-        <role>Module Maintainer</role>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-  </developers>
-
-
-  <!-- =========================================================== -->
-  <!--     Dependency Management                                   -->
-  <!-- =========================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>arcgrid</module>
+    <module>arcsde</module>
+    <module>db2</module>
+    <module>directory</module>
+    <module>epsg-access</module>
+    <module>epsg-hsql</module>
+    <module>epsg-postgresql</module>
+    <module>epsg-wkt</module>
+    <module>geomedia</module>
+<!-- <module>geometryless</module> -->
+    <module>geotiff</module>
+    <module>gml</module>
+    <module>gtopo30</module>
+    <module>hsql</module>
+    <module>image</module>
+    <module>imagemosaic</module>
+    <module>imagepyramid</module>
+    <module>mif</module>
+    <module>mysql</module>
+    <module>oracle-spatial</module>
+    <module>postgis</module>
+    <module>referencing3D</module>
+    <module>shapefile</module>
+    <module>tiger</module>
+    <module>vpf</module>
+    <module>wfs</module>
+    <module>wms</module>
+  </modules>
 
 
 </project>

@@ -78,6 +78,7 @@
   <!--         copies all JARs in a single directory.              -->
   <!-- =========================================================== -->
   <build>
+    <finalName>gt-demo-${artifactId}-${version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.geotools</groupId>

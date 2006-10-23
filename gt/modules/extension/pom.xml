@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>modules</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,12 +24,12 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
-  <packaging>jar</packaging>
-  <name>SVG support</name>
+  <artifactId>extension</artifactId>
+  <packaging>pom</packaging>
+  <name>Geotools extensions</name>
   
   <description>
-    (todo)
+    Extensions to Geotools.
   </description>
 
   <licenses>
@@ -39,45 +39,26 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-
+  
+  
   <!-- =========================================================== -->
-  <!--     Developers and Contributors                             -->
+  <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
-  <developers>
-    <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
-      <roles>
-        <role>Module Maintainer</role>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-  </developers>
-
-
-  <!-- =========================================================== -->
-  <!--     Dependency Management                                   -->
-  <!-- =========================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>brewer</module>
+    <module>graph</module>
+    <module>go</module>
+    <module>openoffice</module>
+    <module>indexed-shapefile</module>
+    <module>shapefile-renderer</module>
+    <module>validation</module>
+    <module>widgets-swing</module>
+    <module>xml</module>
+    <module>xml-gml2</module>
+    <module>xml-gml3</module>
+    <module>xml-filter</module>
+    <module>mappane</module>
+  </modules>
 
 
 </project>

@@ -24,12 +24,12 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
+  <artifactId>sample-data</artifactId>
   <packaging>jar</packaging>
-  <name>SVG support</name>
+  <name>Sample data module</name>
   
   <description>
-    (todo)
+    Contains sample data for testing purpose.
   </description>
 
   <licenses>
@@ -49,10 +49,10 @@
       <name>James Macgill</name>
       <id>jmacgill</id>
       <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
+      <organization>PennState</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
       </roles>
     </developer>
   </developers>
@@ -64,18 +64,10 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
-    </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <!-- We don't really need the referencing module, but we use
+           org.geotools.resources.TestData which is defined there. -->
     </dependency>
   </dependencies>
 

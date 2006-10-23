@@ -14,8 +14,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.geotools.demo</groupId>
-    <artifactId>demo</artifactId>
+    <groupId>org.geotools</groupId>
+    <artifactId>extension</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -23,21 +23,21 @@
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-  <groupId>org.geotools.demo</groupId>
-  <artifactId>introduction</artifactId>
+  <groupId>org.geotools</groupId>
+  <artifactId>validation</artifactId>
   <packaging>jar</packaging>
-  <name>Demo Introduction to Geotools</name>
+  <name>Validation Processor and Framework</name>
   
   <description>
-    An introductory demonstration application.
+    Validation module (and validator batch tool) for use with geotools2.
+    This library has been ported to geotools2 as part of the VWFS project
+    sponcered by Geo Innovations.
   </description>
 
   <licenses>
     <license>
-      <name>Public Domain</name>
-      <url>
-        http://svn.geotools.org/geotools/trunk/gt/demo/introduction/LICENSE.txt
-      </url>
+      <name>Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -48,28 +48,35 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>Adrian Custer</name>
-      <id>acuster</id>
-      <email>acuster@gmail.com</email>
-      <organization>The gnuGIS Project</organization>
+      <name>Jody Garnett</name>
+      <id>jive</id>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
       <roles>
         <role>Java Developer</role>
-        <role>Documentation Writer</role>
+        <role>Module Maintainer</role>
       </roles>
     </developer>
-  </developers>
-  
-  <!--
-  <contributors>
-    <contributor>
-      <name></name>
-      <organization></organization>
+    <developer>
+      <name>David Zwiers</name>
+      <id>dmzwiers</id>
+      <email>dzwiers@refractions.net</email>
+      <organization>Refractions Research Inc.</organization>
       <roles>
-        <role></role>
+        <role>Java Developer</role>
       </roles>
-    </contributor>
-  </contributors>
-  -->
+    </developer>
+    <developer>
+      <name>Brent Owens</name>
+      <id>sploreg</id>
+      <email>sploreg@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Java Developer</role>
+        <role>Module Maintainer</role>
+      </roles>
+    </developer>    
+  </developers>
 
 
   <!-- =========================================================== -->
@@ -77,38 +84,13 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>directory</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>mappane</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools.demo</groupId>
-      <artifactId>mappane</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>wfs</artifactId>
+      <artifactId>graph</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -116,30 +98,39 @@
       <artifactId>postgis</artifactId>
       <version>${project.version}</version>
     </dependency>
-  </dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
+    <!-- Adding J-Unit back in due to conflict-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 
   <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
-    <resources>
-      <resource>
-        <directory>.</directory>
-        <includes>
-          <include>LICENSE*</include>
-          <include>*README*</include>
-        </includes>
-      </resource>
-      <resource>
-        <!-- targetPath>data</targetPath -->
-        <directory>resources</directory>
-        <includes>
-          <include>**</include>
-        </includes>
-      </resource>
-    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- The following test fails with the following exception:
+                 org.geotools.data.DataSourceException: Connection failed -->
+            <exclude>**/MemoryLeakOnlineTest.java</exclude>
+          </excludes>
+          
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
-  
-  
+
+
 </project>

@@ -1298,9 +1298,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>maven</module>
-    <module>module</module>
-    <module>plugin</module>
-    <module>ext</module>
+    <module>modules</module>
     <module>demo</module>
   </modules>
   

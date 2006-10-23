@@ -15,18 +15,18 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>extension</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
+  <artifactId>indexed-shapefile</artifactId>
   <packaging>jar</packaging>
-  <name>SVG support</name>
+  <name>Indexed shapefile module</name>
   
   <description>
     (todo)
@@ -46,16 +46,49 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>James Macgill</name>
-      <id>jmacgill</id>
-      <email>jmacgill@users.sourceforge.net</email>
-      <organization>CCG</organization>
+      <name>Tommaso Nolli</name>
+      <id>tnolli</id>
+      <email>tommaso.nolli@asimantova.it</email>
+      <organization>Azienda Servizi Informativi S.p.a</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jesse Eichar</name>
+      <id>jeichar</id>
+      <email>jeichar@refractions.net</email>
+      <organization>Refraction Research Inc.</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
   </developers>
+
+  <contributors>
+    <contributor>
+      <name>Dave Blasby</name>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Bug Fixer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>William Stockhausen</name>
+      <organization>Virginia Institute of Marine Science</organization>
+      <roles>
+        <role>Bug Fixer</role>
+      </roles>
+    </contributor>
+    <contributor>
+      <name>Ithaqua</name>
+      <organization>Virginia Institute of Marine Science</organization>
+      <roles>
+        <role>External Project Developer</role>
+      </roles>
+    </contributor>
+  </contributors>
 
 
   <!-- =========================================================== -->
@@ -64,17 +97,23 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-svggen</artifactId>
-      <!-- The version number is specified in the parent POM. -->
+      <groupId>org.geotools</groupId>
+      <artifactId>shapefile</artifactId>
+      <version>${project.version}</version>
     </dependency>
-     <dependency>
-      <groupId>batik</groupId>
-      <artifactId>batik-awt-util</artifactId>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>velocity</groupId>
+      <artifactId>velocity</artifactId>
       <!-- The version number is specified in the parent POM. -->
     </dependency>
   </dependencies>
