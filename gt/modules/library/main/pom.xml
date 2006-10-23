@@ -258,7 +258,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.geotools</groupId>
+        <groupId>org.geotools.maven</groupId>
         <artifactId>jjtree-javacc</artifactId>
         <version>${project.version}</version>
         <configuration>

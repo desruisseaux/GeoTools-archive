@@ -23,7 +23,7 @@
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-  <groupId>org.geotools</groupId>
+  <groupId>org.geotools.maven</groupId>
   <artifactId>maven</artifactId>
   <packaging>pom</packaging>
   <name>Maven plugins for Geotools 2</name>

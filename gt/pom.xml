@@ -843,7 +843,7 @@
         </configuration>
         <dependencies>
           <dependency>
-            <groupId>org.geotools</groupId>
+            <groupId>org.geotools.maven</groupId>
             <artifactId>build-configs</artifactId>
             <version>${project.version}</version>
           </dependency>
@@ -917,7 +917,7 @@
         </executions>
         <dependencies>
           <dependency>
-            <groupId>org.geotools</groupId>
+            <groupId>org.geotools.maven</groupId>
             <artifactId>build-configs</artifactId>
             <version>${project.version}</version>
           </dependency>

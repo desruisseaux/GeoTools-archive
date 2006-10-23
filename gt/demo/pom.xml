@@ -81,7 +81,7 @@
     <finalName>gt-demo-${artifactId}-${version}</finalName>
     <plugins>
       <plugin>
-        <groupId>org.geotools</groupId>
+        <groupId>org.geotools.maven</groupId>
         <artifactId>jar-collector</artifactId>
         <version>${project.version}</version>
         <executions>
