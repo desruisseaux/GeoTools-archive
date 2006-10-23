@@ -37,13 +37,6 @@
     is too large to be included in the main geotools release). This class will 
     need to be ported to the new GeoAPI CoordinateReferenceSystem interfaces.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

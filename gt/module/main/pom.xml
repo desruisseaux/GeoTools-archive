@@ -32,13 +32,6 @@
     The main module contains the key interfaces and default
     implementations that are used by other GeoTools modules.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

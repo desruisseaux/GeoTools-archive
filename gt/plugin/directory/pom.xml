@@ -32,13 +32,6 @@
     Used to represent a directory and propagates to the 
     appropriate datastore based on file type.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

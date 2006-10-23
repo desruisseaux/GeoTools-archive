@@ -32,13 +32,6 @@
     Provides a standard interface to the DB2 Spatial Extender.
     More information can be found at: http://www.software.ibm.com/data/spatial.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

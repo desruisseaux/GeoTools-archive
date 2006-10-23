@@ -33,13 +33,6 @@
     is usefull for saving data locally. This module also uses
     the Spatial DB in a Box extensions written by David Blasby.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

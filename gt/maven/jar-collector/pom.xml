@@ -32,13 +32,6 @@
     Copy all JAR files (including dependencies) in the target directory
     of the parent project descriptor.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

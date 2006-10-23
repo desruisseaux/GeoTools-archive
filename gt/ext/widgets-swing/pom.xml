@@ -31,13 +31,6 @@
   <description>
     Provides dialog box, status bar, etc. using Swing framework.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

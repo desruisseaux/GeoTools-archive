@@ -33,13 +33,6 @@
     developed by Refractions Research and conforms to GML 2.x.
     The specification is availiable at the OGC website.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

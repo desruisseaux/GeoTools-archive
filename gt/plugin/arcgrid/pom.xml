@@ -32,13 +32,6 @@
     Datasource created to read ArcGrid raster format. Currently Serving
     as a prototype for the GridCoverageExchange API.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

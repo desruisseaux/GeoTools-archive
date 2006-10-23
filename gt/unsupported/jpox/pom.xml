@@ -32,13 +32,6 @@
     JPOX module, contains helper code for those using JPOX Spatial to map POJOs
     into the GeoTools codebase.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

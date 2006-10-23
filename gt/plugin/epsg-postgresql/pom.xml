@@ -32,13 +32,6 @@
     Connection to an EPSG postgreSQL database.
     This database is built from the SQL scripts delivered by EPSG.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

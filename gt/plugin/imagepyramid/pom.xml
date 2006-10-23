@@ -32,13 +32,6 @@
     Datasource created to read a pyramid of georeferenced images or geotiff 
     (and in future also JPEG2K).
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

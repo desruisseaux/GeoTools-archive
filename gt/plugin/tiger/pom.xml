@@ -31,13 +31,6 @@
   <description>
     U.S. Census TIGER/Line 2000 Datastore implementation.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

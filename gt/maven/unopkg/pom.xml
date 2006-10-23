@@ -32,13 +32,6 @@
     Creates a uno.pkg file for OpenOffice, which is basically a ZIP file with
     a META-INF/manifest.xml file. The principle is similar to Java JAR files.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

@@ -33,13 +33,6 @@
     (found in data), as well as the older DataSource interface (found in core),
     for use with MySQL.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

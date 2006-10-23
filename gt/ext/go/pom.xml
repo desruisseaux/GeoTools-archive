@@ -32,13 +32,6 @@
     Provides a GO-1 (Geospatial Object) implementation. This module contains
     geometry implementations optimized for rendering, as well as a renderer.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

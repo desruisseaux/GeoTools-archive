@@ -35,13 +35,6 @@
     generated files are stored in a 'target/generated-sources' directory and
     are part of the compilation phase.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

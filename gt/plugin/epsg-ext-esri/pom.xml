@@ -36,13 +36,6 @@
     replacement for epsg-access, epsg-hsql or epsg-postgresql. One of the above
     plugins (at user choice) should be in the classpath.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

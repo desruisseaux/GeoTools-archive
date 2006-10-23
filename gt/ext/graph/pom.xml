@@ -37,13 +37,6 @@
     Government department of BMGS. This library has been ported to geotools2 as 
     part of the VWFS project sponcered by Geo Innovations.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

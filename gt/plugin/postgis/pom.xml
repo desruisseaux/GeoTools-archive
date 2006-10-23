@@ -34,13 +34,6 @@
     Postgresql database, adding support for Geographic objects.  It is open
     source and freely available.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

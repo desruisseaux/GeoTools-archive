@@ -30,13 +30,6 @@
     Provides an implementation of JMapPane (a swing widget capable of
     displaying a map) as used in demos.
   </description>
-   
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

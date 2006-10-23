@@ -33,13 +33,6 @@
     other GeoTools modules (and geotools applications). Where possible
     we make use of standard interfaces from projects such as GeoAPI.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

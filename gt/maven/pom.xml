@@ -31,13 +31,6 @@
   <description>
     Maven plugins specific to the the Geotools 2 project.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

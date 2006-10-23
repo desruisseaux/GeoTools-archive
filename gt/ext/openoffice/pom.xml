@@ -33,13 +33,6 @@
     example, the plugin provides coordinate operation services as formulas 
     inside the Calc spreadsheet.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

@@ -32,13 +32,6 @@
     Implementation of Grid Coverage specification. Provides support
     for rasters and some image processing like reprojection.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

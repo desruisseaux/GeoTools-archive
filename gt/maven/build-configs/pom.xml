@@ -33,13 +33,6 @@
     Jalopy only) so that there's no need to replicate them, put them on 
     a remote server, or use an absolute path.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

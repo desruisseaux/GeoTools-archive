@@ -35,13 +35,6 @@
     should be suffisient for making vertical transformations available to an 
     application like any other transforms.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>

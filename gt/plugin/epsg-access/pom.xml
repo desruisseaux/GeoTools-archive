@@ -34,13 +34,6 @@
     one. This plugin is very short and contains nothing else than connection 
      parameters. The user must install himself the EPSG database on his machine.
   </description>
-  
-  <organization>
-    <name>Geotools</name>
-    <url>http://www.geotools.org</url>
-  </organization>
-  
-  <inceptionYear>1996</inceptionYear>
 
   <licenses>
     <license>
