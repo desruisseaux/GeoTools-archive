@@ -156,13 +156,13 @@
         </configuration>
       </plugin>
 
-      <!-- Creates the uno.pkg file -->
+      <!-- Creates the oxt file -->
       <plugin>
         <groupId>org.geotools.maven</groupId>
         <artifactId>unopkg</artifactId>
         <version>${project.version}</version>
         <configuration>
-          <finalName>geotools</finalName>
+          <oxtName>geotools-${project.version}</oxtName>
         </configuration>
         <executions>
           <execution>

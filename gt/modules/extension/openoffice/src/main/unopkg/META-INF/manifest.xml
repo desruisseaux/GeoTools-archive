@@ -4,5 +4,5 @@
   <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-typelibrary;type=RDB"
                        manifest:full-path="geotools.rdb"/>
   <manifest:file-entry manifest:media-type="application/vnd.sun.star.uno-component;type=Java"
-                       manifest:full-path="gt2-openoffice-2.4-SNAPSHOT.jar"/>
+                       manifest:full-path="${project.build.finalName}.jar"/>
 </manifest:manifest>

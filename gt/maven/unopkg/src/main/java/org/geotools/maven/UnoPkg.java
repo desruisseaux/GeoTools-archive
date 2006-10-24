@@ -16,12 +16,7 @@
 package org.geotools.maven;
 
 // J2SE dependencies
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.zip.ZipEntry;
@@ -36,7 +31,7 @@ import org.apache.maven.artifact.Artifact;
 
 // Note: javadoc in class and fields descriptions must be XHTML.
 /**
- * Creates a <code>.uno.pkg</code> package for <a href="http://www.openoffice.org">OpenOffice</a>
+ * Creates a <code>.oxt</code> package for <a href="http://www.openoffice.org">OpenOffice</a>
  * addins.
  * 
  * @goal unopkg
@@ -47,16 +42,26 @@ import org.apache.maven.artifact.Artifact;
  */
 public class UnoPkg extends AbstractMojo implements FilenameFilter {
     /**
+     * The encoding for text files to read and write.
+     */
+    private static final String ENCODING = "UTF-8";
+
+    /**
+     * The string to replace by the final name.
+     */
+    private static final String SUBSTITUTE = "${project.build.finalName}";
+
+    /**
      * Directory where the source files are located. The plugin will looks for the
      * <code>META-INF/manifest.xml</code> and <code>*.rdb</code> files in this directory.
      *
-     * @parameter expression="${project.build.sourceDirectory}"
+     * @parameter expression="${basedir}/src/main/unopkg"
      * @required
      */
     private String sourceDirectory;
 
     /**
-     * Directory where the output <code>uno.pkg</code> file will be located.
+     * Directory where the output <code>oxt</code> file will be located.
      *
      * @parameter expression="${project.build.directory}"
      * @required
@@ -64,12 +69,21 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     private String outputDirectory;
 
     /**
-     * The name for the <code>uno.pkg</code> file to create.
+     * In <code>META-INF/manifest.xml</code>, replaces all occurences of
+     * <code>${project.build.finalName}</code> by this value.
      *
      * @parameter expression="${project.build.finalName}"
      * @required
      */
     private String finalName;
+
+    /**
+     * The name for the <code>oxt</code> file to create.
+     *
+     * @parameter expression="${project.build.finalName}"
+     * @required
+     */
+    private String oxtName;
 
     /**
      * Project dependencies.
@@ -88,6 +102,17 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     private MavenProject project;
 
     /**
+     * The prefix to be added before JAR file names.
+     * To be determined by heuristic rule.
+     */
+    private transient String prefix;
+
+    /**
+     * Apply prefix only for dependencies of this group.
+     */
+    private transient String prefixGroup;
+
+    /**
      * Tests if a specified file should be included in a file list.
      *
      * @param   directory the directory in which the file was found.
@@ -99,31 +124,34 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     }
 
     /**
-     * Generates the {@code .uno.pkg} file from all {@code .jar} files found in the target directory.
+     * Generates the {@code .oxt} file from all {@code .jar} files found in the target directory.
      *
      * @throws MojoExecutionException if the plugin execution failed.
      */
     public void execute() throws MojoExecutionException {
+        final int i = finalName.indexOf(project.getArtifactId());
+        prefix = (i >= 0) ? finalName.substring(0, i) : "";
+        prefixGroup = project.getGroupId();
         try {
             createPackage();
         } catch (IOException e) {
-            throw new MojoExecutionException("Error creating the uno.pkg file.", e);
+            throw new MojoExecutionException("Error creating the oxt file.", e);
         }
     }
 
     /**
-     * Creates the {@code .uno.pkg} file.
+     * Creates the {@code .oxt} file.
      */
     private void createPackage() throws IOException {
         final String  manifestName = "META-INF/manifest.xml";
         final File outputDirectory = new File(this.outputDirectory);
-        final File         zipFile = new File(outputDirectory, finalName + ".uno.pkg");
+        final File         zipFile = new File(outputDirectory, oxtName + ".oxt");
         final File    manifestFile = new File(sourceDirectory, manifestName);
         final File[]          jars = outputDirectory.listFiles(this);
         final File[]          rdbs = new File(sourceDirectory).listFiles(this);
         final ZipOutputStream  out = new ZipOutputStream(new FileOutputStream(zipFile));
         if (manifestFile.isFile()) {
-            copy(manifestFile, out, manifestName);
+            copyFiltered(manifestFile, out, manifestName);
         }
         /*
          * Copies the RDB files.
@@ -147,7 +175,12 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
                 if (scope.equalsIgnoreCase(Artifact.SCOPE_COMPILE) ||
                     scope.equalsIgnoreCase(Artifact.SCOPE_RUNTIME))
                 {
-                    copy(artifact.getFile(), out, null);
+                    final File file = artifact.getFile();
+                    String name = file.getName();
+                    if (artifact.getGroupId().startsWith(prefixGroup) && !name.startsWith(prefix)) {
+                        name = prefix + name;
+                    }
+                    copy(file, out, name);
                 }
             }
         }
@@ -155,7 +188,7 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
     }
 
     /**
-     * Copies the content of the specified file to the specified output stream.
+     * Copies the content of the specified binary file to the specified output stream.
      */
     private static void copy(final File file, final ZipOutputStream out, String name)
             throws IOException
@@ -166,12 +199,38 @@ public class UnoPkg extends AbstractMojo implements FilenameFilter {
         final ZipEntry entry = new ZipEntry(name);
         out.putNextEntry(entry);
         final InputStream in = new FileInputStream(file);
-        final byte[] buffer = new byte[64*1024];
+        final byte[] buffer = new byte[4*1024];
         int length;
         while ((length = in.read(buffer)) >= 0) {
             out.write(buffer, 0, length);
         }
         in.close();
+        out.closeEntry();
+    }
+
+    /**
+     * Copies the content of the specified ASCII file to the specified output stream.
+     */
+    private void copyFiltered(final File file, final ZipOutputStream out, String name)
+            throws IOException
+    {
+        if (name == null) {
+            name = file.getName();
+        }
+        final ZipEntry entry = new ZipEntry(name);
+        out.putNextEntry(entry);
+        final Writer writer = new OutputStreamWriter(out, ENCODING);
+        final BufferedReader in = new BufferedReader(
+                new InputStreamReader(new FileInputStream(file), ENCODING));
+        String line; while ((line=in.readLine()) != null) {
+            int r=-1; while ((r=line.indexOf(SUBSTITUTE, r+1)) >= 0) {
+                line = line.substring(0, r) + finalName + line.substring(r + SUBSTITUTE.length());
+            }
+            writer.write(line);
+            writer.write('\n');
+        }
+        in.close();
+        writer.flush();
         out.closeEntry();
     }
 }
