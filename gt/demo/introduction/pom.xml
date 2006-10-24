@@ -123,6 +123,20 @@
   <!--     Build Configuration                                     -->
   <!-- =========================================================== -->
   <build>
+    <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-jar-plugin</artifactId>
+         <configuration>
+           <archive>
+             <manifest>
+               <mainClass>org.geotools.demo.introduction.DemoBase</mainClass>
+               <addClasspath>true</addClasspath>
+             </manifest>
+           </archive>
+         </configuration>
+       </plugin>
+     </plugins>
     <resources>
       <resource>
         <directory>.</directory>
