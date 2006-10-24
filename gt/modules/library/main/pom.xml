@@ -214,6 +214,11 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
     <dependency>
+      <groupId>jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <!-- The version number is specified in the parent POM. -->
