@@ -42,7 +42,6 @@ import org.geotools.filter.SortBy;
 import org.geotools.filter.SortBy2;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
-import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -93,8 +92,8 @@ public class DefaultFeatureCollection implements FeatureCollection {
     	this.id = id;
     	if(featureType == null){
     		List ats = new LinkedList();
-    		ats.add(new FeatureAttributeType("_Feature",new DefaultFeatureType("AbstractFeatureType",GMLSchema.NAMESPACE,new LinkedList(),new LinkedList(),null),false));
-    		featureType = new DefaultFeatureType("AbstractFeatureCollectionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);
+    		ats.add(new FeatureAttributeType("_Feature",new DefaultFeatureType("AbstractFeatureType",FeatureTypes.DEFAULT_NAMESPACE,new LinkedList(),new LinkedList(),null),false));
+    		featureType = new DefaultFeatureType("AbstractFeatureCollectionType",FeatureTypes.DEFAULT_NAMESPACE,ats,new LinkedList(),null);
     	}
     	this.featureType = featureType;
         this.childType = null; // no children yet
@@ -105,7 +104,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
     public FeatureType getSchema() {
         if( childType == null ) {
             // no children guess Features are okay then
-            new DefaultFeatureType("AbstractFeatureType",GMLSchema.NAMESPACE,new LinkedList(),new LinkedList(),null); 
+            new DefaultFeatureType("AbstractFeatureType",FeatureTypes.DEFAULT_NAMESPACE,new LinkedList(),new LinkedList(),null); 
         }
         return childType;
     }

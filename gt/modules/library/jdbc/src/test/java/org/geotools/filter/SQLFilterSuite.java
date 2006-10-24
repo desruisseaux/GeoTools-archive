@@ -46,8 +46,7 @@ public class SQLFilterSuite extends TestCase {
 
         suite.addTestSuite(SQLEncoderTest.class);
         suite.addTestSuite(SQLUnpackerTest.class);
-        suite.addTestSuite(CapabilitiesTest.class);
-
+        
         return suite;
     }
 }

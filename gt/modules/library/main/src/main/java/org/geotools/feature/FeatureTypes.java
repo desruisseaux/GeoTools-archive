@@ -16,6 +16,7 @@
 package org.geotools.feature;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,7 +29,6 @@ import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.JTS;
-import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -54,6 +54,21 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class FeatureTypes {
 
+	/** the default namespace for feature types */
+	//public static final URI = GMLSchema.NAMESPACE;
+	public static final URI DEFAULT_NAMESPACE;
+	static {
+		URI uri;
+		try {
+			uri = new URI( "http://www.opengis.net/gml" );
+		} 
+		catch (URISyntaxException e) {
+			uri = null;	//will never happen
+		}
+		DEFAULT_NAMESPACE = uri;
+	}
+		
+	
     /** represent an unbounded field length */
     final public static int ANY_LENGTH = -1;
 
@@ -284,7 +299,7 @@ public class FeatureTypes {
      */
     public static FeatureType newFeatureType( AttributeType[] types, String name )
             throws FactoryConfigurationError, SchemaException {
-        return newFeatureType(types, name, GMLSchema.NAMESPACE, false);
+        return newFeatureType(types, name, DEFAULT_NAMESPACE, false);
     }
 
     /**

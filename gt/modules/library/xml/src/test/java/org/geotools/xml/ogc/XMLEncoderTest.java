@@ -24,11 +24,13 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.filter.BetweenFilter;
@@ -60,9 +62,12 @@ import org.w3c.dom.NodeList;
  * @author David Zwiers
  * @source $URL$
  */
-public class XMLEncoderTest extends FilterTestSupport {
+public class XMLEncoderTest extends TestCase {
 
-
+    /** Standard logging instance */
+    protected static final Logger LOGGER = Logger.getLogger(
+            "org.geotools.filter");
+    
     /** Constructor with test name. */
     String dataFolder = "";
 

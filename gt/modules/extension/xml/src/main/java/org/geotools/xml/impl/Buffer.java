@@ -82,5 +82,6 @@ public class Buffer {
 
     public synchronized void close() {
         closed = true;
+        notifyAll();
     }
 }

@@ -86,7 +86,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.styling.StyleAttributeExtractor;
-import org.geotools.xml.gml.GMLSchema;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -625,7 +624,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
                                 createFeatureTypeName(), namespace, false);
                     } else {
                         schema = FeatureTypes.newFeatureType(readAttributes(),
-                                createFeatureTypeName(), GMLSchema.NAMESPACE,
+                                createFeatureTypeName(), FeatureTypes.DEFAULT_NAMESPACE,
                                 false);
                     }
                 }

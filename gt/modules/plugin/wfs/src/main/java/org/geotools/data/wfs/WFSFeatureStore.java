@@ -29,7 +29,7 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.MutableFIDFeature;
+
 import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;

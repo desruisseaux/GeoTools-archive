@@ -20,8 +20,6 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.geotools.xml.gml.GMLSchema;
-
 /**
  * A basic implementation of FeatureType.
  *
@@ -94,7 +92,7 @@ public class DefaultFeatureType implements FeatureType {
         }
 
         this.typeName = typeName;
-        this.namespace = namespace == null ? GMLSchema.NAMESPACE : namespace;
+        this.namespace = namespace == null ? FeatureTypes.DEFAULT_NAMESPACE : namespace;
         this.ancestors = (FeatureType[]) superTypes.toArray(new FeatureType[superTypes
                 .size()]);
 
@@ -128,7 +126,7 @@ public class DefaultFeatureType implements FeatureType {
      */
     private DefaultFeatureType() {
         this.typeName = "emptyFeatureType";
-            namespace = GMLSchema.NAMESPACE;
+            namespace = FeatureTypes.DEFAULT_NAMESPACE;
         this.types = new AttributeType[0];
         this.ancestors = new FeatureType[0];
         this.defaultGeomIdx = -1;

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,12 +24,12 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>geomedia</artifactId>
+  <artifactId>xml</artifactId>
   <packaging>jar</packaging>
-  <name>GeoMedia datastore implementation</name>
+  <name>XML Parsing Support</name>
   
   <description>
-    (todo)
+		XML Parser based on the XDO design.
   </description>
 
   <licenses>
@@ -46,10 +46,18 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>Julian Ray</name>
-      <id>jjray</id>
-      <email>jjray@users.sourceforge.net</email>
-      <organization></organization>
+      <name>Jody Garnett</name>
+      <email>jive@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Justin Deoliveira</name>
+      <email>jdeolive@users.sourceforge.net</email>
+      <organization>The Open Planning Project</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
@@ -62,11 +70,33 @@
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
   <dependencies>
-    <dependency>
+		<dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>coverage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+			<scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 

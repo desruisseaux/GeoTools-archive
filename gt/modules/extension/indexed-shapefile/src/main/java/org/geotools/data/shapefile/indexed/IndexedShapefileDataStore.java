@@ -83,7 +83,6 @@ import org.geotools.index.quadtree.fs.FileSystemIndexStore;
 import org.geotools.index.rtree.FilterConsumer;
 import org.geotools.index.rtree.RTree;
 import org.geotools.index.rtree.fs.FileSystemPageStore;
-import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -866,7 +865,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 								createFeatureTypeName(), namespace, false);
 					} else {
 						schema = FeatureTypes.newFeatureType(readAttributes(),
-								createFeatureTypeName(), GMLSchema.NAMESPACE,
+								createFeatureTypeName(), FeatureTypes.DEFAULT_NAMESPACE,
 								false);
 					}
 				}

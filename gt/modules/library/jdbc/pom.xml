@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,12 +24,13 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>geomedia</artifactId>
+  <artifactId>jdbc</artifactId>
   <packaging>jar</packaging>
-  <name>GeoMedia datastore implementation</name>
+  <name>JDBC DataStore Support</name>
   
   <description>
-    (todo)
+		Abstract datastore implementation and helper classes / apis to be extended
+    by datastores backed by releational databases accesible via jdbc.
   </description>
 
   <licenses>
@@ -46,10 +47,9 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>Julian Ray</name>
-      <id>jjray</id>
-      <email>jjray@users.sourceforge.net</email>
-      <organization></organization>
+      <name>Cory Horner</name>
+      <email>chorner@users.sourceforge.net</email>
+      <organization>Refractions Research</organization>
       <roles>
         <role>Module Maintainer</role>
         <role>Java Developer</role>
@@ -64,9 +64,44 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>jdbc</artifactId>
+      <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>coverage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.mockrunner</groupId>
+      <artifactId>mockrunner</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
+		<dependency>
+      <groupId>oro</groupId>
+      <artifactId>oro</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
+		<dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 

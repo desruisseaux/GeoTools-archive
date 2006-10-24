@@ -21,7 +21,6 @@ import java.util.Arrays;
 import org.geotools.factory.FactoryCreator;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.FactoryRegistryException;
-import org.geotools.xml.gml.GMLSchema;
 
 
 /**
@@ -217,7 +216,7 @@ public abstract class FeatureTypeFactory extends FeatureTypeBuilder {
      */
     public static FeatureType newFeatureType(AttributeType[] types, String name)
         throws FactoryRegistryException, SchemaException {
-        return newFeatureType(types, name, GMLSchema.NAMESPACE, false);
+        return newFeatureType(types, name, FeatureTypes.DEFAULT_NAMESPACE, false);
     }
 
     /**

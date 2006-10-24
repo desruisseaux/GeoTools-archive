@@ -26,8 +26,6 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.type.SchemaImpl;
-import org.geotools.xml.gml.GMLComplexTypes.PolygonPropertyType;
-import org.geotools.xml.gml.GMLComplexTypes.PolygonType;
 
 
 public class GMLSchema extends SchemaImpl {
@@ -5425,7 +5423,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType POLYGONTYPE_TYPE = AttributeTypeFactory.newAttributeType("PolygonType",
-            PolygonType.class);
+            Polygon.class);
 
     /**
      * <p>

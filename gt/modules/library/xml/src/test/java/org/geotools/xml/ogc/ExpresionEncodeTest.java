@@ -17,8 +17,11 @@ package org.geotools.xml.ogc;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
+
+import junit.framework.TestCase;
 
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.Expression;
@@ -36,8 +39,10 @@ import org.geotools.xml.filter.FilterSchema;
  * @author David Zwiers, Refractions Research
  * @source $URL$
  */
-public class ExpresionEncodeTest extends FilterTestSupport {
-
+public class ExpresionEncodeTest extends TestCase {
+    /** Standard logging instance */
+    protected static final Logger LOGGER = Logger.getLogger(
+            "org.geotools.filter");
     /** Constructor with test name. */
     String dataFolder = "";
 

@@ -51,6 +51,8 @@
     <module>main</module>
     <module>sample-data</module>
     <module>render</module>
+    <module>xml</module>
+    <module>jdbc</module>
   </modules>
 
 

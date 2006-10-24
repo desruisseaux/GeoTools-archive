@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>xml</artifactId>
+  <artifactId>xml2</artifactId>
   <packaging>jar</packaging>
   <name>XML Parsing</name>
   

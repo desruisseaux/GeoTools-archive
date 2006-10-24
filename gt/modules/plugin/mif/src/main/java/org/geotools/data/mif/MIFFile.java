@@ -35,8 +35,8 @@ import org.geotools.feature.AttributeTypes;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
-import org.geotools.xml.gml.GMLSchema;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -364,7 +364,7 @@ public class MIFFile {
         geometryClass = ((String) getParam(MIFDataStore.PARAM_GEOMTYPE,
                 "untyped", false, params)).toLowerCase();
 
-        namespace = (URI) getParam("namespace", GMLSchema.NAMESPACE, false,
+        namespace = (URI) getParam("namespace", FeatureTypes.DEFAULT_NAMESPACE, false,
                 params);
     }
 

@@ -35,6 +35,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.collection.FeatureState;
@@ -46,7 +47,6 @@ import org.geotools.filter.SortBy;
 import org.geotools.filter.SortBy2;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
-import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -422,7 +422,7 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         if( featureType == null ){
             List ats = new LinkedList();
             ats.add(new FeatureAttributeType( getSchema().getTypeName(), getSchema(),false));
-            featureType = new DefaultFeatureType("AbstractFeatureCollectionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);        
+            featureType = new DefaultFeatureType("AbstractFeatureCollectionType",FeatureTypes.DEFAULT_NAMESPACE,ats,new LinkedList(),null);        
         }
         return featureType;
     }

@@ -113,13 +113,15 @@ public class StreamingParser {
      * available.
      */
     public Object parse() {
+    	
         if (thread == null) {
             Runnable runnable = new Runnable() {
                     public void run() {
                         try {
                             parser.parse(input, handler);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                        	//close the buffer
+                        	handler.getBuffer().close();
                             throw new RuntimeException(e);
                         }
                     }
@@ -130,6 +132,6 @@ public class StreamingParser {
             thread.start();
         }
 
-        return handler.getBuffer().get();
+        return handler.getBuffer().get();	
     }
 }

@@ -47,6 +47,7 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.CompareFilter;
@@ -55,7 +56,6 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.referencing.CRS;
-import org.geotools.xml.gml.GMLSchema;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -152,7 +152,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         FeatureCollection features = loadFeatures(STATE_POP,null);
         FeatureType schema = firstFeature(features).getFeatureType();
         assertTrue(schema.isDescendedFrom(BasicFeatureTypes.POLYGON));
-        assertTrue(schema.isDescendedFrom(GMLSchema.NAMESPACE,"polygonFeature"));
+        assertTrue(schema.isDescendedFrom(FeatureTypes.DEFAULT_NAMESPACE,"polygonFeature"));
     }
     
     public void testCreateSchema() throws Exception {

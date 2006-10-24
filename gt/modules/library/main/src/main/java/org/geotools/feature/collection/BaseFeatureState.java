@@ -27,8 +27,8 @@ import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.type.FeatureAttributeType;
-import org.geotools.xml.gml.GMLSchema;
 
 /**
  * This is *not* a Feature - it is a Delegate used by FeatureCollection
@@ -76,7 +76,7 @@ public class BaseFeatureState extends FeatureState {
 	public static FeatureType featureType( FeatureType schema ){
 		List ats = new LinkedList();
         ats.add(new FeatureAttributeType(schema.getTypeName(), schema,false));
-        return new DefaultFeatureType("AbstractFeatureColletionType",GMLSchema.NAMESPACE,ats,new LinkedList(),null);        
+        return new DefaultFeatureType("AbstractFeatureColletionType",FeatureTypes.DEFAULT_NAMESPACE,ats,new LinkedList(),null);        
 	}
 
 	public BaseFeatureState( ResourceCollection collection, FeatureType schema ){
