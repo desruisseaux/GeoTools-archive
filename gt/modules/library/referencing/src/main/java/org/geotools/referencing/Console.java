@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Locale;
@@ -116,9 +117,14 @@ import org.geotools.resources.i18n.VocabularyKeys;
  */
 public class Console extends AbstractConsole {
     /**
+     * The locale for number parser.
+     */
+    private final Locale locale = Locale.US;
+
+    /**
      * The number format to use for reading coordinate points.
      */
-    private final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
+    private final NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 
     /**
      * The number separator in vectors. Usually {@code ,}, but could
@@ -649,7 +655,16 @@ public class Console extends AbstractConsole {
         final StringTokenizer st = new StringTokenizer(text, numberSeparator);
         final double[]    values = new double[st.countTokens()];
         for (int i=0; i<values.length; i++) {
-            values[i] = numberFormat.parse(st.nextToken().trim()).doubleValue();
+            // Note: we need to convert the number to upper-case because
+            //       NumberParser seems to accepts "1E-10" but not "1e-10".
+            final String token = st.nextToken().trim().toUpperCase(locale);
+            final ParsePosition position = new ParsePosition(0);
+            final Number result = numberFormat.parse(token, position);
+            if (position.getIndex() != token.length()) {
+                throw new ParseException(Errors.format(ErrorKeys.UNPARSABLE_NUMBER_$1, token),
+                                         position.getErrorIndex());
+            }
+            values[i] = result.doubleValue();
         }
         return values;
     }

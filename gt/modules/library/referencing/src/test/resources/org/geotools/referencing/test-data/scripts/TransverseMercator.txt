@@ -21,6 +21,8 @@
 // Note 4: Spherical equations are compared to the elliptical when asserts are enabled.
 //         Because of note 1, these comparisons are not done when we are > 15 degrees from
 //         the central meridian.
+// Note 5: The test tolerance is usually 1 centimeter, but in some occasions it is relaxed
+//         to up to 1 meter.
 //
 // Rueben Schulz - Feb, 2005
 //
@@ -93,8 +95,10 @@ target pt=(-550460.837471118, 0.0)
 source pt=(-106.199119210243, 0.0)
 target pt=(1709099.01345829, 0.0)
 
+test tolerance = (1e-1, 1e-1)
 source pt=(-104.794310867786, 0.0)
 target pt=(1868649.9149578, 0.0)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(-123.542824029922, 0.0)
 target pt=(-229650.770446223, 0.0)
@@ -119,7 +123,7 @@ target pt=(-23873.5422778988, -7825633.25766495)
 
 source pt=(-107.443280994892, 90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-target pt=(500000.000000000058,     9997964.943020997569)
+target pt=(500000.000000000058, 9997964.943020997569)
 
 source pt=(-115.595913648605, -90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
@@ -139,8 +143,10 @@ target pt=(496326.051449956, 14867985.7372436)
 source pt=(14.2116364836693, -33.9166666666)
 target pt=(427124.447045236, 6246804.02787094)
 
+test tolerance = (1e-1, 1e-1)
 source pt=(30.9734220504761, -15.75)
 target pt=(2230429.56926542, 8191984.78936994)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(19.9210212826729, 35.6833333333)
 target pt=(945462.450404275, 13960001.0888566)
@@ -160,8 +166,10 @@ target pt=(-409257.93664342, 10000000)
 source pt=(22.5445719957352, 0)
 target pt=(1341975.16733085, 10000000)
 
+test tolerance = (1e-1, 1e-1)
 source pt=(29.2473205924034, 0)
 target pt=(2102080.13415998, 10000000)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(25.6049866676331, -55)
 target pt=(1177043.45776129, 3853637.7397625)
@@ -183,11 +191,11 @@ target pt=(462431.054613172, 2233823.62613801)
 
 source pt=(9.2997213602066, 90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-target pt=(499999.999999999942,     19997964.943020999432)
+target pt=(499999.999999999942, 19997964.943020999432)
 
 source pt=(6.98187249898911, -90)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-target pt=(499999.999999999942,     2035.056979001622)
+target pt=(499999.999999999942, 2035.056979001622)
 
 
 source crs = _WGS84_
@@ -224,8 +232,10 @@ target pt=(-145875.711871511, 3988102.05814631)
 source pt=(144.685746490955, 0)
 target pt=(-33192.2027222244, 3988102.05814631)
 
+test tolerance = (1e-1, 1e-1)
 source pt=(164.096502184868, 0)
 target pt=(1926861.33390233, 3988102.05814631)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(145.097191035748, -55)
 target pt=(217742.098184494, -1509307.70102619)
@@ -279,17 +289,21 @@ target pt=(697001.69024722, -10656990.4343806)
 source pt=(-45.9275395274162, 0)
 target pt=(789323.305524357, -6876930.9202052)
 
+test tolerance = (1e-1, 1e-1)
 source pt=(-67.325022816658, 0)
 target pt=(-1611648.96283018, -6876930.9202052)
 
 source pt=(-65.1325729489326, 0)
 target pt=(-1360869.93907289, -6876930.9202052)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(-63.4769666194916, 0)
 target pt=(-1172889.8043455, -6876930.9202052)
 
+test tolerance = (1e-1, 1e-1)
 source pt=(-37.4437856078148, 0)
 target pt=(1753537.01461339, -6876930.9202052)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(-53.5433286428452, -55)
 target pt=(-34769.6655635273, -12974296.2789229)
@@ -343,9 +357,11 @@ target pt=(-8635552.87866394, -3554945.96723421)
 source pt=(18.45, -33.9166666666)
 target pt=(-8302359.97263055, -66747202.7054016)
 
+test tolerance = (1e-0, 1e-0)
 source pt=(0, 0)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-target pt=(-3483443.041999361478,   45054262.819412700832)
+target pt=(-3483443.041999361478, 45054262.819412700832)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(180, 0)
 target pt=(3483443.04199937, -17328562.8773271)
@@ -356,9 +372,11 @@ target pt=(3483443.04199937, -17328562.8773271)
 source pt=(90, 0)
 target pt=(-48376709.2979346, -17328562.8773271)
 
+test tolerance = (1e-0, 1e-0)
 source pt=(-90, 0)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
 target pt=(48376709.297934658825, 45054262.819412700832)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(-76, -55)
 target pt=(11553272.5099346, -54029404.2381212)
@@ -475,17 +493,19 @@ target pt=(6363780.15896415, -14108128.945581)
 source pt=(0, 0)
 target pt=(7832454.72952154, -6693931.43193781)
 
+test tolerance = (1e-1, 1e-1)
 source pt=(180, 0)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-target pt=(-7802454.729521553963,   10519035.025686521083)
+target pt=(-7802454.729521553963, 10519035.025686521083)
 
 source pt=(-180, 0)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-target pt=(-7802454.729521531612,   10519035.025686521083)
+target pt=(-7802454.729521531612, 10519035.025686521083)
 
 source pt=(90, 0)
 //Error: The operation was attempted on an empty geometry.::"esri.Point"
-target pt=(2698178.655944796745,    10519035.025686521083)
+target pt=(2698178.655944796745, 10519035.025686521083)
+test tolerance = (1e-2, 1e-2)
 
 source pt=(-90, 0)
 target pt=(-2668178.6559448, -6693931.43193781)
