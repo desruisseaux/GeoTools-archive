@@ -29,7 +29,7 @@
   <name>JDBC DataStore Support</name>
   
   <description>
-		Abstract datastore implementation and helper classes / apis to be extended
+    Abstract datastore implementation and helper classes / apis to be extended
     by datastores backed by releational databases accesible via jdbc.
   </description>
 
@@ -69,17 +69,6 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
       <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -89,13 +78,13 @@
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
-		<dependency>
+    <dependency>
       <groupId>oro</groupId>
       <artifactId>oro</artifactId>
       <!-- The version number is specified in the parent POM. -->
       <scope>test</scope>
     </dependency>
-		<dependency>
+    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <!-- The version number is specified in the parent POM. -->

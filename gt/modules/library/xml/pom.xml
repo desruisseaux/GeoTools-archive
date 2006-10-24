@@ -29,7 +29,7 @@
   <name>XML Parsing Support</name>
   
   <description>
-		XML Parser based on the XDO design.
+    XML Parser based on the XDO design.
   </description>
 
   <licenses>
@@ -70,9 +70,14 @@
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
   <dependencies>
-		<dependency>
+    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -82,19 +87,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>coverage</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-			<scope>test</scope>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
