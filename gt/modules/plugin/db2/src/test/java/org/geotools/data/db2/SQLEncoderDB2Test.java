@@ -28,6 +28,7 @@ import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -36,7 +37,6 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.SQLEncoderException;
-
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -130,6 +130,7 @@ public class SQLEncoderDB2Test extends DB2TestCase {
      * @param left
      * @param right
      *
+     * @return
      *
      * @throws IllegalFilterException
      */
@@ -152,6 +153,7 @@ public class SQLEncoderDB2Test extends DB2TestCase {
      * @param right
      * @param distance
      *
+     * @return
      *
      * @throws IllegalFilterException
      */
@@ -166,7 +168,7 @@ public class SQLEncoderDB2Test extends DB2TestCase {
 
         return gf;
     }
-
+ 
     public void testDistance()
         throws IllegalFilterException, SQLEncoderException {
         StringWriter output;

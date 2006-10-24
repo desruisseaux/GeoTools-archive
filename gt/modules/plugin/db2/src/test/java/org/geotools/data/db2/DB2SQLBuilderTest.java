@@ -24,6 +24,8 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -31,7 +33,6 @@ import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.SQLEncoderException;
-
 import java.io.IOException;
 
 
@@ -59,6 +60,75 @@ public class DB2SQLBuilderTest extends DB2TestCase {
         sqlBuilder = (DB2SQLBuilder) dataStore.getSqlBuilder("Places");
     }
 
+    public void testFidFilter()
+    throws IllegalFilterException, SQLEncoderException, IOException {
+    String typeName = "Places";
+    FeatureSource fs = dataStore.getFeatureSource("Places");
+    FeatureType ft = fs.getSchema();
+    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+    FidFilter fidfilter = null;
+    fidfilter = ff.createFidFilter("1");
+    LikeFilter lf = ff.createLikeFilter();
+
+    DefaultQuery query = new DefaultQuery("Places", fidfilter);
+    Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
+    Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
+    String[] attrNames = new String[ft.getAttributeCount()];
+    AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
+
+    for (int i = 0; i < ft.getAttributeCount(); i++) {
+        attrNames[i] = ft.getAttributeType(i).getName();
+        attrTypes[i] = ft.getAttributeType(i);
+    }
+
+    String fidQuery = this.sqlBuilder.buildSQLQuery("Places",
+            this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
+    assertEquals("LIKE encoding failed",
+        "SELECT \"Id\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Places\" WHERE (\"Id\" = 1)",
+        fidQuery);
+}
+    
+    public void testCompareFilter()
+    throws IllegalFilterException, SQLEncoderException, IOException {
+    String typeName = "Places";
+    FeatureSource fs = dataStore.getFeatureSource("Places");
+    FeatureType ft = fs.getSchema();
+    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+    CompareFilter cf = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
+    AttributeExpression column = ff.createAttributeExpression("Name");
+    LiteralExpression compareValue = ff.createLiteralExpression("Zena");  
+    cf.addLeftValue(column);
+    cf.addRightValue(compareValue);
+
+    String[] attrNames = new String[ft.getAttributeCount()];
+    AttributeType[] attrTypes = new AttributeType[ft.getAttributeCount()];
+
+    for (int i = 0; i < ft.getAttributeCount(); i++) {
+        attrNames[i] = ft.getAttributeType(i).getName();
+        attrTypes[i] = ft.getAttributeType(i);
+    }
+    DefaultQuery query = new DefaultQuery("Places", cf);
+    Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
+    Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
+    String compareQuery = this.sqlBuilder.buildSQLQuery("Places",
+            this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
+    assertEquals("compare encoding failed",
+        "SELECT \"Id\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Places\" WHERE \"Name\" = 'Zena'",
+        compareQuery);
+    
+    column = ff.createAttributeExpression("Id");
+    compareValue = ff.createLiteralExpression(2);   
+    cf.addLeftValue(column);
+    cf.addRightValue(compareValue);    
+    query = new DefaultQuery("Places", cf);
+    preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
+    postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
+    compareQuery = this.sqlBuilder.buildSQLQuery("Places",
+            this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
+    assertEquals("compare encoding failed",
+        "SELECT \"Id\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Places\" WHERE \"Id\" = 2",
+        compareQuery);    
+}    
        public void testLikeFilter()
         throws IllegalFilterException, SQLEncoderException, IOException {
         String typeName = "Places";
@@ -66,7 +136,7 @@ public class DB2SQLBuilderTest extends DB2TestCase {
         FeatureType ft = fs.getSchema();
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         LikeFilter lf = ff.createLikeFilter();
-        AttributeExpression nameColumn = ff.createAttributeExpression(ft, "Name");
+        AttributeExpression nameColumn = ff.createAttributeExpression("Name");
         String pattern = "s.met*s";       
         lf.setPattern(pattern, "*", ".", "\\");
         lf.setValue(nameColumn);
@@ -85,7 +155,7 @@ public class DB2SQLBuilderTest extends DB2TestCase {
         String likeQuery = this.sqlBuilder.buildSQLQuery("Places",
                 this.dataStore.getFIDMapper("Places"), attrTypes, preFilter);
         assertEquals("LIKE encoding failed",
-            "SELECT \"Id\", \"Name\", \"Geom\"..ST_AsText() FROM \"Test\".\"Places\" WHERE \"Name\" LIKE 's_met%s'",
+            "SELECT \"Id\", \"Name\", DB2GSE.ST_AsText(\"Geom\") FROM \"Test\".\"Places\" WHERE \"Name\" LIKE 's_met%s'",
             likeQuery);
     }
 
@@ -105,7 +175,7 @@ public class DB2SQLBuilderTest extends DB2TestCase {
 
         StringBuffer sb = new StringBuffer();
         this.sqlBuilder.sqlGeometryColumn(sb, geomAttr);
-        assertEquals("Encoding didn't match", "\"Geom\"..ST_AsText()",
+        assertEquals("Encoding didn't match", "DB2GSE.ST_AsText(\"Geom\")",
             sb.toString());
     }
 }

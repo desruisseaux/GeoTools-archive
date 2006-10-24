@@ -17,6 +17,7 @@
 package org.geotools.data.db2;
 
 import org.geotools.data.SchemaNotFoundException;
+import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
@@ -34,54 +35,61 @@ import java.sql.SQLException;
 public class DB2FIDMapperFactoryTest extends DB2TestCase {
     public void testMappers() throws Exception {
         String catalog = null;
-        String schema = null;
+        String schema = "Test";
         String tableName = null;
         Connection conn = null;
         FIDMapper fm;
         String wrapperDesc = null;
-        FIDMapperFactory fmFact = new DB2FIDMapperFactory();
+        FIDMapperFactory fmFact = new DB2FIDMapperFactory("Test");
+
+        DB2DataStore ds = getDataStore();
+        FIDMapper fm1 = ds.getFIDMapper("FIDVCHARPRIKEY");
+        FIDMapper fm2 = new TypedFIDMapper(new BasicFIDMapper("IDCOL", 12), "FIDVCHARPRIKEY");
+        fm1.equals(fm2);
+//        assertEquals(new TypedFIDMapper(new BasicFIDMapper("IDCOL", 12), "FIDVCHARPRIKEY"), ds.getFIDMapper("FIDVCHARPRIKEY"));
 
         conn = getLocalConnection();
         tableName = "FIDAUTOINC";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
-        wrapperDesc = toString(fm);
+        wrapperDesc = fm.toString();
+        fm2 = ds.getFIDMapper(tableName);
         assertEquals(tableName, wrapperDesc,
-            "class org.geotools.data.jdbc.fidmapper.AutoIncrementFIDMapper:1:IDCOL:4:-1:-1:false:true:");
+            "Wrapped:class org.geotools.data.db2.DB2AutoIncrementFIDMapper:1:IDCOL:4:0:0:false:true:");
 
         conn = getLocalConnection();
         tableName = "FIDCHARPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
-        wrapperDesc = toString(fm);
+        wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
-            "class org.geotools.data.jdbc.fidmapper.BasicFIDMapper:1:IDCOL:12:32:32:true:false:");
+            "Wrapped:class org.geotools.data.jdbc.fidmapper.BasicFIDMapper:1:IDCOL:12:15:0:true:false:");
 
         conn = getLocalConnection();
         tableName = "FIDNOPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
-        wrapperDesc = toString(fm);
+        wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
-            "class org.geotools.data.db2.DB2NullFIDMapper:0::false:false:");
+            "Wrapped:class org.geotools.data.db2.DB2NullFIDMapper:0::false:false:");
 
         conn = getLocalConnection();
         tableName = "FIDINTPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
-        wrapperDesc = toString(fm);
+        wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
-            "class org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper:1:IDCOL:12:255:255:true:false:");
+            "Wrapped:class org.geotools.data.jdbc.fidmapper.MaxIncFIDMapper:1:IDCOL:4:0:0:true:false:");
 
         conn = getLocalConnection();
         tableName = "FIDVCHARPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
-        wrapperDesc = toString(fm);
+        wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
-            "class org.geotools.data.jdbc.fidmapper.BasicFIDMapper:1:IDCOL:12:32:32:true:false:");
+            "Wrapped:class org.geotools.data.jdbc.fidmapper.BasicFIDMapper:1:IDCOL:12:17:0:true:false:");
 
         conn = getLocalConnection();
         tableName = "FIDMCOLPRIKEY";
         fm = fmFact.getMapper(catalog, schema, tableName, conn);
-        wrapperDesc = toString(fm);
+        wrapperDesc = fm.toString();
         assertEquals(tableName, wrapperDesc,
-            "class org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper:2:IDCOL1:1:32:32:true:false:");
+            "Wrapped:class org.geotools.data.jdbc.fidmapper.MultiColumnFIDMapper:2:IDCOL1:1:11:0:true:false:");
 
         // Don't know why, but DefaultFIDFactory.getPkColumnInfo closes the connection
         conn = getLocalConnection();

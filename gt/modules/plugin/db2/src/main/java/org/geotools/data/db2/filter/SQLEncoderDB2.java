@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2006. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,9 +19,11 @@ package org.geotools.data.db2.filter;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
+
 import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.DefaultExpression;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterVisitor;
@@ -31,9 +33,10 @@ import org.geotools.filter.LikeFilter;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
-
 import java.io.IOException;
 import java.io.Writer;
+import java.sql.Types;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -384,6 +387,20 @@ public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
         this.out.write("db2gse.ST_Geometry('" + wktRepresentation + "', "
             + this.srid + ")");
     }
+    /**
+     * Construct a geometry from the WKT representation of a geometry
+
+     *
+     * @param geom the constructor for the geometry.
+     *
+
+     */
+    public String db2Geom(Geometry geom) {
+		String geomType = geom.getGeometryType();
+		String g1 = geom.toText();
+		String g2 = "db2gse.ST_" + geomType + "('" + g1 + "'," + srid + ")";
+		return g2;
+    }
 
     /**
      * Set the value of the srid value to be used if a DB2 Spatial Extender
@@ -406,6 +423,7 @@ public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
      * @return FilterCapabilities for DB2
      */
     protected FilterCapabilities createFilterCapabilities() {
+
         FilterCapabilities capabilities = new FilterCapabilities();
             
         capabilities.addType(FilterCapabilities.LOGIC_OR);
@@ -458,4 +476,69 @@ public class SQLEncoderDB2 extends SQLEncoder implements FilterVisitor {
     public void setSelectivityClause(String string) {
         this.selectivityClause = string;
     }
+    
+
+    /**
+     * Encodes an FidFilter.
+     *
+     * @param filter
+     *
+     * @throws RuntimeException DOCUMENT ME!
+     *
+     * @see org.geotools.filter.SQLEncoder#visit(org.geotools.filter.FidFilter)
+     */
+    public void visit(FidFilter filter) {
+        if (mapper == null) {
+            throw new RuntimeException(
+                "Must set a fid mapper before trying to encode FIDFilters");
+        }
+
+        String[] fids = filter.getFids();
+        LOGGER.finer("Exporting FID=" + Arrays.asList(fids));
+
+        // prepare column name array
+        String[] colNames = new String[mapper.getColumnCount()];
+        String[] colDelimiters = new String[mapper.getColumnCount()];
+
+        for (int i = 0; i < colNames.length; i++) {
+            colNames[i] = mapper.getColumnName(i);
+            int dataType = mapper.getColumnType(i);
+            if ((dataType == Types.VARCHAR) || (dataType == Types.CHAR)
+            || (dataType == Types.CLOB)) {
+            	colDelimiters[i] = "'";
+            } else {
+            	colDelimiters[i] = "";
+            }
+        }
+
+        for (int i = 0; i < fids.length; i++) {
+            try {
+                Object[] attValues = mapper.getPKAttributes(fids[i]);
+
+                out.write("(");
+
+                for (int j = 0; j < attValues.length; j++) {
+                	int colType = mapper.getColumnType(j);
+                    out.write( escapeName(colNames[j]) );
+                    out.write(" = ");
+                    out.write(colDelimiters[j]);
+                    out.write(attValues[j].toString()); 
+                    out.write(colDelimiters[j]);
+
+                    if (j < (attValues.length - 1)) {
+                        out.write(" AND ");
+                    }
+                }
+
+                out.write(")");
+
+                if (i < (fids.length - 1)) {
+                    out.write(" OR ");
+                }
+            } catch (java.io.IOException e) {
+                LOGGER.warning("IO Error exporting FID Filter.");
+            }
+        }
+    }
+
 }

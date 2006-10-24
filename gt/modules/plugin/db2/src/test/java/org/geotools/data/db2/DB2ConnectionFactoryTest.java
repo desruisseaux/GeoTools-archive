@@ -35,6 +35,7 @@ public class DB2ConnectionFactoryTest extends DB2TestCase {
         ConnectionPool pool = null;
         String dbUrl = null;
 
+/* Test connection factory using type 4 connection - port number is non-zero */        
         connFact = new DB2ConnectionFactory(host, String.valueOf(portnum),
                 dbname);
         connFact.setLogin(user, pw);
@@ -50,7 +51,24 @@ public class DB2ConnectionFactoryTest extends DB2TestCase {
         dbUrl = connFact.getDbURL();
         assertEquals("Check returned dbUrl", dbUrl,
             "jdbc:db2://localhost:50000/geotools");
+        
+/* Test connection factory using type 2 connection - port number is zero */        
+        connFact = new DB2ConnectionFactory(host, String.valueOf(0),
+                dbname);
+        connFact.setLogin(user, pw);
 
+        try {
+            pool = connFact.getConnectionPool();
+            conn = pool.getConnection();
+            conn.close();
+        } catch (SQLException e) {
+            fail("Get connection with valid parameters failed: " + e);
+        }
+
+        dbUrl = connFact.getDbURL();
+        assertEquals("Check returned dbUrl", dbUrl,
+            "jdbc:db2://localhost:0/geotools");
+        
         connFact.setLogin("nouser", "nopw");
 
         try {

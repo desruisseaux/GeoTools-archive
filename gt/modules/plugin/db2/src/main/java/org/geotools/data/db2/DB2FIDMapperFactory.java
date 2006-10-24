@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2006. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,13 +39,15 @@ import java.util.logging.Logger;
 public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.db2");
+    private String databaseSchemaName = null;
 
     /**
      * Default constructor will cause FID columns to be returned as business
      * attributes.
      */
-    public DB2FIDMapperFactory() {
+    public DB2FIDMapperFactory(String databaseSchemaName) {
         super(true);
+        this.databaseSchemaName = databaseSchemaName;
     }
 
     /**
@@ -162,16 +164,16 @@ public class DB2FIDMapperFactory extends DefaultFIDMapperFactory {
      *
      * @return a FIDMapper
      */
-    protected FIDMapper buildSingleColumnFidMapper0(String schema,
+    protected FIDMapper buildSingleColumnFidMapper(String schema,
         String tableName, Connection connection, ColumnInfo ci) {
-        //      if (ci.isAutoIncrement()) {
-        //          return new AutoIncrementFIDMapper(ci.getColName(), ci.getDataType());
-        //      } else if (isIntegralType(ci.getDataType())) {
-        //          return new MaxIncFIDMapper(tableName, ci.getColName(), ci.getDataType(), true);
-        //      } else {
-        //          return new BasicFIDMapper(ci.getColName(), ci.getSize(), true);
-        //      }
-        return null;
+
+              if (ci.isAutoIncrement()) {
+                  return new DB2AutoIncrementFIDMapper(databaseSchemaName, tableName, ci.getColName(), ci.getDataType());
+              } else if (isIntegralType(ci.getDataType())) {
+                  return new MaxIncFIDMapper(databaseSchemaName, tableName, ci.getColName(), ci.getDataType(), true);
+              } else {
+                  return new BasicFIDMapper(databaseSchemaName, tableName, ci.getColName(), ci.getSize(), true);
+              }
     }
 
     /**

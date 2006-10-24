@@ -111,13 +111,15 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         try {
             pool = connFact.getConnectionPool();
         } catch (SQLException e) {
-            throw new DataSourceException("Could not create connection", e);
+            LOGGER.info("Get connection pool failed: "
+                    + e);
+            throw new DataSourceException("Could not create connection pool", e);
         }
 
         // Set the namespace and databaseSchemaName both to the table schema name
         // Set the timeout value to 100 seconds to force FeatureTypeHandler caching
         JDBCDataStoreConfig config = new JDBCDataStoreConfig(tabschema,
-                tabschema, 100000);
+                tabschema, 10000);
         DB2DataStore ds;
 
         try {
@@ -125,7 +127,7 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
         } catch (IOException e) {
             LOGGER.info("Create DB2Datastore failed: "
                     + e);
-            return null;
+            throw new DataSourceException("Could not create DB2DataStore", e);
         }
 
         LOGGER.info("Successfully created DB2Datastore for: "

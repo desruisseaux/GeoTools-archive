@@ -23,8 +23,13 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
+import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.jdbc.ConnectionPool;
@@ -38,10 +43,13 @@ import org.geotools.data.jdbc.QueryData;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.data.jdbc.fidmapper.FIDMapperFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.sql.Connection;
@@ -92,7 +100,11 @@ public class DB2DataStore extends JDBCDataStore {
 
     /** The URL for this particular data store */
     private String dbURL = null;
-
+    
+    /** Time since catalog was last reloaded */
+	private long lastTypeNameRequestTime  = 0;
+	
+    
     /**
      * The only supported constructor for a DB2DataStore. This constructor is
      * mainly intended to be called from DB2DataStoreFactory.
@@ -193,7 +205,7 @@ public class DB2DataStore extends JDBCDataStore {
      * @return a DB2FIDMapperFactory
      */
     protected FIDMapperFactory buildFIDMapperFactory(JDBCDataStoreConfig config) {
-        return new DB2FIDMapperFactory();
+        return new DB2FIDMapperFactory(config.getDatabaseSchemaName());
     }
 
     /**
@@ -286,7 +298,8 @@ public class DB2DataStore extends JDBCDataStore {
         int srid = 0;
         SQLEncoderDB2 encoder = new SQLEncoderDB2();
         encoder.setSqlNameEscape("\"");
-        encoder.setFIDMapper(getFIDMapper(typeName));
+        FIDMapper mapper = getFIDMapper(typeName);
+        encoder.setFIDMapper(mapper);
 
         if (info.getSchema().getDefaultGeometry() != null) {
             String geom = info.getSchema().getDefaultGeometry().getName();
@@ -310,7 +323,36 @@ public class DB2DataStore extends JDBCDataStore {
      * @throws IOException if the spatial catalog can not be accessed.
      */
     public String[] getTypeNames() throws IOException {
+
+        long lastTime = lastTypeNameRequestTime;
+        long now = System.currentTimeMillis();
+        
+        lastTypeNameRequestTime = now;
+        
+        if (lastTime < (now - config.getTypeHandlerTimeout())) {
+        	refreshCatalog();
+        }
         return getSpatialCatalog().getTypeNames();
+    }
+    
+    
+    /** 
+     * Reloads the spatial catalog from the database.
+     * <p>
+     * This is useful in case anything changed after the datastore was initialized.
+     * @throws IOException
+     * @throws SQLException
+     */
+    public void refreshCatalog() throws IOException {
+    	try {
+    		Connection conn = getConnection(Transaction.AUTO_COMMIT);
+			getSpatialCatalog().loadCatalog(conn,getTableSchema());
+			lastTypeNameRequestTime = System.currentTimeMillis();
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
+			LOGGER.fine("Refreshing spatial catalog");
+		} catch (SQLException e) {
+			throw(new IOException(e.getLocalizedMessage()));
+		}
     }
 
     /**
@@ -435,4 +477,61 @@ public class DB2DataStore extends JDBCDataStore {
         return new DB2FeatureWriter(featureReader, queryData,
             (DB2SQLBuilder) getSqlBuilder(featureName));
     }
+	/**
+	 * This is a public entry point to the DataStore.
+	 * 
+	 * <p>
+	 * We have given some though to changing this api to be based on query.
+	 * </p>
+	 * 
+	 * <p>
+	 * Currently the is is the only way to retype your features to different
+	 * name spaces.
+	 * </p>
+	 * (non-Javadoc)
+	 * 
+	 * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.feature.FeatureType,
+	 *      org.geotools.filter.Filter, org.geotools.data.Transaction)
+	 */
+	public FeatureReader getFeatureReader(final FeatureType requestType,
+			final Filter filter, final Transaction transaction)
+			throws IOException {
+		String typeName = requestType.getTypeName();
+		FeatureType schemaType = getSchema(typeName);
+        LOGGER.fine("requestType: " + requestType);
+        LOGGER.fine("schemaType: " + schemaType);
+
+		int compare = DataUtilities.compare(requestType, schemaType);
+
+		Query query;
+
+		if (compare == 0) {
+			// they are the same type
+			//
+			query = new DefaultQuery(typeName, filter);
+		} else if (compare == 1) {
+			// featureType is a proper subset and will require reTyping
+			//
+			String[] names = attributeNames(requestType, filter);
+			query = new DefaultQuery(typeName, filter, Query.DEFAULT_MAX,
+					names, "getFeatureReader");
+		} else {
+			// featureType is not compatiable
+			//
+			throw new IOException("Type " + typeName + " does match request");
+		}
+
+		if ((filter == Filter.ALL) || filter.equals(Filter.ALL)) {
+			return new EmptyFeatureReader(requestType);
+		}
+
+		FeatureReader reader = getFeatureReader(query, transaction);
+
+		if (compare == 1) {
+			reader = new ReTypeFeatureReader(reader, requestType);
+		}
+
+		return reader;
+	}
+    
 }

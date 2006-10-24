@@ -44,11 +44,9 @@ import java.util.logging.Logger;
  * @source $URL$
  */
 public class DB2FeatureSource extends JDBCFeatureSource {
-    /** The logger for the filter module. */
+
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.db2");
-    protected DB2DataStore dataStore;
-    protected FeatureType featureType;
 
     /**
      * Constructs a feature source based on a DB2 data store for a specified
@@ -59,8 +57,7 @@ public class DB2FeatureSource extends JDBCFeatureSource {
      */
     public DB2FeatureSource(DB2DataStore dataStore, FeatureType featureType) {
         super(dataStore, featureType);
-        this.dataStore = dataStore;
-        this.featureType = featureType;
+
     }
 
     /**
@@ -95,16 +92,16 @@ public class DB2FeatureSource extends JDBCFeatureSource {
         Envelope env = new Envelope();
         CoordinateReferenceSystem crs = null;
 
-        if (this.featureType != null) {
-            String typeName = this.featureType.getTypeName();
-            GeometryAttributeType geomType = this.featureType
+        if (getSchema() != null) {
+            String typeName = getSchema().getTypeName();
+            GeometryAttributeType geomType = getSchema()
                 .getDefaultGeometry();
 
             if (query.getFilter() != Filter.ALL) {
                 String sqlStmt = null;
 
                 try {
-                    DB2SQLBuilder builder = (DB2SQLBuilder) this.dataStore
+                    DB2SQLBuilder builder = (DB2SQLBuilder) ((DB2DataStore)this.getDataStore())
                         .getSqlBuilder(typeName);
                     sqlStmt = builder.buildSQLBoundsQuery(typeName, geomType,
                             query.getFilter());
@@ -150,4 +147,5 @@ public class DB2FeatureSource extends JDBCFeatureSource {
 
         return env;
     }
+    
 }

@@ -210,7 +210,7 @@ public class DB2SpatialCatalog {
      *
      * @throws SQLException
      */
-    private void loadCatalog(Connection conn, String schemaName)
+     void loadCatalog(Connection conn, String schemaName)
         throws SQLException {
         this.geometryColumns = new HashMap();
 

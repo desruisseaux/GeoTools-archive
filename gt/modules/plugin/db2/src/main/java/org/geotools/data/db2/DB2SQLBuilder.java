@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2006. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,13 +16,22 @@
  */
 package org.geotools.data.db2;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.data.db2.filter.SQLEncoderDB2;
 import org.geotools.data.jdbc.DefaultSQLBuilder;
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+import java.io.IOException;
+import java.sql.Types;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -38,6 +47,7 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
             "org.geotools.data.db2");
     private String tableSchema = null;
     private String tableName = null;
+    private FIDMapper mapper = null;
 
     /**
      * Creates a DB2SQLBuilder that will provide a table schema to qualify
@@ -55,9 +65,10 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      * @param tableSchema table schema to qualify table names
      * @param tableName the table name to be used by this SQL builder
      */
-    public DB2SQLBuilder(SQLEncoder encoder, String tableSchema,
+    public DB2SQLBuilder(SQLEncoder encoder, FIDMapper mapper, String tableSchema,
         String tableName) {
         super(encoder);
+        this.mapper = mapper;
         this.tableSchema = tableSchema;
         this.tableName = tableName;
     }
@@ -73,12 +84,15 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      * or FeatureType.
      * </p>
      *
-     * @param encoder     an SQLEncoder
+     * @param encoder an SQLEncoder
      * @param tableSchema table schema to qualify table names
-     * @param featureType the table name to be used by this SQL builder
+     * @param tableName the table name to be used by this SQL builder
      */
     public DB2SQLBuilder(SQLEncoder encoder, String tableSchema, FeatureType featureType) {
-        super(encoder, featureType, null);
+ //       super(encoder, featureType, null);
+    	this.encoder = encoder;
+//    	this.ft = featureType;
+    	this.accessor = null;
         this.tableSchema = tableSchema;
         this.tableName = featureType.getTypeName();
     }
@@ -95,7 +109,7 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      * @param geomAttribute An AttributeType for a geometry attribute
      */
     public void sqlGeometryColumn(StringBuffer sql, AttributeType geomAttribute) {
-        sql.append(sqlGeometryColumnName(geomAttribute) + "..ST_AsText()");
+        sql.append( "DB2GSE.ST_AsText(" + sqlGeometryColumnName(geomAttribute) + ")");
     }
 
     /**
@@ -216,4 +230,185 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
     String escapeName(String name) {
         return this.encoder.escapeName(name);
     }
+	/**
+     * Creates a sql insert statement.  Uses each feature's schema, which makes
+     * it possible to insert out of order, as well as inserting less than all
+     * features.
+     *
+     * @param feature the feature to add.
+     *
+     * @return an insert sql statement.
+     *
+     * @throws IOException
+     */
+    protected String makeInsertSql(AttributeType[] attributes, Feature feature) throws IOException {
+
+		SQLEncoderDB2 db2Encoder = (SQLEncoderDB2) encoder;
+
+        String attrValue = null;
+        boolean firstAttr = true;
+		StringBuffer colNameList = new StringBuffer("");
+		StringBuffer valueList = new StringBuffer("");
+
+        for (int i = 0; i < attributes.length; i++) {
+			String colName = escapeName(attributes[i].getName());
+			if (!firstAttr) {
+				colNameList.append(", ");
+				valueList.append(", ");
+			}
+			firstAttr = false;
+            colNameList.append(colName);
+            
+			Object currAtt = feature.getAttribute(i);        	
+			if (currAtt == null) {
+				attrValue = "NULL";
+			}
+			else 
+			if (Geometry.class.isAssignableFrom(attributes[i].getType())) {
+				attrValue = db2Encoder.db2Geom((Geometry) currAtt);
+			} else 
+			if (String.class.isAssignableFrom(attributes[i].getType())) {
+				attrValue = "'" + currAtt.toString() + "'";
+				} else	{
+					attrValue = currAtt.toString();
+				}
+
+			
+            valueList.append(attrValue);
+        }
+
+
+        String statementSQL = "INSERT INTO " + getSchemaTableName()
+			+ "( " + colNameList.toString() + ")"
+			+ " VALUES(" + valueList.toString() + ")"
+		;
+        return (statementSQL);
+    }
+	/**
+	 * Generates the SQL UPDATE statement
+	 * 
+	 * @param feature
+	 * 
+	 * @return DB2 UPDATE statement
+	 * 
+	 * @throws IOException
+	 * @throws UnsupportedOperationException
+	 */
+	protected String makeUpdateSql(AttributeType[] attributes, Feature live, Feature current)
+			throws IOException {
+
+		boolean firstAttr = true;
+		SQLEncoderDB2 db2Encoder = (SQLEncoderDB2) encoder;
+		StringBuffer statementSQL = new StringBuffer("UPDATE " + getSchemaTableName()
+				+ " SET ");
+
+		for (int i = 0; i < current.getNumberOfAttributes(); i++) {
+			Object currAtt = current.getAttribute(i);
+			Object liveAtt = live.getAttribute(i);
+
+			if (!DataUtilities.attributesEqual(currAtt, liveAtt)) {
+				if (LOGGER.isLoggable(Level.INFO)) {
+					LOGGER.fine("modifying att# " + i + " to " + currAtt);
+				}
+				String attrValue = null;
+				String attrName = attributes[i].getName();
+
+				if (Geometry.class.isAssignableFrom(attributes[i].getType())) {
+
+					attrValue = db2Encoder.db2Geom((Geometry) currAtt);
+				} else 
+				if (String.class.isAssignableFrom(attributes[i].getType())) {
+					attrValue = "'" + currAtt.toString() + "'";
+					} else {
+						attrValue = currAtt.toString();
+					}
+
+				String colName = escapeName(attrName);
+				if (!firstAttr) {
+					statementSQL.append(", ");
+				}
+				firstAttr = false;
+				statementSQL.append(colName).append(" = ").append(attrValue);
+			}
+		}
+		statementSQL.append(makeFIDWhere(current));
+		return (statementSQL.toString());
+	}
+	/**
+	 * Generates the SQL delete statement
+	 * 
+	 * @param feature
+	 * 
+	 * @return DB2 DELETE statement
+	 * @throws IOException
+	 * 
+	 * @throws IOException
+	 * @throws UnsupportedOperationException
+	 */
+	public String makeDeleteSql(Feature feature) throws IOException {
+		String deleteSQL  = "DELETE FROM "
+			+ getSchemaTableName() + makeFIDWhere(feature);
+		return (deleteSQL);
+	}	
+	
+	/** 
+	 * Build a DB2 WHERE clause based on the FID column values
+	 * 
+	 * @param feature
+	 * @return A DB2 WHERE clause based on the FID column values.
+	 * @throws IOException
+	 */
+	protected String makeFIDWhere(Feature feature) throws IOException {
+		
+		StringBuffer statementSQL = new StringBuffer(" WHERE ");
+		Object[] pkValues = mapper.getPKAttributes(feature.getID());
+
+		if (mapper.getColumnCount() == 0) {
+			// can't update/delete without a primary key
+			throw new UnsupportedOperationException();
+		}
+		boolean firstCol = true;
+		for (int i = 0; i < mapper.getColumnCount(); i++) {
+			
+			if (!firstCol) {
+				statementSQL.append(" AND ");
+				firstCol = false;
+			}
+			
+			statementSQL.append(
+					escapeName(mapper.getColumnName(i)))
+					.append(" = ");
+
+			// don't put quotes around numeric values
+			if (isTypeNumeric(mapper.getColumnType(i))) {
+				statementSQL.append(pkValues[i]);
+			} else {
+				statementSQL.append("'" + pkValues[i] + "'");
+			}
+		}
+		return (statementSQL.toString());		
+	}  
+	/**
+	 * Checks if column type is SQL numeric type
+	 * 
+	 * @param SQL columnType
+	 * 
+	 * @return true if the column is an SQL numeric type
+	 */
+	protected boolean isTypeNumeric(int columnType) {
+		boolean numeric = false;
+
+		if ((columnType == Types.BIT) || (columnType == Types.TINYINT)
+				|| (columnType == Types.SMALLINT)
+				|| (columnType == Types.INTEGER)
+				|| (columnType == Types.BIGINT) || (columnType == Types.FLOAT)
+				|| (columnType == Types.REAL) || (columnType == Types.DOUBLE)
+				|| (columnType == Types.NUMERIC)
+				|| (columnType == Types.DECIMAL)) {
+			numeric = true;
+		}
+
+		return (numeric);
+	}	
+	
 }

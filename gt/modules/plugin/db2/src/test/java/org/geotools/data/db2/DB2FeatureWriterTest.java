@@ -17,10 +17,16 @@
 package org.geotools.data.db2;
 
 import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTReader;
+
+
 import java.io.IOException;
 
 
@@ -43,7 +49,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
         dataStore = getDataStore();
     }
 
-    public void testRemove() throws IOException {
+    public void xtestRemove() throws IOException {
         try {
             DB2FeatureStore fs = (DB2FeatureStore) dataStore.getFeatureSource(
                     "Roads");
@@ -65,15 +71,112 @@ public class DB2FeatureWriterTest extends DB2TestCase {
             System.out.println(e);
         }
     }
+    public void xtestUpdateRoads() throws IOException {
+        try {
+            DB2FeatureStore fs = (DB2FeatureStore) dataStore.getFeatureSource(
+                    "Roads");
+            Transaction trans = null;
+            trans = new DefaultTransaction("trans1");
+
+            //			fs.setTransaction(trans);
+            FeatureWriter fw = this.dataStore.getFeatureWriter("Roads", trans);
+
+            if (fw.hasNext()) {
+                Feature f = fw.next();
+                System.out.println(f);
+                Object a0 = f.getAttribute(0);
+                String name = (String) f.getAttribute(1);
+                f.setAttribute(1, name.trim() + "1");
+                Object a2 = f.getAttribute(2);
+                f.setAttribute(2,Double.valueOf("1.5"));
+
+                Geometry a3 = (Geometry) f.getAttribute(3);
+        		WKTReader wktReader = new WKTReader();
+        		LineString line3 =
+        			(LineString) wktReader.read("LINESTRING (599000.0 1162200.0, 599226.0 1162227.0)");
+        		f.setAttribute(3,line3);
+                System.out.println(f);
+                fw.write();
+            }
+
+            trans.commit();
+            trans.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public void testUpdatePlaces() throws IOException {
+        try {
+            DB2FeatureStore fs = (DB2FeatureStore) dataStore.getFeatureSource(
+                    "Places");
+            Transaction trans = null;
+            trans = new DefaultTransaction("trans1");
+            FeatureWriter fw = this.dataStore.getFeatureWriter("Places", trans);
+
+            if (fw.hasNext()) {
+                Feature f = fw.next();
+                System.out.println(f);
+
+                String name = (String) f.getAttribute(0);
+                f.setAttribute(0, name.trim() + "1");
+
+                Geometry a1 = (Geometry) f.getAttribute(1);
+        		WKTReader wktReader = new WKTReader();
+        		Polygon polygon =
+        			(Polygon) wktReader.read("POLYGON ((-74.099595 42.019401, -74.100484 42.01992, -74.101161 42.020315, -74.099595 42.019401))");
+        		f.setAttribute(1,polygon);
+                System.out.println(f);
+                fw.write();
+            }
+
+            trans.commit();
+            trans.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 
     public void xtestAppend() throws IOException {
         try {
+
             FeatureWriter fw = this.dataStore.getFeatureWriterAppend("Roads",
                     Transaction.AUTO_COMMIT);
             boolean hasNext = fw.hasNext();
-            fw.write();
-
             Feature f = fw.next();
+            f.setAttribute(0,"100");
+            f.setAttribute(1, "name" + "1");
+            Object a2 = f.getAttribute(2);
+            f.setAttribute(2,Double.valueOf("1.5"));
+
+            Geometry a3 = (Geometry) f.getAttribute(3);
+    		WKTReader wktReader = new WKTReader();
+    		LineString line3 =
+    			(LineString) wktReader.read("LINESTRING (599000.0 1162200.0, 599226.0 1162227.0)");
+    		f.setAttribute(3,line3); 
+    		f.toString();
+            System.out.println(f);
+            fw.write();           
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public void xtestAppendPlaces() throws IOException {
+        try {
+
+            FeatureWriter fw = this.dataStore.getFeatureWriterAppend("Places",
+                    Transaction.AUTO_COMMIT);
+            boolean hasNext = fw.hasNext();
+            Feature f = fw.next();
+            System.out.println(f);
+            f.setAttribute(0, "name" + "1");
+            Geometry a1 = (Geometry) f.getAttribute(1);
+    		WKTReader wktReader = new WKTReader();
+    		Polygon polygon =
+    			(Polygon) wktReader.read("POLYGON ((-74.099595 42.019401, -74.100484 42.01992, -74.101161 42.020315, -74.099595 42.019401))");
+    		f.setAttribute(1,polygon); 
+    		f.toString();
+            System.out.println(f);
+            fw.write();           
         } catch (Exception e) {
             System.out.println(e);
         }
