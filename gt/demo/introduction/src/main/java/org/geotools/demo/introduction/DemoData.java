@@ -1,3 +1,13 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2006, Adrian Custer, assigned to the PMC.
+ *
+ *    This file is hereby placed into the Public Domain. This means anyone is
+ *    free to do whatever they wish with this file. Use it well and enjoy!
+ */
+
 package org.geotools.demo.introduction;
 
 import java.awt.Color;
