@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -28,6 +29,7 @@ import junit.framework.TestSuite;
 import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionType;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -223,7 +225,7 @@ public class SLDStyleTest extends TestCase {
      * Test of parseSLD method to ensure NamedLayer/Name and
      * NamedLayer/NamedStyle are parsed correctly
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception boom
      */
     public void testParseSLDNamedLayersOnly() throws Exception {
         StyleFactory factory = StyleFactoryFinder.createStyleFactory();
@@ -259,7 +261,7 @@ public class SLDStyleTest extends TestCase {
      * Test of parseSLD method to ensure NamedLayer/Name and
      * NamedLayer/NamedStyle are parsed correctly
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception boom
      */
     public void testParseSLDNamedAndUserLayers() throws Exception {
         StyleFactory factory = StyleFactoryFinder.createStyleFactory();
@@ -283,7 +285,7 @@ public class SLDStyleTest extends TestCase {
      * Verifies that geometry filters inside SLD documents are correctly
      * parsed.
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException boom
      */
     public void testParseGeometryFilters() throws IOException {
         final String TYPE_NAME = "testType";
@@ -327,10 +329,43 @@ public class SLDStyleTest extends TestCase {
         assertEquals(10D, bbox.getMaxY(), 0);
     }
 
-    // Add test methods here, they have to start with 'test' name.
-    // for example:
-    // public void testHello() {}
-    public static void main(java.lang.String[] args) {
-        junit.textui.TestRunner.run(suite());
+    /**
+     * Verifies that a FID Filter is correctly parsed (GEOT-992).
+     *
+     * @throws IOException boom
+     */
+    public void testParseFidFilter() throws IOException {
+        StyleFactory factory = StyleFactoryFinder.createStyleFactory();
+        java.net.URL surl = TestData.getResource(this, "fidFilter.xml");
+        SLDParser stylereader = new SLDParser(factory, surl);
+
+        Style[] styles = stylereader.readXML();
+
+        final int expectedStyleCount = 1;
+        assertEquals(expectedStyleCount, styles.length);
+
+        Style style = styles[0];
+        assertEquals(1, style.getFeatureTypeStyles().length);
+
+        FeatureTypeStyle fts = style.getFeatureTypeStyles()[0];
+        assertEquals("Feature", fts.getFeatureTypeName());
+        assertEquals(1, fts.getRules().length);
+
+        
+        Filter filter = fts.getRules()[0].getFilter();
+        assertEquals(FilterType.FID, filter.getFilterType());
+
+        FidFilter fidFilter = (FidFilter) filter;
+        String[] fids = fidFilter.getFids();
+        assertEquals("Wrong number of fids", 5, fids.length);
+        
+        Arrays.sort(fids);
+        
+        assertEquals("fid.0", fids[0]);
+        assertEquals("fid.1", fids[1]);
+        assertEquals("fid.2", fids[2]);
+        assertEquals("fid.3", fids[3]);
+        assertEquals("fid.4", fids[4]);
     }
+    
 }

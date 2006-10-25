@@ -772,29 +772,16 @@ public class SLDParser {
 			}
 
 			if (childName.equalsIgnoreCase("Filter")) {
-				NodeList list = child.getChildNodes();
-				Node kid = null;
-
-				for (int k = 0; k < list.getLength(); k++) {
-					kid = list.item(k);
-
-					if ((kid == null)
-							|| (kid.getNodeType() != Node.ELEMENT_NODE)) {
-						continue;
-					}
-
-					org.geotools.filter.Filter filter = org.geotools.filter.FilterDOMParser
-							.parseFilter(kid);
-
-					if (LOGGER.isLoggable(Level.FINEST)) {
-						LOGGER
-								.finest("filter: "
-										+ filter.getClass().toString());
-						LOGGER.finest("parsed: " + filter.toString());
-					}
-
-					rule.setFilter(filter);
-				}
+                // this sounds stark raving mad, but this is actually how the dom parser works...
+                // instead of passing in the parent element, pass in the first child and its
+                // siblings will also be parsed
+                Node firstChild = child.getFirstChild();
+                while (firstChild != null && firstChild.getNodeType() != Node.ELEMENT_NODE) {
+                    //advance to the first actual element (rather than whitespace)
+                    firstChild = firstChild.getNextSibling();
+                }
+                org.geotools.filter.Filter filter = org.geotools.filter.FilterDOMParser.parseFilter(firstChild);
+                rule.setFilter(filter);
 			}
 
 			if (childName.equalsIgnoreCase("ElseFilter")) {
