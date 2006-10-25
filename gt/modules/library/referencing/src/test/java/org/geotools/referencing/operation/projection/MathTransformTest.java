@@ -412,4 +412,29 @@ public class MathTransformTest extends TestCase {
         doTransform(new DirectPosition2D(5.807370277, 50.6795725),
                     new DirectPosition2D(251763.20, 153034.13), transform);
     }
+    
+    public void testKrovak() throws FactoryException, TransformException {
+
+        ///////////////////////////////////////
+        //          Krovak tests             //
+        ///////////////////////////////////////
+        if (VERBOSE) {
+            printParameters("Krovak");
+        }        
+        MathTransform transform;
+        ParameterValueGroup params;
+              
+        params = mtFactory.getDefaultParameters("Krovak");
+        
+        params.parameter("semi_major")         .setValue(6377397.155);
+        params.parameter("semi_minor")         .setValue(6356078.963);
+    
+        transform = mtFactory.createParameterizedTransform(params);
+        if (VERBOSE) {
+            System.out.println(transform);
+        }
+        doTransform(new DirectPosition2D(14.370530947 , 50.071153856 ),
+                    new DirectPosition2D(-746742.6075,  -1044389.4516), transform);
+                   
+    }
 }

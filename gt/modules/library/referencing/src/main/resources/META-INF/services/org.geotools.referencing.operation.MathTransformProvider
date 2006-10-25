@@ -35,3 +35,4 @@ org.geotools.referencing.operation.projection.Stereographic$Provider_North_Pole
 org.geotools.referencing.operation.projection.Stereographic$Provider_South_Pole
 org.geotools.referencing.operation.projection.Stereographic$Provider_USGS
 org.geotools.referencing.operation.projection.NewZealandMapGrid$Provider
+org.geotools.referencing.operation.projection.Krovak$Provider
