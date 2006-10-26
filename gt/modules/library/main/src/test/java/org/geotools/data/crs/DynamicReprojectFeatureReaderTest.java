@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Point;
 
 import junit.framework.TestCase;
 
-public class ReprojectFeatureReaderTest extends TestCase {
+public class DynamicReprojectFeatureReaderTest extends TestCase {
 
 	CoordinateReferenceSystem src,target;
 	FeatureCollection fc;
