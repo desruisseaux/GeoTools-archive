@@ -22,6 +22,7 @@ import java.net.URL;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+import org.geotools.feature.DefaultFeatureCollections;
 import org.geotools.gml2.bindings.GML;
 import org.geotools.gml2.bindings.GMLBindingConfiguration;
 import org.geotools.gml2.bindings.GMLSchemaLocationResolver;
@@ -85,6 +86,7 @@ public class GMLConfiguration extends Configuration {
      * <li>{@link CoordinateArraySequenceFactory} under {@link CoordinateSequenceFactory}
      * <li>{@link GeometryFactory}
      * <li>{@link FeatureTypeCache}
+     * <li>{@link DefaultFeatureCollections}
      * </ul>
      * </p>
      */
@@ -95,5 +97,6 @@ public class GMLConfiguration extends Configuration {
         container.registerComponentInstance(CoordinateSequenceFactory.class,
             CoordinateArraySequenceFactory.instance());
         container.registerComponentImplementation(GeometryFactory.class);
+        container.registerComponentImplementation(DefaultFeatureCollections.class);
     }
 }
