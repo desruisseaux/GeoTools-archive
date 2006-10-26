@@ -58,8 +58,7 @@ public class GMLFeatureAssociationTypeBindingTest extends AbstractGMLBindingTest
         GMLFeatureAssociationTypeBinding s = (GMLFeatureAssociationTypeBinding) getBinding(GML.FEATUREASSOCIATIONTYPE);
 
         try {
-            s.parse(featureAssociation, node, null);
-            fail("Parse with no feature should throw an exception");
+            assertNull(s.parse(featureAssociation, node, null));
         } catch (Exception e) {
             //ok
         }
