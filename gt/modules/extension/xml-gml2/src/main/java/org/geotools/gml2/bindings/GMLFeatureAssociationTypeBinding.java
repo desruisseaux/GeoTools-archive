@@ -20,11 +20,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.util.Iterator;
 import javax.xml.namespace.QName;
-import org.opengis.feature.Feature;
+import org.geotools.feature.Feature;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -103,17 +100,9 @@ public class GMLFeatureAssociationTypeBinding implements ComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        for (Iterator itr = node.getChildren().iterator(); itr.hasNext();) {
-            Node cnode = (Node) itr.next();
-
-            if (cnode.getValue() instanceof Feature) {
-                return cnode.getValue();
-            }
-        }
+        return node.getChildValue(Feature.class);
 
         //TODO: xlink and remoteSchema attributes, hard to do because of streaming
-        //TODO: dont throw an exception here
-        throw new RuntimeException("Could not find feature in feature association");
     }
 
     /**
