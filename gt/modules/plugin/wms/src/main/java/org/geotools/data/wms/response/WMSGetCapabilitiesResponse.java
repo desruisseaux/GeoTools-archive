@@ -39,24 +39,28 @@ public class WMSGetCapabilitiesResponse extends GetCapabilitiesResponse {
 
 	public WMSGetCapabilitiesResponse(String contentType, InputStream inputStream) throws ServiceException, IOException {
 		super(contentType, inputStream);
-	
-        Map hints = new HashMap();
-        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
-        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
-
-        Object object;
+		
 		try {
-			object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
-		} catch (SAXException e) {
-			throw (ServiceException) new ServiceException("Error while parsing XML.").initCause(e);
+	        Map hints = new HashMap();
+	        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+	        hints.put(DocumentFactory.VALIDATION_HINT, Boolean.FALSE);
+	
+	        Object object;
+			try {
+				object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
+			} catch (SAXException e) {
+				throw (ServiceException) new ServiceException("Error while parsing XML.").initCause(e);
+			}
+	        
+	        if (object instanceof ServiceException) {
+	        	throw (ServiceException) object;
+	        }
+	
+	        Capabilities capabilities = (Capabilities) object;
+	        this.capabilities = capabilities;
+		} finally {
+			inputStream.close();
 		}
-        
-        if (object instanceof ServiceException) {
-        	throw (ServiceException) object;
-        }
-
-        Capabilities capabilities = (Capabilities) object;
-        this.capabilities = capabilities;
 	}
 
 }

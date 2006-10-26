@@ -49,17 +49,21 @@ public class DescribeLayerResponse extends Response {
     public DescribeLayerResponse( String contentType, InputStream inputStream ) throws IOException, ServiceException {
         super(contentType, inputStream);
         
-        Map hints = new HashMap();
-        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
-
-        Object object;
-		try {
-			object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
-		} catch (SAXException e) {
-			throw (IOException) new IOException().initCause(e);
-		}
-        
-        layerDescs = (LayerDescription[]) object;
+        try {
+	        Map hints = new HashMap();
+	        hints.put(DocumentHandler.DEFAULT_NAMESPACE_HINT_KEY, WMSSchema.getInstance());
+	
+	        Object object;
+			try {
+				object = DocumentFactory.getInstance(inputStream, hints, Level.WARNING);
+			} catch (SAXException e) {
+				throw (IOException) new IOException().initCause(e);
+			}
+	        
+	        layerDescs = (LayerDescription[]) object;
+        } finally {
+        	inputStream.close();
+        }
     }
 
     public LayerDescription[] getLayerDescs() {

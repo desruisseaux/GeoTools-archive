@@ -49,6 +49,17 @@ public abstract class Response {
         return contentType;
     }
 
+    /**
+     * Returns the InputStream that contains the response from the server. 
+     * The contents of this stream vary according to the type of request
+     * that was made, and whether it was successful or not.
+     * 
+     * <B>NOTE:</B>
+     * Note that clients using this code are responsible for closing the
+     * InputStream when they are finished with it.
+     * 
+     * @return the input stream containing the response from the server
+     */
     public InputStream getInputStream() {
         return inputStream;
     }
@@ -58,6 +69,8 @@ public abstract class Response {
 			return ServiceExceptionParser.parse(inputStream);
 		} catch (JDOMException e) {
 			throw (IOException) new IOException().initCause(e);
-		} 
+		} finally {
+			inputStream.close();
+		}
     }
 }
