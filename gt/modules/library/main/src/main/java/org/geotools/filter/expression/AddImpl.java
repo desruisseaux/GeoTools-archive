@@ -15,7 +15,6 @@
  */
 package org.geotools.filter.expression;
 
-import org.geotools.data.DataUtilities;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Filters;
 import org.geotools.filter.MathExpressionImpl;
