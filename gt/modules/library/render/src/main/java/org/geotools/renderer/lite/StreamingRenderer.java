@@ -531,11 +531,11 @@ public final class StreamingRenderer implements GTRenderer {
 				this.screenSize = paintArea;
 				processStylers(graphics, currLayer, at, destinationCrs,
 						mapArea, paintArea);
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			} catch (Throwable t) {
+				LOGGER.log(Level.SEVERE, t.getLocalizedMessage(), t);
 				fireErrorEvent(new Exception(new StringBuffer(
 						"Exception rendering layer ").append(currLayer)
-						.toString(), e));
+						.toString(), t));
 			}
 
 			labelCache.endLayer(graphics, screenSize);
@@ -679,11 +679,11 @@ public final class StreamingRenderer implements GTRenderer {
 				// and process them
 				processStylers(graphics, currLayer, worldToScreenTransform,
 						destinationCrs, mapExtent, screenSize);
-			} catch (Exception e) {
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			} catch (Throwable t) {
+				LOGGER.log(Level.SEVERE, t.getLocalizedMessage(), t);
 				fireErrorEvent(new Exception(new StringBuffer(
 						"Exception rendering layer ").append(currLayer)
-						.toString(), e));
+						.toString(), t));
 			}
 
 			labelCache.endLayer(graphics, screenSize);
@@ -1469,9 +1469,9 @@ public final class StreamingRenderer implements GTRenderer {
 					// reader.close() ; //DJB -- if we've got an out of memory
 					// error, we pretty much have to abort what we're doing!
 					throw oom;
-				} catch (Exception e) {
-					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-					fireErrorEvent(e);
+				} catch (Throwable tr) {
+					LOGGER.log(Level.SEVERE, tr.getLocalizedMessage(), tr);
+					fireErrorEvent(new Exception("Error rendering feature", tr));
 				}
 			}
 
@@ -1625,9 +1625,11 @@ public final class StreamingRenderer implements GTRenderer {
 				try {
 					shape = getTransformedShape(g, sa.getXform());
 				} catch (TransformException te) {
+                                        LOGGER.log(Level.FINE, te.getLocalizedMessage(), te);
 					fireErrorEvent(te);
 					continue;
 				} catch (AssertionError ae) {
+                                        LOGGER.log(Level.FINE, ae.getLocalizedMessage(), ae);
 					fireErrorEvent(new RuntimeException(ae));
 					continue;
 				}
