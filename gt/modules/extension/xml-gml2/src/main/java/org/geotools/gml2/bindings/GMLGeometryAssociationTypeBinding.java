@@ -82,7 +82,7 @@ public class GMLGeometryAssociationTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Geometry.class;
     }
 
     /**

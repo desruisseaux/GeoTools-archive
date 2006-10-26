@@ -19,11 +19,9 @@ import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.opengis.feature.FeatureCollection;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -77,7 +75,7 @@ public class GMLAbstractFeatureCollectionTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return FeatureCollection.class;
     }
 
     /**
@@ -101,29 +99,8 @@ public class GMLAbstractFeatureCollectionTypeBinding implements ComplexBinding {
         FeatureCollection fc = (FeatureCollection) value;
 
         //add all feature member children
-        fc.addAll(node.getChildValues("featureMember"));
+        fc.addAll(node.getChildValues(Feature.class));
 
         return fc;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

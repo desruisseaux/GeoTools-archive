@@ -77,7 +77,7 @@ public class GMLPointTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return BEFORE;
     }
 
     /**

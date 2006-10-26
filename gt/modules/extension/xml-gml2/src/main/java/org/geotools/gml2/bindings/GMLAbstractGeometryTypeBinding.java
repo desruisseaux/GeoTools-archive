@@ -18,11 +18,13 @@ package org.geotools.gml2.bindings;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import java.net.URI;
+import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.referencing.CRS;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -53,6 +55,12 @@ import org.geotools.xml.Node;
  * @generated
  */
 public class GMLAbstractGeometryTypeBinding implements ComplexBinding {
+    Logger logger;
+
+    public GMLAbstractGeometryTypeBinding(Logger logger) {
+        this.logger = logger;
+    }
+
     /**
      * @generated
      */
@@ -67,7 +75,7 @@ public class GMLAbstractGeometryTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return OVERRIDE;
     }
 
     /**
@@ -77,7 +85,7 @@ public class GMLAbstractGeometryTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Geometry.class;
     }
 
     /**
@@ -97,8 +105,24 @@ public class GMLAbstractGeometryTypeBinding implements ComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: parse the srsName into an srs object
-        //TODO: process the ID attribute
+        if (value instanceof Geometry) {
+            Geometry geometry = (Geometry) value;
+
+            //&lt;attribute name="srsName" type="anyURI" use="optional"/&gt;
+            if (node.hasAttribute("srsName")) {
+                URI srs = (URI) node.getAttributeValue("srsName");
+                CoordinateReferenceSystem crs = CRS.decode(srs.toString());
+
+                if (crs != null) {
+                    geometry.setUserData(crs);
+                } else {
+                    logger.warning("Could not create Coordinate Reference System for " + srs);
+                }
+            }
+
+            //TODO: process the ID attribute
+        }
+
         return value;
     }
 

@@ -23,10 +23,8 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -82,7 +80,7 @@ public class GMLLineStringTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return BEFORE;
     }
 
     /**
@@ -92,7 +90,7 @@ public class GMLLineStringTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return LineString.class;
     }
 
     /**

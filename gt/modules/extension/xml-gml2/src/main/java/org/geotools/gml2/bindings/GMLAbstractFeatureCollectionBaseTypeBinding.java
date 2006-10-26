@@ -19,11 +19,9 @@ import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -63,6 +61,10 @@ public class GMLAbstractFeatureCollectionBaseTypeBinding implements ComplexBindi
         this.fcFactory = fcFactory;
     }
 
+    public int getExecutionMode() {
+        return OVERRIDE;
+    }
+
     /**
      * @generated
      */
@@ -76,18 +78,8 @@ public class GMLAbstractFeatureCollectionBaseTypeBinding implements ComplexBindi
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
-        return null;
+        return FeatureCollection.class;
     }
 
     /**
@@ -111,26 +103,5 @@ public class GMLAbstractFeatureCollectionBaseTypeBinding implements ComplexBindi
         // "correct" subclass without hacking, so for now we just create a 
         // default feature collection.
         return fcFactory.newCollection();
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

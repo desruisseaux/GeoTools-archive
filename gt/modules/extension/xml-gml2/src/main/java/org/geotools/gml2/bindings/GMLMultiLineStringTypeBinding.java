@@ -22,10 +22,8 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -78,7 +76,7 @@ public class GMLMultiLineStringTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return BEFORE;
     }
 
     /**
@@ -88,7 +86,7 @@ public class GMLMultiLineStringTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return MultiLineString.class;
     }
 
     /**

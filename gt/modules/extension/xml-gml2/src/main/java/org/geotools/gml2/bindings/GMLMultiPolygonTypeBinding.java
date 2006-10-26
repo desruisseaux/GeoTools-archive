@@ -21,11 +21,9 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -79,7 +77,7 @@ public class GMLMultiPolygonTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return BEFORE;
     }
 
     /**
@@ -89,7 +87,7 @@ public class GMLMultiPolygonTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return MultiPolygon.class;
     }
 
     /**

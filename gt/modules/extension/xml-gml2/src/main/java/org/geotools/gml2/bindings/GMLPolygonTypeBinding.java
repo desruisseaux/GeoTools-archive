@@ -22,10 +22,8 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -77,7 +75,7 @@ public class GMLPolygonTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return BEFORE;
     }
 
     /**
@@ -87,7 +85,7 @@ public class GMLPolygonTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Polygon.class;
     }
 
     /**

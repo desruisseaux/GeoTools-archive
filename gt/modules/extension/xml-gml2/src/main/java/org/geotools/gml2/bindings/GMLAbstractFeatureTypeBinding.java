@@ -219,6 +219,7 @@ public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
             ftCache.put(fType);
         }
 
+        //fid
         String fid = (String) node.getAttributeValue("fid");
 
         //create the feature
