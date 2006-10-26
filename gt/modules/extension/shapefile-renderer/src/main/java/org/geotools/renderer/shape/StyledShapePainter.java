@@ -216,7 +216,7 @@ public class StyledShapePainter {
     private void drawWithGraphicsStroke(Graphics2D graphics, Shape shape,
         BufferedImage image) {
         PathIterator pi = shape.getPathIterator(null, 10.0);
-        double[] coords = new double[2];
+        double[] coords = new double[4];
         int type;
 
         // I suppose the image has been already scaled and its square
