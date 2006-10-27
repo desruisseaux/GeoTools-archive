@@ -1,22 +1,27 @@
-<!-- Top Level, a description with the chapter TOC -->
-<para>
+<chapter id="chapter-blank">
+  <title>Blank Chapter</title>
 
-</para>
-
-<sect1 id="sect--top">
-  <title></title>
-
+  <!-- Top Level, a description with the chapter TOC -->
   <para>
-     
+    A blank to be reused.
   </para>
-<!--
-  <sect2 id="">
+
+  <sect1 id="sect-blank-top">
     <title></title>
 
     <para>
+      
     </para>
+    <!--
+    <sect2 id="">
+      <title></title>
 
-  </sect2>
--->
-</sect1>
+      <para>
+        
+      </para>
 
+    </sect2>
+    -->
+  </sect1>
+
+</chapter>

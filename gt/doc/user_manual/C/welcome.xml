@@ -1,156 +1,160 @@
-<!-- 
-  This is at the top level to avoid any chapter TOC.
--->
+<chapter id="chapter-welcome">
+    <title>Welcome!</title>
 
-<para>
-  Geotools is a code library for Geospatial applications. The 
-  library is intended to provide foundational object classes for 
-  creating geographic information systems. The library is 
-  written in the Java computer language, currently using 
-  version &javaVersion;. For more details, visit the Geotools project 
-  <ulink url="http://www.geotools.org/" type="http">webpage</ulink>.
-</para>
-
-
-<para>
-  This manual intends to help people develop software programs which use part
-  or all of the Geotools library to create their own geospatial applications. 
-  These programmers are considered <emphasis>users</emphasis> of the &lib; 
-  library.
-  This manual is intended to help programers learn how to use both the 
-  GeoTools library itself and closely related libraries such as the GeoAPI 
-  and JTS libraries. 
-</para>
-
-<warning>
-  <title>WORK IN PROGRESS!</title>
-  <para>
-    The Users' Manual is incomplete. Hopefully a first version will be
-    released with version 2.3 of the Geotools library.
-  </para>
-</warning>
-
-<para>
-  &lib; can be used to build applications of many different types including 
-  network server applications and desktop clients. The library consists of 
-  various modules which can be combined according to programmer needs. An 
-  example client application is included as the &lib; demo shown in <xref
-    linkend="fig-geotools-demo-render" /> .
-    <!-- SYNC WITH QUICKSTART-RUNTHEDEMO -->
-    <figure id="fig-geotools-demo-render">
-      <title>The Geotools Demo showing an unprojected map of the world.</title>
-      <screenshot>
-        <mediaobject>
-        <imageobject>
-          <imagedata fileref="figures/geotools-demo-render.png" 
-                     format="PNG" 
-                     width="600px"
-                     scalefit="1"
-                     />
-        </imageobject>
-        <textobject>
-          <phrase>
-            A screenshot of the user demo.
-          </phrase>
-        </textobject>
-	<caption>
-	  <para>
-	    The &lib; demonstration application uses swing components, such 
-            as a label, buttons, and a text area, but also uses the JMapPane
-            component to display geospatial data and provide a simple toolbar 
-            with tools to manipulate those data.
-	  </para>
-	</caption>
-        </mediaobject>
-      </screenshot>
-    </figure>
-  </para>
+  <!-- This is at the top level to avoid any chapter TOC. -->
 
   <para>
-    This manual will get users started using the geotools codebase. We hope
-    the manual can get users to the point that they can continue on their 
-    own by reading the GeoAPI and Geotools javadocs along with the source 
-    code. Advanced questions should be addressed to the mailing list or 
-    raised in the Internet Relay Chat (IRC) room.
+    Geotools is a code library for Geospatial applications. The 
+    library is intended to provide foundational object classes for 
+    creating geographic information systems. The library is 
+    written in the Java computer language, currently using 
+    version &javaVersion;. For more details, visit the Geotools project 
+    <ulink url="http://www.geotools.org/" type="http">webpage</ulink>.
   </para>
 
-<note>
-  <title>The Users' Manual vs the Developers' Guide</title>
-  <para>
-    The Users' Manual is <emphasis>not</emphasis> a guide to developing and 
-    improving the &lib; library itself.
-  </para>
-  <para> 
-    The Developers' Guide provides helpful information for those who want to
-    contribute to the library itself. For more information, see the 
-    <ulink url="http://www.geotools.org/Develop/" type="http">developers page
-    </ulink> of the web site.
-  </para>
-</note>
-
-<warning>
-  <title>Geotools is a library <emphasis>not</emphasis> an application.</title>
-  <para>
-    Geotools provides almost no graphical user interface functionality. Several 
-    efforts may yield more user interface elements, notably the GO-1 module in the 
-    gt/ext/go directory and the 
-    <ulink url="http://geowidgets.sourceforge.net/" type="http">
-      GeoWidgets project
-    </ulink> which will hopefully provide widgets based on the 
-    <ulink url="http://geoapi.sourceforge.net/" type="http">
-      GeoAPI
-    </ulink> interfaces. 
-  </para>
 
   <para>
-    There are two notable projects which leverage Geotools to provide 
-    higher level functionality:
-    <itemizedlist>
-      <listitem>
-        <para>
-          <ulink url="http://www.geoserver.org/" type="http">
-            Geoserver
-          </ulink> is a network server to provide maps using the Web 
-          Mapping Standard (WMS) or to provide individual features using the 
-          Web Feature Standard (WFS) and its transactional extension, the Web 
-          Feature Standard for Transactions (WFS-T).  
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          <ulink url="http://udig.refractions.net/" type="http">
-            User-friendly Desktop Internet GIS (uDig)
-          </ulink> is both a powerful desktop application and a platform for 
-          the creation of other applications. The platform draws on the  
-          <ulink url="http://www.eclipse.org/" type="http">
-            Eclipse
-          </ulink> project and its 
-          <ulink url="http://www.eclipse.org/rcp/" type="http">
-            Rich Client Plarform 
-          </ulink> sub-project.   
-        </para>
-      </listitem>
-    </itemizedlist>
+    This manual intends to help people develop software programs which use part
+    or all of the Geotools library to create their own geospatial applications. 
+    These programmers are considered <emphasis>users</emphasis> of the &geot; 
+    library.
+    This manual is intended to help programers learn how to use both the 
+    GeoTools library itself and closely related libraries such as the GeoAPI 
+    and JTS libraries. 
   </para>
 
+  <warning>
+    <title>WORK IN PROGRESS!</title>
+    <para>
+      The Users' Manual is incomplete. Hopefully a first version will be
+      released with an upcoming version of the Geotools library.
+    </para>
+  </warning>
+
   <para>
-    There are also many other software projects for 
-    spatial data which may be easier to use for simple projects than the 
-    Geotools library. For example, the 
-    <ulink url="http://www.jump-project.org/" type="http">
-      JUMP
-    </ulink> project and its 
-    <ulink url="http://openjump.org/" type="http">
-      OpenJUMP
-    </ulink> fork are reputedly easy to use. The 
-    <ulink url="http://www.freegis.org/" type="http">
-      FreeGIS
-    </ulink> project attempts to maintain a list of the free software 
-    projects related to geospatial data. Those projects, or others like 
-    them, may be a better place to start than working directly with the
-    library itself.
-  </para>
-</warning>
+    &geot; can be used to build applications of many different types including 
+    network server applications and desktop clients. The library consists of 
+    various modules which can be combined according to programmer needs. An 
+    example client application is included as the &geot; demo shown in <xref
+      linkend="fig-geotools-demo-render" /> .
+      <!-- SYNC WITH QUICKSTART-RUNTHEDEMO -->
+      <figure id="fig-geotools-demo-render">
+        <title>The Geotools Demo showing an unprojected map of the world.</title>
+        <screenshot>
+          <mediaobject>
+          <imageobject>
+            <imagedata fileref="figures/geotools-demo-render.png" 
+                       format="PNG" 
+                       width="600px"
+                       scalefit="1"
+                       />
+          </imageobject>
+          <textobject>
+            <phrase>
+              A screenshot of the user demo.
+            </phrase>
+          </textobject>
+  	<caption>
+  	  <para>
+  	    The &geot; demonstration application uses swing components, such 
+              as a label, buttons, and a text area, but also uses the JMapPane
+              component to display geospatial data and provide a simple toolbar 
+              with tools to manipulate those data.
+  	  </para>
+  	</caption>
+          </mediaobject>
+        </screenshot>
+      </figure>
+    </para>
+
+    <para>
+      This manual will get users started using the geotools codebase. We hope
+      the manual can get users to the point that they can continue on their 
+      own by reading the GeoAPI and Geotools javadocs along with the source 
+      code. Advanced questions should be addressed to the mailing list or 
+      raised in the Internet Relay Chat (IRC) room.
+    </para>
+
+  <note>
+    <title>The Users' Manual vs the Developers' Guide</title>
+    <para>
+      The Users' Manual is <emphasis>not</emphasis> a guide to developing and 
+      improving the &geot; library itself.
+    </para>
+    <para> 
+      The Developers' Guide provides helpful information for those who want to
+      contribute to the library itself. For more information, see the 
+      <ulink url="http://www.geotools.org/Develop/" type="http">developers page
+      </ulink> of the web site.
+    </para>
+  </note>
+
+  <warning>
+    <title>Geotools is a library <emphasis>not</emphasis> an application.</title>
+    <para>
+      Geotools provides almost no graphical user interface functionality. Several 
+      efforts may yield more user interface elements, notably the GO-1 module in 
+      the gt/ext/go directory and the 
+      <ulink url="http://geowidgets.sourceforge.net/" type="http">
+        GeoWidgets project
+      </ulink> which will hopefully provide widgets based on the 
+      <ulink url="http://geoapi.sourceforge.net/" type="http">
+        GeoAPI
+      </ulink> interfaces. 
+    </para>
+
+    <para>
+      There are two notable projects which leverage Geotools to provide 
+      higher level functionality:
+      <itemizedlist>
+        <listitem>
+          <para>
+            <ulink url="http://www.geoserver.org/" type="http">
+              Geoserver
+            </ulink> is a network server to provide maps using the Web 
+            Mapping Standard (WMS) or to provide individual features using the 
+            Web Feature Standard (WFS) and its transactional extension, the Web 
+            Feature Standard for Transactions (WFS-T).  
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <ulink url="http://udig.refractions.net/" type="http">
+              User-friendly Desktop Internet GIS (uDig)
+            </ulink> is both a powerful desktop application and a platform for 
+            the creation of other applications. The platform draws on the  
+            <ulink url="http://www.eclipse.org/" type="http">
+              Eclipse
+            </ulink> project and its 
+            <ulink url="http://www.eclipse.org/rcp/" type="http">
+              Rich Client Plarform 
+            </ulink> sub-project.   
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      There are also many other software projects for 
+      spatial data which may be easier to use for simple projects than the 
+      Geotools library. For example, the 
+      <ulink url="http://www.jump-project.org/" type="http">
+        JUMP
+      </ulink> project and its 
+      <ulink url="http://openjump.org/" type="http">
+        OpenJUMP
+      </ulink> fork are reputedly easy to use. The 
+      <ulink url="http://www.freegis.org/" type="http">
+        FreeGIS
+      </ulink> project attempts to maintain a list of the free software 
+      projects related to geospatial data. Those projects, or others like 
+      them, may be a better place to start than working directly with the
+      library itself.
+    </para>
+  </warning>
+
+
+</chapter>
 
 
 

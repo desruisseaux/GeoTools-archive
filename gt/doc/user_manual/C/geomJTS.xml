@@ -1,15 +1,15 @@
 <!-- Top Level, a description with the chapter TOC -->
 <para>
-  This chapter explains the geometric model used in &lib;. The geometric model 
+  This chapter explains the geometric model used in &geot;. The geometric model 
   provides the structure through which the Geotools library defines the spatial 
   properties of its Features.
 </para>
 
 <warning>
   <para>
-    &lib; uses the Java Topology Suite (JTS) library for all of its geometric
+    &geot; uses the Java Topology Suite (JTS) library for all of its geometric
     representation. Note also, that all access is done directly into JTS classes
-    rather than working through an abstract layer of interfaces. The &lib; 
+    rather than working through an abstract layer of interfaces. The &geot; 
     project intends eventually to switch to use an internal geometric 
     representation and to develop and use a standard set of GeoAPI interfaces.
   </para>
@@ -17,7 +17,7 @@
 
 <note>
   <para>
-    Most development using &lib; library can be done at a higher level than 
+    Most development using &geot; library can be done at a higher level than 
     opertating directly on the geometric model itself. The information in this 
     section may be most relevant simply as background for the use of operations 
     at a higher level.
@@ -30,7 +30,7 @@
   <title>Geometries in Geotools</title>
 
   <para>
-     The core geometric model of &lib; uses lightweight objects.
+     The core geometric model of &geot; uses lightweight objects.
     <figure id="fig-geotools-geomModel">
       <title>The Geotools Geometric Model.</title>
       <screenshot>
@@ -46,7 +46,7 @@
         </textobject>
 	<caption>
 	  <para>
-	    &lib; does not use its own geometric model but instead relies on 
+	    &geot; does not use its own geometric model but instead relies on 
             the JTS library.
 	  </para>
 	</caption>
@@ -405,7 +405,7 @@
 
   <para>
     The "gt/demo/geomJTS/" directory has a number of tutorials which might be 
-    useful to understand the JTS library and the &lib; geometry model.
+    useful to understand the JTS library and the &geot; geometry model.
   </para>
 <!--
   <sect2 id="">
@@ -424,7 +424,7 @@
   <title>Reading more Code</title>
 
   <para>
-    JTS geometries are used throughout the &lib; code base. Some especially 
+    JTS geometries are used throughout the &geot; code base. Some especially 
     interesting areas to read are: TODO
   </para>
 <!--

@@ -93,11 +93,11 @@
 
   <!-- TODO: check the new name of the EPSG. -->
   <para>
-    &lib; is explicitly designed to implement the fundamental international 
+    &geot; is explicitly designed to implement the fundamental international 
     standards for geospatial application. This included, first of all, the 
     standards promulgated by the Open Geospatial Consortium (OGC). Those 
     standards have been partially superceeded by newer standards proposed by the
-    International Organization for Standardization (ISO). &lib; also uses 
+    International Organization for Standardization (ISO). &geot; also uses 
     common standards provided by other ogranizations, notably the database of 
     coordinate reference systems and transformations provided by the Surveying 
     and Positioning Committee of the International Petroleum Organization 
@@ -492,15 +492,15 @@
             </textobject>
       	     <caption>
           	  <para>
-          	    &lib; is written in Java and therefore runs inside a Java Virtual 
+          	    &geot; is written in Java and therefore runs inside a Java Virtual 
                 machine (VM). The Java VM generally runs through the POSIX layer 
                 on the hardware. The library requires two of the standard Java 
                 extension libraries, Java Advanced Imaging and Java Image I/O.  
-                &lib; uses the GeoAPI project to define a standard API, the JTS 
+                &geot; uses the GeoAPI project to define a standard API, the JTS 
                 project for robust geometric convolutions, and the definitions 
                 for scientific units provided by JSR-108 or more recently by the
                 JScience project. There are also several external libraries and 
-                code plugins which can be connected to &lib;.
+                code plugins which can be connected to &geot;.
           	  </para>
           	</caption>
           </mediaobject>
@@ -537,7 +537,7 @@
           </textobject>
   	<caption>
   	  <para>
-  	    The &lib; architecture is comprised of several data subsystems and a 
+  	    The &geot; architecture is comprised of several data subsystems and a 
               display subsystem.
   	  </para>
   	</caption>
@@ -547,7 +547,7 @@
     </para>
 
     <para>
-      &lib; is comprised of several components each with various subsytems. The 
+      &geot; is comprised of several components each with various subsytems. The 
       main library is split between the View component and the Data Model component 
       following the standard model/view/controller computer code pattern.
     </para>
@@ -557,7 +557,7 @@
       geopositioning 
       subsystem, and the feature subsystem, which jointly provide the core data 
       model for geospatial entities. The positioning subsystem uses one or more 
-      authorities, most notably the EPSG database. &lib; also uses a Data access 
+      authorities, most notably the EPSG database. &geot; also uses a Data access 
       and storage subsystem, with plugins for many common data formats. A Query 
       subsystem provides a rich facility for data selection and manipulation.
     </para>
@@ -582,7 +582,7 @@
     <title>The Data Component</title>
 
     <para>
-      The &lib; library follows the standard split between the model, view, 
+      The &geot; library follows the standard split between the model, view, 
       and controller components. The data component consists of the entities 
       which describe the real world entities within the computational system.
     </para>
@@ -783,7 +783,7 @@
 
     <!--TODO: make the userAppModel figure. -->
     <para>
-      Applications which use the &lib; library can use as much or as little of 
+      Applications which use the &geot; library can use as much or as little of 
       the library as they choose, dependent only on the depencence hierarchy 
       shown in figure <xref linkend="fig-geotools-userAppModel" /> below:
       <figure id="fig-geotools-userAppModel">
@@ -797,12 +797,12 @@
             <textobject>
               <phrase>
                 An image of the internal structure of a user application using
-                the &lib; library.
+                the &geot; library.
               </phrase>
             </textobject>
           	<caption>
           	  <para>
-          	    A user application which uses most of the &lib; library to 
+          	    A user application which uses most of the &geot; library to 
           	    define and render its geospatial data will contain the systems 
           	    shown in the figure.
           	  </para>
@@ -823,15 +823,15 @@
 
   <para>
     Developers can use several programming interfaces through which to access 
-    the functionality of &lib;. Obviously, since the code is openly distributed   
+    the functionality of &geot;. Obviously, since the code is openly distributed   
     and freely accessible users can develop their applications in any way they 
     choose. However, there are several defined series of interfaces which have
     been created to allow users to develop applications which can be easily 
-    updated as newer versions of &lib; are released in the future.
+    updated as newer versions of &geot; are released in the future.
   </para>
   
   <para>
-    Ideally, and hopefully in the not to distant future, &lib; users will be 
+    Ideally, and hopefully in the not to distant future, &geot; users will be 
     able to use only a single method from Geotools and code their entire 
     application against the GeoAPI interfaces. These interfaces are designed to 
     follow as closely as possible the fundamental standards defined by the ISO 
@@ -841,20 +841,20 @@
   
   <para>
     Unfortunately the GeoAPI specifications are a work in progress so developers
-    must currently mix the use of GeoAPI interfaces, internal &lib; interfaces, 
-    interfaces defined in third party libraries and classes from &lib; and other 
+    must currently mix the use of GeoAPI interfaces, internal &geot; interfaces, 
+    interfaces defined in third party libraries and classes from &geot; and other 
     libraries. This situation is unfortunate but a consequence of the incomplete 
     nature of each of these projects.
   </para>
   
   <para>
-    The best practice, for an application using the &lib; library, involves using 
-    the GeoAPI interfaces as extensively as possible, using the internal &lib; 
+    The best practice, for an application using the &geot; library, involves using 
+    the GeoAPI interfaces as extensively as possible, using the internal &geot; 
     interfaces where avaiable and then, only if none of these provide the needed 
-    functionality, using interfaces defined by third parties or using &lib; 
+    functionality, using interfaces defined by third parties or using &geot; 
     classes directly. Following such a practice will lead to the least amount of 
     work when upgrading an application in the future to newer versions of GeoAPI 
-    and &lib;.
+    and &geot;.
   </para>
 
 
@@ -868,13 +868,13 @@
     </para>
     
     <para>
-      The &lib; library can be considered simply one implementation of the GeoAPI
-      interfaces. &lib; is both a proof-of-concept implementation and a freely
+      The &geot; library can be considered simply one implementation of the GeoAPI
+      interfaces. &geot; is both a proof-of-concept implementation and a freely
       distributable complement to the GeoAPI interfaces. Indeed, GeoAPI grew out
-      of the &lib; project because of the need for a clean separation between the
+      of the &geot; project because of the need for a clean separation between the
       interfaces metting the geospatial standards and the particular implementation 
       provided by the project. Currently, interfaces are generally first defined 
-      as internal &lib; interfaces and gradually migrate to GeoAPI as these 
+      as internal &geot; interfaces and gradually migrate to GeoAPI as these 
       interfaces prove sufficiently mature.
     </para>
     
@@ -885,7 +885,7 @@
   </sect2>
 
   <sect2 id="sect-conceptual-foundations-api-geotools">
-    <title>&lib; API</title>
+    <title>&geot; API</title>
 
     <para>
       
@@ -903,11 +903,11 @@
   </sect2>
   
   <sect2 id="sect-conceptual-foundations-api-gtClasses">
-  <title>&lib; Classes</title>
+  <title>&geot; Classes</title>
 
   <para>
     Sometimes users must access needed functionality by directly accessing 
-    classes in the &lib; library. 
+    classes in the &geot; library. 
   </para>
 
   </sect2>
@@ -923,7 +923,7 @@
   <title>Code Layout</title>
 
   <para>
-     The &lib; library consists of several modules which can be assembled
+     The &geot; library consists of several modules which can be assembled
      according to user needs. For example, a simple application could use 
      only the api, geometric, referencing and feature modules. Each module 
      contributes several java packages 
@@ -959,24 +959,24 @@
   <para>
      The GeoAPI project defines an Application Programming Interface (API)
      consisting of java interfaces which outline the 
-     conceptual model developed by the ISO and OGC standards. &lib; 
+     conceptual model developed by the ISO and OGC standards. &geot; 
      intents eventually to be simply one implementation backing the 
      GeoAPI interfaces. It will hopefully eventually be possible to use
-     &lib; simply by obtaining a single reference to a Geotools object 
+     &geot; simply by obtaining a single reference to a Geotools object 
      and then develop all code against the GeoAPI interfaces. 
   </para>
 
   <warning>
     <para>
-      Neither &lib; nor GeoAPI have matured sufficiently for the ideal
+      Neither &geot; nor GeoAPI have matured sufficiently for the ideal
       use pattern to be effective. Currently, the user need to mix methods
-      from the GeoAPI project, from the &lib; internal API, and from 
-      actual &lib; classes themselves.
+      from the GeoAPI project, from the &geot; internal API, and from 
+      actual &geot; classes themselves.
     </para>
   </warning>
 
   <para>
-     The GeoAPI project grew of the needs of &lib; and several other java
+     The GeoAPI project grew of the needs of &geot; and several other java
      language geospatial projects which wanted to implement standards 
      conformant code. 
   </para>
@@ -1004,10 +1004,10 @@
 
   <warning>
     <para>
-      Neither &lib; nor GeoAPI have matured sufficiently for the ideal
+      Neither &geot; nor GeoAPI have matured sufficiently for the ideal
       use pattern to be effective. Currently, the user need to mix methods
-      from the GeoAPI project, from the &lib; internal API, and from 
-      actual &lib; classes themselves.
+      from the GeoAPI project, from the &geot; internal API, and from 
+      actual &geot; classes themselves.
     </para>
   </warning>
 
@@ -1019,7 +1019,7 @@
   <title>Factory Systems</title>
 
   <para>
-    &lib; uses the "factory" pattern extensively to enable users to create
+    &geot; uses the "factory" pattern extensively to enable users to create
     objects while developing most of their code against the standard 
     APIs.
   </para>

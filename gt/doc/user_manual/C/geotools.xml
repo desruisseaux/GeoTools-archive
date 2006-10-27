@@ -21,8 +21,8 @@
 -->
 
 
-  <!ENTITY lib "Geotools">
-  <!ENTITY libversion "2.3">
+  <!ENTITY geot "Geotools">
+  <!ENTITY geotversion "2.3">
   <!ENTITY manversion "0.1">
   <!ENTITY date "August 2006">
   <!ENTITY javaVersion "1.4">
@@ -34,11 +34,13 @@
 
   <!ENTITY quickstart           SYSTEM "quick-start.xml">
 
+  <!ENTITY design               SYSTEM "design.xml">
+
   <!ENTITY conceptFound         SYSTEM "conceptual-foundations.xml">
 
   <!ENTITY geoSci               SYSTEM "geospatial-science.xml">
 
-  <!ENTITY sdkConfig            SYSTEM "sdk-config.xml">
+  <!ENTITY ideConfig            SYSTEM "ide-config.xml">
 
   <!ENTITY geoapiUtil           SYSTEM "geoapiUtil.xml">
   <!ENTITY geomJTS              SYSTEM "geomJTS.xml">
@@ -105,8 +107,8 @@
 
 
     <releaseinfo>
-      This manual describes the &lib; geospatial software library 
-      for programmers wishing to learn version &libversion;.
+      This manual describes the &geot; geospatial software library 
+      for programmers wishing to learn version &geotversion;.
     </releaseinfo> 
 
 
@@ -185,15 +187,12 @@
 
 <!-- ============= Document Body ============================= -->
 
-  <chapter id="chapter-welcome">
-    <title>Welcome!</title>
-    &welcome;
-  </chapter>
-
-  <chapter id="chapter-quickStart">
-    <title>Quick Start</title>
-    &quickstart;
-  </chapter>
+  
+  &welcome;
+    
+  &quickstart;
+  
+  &design;
 
   <chapter id="chapter-conceptFound">
     <title>Conceptual Foundations</title>
@@ -205,10 +204,7 @@
     &geoSci;
   </chapter>
 
-  <chapter id="chapter-sdkConfig">
-    <title>SDK Configuration</title>
-    &sdkConfig;
-  </chapter>
+  &ideConfig;
 
   <chapter id="chapter-geoapiUtil">
     <title>GeoAPI Utilities</title>
@@ -282,7 +278,7 @@
 
     <para>
       This chapter provides some background information on the
-      creation and distribution of &lib;.
+      creation and distribution of &geot;.
     </para>
 
     &about-history;

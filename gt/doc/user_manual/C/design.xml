@@ -1,0 +1,34 @@
+<chapter id="chapter-design">
+  <title>Design and Use</title>
+
+  <!-- This is at the top level to avoid any chapter TOC. -->
+  <para>
+    Geotools is a code library built as a set of modular sub-systems for easy 
+    use. 
+  </para>
+
+
+  <sect1 id="sect-design-overview">
+    <title>Overview</title>
+
+    <para>
+      
+    </para>
+    <!--
+    <sect2 id="">
+      <title></title>
+
+      <para>
+      </para>
+
+    </sect2>
+    -->
+  </sect1>
+
+
+</chapter>
+
+
+
+
+
