@@ -26,6 +26,7 @@ import java.awt.image.renderable.RenderableImage;
 import java.util.Date;
 import java.util.Set;
 
+// JAI dependencies
 import javax.media.jai.util.Range;
 
 // OpenGIS dependencies
@@ -52,6 +53,7 @@ import org.geotools.factory.Hints;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
@@ -257,7 +259,7 @@ control:    for (int p=0; p<=1; p++) {
                     envelope.getMaximum(yDimension));
             final CoordinateReferenceSystem sourceCRS = CRSUtilities.getHorizontalCRS(crs);
             final CoordinateReferenceSystem targetCRS = DefaultGeographicCRS.WGS84;
-            if (!CRSUtilities.equalsIgnoreMetadata(targetCRS, sourceCRS)) {
+            if (!CRS.equalsIgnoreMetadata(targetCRS, sourceCRS)) {
                 final CoordinateOperation      transform;
                 final CoordinateOperationFactory factory;
                 factory = FactoryFinder.getCoordinateOperationFactory(HINTS);

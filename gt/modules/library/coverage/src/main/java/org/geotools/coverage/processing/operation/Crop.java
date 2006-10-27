@@ -23,7 +23,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
-import org.geotools.resources.CRSUtilities;
+import org.geotools.referencing.CRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.Coverage;
@@ -110,7 +110,7 @@ public class Crop extends Operation2D {
 		// crs have to be equals
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, destinationCRS)) {
+		if (!CRS.equalsIgnoreMetadata(sourceCRS, destinationCRS)) {
 			throw new CannotCropException(Errors.format(ErrorKeys.MISMATCHED_ENVELOPE_CRS_$2,
                     sourceCRS.getName().getCode(), destinationCRS.getName().getCode()));
         }

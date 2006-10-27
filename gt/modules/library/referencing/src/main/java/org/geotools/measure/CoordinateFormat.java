@@ -47,7 +47,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.referencing.crs.AbstractCRS;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.CRSUtilities;
@@ -56,10 +56,10 @@ import org.geotools.resources.i18n.Errors;
 
 
 /**
- * Formats a {@linkplain org.geotools.geometry.GeneralDirectPosition direct position} in an
- * arbitrary {@linkplain org.geotools.referencing.crs.AbstractCRS coordinate reference system}.
- * The format for each ordinate is infered from the coordinate system units using the following
- * rules:
+ * Formats a {@linkplain org.geotools.geometry.GeneralDirectPosition direct position}
+ * in an arbitrary {@linkplain CoordinateReferenceSystem coordinate reference system}.
+ * The format for each ordinate is infered from the coordinate system units using the
+ * following rules:
  * <ul>
  *   <li>Ordinate values in {@linkplain NonSI#DEGREE_ANGLE degrees} are formated as angles
  *       using {@link AngleFormat}.</li>
@@ -182,7 +182,7 @@ public class CoordinateFormat extends Format {
      * @param crs The new coordinate system.
      */
     public void setCoordinateReferenceSystem(final CoordinateReferenceSystem crs) {
-        if (CRSUtilities.equalsIgnoreMetadata(this.crs, (this.crs = crs))) {
+        if (CRS.equalsIgnoreMetadata(this.crs, (this.crs = crs))) {
             return;
         }
         Format numberFormat = null;

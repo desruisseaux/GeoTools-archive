@@ -33,8 +33,8 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
+import org.geotools.referencing.CRS;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.coverage.grid.GridCoverageTest;
 
 
@@ -210,7 +210,7 @@ public class MetadataBuilderTest extends TestCase {
         assertTrue   ("The test data changed!", expectedCRS instanceof GeographicCRS);
         assertTrue   ("Created wrong CRS type.", createdCRS instanceof GeographicCRS);
         assertNotSame("Not testing creation.",  expectedCRS, createdCRS);
-        assertTrue   ("Created incompatible CRS.", CRSUtilities.equalsIgnoreMetadata(expectedCRS, createdCRS));
+        assertTrue   ("Created incompatible CRS.", CRS.equalsIgnoreMetadata(expectedCRS, createdCRS));
         
         parser.addAlias(MetadataBuilder.COORDINATE_REFERENCE_SYSTEM, "CRS");
         parser.add(coverage);

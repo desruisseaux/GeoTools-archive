@@ -17,9 +17,13 @@ package org.geotools.referencing;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 // OpenGIS dependencies
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.extent.BoundingPolygon;
+import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.Factory;                              // For javadoc
 import org.opengis.referencing.FactoryException;
@@ -408,8 +412,40 @@ public final class CRS {
      * @return The envelope, or {@code null} if none.
      */
     private static Envelope getGeographicEnvelope(final CoordinateReferenceSystem crs) {
-        // TODO: Copy the implementation from CRSUtilities there.
-        return CRSUtilities.getEnvelope(crs);
+        GeneralEnvelope envelope = null;
+        if (crs != null) {
+            final Extent validArea = crs.getValidArea();
+            if (validArea != null) {
+                for (final Iterator it=validArea.getGeographicElements().iterator(); it.hasNext();) {
+                    final GeographicExtent geo = (GeographicExtent) it.next();
+                    final GeneralEnvelope candidate;
+                    if (geo instanceof GeographicBoundingBox) {
+                        final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
+                        if (!bounds.getInclusion()) {
+                            // TODO: we could uses Envelope.substract if such
+                            //       a method is defined in a future version.
+                            continue;
+                        }
+                        candidate = new GeneralEnvelope(new double[] {bounds.getWestBoundLongitude(),
+                                                                      bounds.getSouthBoundLatitude()},
+                                                        new double[] {bounds.getEastBoundLongitude(),
+                                                                      bounds.getNorthBoundLatitude()});
+                        candidate.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
+                    } else if (geo instanceof BoundingPolygon) {
+                        // TODO: iterates through all polygons and invoke Polygon.getEnvelope();
+                        continue;
+                    } else {
+                        continue;
+                    }
+                    if (envelope == null) {
+                        envelope = candidate;
+                    } else {
+                        envelope.add(candidate);
+                    }
+                }
+            }
+        }
+        return envelope;
     }
 
     /**
@@ -449,7 +485,15 @@ public final class CRS {
      * @since 2.2
      */
     public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
-        // TODO: Copy the implementation from CRSUtilities there.
-        return CRSUtilities.equalsIgnoreMetadata(object1, object2);
+        if (object1 == object2) {
+            return true;
+        }
+        if (object1 instanceof AbstractIdentifiedObject &&
+            object2 instanceof AbstractIdentifiedObject)
+        {
+            return ((AbstractIdentifiedObject) object1).equals(
+                   ((AbstractIdentifiedObject) object2), false);
+        }
+        return object1!=null && object1.equals(object2);
     }
 }

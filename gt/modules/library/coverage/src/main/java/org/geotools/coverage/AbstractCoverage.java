@@ -65,8 +65,8 @@ import javax.swing.SwingUtilities;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.io.LineWriter;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.geometry.XAffineTransform;
@@ -294,7 +294,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements
 	 *         coordinates.
 	 */
 	public Envelope getEnvelope() {
-		return CRSUtilities.getEnvelope(crs);
+		return CRS.getEnvelope(crs);
 	}
 
 	/**

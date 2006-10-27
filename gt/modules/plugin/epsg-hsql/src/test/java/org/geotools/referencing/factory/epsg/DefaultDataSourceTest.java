@@ -67,7 +67,6 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.util.MonolineFormatter;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Arguments;
 
 
@@ -532,7 +531,7 @@ public class DefaultDataSourceTest extends TestCase {
         /*
          * WGS 72BE / UTM zone 10N
          */
-        assertFalse(CRSUtilities.equalsIgnoreMetadata(crs, factory.createProjectedCRS("32410")));
+        assertFalse(CRS.equalsIgnoreMetadata(crs, factory.createProjectedCRS("32410")));
         /*
          * Creates a projected CRS from base and projected CRS codes.
          */

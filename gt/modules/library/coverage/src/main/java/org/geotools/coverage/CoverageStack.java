@@ -68,6 +68,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NumberRange;
@@ -566,7 +567,7 @@ public class CoverageStack extends AbstractCoverage {
                     throw new MismatchedDimensionException("An element uses an incompatible CRS");
                 }
                 final CoordinateReferenceSystem targetCRS = CRSUtilities.getSubCRS(crs, 0, dim);
-                if (!CRSUtilities.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
+                if (!CRS.equalsIgnoreMetadata(sourceCRS, targetCRS)) {
                     // TODO: localize
                     throw new IllegalArgumentException("An element uses an incompatible CRS");
                 }
@@ -607,7 +608,7 @@ public class CoverageStack extends AbstractCoverage {
             envelope.setCoordinateReferenceSystem(crs);
         } else {
             assert this.elements.length == 0;
-            this.envelope = new GeneralEnvelope(CRSUtilities.getEnvelope(crs));
+            this.envelope = new GeneralEnvelope(CRS.getEnvelope(crs));
         }
         zCRS = CRSUtilities.getSubCRS(crs, zDimension, zDimension+1);
     }
@@ -861,7 +862,7 @@ public class CoverageStack extends AbstractCoverage {
          * CRS assertions (for debugging purpose).
          */
         final CoordinateReferenceSystem sourceCRS;
-        assert CRSUtilities.equalsIgnoreMetadata((sourceCRS=coverage.getCoordinateReferenceSystem()),
+        assert CRS.equalsIgnoreMetadata((sourceCRS=coverage.getCoordinateReferenceSystem()),
                CRSUtilities.getSubCRS(crs, 0, sourceCRS.getCoordinateSystem().getDimension())) :
                sourceCRS + "\n\n" + crs;
         assert coverage.getNumSampleDimensions() == numSampleDimensions : coverage;
@@ -1033,7 +1034,7 @@ public class CoverageStack extends AbstractCoverage {
             }
             coord = reducedPosition;
         } else {
-            assert CRSUtilities.equalsIgnoreMetadata(crs, targetCRS) : targetCRS;
+            assert CRS.equalsIgnoreMetadata(crs, targetCRS) : targetCRS;
         }
         return coord;
     }

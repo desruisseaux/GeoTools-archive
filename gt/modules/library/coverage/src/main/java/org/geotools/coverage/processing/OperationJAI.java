@@ -60,6 +60,7 @@ import org.geotools.coverage.grid.InvalidGridGeometryException;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.ImagingParameters;
 import org.geotools.parameter.ImagingParameterDescriptors;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.image.jai.Registry;
@@ -322,8 +323,8 @@ public class OperationJAI extends Operation2D {
         final MathTransform2D gridToCRS = ((GridGeometry2D) coverage.getGridGeometry()).getGridToCoordinateSystem2D();
         for (int i=0; i<sources.length; i++) {
             final GridCoverage2D source = sources[i];
-            if (!CRSUtilities.equalsIgnoreMetadata(crs, source.getCoordinateReferenceSystem2D()) ||
-                !CRSUtilities.equalsIgnoreMetadata(gridToCRS,
+            if (!CRS.equalsIgnoreMetadata(crs, source.getCoordinateReferenceSystem2D()) ||
+                !CRS.equalsIgnoreMetadata(gridToCRS,
                     ((GridGeometry2D) source.getGridGeometry()).getGridToCoordinateSystem2D()))
             {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.INCOMPATIBLE_GRID_GEOMETRY));
@@ -458,7 +459,7 @@ public class OperationJAI extends Operation2D {
             final CoordinateReferenceSystem srcCrs2D  = source.getCoordinateReferenceSystem2D();
             final CoordinateReferenceSystem sourceCRS = source.getCoordinateReferenceSystem();
             final CoordinateReferenceSystem targetCRS;
-            if (CRSUtilities.equalsIgnoreMetadata(crs2D, srcCrs2D)) {
+            if (CRS.equalsIgnoreMetadata(crs2D, srcCrs2D)) {
                 targetCRS = sourceCRS; // No reprojection needed for this source coverage.
             } else {
                 /*
@@ -499,7 +500,7 @@ public class OperationJAI extends Operation2D {
             final MathTransform toSource2D = geometry.getGridToCoordinateSystem2D();
             final MathTransform toSource   = geometry.getGridToCoordinateSystem();
             MathTransform toTarget;
-            if (CRSUtilities.equalsIgnoreMetadata(gridToCrs2D, toSource2D)) {
+            if (CRS.equalsIgnoreMetadata(gridToCrs2D, toSource2D)) {
                 toTarget  = toSource;
             } else {
                 /*

@@ -31,8 +31,8 @@ import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.geometry.XRectangle2D;
@@ -169,7 +169,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             crs = crs2;
         } else {
             crs = crs1;
-            if (crs2!=null && !CRSUtilities.equalsIgnoreMetadata(crs1, crs2)) {
+            if (crs2!=null && !CRS.equalsIgnoreMetadata(crs1, crs2)) {
                 throw new IllegalArgumentException(
                           Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
             }
@@ -502,7 +502,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     private static boolean equalsIgnoreMetadata(final CoordinateReferenceSystem crs1,
                                                 final CoordinateReferenceSystem crs2)
     {
-        return crs1==null || crs2==null || CRSUtilities.equalsIgnoreMetadata(crs1, crs2);
+        return crs1==null || crs2==null || CRS.equalsIgnoreMetadata(crs1, crs2);
     }
 
     /**

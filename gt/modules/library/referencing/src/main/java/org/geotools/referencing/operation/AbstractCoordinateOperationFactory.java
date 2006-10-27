@@ -53,6 +53,7 @@ import org.opengis.referencing.operation.Transformation;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.FactoryFinder;
@@ -60,7 +61,6 @@ import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.ReferencingFactory;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -708,7 +708,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
     static boolean equalsIgnoreMetadata(final IdentifiedObject object1,
                                         final IdentifiedObject object2)
     {
-        return CRSUtilities.equalsIgnoreMetadata(object1, object2);
+        return CRS.equalsIgnoreMetadata(object1, object2);
     }
 
     /**

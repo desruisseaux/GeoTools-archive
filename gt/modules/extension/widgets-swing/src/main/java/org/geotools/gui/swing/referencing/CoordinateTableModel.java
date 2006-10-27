@@ -35,7 +35,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
-import org.geotools.resources.CRSUtilities;
+import org.geotools.referencing.CRS;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.TransformedDirectPosition;
@@ -110,7 +110,7 @@ public class CoordinateTableModel extends AbstractTableModel {
         for (int i=0; i<columnNames.length; i++){
             columnNames[i] = crs.getCoordinateSystem().getAxis(i).getName().getCode();
         }
-        validArea = new GeneralEnvelope(CRSUtilities.getEnvelope(crs));
+        validArea = new GeneralEnvelope(CRS.getEnvelope(crs));
     }
 
     /**

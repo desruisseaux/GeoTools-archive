@@ -22,25 +22,16 @@ package org.geotools.metadata.iso.extent;
 // J2SE dependencies
 import java.util.Locale;
 import java.awt.geom.Rectangle2D;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
-import org.geotools.factory.Hints;
-import org.geotools.measure.Latitude;
-import org.geotools.measure.Longitude;
-import org.geotools.measure.AngleFormat;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.TransformPathNotFoundException;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -49,12 +40,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  * Geographic position of the dataset. This is only an approximate
  * so specifying the co-ordinate reference system is unnecessary.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Touraïvane
- *
- * @since 2.1
  */
 public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         implements GeographicBoundingBox
@@ -63,6 +53,18 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = -3278089380004172514L;
+
+    /**
+     * The method for constructing a bounding box from an envelope.
+     * Will be obtained only when first needed.
+     */
+    private static Method constructor;
+
+    /**
+     * The method for constructing a string representation of this box.
+     * Will be obtained only when first needed.
+     */
+    private static Method toString;
 
     /**
      * A bounding box ranging from 180°W to 180°E and 90°S to 90°N.
@@ -75,14 +77,6 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
         world.freeze();
         WORLD = world;
     }
-
-    /**
-     * A set of hints used in order to fetch lenient coordinate operation factory. We accept
-     * lenient transforms because {@link GeographicBoundingBox} are usually for approximative
-     * bounds (e.g. the area of validity of some CRS). If a user wants accurate bounds, he
-     * should probably use an {@link Envelope} with the appropriate CRS.
-     */
-    private static final Hints LENIENT = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 
     /**
      * The western-most coordinate of the limit of the dataset extent.
@@ -131,44 +125,32 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
      * Constructs a geographic bounding box from the specified envelope. If the envelope contains
      * a CRS, then the bounding box will be projected to the {@linkplain DefaultGeographicCRS#WGS84
      * WGS 84} CRS. Otherwise, the envelope is assumed already in WGS 84 CRS.
+     * <p>
+     * <strong>Note:</strong> This method is available only if the referencing module is
+     * on the classpath.
+     *
+     * @param  envelope The envelope to use for initializing this geographic bounding box.
+     * @throws UnsupportedOperationException if the referencing module is not on the classpath.
+     * @throws TransformException if the envelope can't be transformed.
      *
      * @since 2.2
      */
-    public GeographicBoundingBoxImpl(Envelope envelope) throws TransformException {
+    public GeographicBoundingBoxImpl(final Envelope envelope) throws TransformException {
         super(true);
-        // TODO: use a more direct way if we add a 'getCRS()' method straight into Envelope.
-        final CoordinateReferenceSystem crs = envelope.getLowerCorner().getCoordinateReferenceSystem();
-        if (crs != null) {
-            if (!startsWith(crs, DefaultGeographicCRS.WGS84) &&
-                !startsWith(crs, DefaultGeographicCRS.WGS84_3D))
-            {
-                final CoordinateOperation operation;
-                final CoordinateOperationFactory factory;
-                factory = FactoryFinder.getCoordinateOperationFactory(LENIENT);
-                try {
-                    operation = factory.createOperation(crs, DefaultGeographicCRS.WGS84);
-                } catch (FactoryException exception) {
-                    throw new TransformPathNotFoundException(Errors.format(
-                              ErrorKeys.CANT_TRANSFORM_ENVELOPE, exception));
-                }
-                envelope = CRSUtilities.transform(operation.getMathTransform(), envelope);
-            }
-            setWestBoundLongitude(envelope.getMinimum(0));
-            setEastBoundLongitude(envelope.getMaximum(0));
-            setSouthBoundLatitude(envelope.getMinimum(1));
-            setNorthBoundLatitude(envelope.getMaximum(1));
+        if (constructor == null) {
+            // No need to synchronize.
+            constructor = getMethod("copy",  new Class[] {
+                            Envelope.class, GeographicBoundingBoxImpl.class});
         }
-    }
-
-    /**
-     * Returns {@code true} if the specified {@code crs} starts with the specified {@code head}.
-     */
-    private static final boolean startsWith(final CoordinateReferenceSystem crs,
-                                            final CoordinateReferenceSystem head)
-    {
-        final int dimension = head.getCoordinateSystem().getDimension();
-        return crs.getCoordinateSystem().getDimension()>=dimension &&
-               CRSUtilities.equalsIgnoreMetadata(CRSUtilities.getSubCRS(crs,0,dimension), head);
+        try {
+            invoke(constructor, new Object[] {envelope, this});
+        } catch (InvocationTargetException exception) {
+            final Throwable cause = exception.getTargetException();
+            if (cause instanceof TransformException) {
+                throw (TransformException) cause;
+            }
+            throw new UndeclaredThrowableException(cause);
+        }
     }
 
     /**
@@ -372,16 +354,57 @@ public class GeographicBoundingBoxImpl extends GeographicExtentImpl
                                   final String                pattern,
                                   final Locale                locale)
     {
-        final StringBuffer buffer = new StringBuffer();
-        final AngleFormat  format = (locale!=null) ? new AngleFormat(pattern, locale) :
-                                                     new AngleFormat(pattern);
-        buffer.append(format.format(new  Latitude(box.getNorthBoundLatitude())));
-        buffer.append(", ");
-        buffer.append(format.format(new Longitude(box.getWestBoundLongitude())));
-        buffer.append(" - ");
-        buffer.append(format.format(new  Latitude(box.getSouthBoundLatitude())));
-        buffer.append(", ");
-        buffer.append(format.format(new Longitude(box.getEastBoundLongitude())));
-        return buffer.toString();
-    }    
+        if (toString == null) {
+            // No need to synchronize.
+            toString = getMethod("toString",  new Class[] {
+                        GeographicBoundingBox.class, String.class, Locale.class});
+        }
+        try {
+            return String.valueOf(invoke(toString, new Object[] {box, pattern, locale}));
+        } catch (InvocationTargetException exception) {
+            throw new UndeclaredThrowableException(exception.getTargetException());
+        }
+    }
+
+    /**
+     * Returns a helper method which depends on the referencing module. We use reflection
+     * since we can't have a direct dependency to this module.
+     */
+    private static Method getMethod(final String name, final Class[] arguments) {
+        try {
+            return Class.forName("org.geotools.resources.BoundingBoxes").getMethod(name, arguments);
+        } catch (ClassNotFoundException exception) {
+            // Simplify when we will be allowed to compile for J2SE 1.5.
+            UnsupportedOperationException e = new UnsupportedOperationException(Errors.format(
+                    ErrorKeys.MISSING_MODULE_$1, "referencing"));
+            e.initCause(exception);
+            throw e;
+        } catch (NoSuchMethodException exception) {
+            // Should never happen if we didn't broke our BoundingBoxes helper class.
+            throw new AssertionError(exception);
+        }
+    }
+
+    /**
+     * Invokes the specified method with the specified arguments.
+     */
+    private static Object invoke(final Method method, final Object[] arguments)
+            throws InvocationTargetException
+    {
+        try {
+            return method.invoke(null, arguments);
+        } catch (IllegalAccessException exception) {
+            // Should never happen if our BoundingBoxes helper class is not broken.
+            throw new AssertionError(exception);
+        } catch (InvocationTargetException exception) {
+            final Throwable cause = exception.getTargetException();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            if (cause instanceof Error) {
+                throw (Error) cause;
+            }
+            throw exception;
+        }
+    }
 }

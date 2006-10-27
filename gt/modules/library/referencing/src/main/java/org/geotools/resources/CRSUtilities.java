@@ -25,10 +25,6 @@ import java.awt.geom.Rectangle2D;
 import javax.units.Unit;
 
 // OpenGIS dependencies
-import org.opengis.metadata.extent.BoundingPolygon;
-import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CompoundCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -53,13 +49,14 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
+import org.geotools.referencing.CRS;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.measure.AngleFormat;
 import org.geotools.measure.Latitude;
 import org.geotools.measure.Longitude;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -85,31 +82,6 @@ public final class CRSUtilities {
      * Do not allow creation of instances of this class.
      */
     private CRSUtilities() {
-    }
-
-    /**
-     * Compare the specified objects for equality. If both objects are Geotools
-     * implementations of {@linkplain AbstractIdentifiedObject}, then this method
-     * will ignore the metadata during the comparaison.
-     *
-     * @param  object1 The first object to compare (may be null).
-     * @param  object2 The second object to compare (may be null).
-     * @return {@code true} if both objects are equals.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
-     *       The method signature is already there.
-     */
-    public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
-        if (object1 == object2) {
-            return true;
-        }
-        if (object1 instanceof AbstractIdentifiedObject &&
-            object2 instanceof AbstractIdentifiedObject)
-        {
-            return ((AbstractIdentifiedObject) object1).equals(
-                   ((AbstractIdentifiedObject) object2), false);
-        }
-        return object1!=null && object1.equals(object2);
     }
     
     /**
@@ -435,53 +407,6 @@ public final class CRSUtilities {
         // Remove first cast when covariance will be allowed (J2SE 1.5).
         return ((GeodeticDatum) ((GeographicCRS) crs).getDatum()).getEllipsoid();
     }
-
-    /**
-     * Returns the bounding box of the specified coordinate reference system, or {@code null}
-     * if none. This method search in the metadata informations.
-     *
-     * @param  crs The coordinate reference system, or {@code null}.
-     * @return The envelope, or {@code null} if none.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
-     *       The method signature is already there.
-     */
-    public static Envelope getEnvelope(final CoordinateReferenceSystem crs) {
-        GeneralEnvelope envelope = null;
-        if (crs != null) {
-            final Extent validArea = crs.getValidArea();
-            if (validArea != null) {
-                for (final Iterator it=validArea.getGeographicElements().iterator(); it.hasNext();) {
-                    final GeographicExtent geo = (GeographicExtent) it.next();
-                    final GeneralEnvelope candidate;
-                    if (geo instanceof GeographicBoundingBox) {
-                        final GeographicBoundingBox bounds = (GeographicBoundingBox) geo;
-                        if (!bounds.getInclusion()) {
-                            // TODO: we could uses Envelope.substract if such
-                            //       a method is defined in a future version.
-                            continue;
-                        }
-                        candidate = new GeneralEnvelope(new double[] {bounds.getWestBoundLongitude(),
-                                                                      bounds.getSouthBoundLatitude()},
-                                                        new double[] {bounds.getEastBoundLongitude(),
-                                                                      bounds.getNorthBoundLatitude()});
-                        candidate.setCoordinateReferenceSystem(DefaultGeographicCRS.WGS84);
-                    } else if (geo instanceof BoundingPolygon) {
-                        // TODO: iterates through all polygons and invoke Polygon.getEnvelope();
-                        continue;
-                    } else {
-                        continue;
-                    }
-                    if (envelope == null) {
-                        envelope = candidate;
-                    } else {
-                        envelope.add(candidate);
-                    }
-                }
-            }
-        }
-        return envelope;
-    }
     
     /**
      * Transforms an envelope. The transformation is only approximative. Note that the returned
@@ -703,7 +628,7 @@ public final class CRSUtilities {
         StringBuffer buffer = new StringBuffer();
         try {
             crs = getCRS2D(crs);
-            if (!equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
+            if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
                 final CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory(null)
                         .createOperation(crs, DefaultGeographicCRS.WGS84);
                 bounds = transform((MathTransform2D) op.getMathTransform(), bounds, null);

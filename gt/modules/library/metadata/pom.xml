@@ -24,21 +24,12 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-referencing</artifactId>
+  <artifactId>gt2-metadata</artifactId>
   <packaging>jar</packaging>
-  <name>Referencing services</name>
-  <url>http://maven.geotools.fr/reports/modules/library/referencing/</url>
-  
-  <scm>
-    <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/
-    </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/</url>
-  </scm>
+  <name>Metadata</name>
   
   <description>
-    Contains implementations of Coordinate Reference Systems (CRS), 
-    conversion and transformation services.
+    Contains implementations of metadata and some core utilities classes.
   </description>
 
   <licenses>
@@ -67,22 +58,6 @@
       </roles>
     </developer>
     <developer>
-      <name>Rueben Schulz</name>
-      <id>rschulz</id>
-      <organization>University of British Columbia</organization>
-      <roles>
-        <role>Java developper</role>
-        <role>Tester</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Jan Jezek</name>
-      <id>jezekjan</id>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
       <name>Jody Garnett</name>
       <id>jive</id>
       <email>jive@users.sourceforge.net</email>
@@ -91,62 +66,17 @@
         <role>Java Developer</role>
       </roles>
     </developer>
-    <developer>
-      <name>Simone Giannecchinir</name>
-      <id>simboss</id>
-      <email>simone.giannecchini@geo-solutions.it</email>
-      <organization>GeoSolutions</organization>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </developer>
   </developers>
 
   <contributors>
     <contributor>
-      <name>Rémi Eve</name>
+      <name>Touraïvane</name>
       <organization>
         Institut de Recherche pour le Développement (IRD)
       </organization>
       <roles>
         <role>Java developper</role>
       </roles>
-    </contributor>
-    <contributor>
-      <name>Yann Cézard</name>
-      <organization>Université de Montpellier II</organization>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-    <contributor>
-      <name>Daniele Franzoni</name>
-      <organization>SATA srl, Italy</organization>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-    <contributor>
-      <name>Matthias Basler</name>
-      <email>matthiasbasier@users.sourceforge.net</email>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-    <contributor>
-      <name>David Heath</name>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-    </contributor>
-    <contributor>
-      <name>Beate Stollberg</name>
-      <roles>
-        <role>Java developper</role>
-      </roles>
-      <organization>
-        Institute for Environment and Sustainability
-      </organization>
     </contributor>
   </contributors>
 
@@ -155,16 +85,19 @@
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
   <dependencies>
-    <!-- NOTE: The referencing module does not depends on JTS. -->
+    <!-- NOTE: The metadata module does not depends on JTS. -->
+
+    <!--
+      The following is required only for compilation.  It should not be included
+      in distribution, unless the user really want to use Apache commons logging
+      (in which case he should put this dependency explicitly on the classpath).
+    -->
     <dependency>
-      <groupId>java3d</groupId>
-      <artifactId>vecmath</artifactId>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
       <!-- The version number is specified in the parent POM. -->
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-metadata</artifactId>
-      <version>${project.version}</version>
+      <scope>provided</scope>  <!-- Not required for default execution. -->
+      <optional>true</optional>
     </dependency>
   </dependencies>
 

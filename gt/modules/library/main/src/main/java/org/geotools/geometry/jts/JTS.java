@@ -249,7 +249,7 @@ public final class JTS {
     public static Envelope toGeographic(final Envelope envelope, final CoordinateReferenceSystem crs)
             throws TransformException
     {
-        if (CRSUtilities.equalsIgnoreMetadata(crs, DefaultGeographicCRS.WGS84)) {
+        if (CRS.equalsIgnoreMetadata(crs, DefaultGeographicCRS.WGS84)) {
             return envelope;
         }
         final MathTransform transform;
@@ -471,7 +471,7 @@ public final class JTS {
         if (envelope instanceof ReferencedEnvelope) {
             final ReferencedEnvelope referenced = (ReferencedEnvelope) envelope;
             final CoordinateReferenceSystem implicitCRS = referenced.getCoordinateReferenceSystem();
-            if (crs!=null && !CRSUtilities.equalsIgnoreMetadata(crs, implicitCRS)) {
+            if (crs!=null && !CRS.equalsIgnoreMetadata(crs, implicitCRS)) {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.MISMATCHED_ENVELOPE_CRS_$2,
                           crs.getName().getCode(), implicitCRS.getName().getCode()));
             }

@@ -37,6 +37,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.display.event.ReferencedEvent;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -130,7 +131,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
         final CoordinateReferenceSystem oldCRS;
         synchronized (getTreeLock()) {
             oldCRS = getObjectiveCRS();
-            if (CRSUtilities.equalsIgnoreMetadata(oldCRS, crs)) {
+            if (CRS.equalsIgnoreMetadata(oldCRS, crs)) {
                 /*
                  * If the new CRS is equivalent to the old one (except for metadata), then there
                  * is no need to apply any transformation. Just set the new CRS.  Note that this

@@ -34,6 +34,7 @@ import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
@@ -115,7 +116,7 @@ public class TransformedCoverage extends AbstractCoverage {
                                      Coverage coverage) throws FactoryException
     {
         while (true) {
-            if (CRSUtilities.equalsIgnoreMetadata(coverage.getCoordinateReferenceSystem(), crs)) {
+            if (CRS.equalsIgnoreMetadata(coverage.getCoordinateReferenceSystem(), crs)) {
                 return coverage;
             }
             if (TransformedCoverage.class.equals(coverage.getClass())) {

@@ -132,6 +132,7 @@ public final class ErrorKeys {
     public static final int MISMATCHED_ENVELOPE_CRS_$2             =   186;
     public static final int MISSING_AUTHORITY_$1                   =   182;
     public static final int MISSING_CHARACTER_$1                   =    70;
+    public static final int MISSING_MODULE_$1                      =   194;
     public static final int MISSING_PARAMETER_$1                   =    71;
     public static final int MISSING_PARAMETER_VALUE_$1             =    72;
     public static final int MISSING_WKT_DEFINITION                 =   171;

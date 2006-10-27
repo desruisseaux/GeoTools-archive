@@ -56,6 +56,7 @@ import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.coverage.processing.CannotReprojectException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.DimensionFilter;
@@ -194,7 +195,7 @@ final class Resampler2D extends GridCoverage2D {
 				targetCRS = sourceCRS;
 			}
 			sameGG = (targetGG == null || equivalent(targetGG, sourceGG));
-			sameCRS = CRSUtilities.equalsIgnoreMetadata(targetCRS, sourceCRS);
+			sameCRS = CRS.equalsIgnoreMetadata(targetCRS, sourceCRS);
 			if (sameGG && sameCRS) {
 				return sourceCoverage;
 			}
@@ -593,7 +594,7 @@ final class Resampler2D extends GridCoverage2D {
 			targetCoverage = targetCoverage.geophysics(targetGeophysics
 					.booleanValue());
 		}
-		assert CRSUtilities.equalsIgnoreMetadata(targetCoverage
+		assert CRS.equalsIgnoreMetadata(targetCoverage
 				.getCoordinateReferenceSystem(), targetCRS) : targetCoverage;
 		assert ((GridGeometry2D) targetCoverage.getGridGeometry())
 				.getGridRange2D().equals(

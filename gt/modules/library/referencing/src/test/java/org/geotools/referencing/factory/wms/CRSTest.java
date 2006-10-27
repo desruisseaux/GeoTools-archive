@@ -30,8 +30,8 @@ import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
+import org.geotools.referencing.CRS;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.util.MonolineFormatter;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -110,9 +110,9 @@ public class CRSTest extends TestCase {
     public void testCRS() throws FactoryException {
         GeographicCRS crs = factory.createGeographicCRS("CRS:84");
         assertFalse(DefaultGeographicCRS.WGS84.equals(crs));
-        assertTrue(CRSUtilities.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
+        assertTrue(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
 
         crs = factory.createGeographicCRS("CRS:83");
-        assertFalse(CRSUtilities.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
+        assertFalse(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
     }
 }

@@ -47,7 +47,7 @@ public final class AllTests {
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("org.geotools.measure");
-        suite.addTest(org.geotools.util.AllTests.suite());
+//      suite.addTest(org.geotools.util.AllTests.suite());
         suite.addTest(FormatTest                .suite());
         return suite;
     }

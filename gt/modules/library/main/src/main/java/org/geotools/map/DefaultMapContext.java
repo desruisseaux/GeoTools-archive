@@ -37,8 +37,8 @@ import org.geotools.map.event.MapBoundsEvent;
 import org.geotools.map.event.MapLayerEvent;
 import org.geotools.map.event.MapLayerListEvent;
 import org.geotools.map.event.MapLayerListener;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.FactoryException;
@@ -543,7 +543,7 @@ public class DefaultMapContext implements MapContext {
 
 					if ((sourceCrs != null)
 							&& (crs != null)
-							&& !CRSUtilities.equalsIgnoreMetadata(sourceCrs,
+							&& !CRS.equalsIgnoreMetadata(sourceCrs,
 									crs)) {
 
 						env = env.transform(crs, true);
@@ -1132,7 +1132,7 @@ public class DefaultMapContext implements MapContext {
 		final Envelope oldBounds = this.areaOfInterest;
 		final CoordinateReferenceSystem oldCRS = this.crs;
 		this.bounds = null;
-		if (!CRSUtilities.equalsIgnoreMetadata(crs, this.crs)
+		if (!CRS.equalsIgnoreMetadata(crs, this.crs)
 				&& this.areaOfInterest != null)
 			this.areaOfInterest = this.areaOfInterest.transform(crs, true);
 		this.crs = crs;

@@ -29,9 +29,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistryException;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
@@ -165,7 +165,7 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
     {
         super(targetCRS);
         ensureNonNull("targetCRS", targetCRS);
-        defaultCRS = CRSUtilities.equalsIgnoreMetadata(sourceCRS, targetCRS) ? null : sourceCRS;
+        defaultCRS = CRS.equalsIgnoreMetadata(sourceCRS, targetCRS) ? null : sourceCRS;
         factory = FactoryFinder.getCoordinateOperationFactory(hints);
     }
 
@@ -252,7 +252,7 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
          * CRS, then gets the transformation and saves it in case the next call to this
          * method would uses again the same transformation.
          */
-        if (forward==null || !CRSUtilities.equalsIgnoreMetadata(sourceCRS, userCRS)) {
+        if (forward==null || !CRS.equalsIgnoreMetadata(sourceCRS, userCRS)) {
             setSourceCRS(userCRS);
         }
         if (forward.transform(position, this) != this) {
@@ -274,7 +274,7 @@ public class TransformedDirectPosition extends GeneralDirectPosition {
     public DirectPosition inverseTransform(final CoordinateReferenceSystem crs)
             throws TransformException
     {
-        if (inverse==null || !CRSUtilities.equalsIgnoreMetadata(sourceCRS, crs)) {
+        if (inverse==null || !CRS.equalsIgnoreMetadata(sourceCRS, crs)) {
             ensureNonNull("crs", crs);
             setSourceCRS(crs);
             inverse = forward.inverse();

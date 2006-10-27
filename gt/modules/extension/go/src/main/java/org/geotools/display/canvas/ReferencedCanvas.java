@@ -66,6 +66,7 @@ import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.TransformedDirectPosition;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -752,7 +753,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     {
         final CoordinateReferenceSystem oldCRS = getObjectiveCRS();
         assert oldCRS == getObjectiveCoordinateReferenceSystem();
-        if (CRSUtilities.equalsIgnoreMetadata(crs, oldCRS)) {
+        if (CRS.equalsIgnoreMetadata(crs, oldCRS)) {
             return;
         }
         final GeneralEnvelope oldEnvelope = new GeneralEnvelope(envelope);
@@ -879,7 +880,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
              */
             final CoordinateReferenceSystem crs = graphic.getObjectiveCRS();
             try {
-                if (!CRSUtilities.equalsIgnoreMetadata(crs, lastCRS)) {
+                if (!CRS.equalsIgnoreMetadata(crs, lastCRS)) {
                     transform = getMathTransform(crs, getObjectiveCRS(),
                                                  sourceClassName, sourceMethodName);
                     lastCRS = crs;
@@ -1368,7 +1369,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
          * 'graphicCRS' to 'objectiveCRS' transform.
          */
         final CoordinateReferenceSystem objectiveCRS = getObjectiveCRS();
-        final boolean cachedTransform = CRSUtilities.equalsIgnoreMetadata(targetCRS, objectiveCRS);
+        final boolean cachedTransform = CRS.equalsIgnoreMetadata(targetCRS, objectiveCRS);
         if (cachedTransform) {
             tr = (MathTransform) transforms.get(sourceCRS);
             if (tr != null) {
@@ -1385,7 +1386,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
          */
         if (targetCRS instanceof GeneralDerivedCRS) {
             final GeneralDerivedCRS derivedCRS = (GeneralDerivedCRS) targetCRS;
-            if (CRSUtilities.equalsIgnoreMetadata(sourceCRS, derivedCRS.getBaseCRS())) {
+            if (CRS.equalsIgnoreMetadata(sourceCRS, derivedCRS.getBaseCRS())) {
                 return derivedCRS.getConversionFromBase().getMathTransform();
             }
         }

@@ -34,6 +34,7 @@ import org.opengis.referencing.operation.CoordinateOperationFactory; // For java
 
 // Geotools dependencies
 import org.geotools.factory.Hints;  // For javadoc
+import org.geotools.referencing.CRS;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -227,10 +228,10 @@ public final class RenderingContext {
      */
     public Shape getPaintingArea(CoordinateReferenceSystem crs) throws TransformException {
         crs = CRSUtilities.getCRS2D(crs);
-        if (CRSUtilities.equalsIgnoreMetadata(displayCRS, crs)) {
+        if (CRS.equalsIgnoreMetadata(displayCRS, crs)) {
             return displayBounds;
         }
-        final boolean isObjectiveCRS = CRSUtilities.equalsIgnoreMetadata(objectiveCRS, crs);
+        final boolean isObjectiveCRS = CRS.equalsIgnoreMetadata(objectiveCRS, crs);
         if (isObjectiveCRS && objectiveBounds!=null) {
             return objectiveBounds;
         }

@@ -53,6 +53,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <module>metadata</module>
     <module>referencing</module>
     <module>coverage</module>
     <module>api</module>

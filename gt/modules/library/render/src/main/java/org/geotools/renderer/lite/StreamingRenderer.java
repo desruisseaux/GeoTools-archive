@@ -65,6 +65,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.parameter.Parameter;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -73,7 +74,6 @@ import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.gridcoverage2d.GridCoverageRenderer;
 import org.geotools.renderer.style.SLDStyleFactory;
 import org.geotools.renderer.style.Style2D;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.LineSymbolizer;
 import org.geotools.styling.PointSymbolizer;
@@ -796,7 +796,7 @@ public final class StreamingRenderer implements GTRenderer {
 				// feature may have more than one and the styles could use non
 				// default geometric ones
 				if (mapCRS != null && featCrs != null
-						&& !CRSUtilities.equalsIgnoreMetadata(featCrs, mapCRS)) {
+						&& !CRS.equalsIgnoreMetadata(featCrs, mapCRS)) {
 					// get an unprojected envelope since the feature source is
 					// operating on
 					// unprojected geometries
@@ -1597,7 +1597,7 @@ public final class StreamingRenderer implements GTRenderer {
 						// DJB: this should never be necessary since we've
 						// already taken care to make sure the reader is
 						// producing the correct coordinate system
-						if (CRSUtilities.equalsIgnoreMetadata(sa.crs,
+						if (CRS.equalsIgnoreMetadata(sa.crs,
 								destinationCrs))
 							transform = null;
 						else
