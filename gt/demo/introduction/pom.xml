@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.demo</groupId>
-  <artifactId>gt2-introduction</artifactId>
+  <artifactId>gt2-demo-introduction</artifactId>
   <packaging>jar</packaging>
   <name>Demo Introduction to Geotools</name>
   <url>http://maven.geotools.fr/reports/demo/introduction/</url>
@@ -111,7 +111,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools.demo</groupId>
-      <artifactId>gt2-mappane</artifactId>
+      <artifactId>gt2-demo-mappane</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

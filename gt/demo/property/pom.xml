@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.demo</groupId>
-  <artifactId>gt2-property</artifactId>
+  <artifactId>gt2-demo-property</artifactId>
   <packaging>jar</packaging>
   <name>Property File Demo DataStore</name>
   <url>http://maven.geotools.fr/reports/demo/property/</url>

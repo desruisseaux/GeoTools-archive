@@ -24,7 +24,7 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.demo</groupId>
-  <artifactId>gt2-data</artifactId>
+  <artifactId>gt2-demo-data</artifactId>
   <packaging>jar</packaging>
   <name>Data Access Examples</name>
   <url>http://maven.geotools.fr/reports/demo/data/</url>
