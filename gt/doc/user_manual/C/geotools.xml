@@ -26,6 +26,7 @@
   <!ENTITY manversion "0.1">
   <!ENTITY date "August 2006">
   <!ENTITY javaVersion "1.4">
+  
 
   <!ENTITY legal                SYSTEM "legal.xml">
   <!ENTITY legalprovisional     SYSTEM "legalprovisional.xml">
@@ -194,10 +195,7 @@
   
   &design;
 
-  <chapter id="chapter-conceptFound">
-    <title>Conceptual Foundations</title>
-    &conceptFound;
-  </chapter>
+  &conceptFound;
 
   <chapter id="chapter-geoSci">
     <title>Geospatial Science</title>
