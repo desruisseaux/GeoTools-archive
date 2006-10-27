@@ -24,16 +24,16 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-xml2</artifactId>
+  <artifactId>gt2-xml-xsd</artifactId>
   <packaging>jar</packaging>
   <name>XML Parsing</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/xml/</url>
+  <url>http://maven.geotools.fr/reports/modules/extension/xml-xsd/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xml/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xml-xsd/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xml/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xml-xsd/</url>
   </scm>
   
   <description>

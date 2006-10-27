@@ -24,16 +24,16 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-epsg-ext-esri</artifactId>
+  <artifactId>gt2-epsg-extension</artifactId>
   <packaging>jar</packaging>
   <name>Extensions to EPSG authority factory</name>
-  <url>http://maven.geotools.fr/reports/modules/plugin/epsg-ext-esri/</url>
+  <url>http://maven.geotools.fr/reports/modules/plugin/epsg-extension/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-ext-esri/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-extension/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-ext-esri/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-extension/</url>
   </scm>
   
   <description>
