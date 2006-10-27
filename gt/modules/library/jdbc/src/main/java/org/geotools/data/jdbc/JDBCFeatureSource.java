@@ -297,7 +297,8 @@ public class JDBCFeatureSource implements FeatureSource {
         JDBC1DataStore jdbc = getJDBCDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(featureType.getTypeName());
 
-        if (sqlBuilder.getPostQueryFilter(query.getFilter()) != null) {
+        Filter postFilter = sqlBuilder.getPostQueryFilter(filter); 
+        if (postFilter != null && postFilter != Filter.NONE) {
             // this would require postprocessing the filter
             // so we cannot optimize
             return -1;
