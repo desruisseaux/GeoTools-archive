@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools.maven</groupId>
-    <artifactId>maven</artifactId>
+    <artifactId>gt2-maven</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>unopkg</artifactId>
+  <artifactId>gt2-unopkg</artifactId>
   <packaging>maven-plugin</packaging>
   <name>UNO packager for OpenOffice addins</name>
+  <url>http://maven.geotools.fr/reports/maven/unopkg/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/unopkg/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/unopkg/</url>
+  </scm>
   
   <description>
     Creates a uno.pkg file for OpenOffice, which is basically a ZIP file with

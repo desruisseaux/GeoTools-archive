@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>modules</artifactId>
+    <artifactId>gt2-modules</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>library</artifactId>
+  <artifactId>gt2-library</artifactId>
   <packaging>pom</packaging>
   <name>Geotools libraries</name>
+  <url>http://maven.geotools.fr/reports/modules/library/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/</url>
+  </scm>
   
   <description>
     Geotools core modules.

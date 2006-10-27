@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>extension</artifactId>
+    <artifactId>gt2-extension</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>shapefile-renderer</artifactId>
+  <artifactId>gt2-shapefile-renderer</artifactId>
   <packaging>jar</packaging>
   <name>Renderer optimized for shapefiles</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/shapefile-renderer/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/shapefile-renderer/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/shapefile-renderer/</url>
+  </scm>
   
   <description>
     (todo)
@@ -64,22 +72,22 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>indexed-shapefile</artifactId>
+      <artifactId>gt2-indexed-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>gt2-render</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

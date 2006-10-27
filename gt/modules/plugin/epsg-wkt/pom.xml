@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-wkt</artifactId>
+  <artifactId>gt2-epsg-wkt</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using WKT file</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/epsg-wkt/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-wkt/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-wkt/</url>
+  </scm>
   
   <description>
     EPSG and AUTO authority factories are defined for data.crs.CRSService.
@@ -70,12 +78,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

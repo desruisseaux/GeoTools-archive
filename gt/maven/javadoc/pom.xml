@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools.maven</groupId>
-    <artifactId>maven</artifactId>
+    <artifactId>gt2-maven</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>javadoc</artifactId>
+  <artifactId>gt2-javadoc</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Cross-modules javadoc</name>
+  <url>http://maven.geotools.fr/reports/maven/javadoc/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/javadoc/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/javadoc/</url>
+  </scm>
   
   <description>
     Defines custom taglet for 'source' and 'tutorial' javadoc tags and for the 

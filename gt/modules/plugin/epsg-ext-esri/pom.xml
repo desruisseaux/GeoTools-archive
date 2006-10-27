@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-ext-esri</artifactId>
+  <artifactId>gt2-epsg-ext-esri</artifactId>
   <packaging>jar</packaging>
   <name>Extensions to EPSG authority factory</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/epsg-ext-esri/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-ext-esri/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-ext-esri/</url>
+  </scm>
   
   <description>
     Contains extra CRS defined by ESRI (and other parties) in the EPSG namespace.
@@ -80,18 +88,18 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

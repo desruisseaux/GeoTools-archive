@@ -15,7 +15,7 @@
   
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>extension</artifactId>
+    <artifactId>gt2-extension</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
 
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>graph</artifactId>
+  <artifactId>gt2-graph</artifactId>
   <packaging>jar</packaging>
   <name>Feature Based Graphs and Networks</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/graph/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/graph/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/graph/</url>
+  </scm>
   
   <description>
     Graph classes that builds and walk networks based on Feature relationships.
@@ -81,7 +89,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

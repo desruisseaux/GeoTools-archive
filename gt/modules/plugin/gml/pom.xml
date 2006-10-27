@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gml</artifactId>
+  <artifactId>gt2-gml</artifactId>
   <packaging>jar</packaging>
   <name>GML module</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/gml/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/gml/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/gml/</url>
+  </scm>
   
   <description>
     Used to extract features from a GML file. The GML parser was 
@@ -76,22 +84,22 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
     </dependency>    
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-wkt</artifactId>
+      <artifactId>gt2-epsg-wkt</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>xml</artifactId>
+      <artifactId>gt2-xml</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

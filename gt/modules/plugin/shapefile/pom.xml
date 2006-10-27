@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>shapefile</artifactId>
+  <artifactId>gt2-shapefile</artifactId>
   <packaging>jar</packaging>
   <name>Shapefile module</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/shapefile/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/shapefile/</url>
+  </scm>
   
   <description>
     (todo)
@@ -123,19 +131,19 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- because main and sample-data depend on referencing we need a tie breaker -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -148,7 +156,7 @@
     <!-- We need this to make the referencing module useful -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

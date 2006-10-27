@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools.demo</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>gt2-demo</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.demo</groupId>
-  <artifactId>data</artifactId>
+  <artifactId>gt2-data</artifactId>
   <packaging>jar</packaging>
   <name>Data Access Examples</name>
+  <url>http://maven.geotools.fr/reports/demo/data/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/data/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/data/</url>
+  </scm>
   
   <description>
     Demo of geotools data access abilities
@@ -64,17 +72,17 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-wkt</artifactId>
+      <artifactId>gt2-epsg-wkt</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>shapefile</artifactId>
+      <artifactId>gt2-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

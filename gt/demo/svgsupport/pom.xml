@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>gt2-library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>svgsupport</artifactId>
+  <artifactId>gt2-svgsupport</artifactId>
   <packaging>jar</packaging>
   <name>SVG support</name>
+  <url>http://maven.geotools.fr/reports/demo/svgsupport/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/demo/svgsupport/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/demo/svgsupport/</url>
+  </scm>
   
   <description>
     (todo)
@@ -64,7 +72,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>render</artifactId>
+      <artifactId>gt2-render</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>extension</artifactId>
+    <artifactId>gt2-extension</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>openoffice</artifactId>
+  <artifactId>gt2-openoffice</artifactId>
   <packaging>jar</packaging>
   <name>Bridges to OpenOffice suite</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/openoffice/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/openoffice/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/openoffice/</url>
+  </scm>
   
   <description>
     Provides some Geotools's fonctionalities as OpenOffice plugins. For 
@@ -79,12 +87,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-hsql</artifactId>
+      <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -129,7 +137,7 @@
       <!-- Copies the OpenOffice-generated .class files -->
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>javamaker</artifactId>
+        <artifactId>gt2-javamaker</artifactId>
         <version>${project.version}</version>
         <executions>
           <execution>
@@ -159,7 +167,7 @@
       <!-- Creates the oxt file -->
       <plugin>
         <groupId>org.geotools.maven</groupId>
-        <artifactId>unopkg</artifactId>
+        <artifactId>gt2-unopkg</artifactId>
         <version>${project.version}</version>
         <configuration>
           <oxtName>geotools-${project.version}</oxtName>

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>gt2-library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>coverage</artifactId>
+  <artifactId>gt2-coverage</artifactId>
   <packaging>jar</packaging>
   <name>Grid Coverage module</name>
+  <url>http://maven.geotools.fr/reports/modules/library/coverage/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/</url>
+  </scm>
   
   <description>
     Implementation of Grid Coverage specification. Provides support
@@ -105,7 +113,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

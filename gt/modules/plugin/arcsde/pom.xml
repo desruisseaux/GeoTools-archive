@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>arcsde-plugin</artifactId>
+  <artifactId>gt2-arcsde-plugin</artifactId>
   <packaging>pom</packaging>
   <name>ArcSDE plugin</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/arcsde/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcsde/</url>
+  </scm>
   
   <description>
     Root project for arcsde plugin.

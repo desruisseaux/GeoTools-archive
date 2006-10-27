@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools.maven</groupId>
-    <artifactId>maven</artifactId>
+    <artifactId>gt2-maven</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>rmic</artifactId>
+  <artifactId>gt2-rmic</artifactId>
   <packaging>maven-plugin</packaging>
   <name>RMI compiler (rmic)</name>
+  <url>http://maven.geotools.fr/reports/maven/rmic/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/rmic/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/rmic/</url>
+  </scm>
   
   <description>
     Invokes the RMI compiler 'rmic'.

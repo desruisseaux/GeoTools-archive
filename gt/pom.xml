@@ -844,7 +844,7 @@
         <dependencies>
           <dependency>
             <groupId>org.geotools.maven</groupId>
-            <artifactId>build-configs</artifactId>
+            <artifactId>gt2-build-configs</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>
@@ -918,7 +918,7 @@
         <dependencies>
           <dependency>
             <groupId>org.geotools.maven</groupId>
-            <artifactId>build-configs</artifactId>
+            <artifactId>gt2-build-configs</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>
@@ -996,7 +996,7 @@
               <tagletClass>org.geotools.maven.taglet.Tutorial</tagletClass>
               <tagletArtifact>
                 <groupId>org.geotools</groupId>
-                <artifactId>javadoc</artifactId>
+                <artifactId>gt2-javadoc</artifactId>
                 <version>${project.version}</version>
               </tagletArtifact>
             </taglet>
@@ -1004,7 +1004,7 @@
               <tagletClass>org.geotools.maven.taglet.Source</tagletClass>
               <tagletArtifact>
                 <groupId>org.geotools</groupId>
-                <artifactId>javadoc</artifactId>
+                <artifactId>gt2-javadoc</artifactId>
                 <version>${project.version}</version>
               </tagletArtifact>
             </taglet>

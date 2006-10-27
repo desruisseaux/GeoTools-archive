@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>gt2-library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>api</artifactId>
+  <artifactId>gt2-api</artifactId>
   <packaging>jar</packaging>
   <name>API interfaces</name>
+  <url>http://maven.geotools.fr/reports/modules/library/api/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/api/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/api/</url>
+  </scm>
   
   <description>
     The api module contains key geotools interfaces that are used by
@@ -82,7 +90,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

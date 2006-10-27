@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>extension</artifactId>
+    <artifactId>gt2-extension</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
 
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>xml2</artifactId>
+  <artifactId>gt2-xml2</artifactId>
   <packaging>jar</packaging>
   <name>XML Parsing</name>
+  <url>http://maven.geotools.fr/reports/modules/extension/xml/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/xml/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/xml/</url>
+  </scm>
   
   <description>
     Schema based xml parsing. This module contains tools for creating 
@@ -75,7 +83,7 @@
   <dependencies> 
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>graph</artifactId>
+      <artifactId>gt2-graph</artifactId>
       <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>

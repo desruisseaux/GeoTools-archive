@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>mif</artifactId>
+  <artifactId>gt2-mif</artifactId>
   <packaging>jar</packaging>
   <name>MapInfo MIF format module</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/mif/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/mif/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/mif/</url>
+  </scm>
   
   <description>
     (todo)
@@ -83,7 +91,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>vpf</artifactId>
+  <artifactId>gt2-vpf</artifactId>
   <packaging>jar</packaging>
   <name>VPF Plugin</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/vpf/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/vpf/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/vpf/</url>
+  </scm>
   
   <description>
     (todo)
@@ -91,12 +99,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>epsg-wkt</artifactId>
+      <artifactId>gt2-epsg-wkt</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -105,7 +113,7 @@
     <!-- because this is confusing to maven we need to give it a clue -->
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

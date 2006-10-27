@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>epsg-hsql</artifactId>
+  <artifactId>gt2-epsg-hsql</artifactId>
   <packaging>jar</packaging>
   <name>EPSG Authority Service using HSQL database</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/epsg-hsql/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-hsql/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-hsql/</url>
+  </scm>
   
   <description>
     Connection to an embedded EPSG database in HSQL format.
@@ -96,12 +104,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>referencing</artifactId>
+      <artifactId>gt2-referencing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>sample-data</artifactId>
+      <artifactId>gt2-sample-data</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

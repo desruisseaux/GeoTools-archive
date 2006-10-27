@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>plugin</artifactId>
+    <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>geometryless</artifactId>
+  <artifactId>gt2-geometryless</artifactId>
   <packaging>jar</packaging>
   <name>Generic (geometryless) DataStore implementation</name>
+  <url>http://maven.geotools.fr/reports/modules/plugin/geometryless/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/geometryless/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/geometryless/</url>
+  </scm>
   
   <description>
     The JDBC module contains an implementation of the DataStore interface 
@@ -65,7 +73,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

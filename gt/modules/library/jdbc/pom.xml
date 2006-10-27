@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>gt2-library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>jdbc</artifactId>
+  <artifactId>gt2-jdbc</artifactId>
   <packaging>jar</packaging>
   <name>JDBC DataStore Support</name>
+  <url>http://maven.geotools.fr/reports/modules/library/jdbc/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/</url>
+  </scm>
   
   <description>
     Abstract datastore implementation and helper classes / apis to be extended
@@ -64,12 +72,12 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>api</artifactId>
+      <artifactId>gt2-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>main</artifactId>
+      <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

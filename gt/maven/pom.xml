@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>maven</artifactId>
+  <artifactId>gt2-maven</artifactId>
   <packaging>pom</packaging>
   <name>Maven plugins for Geotools 2</name>
+  <url>http://maven.geotools.fr/reports/maven/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/maven/</url>
+  </scm>
   
   <description>
     Maven plugins specific to the the Geotools 2 project.

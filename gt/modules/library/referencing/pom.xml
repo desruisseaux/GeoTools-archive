@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>library</artifactId>
+    <artifactId>gt2-library</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,9 +24,17 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>referencing</artifactId>
+  <artifactId>gt2-referencing</artifactId>
   <packaging>jar</packaging>
   <name>Referencing services</name>
+  <url>http://maven.geotools.fr/reports/modules/library/referencing/</url>
+  
+  <scm>
+    <connection>
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/
+    </connection>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/library/referencing/</url>
+  </scm>
   
   <description>
     Contains implementations of Coordinate Reference Systems (CRS), Coordinate
