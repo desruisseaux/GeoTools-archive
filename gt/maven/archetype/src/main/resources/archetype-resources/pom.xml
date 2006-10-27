@@ -64,7 +64,7 @@
     <build>
       <!--finalName>gt-${artifactId}-${version}</finalName-->
       
-      <!--plugins>
+      <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
@@ -77,7 +77,7 @@
             </archive>
           </configuration>
         </plugin>
-      </plugins-->
+      </plugins>
       
       <resources>
         <resource>
@@ -89,7 +89,7 @@
         </resource>
         <resource>
           <!-- targetPath>data</targetPath -->
-          <directory>resources</directory>
+          <directory>src/main/resources</directory>
           <includes>
             <include>**</include>
           </includes>
