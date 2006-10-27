@@ -25,42 +25,75 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-api</artifactId>
-      <version>${project.version}</version>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
-      <version>${project.version}</version>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-referencing</artifactId>
-      <version>${project.version}</version>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-mappane</artifactId>
-      <version>${project.version}</version>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools.demo</groupId>
       <artifactId>gt2-mappane</artifactId>
-      <version>${project.version}</version>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-wfs</artifactId>
-      <version>${project.version}</version>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-postgis</artifactId>
-      <version>${project.version}</version>
+      <version>2.4-SNAPSHOT</version>
     </dependency>
     </dependencies>
     
-    <!--build>
-      <finalName>${artifactId}</finalName>
-    </build -->
+    <build>
+      <!--finalName>gt-${artifactId}-${version}</finalName-->
+      
+      <!--plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <manifest>
+                <mainClass>org.example.geotools.base.DemoBase</mainClass>
+                <addClasspath>true</addClasspath>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+      </plugins-->
+      
+      <resources>
+        <resource>
+          <directory>.</directory>
+          <includes>
+            <include>LICENSE*</include>
+            <include>*README*</include>
+          </includes>
+        </resource>
+        <resource>
+          <!-- targetPath>data</targetPath -->
+          <directory>resources</directory>
+          <includes>
+            <include>**</include>
+          </includes>
+        </resource>
+      </resources>
+      
+    </build>
     
   </project>
