@@ -87,6 +87,12 @@
   <dependencies>
     <!-- NOTE: The metadata module does not depends on JTS. -->
 
+    <dependency>
+      <groupId>java3d</groupId>
+      <artifactId>vecmath</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+
     <!--
       The following is required only for compilation.  It should not be included
       in distribution, unless the user really want to use Apache commons logging
