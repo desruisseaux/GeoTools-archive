@@ -205,6 +205,15 @@ public class ScriptTest extends TestCase {
     }
     
     /**
+     * Run "Krovak.txt"
+     * 
+     * @throws Exception If a test failed.
+     */
+    public void testKrovak() throws Exception {
+    	runScript("scripts/Krovak.txt");
+    }
+    
+    /**
      * Run "OpenGIS.txt".
      *
      * @throws Exception If a test failed.

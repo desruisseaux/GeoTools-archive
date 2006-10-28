@@ -413,6 +413,9 @@ public class MathTransformTest extends TestCase {
                     new DirectPosition2D(251763.20, 153034.13), transform);
     }
     
+    /**
+     * Some tests for Krovak Projection.
+     */
     public void testKrovak() throws FactoryException, TransformException {
 
         ///////////////////////////////////////
@@ -423,18 +426,20 @@ public class MathTransformTest extends TestCase {
         }        
         MathTransform transform;
         ParameterValueGroup params;
-              
-        params = mtFactory.getDefaultParameters("Krovak");
         
-        params.parameter("semi_major")         .setValue(6377397.155);
-        params.parameter("semi_minor")         .setValue(6356078.963);
-    
+        params = mtFactory.getDefaultParameters("Krovak");
+        params.parameter("semi_major")                .setValue(6377397.155);
+        params.parameter("semi_minor")                .setValue(6356078.963);
+        params.parameter("latitude_of_center")        .setValue(49.5);
+        params.parameter("longitude_of_center")       .setValue(42.5 - 17.66666666666667);
+        params.parameter("azimuth")                   .setValue(30.28813972222222);
+        params.parameter("pseudo_standard_parallel_1").setValue(78.5);
+        params.parameter("scale_factor")              .setValue(0.9999);
         transform = mtFactory.createParameterizedTransform(params);
         if (VERBOSE) {
             System.out.println(transform);
         }
         doTransform(new DirectPosition2D(14.370530947 , 50.071153856 ),
                     new DirectPosition2D(-746742.6075,  -1044389.4516), transform);
-                   
     }
 }

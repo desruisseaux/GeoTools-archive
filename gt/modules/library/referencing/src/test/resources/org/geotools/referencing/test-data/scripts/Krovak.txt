@@ -1,6 +1,7 @@
 // Test points for the Krovak
 //
-// The following test points were calculated with Proj4 and also with Geodetic software (Kokes) that is used in Czech Perupblic.
+// The following test points were calculated with Proj4 and also with
+// Geodetic software (Kokes) that is used in Czech Perupblic.
 //
 // Jan Jezek August 2006
 //
@@ -9,7 +10,7 @@
 // How to run this script:
 //
 //    chdir org/geotools/referencing/test-data/scripts
-//    java -ea org.geotools.referencing.TestScript Mercator.txt
+//    java -ea org.geotools.referencing.TestScript Krovak.txt
 //
 // A test is performed every time a "target pt" statement occurs. If the target point computed
 // by Geotools is different from the target point declared in this script by an amount greater
@@ -23,9 +24,9 @@
 
 //geogCS's 
 
-set _WGS84_  = GEOGCS["WGS84",  DATUM["WGS84",  SPHEROID["WGS84",  6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
-set _SJTSKFerro =  GEOGCS["S-JTSK (Ferro)", DATUM["S_JTSK_Ferro", SPHEROID["Bessel 1841",6377397.155,299.1528128], TOWGS84[570.8,85.7,462.8,4.998,1.587,5.261,3.56]], PRIMEM["Ferro",-17.66666666666667],UNIT["degree",0.0174532925199433]]
-set _SJTSKGreen =  GEOGCS["S-JTSK (Ferro)", DATUM["S_JTSK_Ferro", SPHEROID["Bessel 1841",6377397.155,299.1528128], TOWGS84[570.8,85.7,462.8,4.998,1.587,5.261,3.56]], PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]]
+set _WGS84_     = GEOGCS["WGS84",  DATUM["WGS84",  SPHEROID["WGS84",  6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]]
+set _SJTSKFerro = GEOGCS["S-JTSK (Ferro)", DATUM["S_JTSK_Ferro", SPHEROID["Bessel 1841",6377397.155,299.1528128], TOWGS84[570.8,85.7,462.8,4.998,1.587,5.261,3.56]], PRIMEM["Ferro",-17.66666666666667],UNIT["degree",0.0174532925199433]]
+set _SJTSKGreen = GEOGCS["S-JTSK (Ferro)", DATUM["S_JTSK_Ferro", SPHEROID["Bessel 1841",6377397.155,299.1528128], TOWGS84[570.8,85.7,462.8,4.998,1.587,5.261,3.56]], PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]]
 
 /////////////////////////////////////////
 //Elliptical 1SP tests            ///////
@@ -42,9 +43,6 @@ test tolerance = (1e-2, 1e-2)
 
 source pt = (32.037197614 , 50.071153856 )
 target pt = (-746742.6075,  -1044389.4516)
-
-print crs  
-print pts  
 
 // The Axis are setup like this:
 //
@@ -84,4 +82,3 @@ target pt = (703105.69, 1058219.60)
 
 source pt = (18 , 50 )
 target pt = (489343.16, 1081630.34)
-
