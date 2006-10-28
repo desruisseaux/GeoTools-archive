@@ -750,7 +750,7 @@ public abstract class AbstractGridCoverage2DReader implements
 					final MathTransform tr = operationFactory.createOperation(
 							crs2D, crs).getMathTransform();
 					if (!tr.isIdentity())
-						envelope = CRSUtilities.transform(tr, envelope);
+						envelope = CRS.transform(tr, envelope);
 				}
 				requestedRes = new double[2];
 				requestedRes[0] = envelope.getLength(0) / dim.getWidth();

@@ -45,6 +45,7 @@ import org.geotools.coverage.processing.operation.Scale;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.styling.RasterSymbolizer;
@@ -258,7 +259,7 @@ public final class GridCoverageRenderer {
 		// this is the destination envelope in the coverage crs which is going
 		// to be used for getting the crop area to crop the source coverage
 		final GeneralEnvelope destinationEnvelopeInSourceGCCRS = (!deviceCRSToGCCRSTransform
-				.isIdentity()) ? CRSUtilities.transform(
+				.isIdentity()) ? CRS.transform(
 				deviceCRSToGCCRSTransform, destinationEnvelope)
 				: new GeneralEnvelope(destinationEnvelope);
 		destinationEnvelopeInSourceGCCRS

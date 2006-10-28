@@ -39,7 +39,6 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -249,7 +248,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                 envelope.setRange(i, gridRange.getLower(i)-0.5, gridRange.getUpper(i)-0.5);
             }
             try {
-                envelope = CRSUtilities.transform(gridToCRS, envelope);
+                envelope = org.geotools.referencing.CRS.transform(gridToCRS, envelope);
             } catch (TransformException exception) {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
                                         Utilities.getShortClassName(gridToCRS))/*, exception*/);

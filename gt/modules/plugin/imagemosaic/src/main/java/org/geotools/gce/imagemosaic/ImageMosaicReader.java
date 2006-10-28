@@ -74,7 +74,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -517,7 +516,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 											.getCoordinateReferenceSystem(),
 									crs).getMathTransform();
 					if (!transform.isIdentity()) {
-						requestedEnvelope = CRSUtilities.transform(transform,
+						requestedEnvelope = CRS.transform(transform,
 								requestedEnvelope);
 						requestedEnvelope
 								.setCoordinateReferenceSystem(this.crs);
@@ -951,7 +950,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 								new GeneralGridRange(finalLayout.getBounds()),
 								loadedTilesBoundEnv, false).inverse();
 				final GeneralGridRange finalRange = new GeneralGridRange(
-						CRSUtilities.transform(transform, intersection));
+						CRS.transform(transform, intersection));
 				// CROP
 				finalLayout.intersect(new Area(finalRange.toRectangle()));
 				Rectangle tempRect = finalLayout.getBounds();

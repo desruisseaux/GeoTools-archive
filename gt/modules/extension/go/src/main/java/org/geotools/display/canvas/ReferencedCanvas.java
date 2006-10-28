@@ -58,7 +58,6 @@ import org.opengis.spatialschema.geometry.Envelope;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
@@ -406,7 +405,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                     final double width  = (j<cellSize.length) ? cellSize[j] : 0;
                     cellPrototype.setRange(j, center-width, center+width);
                 }
-                cellPrototype = CRSUtilities.transform(transform, cellPrototype);
+                cellPrototype = CRS.transform(transform, cellPrototype);
                 for (int j=Math.min(cellSize.length, cellPrototype.getDimension()); --j>=0;) {
                     cellSize[j] = cellPrototype.getLength(j);
                 }
@@ -885,7 +884,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                                                  sourceClassName, sourceMethodName);
                     lastCRS = crs;
                 }
-                final GeneralEnvelope bounds = CRSUtilities.transform(transform, graphicEnvelope);
+                final GeneralEnvelope bounds = CRS.transform(transform, graphicEnvelope);
                 if (envelope.isNull()) {
                     envelope.setEnvelope(bounds);
                 } else {
@@ -925,8 +924,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         try {
             final MathTransform transform = getMathTransform(crs, getObjectiveCRS(),
                                                              sourceClassName, sourceMethodName);
-            oldProjected = CRSUtilities.transform(transform, oldEnvelope);
-            newProjected = CRSUtilities.transform(transform, newEnvelope);
+            oldProjected = CRS.transform(transform, oldEnvelope);
+            newProjected = CRS.transform(transform, newEnvelope);
         } catch (FactoryException exception) {
             handleException(sourceClassName, sourceMethodName, exception);
             computeEnvelope(sourceClassName, sourceMethodName);

@@ -466,7 +466,7 @@ public final class RendererUtilities {
 				try {
 					// try to compute the envelope by reprojecting the WGS84
 					// envelope
-					sourceCRSEnvelope = CRSUtilities.transform(toWGS84
+					sourceCRSEnvelope = CRS.transform(toWGS84
 							.inverse(), CRS.getEnvelope(GeogCRS));
 				} catch (TransformException e) {
 					// for some transformatio this is normal, it's not possible
@@ -512,7 +512,7 @@ public final class RendererUtilities {
 			// Go to WGS84 in order to see how things are there
 			//
 			// //
-			final GeneralEnvelope geographicEnvelope = CRSUtilities.transform(
+			final GeneralEnvelope geographicEnvelope = CRS.transform(
 					toWGS84, intersectedEnvelope);
 			geographicEnvelope.setCoordinateReferenceSystem(GeogCRS);
 

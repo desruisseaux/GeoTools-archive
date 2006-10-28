@@ -159,7 +159,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
                         newEnvelope = new GeneralEnvelope(envelope);
                     } else {
                         origin = envelope.getCenter();
-                        newEnvelope = CRSUtilities.transform(transform, envelope);
+                        newEnvelope = CRS.transform(transform, envelope);
                     }
                     newEnvelope.setCoordinateReferenceSystem(crs);
                     /*
@@ -272,7 +272,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
             final MathTransform mt;
             mt = getMathTransform(sourceCRS, targetCRS, "ReferencedGraphic", "setEnvelope");
             old = new GeneralEnvelope(envelope);
-            envelope.setEnvelope(CRSUtilities.transform(mt, newEnvelope));
+            envelope.setEnvelope(CRS.transform(mt, newEnvelope));
             assert envelope.getCoordinateReferenceSystem() == old.getCoordinateReferenceSystem();
             listeners.firePropertyChange(ENVELOPE_PROPERTY, old, envelope);
         }

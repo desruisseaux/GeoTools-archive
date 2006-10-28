@@ -44,7 +44,6 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -533,7 +532,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
     final Rectangle inverseTransform(Rectangle2D bounds) {
         if (bounds!=null && gridFromCRS2D!=null) {
             try {
-                bounds = CRSUtilities.transform(gridFromCRS2D, bounds, null);
+                bounds = org.geotools.referencing.CRS.transform(gridFromCRS2D, bounds, null);
                 final int xmin = (int)Math.floor(bounds.getMinX() - 0.5);
                 final int ymin = (int)Math.floor(bounds.getMinY() - 0.5);
                 final int xmax = (int)Math.ceil (bounds.getMaxX() - 0.5);

@@ -62,7 +62,6 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.WarpTransform2D;
 import org.geotools.referencing.operation.transform.IdentityTransform;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -298,7 +297,7 @@ final class Resampler2D extends GridCoverage2D {
 					 */
 					Envelope gridRange;
 					gridRange = toEnvelope(sourceGG.getGridRange());
-					gridRange = CRSUtilities.transform(allSteps.inverse(),
+					gridRange = CRS.transform(allSteps.inverse(),
 							gridRange);
 					targetGG = new GridGeometry2D(new GeneralGridRange(
 							gridRange), step1, targetCRS);
@@ -314,7 +313,7 @@ final class Resampler2D extends GridCoverage2D {
 					.getMathTransform();
 			step3 = sourceGG.getGridToCoordinateSystem().inverse();
 			sourceEnvelope = sourceCoverage.getEnvelope();
-			targetEnvelope = CRSUtilities.transform(step2.inverse(),
+			targetEnvelope = CRS.transform(step2.inverse(),
 					sourceEnvelope);
 			targetEnvelope.setCoordinateReferenceSystem(targetCRS);
 			/*
@@ -343,7 +342,7 @@ final class Resampler2D extends GridCoverage2D {
 				step1 = targetGG.getGridToCoordinateSystem();
 				if (!targetGG.isDefined(GridGeometry2D.GRID_RANGE)) {
 					final GeneralEnvelope gridRange;
-					gridRange = CRSUtilities.transform(step1.inverse(),
+					gridRange = CRS.transform(step1.inverse(),
 							targetEnvelope);
 					for (int i = gridRange.getDimension(); --i >= 0;) {
 						// According OpenGIS specification, GridGeometry maps

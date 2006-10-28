@@ -38,7 +38,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.TransformPathNotFoundException;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -92,7 +91,7 @@ public final class BoundingBoxes {
                     throw new TransformPathNotFoundException(Errors.format(
                               ErrorKeys.CANT_TRANSFORM_ENVELOPE, exception));
                 }
-                envelope = CRSUtilities.transform(operation.getMathTransform(), envelope);
+                envelope = CRS.transform(operation.getMathTransform(), envelope);
             }
             box.setWestBoundLongitude(envelope.getMinimum(0));
             box.setEastBoundLongitude(envelope.getMaximum(0));

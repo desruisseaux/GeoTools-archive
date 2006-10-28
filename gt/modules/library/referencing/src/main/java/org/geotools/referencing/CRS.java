@@ -17,8 +17,11 @@ package org.geotools.referencing;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.List;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.Extent;
@@ -28,29 +31,31 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.Factory;                              // For javadoc
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.CoordinateOperation;        // For javadoc
-import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.*;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.FactoryNotFoundException;
 import org.geotools.referencing.crs.DefaultGeographicCRS;            // For javadoc
+import org.geotools.util.UnsupportedImplementationException;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
  * Simple utility class for making use of the {@linkplain CoordinateReferenceSystem
  * coordinate reference system} and associated {@linkplain Factory factory} implementations.
- * <p>
  * This utility class is made up of static final functions. This class is not a factory or a
  * builder. It makes use of the GeoAPI factory interfaces provided by {@link FactoryFinder}.
  * <p>
@@ -91,66 +96,53 @@ public final class CRS {
     private CRS() {
     }
 
-    /**
-     * Grab a transform between two Coordinate Reference Systems. This convenience method is a
-     * shorthand for the following:
-     *
-     * <blockquote><code>FactoryFinder.{@linkplain FactoryFinder#getCoordinateOperationFactory
-     * getCoordinateOperationFactory}(null).{@linkplain CoordinateOperationFactory#createOperation
-     * createOperation}(sourceCRS, targetCRS).{@linkplain CoordinateOperation#getMathTransform
-     * getMathTransform}();</code></blockquote>
-     *
-     * Note that some metadata like {@linkplain CoordinateOperation#getPositionalAccuracy
-     * positional accuracy} are lost by this method. If those metadata are wanted, use the
-     * {@linkplain CoordinateOperationFactory coordinate operation factory} directly.
-     * <p>
-     * Sample use:
-     * <blockquote><code>
-     * {@linkplain MathTransform} transform = CRS.findMathTransform(
-     * CRS.{@linkplain #decode decode}("EPSG:42102"),
-     * CRS.{@linkplain #decode decode}("EPSG:4326") );
-     * </blockquote></code>
-     * 
-     * @param  sourceCRS The source CRS.
-     * @param  targetCRS The target CRS.
-     * @return The math transform from {@code sourceCRS} to {@code targetCRS}.
-     * @throws FactoryException If no math transform can be created for the specified source and
-     *         target CRS.
-     */
-    public static MathTransform findMathTransform(final CoordinateReferenceSystem sourceCRS,
-                                                  final CoordinateReferenceSystem targetCRS)
-            throws FactoryException
-    {
-    	return findMathTransform(sourceCRS, targetCRS, false);
-    }
+
+    //////////////////////////////////////////////////////////////
+    ////                                                      ////
+    ////        FACTORIES, CRS CREATION AND INSPECTION        ////
+    ////                                                      ////
+    //////////////////////////////////////////////////////////////
 
     /**
-     * Grab a transform between two Coordinate Reference Systems. This method is similar to
-     * <code>{@linkplain #transform(CoordinateReferenceSystem, CoordinateReferenceSystem)
-     * transform}(sourceCRS, targetCRS)</code>, except that it can optionally tolerate
-     * <cite>lenient datum shift</cite>. If the {@code lenient} argument is {@code true},
-     * then this method will not throw a "<cite>Bursa-Wolf parameters required</cite>"
-     * exception during datum shifts if the Bursa-Wolf paramaters are not specified.
-     * Instead it will assume a no datum shift.
-     * 
-     * @param  sourceCRS The source CRS.
-     * @param  targetCRS The target CRS.
-     * @param  lenient {@code true} if the math transform should be created even when there is
-     *         no information available for a datum shift. The default value is {@code false}.
-     * @return The math transform from {@code sourceCRS} to {@code targetCRS}.
-     * @throws FactoryException If no math transform can be created for the specified source and
-     *         target CRS.
+     * Returns the CRS authority factory used by the {@link #decode(String,boolean) decode} methods.
+     * This factory is
+     * {@linkplain org.geotools.referencing.factory.BufferedAuthorityFactory buffered}, scans over
+     * {@linkplain org.geotools.referencing.factory.AllAuthoritiesFactory all factories} and uses
+     * additional factories as {@linkplain org.geotools.referencing.factory.FallbackAuthorityFactory
+     * fallbacks} if there is more than one {@linkplain FactoryFinder#getCRSAuthorityFactories
+     * registered factory} for the same authority.
+     * <p>
+     * This factory can be used as a kind of <cite>system-wide</cite> factory for all authorities.
+     * However for more determinist behavior, consider using a more specific factory (as returned
+     * by {@link FactoryFinder#getCRSAuthorityFactory} when the authority in known.
      *
-     * @see Hints#LENIENT_DATUM_SHIFT
+     * @param  longitudeFirst {@code true} if axis order should be forced to
+     *         (<var>longitude</var>,<var>latitude</var>).
+     * @return The CRS authority factory.
+     * @throws FactoryRegistryException if the factory can't be created.
+     *
+     * @since 2.3
      */
-    public static MathTransform findMathTransform(final CoordinateReferenceSystem sourceCRS,
-                                                  final CoordinateReferenceSystem targetCRS,
-                                                  boolean lenient)
-            throws FactoryException
+    public static synchronized CRSAuthorityFactory getAuthorityFactory(final boolean longitudeFirst)
+            throws FactoryRegistryException
     {
-        final CoordinateOperationFactory factory =
-                FactoryFinder.getCoordinateOperationFactory(lenient ? LENIENT : null);
-        return factory.createOperation(sourceCRS, targetCRS).getMathTransform();
+        if (FactoryFinder.updated) {
+            FactoryFinder.updated = false;
+            defaultFactory = xyFactory = null;
+        }
+        CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
+        if (factory == null) try {
+            factory = new DefaultAuthorityFactory(longitudeFirst);
+            if (longitudeFirst) {
+                xyFactory = factory;
+            } else {
+                defaultFactory = factory;
+            }
+        } catch (NoSuchElementException exception) {
+            // No factory registered in FactoryFinder.
+            throw new FactoryNotFoundException(null, exception);
+        }
+        return factory;
     }
 
     /**
@@ -314,48 +306,6 @@ public final class CRS {
     }
 
     /**
-     * Returns the CRS authority factory used by the {@link #decode(String,boolean) decode} methods.
-     * This factory is
-     * {@linkplain org.geotools.referencing.factory.BufferedAuthorityFactory buffered}, scans over
-     * {@linkplain org.geotools.referencing.factory.AllAuthoritiesFactory all factories} and uses
-     * additional factories as {@linkplain org.geotools.referencing.factory.FallbackAuthorityFactory
-     * fallbacks} if there is more than one {@linkplain FactoryFinder#getCRSAuthorityFactories
-     * registered factory} for the same authority.
-     * <p>
-     * This factory can be used as a kind of <cite>system-wide</cite> factory for all authorities.
-     * However for more determinist behavior, consider using a more specific factory (as returned
-     * by {@link FactoryFinder#getCRSAuthorityFactory} when the authority in known.
-     *
-     * @param  longitudeFirst {@code true} if axis order should be forced to
-     *         (<var>longitude</var>,<var>latitude</var>).
-     * @return The CRS authority factory.
-     * @throws FactoryRegistryException if the factory can't be created.
-     *
-     * @since 2.3
-     */
-    public static synchronized CRSAuthorityFactory getAuthorityFactory(final boolean longitudeFirst)
-            throws FactoryRegistryException
-    {
-        if (FactoryFinder.updated) {
-            FactoryFinder.updated = false;
-            defaultFactory = xyFactory = null;
-        }
-        CRSAuthorityFactory factory = (longitudeFirst) ? xyFactory : defaultFactory;
-        if (factory == null) try {
-            factory = new DefaultAuthorityFactory(longitudeFirst);
-            if (longitudeFirst) {
-                xyFactory = factory;
-            } else {
-                defaultFactory = factory;
-            }
-        } catch (NoSuchElementException exception) {
-            // No factory registered in FactoryFinder.
-            throw new FactoryNotFoundException(null, exception);
-        }
-        return factory;
-    }
-
-    /**
      * Returns the valid area bounding box for the specified coordinate reference system, or
      * {@code null} if unknown. This method search in the metadata informations associated with
      * the given CRS. The returned envelope is expressed in terms of the specified CRS.
@@ -375,7 +325,7 @@ public final class CRS {
                 crs = CRSUtilities.getCRS2D(crs);
                 if (!equalsIgnoreMetadata(sourceCRS, crs)) {
                     final GeneralEnvelope e;
-                    e = CRSUtilities.transform(findMathTransform(sourceCRS, crs, true), envelope);
+                    e = transform(findMathTransform(sourceCRS, crs, true), envelope);
                     e.setCoordinateReferenceSystem(crs);
                     envelope = e;
                 }
@@ -474,6 +424,130 @@ public final class CRS {
     }
 
     /**
+     * Returns the first horizontal coordinate reference system found in the given CRS,
+     * or {@code null} if there is none. A horizontal CRS is usually a two-dimensional
+     * {@linkplain GeographicCRS geographic} or {@linkplain ProjectedCRS projected} CRS.
+     *
+     * @since 2.4
+     */
+    public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
+        if (crs instanceof SingleCRS && crs.getCoordinateSystem().getDimension()==2) {
+            CoordinateReferenceSystem base = crs;
+            while (base instanceof GeneralDerivedCRS) {
+                base = ((GeneralDerivedCRS) base).getBaseCRS();
+            }
+            // No need to test for ProjectedCRS, since the code above unwrap it.
+            if (base instanceof GeographicCRS) {
+                return (SingleCRS) crs; // Really returns 'crs', not 'base'.
+            }
+        }
+        if (crs instanceof CompoundCRS) {
+            final List/*<CoordinateReferenceSystem>*/ c=
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final SingleCRS candidate = getHorizontalCRS((CoordinateReferenceSystem) it.next());
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the first projected coordinate reference system found in a the given CRS,
+     * or {@code null} if there is none.
+     *
+     * @since 2.4
+     */
+    public static ProjectedCRS getProjectedCRS(final CoordinateReferenceSystem crs) {
+        if (crs instanceof ProjectedCRS) {
+            return (ProjectedCRS) crs;
+        }
+        if (crs instanceof CompoundCRS) {
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final ProjectedCRS candidate = getProjectedCRS((CoordinateReferenceSystem) it.next());
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the first vertical coordinate reference system found in a the given CRS,
+     * or {@code null} if there is none.
+     *
+     * @since 2.4
+     */
+    public static VerticalCRS getVerticalCRS(final CoordinateReferenceSystem crs) {
+        if (crs instanceof VerticalCRS) {
+            return (VerticalCRS) crs;
+        }
+        if (crs instanceof CompoundCRS) {
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final VerticalCRS candidate = getVerticalCRS((CoordinateReferenceSystem) it.next());
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the first temporal coordinate reference system found in the given CRS,
+     * or {@code null} if there is none.
+     *
+     * @since 2.4
+     */
+    public static TemporalCRS getTemporalCRS(final CoordinateReferenceSystem crs) {
+        if (crs instanceof TemporalCRS) {
+            return (TemporalCRS) crs;
+        }
+        if (crs instanceof CompoundCRS) {
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final TemporalCRS candidate = getTemporalCRS((CoordinateReferenceSystem) it.next());
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the first ellipsoid found in a coordinate reference system,
+     * or {@code null} if there is none.
+     *
+     * @since 2.4
+     */
+    public static Ellipsoid getEllipsoid(final CoordinateReferenceSystem crs) {
+        final Datum datum = CRSUtilities.getDatum(crs);
+        if (datum instanceof GeodeticDatum) {
+            return ((GeodeticDatum) datum).getEllipsoid();
+        }
+        if (crs instanceof CompoundCRS) {
+            final List/*<CoordinateReferenceSystem>*/ c =
+                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
+            for (final Iterator it=c.iterator(); it.hasNext();) {
+                final Ellipsoid candidate = getEllipsoid((CoordinateReferenceSystem) it.next());
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Compares the specified objects for equality. If both objects are Geotools
      * implementations of class {@link AbstractIdentifiedObject}, then this method
      * will ignore the metadata during the comparaison.
@@ -495,5 +569,204 @@ public final class CRS {
                    ((AbstractIdentifiedObject) object2), false);
         }
         return object1!=null && object1.equals(object2);
+    }
+
+
+    /////////////////////////////////////////////////
+    ////                                         ////
+    ////          COORDINATE OPERATIONS          ////
+    ////                                         ////
+    /////////////////////////////////////////////////
+
+    /**
+     * Grab a transform between two Coordinate Reference Systems. This convenience method is a
+     * shorthand for the following:
+     *
+     * <blockquote><code>FactoryFinder.{@linkplain FactoryFinder#getCoordinateOperationFactory
+     * getCoordinateOperationFactory}(null).{@linkplain CoordinateOperationFactory#createOperation
+     * createOperation}(sourceCRS, targetCRS).{@linkplain CoordinateOperation#getMathTransform
+     * getMathTransform}();</code></blockquote>
+     *
+     * Note that some metadata like {@linkplain CoordinateOperation#getPositionalAccuracy
+     * positional accuracy} are lost by this method. If those metadata are wanted, use the
+     * {@linkplain CoordinateOperationFactory coordinate operation factory} directly.
+     * <p>
+     * Sample use:
+     * <blockquote><code>
+     * {@linkplain MathTransform} transform = CRS.findMathTransform(
+     * CRS.{@linkplain #decode decode}("EPSG:42102"),
+     * CRS.{@linkplain #decode decode}("EPSG:4326") );
+     * </blockquote></code>
+     * 
+     * @param  sourceCRS The source CRS.
+     * @param  targetCRS The target CRS.
+     * @return The math transform from {@code sourceCRS} to {@code targetCRS}.
+     * @throws FactoryException If no math transform can be created for the specified source and
+     *         target CRS.
+     */
+    public static MathTransform findMathTransform(final CoordinateReferenceSystem sourceCRS,
+                                                  final CoordinateReferenceSystem targetCRS)
+            throws FactoryException
+    {
+    	return findMathTransform(sourceCRS, targetCRS, false);
+    }
+
+    /**
+     * Grab a transform between two Coordinate Reference Systems. This method is similar to
+     * <code>{@linkplain #transform(CoordinateReferenceSystem, CoordinateReferenceSystem)
+     * transform}(sourceCRS, targetCRS)</code>, except that it can optionally tolerate
+     * <cite>lenient datum shift</cite>. If the {@code lenient} argument is {@code true},
+     * then this method will not throw a "<cite>Bursa-Wolf parameters required</cite>"
+     * exception during datum shifts if the Bursa-Wolf paramaters are not specified.
+     * Instead it will assume a no datum shift.
+     * 
+     * @param  sourceCRS The source CRS.
+     * @param  targetCRS The target CRS.
+     * @param  lenient {@code true} if the math transform should be created even when there is
+     *         no information available for a datum shift. The default value is {@code false}.
+     * @return The math transform from {@code sourceCRS} to {@code targetCRS}.
+     * @throws FactoryException If no math transform can be created for the specified source and
+     *         target CRS.
+     *
+     * @see Hints#LENIENT_DATUM_SHIFT
+     */
+    public static MathTransform findMathTransform(final CoordinateReferenceSystem sourceCRS,
+                                                  final CoordinateReferenceSystem targetCRS,
+                                                  boolean lenient)
+            throws FactoryException
+    {
+        final CoordinateOperationFactory factory =
+                FactoryFinder.getCoordinateOperationFactory(lenient ? LENIENT : null);
+        return factory.createOperation(sourceCRS, targetCRS).getMathTransform();
+    }
+
+    /**
+     * Transforms an envelope. The transformation is only approximative. Note that the returned
+     * envelope may not have the same number of dimensions than the original envelope.
+     *
+     * @param  transform The transform to use.
+     * @param  envelope Envelope to transform, or {@code null}. This envelope will not be modified.
+     * @return The transformed envelope, or {@code null} if {@code envelope} was null.
+     * @throws TransformException if a transform failed.
+     *
+     * @since 2.4
+     */
+    public static GeneralEnvelope transform(final MathTransform transform, final Envelope envelope)
+            throws TransformException
+    {
+        if (envelope == null) {
+            return null;
+        }
+        if (transform.isIdentity()) {
+            /*
+             * Slight optimisation: Just copy the envelope. Note that we need to set the CRS
+             * to null because we don't know what the target CRS was supposed to be. Even if
+             * an identity transform often imply that the target CRS is the same one than the
+             * source CRS, it is not always the case. The metadata may be differents, or the
+             * transform may be a datum shift without Bursa-Wolf parameters, etc.
+             */
+            final GeneralEnvelope e = new GeneralEnvelope(envelope);
+            e.setCoordinateReferenceSystem(null);
+            return e;
+        }
+        final int sourceDim = transform.getSourceDimensions();
+        final int targetDim = transform.getTargetDimensions();
+        if (envelope.getDimension() != sourceDim) {
+            throw new MismatchedDimensionException(Errors.format(
+                      ErrorKeys.MISMATCHED_DIMENSION_$2,
+                      new Integer(sourceDim), new Integer(envelope.getDimension())));
+        }
+        int          coordinateNumber = 0;
+        GeneralEnvelope   transformed = null;
+        final GeneralDirectPosition sourcePt = new GeneralDirectPosition(sourceDim);
+        final GeneralDirectPosition targetPt = new GeneralDirectPosition(targetDim);
+        for (int i=sourceDim; --i>=0;) {
+            sourcePt.setOrdinate(i, envelope.getMinimum(i));
+        }
+  loop: while (true) {
+            // Transform a point and add the transformed point to the destination envelope.
+            if (targetPt != transform.transform(sourcePt, targetPt)) {
+                throw new UnsupportedImplementationException(transform.getClass());
+            }
+            if (transformed != null) {
+                transformed.add(targetPt);
+            } else {
+                transformed = new GeneralEnvelope(targetPt, targetPt);
+            }
+            // Get the next point's coordinate.   The 'coordinateNumber' variable should
+            // be seen as a number in base 3 where the number of digits is equals to the
+            // number of dimensions. For example, a 4-D space would have numbers ranging
+            // from "0000" to "2222". The digits are then translated into minimal, central
+            // or maximal ordinates.
+            int n = ++coordinateNumber;
+            for (int i=sourceDim; --i>=0;) {
+                switch (n % 3) {
+                    case 0:  sourcePt.setOrdinate(i, envelope.getMinimum(i)); n/=3; break;
+                    case 1:  sourcePt.setOrdinate(i, envelope.getCenter (i)); continue loop;
+                    case 2:  sourcePt.setOrdinate(i, envelope.getMaximum(i)); continue loop;
+                    default: throw new AssertionError(n); // Should never happen
+                }
+            }
+            break;
+        }
+        return transformed;
+    }
+    
+    /**
+     * Transforms a rectangular envelope. The transformation is only approximative.
+     * Invoking this method is equivalent to invoking the following:
+     * <p>
+     * <pre>transform(transform, new GeneralEnvelope(source)).toRectangle2D()</pre>
+     *
+     * @param  transform The transform to use. Source and target dimension must be 2.
+     * @param  source The rectangle to transform (may be {@code null}).
+     * @param  dest The destination rectangle (may be {@code source}).
+     *         If {@code null}, a new rectangle will be created and returned.
+     * @return {@code dest}, or a new rectangle if {@code dest} was non-null
+     *         and {@code source} was null.
+     * @throws TransformException if a transform failed.
+     *
+     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     */
+    public static Rectangle2D transform(final MathTransform2D transform,
+                                        final Rectangle2D     source,
+                                        final Rectangle2D     dest)
+            throws TransformException
+    {
+        if (source == null) {
+            return null;
+        }
+        double xmin = Double.POSITIVE_INFINITY;
+        double ymin = Double.POSITIVE_INFINITY;
+        double xmax = Double.NEGATIVE_INFINITY;
+        double ymax = Double.NEGATIVE_INFINITY;
+        final Point2D.Double point = new Point2D.Double();
+        for (int i=0; i<8; i++) {
+            /*
+             *   (0)----(5)----(1)
+             *    |             |
+             *   (4)           (7)
+             *    |             |
+             *   (2)----(6)----(3)
+             */
+            point.x = (i&1)==0 ? source.getMinX() : source.getMaxX();
+            point.y = (i&2)==0 ? source.getMinY() : source.getMaxY();
+            switch (i) {
+                case 5: // fallthrough
+                case 6: point.x=source.getCenterX(); break;
+                case 7: // fallthrough
+                case 4: point.y=source.getCenterY(); break;
+            }
+            transform.transform(point, point);
+            if (point.x < xmin) xmin = point.x;
+            if (point.x > xmax) xmax = point.x;
+            if (point.y < ymin) ymin = point.y;
+            if (point.y > ymax) ymax = point.y;
+        }
+        if (dest != null) {
+            dest.setRect(xmin, ymin, xmax-xmin, ymax-ymin);
+            return dest;
+        }
+        return XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
     }
 }

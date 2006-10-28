@@ -102,6 +102,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.wkt.Formattable;
 import org.geotools.referencing.wkt.UnformattableObjectException;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -267,7 +268,7 @@ public class MetadataBuilder {
      */
     public static final Key ELLIPSOID = new Key("Ellipsoid") {
         public Object getValue(final GridCoverage coverage) {
-            return CRSUtilities.getEllipsoid(coverage.getCoordinateReferenceSystem());
+            return CRS.getEllipsoid(coverage.getCoordinateReferenceSystem());
         }
     };
 
@@ -305,7 +306,7 @@ public class MetadataBuilder {
     public static final Key PROJECTION = new Key("Projection") {
         public Object getValue(final GridCoverage coverage) {
             final ProjectedCRS crs;
-            crs = CRSUtilities.getProjectedCRS(coverage.getCoordinateReferenceSystem());
+            crs = CRS.getProjectedCRS(coverage.getCoordinateReferenceSystem());
             return (crs!=null) ? crs.getConversionFromBase() : null;
         }
     };
@@ -2343,7 +2344,7 @@ loop:       for (int i=str.length(); --i>=0;) {
          * Returns the value for this key from the specified grid coverage.
          */
         public Object getValue(final GridCoverage coverage) {
-            final ProjectedCRS crs = CRSUtilities.getProjectedCRS(coverage.getCoordinateReferenceSystem());
+            final ProjectedCRS crs = CRS.getProjectedCRS(coverage.getCoordinateReferenceSystem());
             if (crs != null) {
                 final ParameterValueGroup parameters = crs.getConversionFromBase().getParameterValues();
                 try {

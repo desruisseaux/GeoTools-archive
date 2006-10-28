@@ -49,7 +49,6 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.referencing.CRS;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.measure.AngleFormat;
@@ -83,7 +82,14 @@ public final class CRSUtilities {
      */
     private CRSUtilities() {
     }
-    
+
+    /**
+     * @deprecated Moved into the {@link CRS} class.
+     */
+    public static boolean equalsIgnoreMetadata(final Object object1, final Object object2) {
+        return CRS.equalsIgnoreMetadata(object1, object2);
+    }
+
     /**
      * Returns the dimension within the coordinate system of the first occurrence of an axis
      * colinear with the specified axis. If an axis with the same
@@ -254,137 +260,47 @@ public final class CRSUtilities {
         }
         return crs;
     }
-    
+
     /**
-     * Returns the first horizontal coordinate reference system found in the given CRS,
-     * or {@code null} if there is none.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     * @deprecated Moved into the {@link CRS} class.
      */
     public static SingleCRS getHorizontalCRS(final CoordinateReferenceSystem crs) {
-        if (crs instanceof SingleCRS && crs.getCoordinateSystem().getDimension()==2) {
-            CoordinateReferenceSystem base = crs;
-            while (base instanceof GeneralDerivedCRS) {
-                base = ((GeneralDerivedCRS) base).getBaseCRS();
-            }
-            // No need to test for ProjectedCRS, since the code above unwrap it.
-            if (base instanceof GeographicCRS) {
-                return (SingleCRS) crs; // Really returns 'crs', not 'base'.
-            }
-        }
-        if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c=
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final SingleCRS candidate = getHorizontalCRS((CoordinateReferenceSystem) it.next());
-                if (candidate != null) {
-                    return candidate;
-                }
-            }
-        }
-        return null;
+        return CRS.getHorizontalCRS(crs);
     }
-    
+
     /**
-     * Returns the first projected coordinate reference system found in a the given CRS,
-     * or {@code null} if there is none.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     * @deprecated Moved into the {@link CRS} class.
      */
     public static ProjectedCRS getProjectedCRS(final CoordinateReferenceSystem crs) {
-        if (crs instanceof ProjectedCRS) {
-            return (ProjectedCRS) crs;
-        }
-        if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final ProjectedCRS candidate = getProjectedCRS((CoordinateReferenceSystem) it.next());
-                if (candidate != null) {
-                    return candidate;
-                }
-            }
-        }
-        return null;
+        return CRS.getProjectedCRS(crs);
     }
-    
+
     /**
-     * Returns the first vertical coordinate reference system found in a the given CRS,
-     * or {@code null} if there is none.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     * @deprecated Moved into the {@link CRS} class.
      */
     public static VerticalCRS getVerticalCRS(final CoordinateReferenceSystem crs) {
-        if (crs instanceof VerticalCRS) {
-            return (VerticalCRS) crs;
-        }
-        if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final VerticalCRS candidate = getVerticalCRS((CoordinateReferenceSystem) it.next());
-                if (candidate != null) {
-                    return candidate;
-                }
-            }
-        }
-        return null;
+        return CRS.getVerticalCRS(crs);
     }
-    
+
     /**
-     * Returns the first temporal coordinate reference system found in the given CRS,
-     * or {@code null} if there is none.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     * @deprecated Moved into the {@link CRS} class.
      */
     public static TemporalCRS getTemporalCRS(final CoordinateReferenceSystem crs) {
-        if (crs instanceof TemporalCRS) {
-            return (TemporalCRS) crs;
-        }
-        if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final TemporalCRS candidate = getTemporalCRS((CoordinateReferenceSystem) it.next());
-                if (candidate != null) {
-                    return candidate;
-                }
-            }
-        }
-        return null;
+        return CRS.getTemporalCRS(crs);
     }
 
     /**
      * Returns the datum of the specified CRS, or {@code null} if none.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
      */
     public static Datum getDatum(final CoordinateReferenceSystem crs) {
         return (crs instanceof SingleCRS) ? ((SingleCRS) crs).getDatum() : null;
     }
 
     /**
-     * Returns the first ellipsoid found in a coordinate reference system,
-     * or {@code null} if there is none.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     * @deprecated Moved into the {@link CRS} class.
      */
     public static Ellipsoid getEllipsoid(final CoordinateReferenceSystem crs) {
-        final Datum datum = getDatum(crs);
-        if (datum instanceof GeodeticDatum) {
-            return ((GeodeticDatum) datum).getEllipsoid();
-        }
-        if (crs instanceof CompoundCRS) {
-            final List/*<CoordinateReferenceSystem>*/ c =
-                    ((CompoundCRS)crs).getCoordinateReferenceSystems();
-            for (final Iterator it=c.iterator(); it.hasNext();) {
-                final Ellipsoid candidate = getEllipsoid((CoordinateReferenceSystem) it.next());
-                if (candidate != null) {
-                    return candidate;
-                }
-            }
-        }
-        return null;
+        return CRS.getEllipsoid(crs);
     }
 
     /**
@@ -407,135 +323,25 @@ public final class CRSUtilities {
         // Remove first cast when covariance will be allowed (J2SE 1.5).
         return ((GeodeticDatum) ((GeographicCRS) crs).getDatum()).getEllipsoid();
     }
-    
+
     /**
-     * Transforms an envelope. The transformation is only approximative. Note that the returned
-     * envelope may not have the same number of dimensions than the original envelope.
-     *
-     * @param  transform The transform to use.
-     * @param  envelope Envelope to transform, or {@code null}. This envelope will not be modified.
-     * @return The transformed envelope, or {@code null} if {@code envelope} was null.
-     * @throws TransformException if a transform failed.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     * @deprecated Moved into the {@link CRS} class.
      */
     public static GeneralEnvelope transform(final MathTransform transform, final Envelope envelope)
             throws TransformException
     {
-        if (envelope == null) {
-            return null;
-        }
-        if (transform.isIdentity()) {
-            /*
-             * Slight optimisation: Just copy the envelope. Note that we need to set the CRS
-             * to null because we don't know what the target CRS was supposed to be. Even if
-             * an identity transform often imply that the target CRS is the same one than the
-             * source CRS, it is not always the case. The metadata may be differents, or the
-             * transform may be a datum shift without Bursa-Wolf parameters, etc.
-             */
-            final GeneralEnvelope e = new GeneralEnvelope(envelope);
-            e.setCoordinateReferenceSystem(null);
-            return e;
-        }
-        final int sourceDim = transform.getSourceDimensions();
-        final int targetDim = transform.getTargetDimensions();
-        if (envelope.getDimension() != sourceDim) {
-            throw new MismatchedDimensionException(Errors.format(
-                      ErrorKeys.MISMATCHED_DIMENSION_$2,
-                      new Integer(sourceDim), new Integer(envelope.getDimension())));
-        }
-        int          coordinateNumber = 0;
-        GeneralEnvelope   transformed = null;
-        final GeneralDirectPosition sourcePt = new GeneralDirectPosition(sourceDim);
-        final GeneralDirectPosition targetPt = new GeneralDirectPosition(targetDim);
-        for (int i=sourceDim; --i>=0;) {
-            sourcePt.setOrdinate(i, envelope.getMinimum(i));
-        }
-  loop: while (true) {
-            // Transform a point and add the transformed point to the destination envelope.
-            if (targetPt != transform.transform(sourcePt, targetPt)) {
-                throw new UnsupportedImplementationException(transform.getClass());
-            }
-            if (transformed != null) {
-                transformed.add(targetPt);
-            } else {
-                transformed = new GeneralEnvelope(targetPt, targetPt);
-            }
-            // Get the next point's coordinate.   The 'coordinateNumber' variable should
-            // be seen as a number in base 3 where the number of digits is equals to the
-            // number of dimensions. For example, a 4-D space would have numbers ranging
-            // from "0000" to "2222". The digits are then translated into minimal, central
-            // or maximal ordinates.
-            int n = ++coordinateNumber;
-            for (int i=sourceDim; --i>=0;) {
-                switch (n % 3) {
-                    case 0:  sourcePt.setOrdinate(i, envelope.getMinimum(i)); n/=3; break;
-                    case 1:  sourcePt.setOrdinate(i, envelope.getCenter (i)); continue loop;
-                    case 2:  sourcePt.setOrdinate(i, envelope.getMaximum(i)); continue loop;
-                    default: throw new AssertionError(); // Should never happen
-                }
-            }
-            break;
-        }
-        return transformed;
+        return CRS.transform(transform, envelope);
     }
-    
+
     /**
-     * Transform an envelope. The transformation is only approximative.
-     * Invoking this method is equivalent to invoking the following:
-     * <p>
-     * <pre>transform(transform, new GeneralEnvelope(source)).toRectangle2D()</pre>
-     *
-     * @param  transform The transform to use. Source and target dimension must be 2.
-     * @param  source The rectangle to transform (may be {@code null}).
-     * @param  dest The destination rectangle (may be {@code source}).
-     *         If {@code null}, a new rectangle will be created and returned.
-     * @return {@code dest}, or a new rectangle if {@code dest} was non-null
-     *         and {@code source} was null.
-     * @throws TransformException if a transform failed.
-     *
-     * @todo Move this method as a static method in {@link org.geotools.referencing.CRS}.
+     * @deprecated Moved into the {@link CRS} class.
      */
     public static Rectangle2D transform(final MathTransform2D transform,
                                         final Rectangle2D     source,
                                         final Rectangle2D     dest)
             throws TransformException
     {
-        if (source == null) {
-            return null;
-        }
-        double xmin = Double.POSITIVE_INFINITY;
-        double ymin = Double.POSITIVE_INFINITY;
-        double xmax = Double.NEGATIVE_INFINITY;
-        double ymax = Double.NEGATIVE_INFINITY;
-        final Point2D.Double point = new Point2D.Double();
-        for (int i=0; i<8; i++) {
-            /*
-             *   (0)----(5)----(1)
-             *    |             |
-             *   (4)           (7)
-             *    |             |
-             *   (2)----(6)----(3)
-             */
-            point.x = (i&1)==0 ? source.getMinX() : source.getMaxX();
-            point.y = (i&2)==0 ? source.getMinY() : source.getMaxY();
-            switch (i) {
-                case 5: // fallthrough
-                case 6: point.x=source.getCenterX(); break;
-                case 7: // fallthrough
-                case 4: point.y=source.getCenterY(); break;
-            }
-            transform.transform(point, point);
-            if (point.x<xmin) xmin=point.x;
-            if (point.x>xmax) xmax=point.x;
-            if (point.y<ymin) ymin=point.y;
-            if (point.y>ymax) ymax=point.y;
-        }
-        if (dest != null) {
-            dest.setRect(xmin, ymin, xmax-xmin, ymax-ymin);
-            return dest;
-        }
-        return XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
+        return CRS.transform(transform, source, dest);
     }
 
     /**
@@ -631,7 +437,7 @@ public final class CRSUtilities {
             if (!CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs)) {
                 final CoordinateOperation op = FactoryFinder.getCoordinateOperationFactory(null)
                         .createOperation(crs, DefaultGeographicCRS.WGS84);
-                bounds = transform((MathTransform2D) op.getMathTransform(), bounds, null);
+                bounds = CRS.transform((MathTransform2D) op.getMathTransform(), bounds, null);
             }
             final AngleFormat fmt = new AngleFormat("DD°MM.m'");
             buffer = fmt.format(new  Latitude(bounds.getMinY()), buffer, null); buffer.append('-');

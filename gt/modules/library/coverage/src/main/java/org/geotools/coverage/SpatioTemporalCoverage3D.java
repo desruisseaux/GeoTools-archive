@@ -175,7 +175,7 @@ public class SpatioTemporalCoverage3D extends AbstractCoverage {
             this.boundingBox       = source.boundingBox;
         } else {
             this.coverage = coverage;
-            temporalCRS = DefaultTemporalCRS.wrap(CRSUtilities.getTemporalCRS(crs));
+            temporalCRS = DefaultTemporalCRS.wrap(CRS.getTemporalCRS(crs));
             if (temporalCRS == null) {
                 throw new IllegalArgumentException( // TODO: localize
                         /*Errors.format(ErrorKeys.BAD_COORDINATE_SYSTEM)*/);
@@ -257,7 +257,7 @@ control:    for (int p=0; p<=1; p++) {
                     envelope.getMinimum(yDimension),
                     envelope.getMaximum(xDimension),
                     envelope.getMaximum(yDimension));
-            final CoordinateReferenceSystem sourceCRS = CRSUtilities.getHorizontalCRS(crs);
+            final CoordinateReferenceSystem sourceCRS = CRS.getHorizontalCRS(crs);
             final CoordinateReferenceSystem targetCRS = DefaultGeographicCRS.WGS84;
             if (!CRS.equalsIgnoreMetadata(targetCRS, sourceCRS)) {
                 final CoordinateOperation      transform;
@@ -268,8 +268,8 @@ control:    for (int p=0; p<=1; p++) {
                 } catch (FactoryException exception) {
                     throw new TransformPathNotFoundException(exception);
                 }
-                geographicArea = CRSUtilities.transform((MathTransform2D)transform.getMathTransform(),
-                                                         geographicArea, geographicArea);
+                geographicArea = CRS.transform((MathTransform2D)transform.getMathTransform(),
+                                               geographicArea, geographicArea);
             }
             boundingBox = (GeographicBoundingBox) new GeographicBoundingBoxImpl(geographicArea).unmodifiable();
         }
@@ -557,7 +557,7 @@ control:    for (int p=0; p<=1; p++) {
      */
     public GridCoverage2D getGridCoverage2D(final Date time) throws CannotEvaluateException {
         final InternationalString      name = getName();
-        final CoordinateReferenceSystem crs = CRSUtilities.getHorizontalCRS(this.crs);
+        final CoordinateReferenceSystem crs = CRS.getHorizontalCRS(this.crs);
         final RenderedImage           image = getRenderableImage(time).createDefaultRendering();
         final GridSampleDimension[]   bands = new GridSampleDimension[getNumSampleDimensions()];
         for (int i=0; i<getNumSampleDimensions(); i++){

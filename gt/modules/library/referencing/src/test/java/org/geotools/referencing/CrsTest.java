@@ -32,7 +32,6 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.wkt.Parser;
-import org.geotools.resources.CRSUtilities;
 
 
 /**
@@ -91,10 +90,10 @@ public class CrsTest extends TestCase {
         firstEnvelope = new GeneralEnvelope(new double[] {-124, 42}, new double[] {-122, 43});
         firstEnvelope.setCoordinateReferenceSystem(WGS84);
 
-        transformedEnvelope = CRSUtilities.transform(crsTransform, firstEnvelope);
+        transformedEnvelope = CRS.transform(crsTransform, firstEnvelope);
         transformedEnvelope.setCoordinateReferenceSystem(mapCRS);
 
-        oldEnvelope = CRSUtilities.transform(crsTransform.inverse(), transformedEnvelope);
+        oldEnvelope = CRS.transform(crsTransform.inverse(), transformedEnvelope);
         oldEnvelope.setCoordinateReferenceSystem(WGS84);
 
         assertTrue(oldEnvelope.contains(firstEnvelope, true));

@@ -38,7 +38,6 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.CRSUtilities;
 
 
 /**
@@ -165,7 +164,7 @@ public class TransformedCoverage extends AbstractCoverage {
     public Envelope getEnvelope() {
         final GeneralEnvelope envelope;
         try {
-            envelope = CRSUtilities.transform(toWrapped.inverse(), coverage.getEnvelope());
+            envelope = CRS.transform(toWrapped.inverse(), coverage.getEnvelope());
         } catch (TransformException exception) {
             throw transformationFailed(exception);
         }

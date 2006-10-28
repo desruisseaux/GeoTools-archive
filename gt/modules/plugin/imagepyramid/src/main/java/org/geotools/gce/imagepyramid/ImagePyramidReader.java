@@ -49,7 +49,6 @@ import org.geotools.gce.imagemosaic.ImageMosaicReader;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.util.SoftValueHashMap;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -453,7 +452,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 					.getCoordinateReferenceSystem(), this.crs)) {
 				try {
 					// transforming the envelope back to the data set crs
-					requestedEnvelope = CRSUtilities.transform(operationFactory
+					requestedEnvelope = CRS.transform(operationFactory
 							.createOperation(
 									requestedEnvelope
 											.getCoordinateReferenceSystem(),

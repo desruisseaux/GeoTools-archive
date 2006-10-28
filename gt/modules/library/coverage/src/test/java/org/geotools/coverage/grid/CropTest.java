@@ -24,7 +24,7 @@ import javax.media.jai.RenderedOp;
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
+import org.geotools.referencing.CRS;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -102,7 +102,7 @@ public class CropTest extends GridCoverageTest {
 		gridToWorld.translate(-0.5, -0.5);
 		final MathTransform worldToGrid = ProjectiveTransform.create(
 				gridToWorld).inverse();
-		final GeneralEnvelope sourceRange = CRSUtilities.transform(worldToGrid,
+		final GeneralEnvelope sourceRange = CRS.transform(worldToGrid,
 				source.getEnvelope2D());
 		LOGGER.info(source.getEnvelope2D().toString());
 

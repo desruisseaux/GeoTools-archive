@@ -236,7 +236,7 @@ public class GeodeticCalculator {
      * @since 2.2
      */
     public GeodeticCalculator(final CoordinateReferenceSystem crs) {
-        this(CRSUtilities.getEllipsoid(crs), crs);
+        this(CRS.getEllipsoid(crs), crs);
     }
 
     /**

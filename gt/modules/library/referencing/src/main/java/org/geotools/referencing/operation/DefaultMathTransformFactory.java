@@ -559,7 +559,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
             Set transforms = Collections.EMPTY_SET;
             if (printAll || args.length==0) {
                 final Set scopes = new HashSet();
-                scopes.add("OGC");
+//              scopes.add("OGC");  // Omitted because usually the same than 'identifier'.
                 scopes.add("EPSG");
                 scopes.add("Geotools"); // Limit the number of columns to output.
                 transforms = new TreeSet(AbstractIdentifiedObject.NAME_COMPARATOR);

@@ -281,7 +281,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 						(AffineTransform) raster2Model);
 				tempTransform.translate(-0.5, -0.5);
 
-				originalEnvelope = CRSUtilities.transform(ProjectiveTransform
+				originalEnvelope = CRS.transform(ProjectiveTransform
 						.create(tempTransform), new GeneralEnvelope(actualDim));
 				originalEnvelope.setCoordinateReferenceSystem(crs);
 			}

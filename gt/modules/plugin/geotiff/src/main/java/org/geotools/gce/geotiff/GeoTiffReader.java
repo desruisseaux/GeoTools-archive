@@ -65,8 +65,8 @@ import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.gce.geotiff.crs_adapters.GeoTiffMetadata2CRSAdapter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
@@ -281,7 +281,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		final AffineTransform tempTransform = new AffineTransform(
 				(AffineTransform) raster2Model);
 		tempTransform.translate(-0.5, -0.5);
-		originalEnvelope = CRSUtilities.transform(ProjectiveTransform
+		originalEnvelope = CRS.transform(ProjectiveTransform
 				.create(tempTransform), new GeneralEnvelope(actualDim));
 		originalEnvelope.setCoordinateReferenceSystem(crs);
 

@@ -33,8 +33,8 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.CannotCropException;
 import org.geotools.coverage.processing.OperationJAI;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.opengis.coverage.grid.GridCoverage;
@@ -220,7 +220,7 @@ final class CroppedCoverage2D extends GridCoverage2D {
 		gridToWorld.translate(-0.5, -0.5);
 		final MathTransform worldToGridTransform = ProjectiveTransform
 				.create(gridToWorld.createInverse());
-		final GeneralEnvelope finalGridRange = CRSUtilities.transform(
+		final GeneralEnvelope finalGridRange = CRS.transform(
 				worldToGridTransform, intersectionEnvelope);
 		finalGridRange.intersect(new GeneralEnvelope(oldRange.toRectangle()));
 

@@ -46,7 +46,6 @@ import org.geotools.referencing.operation.DefaultConversion;
 import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.wkt.Formatter;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 
