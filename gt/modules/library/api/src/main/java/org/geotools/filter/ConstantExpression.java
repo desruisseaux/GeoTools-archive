@@ -51,11 +51,11 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
     final short type;
     Object value;
 
-    private ConstantExpression(Object value) {
+    protected ConstantExpression(Object value) {
         this(type(value), value);
     }
 
-    private ConstantExpression(short type, Object value) {
+    protected ConstantExpression(short type, Object value) {
         this.type = type;
         this.value = value;
     }
