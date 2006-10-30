@@ -65,6 +65,7 @@
     <module>xml-gml2</module>
     <module>xml-gml3</module>
     <module>xml-filter</module>
+    <module>xml-sld</module>
     <module>mappane</module>
   </modules>
 
