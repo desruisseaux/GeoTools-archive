@@ -35,11 +35,6 @@ public class SLDFillBindingTest extends SLDTestSupport {
         assertEquals(c.getRed(), integer("12"));
         assertEquals(c.getGreen(), integer("34"));
         assertEquals(c.getBlue(), integer("56"));
-
-        c = org.geotools.styling.SLD.color(fill.getBackgroundColor());
-        assertEquals(c.getRed(), integer("65"));
-        assertEquals(c.getGreen(), integer("43"));
-        assertEquals(c.getBlue(), integer("21"));
     }
 
     public int integer(String hex) {

@@ -88,9 +88,8 @@ public class SLDMockData {
     static Element fill(Document document, Node parent) {
         Element fill = element(SLD.FILL, document, parent);
 
-        css("color", "#123456", document, fill);
-        css("background-color", "#654321", document, fill);
-        opacity(document, fill);
+        css("fill", "#123456", document, fill);
+        css("fill-opacity", "1.0", document, fill);
 
         return fill;
     }
