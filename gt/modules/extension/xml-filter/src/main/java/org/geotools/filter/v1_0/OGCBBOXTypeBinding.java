@@ -60,7 +60,7 @@ public class OGCBBOXTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BBOXTYPE;
+        return OGC.BBOXType;
     }
 
     /**

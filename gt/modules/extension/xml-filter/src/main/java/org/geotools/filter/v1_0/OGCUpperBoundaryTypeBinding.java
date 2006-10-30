@@ -46,7 +46,7 @@ public class OGCUpperBoundaryTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.UPPERBOUNDARYTYPE;
+        return OGC.UpperBoundaryType;
     }
 
     /**

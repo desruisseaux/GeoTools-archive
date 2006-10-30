@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FeatureId;
 import org.opengis.filter.FilterFactory2;
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -62,7 +63,7 @@ public class OGCFilterTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.FILTERTYPE;
+        return OGC.FilterType;
     }
 
     /**
@@ -82,7 +83,7 @@ public class OGCFilterTypeBinding implements ComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Filter.class;
     }
 
     /**

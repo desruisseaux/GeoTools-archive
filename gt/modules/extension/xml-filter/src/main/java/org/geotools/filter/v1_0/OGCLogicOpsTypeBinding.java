@@ -45,7 +45,7 @@ public class OGCLogicOpsTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.LOGICOPSTYPE;
+        return OGC.LogicOpsType;
     }
 
     /**

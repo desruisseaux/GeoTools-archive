@@ -58,7 +58,7 @@ public class OGCLiteralTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.LITERALTYPE;
+        return OGC.LiteralType;
     }
 
     /**

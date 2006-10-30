@@ -46,7 +46,7 @@ public class OGCLowerBoundaryTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.LOWERBOUNDARYTYPE;
+        return OGC.LowerBoundaryType;
     }
 
     /**

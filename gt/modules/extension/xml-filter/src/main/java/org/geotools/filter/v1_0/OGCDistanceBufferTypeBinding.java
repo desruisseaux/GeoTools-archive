@@ -64,7 +64,7 @@ public class OGCDistanceBufferTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.DISTANCEBUFFERTYPE;
+        return OGC.DistanceBufferType;
     }
 
     /**

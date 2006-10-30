@@ -41,7 +41,7 @@ public class OGCComparisonOpsTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.COMPARISONOPSTYPE;
+        return OGC.ComparisonOpsType;
     }
 
     /**

@@ -43,7 +43,7 @@ public class OGCDistanceTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.DISTANCETYPE;
+        return OGC.DistanceType;
     }
 
     /**

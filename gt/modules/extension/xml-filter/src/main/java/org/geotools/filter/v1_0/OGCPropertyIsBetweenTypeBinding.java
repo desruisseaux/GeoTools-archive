@@ -60,7 +60,7 @@ public class OGCPropertyIsBetweenTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.PROPERTYISBETWEENTYPE;
+        return OGC.PropertyIsBetweenType;
     }
 
     /**

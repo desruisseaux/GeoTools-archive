@@ -59,7 +59,7 @@ public class OGCPropertyIsNullTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.PROPERTYISNULLTYPE;
+        return OGC.PropertyIsNullType;
     }
 
     /**

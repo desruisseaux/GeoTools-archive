@@ -54,7 +54,7 @@ public class OGCFeatureIdTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.FEATUREIDTYPE;
+        return OGC.FeatureIdType;
     }
 
     /**

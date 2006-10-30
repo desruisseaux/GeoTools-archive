@@ -59,7 +59,7 @@ public class OGCFunctionTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.FUNCTIONTYPE;
+        return OGC.FunctionType;
     }
 
     /**

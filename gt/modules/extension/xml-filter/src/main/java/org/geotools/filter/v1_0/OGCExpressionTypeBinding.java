@@ -49,7 +49,7 @@ public class OGCExpressionTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.EXPRESSIONTYPE;
+        return OGC.ExpressionType;
     }
 
     /**

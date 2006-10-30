@@ -70,7 +70,7 @@ public class OGCBinarySpatialOpTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BINARYSPATIALOPTYPE;
+        return OGC.BinarySpatialOpType;
     }
 
     /**

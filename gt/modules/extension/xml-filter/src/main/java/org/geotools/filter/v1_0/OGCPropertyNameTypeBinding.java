@@ -55,7 +55,7 @@ public class OGCPropertyNameTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.PROPERTYNAMETYPE;
+        return OGC.PropertyNameType;
     }
 
     /**

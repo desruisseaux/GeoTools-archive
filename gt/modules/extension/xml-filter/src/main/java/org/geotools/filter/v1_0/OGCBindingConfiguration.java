@@ -30,41 +30,41 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
      */
     public void configure(MutablePicoContainer container) {
         //expr.xsd
-        container.registerComponentImplementation(OGC.BINARYOPERATORTYPE,
+        container.registerComponentImplementation(OGC.BinaryOperatorType,
             OGCBinaryOperatorTypeBinding.class);
-        container.registerComponentImplementation(OGC.EXPRESSIONTYPE, OGCExpressionTypeBinding.class);
-        container.registerComponentImplementation(OGC.FUNCTIONTYPE, OGCFunctionTypeBinding.class);
-        container.registerComponentImplementation(OGC.LITERALTYPE, OGCLiteralTypeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYNAMETYPE,
+        container.registerComponentImplementation(OGC.ExpressionType, OGCExpressionTypeBinding.class);
+        container.registerComponentImplementation(OGC.FunctionType, OGCFunctionTypeBinding.class);
+        container.registerComponentImplementation(OGC.LiteralType, OGCLiteralTypeBinding.class);
+        container.registerComponentImplementation(OGC.PropertyNameType,
             OGCPropertyNameTypeBinding.class);
 
         //filter.xsd
-        container.registerComponentImplementation(OGC.BBOXTYPE, OGCBBOXTypeBinding.class);
-        container.registerComponentImplementation(OGC.BINARYCOMPARISONOPTYPE,
+        container.registerComponentImplementation(OGC.BBOXType, OGCBBOXTypeBinding.class);
+        container.registerComponentImplementation(OGC.BinaryComparisonOpType,
             OGCBinaryComparisonOpTypeBinding.class);
-        container.registerComponentImplementation(OGC.BINARYLOGICOPTYPE,
+        container.registerComponentImplementation(OGC.BinaryLogicOpType,
             OGCBinaryLogicOpTypeBinding.class);
-        container.registerComponentImplementation(OGC.BINARYSPATIALOPTYPE,
+        container.registerComponentImplementation(OGC.BinarySpatialOpType,
             OGCBinarySpatialOpTypeBinding.class);
         //container.registerComponentImplementation(OGC.COMPARISONOPSTYPE,OGCComparisonOpsTypeBinding.class);
-        container.registerComponentImplementation(OGC.DISTANCEBUFFERTYPE,
+        container.registerComponentImplementation(OGC.DistanceBufferType,
             OGCDistanceBufferTypeBinding.class);
-        container.registerComponentImplementation(OGC.DISTANCETYPE, OGCDistanceTypeBinding.class);
-        container.registerComponentImplementation(OGC.FEATUREIDTYPE, OGCFeatureIdTypeBinding.class);
-        container.registerComponentImplementation(OGC.FILTERTYPE, OGCFilterTypeBinding.class);
+        container.registerComponentImplementation(OGC.DistanceType, OGCDistanceTypeBinding.class);
+        container.registerComponentImplementation(OGC.FeatureIdType, OGCFeatureIdTypeBinding.class);
+        container.registerComponentImplementation(OGC.FilterType, OGCFilterTypeBinding.class);
         //container.registerComponentImplementation(OGC.LOGICOPSTYPE,OGCLogicOpsTypeBinding.class);
-        container.registerComponentImplementation(OGC.LOWERBOUNDARYTYPE,
+        container.registerComponentImplementation(OGC.LowerBoundaryType,
             OGCLowerBoundaryTypeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISBETWEENTYPE,
+        container.registerComponentImplementation(OGC.PropertyIsBetweenType,
             OGCPropertyIsBetweenTypeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISLIKETYPE,
+        container.registerComponentImplementation(OGC.PropertyIsLikeType,
             OGCPropertyIsLikeTypeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISNULLTYPE,
+        container.registerComponentImplementation(OGC.PropertyIsNullType,
             OGCPropertyIsNullTypeBinding.class);
         //container.registerComponentImplementation(OGC.SPATIALOPSTYPE,OGCSpatialOpsTypeBinding.class);
-        container.registerComponentImplementation(OGC.UNARYLOGICOPTYPE,
+        container.registerComponentImplementation(OGC.UnaryLogicOpType,
             OGCUnaryLogicOpTypeBinding.class);
-        container.registerComponentImplementation(OGC.UPPERBOUNDARYTYPE,
+        container.registerComponentImplementation(OGC.UpperBoundaryType,
             OGCUpperBoundaryTypeBinding.class);
     }
 }

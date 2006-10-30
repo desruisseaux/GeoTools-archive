@@ -64,7 +64,7 @@ public class OGCPropertyIsLikeTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.PROPERTYISLIKETYPE;
+        return OGC.PropertyIsLikeType;
     }
 
     /**

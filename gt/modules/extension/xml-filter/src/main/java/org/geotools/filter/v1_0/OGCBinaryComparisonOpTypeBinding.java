@@ -58,7 +58,7 @@ public class OGCBinaryComparisonOpTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BINARYCOMPARISONOPTYPE;
+        return OGC.BinaryComparisonOpType;
     }
 
     /**

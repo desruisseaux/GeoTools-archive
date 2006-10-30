@@ -61,7 +61,7 @@ public class OGCBinaryLogicOpTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BINARYLOGICOPTYPE;
+        return OGC.BinaryLogicOpType;
     }
 
     /**

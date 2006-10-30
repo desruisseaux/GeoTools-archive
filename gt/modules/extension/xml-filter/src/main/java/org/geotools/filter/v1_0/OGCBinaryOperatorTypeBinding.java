@@ -59,7 +59,7 @@ public class OGCBinaryOperatorTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BINARYOPERATORTYPE;
+        return OGC.BinaryOperatorType;
     }
 
     /**

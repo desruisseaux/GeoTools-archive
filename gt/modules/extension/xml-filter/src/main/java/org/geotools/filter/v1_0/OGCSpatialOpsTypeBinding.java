@@ -41,7 +41,7 @@ public class OGCSpatialOpsTypeBinding implements ComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.SPATIALOPSTYPE;
+        return OGC.SpatialOpsType;
     }
 
     /**
