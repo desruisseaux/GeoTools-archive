@@ -15,6 +15,8 @@
  */
 package org.geotools.styling;
 
+import org.geotools.filter.ConstantExpression;
+
 
 /**
  * OverlapBehavior tells a system how to behave when multiple raster images in
@@ -47,30 +49,13 @@ package org.geotools.styling;
  *
  * @source $URL$
  */
-public interface OverlapBehavior {
-    static final OverlapBehavior LATEST_ON_TOP = new OverlapBehavior() {
-            public String getValue() {
-                return "LATEST_ON_TOP";
-            }
-        };
+public class OverlapBehavior extends ConstantExpression {
+    public static final OverlapBehavior LATEST_ON_TOP = new OverlapBehavior("LATEST_ON_TOP");
+    public static final OverlapBehavior EARLIEST_ON_TOP = new OverlapBehavior("EARLIEST_ON_TOP");
+    public static final OverlapBehavior AVERAGE = new OverlapBehavior("AVERAGE");
+    public static final OverlapBehavior RANDOM = new OverlapBehavior("RANDOM");
 
-    static final OverlapBehavior EARLIEST_ON_TOP = new OverlapBehavior() {
-            public String getValue() {
-                return "EARLIEST_ON_TOP";
-            }
-        };
-
-    static final OverlapBehavior AVERAGE = new OverlapBehavior() {
-            public String getValue() {
-                return "AVERAGE";
-            }
-        };
-
-    static final OverlapBehavior RANDOM = new OverlapBehavior() {
-            public String getValue() {
-                return "RANDOM";
-            }
-        };
-
-    String getValue();
+    private OverlapBehavior(String value) {
+        super(value);
+    }
 }
