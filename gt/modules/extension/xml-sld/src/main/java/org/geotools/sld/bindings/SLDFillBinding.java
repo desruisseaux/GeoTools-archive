@@ -110,35 +110,28 @@ public class SLDFillBinding implements ComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         Expression color = null;
-        Expression bgColor = null;
         Expression opacity = null;
         Graphic graphicFill = null;
 
         graphicFill = (Graphic) node.getChildValue("GraphicFill");
 
+        //&quot;fill&quot; (color) 
+        //&quot;fill-opacity&quot;
         List params = node.getChildValues("CssParameter");
 
         for (Iterator itr = params.iterator(); itr.hasNext();) {
             CssParameter param = (CssParameter) itr.next();
 
-            if ("color".equals(param.getName())) {
+            if ("fill".equals(param.getName())) {
                 color = (Expression) param.getExpressions().get(0);
             }
 
-            if ("background-color".equals(param.getName())) {
-                bgColor = (Expression) param.getExpressions().get(0);
-            }
-
-            if ("opacity".equals(param.getName())) {
+            if ("fill-opacity".equals(param.getName())) {
                 opacity = (Expression) param.getExpressions().get(0);
             }
         }
 
         Fill fill = styleFactory.createFill(color);
-
-        if (bgColor != null) {
-            fill.setBackgroundColor(bgColor);
-        }
 
         if (opacity != null) {
             fill.setOpacity(opacity);
