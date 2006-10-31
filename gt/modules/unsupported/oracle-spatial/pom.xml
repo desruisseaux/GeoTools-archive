@@ -117,10 +117,9 @@
     <!-- of "Mock Objects" so you we can compile the plugin even   -->
     <!-- without downloading the real thing from oracle.           -->
 <!--
-    <!--dependency>
+    <dependency>
           <artifactId>ojdbc14</artifactId>
           <groupId>com.oracle</groupId>
-          <!-- The version number is specified in the parent POM. -->
     </dependency>
 -->
     <dependency>
