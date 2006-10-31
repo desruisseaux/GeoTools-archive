@@ -114,7 +114,7 @@ public class Schemas {
             String namespaceURI = conf.getNamespaceURI();
             String schemaLocation = null;
             try{
-                URL location = conf.getSchemaFileURL();
+                URL location = new URL( conf.getSchemaFileURL() );
                 schemaLocation = location.toExternalForm();
             }catch(MalformedURLException e){
                 throw new RuntimeException(e);
