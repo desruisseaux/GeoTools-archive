@@ -73,6 +73,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public abstract class Mercator extends MapProjection {
     /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
      * Standard Parallel used for the {@code Mercator_2SP} case.
      * Set to {@link Double#NaN} for the {@code Mercator_1SP} case.
      */
@@ -132,7 +137,7 @@ public abstract class Mercator extends MapProjection {
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        if (Math.abs(y) > (Math.PI/2 - EPS)) {
+        if (Math.abs(y) > (Math.PI/2 - EPSILON)) {
             throw new ProjectionException(Errors.format(
                     ErrorKeys.POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
         }
@@ -193,7 +198,7 @@ public abstract class Mercator extends MapProjection {
         protected Point2D transformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException
         {
-            if (Math.abs(y) > (Math.PI/2 - EPS)) {
+            if (Math.abs(y) > (Math.PI/2 - EPSILON)) {
                 throw new ProjectionException(Errors.format(
                         ErrorKeys.POLE_PROJECTION_$1, new Latitude(Math.toDegrees(y))));
             }
@@ -202,8 +207,7 @@ public abstract class Mercator extends MapProjection {
           
             y = Math.log(Math.tan((Math.PI/4) + 0.5*y));
 
-            assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
+            assert checkTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -223,8 +227,7 @@ public abstract class Mercator extends MapProjection {
 
             y = (Math.PI/2) - 2.0*Math.atan(Math.exp(-y));
 
-            assert Math.abs(ptDst.getX()-x) <= EPS : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS : y;
+            assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;

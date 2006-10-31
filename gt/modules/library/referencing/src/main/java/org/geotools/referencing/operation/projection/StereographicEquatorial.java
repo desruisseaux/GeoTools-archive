@@ -50,6 +50,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class StereographicEquatorial extends StereographicOblique {
     /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
      * A constant used in the transformations.
      * This is <strong>not</strong> equal to the {@link #scaleFactor}.
      */
@@ -91,9 +96,7 @@ public class StereographicEquatorial extends StereographicOblique {
         x = A * cosChi*Math.sin(x);
         y = A * Math.sin(chi);
 
-        assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
-        assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
-        
+        assert checkTransform(x, y, ptDst);
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
@@ -141,7 +144,7 @@ public class StereographicEquatorial extends StereographicOblique {
 
             final double coslat = Math.cos(y);
             double f = 1.0 + coslat*Math.cos(x);
-            if (f < EPS) {
+            if (f < EPSILON) {
                 throw new ProjectionException(Errors.format(
                           ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
@@ -149,8 +152,7 @@ public class StereographicEquatorial extends StereographicOblique {
             x = f * coslat * Math.sin(x); // (21-2)
             y = f * Math.sin(y);          // (21-13)
 
-            assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
+            assert checkTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -169,8 +171,8 @@ public class StereographicEquatorial extends StereographicOblique {
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
             final double rho = Math.sqrt(x*x + y*y);
-            if (Math.abs(rho) < EPS) {
-                y = 0.0;                     //latitudeOfOrigin
+            if (Math.abs(rho) < EPSILON) {
+                y = 0.0;                     // latitudeOfOrigin
                 x = 0.0;
             } else {
                 final double c = 2.0 * Math.atan(rho/k0);
@@ -179,12 +181,10 @@ public class StereographicEquatorial extends StereographicOblique {
                 y = Math.asin(y * sinc/rho); // (20-14)  with phi1=0
                 final double t  = x*sinc;
                 final double ct = rho*cosc;
-                x = (Math.abs(t)<EPS && Math.abs(ct)<EPS) ? 
-                     0.0 : Math.atan2(t, ct);
+                x = (Math.abs(t) < EPSILON && Math.abs(ct) < EPSILON) ? 0.0 : Math.atan2(t, ct);
             }
 
-            assert Math.abs(ptDst.getX()-x) <= EPS : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS : y;
+            assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;

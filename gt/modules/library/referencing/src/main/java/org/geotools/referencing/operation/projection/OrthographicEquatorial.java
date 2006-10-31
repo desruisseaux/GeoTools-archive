@@ -49,6 +49,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class OrthographicEquatorial extends OrthographicOblique {
     /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
      * Constructs an equatorial orthographic projection.
      *
      * @param  parameters The parameter values in standard units.
@@ -59,7 +64,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
             throws ParameterNotFoundException
     {
         super(parameters, expected);
-        assert (latitudeOfOrigin < EPS) : latitudeOfOrigin;
+        assert (latitudeOfOrigin < EPSILON) : latitudeOfOrigin;
         latitudeOfOrigin = 0.0;
     }
 
@@ -77,16 +82,14 @@ public class OrthographicEquatorial extends OrthographicOblique {
         double cosphi = Math.cos(y);
         double coslam = Math.cos(x);
 
-        if (cosphi * coslam < -EPS) {
+        if (cosphi * coslam < -EPSILON) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
 
         y = Math.sin(y);
         x = cosphi * Math.sin(x);   
 
-        assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
-        assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
-
+        assert checkTransform(x, y, ptDst);
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
@@ -107,14 +110,14 @@ public class OrthographicEquatorial extends OrthographicOblique {
         final double rho = Math.sqrt(x*x + y*y);
         double sinc = rho;
         if (sinc > 1.0) {
-            if ((sinc - 1.0) > EPS) {
+            if ((sinc - 1.0) > EPSILON) {
                 throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
             }
             sinc = 1.0;
         }
 
         double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
-        if (rho <= EPS) {
+        if (rho <= EPSILON) {
             y = latitudeOfOrigin;
             x = 0.0;
         } else {
@@ -143,8 +146,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
             y = phi;
         }
 
-        assert Math.abs(ptDst.getX()-x) <= EPS : x;
-        assert Math.abs(ptDst.getY()-y) <= EPS : y;
+        assert checkInverseTransform(x, y, ptDst);
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;

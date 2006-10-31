@@ -105,6 +105,27 @@ import org.geotools.resources.i18n.Errors;
  */
 public class TransverseMercator extends MapProjection {
     /**
+     * Maximum number of iterations for iterative computations.
+     */
+    private static final int MAXIMUM_ITERATIONS = 15;
+    
+    /**
+     * Relative iteration precision used in the {@code mlfn} method.
+     * This overrides the value in the {@link MapProjection} class.
+     */
+    private static final double ITERATION_TOLERANCE = 1E-11;
+    
+    /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
+     * Maximum difference allowed when comparing latitudes.
+     */
+    private static final double EPSILON_LATITUDE = 1E-10;
+    
+    /**
      * A derived quantity of excentricity, computed by <code>e'² = (a²-b²)/b² = es/(1-es)</code>
      * where <var>a</var> is the semi-major axis length and <var>b</bar> is the semi-minor axis
      * length.
@@ -154,12 +175,6 @@ public class TransverseMercator extends MapProjection {
                                 FC8= 0.01785714285714285714285;  // 1/56
 
     /**
-     * Relative iteration precision used in the <code>mlfn<code> method. This 
-     * overrides the value in the MapProjection class.
-     */
-    private static final double TOL = 1E-11;
-
-    /**
      * Constructs a new map projection from the supplied parameters.
      *
      * @param  parameters The parameter values in standard units.
@@ -204,7 +219,7 @@ public class TransverseMercator extends MapProjection {
         double sinphi = Math.sin(y);
         double cosphi = Math.cos(y);
         
-        double t = (Math.abs(cosphi)>EPS) ? sinphi/cosphi : 0;
+        double t = (Math.abs(cosphi) > EPSILON) ? sinphi/cosphi : 0;
         t *= t;
         double al = cosphi*x;
         double als = al*al;
@@ -245,7 +260,7 @@ public class TransverseMercator extends MapProjection {
         } else {
             double sinphi = Math.sin(phi);
             double cosphi = Math.cos(phi);
-            double t = (Math.abs(cosphi) > EPS) ? sinphi/cosphi : 0.0;
+            double t = (Math.abs(cosphi) > EPSILON) ? sinphi/cosphi : 0.0;
             double n = esp * cosphi*cosphi;
             double con = 1.0 - excentricitySquared * sinphi*sinphi;
             double d = x*Math.sqrt(con);
@@ -275,12 +290,12 @@ public class TransverseMercator extends MapProjection {
      * {@inheritDoc}
      */
     protected double getToleranceForAssertions(final double longitude, final double latitude) {
-        if (Math.abs(longitude - centralMeridian) > 0.26) {   //15 degrees
+        if (Math.abs(longitude - centralMeridian) > 0.26) {   // 15 degrees
             // When far from the valid area, use a larger tolerance.
             return 2.5;
-        } else if (Math.abs(longitude - centralMeridian) > 0.22) {  //12.5 degrees
+        } else if (Math.abs(longitude - centralMeridian) > 0.22) {  // 12.5 degrees
             return 1.0;
-        } else if (Math.abs(longitude - centralMeridian) > 0.17) {  //10 degrees
+        } else if (Math.abs(longitude - centralMeridian) > 0.17) {  // 10 degrees
             return 0.5;
         }
         // a normal tolerance
@@ -318,12 +333,12 @@ public class TransverseMercator extends MapProjection {
                 throws ProjectionException 
         {
             // Compute using ellipsoidal formulas, for comparaison later.
-            double normalizedLongitude = x;
+            final double normalizedLongitude = x;
             assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
                     
             double cosphi = Math.cos(y);
             double b = cosphi * Math.sin(x);
-            if (Math.abs(Math.abs(b) - 1.0) <= EPS) {
+            if (Math.abs(Math.abs(b) - 1.0) <= EPSILON) {
                 throw new ProjectionException(Errors.format(ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
             
@@ -332,8 +347,7 @@ public class TransverseMercator extends MapProjection {
             y = Math.atan2(Math.tan(y),Math.cos(x)) - latitudeOfOrigin;   /* Snyder 8-3 */
             x = 0.5 * Math.log((1.0+b)/(1.0-b));    /* Snyder 8-1 */
 
-            assert Math.abs(ptDst.getX()-x) <= getToleranceForSphereAssertions(normalizedLongitude,0) : ptDst.getX()-x;
-            assert Math.abs(ptDst.getY()-y) <= getToleranceForSphereAssertions(normalizedLongitude,0) : ptDst.getY()-y;
+            assert checkTransform(x, y, ptDst, getToleranceForSphereAssertions(normalizedLongitude));
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -351,16 +365,15 @@ public class TransverseMercator extends MapProjection {
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
             
             double t = Math.exp(x);
-            double sinhX = 0.5 * (t-1.0/t);                //sinh(x)
+            double sinhX = 0.5 * (t - 1.0/t);              // sinh(x)
             double cosD = Math.cos(latitudeOfOrigin + y);
-            double phi = Math.asin(Math.sqrt((1.0-cosD*cosD)/(1.0+sinhX*sinhX)));
+            double phi = Math.asin(Math.sqrt((1.0 - cosD*cosD) / (1.0 + sinhX*sinhX)));
             // correct for the fact that we made everything positive using sqrt(x*x)
             y = ((y + latitudeOfOrigin)<0.0) ? -phi : phi;   
-            x = (Math.abs(sinhX)<=EPS && Math.abs(cosD)<=EPS) ? 
+            x = (Math.abs(sinhX) <= EPSILON  &&  Math.abs(cosD) <= EPSILON) ?
                     0.0 : Math.atan2(sinhX,cosD);
-           
-            assert Math.abs(ptDst.getX()-x) <= getToleranceForSphereAssertions(x,0) : ptDst.getX()-x;
-            assert Math.abs(ptDst.getY()-y) <= getToleranceForSphereAssertions(x,0) : ptDst.getY()-y;
+            
+            assert checkInverseTransform(x, y, ptDst, getToleranceForSphereAssertions(x));
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -368,22 +381,29 @@ public class TransverseMercator extends MapProjection {
             return new Point2D.Double(x,y);
         }
         
-        /*
-         *  Allow a larger tolerance when comparing spherical to elliptical calculations
-         *  when we are far from the central meridian (elliptical calculations are
-         *  not valid here).
+        /**
+         * Maximal error tolerated for assertions in the spherical case. When assertions
+         * are enabled, every projection using spherical formulas is followed by a projection
+         * using the ellipsical formulas, and the results are compared. If a distance greater
+         * than the tolerance level is found, then an {@link AssertionError} will be thrown.
+         * Subclasses may override this method if they need to relax the tolerance level.
+         * <p>
+         * The default implementation allows a larger tolerance when comparing spherical to
+         * elliptical calculations when we are far from the central meridian (elliptical
+         * calculations are not valid here).
          *
-         *  longitude here is standardized (in radians) and centralMeridian has 
-         *  already been removed from it.
+         * @param  longitude The longitude standardized (in radians) with
+         *         {@linkplain #centralMeridian} already removed from it.
+         * @return The tolerance level for assertions, in meters.
          */
-        protected double getToleranceForSphereAssertions(final double longitude, final double latitude) {
-            if (Math.abs(Math.abs(longitude)- Math.PI/2.0) < TOL) {  //90 degrees
+        protected double getToleranceForSphereAssertions(final double longitude) {
+            if (Math.abs(Math.abs(longitude)- Math.PI/2.0) < EPSILON_LATITUDE) {  // 90 degrees
                 // elliptical equations are at their worst here
-                return 1E18;
+                return 1E+18;
             }
-            if (Math.abs(longitude) > 0.26) {   //15 degrees
+            if (Math.abs(longitude) > 0.26) {   // 15 degrees
                 // When far from the valid area, use a very larger tolerance.          
-                return 1000000;
+                return 1E+6;
             }
             // a normal tolerance
             return 1E-6;
@@ -413,7 +433,8 @@ public class TransverseMercator extends MapProjection {
     
     /**
      * Calculates the latitude ({@code phi}) from a meridian distance.
-     * Determines phi to TOL (1e-11) radians, about 1e-6 seconds.
+     * Determines phi to {@link #ITERATION_TOLERANCE} radians, about
+     * 1e-6 seconds.
      * 
      * @param arg meridian distance to calulate latitude for.
      * @return the latitude of the meridian distance.
@@ -423,7 +444,7 @@ public class TransverseMercator extends MapProjection {
         double s, t, phi, k = 1.0/(1.0 - excentricitySquared);
         int i;
         phi = arg;
-        for (i=MAX_ITER; true;) { // rarely goes over 5 iterations
+        for (i=MAXIMUM_ITERATIONS; true;) { // rarely goes over 5 iterations
             if (--i < 0) {
                 throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
             }
@@ -431,7 +452,7 @@ public class TransverseMercator extends MapProjection {
             t = 1.0 - excentricitySquared * s * s;
             t = (mlfn(phi, s, Math.cos(phi)) - arg) * (t * Math.sqrt(t)) * k;
             phi -= t;
-            if (Math.abs(t) < TOL) {
+            if (Math.abs(t) < ITERATION_TOLERANCE) {
                 return phi;
             }
         }
@@ -466,7 +487,7 @@ public class TransverseMercator extends MapProjection {
         double t;
         t  = centralLongitudeZone1 - 0.5*zoneWidth; // Longitude at the beginning of the first zone.
         t  = Math.toDegrees(centralMeridian) - t;   // Degrees of longitude between the central longitude and longitude 1.
-        t  = Math.floor(t/zoneWidth + EPS);         // Number of zones between the central longitude and longitude 1.
+        t  = Math.floor(t/zoneWidth + EPSILON);     // Number of zones between the central longitude and longitude 1.
         t -= zoneCount*Math.floor(t/zoneCount);     // If negative, bring back to the interval 0 to (zoneCount-1).
         return ((int) t)+1;
     }

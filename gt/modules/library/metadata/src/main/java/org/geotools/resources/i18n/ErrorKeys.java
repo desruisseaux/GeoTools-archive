@@ -197,6 +197,8 @@ public final class ErrorKeys {
     public static final int RECURSIVE_CALL_$2                      =   172;
     public static final int RGB_OUT_OF_RANGE_$1                    =   122;
     public static final int RMI_FAILURE                            =   123;
+    public static final int TEST_FAILURE_$3                        =   195;
+    public static final int TOLERANCE_ERROR                        =   196;
     public static final int TOO_MANY_OCCURENCES_$2                 =   124;
     public static final int UNDEFINED_PROPERTY                     =   125;
     public static final int UNDEFINED_PROPERTY_$1                  =   126;

@@ -80,6 +80,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Rueben Schulz
  */
 public abstract class LambertConformal extends MapProjection {
+    /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
     /** 
      * Constant for the belgium 2SP case. This is 29.2985 seconds, given here in radians.
      */
@@ -148,14 +153,14 @@ public abstract class LambertConformal extends MapProjection {
             phi1 = phi2 = latitudeOfOrigin;
         }
         // Compute constants
-        if (Math.abs(phi1 + phi2) < EPS) {
+        if (Math.abs(phi1 + phi2) < EPSILON) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ANTIPODE_LATITUDES_$2,
                                                new Latitude(Math.toDegrees(phi1)),
                                                new Latitude(Math.toDegrees(phi2))));
         }
         final double  cosphi1 = Math.cos(phi1);
         final double  sinphi1 = Math.sin(phi1);
-        final boolean  secant = Math.abs(phi1-phi2) > EPS; // Should be 'true' for 2SP case.
+        final boolean  secant = Math.abs(phi1-phi2) > EPSILON; // Should be 'true' for 2SP case.
         if (isSpherical) {
             if (secant) {
                 n = Math.log(cosphi1 / Math.cos(phi2)) /
@@ -165,7 +170,7 @@ public abstract class LambertConformal extends MapProjection {
                 n = sinphi1;
             }
             F = cosphi1 * Math.pow(Math.tan((Math.PI/4) + 0.5*phi1), n) / n;
-            if (Math.abs(Math.abs(latitudeOfOrigin) - (Math.PI/2)) >= EPS) {
+            if (Math.abs(Math.abs(latitudeOfOrigin) - (Math.PI/2)) >= EPSILON) {
                 rho0 = F * Math.pow(Math.tan((Math.PI/4) + 0.5*latitudeOfOrigin), -n);
             } else {
                 rho0 = 0.0;
@@ -182,7 +187,7 @@ public abstract class LambertConformal extends MapProjection {
                 n = sinphi1;
             }
             F = m1 * Math.pow(t1, -n) / n;
-            if (Math.abs(Math.abs(latitudeOfOrigin) - (Math.PI/2)) >= EPS) {
+            if (Math.abs(Math.abs(latitudeOfOrigin) - (Math.PI/2)) >= EPSILON) {
                 rho0 = F * Math.pow(tsfn(latitudeOfOrigin, Math.sin(latitudeOfOrigin)), n);
             } else {
                 rho0 = 0.0;
@@ -211,7 +216,7 @@ public abstract class LambertConformal extends MapProjection {
     {
         double rho;
         //Snyder p. 108
-        if (Math.abs(Math.abs(y) - (Math.PI/2)) < EPS) {
+        if (Math.abs(Math.abs(y) - (Math.PI/2)) < EPSILON) {
             if (y*n <= 0) {
                 throw new ProjectionException(Errors.format(ErrorKeys.POLE_PROJECTION_$1,
                                               new Latitude(Math.toDegrees(y))));
@@ -248,7 +253,7 @@ public abstract class LambertConformal extends MapProjection {
         double theta;
         y = rho0 - y;
         double rho = Math.sqrt(x*x + y*y);  // Zero when the latitude is 90 degrees.
-        if (rho > EPS) {
+        if (rho > EPSILON) {
             if (n < 0) {
                 rho = -rho;
                 x = -x;

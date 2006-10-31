@@ -45,6 +45,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class OrthographicOblique extends Orthographic {
     /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
      * The sine of the {@link #latitudeOfOrigin}.
      */
     private final double sinphi0; 
@@ -82,7 +87,7 @@ public class OrthographicOblique extends Orthographic {
         double coslam = Math.cos(x);
         double sinphi = Math.sin(y);
         
-        if (sinphi0*sinphi + cosphi0*cosphi*coslam < - EPS) {
+        if (sinphi0*sinphi + cosphi0*cosphi*coslam < - EPSILON) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
         
@@ -106,14 +111,14 @@ public class OrthographicOblique extends Orthographic {
         final double rho = Math.sqrt(x*x + y*y);
         double sinc = rho;
         if (sinc > 1.0) {
-            if ((sinc - 1.0) > EPS) {
+            if ((sinc - 1.0) > EPSILON) {
                 throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
             }
             sinc = 1.0;
         }
         
         double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
-        if (rho <= EPS) {
+        if (rho <= EPSILON) {
             y = latitudeOfOrigin;
             x = 0.0;
         } else {

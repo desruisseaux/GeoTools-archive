@@ -50,6 +50,21 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class StereographicPolar extends Stereographic {
     /**
+     * Maximum number of iterations for iterative computations.
+     */
+    private static final int MAXIMUM_ITERATIONS = 15;
+    
+    /**
+     * Difference allowed in iterative computations.
+     */
+    private static final double ITERATION_TOLERANCE = 1E-10;
+    
+    /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
      * A constant used in the transformations.
      * This is <strong>not</strong> equal to the {@link #scaleFactor}.
      */
@@ -98,7 +113,7 @@ public class StereographicPolar extends Stereographic {
         }
         ensureLatitudeInRange(Provider_Polar_B.LATITUDE_TRUE_SCALE, latitudeTrueScale, true);
                   
-        if (Math.abs(Math.abs(latitudeTrueScale)-(Math.PI/2)) >= EPS) {
+        if (Math.abs(Math.abs(latitudeTrueScale)-(Math.PI/2)) >= EPSILON) {
             final double latTrueScale = (southPole) ? -latitudeTrueScale : latitudeTrueScale;
             final double t = Math.sin(latTrueScale);
             k0 = msfn(t ,Math.cos(latTrueScale)) /
@@ -155,13 +170,12 @@ public class StereographicPolar extends Stereographic {
         final double t = rho/k0;
         final double halfe = excentricity/2.0;
         double phi0 = 0;
-        for (int i=MAX_ITER;;) {
+        for (int i=MAXIMUM_ITERATIONS;;) {
             final double esinphi = excentricity * Math.sin(phi0);
             final double phi = (Math.PI/2) - 
                                2.0*Math.atan(t*Math.pow((1-esinphi)/(1+esinphi), halfe));
-            if (Math.abs(phi-phi0) < TOL) {
-                x = (Math.abs(rho)<EPS) ? 
-                    0.0 : Math.atan2(x, -y);
+            if (Math.abs(phi-phi0) < ITERATION_TOLERANCE) {
+                x = (Math.abs(rho) < EPSILON) ? 0.0 : Math.atan2(x, -y);
                 y = (southPole) ? -phi : phi;
                 break;
             }
@@ -254,7 +268,7 @@ public class StereographicPolar extends Stereographic {
         {
             super(parameters, expected, latitudeOfOrigin, stereoType);
             assert isSpherical;
-            if (Math.abs(Math.abs(latitudeTrueScale) - (Math.PI/2)) >= EPS) {
+            if (Math.abs(Math.abs(latitudeTrueScale) - (Math.PI/2)) >= EPSILON) {
                 if (southPole) {
                     k0 = 1 - Math.sin(latitudeTrueScale);     //derived from (21-11)
                 } else {
@@ -282,7 +296,7 @@ public class StereographicPolar extends Stereographic {
             final double sinlon = Math.sin(x);
 
             if (southPole) {
-                if (Math.abs(1-sinlat) < EPS) {
+                if (Math.abs(1-sinlat) < EPSILON) {
                     throw new ProjectionException(Errors.format(
                         ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 }
@@ -291,7 +305,7 @@ public class StereographicPolar extends Stereographic {
                 x = f * sinlon; // (21-9)
                 y = f * coslon; // (21-10)
             } else {
-                if (Math.abs(1+sinlat) < EPS) {
+                if (Math.abs(1+sinlat) < EPSILON) {
                     throw new ProjectionException(Errors.format(
                         ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
                 }
@@ -299,10 +313,9 @@ public class StereographicPolar extends Stereographic {
                 final double f = k0 * coslat / (1+sinlat); // == tan (pi/4 - phi/2)
                 x =  f * sinlon; // (21-5)
                 y = -f * coslon; // (21-6)
-	    }
+            }
 
-            assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
+            assert checkTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -326,8 +339,8 @@ public class StereographicPolar extends Stereographic {
                 y = -y;
             }
             // (20-17) call atan2(x,y) to properly deal with y==0
-            x = (Math.abs(x)<EPS && Math.abs(y)<EPS) ? 0.0 : Math.atan2(x, y);
-            if (Math.abs(rho) < EPS) {
+            x = (Math.abs(x)<EPSILON && Math.abs(y)<EPSILON) ? 0.0 : Math.atan2(x, y);
+            if (Math.abs(rho) < EPSILON) {
                 y = latitudeOfOrigin;
             } else {
                 final double c = 2.0 * Math.atan(rho/k0);
@@ -336,8 +349,7 @@ public class StereographicPolar extends Stereographic {
                 // (20-14) with phi1=90
             }
 
-            assert Math.abs(ptDst.getX()-x) <= EPS : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS : y;
+            assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -408,7 +420,7 @@ public class StereographicPolar extends Stereographic {
             C *= 4.0;
             D *= 8.0;
 
-            if (Math.abs(Math.abs(latitudeTrueScale)-(Math.PI/2)) >= EPS) {
+            if (Math.abs(Math.abs(latitudeTrueScale)-(Math.PI/2)) >= EPSILON) {
                 final double latTrueScale = (southPole) ? -latitudeTrueScale : latitudeTrueScale;
                 final double t = Math.sin(latTrueScale);
                 k0 = msfn(t, Math.cos(latTrueScale)) *
@@ -439,16 +451,15 @@ public class StereographicPolar extends Stereographic {
                              Math.pow(1-excentricity, 1-excentricity)) / 2;
             final double chi = Math.PI/2 - 2*Math.atan(t);
 
-            x = (Math.abs(rho)<EPS) ? 0.0 : Math.atan2(x, -y);
+            x = (Math.abs(rho) < EPSILON) ? 0.0 : Math.atan2(x, -y);
 
-            //See Snyde P. 19, "Computation of Series"
+            // See Snyde P. 19, "Computation of Series"
             final double sin2chi = Math.sin(2.0*chi);
             final double cos2chi = Math.cos(2.0*chi);
             y = chi + sin2chi*(A + cos2chi*(B + cos2chi*(C + D*cos2chi)));
             y = (southPole) ? -y : y;
 
-            assert Math.abs(ptDst.getX()-x) <= EPS : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS : y;
+            assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;

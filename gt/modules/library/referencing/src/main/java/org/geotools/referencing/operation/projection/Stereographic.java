@@ -143,18 +143,15 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @author Rueben Schulz
  */
 public abstract class Stereographic extends MapProjection {
-    /** Projection mode for switch statement. */
-    protected static final short EPSG = 0;
-    /** Projection mode for switch statement. */
-    protected static final short USGS = 1;
-    /** Projection mode for switch statement. */
-    protected static final short POLAR_A = 2;
-    /** Projection mode for switch statement. */
-    protected static final short POLAR_B = 3;
-    /** Projection mode for switch statement. */
-    protected static final short POLAR_NORTH = 4;
-    /** Projection mode for switch statement. */
-    protected static final short POLAR_SOUTH = 5;
+    /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
+     * Projection mode for switch statement.
+     */
+    protected static final short EPSG=0, USGS=1, POLAR_A=2, POLAR_B=3, POLAR_NORTH=4, POLAR_SOUTH=5;
     
     /**
      * The type of stereographic projection, used for wkt parameters.
@@ -266,11 +263,11 @@ public abstract class Stereographic extends MapProjection {
             final Collection descriptors = PARAMETERS.descriptors();
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
                     return new StereographicPolar.Spherical(parameters, descriptors, Double.NaN, EPSG);
                 }
                 // Equatorial case.
-                else if (latitudeOfOrigin < EPS) {
+                else if (latitudeOfOrigin < EPSILON) {
                     return new StereographicEquatorial.Spherical(parameters, descriptors, EPSG);
                 }
                 // Generic (oblique) case.
@@ -279,7 +276,7 @@ public abstract class Stereographic extends MapProjection {
                 }
             } else {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
                     return new StereographicPolar(parameters, descriptors, Double.NaN, EPSG);
                 }
                 // Generic (oblique) case.
@@ -611,11 +608,11 @@ public abstract class Stereographic extends MapProjection {
             final Collection descriptors = PARAMETERS.descriptors();
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
                     return new StereographicPolar.Spherical(parameters, descriptors, Double.NaN, USGS);
                 }
                 // Equatorial case.
-                else if (latitudeOfOrigin < EPS) {
+                else if (latitudeOfOrigin < EPSILON) {
                     return new StereographicEquatorial.Spherical(parameters, descriptors, USGS);
                 }
                 // Generic (oblique) case.
@@ -624,11 +621,11 @@ public abstract class Stereographic extends MapProjection {
                 }
             } else {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
                     return new StereographicPolar(parameters, descriptors, Double.NaN, USGS);
                 }
                 // Equatorial case.
-                else if (latitudeOfOrigin < EPS) {
+                else if (latitudeOfOrigin < EPSILON) {
                     return new StereographicEquatorial(parameters, descriptors, USGS);
                 }
                 // Generic (oblique) case.

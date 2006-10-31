@@ -32,6 +32,9 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.XMath;
 
 
 /**
@@ -100,9 +103,14 @@ import org.geotools.referencing.NamedIdentifier;
  */
 public class Krovak extends MapProjection {
     /**
+     * Maximum number of iterations for iterative computations.
+     */
+    private static final int MAXIMUM_ITERATIONS = 15;
+    
+    /**
      * When to stop the iteration.
      */
-    private static final double EPS = 1E-11;
+    private static final double ITERATION_TOLERANCE = 1E-11;
 
     /**
      * Azimuth of the centre line passing through the centre of the projection.
@@ -141,6 +149,8 @@ public class Krovak extends MapProjection {
         azimuth                = doubleValue(expected, Provider.AZIMUTH,                  parameters);
         pseudoStandardParallel = doubleValue(expected, Provider.PSEUDO_STANDARD_PARALLEL, parameters);
         scaleFactor            = doubleValue(expected, Provider.SCALE_FACTOR,             parameters);
+        ensureLatitudeInRange (Provider.LATITUDE_OF_CENTER,  latitudeOfOrigin, false);
+        ensureLongitudeInRange(Provider.LONGITUDE_OF_CENTER, centralMeridian,  false);
 
         // Calculates useful constants.
         sinAzim = Math.sin(azimuth);
@@ -227,7 +237,7 @@ public class Krovak extends MapProjection {
             throws ProjectionException
     {
         // x -> southing, y -> westing
-        final double ro  = Math.sqrt(x*x + y*y);
+        final double ro  = XMath.hypot(x, y);
         final double eps = Math.atan2(-x, -y);
         final double d   = eps / n;
         final double s   = 2 * (Math.atan(Math.pow(ro0/ro, 1/n) * tanS2) - s45);
@@ -240,10 +250,16 @@ public class Krovak extends MapProjection {
         double fi1 = u;
 
         // iteration calculation
-        while (Math.abs(fi1 - phi) > EPS) {
+        for (int i=MAXIMUM_ITERATIONS;;) {
             fi1 = phi;
             final double esf = excentricity * Math.sin(fi1);
             phi = 2. * (Math.atan(kau * Math.pow((1. + esf) / (1. - esf), excentricity/2.)) - s45);
+            if (Math.abs(fi1 - phi) <= ITERATION_TOLERANCE) {
+                break;
+            }
+            if (--i < 0) {
+                throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
+            }
         }
 
         if (ptDst != null) {

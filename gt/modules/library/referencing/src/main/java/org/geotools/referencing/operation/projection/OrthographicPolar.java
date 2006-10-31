@@ -45,6 +45,11 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class OrthographicPolar extends Orthographic {
     /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
      * {@code true} if this projection is for the north pole, or {@code false}
      * if it is for the south pole.
      */
@@ -61,7 +66,7 @@ public class OrthographicPolar extends Orthographic {
             throws ParameterNotFoundException
     {
         super(parameters, expected);
-        assert (Math.abs(Math.abs(latitudeOfOrigin) - Math.PI/2) < EPS) : latitudeOfOrigin;
+        assert (Math.abs(Math.abs(latitudeOfOrigin) - Math.PI/2) < EPSILON) : latitudeOfOrigin;
         northPole = (latitudeOfOrigin > 0);
         latitudeOfOrigin = (northPole) ? Math.PI/2.0 : -Math.PI/2.0;
         assert isSpherical;
@@ -75,7 +80,7 @@ public class OrthographicPolar extends Orthographic {
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        if (Math.abs(y - latitudeOfOrigin) - EPS > Math.PI/2.0) {
+        if (Math.abs(y - latitudeOfOrigin) - EPSILON > Math.PI/2.0) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
         double cosphi = Math.cos(y);
@@ -103,12 +108,12 @@ public class OrthographicPolar extends Orthographic {
         final double rho = Math.sqrt(x*x + y*y);
         double sinc = rho;
         if (sinc > 1.0) {
-            if ((sinc - 1.0) > EPS) {
+            if ((sinc - 1.0) > EPSILON) {
                 throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
             }
             sinc = 1.0;
         }
-        if (rho <= EPS) {
+        if (rho <= EPSILON) {
             y = latitudeOfOrigin;
             x = 0.0;
         } else {

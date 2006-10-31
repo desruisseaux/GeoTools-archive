@@ -86,17 +86,17 @@ public abstract class MapProjection extends AbstractMathTransform
     /**
      * Maximum difference allowed when comparing real numbers.
      */
-    static final double EPS = 1.0E-6;
+    private static final double EPSILON = 1E-6;
     
     /**
      * Difference allowed in iterative computations.
      */
-    static final double TOL = 1E-10;
+    private static final double ITERATION_TOLERANCE = 1E-10;
     
     /**
-     * Maximum number of itterations for iterative computations.
+     * Maximum number of iterations for iterative computations.
      */
-    static final int MAX_ITER = 15;
+    private static final int MAXIMUM_ITERATIONS = 15;
     
     /**
      * Ellipsoid excentricity, equals to <code>sqrt({@link #excentricitySquared})</code>.
@@ -453,7 +453,21 @@ public abstract class MapProjection extends AbstractMathTransform
     //////////////////////////////////////////////////////////////////////////////////////////
     
     /**
-     * Check point for private use by {@link #checkTransform}. This class is necessary in order
+     * Returns the orthodromic distance between the two specified points using a spherical
+     * approximation. This is used for assertions only.
+     */
+    private double orthodromicDistance(final Point2D source, final Point2D target) {
+        final double y1 = Math.toRadians(source.getY());
+        final double y2 = Math.toRadians(target.getY());
+        final double dx = Math.toRadians(Math.abs(target.getX() - source.getX()) % 360);
+        double rho = Math.sin(y1)*Math.sin(y2) + Math.cos(y1)*Math.cos(y2)*Math.cos(dx);
+        if (rho>+1) {assert rho <= +(1+EPSILON) : rho; rho=+1;}
+        if (rho<-1) {assert rho >= -(1+EPSILON) : rho; rho=-1;}
+        return Math.acos(rho) * semiMajor;
+    }
+    
+    /**
+     * Check point for private use by {@link #checkReciprocal}. This class is necessary in order
      * to avoid never-ending loop in {@code assert} statements (when an {@code assert}
      * calls {@code transform(...)}, which calls {@code inverse.transform(...)}, which
      * calls {@code transform(...)}, etc.).
@@ -474,7 +488,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * @param inverse {@code true} for an inverse transform instead of a direct one.
      * @return {@code true} if the two points are close enough.
      */
-    private boolean checkTransform(Point2D point, final Point2D target, final boolean inverse) {
+    private boolean checkReciprocal(Point2D point, final Point2D target, final boolean inverse) {
         if (!(point instanceof CheckPoint)) try {
             point = new CheckPoint(point);
             final double longitude;
@@ -483,13 +497,7 @@ public abstract class MapProjection extends AbstractMathTransform
             if (inverse) {
                 // Computes orthodromic distance (spherical model) in metres.
                 point = ((MathTransform2D)inverse()).transform(point, point);
-                final double y1 = Math.toRadians(point .getY());
-                final double y2 = Math.toRadians(target.getY());
-                final double dx = Math.toRadians(Math.abs(target.getX()-point.getX()) % 360);
-                double rho = Math.sin(y1)*Math.sin(y2) + Math.cos(y1)*Math.cos(y2)*Math.cos(dx);
-                if (rho>+1) {assert rho<=+(1+EPS) : rho; rho=+1;}
-                if (rho<-1) {assert rho>=-(1+EPS) : rho; rho=-1;}
-                distance  = Math.acos(rho)*semiMajor;
+                distance  = orthodromicDistance(point, target);
                 longitude = point.getX();
                 latitude  = point.getY();
             } else {
@@ -512,6 +520,79 @@ public abstract class MapProjection extends AbstractMathTransform
             throw error;
         }
         return true;
+    }
+
+    /**
+     * Checks if transform using spherical formulas produces the same result
+     * than ellipsoidal formulas. This method is invoked during assertions only.
+     *
+     * @param x The easting computed by spherical formulas, in metres.
+     * @param y The northing computed by spherical formulas, in metres.
+     * @param expected The (easting,northing) computed by ellipsoidal formulas.
+     * @param tolerance The tolerance (optional).
+     */
+    static boolean checkTransform(final double x, final double y,
+                                  final Point2D expected, final double tolerance)
+    {
+        compare("x", expected.getX(), x, tolerance);
+        compare("y", expected.getY(), y, tolerance);
+        return tolerance < Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Default version of {@link #checkTransform(double,double,Point2D,double)}.
+     */
+    static boolean checkTransform(final double x, final double y, final Point2D expected) {
+        return checkTransform(x, y, expected, EPSILON);
+    }
+
+    /**
+     * Checks if inverse transform using spherical formulas produces the same result
+     * than ellipsoidal formulas. This method is invoked during assertions only.
+     * <p>
+     * <strong>Note:</strong> this method ignore the longitude if the latitude is
+     * at a pole, because in such case the longitude is meanless.
+     *
+     * @param longitude The longitude computed by spherical formulas, in radians.
+     * @param latitude  The latitude computed by spherical formulas, in radians.
+     * @param expected  The (longitude,latitude) computed by ellipsoidal formulas.
+     * @param tolerance The tolerance (optional).
+     */
+    static boolean checkInverseTransform(final double longitude, final double latitude,
+                                         final Point2D expected, final double tolerance)
+    {
+        compare("latitude", expected.getY(), latitude, tolerance);
+        if (Math.abs(Math.PI/2 - latitude) > EPSILON) {
+            compare("longitude", expected.getX(), longitude, tolerance);
+        }
+        return tolerance < Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Default version of {@link #checkInverseTransform(double,double,Point2D,double)}.
+     */
+    static boolean checkInverseTransform(double longitude, double latitude, Point2D expected) {
+        return checkInverseTransform(longitude, latitude, expected, EPSILON);
+    }
+
+    /**
+     * Compares two value for equality up to some tolerance threshold. This is used during
+     * assertions only. The comparaison do not fails if at least one value to compare is
+     * {@link Double#NaN}.
+     * <p>
+     * <strong>Hack:</strong> if the {@code variable} name starts by lower-case {@code L}
+     * (as in "longitude" and "latitude"), then the value is assumed to be an angle in
+     * radians. This is used for formatting an error message, if needed.
+     */
+    private static void compare(String variable, double expected, double actual, double tolerance) {
+        if (Math.abs(expected - actual) > tolerance) {
+            if (variable.charAt(0) == 'l') {
+                actual   = Math.toDegrees(actual);
+                expected = Math.toDegrees(expected);
+            }
+            throw new AssertionError(Errors.format(ErrorKeys.TEST_FAILURE_$3, variable,
+                      new Double(expected), new Double(actual)));
+        }
     }
     
     /**
@@ -616,11 +697,12 @@ public abstract class MapProjection extends AbstractMathTransform
     public final Point2D transform(final Point2D ptSrc, Point2D ptDst) throws ProjectionException {
         final double x = ptSrc.getX();
         final double y = ptSrc.getY();
-        if (x<Longitude.MIN_VALUE-EPS || x>Longitude.MAX_VALUE+EPS) { // Do not fail for NaN values.
+        // Note: the following tests should not fails for NaN values.
+        if (x<Longitude.MIN_VALUE-EPSILON || x>Longitude.MAX_VALUE+EPSILON) {
             throw new PointOutsideEnvelopeException(Errors.format(
                     ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
         }
-        if (y<Latitude.MIN_VALUE-EPS || y>Latitude.MAX_VALUE+EPS) { // Do not fail for NaN values.
+        if (y<Latitude.MIN_VALUE-EPSILON || y>Latitude.MAX_VALUE+EPSILON) {
             throw new PointOutsideEnvelopeException(Errors.format(
                     ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
         }
@@ -639,7 +721,7 @@ public abstract class MapProjection extends AbstractMathTransform
         ptDst.setLocation(globalScale*ptDst.getX() + falseEasting, 
                           globalScale*ptDst.getY() + falseNorthing);
 
-        assert checkTransform(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x,y), true);
+        assert checkReciprocal(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x,y), true);
         return ptDst;
     }
     
@@ -798,15 +880,16 @@ public abstract class MapProjection extends AbstractMathTransform
             final double y = Math.toDegrees(ptDst.getY());
             ptDst.setLocation(x,y);
 
-            if (x<Longitude.MIN_VALUE-EPS || x>Longitude.MAX_VALUE+EPS) { // Accept NaN values.
+            // Note: the following tests should not fails for NaN values.
+            if (x<Longitude.MIN_VALUE-EPSILON || x>Longitude.MAX_VALUE+EPSILON) {
                 throw new PointOutsideEnvelopeException(Errors.format(
                         ErrorKeys.LONGITUDE_OUT_OF_RANGE_$1, new Longitude(x)));
             }
-            if (y<Latitude.MIN_VALUE-EPS || y>Latitude.MAX_VALUE+EPS) { // Accept NaN values.
+            if (y<Latitude.MIN_VALUE-EPSILON || y>Latitude.MAX_VALUE+EPSILON) {
                 throw new PointOutsideEnvelopeException(Errors.format(
                         ErrorKeys.LATITUDE_OUT_OF_RANGE_$1, new Latitude(y)));
             }
-            assert checkTransform(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x0, y0), false);
+            assert checkReciprocal(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x0, y0), false);
             return ptDst;
         }
 
@@ -921,7 +1004,7 @@ public abstract class MapProjection extends AbstractMathTransform
     }
 
     /**
-     * Maximal error (in metres) tolerated for assertion, if enabled. When assertions are enabled,
+     * Maximal error (in metres) tolerated for assertions, if enabled. When assertions are enabled,
      * every direct projection is followed by an inverse projection, and the result is compared to
      * the original coordinate. If a distance greater than the tolerance level is found, then an
      * {@link AssertionError} will be thrown. Subclasses should override this method if they need
@@ -939,7 +1022,7 @@ public abstract class MapProjection extends AbstractMathTransform
             return 1;
         }
         // Be less strict when the point is near an edge.
-        return (Math.abs(longitude) > 179) || (Math.abs(latitude) > 89) ? 1E-1 : 1E-6;
+        return (Math.abs(longitude) > 179) || (Math.abs(latitude) > 89) ? 1E-1 : EPSILON;
     }
     
     
@@ -1004,11 +1087,11 @@ public abstract class MapProjection extends AbstractMathTransform
     final double cphi2(final double ts) throws ProjectionException {
         final double eccnth = 0.5*excentricity;
         double phi = (Math.PI/2) - 2.0*Math.atan(ts);
-        for (int i=0; i<MAX_ITER; i++) {
+        for (int i=0; i<MAXIMUM_ITERATIONS; i++) {
             final double con  = excentricity*Math.sin(phi);
             final double dphi = (Math.PI/2) - 2.0*Math.atan(ts * Math.pow((1-con)/(1+con), eccnth)) - phi;
             phi += dphi;
-            if (Math.abs(dphi) <= TOL) {
+            if (Math.abs(dphi) <= ITERATION_TOLERANCE) {
                 return phi;
             }
         }
@@ -1068,7 +1151,8 @@ public abstract class MapProjection extends AbstractMathTransform
         public static final ParameterDescriptor SEMI_MAJOR = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "semi_major"),
-                    new NamedIdentifier(Citations.EPSG, "semi-major axis")   //epsg does not specifically define this parameter
+                    new NamedIdentifier(Citations.EPSG, "semi-major axis")
+                    // EPSG does not specifically define the above parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 
@@ -1081,7 +1165,8 @@ public abstract class MapProjection extends AbstractMathTransform
         public static final ParameterDescriptor SEMI_MINOR = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "semi_minor"),
-                    new NamedIdentifier(Citations.EPSG, "semi-minor axis")   //epsg does not specifically define this parameter
+                    new NamedIdentifier(Citations.EPSG, "semi-minor axis")
+                    // EPSG does not specifically define the above parameter
                 },
                 Double.NaN, 0, Double.POSITIVE_INFINITY, SI.METER);
 

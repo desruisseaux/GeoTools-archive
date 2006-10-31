@@ -59,7 +59,7 @@ import org.geotools.metadata.iso.citation.Citations;
  *       like {@link Complex#add add} (easy), {@link Complex#multiply multiply} (more tedious),
  *       <cite>etc.</cite>, until we get a code using only {@code double} primitives on the stack
  *       and no {@link Complex} objects on the heap (except the {@code A} and {@code B} constants).
- *       But it would make the code significantly more complex and difficult to read.
+ *       But it would make the code significantly more difficult to read.
  *       <p>
  *       An elegant fix would have been "lightweight objects" allocated on the stack (something
  *       similar to {@code struct} in C#), if such thing existed in the Java language.

@@ -33,6 +33,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
+import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 
@@ -49,6 +50,21 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @author Rueben Schulz
  */
 public class StereographicOblique extends Stereographic {    
+    /**
+     * Maximum number of iterations for iterative computations.
+     */
+    private static final int MAXIMUM_ITERATIONS = 15;
+    
+    /**
+     * Difference allowed in iterative computations.
+     */
+    private static final double ITERATION_TOLERANCE = 1E-10;
+    
+    /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
     /**
      * A constant used in the transformations.
      * This is <strong>not</strong> equal to the {@link #scaleFactor}.
@@ -74,7 +90,7 @@ public class StereographicOblique extends Stereographic {
     {
         super(parameters, expected);
         this.stereoType = stereoType;
-        if (Math.abs(latitudeOfOrigin) < EPS) {    //Equitorial
+        if (Math.abs(latitudeOfOrigin) < EPSILON) {    // Equitorial
             cosphi0 = 1.0;
             sinphi0 = 0.0;
             chi1    = 0.0;
@@ -126,8 +142,8 @@ public class StereographicOblique extends Stereographic {
         final double ce = 2.0 * Math.atan2(rho*cosChi1, k0);
         final double cosce = Math.cos(ce);
         final double since = Math.sin(ce);
-        final double chi = (Math.abs(rho)>=EPS) ? 
-            Math.asin(cosce*sinChi1 + (y*since*cosChi1 / rho)) : chi1;
+        final double chi = (Math.abs(rho) >= EPSILON) ? 
+                Math.asin(cosce*sinChi1 + (y*since*cosChi1 / rho)) : chi1;
         final double tp = Math.tan(Math.PI/4.0 + chi/2.0);
         
         //parts of (21-36) used to calculate longitude
@@ -139,12 +155,12 @@ public class StereographicOblique extends Stereographic {
          */
         final double halfe = excentricity/2.0;
         double phi0 = chi;
-        for (int i=MAX_ITER;;) {
+        for (int i=MAXIMUM_ITERATIONS;;) {
             final double esinphi = excentricity*Math.sin(phi0);
             final double phi = 2*Math.atan(tp*Math.pow((1+esinphi)/(1-esinphi), halfe))-(Math.PI/2);
-            if (Math.abs(phi-phi0) < TOL) {
+            if (Math.abs(phi-phi0) < ITERATION_TOLERANCE) {
                 // TODO: checking rho may be redundant
-                x = (Math.abs(rho)<EPS) || (Math.abs(t)<EPS && Math.abs(ct)<EPS) ? 
+                x = (Math.abs(rho)<EPSILON) || (Math.abs(t)<EPSILON && Math.abs(ct)<EPSILON) ? 
                      0.0 : Math.atan2(t, ct);
                 y = phi;
                 break;
@@ -249,7 +265,7 @@ public class StereographicOblique extends Stereographic {
             final double sinlat = Math.sin(y);
             final double coslon = Math.cos(x);
             double f = 1.0 + sinphi0*sinlat + cosphi0*coslat*coslon; // (21-4)
-            if (f < EPS) {
+            if (f < EPSILON) {
                 throw new ProjectionException(Errors.format(
                           ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
@@ -257,8 +273,7 @@ public class StereographicOblique extends Stereographic {
             x = f * coslat * Math.sin(x);                           // (21-2)
             y = f * (cosphi0 * sinlat - sinphi0 * coslat * coslon); // (21-3)
 
-            assert Math.abs(ptDst.getX()-x) <= EPS*globalScale : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS*globalScale : y;
+            assert checkTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -277,7 +292,7 @@ public class StereographicOblique extends Stereographic {
             assert (ptDst = super.inverseTransformNormalized(x, y, ptDst)) != null;
 
             final double rho = Math.sqrt(x*x + y*y);
-            if (Math.abs(rho) < EPS) {
+            if (Math.abs(rho) < EPSILON) {
                 y = latitudeOfOrigin;
                 x = 0.0;
             } else {
@@ -287,12 +302,11 @@ public class StereographicOblique extends Stereographic {
                 final double ct = rho*cosphi0*cosc - y*sinphi0*sinc; // (20-15)
                 final double t  = x*sinc;                            // (20-15)
                 y = Math.asin(cosc*sinphi0 + y*sinc*cosphi0/rho);    // (20-14)
-                x = (Math.abs(ct)<EPS && Math.abs(t)<EPS) ? 
+                x = (Math.abs(ct)<EPSILON && Math.abs(t)<EPSILON) ? 
                      0.0 : Math.atan2(t, ct);
             }
-
-            assert Math.abs(ptDst.getX()-x) <= EPS : x;
-            assert Math.abs(ptDst.getY()-y) <= EPS : y;
+            
+            assert checkInverseTransform(x, y, ptDst);
             if (ptDst != null) {
                 ptDst.setLocation(x,y);
                 return ptDst;
@@ -348,7 +362,7 @@ public class StereographicOblique extends Stereographic {
          * The tolerance used for the inverse itteration. This is smaller
          * than the tolerance in the {@link MapProjection} superclass.
          */
-        private static final double TOL = 1E-14;
+        private static final double ITERATION_TOLERANCE = 1E-14;
         
         /**
          * Constructs an oblique stereographic projection (EPSG equations).
@@ -413,9 +427,8 @@ public class StereographicOblique extends Stereographic {
         protected Point2D inverseTransformNormalized(double x, double y, Point2D ptDst)
                 throws ProjectionException 
         {
-            final double rho = Math.sqrt(x*x + y*y);
-            
-            if (Math.abs(rho) < EPS) {
+            final double rho = XMath.hypot(x, y);
+            if (Math.abs(rho) < EPSILON) {
                 x = 0.0;
                 y = phic0;
             } else {
@@ -435,9 +448,9 @@ public class StereographicOblique extends Stereographic {
             // Begin pj_inv_gauss(...) method inlined
             x /= C;
             double num = Math.pow(Math.tan(.5 * y + Math.PI/4.0)/K, 1./C);
-            for (int i=MAX_ITER;;) {
+            for (int i=MAXIMUM_ITERATIONS;;) {
                 double phi = 2.0 * Math.atan(num * srat(excentricity * Math.sin(y), - 0.5 * excentricity)) - Math.PI/2.0;
-                if (Math.abs(phi - y) < TOL) {
+                if (Math.abs(phi - y) < ITERATION_TOLERANCE) {
                     break;
                 }
                 y = phi;

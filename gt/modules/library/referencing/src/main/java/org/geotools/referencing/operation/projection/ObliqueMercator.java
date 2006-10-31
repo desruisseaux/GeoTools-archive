@@ -152,6 +152,16 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class ObliqueMercator extends MapProjection {
     /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
+     * Maximum difference allowed when comparing latitudes.
+     */
+    private static final double EPSILON_LATITUDE = 1E-10;
+    
+    /**
      * Latitude of the projection centre. This is similar to the 
      * {@link #latitudeOfOrigin}, but the latitude of origin is the
      * Earth equator on aposphere for the oblique mercator. Needed
@@ -289,13 +299,13 @@ public class ObliqueMercator extends MapProjection {
             ensureLongitudeInRange(Provider_TwoPoint.LONG_OF_2ND_POINT, longitudeOf2ndPoint, true);
             
             double con = Math.abs(latitudeOf1stPoint);
-            if (Math.abs(latitudeOf1stPoint - latitudeOf2ndPoint) < TOL) {
+            if (Math.abs(latitudeOf1stPoint - latitudeOf2ndPoint) < EPSILON_LATITUDE) {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT1_EQ_LAT2));
             }
-            if (Math.abs(latitudeOf1stPoint) < TOL) {
+            if (Math.abs(latitudeOf1stPoint) < EPSILON_LATITUDE) {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT1_EQ_ZERO));
             }
-            if (Math.abs(latitudeOf2ndPoint + Math.PI/2.0) < TOL) {
+            if (Math.abs(latitudeOf2ndPoint + Math.PI/2.0) < EPSILON_LATITUDE) {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT2_EQ_NEG_90));
             }
         } else {
@@ -367,8 +377,8 @@ public class ObliqueMercator extends MapProjection {
             //check for asin(+-1.00000001)
             double temp = 0.5 * (F - 1.0 / F) * Math.tan(gamma0);
             if (Math.abs(temp) > 1.0) {
-                if (Math.abs(Math.abs(temp) - 1.0) > EPS) {
-                    throw new IllegalArgumentException("Tolerance condition error");
+                if (Math.abs(Math.abs(temp) - 1.0) > EPSILON) {
+                    throw new IllegalArgumentException(Errors.format(ErrorKeys.TOLERANCE_ERROR));
                 }
                 temp = (temp > 0) ? 1.0 : -1.0;
             }
@@ -388,7 +398,7 @@ public class ObliqueMercator extends MapProjection {
         if (hotine) {
             u_c = 0.0;
         } else {
-            if (Math.abs(Math.abs(alpha_c) - Math.PI/2.0) < TOL) {
+            if (Math.abs(Math.abs(alpha_c) - Math.PI/2.0) < EPSILON_LATITUDE) {
                 //longitudeOfCentre = NaN in twopoint, but alpha_c cannot be 90 here (lat1 != lat2)
                 u_c = A * (longitudeOfCentre - centralMeridian);
             } else {
@@ -439,18 +449,18 @@ public class ObliqueMercator extends MapProjection {
             throws ProjectionException 
     {
         double u, v;
-        if (Math.abs(Math.abs(y) - Math.PI/2.0) > EPS) {
+        if (Math.abs(Math.abs(y) - Math.PI/2.0) > EPSILON) {
             double Q = E / Math.pow(tsfn(y, Math.sin(y)), B);
             double temp = 1.0 / Q;
             double S = 0.5 * (Q - temp);
             double V = Math.sin(B * x);
             double U = (S * singamma0 - V * cosgamma0) / (0.5 * (Q + temp));
-            if (Math.abs(Math.abs(U) - 1.0) < EPS) {
+            if (Math.abs(Math.abs(U) - 1.0) < EPSILON) {
                 throw new ProjectionException(Errors.format(ErrorKeys.INFINITE_VALUE_$1, "v"));
             }
             v = 0.5 * ArB * Math.log((1.0 - U) / (1.0 + U));
             temp = Math.cos(B * x);
-            if (Math.abs(temp) < TOL) {
+            if (Math.abs(temp) < EPSILON_LATITUDE) {
                 u = AB * x;
             } else {
                 u = ArB * Math.atan2((S * cosgamma0 + V * singamma0), temp);
@@ -485,7 +495,7 @@ public class ObliqueMercator extends MapProjection {
         double Sp = 0.5 * (Qp - temp);
         double Vp = Math.sin(BrA * u);
         double Up = (Vp * cosgamma0 + Sp * singamma0) / (0.5 * (Qp + temp));
-        if (Math.abs(Math.abs(Up) - 1.0) < EPS) {
+        if (Math.abs(Math.abs(Up) - 1.0) < EPSILON) {
             x = 0.0;
             y = Up < 0.0 ? -Math.PI / 2.0 : Math.PI / 2.0;
         } else {

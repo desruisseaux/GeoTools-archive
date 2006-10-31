@@ -72,6 +72,11 @@ import org.geotools.resources.i18n.Errors;
  */
 public abstract class Orthographic extends MapProjection {
     /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+    
+    /**
      * Creates a transform from the specified group of parameter values.
      *
      * @param  parameters The group of parameter values.
@@ -170,11 +175,11 @@ public abstract class Orthographic extends MapProjection {
             final Collection descriptors = PARAMETERS.descriptors();
             if (isSpherical(parameters)) {
                 // Polar case.
-                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPS) {
+                if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
                     return new OrthographicPolar(parameters, descriptors);
                 }
                 // Equatorial case.
-                else if (latitudeOfOrigin < EPS) {
+                else if (latitudeOfOrigin < EPSILON) {
                     return new OrthographicEquatorial(parameters, descriptors);
                 }
                 // Generic (oblique) case.

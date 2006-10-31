@@ -4,7 +4,6 @@
  *
  *   (C) 2003-2006, Geotools Project Managment Committee (PMC)
  *   (C) 2000, Frank Warmerdam
- *   (C) 1999, Fisheries and Oceans Canada
  *   (C) 1995, Gerald Evenden
  *   
  *    This library is free software; you can redistribute it and/or
@@ -83,6 +82,21 @@ import org.geotools.resources.i18n.Errors;
  */
 public class AlbersEqualArea extends MapProjection {       
     /**
+     * Maximum number of iterations for iterative computations.
+     */
+    private static final int MAXIMUM_ITERATIONS = 15;
+    
+    /**
+     * Difference allowed in iterative computations.
+     */
+    private static final double ITERATION_TOLERANCE = 1E-10;
+    
+    /**
+     * Maximum difference allowed when comparing real numbers.
+     */
+    private static final double EPSILON = 1E-6;
+        
+    /**
      * Constants used by the spherical and elliptical Albers projection. 
      */
     private final double n, c, rho0;
@@ -124,7 +138,7 @@ public class AlbersEqualArea extends MapProjection {
         ensureLatitudeInRange(Provider.STANDARD_PARALLEL_2, phi2, true);
 
         // Compute Constants
-        if (Math.abs(phi1 + phi2) < EPS) 
+        if (Math.abs(phi1 + phi2) < EPSILON) 
             throw new IllegalArgumentException(Errors.format(ErrorKeys.ANTIPODE_LATITUDES_$2,
                                                new Latitude(Math.toDegrees(phi1)),
                                                new Latitude(Math.toDegrees(phi2))));
@@ -132,7 +146,7 @@ public class AlbersEqualArea extends MapProjection {
         double  sinphi = Math.sin(phi1);
         double  cosphi = Math.cos(phi1);
         double  n      = sinphi;
-        boolean secant = (Math.abs(phi1 - phi2) >= EPS);
+        boolean secant = (Math.abs(phi1 - phi2) >= EPSILON);
         if (isSpherical) {
             if (secant) {
                 n = 0.5 * (n + Math.sin(phi2));
@@ -193,11 +207,10 @@ public class AlbersEqualArea extends MapProjection {
         }
 
         if (rho < 0.0) {
-            if (Math.abs(rho) < EPS) {
+            if (rho > -EPSILON) {
                 rho = 0.0;
             } else {
-                //TODO: can remove if someone can prove this condition will never happen
-                throw new ProjectionException("Tolerance condition error");
+                throw new ProjectionException(Errors.format(ErrorKeys.TOLERANCE_ERROR));
             }
         }
         rho = Math.sqrt(rho) / n;
@@ -220,7 +233,7 @@ public class AlbersEqualArea extends MapProjection {
     {
         y = rho0 - y;
         double rho = Math.sqrt(x*x + y*y);
-        if (rho > EPS) {
+        if (rho > EPSILON) {
             if (n < 0.0) {
                 rho = -rho;
                 x   = -x;
@@ -238,7 +251,7 @@ public class AlbersEqualArea extends MapProjection {
                 }     
             } else {
                 y = (c - y*y) / n;
-                if (Math.abs(ec - Math.abs(y)) > EPS) {
+                if (Math.abs(ec - Math.abs(y)) > EPSILON) {
                     y = phi1(y);
                 } else {
                     y = (y < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
@@ -265,10 +278,10 @@ public class AlbersEqualArea extends MapProjection {
     private double phi1(final double qs) throws ProjectionException {
         final double tone_es = 1 - excentricitySquared;
         double phi = Math.asin(0.5 * qs);
-        if (excentricity < EPS) {
+        if (excentricity < EPSILON) {
             return phi;
         }
-        for (int i=0; i<MAX_ITER; i++) {
+        for (int i=0; i<MAXIMUM_ITERATIONS; i++) {
             final double sinpi = Math.sin(phi);
             final double cospi = Math.cos(phi);
             final double con   = excentricity * sinpi;
@@ -277,7 +290,7 @@ public class AlbersEqualArea extends MapProjection {
                                  (qs/tone_es - sinpi / com + 0.5/excentricity * 
                                  Math.log((1. - con) / (1. + con)));
             phi += dphi;
-            if (Math.abs(dphi) <= TOL) {
+            if (Math.abs(dphi) <= ITERATION_TOLERANCE) {
                 return phi;
             }
         } 
@@ -292,7 +305,7 @@ public class AlbersEqualArea extends MapProjection {
      */
     private double qsfn(final double sinphi) {
         final double one_es = 1 - excentricitySquared;
-        if (excentricity >= EPS) {
+        if (excentricity >= EPSILON) {
             final double con = excentricity * sinphi;
             return (one_es * (sinphi / (1. - con*con) -
                    (0.5/excentricity) * Math.log((1.-con) / (1.+con))));

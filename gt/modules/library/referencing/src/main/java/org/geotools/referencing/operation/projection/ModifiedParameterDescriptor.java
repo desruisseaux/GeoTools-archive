@@ -26,10 +26,20 @@ import org.opengis.parameter.ParameterDescriptor;
 
 // Geotools dependencies
 import org.geotools.parameter.DefaultParameterDescriptor;
+import org.geotools.referencing.operation.MathTransformProvider;  // For javadoc
 
 
 /**
- * A parameter descriptor identical to the supplied one except for the default value.
+ * A parameter descriptor identical to the supplied one except for the
+ * default value. The constructor expects a model created by one of the
+ * {@linkplain MathTransformProvider#createDescriptor(Identifier[],double,double,double,Unit)
+ * provider methods}, usually using some neutral default value. For example the base class for
+ * map projection providers defines a set of
+ * {@linkplain org.geotools.referencing.operation.projection.MapProjection.Provider#SEMI_MAJOR
+ * commonly used parameter descriptors}. However some map projections are specific to a
+ * particular area (for example the {@linkplain NewZealandMapGrid New Zealand map grid}
+ * and may wish to override the neutral default values with some default value appropriate
+ * for that area.
  *
  * @source $URL$
  * @version $Id$
