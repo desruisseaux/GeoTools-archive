@@ -53,7 +53,26 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <module>arcsde</module>
+    <module>db2</module>
+    <module>directory</module>
+<!-- <module>epsg-extension</module> -->
+    <module>geomedia</module>
+<!-- <module>geometryless</module> -->
+    <module>gml</module>
+    <module>go</module>
+    <module>hsql</module>
     <module>jpox</module>
+    <module>mif</module>
+    <module>mysql</module>
+    <module>oracle-spatial</module>
+    <module>tiger</module>
+    <module>vpf</module>
+    <module>xml-sld</module>
+    <module>xml-xsd</module>
+    <module>xml-gml2</module>
+    <module>xml-gml3</module>
+    <module>xml-filter</module>
   </modules>
   
 </project>

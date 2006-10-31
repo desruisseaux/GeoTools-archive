@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-modules</artifactId>
+    <artifactId>gt2-unsupported</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,20 +24,20 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-extension</artifactId>
-  <packaging>pom</packaging>
-  <name>Geotools extensions</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/</url>
+  <artifactId>gt2-geomedia</artifactId>
+  <packaging>jar</packaging>
+  <name>GeoMedia datastore implementation</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/geomedia/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geomedia/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/geomedia/</url>
   </scm>
   
   <description>
-    Extensions to Geotools.
+    (todo)
   </description>
 
   <licenses>
@@ -47,20 +47,35 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
-  
+
+
   <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
+  <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
-  <modules>
-    <module>brewer</module>
-    <module>graph</module>
-    <module>openoffice</module>
-    <module>shapefile-renderer</module>
-    <module>validation</module>
-    <module>widgets-swing</module>
-    <module>mappane</module>
-  </modules>
+  <developers>
+    <developer>
+      <name>Julian Ray</name>
+      <id>jjray</id>
+      <email>jjray@users.sourceforge.net</email>
+      <organization></organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-jdbc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 
 
 </project>

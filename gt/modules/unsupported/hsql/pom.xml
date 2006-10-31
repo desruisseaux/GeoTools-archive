@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-modules</artifactId>
+    <artifactId>gt2-unsupported</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,20 +24,22 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-extension</artifactId>
-  <packaging>pom</packaging>
-  <name>Geotools extensions</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/</url>
+  <artifactId>gt2-hsql</artifactId>
+  <packaging>jar</packaging>
+  <name>HSQL datasource module</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/hsql/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/hsql/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/hsql/</url>
   </scm>
   
   <description>
-    Extensions to Geotools.
+    HSQL is a lightweight (about 600k) JAVA database that
+    is usefull for saving data locally. This module also uses
+    the Spatial DB in a Box extensions written by David Blasby.
   </description>
 
   <licenses>
@@ -47,20 +49,45 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
-  
+
+
   <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
+  <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
-  <modules>
-    <module>brewer</module>
-    <module>graph</module>
-    <module>openoffice</module>
-    <module>shapefile-renderer</module>
-    <module>validation</module>
-    <module>widgets-swing</module>
-    <module>mappane</module>
-  </modules>
+  <developers>
+    <developer>
+      <name>Amr Alam</name>
+      <id>aalam</id>
+      <email>aalam@refractions.net</email>
+      <organization>Refractions Research</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-jdbc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    <dependency>
+      <groupId>org.openplans</groupId>
+      <artifactId>spatialdb</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+  </dependencies>
 
 
 </project>

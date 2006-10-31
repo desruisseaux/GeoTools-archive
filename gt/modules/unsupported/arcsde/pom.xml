@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-modules</artifactId>
+    <artifactId>gt2-unsupported</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,20 +24,20 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-extension</artifactId>
+  <artifactId>gt2-arcsde-plugin</artifactId>
   <packaging>pom</packaging>
-  <name>Geotools extensions</name>
-  <url>http://maven.geotools.fr/reports/modules/extension/</url>
+  <name>ArcSDE plugin</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/arcsde/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/extension/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/extension/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/arcsde/</url>
   </scm>
   
   <description>
-    Extensions to Geotools.
+    Root project for arcsde plugin.
   </description>
 
   <licenses>
@@ -47,20 +47,50 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+
+  <!-- =========================================================== -->
+  <!--     Developers and Contributors                             -->
+  <!-- =========================================================== -->
+  <developers>
+    <developer>
+      <name>Gabriel Roldan</name>
+      <id>groldan</id>
+      <email>groldan@axios.es</email>
+      <organization>Axios Engineering</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Chris Dillard</name>
+      <id>csdillard</id>
+      <email>cdillard@polexis.com</email>
+      <organization>Polexis</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Jake Fear</name>
+      <id>jfear</id>
+      <email>jfear@polexis.com</email>
+      <organization>Polexis</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
   
   
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>brewer</module>
-    <module>graph</module>
-    <module>openoffice</module>
-    <module>shapefile-renderer</module>
-    <module>validation</module>
-    <module>widgets-swing</module>
-    <module>mappane</module>
+    <module>sde-dummy</module>
+    <module>datastore</module>
   </modules>
-
-
+  
+  
 </project>
