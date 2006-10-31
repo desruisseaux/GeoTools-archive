@@ -37,7 +37,7 @@
   </scm>
   
   <description>
-    (todo)
+    Module offers GeoTools DataStore support for Oracle Spatial.
   </description>
 
   <licenses>
@@ -53,13 +53,24 @@
   <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
   <developers>
+
+    <developer>
+      <name>Marc Risney</name>
+      <id>mrisney</id>
+      <email>marc.risney@gmail.com</email>
+      <organization>Oracle</organization>
+      <roles>
+      <role>Java Developer</role>
+      <role>Module Mantainer</role>
+      </roles>
+    </developer>
+
     <developer>
       <name>Sean Geoghegan</name>
       <id>seangeo</id>
       <email>sean.geoghegan@dsto.defence.gov.au</email>
       <organization>Defence Science and Technology Organisation</organization>
       <roles>
-        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
