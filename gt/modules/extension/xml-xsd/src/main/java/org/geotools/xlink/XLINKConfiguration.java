@@ -28,10 +28,8 @@ public class XLINKConfiguration extends Configuration {
 	/**
 	 * @return The xlinks.xsd of the xlink schema.
 	 */
-	public URL getSchemaFileURL() throws MalformedURLException {
-		return new URL( 
-			getSchemaLocationResolver().resolveSchemaLocation( null, getNamespaceURI(), "xlinks.xsd" )
-		);
+	public String getSchemaFileURL() {
+		return getSchemaLocationResolver().resolveSchemaLocation( null, getNamespaceURI(), "xlinks.xsd" );
 	}
 
 	/**

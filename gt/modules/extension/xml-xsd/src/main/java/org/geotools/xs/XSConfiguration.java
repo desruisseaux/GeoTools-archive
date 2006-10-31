@@ -22,7 +22,7 @@ public class XSConfiguration extends Configuration {
 		return XS.NAMESPACE;
 	}
 
-	public URL getSchemaFileURL() throws MalformedURLException {
+	public String getSchemaFileURL() {
 		//special case, this is the bootstrap
 		return null;
 	}

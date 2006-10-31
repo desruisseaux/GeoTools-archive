@@ -31,6 +31,7 @@ import org.geotools.resources.Utilities;
 import org.geotools.xs.XSConfiguration;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
+import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
 
 /**
  * Responsible for configuring a parser runtime environment.
@@ -211,6 +212,11 @@ public abstract class Configuration {
      */
     private SchemaLocator schemaLocator;
     
+    /**
+     * List of parser properties.
+     */
+    private List properties;
+    
 	/**
 	 * Creates a new configuration. 
 	 * <p>
@@ -226,6 +232,8 @@ public abstract class Configuration {
 		if ( !( this instanceof XSConfiguration ) ) {
 			dependencies.add( new XSConfiguration() );
 		}
+		
+		properties = new ArrayList();
 	}
 	
 	/**
@@ -236,6 +244,21 @@ public abstract class Configuration {
 		return dependencies;
 	}
 
+	/**
+	 * Returns a list of parser properties to set.
+	 * <p>
+	 * To set a parser property:
+	 * <pre>
+	 * Configuration configuration = ...
+	 * configuration.getProperties().add( Parser.Properties.... );
+	 * </pre>
+	 * </p>
+	 * @return A list of hte set parser properties.
+	 */
+	public final List/*<QName>*/ getProperties() {
+		return properties;
+	}
+	
 	/**
 	 * Returns all dependencies in the configuration dependency tree.
 	 * <p>
@@ -288,7 +311,7 @@ public abstract class Configuration {
 	 * which includes all other files that define the schema.
 	 * </p>
 	 */
-	abstract public URL getSchemaFileURL() throws MalformedURLException;
+	abstract public String getSchemaFileURL();
 	
 	/**
 	 * @return The binding set for types, elements, attributes of the configuration schema.
@@ -381,6 +404,17 @@ public abstract class Configuration {
         		container.registerComponentInstance( key, locator );	
         	}
 
+        	//set any parser properties
+        	for ( Iterator p = dependency.getProperties().iterator(); p.hasNext(); ) {
+        		QName property = (QName) p.next();
+        		try {
+        			container.registerComponentInstance( property, property );	
+        		}
+        		catch( DuplicateComponentKeyRegistrationException e ) {
+        			//ok, ignore
+        		}
+        	}
+        	
         	//add any additional configuration, factories and such
         	// create a new container to allow configurations to override factories in dependant
         	// configurations
