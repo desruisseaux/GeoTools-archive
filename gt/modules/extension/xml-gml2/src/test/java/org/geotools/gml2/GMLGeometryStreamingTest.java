@@ -16,6 +16,7 @@
 package org.geotools.gml2;
 
 import junit.framework.TestCase;
+import java.io.InputStream;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -24,15 +25,25 @@ import org.geotools.xml.StreamingParser;
 
 
 public class GMLGeometryStreamingTest extends TestCase {
-    StreamingParser parser;
-
-    protected void setUp() throws Exception {
+    public void testStreamByXpath() throws Exception {
         Configuration configuration = new GMLConfiguration();
-        parser = new StreamingParser(configuration, getClass().getResourceAsStream("geometry.xml"),
-                "/child::*");
+        InputStream input = getClass().getResourceAsStream("geometry.xml");
+        String xpath = "/pointMember | /lineStringMember | /polygonMember";
+
+        //String xpath = "/child::*";
+        StreamingParser parser = new StreamingParser(configuration, input, xpath);
+
+        makeAssertions(parser);
     }
 
-    public void test() throws Exception {
+    //    public void testStreamByType() throws Exception {
+    //    	Configuration configuration = new GMLConfiguration();
+    //    	InputStream input = getClass().getResourceAsStream("geometry.xml");
+    //        StreamingParser parser = new StreamingParser(configuration, input , Geometry.class );
+    //        
+    //        makeAssertions( parser );
+    //    }
+    private void makeAssertions(StreamingParser parser) {
         Object o = parser.parse();
         assertNotNull(o);
         assertTrue(o instanceof Point);
