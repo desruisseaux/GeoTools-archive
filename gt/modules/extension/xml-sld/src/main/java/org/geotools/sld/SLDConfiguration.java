@@ -66,10 +66,9 @@ public class SLDConfiguration extends Configuration {
     /**
      * @return the StyledLayerDescriptor.xsd file of the schema.
      */
-    public URL getSchemaFileURL() throws MalformedURLException {
-        return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(),
-                "StyledLayerDescriptor.xsd"));
+    public String getSchemaFileURL() {
+        return getSchemaLocationResolver()
+                   .resolveSchemaLocation(null, getNamespaceURI(), "StyledLayerDescriptor.xsd");
     }
 
     /**
