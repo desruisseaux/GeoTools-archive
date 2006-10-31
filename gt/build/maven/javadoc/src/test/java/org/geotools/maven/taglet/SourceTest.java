@@ -59,7 +59,7 @@ public class SourceTest extends TestCase {
     public void testCurrentTag() {
         Source  s = new Source();
         Matcher m;
-        String tag, url, category, module;
+        String tag, url, group, category, module;
         tag = "$URL$";
         m = s.findURL.matcher(tag);
         assertTrue(m.matches());
@@ -68,31 +68,37 @@ public class SourceTest extends TestCase {
         url = m.group(1).trim();
         m = s.findModule.matcher(url);
         assertTrue(m.matches());
-        category = m.group(1);
-        module   = m.group(2);
+        group    = m.group(1);
+        category = m.group(2);
+        module   = m.group(3);
+        assertEquals("build", group);
         assertEquals("maven", category);
         assertEquals("javadoc", module);
 
         // Try an other URL from a tag.
-        url = "http://svn.geotools.org/geotools/tags/2.2.RC0/module/api/src/org/geotools/catalog/ResolveChangeListener.java";
+        url = "http://svn.geotools.org/geotools/tags/2.4-M0/modules/library/api/src/main/java/org/geotools/catalog/ResolveChangeListener.java";
         m = s.findModule.matcher(url);
         assertTrue(m.matches());
-        category = m.group(1);
-        module   = m.group(2);
-        assertEquals("module", category);
+        group    = m.group(1);
+        category = m.group(2);
+        module   = m.group(3);
+        assertEquals("modules", group);
+        assertEquals("library", category);
         assertEquals("api", module);
 
         // Try an other URL from a tag.
-        url = "http://svn.geotools.org/geotools/tags/2.2-RC4/module/referencing/src/org/geotools/referencing/CRS.java";
+        url = "http://svn.geotools.org/geotools/tags/2.2-RC4/modules/library/referencing/src/main/java/org/geotools/referencing/CRS.java";
         tag = Source.SVN_KEYWORD_DELIMITER + "URL: " + url + ' ' + Source.SVN_KEYWORD_DELIMITER;
         m = s.findURL.matcher(tag);
         assertTrue(m.matches());
         assertEquals(url, m.group(1).trim());
         m = s.findModule.matcher(url);
         assertTrue(m.matches());
-        category = m.group(1);
-        module   = m.group(2);
-        assertEquals("module", category);
+        group    = m.group(1);
+        category = m.group(2);
+        module   = m.group(3);
+        assertEquals("modules", group);
+        assertEquals("library", category);
         assertEquals("referencing", module);
     }
 }

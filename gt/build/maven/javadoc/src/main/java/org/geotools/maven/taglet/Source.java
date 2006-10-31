@@ -81,7 +81,8 @@ public final class Source implements Taglet {
                   "\\/geotools\\/"          +  //   /geotools/
                   "\\p{Alpha}+\\/"          +  //   trunk/                  tags/
                  "[\\p{Alnum}\\.\\-]+\\/"   +  //   gt/                     2.3-M1/
-                "([\\p{Alnum}\\-]+)\\/"     +  //   module/                 plugins/
+                "([\\p{Alnum}\\-]+)\\/"     +  //   modules/                build/
+                "([\\p{Alnum}\\-]+)\\/"     +  //   library/                plugins/
                 "([\\p{Alnum}\\-]+)\\/"     +  //   referencing/            epsg-hsql/
                 ".+");
     }
@@ -170,17 +171,25 @@ public final class Source implements Taglet {
             if (!matchModule.matches()) {
                 continue;
             }
-            final String category = matchModule.group(1);
-            final String module   = matchModule.group(2);
+            final String group    = matchModule.group(1);
+            final String category = matchModule.group(2);
+            final String module   = matchModule.group(3);
             buffer.append('\n');
             buffer.append(i==0 ? "<DD>" : "    ");
             buffer.append("<CODE><B>");
+            buffer.append(group);
+            buffer.append('/');
             buffer.append(category);
             buffer.append('/');
             buffer.append(module);
             buffer.append("</B></CODE> &nbsp; (<A HREF=\"");
             buffer.append(MAVEN_REPOSITORY_BASE_URL);
-            buffer.append("org/geotools/gt2-");
+            buffer.append("org/geotools/");
+            if (category.equals("maven")) {
+                buffer.append(category);
+                buffer.append('/');
+            }
+            buffer.append("gt2-");
             buffer.append(module);
             buffer.append("/\"><CODE>gt2-");
             buffer.append(module);
