@@ -153,6 +153,12 @@
       <!-- The version number is specified in the parent POM. -->
     </dependency>
 
+    <dependency>
+      <groupId>velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <!-- The version number is specified in the parent POM. -->
+    </dependency>
+    
     <!-- We need this to make the referencing module useful -->
     <dependency>
       <groupId>org.geotools</groupId>
