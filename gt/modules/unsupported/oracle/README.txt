@@ -19,9 +19,9 @@ To place the real jars into your maven repository:
 
 #1 Download from oracle
 - http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/htdocs/jdbc_10201.html
-
+  (or found in C:\oracle\product\10.2.0\jdbc\lib)
 #2 Place into your maven 2 repository
-C:\oracle\product\10.2.0\jdbc\lib>mvn install:install-file -Dfile=ojdbc14.jar -DgroupId=com.oracle -DartifactId=ojdbc14 -Dversion=10.2.0 -Dpackaging=jar
+mvn install:install-file -Dfile=ojdbc14.jar -DgroupId=com.oracle -DartifactId=ojdbc14 -Dversion=10.2.0 -Dpackaging=jar
 
 #3 Aquire sdoapi.jar
 - http://www.oracle.com/technology/software/products/spatial/htdocs/xplatformsoft.html 
@@ -44,4 +44,4 @@ The project pom.xml file contains a profile that will run tests, to use this:
 **  Further Help **
 
 If you are still having problems getting the Oracle Data Store
-to work, contact Sean Geoghegan at jgarnett@refractions.net.
+to work, contact Jody Garnett at jgarnett@refractions.net.

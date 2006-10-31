@@ -79,9 +79,15 @@
     </dependency>
 
     <dependency>
-          <artifactId>ojdbc</artifactId>
-          <groupId>oracle</groupId>
-          <version>14</version>
+          <artifactId>ojdbc14</artifactId>
+          <groupId>com.oracle</groupId>
+          <!-- The version number is specified in the parent POM. -->
+    </dependency>
+
+    <dependency>
+          <artifactId>sdoapi</artifactId>
+          <groupId>com.oracle</groupId>
+          <!-- The version number is specified in the parent POM. -->
     </dependency>
 
   </dependencies>
