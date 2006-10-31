@@ -17,11 +17,15 @@ package org.geotools.xml.impl;
 
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchemaContent;
+import org.eclipse.xsd.XSDSimpleTypeDefinition;
+import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
 import org.geotools.xml.BindingFactory;
 import org.geotools.xml.InstanceComponent;
+import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.picocontainer.defaults.DefaultPicoContainer;
@@ -89,6 +93,23 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
             XSDAttributeDeclaration decl = Schemas.getAttributeDeclaration(content,
                     attQName);
 
+            if ( decl == null ) {
+            	//check wether unknown attributes should be parsed
+            	if ( parent.getContext().getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ATTRIBUTES ) != null ) {
+            		//create a mock attribute and continue
+            		decl = XSDFactory.eINSTANCE.createXSDAttributeDeclaration();
+            		decl.setName( attQName.getLocalPart() );
+            		decl.setTargetNamespace( attQName.getNamespaceURI() );
+            		
+            		//set the type to be of string
+            		XSDSimpleTypeDefinition type = (XSDSimpleTypeDefinition) 
+            			XSDUtil.getSchemaForSchema( XSDUtil.SCHEMA_FOR_SCHEMA_URI_2001 )
+            			.getSimpleTypeIdMap().get( "string" );
+            		
+            		decl.setTypeDefinition( type );
+            	}
+            }
+            
             //TODO: validate, if there is no declaration for an attribute, then 
             //TODO: make sure no required attributes are missing
             // validation should fail, this is being side stepped for now until
@@ -103,10 +124,9 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
 
                 atts.add(att);
             }
-
-            //			else {
-            //				parser.getLogger().warning("Could not find attribute declaration: " + attQName);
-            //			}
+            else {
+				parser.getLogger().warning("Could not find attribute declaration: " + attQName);
+			}
         }
 
         //create the element
