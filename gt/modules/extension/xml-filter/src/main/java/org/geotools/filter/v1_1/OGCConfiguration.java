@@ -52,9 +52,9 @@ public class OGCConfiguration extends Configuration {
     /**
      * @return the filter.xsd file of the schema.
      */
-    public URL getSchemaFileURL() throws MalformedURLException {
-        return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(), "filter.xsd"));
+    public String getSchemaFileURL() {
+        return getSchemaLocationResolver()
+                   .resolveSchemaLocation(null, getNamespaceURI(), "filter.xsd");
     }
 
     /**
