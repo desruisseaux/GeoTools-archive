@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -155,5 +157,42 @@ public class Parser {
         }
 
         return null;
+    }
+    
+    /**
+     * Properties used to control the parser behaviour.
+     * <p>
+     * Parser properties are set in the configuration of a parser.
+     * <pre>
+     * Configuration configuration = new ....
+     * configuration.getProperties().add( Parser.Properties.PARSE_UNKNOWN_ELEMENTS );
+     * configuration.getProperties().add( Parser.Properties.PARSE_UNKNOWN_ATTRIBUTES );
+     * </pre>
+     * </p>
+     * @author Justin Deoliveira, The Open Planning Project
+     *
+     */
+    public static interface Properties {
+    	
+    	/**
+    	 * If set, the parser will continue to parse when it finds an element 
+    	 * and cannot determine its type.
+    	 */
+    	QName PARSE_UNKNOWN_ELEMENTS = 
+    		new QName( "http://www.geotools.org", "parseUnknownElements" ); 
+    	
+    	/**
+    	 * If set, the parser will continue to parse when it finds an attribute
+    	 * and cannot determine its type.
+    	 */
+    	QName PARSE_UNKNOWN_ATTRIBUTES = 
+    		new QName( "http://www.geotools.org", "parseUnknownAttributes" );
+    	
+    	/**
+    	 * If set, the parser will ignore the schemaLocation attribute of an 
+    	 * instance document.
+    	 */
+    	QName IGNORE_SCHEMA_LOCATION = 
+    		new QName( "http://www.geotools.org", "ignoreSchemaLocation" );
     }
 }
