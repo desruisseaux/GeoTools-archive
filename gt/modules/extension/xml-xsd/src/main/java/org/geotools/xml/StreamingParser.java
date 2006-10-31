@@ -15,74 +15,166 @@
  */
 package org.geotools.xml;
 
+import org.geotools.xml.impl.ElementNameStreamingParserHandler;
 import org.geotools.xml.impl.StreamingParserHandler;
+import org.geotools.xml.impl.TypeStreamingParserHandler;
+import org.geotools.xml.impl.jxpath.JXPathStreamingParserHandler;
 import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 
 /**
- * Main interface to the streaming geotools xml parser.
+ * XML parser capable of streaming.
  * <p>
  * Performs the same task as {@link org.geotools.xml.Parser}, with the addition
- * that objects are streamed back to the client. The client must inform the
- * parser what objects to stream back via an xpath expression. Consider the
- * following example.
- *
+ * that objects are streamed back to the client. Streaming can occur in a 
+ * number of different modes.
+ * </p>
+ * <p>
+ * As an example consider the following gml document:
  * <pre>
- *         <code>
- *  Configuration config = ... //some configuration
- *  String input = ... //some instance document
- *  String xpath = "//envelope";
+ * &lt;test:TestFeatureCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *	xmlns:gml="http://www.opengis.net/gml"
+ *	xmlns:test="http://www.geotools.org/test"
+ *	xsi:schemaLocation="http://www.geotools.org/test test.xsd"&gt;
  *
- *  StreamingParser parser = new StreamingParser(config,input,xpath);
- *  Envelope e = null;
- *  while((e = (Envelope)parser.parse()) != null) {
- *          //do something
- *  }
- *  </code>
+ *   &lt;gml:featureMember&gt;
+ *      &lt;test:TestFeature fid="0"&gt;
+ *	      ...
+ *      &lt;/test:TestFeature&gt;		
+ *   &lt;/gml:featureMember&gt;
+ *	
+ *   &lt;gml:featureMember&gt;
+ *      &lt;test:TestFeature fid="1"&gt;
+ *	      ...
+ *      &lt;/test:TestFeature&gt;
+ *   &lt;/gml:featureMember&gt;
+ *  	
+ *   &lt;gml:featureMember&gt;
+ *      &lt;test:TestFeature fid="2"&gt;
+ *	      ....
+ *      &lt;/test:TestFeature&gt;
+ *   &lt;/gml:featureMember&gt;
+ *
+ * &lt;/test:TestFeatureCollection&gt;
  * </pre>
- *
- * The xpath expression <code>//envelope</code> matches any element named
- * <code>envelope</code> in the instance document. Whenever the parser has
- * turned such an element into an object (an instance of Envelope), the object
- * is returned.
+ * And suppose we want to stream back each feature as it is parsed.
+ * </p>
+ * <p>
+ *	<h3>1. Element Name</h3>
+ *	Objects are streamed back when an element of a particular name has been 
+ *	parsed. 
+ *	<pre>
+ *    Configuration configuration = new GMLConfiguration();
+ *    QName elementName = new QName( "http://www.geotools.org/test", "TestFeature" );
+ *    
+ *    StreamingParser parser = new StreamingParser( configuration, elementName );
+ *    
+ *    Feature f = null;
+ *    while ( ( f = parser.parse() ) != null ) {
+ *       ...
+ *    }
+ *  </pre>
+ * </p>
+ * <p>
+ * 	<h3>2. Type</h3>
+ * 	Objects are streamed back when an element has been parsed into an object 
+ * 	of a particular type. 
+ *  <pre>
+ *    Configuration configuration = new GMLConfiguration();
+ *    StreamingParser parser = new StreamingParser( configuration, Feature.class );
+ *    
+ *    Feature f = null;
+ *    while ( ( f = parser.parse() ) != null ) {
+ *       ...
+ *    }
+ *  </pre>
+ * </p>
+ * <p>
+ * 	<h3>3. Xpath Expression</h3>
+ * 	Objects are streamed back when an element has been parsed which matches 
+ * 	a particular xpath expression.
+ *  <pre>
+ *    Configuration configuration = new GMLConfiguration();
+ *    String xpath = "//TestFeature";
+ *    StreamingParser parser = new StreamingParser( configuration, xpath );
+ *    
+ *    Feature f = null;
+ *    while ( ( f = parser.parse() ) != null ) {
+ *       ...
+ *    }
+ *  </pre>
  * </p>
  *
  * @author Justin Deoliveira, The Open Planning Project
  */
 public class StreamingParser {
+	/**
+	 * The sax driver / handler.
+	 */
     private StreamingParserHandler handler;
+    /**
+     * The sax parser.
+     */
     private SAXParser parser;
+    /**
+     * The xml input.
+     */
     private InputStream input;
+    /**
+     * The parsing thread.
+     */
     private Thread thread;
 
+    
     /**
-     * Creates a new instance of the streaming parser.
+     * Creates a new instance of the type based streaming parser.
      *
      * @param configuration Object representing the configuration of the parser.
-     * @param input The path to the instance document to be parsed.
-     * @param xpath An xpath expression which dictates how the parser streams
-     * objects back to the client.
+     * @param input The input stream representing the instance document to be parsed.
+     * @param type The type of parsed objects to stream back.
      *
      * @throws ParserConfigurationException
      * @throws SAXException
-     * @throws FileNotFoundException
      */
-    public StreamingParser(Configuration configuration, String input,
-        String xpath)
-        throws ParserConfigurationException, SAXException, FileNotFoundException {
-        this(configuration,
-            new BufferedInputStream(new FileInputStream(input)), xpath);
-    }
+    public StreamingParser(Configuration configuration, InputStream input,
+		Class type) throws ParserConfigurationException, SAXException {
+    	
+    	this( 
+			configuration, input, 
+			new TypeStreamingParserHandler( configuration, type ) 
+		);    
+	}
 
     /**
-     * Creates a new instance of the streaming parser.
+     * Creates a new instance of the element name based streaming parser.
+     *
+     * @param configuration Object representing the configuration of the parser.
+     * @param input The input stream representing the instance document to be parsed.
+     * @param elementName The name of elements to stream back.
+     *
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     */
+    public StreamingParser(Configuration configuration, InputStream input,
+		QName elementName) throws ParserConfigurationException, SAXException {
+    	
+    	this( 
+			configuration, input, 
+			new ElementNameStreamingParserHandler( configuration, elementName ) 
+		);    
+	}
+    
+    /**
+     * Creates a new instance of the xpath based streaming parser. 
      *
      * @param configuration Object representing the configuration of the parser.
      * @param input The input stream representing the instance document to be parsed.
@@ -91,19 +183,31 @@ public class StreamingParser {
      *
      * @throws ParserConfigurationException
      * @throws SAXException
-     * @throws FileNotFoundException
      */
     public StreamingParser(Configuration configuration, InputStream input,
         String xpath) throws ParserConfigurationException, SAXException {
-        SAXParserFactory spf = SAXParserFactory.newInstance();
+        
+    	this( 
+			configuration, input, 
+			new JXPathStreamingParserHandler(configuration, xpath) 
+		);
+    }
+    
+    /**
+     * Internal constructor.
+     */
+    protected StreamingParser( 
+		Configuration configuration, InputStream input, StreamingParserHandler handler 
+	) throws ParserConfigurationException, SAXException {
+    	
+    	SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
-
         parser = spf.newSAXParser();
-        handler = new StreamingParserHandler(configuration, xpath);
-
+        
+        this.handler = handler;
         this.input = input;
     }
-
+    
     /**
      * Streams the parser to the next element in the instance document which
      * matches the xpath query specified in the contstructor. This method
@@ -116,17 +220,17 @@ public class StreamingParser {
     	
         if (thread == null) {
             Runnable runnable = new Runnable() {
-                    public void run() {
-                        try {
-                            parser.parse(input, handler);
-                        } catch (Exception e) {
-                        	//close the buffer
-                        	handler.getBuffer().close();
-                            throw new RuntimeException(e);
-                        }
+                public void run() {
+                    try {
+                        parser.parse(input, handler);
+                    } catch (Exception e) {
+                    	//close the buffer
+                    	handler.getBuffer().close();
+                        throw new RuntimeException(e);
                     }
-                    ;
-                };
+                }
+                ;
+            };
 
             thread = new Thread(runnable);
             thread.start();
