@@ -29,6 +29,7 @@ import org.geotools.gml2.bindings.GMLSchemaLocationResolver;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
+import org.geotools.xml.Parser;
 
 
 /**
@@ -47,6 +48,10 @@ public class GMLConfiguration extends Configuration {
 
         //add xlink cdependency
         addDependency(new XLINKConfiguration());
+
+        //add the parse unknown attributes property, this is mostly for 
+        // the "fid" attribute
+        getProperties().add(Parser.Properties.PARSE_UNKNOWN_ATTRIBUTES);
     }
 
     /**
@@ -73,9 +78,9 @@ public class GMLConfiguration extends Configuration {
     /**
      * @return URL to the gml2 feauture.xsd file.
      */
-    public URL getSchemaFileURL() throws MalformedURLException {
-        return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(), "feature.xsd"));
+    public String getSchemaFileURL() {
+        return getSchemaLocationResolver()
+                   .resolveSchemaLocation(null, getNamespaceURI(), "feature.xsd");
     }
 
     /**
