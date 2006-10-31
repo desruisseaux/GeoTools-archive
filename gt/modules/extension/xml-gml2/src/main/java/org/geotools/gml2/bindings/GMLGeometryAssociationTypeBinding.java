@@ -103,17 +103,8 @@ public class GMLGeometryAssociationTypeBinding implements ComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        for (Iterator itr = node.getChildren().iterator(); itr.hasNext();) {
-            Node cnode = (Node) itr.next();
-
-            if (cnode.getValue() instanceof Geometry) {
-                return cnode.getValue();
-            }
-        }
-
         //TODO: xlink and remoteSchema attributes, hard to do because of streaming
-        //TODO: dont throw an exception here
-        throw new RuntimeException("Could not find geometry in geometry association");
+        return node.getChildValue(Geometry.class);
     }
 
     /**
