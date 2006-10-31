@@ -57,9 +57,7 @@ public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler 
     }
 
     public Handler getChildHandler(QName qName) {
-        handler = factory.createElementHandler(qName, this, parser );
-
-        return handler;
+        return factory.createElementHandler(qName, this, parser );
     }
     
     public List getChildHandlers() {
@@ -75,11 +73,11 @@ public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler 
     
 
     public void addChildHandler(Handler child) {
-    	//do nothing
+    	this.handler = (ElementHandler) child;
     }
     
     public void removeChildHandler(Handler child) {
-    	//do nothing
+    	this.handler = null;
     }
     
     public Handler getParentHandler() {
