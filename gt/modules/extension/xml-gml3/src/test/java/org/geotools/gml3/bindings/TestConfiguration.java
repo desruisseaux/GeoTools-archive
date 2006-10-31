@@ -34,8 +34,8 @@ public class TestConfiguration extends Configuration {
         return TEST.NAMESPACE;
     }
 
-    public URL getSchemaFileURL() throws MalformedURLException {
-        return getClass().getResource("AbstractFeatureTypeBindingTest.xsd");
+    public String getSchemaFileURL() {
+        return getClass().getResource("AbstractFeatureTypeBindingTest.xsd").toString();
     }
 
     public BindingConfiguration getBindingConfiguration() {
@@ -51,11 +51,7 @@ public class TestConfiguration extends Configuration {
                 public String resolveSchemaLocation(XSDSchema schema, String namespaceURI,
                     String schemaLocationURI) {
                     if (getNamespaceURI().equals(namespaceURI)) {
-                        try {
-                            return getSchemaFileURL().toString();
-                        } catch (MalformedURLException e) {
-                            throw new RuntimeException(e);
-                        }
+                        return getSchemaFileURL().toString();
                     }
 
                     return null;

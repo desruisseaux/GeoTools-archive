@@ -75,9 +75,8 @@ public class GMLConfiguration extends Configuration {
     /**
      * @return Url to the gml.xsd file of the gml3 schema.
      */
-    public URL getSchemaFileURL() throws MalformedURLException {
-        return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(), "gml.xsd"));
+    public String getSchemaFileURL() {
+        return getSchemaLocationResolver().resolveSchemaLocation(null, getNamespaceURI(), "gml.xsd");
     }
 
     /**

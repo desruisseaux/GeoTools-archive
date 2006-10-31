@@ -42,9 +42,9 @@ public class SMIL20Configuration extends Configuration {
     /**
      * @return URL to smil20.xsd file of schema.
      */
-    public URL getSchemaFileURL() throws MalformedURLException {
-        return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(), "smil20.xsd"));
+    public String getSchemaFileURL() {
+        return getSchemaLocationResolver()
+                   .resolveSchemaLocation(null, getNamespaceURI(), "smil20.xsd");
     }
 
     /**

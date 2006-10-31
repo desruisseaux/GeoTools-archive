@@ -36,9 +36,9 @@ public class SMIL20LANGConfiguration extends Configuration {
     /**
      * @return URL to smil20-language.xsd file of schema.
      */
-    public URL getSchemaFileURL() throws MalformedURLException {
-        return new URL(getSchemaLocationResolver()
-                           .resolveSchemaLocation(null, getNamespaceURI(), "smil20-language.xsd"));
+    public String getSchemaFileURL() {
+        return getSchemaLocationResolver()
+                   .resolveSchemaLocation(null, getNamespaceURI(), "smil20-language.xsd");
     }
 
     /**
