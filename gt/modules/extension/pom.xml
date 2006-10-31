@@ -57,7 +57,6 @@
     <module>graph</module>
     <module>go</module>
     <module>openoffice</module>
-    <module>indexed-shapefile</module>
     <module>shapefile-renderer</module>
     <module>validation</module>
     <module>widgets-swing</module>

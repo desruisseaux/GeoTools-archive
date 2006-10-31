@@ -77,7 +77,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-indexed-shapefile</artifactId>
+      <artifactId>gt2-shapefile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
