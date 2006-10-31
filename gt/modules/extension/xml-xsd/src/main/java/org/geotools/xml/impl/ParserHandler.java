@@ -16,11 +16,15 @@
 package org.geotools.xml.impl;
 
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
+import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Configuration;
+import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.picocontainer.MutablePicoContainer;
@@ -49,7 +53,7 @@ import javax.xml.namespace.QName;
  */
 public class ParserHandler extends DefaultHandler {
     /** execution stack **/
-    Stack handlers;
+    protected Stack handlers;
 
     /** namespace support **/
     NamespaceSupport namespaces;
@@ -157,16 +161,25 @@ public class ParserHandler extends DefaultHandler {
             //TODO: this processing is too loose, do some validation will ya!
             String[] locations = null;
 
-            for (int i = 0; i < attributes.getLength(); i++) {
-                String name = attributes.getQName(i);
+            if ( context.getComponentInstance( Parser.Properties.IGNORE_SCHEMA_LOCATION ) != null ) {
+            	//use the configuration
+            	locations = new String[] {
+            		config.getNamespaceURI(), config.getSchemaFileURL()	
+            	};
+            }
+            else {
+            	for (int i = 0; i < attributes.getLength(); i++) {
+                    String name = attributes.getQName(i);
 
-                if (name.endsWith("schemaLocation")) {
-                    //create an array of alternating namespace, location pairs
-                    locations = attributes.getValue(i).split(" +");
+                    if (name.endsWith("schemaLocation")) {
+                        //create an array of alternating namespace, location pairs
+                        locations = attributes.getValue(i).split(" +");
 
-                    break;
+                        break;
+                    }
                 }
             }
+            
 
             //look up schema overrides
             XSDSchemaLocator[] locators = findSchemaLocators();
@@ -270,6 +283,24 @@ public class ParserHandler extends DefaultHandler {
         	for ( Iterator hf = handlerFactories.iterator(); handler == null && hf.hasNext(); ) {
         		HandlerFactory handlerFactory = (HandlerFactory) hf.next();
         		handler = handlerFactory.createElementHandler( qualifiedName, parent, this );
+        	}
+        }
+        
+        if ( handler == null ) {
+        	//check the parser flag, and just parse it anyways
+        	if( context.getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ELEMENTS ) != null) {
+        		//create a mock element declaration
+        		XSDElementDeclaration decl = XSDFactory.eINSTANCE.createXSDElementDeclaration();
+        		decl.setName( qualifiedName.getLocalPart() );
+        		decl.setTargetNamespace( qualifiedName.getNamespaceURI() );
+        		
+        		//set the type to be of string
+        		XSDSimpleTypeDefinition type = (XSDSimpleTypeDefinition) 
+        			XSDUtil.getSchemaForSchema( XSDUtil.SCHEMA_FOR_SCHEMA_URI_2001 )
+        			.getSimpleTypeIdMap().get( "anyType" );
+        		
+        		decl.setTypeDefinition( type );
+        		handler = new ElementHandlerImpl( decl, parent, this );
         	}
         }
         
