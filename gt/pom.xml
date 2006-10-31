@@ -1296,7 +1296,7 @@
   <!--     Modules for the build in approximate dependency order   -->
   <!-- =========================================================== -->
   <modules>
-    <module>maven</module>
+    <module>build</module>
     <module>modules</module>
     <module>demo</module>
   </modules>

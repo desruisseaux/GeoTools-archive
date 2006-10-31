@@ -14,8 +14,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.geotools.maven</groupId>
-    <artifactId>gt2-maven</artifactId>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,22 +24,20 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>gt2-build-configs</artifactId>
-  <packaging>maven-plugin</packaging>
-  <name>Configuration files for the multimodule build</name>
-  <url>http://maven.geotools.fr/reports/maven/build-configs/</url>
+  <artifactId>gt2-build</artifactId>
+  <packaging>pom</packaging>
+  <name>Build tools for Geotools 2</name>
+  <url>http://maven.geotools.fr/reports/build/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/build-configs/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/build/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/maven/build-configs/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/build/</url>
   </scm>
   
   <description>
-    Contains the configuration files for a few plugins (for the moment, 
-    Jalopy only) so that there's no need to replicate them, put them on 
-    a remote server, or use an absolute path.
+    Build tools for the the Geotools 2 project.
   </description>
 
   <licenses>
@@ -49,21 +47,14 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-
+  
+  
   <!-- =========================================================== -->
-  <!--     Developers and Contributors                             -->
+  <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
-  <developers>
-    <developer>
-      <name>Andrea Aime</name>
-      <id>aaime</id>
-      <email>aaime@users.sourceforge.net</email>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-  </developers>
-
+  <modules>
+    <module>maven</module>
+  </modules>
+  
 
 </project>

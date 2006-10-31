@@ -14,8 +14,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.geotools</groupId>
-    <artifactId>gt2</artifactId>
+    <groupId>org.geotools.maven</groupId>
+    <artifactId>gt2-maven</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,20 +24,21 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>gt2-maven</artifactId>
-  <packaging>pom</packaging>
-  <name>Maven plugins for Geotools 2</name>
-  <url>http://maven.geotools.fr/reports/maven/</url>
+  <artifactId>gt2-unopkg</artifactId>
+  <packaging>maven-plugin</packaging>
+  <name>UNO packager for OpenOffice addins</name>
+  <url>http://maven.geotools.fr/reports/build/maven/unopkg/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/build/maven/unopkg/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/maven/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/build/maven/unopkg/</url>
   </scm>
   
   <description>
-    Maven plugins specific to the the Geotools 2 project.
+    Creates a uno.pkg file for OpenOffice, which is basically a ZIP file with
+    a META-INF/manifest.xml file. The principle is similar to Java JAR files.
   </description>
 
   <licenses>
@@ -50,40 +51,22 @@
 
 
   <!-- =========================================================== -->
-  <!--     Dependency Management                                   -->
+  <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-      <version>2.0.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>2.0.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>1.2</version>
-    </dependency>
-  </dependencies>
-  
-  
-  <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
-  <!-- =========================================================== -->
-  <modules>
-    <module>archetype</module>
-    <module>build-configs</module>
-    <module>jar-collector</module>
-    <module>javadoc</module>
-    <module>javamaker</module>
-    <module>jjtree-javacc</module>
-    <module>rmic</module>
-    <module>unopkg</module>
-  </modules>
-  
+  <developers>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <id>desruisseaux</id>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <timezone>+1</timezone>
+      <roles>
+        <role>Java Developer</role>
+        <role>Project Management Committee (PMC) Member</role>
+      </roles>
+    </developer>
+  </developers>
+
 
 </project>

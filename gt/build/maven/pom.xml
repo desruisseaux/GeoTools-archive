@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools.maven</groupId>
-    <artifactId>gt2-maven</artifactId>
+    <artifactId>gt2-build</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,21 +24,20 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>gt2-javadoc</artifactId>
-  <packaging>maven-plugin</packaging>
-  <name>Cross-modules javadoc</name>
-  <url>http://maven.geotools.fr/reports/maven/javadoc/</url>
+  <artifactId>gt2-maven</artifactId>
+  <packaging>pom</packaging>
+  <name>Maven plugins for Geotools 2</name>
+  <url>http://maven.geotools.fr/reports/build/maven/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/javadoc/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/build/maven/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/maven/javadoc/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/build/maven/</url>
   </scm>
   
   <description>
-    Defines custom taglet for 'source' and 'tutorial' javadoc tags and for the 
-    'code' javadoc inline tag.
+    Maven plugins specific to the the Geotools 2 project.
   </description>
 
   <licenses>
@@ -51,49 +50,40 @@
 
 
   <!-- =========================================================== -->
-  <!--     Developers and Contributors                             -->
+  <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
-  <developers>
-    <developer>
-      <name>Martin Desruisseaux</name>
-      <id>desruisseaux</id>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <timezone>+1</timezone>
-      <roles>
-        <role>Java Developer</role>
-        <role>Project Management Committee (PMC) Member</role>
-      </roles>
-    </developer>
-  </developers>
-
-
-
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.2</version>
+    </dependency>
+  </dependencies>
+  
+  
   <!-- =========================================================== -->
-  <!--     Sun's tools dependency   (from Maven FAQ)               -->
+  <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
-  <profiles>
-    <profile>
-      <id>default-tools.jar</id>
-      <activation>
-        <property>
-          <name>java.vendor</name>
-          <value>Sun Microsystems Inc.</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>com.sun</groupId>
-          <artifactId>tools</artifactId>
-          <version>1.5</version>
-          <scope>system</scope>
-          <systemPath>${java.home}/../lib/tools.jar</systemPath>
-          <!-- Note: a ${tools.jar} variable exists - we should try to use it. -->
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
-
+  <modules>
+    <module>archetype</module>
+    <module>build-configs</module>
+    <module>jar-collector</module>
+    <module>javadoc</module>
+    <module>javamaker</module>
+    <module>jjtree-javacc</module>
+    <module>rmic</module>
+    <module>unopkg</module>
+  </modules>
+  
 
 </project>

@@ -27,13 +27,13 @@
   <artifactId>gt2-rmic</artifactId>
   <packaging>maven-plugin</packaging>
   <name>RMI compiler (rmic)</name>
-  <url>http://maven.geotools.fr/reports/maven/rmic/</url>
+  <url>http://maven.geotools.fr/reports/build/maven/rmic/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/rmic/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/build/maven/rmic/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/maven/rmic/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/build/maven/rmic/</url>
   </scm>
   
   <description>

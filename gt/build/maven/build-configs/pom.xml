@@ -24,21 +24,22 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools.maven</groupId>
-  <artifactId>gt2-jar-collector</artifactId>
+  <artifactId>gt2-build-configs</artifactId>
   <packaging>maven-plugin</packaging>
-  <name>JAR files collector</name>
-  <url>http://maven.geotools.fr/reports/maven/jar-collector/</url>
+  <name>Configuration files for the multimodule build</name>
+  <url>http://maven.geotools.fr/reports/build/maven/build-configs/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/jar-collector/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/build/maven/build-configs/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/maven/jar-collector/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/build/maven/build-configs/</url>
   </scm>
   
   <description>
-    Copy all JAR files (including dependencies) in the target directory
-    of the parent project descriptor.
+    Contains the configuration files for a few plugins (for the moment, 
+    Jalopy only) so that there's no need to replicate them, put them on 
+    a remote server, or use an absolute path.
   </description>
 
   <licenses>
@@ -55,15 +56,11 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>Martin Desruisseaux</name>
-      <id>desruisseaux</id>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <timezone>+1</timezone>
+      <name>Andrea Aime</name>
+      <id>aaime</id>
+      <email>aaime@users.sourceforge.net</email>
       <roles>
         <role>Java Developer</role>
-        <role>Project Management Committee (PMC) Member</role>
       </roles>
     </developer>
   </developers>

@@ -18,13 +18,13 @@
     <packaging>maven-plugin</packaging>
     <version>2.4-SNAPSHOT</version>
     <name>Geotools Archetype</name>
-    <url>http://maven.geotools.fr/reports/maven/archetype/</url>
+    <url>http://maven.geotools.fr/reports/build/maven/archetype/</url>
     
     <scm>
       <connection>
-        scm:svn:http://svn.geotools.org/geotools/trunk/gt/maven/archetype/
+        scm:svn:http://svn.geotools.org/geotools/trunk/gt/build/maven/archetype/
       </connection>
-      <url>http://svn.geotools.org/geotools/trunk/gt/maven/archetype/</url>
+      <url>http://svn.geotools.org/geotools/trunk/gt/build/maven/archetype/</url>
     </scm>
     
     <!-- dependencies>
