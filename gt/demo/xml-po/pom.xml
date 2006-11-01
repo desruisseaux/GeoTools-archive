@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.geotools.demo</groupId>
+  <artifactId>gt2-xml-po</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Purchase Order XML Support</name>
+	
+  <dependencies>
+      <dependency>
+          <groupId>openejb</groupId>
+          <artifactId>jaxb-api</artifactId>
+          <version>2.0EA3</version>
+      </dependency>
+      <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt2-xml-xsd</artifactId>
+          <version>2.4-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>3.8.1</version>
+					<scope>test</scope>
+      </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxb2-maven-plugin</artifactId>
+        <configuration>
+          <packageName>org.geotools.po</packageName>
+	       	<outputDirectory>${project.build.sourceDirectory}</outputDirectory>
+         </configuration>
+       </plugin>
+       <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+       </plugin>
+			 <plugin>
+				<groupId>org.geotools.maven</groupId>
+				<artifactId>gt2-xmlcodegen</artifactId>
+				<version>2.4-SNAPSHOT</version>	
+				<configuration>
+					<schemaLocation>po.xsd</schemaLocation>
+					<destinationPackage>org.geotools.po.bindings</destinationPackage>
+					<constructorArguments>
+						<constructorArgument>
+							<name>factory</name>
+							<type>org.geotools.po.ObjectFactory</type>
+						</constructorArgument>
+					</constructorArguments>
+				</configuration>
+			 </plugin>
+     </plugins>
+   </build>
+	
+</project>
