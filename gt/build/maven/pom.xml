@@ -83,6 +83,7 @@
     <module>jjtree-javacc</module>
     <module>rmic</module>
     <module>unopkg</module>
+    <module>xmlcodegen</module>
   </modules>
   
 
