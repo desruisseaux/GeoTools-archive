@@ -17,8 +17,6 @@ package org.geotools.gml3;
 
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.picocontainer.MutablePicoContainer;
-import java.net.MalformedURLException;
-import java.net.URL;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
