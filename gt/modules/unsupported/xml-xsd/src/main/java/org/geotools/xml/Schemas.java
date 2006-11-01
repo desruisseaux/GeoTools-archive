@@ -806,7 +806,9 @@ public class Schemas {
 
         for (Iterator itr = pre2ns.entrySet().iterator(); itr.hasNext();) {
             Map.Entry entry = (Map.Entry) itr.next();
-
+            if ( entry.getKey() == null ) 
+            	continue;	//default prefix
+            
             if (entry.getValue().equals(ns)) {
                 return (String) entry.getKey();
             }
