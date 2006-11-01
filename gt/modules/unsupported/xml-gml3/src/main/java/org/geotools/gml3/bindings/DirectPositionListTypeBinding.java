@@ -15,6 +15,7 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.math.BigInteger;
 import javax.xml.namespace.QName;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
@@ -86,11 +87,11 @@ public class DirectPositionListTypeBinding extends AbstractComplexBinding {
         CoordinateReferenceSystem crs = GML3ParsingUtils.crs(node);
 
         double[] values = (double[]) value;
-        Integer count = (Integer) node.getAttributeValue("count");
+        BigInteger count = (BigInteger) node.getAttributeValue("count");
 
         if (count == null) {
             //assume 2 dimensional
-            count = new Integer(values.length / 2);
+            count = BigInteger.valueOf(values.length / 2);
         }
 
         if (count.intValue() == 0) {
