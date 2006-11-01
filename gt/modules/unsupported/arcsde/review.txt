@@ -1,5 +1,5 @@
-Module Maintainer: Gabriel Roland
-IP Review: Gabriel Roland
+Module Maintainer: Gabriel Roldan
+IP Review: Gabriel Roldan
 
 The following was taken from the ArcSDE wiki page...
 
@@ -8,7 +8,7 @@ Contributor Review
 - all code provided by Gabriel Roldan was done under the LGPL
 - all code provided by Jake Fear was donated under the LGPL
 - all code provided by Chris Dillard was donated under the LGPL
-- all code provided by Saul Farber was donated under the LGPL as patched of already existing files
+- all code provided by Saul Farber was donated under the LGPL as patches of already existing files
 
 src/ checked by [~groldan]
 test/ checked by [~groldan]
