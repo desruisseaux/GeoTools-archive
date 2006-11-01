@@ -3,8 +3,7 @@ To Run the following application you can either...
 Use maven from the command line:
 1. mvn exec:java -Dexec.mainClass="org.geotools.demo.example.WFSExample
 2. mvn exec:java -Dexec.mainClass="org.geotools.demo.example.WMSExample
-3. mvn exec:java -Dexec.mainClass="org.geotools.demo.example.SLDExample" -Dexec.keepAliv
-e=true
+3. mvn exec:java -Dexec.mainClass="org.geotools.demo.example.SLDExample" -Dexec.keepAlive=true
 
 Open it up in your IDE (instructions for eclipse follow):
 1. Use maven to produce the eclipse project and classpath files:
