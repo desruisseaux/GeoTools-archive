@@ -25,6 +25,7 @@ import org.geotools.filter.expression.AddImpl;
 import org.geotools.filter.expression.DivideImpl;
 import org.geotools.filter.expression.MultiplyImpl;
 import org.geotools.filter.expression.SubtractImpl;
+import org.geotools.filter.identity.FeatureIdImpl;
 import org.geotools.filter.spatial.BBOXImpl;
 import org.geotools.filter.spatial.BeyondImpl;
 import org.geotools.filter.spatial.ContainsImpl;
@@ -39,6 +40,7 @@ import org.geotools.filter.spatial.WithinImpl;
 import org.opengis.filter.And;
 import org.opengis.filter.FeatureId;
 import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
 import org.opengis.filter.Not;
 import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsBetween;
@@ -113,6 +115,10 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public abstract class Expr implements FilterFactory {
 
+	public FeatureId featureId(String id) {
+		return new FeatureIdImpl( id );
+	} 
+	
 	public And and(Filter f, Filter g ) {
 		List/*<Filter>*/ list = new ArrayList/*<Filter>*/( 2 );
 		list.add( f );
@@ -140,12 +146,11 @@ public abstract class Expr implements FilterFactory {
 		return new NotImpl( this, filter );
 	}
 
-	public FeatureId featureId(Set ids) {
-		FidFilter filter =  new FidFilterImpl();
-		filter.addAllFids(ids);
-		return filter;
-	}
-
+	
+	public Id id( Set id ){
+        return new FidFilterImpl( id );
+    }
+	
 	public PropertyName property(String name) {
 		return new AttributeExpressionImpl(name);
 	}
