@@ -132,7 +132,7 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(OGC.EID, EIDBinding.class);
         container.registerComponentImplementation(OGC.EQUALS, EqualsBinding.class);
         //container.registerComponentImplementation(OGC.EXPRESSION, ExpressionBinding.class);
-        container.registerComponentImplementation(OGC.FEATUREID, FeatureIdBinding.class);
+        //container.registerComponentImplementation(OGC.FEATUREID, FeatureIdBinding.class);
         container.registerComponentImplementation(OGC.FID, FIDBinding.class);
         //container.registerComponentImplementation(OGC.FILTER,FilterBinding.class);
         container.registerComponentImplementation(OGC.FILTER_CAPABILITIES,
