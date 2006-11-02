@@ -29,6 +29,7 @@ import org.geotools.filter.expression.AddImpl;
 import org.geotools.filter.expression.DivideImpl;
 import org.geotools.filter.expression.MultiplyImpl;
 import org.geotools.filter.expression.SubtractImpl;
+import org.geotools.filter.identity.FeatureIdImpl;
 import org.geotools.filter.spatial.BBOXImpl;
 import org.geotools.filter.spatial.BeyondImpl;
 import org.geotools.filter.spatial.ContainsImpl;
@@ -65,13 +66,6 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
     public FilterFactoryImpl() {
     }
       
-    public Id id( Set id ){
-        return null;
-    }
-    
-    public FeatureId featureId( String fid ){
-        return new FidFilterImpl( fid );
-    }
     /**
      * Creates an AttributeExpression using the supplied xpath.
      * <p>
