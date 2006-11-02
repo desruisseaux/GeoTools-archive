@@ -106,7 +106,7 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-wkt</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
 
     <!-- this dependency is covered by main (via api) and by epsg-wkt -->

@@ -105,6 +105,7 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-wkt</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.geowidgets</groupId>
