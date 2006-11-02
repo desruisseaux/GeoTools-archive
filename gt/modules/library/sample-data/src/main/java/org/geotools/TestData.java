@@ -46,7 +46,6 @@ import java.nio.channels.ReadableByteChannel;
  * @tutorial http://www.geotools.org/display/GEOT/5.8+Test+Data
  */
 public final class TestData extends org.geotools.resources.TestData {
-
     /**
      * Do not allow instantiation of this class.
      */
@@ -140,7 +139,11 @@ public final class TestData extends org.geotools.resources.TestData {
      * If the named file already exists in the caller {@code test-data} directory, then this
      * method does nothing. It make it safe to invoke this method many time in a test suite,
      * since this method should not copy the file more than once for a given JVM execution.
-     * The file will be {@linkplain File#deleteOnExit deleted on exit}.
+     * <p>
+     * The file will be {@linkplain File#deleteOnExit deleted on exit} if and only if it has
+     * been modified. Callers don't need to worry about cleanup, because the files are copied
+     * in the {@code target/.../test-data} directory, which is not versionned by SVN and is
+     * cleaned by Maven on {@code mvn clean} execution.
      *
      * @param  caller Calling class or object used to locate the destination {@code test-data}.
      * @param  name Path to file in {@code org/geotools/test-data}.
@@ -155,12 +158,12 @@ public final class TestData extends org.geotools.resources.TestData {
         final File file      = new File(directory, path.getName());
         if (!file.exists()) {
             if (directory.mkdirs()) {
-                deleteOnExit(directory);
+                deleteOnExit(directory, false);
             }
             final InputStream   in = openStream(name);
             final OutputStream out = new FileOutputStream(file);
             final byte[]    buffer = new byte[4096];
-            deleteOnExit(file);
+            deleteOnExit(file, false);
             int count;
             while ((count = in.read(buffer)) >= 0) {
                 out.write(buffer, 0, count);

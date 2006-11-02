@@ -88,7 +88,7 @@ public class TestData implements Runnable {
      * Encoding of URL path.
      */
     private static final String ENCODING = "UTF-8";
-    
+
     /**
      * The {@linkplain System#getProperty(String) system property} key for more extensive test
      * suite. The value for this key is returned by the {@link #isExtensiveTest} method. Some
@@ -97,7 +97,7 @@ public class TestData implements Runnable {
      * <code>-D{@value}=true</code> option at Java or Maven starting time.
      */
     public static final String EXTENSIVE_TEST_KEY = "org.geotools.test.extensive";
-    
+
     /**
      * The {@linkplain System#getProperty(String) system property} key for interactive tests. 
      * The value for this key is returned by the {@link #isInteractiveTest} method. Some
@@ -107,9 +107,9 @@ public class TestData implements Runnable {
      * <code>-D{@value}=true</code> option at Java or Maven starting time.
      */
     public static final String INTERACTIVE_TEST_KEY = "org.geotools.test.interactive";
-    
+
     /**
-     * The file to deletes at shutdown time. {@link File#deleteOnExit} alone doesn't seem
+     * The files to delete at shutdown time. {@link File#deleteOnExit} alone doesn't seem
      * suffisient since it will preserve any overwritten files.
      */
     private static final LinkedList toDelete = new LinkedList();
@@ -127,33 +127,34 @@ public class TestData implements Runnable {
      */
     protected TestData() {
     }
-    
+
     /**
-     * Returns {@code true} if {@value #EXTENSIVE_TEST_KEY} system property is set to {@code true}.
-     * Test suites should check this value before to perform lengthly tests.
+     * Get a property as a boolean value. If the property can't be
+     * fetch for security reason, then default to {@code false}.
      */
-    public static boolean isExtensiveTest() {
+    private static boolean getBoolean(final String name) {
         try {
-            return Boolean.getBoolean(EXTENSIVE_TEST_KEY);
+            return Boolean.getBoolean(name);
         } catch (SecurityException exception) {
             Logger.getLogger("org.geotools").warning(exception.getLocalizedMessage());
             return false;
         }
     }
-    
+
+    /**
+     * Returns {@code true} if {@value #EXTENSIVE_TEST_KEY} system property is set to
+     * {@code true}. Test suites should check this value before to perform lengthly tests.
+     */
+    public static boolean isExtensiveTest() {
+        return getBoolean(EXTENSIVE_TEST_KEY);
+    }
+
     /**
      * Returns {@code true} if {@value #INTERACTIVE_TEST_KEY} system property is set to {@code true}.
      * Test suites should check this value before showing any kind of graphical window to the user.
      */
     public static boolean isInteractiveTest() {
-        try {
-            return  Boolean.getBoolean(INTERACTIVE_TEST_KEY);
-//            System.out.println("Interactive tests: " + b);
-//            return b;
-        } catch (SecurityException exception) {
-            Logger.getLogger("org.geotools").warning(exception.getLocalizedMessage());
-            return false;
-        }
+        return getBoolean(INTERACTIVE_TEST_KEY);
     }
 
     /**
@@ -319,7 +320,9 @@ public class TestData implements Runnable {
      *
      * @since 2.2
      */
-    public static ReadableByteChannel openChannel(final Object caller, final String name) throws IOException {
+    public static ReadableByteChannel openChannel(final Object caller, final String name)
+            throws IOException
+    {
         final URL url = url(caller, name);
         final File file = new File(URLDecoder.decode(url.getPath(), ENCODING));
         if (file.exists()) {
@@ -330,14 +333,16 @@ public class TestData implements Runnable {
 
     /**
      * Unzip a file in the {@code test-data} directory. The zip file content is inflated in place,
-     * i.e. are inflated files are written in the same {@code test-data} directory. If a file to be
-     * inflated already exists in the {@code test-data} directory, then the existing file left
+     * i.e. inflated files are written in the same {@code test-data} directory. If a file to be
+     * inflated already exists in the {@code test-data} directory, then the existing file is left
      * untouched and the corresponding ZIP entry is silently skipped. This approach avoid the
      * overhead of inflating the same files many time if this {@code unzipFile} method is invoked
      * before every tests.
      * <p>
-     * All inflated files will be automatically {@linkplain File#deleteOnExit deleted on exit}.
-     * Callers don't need to worry about cleanup.
+     * Inflated files will be automatically {@linkplain File#deleteOnExit deleted on exit}
+     * if and only if they have been modified. Callers don't need to worry about cleanup,
+     * because the files are inflated in the {@code target/.../test-data} directory, which
+     * is not versionned by SVN and is cleaned by Maven on {@code mvn clean} execution.
      *
      * @param  caller The class of the object associated with named data.
      * @param  name The file name to unzip in place.
@@ -369,13 +374,15 @@ public class TestData implements Runnable {
             // since we are already using a buffer of type byte[4096].
             final InputStream  in  = zipFile.getInputStream(entry);
             final OutputStream out = new FileOutputStream(path);
-            deleteOnExit(path);
             int len;
             while ((len = in.read(buffer)) >= 0) {
                 out.write(buffer, 0, len);
             }
             out.close();
             in.close();
+            // Call 'deleteOnExit' only after after we closed the file,
+            // because this method will save the modification time.
+            deleteOnExit(path, false);
         }
         zipFile.close();
     }
@@ -385,13 +392,81 @@ public class TestData implements Runnable {
      * pathname be deleted when the virtual machine terminates.
      */
     protected static void deleteOnExit(final File file) {
-        file.deleteOnExit();
+        deleteOnExit(file, true);
+    }
+
+    /**
+     * Requests that the file or directory denoted by the specified pathname be deleted
+     * when the virtual machine terminates. This method can optionnaly delete the file
+     * only if it has been modified, thus giving a chance for test suites to copy their
+     * resources only once.
+     * 
+     * @param file The file to delete.
+     * @param force If {@code true}, delete the file in all cases. If {@code false},
+     *        delete the file if and only if it has been modified. The default value
+     *        if {@code true}.
+     *
+     * @since 2.4
+     */
+    protected static void deleteOnExit(final File file, final boolean force) {
+        if (force) {
+            file.deleteOnExit();
+        }
+        final Deletable entry = new Deletable(file, force);
         synchronized (toDelete) {
             if (file.isFile()) {
-                toDelete.addFirst(file);
+                toDelete.addFirst(entry);
             } else {
-                toDelete.addLast(file);
+                toDelete.addLast(entry);
             }
+        }
+    }
+
+    /**
+     * A file that may be deleted on JVM shutdown.
+     */
+    private static final class Deletable {
+        /**
+         * The file to delete.
+         */
+        private final File file;
+
+        /**
+         * The initial timestamp. Used in order to determine if the file has been modified.
+         */
+        private final long timestamp;
+
+        /**
+         * Constructs an entry for a file to be deleted.
+         */
+        public Deletable(final File file, final boolean force) {
+            this.file = file;
+            timestamp = force ? Long.MIN_VALUE : file.lastModified();
+        }
+
+        /**
+         * Returns {@code true} if failure to delete this file can be ignored.
+         */
+        public boolean canIgnore() {
+            return timestamp != Long.MIN_VALUE && file.isDirectory();
+        }
+
+        /**
+         * Deletes this file, if modified. Returns {@code false} only
+         * if the file should be deleted but the operation failed.
+         */
+        public boolean delete() {
+            if (!file.exists() || file.lastModified() <= timestamp) {
+                return true;
+            }
+            return file.delete();
+        }
+
+        /**
+         * Returns the filepath.
+         */
+        public String toString() {
+            return String.valueOf(file);
         }
     }
 
@@ -414,7 +489,7 @@ public class TestData implements Runnable {
                 System.gc();
                 System.runFinalization();
                 for (final Iterator it=toDelete.iterator(); it.hasNext();) {
-                    final File f = (File) it.next();
+                    final Deletable f = (Deletable) it.next();
                     try {
                         if (f.delete()) {
                             it.remove();
@@ -427,7 +502,7 @@ public class TestData implements Runnable {
                         }
                     }
                     // Can't use logging, since logger are not available anymore at shutdown time.
-                    if (iteration == 0) {
+                    if (iteration == 0 && !f.canIgnore()) {
                         System.err.print("Can't delete ");
                         System.err.println(f);
                     }
