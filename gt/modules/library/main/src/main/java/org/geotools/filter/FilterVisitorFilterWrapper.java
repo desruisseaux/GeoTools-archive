@@ -15,11 +15,13 @@
  */
 package org.geotools.filter;
 
+import org.opengis.filter.AllFilter;
 import org.opengis.filter.And;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.FeatureId;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.NoneFilter;
 import org.opengis.filter.Not;
 import org.opengis.filter.Or;
 import org.opengis.filter.PropertyIsBetween;
@@ -57,7 +59,7 @@ public class FilterVisitorFilterWrapper implements FilterVisitor {
 	public FilterVisitorFilterWrapper(org.geotools.filter.FilterVisitor delegate) {
 		this.delegate = delegate;
 	}
-	
+	    
 	protected void visitLogicFilter(org.opengis.filter.Filter filter) {
 		if (filter instanceof LogicFilter) {
 			delegate.visit((LogicFilter)filter);
@@ -104,6 +106,15 @@ public class FilterVisitorFilterWrapper implements FilterVisitor {
 		return extraData;
 	}
 
+    public Object visitNullFilter( Object extraData) {        
+        return extraData;
+    }
+    public Object visit( NoneFilter filter, Object extraData) {        
+        return extraData;
+    }
+    public Object visit( AllFilter filter, Object extraData) {        
+        return extraData;
+    }
 	public Object visit(Not filter, Object extraData) {
 		visitLogicFilter(filter);
 		return extraData;

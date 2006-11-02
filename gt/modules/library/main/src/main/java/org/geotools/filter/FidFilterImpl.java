@@ -42,7 +42,23 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
 
     /** List of the feature IDs. */
     private Set fids = new HashSet();
-
+    
+    public String getID(){
+        return (String) fids.iterator().next();
+    }
+    
+    public boolean matches( org.opengis.feature.Feature feature ){
+        if( feature == null ) return false;
+        
+        String FID = feature.getID();
+        if( FID == null ) return false;
+        
+        return FID.equals( getID() );
+    }
+    
+    public boolean matches( Object object ){
+        return false;
+    }
     
     /**
      * Empty constructor.

@@ -179,7 +179,7 @@ public class XSISAXHandler extends DefaultHandler {
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
     	handleCharacters();
-        logger.info("END: " + qName);
+        logger.fine("END: " + qName);
 
         try {
             XSIElementHandler element = (XSIElementHandler) handlers.pop();
@@ -207,7 +207,7 @@ public class XSISAXHandler extends DefaultHandler {
     public void startElement(String namespaceURI, String localName,
         String qName, Attributes atts) throws SAXException {
     	characters.setLength(0);
-        logger.info("START: " + qName);
+        logger.fine("START: " + qName);
 
         try {
             XSIElementHandler eh = ((XSIElementHandler) handlers.peek())

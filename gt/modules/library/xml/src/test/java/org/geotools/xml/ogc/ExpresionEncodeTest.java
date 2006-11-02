@@ -89,7 +89,7 @@ public class ExpresionEncodeTest extends TestCase {
         DocumentWriter.writeFragment(lf,
             FilterSchema.getInstance(), output, null);
         
-        System.out.println(output);
+        //System.out.println(output);
     }
     
     public void testFidFilter() throws OperationNotSupportedException, IOException{
@@ -104,6 +104,6 @@ public class ExpresionEncodeTest extends TestCase {
         DocumentWriter.writeFragment(fif,
             FilterSchema.getInstance(), output, null);
         
-        System.out.println(output);
+        //System.out.println(output);
     }
 }

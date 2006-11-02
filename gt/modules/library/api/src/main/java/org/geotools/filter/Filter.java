@@ -38,9 +38,6 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
      * </pre>
      */
     static final Filter NONE = new Filter() {
-            /**
-             * @deprecated use {@link #evaluate(org.opengis.feature.Feature)}
-             */
             public final boolean contains(Feature f) {
                 return evaluate((Feature) f);
             }

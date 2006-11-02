@@ -96,10 +96,8 @@ public class OGCFeatureIdTypeBinding implements ComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         URI fid = (URI) node.getAttribute("fid").getValue();
-        Set fids = new HashSet();
-        fids.add(fid.toString());
 
-        return factory.featureId(fids);
+        return factory.featureId(fid.toString());
     }
 
     /**

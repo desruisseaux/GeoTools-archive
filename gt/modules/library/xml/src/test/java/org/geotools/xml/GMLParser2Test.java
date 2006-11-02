@@ -65,9 +65,7 @@ public class GMLParser2Test extends TestCase {
 
           Object doc = xmlContentHandler.getDocument();
           assertNotNull("Document missing", doc);
-          System.out.println(doc);
-          
-                      
+          //System.out.println(doc);
       } catch (Throwable e) {
           e.printStackTrace();
           fail(e.toString());

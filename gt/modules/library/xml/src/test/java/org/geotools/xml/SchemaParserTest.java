@@ -89,7 +89,7 @@ public class SchemaParserTest extends TestCase {
     
             try{
                 assertNotNull("Schema missing", contentHandler.getSchema());
-                System.out.println(contentHandler.getSchema());
+                //System.out.println(contentHandler.getSchema());
             } catch (Exception e) {
                 e.printStackTrace();
                 fail(e.toString());

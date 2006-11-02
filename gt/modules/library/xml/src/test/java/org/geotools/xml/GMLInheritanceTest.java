@@ -115,6 +115,7 @@ public class GMLInheritanceTest extends TestCase {
 //            System.out.println("Feature "+j+" : "+ft);
             j++;
         }
-        System.out.println("Found "+j+" Features");
+        assertEquals( 2, j );
+        // System.out.println("Found "+j+" Features");
     }
 }

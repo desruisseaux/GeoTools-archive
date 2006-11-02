@@ -255,7 +255,7 @@ public class XMLSAXHandler extends DefaultHandler {
     public void endElement(String namespaceURI, String localName, String qName)
         throws SAXException {
     	handleCharacters();
-        logger.info("END: " + qName);
+        logger.fine("END: " + qName);
 
         try {
         	
@@ -312,7 +312,7 @@ public class XMLSAXHandler extends DefaultHandler {
     	checkStatus();
 
         if (schemaProxy.size() != 0) {
-        	logger.info("ADDING NAMESPACES: " + schemaProxy.size());
+        	logger.fine("ADDING NAMESPACES: " + schemaProxy.size());
 
             String t = atts.getValue("http://www.w3.org/2001/XMLSchema-instance",
                     "schemaLocation");

@@ -26,7 +26,7 @@ import oracle.jdbc.OracleConnection;
 import oracle.sql.STRUCT;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.jdbc.QueryData;
+import org.geotools.data.oracle.QueryData;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.oracle.sdo.GeometryConverter;
 import org.geotools.feature.AttributeType;

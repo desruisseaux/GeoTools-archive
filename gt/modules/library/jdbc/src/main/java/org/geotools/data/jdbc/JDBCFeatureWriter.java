@@ -42,7 +42,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public class JDBCFeatureWriter implements FeatureWriter {
-    /** The logger for the filter module. */
+    /** The logger for the jdbc module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.jdbc");
     protected QueryData queryData;

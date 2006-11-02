@@ -214,52 +214,6 @@ public abstract class JDBC1DataStore implements DataStore {
     protected int transactionIsolation = Connection.TRANSACTION_NONE;
     
 	/**
-	 * DOCUMENT ME!
-	 *
-	 * @param connectionPool
-	 * @param config
-	 *
-	 * @throws IOException
-	 *
-	 * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
-	 *             object. public JDBCDataStore(ConnectionPool connectionPool,
-	 *             String databaseSchemaName) throws IOException {
-	 *             this(connectionPool, databaseSchemaName, new HashMap(),
-	 *             databaseSchemaName); }
-	 */
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @param connectionPool
-	 * @param config
-	 *
-	 * @throws IOException
-	 *
-	 * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
-	 *             object. public JDBCDataStore( ConnectionPool connectionPool,
-	 *             String databaseSchemaName, Map fidGenerationTypes) throws
-	 *             IOException { this(connectionPool, databaseSchemaName,
-	 *             fidGenerationTypes, databaseSchemaName); }
-	 */
-
-	/*
-	 *
-	 *
-	 * @param connectionPool @param databaseSchemaName @param fidGenerationTypes
-	 * @param namespace
-	 *
-	 * @throws IOException
-	 *
-	 * @deprecated This is deprecated in favour of the JDBCDataStoreConfig
-	 *             object.
-	 *
-	 * public JDBCDataStore( ConnectionPool connectionPool, String
-	 * databaseSchemaName, Map fidMapperTypes, String namespace) throws
-	 * IOException { this( connectionPool, new JDBCDataStoreConfig(namespace,
-	 * databaseSchemaName, new HashMap(), fidMapperTypes)); }
-	 */
-
-	/**
 	 * Construct a JDBCDataStore with ConnectionPool and associated
 	 * configuration.
 	 * 

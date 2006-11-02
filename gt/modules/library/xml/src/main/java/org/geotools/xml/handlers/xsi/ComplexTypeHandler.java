@@ -417,7 +417,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
      */
     protected ComplexType compress(SchemaHandler parent)
         throws SAXException {
-        logger.info("Start compressing ComplexType " + getName());
+        logger.fine("Start compressing ComplexType " + getName());
 
         if (cache != null) {
             return cache;
@@ -642,7 +642,7 @@ public class ComplexTypeHandler extends XSIElementHandler {
             throw new NullPointerException();
         }
 
-        logger.info("End compressing ComplexType " + getName());
+        logger.fine("End compressing ComplexType " + getName());
 
         attrDecs = null;
         anyAttribute = null;

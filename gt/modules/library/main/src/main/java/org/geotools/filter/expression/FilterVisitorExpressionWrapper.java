@@ -26,6 +26,7 @@ import org.opengis.filter.expression.ExpressionVisitor;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.NilExpression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
 
@@ -51,6 +52,9 @@ public class FilterVisitorExpressionWrapper implements ExpressionVisitor {
 		return data;
 	}
 	
+    public Object visit(NilExpression expression, Object extraData){
+        return extraData;
+    }
 	public Object visit(Add expression, Object extraData) {
 		return visitMath(expression,extraData);
 	}

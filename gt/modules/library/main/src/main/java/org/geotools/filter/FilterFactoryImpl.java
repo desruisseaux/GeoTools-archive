@@ -21,6 +21,7 @@ package org.geotools.filter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
@@ -39,6 +40,8 @@ import org.geotools.filter.spatial.IntersectsImpl;
 import org.geotools.filter.spatial.OverlapsImpl;
 import org.geotools.filter.spatial.TouchesImpl;
 import org.geotools.filter.spatial.WithinImpl;
+import org.opengis.filter.FeatureId;
+import org.opengis.filter.Id;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.sort.SortBy;
@@ -61,7 +64,14 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
      */
     public FilterFactoryImpl() {
     }
-  
+      
+    public Id id( Set id ){
+        return null;
+    }
+    
+    public FeatureId featureId( String fid ){
+        return new FidFilterImpl( fid );
+    }
     /**
      * Creates an AttributeExpression using the supplied xpath.
      * <p>

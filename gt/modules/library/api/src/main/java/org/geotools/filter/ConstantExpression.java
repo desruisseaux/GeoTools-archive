@@ -25,6 +25,7 @@ import org.opengis.filter.expression.ExpressionVisitor;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.NilExpression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
 import org.geotools.feature.Feature;
@@ -133,6 +134,10 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
                 }
 
                 public Object visit(Subtract expression, Object extraData) {
+                    return null;
+                }
+
+                public Object visit(NilExpression arg0, Object arg1) {
                     return null;
                 }
             }, null);

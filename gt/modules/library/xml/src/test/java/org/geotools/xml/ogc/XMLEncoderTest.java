@@ -119,7 +119,7 @@ public class XMLEncoderTest extends TestCase {
         assertNotNull( test );
         StringWriter output = new StringWriter();        
         DocumentWriter.writeFragment( test, FilterSchema.getInstance(), output, null);
-        System.out.println( output );
+        //System.out.println( output );
         InputStream stream = new StringBufferInputStream( output.toString() );
                 
         Object o = DocumentFactory.getInstance( stream, new HashMap(), Level.FINEST );
@@ -206,7 +206,7 @@ public class XMLEncoderTest extends TestCase {
         StringWriter output = new StringWriter();        
         DocumentWriter.writeFragment( test, FilterSchema.getInstance(), output, null);
 
-        System.out.println(output);
+        //System.out.println(output);
 //        LOGGER.fine("parsedfilter is: " + test);
     }
 

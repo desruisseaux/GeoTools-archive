@@ -15,11 +15,12 @@
  */
 package org.geotools.filter.v1_1;
 
-import java.util.HashSet;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FeatureId;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -74,12 +75,12 @@ public class FeatureIdTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        HashSet fids = new HashSet();
+        String fid = null;
 
         if (node.getAttribute("fid") != null) {
-            fids.add(node.getAttributeValue("fid"));
+            fid = node.getAttributeValue("fid").toString();
         }
 
-        return filterfactory.featureId(fids);
+        return filterfactory.featureId(fid);
     }
 }

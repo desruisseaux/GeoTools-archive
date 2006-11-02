@@ -26,7 +26,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>gt2-oracle</artifactId>
   <packaging>jar</packaging>
-  <name>Oracle Spatial Module</name>
+  <name>Oracle 10g Module</name>
   <url>http://maven.geotools.fr/reports/modules/plugin/oracle/</url>
   
   <scm>

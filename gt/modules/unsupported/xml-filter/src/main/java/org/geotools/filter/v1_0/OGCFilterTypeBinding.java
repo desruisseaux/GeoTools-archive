@@ -108,19 +108,19 @@ public class OGCFilterTypeBinding implements ComplexBinding {
             return node.getChildValue(0); // return directly ...
         }
 
-        // we must be a mess of FidFilters, concatenate
+        // we must be a mess of FidFilters, concatenate into an Id
         Set fids = new HashSet();
 
         for (Iterator i = node.getChildren().iterator(); i.hasNext();) {
             Node child = (Node) i.next();
             FeatureId fid = (FeatureId) child.getValue();
 
-            if ((fid != null) && (fid.getIDs() != null)) {
-                fids.addAll(fid.getIDs());
+            if ((fid != null) && (fid.getID() != null)) {
+                fids.add(fid);
             }
         }
 
-        return factory.featureId(fids);
+        return factory.id(fids);
     }
 
     /**
