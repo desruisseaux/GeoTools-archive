@@ -16,8 +16,8 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
-import org.opengis.filter.FeatureId;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.identity.FeatureId;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;

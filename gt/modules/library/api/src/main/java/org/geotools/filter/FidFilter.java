@@ -16,8 +16,8 @@
 package org.geotools.filter;
 
 import java.util.Collection;
-import org.opengis.filter.FeatureId;
 import org.opengis.filter.Id;
+import org.opengis.filter.identity.FeatureId;
 import org.geotools.feature.Feature;
 
 
@@ -30,7 +30,7 @@ import org.geotools.feature.Feature;
  * @source $URL$
  * @version $Id$
  *
- * @deprecated use {@link org.opengis.filter.FeatureId}
+ * @deprecated use {@link org.opengis.filter.identity.FeatureId}
  */
 public interface FidFilter extends Filter, Id {
     /**

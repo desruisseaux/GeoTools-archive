@@ -22,8 +22,8 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import javax.xml.namespace.QName;
-import org.opengis.filter.FeatureId;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.identity.FeatureId;
 import org.geotools.xml.*;
 
 

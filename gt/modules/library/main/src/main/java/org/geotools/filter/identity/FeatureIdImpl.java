@@ -1,11 +1,11 @@
 package org.geotools.filter.identity;
 
 import org.opengis.feature.Feature;
-import org.opengis.filter.FeatureId;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.identity.Identifier;
 
 /**
- * Implementation of {@link org.opengis.filter.FeatureId}
+ * Implementation of {@link org.opengis.filter.identity.FeatureId}
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *

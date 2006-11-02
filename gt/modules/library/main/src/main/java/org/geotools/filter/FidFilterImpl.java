@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
-import org.opengis.filter.FeatureId;
 import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.identity.FeatureId;
 
 
 /**
@@ -117,7 +117,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
     }
     
     /**
-     * @see org.opengis.filter.FeatureId#setIDs(Set)
+     * @see org.opengis.filter.identity.FeatureId#setIDs(Set)
      */
     public void setIDs(Set ids) {
     	fids = new HashSet();
