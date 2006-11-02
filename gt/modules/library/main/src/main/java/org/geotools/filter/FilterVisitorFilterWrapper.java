@@ -21,6 +21,7 @@ import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.FeatureId;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Id;
 import org.opengis.filter.NoneFilter;
 import org.opengis.filter.Not;
 import org.opengis.filter.Or;
@@ -98,7 +99,7 @@ public class FilterVisitorFilterWrapper implements FilterVisitor {
 		return extraData;
 	}
 
-	public Object visit(FeatureId filter, Object extraData) {
+	public Object visit( Id filter, Object extraData) {
 		if (filter instanceof FidFilter) {
 			delegate.visit((FidFilter)filter);
 		}
