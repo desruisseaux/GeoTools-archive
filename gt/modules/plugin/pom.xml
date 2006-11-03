@@ -19,6 +19,30 @@
     <version>2.4-SNAPSHOT</version>
   </parent>
   
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <modules>
+        <module>epsg-access</module>      
+      </modules>
+    </profile>
+    <profile>
+      <id>unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <modules>
+        <module>epsg-access</module>      
+      </modules>
+    </profile>
+  </profiles>
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -54,7 +78,6 @@
   <!-- =========================================================== -->
   <modules>
     <module>arcgrid</module>
-    <module>epsg-access</module>
     <module>epsg-hsql</module>
     <module>epsg-postgresql</module>
     <module>epsg-wkt</module>
