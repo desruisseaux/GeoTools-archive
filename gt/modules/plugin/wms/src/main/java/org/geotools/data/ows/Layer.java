@@ -460,7 +460,7 @@ public class Layer implements Comparable {
                     DirectPosition newUpper = transform.transform(env.getUpperCorner(),null);
                     
                     env = new GeneralEnvelope(newLower.getCoordinates(), newUpper.getCoordinates());
-                    env.setCoordinateReferenceSystem(fromCRS);
+                    env.setCoordinateReferenceSystem(crs);
                     
                     //success!!
                     envelopeCache.put(crs, env);
