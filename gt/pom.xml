@@ -35,8 +35,12 @@
   <!--                        reported by the surefire report      -->
   <!--                        plugin.                              -->
   <!--                                                             -->
-  <!--     Example:           mvn -Pextensive.tests install        -->
-  <!--                        mvn -Psite.build site                -->
+  <!--     offline.mode       Disables tests which match the       -->
+  <!--                        pattern *OnlineTest.java.            -->
+  <!--                        (default profile)                    -->
+  <!--                                                             -->
+  <!--     Example:           mvn -P extensive.tests install       -->
+  <!--                        mvn -P site.build,offline.mode site  -->
   <!--                                                             -->
   <!--     Note that profiles like "site.build" are not mandatory  -->
   <!--     for using the "site" goal. Such profiles just modify    -->
@@ -72,6 +76,24 @@
         <extensive.tests>true</extensive.tests>
       </properties>
     </profile>
+    <profile>
+      <id>offline.mode</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <excludes>
+                  <exclude>**/*OnlineTest.java</exclude>
+                </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+      </build>
+    </profile>
   </profiles>
   
 
@@ -93,7 +115,7 @@
   </scm>
   
   <description>
-    Welcome to the homepage of the GeoTool build process
+    Welcome to the homepage of the GeoTools build process
     In the left side bar you should see a list of active modules,
     visit each for more details on the status of each module.
   </description>
@@ -895,9 +917,6 @@
           <includes>
             <include>**/*Test.java</include>
           </includes>
-          <excludes>
-            <exclude>**/*OnlineTest.java</exclude>
-          </excludes>
           <forkMode>once</forkMode>
           <argLine>-Xmx512M -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests}</argLine>
           <!-- Ignores test failure only if we are generating a       -->
