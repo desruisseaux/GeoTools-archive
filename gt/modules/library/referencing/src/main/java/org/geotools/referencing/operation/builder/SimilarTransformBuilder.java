@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.calculator;
+package org.geotools.referencing.operation.builder;
 
 // J2SE and extensions
 import javax.vecmath.MismatchedSizeException;
@@ -48,16 +48,18 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
  *
  * @author Jan Jezek
  */
-public class SimilarParamCalculator extends ProjectiveParamCalculator {
+public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
     /**
-     * Creates SimilarParamCalculator for the set of properties.
-     * @param ptSrc Set of source points
-     * @param ptDst Set of destination points
+     * Creates SimilarTransformBuilder for the set of properties.
+     * 
+     * 
+     * @param sourcePoints Set of source points
+     * @param targetPoints Set of destination points
      */
-    public SimilarParamCalculator(DirectPosition[] ptSrc, DirectPosition[] ptDst)
+    public SimilarTransformBuilder(DirectPosition[] ptSrc, DirectPosition[] ptDst)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        this.ptDst = ptDst;
-        this.ptSrc = ptSrc;
+        this.targetPoints = ptDst;
+        this.sourcePoints = ptSrc;
 
         super.checkPoints(2, 2);
         super.checkCRS();
@@ -78,28 +80,28 @@ public class SimilarParamCalculator extends ProjectiveParamCalculator {
      */
     public double[] generateMMatrix() {
         //super.checkPoints(2 , 2);
-        GeneralMatrix A = new GeneralMatrix(2 * ptSrc.length, 4);
-        GeneralMatrix X = new GeneralMatrix(2 * ptSrc.length, 1);
+        GeneralMatrix A = new GeneralMatrix(2 * sourcePoints.length, 4);
+        GeneralMatrix X = new GeneralMatrix(2 * sourcePoints.length, 1);
 
         int numRow = A.getNumRow();
 
         // Creates A matrix
         for (int j = 0; j < (numRow / 2); j++) {
-            A.setElement(j, 0, ptSrc[j].getCoordinates()[0]); //X
-            A.setElement(j, 1, -ptSrc[j].getCoordinates()[1]); //Y
+            A.setElement(j, 0, sourcePoints[j].getCoordinates()[0]); //X
+            A.setElement(j, 1, -sourcePoints[j].getCoordinates()[1]); //Y
             A.setElement(j, 2, 1);
             A.setElement(j, 3, 0);
 
-            X.setElement(j, 0, ptDst[j].getCoordinates()[0]);
+            X.setElement(j, 0, targetPoints[j].getCoordinates()[0]);
         }
 
         for (int j = numRow / 2; j < numRow; j++) {
-            A.setElement(j, 0, ptSrc[j - (numRow / 2)].getCoordinates()[1]); //Y
-            A.setElement(j, 1, ptSrc[j - (numRow / 2)].getCoordinates()[0]); //X
+            A.setElement(j, 0, sourcePoints[j - (numRow / 2)].getCoordinates()[1]); //Y
+            A.setElement(j, 1, sourcePoints[j - (numRow / 2)].getCoordinates()[0]); //X
             A.setElement(j, 2, 0);
             A.setElement(j, 3, 1);
 
-            X.setElement(j, 0, ptDst[j - (numRow / 2)].getCoordinates()[1]);
+            X.setElement(j, 0, targetPoints[j - (numRow / 2)].getCoordinates()[1]);
         }
 
         GeneralMatrix AT = (GeneralMatrix) A.clone();

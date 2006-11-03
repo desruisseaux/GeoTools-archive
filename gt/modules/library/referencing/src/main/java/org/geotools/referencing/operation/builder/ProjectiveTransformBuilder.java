@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.calculator;
+package org.geotools.referencing.operation.builder;
 
 // J2SE and extensions
 import javax.vecmath.MismatchedSizeException;
@@ -51,23 +51,25 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
  *
  * @author Jan Jezek
  */
-public class ProjectiveParamCalculator extends MathTransformBuilder {
-    protected ProjectiveParamCalculator() {
+public class ProjectiveTransformBuilder extends MathTransformBuilder {
+    protected ProjectiveTransformBuilder() {
     }
 
     /**
-     * Creates ProjectiveParamCalculator for the set of properties.        
-     * @param ptSrc Set of source points
-     * @param ptDst Set of destination points
+     * Creates ProjectiveTransformBuilder for the set of properties.        
+     * 
+     * 
+     * @param sourcePoints Set of source points
+     * @paramtargetPointst Set of destination points
      * @throws MismatchedSizeException if the number of properties is not set properly.
      * @throws MismatchedDimensionException if the dimension of properties is not set properly.
-     * @throws MismatchedReferenceSystemException -if the CRS of {@link #ptSrt} and {@link #ptDst}
+     * @throws MismatchedReferenceSystemException -if the CRS of {@link #ptSrt} and {@link targetPointst}
      *         have wrong Coordinate Reference System.
      */
-    public ProjectiveParamCalculator(DirectPosition[] ptSrc, DirectPosition[] ptDst)
+    public ProjectiveTransformBuilder(DirectPosition[] ptSrc, DirectPosition[] ptDst)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        this.ptDst = ptDst;
-        this.ptSrc = ptSrc;
+        this.targetPoints = ptDst;
+        this.sourcePoints = ptSrc;
 
         super.checkPoints(4, 2);
 
@@ -76,7 +78,7 @@ public class ProjectiveParamCalculator extends MathTransformBuilder {
 
     /**
      * Returns the minimum number of points required by this builder, which is 4 by default.
-     * Subclasses like {@linkplain AffineParamCalculator affine transform builders} will reduce
+     * Subclasses like {@linkplain AffineTransformBuilder affine transform builders} will reduce
      * this minimum.
      */
     public int getMinimumPointCount() {
@@ -90,8 +92,8 @@ public class ProjectiveParamCalculator extends MathTransformBuilder {
      *         {@linkplain DefaultEngineeringCRS}.
      */
     protected void checkCRS() throws MismatchedReferenceSystemException {
-        if ((ptDst[0].getCoordinateReferenceSystem() != DefaultEngineeringCRS.CARTESIAN_2D)
-                && (ptDst[0].getCoordinateReferenceSystem() != null)) {
+        if ((targetPoints[0].getCoordinateReferenceSystem() != DefaultEngineeringCRS.CARTESIAN_2D)
+                && (targetPoints[0].getCoordinateReferenceSystem() != null)) {
             throw new MismatchedReferenceSystemException(
                 "DefaultEngineeringCRS.CARTESIAN_2D is expected for this method");
         }
@@ -105,16 +107,16 @@ public class ProjectiveParamCalculator extends MathTransformBuilder {
      */
     protected double[] generateMMatrix() {
         // super.checkPoints(3, 2);
-        GeneralMatrix A = new GeneralMatrix(2 * ptSrc.length, 8);
-        GeneralMatrix X = new GeneralMatrix(2 * ptSrc.length, 1);
+        GeneralMatrix A = new GeneralMatrix(2 * sourcePoints.length, 8);
+        GeneralMatrix X = new GeneralMatrix(2 * sourcePoints.length, 1);
 
         int numRow = X.getNumRow();
 
         // Creates X matrix
         for (int j = 0; j < (numRow / 2); j++) {
-            double xs = ptSrc[j].getCoordinates()[0];
-            double ys = ptSrc[j].getCoordinates()[1];
-            double xd = ptDst[j].getCoordinates()[0];
+            double xs = sourcePoints[j].getCoordinates()[0];
+            double ys = sourcePoints[j].getCoordinates()[1];
+            double xd = targetPoints[j].getCoordinates()[0];
 
             A.setElement(j, 0, xs);
             A.setElement(j, 1, ys);
@@ -125,24 +127,24 @@ public class ProjectiveParamCalculator extends MathTransformBuilder {
             A.setElement(j, 6, -xd * xs);
             A.setElement(j, 7, -xd * ys);
 
-            X.setElement(j, 0, ptDst[j].getCoordinates()[0]);
+            X.setElement(j, 0, targetPoints[j].getCoordinates()[0]);
         }
 
         for (int j = numRow / 2; j < numRow; j++) {
-            double xs = ptSrc[j - (numRow / 2)].getCoordinates()[0];
-            double ys = ptSrc[j - (numRow / 2)].getCoordinates()[1];
-            double yd = ptDst[j - (numRow / 2)].getCoordinates()[1];
+            double xs = sourcePoints[j - (numRow / 2)].getCoordinates()[0];
+            double ys = sourcePoints[j - (numRow / 2)].getCoordinates()[1];
+            double yd = targetPoints[j - (numRow / 2)].getCoordinates()[1];
 
             A.setElement(j, 0, 0);
             A.setElement(j, 1, 0);
             A.setElement(j, 2, 0);
-            A.setElement(j, 3, ptSrc[j - (numRow / 2)].getCoordinates()[0]);
-            A.setElement(j, 4, ptSrc[j - (numRow / 2)].getCoordinates()[1]);
+            A.setElement(j, 3, sourcePoints[j - (numRow / 2)].getCoordinates()[0]);
+            A.setElement(j, 4, sourcePoints[j - (numRow / 2)].getCoordinates()[1]);
             A.setElement(j, 5, 1);
             A.setElement(j, 6, -yd * xs);
             A.setElement(j, 7, -yd * ys);
 
-            X.setElement(j, 0, ptDst[j - (numRow / 2)].getCoordinates()[1]);
+            X.setElement(j, 0, targetPoints[j - (numRow / 2)].getCoordinates()[1]);
         }
 
         return calculateLSM(A, X);

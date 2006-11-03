@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.calculator.algorithm;
+package org.geotools.referencing.operation.builder.algorithm;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,12 +28,12 @@ import java.util.Map;
  * @author Jan Jezek
  */
 public class MapTriangulationFactory extends TriangulationFactory {
-/**
-    * 
-    * @param quad defines the area for transformation.
-    * @param vectors represents pairs of identical points.
-    * @throws TriangulationException thrown when the source points are outside the quad. 
-    */
+    /**
+     * 
+     * @param quad defines the area for transformation.
+     * @param vectors represents pairs of identical points.
+     * @throws TriangulationException thrown when the source points are outside the quad. 
+     */
     public MapTriangulationFactory(Quadrilateral quad, MappedPosition[] vectors)
         throws TriangulationException {
         super(quad, vectors);
@@ -59,7 +59,6 @@ public class MapTriangulationFactory extends TriangulationFactory {
                     ((MappedPosition) sourceTriangle.p1).getMappedposition(),
                     ((MappedPosition) sourceTriangle.p2).getMappedposition()));
         }
-
         return triangleMap;
     }
 }

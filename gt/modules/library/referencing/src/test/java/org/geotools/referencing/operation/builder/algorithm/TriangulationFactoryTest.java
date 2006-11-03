@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.calculator.algorithm;
+package org.geotools.referencing.operation.builder.algorithm;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

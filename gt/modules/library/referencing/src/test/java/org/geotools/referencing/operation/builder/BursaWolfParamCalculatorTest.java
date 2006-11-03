@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.calculator;
+package org.geotools.referencing.operation.builder;
 
 // J2SE and extensions
 import java.util.Random;
@@ -23,9 +23,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.geotools.geometry.GeneralDirectPosition;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.transform.GeocentricTranslation;
-import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
@@ -52,9 +53,9 @@ public class BursaWolfParamCalculatorTest extends TestCase {
     }
 
     /**
-     * Test {@link BursaWolfParamCalculator}.
+     * Test {@link BursaWolfParametersBuilder}.
      */
-    public void testBursaWolfParamCalculaterXrotation() throws TransformException {
+    public void testBursaWolfParamCalculaterXrotation() throws FactoryException, TransformException {
         Random random = new Random(773418718);
 
         double R = 6370000;
@@ -83,7 +84,7 @@ public class BursaWolfParamCalculatorTest extends TestCase {
 
         double[] dstPoints = new double[points.length];
 
-        MathTransformBuilder BWPT = new BursaWolfParamCalculator(ptSrc, ptDst);
+        MathTransformBuilder BWPT = new BursaWolfParametersBuilder(ptSrc, ptDst);
         BWPT.getMathTransform()
             .transform(points, 0, dstPoints, 0, (points.length / 3));
 
@@ -105,7 +106,7 @@ public class BursaWolfParamCalculatorTest extends TestCase {
      *
      * @throws TransformException
      */
-    public void test2BursaWolfParamCalculater() throws TransformException {
+    public void test2BursaWolfParamCalculater() throws FactoryException, TransformException {
         double R = 6370000;
         Random random = new Random(143477662);
         int numberOfPoints = 3 * 10;
@@ -141,7 +142,7 @@ public class BursaWolfParamCalculatorTest extends TestCase {
             ptDst[i] = new GeneralDirectPosition(pom);
         }
 
-        BursaWolfParamCalculator BWPT = new BursaWolfParamCalculator(ptSrc,
+        BursaWolfParametersBuilder BWPT = new BursaWolfParametersBuilder(ptSrc,
                 ptDst);
         assertEquals(BWPT.getBursaWolfParameters(null).dx, bwp.dx, 1E-2);
         assertEquals(BWPT.getBursaWolfParameters(null).dy, bwp.dy, 1E-2);

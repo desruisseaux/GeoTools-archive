@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.calculator;
+package org.geotools.referencing.operation.builder;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -22,8 +22,9 @@ import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.referencing.operation.calculator.algorithm.Quadrilateral;
-import org.geotools.referencing.operation.calculator.algorithm.TriangulationException;
+import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
+import org.geotools.referencing.operation.builder.algorithm.TriangulationException;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -63,7 +64,7 @@ public class ParamCalculatorTest extends TestCase {
     }
 
     /**
-     * Test {@link AffineParamCalculator}.
+     * Test {@link AffineTransformBuilder}.
      *
      * @param countOfVertices counf of genareted points
      *
@@ -87,8 +88,7 @@ public class ParamCalculatorTest extends TestCase {
         return vert;
     }
 
-    private DirectPosition[] generateCoordsWithCRS(int countOfVertices,
-        AbstractCRS crs) {
+    private DirectPosition[] generateCoordsWithCRS(int countOfVertices, AbstractCRS crs) {
         DirectPosition[] vert = generateCoords(countOfVertices);
 
         for (int i = 0; i < countOfVertices; i++) {
@@ -99,8 +99,9 @@ public class ParamCalculatorTest extends TestCase {
         return vert;
     }
 
-    private void transformTest(MathTransform mt, DirectPosition[] ptSrc,
-        DirectPosition[] ptDst) throws TransformException {
+    private void transformTest(MathTransform mt, DirectPosition[] ptSrc, DirectPosition[] ptDst)
+            throws FactoryException, TransformException
+    {
         double[] points = new double[ptSrc.length * 2];
         double[] ptCalculated = new double[ptSrc.length * 2];
 
@@ -118,9 +119,9 @@ public class ParamCalculatorTest extends TestCase {
         }
     }
 
-    public void testRubberCalculator()
-        throws MismatchedSizeException, MismatchedDimensionException,
-            TransformException, TriangulationException {
+    public void testRubberCalculator() throws MismatchedSizeException, MismatchedDimensionException,
+                FactoryException, TransformException, TriangulationException
+    {
         DirectPosition[] ptSrc = generateCoords(7, 324);
         DirectPosition[] ptDst = generateCoords(7, 124);
 
@@ -130,39 +131,39 @@ public class ParamCalculatorTest extends TestCase {
                 new DirectPosition2D(crs, 0, 0),
                 new DirectPosition2D(crs, 0, 1000),
                 new DirectPosition2D(crs, 1000, 1000));
-        MathTransformBuilder ppc = new RubberSheetCalculator(ptSrc, ptDst, quad);
+        MathTransformBuilder ppc = new RubberSheetBuilder(ptSrc, ptDst, quad);
 
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
         assertTrue(ppc.getStandardDeviation() < 0.00001);
     }
 
-    public void testProjectiveCalculator()
-        throws MismatchedSizeException, MismatchedDimensionException,
-            TransformException {
+    public void testProjectiveCalculator() throws MismatchedSizeException,
+            MismatchedDimensionException, FactoryException, TransformException
+    {
         DirectPosition[] ptSrc = generateCoords(4, 3243);
         DirectPosition[] ptDst = generateCoords(4, 2344);
-        MathTransformBuilder ppc = new ProjectiveParamCalculator(ptSrc, ptDst);
+        MathTransformBuilder ppc = new ProjectiveTransformBuilder(ptSrc, ptDst);
         //System.out.println(ppc.getMathTransform().toWKT());
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
         assertTrue(ppc.getStandardDeviation() < 0.00001);
     }
 
-    public void testAffineCalculator()
-        throws MismatchedSizeException, MismatchedDimensionException,
-            TransformException {
+    public void testAffineCalculator() throws MismatchedSizeException,
+            MismatchedDimensionException, FactoryException, TransformException
+    {
         DirectPosition[] ptSrc = generateCoords(3, 2345);
         DirectPosition[] ptDst = generateCoords(3, 2312);
-        MathTransformBuilder ppc = new AffineParamCalculator(ptSrc, ptDst);
+        MathTransformBuilder ppc = new AffineTransformBuilder(ptSrc, ptDst);
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
         assertTrue(ppc.getStandardDeviation() < 0.00001);
     }
 
-    public void testSimilarCalculator()
-        throws MismatchedSizeException, MismatchedDimensionException,
-            TransformException {
+    public void testSimilarCalculator() throws MismatchedSizeException,
+            MismatchedDimensionException, FactoryException, TransformException
+    {
         DirectPosition[] ptSrc = generateCoords(2, 142);
         DirectPosition[] ptDst = generateCoords(2, 1244);
-        MathTransformBuilder ppc = new SimilarParamCalculator(ptSrc, ptDst);
+        MathTransformBuilder ppc = new SimilarTransformBuilder(ptSrc, ptDst);
         //System.out.println(ppc.getMMatrix());
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
         assertTrue(ppc.getStandardDeviation() < 0.00001);
@@ -174,7 +175,7 @@ public class ParamCalculatorTest extends TestCase {
         DirectPosition[] ptDst = generateCoords(3);
 
         try {
-            new SimilarParamCalculator(ptSrc, ptDst);
+            new SimilarTransformBuilder(ptSrc, ptDst);
             fail("Expected MismatchedSizeException");
         } catch (MismatchedSizeException e) {
         }
@@ -184,7 +185,7 @@ public class ParamCalculatorTest extends TestCase {
         ptDst = generateCoords(2);
 
         try {
-            new AffineParamCalculator(ptSrc, ptDst);
+            new AffineTransformBuilder(ptSrc, ptDst);
             fail("Expected MismatchedSizeException");
         } catch (MismatchedSizeException e) {
         }
@@ -195,7 +196,7 @@ public class ParamCalculatorTest extends TestCase {
         ptDst = generateCoords(4);
 
         try {
-            new AffineParamCalculator(ptSrc, ptDst);
+            new AffineTransformBuilder(ptSrc, ptDst);
             fail("Expected MismatchedReferenceSystemException");
         } catch (MismatchedReferenceSystemException e) {
         }
@@ -205,7 +206,7 @@ public class ParamCalculatorTest extends TestCase {
         ptDst = generateCoords(4);
 
         try {
-            new AffineParamCalculator(ptSrc, ptDst);
+            new AffineTransformBuilder(ptSrc, ptDst);
             fail("Expected MismatchedReferenceSystemException");
         } catch (MismatchedReferenceSystemException e) {
         }

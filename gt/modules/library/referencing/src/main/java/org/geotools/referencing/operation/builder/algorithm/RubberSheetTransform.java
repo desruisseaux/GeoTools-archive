@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.calculator.algorithm;
+package org.geotools.referencing.operation.builder.algorithm;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.transform.AbstractMathTransform;
@@ -52,7 +52,7 @@ public class RubberSheetTransform extends AbstractMathTransform implements MathT
      * Constructs the RubberSheetTransform.
      * 
      * @param trianglesToAffineTransform The HashMap where the keys are the original
-     *        {@link org.geotools.referencing.operation.calculator.algorithm.TINTriangle}
+     *        {@link org.geotools.referencing.operation.builder.algorithm.TINTriangle}
      *        and values are {@link org.opengis.referencing.operation.MathTransform}.
      */
     public RubberSheetTransform(HashMap trianglesToAffineTransform) {

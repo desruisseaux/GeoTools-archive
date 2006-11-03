@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.operation.calculator;
+package org.geotools.referencing.operation.builder;
 
 // J2SE and extensions
 import java.util.ArrayList;
@@ -24,15 +24,15 @@ import java.util.Map;
 import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.referencing.operation.calculator.algorithm.MapTriangulationFactory;
-import org.geotools.referencing.operation.calculator.algorithm.MappedPosition;
-import org.geotools.referencing.operation.calculator.algorithm.Quadrilateral;
-import org.geotools.referencing.operation.calculator.algorithm.RubberSheetTransform;
-import org.geotools.referencing.operation.calculator.algorithm.TINTriangle;
-import org.geotools.referencing.operation.calculator.algorithm.TriangulationException;
+import org.geotools.referencing.operation.builder.algorithm.MapTriangulationFactory;
+import org.geotools.referencing.operation.builder.algorithm.MappedPosition;
+import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
+import org.geotools.referencing.operation.builder.algorithm.RubberSheetTransform;
+import org.geotools.referencing.operation.builder.algorithm.TINTriangle;
+import org.geotools.referencing.operation.builder.algorithm.TriangulationException;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
@@ -45,7 +45,7 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
  *
  * @author Jan Jezek
  */
-public class RubberSheetCalculator extends MathTransformBuilder {
+public class RubberSheetBuilder extends MathTransformBuilder {
     /** trianglesMap Map of the original and destination triangles. */
     private HashMap trianglesMap;
 
@@ -59,20 +59,22 @@ public class RubberSheetCalculator extends MathTransformBuilder {
      * Creates the transformation from specified pairs of points and
      * quadrilateral that deffines the area of transformation.
      * 
-     * @param ptSrc
+     * 
+     * 
+     * @param sourcePoints
      *            Set of source points
-     * @param ptDst
+     * @param targetPoints
      *            Set of destination points
      * @throws MismatchedSizeException
-     * @throws MismatchedDimensionException 
+     * @throws MismatchedDimensionException
      * @throws MismatchedReferenceSystemException
      * @throws TriangulationException
      */
-    public RubberSheetCalculator(DirectPosition[] ptSrc,
+    public RubberSheetBuilder(DirectPosition[] ptSrc,
         DirectPosition[] ptDst, Quadrilateral quad)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException, TriangulationException {
-        this.ptDst = ptDst;
-        this.ptSrc = ptSrc;
+        this.targetPoints = ptDst;
+        this.sourcePoints = ptSrc;
 
         super.checkPoints(0, 2);
         checkQuad(quad);
@@ -108,7 +110,7 @@ public class RubberSheetCalculator extends MathTransformBuilder {
      * @throws MismatchedReferenceSystemException
      */
     private void checkQuad(Quadrilateral quad) throws MismatchedReferenceSystemException {
-        CoordinateReferenceSystem crs = ptSrc[0].getCoordinateReferenceSystem();
+        CoordinateReferenceSystem crs = sourcePoints[0].getCoordinateReferenceSystem();
 
         if ((quad.p0.getCoordinateReferenceSystem() != crs)
                 || (quad.p1.getCoordinateReferenceSystem() != crs)
@@ -136,7 +138,7 @@ public class RubberSheetCalculator extends MathTransformBuilder {
      *         are AffineTransformation Objects.
      */
     private HashMap mapTrianglesToKey() {
-        AffineParamCalculator calculator;
+        AffineTransformBuilder calculator;
 
         // CoordinateList ptlSrc = new CoordinateList();
         // CoordinateList ptlDst = new CoordinateList();
@@ -151,7 +153,7 @@ public class RubberSheetCalculator extends MathTransformBuilder {
             Map.Entry a = (Map.Entry) it.next();
 
             try {
-                calculator = new AffineParamCalculator(((TINTriangle) a.getKey())
+                calculator = new AffineTransformBuilder(((TINTriangle) a.getKey())
                         .getPoints(), ((TINTriangle) a.getValue()).getPoints());
                 a.setValue(calculator.getMathTransform());
             } catch (Exception e) {
@@ -246,15 +248,16 @@ public class RubberSheetCalculator extends MathTransformBuilder {
 
     /**
      * Returns MathTransform transformation setup as RubberSheet, that
-     * transforms the {@link #ptSrc} into the {@link #ptDst} with zero deltas
+     * transforms the {@link #sourcePoints} into the {@link #targetPoints} with zero deltas
      * on these points
-     *
+     * 
+     * 
+     * 
      * @return calculated MathTransform
-     *
-     * @throws TransformException when the size of source and destination point
+     * @throws FactoryException when the size of source and destination point
      *         is not the same.
      */
-    public MathTransform getMathTransform() throws TransformException {
+    public MathTransform getMathTransform() throws FactoryException {
         return new RubberSheetTransform(trianglesToKeysMap);
     }
 }
