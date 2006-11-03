@@ -61,7 +61,7 @@ public class PolygonHandler implements ShapeHandler {
 		this.bbox = env;
 		this.mt = mt;
 		if (mt != null) {
-			Point2D span = GeometryHandlerUtilities.calculateSpan(mt);
+			Point2D span = GeometryHandlerUtilities.calculateSpan(mt,0,0);
 			this.spanx = span.getX() ;
 			this.spany = span.getY() ;
 		}

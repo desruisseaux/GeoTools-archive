@@ -26,7 +26,7 @@ public class ScreenMapTest extends TestCase {
      * Test method for 'org.geotools.renderer.shape.ScreenMap.set(int, int)'
      */
     public void testSet() {
-        ScreenMap map = new ScreenMap(8, 8);
+        ScreenMap map = new ScreenMap(0,0,8, 8);
         
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {

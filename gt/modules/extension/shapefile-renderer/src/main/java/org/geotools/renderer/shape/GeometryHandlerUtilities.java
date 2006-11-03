@@ -20,6 +20,8 @@ import org.geotools.data.shapefile.shp.ShapeType;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
+
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 
@@ -92,10 +94,21 @@ public class GeometryHandlerUtilities {
         }
     }
 
-    public static Point2D calculateSpan(MathTransform mt)
+    /**
+     * calculates the distance between the centers of the two pixels at x,y
+     *
+     * @param mt the transform to use to calculate the centers.
+     * @param x the x coordinate at which to make the calculation
+     * @param y the y coordinate at which to make the calculation
+     * @return a point whose x coord it the distance in world coordinates between x-0.5 and x+0.5 and the y is the span 
+     * around the y point.
+     * @throws NoninvertibleTransformException
+     * @throws TransformException
+     */
+    public static Point2D calculateSpan(MathTransform mt, int x, int y)
         throws NoninvertibleTransformException, TransformException {
         MathTransform screenToWorld = mt.inverse();
-        double[] original = new double[] { 0, 0, 1, 1 };
+        double[] original = new double[] { x-0.5, y-0.5, x+0.5, y+0.5 };
         double[] coords = new double[4];
         screenToWorld.transform(original, 0, coords, 0, 2);
 
@@ -116,13 +129,13 @@ public class GeometryHandlerUtilities {
      * @throws TransformException
      * @throws NoninvertibleTransformException
      */
-    public static ScreenMap calculateScreenSize(Envelope env, MathTransform mt,
+    public static ScreenMap calculateScreenSize(Rectangle screenSize,
         boolean hasOpacity)
         throws TransformException, NoninvertibleTransformException {
         if (hasOpacity) {
             // if opacity then this short optimization cannot be used
             // so return a screenMap that always says to write there.
-            return new ScreenMap(0, 0) {
+            return new ScreenMap(0,0, 0, 0) {
                     public boolean get(int x, int y) {
                         return false;
                     }
@@ -133,15 +146,8 @@ public class GeometryHandlerUtilities {
                 };
         }
 
-        double[] worldSize = new double[] {
-                env.getMinX(), env.getMinY(), env.getMaxX(), env.getMaxY()
-            };
-        double[] screenSize = new double[4];
-        mt.transform(worldSize, 0, screenSize, 0, 2);
 
-        int height = Math.abs((int) (screenSize[1] - screenSize[0]));
-        int width = Math.abs((int) (screenSize[3] - screenSize[2]));
 
-        return new ScreenMap(width + 1, height + 1);
+        return new ScreenMap(screenSize.x, screenSize.y, screenSize.width + 1, screenSize.height + 1);
     }
 }

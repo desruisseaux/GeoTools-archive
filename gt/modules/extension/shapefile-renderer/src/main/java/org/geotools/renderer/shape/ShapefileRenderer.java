@@ -273,14 +273,12 @@ public class ShapefileRenderer implements GTRenderer {
 		return null;
 	}
 
-	private void processStylersNoCaching(Graphics2D graphics,
-			ShapefileDataStore datastore, Query query, Envelope bbox,
-			MathTransform mt, Style style, IndexInfo info,
-			Transaction transaction) throws IOException {
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine("processing " + style.getFeatureTypeStyles().length
-					+ " stylers");
-		}
+    private void processStylersNoCaching( Graphics2D graphics, ShapefileDataStore datastore,
+            Query query, Envelope bbox, Rectangle screenSize, MathTransform mt, Style style, IndexInfo info,
+            Transaction transaction) throws IOException {
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("processing " + style.getFeatureTypeStyles().length + " stylers");
+        }
 
 		FeatureTypeStyle[] featureStylers = style.getFeatureTypeStyles();
 		FeatureType type;
@@ -348,11 +346,11 @@ public class ShapefileRenderer implements GTRenderer {
 						datastore, transaction, typeName, query, ruleList,
 						elseRuleList, scaleRange);
 
-				processShapefile(graphics, datastore, bbox, mt, info, type,
-						query, ruleList, elseRuleList, modifiedFIDs, scaleRange);
-			}
-		}
-	}
+                processShapefile(graphics, datastore, bbox,screenSize, mt, info, type, query, ruleList,
+                        elseRuleList, modifiedFIDs, scaleRange);
+            }
+        }
+    }
 
 	private Set processTransaction(Graphics2D graphics, Envelope bbox,
 			MathTransform transform, DataStore ds, Transaction transaction,
@@ -489,12 +487,11 @@ public class ShapefileRenderer implements GTRenderer {
 		return fids;
 	}
 
-	private void processShapefile(Graphics2D graphics,
-			ShapefileDataStore datastore, Envelope bbox, MathTransform mt,
-			IndexInfo info, FeatureType type, Query query, List ruleList,
-			List elseRuleList, Set modifiedFIDs, NumberRange scaleRange)
-			throws IOException {
-		IndexedDbaseFileReader dbfreader = null;
+    private void processShapefile( Graphics2D graphics, ShapefileDataStore datastore,
+            Envelope bbox, Rectangle screenSize, MathTransform mt, IndexInfo info, FeatureType type, Query query,
+            List ruleList, List elseRuleList, Set modifiedFIDs, NumberRange scaleRange )
+            throws IOException {
+        IndexedDbaseFileReader dbfreader = null;
 
 		try {
 			dbfreader = ShapefileRendererUtil.getDBFReader(datastore);
@@ -512,14 +509,13 @@ public class ShapefileRenderer implements GTRenderer {
 
 		IndexInfo.Reader shpreader = null;
 
-		try {
-			shpreader = new IndexInfo.Reader(info,
-					ShapefileRendererUtil.getShpReader(datastore, bbox, mt,
-							opacityFinder.hasOpacity), bbox);
-		} catch (Exception e) {
-			fireErrorEvent(e);
-			return;
-		}
+        try {
+            shpreader = new IndexInfo.Reader(info, ShapefileRendererUtil.getShpReader(datastore,
+                    bbox, screenSize, mt, opacityFinder.hasOpacity), bbox);
+        } catch (Exception e) {
+            fireErrorEvent(e);
+            return;
+        }
 
 		FIDReader fidReader = null;
 		try {
@@ -1409,13 +1405,11 @@ public class ShapefileRenderer implements GTRenderer {
 							.getTransaction();
 				}
 
-				processStylersNoCaching(graphics, ds, currLayer.getQuery(),
-						bbox, mt, currLayer.getStyle(), layerIndexInfo[i],
-						transaction);
-			} catch (Exception exception) {
-				fireErrorEvent(new Exception("Exception rendering layer "
-						+ currLayer, exception));
-			}
+                processStylersNoCaching(graphics, ds, currLayer.getQuery(), bbox, paintArea,
+                        mt, currLayer.getStyle(), layerIndexInfo[i], transaction);
+            } catch (Exception exception) {
+                fireErrorEvent(new Exception("Exception rendering layer " + currLayer, exception));
+            }
 
 			labelCache.endLayer(graphics, paintArea);
 		}

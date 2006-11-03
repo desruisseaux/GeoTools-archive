@@ -46,7 +46,7 @@ import org.opengis.referencing.operation.MathTransform;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * @TODO class description
+ * Tests multilinehandler class
  * 
  * @author jeichar
  * @since 2.1.x
@@ -71,7 +71,8 @@ public class MultiLineHandlerTest extends TestCase {
 		}
 
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false));
+		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, 
+                        mt, false, new Rectangle(512,512) ));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
 		assertTrue( shape instanceof SimpleGeometry);
@@ -101,7 +102,7 @@ public class MultiLineHandlerTest extends TestCase {
 		mt = FactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt,worldToScreen);
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false));
+		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false,new Rectangle(300,300)));
 		SimpleGeometry shape=(SimpleGeometry) reader.nextRecord().shape();
 		assertEquals( 6, shape.coords[0].length );
 		
@@ -127,7 +128,9 @@ public class MultiLineHandlerTest extends TestCase {
 	}
 
 	public void testBBoxIntersectSegment() throws Exception{
-		MultiLineHandler handler=new MultiLineHandler(ShapeType.ARC, new Envelope(0,10,0,10), null, false);
+		MultiLineHandler handler=
+                    new MultiLineHandler(ShapeType.ARC, new Envelope(0,10,0,10), null, false, 
+                            new Rectangle(0,0,10,10));
 		assertTrue("point contained in bbox", handler.bboxIntersectSegment(false, new double[]{1,1}, 2));
 		assertFalse("point outside of bbox",handler.bboxIntersectSegment(false, new double[]{-1,1}, 2));
 		assertTrue("Line enters bbox", handler.bboxIntersectSegment(false, new double[]{-1,1, 1,1}, 4));

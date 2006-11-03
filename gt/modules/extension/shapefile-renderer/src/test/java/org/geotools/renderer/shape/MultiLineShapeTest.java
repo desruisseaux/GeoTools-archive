@@ -106,6 +106,5 @@ public class MultiLineShapeTest extends TestCase {
 		i.next();
 		assertTrue( i.isDone() );
 	}
-	
 
 }

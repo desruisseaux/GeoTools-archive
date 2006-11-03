@@ -20,6 +20,8 @@ import org.geotools.data.shapefile.shp.ShapeHandler;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 
@@ -51,18 +53,19 @@ public class MultiLineHandler implements ShapeHandler {
      * @param mt the transform to go from data to the envelope (and that should
      *        be used to transform the shape coords)
      * @param hasOpacity
+     * @param screenSize 
      *
      * @throws TransformException
      */
     public MultiLineHandler(ShapeType type, Envelope env, MathTransform mt,
-        boolean hasOpacity) throws TransformException {
+        boolean hasOpacity, Rectangle screenSize) throws TransformException {
         this.type = type;
         this.bbox = env;
         this.mt = mt;
 
         if (mt != null) {
-            span = GeometryHandlerUtilities.calculateSpan(mt);
-            screenMap = GeometryHandlerUtilities.calculateScreenSize(env, mt,
+            span = GeometryHandlerUtilities.calculateSpan(mt,0,0);
+            screenMap = GeometryHandlerUtilities.calculateScreenSize(screenSize,
                     hasOpacity);
         }
     }
@@ -181,9 +184,9 @@ public class MultiLineHandler implements ShapeHandler {
                     readDoubles++;
                     currentDoubles++;
                     intersection = bboxIntersectSegment(intersection,
-                            coords[part], currentDoubles);
+                            coords[part], readDoubles);
 
-                    if ((currentDoubles > 3)
+                    if ((readDoubles > 3)
                             && (currentDoubles < (totalDoubles - 1))) {
                         if ((Math.abs(coords[part][readDoubles - 4]
                                     - coords[part][readDoubles - 2]) <= span
@@ -192,10 +195,7 @@ public class MultiLineHandler implements ShapeHandler {
                                     - coords[part][readDoubles - 1]) <= span
                                 .getY())) {
                             readDoubles -= 2;
-                        } else {
-                            if (!mt.isIdentity()) {
-                            }
-                        }
+                        } 
                     }
                 }
 
@@ -208,9 +208,6 @@ public class MultiLineHandler implements ShapeHandler {
                         transformed[partsInBBox] = new double[readDoubles];
                         GeometryHandlerUtilities.transform(type, mt,
                             coords[part], transformed[partsInBBox]);
-
-                        //						mt.transform(coords[part], 0, transformed[partsInBBox], 0,
-                        //								readDoubles / 2);
                     } catch (Exception e) {
                         ShapefileRenderer.LOGGER.severe(
                             "could not transform coordinates "
@@ -241,23 +238,23 @@ public class MultiLineHandler implements ShapeHandler {
     }
 
     public boolean bboxIntersectSegment(boolean intersection, double[] coords,
-        int currentDoubles) {
+        int index) {
         if (intersection) {
             return true;
         }
 
-        if (bbox.contains(coords[currentDoubles - 2], coords[currentDoubles - 1])) {
+        if (bbox.contains(coords[index - 2], coords[index - 1])) {
             return true;
         }
 
-        if (currentDoubles < 4) {
+        if (index < 4) {
             return false;
         }
 
-        return intersect(coords[currentDoubles - 4],
-            coords[currentDoubles - 3], coords[currentDoubles - 2],
-            coords[currentDoubles - 1], bbox.getMinX(), bbox.getMinY(),
-            bbox.getMaxX(), bbox.getMaxY());
+        return intersect(coords[index - 4],
+                    coords[index - 3], coords[index - 2],
+                    coords[index - 1], bbox.getMinX(), bbox.getMinY(),
+                    bbox.getMaxX(), bbox.getMaxY());
     }
 
     /**
@@ -276,7 +273,7 @@ public class MultiLineHandler implements ShapeHandler {
      *
      * @return DOCUMENT ME!
      */
-    private boolean intersect(double x0, double y0, double x1, double y1,
+    public static boolean intersect(double x0, double y0, double x1, double y1,
         double xmin, double ymin, double xmax, double ymax) {
         boolean accept = false;
         boolean done = false;
@@ -330,7 +327,7 @@ public class MultiLineHandler implements ShapeHandler {
         return accept;
     }
 
-    private int compOutCode(double x, double y, double xmin, double xmax,
+    private static int compOutCode(double x, double y, double xmin, double xmax,
         double ymin, double ymax) {
         int outcode = 0;
 

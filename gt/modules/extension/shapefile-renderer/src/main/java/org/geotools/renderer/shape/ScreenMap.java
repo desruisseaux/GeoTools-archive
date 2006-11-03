@@ -23,13 +23,17 @@ public class ScreenMap {
     int[] pixels;
     int width;
     int height;
+    private int minx;
+    private int miny;
 
     public ScreenMap(){}
-    public ScreenMap(int x, int y) {
-        width = x;
-        height = y;
+    public ScreenMap(int x, int y, int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.minx=x;
+        this.miny=y;
 
-        int arraySize = ((x * y) / 32) + 1;
+        int arraySize = ((width * height) / 32) + 1;
         pixels = new int[arraySize];
     }
 
@@ -37,9 +41,9 @@ public class ScreenMap {
      * Sets location at position x,y to the value.
      */
     public void set(int x, int y, boolean value) {
-        if( x<0 || x>width-1 || y<0 || y>height-1 )
+        if( (x-minx)<0 || (x-minx)>width-1 ||(y-miny)<0 || (y-miny)>height-1 )
             return;
-        int bit = bit(x, y);
+        int bit = bit(x-minx, y-miny);
         int index = bit / 32;
         int offset = bit % 32;
         int mask = 1;
@@ -60,9 +64,9 @@ public class ScreenMap {
      * Returns true if the pixel at location x,y is set or out of bounds.
      */
     public boolean get(int x, int y) {
-        if( x<0 || x>width-1 || y<0 || y>height-1 )
+        if( (x-minx)<0 || (x-minx)>width-1 ||(y-miny)<0 || (y-miny)>height-1 )
             return true;
-        int bit = bit(x, y);
+        int bit = bit(x-minx, y-miny);
         int index = bit / 32;
         int offset = bit % 32;
         int mask = 1 << offset;
