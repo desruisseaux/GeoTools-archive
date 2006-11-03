@@ -28,6 +28,7 @@ import java.util.TreeSet;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.referencing.CRS;
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -162,7 +163,24 @@ public class WMSUtils {
     		}
     	}
     	
-    	Iterator iter = codes.iterator();
+    	Iterator iter = crs.getIdentifiers().iterator();
+    	while (iter.hasNext()) {
+    		Identifier ident = (Identifier) iter.next();
+    		String epsgCode = ident.toString();
+    		if (codes.contains(epsgCode)) {
+    			if (crsCache.get(crs) == null) {
+    				crsCache.put(crs, new TreeSet());
+    			}
+    			TreeSet set = (TreeSet) crsCache.get(crs);
+    			set.add(epsgCode);
+    			
+    			return epsgCode;
+    		}
+    	}
+    	
+    	iter = null;
+    	
+    	iter = codes.iterator();
     	while (iter.hasNext()) {
     		String epsgCode = (String) iter.next();
     		
@@ -170,7 +188,7 @@ public class WMSUtils {
 			try {
 				epsgCRS = CRS.decode(epsgCode);
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				continue;
 			}
     		
@@ -178,7 +196,7 @@ public class WMSUtils {
 			try {
 				transform = CRS.findMathTransform(crs, epsgCRS, true);
 			} catch (FactoryException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				continue;
 			}
     		
