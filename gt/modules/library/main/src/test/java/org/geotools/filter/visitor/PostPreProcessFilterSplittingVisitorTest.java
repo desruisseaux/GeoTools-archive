@@ -18,7 +18,7 @@ package org.geotools.filter.visitor;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterType;
@@ -46,26 +46,26 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
 		Filter f2 = createEqualsCompareFilter(nameAtt, "david");
 
-		runTest(f1.and(f2), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
+		runTest( filterFactory.and( f1,f2 ), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
 	}
 	
 	public void testVisitLogicalANDFilter() throws Exception{
 		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
 		Filter f2 = createEqualsCompareFilter(nameAtt, "david");
 
-		runTest(f1.and(f2), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
+		runTest( filterFactory.and(f1,f2), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
 	}
 	public void testVisitLogicalNOTFilter() throws Exception{
 		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
 
-		runTest(f1.not(), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
+		runTest( filterFactory.not( f1 ), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
 	}
 
 	public void testVisitLogicalORFilter() throws Exception{
 		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
 		Filter f2 = createEqualsCompareFilter("name", "jose");
 
-		Filter orFilter = f1.or(f2);
+		Filter orFilter = ((org.geotools.filter.Filter)f1).or(f2);
 		runTest(orFilter, (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
 		
 		filterCapabilitiesMask=new FilterCapabilities();
@@ -75,12 +75,12 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		visitor=newVisitor();
 		
 		f2=createGeometryFilter(FilterType.GEOMETRY_BBOX);
-		orFilter = f1.or(f2);
-		orFilter.accept(visitor);
+		orFilter = filterFactory.or( f1,f2);
+        ((org.geotools.filter.Filter)orFilter).accept(visitor);
 		
 		// f1 could be pre-processed but since f2 can't all the processing has to be done on the client side :-(
 		assertEquals(orFilter, visitor.getFilterPost());
-		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 	}
 
 
@@ -104,7 +104,7 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 
 		f.accept(visitor);
 
-		assertEquals(visitor.getFilterPost().toString(), Filter.NONE, visitor
+		assertEquals(visitor.getFilterPost().toString(), Filter.INCLUDE, visitor
 				.getFilterPost());
 		assertEquals(visitor.getFilterPre().toString(), f,
 				visitor.getFilterPre());
@@ -128,7 +128,7 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		FidFilter filter = filterFactory.createFidFilter("david");
 		filter.accept(visitor);
 		
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
 	}
 
@@ -142,14 +142,14 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		filter.accept(visitor);
 
 		assertEquals(filter, visitor.getFilterPost());
-		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		
 		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		visitor=newVisitor();
 		
 		filter.accept(visitor);
 
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
 	}
 	
@@ -161,9 +161,9 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		Filter funtionFilter = createFunctionFilter();
 		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
 		
-		Filter andFilter = funtionFilter.and(geomFilter);
+		Filter andFilter = filterFactory.and(funtionFilter,geomFilter);
 
-		andFilter.accept(visitor);
+        ((org.geotools.filter.Filter)andFilter).accept(visitor);
 
 		assertEquals(funtionFilter, visitor.getFilterPost());
 		assertEquals(geomFilter, visitor.getFilterPre());
@@ -171,9 +171,9 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		visitor=newVisitor();
 		
-		andFilter.accept(visitor);
+        ((org.geotools.filter.Filter)andFilter).accept(visitor);
 
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(andFilter, visitor.getFilterPre());
 	}
 
@@ -185,19 +185,19 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		Filter funtionFilter = createFunctionFilter();
 		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
 		
-		Filter orFilter = funtionFilter.or(geomFilter);
+		Filter orFilter = filterFactory.or(funtionFilter,geomFilter);
 
-		orFilter.accept(visitor);
+        ((org.geotools.filter.Filter)orFilter).accept(visitor);
 
-		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		assertEquals(orFilter, visitor.getFilterPost());
 		
 		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		visitor=newVisitor();
 		
-		orFilter.accept(visitor);
+        ((org.geotools.filter.Filter)orFilter).accept(visitor);
 
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(orFilter, visitor.getFilterPre());
 
 	}
@@ -208,18 +208,18 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		
 		Filter funtionFilter = createFunctionFilter();
 
-		Filter not = funtionFilter.not();
-		not.accept(visitor);
+		Filter not = filterFactory.not( funtionFilter );
+        ((org.geotools.filter.Filter)not).accept(visitor);
 
 		assertEquals(not, visitor.getFilterPost());
-		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		
 		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		visitor=newVisitor();
 		
-		not.accept(visitor);
+        ((org.geotools.filter.Filter)not).accept(visitor);
 
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(not, visitor.getFilterPre());
 	}
 
@@ -232,18 +232,18 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		Filter funtionFilter = createFunctionFilter();
 		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
 		
-		Filter orFilter = funtionFilter.or(geomFilter);
+		Filter orFilter = filterFactory.or( funtionFilter, geomFilter );
 		visitor=new PostPreProcessFilterSplittingVisitor(new FilterCapabilities(), null, null);
-		orFilter.accept(visitor);
+		((org.geotools.filter.Filter)orFilter).accept(visitor);
 
-		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		assertEquals(orFilter, visitor.getFilterPost());
 
 		visitor=new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, null, null);
 		
-		orFilter.accept(visitor);
+        ((org.geotools.filter.Filter)orFilter).accept(visitor);
 
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(orFilter, visitor.getFilterPre());
 	}
 	
@@ -265,18 +265,18 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 		g.addRightGeometry(filterFactory.createBBoxExpression(new Envelope(0,180,0,90)));
 		
 		Filter f = c2.or(c3);
-		f=c1.not().and(f);
-		f=f.and(g);
+		f= filterFactory.and( filterFactory.not( (Filter) c1) ,f);
+		f= filterFactory.and(f,g);
 		
 		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
 		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
 		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
 		
 		visitor=new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, null, null);
-		f.accept(visitor);
+        ((org.geotools.filter.Filter)f).accept(visitor);
 		
 		assertEquals(f, visitor.getFilterPre());
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		
 		visitor=new PostPreProcessFilterSplittingVisitor( filterCapabilitiesMask, null, new ClientTransactionAccessor(){
 
@@ -293,10 +293,10 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 			
 		});
 
-		f.accept(visitor);
+        ((org.geotools.filter.Filter)f).accept(visitor);
 		
 		assertEquals(f, visitor.getFilterPost());
-		assertEquals(f.or(filterFactory.createFidFilter("fid")), visitor.getFilterPre());
+		assertEquals( filterFactory.or( f,filterFactory.createFidFilter("fid")), visitor.getFilterPre());
 	}
 	
 }

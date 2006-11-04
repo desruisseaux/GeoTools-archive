@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.And;
 import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Or;
 
 
 
@@ -131,7 +133,7 @@ public abstract class LogicFilterImpl extends BinaryLogicAbstract implements Log
      * @task REVISIT: make all filters immutable.  This should return a new
      *       filter.
      */
-    public final void addFilter(Filter filter) throws IllegalFilterException {
+    public final void addFilter(org.opengis.filter.Filter filter) throws IllegalFilterException {
         if ((filterType != LOGIC_NOT) || (children.size() == 0)) {
             children.add(filter);
         } else {
@@ -169,15 +171,20 @@ public abstract class LogicFilterImpl extends BinaryLogicAbstract implements Log
      * @task REVISIT: make immutable, should not modify the subfilters of the
      *       filter being ored.
      */
-    public Filter or(Filter filter) {
+    public Filter or(org.opengis.filter.Filter filter) {
         // Just makes sure that we are not creating unnecessary new filters
         //  by popping onto stack if current filter is OR
         //HACK: not sure what should be returned by this method
         //HACK: assuming it is the result of each method
         //REVISIT: should return a new copy, must implement cloneable to do so.
         if (filterType == super.LOGIC_OR) {
-            children.add(filter);
-
+            if( filter instanceof Or ){
+                Or more = (Or) filter;
+                children.addAll( more.getChildren() );
+            }
+            else {
+                children.add(filter);
+            }
             return this;
         } else {
             return super.or(filter);
@@ -194,14 +201,19 @@ public abstract class LogicFilterImpl extends BinaryLogicAbstract implements Log
      * @task REVISIT: make immutable, should not modify the subfilters of the
      *       filter being anded.
      */
-    public Filter and(Filter filter) {
+    public Filter and(org.opengis.filter.Filter filter) {
         // Just makes sure that we are not creating unnecessary new filters
         //  by popping onto stack if current filter is AND
         //HACK: not sure what should be returned by this method
         //HACK: assuming it is the result of each method
         if (filterType == super.LOGIC_AND) {
-            children.add(filter);
-
+            if( filter instanceof And ){
+                And more = (And) filter;
+                children.addAll( more.getChildren() );
+            }
+            else {
+                children.add(filter);
+            }
             return this;
         } else {
             return super.and(filter);

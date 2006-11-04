@@ -30,9 +30,10 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.validation.ValidationResults;
@@ -385,18 +386,18 @@ public class OverlapsIntegrity extends RelationIntegrity
 	
 	
 	
-	/** Try and Filter by the provided bbox, will default to Filter.ALL if null */
+	/** Try and Filter by the provided bbox, will default to Filter.EXCLUDE if null */
 	static public Filter filterBBox(Envelope bBox, FeatureType ft)
 		throws FactoryConfigurationError, IllegalFilterException
 	{
 		if( bBox == null ){
-			return Filter.NONE;
+			return Filter.INCLUDE;
 		}
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		BBoxExpression bboxExpr = ff.createBBoxExpression(bBox);
 		//GeometryFilter bbFilter = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);
 		AttributeExpression geomExpr = ff.createAttributeExpression(ft, ft.getDefaultGeometry().getName());
-		GeometryFilter disjointFilter = ff.createGeometryFilter(Filter.GEOMETRY_DISJOINT);
+		GeometryFilter disjointFilter = ff.createGeometryFilter(FilterType.GEOMETRY_DISJOINT);
 		disjointFilter.addLeftGeometry(geomExpr);
 		disjointFilter.addRightGeometry(bboxExpr);
 		Filter filter = disjointFilter.not();

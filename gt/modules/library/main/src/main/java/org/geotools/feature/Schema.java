@@ -19,7 +19,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.filter.Filter;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsNull;
 
 /**
  * This class contains utility methods focused on the schema represented by
@@ -37,19 +41,35 @@ import org.geotools.filter.Filter;
  * @see FeatureTypes
  * @see FeatureType
  * @author Jody Garnett
- * @since 0.6.0
+ * @since 2.1.0
  * @source $URL$
  */
 public class Schema {
+    private static Schema DEFAULT = new Schema();
+    private FilterFactory ff;
+    
+    public Schema(){
+        this( (Hints) null );
+    }
+    public Schema( Hints hints ){
+        this( CommonFactoryFinder.getFilterFactory( hints ));
+    }
+    public Schema( FilterFactory filterFactory ){
+        ff = filterFactory;
+    }
+
     /**
      * Walk the provided FeatureType and produce a count of distinct attribtues.
-     * 
+     * <p>
+     * used to detect duplicate attributes names (ie override)
+     * </p>
+     *  
      * @param featureType
      */
-    public static int attribtueCount( FeatureType featureType ) {
-//      used to detect duplicate attributes names (ie override)
-        return names( featureType ).size();
+    public int getAttributeCount( FeatureType featureType ) {
+        return getNames( featureType ).size();
     }
+    
     /**
      * Does a quick walk to detect only a list of attribute names.
      * <p>
@@ -61,18 +81,11 @@ public class Schema {
      * 
      * @return Set of unique attribute names
      */
-    public static List names( FeatureType featureType ) {
-        List names = new ArrayList();
-        names( featureType, names );        
-        return names;
+    public List getNames( FeatureType featureType ) {
+        return getNames( featureType, new ArrayList() );        
     }
     
-    public static List attributes( FeatureType featureType ){
-    	List list = new ArrayList();
-    	attributes( featureType, list );        
-        return list;
-    	
-    }
+        
     /**
      * This order is to be respected, based on Ancestors and so on.
      * <p>
@@ -80,14 +93,16 @@ public class Schema {
      * AttribtueTypes.
      * </p>
      */
-    public static void names( FeatureType featureType, List names ){
-        if( featureType == null || featureType.getAttributeTypes() == null ) return;
+    public List getNames( FeatureType featureType, List names ){
+        if( featureType == null || featureType.getAttributeTypes() == null ){
+            return names;
+        }
 
         FeatureType ancestors[] = featureType.getAncestors();
         if( ancestors != null && ancestors.length != 0 ){
             for( int i=0, length = ancestors.length; i<length; i++ ){
-                FeatureType type = ancestors[i];
-                names( ancestors[i], names );	           
+                FeatureType superType = ancestors[i];
+                getNames( superType, names );	           
 	        }
         }
         AttributeType attributes[] = featureType.getAttributeTypes();
@@ -100,7 +115,13 @@ public class Schema {
 	            }
 	        }
         }
+        return names;
     }
+
+    public List getAttributes( FeatureType featureType ){
+        return getAttributes( featureType, new ArrayList() );                       
+    }
+    
     
     /**
      * This order is to be respected, based on Ancestors and so on.
@@ -109,14 +130,16 @@ public class Schema {
      * AttribtueTypes.
      * </p>
      */
-    public static void attributes( FeatureType featureType, List list ){
-        if( featureType == null || featureType.getAttributeTypes() == null ) return;
+    public List getAttributes( FeatureType featureType, List list ){
+        if( featureType == null || featureType.getAttributeTypes() == null ) {
+            return list;
+        }
 
         FeatureType ancestors[] = featureType.getAncestors();
         if( ancestors != null && ancestors.length != 0 ){
             for( int i=0, length = ancestors.length; i<length; i++ ){
-                FeatureType type = ancestors[i];
-                attributes( ancestors[i], list );	           
+                //eatureType type = ancestors[i];
+                getAttributes( ancestors[i], list );	           
 	        }
         }
         AttributeType attributes[] = featureType.getAttributeTypes();
@@ -124,7 +147,7 @@ public class Schema {
             for( int i=0, length = attributes.length; i<length; i++ ){
                 AttributeType type = attributes[i];
 	            String name = type.getName();
-	            int index = indexOf( list, name );
+	            int index = getIndexOf( list, name );
 	            if( index != -1 ){
 	            	AttributeType origional = (AttributeType) list.get( index );
 	            	list.remove( index );
@@ -135,84 +158,18 @@ public class Schema {
 	            }
 	        }
         }
+        return list;
     }
-    
-    private static int indexOf( List attributes, String name ){
-    	int index = 0;
-    	for( Iterator i=attributes.iterator(); i.hasNext(); index++){
-    		AttributeType type = (AttributeType) i.next();
-    		if( name.equals( type.getName() )) return index;
-    	}
-    	return -1;
-    }
-    private static AttributeType override(AttributeType type, AttributeType override ){
-    	int max = override.getMaxOccurs();
-    	if( max < 0 ) max = type.getMinOccurs();
-    	
-    	int min = override.getMinOccurs();
-    	if( min < 0 ) min = type.getMinOccurs();
-    	
-    	String name = override.getName();
-    	if( name == null ) name = type.getName();
-    	
-    	Filter restriction = override( type.getRestriction(), override.getRestriction() );
-    	
-    	Class javaType = override.getType();
-    	if( javaType == null ) javaType = type.getType();
-    	
-    	boolean isNilable = override.isNillable();
-    	
-    	Object defaultValue = override.createDefaultValue();
-    	if( defaultValue == null ) defaultValue = type.createDefaultValue();
-    	
-    	// WARNING cannot copy metadata!    	
-    	return AttributeTypeFactory.newAttributeType( name, javaType, isNilable, restriction, defaultValue, null );    	
-    }
-    
     /**
      * Query featureType information the complete restrictions for the indicated name.
      * 
      * @param featureType
      * @param name
      */
-    public static Filter restriction( FeatureType featureType, String name ){
-        if( featureType == null || featureType.getAttributeTypes() == null ) return Filter.ALL;
+    public Filter getRestrictions( FeatureType featureType, String name ){
+        if( featureType == null || featureType.getAttributeTypes() == null ) return Filter.EXCLUDE;
         
-        return restriction( featureType, name, Filter.NONE );
-    }
-    private static Filter restriction( FeatureType featureType, String name, Filter filter ){
-        FeatureType ancestors[] = featureType.getAncestors();
-        if( ancestors != null && ancestors.length != 0 ){
-            for( int i=0, length = ancestors.length; i<length; i++ ){
-                FeatureType type = ancestors[i];
-                filter = restriction( featureType, name, filter );                	          
-	        }
-        }
-        AttributeType attributes[] = featureType.getAttributeTypes();
-        if( attributes != null && attributes.length != 0 ){
-            for( int i=0, length = attributes.length; i<length; i++ ){
-                AttributeType type = attributes[i];
-	            if( name.equals( type.getName() )){
-	            	filter = override( filter, type.getRestriction() );	            	
-	            }
-	        }
-        }
-        return filter;
-    }
-    private static Filter override( Filter filter, Filter override ){
-    	if( isNOP( override )){
-    		// no override is needed
-    		return filter;
-    	}
-    	else if( isNOP( filter )){
-    		return override;
-    	}
-    	else {
-    		return filter.and( override );
-    	}
-    }
-    private static boolean isNOP( Filter filter ){
-        return filter == null || filter.getFilterType() == Filter.NULL || Filter.NONE.equals( filter );
+        return restriction( featureType, name, Filter.INCLUDE );
     }
     
     /**
@@ -220,10 +177,11 @@ public class Schema {
      * 
      * @param type
      */
-    public static int find( FeatureType type, String name ) {
-        List names = names( type );
+    public int getIndexOf( FeatureType type, String name ) {
+        List names = getNames( type );
         return names.indexOf( name );
     }
+    
     /**
      * Look up based on name in the provided position.
      * 
@@ -231,18 +189,18 @@ public class Schema {
      * @param index the position
      * 
      */
-    public static AttributeType attribute( FeatureType type, int index ) {
-        String name = (String) names( type ).get( index );
-        return xpath( type, name );
+    public AttributeType getAttribute( FeatureType type, int index ) {
+        String name = (String) getNames( type ).get( index );
+        return getXPath( type, name );
     }
     
-    public static AttributeType attribute( FeatureType type, String name ){
-    	List list = attributes( type );
-    	int index = indexOf( list, name );
+    public AttributeType getAttribute( FeatureType type, String name ){
+    	List list = getAttributes( type );
+    	int index = getIndexOf( list, name );
     	if( index == -1 ) return null;
     	return (AttributeType) list.get( index );
     }
-    
+
     /**
      * Look up based on name in the provided position.
      * <p>
@@ -252,7 +210,150 @@ public class Schema {
      * @param xpath
      * 
      */
+    public AttributeType getXPath( FeatureType type, String xpath) {
+        return getAttribute( type, xpath ); // for now, use JXPath later
+    }
+    
+    // Utility Methods
+    //
+    private int getIndexOf( List attributes, String name ){
+        int index = 0;
+        for( Iterator i=attributes.iterator(); i.hasNext(); index++){
+            AttributeType type = (AttributeType) i.next();
+            if( name.equals( type.getName() )) return index;
+        }
+        return -1;
+    }
+    
+    private AttributeType override(AttributeType type, AttributeType override ){
+        int max = override.getMaxOccurs();
+        if( max < 0 ) max = type.getMinOccurs();
+        
+        int min = override.getMinOccurs();
+        if( min < 0 ) min = type.getMinOccurs();
+        
+        String name = override.getName();
+        if( name == null ) name = type.getName();
+        
+        Filter restriction = override( type.getRestriction(), override.getRestriction() );
+        
+        Class javaType = override.getType();
+        if( javaType == null ) javaType = type.getType();
+        
+        boolean isNilable = override.isNillable();
+        
+        Object defaultValue = override.createDefaultValue();
+        if( defaultValue == null ) defaultValue = type.createDefaultValue();
+        
+        // WARNING cannot copy metadata!        
+        return AttributeTypeFactory.newAttributeType( name, javaType, isNilable, restriction, defaultValue, null );     
+    }
+    
+    private Filter restriction( FeatureType featureType, String name, Filter filter ){
+        FeatureType ancestors[] = featureType.getAncestors();
+        if( ancestors != null && ancestors.length != 0 ){
+            for( int i=0, length = ancestors.length; i<length; i++ ){
+                FeatureType superType = ancestors[i];
+                filter = restriction( superType, name, filter );                              
+            }
+        }
+        AttributeType attributes[] = featureType.getAttributeTypes();
+        if( attributes != null && attributes.length != 0 ){
+            for( int i=0, length = attributes.length; i<length; i++ ){
+                AttributeType type = attributes[i];
+                if( name.equals( type.getName() )){
+                    filter = override( filter, type.getRestriction() );                 
+                }
+            }
+        }
+        return filter;
+    }
+    
+    private Filter override( Filter filter, Filter override ){
+        if( isNOP( override )){
+            // no override is needed
+            return filter;
+        }
+        else if( isNOP( filter )){
+            return override;
+        }
+        else {            
+            return ff.and( filter, override );
+        }
+    }
+    
+    private boolean isNOP( Filter filter ){
+        return filter == null || filter instanceof PropertyIsNull || filter == Filter.INCLUDE;
+    }
+    
+    // Utiltie Methods
+    // (make use of DEFAULT Schema)
+    //
+    
+    /**
+     * Walk the provided FeatureType and produce a count of distinct attribtues.
+     * <p>
+     * used to detect duplicate attributes names (ie override)
+     * </p>
+     *  
+     * @param featureType
+     */
+    public static int attributeCount( FeatureType featureType ){
+        return DEFAULT.getAttributeCount(featureType);
+    }    
+    
+    /**
+     * @deprecated use getAttribute( type, index )
+     */
+    public static AttributeType attribute( FeatureType type, int index ) {
+        return DEFAULT.getAttribute(type, index);
+    }
+    /** @deprecated use getAttribute( type, name ) */
+    public static AttributeType attribute( FeatureType type, String name ){
+        return DEFAULT.getAttribute(type, name );
+    }
+    /** @deprecated use getAttributes( featureType ) */
+    public static List attributes( FeatureType featureType ){
+        return DEFAULT.getAttributes(featureType);
+    }    
+    /** @deprecated use getAttributes( featureType, list ) */
+    public static List attributes( FeatureType featureType, List list ){
+        return DEFAULT.getAttributes(featureType, list);
+    }
+     
+    /**
+     * @deprecated please use getIndexOf( type, name )
+     */
+    public static int find( FeatureType type, String name ) {
+        return DEFAULT.getIndexOf(type, name);
+    }
+    
+    
+    /**
+     * @deprecated use getNames( featureType )
+     */
+    public static List names( FeatureType featureType ) {
+        return DEFAULT.getNames(featureType);
+    }
+    
+    /**
+     * @deprecated use getNames( featureType, List )
+     */
+    public static List names( FeatureType featureType, List names ){
+        return DEFAULT.getNames( featureType, names );
+    }
+    
+    /**
+     * @deprecated please use getRestriction( featureType, name )
+     */
+    public static Filter restriction( FeatureType featureType, String name ){
+        return DEFAULT.getRestrictions(featureType, name);
+    }
+    
+    /**
+     * @deprecated use getXPath( type, xpath );
+     */
     public static AttributeType xpath( FeatureType type, String xpath) {
-        return attribute( type, xpath ); // for now, use JXPath later
+        return DEFAULT.getAttribute( type, xpath ); // for now, use JXPath later
     }
 }

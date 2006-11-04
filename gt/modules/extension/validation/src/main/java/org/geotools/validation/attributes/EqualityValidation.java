@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.validation.DefaultFeatureValidation;
 import org.geotools.validation.ValidationResults;
 
@@ -49,7 +49,7 @@ public class EqualityValidation extends DefaultFeatureValidation {
     private Object expected;
 
     /** Filter used to limit the number of Features we check */
-    private Filter filter = Filter.NONE;
+    private Filter filter = Filter.INCLUDE;
 
     /**
      * No argument constructor, required by the Java Bean Specification.
@@ -104,7 +104,7 @@ public class EqualityValidation extends DefaultFeatureValidation {
      */
     public boolean validate(Feature feature, FeatureType type,
         ValidationResults results) {
-        if (!filter.contains(feature)) {
+        if (!filter.evaluate(feature)) {
             return true;
         }
 

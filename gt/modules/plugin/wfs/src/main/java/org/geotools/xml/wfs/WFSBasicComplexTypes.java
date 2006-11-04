@@ -580,7 +580,7 @@ public class WFSBasicComplexTypes {
                     }
                 }
 
-                if (Filter.NONE != query.getFilter()) {
+                if (Filter.INCLUDE != query.getFilter()) {
                     if ((query.getFilter() != null)
                             && elems[1].getType().canEncode(elems[1],
                                 query.getFilter(), hints)) {

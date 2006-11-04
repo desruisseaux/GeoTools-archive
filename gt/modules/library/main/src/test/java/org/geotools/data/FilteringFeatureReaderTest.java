@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  * Test FilteredFeatureReader for conformance.
@@ -62,22 +62,22 @@ public class FilteringFeatureReaderTest extends DataTestCase {
     public void testFilteringFeatureReaderALL() throws IOException {
         FeatureReader reader;
         
-        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.ALL );
+        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.EXCLUDE );
         try {
             assertFalse( reader.hasNext() );
         }
         finally {
             reader.close();
         }        
-        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.ALL );
+        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.EXCLUDE );
         assertEquals( 0, count( reader ));
         
-        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.ALL );
+        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.EXCLUDE );
         assertContents( new Feature[0], reader );                                                           
     }
     public void testFilteringFeatureReaderNONE() throws IOException {
         FeatureReader reader;        
-        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.NONE );
+        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.INCLUDE );
         try {
             assertTrue( reader.hasNext() );
         }
@@ -87,10 +87,10 @@ public class FilteringFeatureReaderTest extends DataTestCase {
         reader = DataUtilities.reader( roadFeatures );
         assertEquals( roadFeatures.length, count( reader ));
                 
-        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.NONE );
+        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.INCLUDE );
         assertEquals( roadFeatures.length, count( reader ));
         
-        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.NONE );
+        reader = new FilteringFeatureReader(DataUtilities.reader( roadFeatures ), Filter.INCLUDE );
         assertContents( roadFeatures, reader );                                            
     }
     void assertContents( Feature expected[], FeatureReader reader ) throws IOException {

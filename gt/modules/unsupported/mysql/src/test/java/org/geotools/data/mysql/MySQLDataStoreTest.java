@@ -232,7 +232,7 @@ public class MySQLDataStoreTest extends TestCase {
         LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
         FeatureReader reader =
-            dstore.getFeatureReader(schema, Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
         int numFeatures = count(reader);
         assertEquals("Number of features off:", 6, numFeatures);
     }
@@ -305,7 +305,7 @@ public class MySQLDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter("testset", Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter("testset", Filter.INCLUDE, trans);
 
         //count(writer);
         assertEquals(6, count(writer));
@@ -327,7 +327,7 @@ public class MySQLDataStoreTest extends TestCase {
         try {
             String badType = "badType43";
             FeatureWriter writer =
-                dstore.getFeatureWriter(badType, Filter.NONE, Transaction.AUTO_COMMIT);
+                dstore.getFeatureWriter(badType, Filter.INCLUDE, Transaction.AUTO_COMMIT);
             fail("should not have type " + badType);
         } catch (SchemaNotFoundException e) {
             LOGGER.fine("succesfully caught exception: " + e);
@@ -367,7 +367,7 @@ public class MySQLDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int attKeyPos = 0;
         Integer attKey = new Integer(10);
         String attName = "name";
@@ -386,7 +386,7 @@ public class MySQLDataStoreTest extends TestCase {
         }
 
         //writer.close();
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
 
         while (reader.hasNext()) {
             feature = reader.next();
@@ -410,7 +410,7 @@ public class MySQLDataStoreTest extends TestCase {
     public void testGetFeaturesWriterModifyGeometry()
         throws IOException, IllegalAttributeException {
         FeatureWriter writer =
-            dstore.getFeatureWriter("road", Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         Feature feature;
         Coordinate[] points =
             {
@@ -440,7 +440,7 @@ public class MySQLDataStoreTest extends TestCase {
     public void testGetFeaturesWriterModifyMultipleAtts()
         throws IOException, IllegalAttributeException {
         FeatureWriter writer =
-            dstore.getFeatureWriter("road", Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         Feature feature;
         Coordinate[] points =
             {
@@ -473,7 +473,7 @@ public class MySQLDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int count = 0;
 
         while (writer.hasNext()) {
@@ -493,7 +493,7 @@ public class MySQLDataStoreTest extends TestCase {
         //assertEquals( fixture.roadFeatures.length+1, data.features( "road" ).size() );
         writer.close();
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 7, numFeatures);
         state.rollback();
@@ -529,9 +529,9 @@ public class MySQLDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
 
         //assertEquals("Wrong number of features before delete", 6, numFeatures);
@@ -547,7 +547,7 @@ public class MySQLDataStoreTest extends TestCase {
         }
 
         writer.close();
-        reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 5, numFeatures);
         state.rollback();

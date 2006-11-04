@@ -30,7 +30,10 @@ import org.geotools.filter.AttributeExpressionImpl;
 import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
+import org.opengis.filter.Not;
+import org.opengis.filter.spatial.Disjoint;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
@@ -307,11 +310,11 @@ public class SLDStyleTest extends TestCase {
         assertEquals(1, fts.getRules().length);
 
         Filter filter = fts.getRules()[0].getFilter();
-        assertEquals(FilterType.LOGIC_NOT, filter.getFilterType());
+        assertTrue( filter instanceof Not );
 
         Filter spatialFilter = (Filter) ((LogicFilter) filter).getFilterIterator()
                                          .next();
-        assertEquals(FilterType.GEOMETRY_DISJOINT, spatialFilter.getFilterType());
+        assertTrue( spatialFilter instanceof Disjoint );
 
         Expression left = ((GeometryFilter) spatialFilter).getLeftGeometry();
         Expression right = ((GeometryFilter) spatialFilter).getRightGeometry();
@@ -353,7 +356,7 @@ public class SLDStyleTest extends TestCase {
 
         
         Filter filter = fts.getRules()[0].getFilter();
-        assertEquals(FilterType.FID, filter.getFilterType());
+        assertTrue( filter instanceof Id);
 
         FidFilter fidFilter = (FidFilter) filter;
         String[] fids = fidFilter.getFids();

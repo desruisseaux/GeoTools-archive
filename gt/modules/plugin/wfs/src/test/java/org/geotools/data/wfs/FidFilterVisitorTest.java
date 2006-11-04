@@ -26,6 +26,7 @@ import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
+import org.geotools.filter.Filters;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
@@ -44,7 +45,7 @@ import junit.framework.TestCase;
 public class FidFilterVisitorTest extends TestCase {
 
 	private FidFilterVisitor visitor;
-	private FilterFactory fac=FilterFactoryFinder.createFilterFactory();
+	private FilterFactory ff=FilterFactoryFinder.createFilterFactory();
 	private Map state;
 	
 	protected void setUp() throws Exception {
@@ -60,57 +61,57 @@ public class FidFilterVisitorTest extends TestCase {
 	 * Test method for {@link org.geotools.data.wfs.FidFilterVisitor#visit(org.geotools.filter.LogicFilter)}.
 	 */
 	public void testVisitLogicFilterOR() throws Exception {
-		LogicFilter f=fac.createLogicFilter(FilterType.LOGIC_OR);
-		f.addFilter(fac.createFidFilter("new1"));
-		f.addFilter(fac.createFidFilter("new2"));
+		LogicFilter f=ff.createLogicFilter(FilterType.LOGIC_OR);
+		f.addFilter(ff.createFidFilter("new1"));
+		f.addFilter(ff.createFidFilter("new2"));
 		visitor.visit(f);
 		
-		assertEquals(fac.createFidFilter("final1").or(fac.createFidFilter("final2")), visitor.getProcessedFilter());
+		assertEquals(ff.createFidFilter("final1").or(ff.createFidFilter("final2")), visitor.getProcessedFilter());
 	}
 
 	/**
 	 * Test method for {@link org.geotools.data.wfs.FidFilterVisitor#visit(org.geotools.filter.LogicFilter)}.
 	 */
 	public void testVisitLogicFilterAND() throws Exception {
-		LogicFilter f=fac.createLogicFilter(FilterType.LOGIC_AND);
-		f.addFilter(fac.createFidFilter("new1"));
-		f.addFilter(fac.createFidFilter("new2"));
+		LogicFilter f=ff.createLogicFilter(FilterType.LOGIC_AND);
+		f.addFilter(ff.createFidFilter("new1"));
+		f.addFilter(ff.createFidFilter("new2"));
 		visitor.visit(f);
 		
-		assertEquals(fac.createFidFilter("final1").and(fac.createFidFilter("final2")), visitor.getProcessedFilter());
+		assertEquals(ff.createFidFilter("final1").and(ff.createFidFilter("final2")), visitor.getProcessedFilter());
 	}
 	
 	/**
 	 * Test method for {@link org.geotools.data.wfs.FidFilterVisitor#visit(org.geotools.filter.FidFilter)}.
 	 */
 	public void testVisitLogicFilterNOT() {
-		FidFilter f = fac.createFidFilter("new1");
+		FidFilter f = ff.createFidFilter("new1");
 		visitor.visit((LogicFilter)f.not());
-		assertEquals(fac.createFidFilter("final1").not(), visitor.getProcessedFilter());
+		assertEquals(ff.createFidFilter("final1").not(), visitor.getProcessedFilter());
 	}
 
 	/**
 	 * Test method for {@link org.geotools.data.wfs.FidFilterVisitor#visit(org.geotools.filter.FidFilter)}.
 	 */
 	public void testVisitFidFilter() {
-		FidFilter f = fac.createFidFilter("new1");
+		FidFilter f = ff.createFidFilter("new1");
 		visitor.visit(f);
-		assertEquals(fac.createFidFilter("final1"), visitor.getProcessedFilter());
+		assertEquals(ff.createFidFilter("final1"), visitor.getProcessedFilter());
 	}
 	public void testVisitFidFilter2() {
-		FidFilter f = fac.createFidFilter("other");
+		FidFilter f = ff.createFidFilter("other");
 		visitor.visit(f);
-		assertEquals(fac.createFidFilter("other"), visitor.getProcessedFilter());
+		assertEquals(ff.createFidFilter("other"), visitor.getProcessedFilter());
 	}
 	public void testVisitFidFilter3() {
-		FidFilter f = fac.createFidFilter();
+		FidFilter f = ff.createFidFilter();
 		f.addFid("new1");
 		f.addFid("new2");
 		f.addFid("new3");
 		f.addFid("other");
 		visitor.visit(f);
 		
-		FidFilter expected = fac.createFidFilter();
+		FidFilter expected = ff.createFidFilter();
 		expected.addFid("final1");
 		expected.addFid("final2");
 		expected.addFid("final3");
@@ -123,82 +124,82 @@ public class FidFilterVisitorTest extends TestCase {
 	 * Test method for {@link org.geotools.data.wfs.FidFilterVisitor#visit(org.geotools.filter.Filter)}.
 	 */
 	public void testVisitFilter() {
-		Filter f = fac.createFidFilter("new1");
+		Filter f = ff.createFidFilter("new1");
 		visitor.visit(f);
-		assertEquals(fac.createFidFilter("final1"), visitor.getProcessedFilter());
+		assertEquals(ff.createFidFilter("final1"), visitor.getProcessedFilter());
 		
-		Filter filter=fac.createFidFilter("new2");
-		filter=filter.and(fac.createFidFilter("new3"));
+		Filter filter=ff.createFidFilter("new2");
+		filter=filter.and(ff.createFidFilter("new3"));
 		visitor=new FidFilterVisitor(state);
 		visitor.visit(filter);
 		
-		assertEquals(fac.createFidFilter("final2").and(fac.createFidFilter("final3")), visitor.getProcessedFilter());
+		assertEquals(ff.createFidFilter("final2").and(ff.createFidFilter("final3")), visitor.getProcessedFilter());
 	}
 	
 
 	public void testVisitBetweenFilter() throws IllegalFilterException {
-		BetweenFilter filter = fac.createBetweenFilter();
-		filter.addLeftValue(fac.createLiteralExpression("1"));
-		filter.addMiddleValue(fac.createLiteralExpression("1"));
-		filter.addRightValue(fac.createLiteralExpression("1"));
+		BetweenFilter filter = ff.createBetweenFilter();
+		filter.addLeftValue(ff.createLiteralExpression("1"));
+		filter.addMiddleValue(ff.createLiteralExpression("1"));
+		filter.addRightValue(ff.createLiteralExpression("1"));
 		filter.accept(visitor);
 		assertSame(filter, visitor.getProcessedFilter());
 	}
 
 	public void testVisitCompareFilter()  throws IllegalFilterException {
-		CompareFilter filter = fac.createCompareFilter(FilterType.COMPARE_EQUALS);
-		filter.addLeftValue(fac.createLiteralExpression("1"));
-		filter.addRightValue(fac.createLiteralExpression("1"));
+		CompareFilter filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
+		filter.addLeftValue(ff.createLiteralExpression("1"));
+		filter.addRightValue(ff.createLiteralExpression("1"));
 		filter.accept(visitor);
 		assertSame(filter, visitor.getProcessedFilter());
 	}
 
 	public void testVisitGeometryFilter() throws IllegalFilterException  {
-		GeometryFilter filter = fac.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-		filter.addLeftGeometry(fac.createBBoxExpression(new Envelope(0,10,0,10)));
-		filter.addLeftGeometry(fac.createBBoxExpression(new Envelope(0,10,0,10)));
+		GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		filter.addLeftGeometry(ff.createBBoxExpression(new Envelope(0,10,0,10)));
+		filter.addLeftGeometry(ff.createBBoxExpression(new Envelope(0,10,0,10)));
 		filter.accept(visitor);
 		assertSame(filter, visitor.getProcessedFilter());
 	}
 
 	public void testVisitLikeFilter() throws IllegalFilterException  {
-		LikeFilter filter = fac.createLikeFilter();
+		LikeFilter filter = ff.createLikeFilter();
 		filter.setPattern("patt", "", "", "");
 		filter.accept(visitor);
 		assertSame(filter, visitor.getProcessedFilter());
 	}
 
 	public void testVisitNullFilter() throws IllegalFilterException  {
-		NullFilter filter = fac.createNullFilter();
+		NullFilter filter = ff.createNullFilter();
 		filter.accept(visitor);
 		assertSame(filter, visitor.getProcessedFilter());
 	}
 	
 	public void testFilterNONE() throws Exception {
-		Filter.NONE.accept(visitor);
-		assertSame(Filter.NONE, visitor.getProcessedFilter());
+		Filters.accept( Filter.INCLUDE, visitor);
+		assertSame(Filter.INCLUDE, visitor.getProcessedFilter());
 	}
 	public void testFilterALL() throws Exception {
-		Filter.ALL.accept(visitor);
-		assertSame(Filter.ALL, visitor.getProcessedFilter());		
+        Filters.accept( Filter.EXCLUDE, visitor);
+		assertSame(Filter.EXCLUDE, visitor.getProcessedFilter());		
 	}
 
 	public void testFilterUnchanged() throws Exception {
-		CompareFilter c1=fac.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c1.addLeftValue(fac.createAttributeExpression("eventstatus"));
-		c1.addRightValue(fac.createLiteralExpression("deleted"));
+		CompareFilter c1=ff.createCompareFilter(FilterType.COMPARE_EQUALS);
+		c1.addLeftValue(ff.createAttributeExpression("eventstatus"));
+		c1.addRightValue(ff.createLiteralExpression("deleted"));
 		
-		CompareFilter c2 = fac.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c2.addLeftValue(fac.createAttributeExpression("eventtype"));
-		c2.addRightValue(fac.createLiteralExpression("road hazard"));
+		CompareFilter c2 = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
+		c2.addLeftValue(ff.createAttributeExpression("eventtype"));
+		c2.addRightValue(ff.createLiteralExpression("road hazard"));
 		
-		CompareFilter c3 = fac.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c3.addLeftValue(fac.createAttributeExpression("eventtype"));
-		c3.addRightValue(fac.createLiteralExpression("area warning"));
+		CompareFilter c3 = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
+		c3.addLeftValue(ff.createAttributeExpression("eventtype"));
+		c3.addRightValue(ff.createLiteralExpression("area warning"));
 
-		GeometryFilter g = fac.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-		g.addLeftGeometry(fac.createAttributeExpression("geom"));
-		g.addRightGeometry(fac.createBBoxExpression(new Envelope(0,180,0,90)));
+		GeometryFilter g = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		g.addLeftGeometry(ff.createAttributeExpression("geom"));
+		g.addRightGeometry(ff.createBBoxExpression(new Envelope(0,180,0,90)));
 		
 		Filter f = c2.or(c3);
 		f=c1.not().and(f);

@@ -30,7 +30,7 @@ import org.geotools.data.Query;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -101,7 +101,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
      * @see org.geotools.data.FeatureLocking#lockFeatures()
      */
     public int lockFeatures() throws IOException {
-        return lockFeatures(Filter.NONE);
+        return lockFeatures(Filter.INCLUDE);
     }
 
     /**
@@ -118,7 +118,9 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
     public int lockFeatures(Filter filter) throws IOException {
         return lockFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
     }
-
+    public int lockFeatures( org.geotools.filter.Filter filter ) throws IOException {
+        return lockFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
+    }
     /**
      * Lock features matching Query.
      * 
@@ -232,7 +234,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
      * @see org.geotools.data.FeatureLocking#unLockFeatures()
      */
     public void unLockFeatures() throws IOException {
-        unLockFeatures(Filter.NONE);
+        unLockFeatures(Filter.INCLUDE);
     }
 
     /**

@@ -20,6 +20,7 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.collection.DelegateFeatureReader;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -28,8 +29,9 @@ import org.geotools.feature.FeatureList;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.filter.Filter;
-import org.geotools.filter.SortBy;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.sort.SortBy;
 import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -51,24 +53,24 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
     protected Filter filter;
     
     /** Origional Collection */
-	protected FeatureCollection collection;
-    
+	protected FeatureCollection collection;    
     protected FeatureState state;
+    protected FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
     
     public SubFeatureCollection(FeatureCollection collection ) {
         this( collection, null );
     }
 	public SubFeatureCollection(FeatureCollection collection, Filter subfilter ){
-		if (subfilter != null && subfilter.equals(Filter.ALL)) {
-			throw new IllegalArgumentException("A subcollection with Filter.ALL is a null operation");
+		if (subfilter != null && subfilter.equals(Filter.EXCLUDE)) {
+			throw new IllegalArgumentException("A subcollection with Filter.EXCLUDE is a null operation");
 		}
-		if (subfilter != null && subfilter.equals(Filter.NONE)) {
-			throw new IllegalArgumentException("A subcollection with Filter.NONE should be a FeatureCollectionEmpty");
+		if (subfilter != null && subfilter.equals(Filter.INCLUDE)) {
+			throw new IllegalArgumentException("A subcollection with Filter.INCLUDE should be a FeatureCollectionEmpty");
 		}
         if( subfilter != null && (collection instanceof SubFeatureCollection)){
 			SubFeatureCollection filtered = (SubFeatureCollection) collection;
 			this.collection = filtered.collection;            
-			this.filter = filtered.filter().and(subfilter);
+			this.filter = ff.and( filtered.filter(), subfilter );
 		} else {
 			this.collection = collection;
 			this.filter = subfilter;
@@ -84,7 +86,7 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
     }
     /** Override to implement subsetting */
     protected Filter createFilter(){
-        return Filter.NONE;
+        return Filter.INCLUDE;
     }
     
 	public FeatureType getFeatureType() {
@@ -168,10 +170,10 @@ public class SubFeatureCollection extends AbstractResourceCollection implements 
     //
     //
 	public FeatureCollection subCollection(Filter filter) {
-		if (filter.equals(Filter.NONE)) {
+		if (filter.equals(Filter.INCLUDE)) {
 			return this;
 		}
-		if (filter.equals(Filter.ALL)) {
+		if (filter.equals(Filter.EXCLUDE)) {
 			// TODO implement EmptyFeatureCollection( schema )
 		}
 		return new SubFeatureCollection(this, filter);

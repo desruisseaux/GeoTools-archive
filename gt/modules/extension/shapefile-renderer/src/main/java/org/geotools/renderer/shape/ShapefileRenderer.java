@@ -60,9 +60,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.Filters;
 import org.geotools.geometry.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.index.quadtree.StoreException;
@@ -405,7 +406,7 @@ public class ShapefileRenderer implements GTRenderer {
 					feature = (Feature) addedIter.next();
 				}
 
-				if (!query.getFilter().contains(feature))
+				if (!query.getFilter().evaluate(feature))
 					continue;
 
 				if (feature != TransactionStateDiff.NULL) {
@@ -423,7 +424,7 @@ public class ShapefileRenderer implements GTRenderer {
 
 						filter = r.getFilter();
 
-						if ((filter == null) || filter.contains(feature)) {
+						if ((filter == null) || filter.evaluate(feature)) {
 							doElse = false;
 
 							if (LOGGER.isLoggable(Level.FINER)) {
@@ -571,7 +572,7 @@ public class ShapefileRenderer implements GTRenderer {
 					}
 
 					feature = createFeature(type, record, dbfreader, nextFid);
-					if (!query.getFilter().contains(feature))
+					if (!query.getFilter().evaluate(feature))
 						continue;
 
 					if (renderingStopRequested) {
@@ -605,7 +606,7 @@ public class ShapefileRenderer implements GTRenderer {
 
 						filter = r.getFilter();
 
-						if ((filter == null) || filter.contains(feature)) {
+						if ((filter == null) || filter.evaluate(feature)) {
 							doElse = false;
 
 							if (LOGGER.isLoggable(Level.FINER)) {
@@ -810,7 +811,7 @@ public class ShapefileRenderer implements GTRenderer {
 		sae.visit(style);
 
         FilterAttributeExtractor qae = new FilterAttributeExtractor();
-        query.getFilter().accept(qae);
+        Filters.accept( query.getFilter(), qae);
         Set ftsAttributes=new HashSet(sae.getAttributeNameSet());
         ftsAttributes.addAll(qae.getAttributeNameSet());
         return (String[]) ftsAttributes.toArray(new String[0]);

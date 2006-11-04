@@ -34,6 +34,8 @@ import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
 import org.geotools.xml.XMLHandlerHints;
+import org.opengis.filter.BinaryLogicOperator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,7 +75,7 @@ import java.util.Stack;
  * geotools level is extremely flexible and forgiving.
  *
  * <p>
- * All NOT(FidFilter) are changed to Filter.NONE.  So make sure that the filter is processed again on the client with the original
+ * All NOT(FidFilter) are changed to Filter.INCLUDE.  So make sure that the filter is processed again on the client with the original
  * filter
  * </p>
  *
@@ -92,7 +94,7 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
     private static final int HIGH = 2;
     private int complianceInt;
     private Stack current = new Stack();
-    FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
+    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
     private boolean requiresPostProcessing=false;
 
     public FilterEncodingPreProcessor(Integer complianceLevel) {
@@ -114,7 +116,7 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
      * @return the fid filter that contains all the fids.
      */
     public FidFilter getFidFilter() {
-        FidFilter filter = filterFac.createFidFilter();
+        FidFilter filter = ff.createFidFilter();
 
         if (current.isEmpty()) {
             return filter;
@@ -134,9 +136,9 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
      *
      * @return the filter that can be encoded.
      */
-    public Filter getFilter() {
+    public org.opengis.filter.Filter getFilter() {
         if( current.isEmpty() )
-            return Filter.ALL;
+            return Filter.EXCLUDE;
         return ((Data) this.current.peek()).filter;
     }
 
@@ -227,7 +229,7 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
             resultingFilter = buildFilter(filterType, startOfFilterStack);
             resultingFilter.fids.addAll(fids);
             
-            if( resultingFilter.filter!=Filter.ALL && !fids.isEmpty() )
+            if( resultingFilter.filter!=Filter.EXCLUDE && !fids.isEmpty() )
                 requiresPostProcessing=true;
             break;
         }
@@ -283,7 +285,7 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
             } else {
                 fidSet.add(data.fids);
 
-                if (data.filter != Filter.ALL) {
+                if (data.filter != Filter.EXCLUDE) {
                     doRemove = false;
                 }
             }
@@ -344,12 +346,12 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
             return (Data) current.pop();
         }
 
-        LogicFilter f = filterFac.createLogicFilter(filterType);
+        LogicFilter f = ff.createLogicFilter(filterType);
 
         while (current.size() > startOfFilterStack) {
             Data data = (Data) current.pop();
 
-            if (data.filter != Filter.ALL) {
+            if (data.filter != Filter.EXCLUDE) {
                 f.addFilter(data.filter);
             }
         }
@@ -357,7 +359,7 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
         return new Data(compressFilter(filterType, f));
     }
 
-    private Filter compressFilter(short filterType, LogicFilter f)
+    private org.opengis.filter.Filter compressFilter(short filterType, LogicFilter f)
         throws IllegalFilterException {
         LogicFilter result;
         int added = 0;
@@ -365,16 +367,16 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
         switch (filterType) {
         case FilterType.LOGIC_AND:
 
-            if (contains(f, Filter.ALL)) {
-                return Filter.ALL;
+            if (contains(f, Filter.EXCLUDE)) {
+                return Filter.EXCLUDE;
             }
 
-            result = filterFac.createLogicFilter(filterType);
+            result = ff.createLogicFilter(filterType);
 
             for (Iterator iter = f.getFilterIterator(); iter.hasNext();) {
-                Filter filter = (Filter) iter.next();
+                org.opengis.filter.Filter filter = (org.opengis.filter.Filter) iter.next();
 
-                if (filter == Filter.NONE) {
+                if (filter == Filter.INCLUDE) {
                     continue;
                 }
 
@@ -383,23 +385,23 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
             }
 
             if (!result.getFilterIterator().hasNext()) {
-                return Filter.ALL;
+                return Filter.EXCLUDE;
             }
 
             break;
 
         case FilterType.LOGIC_OR:
 
-            if (contains(f, Filter.NONE)) {
-                return Filter.NONE;
+            if (contains(f, Filter.INCLUDE)) {
+                return Filter.INCLUDE;
             }
 
-            result = filterFac.createLogicFilter(filterType);
+            result = ff.createLogicFilter(filterType);
 
             for (Iterator iter = f.getFilterIterator(); iter.hasNext();) {
                 Filter filter = (Filter) iter.next();
 
-                if (filter == Filter.ALL) {
+                if (filter == Filter.EXCLUDE) {
                     continue;
                 }
 
@@ -408,18 +410,18 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
             }
 
             if (!result.getFilterIterator().hasNext()) {
-                return Filter.ALL;
+                return Filter.EXCLUDE;
             }
 
             break;
 
         default:
-            return Filter.ALL;
+            return Filter.EXCLUDE;
         }
 
         switch (added) {
         case 0:
-            return Filter.ALL;
+            return Filter.EXCLUDE;
 
         case 1:
             return (Filter) result.getFilterIterator().next();
@@ -429,15 +431,12 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
         }
     }
 
-    private boolean contains(LogicFilter f, Filter toFind) {
-        for (Iterator iter = f.getFilterIterator(); iter.hasNext();) {
-            Filter filter = (Filter) iter.next();
-
-            if (filter.equals(toFind)) {
+    private boolean contains( BinaryLogicOperator f, org.opengis.filter.Filter toFind) {
+        for (Iterator iter = f.getChildren().iterator(); iter.hasNext();) {
+            if( toFind.equals( iter.next() ) ){
                 return true;
             }
         }
-
         return false;
     }
 
@@ -448,7 +447,8 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
         } else {
             Data tmp = (Data) current.pop();
 
-            Data data = new Data(tmp.filter.not());
+            
+            Data data = new Data(  ff.not( tmp.filter) );
 
             if (!tmp.fids.isEmpty()) {
                 data.filter = Filter.NONE;
@@ -510,7 +510,7 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
         for (int i = startOfFilterStack; i < current.size(); i++) {
             Data data = (Data) current.get(i);
 
-            if (data.filter != Filter.ALL) {
+            if (data.filter != Filter.EXCLUDE) {
                 return true;
             }
         }
@@ -561,14 +561,18 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
     }
 
     private static class Data {
-        final public static Data NONE = new Data(Filter.NONE);
-        final public static Data ALL = new Data(Filter.ALL);
+        final public static Data NONE = new Data(Filter.EXCLUDE);
+        final public static Data ALL = new Data(Filter.INCLUDE);
         final Set fids = new HashSet();
-        Filter filter = Filter.ALL;
+        org.opengis.filter.Filter filter;
 
         public Data() {
+            this( Filter.ALL );
         }
 
+        public Data(org.opengis.filter.Filter f ){
+            filter = f;
+        }
         public Data(Filter f) {
             filter = f;
         }

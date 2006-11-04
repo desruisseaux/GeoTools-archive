@@ -28,9 +28,10 @@ import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LikeFilter;
@@ -290,8 +291,8 @@ public class DataUtilitiesTest extends DataTestCase {
         assertEquals( -1, s.getCount( Query.ALL ) );
         assertEquals( 3, s.getFeatures().getCount() );
         assertEquals( 3, s.getFeatures( Query.ALL ).getCount() );
-        assertEquals( 3, s.getFeatures( Filter.NONE ).getCount() );
-        assertEquals( 0, s.getFeatures( Filter.ALL ).getCount() );
+        assertEquals( 3, s.getFeatures( Filter.INCLUDE ).getCount() );
+        assertEquals( 0, s.getFeatures( Filter.EXCLUDE ).getCount() );
         assertEquals( 1, s.getFeatures( rd1Filter ).getCount() );
         assertEquals( 2, s.getFeatures( rd12Filter ).getCount() );                             
     }
@@ -305,8 +306,8 @@ public class DataUtilitiesTest extends DataTestCase {
     	Query firstQuery;
     	Query secondQuery;
 
-    	firstQuery = new DefaultQuery("typeName", Filter.ALL, 100, new String[]{"att1", "att2", "att3"}, "handle");
-    	secondQuery = new DefaultQuery("typeName", Filter.ALL, 20, new String[]{"att1", "att2", "att4"}, "handle2");
+    	firstQuery = new DefaultQuery("typeName", Filter.EXCLUDE, 100, new String[]{"att1", "att2", "att3"}, "handle");
+    	secondQuery = new DefaultQuery("typeName", Filter.EXCLUDE, 20, new String[]{"att1", "att2", "att4"}, "handle2");
     	
     	Query mixed = DataUtilities.mixQueries(firstQuery, secondQuery, "newhandle");
     	
@@ -324,13 +325,13 @@ public class DataUtilitiesTest extends DataTestCase {
 
     	String typeSpec = "geom:Point,att1:String,att2:String,att3:String,att4:String";
     	FeatureType testType = DataUtilities.createType("testType", typeSpec);
-    	System.err.println("created test type: " + testType);
+    	//System.err.println("created test type: " + testType);
     	
-    	filter1 = ffac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+    	filter1 = ffac.createCompareFilter(FilterType.COMPARE_EQUALS);
     	((CompareFilter)filter1).addLeftValue(ffac.createAttributeExpression(testType, "att1"));
     	((CompareFilter)filter1).addRightValue(ffac.createLiteralExpression("val1"));
     	
-    	filter2 = ffac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+    	filter2 = ffac.createCompareFilter(FilterType.COMPARE_EQUALS);
     	((CompareFilter)filter2).addLeftValue(ffac.createAttributeExpression(testType, "att2"));
     	((CompareFilter)filter2).addRightValue(ffac.createLiteralExpression("val2"));
 

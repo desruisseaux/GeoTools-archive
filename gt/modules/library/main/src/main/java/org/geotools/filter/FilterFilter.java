@@ -404,45 +404,45 @@ public class FilterFilter extends XMLFilterImpl implements GMLHandlerJTS {
     protected static short convertType(String filterType) {
         // matches all filter types to the default logic type
         if (filterType.equals("Or")) {
-            return AbstractFilter.LOGIC_OR;
+            return Filter.LOGIC_OR;
         } else if (filterType.equals("And")) {
-            return AbstractFilter.LOGIC_AND;
+            return Filter.LOGIC_AND;
         } else if (filterType.equals("Not")) {
-            return AbstractFilter.LOGIC_NOT;
+            return Filter.LOGIC_NOT;
         } else if (filterType.equals("Equals")) {
-            return AbstractFilter.GEOMETRY_EQUALS;
+            return Filter.GEOMETRY_EQUALS;
         } else if (filterType.equals("Disjoint")) {
-            return AbstractFilter.GEOMETRY_DISJOINT;
+            return Filter.GEOMETRY_DISJOINT;
         } else if (filterType.equals("DWithin")) {
-            return AbstractFilter.GEOMETRY_DWITHIN;
+            return Filter.GEOMETRY_DWITHIN;
         } else if (filterType.equals("Intersects")) {
-            return AbstractFilter.GEOMETRY_INTERSECTS;
+            return Filter.GEOMETRY_INTERSECTS;
         } else if (filterType.equals("Touches")) {
-            return AbstractFilter.GEOMETRY_TOUCHES;
+            return Filter.GEOMETRY_TOUCHES;
         } else if (filterType.equals("Crosses")) {
-            return AbstractFilter.GEOMETRY_CROSSES;
+            return Filter.GEOMETRY_CROSSES;
         } else if (filterType.equals("Within")) {
-            return AbstractFilter.GEOMETRY_WITHIN;
+            return Filter.GEOMETRY_WITHIN;
         } else if (filterType.equals("Contains")) {
-            return AbstractFilter.GEOMETRY_CONTAINS;
+            return Filter.GEOMETRY_CONTAINS;
         } else if (filterType.equals("Overlaps")) {
-            return AbstractFilter.GEOMETRY_OVERLAPS;
+            return Filter.GEOMETRY_OVERLAPS;
         } else if (filterType.equals("Beyond")) {
-            return AbstractFilter.GEOMETRY_BEYOND;
+            return Filter.GEOMETRY_BEYOND;
         } else if (filterType.equals("BBOX")) {
-            return AbstractFilter.GEOMETRY_BBOX;
+            return Filter.GEOMETRY_BBOX;
         } else if (filterType.equals("PropertyIsEqualTo")) {
-            return AbstractFilter.COMPARE_EQUALS;
+            return FilterType.COMPARE_EQUALS;
         } else if (filterType.equals("PropertyIsNotEqualTo")) {
-            return AbstractFilter.COMPARE_NOT_EQUALS;
+            return FilterType.COMPARE_NOT_EQUALS;
         } else if (filterType.equals("PropertyIsLessThan")) {
-            return AbstractFilter.COMPARE_LESS_THAN;
+            return FilterType.COMPARE_LESS_THAN;
         } else if (filterType.equals("PropertyIsGreaterThan")) {
-            return AbstractFilter.COMPARE_GREATER_THAN;
+            return FilterType.COMPARE_GREATER_THAN;
         } else if (filterType.equals("PropertyIsLessThanOrEqualTo")) {
-            return AbstractFilter.COMPARE_LESS_THAN_EQUAL;
+            return FilterType.COMPARE_LESS_THAN_EQUAL;
         } else if (filterType.equals("PropertyIsGreaterThanOrEqualTo")) {
-            return AbstractFilter.COMPARE_GREATER_THAN_EQUAL;
+            return FilterType.COMPARE_GREATER_THAN_EQUAL;
         } else if (filterType.equals("PropertyIsBetween")) {
             return AbstractFilter.BETWEEN;
         } else if (filterType.equals("PropertyIsLike")) {

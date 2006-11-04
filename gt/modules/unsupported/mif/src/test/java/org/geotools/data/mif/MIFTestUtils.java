@@ -24,7 +24,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.ExpressionBuilder;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.parser.ParseException;
 import org.geotools.resources.TestData;
 import java.io.File;
@@ -249,7 +249,7 @@ public class MIFTestUtils {
         try {
             return (Filter) ExpressionBuilder.parse(expression);
         } catch (ParseException e) {
-            return Filter.ALL;
+            return Filter.EXCLUDE;
         }
     }
 

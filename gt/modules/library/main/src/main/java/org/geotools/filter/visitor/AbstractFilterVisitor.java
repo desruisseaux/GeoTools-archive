@@ -125,7 +125,7 @@ public class AbstractFilterVisitor implements org.geotools.filter.FilterVisitor 
      */
     public void visit(LogicFilter filter) {
         for (Iterator it = filter.getFilterIterator(); it.hasNext();) {
-            Filter f = (Filter) it.next();
+            org.geotools.filter.Filter f = (Filter) it.next();
             f.accept(this);
         }
     }

@@ -32,9 +32,10 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.Filters;
 import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.filter.FilterEncodingPreProcessor;
 
@@ -58,7 +59,7 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
 
     protected FeatureReader wrapWithFilteringFeatureReader(Filter postFilter, FeatureReader reader, Filter processedFilter) {
         FilterEncodingPreProcessor visitor = new FilterEncodingPreProcessor(COMPLIANCE_LEVEL);
-        processedFilter.accept(visitor);
+        Filters.accept( processedFilter, visitor);
         
         if( visitor.requiresPostProcessing() )
             return new FilteringFeatureReader(reader, processedFilter);
@@ -89,12 +90,12 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
 
         public StrictFeatureReader(Transaction transaction, Query query, Integer level) throws IOException {
             FilterEncodingPreProcessor visitor = new FilterEncodingPreProcessor(level);
-            query.getFilter().accept(visitor);
+            Filters.accept( query.getFilter(), visitor );
             
             this.transaction=transaction;
             if( visitor.requiresPostProcessing() && query.getPropertyNames()!=Query.ALL_NAMES){
                 FilterAttributeExtractor attributeExtractor=new FilterAttributeExtractor();
-                query.getFilter().accept(attributeExtractor);
+                Filters.accept( query.getFilter(), attributeExtractor );
                 Set properties=new HashSet(attributeExtractor.getAttributeNameSet());
                 properties.addAll(Arrays.asList(query.getPropertyNames()));
                 this.query=new DefaultQuery(query.getTypeName(), query.getFilter(), query.getMaxFeatures(),

@@ -18,13 +18,41 @@ package org.geotools.filter;
 import java.awt.Color;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
+import org.opengis.filter.And;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
+import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.Not;
+import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 
 /**
  * Utility class for working with Filters & Expression.
@@ -93,6 +121,71 @@ public class Filters {
 	public void setFilterFactory( FilterFactory factory ){
 		ff = factory;
 	}
+    
+    public static Filter and( org.opengis.filter.FilterFactory ff, Filter a, Filter b ){
+        ArrayList list = new ArrayList();
+        if( a instanceof And){
+            And some = (And) a;            
+            list.addAll( some.getChildren() );
+        }
+        else {
+            list.add( a );
+        }
+        if( b instanceof And){
+            And more = (And) b;            
+            list.addAll( more.getChildren() );
+        }
+        else {
+            list.add( b );
+        }
+        return ff.and( list );
+    }
+    public static Filter or( org.opengis.filter.FilterFactory ff, Filter a, Filter b ){
+        ArrayList list = new ArrayList();
+        if( a instanceof Or){
+            Or some = (Or) a;            
+            list.addAll( some.getChildren() );
+        }
+        else {
+            list.add( a );
+        }
+        if( b instanceof Or){
+            Or more = (Or) b;            
+            list.addAll( more.getChildren() );
+        }
+        else {
+            list.add( b );
+        }
+        return ff.or( list );
+    }  
+    
+    /**
+     * Safely visit the provided filter.
+     * 
+     * @param filter
+     * @param visitor
+     */
+    public static void accept( org.opengis.filter.Filter filter, FilterVisitor visitor ){        
+       if( filter == Filter.EXCLUDE ){
+           if( visitor instanceof FilterVisitor2 ){
+               ((FilterVisitor2)visitor).visit( (ExcludeFilter) Filter.EXCLUDE );
+           }
+           return;
+       }
+       else if( filter == Filter.INCLUDE ){
+           if( visitor instanceof FilterVisitor2 ){
+               ((FilterVisitor2)visitor).visit( (IncludeFilter) Filter.INCLUDE);
+           }
+           return;
+       }
+       
+       if( filter instanceof org.geotools.filter.Filter ){
+           ((org.geotools.filter.Filter) filter).accept( visitor );
+       }
+       else {
+           throw new ClassCastException("Update code to use org.opengis.filter.Filter");
+       }
+    }
     /**
      * Deep copy the filter.
      * <p>
@@ -102,12 +195,60 @@ public class Filters {
      * </p>
      */
     public Filter duplicate( Filter filter ){
-    	DuplicatorFilterVisitor xerox = new DuplicatorFilterVisitor( ff );
-    	filter.accept( xerox );
+    	DuplicatorFilterVisitor xerox = new DuplicatorFilterVisitor( ff );        
+    	Filters.accept( filter, xerox );
     	return (Filter) xerox.getCopy();
     	
     }
         
+    /**
+     * Utility method used to transition to geoapi filter.
+     * <p>
+     * This utility method is designed to help people port their
+     * code quickly, an instanceof check is much preferred.
+     * </p>
+     * Example:<pre><code>
+     * BEFORE: filter.getFilterType() == FilterType.GEOMETRY_CONTAINS
+     * QUICK:  Filters.getFilterType( filter ) == FilterType.GEOMETRY_CONTAINS
+     * AFTER: filter instanceof Contains
+     * </code></pre>
+     * @param filter
+     * @deprecated please use instanceof
+     */
+    public static short getFilterType( org.opengis.filter.Filter filter ){
+        if( filter == org.opengis.filter.Filter.EXCLUDE ) return FilterType.ALL;
+        if( filter == org.opengis.filter.Filter.INCLUDE ) return FilterType.NONE;
+        if( filter instanceof Filter){
+            return ((org.geotools.filter.Filter)filter).getFilterType();
+        }
+        
+        if( filter instanceof PropertyIsBetween ) return FilterType.BETWEEN;
+        if( filter instanceof PropertyIsEqualTo ) return FilterType.COMPARE_EQUALS;
+        if( filter instanceof PropertyIsGreaterThan ) return FilterType.COMPARE_GREATER_THAN;
+        if( filter instanceof PropertyIsGreaterThanOrEqualTo ) return FilterType.COMPARE_GREATER_THAN_EQUAL;
+        if( filter instanceof PropertyIsLessThan) return FilterType.COMPARE_LESS_THAN;
+        if( filter instanceof PropertyIsLessThanOrEqualTo ) return FilterType.COMPARE_LESS_THAN_EQUAL;
+        if( filter instanceof PropertyIsNotEqualTo ) return FilterType.COMPARE_NOT_EQUALS;
+        if( filter instanceof Id ) return FilterType.FID;
+        if( filter instanceof BBOX ) return FilterType.GEOMETRY_BBOX;
+        if( filter instanceof Beyond) return FilterType.GEOMETRY_BEYOND;
+        if( filter instanceof Contains ) return FilterType.GEOMETRY_CONTAINS;
+        if( filter instanceof Crosses ) return FilterType.GEOMETRY_CROSSES;
+        if( filter instanceof Disjoint ) return FilterType.GEOMETRY_DISJOINT;
+        if( filter instanceof DWithin) return FilterType.GEOMETRY_DWITHIN;
+        if( filter instanceof Equals) return FilterType.GEOMETRY_EQUALS;
+        if( filter instanceof Intersects) return FilterType.GEOMETRY_INTERSECTS;
+        if( filter instanceof Overlaps) return FilterType.GEOMETRY_OVERLAPS;
+        if( filter instanceof Touches) return FilterType.GEOMETRY_TOUCHES;
+        if( filter instanceof Within) return FilterType.GEOMETRY_WITHIN;
+        if( filter instanceof PropertyIsLike) return FilterType.LIKE;
+        if( filter instanceof And) return FilterType.LOGIC_AND;
+        if( filter instanceof Not) return FilterType.LOGIC_NOT;
+        if( filter instanceof Or ) return FilterType.LOGIC_OR;        
+        if( filter instanceof PropertyIsNull) return FilterType.NULL;
+        
+        return 0;
+    }
     /**
      * Uses number( expr ), will turn result into an interger, or NOTFOUND
      *

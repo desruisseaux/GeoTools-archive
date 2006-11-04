@@ -18,11 +18,12 @@ package org.geotools.filter.visitor;
 import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -65,7 +66,7 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 	protected static final String geomAtt = "geom";
 	protected static final String nameAtt = "name";
 	protected static final String numAtt = "num";
-
+    
 	protected void setUp() throws Exception {
 		super.setUp();
 		accessor = new TestAccessor();
@@ -107,18 +108,18 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 		accessor.setUpdate("",null);
 
 		// Testing when FilterCapabilites indicate that filter type is not supported
-		filter.accept(visitor);
+		((org.geotools.filter.Filter)filter).accept(visitor);
 
 		assertEquals(filter, visitor.getFilterPost());
-		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		
 		// now filter type is supported
 		filterCapabilitiesMask.addType(filterTypeMask);
 		visitor=newVisitor();
 		
-		filter.accept(visitor);
+        ((org.geotools.filter.Filter)filter).accept(visitor);
 		
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
 		
 		if (attToEdit != null && accessor!=null ) {
@@ -130,10 +131,10 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 
 			visitor = newVisitor();
 
-			filter.accept(visitor);
+            ((org.geotools.filter.Filter)filter).accept(visitor);
 
 			assertEquals(filter, visitor.getFilterPost());
-			assertEquals(filter.or(updateFilter), visitor.getFilterPre());
+			assertEquals(((org.geotools.filter.Filter)filter).or(updateFilter), visitor.getFilterPre());
 		}
 	}
 

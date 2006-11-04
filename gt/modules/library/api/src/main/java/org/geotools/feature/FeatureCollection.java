@@ -17,11 +17,11 @@ package org.geotools.feature;
 
 import java.io.IOException;
 import java.util.Iterator;
+import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.filter.Filter;
-import org.geotools.filter.SortBy;
 import org.geotools.util.ProgressListener;
 
 

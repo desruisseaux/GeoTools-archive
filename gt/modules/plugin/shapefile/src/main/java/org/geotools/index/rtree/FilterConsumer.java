@@ -57,11 +57,11 @@ public class FilterConsumer implements FilterVisitor {
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
      */
     public void visit(Filter filter) {
-        if (filter.getFilterType() == Filter.NONE.getFilterType()) {
+        if (filter == Filter.NONE) {
             this.bounds = new Envelope(Double.NEGATIVE_INFINITY,
                     Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY,
                     Double.POSITIVE_INFINITY);
-        } else if (filter.getFilterType() == Filter.ALL.getFilterType()) {
+        } else if (filter == Filter.ALL) {
             this.bounds = null;
         } else {
             LOGGER.warning("Unknown filter type:" + filter.toString());

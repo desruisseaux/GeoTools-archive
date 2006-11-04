@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  * Represents an un-ordered Set of AttributeTypes. For SFS this should not be used. 
@@ -66,7 +66,7 @@ public class SetAttributeType implements AttributeType {
 
     public SetAttributeType(String name, boolean nillable,
     		AttributeType[] children) {
-    	this(name, nillable, 1, 1, children,Filter.ALL);
+    	this(name, nillable, 1, 1, children,Filter.EXCLUDE);
     }
     public Filter getRestriction(){return restriction;}
 	/* (non-Javadoc)

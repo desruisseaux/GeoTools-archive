@@ -73,7 +73,7 @@ public class TextSymbolTest extends TestCase {
     }
 
     public void testRender() throws Exception {
-        System.out.println("\n\nTextSymbolTest\n");
+        //System.out.println("\n\nTextSymbolTest\n");
 
         // Request extent
         GeometryFactory geomFac = new GeometryFactory();

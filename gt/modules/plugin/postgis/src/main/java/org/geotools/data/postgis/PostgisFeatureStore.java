@@ -44,7 +44,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.SQLEncoderException;
@@ -714,7 +714,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
         Filter encodableFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
         Filter unEncodableFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
-        boolean useLimit = (unEncodableFilter == null || unEncodableFilter.equals(Filter.NONE));
+        boolean useLimit = (unEncodableFilter == null || unEncodableFilter.equals(Filter.INCLUDE));
 
         LOGGER.fine("Filter in making sql is " + encodableFilter);
 
@@ -867,7 +867,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
     protected ReferencedEnvelope bounds(Query query) throws IOException {
         Filter filter = query.getFilter();
 
-        if (filter == Filter.ALL) {
+        if (filter == Filter.EXCLUDE) {
             return new ReferencedEnvelope(new Envelope(), query.getCoordinateSystem());
         }
 

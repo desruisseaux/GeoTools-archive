@@ -18,7 +18,8 @@ package org.geotools.index.rtree;
 
 import com.vividsolutions.jts.geom.Envelope;
 import org.apache.velocity.runtime.exception.NodeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.geotools.filter.Filters;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.Lock;
@@ -76,7 +77,7 @@ public class RTree {
         this.checkOpen();
 
         FilterConsumer fc = new FilterConsumer();
-        fc.visit(filter);
+        Filters.accept( filter, fc );
 
         Envelope env = fc.getBounds();
 
@@ -180,7 +181,7 @@ public class RTree {
 
         try {
             FilterConsumer fc = new FilterConsumer();
-            filter.accept(fc);
+            Filters.accept( filter,fc);
 
             if (fc.getBounds() != null) {
                 ret = this.search(fc.getBounds(), lock);

@@ -15,7 +15,7 @@
  */
 package org.geotools.filter.visitor;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterType;
 

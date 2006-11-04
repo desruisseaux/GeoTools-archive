@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -51,7 +51,7 @@ public class FilteringFeatureReader implements FeatureReader {
      * Creates a new instance of AbstractFeatureReader
      * 
      * <p>
-     * Please don't call this method with Filter.NONE or Filter.ALL (consider
+     * Please don't call this method with Filter.INCLUDE or Filter.EXCLUDE (consider
      * not filtering and EmptyFeatureReader instead)
      * </p>
      *
@@ -117,7 +117,7 @@ public class FilteringFeatureReader implements FeatureReader {
             while (featureReader.hasNext()) {
                 peek = featureReader.next();
 
-                if (filter.contains(peek)) {
+                if (filter.evaluate(peek)) {
                     next = peek;
                     return true;
                 }                                

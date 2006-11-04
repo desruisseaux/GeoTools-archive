@@ -63,7 +63,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 
@@ -467,7 +467,7 @@ public abstract class JDBC1DataStore implements DataStore {
 			throw new IOException("Type " + typeName + " does match request");
 		}
 
-		if ((filter == Filter.ALL) || filter.equals(Filter.ALL)) {
+		if ((filter == Filter.EXCLUDE) || filter.equals(Filter.EXCLUDE)) {
 			return new EmptyFeatureReader(requestType);
 		}
 
@@ -559,11 +559,11 @@ public abstract class JDBC1DataStore implements DataStore {
 
 		SQLBuilder sqlBuilder = getSqlBuilder(typeName);
 		
-		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter()); //process in DB
-		Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter()); //process after DB
+		Filter preFilter = (Filter) sqlBuilder.getPreQueryFilter(query.getFilter()); //process in DB
+		Filter postFilter = (Filter) sqlBuilder.getPostQueryFilter(query.getFilter()); //process after DB
 		
 		//JD: This is bad, we should not assume we have the right to change the query object
-		Filter originalFilter = query.getFilter();
+		Filter originalFilter = (Filter) query.getFilter();
 		((DefaultQuery) query).setFilter(preFilter);
 		
 		String[] requestedNames = propertyNames(query);
@@ -655,7 +655,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		}
 
         // chorner: this is redundant, since we've already created the reader with the post filter attached		
-        // if (postFilter != null && !postFilter.equals(Filter.NONE)) {
+        // if (postFilter != null && !postFilter.equals(Filter.INCLUDE)) {
         //     reader = new FilteringFeatureReader(reader, postFilter);
         // }
 		
@@ -676,7 +676,7 @@ public abstract class JDBC1DataStore implements DataStore {
 			throws IOException, DataSourceException {
 		String typeName = query.getTypeName();
 		SQLBuilder sqlBuilder = getSqlBuilder(query.getTypeName());
-		Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter()); //dupe?
+		org.opengis.filter.Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter()); //dupe?
 		//Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
 
 		FIDMapper mapper = getFIDMapper(typeName);
@@ -688,7 +688,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		try {
 			LOGGER.fine("calling sql builder with filter " + preFilter);
 
-			if (query.getFilter() == Filter.ALL) {
+			if (query.getFilter() == Filter.EXCLUDE) {
 				StringBuffer buf = new StringBuffer("SELECT ");
 				sqlBuilder.sqlColumns(buf, mapper, attrTypes);
 				sqlBuilder.sqlFrom(buf, typeName);
@@ -741,14 +741,14 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @throws IOException
 	 */
 	protected FeatureReader createFeatureReader(FeatureType schema,
-			Filter postFilter, QueryData queryData) throws IOException {
+			org.opengis.filter.Filter postFilter, QueryData queryData) throws IOException {
 		FeatureReader fReader = getJDBCFeatureReader(queryData);
 
-		if ((postFilter != null) && (postFilter != Filter.NONE)) {
+		if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
 			fReader = new FilteringFeatureReader(fReader, postFilter);
 		}
 
-		if (postFilter == Filter.ALL) {
+		if (postFilter == Filter.EXCLUDE) {
 			return new EmptyFeatureReader(schema);
 		}
 		
@@ -1389,7 +1389,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 */
 	public FeatureWriter getFeatureWriter(String typeName,
 			Transaction transaction) throws IOException {
-		return getFeatureWriter(typeName, Filter.NONE, transaction);
+		return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
 	}
 
 	/**
@@ -1422,7 +1422,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 */
 	public FeatureWriter getFeatureWriterAppend(String typeName,
 			Transaction transaction) throws IOException {
-		FeatureWriter writer = getFeatureWriter(typeName, Filter.ALL,
+		FeatureWriter writer = getFeatureWriter(typeName, Filter.EXCLUDE,
 				transaction);
 
 		while (writer.hasNext()) {
@@ -1459,11 +1459,11 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String,
 	 *      org.geotools.filter.Filter, org.geotools.data.Transaction)
 	 */
-	public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+	public FeatureWriter getFeatureWriter(String typeName, org.opengis.filter.Filter filter,
 			Transaction transaction) throws IOException {
 		if (filter == null) {
 			throw new NullPointerException("getFeatureReader requires Filter: "
-					+ "did you mean Filter.NONE?");
+					+ "did you mean Filter.INCLUDE?");
 		}
 
 		if (transaction == null) {
@@ -1477,8 +1477,8 @@ public abstract class JDBC1DataStore implements DataStore {
 		LOGGER.fine("getting feature writer for " + typeName + ": " + info);
 
 		SQLBuilder sqlBuilder = getSqlBuilder(typeName);
-		Filter preFilter = sqlBuilder.getPreQueryFilter(filter);
-		Filter postFilter = sqlBuilder.getPostQueryFilter(filter);
+		org.opengis.filter.Filter preFilter = sqlBuilder.getPreQueryFilter(filter);
+        org.opengis.filter.Filter postFilter = sqlBuilder.getPostQueryFilter(filter);
 		Query query = new DefaultQuery(typeName, preFilter);
 		String sqlQuery;
 
@@ -1508,7 +1508,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		}
 
         // chorner: writer shouldn't have a wrapped post filter, otherwise one can't add features.
-        // if ((postFilter != null) && (postFilter != Filter.NONE)) {
+        // if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
         //     writer = new FilteringFeatureWriter(writer, postFilter);
         // }
 

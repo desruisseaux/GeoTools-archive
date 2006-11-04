@@ -65,12 +65,9 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.map.MapContext;
@@ -100,6 +97,8 @@ import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
+import org.opengis.filter.Filter;
+import org.opengis.filter.spatial.BBOX;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -676,16 +675,16 @@ public class LiteRenderer implements Renderer, Renderer2D {
 				}
 
 				BoundsExtractor extractor = new BoundsExtractor(envelope);
-				currLayer.getQuery().getFilter().accept(extractor);
+				{   Filter filter = currLayer.getQuery().getFilter();
+                    ((org.geotools.filter.Filter)filter).accept(extractor);
+                }
 				envelope = extractor.getBBox();
 
 				Filter filter = null;
-				if (!memoryPreloadingEnabled) {
-					BBoxExpression rightBBox = filterFactory
-							.createBBoxExpression(envelope);
-					filter = createBBoxFilters(schema, attributes, rightBBox);
+				if (!memoryPreloadingEnabled) {					
+					filter = createBBoxFilters(schema, attributes, envelope);
 				} else {
-					filter = Filter.NONE;
+					filter = Filter.INCLUDE;
 				}
 
 				// now build the query using only the attributes and the
@@ -705,20 +704,20 @@ public class LiteRenderer implements Renderer, Renderer2D {
 							.fine("Got a tranform exception while trying to de-project the current "
 									+ "envelope, bboxs intersect therefore using envelope)");
 
-					BoundsExtractor extractor = new BoundsExtractor(envelope);
-					currLayer.getQuery().getFilter().accept(extractor);
+					BoundsExtractor extractor = new BoundsExtractor(envelope);					
+                    {   Filter filter = currLayer.getQuery().getFilter();
+                        ((org.geotools.filter.Filter)filter).accept(extractor);
+                    }
 					envelope = extractor.getBBox();
 
-					Filter filter = null;
-					BBoxExpression rightBBox = filterFactory
-							.createBBoxExpression(envelope);
-					filter = createBBoxFilters(schema, attributes, rightBBox);
+					Filter filter = null;					
+					filter = createBBoxFilters(schema, attributes, envelope);
 					q.setFilter(filter);
 				} else {
 					LOGGER
 							.fine("Got a tranform exception while trying to de-project the current "
 									+ "envelope, falling back on full data loading (no bbox query)");
-					q.setFilter(Filter.NONE);
+					q.setFilter(Filter.INCLUDE);
 				}
 				query = q;
 			}
@@ -831,7 +830,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 *             if something goes wrong creating the filter
 	 */
 	private Filter createBBoxFilters(FeatureType schema, String[] attributes,
-			BBoxExpression bbox) throws IllegalFilterException {
+			Envelope bbox) throws IllegalFilterException {
 		Filter filter = null;
 
 		for (int j = 0; j < attributes.length; j++) {
@@ -844,21 +843,13 @@ public class LiteRenderer implements Renderer, Renderer2D {
 						+ schema.getTypeName() + ")");
 
 			if (attType instanceof GeometryAttributeType) {
-				GeometryFilter gfilter = filterFactory
-						.createGeometryFilter(Filter.GEOMETRY_BBOX);
-
-				// TODO: how do I get the full xpath of an attribute should
-				// feature composition be used?
-				Expression left = filterFactory.createAttributeExpression(
-						schema, attType.getName());
-				gfilter.addLeftGeometry(left);
-				gfilter.addRightGeometry(bbox);
-
-				if (filter == null) {
-					filter = gfilter;
-				} else {
-					filter = filter.or(gfilter);
-				}
+			    BBOX gfilter = filterFactory.bbox( attType.getName(), bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), null );
+                
+                if (filter == null) {
+                    filter = gfilter;
+                } else {
+                    filter = filterFactory.or( filter, gfilter );
+                }
 			}
 		}
 
@@ -1188,7 +1179,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
 							// if( r != null ) {
 							Filter filter = r.getFilter();
 
-							if ((filter == null) || filter.contains(feature)) {
+							if ((filter == null) || filter.evaluate(feature)) {
 								doElse = false;
 
 								if (LOGGER.isLoggable(Level.FINER)) {

@@ -133,7 +133,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
     public FeatureReader getFeatureReader(final String typeName)
         throws IOException {
     	FeatureType featureType = getSchema(typeName);
-    	return getFeatureReader(featureType, Filter.NONE, Transaction.AUTO_COMMIT);
+    	return getFeatureReader(featureType, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
     
     
@@ -155,7 +155,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
             reader = new DiffFeatureReader(reader, diff);
         }
 		
-		if ((query.getFilter() != null) && (query.getFilter() != Filter.NONE)) {
+		if ((query.getFilter() != null) && (query.getFilter() != Filter.INCLUDE)) {
             reader = new FilteringFeatureReader(reader, query.getFilter());
         }
     	
@@ -238,7 +238,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      * @throws IOException if the database cannot be properly accessed
      */
     public FeatureWriter getFeatureWriter(String typeName) throws IOException {
-        return getFeatureWriter(typeName, Filter.NONE, Transaction.AUTO_COMMIT);
+        return getFeatureWriter(typeName, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
     
     /**

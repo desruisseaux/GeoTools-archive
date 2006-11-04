@@ -47,6 +47,8 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.spatialschema.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -65,7 +67,7 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
      */
     public FilterFactoryImpl() {
     }
-      
+    
     /**
      * Creates an AttributeExpression using the supplied xpath.
      * <p>

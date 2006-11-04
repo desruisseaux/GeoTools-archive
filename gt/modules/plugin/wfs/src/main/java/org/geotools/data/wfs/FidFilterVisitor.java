@@ -28,6 +28,7 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.FilterVisitor2;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
@@ -35,6 +36,8 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.IncludeFilter;
 
 /**
  * Changes all the Fids in FidFilters to be translated to the concrete fid.
@@ -47,7 +50,7 @@ import org.geotools.filter.NullFilter;
  *  
  * @author Jesse
  */
-public class FidFilterVisitor implements FilterVisitor{
+public class FidFilterVisitor implements FilterVisitor, FilterVisitor2 {
 
 	private Stack current=new Stack();
 	private Map fidMap;
@@ -56,6 +59,12 @@ public class FidFilterVisitor implements FilterVisitor{
 		this.fidMap=fidMap;
 	}
 
+    public void visit( ExcludeFilter filter ) {
+        current.push(filter);
+    }
+    public void visit( IncludeFilter filter ) {        
+        current.push(filter);
+    }
 	public void visit(Filter filter) {
 		if (filter instanceof FidFilter) {
 			FidFilter ff = (FidFilter) filter;
@@ -163,8 +172,8 @@ public class FidFilterVisitor implements FilterVisitor{
 		// nothing todo
 	}
 
-	public Filter getProcessedFilter() {
+	public org.opengis.filter.Filter getProcessedFilter() {
 		assert current.size()==1;
-		return (Filter) current.peek();
+		return (org.opengis.filter.Filter) current.peek();
 	}
 }

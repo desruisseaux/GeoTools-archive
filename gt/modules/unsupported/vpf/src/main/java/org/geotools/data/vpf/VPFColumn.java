@@ -24,7 +24,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Geometry;
 

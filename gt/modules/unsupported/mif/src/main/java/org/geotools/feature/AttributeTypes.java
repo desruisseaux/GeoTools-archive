@@ -17,7 +17,9 @@ package org.geotools.feature;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.Filters;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
@@ -104,13 +106,13 @@ public class AttributeTypes {
     public static int getFieldLengthFromFilter(Filter filter) {
         int length = FIELD_LENGTH_UNDEFINED;
 
-        if ((filter != null) && (filter != Filter.ALL)
-                && (filter != Filter.NONE)) {
-            short filterType = filter.getFilterType();
+        if ((filter != null) && (filter != Filter.EXCLUDE)
+                && (filter != Filter.INCLUDE)) {
+            short filterType = Filters.getFilterType( filter );
 
-            if ((filterType == Filter.COMPARE_LESS_THAN)
-                    || (filterType == Filter.COMPARE_LESS_THAN_EQUAL)
-                    || (filterType == Filter.COMPARE_EQUALS)) {
+            if ((filterType == FilterType.COMPARE_LESS_THAN)
+                    || (filterType == FilterType.COMPARE_LESS_THAN_EQUAL)
+                    || (filterType == FilterType.COMPARE_EQUALS)) {
                 try {
                     CompareFilter cf = (CompareFilter) filter;
 
@@ -125,15 +127,15 @@ public class AttributeTypes {
                         }
                     }
 
-                    if (filterType == Filter.COMPARE_LESS_THAN) {
+                    if (filterType == FilterType.COMPARE_LESS_THAN) {
                         length--;
                     }
                 } catch (NumberFormatException e) {
                 }
 
                 // In case of a complex filter, looks for the maximum defined length in filter
-            } else if ((filterType == Filter.LOGIC_AND)
-                    || (filterType == Filter.LOGIC_OR)) {
+            } else if ((filterType == FilterType.LOGIC_AND)
+                    || (filterType == FilterType.LOGIC_OR)) {
                 for (Iterator it = ((LogicFilter) filter).getFilterIterator();
                         it.hasNext();) {
                     Filter subFilter = (Filter) it.next();

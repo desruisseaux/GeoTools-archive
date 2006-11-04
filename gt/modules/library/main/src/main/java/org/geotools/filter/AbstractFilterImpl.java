@@ -40,11 +40,11 @@ public abstract class AbstractFilterImpl
      *
      * @return ORed filter.
      */
-    public Filter or(Filter filter) {
+    public Filter or(org.opengis.filter.Filter filter) {
         try {
-        	return factory.createLogicFilter(this,filter,LOGIC_OR);
+        	return factory.or(this,(Filter)filter);
         } catch (IllegalFilterException ife) {
-            return filter;
+            return (Filter) filter;
         }
     }
 
@@ -55,11 +55,11 @@ public abstract class AbstractFilterImpl
      *
      * @return ANDed filter.
      */
-    public Filter and(Filter filter) {
+    public Filter and(org.opengis.filter.Filter filter) {
         try {
-            return factory.createLogicFilter(this,filter,LOGIC_AND);
+            return factory.and(this,(Filter)filter);
         } catch (IllegalFilterException ife) {
-            return filter;
+            return (Filter) filter;
         }
     }
 
@@ -70,7 +70,7 @@ public abstract class AbstractFilterImpl
      */
     public Filter not() {
         try {
-            return factory.createLogicFilter(this,LOGIC_NOT);
+            return factory.not( this );
         } catch (IllegalFilterException ife) {
             return this;
         }

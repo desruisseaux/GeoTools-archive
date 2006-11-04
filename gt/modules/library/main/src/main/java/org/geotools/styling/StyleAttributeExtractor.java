@@ -15,7 +15,7 @@
  */
 package org.geotools.styling;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 
 
@@ -74,7 +74,7 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         Filter filter = rule.getFilter();
 
         if (filter != null) {
-            filter.accept(this);
+            ((org.geotools.filter.Filter)filter).accept(this);
         }
 
         Symbolizer[] symbolizers = rule.getSymbolizers();

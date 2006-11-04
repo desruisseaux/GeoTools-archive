@@ -270,7 +270,7 @@ public class ShapeRendererTest extends TestCase {
         Transaction t = new DefaultTransaction();
         store.setTransaction(t);
         store.modifyFeatures(ds.getSchema().getAttributeType("NAME"), "bleep",
-                Filter.NONE);
+                Filter.INCLUDE);
 
         MapContext context = new DefaultMapContext();
         context.addLayer(store, st);

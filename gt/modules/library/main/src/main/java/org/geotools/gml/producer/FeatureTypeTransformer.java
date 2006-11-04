@@ -27,7 +27,9 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
@@ -345,10 +347,11 @@ public class FeatureTypeTransformer extends TransformerBase {
         protected void encodeString(AttributeType attribute)
             throws SAXException {
             int length = AttributeType.UNBOUNDED;
-            if(attribute.getRestriction()!=null && attribute.getRestriction()!=Filter.ALL && attribute.getRestriction()!=Filter.NONE){
+            if(attribute.getRestriction()!=null && attribute.getRestriction()!=Filter.EXCLUDE && attribute.getRestriction()!=Filter.INCLUDE){
             	try{
             	Filter f = attribute.getRestriction();
-            	if(f.getFilterType() == FilterType.COMPARE_LESS_THAN || f.getFilterType() == FilterType.COMPARE_LESS_THAN_EQUAL){
+            	if(f instanceof PropertyIsLessThan ||
+                   f instanceof PropertyIsLessThanOrEqualTo ){
             		CompareFilter cf = (CompareFilter)f;
             		Expression e = cf.getLeftValue();
             		if(e!= null && e instanceof LengthFunction){

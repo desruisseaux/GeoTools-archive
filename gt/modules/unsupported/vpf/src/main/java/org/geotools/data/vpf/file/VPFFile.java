@@ -361,7 +361,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
         while (iter.hasNext()) {
             VPFColumn column = (VPFColumn) iter.next();
 //            currentSize = column.getFieldLength();
-            if (column.getRestriction() == Filter.NONE || column.getRestriction() == null) {
+            if (column.getRestriction() == Filter.INCLUDE || column.getRestriction() == null) {
 //            if (currentSize < 0) {
                 return -1;
             } else {
@@ -716,7 +716,7 @@ public class VPFFile implements FeatureType, FileConstants, DataTypesDefinition 
             for (int inx = 0; inx < columns.size(); inx++) {
                 column = (VPFColumn) columns.get(inx);
 
-                if (column.getRestriction() == Filter.NONE || column.getRestriction() == null) {
+                if (column.getRestriction() == Filter.INCLUDE || column.getRestriction() == null) {
 //                    if (column.getFieldLength() < 0) {
                     values[inx] = readVariableSizeData(column.getTypeChar());
                 } else {

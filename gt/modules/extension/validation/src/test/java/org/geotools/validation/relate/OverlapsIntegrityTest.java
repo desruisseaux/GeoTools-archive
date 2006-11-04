@@ -25,7 +25,7 @@ import java.util.Map;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -86,7 +86,7 @@ public class OverlapsIntegrityTest extends SpatialTestCase
 			System.out.println("Loop counter: " +  ++counter);
 			Feature victim = r.next();
 			System.out.println("Found line number: " + victim.getID());
-			assertTrue( "feature "+victim.getID(), filter.contains( victim ));
+			assertTrue( "feature "+victim.getID(), filter.evaluate( victim ));
 		}
 		assertEquals( "count of all features", 4, line.getFeatures( filter ).getCount() );
 	}

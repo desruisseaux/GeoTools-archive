@@ -17,9 +17,9 @@ package org.geotools.data;
 
 import java.io.IOException;
 import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
 
 
 /**
@@ -107,7 +107,7 @@ public interface FeatureSource {
      * based on the passed filter.
      *
      * @param filter An OpenGIS filter; specifies which features to retrieve.
-     *        <tt>null</tt> is not allowed, use Filter.NONE instead.
+     *        <tt>null</tt> is not allowed, use Filter.INCLUDE instead.
      *
      * @return Collection The collection to put the features into.
      *
@@ -119,7 +119,7 @@ public interface FeatureSource {
      * Loads all features from the datasource into the return FeatureResults.
      *
      * <p>
-     * Filter.NONE can also be used to get all features.  Calling this function
+     * Filter.INCLUDE can also be used to get all features.  Calling this function
      * is equivalent to using {@link Query#ALL}
      * </p>
      *

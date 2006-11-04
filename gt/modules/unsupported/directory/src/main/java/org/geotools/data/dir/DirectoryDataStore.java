@@ -38,7 +38,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**

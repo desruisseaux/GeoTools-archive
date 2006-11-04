@@ -52,12 +52,8 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.BBoxExpression;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.JTS;
@@ -85,6 +81,8 @@ import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.filter.Filter;
+import org.opengis.filter.spatial.BBOX;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -773,7 +771,7 @@ public final class StreamingRenderer implements GTRenderer {
 		AttributeType[] ats;
 		final int length;
 		Filter filter = null;
-		BBoxExpression rightBBox;
+		
 		ReferencedEnvelope envelope = new ReferencedEnvelope(mapArea, mapCRS);
 		if (isOptimizedDataLoadingEnabled()) {
 			// see what attributes we really need by exploring the styles
@@ -819,10 +817,9 @@ public final class StreamingRenderer implements GTRenderer {
 				}
 
 				if (!isMemoryPreloadingEnabled()) {
-					rightBBox = filterFactory.createBBoxExpression(envelope);
-					filter = createBBoxFilters(schema, attributes, rightBBox);
+					filter = createBBoxFilters(schema, attributes, envelope);
 				} else {
-					filter = Filter.NONE;
+					filter = Filter.INCLUDE;
 				}
 
 				// now build the query using only the attributes and the
@@ -844,9 +841,8 @@ public final class StreamingRenderer implements GTRenderer {
 									.append(
 											"envelope, bboxs intersect therefore using envelope)")
 									.toString());
-					filter = null;
-					rightBBox = filterFactory.createBBoxExpression(envelope);
-					filter = createBBoxFilters(schema, attributes, rightBBox);
+					filter = null;					
+					filter = createBBoxFilters(schema, attributes, envelope);
 					query.setFilter(filter);
 				} else {
 					LOGGER
@@ -855,7 +851,7 @@ public final class StreamingRenderer implements GTRenderer {
 									.append(
 											"envelope, falling back on full data loading (no bbox query)")
 									.toString());
-					query.setFilter(Filter.NONE);
+					query.setFilter(Filter.INCLUDE);
 				}
 				processRuleForQuery(styles, query);
 
@@ -920,7 +916,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 */
 	private boolean doesntHaveFIDFilter(Query query) {
 		FIDFilterFinder finder = new FIDFilterFinder();
-		finder.visit(query.getFilter());
+		finder.visit( (org.geotools.filter.Filter)query.getFilter());
 
 		return !finder.hasFIDFilter; // note: not
 	}
@@ -997,7 +993,7 @@ public final class StreamingRenderer implements GTRenderer {
 			if (actualFilters > maxFilters)
 				return;
 
-			Filter ruleFiltersCombined;
+			org.opengis.filter.Filter ruleFiltersCombined;
 			Filter newFilter;
 			// We're GOLD -- OR together all the Rule's Filters
 			if (filtersToDS.size() == 1) // special case of 1 filter
@@ -1011,13 +1007,13 @@ public final class StreamingRenderer implements GTRenderer {
 				// redo 1st one
 				{
 					newFilter = (Filter) filtersToDS.get(t);
-					ruleFiltersCombined = filterFactory.createLogicFilter(
-							ruleFiltersCombined, newFilter, Filter.LOGIC_OR);
+					ruleFiltersCombined = filterFactory.or(
+							ruleFiltersCombined, newFilter );
 				}
 			}
 			// combine with the geometry filter (preexisting)
-			ruleFiltersCombined = filterFactory.createLogicFilter(
-					q.getFilter(), ruleFiltersCombined, Filter.LOGIC_AND);
+			ruleFiltersCombined = filterFactory.and(
+					q.getFilter(), ruleFiltersCombined);
 
 			// set the actual filter
 			q.setFilter(ruleFiltersCombined);
@@ -1174,12 +1170,11 @@ public final class StreamingRenderer implements GTRenderer {
 	 *             if something goes wrong creating the filter
 	 */
 	private Filter createBBoxFilters(FeatureType schema, String[] attributes,
-			BBoxExpression bbox) throws IllegalFilterException {
+			Envelope bbox) throws IllegalFilterException {
 		Filter filter = null;
 		final int length = attributes.length;
 		AttributeType attType;
-		GeometryFilter gfilter;
-		Expression left;
+		
 		for (int j = 0; j < length; j++) {
 			attType = schema.getAttributeType(attributes[j]);
 
@@ -1196,21 +1191,13 @@ public final class StreamingRenderer implements GTRenderer {
 						schema.getTypeName()).append(")").toString());
 			}
 
-			if (attType instanceof GeometryAttributeType) {
-				gfilter = filterFactory
-						.createGeometryFilter(Filter.GEOMETRY_BBOX);
-
-				// TODO: how do I get the full xpath of an attribute should
-				// feature composition be used?
-				left = filterFactory.createAttributeExpression(schema, attType
-						.getName());
-				gfilter.addLeftGeometry(left);
-				gfilter.addRightGeometry(bbox);
-
+			if (attType instanceof GeometryAttributeType) {                                
+                BBOX gfilter = filterFactory.bbox( attType.getName(), bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), null );
+                
 				if (filter == null) {
 					filter = gfilter;
 				} else {
-					filter = filter.or(gfilter);
+					filter = filterFactory.or( filter, gfilter );
 				}
 			}
 		}
@@ -1515,7 +1502,7 @@ public final class StreamingRenderer implements GTRenderer {
 			r = ruleList[t];
 			filter = r.getFilter();
 
-			if ((filter == null) || filter.contains(feature)) {
+			if ((filter == null) || filter.evaluate(feature)) {
 				doElse = false;
 				symbolizers = r.getSymbolizers();
 				processSymbolizers(graphics, feature, symbolizers, scaleRange,

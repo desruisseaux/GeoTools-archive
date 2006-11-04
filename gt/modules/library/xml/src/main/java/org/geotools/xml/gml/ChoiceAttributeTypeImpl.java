@@ -2,7 +2,7 @@ package org.geotools.xml.gml;
 
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.GeometryCollection;

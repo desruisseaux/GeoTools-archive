@@ -54,7 +54,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
@@ -336,7 +336,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertEquals(type, reader.getFeatureType());
         assertEquals(roadFeatures.length, count(reader));
 
-        reader = data.getFeatureReader( new DefaultQuery( "road", Filter.ALL ), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader( new DefaultQuery( "road", Filter.EXCLUDE ), Transaction.AUTO_COMMIT);
         assertTrue(reader instanceof EmptyFeatureReader);
 
         assertEquals(type, reader.getFeatureType());
@@ -355,7 +355,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         FeatureType type = data.getSchema("road");
         FeatureReader reader;
 
-        reader = data.getFeatureReader( new DefaultQuery( "road", Filter.ALL ), t);
+        reader = data.getFeatureReader( new DefaultQuery( "road", Filter.EXCLUDE ), t);
         assertTrue(reader instanceof EmptyFeatureReader);
         assertEquals(type, reader.getFeatureType());
         assertEquals(0, count(reader));
@@ -371,7 +371,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertEquals(1, count(reader));
 
         TransactionStateDiff state = (TransactionStateDiff) t.getState(data);
-        FeatureWriter writer = state.writer("road", Filter.NONE);
+        FeatureWriter writer = state.writer("road", Filter.INCLUDE);
         Feature feature;
 
         while (writer.hasNext()) {
@@ -382,7 +382,7 @@ public class MemoryDataStoreTest extends DataTestCase {
             }
         }
 
-        reader = data.getFeatureReader(new DefaultQuery( "road", Filter.ALL ), t);
+        reader = data.getFeatureReader(new DefaultQuery( "road", Filter.EXCLUDE ), t);
         assertEquals(0, count(reader));
 
         reader = data.getFeatureReader(new DefaultQuery("road"), t);
@@ -392,7 +392,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertEquals(0, count(reader));
 
         t.rollback();
-        reader = data.getFeatureReader(new DefaultQuery( "road", Filter.ALL ), t);
+        reader = data.getFeatureReader(new DefaultQuery( "road", Filter.EXCLUDE ), t);
         assertEquals(0, count(reader));
 
         reader = data.getFeatureReader(new DefaultQuery("road"), t);
@@ -595,12 +595,12 @@ public class MemoryDataStoreTest extends DataTestCase {
         throws NoSuchElementException, IOException, IllegalAttributeException {
         FeatureWriter writer;
 
-        writer = data.getFeatureWriter("road", Filter.ALL,
+        writer = data.getFeatureWriter("road", Filter.EXCLUDE,
                 Transaction.AUTO_COMMIT);
         assertTrue(writer instanceof EmptyFeatureWriter);
         assertEquals(0, count(writer));
 
-        writer = data.getFeatureWriter("road", Filter.NONE,
+        writer = data.getFeatureWriter("road", Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
         assertFalse(writer instanceof FilteringFeatureWriter);
         assertEquals(roadFeatures.length, count(writer));

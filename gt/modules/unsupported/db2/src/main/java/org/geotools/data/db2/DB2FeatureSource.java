@@ -97,7 +97,7 @@ public class DB2FeatureSource extends JDBCFeatureSource {
             GeometryAttributeType geomType = getSchema()
                 .getDefaultGeometry();
 
-            if (query.getFilter() != Filter.ALL) {
+            if (query.getFilter() != Filter.EXCLUDE) {
                 String sqlStmt = null;
 
                 try {

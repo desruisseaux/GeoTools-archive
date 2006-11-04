@@ -54,15 +54,15 @@ public class FilterTransformer extends TransformerBase {
     private static Map expressions = new HashMap();
     
     static {
-        comparisions.put(new Integer(AbstractFilter.COMPARE_EQUALS),
+        comparisions.put(new Integer(FilterType.COMPARE_EQUALS),
         "PropertyIsEqualTo");
-        comparisions.put(new Integer(AbstractFilter.COMPARE_GREATER_THAN),
+        comparisions.put(new Integer(FilterType.COMPARE_GREATER_THAN),
         "PropertyIsGreaterThan");
-        comparisions.put(new Integer(AbstractFilter.COMPARE_GREATER_THAN_EQUAL),
+        comparisions.put(new Integer(FilterType.COMPARE_GREATER_THAN_EQUAL),
         "PropertyIsGreaterThanOrEqualTo");
-        comparisions.put(new Integer(AbstractFilter.COMPARE_LESS_THAN),
+        comparisions.put(new Integer(FilterType.COMPARE_LESS_THAN),
         "PropertyIsLessThan");
-        comparisions.put(new Integer(AbstractFilter.COMPARE_LESS_THAN_EQUAL),
+        comparisions.put(new Integer(FilterType.COMPARE_LESS_THAN_EQUAL),
         "PropertyIsLessThanOrEqualTo");
         comparisions.put(new Integer(AbstractFilter.LIKE), "PropertyIsLike");
         comparisions.put(new Integer(AbstractFilter.NULL), "PropertyIsNull");

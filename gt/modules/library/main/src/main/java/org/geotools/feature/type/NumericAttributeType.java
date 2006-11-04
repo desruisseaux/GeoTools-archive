@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.PrimativeAttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  * Class that represents a Numeric.

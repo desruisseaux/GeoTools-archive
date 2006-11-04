@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -133,7 +133,7 @@ public class FilteringFeatureWriter implements FeatureWriter {
         while (writer.hasNext()) {
             peek = writer.next();
 
-            if (filter.contains(peek)) {
+            if (filter.evaluate(peek)) {
                 next = peek;
 
                 return true; // we have a match!

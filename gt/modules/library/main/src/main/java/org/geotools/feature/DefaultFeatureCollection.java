@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,8 +36,8 @@ import org.geotools.feature.collection.FeatureIteratorImpl;
 import org.geotools.feature.collection.SubFeatureCollection;
 import org.geotools.feature.type.FeatureAttributeType;
 import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.filter.Filter;
-import org.geotools.filter.SortBy;
+import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 import org.geotools.filter.SortBy2;
 import org.geotools.util.NullProgressListener;
 import org.geotools.util.ProgressListener;
@@ -782,7 +781,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * @since GeoTools 2.2, Filter 1.1
      */
 	public FeatureCollection subCollection(Filter filter) {
-		if( filter == Filter.ALL || filter.equals( Filter.ALL )){
+		if( filter == Filter.EXCLUDE || filter.equals( Filter.EXCLUDE )){
 			return this;
 		}		
 		return new SubFeatureCollection( this, filter );
@@ -826,7 +825,6 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * @return FeatureList sorted according to provided order
      */
     public FeatureList sort(SortBy2 order ){
-    	Comparator compare;    	
     	if( order == SortBy.NATURAL_ORDER ){
     		// forward
     	}

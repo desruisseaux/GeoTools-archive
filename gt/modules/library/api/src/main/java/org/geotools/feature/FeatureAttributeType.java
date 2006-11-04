@@ -15,7 +15,7 @@
  */
 package org.geotools.feature;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**

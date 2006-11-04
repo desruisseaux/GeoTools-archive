@@ -21,7 +21,7 @@ import java.util.NoSuchElementException;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -57,7 +57,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
      * @param diff
      */
     public DiffFeatureWriter(FeatureReader reader, Diff diff) {
-        this(reader, diff, Filter.NONE);
+        this(reader, diff, Filter.INCLUDE);
     }
 
     /**

@@ -295,17 +295,17 @@ public class ExpressionBuilder {
                     
                     // Compare Nodes
                 case JJTLENODE:
-                    return compareFilter(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
+                    return compareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
                 case JJTLTNODE:
-                    return compareFilter(AbstractFilter.COMPARE_LESS_THAN);
+                    return compareFilter(FilterType.COMPARE_LESS_THAN);
                 case JJTGENODE:
-                    return compareFilter(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
+                    return compareFilter(FilterType.COMPARE_GREATER_THAN_EQUAL);
                 case JJTGTNODE:
-                    return compareFilter(AbstractFilter.COMPARE_GREATER_THAN);
+                    return compareFilter(FilterType.COMPARE_GREATER_THAN);
                 case JJTEQNODE:
-                    return compareFilter(AbstractFilter.COMPARE_EQUALS);
+                    return compareFilter(FilterType.COMPARE_EQUALS);
                 case JJTNENODE:
-                    return compareFilter(AbstractFilter.COMPARE_NOT_EQUALS);
+                    return compareFilter(FilterType.COMPARE_NOT_EQUALS);
                     
                     
                     // Geometries:

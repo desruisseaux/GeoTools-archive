@@ -86,7 +86,7 @@ public class FilterAbstract implements org.opengis.filter.Filter
 	 * @return value or null
 	 */
 	protected Object eval(org.opengis.filter.expression.Expression expression, Object object) {
-		if( expression == null || object == null ) return null;
+		if( expression == null ) return null;
 		return expression.evaluate( object );
 	}
 	

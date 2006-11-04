@@ -173,7 +173,7 @@ public class FilterAttributeExtractorTest extends TestCase {
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
 
         CompareFilter filter = FilterFactoryFinder.createFilterFactory()
-        	.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        	.createCompareFilter(FilterType.COMPARE_EQUALS);
         Expression testLiteral;
         filter.addLeftValue(testAttribute);
         testLiteral = new LiteralExpressionImpl("test string data");
@@ -334,14 +334,14 @@ public class FilterAttributeExtractorTest extends TestCase {
         // Set up true sub filter
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
 
-        CompareFilter filterTrue = fac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        CompareFilter filterTrue = fac.createCompareFilter(FilterType.COMPARE_EQUALS);
         Expression testLiteral;
         filterTrue.addLeftValue(testAttribute);
         testLiteral = new LiteralExpressionImpl("test string data");
         filterTrue.addRightValue(testLiteral);
 
         // Set up false sub filter
-        CompareFilter filterFalse = fac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        CompareFilter filterFalse = fac.createCompareFilter(FilterType.COMPARE_EQUALS);
         filterFalse.addLeftValue(testAttribute);
         testLiteral = new LiteralExpressionImpl("incorrect test string data");
         filterFalse.addRightValue(testLiteral);

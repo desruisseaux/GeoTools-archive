@@ -604,7 +604,7 @@ class ArcSDEDataStore extends AbstractDataStore {
      * 
      * <p>
      * If the complete filter is supported, the subclass must return
-     * <code>Filter.NONE</code>
+     * <code>Filter.INCLUDE</code>
      * </p>
      *
      * @param typeName DOCUMENT ME!
@@ -612,12 +612,12 @@ class ArcSDEDataStore extends AbstractDataStore {
      *
      * @return DOCUMENT ME!
      */
-    protected Filter getUnsupportedFilter(String typeName, Filter filter) {
+    protected org.opengis.filter.Filter getUnsupportedFilter(String typeName, Filter filter) {
         try {
             ArcSDEQuery.FilterSet filters = ArcSDEQuery.createFilters(this,
                     typeName, filter);
 
-            Filter result = filters.getUnsupportedFilter();
+            org.opengis.filter.Filter result = filters.getUnsupportedFilter();
 
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.fine("Supported filters: " + filters.getSqlFilter()

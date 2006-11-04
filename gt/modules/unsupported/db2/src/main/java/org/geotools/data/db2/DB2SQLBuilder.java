@@ -174,7 +174,7 @@ public class DB2SQLBuilder extends DefaultSQLBuilder {
      * @throws SQLEncoderException
      */
     public String buildSQLBoundsQuery(String typeName, AttributeType geomAttr,
-        Filter filter) throws SQLEncoderException {
+        org.opengis.filter.Filter filter) throws SQLEncoderException {
         StringBuffer sqlBuffer = new StringBuffer();
 
         sqlBuffer.append("SELECT ");

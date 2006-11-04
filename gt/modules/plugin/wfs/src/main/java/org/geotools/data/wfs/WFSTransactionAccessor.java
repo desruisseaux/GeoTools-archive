@@ -19,13 +19,16 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.data.wfs.Action.UpdateAction;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.visitor.ClientTransactionAccessor;
 
 public class WFSTransactionAccessor implements ClientTransactionAccessor {
 
     private List actions;
-
+    private static FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
+    
 	WFSTransactionAccessor(List actions){
         this.actions=actions;
 	}
@@ -47,7 +50,7 @@ public class WFSTransactionAccessor implements ClientTransactionAccessor {
 				if( deleteFilter==null )
 					deleteFilter=a.getFilter();
 				else
-					deleteFilter=deleteFilter.and(a.getFilter());
+					deleteFilter=  ff.and( deleteFilter, a.getFilter());
 			}
 		}
 		return deleteFilter;
@@ -71,7 +74,7 @@ public class WFSTransactionAccessor implements ClientTransactionAccessor {
         			if( updateFilter==null )
         				updateFilter=a.getFilter();
         			else
-        				updateFilter=updateFilter.and(a.getFilter());
+        				updateFilter=ff.and( updateFilter, a.getFilter());
         		}
         	}
         }

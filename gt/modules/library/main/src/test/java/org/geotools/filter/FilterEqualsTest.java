@@ -286,8 +286,8 @@ public class FilterEqualsTest extends TestCase {
     public void testCompareFilter()
 	throws IllegalFilterException {
     	FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-	CompareFilter cFilter1 = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-	CompareFilter cFilter2 = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+	CompareFilter cFilter1 = factory.createCompareFilter(FilterType.COMPARE_EQUALS);
+	CompareFilter cFilter2 = factory.createCompareFilter(FilterType.COMPARE_EQUALS);
 	testExp1 = new LiteralExpressionImpl(new Integer(45));
 	testExp2 = new LiteralExpressionImpl(new Integer(45));
 	testExp3 = new AttributeExpressionImpl(testSchema, "testInteger");
@@ -324,7 +324,7 @@ public class FilterEqualsTest extends TestCase {
 	bFilter2.addRightValue(testLit2);
 	assertTrue(bFilter2.equals(bFilter1));
 	tFilter1 = FilterFactoryFinder.createFilterFactory()
-		.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+		.createCompareFilter(FilterType.COMPARE_EQUALS);
 	assertTrue(!bFilter2.equals(tFilter1));
 	bFilter2.addRightValue(new LiteralExpressionImpl(new Integer(65)));
 	assertTrue(!bFilter2.equals(bFilter1));
@@ -356,8 +356,8 @@ public class FilterEqualsTest extends TestCase {
     public void testLogicFilter()
 	throws IllegalFilterException{
     FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-	CompareFilter cFilter1 = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-	CompareFilter cFilter2 = factory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+	CompareFilter cFilter1 = factory.createCompareFilter(FilterType.COMPARE_EQUALS);
+	CompareFilter cFilter2 = factory.createCompareFilter(FilterType.COMPARE_EQUALS);
 	testExp1 = new LiteralExpressionImpl(new Integer(45));
 	testExp2 = new LiteralExpressionImpl(new Integer(45));
 	testExp3 = new AttributeExpressionImpl(testSchema, "testInteger");
@@ -382,9 +382,9 @@ public class FilterEqualsTest extends TestCase {
 	assertTrue(logFilter3.equals(logFilter4));
 
 	//Questionable behavior.  Is this what we want?
-	Filter logFilter5 = cFilter1.or(logFilter3);
+	Filter logFilter5 = (org.geotools.filter.Filter)  cFilter1.or(logFilter3);
 	//does not change structure of logFilter3
-	Filter logFilter6 = logFilter4.or(cFilter1);
+	Filter logFilter6 = (org.geotools.filter.Filter)  logFilter4.or(cFilter1);
 	//does change structure of logFilter4
 	assertTrue(!logFilter5.equals(logFilter6));//do we want these equal? 
 	//the order of ORs is different, but the effect the same.

@@ -47,7 +47,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         visitor = new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_MEDIUM);
         filter.accept(visitor);
 
-        assertEquals(Filter.NONE, visitor.getFilter());
+        assertEquals(Filter.INCLUDE, visitor.getFilter());
         assertEquals(factory.createFidFilter(), visitor.getFidFilter());
         assertTrue(visitor.requiresPostProcessing());
 
@@ -55,7 +55,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         visitor = new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_HIGH);
         filter.accept(visitor);
 
-        assertEquals(Filter.NONE, visitor.getFilter());
+        assertEquals(Filter.INCLUDE, visitor.getFilter());
         assertEquals(factory.createFidFilter(), visitor.getFidFilter());
         assertTrue(visitor.requiresPostProcessing());
     }
@@ -117,7 +117,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         filter.accept(visitor);
 
         // anding 2 different fids results in nothing.
-        assertEquals(Filter.ALL, visitor.getFilter());
+        assertEquals(Filter.EXCLUDE, visitor.getFilter());
         fidFilter = factory.createFidFilter();
         assertEquals(fidFilter, visitor.getFidFilter());
         assertFalse(visitor.requiresPostProcessing());
@@ -127,7 +127,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         filter.accept(visitor);
 
         // anding 2 different fids results in nothing.
-        assertEquals(Filter.ALL, visitor.getFilter());
+        assertEquals(Filter.EXCLUDE, visitor.getFilter());
         fidFilter = factory.createFidFilter();
         assertEquals(fidFilter, visitor.getFidFilter());
         assertFalse(visitor.requiresPostProcessing());
@@ -139,7 +139,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         visitor = new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_MEDIUM);
         filter.accept(visitor);
 
-        assertEquals(Filter.ALL, visitor.getFilter());
+        assertEquals(Filter.EXCLUDE, visitor.getFilter());
         fidFilter = factory.createFidFilter();
         fidFilter.addFid(fid1);
         assertEquals(fidFilter, visitor.getFidFilter());
@@ -149,7 +149,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         visitor = new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_HIGH);
         filter.accept(visitor);
 
-        assertEquals(Filter.ALL, visitor.getFilter());
+        assertEquals(Filter.EXCLUDE, visitor.getFilter());
         assertEquals(fidFilter, visitor.getFidFilter());
         assertFalse(visitor.requiresPostProcessing());
     }
@@ -179,7 +179,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         visitor = new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_MEDIUM);
         filter.accept(visitor);
 
-        assertEquals(Filter.ALL, visitor.getFilter());
+        assertEquals(Filter.EXCLUDE, visitor.getFilter());
         fidFilter = factory.createFidFilter();
         fidFilter.addFid(fid1);
         fidFilter.addFid(fid2);
@@ -190,7 +190,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         visitor = new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_HIGH);
         filter.accept(visitor);
 
-        assertEquals(Filter.ALL, visitor.getFilter());
+        assertEquals(Filter.EXCLUDE, visitor.getFilter());
         fidFilter = factory.createFidFilter();
         fidFilter.addFid(fid1);
         fidFilter.addFid(fid2);
@@ -219,7 +219,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         visitor = new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_MEDIUM);
         filter.accept(visitor);
 
-        assertEquals(Filter.ALL, visitor.getFilter());
+        assertEquals(Filter.EXCLUDE, visitor.getFilter());
         fidFilter = factory.createFidFilter();
         fidFilter.addFid(fid1);
         fidFilter.addFid(fid2);
@@ -230,7 +230,7 @@ public class FilterEncodingPreProcessorTest extends TestCase {
         visitor = new FilterEncodingPreProcessor(XMLHandlerHints.VALUE_FILTER_COMPLIANCE_HIGH);
         filter.accept(visitor);
 
-        assertEquals(Filter.ALL, visitor.getFilter());
+        assertEquals(Filter.EXCLUDE, visitor.getFilter());
         fidFilter = factory.createFidFilter();
         fidFilter.addFid(fid1);
         fidFilter.addFid(fid2);

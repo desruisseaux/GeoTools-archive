@@ -82,11 +82,12 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.SQLEncoderOracle;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -471,7 +472,7 @@ public class OracleDataStore implements DataStore {
 	    		}    		
 	    	}
 	    	Envelope extent = new Envelope(minx,maxx, miny,maxy );
-	    	JTS.ReferencedEnvelope ref = new JTS.ReferencedEnvelope( extent, crs );
+	    	ReferencedEnvelope ref = new ReferencedEnvelope( extent, crs );
 	    	return ref;
 	    }
     	catch( Exception erp ){
@@ -757,7 +758,7 @@ public class OracleDataStore implements DataStore {
             throw new IOException("Type " + typeName + " does match request");
         }
 
-        if ((filter == Filter.ALL) || filter.equals(Filter.ALL)) {
+        if ((filter == Filter.EXCLUDE) || filter.equals(Filter.EXCLUDE)) {
             return new EmptyFeatureReader(requestType);
         }
 
@@ -945,7 +946,7 @@ public class OracleDataStore implements DataStore {
         }
 
         // chorner: this is redundant, since we've already created the reader with the post filter attached     
-        // if (postFilter != null && !postFilter.equals(Filter.NONE)) {
+        // if (postFilter != null && !postFilter.equals(Filter.INCLUDE)) {
         //     reader = new FilteringFeatureReader(reader, postFilter);
         // }
         
@@ -978,7 +979,7 @@ public class OracleDataStore implements DataStore {
         try {
             LOGGER.fine("calling sql builder with filter " + preFilter);
 
-            if (query.getFilter() == Filter.ALL) {
+            if (query.getFilter() == Filter.EXCLUDE) {
                 StringBuffer buf = new StringBuffer("SELECT ");
                 sqlBuilder.sqlColumns(buf, mapper, attrTypes);
                 sqlBuilder.sqlFrom(buf, typeName);
@@ -1034,11 +1035,11 @@ public class OracleDataStore implements DataStore {
             Filter postFilter, QueryData queryData) throws IOException {
         FeatureReader fReader = getJDBCFeatureReader(queryData);
 
-        if ((postFilter != null) && (postFilter != Filter.NONE)) {
+        if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
             fReader = new FilteringFeatureReader(fReader, postFilter);
         }
 
-        if (postFilter == Filter.ALL) {
+        if (postFilter == Filter.EXCLUDE) {
             return new EmptyFeatureReader(schema);
         }
         
@@ -1588,7 +1589,7 @@ public class OracleDataStore implements DataStore {
      */
     public FeatureWriter getFeatureWriter(String typeName,
             Transaction transaction) throws IOException {
-        return getFeatureWriter(typeName, Filter.NONE, transaction);
+        return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
     }
 
     /**
@@ -1621,7 +1622,7 @@ public class OracleDataStore implements DataStore {
      */
     public FeatureWriter getFeatureWriterAppend(String typeName,
             Transaction transaction) throws IOException {
-        FeatureWriter writer = getFeatureWriter(typeName, Filter.ALL,
+        FeatureWriter writer = getFeatureWriter(typeName, Filter.EXCLUDE,
                 transaction);
 
         while (writer.hasNext()) {
@@ -1662,7 +1663,7 @@ public class OracleDataStore implements DataStore {
             Transaction transaction) throws IOException {
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
-                    + "did you mean Filter.NONE?");
+                    + "did you mean Filter.INCLUDE?");
         }
 
         if (transaction == null) {
@@ -1707,7 +1708,7 @@ public class OracleDataStore implements DataStore {
         }
 
         // chorner: writer shouldn't have a wrapped post filter, otherwise one can't add features.
-        // if ((postFilter != null) && (postFilter != Filter.NONE)) {
+        // if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
         //     writer = new FilteringFeatureWriter(writer, postFilter);
         // }
 

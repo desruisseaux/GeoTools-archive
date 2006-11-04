@@ -17,7 +17,7 @@ package org.geotools.feature.type;
 
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

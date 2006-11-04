@@ -23,6 +23,8 @@ package org.geotools.filter;
  * @source $URL$
  */
 public class SQLEncoderException extends Exception {
+    private static final long serialVersionUID = -2394509611777950167L;
+
     /**
      * Constructor with message argument.
      *

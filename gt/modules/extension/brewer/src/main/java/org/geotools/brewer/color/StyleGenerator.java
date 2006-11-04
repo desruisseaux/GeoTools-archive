@@ -26,10 +26,11 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
+import org.geotools.filter.Filters;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
@@ -407,7 +408,7 @@ public class StyleGenerator {
 
         if (localMin == localMax) {
             // build filter: =
-            CompareFilter eqFilter = ff.createCompareFilter(CompareFilter.COMPARE_EQUALS);
+            CompareFilter eqFilter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
             eqFilter.addLeftValue(expression);
             eqFilter.addRightValue(ff.createLiteralExpression(localMax));
             filter = eqFilter;
@@ -418,7 +419,7 @@ public class StyleGenerator {
             CompareFilter hiBoundFilter = null; // less than
 
             if (localMin != null) {
-                lowBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_GREATER_THAN_EQUAL);
+                lowBoundFilter = ff.createCompareFilter(FilterType.COMPARE_GREATER_THAN_EQUAL);
                 lowBoundFilter.addLeftValue(expression); // x
                 lowBoundFilter.addRightValue(ff.createLiteralExpression(
                         localMin)); // min
@@ -427,9 +428,9 @@ public class StyleGenerator {
             if (localMax != null) {
                 // if this is the global maximum, include the max value
                 if (i == (function.getNumberOfClasses() - 1)) {
-                    hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN_EQUAL);
+                    hiBoundFilter = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
                 } else {
-                    hiBoundFilter = ff.createCompareFilter(CompareFilter.COMPARE_LESS_THAN);
+                    hiBoundFilter = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN);
                 }
 
                 hiBoundFilter.addLeftValue(expression); // x
@@ -438,7 +439,7 @@ public class StyleGenerator {
 
             if ((localMin != null) && (localMax != null)) {
                 andFilter = ff.createLogicFilter(lowBoundFilter, hiBoundFilter,
-                        LogicFilter.LOGIC_AND);
+                        FilterType.LOGIC_AND);
                 filter = andFilter;
             } else if ((localMin == null) && (localMax != null)) {
                 filter = hiBoundFilter;
@@ -545,9 +546,9 @@ public class StyleGenerator {
         Rule[] rule = fts.getRules();
         Rule thisRule = rule[ruleIndex];
         Filter filter = thisRule.getFilter();
-        short filterType = filter.getFilterType();
+        short filterType = Filters.getFilterType( filter );
 
-        if (filterType == Filter.LOGIC_AND) { //ranged expression
+        if (filterType == FilterType.LOGIC_AND) { //ranged expression
                                               //figure out the appropriate values
 
             String[] newValue = styleExpression.split("\\.\\."); //$NON-NLS-1$
@@ -587,13 +588,13 @@ public class StyleGenerator {
             thisRule.setFilter(filter); // style events don't handle filters yet, so fire the change event for filter
 
             //TODO: adjust the previous and next filters (uses isFirst, isLast)
-        } else if ((filterType == Filter.LOGIC_OR)
-                || (filterType == Filter.COMPARE_EQUALS)) { //explicit expression 
+        } else if ((filterType == FilterType.LOGIC_OR)
+                || (filterType == FilterType.COMPARE_EQUALS)) { //explicit expression 
                                                             //obtain the expression containing the attribute
 
             Expression attrExpression;
 
-            if (filterType == Filter.LOGIC_OR) {
+            if (filterType == FilterType.LOGIC_OR) {
                 Iterator iterator = ((LogicFilter) filter).getFilterIterator();
                 attrExpression = ((CompareFilter) iterator.next()).getLeftValue();
             } else { //COMPARE_EQUALS (simple explicit expression)
@@ -611,9 +612,9 @@ public class StyleGenerator {
     }
 
     public static String toStyleExpression(Filter filter) {
-        short filterType = filter.getFilterType();
+        short filterType = Filters.getFilterType( filter );
 
-        if (filterType == Filter.LOGIC_AND) { //looks like a ranged filter
+        if (filterType == FilterType.LOGIC_AND) { //looks like a ranged filter
 
             return toRangedStyleExpression((LogicFilter) filter);
         } else { //it's probably a filter with explicitly defined values
@@ -737,23 +738,23 @@ public class StyleGenerator {
 
         LiteralExpression localMin = ff.createLiteralExpression(strs[0]);
         LiteralExpression localMax = ff.createLiteralExpression(strs[1]);
-        CompareFilter lowerBound = ff.createCompareFilter(Filter.COMPARE_LESS_THAN_EQUAL);
+        CompareFilter lowerBound = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
         lowerBound.addLeftValue(localMin);
         lowerBound.addRightValue(attrib);
 
         CompareFilter upperBound;
 
         if (upperBoundClosed) {
-            upperBound = ff.createCompareFilter(Filter.COMPARE_LESS_THAN_EQUAL);
+            upperBound = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
         } else {
-            upperBound = ff.createCompareFilter(Filter.COMPARE_LESS_THAN);
+            upperBound = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN);
         }
 
         upperBound.addLeftValue(attrib);
         upperBound.addRightValue(localMax);
 
         LogicFilter filter = ff.createLogicFilter(lowerBound, upperBound,
-                Filter.LOGIC_AND);
+                FilterType.LOGIC_AND);
 
         return filter;
     }
@@ -770,7 +771,7 @@ public class StyleGenerator {
         if (filter instanceof LogicFilter) {
             LogicFilter lFilter = (LogicFilter) filter;
 
-            if (lFilter.getFilterType() != Filter.LOGIC_AND) {
+            if (lFilter.getFilterType() != FilterType.LOGIC_AND) {
                 throw new IllegalArgumentException(
                     "Only logic filters constructed using the LOGIC_AND filterType are currently supported by this method.");
             }
@@ -793,31 +794,31 @@ public class StyleGenerator {
             }
 
             //find min and max values
-            short filterType1 = filter1.getFilterType();
-            short filterType2 = filter2.getFilterType();
+            short filterType1 = Filters.getFilterType( filter1 );
+            short filterType2 = Filters.getFilterType( filter2 );
             Expression min1;
             Expression min2;
             Expression max1;
             Expression max2;
 
-            if ((filterType1 == Filter.COMPARE_LESS_THAN)
-                    || (filterType1 == Filter.COMPARE_LESS_THAN_EQUAL)) {
+            if ((filterType1 == FilterType.COMPARE_LESS_THAN)
+                    || (filterType1 == FilterType.COMPARE_LESS_THAN_EQUAL)) {
                 min1 = ((CompareFilter) filter1).getLeftValue();
                 max1 = ((CompareFilter) filter1).getRightValue();
-            } else if ((filterType1 == Filter.COMPARE_GREATER_THAN)
-                    || (filterType1 == Filter.COMPARE_GREATER_THAN_EQUAL)) {
+            } else if ((filterType1 == FilterType.COMPARE_GREATER_THAN)
+                    || (filterType1 == FilterType.COMPARE_GREATER_THAN_EQUAL)) {
                 min1 = ((CompareFilter) filter1).getRightValue();
                 max1 = ((CompareFilter) filter1).getLeftValue();
             } else {
                 throw new IllegalArgumentException("Unsupported FilterType");
             }
 
-            if ((filterType2 == Filter.COMPARE_LESS_THAN)
-                    || (filterType2 == Filter.COMPARE_LESS_THAN_EQUAL)) {
+            if ((filterType2 == FilterType.COMPARE_LESS_THAN)
+                    || (filterType2 == FilterType.COMPARE_LESS_THAN_EQUAL)) {
                 min2 = ((CompareFilter) filter2).getLeftValue();
                 max2 = ((CompareFilter) filter2).getRightValue();
-            } else if ((filterType2 == Filter.COMPARE_GREATER_THAN)
-                    || (filterType2 == Filter.COMPARE_GREATER_THAN_EQUAL)) {
+            } else if ((filterType2 == FilterType.COMPARE_GREATER_THAN)
+                    || (filterType2 == FilterType.COMPARE_GREATER_THAN_EQUAL)) {
                 min2 = ((CompareFilter) filter2).getRightValue();
                 max2 = ((CompareFilter) filter2).getLeftValue();
             } else {
@@ -875,7 +876,7 @@ public class StyleGenerator {
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 
         // create the first filter
-        CompareFilter cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+        CompareFilter cFilter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
         AttributeExpression attribExpr = ff.createAttributeExpression(attributeTypeName);
         cFilter.addLeftValue(attribExpr);
         cFilter.addRightValue(ff.createLiteralExpression(attribValue[0]));
@@ -885,11 +886,11 @@ public class StyleGenerator {
         }
 
         // more than one value exists, so wrap them inside a logical OR
-        LogicFilter lFilter = ff.createLogicFilter(Filter.LOGIC_OR);
+        LogicFilter lFilter = ff.createLogicFilter(FilterType.LOGIC_OR);
         lFilter.addFilter(cFilter);
 
         for (int i = 1; i < attribValue.length; i++) {
-            cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+            cFilter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
             cFilter.addLeftValue(attribExpr);
             cFilter.addRightValue(ff.createLiteralExpression(attribValue[i]));
             lFilter.addFilter(cFilter);
@@ -924,7 +925,7 @@ public class StyleGenerator {
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 
         // create the first filter
-        CompareFilter cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+        CompareFilter cFilter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
         cFilter.addLeftValue(attribExpr);
         cFilter.addRightValue(ff.createLiteralExpression(attribValue[0]));
 
@@ -933,11 +934,11 @@ public class StyleGenerator {
         }
 
         // more than one value exists, so wrap them inside a logical OR
-        LogicFilter lFilter = ff.createLogicFilter(Filter.LOGIC_OR);
+        LogicFilter lFilter = ff.createLogicFilter(FilterType.LOGIC_OR);
         lFilter.addFilter(cFilter);
 
         for (int i = 1; i < attribValue.length; i++) {
-            cFilter = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+            cFilter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
             cFilter.addLeftValue(attribExpr);
             cFilter.addRightValue(ff.createLiteralExpression(attribValue[i]));
             lFilter.addFilter(cFilter);
@@ -958,10 +959,10 @@ public class StyleGenerator {
      * @param filter
      */
     private static String toExplicitStyleExpression(Filter filter) {
-        short filterType = filter.getFilterType();
+        short filterType = Filters.getFilterType( filter );
         String styleExpression = "";
 
-        if (filterType == Filter.COMPARE_EQUALS) {
+        if (filterType == FilterType.COMPARE_EQUALS) {
             // figure out which side is the attributeExpression, and which side
             // is the LiteralExpression
             CompareFilter compareFilter = (CompareFilter) filter;
@@ -978,7 +979,7 @@ public class StyleGenerator {
                 throw new IllegalArgumentException(
                     "Could not extract an Explicit Style Expression from the CompareFilter");
             }
-        } else if (filterType == Filter.LOGIC_OR) {
+        } else if (filterType == FilterType.LOGIC_OR) {
             // descend into the child elements of this filter
             LogicFilter parentFilter = (LogicFilter) filter;
             Iterator iterator = parentFilter.getFilterIterator();

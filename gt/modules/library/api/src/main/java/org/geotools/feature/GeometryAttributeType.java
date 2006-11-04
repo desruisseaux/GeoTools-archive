@@ -16,10 +16,10 @@
 package org.geotools.feature;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //import org.geotools.cs.CoordinateSystem;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**

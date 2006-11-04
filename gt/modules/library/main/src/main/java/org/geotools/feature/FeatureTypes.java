@@ -24,7 +24,9 @@ import java.util.Set;
 
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
@@ -92,9 +94,9 @@ public class FeatureTypes {
         int fieldLen = -1;
         Filter f = type.getRestriction();
         if (f != null
-                && f != Filter.ALL
-                && f != Filter.NONE
-                && (f.getFilterType() == FilterType.COMPARE_LESS_THAN || f.getFilterType() == FilterType.COMPARE_LESS_THAN_EQUAL)) {
+                && f != Filter.EXCLUDE
+                && f != Filter.INCLUDE
+                && (f instanceof PropertyIsLessThan || f instanceof PropertyIsLessThanOrEqualTo)) {
             try {
                 CompareFilter cf = (CompareFilter) f;
                 if (cf.getLeftValue() instanceof LengthFunction) {

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.opengis.feature.type.AssociationDescriptor;
 import org.opengis.feature.type.AssociationType;
 import org.opengis.feature.type.AttributeDescriptor;

@@ -16,7 +16,7 @@
 package org.geotools.feature;
 
 import java.util.List;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**

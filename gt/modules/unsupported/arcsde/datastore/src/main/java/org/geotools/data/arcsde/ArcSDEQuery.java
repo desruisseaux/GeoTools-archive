@@ -27,7 +27,7 @@ import org.geotools.data.Query;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.GeometryEncoderException;
 import org.geotools.filter.GeometryEncoderSDE;
 import org.geotools.filter.SQLEncoderException;
@@ -148,7 +148,7 @@ class ArcSDEQuery {
      * @param schema DOCUMENT ME!
      * @param query DOCUMENT ME!
      *
-     * @return the newly created ArcSDEQuery or null if <code>Filter.ALL ==
+     * @return the newly created ArcSDEQuery or null if <code>Filter.EXCLUDE ==
      *         query.getFilter()</code>.
      *
      * @throws IOException see <i>throws DataSourceException</i> bellow.
@@ -164,7 +164,7 @@ class ArcSDEQuery {
 
         Filter filter = query.getFilter();
 
-        if (filter == Filter.ALL) {
+        if (filter == Filter.EXCLUDE) {
             return null;
         }
 
@@ -962,7 +962,7 @@ class ArcSDEQuery {
 
                 Filter sqlFilter = getSqlFilter();
 
-                if (!Filter.NONE.equals(sqlFilter)) {
+                if (!Filter.INCLUDE.equals(sqlFilter)) {
                     String whereClause = null;
                     SQLEncoderSDE sqlEncoder = new SQLEncoderSDE(this.sdeLayer);
 
@@ -1014,12 +1014,12 @@ class ArcSDEQuery {
          *
          * @return the subset, non geometry related, of the original filter
          *         this datastore implementation supports natively, or
-         *         <code>Filter.NONE</code> if the original Query does not
+         *         <code>Filter.INCLUDE</code> if the original Query does not
          *         contains non spatial filters that we can deal with at the
          *         ArcSDE Java API side.
          */
         public Filter getSqlFilter() {
-            return (this.sqlFilter == null) ? Filter.NONE : this.sqlFilter;
+            return (this.sqlFilter == null) ? Filter.INCLUDE : this.sqlFilter;
         }
 
         /**
@@ -1027,12 +1027,12 @@ class ArcSDEQuery {
          *
          * @return the geometry related subset of the original filter this
          *         datastore implementation supports natively, or
-         *         <code>Filter.NONE</code> if the original Query does not
+         *         <code>Filter.INCLUDE</code> if the original Query does not
          *         contains spatial filters that we can deal with at the
          *         ArcSDE Java API side.
          */
         public Filter getGeometryFilter() {
-            return (this.geometryFilter == null) ? Filter.NONE
+            return (this.geometryFilter == null) ? Filter.INCLUDE
                                                  : this.geometryFilter;
         }
 
@@ -1041,11 +1041,11 @@ class ArcSDEQuery {
          *
          * @return the part of the original filter this datastore
          *         implementation does not supports natively, or
-         *         <code>Filter.NONE</code> if we support the whole Query
+         *         <code>Filter.INCLUDE</code> if we support the whole Query
          *         filter.
          */
         public Filter getUnsupportedFilter() {
-            return (this.unsupportedFilter == null) ? Filter.NONE
+            return (this.unsupportedFilter == null) ? Filter.INCLUDE
                                                     : this.unsupportedFilter;
         }
     }

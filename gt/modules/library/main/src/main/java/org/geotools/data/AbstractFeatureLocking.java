@@ -20,8 +20,7 @@ import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
-
+import org.opengis.filter.Filter;
 
 /**
  * A Starting point for your own FeatureLocking implementations.
@@ -92,7 +91,7 @@ public abstract class AbstractFeatureLocking extends AbstractFeatureStore
      * @see org.geotools.data.FeatureLocking#lockFeatures()
      */
     public int lockFeatures() throws IOException {
-        return lockFeatures(Filter.NONE);
+        return lockFeatures(Filter.INCLUDE);
     }
 
     /**
@@ -108,6 +107,9 @@ public abstract class AbstractFeatureLocking extends AbstractFeatureStore
      */
     public int lockFeatures(Filter filter) throws IOException {
         return lockFeatures(new DefaultQuery(getSchema().getTypeName(),filter));
+    }
+    public int lockFeatures(org.geotools.filter.Filter filter) throws IOException {
+        return lockFeatures((Filter)filter);
     }
 
     /**
@@ -177,7 +179,7 @@ public abstract class AbstractFeatureLocking extends AbstractFeatureStore
      * @see org.geotools.data.FeatureLocking#unLockFeatures()
      */
     public void unLockFeatures() throws IOException {
-        unLockFeatures(Filter.NONE);
+        unLockFeatures(Filter.INCLUDE);
     }
 
     /**

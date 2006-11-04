@@ -270,7 +270,7 @@ final class SqlStatementEncoder {
         sqlBuffer.append(" FROM ");
         sqlBuffer.append(tableName);
 
-        if (filter != null && filter != Filter.NONE) {
+        if (filter != null && filter != Filter.INCLUDE) {
             String where = whereEncoder.encode(filter);
 
             sqlBuffer.append(" ");

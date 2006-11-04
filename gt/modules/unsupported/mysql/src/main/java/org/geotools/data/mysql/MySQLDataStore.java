@@ -159,7 +159,7 @@ public class MySQLDataStore extends JDBCDataStore {
      * @throws IOException if the database cannot be properly accessed
      */
     public FeatureWriter getFeatureWriter(String typeName) throws IOException {
-        return getFeatureWriter(typeName, Filter.NONE, Transaction.AUTO_COMMIT);
+        return getFeatureWriter(typeName, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
 
     /**

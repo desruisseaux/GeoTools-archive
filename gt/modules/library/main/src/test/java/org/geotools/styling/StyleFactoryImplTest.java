@@ -25,6 +25,7 @@ import org.geotools.filter.FilterFactoryFinder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 
 /**
@@ -38,6 +39,8 @@ public class StyleFactoryImplTest extends TestCase {
     static FilterFactory filterFactory = FilterFactoryFinder
         .createFilterFactory();
     static Feature feature;
+    protected static final Logger LOGGER = Logger
+    .getLogger("org.geotools.styling");
 
     public StyleFactoryImplTest(java.lang.String testName) {
         super(testName);
@@ -60,7 +63,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateStyle() {
-        System.out.println("testCreateStyle");
+        LOGGER.finer("testCreateStyle");
 
         styleFactory = StyleFactoryFinder.createStyleFactory();
 
@@ -72,7 +75,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreatePointSymbolizer() {
-        System.out.println("testCreatePointSymbolizer");
+        LOGGER.finer("testCreatePointSymbolizer");
 
         PointSymbolizer ps = styleFactory.createPointSymbolizer();
 
@@ -84,7 +87,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreatePolygonSymbolizer() {
-        System.out.println("testCreatePolygonSymbolizer");
+        LOGGER.finer("testCreatePolygonSymbolizer");
 
         PolygonSymbolizer ps = styleFactory.createPolygonSymbolizer();
 
@@ -96,7 +99,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateLineSymbolizer() {
-        System.out.println("testCreateLineSymbolizer");
+        LOGGER.finer("testCreateLineSymbolizer");
 
         LineSymbolizer ls = styleFactory.createLineSymbolizer();
 
@@ -108,7 +111,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateTextSymbolizer() {
-        System.out.println("testCreateTextSymbolizer");
+        LOGGER.finer("testCreateTextSymbolizer");
 
         TextSymbolizer ts = styleFactory.createTextSymbolizer();
 
@@ -120,7 +123,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateFeatureTypeStyle() {
-        System.out.println("testCreateFeatureTypeStyle");
+        LOGGER.finer("testCreateFeatureTypeStyle");
 
         FeatureTypeStyle fts = styleFactory.createFeatureTypeStyle();
 
@@ -132,7 +135,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateRule() {
-        System.out.println("testCreateRule");
+        LOGGER.finer("testCreateRule");
 
         Rule r = styleFactory.createRule();
 
@@ -144,7 +147,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateStroke() {
-        System.out.println("testCreateStroke");
+        LOGGER.finer("testCreateStroke");
 
         Stroke s = styleFactory.createStroke(filterFactory
                 .createLiteralExpression("#000000"),
@@ -188,7 +191,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateFill() {
-        System.out.println("testCreateFill");
+        LOGGER.finer("testCreateFill");
 
         Fill f = styleFactory.createFill(filterFactory.createLiteralExpression(
                     "#808080"));
@@ -212,7 +215,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateMark() {
-        System.out.println("testCreateMark");
+        LOGGER.finer("testCreateMark");
 
         Mark m = styleFactory.createMark();
 
@@ -224,7 +227,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testGetNamedMarks() {
-        System.out.println("testGetNamedMarks");
+        LOGGER.finer("testGetNamedMarks");
 
         Mark m;
         String[] names = { "Square", "Circle", "Triangle", "Star", "X", "Cross" };
@@ -233,11 +236,11 @@ public class StyleFactoryImplTest extends TestCase {
             try {
                 Class target = styleFactory.getClass();
 
-                //                System.out.println("About to load get"+names[i]+"Mark");
+                //                LOGGER.finer("About to load get"+names[i]+"Mark");
                 Method method = target.getMethod("get" + names[i] + "Mark",
                         (Class[]) null);
 
-                //                System.out.println("got method back " + method.toString());
+                //                LOGGER.finer("got method back " + method.toString());
                 m = (Mark) method.invoke(styleFactory, (Object[]) null);
                 assertNotNull("Failed to get " + names[i] + " mark ", m);
 
@@ -261,7 +264,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateGraphic() {
-        System.out.println("testCreateGraphic");
+        LOGGER.finer("testCreateGraphic");
 
         ExternalGraphic[] externalGraphics = new ExternalGraphic[] {
                 styleFactory.createExternalGraphic("http://www.ccg.leeds.ac.uk/ian/geotools/icons/rail.gif",
@@ -283,7 +286,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateFont() {
-        System.out.println("testCreateFont");
+        LOGGER.finer("testCreateFont");
 
         Expression fontFamily = filterFactory.createLiteralExpression("Times");
         Expression fontStyle = filterFactory.createLiteralExpression("Italic");
@@ -309,7 +312,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateLinePlacement() {
-        System.out.println("testCreateLinePlacement");
+        LOGGER.finer("testCreateLinePlacement");
 
         LinePlacement lp = styleFactory.createLinePlacement(filterFactory
                 .createLiteralExpression(10));
@@ -322,7 +325,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreatePointPlacement() {
-        System.out.println("testCreatePointPlacement");
+        LOGGER.finer("testCreatePointPlacement");
 
         AnchorPoint anchorPoint = styleFactory.createAnchorPoint(filterFactory
                 .createLiteralExpression(1.0),
@@ -353,7 +356,7 @@ public class StyleFactoryImplTest extends TestCase {
      * org.geotools.styling.StyleFactoryImpl.
      */
     public void testCreateHalo() {
-        System.out.println("testCreateHalo");
+        LOGGER.finer("testCreateHalo");
 
         Halo h = styleFactory.createHalo(styleFactory.getDefaultFill(),
                 filterFactory.createLiteralExpression(4));
@@ -367,75 +370,75 @@ public class StyleFactoryImplTest extends TestCase {
     //    
     //    /** Test of getDefaultFill method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultFill() {
-    //        System.out.println("testGetDefaultFill");
+    //        LOGGER.finer("testGetDefaultFill");
     //        
     //    }
     //    
     //    /** Test of getDefaultLineSymbolizer method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultLineSymbolizer() {
-    //        System.out.println("testGetDefaultLineSymbolizer");
+    //        LOGGER.finer("testGetDefaultLineSymbolizer");
     //        
     //        
     //    }
     //    
     //    /** Test of getDefaultMark method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultMark() {
-    //        System.out.println("testGetDefaultMark");
+    //        LOGGER.finer("testGetDefaultMark");
     //        
     //        
     //    }
     //    
     //    /** Test of getDefaultPointSymbolizer method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultPointSymbolizer() {
-    //        System.out.println("testGetDefaultPointSymbolizer");
+    //        LOGGER.finer("testGetDefaultPointSymbolizer");
     //        
     //        
     //    }
     //    
     //    /** Test of getDefaultPolygonSymbolizer method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultPolygonSymbolizer() {
-    //        System.out.println("testGetDefaultPolygonSymbolizer");
+    //        LOGGER.finer("testGetDefaultPolygonSymbolizer");
     //        
     //    }
     //    
     //    /** Test of getDefaultStroke method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultStroke() {
-    //        System.out.println("testGetDefaultStroke");
+    //        LOGGER.finer("testGetDefaultStroke");
     //        
     //        
     //    }
     //    
     //    /** Test of getDefaultStyle method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultStyle() {
-    //        System.out.println("testGetDefaultStyle");
+    //        LOGGER.finer("testGetDefaultStyle");
     //        
     //        
     //    }
     //    
     //    /** Test of getDefaultTextSymbolizer method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultTextSymbolizer() {
-    //        System.out.println("testGetDefaultTextSymbolizer");
+    //        LOGGER.finer("testGetDefaultTextSymbolizer");
     //        
     //        
     //    }
     //    
     //    /** Test of getDefaultFont method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultFont() {
-    //        System.out.println("testGetDefaultFont");
+    //        LOGGER.finer("testGetDefaultFont");
     //        
     //        
     //    }
     //    
     //    /** Test of getDefaultGraphic method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testGetDefaultGraphic() {
-    //        System.out.println("testGetDefaultGraphic");
+    //        LOGGER.finer("testGetDefaultGraphic");
     //        
     //        
     //    }
     //    
     //    /** Test of createRasterSymbolizer method, of class org.geotools.styling.StyleFactoryImpl. */
     //    public void testCreateRasterSymbolizer() {
-    //        System.out.println("testCreateRasterSymbolizer");
+    //        LOGGER.finer("testCreateRasterSymbolizer");
     //        
     //        
     //    }

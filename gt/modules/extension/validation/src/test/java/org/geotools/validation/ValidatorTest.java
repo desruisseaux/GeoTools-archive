@@ -89,7 +89,7 @@ public class ValidatorTest extends TestCase {
     public Feature createInvalidLake() throws Exception {
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
     	
-    	FeatureReader reader = lakes.getFeatures( new DefaultQuery("lakes", Filter.NONE, 1, null, null) ).reader();
+    	FeatureReader reader = lakes.getFeatures( new DefaultQuery("lakes", Filter.INCLUDE, 1, null, null) ).reader();
     	Feature feature = reader.next();
     	reader.close();
     	

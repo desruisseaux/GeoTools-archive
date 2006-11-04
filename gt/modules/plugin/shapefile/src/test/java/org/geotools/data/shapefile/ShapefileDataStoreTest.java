@@ -227,7 +227,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             
             FeatureWriter writer = null;
             try {
-                writer = sds.getFeatureWriter(sds.getTypeNames()[0],Filter.NONE, Transaction.AUTO_COMMIT);
+                writer = sds.getFeatureWriter(sds.getTypeNames()[0],Filter.INCLUDE, Transaction.AUTO_COMMIT);
                 while (writer.hasNext()) {
                     Feature feat = writer.next();
                     Byte b = (Byte) feat.getAttribute(1);
@@ -272,7 +272,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
                 FeatureWriter writer = null;
                 
                 try {
-                    writer = sds.getFeatureWriter(sds.getTypeNames()[0],Filter.NONE, Transaction.AUTO_COMMIT);                
+                    writer = sds.getFeatureWriter(sds.getTypeNames()[0],Filter.INCLUDE, Transaction.AUTO_COMMIT);                
                     writer.next();
                     writer.remove();
                 }
@@ -310,7 +310,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
             while (idx > 0) {
                 FeatureWriter writer = null;
                 try {
-                    writer =  sds.getFeatureWriter(sds.getTypeNames()[0],Filter.NONE, Transaction.AUTO_COMMIT);
+                    writer =  sds.getFeatureWriter(sds.getTypeNames()[0],Filter.INCLUDE, Transaction.AUTO_COMMIT);
                     while (writer.hasNext()) {
                         writer.next();
                     }
@@ -554,7 +554,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
         ShapefileDataStore s = new ShapefileDataStore(url);
         
         // attributes other than geometry can be ignored here
-        Query q = new DefaultQuery(s.getSchema().getTypeName(), Filter.NONE, new String[] {"the_geom"});
+        Query q = new DefaultQuery(s.getSchema().getTypeName(), Filter.INCLUDE, new String[] {"the_geom"});
         FeatureReader fr = s.getFeatureReader(s.getSchema().getTypeName(), q);
         assertEquals(1, fr.getFeatureType().getAttributeCount());
         assertEquals("the_geom", fr.getFeatureType().getAttributeTypes()[0].getName());

@@ -34,7 +34,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -254,10 +254,10 @@ public class AbstractDataStore2 implements DataStore {
         Transaction transaction) throws IOException {
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
-                + "did you mean Filter.NONE?");
+                + "did you mean Filter.INCLUDE?");
         }
 
-        if (filter == Filter.ALL) {
+        if (filter == Filter.EXCLUDE) {
             FeatureType featureType = getSchema(typeName);
 
             return new EmptyFeatureWriter(featureType);
@@ -265,7 +265,7 @@ public class AbstractDataStore2 implements DataStore {
 
         FeatureWriter writer = getFeatureWriter(typeName, transaction);
 
-        if (filter != Filter.NONE) {
+        if (filter != Filter.INCLUDE) {
             writer = new FilteringFeatureWriter(writer, filter);
         }
 

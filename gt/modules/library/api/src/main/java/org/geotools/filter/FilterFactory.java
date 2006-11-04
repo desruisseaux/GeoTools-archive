@@ -28,6 +28,7 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
+import org.opengis.spatialschema.geometry.BoundingBox;
 import org.geotools.factory.Factory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
@@ -395,7 +396,7 @@ public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory
     //
     //      	SPATIAL FILTERS
     //
-    //////////////////////////////////////////////////////////////////////////////    //
+    ////////////////////////////////////////////////////////////////////////////////
 
     /** Checks if the geometry expression overlaps the specified bounding box. */
     BBOX bbox(Expression geometry, double minx, double miny, double maxx, double maxy, String srs);

@@ -134,7 +134,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 		Feature createFeature = createFeature(0,0,NAME_ATT);
 		Map updateProperties=new HashMap(); 
 		updateProperties.put(NAME_ATT, "noMatch");
-		state.addAction(featureType.getTypeName(), new Action.UpdateAction(typename, Filter.NONE, updateProperties));
+		state.addAction(featureType.getTypeName(), new Action.UpdateAction(typename, Filter.INCLUDE, updateProperties));
 		state.addAction(featureType.getTypeName(), new Action.InsertAction(createFeature));
 		updateProperties.put(NAME_ATT, "newName");
 		state.addAction(featureType.getTypeName(), new Action.UpdateAction(typename, 
@@ -160,7 +160,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 		Feature createFeature = createFeature(0,0,NAME_ATT);
 		Map updateProperties=new HashMap(); 
 		updateProperties.put(NAME_ATT, "noMatch");
-		state.addAction(featureType.getTypeName(), new Action.UpdateAction(typename, Filter.NONE, updateProperties));
+		state.addAction(featureType.getTypeName(), new Action.UpdateAction(typename, Filter.INCLUDE, updateProperties));
 		state.addAction(featureType.getTypeName(), new Action.InsertAction(createFeature));
 		updateProperties.put(NAME_ATT, "newName");
 		state.addAction(featureType.getTypeName(), new Action.UpdateAction(typename, 
@@ -206,7 +206,7 @@ public class ProcessEditsBeforeCommitTest extends TestCase {
 		Action.DeleteAction deleteInsert1 = new Action.DeleteAction(typename, createFidFilter);
 
 		//create update actions
-		Action.UpdateAction updateAll = new Action.UpdateAction(typename, Filter.NONE, updateProperties);
+		Action.UpdateAction updateAll = new Action.UpdateAction(typename, Filter.INCLUDE, updateProperties);
 
 		updateProperties.put(NAME_ATT, "newName");
 		Action.UpdateAction updateInsert1 = new Action.UpdateAction(typename, 

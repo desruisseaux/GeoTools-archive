@@ -18,6 +18,8 @@
 
 package org.geotools.filter;
 
+import java.util.logging.Logger;
+
 import org.geotools.filter.parser.ParseException;
 
 /**
@@ -26,6 +28,8 @@ import org.geotools.filter.parser.ParseException;
  * @source $URL$
  */
 public class ExpressionBuilderTest extends FilterTestSupport {
+    protected static final Logger LOGGER = Logger
+    .getLogger("org.geotools.filter");
     
     private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
     
@@ -44,7 +48,7 @@ public class ExpressionBuilderTest extends FilterTestSupport {
      * Test of parse method, of class org.geotools.filter.ExpressionBuilder.
      */
     public void testParseSimpleExpressions() {
-        System.out.println("testSimpleExpressions");
+        LOGGER.finer("testSimpleExpressions");
         try{
             Expression exp = (Expression)ExpressionBuilder.parse("10 + 5");
             assertEquals(15, ((Number)exp.getValue(testFeature)).intValue());
@@ -64,7 +68,7 @@ public class ExpressionBuilderTest extends FilterTestSupport {
      * Test of parse method, of class org.geotools.filter.ExpressionBuilder.
      */
     public void testParseAttributeExpressions() {
-        System.out.println("testAttributeExpressions");
+        LOGGER.finer("testAttributeExpressions");
         try{
             Expression exp = (Expression)ExpressionBuilder.parse("10 + testInteger");
             assertEquals(1012, ((Number)exp.getValue(testFeature)).intValue());
@@ -79,7 +83,7 @@ public class ExpressionBuilderTest extends FilterTestSupport {
      * Test of parse method, of class org.geotools.filter.ExpressionBuilder.
      */
     public void testParseAttributeAndValidateExpressions() {
-        System.out.println("testAttributeExpressions");
+        LOGGER.finer("testAttributeExpressions");
         try{
             Expression exp = (Expression)ExpressionBuilder.parse(testFeature.getFeatureType(),"10 + testInteger");
             assertEquals(1012, ((Number)exp.getValue(testFeature)).intValue());
@@ -99,7 +103,7 @@ public class ExpressionBuilderTest extends FilterTestSupport {
     }
     
     public void testParseComparisonFilters() {
-        System.out.println("testComparisonFilters");
+        LOGGER.finer("testComparisonFilters");
         try{
             Filter filter = (Filter)ExpressionBuilder.parse("5 < 10");
             assertTrue(filter.contains(testFeature));
@@ -114,7 +118,7 @@ public class ExpressionBuilderTest extends FilterTestSupport {
     }
     
     public void testParseBooleanFilters() {
-        System.out.println("testBooleanFilters");
+        LOGGER.finer("testBooleanFilters");
         try{
             Filter filter = (Filter)ExpressionBuilder.parse("5 < 10 AND 1 < 2");
             assertTrue(filter.contains(testFeature));
@@ -139,14 +143,14 @@ public class ExpressionBuilderTest extends FilterTestSupport {
     }
     
     public void testRoundtripFilter(){
-        System.out.println("testRoudtrip");
+        LOGGER.finer("testRoudtrip");
         roundtripFilter("[[[ 3 < 4 ] AND NOT [ 2 < 4 ]] AND [ 5 < 4 ]]");
         roundtripFilter("[3<4  AND  2<4 ] OR 5<4");
         roundtripFilter("3<4 && 2<4");
     }
     
      public void testRoundtripExpression(){
-        System.out.println("testRoudtrip");
+        LOGGER.finer("testRoudtrip");
         roundtripExpression("((2 + 4) / 2)");
         roundtripExpression("(2 + (4 / 2))");
         roundtripExpression("(2 + ((4 / 2) / 1))");
@@ -177,7 +181,7 @@ public class ExpressionBuilderTest extends FilterTestSupport {
      * Test of getFormattedErrorMessage method, of class org.geotools.filter.ExpressionBuilder.
      */
     public void testGetFormattedErrorMessage() {
-        System.out.println("testGetFormattedErrorMessage");
+        LOGGER.finer("testGetFormattedErrorMessage");
         String exp = "12 / ] + 4";
         try{
             ExpressionBuilder.parse(exp);

@@ -289,7 +289,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
 			try {
 				writer = sds.getFeatureWriter(sds.getTypeNames()[0],
-						Filter.NONE, Transaction.AUTO_COMMIT);
+						Filter.INCLUDE, Transaction.AUTO_COMMIT);
 
 				while (writer.hasNext()) {
 					Feature feat = writer.next();
@@ -341,7 +341,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
 				try {
 					writer = sds.getFeatureWriter(sds.getTypeNames()[0],
-							Filter.NONE, Transaction.AUTO_COMMIT);
+							Filter.INCLUDE, Transaction.AUTO_COMMIT);
 					writer.next();
 					writer.remove();
 				} finally {
@@ -380,7 +380,7 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 
 				try {
 					writer = sds.getFeatureWriter(sds.getTypeNames()[0],
-							Filter.NONE, Transaction.AUTO_COMMIT);
+							Filter.INCLUDE, Transaction.AUTO_COMMIT);
 
 					while (writer.hasNext()) {
 						writer.next();

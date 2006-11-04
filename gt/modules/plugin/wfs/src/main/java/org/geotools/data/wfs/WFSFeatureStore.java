@@ -41,7 +41,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -273,7 +273,7 @@ public class WFSFeatureStore extends WFSFeatureSource implements FeatureStore {
             ts = (WFSTransactionState) trans.getState(ds);
         }
 
-        ts.addAction(getSchema().getTypeName(), new DeleteAction(getSchema().getTypeName(), Filter.NONE));
+        ts.addAction(getSchema().getTypeName(), new DeleteAction(getSchema().getTypeName(), Filter.INCLUDE));
         
         Envelope bounds=null;
         while (reader.hasNext()){

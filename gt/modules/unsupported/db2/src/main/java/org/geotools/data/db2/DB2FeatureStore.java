@@ -35,7 +35,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.JDBCFeatureStore;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -85,7 +85,7 @@ public class DB2FeatureStore extends JDBCFeatureStore{
             GeometryAttributeType geomType = getSchema()
                 .getDefaultGeometry();
 
-            if (query.getFilter() != Filter.ALL) {
+            if (query.getFilter() != Filter.EXCLUDE) {
                 String sqlStmt = null;
 
                 try {
@@ -178,7 +178,7 @@ public class DB2FeatureStore extends JDBCFeatureStore{
 			typeName = getSchema().getTypeName();
 			GeometryAttributeType geomType = getSchema().getDefaultGeometry();
 
-			if (filter != Filter.ALL) {
+			if (filter != Filter.EXCLUDE) {
 				DB2SQLBuilder builder = (DB2SQLBuilder) ((DB2DataStore) 
 						getDataStore()).getSqlBuilder(typeName);
 

@@ -22,7 +22,7 @@ import org.geotools.feature.type.TemporalAttributeType;
 import org.geotools.feature.type.TextualAttributeType;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
@@ -100,7 +100,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         } catch (IllegalFilterException e) {
             // TODO something
         }
-        return cf == null ? Filter.ALL : cf;
+        return cf == null ? Filter.EXCLUDE : cf;
     }
     
     /**
@@ -163,7 +163,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
             } catch (IllegalFilterException e) {
                 // TODO something
             }
-            Filter f = cf == null?Filter.ALL:cf;
+            Filter f = cf == null?Filter.EXCLUDE:cf;
             return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue, (CoordinateReferenceSystem) metaData,f);
         }
         return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );

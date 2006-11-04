@@ -30,10 +30,10 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureList;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.SortBy;
+import org.opengis.filter.sort.SortBy;
 import org.geotools.filter.SortOrder;
 import org.opengis.filter.expression.PropertyName;
 
@@ -99,7 +99,7 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
         try {            
             while( it.hasNext() ){
                 Feature feature = (Feature) it.next();
-                if( filter.contains( feature ) ){
+                if( filter.evaluate(feature ) ){
                     fids.add( feature.getID() );
                 }
             }

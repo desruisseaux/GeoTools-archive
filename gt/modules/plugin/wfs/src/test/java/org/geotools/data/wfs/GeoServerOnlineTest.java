@@ -129,7 +129,7 @@ public class GeoServerOnlineTest extends TestCase {
             features.getSchema();
             features.getFeatureType();
             
-            DefaultQuery query = new DefaultQuery( typeName, Filter.NONE, 20, Query.ALL_NAMES, "work already" );
+            DefaultQuery query = new DefaultQuery( typeName, Filter.INCLUDE, 20, Query.ALL_NAMES, "work already" );
             features = source.getFeatures( query );
             features.size();
             features.getCount();
@@ -174,7 +174,7 @@ public class GeoServerOnlineTest extends TestCase {
             features.getSchema();
             features.getFeatureType();
             
-            DefaultQuery query = new DefaultQuery( typeName, Filter.NONE, 20, Query.ALL_NAMES, "work already" );
+            DefaultQuery query = new DefaultQuery( typeName, Filter.INCLUDE, 20, Query.ALL_NAMES, "work already" );
             features = source.getFeatures( query );
             features.size();
             features.getCount();

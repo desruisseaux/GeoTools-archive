@@ -38,12 +38,12 @@ public class BinaryLogicAbstract extends AbstractFilter implements BinaryLogicOp
 		this.children = children;
 	}
 
-	public Filter and(Filter filter) {
-		return factory.and(this,filter);
+	public Filter and(org.opengis.filter.Filter filter) {
+		return factory.and((Filter)this,(Filter)filter);
 	}
 
-	public Filter or(Filter filter) {
-		return factory.or(this,filter);
+	public Filter or(org.opengis.filter.Filter filter) {
+		return factory.or((Filter)this,(Filter)filter);
 	}
 
 	public Filter not() {

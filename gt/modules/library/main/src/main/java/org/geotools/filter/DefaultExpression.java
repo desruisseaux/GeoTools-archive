@@ -83,10 +83,10 @@ public abstract class DefaultExpression extends ExpressionAbstract implements Ex
      * the super implementation is called.
      */
     public Object evaluate(Object object) {
-    	if (object instanceof Feature) {
+        if (object instanceof Feature || object == null) {
     		return evaluate((Feature)object);
     	}
-    	return new Object();
+    	return null;
     }
     
     /**

@@ -173,6 +173,7 @@ public class LiteralExpressionImpl extends DefaultExpression
         this.literal = literal;
     }
     
+    
     /**
      * Gets the value of this literal.
      *
@@ -186,6 +187,10 @@ public class LiteralExpressionImpl extends DefaultExpression
     public Object evaluate(Feature feature)
     	throws IllegalArgumentException {
     	return literal;
+    }
+
+    public Object evaluate(Object feature) {
+        return literal;
     }
 
     /**

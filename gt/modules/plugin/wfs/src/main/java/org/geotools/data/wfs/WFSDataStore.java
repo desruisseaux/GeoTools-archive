@@ -60,8 +60,9 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterType;
+import org.geotools.filter.Filters;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
@@ -544,12 +545,12 @@ public class WFSDataStore extends AbstractDataStore {
             }
 
             if (request.getFilter() != null) {
-                if (request.getFilter().getFilterType() == FilterType.GEOMETRY_BBOX) {
+                if ( Filters.getFilterType(request.getFilter()) == FilterType.GEOMETRY_BBOX) {
                     String bb = printBBoxGet(((GeometryFilter) request.getFilter()),request.getTypeName());
                     if(bb!=null)
                         url += ("&BBOX=" + URLEncoder.encode(bb, "UTF-8"));
                 } else {
-                    if (request.getFilter().getFilterType() == FilterType.FID) {
+                    if (Filters.getFilterType(request.getFilter()) == FilterType.FID) {
                         FidFilter ff = (FidFilter) request.getFilter();
 
                         if ((ff.getFids() != null) && (ff.getFids().length > 0)) {
@@ -561,7 +562,7 @@ public class WFSDataStore extends AbstractDataStore {
                         }
                     } else {
                         // rest
-                        if (request.getFilter() != Filter.NONE && request.getFilter() != Filter.ALL) {
+                        if (request.getFilter() != Filter.INCLUDE && request.getFilter() != Filter.EXCLUDE) {
                             url += "&FILTER=" + URLEncoder.encode(
                                     printFilter(request.getFilter()), "UTF-8");
                         }
@@ -803,9 +804,9 @@ public class WFSDataStore extends AbstractDataStore {
     	// have to figure out which part of the request the server is capable of after removing the parts in the update / delete actions
     	// [server][post]
     	if(q.getFilter() == null)
-    		return new Filter[]{Filter.NONE,Filter.NONE};
+    		return new Filter[]{Filter.INCLUDE,Filter.INCLUDE};
     	if(q.getTypeName() == null || t == null)
-    		return new Filter[]{Filter.NONE,q.getFilter()};
+    		return new Filter[]{Filter.INCLUDE,q.getFilter()};
     	
     	FeatureType ft = getSchema(q.getTypeName());
     	
@@ -828,7 +829,7 @@ public class WFSDataStore extends AbstractDataStore {
 
         if (!found) {
             WFSDataStoreFactory.logger.warning("Could not find typeName: " + ft.getTypeName());
-            return new Filter[]{Filter.NONE,q.getFilter()};
+            return new Filter[]{Filter.INCLUDE,q.getFilter()};
         }
         WFSTransactionState state = (t == Transaction.AUTO_COMMIT)?null:(WFSTransactionState)t.getState(this);
         WFSTransactionAccessor transactionAccessor = null;
@@ -837,7 +838,7 @@ public class WFSDataStore extends AbstractDataStore {
 		PostPreProcessFilterSplittingVisitor wfsfv = new PostPreProcessFilterSplittingVisitor(capabilities
                 .getFilterCapabilities(), ft, transactionAccessor);
 
-        q.getFilter().accept(wfsfv);
+        Filters.accept( q.getFilter(), wfsfv);
 
         Filter[] f = new Filter[2]; 
         f[0] = wfsfv.getFilterPre(); // server
@@ -881,7 +882,7 @@ public class WFSDataStore extends AbstractDataStore {
 	 */
 	public Filter processFilter(Filter filter) {
 		FidFilterVisitor visitor=new FidFilterVisitor(fidMap); 
-		filter.accept(visitor);
+		Filters.accept( filter, visitor );
 		return visitor.getProcessedFilter();
 	}
 

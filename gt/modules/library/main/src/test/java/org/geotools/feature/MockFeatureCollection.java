@@ -22,8 +22,8 @@ import java.util.Iterator;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.feature.visitor.FeatureVisitor;
-import org.geotools.filter.Filter;
-import org.geotools.filter.SortBy;
+import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 import org.geotools.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Geometry;

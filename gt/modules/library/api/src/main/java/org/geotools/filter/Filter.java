@@ -28,110 +28,8 @@ import org.geotools.feature.Feature;
  * @deprecated use {@link org.opengis.filter.Filter}
  */
 public interface Filter extends FilterType, org.opengis.filter.Filter {
-    /**
-     * Implements the semantics of "no filtering", that is, every call to
-     * contains will return true. Logic table:<br>
-     * <pre>
-     * NONE or Filter -> NONE
-     * NONE and Filter -> Filter
-     * not NONE -> ALL
-     * </pre>
-     */
-    static final Filter NONE = new Filter() {
-            public final boolean contains(Feature f) {
-                return evaluate((Feature) f);
-            }
-
-            public boolean evaluate(Feature feature) {
-                return true;
-            }
-
-            public boolean evaluate(Object object) {
-                return true;
-            }
-
-            public final Filter or(Filter f) {
-                return this;
-            }
-
-            public final Filter and(Filter f) {
-                return f;
-            }
-
-            public final Filter not() {
-                return Filter.ALL;
-            }
-
-            public final short getFilterType() {
-                return FilterType.NONE;
-            }
-
-            public final void accept(FilterVisitor v) {
-                v.visit(this);
-            }
-
-            public Object accept(org.opengis.filter.FilterVisitor visitor, Object extraData) {
-                return extraData;
-            }
-
-            public final String toString() {
-                return "Filter.NONE";
-            }
-        };
-
-    /**
-     * Implements the semantics of "filter all", that is, every call to
-     * contains will return false. Logic table:<br>
-     * <pre>
-     * ALL or Filter -> Filter
-     * ALL and Filter -> ALL
-     * not ALL -> NONE
-     * </pre>
-     */
-    static final Filter ALL = new Filter() {
-            /**
-             * @deprecated use {@link #evaluate(org.opengis.feature.Feature)}
-             */
-            public final boolean contains(Feature f) {
-                return evaluate((Feature) f);
-            }
-
-            public boolean evaluate(Feature feature) {
-                return false;
-            }
-
-            public boolean evaluate(Object object) {
-                return false;
-            }
-
-            public final Filter or(Filter f) {
-                return f;
-            }
-
-            public final Filter and(Filter f) {
-                return this;
-            }
-
-            public final Filter not() {
-                return Filter.NONE;
-            }
-
-            public final short getFilterType() {
-                return FilterType.ALL;
-            }
-
-            public final void accept(FilterVisitor v) {
-                v.visit(this);
-            }
-
-            public Object accept(org.opengis.filter.FilterVisitor visitor, Object extraData) {
-                return extraData;
-            }
-
-            public final String toString() {
-                return "Filter.ALL";
-            }
-        };
+    static final org.opengis.filter.Filter ALL = org.opengis.filter.Filter.EXCLUDE;
+    static final org.opengis.filter.Filter NONE = org.opengis.filter.Filter.INCLUDE;
 
     /**
      * Evaluates the filter against an instance of {@link Feature}.
@@ -192,7 +90,7 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
      *
      * @return Combined filter.
      */
-    Filter and(Filter filter);
+    Filter and(org.opengis.filter.Filter filter);
 
     /**
      * Implements a logical OR with this filter and returns the merged filter.
@@ -201,7 +99,7 @@ public interface Filter extends FilterType, org.opengis.filter.Filter {
      *
      * @return Combined filter.
      */
-    Filter or(Filter filter);
+    Filter or(org.opengis.filter.Filter filter);
 
     /**
      * Implements a logical NOT with this filter and returns the negated filter

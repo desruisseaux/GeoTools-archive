@@ -18,7 +18,7 @@
 package org.geotools.styling;
 
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 

@@ -15,6 +15,8 @@
  */
 package org.geotools.filter.function;
 
+import java.util.logging.Logger;
+
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Expression;
@@ -28,7 +30,8 @@ import org.geotools.filter.parser.ParseException;
  * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/test/org/geotools/filter/function/EqualIntervalFunctionTest.java $
  */
 public class StandardDeviationFunctionTest extends FunctionTestSupport {
-   
+    private static final Logger LOGGER = Logger.getLogger(
+    "org.geotools.filter");
     
     public StandardDeviationFunctionTest(String testName) {
         super(testName);
@@ -50,12 +53,12 @@ public class StandardDeviationFunctionTest extends FunctionTestSupport {
     
     public void testGetName() {
         FunctionExpression equInt = FilterFactoryFinder.createFilterFactory().createFunctionExpression("StandardDeviation");
-        System.out.println("testGetName");
+        LOGGER.finer("testGetName");
         assertEquals("StandardDeviation",equInt.getName());
     }
     
     public void testSetNumberOfClasses() throws Exception{
-        System.out.println("testSetNumberOfClasses");
+        LOGGER.finer("testSetNumberOfClasses");
         
         Expression classes = (Expression)builder.parse(dataType, "3");
         Expression exp = (Expression)builder.parse(dataType, "foo");
@@ -68,7 +71,7 @@ public class StandardDeviationFunctionTest extends FunctionTestSupport {
     }
     
     public void testCalculateSlot() throws ParseException {
-        System.out.println("testCalculateSlot");
+        LOGGER.finer("testCalculateSlot");
         Expression classes = (Expression)builder.parse(dataType, "3");
         Expression exp = (Expression)builder.parse(dataType, "foo");
         FunctionExpression func = fac.createFunctionExpression("StandardDeviation");
@@ -78,13 +81,13 @@ public class StandardDeviationFunctionTest extends FunctionTestSupport {
         while(list.hasNext()){
             Feature f = list.next();
             int slot = ((Number)func.getValue(f)).intValue();
-            System.out.println(slot);
+            LOGGER.finer( String.valueOf(slot));
         }
         
     }
     
     public void testGetValue() throws Exception{
-        System.out.println("testGetValue");
+        LOGGER.finer("testGetValue");
         Expression classes = (Expression)builder.parse(dataType, "5");
         Expression exp = (Expression)builder.parse(dataType, "foo");
         FunctionExpression func = fac.createFunctionExpression("StandardDeviation");

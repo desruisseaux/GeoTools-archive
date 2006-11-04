@@ -27,6 +27,7 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterVisitor2;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
@@ -35,6 +36,8 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.IncludeFilter;
 
 
 /**
@@ -43,7 +46,7 @@ import org.geotools.filter.NullFilter;
  * @author Jody Garnett, Refractions Research Inc.
  * @source $URL$
  */
-public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
+public class DuplicatorFilterVisitor extends AbstractFilterVisitor implements FilterVisitor2 {
     Stack pages = new Stack(); // need a Stack as Filter structure is recursive
     FilterFactory ff;
 	private boolean strict;
@@ -58,7 +61,7 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
      */
     public DuplicatorFilterVisitor(FilterFactory factory) {
        	this(factory,true);
-    }    
+    }
     /**
      * New instance
      * @param factory factory to use for creating the filters.
@@ -74,12 +77,19 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
         ff = factory;
     }
 
+    public void visit( IncludeFilter filter ){
+        pages.push( Filter.INCLUDE );
+    }
+    public void visit( ExcludeFilter filter ){
+        pages.push( Filter.EXCLUDE );
+    }
+    
     public void visit(Filter filter) {
-    	if( filter==Filter.NONE){
-    		pages.push(Filter.NONE);
+    	if( filter==Filter.INCLUDE){
+    		pages.push(Filter.INCLUDE);
     		return;
-    	}else if( filter==Filter.ALL){
-    		pages.push(Filter.ALL);
+    	}else if( filter==Filter.EXCLUDE){
+    		pages.push(Filter.EXCLUDE);
     		return;
     	}
     	if( strict )
@@ -320,6 +330,7 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor {
     }
 
     public Object getCopy() {
+        if( pages.isEmpty() ) return null;
         return pages.firstElement();
     }
 }

@@ -173,7 +173,7 @@ public class Rendering2DTest extends TestCase {
 		myStroke.setColor(filterFactory.createLiteralExpression("#0000ff"));
 		myStroke
 				.setWidth(filterFactory.createLiteralExpression(new Integer(5)));
-		LOGGER.info("got new Stroke " + myStroke);
+		LOGGER.fine("got new Stroke " + myStroke);
 		linesym.setStroke(myStroke);
 		return linesym;
 	}
@@ -295,7 +295,7 @@ public class Rendering2DTest extends TestCase {
 
 	public void testSimplePolygonRender() throws Exception {
 
-		LOGGER.info("starting rendering2DTest");
+		LOGGER.finer("starting rendering2DTest");
 
 		// ////////////////////////////////////////////////////////////////////
 		//
@@ -530,7 +530,7 @@ public class Rendering2DTest extends TestCase {
 
 		RendererBaseTest.showRender("testReprojection", renderer, 1000, bounds);
 
-		LOGGER.info(stringBuffer.toString());
+		LOGGER.finer(stringBuffer.toString());
 
 	}
 
@@ -541,7 +541,7 @@ public class Rendering2DTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		LOGGER.info("starting testLiteRender2");
+		LOGGER.finer("starting testLiteRender2");
 		final GeometryFactory geomFac = new GeometryFactory(
 				PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
 		final FeatureCollection ft = createTestFeatureCollection(
@@ -610,7 +610,7 @@ public class Rendering2DTest extends TestCase {
 		//
 		//
 		// /////////////////////////////////////////////////////////////////
-		LOGGER.info("starting testLiteRender2");
+		LOGGER.finer("starting testLiteRender2");
 		final GeometryFactory geomFac = new GeometryFactory(
 				PackedCoordinateSequenceFactory.DOUBLE_FACTORY);
 		final FeatureCollection ft = createTestFeatureCollection(
@@ -707,7 +707,7 @@ public class Rendering2DTest extends TestCase {
 		//
 		// // this is the reader that StreamingRenderer obtains after applying
 		// // the mixed filter to a given layer.
-		// Filter filter = Filter.NONE;
+		// Filter filter = Filter.INCLUDE;
 		// FilterFactory ffac = FilterFactoryFinder.createFilterFactory();
 		//
 		// // test maxFeatures, render just the first 2 features
@@ -821,7 +821,7 @@ public class Rendering2DTest extends TestCase {
 		// // this is the reader that StreamingRenderer obtains after applying
 		// // the mixed filter to a given layer.
 		// FeatureReader reader;
-		// Filter filter = Filter.NONE;
+		// Filter filter = Filter.INCLUDE;
 		// FilterFactory ffac = FilterFactoryFinder.createFilterFactory();
 		//
 		// // test maxFeatures, render just the first 2 features

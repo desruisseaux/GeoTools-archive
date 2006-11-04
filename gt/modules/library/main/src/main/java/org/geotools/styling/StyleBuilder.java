@@ -30,6 +30,8 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsLessThan;
 
 /**
  * An utility class designed to ease style building by convinience methods.
@@ -1741,9 +1743,9 @@ public class StyleBuilder {
 
         //        ret.setName(name);
         Rule[] rules = new Rule[colors.length + 1];
-        CompareFilter cf1 = ff.createCompareFilter(AbstractFilter.COMPARE_LESS_THAN);
-        cf1.addLeftValue(value);
-        cf1.addRightValue(ff.createLiteralExpression(breaks[0]));
+        
+        PropertyIsLessThan cf1 = ff.less( value, ff.literal( breaks[0] ));        
+        
         LOGGER.fine(cf1.toString());
         rules[0] = sf.createRule();
         rules[0].setFilter(cf1);
@@ -1765,6 +1767,7 @@ public class StyleBuilder {
             cf.addLeftValue(ff.createLiteralExpression(breaks[i - 1]));
             cf.addRightValue(ff.createLiteralExpression(breaks[i]));
             cf.addMiddleValue(value);
+            
             LOGGER.fine(cf.toString());
             c = this.createColor(colors[i]);
             LOGGER.fine("color " + c.toString());
@@ -1779,9 +1782,8 @@ public class StyleBuilder {
             LOGGER.fine("added class " + breaks[i - 1] + "->" + breaks[i] + " " + colors[i]);
         }
 
-        CompareFilter cf2 = ff.createCompareFilter(AbstractFilter.COMPARE_GREATER_THAN_EQUAL);
-        cf2.addLeftValue(value);
-        cf2.addRightValue(ff.createLiteralExpression(breaks[colors.length - 2]));
+        PropertyIsGreaterThan cf2 = ff.greater( value, ff.literal(breaks[colors.length - 2]));
+        
         LOGGER.fine(cf2.toString());
         rules[colors.length - 1] = sf.createRule();
         rules[colors.length - 1].setFilter(cf2);

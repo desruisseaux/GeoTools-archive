@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import org.geotools.data.view.DefaultView;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -314,7 +314,7 @@ public abstract class AbstractDataStore implements DataStore {
 
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
-                + "did you mean Filter.NONE?");
+                + "did you mean Filter.INCLUDE?");
         }
         if( typeName == null ){
             throw new NullPointerException(
@@ -337,14 +337,14 @@ public abstract class AbstractDataStore implements DataStore {
 
             }
         }
-        if ( filter == Filter.ALL || filter.equals( Filter.ALL )) {
+        if ( filter == Filter.EXCLUDE || filter.equals( Filter.EXCLUDE )) {
             return new EmptyFeatureReader(featureType);
         }
         //GR: allow subclases to implement as much filtering as they can,
         //by returning just it's unsupperted filter
         filter = getUnsupportedFilter(typeName, filter);
         if(filter == null){
-            throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.NONE?");
+            throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.INCLUDE?");
         }
 
         // This calls our subclass "simple" implementation
@@ -358,7 +358,7 @@ public abstract class AbstractDataStore implements DataStore {
             reader = new DiffFeatureReader(reader, diff, query.getFilter());
         }
 
-        if (!filter.equals( Filter.NONE ) ) {
+        if (!filter.equals( Filter.INCLUDE ) ) {
             reader = new FilteringFeatureReader(reader, filter);
         }
 
@@ -395,7 +395,7 @@ public abstract class AbstractDataStore implements DataStore {
      * FilteringFeatureReader will be constructed upon it. Otherwise it will
      * just return the same filter.
      * <p>
-     * If the complete filter is supported, the subclass must return <code>Filter.NONE</code>
+     * If the complete filter is supported, the subclass must return <code>Filter.INCLUDE</code>
      * </p>
      */
     protected Filter getUnsupportedFilter(String typeName, Filter filter)
@@ -410,7 +410,7 @@ public abstract class AbstractDataStore implements DataStore {
         Filter filter, Transaction transaction) throws IOException {
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
-                + "did you mean Filter.NONE?");
+                + "did you mean Filter.INCLUDE?");
         }
 
         if (featureType == null) {
@@ -425,7 +425,7 @@ public abstract class AbstractDataStore implements DataStore {
                 + "did you mean to use Transaction.AUTO_COMMIT?");
         }
 
-        if (filter == Filter.ALL) {
+        if (filter == Filter.EXCLUDE) {
             return new EmptyFeatureReader(featureType);
         }
 
@@ -433,7 +433,7 @@ public abstract class AbstractDataStore implements DataStore {
 
         FeatureReader reader = getFeatureReader(typeName);
 
-        if (filter != Filter.NONE) {
+        if (filter != Filter.INCLUDE) {
             reader = new FilteringFeatureReader(reader, filter);
         }
 
@@ -470,10 +470,10 @@ public abstract class AbstractDataStore implements DataStore {
         Transaction transaction) throws IOException {
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
-                + "did you mean Filter.NONE?");
+                + "did you mean Filter.INCLUDE?");
         }
 
-        if (filter == Filter.ALL) {
+        if (filter == Filter.EXCLUDE) {
             FeatureType featureType = getSchema(typeName);
 
             return new EmptyFeatureWriter(featureType);
@@ -504,7 +504,7 @@ public abstract class AbstractDataStore implements DataStore {
             writer = lockingManager.checkedWriter(writer, transaction);
         }
 
-        if (filter != Filter.NONE) {
+        if (filter != Filter.INCLUDE) {
             writer = new FilteringFeatureWriter(writer, filter);
         }
 
@@ -517,7 +517,7 @@ public abstract class AbstractDataStore implements DataStore {
     public FeatureWriter getFeatureWriter(String typeName,
         Transaction transaction) throws IOException {
 
-    	return getFeatureWriter(typeName, Filter.NONE, transaction);
+    	return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
     }
 
     /* (non-Javadoc)

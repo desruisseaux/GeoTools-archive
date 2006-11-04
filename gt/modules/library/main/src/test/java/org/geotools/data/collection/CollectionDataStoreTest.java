@@ -37,7 +37,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -247,7 +247,7 @@ public class CollectionDataStoreTest extends DataTestCase {
         assertEquals(type, reader.getFeatureType());
         assertEquals(roadFeatures.length, count(reader));
 
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.ALL), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), Transaction.AUTO_COMMIT);
         assertTrue(reader instanceof EmptyFeatureReader);
 
         assertEquals(type, reader.getFeatureType());
@@ -265,7 +265,7 @@ public class CollectionDataStoreTest extends DataTestCase {
         FeatureType type = data.getSchema("road");
         FeatureReader reader;
 
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.ALL), t);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
         assertTrue(reader instanceof EmptyFeatureReader);
         assertEquals(type, reader.getFeatureType());
         assertEquals(0, count(reader));
@@ -281,7 +281,7 @@ public class CollectionDataStoreTest extends DataTestCase {
         assertEquals(1, count(reader));
 
         TransactionStateDiff state = (TransactionStateDiff) t.getState(data);
-        FeatureWriter writer = state.writer("road", Filter.NONE);
+        FeatureWriter writer = state.writer("road", Filter.INCLUDE);
         Feature feature;
 
         while (writer.hasNext()) {
@@ -292,7 +292,7 @@ public class CollectionDataStoreTest extends DataTestCase {
             }
         }
 
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.ALL), t);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
         assertEquals(0, count(reader));
 
         reader = data.getFeatureReader(new DefaultQuery("road"), t);
@@ -302,7 +302,7 @@ public class CollectionDataStoreTest extends DataTestCase {
         assertEquals(0, count(reader));
 
         t.rollback();
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.ALL), t);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
         assertEquals(0, count(reader));
 
         reader = data.getFeatureReader(new DefaultQuery("road"), t);

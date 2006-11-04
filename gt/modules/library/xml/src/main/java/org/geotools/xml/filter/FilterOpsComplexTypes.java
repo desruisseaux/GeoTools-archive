@@ -74,7 +74,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class FilterOpsComplexTypes {    
     
-    protected static void encodeFilter(Filter filter, PrintHandler output, Map hints) throws OperationNotSupportedException, IOException{
+    protected static void encodeFilter(org.opengis.filter.Filter filter, PrintHandler output, Map hints) throws OperationNotSupportedException, IOException{
 
         if (filter instanceof LogicFilter) {
             FilterType.elems[2].getType().encode(FilterType.elems[2], filter, output, hints);
@@ -761,7 +761,7 @@ public class FilterOpsComplexTypes {
                 if( value.length==1 )
                     return value[0].getValue();
                 if( value.length==0 )
-                    return Filter.ALL;
+                    return Filter.EXCLUDE;
                 try{
                     FilterFactory fac=FilterFactoryFinder.createFilterFactory();
                     LogicFilter filter=fac.createLogicFilter(FilterType.LOGIC_OR);
@@ -831,11 +831,11 @@ public class FilterOpsComplexTypes {
                 return;
             }
 
-            if (filter == Filter.NONE) {
+            if (filter == Filter.INCLUDE) {
                 return;
             }
 
-            if (filter == Filter.ALL) {
+            if (filter == Filter.EXCLUDE) {
                 return;
             }
 
@@ -848,8 +848,9 @@ public class FilterOpsComplexTypes {
             }
             FilterEncodingPreProcessor visitor=getFilterEncodingPreProcessor(hints);
             filter.accept(visitor);
-            if( !visitor.getFilter().equals(Filter.ALL) )
+            if( !visitor.getFilter().equals(Filter.EXCLUDE) ){
             	encodeFilter(visitor.getFilter(),output,hints);
+            }
             encodeFilter(visitor.getFidFilter(), output, hints);
             
             if (element != null) {

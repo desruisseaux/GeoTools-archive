@@ -254,17 +254,17 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
     }
     
     Object aggregate(String aggregate, Expression expression) throws IOException {
-        Filter filter = query.getFilter();
+        Filter filter = (Filter) query.getFilter();
 
-        if (filter == Filter.ALL) {
+        if (filter == Filter.EXCLUDE) {
             return null;
         }
 
         JDBC1DataStore jdbc = getDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(this.getSchema().getTypeName());
 
-        Filter postFilter = sqlBuilder.getPostQueryFilter(query.getFilter()); 
-        if (postFilter != null && postFilter != Filter.NONE) {
+        Filter postFilter = (Filter) sqlBuilder.getPostQueryFilter(query.getFilter()); 
+        if (postFilter != null && postFilter != Filter.INCLUDE) {
             // this would require postprocessing the filter
             // so we cannot optimize
             return null;

@@ -76,8 +76,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.geotools.filter.FilterType;
+import org.geotools.filter.Filters;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.jts.JTS;
@@ -392,7 +395,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         // gather attributes needed by the query too, they will be used by the
         // query filter
         StyleAttributeExtractor extractor = new StyleAttributeExtractor();
-        query.getFilter().accept(extractor);
+        Filters.accept( query.getFilter(), extractor);
         String[] filterAttnames = extractor.getAttributeNames();
 
         // check if the geometry is the one and only attribute needed
@@ -887,7 +890,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     }
 
     protected Envelope getBounds(Query query) throws IOException {
-        if (query.getFilter().equals(Filter.NONE)) {
+        if (query.getFilter().equals(Filter.INCLUDE)) {
             return getBounds();
         }
 
@@ -982,7 +985,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
      * @see org.geotools.data.AbstractDataStore#getCount(org.geotools.data.Query)
      */
     protected int getCount(Query query) throws IOException {
-        if (query.getFilter() == Filter.NONE) {
+        if (query.getFilter() == Filter.INCLUDE) {
             ShapefileReader reader = new ShapefileReader(getReadChannel(shpURL),
                     readWriteLock);
             int count = -1;
@@ -1031,9 +1034,9 @@ public class ShapefileDataStore extends AbstractFileDataStore {
             int fieldLen = -1;
             Filter f = type.getRestriction();
 
-            if ((f != null) && (f != Filter.ALL) && (f != Filter.NONE)
-                    && ((f.getFilterType() == FilterType.COMPARE_LESS_THAN)
-                    || (f.getFilterType() == FilterType.COMPARE_LESS_THAN_EQUAL))) {
+            if (f != null && f != Filter.EXCLUDE && f != Filter.INCLUDE &&
+                    ( (f instanceof PropertyIsLessThan )
+                      || (f instanceof PropertyIsLessThanOrEqualTo))) {
                 try {
                     CompareFilter cf = (CompareFilter) f;
 

@@ -177,7 +177,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
 
         fr.close();
     	System.out.println("Update Modify");
-    	fs.modifyFeatures(at,newValue,Filter.NONE);
+    	fs.modifyFeatures(at,newValue,Filter.INCLUDE);
 
     	System.out.println("Update Read 2");
     	fr = fs.getFeatures(f).features();
@@ -208,7 +208,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
             assertEquals(count2, count3);
         } finally {
             // cleanup
-            fs.modifyFeatures(at, oldValue, Filter.NONE);
+            fs.modifyFeatures(at, oldValue, Filter.INCLUDE);
             t.commit();
         }
     }

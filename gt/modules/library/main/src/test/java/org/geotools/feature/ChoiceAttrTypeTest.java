@@ -70,7 +70,7 @@ public class ChoiceAttrTypeTest extends TestCase {
 
     public void testEquals() {
         AttributeType typeA = SampleFeatureFixtures.getChoiceAttrType1();
-        LOGGER.info("created: " + typeA);
+        LOGGER.finer("created: " + typeA);
 
         AttributeType typeB = SampleFeatureFixtures.getChoiceAttrType1();
         AttributeType typeC = SampleFeatureFixtures.getChoiceAttrType2();
@@ -103,7 +103,7 @@ public class ChoiceAttrTypeTest extends TestCase {
 	type2 = SampleFeatureFixtures.createChoiceAttrType("testAtt2", choices);
         //if one choice is nillable then the overall choice should be.
 	assertEquals(true, type.isNillable());
-	LOGGER.info("type is: " + type + "\ntype2 is: " + type2);
+	LOGGER.finer("type is: " + type + "\ntype2 is: " + type2);
 	//a choice between two non nillable choices should not be nillable
 	type = SampleFeatureFixtures.createChoiceAttrType("choiceTest2", choices);
         type = choices[1] = AttributeTypeFactory.newAttributeType("tester", String.class, false);

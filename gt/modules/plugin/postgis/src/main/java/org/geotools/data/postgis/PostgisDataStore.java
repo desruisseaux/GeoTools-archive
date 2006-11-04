@@ -68,7 +68,9 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
@@ -693,7 +695,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             throw new IOException("Type " + typeName + " does match request");
         }
 
-        if ((filter == Filter.ALL) || filter.equals(Filter.ALL)) {
+        if ((filter == Filter.EXCLUDE) || filter.equals(Filter.EXCLUDE)) {
             return new EmptyFeatureReader(requestType);
         }
         
@@ -1336,7 +1338,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 } else if (typeName.equals("VARCHAR")) {
                 	int length = -1;
                 	Filter f = attributeType[i].getRestriction();
-                	if(f !=null && f!=Filter.ALL && f != Filter.NONE && (f.getFilterType() == FilterType.COMPARE_LESS_THAN || f.getFilterType() == FilterType.COMPARE_LESS_THAN_EQUAL)){
+                	if(f != null && f !=Filter.EXCLUDE && f != Filter.INCLUDE &&
+                       (f instanceof PropertyIsLessThan || f instanceof PropertyIsLessThanOrEqualTo)){
                 		try{
                 		CompareFilter cf = (CompareFilter)f;
                 		if(cf.getLeftValue() instanceof LengthFunction){
@@ -1585,7 +1588,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     public FeatureWriter getFeatureWriter(String typeName,
         Transaction transaction) throws IOException {
-        return getFeatureWriter(typeName, Filter.NONE, transaction);
+        return getFeatureWriter(typeName, Filter.INCLUDE, transaction);
     }
 
     /*
@@ -1625,7 +1628,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     public FeatureWriter getFeatureWriterAppend(String typeName,
         Transaction transaction) throws IOException {
-        FeatureWriter writer = getFeatureWriter(typeName, Filter.ALL,
+        FeatureWriter writer = getFeatureWriter(typeName, Filter.EXCLUDE,
                 transaction);
 
         while (writer.hasNext()) {

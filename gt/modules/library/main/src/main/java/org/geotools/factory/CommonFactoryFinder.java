@@ -21,6 +21,7 @@ import java.util.Set;
 
 // Geotools dependencies
 import org.geotools.styling.StyleFactory;
+import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.resources.LazySet;
 
 // OpenGIS dependencies

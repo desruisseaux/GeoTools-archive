@@ -321,10 +321,14 @@ public class SQLUnpackerTest extends SQLFilterTestSupport {
         Filter hugeAndFilter = (bigAndFilter.and(andFilter)).and(bigOrFilter);
         unpacker.unPackAND(hugeAndFilter);
 
-        //two comps should be supported; geom, or and bigOr unsupported
-        //(compFilter AND compFilter, geomFilter AND orFilter AND orFilter AND bigOrFilter)
-        assertEquals((compFilter.and(compFilter)), unpacker.getSupported());
-        assertEquals((((geomFilter.and(orFilter)).and(orFilter)).and(
-                bigOrFilter)), unpacker.getUnSupported());
+        // two comps should be supported; geom, or and bigOr unsupported
+        // (compFilter AND compFilter, geomFilter AND orFilter AND orFilter AND bigOrFilter)
+        assertEquals( (compFilter.and(compFilter)), unpacker.getSupported() );
+        
+        Filter expected = (((geomFilter.and(orFilter)).and(orFilter)).and(
+                bigOrFilter));
+        org.opengis.filter.Filter unsupported = unpacker.getUnSupported();
+
+        assertEquals( expected, unsupported );
     }
 }

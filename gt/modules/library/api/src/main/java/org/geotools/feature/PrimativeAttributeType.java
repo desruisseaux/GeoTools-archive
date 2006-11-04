@@ -15,7 +15,7 @@
  */
 package org.geotools.feature;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -37,10 +37,10 @@ public interface PrimativeAttributeType extends AttributeType {
      *
      * Examples may include Length <= 20 (VARCHAR 20)
      *
-     * The Default value is Filter.ALL
+     * The Default value is Filter.EXCLUDE
      *
      * @return the restriction for applied to this attribute type, or
-     * Filter.ALL. Mat not be null.
+     * Filter.EXCLUDE. Mat not be null.
      *
      * @see Filter
      * @see Filter#ALL

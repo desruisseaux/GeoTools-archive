@@ -28,7 +28,8 @@ import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
 import org.geotools.data.ows.WFSCapabilities;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.geotools.filter.Filters;
 import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor.WFSBBoxFilterVisitor;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
@@ -89,7 +90,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
     }
 
     protected FeatureReader wrapWithFilteringFeatureReader(Filter postFilter, FeatureReader reader, Filter processedFilter) {
-        if (!postFilter.equals( Filter.NONE ) ) {
+        if (!postFilter.equals( Filter.INCLUDE ) ) {
             return new FilteringFeatureReader(reader, postFilter);
         }
         return reader;
@@ -203,10 +204,10 @@ class NonStrictWFSStrategy implements WFSStrategy {
         // Rewrite request if we have a mxxbox
         if(maxbbox!=null){
             WFSBBoxFilterVisitor clipVisitor = new WFSBBoxFilterVisitor(maxbbox);
-            serverFilter.accept(clipVisitor);
+            Filters.accept( serverFilter, clipVisitor );
         } else { // give up an request everything
             WFSDataStoreFactory.logger.log( Level.FINE, "Unable to clip your query against the latlongboundingbox element" );
-            // filters[0] = Filter.ALL; // uncoment this line to just give up
+            // filters[0] = Filter.EXCLUDE; // uncoment this line to just give up
         }
         return dataCRS;
     }

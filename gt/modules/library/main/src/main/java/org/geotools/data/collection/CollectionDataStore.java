@@ -30,7 +30,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -136,7 +136,7 @@ public class CollectionDataStore extends AbstractDataStore {
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
                 Feature feature = iterator.next();
 
-                if (filter.contains(feature)) {
+                if (filter.evaluate(feature)) {
                     count++;
                     envelope.expandToInclude(feature.getDefaultGeometry().getEnvelopeInternal());
                 }
@@ -162,7 +162,7 @@ public class CollectionDataStore extends AbstractDataStore {
             Filter filter = query.getFilter();
 
             while (iterator.hasNext() && (count < query.getMaxFeatures())) {
-                if (filter.contains(iterator.next())) {
+                if (filter.evaluate(iterator.next())) {
                     count++;
                 }
             }

@@ -24,7 +24,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  *
@@ -43,7 +43,7 @@ public class DefaultQueryTest extends TestCase {
     }
     
     public void testFullConstructor(){
-        DefaultQuery query = new DefaultQuery("mytype", Filter.NONE, 10, new String[] {"foo"}, "myquery");
+        DefaultQuery query = new DefaultQuery("mytype", Filter.INCLUDE, 10, new String[] {"foo"}, "myquery");
         assertNotNull(query);
     }
     
@@ -64,7 +64,7 @@ public class DefaultQueryTest extends TestCase {
         query.setPropertyNames((List)null);
         assertNull(query.getPropertyNames());
         
-        query = new DefaultQuery( "Test", Filter.NONE, new String[]{"foo", "wibble"});
+        query = new DefaultQuery( "Test", Filter.INCLUDE, new String[]{"foo", "wibble"});
         assertNotNull(query.getPropertyNames());
     }
     
@@ -104,11 +104,11 @@ public class DefaultQueryTest extends TestCase {
     public void testFilter() {
         System.out.println("testGetFilter");
         DefaultQuery query = new DefaultQuery();
-        query.setFilter(Filter.ALL);
-        assertEquals(Filter.ALL, query.getFilter());
+        query.setFilter(Filter.EXCLUDE);
+        assertEquals(Filter.EXCLUDE, query.getFilter());
         
-        query = new DefaultQuery( "test", Filter.NONE);
-        assertEquals(Filter.NONE, query.getFilter());
+        query = new DefaultQuery( "test", Filter.INCLUDE);
+        assertEquals(Filter.INCLUDE, query.getFilter());
     }
     
     
@@ -121,7 +121,7 @@ public class DefaultQueryTest extends TestCase {
         query.setTypeName("foobar");
         assertEquals("foobar", query.getTypeName());
         
-        query = new DefaultQuery("mytype", Filter.ALL);
+        query = new DefaultQuery("mytype", Filter.EXCLUDE);
         assertEquals("mytype", query.getTypeName());
     }
     
@@ -154,7 +154,7 @@ public class DefaultQueryTest extends TestCase {
         query.setHandle("myquery");
         assertNotNull(query.toString());
         
-        query.setFilter(Filter.ALL);
+        query.setFilter(Filter.EXCLUDE);
         assertNotNull(query.toString());
         
         query.setPropertyNames(new String[]{"foo", "bar"});

@@ -17,11 +17,17 @@ package org.geotools.filter;
 
 
 /**
- * The FilterType interface lists all the possible type of filter. Should be
- * replaced by a type safe enum when we move to Java 1.5
+ * The FilterType interface lists all the possible type of filter.
+ * <p>
+ * Example:<pre><code>
+ * BEFORE: filter.getFilterType() == FilterType.GEOMETRY_CONTAINS
+ * QUICK:  Filters.getFilterType( filter ) == FilterType.GEOMETRY_CONTAINS
+ * AFTER: filter instanceof Contains
+ * </code></pre>
  *
  * @author aaime
  * @source $URL$
+ * @deprecated please use instance of check against geoapi class.
  */
 public interface FilterType {
     /* ***********************************************************************
@@ -108,9 +114,9 @@ public interface FilterType {
     /** Defines a fid filter, which is implemented by FidFilterImpl. */
     public static final short FID = 22;
 
-    /** Defines an empty filter, with static implementation Filter.NONE */
+    /** Defines an empty filter, with static implementation Filter.INCLUDE */
     public static final short NONE = 12345;
 
-    /** Defines a sieve filter, with static implementation Filter.ALL */
+    /** Defines a sieve filter, with static implementation Filter.EXCLUDE */
     public static final short ALL = -12345;
 }

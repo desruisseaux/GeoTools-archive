@@ -36,13 +36,13 @@ public class FilterCapabilities {
     public static final long NO_OP = 0;
 
     /**
-     * Mask for Filter.NONE
+     * Mask for Filter.INCLUDE
      */
     //public static final long NONE = 12345;
     public static final long NONE = 0x01<<30;
 
     /**
-     * Mask for Filter.ALL
+     * Mask for Filter.EXCLUDE
      */
     //public static final long ALL = -12345;
     public static final long ALL = 0x01<<31;
@@ -212,9 +212,9 @@ public class FilterCapabilities {
      * @return the mask that is equivalent to the FilterType constant.
      */
 	public FilterCapabilities convertFilterTypeToMask(short type) {
-		if( type==Filter.ALL.getFilterType() )
+		if( type==FilterType.ALL )
 			return FilterNameTypeMapping.NO_OP_CAPS;
-		if( type==Filter.NONE.getFilterType() )
+		if( type==FilterType.NONE )
 			return FilterNameTypeMapping.ALL_CAPS;
 		Object object = FilterNameTypeMapping.filterTypeToFilterCapabilitiesMap.get(new Short(type));
 		return (FilterCapabilities)object;
@@ -229,8 +229,8 @@ public class FilterCapabilities {
      *
      * @return true if supported, false otherwise.
      */
-    public boolean supports(Filter filter) {
-        short filterType = filter.getFilterType();
+    public boolean supports(org.opengis.filter.Filter filter) {
+        short filterType = Filters.getFilterType( filter );
 
         return supports(filterType);
     }
@@ -239,7 +239,7 @@ public class FilterCapabilities {
      * Determines if the filter and all its sub filters are supported.  Is most
      * important for logic filters, as they are the only ones with subFilters.
      * Null filters should not be used here, if nothing should be filtered
-     * than Filter.NONE can be used.  Embedded nulls can be a particular
+     * than Filter.INCLUDE can be used.  Embedded nulls can be a particular
      * source of problems, buried in logic filters.
      *
      * @param filter the filter to be tested.
@@ -250,15 +250,15 @@ public class FilterCapabilities {
      *         function is recursive a null in a logic filter will also cause
      *         an error.
      */
-    public boolean fullySupports(Filter filter) {
+    public boolean fullySupports(org.opengis.filter.Filter filter) {
         boolean supports = true;
 
         if (filter == null) {
             throw new IllegalArgumentException("Null filters can not be "
-                + "unpacked, did you mean " + "Filter.NONE?");
+                + "unpacked, did you mean " + "Filter.INCLUDE?");
         }
 
-        short filterType = filter.getFilterType();
+        short filterType = Filters.getFilterType(filter);
 
         if (AbstractFilter.isLogicFilter(filterType)) {
             Iterator filters = ((LogicFilter) filter).getFilterIterator();

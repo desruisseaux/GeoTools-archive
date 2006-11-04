@@ -24,8 +24,9 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.Filters;
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 
 
@@ -84,7 +85,7 @@ public interface Action {
          */
         public UpdateAction(String typeName, Filter f, Map properties) {
         	DuplicatorFilterVisitor visitor=new DuplicatorFilterVisitor(FilterFactoryFinder.createFilterFactory(), false);
-        	f.accept(visitor);
+        	Filters.accept( f, visitor);
             filter = (Filter) visitor.getCopy();
             this.properties = new HashMap(properties);
             this.typeName = typeName;
@@ -141,7 +142,7 @@ public interface Action {
         }
 
 		public void update(Feature feature) {
-			if( !filter.contains(feature) )
+			if( !filter.evaluate(feature) )
 				throw new IllegalArgumentException(feature+"is not affected by this update, only call update on features that" +
 						"the Action applies to!");
             String[] propNames = getPropertyNames();
@@ -181,7 +182,7 @@ public interface Action {
          */
         public DeleteAction(String typeName, Filter f) {
         	DuplicatorFilterVisitor visitor=new DuplicatorFilterVisitor(FilterFactoryFinder.createFilterFactory(),false);
-        	f.accept(visitor);
+        	Filters.accept( f, visitor );
             filter = (Filter) visitor.getCopy();
             this.typeName = typeName;
         }

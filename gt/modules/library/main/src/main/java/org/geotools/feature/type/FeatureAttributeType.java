@@ -19,7 +19,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  * Represents an ordered list of AttributeTypes. For SFS this will be a 
@@ -60,7 +60,7 @@ public class FeatureAttributeType implements AttributeType {
     public FeatureAttributeType(String name,FeatureType featureType, boolean nillable){
     	this(name,featureType, nillable, 1, 1);
     }
-    public Filter getRestriction(){return Filter.NONE;}
+    public Filter getRestriction(){return Filter.INCLUDE;}
     
     protected FeatureType getFeatureType(){return featureType;}
 	/* (non-Javadoc)

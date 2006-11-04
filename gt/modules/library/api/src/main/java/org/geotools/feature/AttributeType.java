@@ -15,7 +15,7 @@
  */
 package org.geotools.feature;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -102,7 +102,7 @@ public interface AttributeType {
      * This represents a Facet in XML schema ... for example can be used to
      * represent the max length of 20 for a string.
      *
-     * @return Filter, or Filter.NONE if no restriction is needed.
+     * @return Filter, or Filter.INCLUDE if no restriction is needed.
      */
     Filter getRestriction();
 

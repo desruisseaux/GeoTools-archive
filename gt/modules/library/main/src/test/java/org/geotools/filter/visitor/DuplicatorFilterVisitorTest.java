@@ -18,9 +18,10 @@ package org.geotools.filter.visitor;
 import junit.framework.TestCase;
 
 import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LogicFilter;
 
@@ -44,12 +45,12 @@ public class DuplicatorFilterVisitorTest extends TestCase {
     
     public void testLogicFilterDuplication() throws IllegalFilterException {
     	//create a filter
-    	LogicFilter oldFilter = fac.createLogicFilter(Filter.LOGIC_AND);
-    	CompareFilter filter1 = fac.createCompareFilter(Filter.COMPARE_GREATER_THAN);
+    	LogicFilter oldFilter = fac.createLogicFilter(FilterType.LOGIC_AND);
+    	CompareFilter filter1 = fac.createCompareFilter(FilterType.COMPARE_GREATER_THAN);
     	filter1.addLeftValue(fac.createLiteralExpression(2));
     	filter1.addRightValue(fac.createLiteralExpression(1));
     	oldFilter.addFilter(filter1);
-    	CompareFilter filter2 = fac.createCompareFilter(Filter.COMPARE_GREATER_THAN);
+    	CompareFilter filter2 = fac.createCompareFilter(FilterType.COMPARE_GREATER_THAN);
     	filter2.addLeftValue(fac.createLiteralExpression(4));
     	filter2.addRightValue(fac.createLiteralExpression(3));
     	oldFilter.addFilter(filter2);
@@ -63,4 +64,5 @@ public class DuplicatorFilterVisitorTest extends TestCase {
     	assertNotNull(newFilter);
     	//TODO: a decent comparison
     }
+    
 }

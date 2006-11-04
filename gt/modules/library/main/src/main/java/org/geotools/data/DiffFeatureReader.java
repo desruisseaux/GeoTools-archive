@@ -28,7 +28,14 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.geotools.filter.Filters;
+import org.opengis.filter.Filter;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LiteralExpression;
@@ -75,7 +82,7 @@ public class DiffFeatureReader implements FeatureReader {
      * @param diff2 Differences of Feature by FID
      */
     public DiffFeatureReader( FeatureReader reader, Diff diff2 ) {
-        this(reader, diff2, Filter.NONE);
+        this(reader, diff2, Filter.INCLUDE);
     }
 
     /**
@@ -140,7 +147,7 @@ public class DiffFeatureReader implements FeatureReader {
         }
         Feature peek;
 
-        if( filter==Filter.ALL)
+        if( filter==Filter.EXCLUDE)
             return false;
         
         while( (reader != null) && reader.hasNext() ) {
@@ -158,7 +165,7 @@ public class DiffFeatureReader implements FeatureReader {
 
             if (diff.modified2.containsKey(fid)) {
                 Feature changed = (Feature) diff.modified2.get(fid);
-                if (changed == TransactionStateDiff.NULL || !filter.contains(changed) ) {
+                if (changed == TransactionStateDiff.NULL || !filter.evaluate(changed) ) {
                     continue;
                 } else {
                     next = changed;
@@ -204,7 +211,7 @@ public class DiffFeatureReader implements FeatureReader {
 	protected void querySpatialIndex() {
 		while( spatialIndexIterator.hasNext() && next == null ){
 			Feature f = (Feature) spatialIndexIterator.next();
-			if( encounteredFids.contains(f.getID()) || !filter.contains(f)){
+			if( encounteredFids.contains(f.getID()) || !filter.evaluate(f)){
 				continue;
 			}
 			next = f;
@@ -214,7 +221,7 @@ public class DiffFeatureReader implements FeatureReader {
 	protected void queryAdded() {
 		while( addedIterator.hasNext() && next == null ){
 			next = (Feature) addedIterator.next();
-			if( encounteredFids.contains(next.getID()) || !filter.contains(next)){
+			if( encounteredFids.contains(next.getID()) || !filter.evaluate(next)){
 				next = null;
 			}
 		}
@@ -223,7 +230,7 @@ public class DiffFeatureReader implements FeatureReader {
 	protected void queryModified() {
 		while( modifiedIterator.hasNext() && next == null ){
 			next = (Feature) modifiedIterator.next();
-			if( next==TransactionStateDiff.NULL || encounteredFids.contains(next.getID()) || !filter.contains(next) ){
+			if( next==TransactionStateDiff.NULL || encounteredFids.contains(next.getID()) || !filter.evaluate(next) ){
 				next = null;
 			}
 		}
@@ -273,13 +280,11 @@ public class DiffFeatureReader implements FeatureReader {
     }
     
     protected boolean isSubsetOfBboxFilter(Filter f) {
-    	short filterType = f.getFilterType();
-    	return f instanceof GeometryFilter 
-    	&& (filterType == FilterType.GEOMETRY_CONTAINS
-    			|| filterType == FilterType.GEOMETRY_CROSSES
-    			|| filterType == FilterType.GEOMETRY_OVERLAPS
-    			|| filterType == FilterType.GEOMETRY_TOUCHES
-    			|| filterType == FilterType.GEOMETRY_WITHIN
-    			|| filterType == FilterType.GEOMETRY_BBOX);
+       return filter instanceof Contains ||
+            filter instanceof Crosses ||
+            filter instanceof Overlaps ||
+            filter instanceof Touches ||
+            filter instanceof Within ||
+            filter instanceof BBOX;
     }
 }

@@ -61,7 +61,7 @@
 <!-- <module>geometryless</module> -->
     <module>gml</module>
     <module>go</module>
-    <module>hsql</module>
+<!--<module>hsql</module>-->
     <module>jpox</module>
     <module>mif</module>
     <module>mysql</module>

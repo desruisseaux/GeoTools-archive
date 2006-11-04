@@ -198,7 +198,9 @@ public class JDBCFeatureSource implements FeatureSource {
     public FeatureCollection getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(featureType.getTypeName(), filter));
     }
-
+    public FeatureCollection getFeatures(org.opengis.filter.Filter filter) throws IOException {
+        return getFeatures(new DefaultQuery(featureType.getTypeName(), filter));
+    }
     /**
      * Retrieve all Features
      *
@@ -207,7 +209,7 @@ public class JDBCFeatureSource implements FeatureSource {
      * @throws IOException DOCUMENT ME!
      */
     public FeatureCollection getFeatures() throws IOException {
-        return getFeatures(Filter.NONE);
+        return getFeatures(Filter.INCLUDE);
     }
 
     /**
@@ -249,7 +251,7 @@ public class JDBCFeatureSource implements FeatureSource {
      * @throws IOException DOCUMENT ME!
      */
     public Envelope getBounds(Query query) throws IOException {
-        if (query.getFilter() == Filter.ALL) {
+        if (query.getFilter() == Filter.EXCLUDE) {
             if(featureType!=null)
                 return new ReferencedEnvelope(new Envelope(),featureType.getDefaultGeometry().getCoordinateSystem());
             return new Envelope();
@@ -288,17 +290,17 @@ public class JDBCFeatureSource implements FeatureSource {
      */
     public int count(Query query, Transaction transaction)
         throws IOException {
-        Filter filter = query.getFilter();
+        Filter filter = (Filter) query.getFilter();
 
-        if (filter == Filter.ALL) {
+        if (filter == Filter.EXCLUDE) {
             return 0;
         }
 
         JDBC1DataStore jdbc = getJDBCDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(featureType.getTypeName());
 
-        Filter postFilter = sqlBuilder.getPostQueryFilter(filter); 
-        if (postFilter != null && postFilter != Filter.NONE) {
+        Filter postFilter = (Filter) sqlBuilder.getPostQueryFilter(filter); 
+        if (postFilter != null && postFilter != Filter.INCLUDE) {
             // this would require postprocessing the filter
             // so we cannot optimize
             return -1;

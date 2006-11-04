@@ -45,7 +45,7 @@ import org.geotools.data.wfs.Action.DeleteAction;
 import org.geotools.data.wfs.Action.InsertAction;
 import org.geotools.data.wfs.Action.UpdateAction;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.wfs.WFSSchema;
@@ -393,12 +393,12 @@ public class WFSTransactionState implements State {
     }
 
     /**
-     * Removes all actions whose filter is Filter.ALL
+     * Removes all actions whose filter is Filter.EXCLUDE
      */
     private void removeFilterAllActions(List actions) {
         for( Iterator iter = actions.iterator(); iter.hasNext(); ) {
             Action element = (Action) iter.next();
-            if (Filter.ALL.equals(element.getFilter()))
+            if (Filter.EXCLUDE.equals(element.getFilter()))
                 iter.remove();
         }
     }
@@ -436,7 +436,7 @@ public class WFSTransactionState implements State {
 
     private void handleDeleteAction( List actions, int i, InsertAction action, DeleteAction deleteAction ) {
         // if inserted action has been deleted then remove action
-        if (deleteAction.getFilter().contains(action.getFeature())) {
+        if (deleteAction.getFilter().evaluate(action.getFeature())) {
             actions.remove(i);
             // if filter is a fid filter of size 1 then it only contains the inserted feature which
             // no longer exists since it has been deleted. so remove that action as well.
@@ -451,7 +451,7 @@ public class WFSTransactionState implements State {
 
     private int handleUpdateAction( List actions, int i, InsertAction action, UpdateAction updateAction ) {
         // if update action applies to feature then update feature
-        if (updateAction.getFilter().contains(action.getFeature())) {
+        if (updateAction.getFilter().evaluate(action.getFeature())) {
             updateAction.update(action.getFeature());
             // if filter is a fid filter and there is only 1 fid then filter uniquely identifies
             // only the

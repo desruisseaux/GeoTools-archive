@@ -16,9 +16,9 @@
 package org.geotools.data;
 
 import java.net.URI;
+import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.filter.Filter;
 
 
 /**

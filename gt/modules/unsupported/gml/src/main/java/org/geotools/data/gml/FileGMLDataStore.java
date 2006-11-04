@@ -214,7 +214,7 @@ public class FileGMLDataStore extends AbstractDataStore {
 	}
 
 	protected Envelope getBounds(Query query) throws IOException {
-		if( query==Query.ALL || query.getFilter().equals(Filter.NONE) ){
+		if( query==Query.ALL || query.getFilter().equals(Filter.INCLUDE) ){
 			//TODO parse out bounds
 			return null;
 		}else{

@@ -60,7 +60,7 @@ public class PostgisPermissionOnlineTest extends TestCase {
 	
 	public void testGetFeatureWriter() throws IOException {
 		try {
-			dataStore.getFeatureWriter("restricted", Filter.ALL, Transaction.AUTO_COMMIT);
+			dataStore.getFeatureWriter("restricted", Filter.EXCLUDE, Transaction.AUTO_COMMIT);
 			fail("user should not have been able to create featureWriter to restricted table");		
 		} 
 		catch (DataSourceException e) {}

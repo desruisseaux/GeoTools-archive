@@ -19,7 +19,7 @@ package org.geotools.data.jdbc;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
 import org.opengis.filter.sort.SortBy;
 

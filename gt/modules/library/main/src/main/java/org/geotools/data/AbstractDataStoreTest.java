@@ -25,7 +25,8 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
@@ -164,11 +165,14 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         store1.addFeatureListener(listener1);
         store2.addFeatureListener(listener2);
 
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 
         //test that only the listener listening with the current transaction gets the event.
         final Feature feature = roadFeatures[0];
-        store1.removeFeatures(factory.createFidFilter(feature.getID()));
+        FidFilter fidFilter = ff.createFidFilter(feature.getID());
+        
+        store1.removeFeatures(fidFilter);
+        
         assertEquals(1, listener1.events.size());
         assertEquals(0, listener2.events.size());
 
@@ -592,7 +596,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         assertEquals(type, reader.getFeatureType());
         assertEquals(roadFeatures.length, count(reader));
 
-        reader = data.getFeatureReader(new DefaultQuery("ROAD", Filter.ALL),
+        reader = data.getFeatureReader(new DefaultQuery("ROAD", Filter.EXCLUDE),
                 Transaction.AUTO_COMMIT);
 
         //TODO: This assert sucks since it EXPECTS an emptyFeatureWriter...well, we got A writer...
@@ -619,7 +623,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         FeatureType type = data.getSchema("ROAD");
         FeatureReader reader;
 
-        reader = data.getFeatureReader(new DefaultQuery("ROAD", Filter.ALL), t);
+        reader = data.getFeatureReader(new DefaultQuery("ROAD", Filter.EXCLUDE), t);
 
         //TODO: remove this silly check!
         //assertTrue(reader instanceof EmptyFeatureReader);
@@ -641,7 +645,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         store.setTransaction(t);
         store.removeFeatures(rd1Filter);
 
-        reader = data.getFeatureReader(new DefaultQuery("ROAD", Filter.ALL), t);
+        reader = data.getFeatureReader(new DefaultQuery("ROAD", Filter.EXCLUDE), t);
         assertEquals(0, count(reader));
 
         reader = data.getFeatureReader(new DefaultQuery("ROAD"), t);
@@ -651,7 +655,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         assertEquals(0, count(reader));
 
         t.rollback();
-        reader = data.getFeatureReader(new DefaultQuery("ROAD", Filter.ALL), t);
+        reader = data.getFeatureReader(new DefaultQuery("ROAD", Filter.EXCLUDE), t);
         assertEquals(0, count(reader));
 
         reader = data.getFeatureReader(new DefaultQuery("ROAD"), t);
@@ -870,7 +874,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         throws NoSuchElementException, IOException, IllegalAttributeException {
         FeatureWriter writer;
 
-        writer = data.getFeatureWriter("ROAD", Filter.ALL,
+        writer = data.getFeatureWriter("ROAD", Filter.EXCLUDE,
                 Transaction.AUTO_COMMIT);
         assertFalse(writer.hasNext());
 
@@ -879,7 +883,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         //        assertTrue(writer instanceof EmptyFeatureWriter);
         assertEquals(0, count(writer));
 
-        writer = data.getFeatureWriter("ROAD", Filter.NONE,
+        writer = data.getFeatureWriter("ROAD", Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
         assertFalse(writer instanceof FilteringFeatureWriter);
         assertEquals(roadFeatures.length, count(writer));

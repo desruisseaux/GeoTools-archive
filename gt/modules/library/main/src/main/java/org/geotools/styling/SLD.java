@@ -27,7 +27,7 @@ import org.geotools.event.GTComponent;
 import org.geotools.event.GTRoot;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.Filters;
 
 
@@ -39,7 +39,7 @@ import org.geotools.filter.Filters;
  * 
  * <ul>
  * <li>
- * Single Rule - matching Filter.NONE
+ * Single Rule - matching Filter.INCLUDE
  * </li>
  * <li>
  * Symbolizer lookup by name

@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -113,7 +113,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      * @throws IOException If features could not be obtained
      */
     public FeatureCollection getFeatures() throws IOException {
-        return getFeatures(Filter.NONE);
+        return getFeatures(Filter.INCLUDE);
     }
     
     /**
@@ -154,7 +154,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      * @throws IOException DOCUMENT ME!
      */
     public Envelope getBounds(Query query) throws IOException {
-        if (query.getFilter() == Filter.ALL) {
+        if (query.getFilter() == Filter.EXCLUDE) {
             return new Envelope();
         }
         
@@ -210,7 +210,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      * @return -1 representing the lack of an optimization
      */
     public int getCount(Query query) throws IOException {
-        if (query.getFilter() == Filter.ALL) {
+        if (query.getFilter() == Filter.EXCLUDE) {
             return 0;
         }
         

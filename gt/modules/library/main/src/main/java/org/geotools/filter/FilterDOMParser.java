@@ -55,27 +55,27 @@ public final class FilterDOMParser {
 
     static {
         comparisions.put("PropertyIsEqualTo",
-            new Integer(AbstractFilter.COMPARE_EQUALS));
+            new Integer(FilterType.COMPARE_EQUALS));
         comparisions.put("PropertyIsNotEqualTo",
-            new Integer(AbstractFilter.COMPARE_NOT_EQUALS));
+            new Integer(FilterType.COMPARE_NOT_EQUALS));
         comparisions.put("PropertyIsGreaterThan",
-            new Integer(AbstractFilter.COMPARE_GREATER_THAN));
+            new Integer(FilterType.COMPARE_GREATER_THAN));
         comparisions.put("PropertyIsGreaterThanOrEqualTo",
-            new Integer(AbstractFilter.COMPARE_GREATER_THAN_EQUAL));
+            new Integer(FilterType.COMPARE_GREATER_THAN_EQUAL));
         comparisions.put("PropertyIsLessThan",
-            new Integer(AbstractFilter.COMPARE_LESS_THAN));
+            new Integer(FilterType.COMPARE_LESS_THAN));
         comparisions.put("PropertyIsLessThanOrEqualTo",
-            new Integer(AbstractFilter.COMPARE_LESS_THAN_EQUAL));
+            new Integer(FilterType.COMPARE_LESS_THAN_EQUAL));
         comparisions.put("PropertyIsLike", new Integer(AbstractFilter.LIKE));
         comparisions.put("PropertyIsNull", new Integer(AbstractFilter.NULL));
         comparisions.put("PropertyIsBetween",
-            new Integer(AbstractFilter.BETWEEN));
+            new Integer(Filter.BETWEEN));
         comparisions.put("FeatureId", new Integer(AbstractFilter.FID));
 
         spatial.put("Equals", new Integer(AbstractFilter.GEOMETRY_EQUALS));
         spatial.put("Disjoint", new Integer(AbstractFilter.GEOMETRY_DISJOINT));
         spatial.put("Intersects",
-            new Integer(AbstractFilter.GEOMETRY_INTERSECTS));
+            new Integer(Filter.GEOMETRY_INTERSECTS));
         spatial.put("Touches", new Integer(AbstractFilter.GEOMETRY_TOUCHES));
         spatial.put("Crosses", new Integer(AbstractFilter.GEOMETRY_CROSSES));
         spatial.put("Within", new Integer(AbstractFilter.GEOMETRY_WITHIN));
@@ -430,7 +430,7 @@ public final class FilterDOMParser {
      */
     private static NullFilter parseNullFilter(Node nullNode)
         throws IllegalFilterException {
-        LOGGER.info("parsing null node: " + nullNode);
+        LOGGER.finest("parsing null node: " + nullNode);
 
         NullFilter nFilter = FILTER_FACT.createNullFilter();
         Node value = nullNode.getFirstChild();

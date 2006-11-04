@@ -37,7 +37,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.xml.PrintHandler;
 import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.gml.FCBuffer.StopException;
@@ -6693,8 +6693,8 @@ public class GMLComplexTypes {
             }
             Class[] choices=collectionChoices(l);
             if( Geometry.class.isAssignableFrom(type))
-            	return new ChoiceAttributeTypeImpl.Geometry(name,choices,type,nillable,1,1,null, null, Filter.NONE);
-            return new ChoiceAttributeTypeImpl(name,choices,type,nillable,1,1,null, Filter.NONE);
+            	return new ChoiceAttributeTypeImpl.Geometry(name,choices,type,nillable,1,1,null, null, Filter.INCLUDE);
+            return new ChoiceAttributeTypeImpl(name,choices,type,nillable,1,1,null, Filter.INCLUDE);
     }
     
     private static Class[] collectionChoices(List l) {

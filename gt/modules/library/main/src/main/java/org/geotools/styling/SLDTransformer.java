@@ -19,7 +19,7 @@
 package org.geotools.styling;
 
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.xml.transform.TransformerBase;
 import org.xml.sax.ContentHandler;

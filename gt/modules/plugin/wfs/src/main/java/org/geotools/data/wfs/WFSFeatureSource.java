@@ -106,7 +106,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * @see org.geotools.data.FeatureSource#getFeatures()
      */
     public FeatureCollection getFeatures(){
-        return getFeatures(new DefaultQuery(getSchema().getTypeName(), Filter.NONE));
+        return getFeatures(new DefaultQuery(getSchema().getTypeName(), Filter.INCLUDE));
     }
 
     /**

@@ -15,9 +15,11 @@
  */
 package org.geotools.styling.visitor;
 
+import java.util.Stack;
+
 import org.geotools.event.GTCloneUtil;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.visitor.DuplicatorFilterVisitor;
 import org.geotools.styling.AnchorPoint;
@@ -61,20 +63,41 @@ import org.geotools.styling.UserLayer;
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL$
  */
-public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
-    implements StyleVisitor {
+public class DuplicatorStyleVisitor implements StyleVisitor {
+    Stack pages = new Stack(); // need a Stack as Filter structure is recursive
+    
     //Stack pages; // need a Stack as Filter structure is recursive
     StyleFactory sf;
 
+    /** TODO: support duplication of pure open gis filters */
+    public DuplicatorFilterVisitor copyFilter;
+        
     public DuplicatorStyleVisitor(StyleFactory sf, FilterFactory ff) { // FilterFactory factory 
-        super(ff);
         this.sf = sf;
+        this.copyFilter = new DuplicatorFilterVisitor( ff );
     }
 
+    
+    /** Duplicate an expression using copyFilter */
+    public Expression copy( Expression expression ){
+        expression.accept( copyFilter );
+        return (Expression) copyFilter.getPages().pop();
+    }
+    
+    /** Duplicate an expression using copyFilter */
+    public Filter copy( org.geotools.filter.Filter filter ){
+        filter.accept( copyFilter );
+        return (Filter) copyFilter.getPages().pop();
+    }
     public void setStyleFactory(StyleFactory styleFactory) {
         this.sf = styleFactory;
     }
-
+    public Stack getPages() {
+        return pages;
+    }
+    public Object getCopy() {
+        return pages.firstElement();
+    }
     public void visit(StyledLayerDescriptor sld) {
         StyledLayerDescriptor copy = null;
 
@@ -196,8 +219,8 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         Filter filterCopy = null;
 
         if (rule.getFilter() != null) {
-            rule.getFilter().accept(this);
-            filterCopy = (Filter) getPages().pop();
+            org.geotools.filter.Filter filter = (org.geotools.filter.Filter) rule.getFilter();
+            filterCopy = copy( filter );
         }
 
         Graphic[] legendGraphic = rule.getLegendGraphic();
@@ -383,22 +406,22 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         Expression opacityCopy = null;
 
         if (gr.getOpacity() != null) {
-            gr.getOpacity().accept(this);
-            opacityCopy = (Expression) getPages().pop();
+            gr.getOpacity().accept(copyFilter);            
+            opacityCopy = (Expression) copyFilter.getPages().pop();
         }
 
         Expression rotationCopy = null;
 
         if (gr.getRotation() != null) {
-            gr.getRotation().accept(this);
-            rotationCopy = (Expression) getPages().pop();
+            gr.getRotation().accept(copyFilter);
+            rotationCopy = (Expression) copyFilter.getPages().pop();
         }
 
         Expression sizeCopy = null;
 
         if (gr.getSize() != null) {
-            gr.getSize().accept(this);
-            sizeCopy = (Expression) getPages().pop();
+            gr.getSize().accept(copyFilter);
+            sizeCopy = (Expression) copyFilter.getPages().pop();
         }
 
         Symbol[] symbols = gr.getSymbols();
@@ -424,29 +447,27 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
 
         getPages().push(copy);
     }
-
+    
     public void visit(Mark mark) {
         Mark copy = null;
 
         Fill fillCopy = null;
 
         if (mark.getFill() != null) {
-            mark.getFill().accept(this);
+            mark.accept( this );
             fillCopy = (Fill) getPages().pop();
         }
 
         Expression rotationCopy = null;
 
         if (mark.getRotation() != null) {
-            mark.getRotation().accept(this);
-            rotationCopy = (Expression) getPages().pop();
+            rotationCopy = copy( mark.getRotation() );
         }
 
         Expression sizeCopy = null;
 
         if (mark.getSize() != null) {
-            mark.getSize().accept(this);
-            sizeCopy = (Expression) getPages().pop();
+            sizeCopy = copy( mark.getSize() );
         }
 
         Stroke strokeCopy = null;
@@ -459,8 +480,7 @@ public class DuplicatorStyleVisitor extends DuplicatorFilterVisitor
         Expression wellKnownNameCopy = null;
 
         if (mark.getWellKnownName() != null) {
-            mark.getWellKnownName().accept(this);
-            wellKnownNameCopy = (Expression) getPages().pop();
+            wellKnownNameCopy = copy( mark.getWellKnownName() );
         }
 
         copy = sf.createMark();

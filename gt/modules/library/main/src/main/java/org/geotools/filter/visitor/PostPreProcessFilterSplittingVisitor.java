@@ -34,6 +34,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.FilterVisitor2;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
@@ -42,6 +43,8 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.IncludeFilter;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -53,7 +56,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author dzwiers
  * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/src/org/geotools/data/wfs/WFSFilterVisitor.java $
  */
-public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
+public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, FilterVisitor2 {
 		private static final Logger logger=Logger.getLogger("org.geotools.filter");
 	    private Stack postStack = new Stack();
 	    private Stack preStack = new Stack();
@@ -89,7 +92,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	     * 
 	     * @return the filter that cannot be sent to the server and must be post-processed on the client by geotools.
 	     */
-	    public Filter getFilterPost() {
+	    public org.opengis.filter.Filter getFilterPost() {
 			if (!changedStack.isEmpty())
 				// Return the original filter to ensure that
 				// correct features are filtered
@@ -101,7 +104,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        }
 	        
 	        // JE:  Changed to peek because get implies that the value can be retrieved multiple times
-	        Filter f = postStack.isEmpty() ? Filter.NONE : (Filter) postStack.peek();
+            org.opengis.filter.Filter f = postStack.isEmpty() ? Filter.INCLUDE : (org.opengis.filter.Filter) postStack.peek();
 	        return f;
 	    }
 		
@@ -110,9 +113,9 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	     * 
 	     * @return the filter that can be sent to the server for pre-processing.
 	     */
-	    public Filter getFilterPre() {
+	    public org.opengis.filter.Filter getFilterPre() {
 	        if (preStack.isEmpty()) {
-	            return Filter.NONE;
+	            return Filter.INCLUDE;
 	        }
 	
 	        if (preStack.size() > 1) {
@@ -122,16 +125,16 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 
 	
 	        // JE:  Changed to peek because get implies that the value can be retrieved multiple times
-	        Filter f = preStack.isEmpty() ? Filter.NONE : (Filter) preStack.peek();
+            org.opengis.filter.Filter f = preStack.isEmpty() ? Filter.INCLUDE : (org.opengis.filter.Filter) preStack.peek();
 			// deal with deletes here !!!
             if(transactionAccessor != null){
-            	if(f != null && f!=Filter.ALL){
-            		Filter deleteFilter = transactionAccessor.getDeleteFilter();
+            	if(f != null && f!=Filter.EXCLUDE){
+            		Filter deleteFilter = (org.geotools.filter.Filter) transactionAccessor.getDeleteFilter();
 	            	if( deleteFilter!=null ){
-                        if( deleteFilter==Filter.ALL )
-                            f=Filter.ALL;
+                        if( deleteFilter==Filter.EXCLUDE )
+                            f=Filter.EXCLUDE;
                         else
-                            f=f.and(deleteFilter.not());
+                            f=((Filter)f).and(deleteFilter.not());
                     }
             	}
             }
@@ -143,33 +146,32 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        Filter updateFilter=(Filter) iter.next();
 	        while( iter.hasNext() ){
                 Filter next=(Filter) iter.next();
-                if( next==Filter.NONE){
+                if( next==Filter.INCLUDE){
                     updateFilter=next;
                     break;
                 }else{
-                    updateFilter=updateFilter.or(next);
+                    updateFilter=(Filter) updateFilter.or(next);
                 }
             }
-            if( updateFilter == Filter.NONE || f==Filter.NONE )
-                return Filter.NONE;
-	        return f.or(updateFilter);
+            if( updateFilter == Filter.INCLUDE || f==Filter.INCLUDE )
+                return Filter.INCLUDE;
+	        return ((Filter)f).or(updateFilter);
 	    }
 
+        public void visit( IncludeFilter filter ) {
+            return;
+        }
+        public void visit( ExcludeFilter filter ) {
+            if (fcs.supports(FilterType.ALL)) {
+                preStack.push(filter);
+            } else {
+                postStack.push(filter);
+            }
+        }
 	    /**
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
 	     */
-	    public void visit(Filter filter) {
-	        if (filter == Filter.NONE) {
-	            return;
-	        }
-            if (filter == Filter.ALL) {
-                if (fcs.supports(FilterType.ALL)) {
-                    preStack.push(filter);
-                } else {
-                    postStack.push(filter);
-                }
-                return;
-            }
+	    public void visit(Filter filter) {	        
 	        if( original==null )
 	        	original=filter;
 	        if (!postStack.isEmpty()) {
@@ -646,7 +648,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	                        Filter f = (Filter) postStack.pop();
 	
 	                        while (postStack.size() > i)
-	                            f=f.and((Filter) postStack.pop());
+	                            f= (Filter) f.and((Filter) postStack.pop());
 	
 	                        postStack.push(f);
 	                        
@@ -654,7 +656,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	                        	f = (Filter)preStack.pop();
 	                        	
 		                        while (preStack.size() > j)
-		                            f=f.and((Filter) preStack.pop());
+		                            f=(Filter) f.and((Filter) preStack.pop());
 		                        preStack.push(f);
 	                        }
 	                    } else {
@@ -732,7 +734,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	        	postStack.push(expression);
 	        }
 	        if(transactionAccessor!=null){
-	        	Filter updateFilter=transactionAccessor.getUpdateFilter(expression.getAttributePath());
+	        	Filter updateFilter= (Filter) transactionAccessor.getUpdateFilter(expression.getAttributePath());
 	        	if( updateFilter!=null ){
 	        		changedStack.add(updateFilter);
 	        		preStack.push(updateFilter);
@@ -868,14 +870,15 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
 	
 	            if (f.getFilterType() == FilterType.LOGIC_NOT) {
 	                // simplify it 
-	                and.addFilter((Filter) ((LogicFilter) f).getFilterIterator()
-	                                        .next());
+                    LogicFilter logic = (LogicFilter) f;
+                    Filter next = (Filter) logic.getFilterIterator().next();
+	                and.addFilter((org.opengis.filter.Filter) next );
 	            } else {
 	                and.addFilter(f.not());
 	            }
 	        }
 	
-	        return and.not();
+	        return (Filter) and.not();
 	    }
 
     public static class WFSBBoxFilterVisitor implements FilterVisitor{
@@ -883,7 +886,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor {
         public WFSBBoxFilterVisitor(Envelope fsd){
             maxbbox = fsd;
         }public void visit(Filter filter) {
-            if (Filter.NONE == filter) {
+            if (Filter.INCLUDE == filter) {
                 return;
             }
                 switch (filter.getFilterType()) {

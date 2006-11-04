@@ -227,22 +227,22 @@ public class FilterTest extends TestCase {
         // Test all integer permutations
         Expression testAttribute = new AttributeExpressionImpl(testSchema,
                 "testInteger");
-        compareNumberRunner(testAttribute, AbstractFilter.COMPARE_EQUALS,
+        compareNumberRunner(testAttribute, FilterType.COMPARE_EQUALS,
             false, true, false);
-        compareNumberRunner(testAttribute, AbstractFilter.COMPARE_GREATER_THAN,
+        compareNumberRunner(testAttribute, FilterType.COMPARE_GREATER_THAN,
             true, false, false);
-        compareNumberRunner(testAttribute, AbstractFilter.COMPARE_LESS_THAN,
+        compareNumberRunner(testAttribute, FilterType.COMPARE_LESS_THAN,
             false, false, true);
         compareNumberRunner(testAttribute,
-            AbstractFilter.COMPARE_GREATER_THAN_EQUAL, true, true, false);
+            FilterType.COMPARE_GREATER_THAN_EQUAL, true, true, false);
         compareNumberRunner(testAttribute,
-            AbstractFilter.COMPARE_LESS_THAN_EQUAL, false, true, true);
+            FilterType.COMPARE_LESS_THAN_EQUAL, false, true, true);
 
         // Set up the string test.
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
 
         CompareFilter filter = FilterFactoryFinder.createFilterFactory()
-        	.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        	.createCompareFilter(FilterType.COMPARE_EQUALS);
         Expression testLiteral;
         filter.addLeftValue(testAttribute);
 
@@ -250,8 +250,8 @@ public class FilterTest extends TestCase {
         testLiteral = new LiteralExpressionImpl("test string data");
         filter.addRightValue(testLiteral);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
 
         // Test for false negative.
@@ -261,7 +261,7 @@ public class FilterTest extends TestCase {
         assertTrue(!filter.contains(testFeature));
 
 	filter = FilterFactoryFinder.createFilterFactory()
-		.createCompareFilter(AbstractFilter.COMPARE_LESS_THAN);
+		.createCompareFilter(FilterType.COMPARE_LESS_THAN);
 	filter.addLeftValue(testAttribute);
 
         // Test for false positive.
@@ -298,22 +298,22 @@ public class FilterTest extends TestCase {
         testLiteral = new LiteralExpressionImpl(new Integer(1001));
         filter.addRightValue(testLiteral);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertEquals(filter.contains(testFeature), test1);
 
         testLiteral = new LiteralExpressionImpl(new Integer(1002));
         filter.addRightValue(testLiteral);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertEquals(filter.contains(testFeature), test2);
 
         testLiteral = new LiteralExpressionImpl(new Integer(1003));
         filter.addRightValue(testLiteral);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertEquals(filter.contains(testFeature), test3);
     }
 
@@ -341,16 +341,16 @@ public class FilterTest extends TestCase {
         // Test for false negative.
         filter.setPattern(new LiteralExpressionImpl("test*"), "*", ".", "!");
 
-        //LOGGER.info( filter.toString());
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         boolean t = filter.contains(testFeature);
         assertTrue(t);
 
         // Test for false positive.
         filter.setPattern(new LiteralExpressionImpl("cows*"), "*", ".", "!");
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
     }
 
@@ -371,8 +371,8 @@ public class FilterTest extends TestCase {
         filter.nullCheckValue(testAttribute);
         assertEquals(testAttribute , filter.getNullCheckValue());
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
         
         
@@ -382,8 +382,8 @@ public class FilterTest extends TestCase {
            assertTrue(!filter.contains(testFeature));
         
            testFeature.setAttribute("testString", "test string data");
-           //LOGGER.info( filter.toString());
-           //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+           //LOGGER.finer( filter.toString());
+           //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
            assertTrue(!filter.contains(testFeature));
          */
     }
@@ -411,8 +411,8 @@ public class FilterTest extends TestCase {
         filter.addRightValue(testLiteralUpper);
 
         // Test for false negative.
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
 
         // Test for false positive.
@@ -421,8 +421,8 @@ public class FilterTest extends TestCase {
         filter.addLeftValue(testLiteralLower);
         filter.addRightValue(testLiteralUpper);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
     }
 
@@ -441,8 +441,8 @@ public class FilterTest extends TestCase {
         filter.addRightValue(testLiteralUpper);
 
         // Test for false negative.
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
 
         // Test for false positive.
@@ -451,8 +451,8 @@ public class FilterTest extends TestCase {
         filter.addLeftValue(testLiteralLower);
         filter.addRightValue(testLiteralUpper);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        //LOGGER.finer( filter.toString());            
+        //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
     }
 
@@ -479,16 +479,16 @@ public class FilterTest extends TestCase {
         Expression right = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(right);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
 
         coords[0] = new Coordinate(0, 0);
         right = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(right);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
 
         // Test Disjoint
@@ -502,8 +502,8 @@ public class FilterTest extends TestCase {
         right = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(right);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
 
         coords[0] = new Coordinate(1, 2);
@@ -512,8 +512,8 @@ public class FilterTest extends TestCase {
         right = new LiteralExpressionImpl(gf.createLineString(coords));
         filter.addRightGeometry(right);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
 
         // Test BBOX
@@ -531,8 +531,8 @@ public class FilterTest extends TestCase {
                     coords2),null));
         filter.addRightGeometry(right);
 
-        //LOGGER.info( filter.toString());
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
 
         coords2[0] = new Coordinate(0, 0);
@@ -544,8 +544,8 @@ public class FilterTest extends TestCase {
                 coords2),null));
         filter.addRightGeometry(right);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
     }
 
@@ -569,13 +569,13 @@ public class FilterTest extends TestCase {
                 coords2),null));
         filter.addRightGeometry(right);
         filter.setDistance(20);
-        LOGGER.info(filter.toString());
-        LOGGER.info("contains feature: " + filter.contains(testFeature));
+        LOGGER.finer(filter.toString());
+        LOGGER.finer("contains feature: " + filter.contains(testFeature));
 
         //assertTrue(filter.contains(testFeature));
         filter.setDistance(2);
-        LOGGER.info(filter.toString());
-        LOGGER.info("contains feature: " + filter.contains(testFeature));
+        LOGGER.finer(filter.toString());
+        LOGGER.finer("contains feature: " + filter.contains(testFeature));
 
         //Test Beyond
         GeometryDistanceFilter filterB = FilterFactoryFinder.createFilterFactory()
@@ -583,13 +583,13 @@ public class FilterTest extends TestCase {
         filterB.addLeftGeometry(left);
         filterB.addRightGeometry(right);
         filterB.setDistance(20);
-        LOGGER.info(filterB.toString());
-        LOGGER.info("contains feature: " + filterB.contains(testFeature));
+        LOGGER.finer(filterB.toString());
+        LOGGER.finer("contains feature: " + filterB.contains(testFeature));
 
         //assertTrue(filter.contains(testFeature));
         filterB.setDistance(2);
-        LOGGER.info(filterB.toString());
-        LOGGER.info("contains feature: " + filterB.contains(testFeature));
+        LOGGER.finer(filterB.toString());
+        LOGGER.finer("contains feature: " + filterB.contains(testFeature));
 
         /*coords2[0] = new Coordinate(20,20);
            /coords2[1] = new Coordinate(21,20);
@@ -599,8 +599,8 @@ public class FilterTest extends TestCase {
            right = new LiteralExpressionImpl(new Polygon(new LinearRing(coords2,new PrecisionModel(), 1),
                                                      null, new PrecisionModel(), 1));
            filter.addRightGeometry(right);
-           //LOGGER.info( filter.toString());
-           //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+           LOGGER.finer( filter.toString());
+           LOGGER.finer( "contains feature: " + filter.contains(testFeature));
            assertTrue(!filter.contains(testFeature));
          */
 
@@ -638,14 +638,14 @@ public class FilterTest extends TestCase {
 
         // Set up true sub filter
         testAttribute = new AttributeExpressionImpl(testSchema, "testString");
-        CompareFilter filterTrue = fac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        CompareFilter filterTrue = fac.createCompareFilter(FilterType.COMPARE_EQUALS);
         Expression testLiteral;
         filterTrue.addLeftValue(testAttribute);
         testLiteral = new LiteralExpressionImpl("test string data");
         filterTrue.addRightValue(testLiteral);
 
         // Set up false sub filter
-        CompareFilter filterFalse = fac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        CompareFilter filterFalse = fac.createCompareFilter(FilterType.COMPARE_EQUALS);
         filterFalse.addLeftValue(testAttribute);
         testLiteral = new LiteralExpressionImpl("incorrect test string data");
         filterFalse.addRightValue(testLiteral);
@@ -654,59 +654,59 @@ public class FilterTest extends TestCase {
         LogicFilter filter = fac.createLogicFilter(filterFalse, filterTrue,
                 AbstractFilter.LOGIC_OR);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
 
         // Test OR for false negatives
         filter = fac.createLogicFilter(filterTrue, filterTrue,
                 AbstractFilter.LOGIC_OR);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
 
         // Test OR for false positives
         filter = fac.createLogicFilter(filterFalse, filterFalse,
                 AbstractFilter.LOGIC_OR);
          //as above but with shortcut
-        Filter filter2 = filterFalse.or(filterTrue);
+        Filter filter2 = (org.geotools.filter.Filter) filterFalse.or(filterTrue);
         assertTrue(!filter.contains(testFeature));
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
         //as above but with shortcut
-        filter2 = filterFalse.or(filterFalse);
+        filter2 = (org.geotools.filter.Filter) filterFalse.or(filterFalse);
         assertTrue(!filter.contains(testFeature));
 
         // Test AND for false positives
         filter = fac.createLogicFilter(filterFalse, filterTrue,
                 AbstractFilter.LOGIC_AND);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
 
         // Test AND for false positives
         filter = fac.createLogicFilter(filterTrue, filterFalse,
                 AbstractFilter.LOGIC_AND);
 
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
 
         // Test AND for false positives
         filter = fac.createLogicFilter(filterTrue, filterTrue,
                 AbstractFilter.LOGIC_AND);
-        filter2 = filterTrue.and(filterTrue);
-        //LOGGER.info( filter.toString());            
-        //LOGGER.info( "contains feature: " + filter.contains(testFeature));
+        filter2 = (org.geotools.filter.Filter) filterTrue.and(filterTrue);
+        LOGGER.finer( filter.toString());            
+        LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(filter.contains(testFeature));
         assertTrue(filter2.contains(testFeature));
         
         //finaly test noting shortcut
-        filter2 = filterFalse.not();
+        filter2 = (org.geotools.filter.Filter) filterFalse.not();
         assertTrue(filter2.contains(testFeature));
     }
 }

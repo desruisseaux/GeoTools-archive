@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.collection.CollectionDataStore;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
@@ -55,7 +56,8 @@ import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
@@ -94,7 +96,9 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  */
 public class DataUtilities {
     static Map typeMap = new HashMap();
-
+    
+    static FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );
+    
     static {
         typeMap.put("String", String.class);
         typeMap.put("string", String.class);
@@ -246,7 +250,7 @@ public class DataUtilities {
             } else if (here instanceof FidFilter) {
                 visitor.visit((FidFilter) here);
             } else if (here instanceof Filter) {
-                visitor.visit((Filter) here);
+                visitor.visit((org.geotools.filter.Filter) here);
             } else if (here instanceof AttributeExpression) {
                 visitor.visit((AttributeExpression) here);
             } else if (here instanceof LiteralExpression) {
@@ -256,7 +260,7 @@ public class DataUtilities {
             } else if (here instanceof FunctionExpression) {
                 visitor.visit((FunctionExpression) here);
             } else if (here instanceof Expression) {
-                visitor.visit((Filter) here);
+                visitor.visit((org.geotools.filter.Filter) here);
             }
         }
     }
@@ -280,7 +284,7 @@ public class DataUtilities {
                 }
             };
 
-        filter.accept(traverse);
+        ((org.geotools.filter.Filter)filter).accept(traverse);
 
         return set;
     }
@@ -1155,10 +1159,10 @@ public class DataUtilities {
         Filter filter = firstQuery.getFilter();
         Filter filter2 = secondQuery.getFilter();
 
-        if ((filter == null) || filter.equals(Filter.NONE)) {
+        if ((filter == null) || filter.equals(Filter.INCLUDE)) {
             filter = filter2;
-        } else if ((filter2 != null) && !filter2.equals(Filter.NONE)) {
-            filter = filter.and(filter2);
+        } else if ((filter2 != null) && !filter2.equals(Filter.INCLUDE)) {
+            filter = ff.and( filter, filter2);
         }
 
         //build the mixed query
@@ -1296,7 +1300,7 @@ public class DataUtilities {
          *
          * @param filter DOCUMENT ME!
          */
-        public void visit(Filter filter) {
+        public void visit(org.geotools.filter.Filter filter) {
             if (filter instanceof BetweenFilter) {
                 visit((BetweenFilter) filter);
             } else if (filter instanceof CompareFilter) {
@@ -1507,7 +1511,7 @@ public class DataUtilities {
 		//traverse((Expression) i.next());
 		//visit((Expression) i.next());
 		traverse((Filter) i.next());
-		visit((Filter) i.next());
+		visit((org.geotools.filter.Filter) i.next());
             }
         }
 

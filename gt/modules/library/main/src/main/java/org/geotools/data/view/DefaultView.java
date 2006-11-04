@@ -36,7 +36,7 @@ import org.geotools.data.crs.ReprojectFeatureResults;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
@@ -275,11 +275,9 @@ public class DefaultView implements FeatureSource {
         Filter newFilter = filter;
         Filter constraintFilter = constraintQuery.getFilter();
         try {
-            if (constraintFilter != Filter.NONE) {
+            if (constraintFilter != Filter.INCLUDE) {
                 FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-                newFilter = ff.createLogicFilter(FilterType.LOGIC_AND);
-                ((LogicFilter) newFilter).addFilter(constraintFilter);
-                ((LogicFilter) newFilter).addFilter(filter);
+                newFilter = ff.and(constraintFilter, filter);
             }
         } catch (Exception ex) {
             throw new DataSourceException("Can't create the constraint filter", ex);
@@ -471,8 +469,8 @@ public class DefaultView implements FeatureSource {
      */
     public Envelope getBounds() throws IOException {
         if (constraintQuery.getCoordinateSystemReproject() == null) {
-            if (constraintQuery.getFilter() == null || constraintQuery.getFilter() == Filter.NONE
-                    || Filter.NONE.equals(constraintQuery.getFilter())) {
+            if (constraintQuery.getFilter() == null || constraintQuery.getFilter() == Filter.INCLUDE
+                    || Filter.INCLUDE.equals(constraintQuery.getFilter())) {
                 return source.getBounds();
             }
                 return source.getBounds(constraintQuery);

@@ -16,8 +16,8 @@
  */
 package org.geotools.styling;
 
+import org.opengis.filter.Filter;
 import org.geotools.event.GTComponent;
-import org.geotools.filter.Filter;
 
 
 /**

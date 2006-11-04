@@ -220,7 +220,7 @@ public class OracleDataStoreTest extends TestCase {
 
     public void testGetFeatureWriter() throws Exception {
     	if( conn == null ) return;    	
-        FeatureWriter writer = dstore.getFeatureWriter("ORA_TEST_POINTS", Filter.NONE, Transaction.AUTO_COMMIT);
+        FeatureWriter writer = dstore.getFeatureWriter("ORA_TEST_POINTS", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         assertNotNull(writer);
 
         Feature feature = writer.next();
@@ -362,14 +362,14 @@ public class OracleDataStoreTest extends TestCase {
     public void testRemoveFeatures() throws Exception {
     	if( conn == null ) return;    	
         FeatureStore fs = (FeatureStore) dstore.getFeatureSource("ORA_TEST_POINTS");
-        fs.removeFeatures(Filter.NONE);
+        fs.removeFeatures(Filter.INCLUDE);
         FeatureResults fr = fs.getFeatures();
         assertEquals(0, fr.getCount());
     }
     
     public void testPropertySelect() throws Exception {
     	if( conn == null ) return;    	
-        DefaultQuery q = new DefaultQuery("ORA_TEST_POINTS",Filter.NONE);
+        DefaultQuery q = new DefaultQuery("ORA_TEST_POINTS",Filter.INCLUDE);
         q.setPropertyNames(new String[]{"NAME"});
         FeatureReader fr = dstore.getFeatureReader(q, Transaction.AUTO_COMMIT);
         Feature f = fr.next();

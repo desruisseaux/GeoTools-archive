@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.opengis.coverage.grid.GridCoverage;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -96,12 +96,12 @@ public class DefaultAttributeType implements AttributeType {
         }
     protected DefaultAttributeType(String name, Class type, boolean nillable, int min, int max,
             Object defaultValue) {
-            this(name,type,nillable,min,max,defaultValue,Filter.NONE);
+            this(name,type,nillable,min,max,defaultValue,Filter.INCLUDE);
         }
 
     protected DefaultAttributeType(String name, Class type, boolean nillable,
                                    Object defaultValue) {
-	this(name, type, nillable, 1, 1,  defaultValue,Filter.NONE);
+	this(name, type, nillable, 1, 1,  defaultValue,Filter.INCLUDE);
     }
 
     protected DefaultAttributeType(AttributeType copy) {

@@ -64,5 +64,5 @@ public interface LogicFilter extends Filter, BinaryLogicOperator {
      * @task REVISIT: make all filters immutable.  This should return a new
      *       filter.
      */
-    void addFilter(Filter filter) throws IllegalFilterException;
+    void addFilter(org.opengis.filter.Filter filter) throws IllegalFilterException;
 }

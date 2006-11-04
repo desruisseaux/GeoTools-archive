@@ -382,7 +382,7 @@ public class MIFDataStoreTest extends TestCase {
 
         try {
             ((FeatureStore) fs).modifyFeatures(featureType.getAttributeType(
-                    "DESCRIPTION"), "FOO", Filter.NONE);
+                    "DESCRIPTION"), "FOO", Filter.INCLUDE);
         } catch (Exception e) {
             fail("Cannot update Features: " + e.getMessage());
         }

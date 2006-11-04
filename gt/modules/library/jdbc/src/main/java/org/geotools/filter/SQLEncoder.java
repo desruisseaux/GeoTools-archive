@@ -195,13 +195,13 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
      * @throws SQLEncoderException If filter type not supported, or if there
      *         were io problems.
      */
-    public void encode(Writer out, Filter filter) throws SQLEncoderException {
+    public void encode(Writer out, org.opengis.filter.Filter filter) throws SQLEncoderException {
         if (getCapabilities().fullySupports(filter)) {
             this.out = out;
 
             try {
                 out.write("WHERE ");
-                filter.accept(this);
+                Filters.accept( filter, this );
 
                 //out.write(";");
             } catch (java.io.IOException ioe) {
@@ -223,7 +223,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
      * @throws SQLEncoderException If filter type not supported, or if there
      *         were io problems.
      */
-    public String encode(Filter filter) throws SQLEncoderException {
+    public String encode(org.opengis.filter.Filter filter) throws SQLEncoderException {
         StringWriter output = new StringWriter();
         encode(output, filter);
 
@@ -256,7 +256,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
      *
      * @throws RuntimeException for IO Encoding problems.
      *
-     * @task REVISIT: I don't think Filter.NONE and Filter.ALL should be
+     * @task REVISIT: I don't think Filter.INCLUDE and Filter.EXCLUDE should be
      *       handled here.  They should have their own methods, but they don't
      *       have interfaces, so I don't know if that's possible.
      */

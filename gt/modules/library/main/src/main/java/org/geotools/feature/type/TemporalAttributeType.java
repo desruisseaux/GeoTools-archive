@@ -18,7 +18,7 @@ package org.geotools.feature.type;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.PrimativeAttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 import java.util.Date;
 

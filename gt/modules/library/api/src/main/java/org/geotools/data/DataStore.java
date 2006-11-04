@@ -16,9 +16,9 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
 
 
 /**
@@ -160,7 +160,7 @@ public interface DataStore {
      * </p>
      * <p>
      * We may wish to limit this method to only support Queries using
-     * Filter.ALL.
+     * Filter.EXCLUDE.
      * </p>
      * <p>
      * Update - GeoServer has an elegatent implementation of this functionality
@@ -271,14 +271,14 @@ public interface DataStore {
      * </li>
      * <li>
      * EmptyFeatureReader
-     * - provides no content for Filter.ALL optimizations
+     * - provides no content for Filter.EXCLUDE optimizations
      * </li>
      * </ul>
      * <p>
      * Sample use (not optimized):
      * </p>
      * <pre><code>
-     * if (filter == Filter.ALL) {
+     * if (filter == Filter.EXCLUDE) {
      *      return new EmptyFeatureReader(featureType);
      *  }
      *
@@ -286,7 +286,7 @@ public interface DataStore {
      *  FeatureType schema = getSchema( typeName );
      *  FeatureReader reader = new DefaultFeatureReader( getAttributeReaders(), schema );
      *
-     *  if (filter != Filter.NONE) {
+     *  if (filter != Filter.INCLUDE) {
      *      reader = new FilteringFeatureReader(reader, filter);
      *  }
      *
@@ -357,7 +357,7 @@ public interface DataStore {
      * </li>
      * <li>
      * EmptyFeatureWriter
-     * - provides no content for Filter.ALL optimizations
+     * - provides no content for Filter.EXCLUDE optimizations
      * </li>
      * </ul>
      *

@@ -394,7 +394,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final int[] featureAddedEventCount = { 0 };
 
         Transaction transaction = new DefaultTransaction();
-        FeatureWriter writer = ds.getFeatureWriter(typeName, Filter.NONE,
+        FeatureWriter writer = ds.getFeatureWriter(typeName, Filter.INCLUDE,
                 transaction);
 
         Feature source;

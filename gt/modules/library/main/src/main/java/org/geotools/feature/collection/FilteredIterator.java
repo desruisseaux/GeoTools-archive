@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  * Provides an implementation of Iterator that will filter
@@ -75,7 +75,7 @@ public class FilteredIterator implements Iterator {
 		Object item = null;
 		while (delegate.hasNext()) {
 			item = (Feature) delegate.next();
-			if (filter.contains( (Feature) item )){ // TODO: Genrealize Filter
+			if (filter.evaluate( item )){
 				return item;
 			}
 		}

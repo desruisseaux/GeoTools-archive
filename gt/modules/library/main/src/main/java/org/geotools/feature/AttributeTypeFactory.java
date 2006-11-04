@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryFinder;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**

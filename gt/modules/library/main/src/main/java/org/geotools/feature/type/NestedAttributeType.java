@@ -16,7 +16,7 @@
 package org.geotools.feature.type;
 
 import org.geotools.feature.AttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  * This level of inheritance is intended for documentation purposes ... 

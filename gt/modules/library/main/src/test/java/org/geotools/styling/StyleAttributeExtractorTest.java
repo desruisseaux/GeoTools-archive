@@ -28,6 +28,7 @@ import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 
 import java.util.Set;
@@ -179,7 +180,7 @@ public class StyleAttributeExtractorTest extends TestCase {
         s.getFeatureTypeStyles()[0].addRule(rule);
         assertAttributeName(s, new String[] { "geometry", "shape" });
 
-        CompareFilter f = filterFactory.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+        CompareFilter f = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
         f.addLeftValue(filterFactory.createAttributeExpression(testSchema,
                 "testLong"));
         f.addRightValue(filterFactory.createLiteralExpression(10.0));

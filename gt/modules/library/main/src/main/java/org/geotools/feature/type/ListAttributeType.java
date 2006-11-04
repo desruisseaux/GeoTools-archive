@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  * Represents an ordered list of AttributeTypes. For SFS this will be a 
@@ -64,7 +64,7 @@ public class ListAttributeType implements AttributeType {
 
     public ListAttributeType(String name, boolean nillable,
     		AttributeType[] children) {
-    	this(name, nillable, 1, 1, children,Filter.ALL);
+    	this(name, nillable, 1, 1, children,Filter.EXCLUDE);
     }
     public Filter getRestriction(){return restriction;}
 	/* (non-Javadoc)

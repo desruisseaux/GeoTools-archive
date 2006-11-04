@@ -70,8 +70,9 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
+import org.geotools.filter.Filters;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
 import org.geotools.index.LockTimeoutException;
@@ -305,7 +306,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	protected Filter getUnsupportedFilter(String typeName, Filter filter) {
 
 		if (filter instanceof FidFilter && fixURL!=null )
-			return Filter.NONE;
+			return Filter.INCLUDE;
 
 		return filter;
 	}
@@ -324,7 +325,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		if (transaction == Transaction.AUTO_COMMIT) {
 			return super.getFeatureWriterAppend(typeName, transaction);
 		} else {
-			writer = state(transaction).writer(typeName, Filter.ALL);
+			writer = state(transaction).writer(typeName, Filter.EXCLUDE);
 		}
  
 
@@ -363,14 +364,14 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	protected FeatureReader getFeatureReader(String typeName, Query query)
 			throws IOException {
-		if( query.getFilter()==Filter.ALL )
+		if( query.getFilter()==Filter.EXCLUDE )
 			return new EmptyFeatureReader(getSchema());
 
 		String[] propertyNames = query.getPropertyNames()==null?new String[0]:query.getPropertyNames();
 		String defaultGeomName = schema.getDefaultGeometry().getName();
 
         FilterAttributeExtractor fae= new FilterAttributeExtractor();
-        query.getFilter().accept(fae);
+        Filters.accept( query.getFilter(),fae);
         
         Set attributes=new HashSet(Arrays.asList(propertyNames));
         attributes.addAll(fae.getAttributeNameSet());
@@ -455,7 +456,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		} else {
 			if (filter != null) {
 				FilterConsumer fc = new FilterConsumer();
-				filter.accept(fc);
+				Filters.accept(filter,fc);
 				bbox = fc.getBounds();
 			}
 
@@ -883,7 +884,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	protected Envelope getBounds(Query query) throws IOException {
 		Envelope ret = null;
 
-		if (query.getFilter() == Filter.NONE) {
+		if (query.getFilter() == Filter.INCLUDE) {
 			ret = getBounds();
 		} else if (this.useIndex) {
 			RTree rtree = this.openRTree();
@@ -989,7 +990,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @see org.geotools.data.AbstractDataStore#getCount(org.geotools.data.Query)
 	 */
 	protected int getCount(Query query) throws IOException {
-		if (query.getFilter() == Filter.NONE) {
+		if (query.getFilter() == Filter.INCLUDE) {
 			ShapefileReader reader = new ShapefileReader(
 					getReadChannel(shpURL), readWriteLock);
 			int count = -1;

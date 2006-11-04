@@ -39,7 +39,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 /**
  * This is a starting point for providing your own FeatureStore implementation.
@@ -179,10 +179,13 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
      */
     public void modifyFeatures(AttributeType type, Object value, Filter filter)
         throws IOException {
-        modifyFeatures(new AttributeType[] { type, }, new Object[] { value, },
-            filter);
+        modifyFeatures( type, value, (org.opengis.filter.Filter) filter );
     }
-
+    public void modifyFeatures(AttributeType type, Object value, org.geotools.filter.Filter filter)
+    throws IOException {
+    modifyFeatures(new AttributeType[] { type, }, new Object[] { value, },
+        filter);
+}
     /**
      * Modifies features matching <code>filter</code>.
      * 

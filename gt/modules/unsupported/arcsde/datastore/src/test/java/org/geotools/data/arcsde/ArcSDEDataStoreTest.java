@@ -344,7 +344,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         }
 
         //build the query asking for a subset of attributes
-        final Query query = new DefaultQuery(typeName, Filter.NONE, queryAtts);
+        final Query query = new DefaultQuery(typeName, Filter.INCLUDE, queryAtts);
 
         FeatureReader reader;
         reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
@@ -380,7 +380,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         }
 
         //build the query asking for a subset of attributes
-        final Query query = new DefaultQuery(typeName, Filter.NONE, queryAtts);
+        final Query query = new DefaultQuery(typeName, Filter.INCLUDE, queryAtts);
 
         FeatureReader reader;
         reader = ds.getFeatureReader(query, Transaction.AUTO_COMMIT);
@@ -431,7 +431,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws IOException DOCUMENT ME!
      */
     private FeatureReader getReader(String typeName) throws IOException {
-        Query q = new DefaultQuery(typeName, Filter.NONE);
+        Query q = new DefaultQuery(typeName, Filter.INCLUDE);
         FeatureReader reader = store.getFeatureReader(q, Transaction.AUTO_COMMIT);
         FeatureType retType = reader.getFeatureType();
         assertNotNull(retType.getDefaultGeometry());

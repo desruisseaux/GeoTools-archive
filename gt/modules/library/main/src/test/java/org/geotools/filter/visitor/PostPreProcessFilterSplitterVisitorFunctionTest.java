@@ -17,7 +17,7 @@ package org.geotools.filter.visitor;
 
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.function.FilterFunction_geometryType;
@@ -41,9 +41,9 @@ public class PostPreProcessFilterSplitterVisitorFunctionTest extends AbstractPos
 		
 		Filter filter=filter1.and(filter2);
 
-		filter.accept(visitor);
+        ((org.geotools.filter.Filter)filter).accept(visitor);
 		
-		assertEquals(Filter.NONE, visitor.getFilterPre());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		assertEquals(filter, visitor.getFilterPost());
 
 		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
@@ -51,9 +51,9 @@ public class PostPreProcessFilterSplitterVisitorFunctionTest extends AbstractPos
 		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL);
 		visitor=newVisitor();
 
-		filter.accept(visitor);
+        ((org.geotools.filter.Filter)filter).accept(visitor);
 		
-		assertEquals(Filter.NONE, visitor.getFilterPost());
+		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
 	}
 
@@ -71,7 +71,7 @@ public class PostPreProcessFilterSplitterVisitorFunctionTest extends AbstractPos
 		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL);
 		visitor=newVisitor();
 
-		filter.accept(visitor);
+        ((org.geotools.filter.Filter)filter).accept(visitor);
 		
 		assertEquals(filter1, visitor.getFilterPre());
 		assertEquals(filter2, visitor.getFilterPost());

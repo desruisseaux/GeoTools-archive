@@ -17,9 +17,9 @@ package org.geotools.data;
 
 import java.net.URI;
 import java.util.Arrays;
+import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.filter.Filter;
 
 
 /**
@@ -54,7 +54,7 @@ class FIDSQuery implements Query {
     }
 
     public Filter getFilter() {
-        return Filter.NONE;
+        return Filter.INCLUDE;
     }
 
     public String getTypeName() {

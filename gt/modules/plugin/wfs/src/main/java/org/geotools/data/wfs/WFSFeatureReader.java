@@ -225,11 +225,11 @@ public class WFSFeatureReader extends FCBuffer {
 
     private Feature updateFeature( Action a, Feature feature ) {
         if ((a.getType() == Action.DELETE)
-                && a.getFilter().contains(feature)) {
+                && a.getFilter().evaluate(feature)) {
             return null;
         } else {
             if ((a.getType() == Action.UPDATE)
-                    && a.getFilter().contains(feature)) {
+                    && a.getFilter().evaluate(feature)) {
                 // update the feature
                 UpdateAction ua = (UpdateAction) a;
                 ua.update(feature);

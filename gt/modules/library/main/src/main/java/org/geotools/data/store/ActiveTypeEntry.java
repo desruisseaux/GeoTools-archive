@@ -47,7 +47,7 @@ import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -294,7 +294,7 @@ final class ActiveTypeEntry implements TypeEntry {
 
         if (filter == null) {
             throw new NullPointerException("getFeatureReader requires Filter: "
-                + "did you mean Filter.NONE?");
+                + "did you mean Filter.INCLUDE?");
         }
         if( typeName == null ){
             throw new NullPointerException(
@@ -317,14 +317,14 @@ final class ActiveTypeEntry implements TypeEntry {
 
             }
         }
-        if ( filter == Filter.ALL || filter.equals( Filter.ALL )) {
+        if ( filter == Filter.EXCLUDE || filter.equals( Filter.EXCLUDE )) {
             return new EmptyFeatureReader(featureType);
         }
         //GR: allow subclases to implement as much filtering as they can,
         //by returning just it's unsupperted filter
         filter = getUnsupportedFilter( filter);
         if(filter == null){
-            throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.NONE?");
+            throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.INCLUDE?");
         }
 
         // This calls our subclass "simple" implementation
@@ -333,7 +333,7 @@ final class ActiveTypeEntry implements TypeEntry {
         //
         FeatureReader reader = createReader( query);
 
-        if (!filter.equals( Filter.NONE ) ) {
+        if (!filter.equals( Filter.INCLUDE ) ) {
             reader = new FilteringFeatureReader(reader, filter);
         }
 
@@ -522,7 +522,7 @@ final class ActiveTypeEntry implements TypeEntry {
      * FilteringFeatureReader will be constructed upon it. Otherwise it will
      * just return the same filter.
      * <p>
-     * If the complete filter is supported, the subclass must return <code>Filter.NONE</code>
+     * If the complete filter is supported, the subclass must return <code>Filter.INCLUDE</code>
      * </p>
      */
     protected Filter getUnsupportedFilter( Filter filter )

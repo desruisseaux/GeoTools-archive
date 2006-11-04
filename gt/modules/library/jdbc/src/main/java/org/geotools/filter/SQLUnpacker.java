@@ -17,6 +17,9 @@ package org.geotools.filter;
 
 import java.util.Iterator;
 
+import org.geotools.factory.CommonFactoryFinder;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 /**
  * Determines which parts of a Filter can be turned into valid SQL statements.
@@ -71,6 +74,7 @@ public class SQLUnpacker {
     /** The types of Filters that should be part of the supported Filter */
     private FilterCapabilities capabilities;
 
+    private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
     /**
      * Constructor with FilterCapabilities from the Encoder used in conjunction
      * with this Unpacker.
@@ -88,7 +92,7 @@ public class SQLUnpacker {
      *
      * @param filter to be unpacked, split on ANDs
      */
-    public void unPackAND(Filter filter) {
+    public void unPackAND(org.opengis.filter.Filter filter) {
         pair = doUnPack(filter, AbstractFilter.LOGIC_AND);
     }
 
@@ -139,7 +143,7 @@ public class SQLUnpacker {
      *
      * @return A filter of the unsupported parts of the unPacked filter.
      */
-    private FilterPair doUnPack(Filter filter, short splitType) {
+    private FilterPair doUnPack(org.opengis.filter.Filter filter, short splitType) {
         /*
          * Implementation notes: This is recursive, so it's worth explaining.
          * The base cases are either the filter is fully supported, ie all of
@@ -181,7 +185,7 @@ public class SQLUnpacker {
         if (capabilities.fullySupports(filter)) {
             retSup = filter;
         } else {
-            short type = filter.getFilterType();
+            short type = Filters.getFilterType(filter);
 
             if ((type == splitType) && capabilities.supports(splitType)) {
                 //REVISIT: one special case not covered, when capabilities 
@@ -190,7 +194,10 @@ public class SQLUnpacker {
                 Iterator filters = ((LogicFilter) filter).getFilterIterator();
 
                 while (filters.hasNext()) {
-                    subPair = doUnPack((Filter) filters.next(), splitType);
+                    Filter next = (Filter) filters.next();
+                    
+                    subPair = doUnPack(next, splitType);
+                    
                     subSup = subPair.getSupported();
                     subUnSup = subPair.getUnSupported();
                     retSup = combineFilters(retSup, subSup, splitType);
@@ -206,11 +213,11 @@ public class SQLUnpacker {
                 subUnSup = subPair.getUnSupported();
 
                 if (subSup != null) {
-                    retSup = subSup.not();
+                    retSup = ff.not( subSup );
                 }
 
                 if (subUnSup != null) {
-                    retUnSup = subUnSup.not();
+                    retUnSup = ff.not( subUnSup );
                 }
             } else { //it's not supported and has no logic subfilters to be split.
                 retUnSup = filter;
@@ -241,9 +248,9 @@ public class SQLUnpacker {
         if (filter1 != null) {
             if (filter2 != null) {
                 if (splitType == AbstractFilter.LOGIC_AND) {
-                    retFilter = filter1.and(filter2);
+                    retFilter = Filters.and( ff, filter1, filter2 );
                 } else { //OR and AND only split types, this must be or.
-                    retFilter = filter1.or(filter2);
+                    retFilter = Filters.or( ff, filter1, filter2 );
                 }
             } else {
                 retFilter = filter1;
@@ -258,6 +265,7 @@ public class SQLUnpacker {
 
         return retFilter;
     }
+
 
     /**
      * An inner class to hold a pair of Filters. Reasoning behind inner class

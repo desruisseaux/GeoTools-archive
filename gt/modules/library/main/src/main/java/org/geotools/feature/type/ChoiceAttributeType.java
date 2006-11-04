@@ -19,7 +19,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.util.Arrays;
 
@@ -79,7 +79,7 @@ public class ChoiceAttributeType implements AttributeType {
     }
 
     public ChoiceAttributeType(String name, AttributeType[] children) {
-        this(name, 1, 1, children, Filter.ALL);
+        this(name, 1, 1, children, Filter.EXCLUDE);
     }
 
     public Filter getRestriction() {

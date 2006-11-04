@@ -34,7 +34,7 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
@@ -349,7 +349,7 @@ public class ArcSDEAdapter {
 				isNilable = (seShapeType & SeLayer.SE_NIL_TYPE_MASK) == SeLayer.SE_NIL_TYPE_MASK;
 				defValue = GeometryBuilder.defaultValueFor(typeClass);
 				attribute = new GeometricAttributeType(seColumns[i]
-						.getName(), typeClass, isNilable,1,1,defValue, crs,Filter.NONE);
+						.getName(), typeClass, isNilable,1,1,defValue, crs,Filter.INCLUDE);
 			} else if (sdeType.intValue() == SeColumnDefinition.TYPE_RASTER) {
 				throw new DataSourceException(
 						"Raster columns are not supported yet");

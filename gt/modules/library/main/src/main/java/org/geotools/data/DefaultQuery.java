@@ -17,10 +17,9 @@ package org.geotools.data;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -48,7 +47,7 @@ public class DefaultQuery implements Query {
     private int maxFeatures = Query.DEFAULT_MAX;
 
     /** The filter to constrain the request. */
-    private Filter filter = Filter.NONE;
+    private Filter filter = Filter.INCLUDE;
 
     /** The typeName to get */
     private String typeName;
@@ -83,7 +82,7 @@ public class DefaultQuery implements Query {
      * @param typeName the name of the featureType to retrieve
      */
     public DefaultQuery( String typeName ){
-        this( typeName, Filter.NONE );
+        this( typeName, Filter.INCLUDE );
     }
 
     /**
@@ -97,7 +96,7 @@ public class DefaultQuery implements Query {
     public DefaultQuery(String typeName, Filter filter) {
         this( typeName, filter, Query.ALL_NAMES );        
     }
-
+    
     /**
      * Constructor that sets the filter and properties
      * @param typeName 
@@ -107,8 +106,7 @@ public class DefaultQuery implements Query {
      */
     public DefaultQuery(String typeName, Filter filter, String[] properties) {
         this( typeName, null, filter, Query.DEFAULT_MAX, properties, null );        
-    }
-
+    }    
     /**
      * Constructor that sets all fields.
      *
@@ -122,6 +120,7 @@ public class DefaultQuery implements Query {
         String[] propNames, String handle) {
         this(typeName, null, filter, maxFeatures, propNames, handle );
     }
+    
     /**
      * Constructor that sets all fields.
      *
@@ -141,7 +140,7 @@ public class DefaultQuery implements Query {
         this.maxFeatures = maxFeatures;
         this.handle = handle;
     }
-
+    
     /**
      * Copy contructor, clones the state of a generic Query into a DefaultQuery
      * @param query
@@ -152,7 +151,27 @@ public class DefaultQuery implements Query {
       this.coordinateSystem = query.getCoordinateSystem();
       this.coordinateSystemReproject = query.getCoordinateSystemReproject();
     }
-
+    // deprecated constructors
+    //
+    /** @deprecated Please use GeoAPI filter */
+    public DefaultQuery(String typeName, org.geotools.filter.Filter filter) {
+        this( typeName, (Filter) filter, Query.ALL_NAMES );
+    }
+    /** @deprecated Please use GeoAPI filter */
+    public DefaultQuery(String typeName, org.geotools.filter.Filter filter, String[] properties) {
+        this( typeName, null, (Filter) filter, Query.DEFAULT_MAX, properties, null );
+    }
+    /** @deprecated please use geoapi filter */
+    public DefaultQuery(String typeName, org.geotools.filter.Filter filter, int maxFeatures,
+        String[] propNames, String handle) {
+        this(typeName, null, (Filter) filter, maxFeatures, propNames, handle );
+    }
+    /** @deprecated please use geoapi filter */
+    public DefaultQuery(String typeName, URI namespace, org.geotools.filter.Filter filter, int maxFeatures,
+            String[] propNames, String handle) {
+        this( typeName, namespace, (Filter) filter, maxFeatures, propNames, handle );
+    }
+    
     /**
      * The property names is used to specify the attributes that should be
      * selected for the return feature collection.  If the property array is

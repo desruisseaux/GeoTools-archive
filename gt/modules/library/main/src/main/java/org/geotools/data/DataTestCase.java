@@ -25,7 +25,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
@@ -81,6 +81,7 @@ public class DataTestCase extends TestCase {
     protected FeatureType lakeType; // lake: id, geom, name
     protected Feature[] lakeFeatures;
     protected Envelope lakeBounds;
+    protected FilterFactory ff;
     
     
     /**
@@ -94,6 +95,7 @@ public class DataTestCase extends TestCase {
      * Invoked before a test is run. The default implementation invokes {@link #dataSetUp}.
      */
     protected void setUp() throws Exception {
+        ff = FilterFactoryFinder.createFilterFactory();
         dataSetUp();
     }
     
@@ -149,12 +151,11 @@ public class DataTestCase extends TestCase {
         roadBounds.expandToInclude( roadFeatures[0].getBounds() );
         roadBounds.expandToInclude( roadFeatures[1].getBounds() );
         roadBounds.expandToInclude( roadFeatures[2].getBounds() );
-        
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-        rd1Filter = factory.createFidFilter("road.rd1");
-        rd2Filter = factory.createFidFilter("road.rd2");
+                
+        rd1Filter = ff.createFidFilter("road.rd1");
+        rd2Filter = ff.createFidFilter("road.rd2");
 
-        FidFilter create = factory.createFidFilter();
+        FidFilter create = ff.createFidFilter();
         create.addFid("road.rd1");
         create.addFid("road.rd2");
         

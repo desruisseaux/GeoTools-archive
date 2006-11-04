@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.arcsde.GeometryBuilder;
 import org.geotools.data.arcsde.GeometryBuildingException;
+import org.opengis.filter.Filter;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
@@ -141,11 +142,11 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      */
     public void encode(Filter filter) throws GeometryEncoderException {
         this.sdeSpatialFilters = new ArrayList();
-        if(Filter.NONE.equals(filter)){
+        if(Filter.INCLUDE.equals(filter)){
         	return;
         }
         if (capabilities.fullySupports(filter)) {
-            filter.accept(this);
+            Filters.accept( filter, this );
         } else {
             throw new GeometryEncoderException("Filter type not supported");
         }
@@ -301,7 +302,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      *
      * @param filter DOCUMENT ME!
      */
-    public void visit(Filter filter) {
+    public void visit(org.geotools.filter.Filter filter) {
     	//intentionally blank
     }
 

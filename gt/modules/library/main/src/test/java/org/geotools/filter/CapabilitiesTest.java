@@ -87,7 +87,7 @@ public class CapabilitiesTest extends TestCase {
 
         try {
             gFilter = fact.createGeometryFilter(AbstractFilter.GEOMETRY_WITHIN);
-            compFilter = fact.createCompareFilter(AbstractFilter.COMPARE_LESS_THAN);
+            compFilter = fact.createCompareFilter(FilterType.COMPARE_LESS_THAN);
         } catch (IllegalFilterException ife) {
             LOGGER.fine("Bad filter " + ife);
         }
@@ -95,14 +95,14 @@ public class CapabilitiesTest extends TestCase {
         capabilities.addType(AbstractFilter.LOGIC_OR);
         capabilities.addType(AbstractFilter.LOGIC_AND);
         capabilities.addType(AbstractFilter.LOGIC_NOT);
-        capabilities.addType(AbstractFilter.COMPARE_EQUALS);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN);
+        capabilities.addType(FilterType.COMPARE_EQUALS);
+        capabilities.addType(FilterType.COMPARE_LESS_THAN);
         capabilities.addType(AbstractFilter.BETWEEN);
     }
 
     public void testAdd() {
-        capabilities.addType(AbstractFilter.COMPARE_GREATER_THAN);
-        capabilities.addType(AbstractFilter.COMPARE_LESS_THAN_EQUAL);
+        capabilities.addType(FilterType.COMPARE_GREATER_THAN);
+        capabilities.addType(FilterType.COMPARE_LESS_THAN_EQUAL);
         capabilities.addType(AbstractFilter.NULL);
         assertTrue(capabilities.supports(AbstractFilter.NULL));
     }
@@ -119,15 +119,15 @@ public class CapabilitiesTest extends TestCase {
 
     public void testFullySupports() {
         try {
-            logFilter = gFilter.and(compFilter);
+            logFilter = (org.geotools.filter.Filter) gFilter.and(compFilter);
             assertTrue(capabilities.fullySupports(compFilter));
             assertTrue(!(capabilities.fullySupports(gFilter)));
             assertTrue(!(capabilities.fullySupports(logFilter)));
-            logFilter = compFilter.and(fact.createBetweenFilter());
+            logFilter = (org.geotools.filter.Filter)  compFilter.and(fact.createBetweenFilter());
             assertTrue(capabilities.fullySupports(logFilter));
-            logFilter = logFilter.or(fact.createBetweenFilter());
+            logFilter = (org.geotools.filter.Filter) logFilter.or(fact.createBetweenFilter());
             assertTrue(capabilities.fullySupports(logFilter));
-            logFilter = logFilter.and(gFilter);
+            logFilter = (org.geotools.filter.Filter) logFilter.and(gFilter);
             assertTrue(!(capabilities.fullySupports(logFilter)));
         } catch (IllegalFilterException e) {
             LOGGER.fine("Bad filter " + e);

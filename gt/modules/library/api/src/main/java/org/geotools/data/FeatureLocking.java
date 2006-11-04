@@ -17,7 +17,7 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Set;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 
 
 /**

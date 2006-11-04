@@ -72,7 +72,7 @@ public abstract class AbstractFilter extends FilterAbstract implements Filter {
      * the super implementation is called.
      */
     public boolean evaluate(Object object) {
-    	if (object instanceof Feature) {
+    	if (object instanceof Feature  || object == null ) {
     		return evaluate((Feature)object);
     	}
     	

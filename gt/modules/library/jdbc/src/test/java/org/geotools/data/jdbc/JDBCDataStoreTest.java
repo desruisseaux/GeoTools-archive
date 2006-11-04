@@ -149,7 +149,7 @@ public class JDBCDataStoreTest extends TestCase {
         ConnectionPool pool = new ConnectionPool(cpds);
         MockJDBCDataStore ds = new MockJDBCDataStore(pool);
         
-        FeatureWriter writer = ds.getFeatureWriter("FEATURE_TYPE1", Filter.NONE, Transaction.AUTO_COMMIT);
+        FeatureWriter writer = ds.getFeatureWriter("FEATURE_TYPE1", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         assertNotNull(writer);
         
         Feature feature = writer.next();

@@ -16,9 +16,9 @@
 package org.geotools.styling;
 
 import java.net.URL;
+import org.opengis.filter.Filter;
 import org.geotools.factory.Factory;
 import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
 
 
 /**

@@ -19,8 +19,9 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.Filters;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.filter.visitor.ClientTransactionAccessor;
@@ -148,10 +149,11 @@ public class DefaultSQLBuilder implements SQLBuilder {
     	lastFilter = filter;
         FilterCapabilities cap = encoder.getCapabilities();
         PostPreProcessFilterSplittingVisitor pfv = new PostPreProcessFilterSplittingVisitor(cap, ft, accessor);
-        filter.accept(pfv);
+        
+        Filters.accept( filter, pfv );
 
-        lastPreFilter = pfv.getFilterPre();
-        lastPostFilter = pfv.getFilterPost();
+        lastPreFilter = (Filter) pfv.getFilterPre();
+        lastPostFilter = (Filter) pfv.getFilterPost();
     }
     
     /**
@@ -185,8 +187,8 @@ public class DefaultSQLBuilder implements SQLBuilder {
      */
     public void sqlWhere(StringBuffer sql, Filter preFilter)
         throws SQLEncoderException {
-        if ((preFilter != null) && (preFilter != Filter.NONE)) {
-            String where = encoder.encode(preFilter);
+        if ((preFilter != null) && (preFilter != Filter.INCLUDE)) {
+            String where = encoder.encode((org.geotools.filter.Filter)preFilter);
             sql.append(" ");
             sql.append(where);
         }
@@ -213,7 +215,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
      *         by the encoder class
      */
     public String buildSQLQuery(String typeName, FIDMapper mapper,
-        AttributeType[] attrTypes, Filter filter) throws SQLEncoderException {
+        AttributeType[] attrTypes, org.opengis.filter.Filter filter) throws SQLEncoderException {
         StringBuffer sqlBuffer = new StringBuffer();
 
         sqlBuffer.append("SELECT ");
