@@ -65,7 +65,8 @@ public final class CommonFactoryFinder {
         assert Thread.holdsLock(CommonFactoryFinder.class);
         if (registry == null) {
             registry = new FactoryCreator(Arrays.asList(new Class[] {
-                    StyleFactory.class}));
+                    StyleFactory.class,
+                    FilterFactory.class}));
         }
         return registry;
     }
