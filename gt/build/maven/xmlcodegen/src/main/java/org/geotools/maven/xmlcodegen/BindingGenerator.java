@@ -60,7 +60,9 @@ public class BindingGenerator extends AbstractGenerator {
     boolean generateAttributes = true;
     boolean generateElements = true;
     boolean generateTypes = true;
-
+    boolean generateConfiguration = true;
+    boolean generateSchemaLocationResolver = true;
+    
     Set includedTypes = new HashSet();
     
     /**
@@ -118,12 +120,14 @@ public class BindingGenerator extends AbstractGenerator {
         }
 
         if (generateTypes) {
-            List types = schema.getTypeDefinitions();
+        	List types = schema.getTypeDefinitions();
 
             for (Iterator t = types.iterator(); t.hasNext();) {
                 XSDTypeDefinition type = (XSDTypeDefinition) t.next();
+                
                 if ( !includedTypes.isEmpty() ) {
                 	if ( includedTypes.contains( type.getName() ) ) {
+                		logger.info( "Generating " + type.getName() );
                 		generate( type, schema );
                 	}
                 }
