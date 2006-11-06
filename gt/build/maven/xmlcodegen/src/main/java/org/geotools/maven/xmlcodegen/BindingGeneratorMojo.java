@@ -5,7 +5,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,6 +17,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.util.XSDSchemaLocationResolver;
+import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.geotools.xml.Schemas;
 
 /**
@@ -57,6 +61,13 @@ public class BindingGeneratorMojo extends AbstractMojo {
 	 * @parameter expression="${basedir}/src/main/xsd"
 	 */
 	private File schemaSourceDirectory;
+	
+	/**
+	 * Additional directories used to locate included and imported schemas.
+	 * 
+	 * @parameter
+	 */
+	private File[] schemaLookupDirectories;
 	
 	/**
 	 * Flag controlling wether files should overide files that already 
@@ -184,12 +195,57 @@ public class BindingGeneratorMojo extends AbstractMojo {
 			}
 		}
 		
+		//add a location resolver which checks the schema source directory
+		XSDSchemaLocationResolver locationResolver = new XSDSchemaLocationResolver() {
+
+			public String resolveSchemaLocation(
+				XSDSchema schema, String namespaceURI, String schemaLocation 
+			) {
+			
+				//check location directlry
+				File file = new File( schemaLocation );  
+				if ( file.exists() ) {
+					getLog().debug( "Resolving " + schemaLocation + " to " + schemaLocation );
+					return schemaLocation;
+				}
+				
+				String fileName = new File( schemaLocation ).getName();
+				
+				//check under teh schema source directory
+				file = new File( schemaSourceDirectory, fileName ); 
+				if ( file.exists() ) {
+					getLog().debug( "Resolving " + schemaLocation + " to " + file.getAbsolutePath() );
+					return file.getAbsolutePath();
+				}
+				
+				//check hte lookup directories
+				if ( schemaLookupDirectories != null ) {
+					for ( int i = 0; i < schemaLookupDirectories.length; i++ ) {
+						File schemaLookupDirectory = schemaLookupDirectories[ i ];
+						file = new File( schemaLookupDirectory, fileName );
+						if ( file.exists() ) {
+							getLog().debug( "Resolving " + schemaLocation + " to " + file.getAbsolutePath() );
+							return file.getAbsolutePath();
+						}
+							
+					}
+				}
+				
+				getLog().warn( "Could not resolve location for: " + schemaLocation );
+				return null;
+			}
+			
+		};
+		
 		//parse the schema
 		XSDSchema xsdSchema = null;
 		try {
 			getLog().info( "Parsing schema: " + schemaLocation );
 			xsdSchema = 
-				Schemas.parse( schemaLocation.getAbsolutePath()  );
+				Schemas.parse( 
+					schemaLocation.getAbsolutePath(),
+					(XSDSchemaLocator[]) null, new XSDSchemaLocationResolver[]{ locationResolver }
+				);
 			
 			if ( xsdSchema == null ) {
 				throw new NullPointerException();
@@ -202,6 +258,8 @@ public class BindingGeneratorMojo extends AbstractMojo {
 		}
 		
 		BindingGenerator generator = new BindingGenerator();
+		generator.setGeneratingBindingConfiguration( generateBindingConfiguration );
+		generator.setGeneratingBindingInterface( generateBindingInterface );
 		generator.setGenerateAttributes( generateAttributes );
 		generator.setGenerateElements( generateElements );
 		generator.setGenerateTypes( generateTypes );
@@ -231,6 +289,12 @@ public class BindingGeneratorMojo extends AbstractMojo {
 			}
 			
 			generator.setBindingConstructorArguments( map );
+		}
+		
+		if ( includes != null && includes.length > 0 ) {
+			HashSet included = new HashSet( Arrays.asList( includes ) );
+			getLog().info( "Including: " + included ); 
+			generator.setIncludedTypes( included );
 		}
 		
 		getLog().info( "Generating bindings...");
