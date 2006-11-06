@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.Diff;
 import org.geotools.data.DiffFeatureReader;
 import org.geotools.data.FeatureReader;
@@ -199,35 +200,13 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
      * 
      * @param features an array of features that should be added to the datastore
      * @throws IOException
-     */
+     *
     public void addFeatures(final Feature[] features) throws IOException {
     	if( features.length == 0 ) return;
     	
-	    FeatureReader reader = new FeatureReader() {
-			int i = 0;
-
-			public FeatureType getFeatureType() {
-				return features[0].getFeatureType();
-			}
-
-			public Feature next() throws IOException,
-					IllegalAttributeException, NoSuchElementException {
-				Feature f = features[i];
-				i++;
-				return f;
-			}
-
-			public boolean hasNext() throws IOException {
-				return i < features.length;
-			}
-
-			public void close() throws IOException {
-			}
-		};
-		
 		FeatureStore fs = (FeatureStore)getFeatureSource(features[0].getFeatureType().getTypeName());
-	    fs.addFeatures(reader);
-    }
+	    fs.addFeatures( DataUtilities.collection( features ));
+    }*/
 
     /**
      * Utility method for getting a FeatureWriter for modifying existing features,

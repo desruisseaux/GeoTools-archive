@@ -1366,7 +1366,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
-        road.addFeatures(reader);
+        road.addFeatures(DataUtilities.collection(reader));
         assertEquals(roadFeatures.length + 1, count("road"));
     }
 

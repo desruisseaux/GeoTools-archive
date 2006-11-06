@@ -98,10 +98,11 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         data.createSchema(roadType);
         data.createSchema(riverType);
         
+        
         ((FeatureStore) data.getFeatureSource(roadType.getTypeName()))
-        .addFeatures(new CollectionFeatureReader(roadFeatures));
+        .addFeatures(DataUtilities.collection(roadFeatures));
         ((FeatureStore) data.getFeatureSource(riverType.getTypeName()))
-        .addFeatures(new CollectionFeatureReader(riverFeatures));
+        .addFeatures(DataUtilities.collection(riverFeatures));
         
 
         FeatureCollection collection=data.getFeatureSource(roadType.getTypeName()).getFeatures();
@@ -197,30 +198,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         listener1.events.clear();
         listener2.events.clear();
 
-        store1.addFeatures(new FeatureReader() {
-                public FeatureType getFeatureType() {
-                    return feature.getFeatureType();
-                }
-
-                boolean hasNext = true;
-
-                public Feature next()
-                    throws IOException, IllegalAttributeException, 
-                        NoSuchElementException {
-                    hasNext = false;
-
-                    return feature;
-                }
-
-                public boolean hasNext() throws IOException {
-                    return hasNext;
-                }
-
-                public void close() throws IOException {
-                    //do nothing.
-                }
-            });
-
+        store1.addFeatures( DataUtilities.collection( feature ));
+        
         assertEquals(1, listener1.events.size());
         event = listener1.getEvent(0);
         assertEquals(feature.getBounds(), event.getBounds());
@@ -1143,8 +1122,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
     public void testGetFeatureStoreAddFeatures() throws IOException {
         FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
         FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
-
-        road.addFeatures(reader);
+        
+        road.addFeatures( DataUtilities.collection(reader));
         assertEquals(roadFeatures.length + 1, road.getFeatures().getCount());
     }
 
@@ -1212,8 +1191,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         // road2 adds road.rd4 on t2
         // ----------------------------
         // - tests transaction independence from each other
-        FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
-        road2.addFeatures(reader);
+        FeatureCollection collection = DataUtilities.collection(new Feature[] { newRoad, });
+        road2.addFeatures(collection);
 
         // We still have ORIGIONAL, t1 has REMOVE, and t2 has ADD
         assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));

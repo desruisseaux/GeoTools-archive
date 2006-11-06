@@ -431,8 +431,8 @@ public class ShapefileDataStoreTest extends TestCaseSupport {
 		newFeatures2[1].setDefaultGeometry(fac
 				.createPoint(new Coordinate(0, 0)));
 
-		store.addFeatures(DataUtilities.reader(newFeatures1));
-		store.addFeatures(DataUtilities.reader(newFeatures2));
+		store.addFeatures(DataUtilities.collection(newFeatures1));
+		store.addFeatures(DataUtilities.collection(newFeatures2));
 		transaction.commit();
 		assertEquals(idx + 3, sds.getCount(Query.ALL));
 

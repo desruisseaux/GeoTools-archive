@@ -92,7 +92,7 @@ public class FidQueryTest extends FIDTestCase {
 						.getAttributeCount()]));
 		FeatureCollection collection = FeatureCollections.newCollection();
 		collection.add(newfeature);
-		Set newFids = featureStore.addFeatures(collection.reader());
+		Set newFids = featureStore.addFeatures(collection);
 		assertEquals(1, newFids.size());
 		this.assertFidsMatch();
 		FilterFactory fac = FilterFactoryFinder.createFilterFactory();

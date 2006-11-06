@@ -781,11 +781,14 @@ public class DataUtilities {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param features DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Copies the provided features into a FeatureCollection.
+     * <p>
+     * Often used when gathering features for FeatureStore:<pre><code>
+     * featureStore.addFeatures( DataUtilities.collection(array));
+     * </code></pre>
+     * 
+     * @param features Array of features
+     * @return FeatureCollection
      */
     public static FeatureCollection collection(Feature[] features) {
         FeatureCollection collection = FeatureCollections.newCollection();
@@ -793,7 +796,50 @@ public class DataUtilities {
 		for (int i = 0; i < length; i++) {
             collection.add(features[i]);
         }
-
+        return collection;
+    }
+    /**
+     * Copies the provided features into a FeatureCollection.
+     * <p>
+     * Often used when gathering features for FeatureStore:<pre><code>
+     * featureStore.addFeatures( DataUtilities.collection(feature));
+     * </code></pre>
+     * 
+     * @param features Array of features
+     * @return FeatureCollection
+     */
+    public static FeatureCollection collection( Feature feature ){
+        FeatureCollection collection = FeatureCollections.newCollection();
+        collection.add(feature);
+        return collection;
+    }
+    /**
+     * Copies the provided reader into a FeatureCollection, reader will be closed.
+     * <p>
+     * Often used when gathering features for FeatureStore:<pre><code>
+     * featureStore.addFeatures( DataUtilities.collection(reader));
+     * </code></pre>
+     * 
+     * @param features Array of features
+     * @return FeatureCollection
+     */
+    public static FeatureCollection collection(FeatureReader reader) throws IOException {
+        FeatureCollection collection = FeatureCollections.newCollection();
+        
+        try {
+            while( reader.hasNext() ) {
+                try {
+                    collection.add( reader.next() );
+                } catch (NoSuchElementException e) {
+                    throw (IOException) new IOException("EOF").initCause( e );
+                } catch (IllegalAttributeException e) {
+                    throw (IOException) new IOException().initCause( e );
+                }                
+            }
+        }
+        finally {
+            reader.close();
+        }
         return collection;
     }
 

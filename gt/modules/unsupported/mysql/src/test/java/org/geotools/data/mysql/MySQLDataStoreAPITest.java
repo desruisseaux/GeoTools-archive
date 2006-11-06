@@ -1463,10 +1463,9 @@ public class MySQLDataStoreAPITest extends DataTestCase {
     }
 
     public void testGetFeatureStoreAddFeatures() throws IOException {
-        FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
-        road.addFeatures(reader);
+        road.addFeatures(DataUtilities.collection( newRoad ));
         assertEquals(roadFeatures.length + 1, count("road"));
     }
 

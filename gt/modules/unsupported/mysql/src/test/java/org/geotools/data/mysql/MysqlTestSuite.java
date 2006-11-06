@@ -191,7 +191,7 @@ public class MysqlTestSuite extends TestCase {
 	    mysql.removeFeatures(tFilter);
 	    collection = mysql.getFeatures(tFilter).collection();
 	    assertEquals(0, collection.size());
-	    mysql.addFeatures( DataUtilities.reader(delFeatures));
+	    mysql.addFeatures( DataUtilities.collection(delFeatures));
 	    collection = mysql.getFeatures(tFilter).collection();
 	    assertEquals(4, collection.size());
 	} catch (DataSourceException e){

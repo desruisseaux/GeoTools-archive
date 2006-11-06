@@ -373,8 +373,7 @@ public class PropertyDataStoreTest extends TestCase {
         assertEquals( 3, road1.getFeatures().getCount() );
         assertEquals( 4, road2.getFeatures().getCount() );               
         
-        FeatureReader reader = DataUtilities.reader( new Feature[]{ feature, });
-        road2.addFeatures( reader ); // road2 adds fid5 on t2
+        road2.addFeatures( DataUtilities.collection( feature )); // road2 adds fid5 on t2
     
         assertEquals( 4, road.getFeatures().getCount() );
         assertEquals( 3, road1.getFeatures().getCount() );

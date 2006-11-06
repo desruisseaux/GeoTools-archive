@@ -22,6 +22,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
@@ -41,11 +42,11 @@ public class RenderNonShapefileTest extends TestCase {
 		
 		IndexedShapefileDataStore polys = TestUtilites.getPolygons();
 		
-		FeatureResults featureCollection = polys.getFeatureSource().getFeatures();
+		FeatureCollection featureCollection = polys.getFeatureSource().getFeatures();
 		store.createSchema(polys.getSchema());
 		
 		FeatureSource target = store.getFeatureSource(store.getTypeNames()[0]);
-		((FeatureStore)target).addFeatures(featureCollection.reader());
+		((FeatureStore)target).addFeatures(featureCollection);
 		
 		MapLayer layer=new DefaultMapLayer(target,TestUtilites.createTestStyle(target.getSchema().getTypeName(), null));
 		MapContext context=new DefaultMapContext(new MapLayer[]{layer});

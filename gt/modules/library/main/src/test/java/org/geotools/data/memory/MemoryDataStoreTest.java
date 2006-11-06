@@ -904,7 +904,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         FeatureReader reader = DataUtilities.reader( new Feature[]{ newRoad,} );
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
         
-        road.addFeatures( reader );        
+        road.addFeatures( DataUtilities.collection(reader) );        
         assertEquals( roadFeatures.length+1, road.getFeatures().getCount() );
     }
     public void testGetFeatureStoreSetFeatures() throws IOException {
@@ -970,7 +970,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         // ----------------------------
         // - tests transaction independence from each other
         FeatureReader reader = DataUtilities.reader( new Feature[]{ newRoad, });
-        road2.addFeatures( reader );
+        road2.addFeatures( DataUtilities.collection(reader) );
         
         // We still have ORIGIONAL, t1 has REMOVE, and t2 has ADD
         assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));        
@@ -1059,26 +1059,7 @@ public class MemoryDataStoreTest extends DataTestCase {
 		listener1.events.clear();
 		listener2.events.clear();
 		
-		store1.addFeatures(new FeatureReader( ){
-
-			public FeatureType getFeatureType() {
-				return feature.getFeatureType();
-			}
-			boolean hasNext=true;
-			public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
-				hasNext=false;
-				return feature;
-			}
-
-			public boolean hasNext() throws IOException {
-				return hasNext;
-			}
-
-			public void close() throws IOException {
-				//do nothing.
-			}
-			
-		});
+		store1.addFeatures(DataUtilities.collection( feature) );
 
 		assertEquals( 1, listener1.events.size() );
 		event=listener1.getEvent(0);
@@ -1103,26 +1084,7 @@ public class MemoryDataStoreTest extends DataTestCase {
 //		 this is how Auto_commit is supposed to work
 		listener1.events.clear();
 		listener2.events.clear();
-		store2.addFeatures(new FeatureReader( ){
-
-			public FeatureType getFeatureType() {
-				return feature.getFeatureType();
-			}
-			boolean hasNext=true;
-			public Feature next() throws IOException, IllegalAttributeException, NoSuchElementException {
-				hasNext=false;
-				return feature;
-			}
-
-			public boolean hasNext() throws IOException {
-				return hasNext;
-			}
-
-			public void close() throws IOException {
-				//do nothing.
-			}
-			
-		});
+		store2.addFeatures(DataUtilities.collection(feature));
 
 		assertEquals( 1, listener1.events.size() );
 		event=listener1.getEvent(0);

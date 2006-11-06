@@ -342,9 +342,9 @@ public class OracleDataStoreTest extends TestCase {
         BigDecimal intval = new BigDecimal(70);
         Point point = jtsFactory.createPoint(new Coordinate(-15.0, -25));
         Feature feature = dstore.getSchema("ORA_TEST_POINTS").create(new Object[] { name, intval, point });
-        FeatureReader reader = DataUtilities.reader(new Feature[] {feature});
+         
         FeatureStore fs = (FeatureStore) dstore.getFeatureSource("ORA_TEST_POINTS");
-        fs.addFeatures(reader);
+        fs.addFeatures(DataUtilities.collection(feature));
 
         // Select is directly from the DB
         Connection conn = cPool.getConnection();

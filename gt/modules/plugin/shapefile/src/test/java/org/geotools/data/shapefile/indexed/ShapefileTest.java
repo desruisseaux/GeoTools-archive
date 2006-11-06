@@ -160,7 +160,7 @@ public class ShapefileTest extends TestCaseSupport {
         String typeName = type.getTypeName();
         FeatureStore store = (FeatureStore) s.getFeatureSource(typeName);
 
-        store.addFeatures(DataUtilities.reader(features));
+        store.addFeatures( features );
 
         s = new IndexedShapefileDataStore(tmpFile.toURL());
         typeName = s.getTypeNames()[0];

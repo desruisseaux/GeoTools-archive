@@ -18,8 +18,6 @@ package org.geotools.data;
 import java.io.IOException;
 import java.util.Set;
 import org.opengis.filter.Filter;
-import org.opengis.filter.Filter;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureCollection;
 
@@ -54,7 +52,8 @@ public interface FeatureStore extends FeatureSource {
      * @deprecated Please use addFeatures( FeatureCollection )
      * @throws IOException if anything goes wrong.
      */
-    Set addFeatures(FeatureReader reader) throws IOException;
+
+    //Set addFeatures(FeatureReader reader) throws IOException;
 
     /**
      * Adds all features from the passed feature collection to the datasource.

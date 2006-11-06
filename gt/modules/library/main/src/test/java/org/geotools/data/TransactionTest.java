@@ -62,8 +62,8 @@ public class TransactionTest extends TestCase {
         
         FeatureStore store=(FeatureStore) ds.getFeatureSource("default");
         store.setTransaction(new DefaultTransaction());
-        store.addFeatures(new TestReader(type, f1));
-        store.addFeatures(new TestReader(type, f2));
+        store.addFeatures( DataUtilities.collection( f1 ) );
+        store.addFeatures( DataUtilities.collection(f2) );
         
         count( store, 3);
 //        assertEquals("Number of known feature as obtained from getCount",3, store.getCount(Query.ALL));
@@ -74,7 +74,7 @@ public class TransactionTest extends TestCase {
         
         FeatureStore store=(FeatureStore) ds.getFeatureSource("default");
         store.setTransaction(new DefaultTransaction());
-        Set fid=store.addFeatures(new TestReader(type, f1));
+        Set fid=store.addFeatures( DataUtilities.collection(f1) );
 
         count(store, 2);
         Filter f=FilterFactoryFinder.createFilterFactory().createFidFilter((String) fid.iterator().next());

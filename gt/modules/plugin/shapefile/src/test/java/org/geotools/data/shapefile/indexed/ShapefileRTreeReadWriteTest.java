@@ -105,11 +105,9 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
 
 		s.createSchema(type);
 		FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
-		FeatureReader reader = one.reader();
-
-		store.addFeatures(reader);
-		reader = one.reader();
-		store.addFeatures(reader);
+		
+		store.addFeatures( one );
+		store.addFeatures( one );
 
 		s = new IndexedShapefileDataStore(tmp.toURL());
 		assertEquals(one.getCount()*2, store.getCount(Query.ALL));
@@ -142,13 +140,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
 
         
         FeatureStore store = (FeatureStore) s.getFeatureSource(type.getTypeName());
-        FeatureReader reader = one.reader();
-        
-        try{
-        store.addFeatures(reader);
-        }finally{
-        	reader.close();
-        }
+        store.addFeatures( one );
         
         s = new IndexedShapefileDataStore(tmp.toURL());
         typeName = s.getTypeNames()[0];
