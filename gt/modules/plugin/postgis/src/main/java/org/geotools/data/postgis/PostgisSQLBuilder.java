@@ -151,7 +151,7 @@ public class PostgisSQLBuilder extends DefaultSQLBuilder {
      */
     public void sqlWhere(StringBuffer sql, Filter preFilter)
         throws SQLEncoderException {
-        if ((preFilter != null) || (preFilter == Filter.INCLUDE)) {
+        if ((preFilter != null) || (preFilter == org.geotools.filter.Filter.NONE)) {
             String where = encoder.encode(preFilter);
             sql.append(" ");
             sql.append(where);
