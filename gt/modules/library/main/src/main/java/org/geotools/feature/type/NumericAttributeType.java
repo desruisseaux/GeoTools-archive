@@ -111,6 +111,9 @@ public class NumericAttributeType extends DefaultAttributeType implements Primat
         // parse a String to our preferred type
         // note, this is the final parsing attempt !
         String str = value.toString();
+        
+        //JD: trim any spaces off
+        str = str.trim();
 
         try {
             Object parsed = parseFromString(str);
