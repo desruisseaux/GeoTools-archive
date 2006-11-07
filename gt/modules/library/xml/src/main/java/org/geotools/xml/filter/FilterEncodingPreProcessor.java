@@ -401,7 +401,7 @@ public class FilterEncodingPreProcessor implements FilterVisitor {
             for (Iterator iter = f.getFilterIterator(); iter.hasNext();) {
                 Filter filter = (Filter) iter.next();
 
-                if (filter == Filter.EXCLUDE) {
+                if (filter == org.geotools.filter.Filter.ALL) {
                     continue;
                 }
 

@@ -256,7 +256,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
     Object aggregate(String aggregate, Expression expression) throws IOException {
         Filter filter = (Filter) query.getFilter();
 
-        if (filter == Filter.EXCLUDE) {
+        if (filter == org.geotools.filter.Filter.ALL) {
             return null;
         }
 
@@ -264,7 +264,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(this.getSchema().getTypeName());
 
         Filter postFilter = (Filter) sqlBuilder.getPostQueryFilter(query.getFilter()); 
-        if (postFilter != null && postFilter != Filter.INCLUDE) {
+        if (postFilter != null && postFilter != org.geotools.filter.Filter.NONE) {
             // this would require postprocessing the filter
             // so we cannot optimize
             return null;

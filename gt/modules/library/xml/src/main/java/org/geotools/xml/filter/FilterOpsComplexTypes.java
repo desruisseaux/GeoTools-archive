@@ -831,11 +831,11 @@ public class FilterOpsComplexTypes {
                 return;
             }
 
-            if (filter == Filter.INCLUDE) {
+            if (filter == org.geotools.filter.Filter.NONE) {
                 return;
             }
 
-            if (filter == Filter.EXCLUDE) {
+            if (filter == org.geotools.filter.Filter.ALL) {
                 return;
             }
 
