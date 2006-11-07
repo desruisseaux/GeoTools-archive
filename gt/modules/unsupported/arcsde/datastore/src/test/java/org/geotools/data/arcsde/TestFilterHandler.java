@@ -18,8 +18,8 @@ package org.geotools.data.arcsde;
 
 import java.util.logging.Logger;
 
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterHandler;
+import org.opengis.filter.Filter;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;

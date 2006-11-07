@@ -44,7 +44,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.BBoxExpression;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterFilter;
@@ -53,6 +52,8 @@ import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LogicFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
+import org.opengis.filter.And;
+import org.opengis.filter.Filter;
 import org.xml.sax.helpers.ParserAdapter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -474,8 +475,8 @@ public class ArcSDEDataStoreTest extends TestCase {
         LOGGER.fine("SQL filter: " + sqlFilter);
 
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        LogicFilter mixedFilter = ff.createLogicFilter(sqlFilter, FilterType.LOGIC_AND);
-        mixedFilter.addFilter(bboxFilter);
+        And mixedFilter = ff.and( sqlFilter, bboxFilter );
+        
         LOGGER.fine("Mixed filter: " + mixedFilter);
 
         //verify both filter constraints are met
