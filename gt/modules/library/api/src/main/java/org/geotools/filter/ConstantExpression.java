@@ -83,6 +83,10 @@ public class ConstantExpression implements LiteralExpression, Cloneable {
         return getValue();
     }
 
+    public Object evaluate(Object object, Class context) {
+        throw new UnsupportedOperationException("Value is constant.");
+    }
+
     public Object getValue() {
         return value;
     }
