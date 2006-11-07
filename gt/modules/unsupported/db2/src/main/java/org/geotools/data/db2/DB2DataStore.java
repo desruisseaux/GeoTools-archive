@@ -521,7 +521,7 @@ public class DB2DataStore extends JDBCDataStore {
 			throw new IOException("Type " + typeName + " does match request");
 		}
 
-		if ((filter == Filter.EXCLUDE) || filter.equals(Filter.EXCLUDE)) {
+		if ((filter == Filter.ALL) || filter.equals(Filter.ALL)) {
 			return new EmptyFeatureReader(requestType);
 		}
 
