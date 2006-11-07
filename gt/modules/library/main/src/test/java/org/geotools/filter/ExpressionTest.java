@@ -364,7 +364,7 @@ public class ExpressionTest extends TestCase {
         LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
             " + " + testAttribute2.getValue(testFeature) + " = " +
             mathTest.getValue(testFeature));
-        assertEquals(new Double(6), mathTest.getValue(testFeature));
+        assertEquals(new Integer(6), mathTest.evaluate(testFeature,Integer.class));
         
         // Test subtraction
         mathTest = new SubtractImpl(null,null);
@@ -373,7 +373,7 @@ public class ExpressionTest extends TestCase {
         LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
             " - " + testAttribute2.getValue(testFeature) + " = " +
             mathTest.getValue(testFeature));
-        assertEquals(new Double(2), mathTest.getValue(testFeature));
+        assertEquals(new Integer(2), mathTest.evaluate(testFeature,Integer.class));
         
         // Test multiplication
         mathTest = new MultiplyImpl(null,null);
@@ -382,7 +382,7 @@ public class ExpressionTest extends TestCase {
         LOGGER.fine("math test: " + testAttribute1.getValue(testFeature) +
             " * " + testAttribute2.getValue(testFeature) + " = " +
             mathTest.getValue(testFeature));
-        assertEquals(new Double(8), mathTest.getValue(testFeature));
+        assertEquals(new Integer(8), mathTest.evaluate(testFeature,Integer.class));
         
         // Test division
         mathTest = new DivideImpl(null,null);

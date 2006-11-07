@@ -298,7 +298,7 @@ StringReader reader = new StringReader( filter );
 	
 		public List filters = new ArrayList();
 		
-		public void filter(Filter filter) {
+		public void filter(org.opengis.filter.Filter filter) {
 			filters.add(filter);
 		}
 	}		

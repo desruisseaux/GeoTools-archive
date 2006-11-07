@@ -49,7 +49,7 @@ public class TestFilterHandler
     ********************************************************/
 
     /** Tracks tag we are currently inside */
-    private Filter filter = null;
+    private org.opengis.filter.Filter filter = null;
     
     public TestFilterHandler () {
     }
@@ -167,7 +167,7 @@ public class TestFilterHandler
      *
      * @param filter (OGC WFS) Filter from (SAX) filter..
      */ 
-    public void filter(Filter filter) {
+    public void filter(org.opengis.filter.Filter filter) {
         
         LOGGER.finer("found filter: " + filter.toString());
         this.filter = filter;
@@ -178,7 +178,7 @@ public class TestFilterHandler
      *
      * @return (OGC WFS) Filter from (SAX) filter..
      */ 
-    public Filter getFilter() {
+    public org.opengis.filter.Filter getFilter() {
         return this.filter;
     }    
 }
