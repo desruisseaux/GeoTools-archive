@@ -100,7 +100,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         } catch (IllegalFilterException e) {
             // TODO something
         }
-        return cf == null ? Filter.EXCLUDE : cf;
+        return cf == null ? org.geotools.filter.Filter.ALL : cf;
     }
     
     /**
@@ -163,7 +163,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
             } catch (IllegalFilterException e) {
                 // TODO something
             }
-            Filter f = cf == null?Filter.EXCLUDE:cf;
+            Filter f = cf == null?org.geotools.filter.Filter.ALL:cf;
             return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue, (CoordinateReferenceSystem) metaData,f);
         }
         return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );
