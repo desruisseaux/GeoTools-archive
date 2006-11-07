@@ -201,7 +201,8 @@ class ArcSDEAttributeReader implements AttributeReader {
 									throw new DataSourceException("Unable to reliably determine an FID column for this table, so we defaulted to using the '" + featureIDAttributeName +"' column.  But it was null, leaving us no FID for this feature.");
 								} else {
 									this.currentFid = Long.parseLong(value.toString());
-									LOGGER.fine("Fetched fid " + this.currentFid + " from column " + featureIDAttributeName);
+									if (LOGGER.isLoggable(Level.FINER))
+										LOGGER.finer("Fetched fid " + this.currentFid + " from column " + featureIDAttributeName);
 									continue;
 								}
 							}

@@ -160,7 +160,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 				LOGGER.fine("Running iteration #" + i);
 
 				SeQuery rowQuery = new SeQuery(conn, columns, sql);
-				rowQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, true,
+				rowQuery.setSpatialConstraints(SeQuery.SE_OPTIMIZE, false,
 						spatFilters);
 				rowQuery.prepareQuery();
 				rowQuery.execute();

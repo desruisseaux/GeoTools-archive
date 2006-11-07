@@ -243,7 +243,7 @@ class ArcSDEQuery {
         }
         
         if (!hasFIDColumn) {
-        	LOGGER.warning("No FID attribute was contained in your query.  Appending the discovered one to the list of columns to be fetched.");
+        	LOGGER.info("No FID attribute was contained in your query.  Appending the discovered one to the list of columns to be fetched.");
         	for (int i = 0; i < schema.getAttributeCount(); i++) {
         		AttributeType type = schema.getAttributeType(i);
             	if (type instanceof ArcSDEAttributeType) {
@@ -251,7 +251,7 @@ class ArcSDEQuery {
             			String[] newQCols = new String[queryColumns.length + 1];
             			System.arraycopy(queryColumns, 0, newQCols, 0, queryColumns.length);
             			newQCols[queryColumns.length] = type.getName();
-            			LOGGER.warning("Appendend " + newQCols[queryColumns.length] + " to column list.");
+            			LOGGER.fine("Appendend " + newQCols[queryColumns.length] + " to column list.");
                     	queryColumns = newQCols;
             			break;
             		}
@@ -298,7 +298,7 @@ class ArcSDEQuery {
             PooledConnection conn = getConnection();
             try {
 				String[] propsToQuery = getPropertiesToFetch();
-				this.query = createSeQueryForFetch(conn, propsToQuery, true);
+				this.query = createSeQueryForFetch(conn, propsToQuery);
 			} catch (DataSourceException e) {
 				throw e;
 			} catch (IOException e) {
@@ -320,15 +320,16 @@ class ArcSDEQuery {
      * returns it.  Queries created with this method can be used to execute and
      * fetch results.  They cannot be used for other operations, such as
      * calculating layer extents, or result count.
-     * 
+     * <p> 
+     * Difference with {@link #createSeQueryForFetch(PooledConnection, String[])}
+     * is tha this function tells <code>SeQuery.setSpatialConstraints</code> to 
+     * NOT return geometry based bitmasks, which are needed for calculating the
+     * query extent and result count, but not for fetching SeRows.
+     * </p>
      *
      * @param connection DOCUMENT ME!
      * @param propertyNames names of attributes to build the query for,
      *        respecting order
-     * @param setReturnGeometryMasks tells
-     *        <code>SeQuery.setSpatialConstraints</code> wether to return
-     *        geometry based bitmasks, which are needed for calculating the
-     *        query extent and result count, but not for fetching SeRows
      *
      * @return DOCUMENT ME!
      *
@@ -337,13 +338,13 @@ class ArcSDEQuery {
      * @throws DataSourceException DOCUMENT ME!
      */
     private SeQuery createSeQueryForFetch(PooledConnection connection,
-        String[] propertyNames, boolean setReturnGeometryMasks)
+        String[] propertyNames)
         throws SeException, DataSourceException {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("constructing new sql query with connection: "
                 + connection + ", propnames: "
-                + java.util.Arrays.asList(propertyNames) + " sqlConstruct: "
-                + this.filters.getSeSqlConstruct());
+                + java.util.Arrays.asList(propertyNames) + " sqlConstruct where clause: '"
+                + this.filters.getSeSqlConstruct().getWhere());
         }
 
         SeQuery query = new SeQuery(connection, propertyNames,
@@ -353,6 +354,7 @@ class ArcSDEQuery {
         query.prepareQuery();
         
         if (spatialConstraints.length > 0) {
+            final boolean setReturnGeometryMasks = false;
             query.setSpatialConstraints(SeQuery.SE_OPTIMIZE,
                 setReturnGeometryMasks, spatialConstraints);
         }
@@ -365,16 +367,18 @@ class ArcSDEQuery {
      * returns it.  Queries created with this method are to be used for
      * calculating layer extents and result counts.  These queries cannot
      * be executed or used to fetch results.
+     * <p> 
+     * Difference with {@link #createSeQueryForFetch(PooledConnection, String[])}
+     * is tha this function tells <code>SeQuery.setSpatialConstraints</code> to 
+     * return geometry based bitmasks, which are needed for calculating the
+     * query extent and result count, but not for fetching SeRows.
+     * </p>
      * 
      *
      * @param connection DOCUMENT ME!
      * @param propertyNames names of attributes to build the query for,
      *        respecting order
-     * @param setReturnGeometryMasks tells
-     *        <code>SeQuery.setSpatialConstraints</code> wether to return
-     *        geometry based bitmasks, which are needed for calculating the
-     *        query extent and result count, but not for fetching SeRows
-     *
+     *        
      * @return DOCUMENT ME!
      *
      * @throws SeException if the ArcSDE Java API throws it while creating the
@@ -382,7 +386,7 @@ class ArcSDEQuery {
      * @throws DataSourceException DOCUMENT ME!
      */
     private SeQuery createSeQueryForQueryInfo(PooledConnection connection,
-        String[] propertyNames, boolean setReturnGeometryMasks)
+        String[] propertyNames)
         throws SeException, DataSourceException {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("constructing new sql query with connection: "
@@ -396,6 +400,7 @@ class ArcSDEQuery {
         SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
         
         if (spatialConstraints.length > 0) {
+            final boolean setReturnGeometryMasks = true;
             query.setSpatialConstraints(SeQuery.SE_OPTIMIZE,
                 setReturnGeometryMasks, spatialConstraints);
         }
@@ -495,7 +500,7 @@ class ArcSDEQuery {
             SeQuery countQuery = null;
 
             try {
-                countQuery = createSeQueryForQueryInfo(getConnection(), columns, true);
+                countQuery = createSeQueryForQueryInfo(getConnection(), columns);
 
                 SeQueryInfo qInfo = new SeQueryInfo();
                 qInfo.setConstruct(this.filters.getSeSqlConstruct());
@@ -538,7 +543,7 @@ class ArcSDEQuery {
                     .getTypeName());
             String[] spatialCol = { layer.getSpatialColumn() };
 
-            extentQuery = createSeQueryForQueryInfo(getConnection(), spatialCol, true);
+            extentQuery = createSeQueryForQueryInfo(getConnection(), spatialCol);
 
             SeQueryInfo sdeQueryInfo = new SeQueryInfo();
             sdeQueryInfo.setColumns(spatialCol);
@@ -929,6 +934,9 @@ class ArcSDEQuery {
             unpacker.unPackAND(this.sourceFilter);
 
             this.sqlFilter = unpacker.getSupported();
+            
+            if (LOGGER.isLoggable(Level.FINE) && sqlFilter != null)
+            	LOGGER.fine("SQL portion of SDE Query: '" + sqlFilter + "'");
 
             Filter remainingFilter = unpacker.getUnSupported();
 
@@ -936,7 +944,12 @@ class ArcSDEQuery {
             unpacker.unPackAND(remainingFilter);
 
             this.geometryFilter = unpacker.getSupported();
+            if (LOGGER.isLoggable(Level.FINE) && geometryFilter != null)
+            	LOGGER.fine("Spatial-Filter portion of SDE Query: '" + geometryFilter + "'");
+            
             this.unsupportedFilter = unpacker.getUnSupported();
+            if (LOGGER.isLoggable(Level.FINE) && unsupportedFilter != null)
+            	LOGGER.fine("Unsupported (and therefore ignored) portion of SDE Query: '" + unsupportedFilter + "'");
         }
 
         /**

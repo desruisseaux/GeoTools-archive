@@ -101,6 +101,7 @@ public class SQLEncoderSDE extends SQLEncoder
         capabilities.addType(FilterCapabilities.FID);
         capabilities.addType(FilterCapabilities.NONE);
         capabilities.addType(FilterCapabilities.ALL);
+        capabilities.addType(FilterCapabilities.LIKE);
 
         return capabilities;
     }

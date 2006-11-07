@@ -18,10 +18,8 @@ package org.geotools.data.arcsde;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -846,8 +844,20 @@ class ArcSDEDataStore extends AbstractDataStore {
      */
     protected Envelope getBounds(Query query) throws IOException {
         LOGGER.info("getBounds");
-
-        Envelope ev = ArcSDEQuery.calculateQueryExtent(this, query);
+        
+        Envelope ev;
+        if (query.getFilter() == null || query.getFilter().equals(Filter.NONE)) {
+        	LOGGER.fine("getting bounds of entire layer.  Using optimized SDE call.");
+        	// we're really asking for a bounds of the WHOLE layer,
+        	// let's just ask SDE metadata for that, rather than doing an expensive query
+        	SeLayer thisLayer = this.connectionPool.getSdeLayer(query.getTypeName());
+        	SeExtent extent = thisLayer.getExtent();
+        	ev = new Envelope(extent.getMinX(), extent.getMaxX(),
+                    extent.getMinY(), extent.getMaxY());
+        } else {
+        	ev = ArcSDEQuery.calculateQueryExtent(this, query);
+        }
+        
         LOGGER.info("bounds: " + ev);
 
         return ev;
