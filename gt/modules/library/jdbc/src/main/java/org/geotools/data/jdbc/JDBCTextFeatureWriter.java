@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
@@ -72,6 +73,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 
     /** indicates the lock attempt failed horribly */
     final int STATE_FAILURE = 3;
+    private FeatureListenerManager listenerManager;
     
     /**
      * Creates a new instance of JDBCFeatureWriter
@@ -85,6 +87,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         throws IOException {
         super(fReader, queryData);
         mapper = queryData.getMapper();
+        listenerManager = queryData.getListenerManager();
     }
 
     /**
@@ -275,8 +278,8 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             statement = conn.createStatement();
             Envelope bounds = this.live.getBounds();
             String sql = makeDeleteSql(current);
-            if (LOGGER.isLoggable(Level.FINE)) 
-            	LOGGER.fine(sql);
+            if (LOGGER.isLoggable(Level.FINE)) LOGGER.fine(sql);
+            
             //System.out.println(sql);
             statement.executeUpdate(sql);
 

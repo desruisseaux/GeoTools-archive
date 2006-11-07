@@ -348,11 +348,21 @@ public abstract class DataFeatureCollection implements FeatureCollection {
     }
 
     public Object[] toArray() {
-        return null;
+        return toArray( new Feature[ size() ]);
     }
 
-    public Object[] toArray( Object[] arg0 ) {
-        return null;
+    public Object[] toArray( Object[] array ) {
+        List list = new ArrayList();
+        Iterator i = iterator();
+        try {
+            while( i.hasNext() ){
+                list.add( i.next() );
+            }
+        }
+        finally {
+            close( i );
+        }
+        return list.toArray( array );
     }
 
     public boolean add( Object arg0 ) {

@@ -99,36 +99,32 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         data.createSchema(riverType);
         
         
-        ((FeatureStore) data.getFeatureSource(roadType.getTypeName()))
-        .addFeatures(DataUtilities.collection(roadFeatures));
-        ((FeatureStore) data.getFeatureSource(riverType.getTypeName()))
-        .addFeatures(DataUtilities.collection(riverFeatures));
+        FeatureStore roads = ((FeatureStore) data.getFeatureSource(roadType.getTypeName()));
         
-
-        FeatureCollection collection=data.getFeatureSource(roadType.getTypeName()).getFeatures();
-        Iterator iter=collection.iterator();
-        int i=0;
-        try{
-        while( iter.hasNext() ){
-            roadFeatures[i]=(SimpleFeature) iter.next();
-            i++;
+        roads.addFeatures(DataUtilities.collection(roadFeatures));
+        
+        FeatureStore rivers = ((FeatureStore) data.getFeatureSource(riverType.getTypeName()));
+        
+        rivers.addFeatures(DataUtilities.collection(riverFeatures));
+        
+        // Now that we have seeded the contents we need to
+        // set up our arrays in the same order
+        //        
+        roadFeatures = grabArray( roads.getFeatures(), roadFeatures.length );
+        riverFeatures = grabArray( rivers.getFeatures(), riverFeatures.length );
+    }
+    
+    SimpleFeature[] grabArray( FeatureCollection features, int size ){        
+        try {
+            SimpleFeature array[] = new SimpleFeature[ size ];
+            array = (SimpleFeature[]) features.toArray( array );
+            assertNotNull( array );
+            
+            return array;
         }
-        }finally{
-            collection.close(iter);
+        finally {
+            features.purge();
         }
-
-         collection=data.getFeatureSource(riverType.getTypeName()).getFeatures();
-        iter=collection.iterator();
-        i=0;
-        try{
-        while( iter.hasNext() ){
-            riverFeatures[i]=(SimpleFeature) iter.next();
-            i++;
-        }
-        }finally{
-            collection.close(iter);
-        }
-
     }
 
     protected void tearDown() throws Exception {
@@ -188,8 +184,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         store1.getTransaction().commit();
 
         assertEquals(0, listener1.events.size());
-
         assertEquals(2, listener2.events.size());
+        
         event = listener2.getEvent(0);
         assertEquals(feature.getBounds(), event.getBounds());
         assertEquals(FeatureEvent.FEATURES_REMOVED, event.getEventType());
@@ -674,6 +670,39 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
      * @throws IOException DOCUMENT ME!
      * @throws IllegalAttributeException DOCUMENT ME!
      */
+    boolean covers(FeatureCollection features, Feature[] array)
+        throws NoSuchElementException, IOException, IllegalAttributeException {
+        
+        Feature feature;
+        int count = 0;
+        Iterator i = features.iterator();
+        try {
+            while (i.hasNext()) {
+                feature = (Feature) i.next();
+                if (!containsFeature(array, feature)) {
+                    return false;
+                }
+                count++;
+            }
+        } finally {
+            features.close( i );
+        }
+        return count == array.length;
+    }
+    
+    /**
+     * Ensure that FeatureReader reader contains extactly the contents of
+     * array.
+     *
+     * @param reader DOCUMENT ME!
+     * @param array DOCUMENT ME!
+     *
+     * @return DOCUMENT ME!
+     *
+     * @throws NoSuchElementException DOCUMENT ME!
+     * @throws IOException DOCUMENT ME!
+     * @throws IllegalAttributeException DOCUMENT ME!
+     */
     boolean covers(FeatureReader reader, Feature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         Feature feature;
@@ -683,17 +712,18 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
             while (reader.hasNext()) {
                 feature = reader.next();
 
+                assertNotNull("feature", feature );
                 if (!containsFeature(array, feature)) {
+                    fail("feature "+feature.getID()+" not listed");
                     return false;
                 }
-
                 count++;
             }
         } finally {
             reader.close();
         }
-
-        return count == array.length;
+        assertEquals( "covers", count, array.length );
+        return true;
     }
 
     boolean coversLax(FeatureReader reader, Feature[] array)
@@ -935,7 +965,9 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         // still have ORIGIONAL and t1 has REMOVE
         reader = data.getFeatureReader(new DefaultQuery("ROAD"),
                 Transaction.AUTO_COMMIT);
+        
         assertTrue(covers(reader, ORIGIONAL));
+        
         reader = data.getFeatureReader(new DefaultQuery("ROAD"), t1);
         assertTrue(covers(reader, REMOVE));
 

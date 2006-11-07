@@ -181,11 +181,7 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
         throws IOException {
         modifyFeatures( type, value, (org.opengis.filter.Filter) filter );
     }
-    public void modifyFeatures(AttributeType type, Object value, org.geotools.filter.Filter filter)
-    throws IOException {
-    modifyFeatures(new AttributeType[] { type, }, new Object[] { value, },
-        filter);
-}
+
     /**
      * Modifies features matching <code>filter</code>.
      * 

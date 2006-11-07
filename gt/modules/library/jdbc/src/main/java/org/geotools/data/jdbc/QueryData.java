@@ -25,12 +25,15 @@ import java.util.NoSuchElementException;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.AttributeWriter;
 import org.geotools.data.DataSourceException;
+import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.Transaction;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -72,6 +75,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
     protected int baseIndex;
     boolean hasNextCalled = false;
     boolean lastNext;
+    protected FeatureListenerManager listenerManager;
 
     /**
      * Creates a new QueryData object.
@@ -93,7 +97,8 @@ public class QueryData implements AttributeReader, AttributeWriter {
         this.connection = connection;
         this.transaction = transaction;
         this.fidAttributes = new Object[mapper.getColumnCount()];
-
+        this.listenerManager = parentDataStore.listenerManager;
+        
         AttributeType[] attributeTypes = featureTypeInfo.getSchema().getAttributeTypes();
 
         this.attributeHandlers = new AttributeIO[attributeTypes.length];
@@ -322,5 +327,25 @@ public class QueryData implements AttributeReader, AttributeWriter {
      */
     public AttributeType getAttributeType(int index) throws ArrayIndexOutOfBoundsException {
         return featureTypeInfo.getSchema().getAttributeType(index);
+    }
+
+    public FeatureListenerManager getListenerManager() {
+        return listenerManager;
+    }
+    
+    /** Call after deleteCurrentRow() */
+    public void fireChangeRemoved(Envelope bounds, boolean isCommit){
+        String typeName = featureTypeInfo.getFeatureTypeName();        
+        listenerManager.fireFeaturesRemoved( typeName, transaction, bounds, isCommit);
+    }
+    /** Call after updateRow */
+    public void fireFeaturesChanged(Envelope bounds, boolean isCommit){
+        String typeName = featureTypeInfo.getFeatureTypeName();        
+        listenerManager.fireFeaturesChanged(typeName, transaction, bounds, isCommit);
+    }
+    /** Call after doUpdate */
+    public void fireFeaturesAdded(Envelope bounds, boolean isCommit){
+        String typeName = featureTypeInfo.getFeatureTypeName();        
+        listenerManager.fireFeaturesAdded(typeName, transaction, bounds, isCommit);
     }
 }

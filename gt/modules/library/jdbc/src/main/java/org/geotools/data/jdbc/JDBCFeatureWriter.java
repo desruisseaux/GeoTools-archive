@@ -49,13 +49,12 @@ public class JDBCFeatureWriter implements FeatureWriter {
     protected FeatureReader reader;
     protected Feature live; // current for FeatureWriter
     protected Feature current; // copy of live returned to user
-    protected FeatureListenerManager listenerManager = new FeatureListenerManager();
     protected boolean closed;
     protected Object[] fidAttributes;
 
     public JDBCFeatureWriter(FeatureReader reader, QueryData queryData) {
         this.reader = reader;
-        this.queryData = queryData;
+        this.queryData = queryData;        
     }
 
     /**
@@ -150,16 +149,15 @@ public class JDBCFeatureWriter implements FeatureWriter {
             live = null;
             current = null;
 
+            Transaction transaction = queryData.getTransaction();
             try {
                 queryData.deleteCurrentRow();
-                listenerManager.fireFeaturesRemoved(getFeatureType()
-                                                        .getTypeName(),
-                    queryData.getTransaction(), bounds, false);
+                queryData.fireChangeRemoved(bounds, false);
             } catch (SQLException sqle) {
                 String message = "problem deleting row";
 
-                if (queryData.getTransaction() != Transaction.AUTO_COMMIT) {
-                    queryData.getTransaction().rollback();
+                if (transaction != Transaction.AUTO_COMMIT) {
+                    transaction.rollback();
                     message += "(transaction canceled)";
                 }
 
@@ -193,18 +191,18 @@ public class JDBCFeatureWriter implements FeatureWriter {
             } else {
                 try {
                     doUpdate(live, current);
+                    
+                    Envelope bounds = new Envelope();
+                    bounds.expandToInclude(live.getBounds());
+                    bounds.expandToInclude(current.getBounds());                
+                    
+                    queryData.fireFeaturesChanged(bounds, false);
+                    
                 } catch (SQLException sqlException) {
                     queryData.close(sqlException);
                     throw new DataSourceException("Error updating row",
                         sqlException);
                 }
-
-                Envelope bounds = new Envelope();
-                bounds.expandToInclude(live.getBounds());
-                bounds.expandToInclude(current.getBounds());
-                listenerManager.fireFeaturesChanged(getFeatureType()
-                                                        .getTypeName(),
-                    queryData.getTransaction(), bounds, false);
                 live = null;
                 current = null;
             }
@@ -213,12 +211,10 @@ public class JDBCFeatureWriter implements FeatureWriter {
 
             try {
                 doInsert((MutableFIDFeature) current);
+                queryData.fireFeaturesAdded( current.getBounds(), false );
             } catch (SQLException e) {
                 throw new DataSourceException("Row adding failed.", e);
             }
-
-            listenerManager.fireFeaturesAdded(getFeatureType().getTypeName(),
-                queryData.getTransaction(), current.getBounds(), false);
             current = null;
         }
     }
@@ -250,7 +246,6 @@ public class JDBCFeatureWriter implements FeatureWriter {
 
             throw ioe;
         }
-
         queryData.updateRow();
     }
 
@@ -347,10 +342,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
                         " already closed");
         } else {
             reader.close();
-	}
+        }
     }
 
-    public void setFeatureListenerManager( FeatureListenerManager listenerManager2 ) {
-        this.listenerManager=listenerManager2;
-    }
 }

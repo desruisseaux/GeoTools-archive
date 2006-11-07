@@ -16,6 +16,7 @@
 package org.geotools.data.hsql;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.logging.Logger;
@@ -200,11 +201,21 @@ public class HsqlDataStoreTest extends AbstractDataStoreTest {
 
 
 
-    public DataStore createDataStore() throws Exception {
+    public DataStore createDataStore() throws Exception {      
         connFactory = new HsqlConnectionFactory("tempDB", "sa", "");
 
         DataStore hsql=null;
         hsql = new HsqlDataStore(connFactory, null, getName());
+
+        File dir = new File(".");
+        String found[] = dir.list( new FilenameFilter(){
+            public boolean accept( File dir, String name ) {
+                return name.startsWith("tempDB");
+            }            
+        });
+        for( int i=0; i < found.length; i++ ){
+            new File( found[i] ).deleteOnExit();
+        }
         return hsql;
     }
 

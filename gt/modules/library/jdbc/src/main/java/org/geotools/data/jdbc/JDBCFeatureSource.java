@@ -31,7 +31,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -198,9 +198,7 @@ public class JDBCFeatureSource implements FeatureSource {
     public FeatureCollection getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(featureType.getTypeName(), filter));
     }
-    public FeatureCollection getFeatures(org.opengis.filter.Filter filter) throws IOException {
-        return getFeatures(new DefaultQuery(featureType.getTypeName(), filter));
-    }
+    
     /**
      * Retrieve all Features
      *
@@ -290,7 +288,7 @@ public class JDBCFeatureSource implements FeatureSource {
      */
     public int count(Query query, Transaction transaction)
         throws IOException {
-        Filter filter = (Filter) query.getFilter();
+        Filter filter = query.getFilter();
 
         if (filter == org.geotools.filter.Filter.ALL) {
             return 0;

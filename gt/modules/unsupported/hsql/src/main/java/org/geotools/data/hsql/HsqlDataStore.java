@@ -451,9 +451,7 @@ public class HsqlDataStore extends JDBC1DataStore implements DataStore {
 		    st.execute(sql);
             typeHandler.forceRefresh();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("Attempted to re-create typeTable table...OK");
+			// Attempted to re-create typeTable table...OK
 		}
 	}
     

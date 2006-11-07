@@ -44,18 +44,6 @@ import org.geotools.feature.FeatureCollection;
  */
 public interface FeatureStore extends FeatureSource {
     /**
-     * Adds all features from the passed feature reader "stream".
-     *
-     * @param reader The reader from which to add the features.
-     *
-     * @return the FeatureIds of the newly added features.
-     * @deprecated Please use addFeatures( FeatureCollection )
-     * @throws IOException if anything goes wrong.
-     */
-
-    //Set addFeatures(FeatureReader reader) throws IOException;
-
-    /**
      * Adds all features from the passed feature collection to the datasource.
      *
      * @param collection The collection of features to add.
