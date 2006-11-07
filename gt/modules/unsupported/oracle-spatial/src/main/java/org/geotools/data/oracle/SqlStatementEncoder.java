@@ -270,7 +270,7 @@ final class SqlStatementEncoder {
         sqlBuffer.append(" FROM ");
         sqlBuffer.append(tableName);
 
-        if (filter != null && filter != Filter.INCLUDE) {
+        if (filter != null && filter != org.geotools.filter.Filter.NONE) {
             String where = whereEncoder.encode(filter);
 
             sqlBuffer.append(" ");
