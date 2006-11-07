@@ -89,28 +89,15 @@ public class FilterAbstract implements org.opengis.filter.Filter
 		if( expression == null ) return null;
 		return expression.evaluate( object );
 	}
-	
 	/**
-	 * Subclass convenience method for turning an expression + feature into something
-	 * comparable.
-	 * <p>
-	 * If the result of the expression is something that implements 
-	 * {@link java.lang.Comparable} it is returned directly, otherwise the 
-	 * object is transformed to a string and returned.
-	 * </p>
-	 * 
-	 * @param expr The expression
-	 * @param feature The feature.
-	 * 
-	 * @return Something comparable.
+	 * Helper method for subclasses to reduce null checks
+	 * @param expression
+	 * @param object
+	 * @param context
+	 * @return value or null
 	 */
-	protected Comparable comparable( org.opengis.filter.expression.Expression expr, Feature feature ){
-		Object value = eval(expr,feature);
-		if( value instanceof Comparable ){
-			return (Comparable) value;
-		}
-		else {
-			return String.valueOf( value );
-		}
+	protected Object eval(org.opengis.filter.expression.Expression expression, Object object, Class context) { 
+		if ( expression == null ) return null;
+		return expression.evaluate( object, context );
 	}
 }

@@ -16,6 +16,7 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Value;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.expression.Expression;
@@ -46,12 +47,23 @@ public class IsBetweenImpl extends CompareFilterImpl implements BetweenFilter {
 	
 	//@Override
 	public boolean evaluate(Feature feature) {
-		Comparable lower = comparable( getExpression1(), feature );
-		Comparable value = comparable( expression, feature );
-		Comparable upper = comparable( getExpression2(), feature );
-
-		return lower.compareTo( value ) == -1 &&
-		       upper.compareTo( upper ) == 1;
+		Object[] values = eval( feature );
+		Comparable lower = comparable( values[ 0 ] );
+		Comparable upper = comparable( values[ 1 ] );
+		
+		Value value = new Value( eval( expression, feature ) );
+		Object o = value.value( lower.getClass() );
+		if ( o == null ) {
+			o = value.value( upper.getClass() );
+		}
+		if ( o == null ) {
+			o = value.getValue();
+		}
+		
+		Comparable between = comparable( o );
+		
+		return lower.compareTo( between ) == -1 &&
+		       upper.compareTo( between ) == 1;
 	}
 
 	public Object accept(FilterVisitor visitor, Object extraData) {

@@ -85,11 +85,11 @@ public class DuplicatorFilterVisitor extends AbstractFilterVisitor implements Fi
     }
     
     public void visit(Filter filter) {
-    	if( filter==Filter.INCLUDE){
-    		pages.push(Filter.INCLUDE);
+    	if( filter==org.geotools.filter.Filter.NONE){
+    		pages.push(org.geotools.filter.Filter.NONE);
     		return;
-    	}else if( filter==Filter.EXCLUDE){
-    		pages.push(Filter.EXCLUDE);
+    	}else if( filter==org.geotools.filter.Filter.ALL){
+    		pages.push(org.geotools.filter.Filter.ALL);
     		return;
     	}
     	if( strict )

@@ -131,7 +131,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
             	if(f != null && f!=Filter.EXCLUDE){
             		Filter deleteFilter = (org.geotools.filter.Filter) transactionAccessor.getDeleteFilter();
 	            	if( deleteFilter!=null ){
-                        if( deleteFilter==Filter.EXCLUDE )
+                        if( deleteFilter==org.geotools.filter.Filter.ALL )
                             f=Filter.EXCLUDE;
                         else
                             f=((Filter)f).and(deleteFilter.not());
@@ -146,14 +146,14 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	        Filter updateFilter=(Filter) iter.next();
 	        while( iter.hasNext() ){
                 Filter next=(Filter) iter.next();
-                if( next==Filter.INCLUDE){
+                if( next==org.geotools.filter.Filter.NONE){
                     updateFilter=next;
                     break;
                 }else{
                     updateFilter=(Filter) updateFilter.or(next);
                 }
             }
-            if( updateFilter == Filter.INCLUDE || f==Filter.INCLUDE )
+            if( updateFilter == org.geotools.filter.Filter.NONE || f==Filter.INCLUDE )
                 return Filter.INCLUDE;
 	        return ((Filter)f).or(updateFilter);
 	    }
@@ -732,6 +732,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	    	// JE: removed deprecated code
 	        if (parent != null  && parent.getAttributeType(expression.getAttributePath()) == null) {
 	        	postStack.push(expression);
+	        	return;
 	        }
 	        if(transactionAccessor!=null){
 	        	Filter updateFilter= (Filter) transactionAccessor.getUpdateFilter(expression.getAttributePath());
@@ -886,7 +887,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
         public WFSBBoxFilterVisitor(Envelope fsd){
             maxbbox = fsd;
         }public void visit(Filter filter) {
-            if (Filter.INCLUDE == filter) {
+            if (org.geotools.filter.Filter.NONE == filter) {
                 return;
             }
                 switch (filter.getFilterType()) {

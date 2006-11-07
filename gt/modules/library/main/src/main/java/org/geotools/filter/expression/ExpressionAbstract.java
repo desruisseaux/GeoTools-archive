@@ -50,7 +50,12 @@ public abstract class ExpressionAbstract implements org.opengis.filter.expressio
 	public Object evaluate(Object object) {
 		return null;
 	}
-
+	
+	public final Object evaluate(Object object, Class context) {
+		Value value = new Value( evaluate( object ) );
+		return value.value( context );
+	}
+	
 	/** Subclass should override, default implementation just returns extraData */
 	public Object accept(ExpressionVisitor visitor, Object extraData) {
 		return extraData;

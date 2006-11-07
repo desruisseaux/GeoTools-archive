@@ -15,6 +15,8 @@
  */
 package org.geotools.filter;
 
+import org.geotools.feature.Feature;
+import org.geotools.filter.expression.Value;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.expression.Expression;
 
@@ -67,4 +69,52 @@ public class BinaryComparisonAbstract extends AbstractFilter
 		return factory.not(this);
 	}
 
+	/**
+	 * Convenience method which evaluates the expressions and trys to align the values
+	 * to be of the same type. 
+	 * <p>
+	 * If the values can not be aligned, the original values are returned.
+	 * </p>
+	 *  
+	 * @return
+	 */
+	protected Object[] eval( Object object ) {
+		Value v1 = new Value( eval( getExpression1(), object ) );
+		Value v2 = new Value( eval( getExpression2(), object ) );
+		
+		if ( v1.getValue() != null && v2.getValue() != null ) {
+			//try to convert so that values are of same type
+			if ( v1.getValue().getClass().equals( v2.getValue().getClass() ) ) {
+				//nothing to do
+				return new Object[] { v1.getValue(), v2.getValue() }; 
+			}
+			
+			Object o = v2.value( v1.getValue().getClass() );
+			if ( o != null ) {
+				return new Object[] { v1.getValue(), o }; 
+			}
+			
+			//try the other way
+			o = v1.value( v2.getValue().getClass() );
+			if ( o != null ) {
+				return new Object[] { o, v2.getValue() };
+			}
+		}
+		
+		return new Object[] { v1.getValue(), v2.getValue() };
+	}
+	
+	/**
+	 * Wraps an object in a Comparable.
+	 * @param value The original value.
+	 * @return A comparable
+	 */
+	protected Comparable comparable( Object value ){
+		if( value instanceof Comparable ){
+			return (Comparable) value;
+		}
+		else {
+			return String.valueOf( value );
+		}
+	}
 }

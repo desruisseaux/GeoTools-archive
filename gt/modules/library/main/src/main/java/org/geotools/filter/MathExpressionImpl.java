@@ -187,6 +187,7 @@ public abstract class MathExpressionImpl extends DefaultExpression
         } 
     }
 
+   
     protected Object number( double number ){
     	//return Filters.puts( number );  // non strongly typed
     	return new Double( number );      // Getools 2.1 style

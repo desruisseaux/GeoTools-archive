@@ -38,8 +38,9 @@ public class IsGreaterThanOrEqualToImpl extends CompareFilterImpl
 	
 	//@Override
 	public boolean evaluate(Feature feature) {
-		Comparable value1 = comparable(expression1,feature);
-		Comparable value2 = comparable(expression2,feature);
+		Object[] values = eval( feature );
+		Comparable value1 = comparable( values[ 0 ] );
+		Comparable value2 = comparable( values[ 1 ] );
 		
 		return compare(value1,value2) >= 0;
 	}

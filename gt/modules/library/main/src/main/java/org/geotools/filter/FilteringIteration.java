@@ -35,7 +35,7 @@ public class FilteringIteration extends FeatureCollectionIteration {
      * @param filter DOCUMENT ME!
      * @param collection DOCUMENT ME!
      */
-    public FilteringIteration(Filter filter, FeatureCollection collection) {
+    public FilteringIteration(org.opengis.filter.Filter filter, FeatureCollection collection) {
         super(new FilterHandler(filter), collection);
     }
 
@@ -51,9 +51,9 @@ public class FilteringIteration extends FeatureCollectionIteration {
 
     static class FilterHandler implements Handler {
         Iterator iterator;
-        final Filter filter;
+        final org.opengis.filter.Filter filter;
 
-        public FilterHandler(Filter filter) {
+        public FilterHandler(org.opengis.filter.Filter filter) {
             this.filter = filter;
         }
 
@@ -69,7 +69,7 @@ public class FilteringIteration extends FeatureCollectionIteration {
         }
 
         public void handleFeature(org.geotools.feature.Feature f) {
-            if (!filter.contains(f)) {
+            if (!filter.evaluate(f)) {
                 iterator.remove();
             }
         }
