@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.expression.PropertyAccessor;
+import org.geotools.filter.expression.PropertyAccessors;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 
@@ -135,7 +137,18 @@ public class AttributeExpressionImpl extends DefaultExpression
       * @param feature Feature from which to extract attribute value.
       */
     public Object evaluate(Feature feature) {
-    	return feature.getAttribute(attPath);
+    	PropertyAccessor accessor =
+    		new PropertyAccessors().findPropertyAccessor( feature, attPath, null );
+    	if ( accessor == null ) {
+    		//JD:not throwing exception to remain backwards compatabile, just returnign null
+    		return null;
+//    		throw new IllegalArgumentException( 
+//				"Could not find property accessor for: (" + feature + "," + attPath + ")" 
+//			);
+    	}
+    	
+    	return accessor.get( feature, attPath );
+    	//return feature.getAttribute(attPath);
     }
     
      /**
