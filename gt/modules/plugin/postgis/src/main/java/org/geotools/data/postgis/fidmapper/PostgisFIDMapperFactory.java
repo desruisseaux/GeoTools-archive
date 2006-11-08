@@ -41,6 +41,7 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
 
     public PostgisFIDMapperFactory(JDBCDataStoreConfig config) {
         this.config = config;
+        setReturningTypedFIDMapper( false );
     }
 
     protected FIDMapper buildNoPKMapper(String schema, String tableName,
