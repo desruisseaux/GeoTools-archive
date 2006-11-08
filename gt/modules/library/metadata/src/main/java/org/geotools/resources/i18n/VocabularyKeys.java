@@ -207,6 +207,7 @@ public final class VocabularyKeys {
     public static final int RED                                =   138;
     public static final int RESET                              =   139;
     public static final int RIGHT                              =   140;
+    public static final int ROOT_MEAN_SQUARED_ERROR            =   232;
     public static final int ROTATE_LEFT                        =   141;
     public static final int ROTATE_RIGHT                       =   142;
     public static final int ROW                                =   143;

@@ -61,7 +61,7 @@ public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
         this.targetPoints = ptDst;
         this.sourcePoints = ptSrc;
 
-        super.checkPoints(2, 2);
+        checkPoints();
         super.checkCRS();
     }
 

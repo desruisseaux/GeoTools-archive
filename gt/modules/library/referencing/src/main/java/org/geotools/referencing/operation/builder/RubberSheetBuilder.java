@@ -76,7 +76,7 @@ public class RubberSheetBuilder extends MathTransformBuilder {
         this.targetPoints = ptDst;
         this.sourcePoints = ptSrc;
 
-        super.checkPoints(0, 2);
+        checkPoints();
         checkQuad(quad);
 
         MappedPosition[] vectors = new MappedPosition[ptSrc.length];
@@ -257,7 +257,7 @@ public class RubberSheetBuilder extends MathTransformBuilder {
      * @throws FactoryException when the size of source and destination point
      *         is not the same.
      */
-    public MathTransform getMathTransform() throws FactoryException {
+    protected MathTransform computeMathTransform() throws FactoryException {
         return new RubberSheetTransform(trianglesToKeysMap);
     }
 }

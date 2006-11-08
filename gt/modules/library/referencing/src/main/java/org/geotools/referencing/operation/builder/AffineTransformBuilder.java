@@ -66,7 +66,7 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
         this.targetPoints = ptDst;
         this.sourcePoints = ptSrc;
 
-        super.checkPoints(3, 2);
+        checkPoints();
         super.checkCRS();
     }
 

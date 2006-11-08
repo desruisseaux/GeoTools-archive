@@ -69,6 +69,7 @@ public final class ErrorKeys {
     public static final int CANT_SEPARATE_CRS_$1                   =   164;
     public static final int CANT_SET_PARAMETER_VALUE_$1            =   177;
     public static final int CANT_TRANSFORM_ENVELOPE                =    26;
+    public static final int CANT_TRANSFORM_VALID_POINTS            =   199;
     public static final int CANVAS_NOT_OWNER_$1                    =   121;
     public static final int COLINEAR_AXIS_$2                       =    27;
     public static final int COVERAGE_ALREADY_BOUND_$2              =    28;
@@ -115,6 +116,7 @@ public final class ErrorKeys {
     public static final int INDEX_OUT_OF_BOUNDS_$1                 =    56;
     public static final int INFINITE_VALUE_$1                      =   147;
     public static final int INSEPARABLE_TRANSFORM                  =    57;
+    public static final int INSUFFICIENT_POINTS_$2                 =   198;
     public static final int INVALID_WKT_FORMAT                     =   159;
     public static final int IN_$1                                  =    58;
     public static final int LAT1_EQ_LAT2                           =    59;
@@ -127,6 +129,7 @@ public final class ErrorKeys {
     public static final int MALFORMED_ENVELOPE                     =   179;
     public static final int MATRIX_NOT_REGULAR                     =    66;
     public static final int MISMATCHED_ARRAY_LENGTH                =    67;
+    public static final int MISMATCHED_COORDINATE_REFERENCE_SYSTEM =   197;
     public static final int MISMATCHED_DIMENSION_$2                =    68;
     public static final int MISMATCHED_DIMENSION_$3                =    69;
     public static final int MISMATCHED_ENVELOPE_CRS_$2             =   186;

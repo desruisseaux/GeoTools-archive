@@ -87,7 +87,7 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
         this.sourcePoints = ptsSrc;
         this.targetPoints = ptsDst;
 
-        super.checkPoints(3, 3);
+        checkPoints();
         checkCRS();
 
         x = new GeneralMatrix(ptsSrc.length, 3);
@@ -101,6 +101,14 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      * Returns the minimum number of points required by this builder, which is 3.
      */
     public int getMinimumPointCount() {
+        return 3;
+    }
+
+    /**
+     * Returns the dimension for {@linkplain #getSourceCRS source} and
+     * {@link #getTargetCRS target} CRS, which is 2.
+     */
+    public int getDimension() {
         return 3;
     }
 
@@ -520,7 +528,7 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      *         is not the same or if the number of points is too small to
      *         define such transformation.
      */
-    public MathTransform getMathTransform() throws FactoryException {
+    protected MathTransform computeMathTransform() throws FactoryException {
         return new GeocentricTranslation(getBursaWolfParameters(targetDatum));
     }
 }

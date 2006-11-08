@@ -21,6 +21,7 @@ import java.util.HashMap;
 import javax.vecmath.MismatchedSizeException;
 
 // OpenGIS dependencies
+import org.opengis.util.InternationalString;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.crs.*;       // Includes imports used only for javadoc.
@@ -28,6 +29,7 @@ import org.opengis.referencing.operation.*; // Includes imports used only for ja
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.quality.EvaluationMethodType;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
@@ -38,13 +40,17 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.operation.DefaultOperationMethod;
+import org.geotools.referencing.operation.DefaultTransformation;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.extent.ExtentImpl;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
+import org.geotools.metadata.iso.quality.QuantitativeResultImpl;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.Utilities;
 
 
@@ -80,7 +86,7 @@ import org.geotools.resources.Utilities;
  * {@linkplain #getDestinationPoints points in target CRS}.
  * <p>
  * Subclasses must implement at least the {@link #getMinimumPointCount()} and
- * {@link #getMathTransform()} methods.
+ * {@link #computeMathTransform()} methods.
  *
  * @since 2.4
  * @source $URL$
@@ -108,6 +114,16 @@ public abstract class MathTransformBuilder {
      * or {@code null} if unknown.
      */
     private CoordinateReferenceSystem sourceCRS, targetCRS;
+
+    /**
+     * The math transform. Will be computed only when first needed.
+     */
+    private transient MathTransform transform;
+
+    /**
+     * The transformation. Will be computed only when first needed.
+     */
+    private transient Transformation transformation;
 
     /**
      * The factory to use for creating {@link MathTransform math transform} instances.
@@ -141,6 +157,17 @@ public abstract class MathTransformBuilder {
     }
 
     /**
+     * Returns the name for the {@linkplain Transformation transformation} to
+     * be created by this builder.
+     *
+     * @todo Consider making this method public, and provide some way for the
+     *       user to specify a name. Also need to find a better default name.
+     */
+    private String getName() {
+        return Utilities.getShortClassName(this) + " fit";
+    }
+
+    /**
      * Returns the minimum number of points required by this builder. This minimum depends on the
      * algorithm used. For example {@linkplain AffineTransformBuilder affine transform builders}
      * require at least 3 points, while {@linkplain SimilarParamCalculator similar transform
@@ -157,51 +184,41 @@ public abstract class MathTransformBuilder {
     }
 
     /**
-     * Returns the name for the {@linkplain Transformation transformation} to
-     * be created by this builder.
+     * Sets the {@linkplain #sourcePoints source points}.
      *
-     * @todo Consider making this method public, and provide some way for the
-     *       user to specify a name. Also need to find a better default name.
+     * @param  sourcePoints The source points.
+     * @throws MismatchedSizeException if the list doesn't have the expected number of points.
+     * @throws MismatchedDimensionException if some points doesn't have the
+     *         {@linkplain #getDimension expected number of dimensions}.
+     * @throws MismatchedReferenceSystemException if CRS is not the same for all points.
      */
-    private String getName() {
-        return Utilities.getShortClassName(this) + " fit";
+    public void setSourcePoints(final DirectPosition[] points)
+            throws MismatchedSizeException, MismatchedDimensionException,
+                   MismatchedReferenceSystemException
+    {
+        // Set the points only after we checked them.
+        sourceCRS    = ensureValid(points, "sourcePoints");
+        sourcePoints = (DirectPosition[]) points.clone();
+        transform    = null;
     }
 
     /**
-     * Creates an engineering CRS using the same {@linkplain CoordinateSystem
-     * coordinate system} than the specified CRS, and an area of validity
-     * determined from the specified points. This method is used for creating
-     * a {@linkplain #getTargetCRS target CRS} from the
-     * {@linkplain #getSourceCRS source CRS}, or conversely.
+     * Sets the {@linkplain #targetPoints target points}.
      *
-     * @param oppositeCRS A CRS to use as template, or {@code null} if none.
-     * @param points The points inside the valid area, or {@code null} if none.
-     * @throws FactoryException if the CRS can't be created.
+     * @param  points The target points.
+     * @throws MismatchedSizeException if the list doesn't have the expected number of points.
+     * @throws MismatchedDimensionException if some points doesn't have the
+     *         {@linkplain #getDimension expected number of dimensions}.
+     * @throws MismatchedReferenceSystemException if CRS is not the same for all points.
      */
-    private EngineeringCRS createEngineeringCRS(final CoordinateReferenceSystem oppositeCRS,
-                                                final DirectPosition[] points)
-            throws FactoryException
+    public void setTargetPoints(final DirectPosition[] points)
+            throws MismatchedSizeException, MismatchedDimensionException,
+                   MismatchedReferenceSystemException
     {
-        final Map properties = new HashMap(4);
-        properties.put(CoordinateReferenceSystem.NAME_KEY, Vocabulary.format(VocabularyKeys.UNKNOW));
-        final GeographicExtent ge = getValidArea(points);
-        if (ge != null) {
-            final ExtentImpl extent = new ExtentImpl();
-            extent.getGeographicElements().add(ge);
-            properties.put(CoordinateReferenceSystem.VALID_AREA_KEY, extent.unmodifiable());
-        }
-        final CoordinateSystem cs;
-        if (oppositeCRS != null) {
-            cs = oppositeCRS.getCoordinateSystem();
-        } else {
-            switch (getDimension()) {
-                case 2: cs = DefaultCartesianCS.GENERIC_2D; break;
-                case 3: cs = DefaultCartesianCS.GENERIC_3D; break;
-                default: throw new FactoryException(Errors.format(ErrorKeys.UNSPECIFIED_CRS));
-            }
-        }
-        return crsFactory.createEngineeringCRS(properties,
-                datumFactory.createEngineeringDatum(properties), cs);
+        // Set the points only after we checked them.
+        targetCRS    = ensureValid(points, "targetPoints");
+        targetPoints = (DirectPosition[]) points.clone();
+        transform    = null;
     }
 
     /**
@@ -251,6 +268,43 @@ public abstract class MathTransformBuilder {
     }
 
     /**
+     * Creates an engineering CRS using the same {@linkplain CoordinateSystem
+     * coordinate system} than the specified CRS, and an area of validity
+     * determined from the specified points. This method is used for creating
+     * a {@linkplain #getTargetCRS target CRS} from the
+     * {@linkplain #getSourceCRS source CRS}, or conversely.
+     *
+     * @param oppositeCRS A CRS to use as template, or {@code null} if none.
+     * @param points The points inside the valid area, or {@code null} if none.
+     * @throws FactoryException if the CRS can't be created.
+     */
+    private EngineeringCRS createEngineeringCRS(final CoordinateReferenceSystem oppositeCRS,
+                                                final DirectPosition[] points)
+            throws FactoryException
+    {
+        final Map properties = new HashMap(4);
+        properties.put(CoordinateReferenceSystem.NAME_KEY, Vocabulary.format(VocabularyKeys.UNKNOW));
+        final GeographicExtent validArea = getValidArea(points);
+        if (validArea != null) {
+            final ExtentImpl extent = new ExtentImpl();
+            extent.getGeographicElements().add(validArea);
+            properties.put(CoordinateReferenceSystem.VALID_AREA_KEY, extent.unmodifiable());
+        }
+        final CoordinateSystem cs;
+        if (oppositeCRS != null) {
+            cs = oppositeCRS.getCoordinateSystem();
+        } else {
+            switch (getDimension()) {
+                case 2: cs = DefaultCartesianCS.GENERIC_2D; break;
+                case 3: cs = DefaultCartesianCS.GENERIC_3D; break;
+                default: throw new FactoryException(Errors.format(ErrorKeys.UNSPECIFIED_CRS));
+            }
+        }
+        return crsFactory.createEngineeringCRS(properties,
+                datumFactory.createEngineeringDatum(properties), cs);
+    }
+
+    /**
      * Returns a geographic extent that contains fully all the specified points.
      * If the envelope can't be calculated, then this method returns {@code null}.
      */
@@ -285,8 +339,6 @@ public abstract class MathTransformBuilder {
     /**
      * Returns the CRS of the specified point. If the CRS of the previous point is known,
      * it can be specified. This method will then ensure that the two CRS are compatibles.
-     *
-     * @todo Provides an error message.
      */
     private static CoordinateReferenceSystem getCoordinateReferenceSystem(
             final DirectPosition point, CoordinateReferenceSystem previousCRS)
@@ -297,47 +349,16 @@ public abstract class MathTransformBuilder {
             if (previousCRS == null) {
                 return candidate;
             }
-            if (!CRS.equalsIgnoreMetadata(previousCRS, candidate)) {
-                throw new MismatchedReferenceSystemException();
+            /*
+             * We use strict 'equals' instead of 'equalsIgnoreCase' because if the metadata
+             * are not identical, we have no easy way to choose which CRS is the "main" one.
+             */
+            if (!previousCRS.equals(candidate)) {
+                throw new MismatchedReferenceSystemException(
+                        Errors.format(ErrorKeys.MISMATCHED_COORDINATE_REFERENCE_SYSTEM));
             }
         }
         return previousCRS;
-    }
-
-    /**
-     * Sets the {@link #sourcePoints}
-     * 
-     * 
-     * @param sourcePoints {@link #sourcePoints}
-     * @throws MismatchedSizeException if the list doesn't have the expected number of points.
-     * @throws MismatchedDimensionException if some points doesn't have the
-     *         {@linkplain #getDimension expected number of dimensions}.
-     * @throws MismatchedReferenceSystemException if CRS is not the same for all points.
-     */
-    public void setSourcePoints(final DirectPosition[] ptSrc)
-            throws MismatchedSizeException, MismatchedDimensionException,
-                   MismatchedReferenceSystemException
-    {
-        this.sourcePoints = ptSrc;
-        sourceCRS = ensureValid(ptSrc, "sourcePoints");
-    }
-
-    /**
-     * Sets the {@link #targetPoints}
-     * 
-     * 
-     * @param targetPoints {@link #targetPoints}
-     * @throws MismatchedSizeException if the list doesn't have the expected number of points.
-     * @throws MismatchedDimensionException if some points doesn't have the
-     *         {@linkplain #getDimension expected number of dimensions}.
-     * @throws MismatchedReferenceSystemException if CRS is not the same for all points.
-     */
-    public void setTargetPoints(final DirectPosition[] ptDst)
-            throws MismatchedSizeException, MismatchedDimensionException,
-                   MismatchedReferenceSystemException
-    {
-        this.targetPoints = ptDst;
-        targetCRS = ensureValid(ptDst, "targetPoints");
     }
 
     /**
@@ -359,8 +380,8 @@ public abstract class MathTransformBuilder {
     {
         final int necessaryNumber = getMinimumPointCount();
         if (points.length < necessaryNumber) {
-            // TODO: localize
-            throw new MismatchedSizeException("Set at least " + necessaryNumber + " points");
+            throw new MismatchedSizeException(Errors.format(ErrorKeys.INSUFFICIENT_POINTS_$2,
+                        new Integer(points.length), new Integer(necessaryNumber)));
         }
         CoordinateReferenceSystem crs = null;
         final int dimension = getDimension();
@@ -372,16 +393,7 @@ public abstract class MathTransformBuilder {
                         ErrorKeys.MISMATCHED_DIMENSION_$3, label + '[' + i + ']',
                         new Integer(pointDim), new Integer(dimension)));
             }
-            final CoordinateReferenceSystem candidate = point.getCoordinateReferenceSystem();
-            if (candidate != null) {
-                if (crs == null) {
-                    crs = candidate;
-                } else if (!crs.equals(candidate)) {
-                    // TODO: localize
-                    throw new MismatchedReferenceSystemException(
-                            "All points must have same CRS.");
-                }
-            }
+            crs = getCoordinateReferenceSystem(point, crs);
         }
         return crs;
     }
@@ -393,21 +405,18 @@ public abstract class MathTransformBuilder {
      * as number of necessary point that defines this transformation, The
      * Coordinate Reference System of {@link #sourcePoints} and {@link #targetPoints} is the
      * same or null.
-     * 
-     * 
-     * 
-     * @param necessaryNumber The number of necessary point that defines this
-     *        transformation.
-     * @param dim The dimension that must {@link #sourcePoints} and {@link #targetPoints}
-     *        have.
+     *
      * @throws MismatchedDimensionException if the number and dimension of {@link
      *         #sourcePoints} and {@link #targetPoints} is not valid.
      * @throws MismatchedReferenceSystemException if there is wrong Cordinate Reference System.
      *
-     * @deprecated To be replaced by a no-args method.
+     * @deprecated Should not be needed anymore.
      */
-    protected void checkPoints(int necessaryNumber, int dim)
-        throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
+    final void checkPoints() throws MismatchedSizeException,
+            MismatchedDimensionException, MismatchedReferenceSystemException
+    {
+        final int necessaryNumber = getMinimumPointCount();
+        final int dim = getDimension();
         // initalize the value of Coordinate refernce system
         sourceCRS = sourcePoints[0].getCoordinateReferenceSystem();
 
@@ -447,40 +456,134 @@ public abstract class MathTransformBuilder {
     /**
      * Returns standard deviation of this transformation method.
      *
-     * @return standard deviation
-     *
-     * @throws FactoryException
+     * @throws FactoryException If the math transform can't be created or used.
      */
-    public double getStandardDeviation() throws FactoryException, TransformException {
-        final int dimension = sourcePoints[0].getDimension();
-        double[] points       = new double[sourcePoints.length * dimension];
-        double[] pointsDst    = new double[sourcePoints.length * dimension];
-        double[] ptCalculated = new double[sourcePoints.length * dimension];
-
-        for (int i = 0; i < sourcePoints.length; i++) {
+    public double getStandardDeviation() throws FactoryException {
+        final int dimension = getDimension();
+        final double[] points = new double[sourcePoints.length * dimension];
+        /*
+         * Copies the source points in an array to be transformed. No need to copy the
+         * target points; we will loop directly over them later, which avoid the cost
+         * of creating a temporary array.
+         */
+        for (int i=0; i<sourcePoints.length; i++) {
             final int base = i * dimension;
-            for (int j = 0; j < sourcePoints[i].getDimension(); j++) {
-                points   [base + j] = sourcePoints[i].getOrdinate(j);
-                pointsDst[base + j] = targetPoints[i].getOrdinate(j);
+            final DirectPosition point = sourcePoints[i];
+            for (int j=0; j<dimension; j++) {
+                points[base + j] = point.getOrdinate(j);
             }
         }
-        getMathTransform().transform(points, 0, ptCalculated, 0, sourcePoints.length);
-
+        /*
+         * Transforms the source point using the math transform calculated by this class.
+         * If the transform can't be applied, then we consider this failure as if it was
+         * a factory error rather than a transformation error. This simplify the exception
+         * declaration, but also has some sense on a conceptual point of view. We are
+         * transforming the exact same points than the one used for creating the math
+         * transform. If one of those points can't be transformed, then there is probably
+         * something wrong with the transform we just created.
+         */
+        try {
+            getMathTransform().transform(points, 0, points, 0, sourcePoints.length);
+        } catch (TransformException e) {
+            throw new FactoryException(Errors.format(ErrorKeys.CANT_TRANSFORM_VALID_POINTS), e);
+        }
         // Calculation of the standard deviation
         double sum = 0;
-        for (int i = 0; i < pointsDst.length; i++) {
-            sum += (pointsDst[i] - ptCalculated[i]) * (pointsDst[i] - ptCalculated[i]);
+        for (int i=0; i<targetPoints.length; i++) {
+            final int base = i * dimension;
+            final DirectPosition point = targetPoints[i];
+            for (int j=0; j<dimension; j++) {
+                final double delta = point.getOrdinate(j) - points[base + j];
+                sum += delta*delta;
+            }
         }
-        return Math.sqrt(sum / (pointsDst.length / sourcePoints[0].getDimension()));
+        return Math.sqrt(sum / targetPoints.length);
     }
 
     /**
-     * Returns the calculated math transform.
-     * 
-     * 
-     * 
+     * Calculates the math transform immediately.
+     *
      * @return The math transform from the set of {@link #sourcePoints} and {@link #targetPoints}.
-     * @throws FactoryException
+     * @throws FactoryException if the math transform can't be created.
      */
-    public abstract MathTransform getMathTransform() throws FactoryException;
+    protected abstract MathTransform computeMathTransform() throws FactoryException;
+
+    /**
+     * Returns the calculated math transform. This method {@linkplain #computes the math
+     * transform} the first time it is requested.
+     *
+     * @return The math transform from the set of {@link #sourcePoints} and {@link #targetPoints}.
+     * @throws FactoryException if the math transform can't be created.
+     */
+    public final MathTransform getMathTransform() throws FactoryException {
+        if (transform == null) {
+            transform = computeMathTransform();
+        }
+        return transform;
+    }
+
+    /**
+     * Returns the coordinate operation wrapping the {@linkplain #getMathTransform() calculated
+     * math transform}. The {@linkplain Transformation#getPositionalAccuracy positional
+     * accuracy} will be set to the Root Mean Square (RMS) of the differences between the
+     * source points transformed to the target CRS, and the expected target points.
+     */
+    public Transformation getTransformation() throws FactoryException {
+        if (transformation == null) {
+            final Map properties = new HashMap();
+            properties.put(Transformation.NAME_KEY, getName());
+            /*
+             * Set the valid area as the intersection of source CRS and target CRS valid area.
+             */
+            final CoordinateReferenceSystem sourceCRS = getSourceCRS();
+            final CoordinateReferenceSystem targetCRS = getTargetCRS();
+            final GeographicBoundingBox sourceBox = CRS.getGeographicBoundingBox(sourceCRS);
+            final GeographicBoundingBox targetBox = CRS.getGeographicBoundingBox(targetCRS);
+            final GeographicBoundingBox validArea;
+            if (sourceBox == null) {
+                validArea = targetBox;
+            } else if (targetBox == null) {
+                validArea = sourceBox;
+            } else {
+                final GeneralEnvelope area = new GeneralEnvelope(sourceBox);
+                area.intersect(new GeneralEnvelope(sourceBox));
+                try {
+                    validArea = new GeographicBoundingBoxImpl(area);
+                } catch (TransformException e) {
+                    // Should never happen, because we know that 'area' CRS is WGS84.
+                    throw new AssertionError(e);
+                }
+            }
+            if (validArea != null) {
+                final ExtentImpl extent = new ExtentImpl();
+                extent.getGeographicElements().add(validArea);
+                properties.put(Transformation.VALID_AREA_KEY, extent.unmodifiable());
+            }
+            /*
+             * Computes the positional accuracy as the RMS value of differences
+             * between the computed target points and the supplied target points.
+             */
+            final double error = getStandardDeviation();
+            if (!Double.isNaN(error)) {
+                final InternationalString description =
+                        Vocabulary.formatInternational(VocabularyKeys.ROOT_MEAN_SQUARED_ERROR);
+                final QuantitativeResultImpl result = new QuantitativeResultImpl();
+                result.setValues(new double[] {error});
+                result.setValueType(Double.TYPE);
+                result.setValueUnit(CRSUtilities.getUnit(targetCRS.getCoordinateSystem()));
+                result.setErrorStatistic(description);
+                final PositionalAccuracyImpl accuracy = new PositionalAccuracyImpl(result);
+                accuracy.setEvaluationMethodType(EvaluationMethodType.DIRECT_INTERNAL);
+                accuracy.setEvaluationMethodDescription(description);
+                properties.put(Transformation.POSITIONAL_ACCURACY_KEY, accuracy.unmodifiable());
+            }
+            /*
+             * Now creates the transformation.
+             */
+            final MathTransform transform = getMathTransform();
+            transformation = new DefaultTransformation(properties, sourceCRS, targetCRS, transform,
+                             new DefaultOperationMethod(transform));
+        }
+        return transformation;
+    }
 }

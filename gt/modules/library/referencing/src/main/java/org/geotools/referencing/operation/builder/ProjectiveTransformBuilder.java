@@ -71,7 +71,7 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
         this.targetPoints = ptDst;
         this.sourcePoints = ptSrc;
 
-        super.checkPoints(4, 2);
+        checkPoints();
 
         checkCRS();
     }
@@ -202,7 +202,7 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
         return M;
     }
 
-    public MathTransform getMathTransform() {
+    protected MathTransform computeMathTransform() {
         return ProjectiveTransform.create(getProjectiveMatrix());
     }
 }
