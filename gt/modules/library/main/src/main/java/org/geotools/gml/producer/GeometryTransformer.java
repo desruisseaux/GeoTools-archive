@@ -113,19 +113,11 @@ public class GeometryTransformer extends TransformerBase {
             // new behavior:
             // <gml:null>unknown</gml:null>
             if(bounds.isNull()) {
-                start("null");
-                String text = "unknown";
-                try{
-                    contentHandler.characters(text.toCharArray(), 0, text.length());
-                } catch(Exception e) //this shouldnt happen!!
-                {
-                    System.out.println("got exception while writing null boundedby:"+e.getLocalizedMessage());
-                    e.printStackTrace();
-                }
-                end("null");
+            	encodeNullBounds();
+                
                 return; // we're done!
             }
-            String boxName = "Box";
+            String boxName = boxName();
             
             if ((srsName == null) || srsName.equals("")) {
                 start(boxName);
@@ -147,6 +139,30 @@ public class GeometryTransformer extends TransformerBase {
             }
             
             end(boxName);
+        }
+        
+        /**
+         * Method to be subclasses in order to allow for gml3 encoding for null enevelope.
+         */
+        protected void encodeNullBounds() {
+        	start("null");
+            String text = "unknown";
+            try{
+                contentHandler.characters(text.toCharArray(), 0, text.length());
+            } catch(Exception e) //this shouldnt happen!!
+            {
+                System.out.println("got exception while writing null boundedby:"+e.getLocalizedMessage());
+                e.printStackTrace();
+            }
+            end("null");
+        }
+        
+        /**
+         * Method to be subclassed in order to allow for gml3 encoding of envelopes.
+         * @return "Box"
+         */
+        protected String boxName() {
+        	return "Box";
         }
         
         public void encode(Geometry geometry) {

@@ -24,6 +24,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
 import org.geotools.feature.FeatureType;
+import org.geotools.gml.producer.GeometryTransformer.GeometryTranslator;
 import org.geotools.xml.transform.TransformerBase;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.xml.sax.Attributes;
@@ -311,7 +312,7 @@ public class FeatureTransformer extends TransformerBase {
     public static class FeatureTranslator extends TranslatorSupport
         implements FeatureCollectionIteration.Handler {
         String fc = "FeatureCollection";
-        GeometryTransformer.GeometryTranslator geometryTranslator;
+        protected GeometryTransformer.GeometryTranslator geometryTranslator;
         String memberString;
         String currentPrefix;
         FeatureTypeNamespaces types;
@@ -335,7 +336,7 @@ public class FeatureTransformer extends TransformerBase {
             String ns, FeatureTypeNamespaces types,
             SchemaLocationSupport schemaLoc) {
             super(handler, prefix, ns, schemaLoc);
-            geometryTranslator = new GeometryTransformer.GeometryTranslator(handler);
+            geometryTranslator = createGeometryTranslator( handler );
             this.types = types;
             this.handler = handler;
             getNamespaceSupport().declarePrefix(geometryTranslator
@@ -344,6 +345,22 @@ public class FeatureTransformer extends TransformerBase {
                 + ":featureMember";
         }
 
+        /**
+         * Method to be subclassed to return a custom geometry translator, mostly for gml3 
+         * geometry support.
+         * @param handler
+         * @return
+         */
+        protected GeometryTranslator createGeometryTranslator( ContentHandler handler ) {
+        	return new GeometryTransformer.GeometryTranslator( handler );
+        }
+        protected GeometryTranslator createGeometryTranslator( ContentHandler handler, int numDecimals ) {
+        	return new GeometryTransformer.GeometryTranslator( handler, numDecimals );
+        }
+        protected GeometryTranslator createGeometryTranslator( ContentHandler handler, int numDecimals, boolean useDummyZ ) {
+        	return new GeometryTransformer.GeometryTranslator( handler, numDecimals, useDummyZ );
+        }
+        
         void setGmlPrefixing(boolean prefixGml) {
             this.prefixGml = prefixGml;
         }
@@ -357,12 +374,11 @@ public class FeatureTransformer extends TransformerBase {
         }
 
         void setNumDecimals(int numDecimals) {
-            geometryTranslator = new GeometryTransformer.GeometryTranslator(handler,
-                    numDecimals);
+        	geometryTranslator = createGeometryTranslator( handler, numDecimals );
         }
 
         void setUseDummyZ(boolean useDummyZ) {
-            geometryTranslator = new GeometryTransformer.GeometryTranslator(handler,
+            geometryTranslator = createGeometryTranslator(handler,
                     geometryTranslator.getNumDecimals(), useDummyZ);
         }
 
@@ -492,8 +508,7 @@ public class FeatureTransformer extends TransformerBase {
             try {
                 String boundedBy = geometryTranslator.getDefaultPrefix() + ":"
                     + "boundedBy";
-                String box = geometryTranslator.getDefaultPrefix() + ":"
-                    + "Box";
+               
                 contentHandler.startElement("", "", boundedBy, NULL_ATTS);
                 geometryTranslator.encode(bounds, srsName);
                 contentHandler.endElement("", "", boundedBy);
@@ -501,7 +516,7 @@ public class FeatureTransformer extends TransformerBase {
                 throw new RuntimeException(se);
             }
         }
-
+        
         /**
          * Sends sax for the ending of a feature collection.
          *
