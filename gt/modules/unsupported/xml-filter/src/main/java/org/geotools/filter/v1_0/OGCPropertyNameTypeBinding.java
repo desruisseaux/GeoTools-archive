@@ -98,14 +98,6 @@ public class OGCPropertyNameTypeBinding implements ComplexBinding {
         Expression expression = (Expression) value;
         String xpath = Filters.asString(expression);
 
-        //strip off namespace prefix.
-        //Our feature model does not suppor tthe notion of namespace for attributes
-        // and there is a lot of code that expects this to be a non-qualified name.
-        // Also, the PropertyName interface doesn't support a namespace
-        if ((xpath != null) && (xpath.indexOf(":") != -1)) {
-            xpath = xpath.substring(xpath.indexOf(":") + 1);
-        }
-
         return factory.property(xpath);
     }
 
