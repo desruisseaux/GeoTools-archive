@@ -44,7 +44,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 		schema.put( new Name( "test", "intType" ), intType );
 		
 		builder = new SimpleTypeBuilder( new SimpleTypeFactoryImpl() );
-		builder.load( schema );
+		//builder.load( schema );
 	}
 	
 	public void test() {
@@ -104,7 +104,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 	 * </ul>
 	 */
 	public void testBuilding() throws Exception {
-		builder.load(new SimpleSchema()); // load java types
+		//builder.load(new SimpleSchema()); // load java types
 		builder.setNamespaceURI(URI);
 		builder.setCRS(DefaultGeographicCRS.WGS84);
 
@@ -128,7 +128,7 @@ public class SimpleTypeBuilderTest extends TestCase {
 	}
 
 	public void testTerse() throws Exception {
-		builder.load(new SimpleSchema()); // load java types
+		//builder.load(new SimpleSchema()); // load java types
 		builder.setNamespaceURI(URI);
 		builder.setCRS(DefaultGeographicCRS.WGS84);
 

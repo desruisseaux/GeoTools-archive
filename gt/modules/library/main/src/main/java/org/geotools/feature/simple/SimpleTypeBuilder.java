@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
@@ -18,18 +17,18 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.feature.type.AssociationDescriptor;
 import org.opengis.feature.type.AssociationType;
-import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.PropertyType;
 import org.opengis.feature.type.Schema;
 import org.opengis.feature.type.TypeName;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.InternationalString;
 
 /**
  * Builder to ease creation of simple types.
+ * <p>
+ * This type builder pre-loads itself with bindings from 
+ * {@link org.geotools.feature.simple.SimpleSchema}
+ * </p>
  * <p>
  * For reference these are the limitations of a "Simple Feature" model:
  * <ol>
@@ -116,6 +115,7 @@ public class SimpleTypeBuilder {
 
 	public SimpleTypeBuilder(SimpleTypeFactory factory) {
 		this.factory = (SimpleTypeFactoryImpl) factory;
+		load( new SimpleSchema() );
 	}
 
 	// Dependency Injection
