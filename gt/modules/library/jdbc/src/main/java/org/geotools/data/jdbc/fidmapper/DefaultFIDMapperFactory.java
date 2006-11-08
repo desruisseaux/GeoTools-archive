@@ -81,6 +81,14 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     }
 
     /**
+     * Setter for the flag controlling wther a "typed" fid mapper is returned.
+     * @param returningTypedFIDMapper
+     */
+    public void setReturningTypedFIDMapper(boolean returningTypedFIDMapper) {
+		this.returningTypedFIDMapper = returningTypedFIDMapper;
+	}
+    
+    /**
      * Gets the appropriate FIDMapper for the specified table.
      *
      * @param catalog
