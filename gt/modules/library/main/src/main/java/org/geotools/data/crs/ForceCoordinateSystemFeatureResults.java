@@ -64,11 +64,11 @@ import com.vividsolutions.jts.geom.Envelope;
  * @version $Id$
  */
 public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
-    FeatureResults results;
+    FeatureCollection results;
     FeatureType schema;
     private FeatureType startingType;
 
-    public ForceCoordinateSystemFeatureResults(FeatureResults results,
+    public ForceCoordinateSystemFeatureResults(FeatureCollection results,
         CoordinateReferenceSystem forcedCS) throws IOException, SchemaException {
         if (forcedCS == null) {
             throw new NullPointerException("CoordinateSystem required");
@@ -129,7 +129,7 @@ public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
      * @see org.geotools.data.FeatureResults#getCount()
      */
     public int getCount() throws IOException {
-        return results.getCount();
+        return results.size();
     }
 
     /**
@@ -158,7 +158,7 @@ public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
      * ForceCoordinateSystemFeatureResults
      *
      */
-    public FeatureResults getOrigin() {
+    public FeatureCollection getOrigin() {
         return results;
     }
 }

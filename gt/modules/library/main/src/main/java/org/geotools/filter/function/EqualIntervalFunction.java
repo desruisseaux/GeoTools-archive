@@ -46,6 +46,7 @@ public class EqualIntervalFunction extends RangedClassificationFunction {
     Object[] values = null;
     boolean isValid = false;
     boolean isNumber = false;
+    private int classNum;
     
     public EqualIntervalFunction() {
     }
@@ -57,21 +58,21 @@ public class EqualIntervalFunction extends RangedClassificationFunction {
     private void calculateMinAndMax() {
         MinVisitor minVisit;
 		try {
-			minVisit = new MinVisitor(expr);
+			minVisit = new MinVisitor(getExpression());
 			if (progress == null) progress = new NullProgressListener();
-			fc.accepts(minVisit, progress);
+			featureCollection.accepts(minVisit, progress);
 			if (progress.isCanceled()) return;
 			globalMin = (Comparable) minVisit.getResult().getValue();
 
-			MaxVisitor maxVisit = new MaxVisitor(expr);
-			fc.accepts(maxVisit, progress);
+			MaxVisitor maxVisit = new MaxVisitor(getExpression());
+			featureCollection.accepts(maxVisit, progress);
 			if (progress.isCanceled()) return;
 			globalMax = (Comparable) maxVisit.getResult().getValue();
 			
 			if (!((globalMin instanceof Number) && (globalMax instanceof Number))) {
 				//obtain of list of unique values, so we can enumerate
-				UniqueVisitor uniqueVisit = new UniqueVisitor(expr);
-				fc.accepts(uniqueVisit, null);
+				UniqueVisitor uniqueVisit = new UniqueVisitor(getExpression());
+				featureCollection.accepts(uniqueVisit, null);
 		        List result = uniqueVisit.getResult().toList();
 		        //sort the results and put them in an array
 		        Collections.sort(result);
@@ -177,34 +178,35 @@ public class EqualIntervalFunction extends RangedClassificationFunction {
     	return -1;
     }
 
+    public Object evaluate( Object object ) {
+        FeatureCollection coll;
+        if (object instanceof FeatureCollection) {
+            coll = (FeatureCollection) object;
+        } else {
+            return null;
+        }
+        if (!(coll.equals(featureCollection))) {
+            featureCollection = coll;
+            calculateMinAndMax();
+        }
+        return new Integer( this.classNum );
+    }
+    /** Must be feature collection for aggregate function */
     public Object evaluate(Feature feature) {
-    	 FeatureCollection coll = feature.getParent();
-
-         if (coll == null) {
-             return null;
-         }
-
-         if (!(coll.equals(fc))) {
-             fc = coll;
-             calculateMinAndMax();
-         }
-
-         int slot = calculateSlot(expr.evaluate(feature));
-
-         return new Integer(slot);
+        return evaluate( (Object) feature ); // must be FeatureCollection
     }
     
     public void setExpression(Expression e) {
         super.setExpression(e);
         isValid = false; // the expression has changed, so we set the flag
 						 // which will cause it to be recalculated.
-        if (fc != null) {
+        if (featureCollection != null) {
             calculateMinAndMax();
         }
     }
     
     public Object getMin(int index) {
-        if (fc == null) 
+        if (featureCollection == null) 
             return null;
 
         if (!isValid) 
@@ -214,7 +216,7 @@ public class EqualIntervalFunction extends RangedClassificationFunction {
     }
 
     public Object getMax(int index) {
-		if (fc == null)
+		if (featureCollection == null)
 			return null;
 
 		if (!isValid)

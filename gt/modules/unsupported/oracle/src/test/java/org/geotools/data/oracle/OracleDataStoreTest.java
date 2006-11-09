@@ -249,8 +249,8 @@ public class OracleDataStoreTest extends TestCase {
         query.setTypeName("ORA_TEST_POINTS");
         query.setMaxFeatures(3);
         FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");        
-        FeatureResults fr = fs.getFeatures(query);
-        assertEquals(3, fr.getCount());
+        FeatureCollection fr = fs.getFeatures(query);
+        assertEquals(3, fr.size());
     }
 
     public void testLikeGetFeatures() throws Exception {
@@ -262,13 +262,13 @@ public class OracleDataStoreTest extends TestCase {
         likeFilter.setValue(attr);
         
         FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
-        FeatureResults fr = fs.getFeatures(likeFilter);
-        assertEquals(5, fr.getCount());
+        FeatureCollection fr = fs.getFeatures(likeFilter);
+        assertEquals(5, fr.size());
         
         pattern = filterFactory.createLiteralExpression("*5");
         likeFilter.setPattern(pattern, "*", "?", "\\");
         fr = fs.getFeatures(likeFilter);
-        assertEquals(1, fr.getCount());
+        assertEquals(1, fr.size());
     }
     
     public void testAttributeFilter() throws Exception {
@@ -280,10 +280,10 @@ public class OracleDataStoreTest extends TestCase {
         attributeEquality.addRightValue(literal);
         
         FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
-        FeatureResults fr = fs.getFeatures(attributeEquality);
-        assertEquals(1, fr.getCount());
+        FeatureCollection fr = fs.getFeatures(attributeEquality);
+        assertEquals(1, fr.size());
         
-        FeatureCollection fc = fr.collection();
+        FeatureCollection fc = fr;
         assertEquals(1, fc.size());
         Feature f = fc.features().next();
         assertEquals("point 1", f.getAttribute("NAME"));        
@@ -298,8 +298,8 @@ public class OracleDataStoreTest extends TestCase {
         filter.addRightGeometry(right);
         
         FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
-        FeatureResults fr = fs.getFeatures(filter);        
-        assertEquals(5, fr.getCount()); // we pass this!
+        FeatureCollection fr = fs.getFeatures(filter);        
+        assertEquals(5, fr.size()); // we pass this!
         
     	//                   + (20,30)
     	//                            +----------------------+
@@ -308,7 +308,7 @@ public class OracleDataStoreTest extends TestCase {
         right = filterFactory.createBBoxExpression(new Envelope(15, 35, 0, 15));        
         filter.addRightGeometry(right);
         fr = fs.getFeatures(filter);
-        assertEquals(2, fr.getCount()); // we have 4!
+        assertEquals(2, fr.size()); // we have 4!
     }
     
     public void testPointGeometryConversion() throws Exception {
@@ -321,10 +321,10 @@ public class OracleDataStoreTest extends TestCase {
         
         
         FeatureSource fs = dstore.getFeatureSource("ORA_TEST_POINTS");
-        FeatureResults fr = fs.getFeatures(filter);        
-        assertEquals(1, fr.getCount());
+        FeatureCollection fr = fs.getFeatures(filter);        
+        assertEquals(1, fr.size());
         
-        Feature feature = (Feature) fr.collection().iterator().next();
+        Feature feature = (Feature) fr.iterator().next();
         Geometry geom = feature.getDefaultGeometry();
         assertEquals(Point.class.getName(), geom.getClass().getName());
         Point point = (Point) geom;
@@ -362,8 +362,8 @@ public class OracleDataStoreTest extends TestCase {
     	if( conn == null ) return;    	
         FeatureStore fs = (FeatureStore) dstore.getFeatureSource("ORA_TEST_POINTS");
         fs.removeFeatures(Filter.INCLUDE);
-        FeatureResults fr = fs.getFeatures();
-        assertEquals(0, fr.getCount());
+        FeatureCollection fr = fs.getFeatures();
+        assertEquals(0, fr.size());
     }
     
     public void testPropertySelect() throws Exception {

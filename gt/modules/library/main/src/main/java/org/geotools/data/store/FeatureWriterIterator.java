@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
-import org.geotools.feature.IllegalAttributeException;
 
 /**
  * An iterator wrapper for a FeatureWriter - for use with

@@ -26,7 +26,6 @@ import junit.framework.AssertionFailedError;
 
 import org.geotools.TestData;
 import org.geotools.data.DataStore;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
@@ -126,7 +125,7 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 		store.addFeatures( one );
 
 		s = createDataStore(maker,tmp.toURL(), true);
-		assertEquals(one.getCount()*2, store.getCount(Query.ALL));
+		assertEquals(one.size()*2, store.getCount(Query.ALL));
 	}
    
     void test(String f) throws Exception {

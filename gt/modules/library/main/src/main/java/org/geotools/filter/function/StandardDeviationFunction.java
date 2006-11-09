@@ -37,6 +37,7 @@ public class StandardDeviationFunction extends RangedClassificationFunction {
 	double average;
 	
 	boolean isValid = false; // we have valid data
+    private int classNum;
 
 	public StandardDeviationFunction() {
 	}
@@ -46,17 +47,18 @@ public class StandardDeviationFunction extends RangedClassificationFunction {
 	}
 
 	private void calculate() throws IllegalFilterException, IOException {
+        classNum = getNumberOfClasses();
 		// find the average
-		AverageVisitor averageVisit = new AverageVisitor(expr);
+		AverageVisitor averageVisit = new AverageVisitor(getExpression());
 		if (progress == null) progress = new NullProgressListener();
-		fc.accepts(averageVisit, progress);
+		featureCollection.accepts(averageVisit, progress);
 		if (progress.isCanceled()) return;
 		CalcResult calcResult = averageVisit.getResult();
 		if (calcResult == null) return;
 		average = calcResult.toDouble();
 		// find the standard deviation
-		StandardDeviationVisitor sdVisit = new StandardDeviationVisitor(expr, average);
-		fc.accepts(sdVisit, progress);
+		StandardDeviationVisitor sdVisit = new StandardDeviationVisitor(getExpression(), average);
+		featureCollection.accepts(sdVisit, progress);
 		if (progress.isCanceled()) return;
 		calcResult = sdVisit.getResult();
 		if (calcResult == null) return;
@@ -87,13 +89,13 @@ public class StandardDeviationFunction extends RangedClassificationFunction {
 		if (feature instanceof FeatureCollection) {
 			fcNew = (FeatureCollection) feature;
 		} else {
-			fcNew = feature.getParent();
+			return null;
 		}
 		if (fcNew == null) {
 			return new Integer(0);
 		}
-		if (!fcNew.equals(fc) || !isValid) {
-			fc = fcNew;
+		if (!fcNew.equals(featureCollection) || !isValid) {
+			featureCollection = fcNew;
 			try {
 				calculate();
 			} catch (IllegalFilterException e) {
@@ -103,16 +105,14 @@ public class StandardDeviationFunction extends RangedClassificationFunction {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		int slot = calculateSlot(expr.getValue(feature)); // feature, not
-															// featureCollection!
-		return new Integer(slot);
+		}        
+		return new Integer(this.classNum);
 	}
 
 	public void setExpression(Expression e) {
 		super.setExpression(e);
 
-		if (fc != null) {
+		if (featureCollection != null) {
 			try {
 				calculate();
 			} catch (Exception e1) {

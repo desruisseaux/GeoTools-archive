@@ -38,11 +38,6 @@ public class PrjFileTest extends TestCaseSupport {
     super(testName);
   }
   
-  public static void main(String[] args) {
-    verbose = true;
-    junit.textui.TestRunner.run(suite(PrjFileTest.class));
-  }
-
   protected void setUp() throws Exception {
     prj = new PrjFileReader(TestData.openChannel(TEST_FILE));
   }
@@ -52,9 +47,6 @@ public class PrjFileTest extends TestCaseSupport {
 	super.tearDown();
 }
 
-  public void testGeneral() {
-    if (verbose) {
-      System.out.println("tested");
-    }
+  public void testIgnoreEmptyTestCaseWarning() {
   }
 }

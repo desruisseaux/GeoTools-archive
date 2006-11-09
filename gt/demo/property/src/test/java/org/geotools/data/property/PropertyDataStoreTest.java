@@ -29,17 +29,17 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
 /**
@@ -258,7 +258,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testWriterChangeRemoveFirst() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
-        Feature f;
+        
         writer.next();
         writer.remove();
         writer.close();
@@ -267,7 +267,7 @@ public class PropertyDataStoreTest extends TestCase {
     public void testWriterChangeRemoveLast() throws Exception{
         PropertyFeatureWriter writer = (PropertyFeatureWriter)
                     store.getFeatureWriter("road");
-        Feature f;
+        
         writer.next();
         writer.next();
         writer.next();
@@ -311,8 +311,8 @@ public class PropertyDataStoreTest extends TestCase {
     }
     public void testGetFeatureSource() throws Exception {
         FeatureSource road = store.getFeatureSource( "road" );
-        FeatureResults features = road.getFeatures();
-        FeatureReader reader = features.reader();
+        FeatureCollection features = road.getFeatures();
+        FeatureIterator reader = features.features();
         List list = new ArrayList();
         try {
             while( reader.hasNext() ){
@@ -324,9 +324,9 @@ public class PropertyDataStoreTest extends TestCase {
         assertEquals( "[fid1, fid2, fid3, fid4]", list.toString() );
         assertEquals( 4, road.getCount(Query.ALL) );
         assertEquals( null, road.getBounds(Query.ALL) );
-        assertEquals( 4, features.getCount() );
+        assertEquals( 4, features.size() );
         assertTrue( features.getBounds().isNull() );
-        assertEquals( 4, features.collection().size() );
+        assertEquals( 4, features.size() );
                 
     }
     private void dir( File file ){
@@ -364,29 +364,29 @@ public class PropertyDataStoreTest extends TestCase {
         Feature feature =
             type.create( new Object[]{ new Integer(5), "chris"}, "fid5" );
             
-        assertEquals( 4, road.getFeatures().getCount() );
-        assertEquals( 4, road1.getFeatures().getCount() );
-        assertEquals( 4, road2.getFeatures().getCount() );
+        assertEquals( 4, road.getFeatures().size() );
+        assertEquals( 4, road1.getFeatures().size() );
+        assertEquals( 4, road2.getFeatures().size() );
                 
         road1.removeFeatures( filter1 ); // road1 removes fid1 on t1
-        assertEquals( 4, road.getFeatures().getCount() );
-        assertEquals( 3, road1.getFeatures().getCount() );
-        assertEquals( 4, road2.getFeatures().getCount() );               
+        assertEquals( 4, road.getFeatures().size() );
+        assertEquals( 3, road1.getFeatures().size() );
+        assertEquals( 4, road2.getFeatures().size() );               
         
         road2.addFeatures( DataUtilities.collection( feature )); // road2 adds fid5 on t2
     
-        assertEquals( 4, road.getFeatures().getCount() );
-        assertEquals( 3, road1.getFeatures().getCount() );
-        assertEquals( 5, road2.getFeatures().getCount() );        
+        assertEquals( 4, road.getFeatures().size() );
+        assertEquals( 3, road1.getFeatures().size() );
+        assertEquals( 5, road2.getFeatures().size() );        
             
         t1.commit();
-        assertEquals( 3, road.getFeatures().getCount() );
-        assertEquals( 3, road1.getFeatures().getCount() );
-        assertEquals( 4, road2.getFeatures().getCount() );                
+        assertEquals( 3, road.getFeatures().size() );
+        assertEquals( 3, road1.getFeatures().size() );
+        assertEquals( 4, road2.getFeatures().size() );                
             
         t2.commit();
-        assertEquals( 4, road.getFeatures().getCount() );
-        assertEquals( 4, road1.getFeatures().getCount() );
-        assertEquals( 4, road2.getFeatures().getCount() );
+        assertEquals( 4, road.getFeatures().size() );
+        assertEquals( 4, road1.getFeatures().size() );
+        assertEquals( 4, road2.getFeatures().size() );
     }
 }

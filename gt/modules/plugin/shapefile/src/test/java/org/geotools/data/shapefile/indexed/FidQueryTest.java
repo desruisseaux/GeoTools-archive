@@ -72,7 +72,7 @@ public class FidQueryTest extends FIDTestCase {
 					features.close();
 			}
 			assertEquals(numFeatures, fids.size());
-			System.out.println("Number of Features=" + numFeatures);
+			//System.out.println("Number of Features=" + numFeatures);
 		}
 
 	}
@@ -201,7 +201,7 @@ public class FidQueryTest extends FIDTestCase {
 	}
 	
 	private void assertFidsMatch() throws IOException {
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		FilterFactory fac = FilterFactoryFinder.createFilterFactory();
 		DefaultQuery query = new DefaultQuery(TYPE_NAME);
 
@@ -225,7 +225,7 @@ public class FidQueryTest extends FIDTestCase {
 
 		}
 		long end = System.currentTimeMillis();
-		System.out.println("Time to search by fid=" + (end - start) + "ms");
+		//System.out.println("Time to search by fid=" + (end - start) + "ms");
 	}
 
 }

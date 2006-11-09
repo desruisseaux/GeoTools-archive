@@ -65,6 +65,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
             try {
                 test(files[i]);
             } catch (Exception e) {
+                System.out.println("File failed:"+files[i]+" "+e);
                 e.printStackTrace();
                 errors.append("\nFile " + files[i] + " : " + e.getMessage());
                 bad = e;
@@ -86,17 +87,18 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         Runnable reader = new Runnable() {
             public void run() {
                 int cutoff = 0;
-                try {
-                    FileInputStream fr = new FileInputStream(file);
-                    try {
+                FileInputStream fr = null;
+                try {    
+                    fr = new FileInputStream(file);
+                    try {                        
                         fr.read();
                     } catch (IOException e1) {
                         exception = e1;
                         return;
                     }
-                    if (verbose) {
-                        System.out.println("locked");
-                    }
+//                    if (verbose) {
+//                        System.out.println("locked");
+//                    }
                     readStarted = true;
                     while (cutoff < 10) {
                         synchronized (this) {
@@ -117,16 +119,25 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
                 } catch (FileNotFoundException e) {
                     assertTrue(false);
                 }
-
+                finally {
+                    if( fr != null ) {
+                        try {
+                            fr.close();
+                        } catch (IOException e) {
+                            exception = e;
+                            return;
+                        }
+                    }
+                }
             }
         };
         Thread readThread = new Thread(reader);
         readThread.start();
         while (!readStarted) {
-            if (exception != null) {
+            if (exception != null) {                
                 throw exception;
             }
-            Thread.yield();
+            Thread.sleep(100);
         }
         test(files[0]);
     }
@@ -143,51 +154,46 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);
         FeatureType type = source.getSchema();
-        FeatureResults one = source.getFeatures();
+        FeatureCollection one = source.getFeatures();
         File tmp = getTempFile();
 
         ShapefileDataStoreFactory maker = new ShapefileDataStoreFactory();
         test(type, one, tmp, maker, true);
-        test(type, one, tmp, maker, false);
+        
+        File tmp2 = getTempFile(); // TODO consider reuse tmp results in failure
+        test(type, one, tmp2, maker, false);
     }
 
-    private void test(FeatureType type, FeatureResults one, File tmp,
+    private void test(FeatureType type, FeatureCollection original, File tmp,
             ShapefileDataStoreFactory maker, boolean memorymapped)
             throws IOException, MalformedURLException, Exception {
-        ShapefileDataStore s;
+        
+        ShapefileDataStore shapefile;
         String typeName;
-        s = (ShapefileDataStore) maker.createDataStore(tmp.toURL(),
-                memorymapped);
-        File file = new File(s.dbfURL.getFile());
-        file.deleteOnExit();
-        file = new File(s.prjURL.getFile());
-        file.deleteOnExit();
-        file = new File(s.shpURL.getFile());
-        file.deleteOnExit();
-        file = new File(s.shxURL.getFile());
-        file.deleteOnExit();
-        file = new File(s.xmlURL.getFile());
-        file.deleteOnExit();
+        shapefile = (ShapefileDataStore) maker.createDataStore(tmp.toURL(),
+                memorymapped);       
         
-        
-        s.createSchema(type);
-        FeatureStore store = (FeatureStore) s.getFeatureSource(type
+        shapefile.createSchema(type);
+                
+        FeatureStore store = (FeatureStore) shapefile.getFeatureSource(type
                 .getTypeName());
-        FeatureReader reader = one.reader();
-        assertNotNull( reader );
-        store.addFeatures(DataUtilities.collection(reader));
-		
-		try {
-		} catch (Exception e) {
-			reader.close();
-			// ignore
-		}
+        
+        store.addFeatures(original);
                     
-            s = new ShapefileDataStore(tmp.toURL());
-            typeName = s.getTypeNames()[0];
-            FeatureResults two = s.getFeatureSource(typeName).getFeatures();
-
-            compare(one.collection(), two.collection());
+        FeatureCollection copy = store.getFeatures();
+        compare(original, copy);
+        
+        
+        if( true ){
+            // review open         
+            ShapefileDataStore review = new ShapefileDataStore(tmp.toURL(), tmp.toURI(), memorymapped );        
+            typeName = review.getTypeNames()[0];            
+            FeatureSource featureSource = featureSource = review.getFeatureSource(typeName);
+            FeatureCollection again = featureSource.getFeatures();
+            
+            compare(copy, again );
+            compare(original, again );
+        }
     }
 
     static void compare(FeatureCollection one, FeatureCollection two)
@@ -198,21 +204,17 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
                     + " != " + two.size());
         }
 
-        FeatureIterator fs1 = one.features();
-        FeatureIterator fs2 = two.features();
+        FeatureIterator iterator1 = one.features();
+        FeatureIterator iterator2 = two.features();
 
         int i = 0;
-        while (fs1.hasNext()) {
-            Feature f1 = fs1.next();
-            Feature f2 = fs2.next();
-
-            if ((i++ % 50) == 0) {
-                if (verbose) {
-                    System.out.print("*");
-                }
-            }
+        while (iterator1.hasNext()) {
+            Feature f1 = iterator1.next();
+            Feature f2 = iterator2.next();
             compare(f1, f2);
         }
+        iterator1.close();
+        iterator2.close();
     }
 
     static void compare(Feature f1, Feature f2) throws Exception {
@@ -244,7 +246,7 @@ public class ShapefileReadWriteTest extends TestCaseSupport {
     }
 
     public static final void main(String[] args) throws Exception {
-        verbose = true;
+        //verbose = true;
         junit.textui.TestRunner.run(suite(ShapefileReadWriteTest.class));
     }
 }

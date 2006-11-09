@@ -54,7 +54,7 @@ public class TestCaseSupport extends TestCase {
      * Set to {@code true} if {@code println} are wanted during normal execution.
      * It doesn't apply to message displayed in case of errors.
      */
-    protected static boolean verbose = false;
+    //protected static boolean verbose = false;
 
     /**
      * Stores all temporary files here - delete on tear down.
@@ -78,15 +78,33 @@ public class TestCaseSupport extends TestCase {
         // care, so I'll just delete everything
         final Iterator f = tmpFiles.iterator();
         while (f.hasNext()) {
-            File tf = (File) f.next();
-            sibling(tf, "dbf").delete();
-            sibling(tf, "shx").delete();
-            tf.delete();
+            File targetFile = (File) f.next();
+            
+            targetFile.deleteOnExit();
+            dieDieDIE( sibling(targetFile, "dbf") );
+            dieDieDIE( sibling(targetFile, "shx") );
+            dieDieDIE( sibling(targetFile, "qix") );
+            dieDieDIE( sibling(targetFile, "fix") );
+            // TODDO: r i tree must die
+            dieDieDIE( sibling(targetFile, "prj") );
+            dieDieDIE( sibling(targetFile, "shp.xml") );
+                        
             f.remove();
         }
         super.tearDown();
     }
-
+    
+    private void dieDieDIE( File file ){
+        if( file.exists() ){
+            if( file.delete() ){
+                // dead
+            }
+            else {
+                file.deleteOnExit(); // dead later
+            }
+        }
+    }
+    
     /**
      * Helper method for {@link #tearDown}.
      */
@@ -140,10 +158,15 @@ public class TestCaseSupport extends TestCase {
     protected File getTempFile() throws IOException {
         File tmpFile = File.createTempFile("test-shp", ".shp");
         assertTrue(tmpFile.isFile());
+        
         // keep track of all temp files so we can delete them
-        tmpFiles.add(tmpFile);
-        tmpFile.deleteOnExit();
+        markTempFile(tmpFile);
+        
         return tmpFile;
+    }
+
+    private void markTempFile( File tmpFile ) {
+        tmpFiles.add(tmpFile);        
     }
 
     /**

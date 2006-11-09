@@ -94,7 +94,8 @@ public interface FeatureResults {
      *
      * @throws IOException if their is a problem getting the FeatureType.
      */
-    FeatureType getSchema() throws IOException;
+
+    //FeatureType getSchema() throws IOException;
 
     /**
      * Provides access to the Features, please note that FeatureReader is a
@@ -136,7 +137,8 @@ public interface FeatureResults {
      *
      * @return Bounding box of this FeatureResults, or an empty Envelope
      */
-    Envelope getBounds();
+
+    //Envelope getBounds();
 
     /**
      * Returns the number of Features in this FeatureResults.
@@ -161,7 +163,8 @@ public interface FeatureResults {
      * @return The number of Features in this FeatureResults.
      * @throws IOException If there are problems getting the count
      */
-    int getCount() throws IOException;
+
+    //int getCount() throws IOException;
 
     /**
      * Convert this set of results to a FeatureCollection.
@@ -187,5 +190,5 @@ public interface FeatureResults {
      */
 
     //@deprecated This method will be removed with as the Renderers convert
-    FeatureCollection collection() throws IOException;
+    //FeatureCollection collection() throws IOException;
 }

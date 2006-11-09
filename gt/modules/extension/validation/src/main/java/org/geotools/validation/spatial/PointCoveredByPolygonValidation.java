@@ -77,8 +77,8 @@ public class PointCoveredByPolygonValidation
         FeatureSource pointSource = (FeatureSource) layers.get(getPointTypeRef());
         FeatureSource polySource = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
 
-        Object[] polys = polySource.getFeatures().collection().toArray();
-        Object[] points = pointSource.getFeatures().collection().toArray();
+        Object[] polys = polySource.getFeatures().toArray();
+        Object[] points = pointSource.getFeatures().toArray();
 
         if (!envelope.contains(polySource.getBounds())) {
             results.error((Feature) polys[0],

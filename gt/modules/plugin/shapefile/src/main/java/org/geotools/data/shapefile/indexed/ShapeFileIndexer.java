@@ -195,7 +195,7 @@ public class ShapeFileIndexer {
          */
         if (alreadyRunning) {
             try {
-                LOGGER.info("Waiting for index build completition by thread "
+                LOGGER.fine("Waiting for index build completition by thread "
                     + sync);
 
                 long start = System.currentTimeMillis();

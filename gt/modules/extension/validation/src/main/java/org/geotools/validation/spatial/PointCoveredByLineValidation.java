@@ -76,8 +76,8 @@ public class PointCoveredByLineValidation extends PointLineAbstractValidation {
         FeatureSource lineSource = (FeatureSource) layers.get(getRestrictedLineTypeRef());
         FeatureSource pointSource = (FeatureSource) layers.get(getPointTypeRef());
 
-        Object[] points = pointSource.getFeatures().collection().toArray();
-        Object[] lines = lineSource.getFeatures().collection().toArray();
+        Object[] points = pointSource.getFeatures().toArray();
+        Object[] lines = lineSource.getFeatures().toArray();
 
         if (!envelope.contains(pointSource.getBounds())) {
             results.error((Feature) points[0],

@@ -82,13 +82,10 @@ public class QuantileFunctionTest extends FunctionTestSupport {
         FunctionExpression func = fac.createFunctionExpression("Quantile");
         func.setArgs(new Expression[]{exp,classes});
         
-        FeatureIterator list = fc.features();
-        while(list.hasNext()){
-            Feature f = list.next();
-            int slot = ((Number)func.getValue(f)).intValue();
-            System.out.println(slot);
-        }
-        
+        FeatureIterator list = featureCollection.features();
+        Object value = func.evaluate( featureCollection );
+        assertNotNull( value );
+        assertEquals( 3, ((Integer)value).intValue() );
     }
     
     public void testGetValue() throws Exception{
@@ -98,14 +95,10 @@ public class QuantileFunctionTest extends FunctionTestSupport {
         FunctionExpression func = fac.createFunctionExpression("Quantile");
         func.setArgs(new Expression[]{exp,classes});
         
-        FeatureIterator list = fc.features();
-        while(list.hasNext()){
-            Feature f = list.next();
-            int slot = ((Number)func.getValue(f)).intValue();
-            int value = ((Number)f.getAttribute("foo")).intValue();
-            System.out.println(slot+"("+value+")");
-            //TODO: test the values are put in the correct slots
-        }
+        FeatureIterator list = featureCollection.features();
+        Object value = func.getValue( featureCollection );
+        assertNotNull( value );
+        assertEquals( 2, ((Integer)value).intValue() );
     }
     
     public void testNullNaNHandling() throws Exception {
@@ -150,18 +143,20 @@ public class QuantileFunctionTest extends FunctionTestSupport {
     	MemoryDataStore store = new MemoryDataStore();
     	store.createSchema(ft);
     	store.addFeatures(testFeatures);
-    	FeatureCollection thisFC = store.getFeatureSource("nullnan").getFeatures().collection();
+    	FeatureCollection thisFC = store.getFeatureSource("nullnan").getFeatures();
 
     	//create the expression
         MathExpression divide = fac.createMathExpression(ExpressionType.MATH_DIVIDE);
         divide.addLeftValue((Expression)builder.parse(dataType, "foo"));
         divide.addRightValue((Expression)builder.parse(dataType, "bar"));
     	
-    	qf.setNumberOfClasses(3);
-    	qf.setCollection(thisFC);
+    	qf.setNumberOfClasses(3);    	
     	qf.setExpression(divide);
+        
+        Object value = qf.evaluate( thisFC );
+        int classNum = ((Integer)value).intValue();
     	
-    	for (int j = 0; j < qf.classNum; j++) {
+    	for (int j = 0; j < classNum; j++) {
     		System.out.println(qf.getMin(j)+".."+qf.getMax(j));
     	}
 

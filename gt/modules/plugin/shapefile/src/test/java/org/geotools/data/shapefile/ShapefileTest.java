@@ -59,12 +59,7 @@ public class ShapefileTest extends TestCaseSupport {
   public ShapefileTest(String testName) throws IOException {
     super(testName);
   }
-  
-  public static void main(String[] args) {
-    verbose = true;
-    junit.textui.TestRunner.run(suite(ShapefileTest.class));
-  }
-  
+    
   public void testLoadingStatePop() throws Exception {
     loadShapes(STATEPOP,49);
     loadMemoryMapped(STATEPOP,49);
@@ -158,7 +153,7 @@ public class ShapefileTest extends TestCaseSupport {
     s = new ShapefileDataStore( tmpFile.toURL() );
     typeName = s.getTypeNames()[0];
     FeatureSource source = s.getFeatureSource( typeName );
-    FeatureCollection fc = source.getFeatures().collection(); 
+    FeatureCollection fc = source.getFeatures(); 
     
     ShapefileReadWriteTest.compare(features,fc);
   }

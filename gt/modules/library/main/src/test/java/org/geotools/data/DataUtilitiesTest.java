@@ -289,12 +289,12 @@ public class DataUtilitiesTest extends DataTestCase {
     public void testSource() throws Exception {
         FeatureSource s = DataUtilities.source( roadFeatures );
         assertEquals( -1, s.getCount( Query.ALL ) );
-        assertEquals( 3, s.getFeatures().getCount() );
-        assertEquals( 3, s.getFeatures( Query.ALL ).getCount() );
-        assertEquals( 3, s.getFeatures( Filter.INCLUDE ).getCount() );
-        assertEquals( 0, s.getFeatures( Filter.EXCLUDE ).getCount() );
-        assertEquals( 1, s.getFeatures( rd1Filter ).getCount() );
-        assertEquals( 2, s.getFeatures( rd12Filter ).getCount() );                             
+        assertEquals( 3, s.getFeatures().size() );
+        assertEquals( 3, s.getFeatures( Query.ALL ).size() );
+        assertEquals( 3, s.getFeatures( Filter.INCLUDE ).size() );
+        assertEquals( 0, s.getFeatures( Filter.EXCLUDE ).size() );
+        assertEquals( 1, s.getFeatures( rd1Filter ).size() );
+        assertEquals( 2, s.getFeatures( rd12Filter ).size() );                             
     }
 
     /**

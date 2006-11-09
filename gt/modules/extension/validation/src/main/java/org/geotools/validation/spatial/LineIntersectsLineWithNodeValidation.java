@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -82,13 +81,13 @@ public class LineIntersectsLineWithNodeValidation
     	boolean r = true;
     	
         FeatureSource fsLine = (FeatureSource) layers.get(getLineTypeRef());
-        FeatureResults frLine = fsLine.getFeatures();
-        FeatureCollection fcLine = frLine.collection();
+        
+        FeatureCollection fcLine = fsLine.getFeatures();
         FeatureIterator fLine = fcLine.features();
         
         FeatureSource fsRLine = (FeatureSource) layers.get(getRestrictedLineTypeRef());
-        FeatureResults frRLine = fsRLine.getFeatures();
-        FeatureCollection fcRLine = frRLine.collection();
+        
+        FeatureCollection fcRLine = fsRLine.getFeatures();
                 
         while(fLine.hasNext()){
         	Feature line = fLine.next();

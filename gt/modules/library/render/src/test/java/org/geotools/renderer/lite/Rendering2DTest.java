@@ -908,7 +908,7 @@ public class Rendering2DTest extends TestCase {
 		data.addFeature(f);
 
 		String typeName = type.getTypeName();
-		return data.getFeatureSource(typeName).getFeatures().collection();
+		return data.getFeatureSource(typeName).getFeatures();
 	}
 
 	private Style createDefQueryTestStyle() throws IllegalFilterException {

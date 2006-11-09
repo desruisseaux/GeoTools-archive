@@ -67,6 +67,7 @@
     <module>mysql</module>
     <module>oracle-spatial</module>
     <module>tiger</module>
+    <module>tile</module>
     <module>vpf</module>
     <module>xml-sld</module>
     <module>xml-xsd</module>

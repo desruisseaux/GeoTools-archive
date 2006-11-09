@@ -132,7 +132,6 @@ public class GeoServerOnlineTest extends TestCase {
             DefaultQuery query = new DefaultQuery( typeName, Filter.INCLUDE, 20, Query.ALL_NAMES, "work already" );
             features = source.getFeatures( query );
             features.size();
-            features.getCount();
             Iterator reader = features.iterator();
             while( reader.hasNext() ){
                 Feature feature = (Feature)reader.next();
@@ -177,7 +176,7 @@ public class GeoServerOnlineTest extends TestCase {
             DefaultQuery query = new DefaultQuery( typeName, Filter.INCLUDE, 20, Query.ALL_NAMES, "work already" );
             features = source.getFeatures( query );
             features.size();
-            features.getCount();
+            
             Iterator reader = features.iterator();
             while( reader.hasNext() ){
                 Feature feature = (Feature)reader.next();

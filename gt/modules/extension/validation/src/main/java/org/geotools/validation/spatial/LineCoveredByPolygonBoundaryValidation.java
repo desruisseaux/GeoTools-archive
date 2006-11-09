@@ -19,7 +19,6 @@ package org.geotools.validation.spatial;
 
 import java.util.Map;
 
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -81,13 +80,13 @@ public class LineCoveredByPolygonBoundaryValidation
     	boolean r = true;
     	
         FeatureSource fsLine = (FeatureSource) layers.get(getLineTypeRef());
-        FeatureResults frLine = fsLine.getFeatures();
-        FeatureCollection fcLine = frLine.collection();
+        
+        FeatureCollection fcLine = fsLine.getFeatures();
         FeatureIterator fLine = fcLine.features();
         
         FeatureSource fsPoly = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
-        FeatureResults frPoly = fsPoly.getFeatures();
-        FeatureCollection fcPoly = frPoly.collection();
+         
+        FeatureCollection fcPoly = fsPoly.getFeatures();
                 
         while(fLine.hasNext()){
         	Feature line = fLine.next();

@@ -110,7 +110,7 @@ public class LabelingTest extends TestCase {
 //        data.addFeature(createPointFeature(2,0,"Label4",crs, geomFac, types));
         data.addFeature(createPointFeature(0,4,"LongLabel6",crs, geomFac, types));
 
-        return data.getFeatureSource(Rendering2DTest.POINT).getFeatures().collection();
+        return data.getFeatureSource(Rendering2DTest.POINT).getFeatures();
 	}
 
 
@@ -160,7 +160,7 @@ public class LabelingTest extends TestCase {
 //        data.addFeature(createPointFeature(2,0,"Label4",crs, geomFac, types));
 //        data.addFeature(createPointFeature(0,4,"LongLabel6",crs, geomFac, types));
 
-        return data.getFeatureSource(Rendering2DTest.LINE).getFeatures().collection();
+        return data.getFeatureSource(Rendering2DTest.LINE).getFeatures();
 	}
 
 
@@ -207,7 +207,7 @@ public class LabelingTest extends TestCase {
         data.addFeature(createPolyFeature(CENTERX+5,CENTERY+0,CENTERX+10,CENTERY+10,"LongLabel1",crs, geomFac, types));
         data.addFeature(createPolyFeature(CENTERX+0,CENTERY+0,CENTERX+10,CENTERY+10,"LongLabel2",crs, geomFac, types));
 
-        return data.getFeatureSource(Rendering2DTest.POLYGON).getFeatures().collection();
+        return data.getFeatureSource(Rendering2DTest.POLYGON).getFeatures();
 	}
 
 

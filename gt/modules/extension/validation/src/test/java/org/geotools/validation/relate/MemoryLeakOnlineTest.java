@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
-import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -63,9 +62,6 @@ import org.geotools.validation.ValidationResults;
  * @source $URL$
  */
 public class MemoryLeakOnlineTest extends DataTestCase {
-    
-    /** The logger for the filter module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
     
     PostgisDataStore data;
     ConnectionPool pool;

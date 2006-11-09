@@ -1057,17 +1057,17 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         assertEquals(new Envelope(1, 5, 0, 4),
             road.getFeatures(Query.ALL).getBounds()); //road.getBounds(Query.ALL));
 
-        FeatureResults all = road.getFeatures();
-        assertEquals(3, all.getCount());
+        FeatureCollection all = road.getFeatures();
+        assertEquals(3, all.size());
         assertEquals(roadBounds, all.getBounds());
 
         FeatureCollection expected = DataUtilities.collection(roadFeatures);
 
-        assertCovers("ALL", expected, all.collection());
-        assertEquals(roadBounds, all.collection().getBounds());
+        assertCovers("ALL", expected, all);
+        assertEquals(roadBounds, all.getBounds());
 
-        FeatureResults some = road.getFeatures(rd12Filter);
-        assertEquals(2, some.getCount());
+        FeatureCollection some = road.getFeatures(rd12Filter);
+        assertEquals(2, some.size());
         assertEquals(rd12Bounds, some.getBounds());
         assertEquals(some.getSchema(), road.getSchema());
 
@@ -1078,8 +1078,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         DefaultQuery query = new DefaultQuery("ROAD", rd12Filter,
                 new String[] { "NAME", });
 
-        FeatureResults half = road.getFeatures(query);
-        assertEquals(2, half.getCount());
+        FeatureCollection half = road.getFeatures(query);
+        assertEquals(2, half.size());
         assertEquals(1, half.getSchema().getAttributeCount());
 
         FeatureReader reader = half.reader();
@@ -1111,14 +1111,14 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         assertEquals(riverType, river.getSchema());
         assertEquals(data, river.getDataStore());
 
-        FeatureResults all = river.getFeatures();
-        assertEquals(2, all.getCount());
+        FeatureCollection all = river.getFeatures();
+        assertEquals(2, all.size());
         assertEquals(riverBounds, all.getBounds());
         assertTrue("RIVERS", covers(all.reader(), riverFeatures));
 
         FeatureCollection expected = DataUtilities.collection(riverFeatures);
-        assertCovers("ALL", expected, all.collection());
-        assertEquals(riverBounds, all.collection().getBounds());
+        assertCovers("ALL", expected, all);
+        assertEquals(riverBounds, all.getBounds());
     }
 
     //
@@ -1129,7 +1129,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         AttributeType name = roadType.getAttributeType("NAME");
         road.modifyFeatures(name, "changed", rd1Filter);
 
-        FeatureCollection results = road.getFeatures(rd1Filter).collection();
+        FeatureCollection results = road.getFeatures(rd1Filter);
         assertEquals("changed", results.features().next().getAttribute("NAME"));
     }
 
@@ -1139,7 +1139,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         road.modifyFeatures(new AttributeType[] { name, },
             new Object[] { "changed", }, rd1Filter);
 
-        FeatureCollection results = road.getFeatures(rd1Filter).collection();
+        FeatureCollection results = road.getFeatures(rd1Filter);
         assertEquals("changed", results.features().next().getAttribute("NAME"));
     }
 
@@ -1147,8 +1147,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
 
         road.removeFeatures(rd1Filter);
-        assertEquals(0, road.getFeatures(rd1Filter).getCount());
-        assertEquals(roadFeatures.length - 1, road.getFeatures().getCount());
+        assertEquals(0, road.getFeatures(rd1Filter).size());
+        assertEquals(roadFeatures.length - 1, road.getFeatures().size());
     }
 
     public void testGetFeatureStoreAddFeatures() throws IOException {
@@ -1156,7 +1156,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
         
         road.addFeatures( DataUtilities.collection(reader));
-        assertEquals(roadFeatures.length + 1, road.getFeatures().getCount());
+        assertEquals(roadFeatures.length + 1, road.getFeatures().size());
     }
 
     public void testGetFeatureStoreSetFeatures() throws IOException {
@@ -1164,7 +1164,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         FeatureStore road = (FeatureStore) data.getFeatureSource("ROAD");
 
         road.setFeatures(reader);
-        assertEquals(1, road.getFeatures().getCount());
+        assertEquals(1, road.getFeatures().size());
     }
 
     public void testGetFeatureStoreTransactionSupport()

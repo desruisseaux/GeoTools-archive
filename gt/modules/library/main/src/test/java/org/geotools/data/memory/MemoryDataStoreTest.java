@@ -817,24 +817,24 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertEquals(3, road.getCount(Query.ALL));
         assertEquals(new Envelope(1, 5, 0, 4), road.getBounds(Query.ALL));
 
-        FeatureResults all = road.getFeatures();
-        assertEquals(3, all.getCount());
+        FeatureCollection all = road.getFeatures();
+        assertEquals(3, all.size());
         assertEquals(roadBounds, all.getBounds());
 
         FeatureCollection expected = DataUtilities.collection(roadFeatures);
 
-        assertCovers("all", expected, all.collection());
-        assertEquals(roadBounds, all.collection().getBounds());
+        assertCovers("all", expected, all);
+        assertEquals(roadBounds, all.getBounds());
         
-        FeatureResults some = road.getFeatures( rd12Filter );
-        assertEquals(2, some.getCount());
+        FeatureCollection some = road.getFeatures( rd12Filter );
+        assertEquals(2, some.size());
         assertEquals( rd12Bounds, some.getBounds() );
         assertEquals( some.getSchema(), road.getSchema() );
         
         DefaultQuery query = new DefaultQuery( "road", rd12Filter, new String[]{ "name", });
         
-        FeatureResults half = road.getFeatures( query );
-        assertEquals( 2, half.getCount());
+        FeatureCollection half = road.getFeatures( query );
+        assertEquals( 2, half.size());
         assertEquals( 1, half.getSchema().getAttributeCount() );
         FeatureReader reader = half.reader();
         FeatureType type = reader.getFeatureType();
@@ -861,14 +861,14 @@ public class MemoryDataStoreTest extends DataTestCase {
         assertSame(riverType, river.getSchema());
         assertSame(data, river.getDataStore());
 
-        FeatureResults all = river.getFeatures();
-        assertEquals(2, all.getCount());
+        FeatureCollection all = river.getFeatures();
+        assertEquals(2, all.size());
         assertEquals(riverBounds, all.getBounds());
         assertTrue("rivers", covers(all.reader(), riverFeatures));
 
         FeatureCollection expected = DataUtilities.collection(riverFeatures);
-        assertCovers("all", expected, all.collection());
-        assertEquals(riverBounds, all.collection().getBounds());
+        assertCovers("all", expected, all);
+        assertEquals(riverBounds, all.getBounds());
     }
 
     //
@@ -879,7 +879,7 @@ public class MemoryDataStoreTest extends DataTestCase {
         AttributeType name = roadType.getAttributeType("name");
         road.modifyFeatures(name, "changed", rd1Filter);
 
-        FeatureCollection results = road.getFeatures(rd1Filter).collection();
+        FeatureCollection results = road.getFeatures(rd1Filter);
         assertEquals("changed", results.features().next().getAttribute("name"));
     }
 
@@ -889,30 +889,29 @@ public class MemoryDataStoreTest extends DataTestCase {
         road.modifyFeatures(new AttributeType[] { name, },
             new Object[] { "changed", }, rd1Filter);
 
-        FeatureCollection results = road.getFeatures(rd1Filter)
-                                        .collection();
+        FeatureCollection results = road.getFeatures(rd1Filter);
         assertEquals("changed", results.features().next().getAttribute("name"));
     }
     public void testGetFeatureStoreRemoveFeatures() throws IOException {
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
         
         road.removeFeatures( rd1Filter );
-        assertEquals( 0, road.getFeatures( rd1Filter ).getCount() );
-        assertEquals( roadFeatures.length-1, road.getFeatures().getCount() );                
+        assertEquals( 0, road.getFeatures( rd1Filter ).size() );
+        assertEquals( roadFeatures.length-1, road.getFeatures().size() );                
     }
     public void testGetFeatureStoreAddFeatures() throws IOException {
         FeatureReader reader = DataUtilities.reader( new Feature[]{ newRoad,} );
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
         
         road.addFeatures( DataUtilities.collection(reader) );        
-        assertEquals( roadFeatures.length+1, road.getFeatures().getCount() );
+        assertEquals( roadFeatures.length+1, road.getFeatures().size() );
     }
     public void testGetFeatureStoreSetFeatures() throws IOException {
         FeatureReader reader = DataUtilities.reader( new Feature[]{ newRoad,} );
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
         
         road.setFeatures( reader );
-        assertEquals( 1, road.getFeatures().getCount() );
+        assertEquals( 1, road.getFeatures().size() );
     }
     public void testGetFeatureStoreTransactionSupport() throws Exception{                
         Transaction t1 = new DefaultTransaction();

@@ -32,7 +32,6 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -168,8 +167,8 @@ public class ArcSDEDataStoreTest extends TestCase {
 
             final int layerCount = source.getCount(Query.ALL);
 
-            assertEquals("After getCount()", initialAvailableCount, pool.getAvailableCount());
-            assertEquals("After getCount()", initialPoolSize, pool.getPoolSize());
+            assertEquals("After size()", initialAvailableCount, pool.getAvailableCount());
+            assertEquals("After size()", initialPoolSize, pool.getPoolSize());
             
             FilterFactory ff = FilterFactoryFinder.createFilterFactory();
             GeometryFilter bbox = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
@@ -185,17 +184,17 @@ public class ArcSDEDataStoreTest extends TestCase {
             for(int i = 0; i < 20; i++){
             	LOGGER.fine("Running iteration #" + i);
             	
-            	FeatureResults res = source.getFeatures(bbox);
+                FeatureCollection res = source.getFeatures(bbox);
             	FeatureReader reader = res.reader();
 
             	assertNotNull(reader.next());
 
-            	assertTrue(0 < res.getCount());
+            	assertTrue(0 < res.size());
             	assertNotNull(res.getBounds());
             	
             	assertNotNull(reader.next());
             	
-            	assertTrue(0 < res.getCount());
+            	assertTrue(0 < res.size());
             	assertNotNull(res.getBounds());
 
             	assertNotNull(reader.next());
@@ -458,7 +457,7 @@ public class ArcSDEDataStoreTest extends TestCase {
      * A mixed query does not fails when getBounds() is performed
      * </li>
      * <li>
-     * A mixed query does not fails when getCount() is performed
+     * A mixed query does not fails when size() is performed
      * </li>
      * </ul>
      * </p>
@@ -487,9 +486,9 @@ public class ArcSDEDataStoreTest extends TestCase {
         for (int i = 0; i < LOOP_COUNT; i++) {
             LOGGER.fine("Running #" + i + " iteration for mixed query test");
 
-            //check that getBounds and getCount do function
+            //check that getBounds and size do function
             try {
-                FeatureResults results = fs.getFeatures(mixedFilter);
+                FeatureCollection results = fs.getFeatures(mixedFilter);
                 Envelope bounds = results.getBounds();
                 assertNotNull(bounds);
                 LOGGER.fine("results bounds: " + bounds);
@@ -497,14 +496,14 @@ public class ArcSDEDataStoreTest extends TestCase {
                 FeatureReader reader = results.reader();
 
                 /*verify that then features are already being fetched, getBounds and
-                 * getCount still work
+                 * size still work
                  */
                 reader.next();
                 bounds = results.getBounds();
                 assertNotNull(bounds);
                 LOGGER.fine("results bounds when reading: " + bounds);
 
-                int count = results.getCount();
+                int count = results.size();
                 assertEquals(EXPECTED_RESULT_COUNT, count);
                 LOGGER.fine("wooohoooo...");
                 reader.close();
@@ -539,7 +538,7 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         attOnlyQuery.setPropertyNames(propNames);
 
-        FeatureResults results = fSource.getFeatures(attOnlyQuery);
+        FeatureCollection results = fSource.getFeatures(attOnlyQuery);
         FeatureType resultSchema = results.getSchema();
         assertEquals(propNames.size(), resultSchema.getAttributeCount());
 
@@ -594,9 +593,9 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         FeatureSource source = ds.getFeatureSource(typeName);
         Query query = new DefaultQuery(typeName, filter);
-        FeatureResults results = source.getFeatures(query);
+        FeatureCollection results = source.getFeatures(query);
 
-        assertEquals(fids.size(), results.getCount());
+        assertEquals(fids.size(), results.size());
         reader = results.reader();
 
         while (reader.hasNext()) {
@@ -776,9 +775,9 @@ public class ArcSDEDataStoreTest extends TestCase {
         assertEquals(fsource.getDataStore(), store);
         assertNotNull(fsource.getSchema());
 
-        FeatureResults results = fsource.getFeatures();
-        int count = results.getCount();
-        assertTrue("getCount returns " + count, count > 0);
+        FeatureCollection results = fsource.getFeatures();
+        int count = results.size();
+        assertTrue("size returns " + count, count > 0);
         LOGGER.fine("feature count: " + count);
 
         Envelope env1;
@@ -874,9 +873,9 @@ public class ArcSDEDataStoreTest extends TestCase {
      */
     private void testFilter(Filter filter, FeatureSource fsource, int expected)
         throws IOException {
-        FeatureResults results = fsource.getFeatures(filter);
-        FeatureCollection fc = results.collection();
-        int resCount = results.getCount();
+        FeatureCollection results = fsource.getFeatures(filter);
+        FeatureCollection fc = results;
+        int resCount = results.size();
         int fCount = fc.size();
         LOGGER.fine("results count: " + resCount + " collection size: "
             + fCount);
@@ -964,9 +963,9 @@ public class ArcSDEDataStoreTest extends TestCase {
         String failMsg = "Expected and returned result count does not match";
         assertEquals(failMsg, expectedCount, fCount);
 
-        FeatureResults fresults = source.getFeatures();
-        FeatureCollection features = fresults.collection();
-        failMsg = "FeatureResults.getCount and .collection().size thoes not match";
+        FeatureCollection fresults = source.getFeatures();
+        FeatureCollection features = fresults;
+        failMsg = "FeatureResults.size and .collection().size thoes not match";
         assertEquals(failMsg, fCount, features.size());
         LOGGER.fine("fetched " + fCount + " features for " + wich
             + " layer, OK");

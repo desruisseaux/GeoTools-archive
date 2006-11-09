@@ -1023,7 +1023,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	private void buildRTree() throws TreeException {
 		if (isLocal()) {
-			LOGGER.info("Creating spatial index for " + shpURL.getPath());
+			LOGGER.fine("Creating spatial index for " + shpURL.getPath());
 
 			synchronized (this) {
 				if (rtree != null) {
@@ -1067,7 +1067,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 */
 	private void buildQuadTree() throws TreeException {
 		if (isLocal()) {
-			LOGGER.info("Creating spatial index for " + shpURL.getPath());
+			LOGGER.fine("Creating spatial index for " + shpURL.getPath());
 
 			ShapeFileIndexer indexer = new ShapeFileIndexer();
 			indexer.setIdxType(ShapeFileIndexer.QUADTREE);

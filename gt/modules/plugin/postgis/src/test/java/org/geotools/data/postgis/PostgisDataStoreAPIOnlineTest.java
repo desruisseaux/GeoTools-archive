@@ -31,7 +31,6 @@ import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureLockFactory;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
@@ -875,7 +874,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     public int count(String typeName) throws IOException {
         //return count(reader(typeName));
         // makes use of optimization if any
-        return data.getFeatureSource(typeName).getFeatures().getCount();
+        return data.getFeatureSource(typeName).getFeatures().size();
     }
 
     public void testGetFeaturesWriterAdd()
@@ -1260,17 +1259,17 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         Envelope bounds = road.getBounds(Query.ALL);
         assertTrue((bounds == null) || bounds.equals(roadBounds));
 
-        FeatureResults all = road.getFeatures();
-        assertEquals(3, all.getCount());
+        FeatureCollection all = road.getFeatures();
+        assertEquals(3, all.size());
         assertEquals(roadBounds, all.getBounds());
 
         FeatureCollection expected = DataUtilities.collection(roadFeatures);
 
-        assertCovers("all", expected, all.collection());
-        assertEquals(roadBounds, all.collection().getBounds());
+        assertCovers("all", expected, all);
+        assertEquals(roadBounds, all.getBounds());
 
-        FeatureResults some = road.getFeatures(rd12Filter);
-        assertEquals(2, some.getCount());
+        FeatureCollection some = road.getFeatures(rd12Filter);
+        assertEquals(2, some.size());
 
         Envelope e = new Envelope();
         e.expandToInclude(roadFeatures[0].getBounds());
@@ -1281,8 +1280,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         DefaultQuery query = new DefaultQuery("road",rd12Filter,
                 new String[] { "name" });
 
-        FeatureResults half = road.getFeatures(query);
-        assertEquals(2, half.getCount());
+        FeatureCollection half = road.getFeatures(query);
+        assertEquals(2, half.size());
         assertEquals(1, half.getSchema().getAttributeCount());
 
         FeatureReader reader = half.reader();
@@ -1314,14 +1313,14 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(riverType, river.getSchema());
         assertSame(data, river.getDataStore());
 
-        FeatureResults all = river.getFeatures();
-        assertEquals(2, all.getCount());
+        FeatureCollection all = river.getFeatures();
+        assertEquals(2, all.size());
         assertEquals(riverBounds, all.getBounds());
         assertTrue("rivers", covers(all.reader(), riverFeatures));
 
         FeatureCollection expected = DataUtilities.collection(riverFeatures);
-        assertCovers("all", expected, all.collection());
-        assertEquals(riverBounds, all.collection().getBounds());
+        assertCovers("all", expected, all);
+        assertEquals(riverBounds, all.getBounds());
     }
 
     //
@@ -1336,7 +1335,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         AttributeType name = roadType.getAttributeType("id");
         road.modifyFeatures(name, changed, rd1Filter);
 
-        FeatureCollection results = road.getFeatures(rd1Filter).collection();
+        FeatureCollection results = road.getFeatures(rd1Filter);
         assertEquals(changed, results.features().next().getAttribute("id"));
     }
 
@@ -1350,7 +1349,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         road.modifyFeatures(new AttributeType[] { name, },
             new Object[] { "changed", }, rd1Filter);
 
-        FeatureCollection results = road.getFeatures(rd1Filter).collection();
+        FeatureCollection results = road.getFeatures(rd1Filter);
         assertEquals("changed", results.features().next().getAttribute("name"));
     }
 
@@ -1358,8 +1357,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
         road.removeFeatures(rd1Filter);
-        assertEquals(0, road.getFeatures(rd1Filter).getCount());
-        assertEquals(roadFeatures.length - 1, road.getFeatures().getCount());
+        assertEquals(0, road.getFeatures(rd1Filter).size());
+        assertEquals(roadFeatures.length - 1, road.getFeatures().size());
     }
 
     public void testGetFeatureStoreAddFeatures() throws IOException {

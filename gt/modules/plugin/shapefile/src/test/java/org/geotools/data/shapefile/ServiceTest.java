@@ -40,11 +40,6 @@ public class ServiceTest extends TestCaseSupport {
     super(testName);
   }
   
-  public static void main(String[] args) {
-    verbose = true;
-    junit.textui.TestRunner.run(suite(ServiceTest.class));
-  }
-  
   /**
    * Make sure that the loading mechanism is working properly.
    */

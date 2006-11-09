@@ -415,24 +415,24 @@ public class CollectionDataStoreTest extends DataTestCase {
         assertEquals(3, road.getCount(Query.ALL));
         assertEquals(new Envelope(1, 5, 0, 4), road.getBounds(Query.ALL));
 
-        FeatureResults all = road.getFeatures();
-        assertEquals(3, all.getCount());
+        FeatureCollection all = road.getFeatures();
+        assertEquals(3, all.size());
         assertEquals(roadBounds, all.getBounds());
 
         FeatureCollection expected = DataUtilities.collection(roadFeatures);
 
-        assertCovers("all", expected, all.collection());
-        assertEquals(roadBounds, all.collection().getBounds());
+        assertCovers("all", expected, all);
+        assertEquals(roadBounds, all.getBounds());
 
-        FeatureResults some = road.getFeatures(rd12Filter);
-        assertEquals(2, some.getCount());
+        FeatureCollection some = road.getFeatures(rd12Filter);
+        assertEquals(2, some.size());
         assertEquals(rd12Bounds, some.getBounds());
         assertEquals(some.getSchema(), road.getSchema());
 
         DefaultQuery query = new DefaultQuery( road.getSchema().getTypeName(), rd12Filter, new String[] { "name" });
         
-        FeatureResults half = road.getFeatures(query);
-        assertEquals(2, half.getCount());
+        FeatureCollection half = road.getFeatures(query);
+        assertEquals(2, half.size());
         assertEquals(1, half.getSchema().getAttributeCount());
 
         FeatureReader reader = half.reader();

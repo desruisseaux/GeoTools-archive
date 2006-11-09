@@ -18,7 +18,6 @@ package org.geotools.validation.spatial;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -84,16 +83,16 @@ public class PolygonNotOverlappingPolygonValidation
     	LOGGER.finer( typeRef1 +": looking up FeatureSource " );    	
         FeatureSource polySource1 = (FeatureSource) layers.get( typeRef1 );
         LOGGER.finer( typeRef1 +": found "+polySource1.getSchema().getTypeName() );
-        FeatureResults features1 = polySource1.getFeatures(); // limit with envelope
-        FeatureCollection collection1 = features1.collection();
+        
+        FeatureCollection collection1 = polySource1.getFeatures(); // limit with envelope
         Object[] poly1 = collection1.toArray();
 
         String typeRef2 = getRestrictedPolygonTypeRef();
         LOGGER.finer( typeRef2 +": looking up FeatureSource " );        
         FeatureSource polySource2 = (FeatureSource) layers.get( typeRef2 );
         LOGGER.finer( typeRef2 +": found "+polySource2.getSchema().getTypeName() );
-        FeatureResults features2 = polySource2.getFeatures(); // limit with envelope
-        FeatureCollection collection2 = features2.collection();
+        
+        FeatureCollection collection2 = polySource2.getFeatures(); // limit with envelope
         Object[] poly2 = collection2.toArray();
         
 /*        if (!envelope.contains(collection1.getBounds())) {

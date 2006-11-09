@@ -74,8 +74,8 @@ public class LinesNotOverlapValidation extends LineLineAbstractValidation {
         FeatureSource lineSource1 = (FeatureSource) layers.get(getLineTypeRef());
         FeatureSource lineSource2 = (FeatureSource) layers.get(getRestrictedLineTypeRef());
 
-        Object[] lines1 = lineSource1.getFeatures().collection().toArray();
-        Object[] lines2 = lineSource2.getFeatures().collection().toArray();
+        Object[] lines1 = lineSource1.getFeatures().toArray();
+        Object[] lines2 = lineSource2.getFeatures().toArray();
 
         if (!envelope.contains(lineSource1.getBounds())) {
             results.error((Feature) lines1[0],

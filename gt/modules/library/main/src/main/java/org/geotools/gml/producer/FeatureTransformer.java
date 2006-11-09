@@ -23,6 +23,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.gml.producer.GeometryTransformer.GeometryTranslator;
 import org.geotools.xml.transform.TransformerBase;
@@ -395,25 +396,10 @@ public class FeatureTransformer extends TransformerBase {
                 if (o instanceof FeatureCollection) {
                     FeatureCollection fc = (FeatureCollection) o;
                     FeatureCollectionIteration.iteration(this, fc);
-                } else if (o instanceof FeatureReader) {
-                    // THIS IS A HACK FOR QUICK USE
-                    FeatureReader r = (FeatureReader) o;
-
-                    startFeatureCollection();
-
-                    handleFeatureReader(r);
-
-                    endFeatureCollection();
-                } else if (o instanceof FeatureResults) {
-                    FeatureResults fr = (FeatureResults) o;
-                    startFeatureCollection();
-                    writeBounds(fr.getBounds());
-                    handleFeatureReader(fr.reader());
-                    endFeatureCollection();
-                } else if (o instanceof FeatureResults[]) {
+                } else if (o instanceof FeatureCollection[]) {
                     //Did FeatureResult[] so that we are sure they're all the same type.
                     //Could also consider collections here...  
-                    FeatureResults[] results = (FeatureResults[]) o;
+                    FeatureCollection[] results = (FeatureCollection[]) o;
                     Envelope bounds = new Envelope();
 
                     for (int i = 0; i < results.length; i++) {
@@ -424,10 +410,42 @@ public class FeatureTransformer extends TransformerBase {
                     writeBounds(bounds);
 
                     for (int i = 0; i < results.length; i++) {
-                        handleFeatureReader(results[i].reader());
+                        handleFeatureIterator(results[i].features());
                     }
+                    endFeatureCollection();
+                } else if (o instanceof FeatureReader) {
+                    // THIS IS A HACK FOR QUICK USE
+                    FeatureReader r = (FeatureReader) o;
+
+                    startFeatureCollection();
+
+                    handleFeatureReader(r);
 
                     endFeatureCollection();
+//                } else if (o instanceof FeatureResults) {
+//                    FeatureResults fr = (FeatureResults) o;
+//                    startFeatureCollection();
+//                    writeBounds(fr.getBounds());
+//                    handleFeatureReader(fr.reader());
+//                    endFeatureCollection();
+//                } else if (o instanceof FeatureResults[]) {
+//                    //Did FeatureResult[] so that we are sure they're all the same type.
+//                    //Could also consider collections here...  
+//                    FeatureResults[] results = (FeatureResults[]) o;
+//                    Envelope bounds = new Envelope();
+//
+//                    for (int i = 0; i < results.length; i++) {
+//                        bounds.expandToInclude(results[i].getBounds());
+//                    }
+//
+//                    startFeatureCollection();
+//                    writeBounds(bounds);
+//
+//                    for (int i = 0; i < results.length; i++) {
+//                        handleFeatureReader(results[i].reader());
+//                    }
+//
+//                    endFeatureCollection();
                 } else {
                     throw new IllegalArgumentException("Cannot encode " + o);
                 }
@@ -437,11 +455,36 @@ public class FeatureTransformer extends TransformerBase {
             }
         }
 
-        public void handleFeatureReader(FeatureReader r)
+        public void handleFeatureIterator(FeatureIterator iterator)
             throws IOException {
             try {
-                while (r.hasNext() && running) {
-                    Feature f = r.next();
+                while (iterator.hasNext() && running) {
+                    Feature f = iterator.next();
+                    handleFeature(f);
+    
+                    FeatureType t = f.getFeatureType();
+    
+                    for (int i = 0, ii = f.getNumberOfAttributes(); i < ii;
+                            i++) {
+                        handleAttribute(t.getAttributeType(i), f.getAttribute(i));
+                    }
+                    endFeature(f);
+                }
+            } catch (Exception ioe) {
+                throw new RuntimeException("Error reading Features", ioe);
+            } finally {
+                if (iterator != null) {
+                    LOGGER.finer("closing reader " + iterator);
+                    iterator.close();
+                }
+            }
+        }
+        
+        public void handleFeatureReader(FeatureReader reader)
+            throws IOException {
+            try {
+                while (reader.hasNext() && running) {
+                    Feature f = reader.next();
                     handleFeature(f);
 
                     FeatureType t = f.getFeatureType();
@@ -456,9 +499,9 @@ public class FeatureTransformer extends TransformerBase {
             } catch (Exception ioe) {
                 throw new RuntimeException("Error reading Features", ioe);
             } finally {
-                if (r != null) {
-                    LOGGER.finer("closing reader " + r);
-                    r.close();
+                if (reader != null) {
+                    LOGGER.finer("closing reader " + reader);
+                    reader.close();
                 }
             }
         }

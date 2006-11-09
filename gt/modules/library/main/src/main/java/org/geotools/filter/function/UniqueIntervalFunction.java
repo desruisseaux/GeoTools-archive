@@ -41,6 +41,7 @@ public class UniqueIntervalFunction extends ExplicitClassificationFunction {
     Object unique = null; //sorted list of unique values
     Set[] values = null; //the contents of each bin (set of objects)
     boolean isValid = false; //we have valid data
+    private int classNum;
     
     public UniqueIntervalFunction() {
     }
@@ -51,10 +52,11 @@ public class UniqueIntervalFunction extends ExplicitClassificationFunction {
 
     private void calculateValues()
         throws IllegalFilterException, IOException {
+        classNum = getNumberOfClasses();
     	//use a visitor to grab the unique values
-        UniqueVisitor uniqueVisit = new UniqueVisitor(expr);
+        UniqueVisitor uniqueVisit = new UniqueVisitor(getExpression());
 		if (progress == null) progress = new NullProgressListener();
-        fc.accepts(uniqueVisit, progress);
+        featureCollection.accepts(uniqueVisit, progress);
 		if (progress.isCanceled()) return;
 
         CalcResult calcResult = uniqueVisit.getResult();
@@ -139,13 +141,10 @@ public class UniqueIntervalFunction extends ExplicitClassificationFunction {
 		if (feature instanceof FeatureCollection) {
 			fcNew = (FeatureCollection) feature;
 		} else {
-			fcNew = feature.getParent();
-		}
-		if (fcNew == null) {
-			return new Integer(0);
-		}
-		if (!fcNew.equals(fc) || !isValid) {
-			fc = fcNew;
+			return null;
+		}		
+		if (!fcNew.equals(featureCollection) || !isValid) {
+			featureCollection = fcNew;
 			try {
 				calculateValues();
 			} catch (IllegalFilterException e) {
@@ -155,15 +154,14 @@ public class UniqueIntervalFunction extends ExplicitClassificationFunction {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-		int slot = calculateSlot(expr.getValue(feature)); //feature, not featureCollection!
-        return new Integer(slot);
+		}		
+        return new Integer(this.classNum);
     }
 
     public void setExpression(Expression e) {
         super.setExpression(e);
 
-        if (fc != null) {
+        if (featureCollection != null) {
             try {
                 calculateValues();
             } catch (Exception e1) {
@@ -179,7 +177,7 @@ public class UniqueIntervalFunction extends ExplicitClassificationFunction {
      * @return the value
      */
     public Object getValue(int index) {
-        if (fc == null) {
+        if (featureCollection == null) {
             return null;
         }
 

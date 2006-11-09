@@ -99,10 +99,10 @@ public class StyleGeneratorTest extends DataTestCase {
 
         //create the classification function
         ClassificationFunction classifier = new EqualIntervalFunction();
-        classifier.setNumberOfClasses(2);
-        classifier.setCollection(fc);
+        classifier.setNumberOfClasses(2);        
         classifier.setExpression(expr2);
-        classifier.getValue(0); //recalc classes? (only useful for UniqueInterval) 
+        classifier.getValue(0); //recalc classes? (only useful for UniqueInterval)
+        classifier.evaluate(fc);
 
         //get the fts
         StyleGenerator sg = new StyleGenerator(brewer.getPalette(paletteName)

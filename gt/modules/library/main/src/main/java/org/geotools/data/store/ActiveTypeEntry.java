@@ -198,7 +198,7 @@ final class ActiveTypeEntry implements TypeEntry {
             FeatureSource source = getFeatureSource();
             count = source.getCount( Query.ALL );
             if( count == -1 ){
-                count = source.getFeatures().getCount();
+                count = source.getFeatures().size();
             }
         } catch (IOException e) {
             bounds = new Envelope();

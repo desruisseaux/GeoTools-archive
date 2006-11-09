@@ -21,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.ReadableByteChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
@@ -37,7 +39,9 @@ import org.geotools.TestData;
  */
 public class DbaseFileTest extends TestCaseSupport {
   
-  static final String TEST_FILE = "shapes/statepop.dbf";
+  private static final Logger LOGGER = Logger.getLogger("org.geotools.data.shapefile");
+
+static final String TEST_FILE = "shapes/statepop.dbf";
   
   private DbaseFileReader dbf = null;
   
@@ -46,7 +50,7 @@ public class DbaseFileTest extends TestCaseSupport {
   }
   
   public static void main(String[] args) {
-    verbose = true;
+    //verbose = true;
     junit.textui.TestRunner.run(suite(DbaseFileTest.class));
   }
 
@@ -93,19 +97,28 @@ public class DbaseFileTest extends TestCaseSupport {
   
   public void testHeader() throws Exception {
     DbaseFileHeader header = new DbaseFileHeader();
-    header.addColumn("emptyString", 'C', 20, 0);
-    header.addColumn("emptyInt", 'N', 20, 0);
-    header.addColumn("emptyDouble", 'N',20,5);
-    header.addColumn("emptyFloat", 'F', 20, 5);
-    header.addColumn("emptyLogical", 'L', 1, 0);
-    header.addColumn("emptyDate", 'D', 20, 0);
-    int length = header.getRecordLength();
-    header.removeColumn("emptyDate");
-    assertTrue(length !=  header.getRecordLength());
-    header.addColumn("emptyDate", 'D',20,0);
-    assertTrue(length == header.getRecordLength());
-    header.removeColumn("billy");
-    assertTrue(length == header.getRecordLength());
+    
+    Level before = LOGGER.getLevel();
+    try {
+        LOGGER.setLevel(Level.INFO);
+    
+        header.addColumn("emptyString", 'C', 20, 0);
+        header.addColumn("emptyInt", 'N', 20, 0);
+        header.addColumn("emptyDouble", 'N',20,5);
+        header.addColumn("emptyFloat", 'F', 20, 5);
+        header.addColumn("emptyLogical", 'L', 1, 0);
+        header.addColumn("emptyDate", 'D', 20, 0);
+        int length = header.getRecordLength();
+        header.removeColumn("emptyDate");
+        assertTrue(length !=  header.getRecordLength());
+        header.addColumn("emptyDate", 'D',20,0);
+        assertTrue(length == header.getRecordLength());
+        header.removeColumn("billy");
+        assertTrue(length == header.getRecordLength());
+    }
+    finally {
+        LOGGER.setLevel( before );
+    }
   }
 
   
@@ -141,9 +154,9 @@ public class DbaseFileTest extends TestCaseSupport {
       DbaseFileWriter.FieldFormatter formatter=new DbaseFileWriter.FieldFormatter();
       
       String stringWithInternationChars="hello "+'\u20ac';
-      if (verbose) {
-        System.out.println(stringWithInternationChars);
-      }
+//      if (verbose) {
+//        System.out.println(stringWithInternationChars);
+//      }
       String formattedString=formatter.getFieldString(10, stringWithInternationChars);
       
       assertEquals("          ".getBytes().length, formattedString.getBytes().length);

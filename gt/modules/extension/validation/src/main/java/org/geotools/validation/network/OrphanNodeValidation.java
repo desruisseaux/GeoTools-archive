@@ -19,7 +19,6 @@ package org.geotools.validation.network;
 
 import java.util.Map;
 
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -89,8 +88,8 @@ public class OrphanNodeValidation extends DefaultIntegrityValidation {
     	
       LineStringGraphGenerator lgb = new LineStringGraphGenerator();
     	FeatureSource fs = (FeatureSource) layers.get(typeName);
-      FeatureResults fr = fs.getFeatures();
-      FeatureCollection fc = fr.collection();
+        FeatureCollection fr = fs.getFeatures();
+      FeatureCollection fc = fr;
       FeatureIterator f = fc.features();
 
       while (f.hasNext()) {

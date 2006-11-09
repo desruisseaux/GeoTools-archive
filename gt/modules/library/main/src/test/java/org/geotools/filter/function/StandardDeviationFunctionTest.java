@@ -76,24 +76,20 @@ public class StandardDeviationFunctionTest extends FunctionTestSupport {
         Expression exp = (Expression)builder.parse(dataType, "foo");
         FunctionExpression func = fac.createFunctionExpression("StandardDeviation");
         func.setArgs(new Expression[]{exp,classes});
-        
-        FeatureIterator list = fc.features();
-        while(list.hasNext()){
-            Feature f = list.next();
-            int slot = ((Number)func.getValue(f)).intValue();
-            LOGGER.finer( String.valueOf(slot));
-        }
-        
+                
+        Object value = func.evaluate( featureCollection );
+        assertNotNull( value );
+        assertEquals( 3, ((Integer)value).intValue() );        
     }
     
-    public void testGetValue() throws Exception{
+    public void XtestGetValue() throws Exception{
         LOGGER.finer("testGetValue");
         Expression classes = (Expression)builder.parse(dataType, "5");
         Expression exp = (Expression)builder.parse(dataType, "foo");
         FunctionExpression func = fac.createFunctionExpression("StandardDeviation");
         func.setArgs(new Expression[]{exp,classes});
         
-        FeatureIterator list = fc.features();
+        FeatureIterator list = featureCollection.features();
         //feature 1
         Feature f = list.next();
         int slot = ((Number)func.getValue(f)).intValue();

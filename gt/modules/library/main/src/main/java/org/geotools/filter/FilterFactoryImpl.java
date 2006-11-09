@@ -19,10 +19,12 @@
 package org.geotools.filter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.expression.AddImpl;
@@ -41,14 +43,43 @@ import org.geotools.filter.spatial.IntersectsImpl;
 import org.geotools.filter.spatial.OverlapsImpl;
 import org.geotools.filter.spatial.TouchesImpl;
 import org.geotools.filter.spatial.WithinImpl;
+import org.opengis.filter.And;
+import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
+import org.opengis.filter.Not;
+import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.expression.Subtract;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 import org.opengis.spatialschema.geometry.BoundingBox;
+import org.opengis.spatialschema.geometry.Geometry;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -61,12 +92,379 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  * @version $Id$
  */
-public class FilterFactoryImpl extends Expr implements FilterFactory {
+public class FilterFactoryImpl implements FilterFactory {
+    
+    private FunctionFinder functionFinder;
+
     /**
      * Creates a new instance of FilterFactoryImpl
      */
     public FilterFactoryImpl() {
+        this( null );
     }
+    public FilterFactoryImpl( Hints hints ){
+        functionFinder = new FunctionFinder( null );
+    }
+
+    public FeatureId featureId(String id) {
+        return new FeatureIdImpl( id );
+    } 
+    
+    public And and(Filter f, Filter g ) {
+        List/*<Filter>*/ list = new ArrayList/*<Filter>*/( 2 );
+        list.add( f );
+        list.add( g );
+        return new AndImpl( this, list );
+    }
+    
+    public And and(List/*<Filter>*/ filters) {
+        return new AndImpl( this, filters );
+    }
+    
+    public Or or(Filter f, Filter g) {
+        List/*<Filter>*/ list = new ArrayList/*<Filter>*/( 2 );
+        list.add( f );
+        list.add( g );
+        return new OrImpl( this, list );
+    }    
+
+    public Or or(List/*<Filter>*/ filters) {
+        return new OrImpl( this, filters );
+    }
+    
+    /** Java 5 type narrowing used to advertise explicit implementation for chaining */
+    public Not /*NotImpl*/ not(Filter filter) {
+        return new NotImpl( this, filter );
+    }
+    
+    public Id id( Set id ){
+        return new FidFilterImpl( id );
+    }
+    
+    public PropertyName property(String name) {
+        return new AttributeExpressionImpl(name);
+    }
+
+    public PropertyIsBetween between(Expression expr, Expression lower,
+            Expression upper) {
+        return new IsBetweenImpl(this,lower,expr,upper);
+    }
+
+    public PropertyIsEqualTo equals(Expression expr1, Expression expr2) {
+        return new IsEqualsToImpl(this,expr1,expr2);
+    }
+
+    public PropertyIsGreaterThan greater(Expression expr1, Expression expr2) {
+        return new IsGreaterThanImpl(this,expr1,expr2);
+    }
+
+    public PropertyIsGreaterThanOrEqualTo greaterOrEqual(Expression expr1,
+            Expression expr2) {
+        return new IsGreaterThanOrEqualToImpl(this,expr1,expr2);
+    }
+
+    public PropertyIsLessThan less(Expression expr1, Expression expr2) {
+        return new IsLessThenImpl(this,expr1,expr2);
+    }
+
+    public PropertyIsLessThanOrEqualTo lessOrEqual(Expression expr1,
+            Expression expr2) {
+        return new IsLessThenOrEqualToImpl(this,expr1,expr2);
+    }
+
+    public PropertyIsLike like(Expression expr, String pattern) {
+        return like(expr,pattern,null,null,null);
+    }
+
+    public PropertyIsLike like(Expression expr, String pattern,
+            String wildcard, String singleChar, String escape) {
+        
+        LikeFilterImpl filter = new LikeFilterImpl();
+        filter.setExpression(expr);
+        filter.setPattern(pattern,wildcard,singleChar,escape);
+        
+        return filter;
+    }
+
+    /**
+     * XXX Java 5 type narrowing used to make generated class explicit for chaining
+     */
+    public PropertyIsNull /*IsNullImpl*/ isNull(Expression expr) {
+        return new IsNullImpl( this, expr );
+    }
+
+    /**
+     * Checks if the bounding box of the feature's geometry overlaps the
+     * specified bounding box.
+     * <p>
+     * Similar to:
+     * <code>
+     * geom().disjoint( geom( bbox )).not()
+     * </code>
+     * </p>
+     */
+    public BBOX bbox(String propertyName, double minx, double miny,
+            double maxx, double maxy, String srs) {
+        
+        PropertyName name = property(propertyName);
+        return bbox( name, minx, miny, maxx, maxy, srs );
+    }
+
+    public BBOX bbox(Expression e, double minx, double miny, double maxx, double maxy, String srs) {
+        
+        PropertyName name = null;
+        if ( e instanceof PropertyName ) {
+            name = (PropertyName) e;
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
+        
+        BBoxExpression bbox = null;
+        try {
+            bbox = createBBoxExpression(new Envelope(minx,maxx,miny,maxy));
+        } 
+        catch (IllegalFilterException ife) {
+            new IllegalArgumentException().initCause(ife);
+        }
+        
+        BBOXImpl box = new BBOXImpl(this,e,bbox);
+        box.setPropertyName( name.getPropertyName() );
+        box.setSRS(srs);
+        box.setMinX(minx);
+        box.setMinY(miny);
+        box.setMaxX(maxx);
+        box.setMaxY(maxy);
+        
+        return box;
+    }
+    
+    public Beyond beyond(String propertyName, Geometry geometry,
+            double distance, String units) {
+        
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return beyond( name, geom, distance, units );
+    }
+
+    public Beyond beyond( 
+        Expression geometry1, Expression geometry2, double distance, String units
+    ) {
+        
+        BeyondImpl beyond = new BeyondImpl(this,geometry1,geometry2);
+        beyond.setDistance(distance);
+        beyond.setUnits(units);
+        
+        return beyond;
+    }
+    
+    public Contains contains(String propertyName, Geometry geometry) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return contains( name, geom );
+    }
+    
+    public Contains contains(Expression geometry1, Expression geometry2) {
+        return new ContainsImpl( this, geometry1, geometry2 );
+    }
+
+    public Crosses crosses(String propertyName, Geometry geometry) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return crosses( name, geom );
+    }
+    
+    public Crosses crosses(Expression geometry1, Expression geometry2) {
+        return new CrossesImpl( this, geometry1, geometry2 );
+    }
+    
+
+    public Disjoint disjoint(String propertyName, Geometry geometry) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return disjoint( name, geom );
+    }
+
+    
+    public Disjoint disjoint(Expression geometry1, Expression geometry2) {
+        return new DisjointImpl( this, geometry1, geometry2 );
+    }
+    
+    public DWithin dwithin(String propertyName, Geometry geometry,
+            double distance, String units) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return dwithin( name, geom, distance, units );
+    }
+
+    public DWithin dwithin(Expression geometry1, Expression geometry2, double distance, String units) {
+        DWithinImpl dwithin =  new DWithinImpl( this, geometry1, geometry2 );
+        dwithin.setDistance( distance );
+        dwithin.setUnits( units );
+        
+        return dwithin;
+    }
+    
+    public Equals equals(String propertyName, Geometry geometry) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return equal( name, geom );
+    }
+    
+    public Equals equal(Expression geometry1, Expression geometry2) {
+        return new EqualsImpl( this, geometry1, geometry2 );
+    }
+
+    public Intersects intersects(String propertyName, Geometry geometry) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return intersects( name, geom );
+    }
+
+    public Intersects intersects(Expression geometry1, Expression geometry2) {
+        return new IntersectsImpl( this, geometry1, geometry2 );
+    }
+    
+    public Overlaps overlaps(String propertyName, Geometry geometry) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return overlaps( name, geom );
+    }
+
+    public Overlaps overlaps(Expression geometry1, Expression geometry2) {
+        return new OverlapsImpl( this, geometry1, geometry2 );
+    }
+    
+    public Touches touches(String propertyName, Geometry geometry) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return touches( name, geom );
+    }
+
+    public Touches touches(Expression geometry1, Expression geometry2) {
+        return new TouchesImpl(this,geometry1,geometry2);
+    }
+    
+    public Within within(String propertyName, Geometry geometry) {
+        PropertyName name = property(propertyName);
+        Literal geom = literal(geometry);
+        
+        return within( name, geom );
+    }
+
+    public Within within(Expression geometry1, Expression geometry2) {
+        return new WithinImpl( this, geometry1, geometry2 );
+    }
+    
+    public Add add(Expression expr1, Expression expr2) {
+        return new AddImpl(expr1,expr2);
+    }
+
+    public Divide divide(Expression expr1, Expression expr2) {
+        return new DivideImpl(expr1,expr2);
+    }
+
+    public Multiply multiply(Expression expr1, Expression expr2) {
+        return new MultiplyImpl(expr1,expr2);
+    }
+
+    public Subtract subtract(Expression expr1, Expression expr2) {
+        return new SubtractImpl(expr1,expr2);
+    }
+
+    public Function function(String name, Expression[] args) {
+        Function function = functionFinder.findFunction( name );
+        function.setParameters( Arrays.asList(args) );        
+        return function;
+    }
+
+    public Function function(String name, Expression arg1) {
+        Function function = functionFinder.findFunction( name );
+        
+        List params = new ArrayList(2);
+        params.add( arg1 );
+        
+        function.setParameters( params );
+        return function;
+    }
+
+    public Function function(String name, Expression arg1, Expression arg2) {
+        Function function = functionFinder.findFunction( name );
+        
+        List params = new ArrayList(2);
+        params.add( arg1 );
+        params.add( arg2 );
+        
+        function.setParameters( params );
+        return function;
+    }
+
+    public Function function(String name, Expression arg1, Expression arg2,
+            Expression arg3) {
+        Function function = functionFinder.findFunction( name );
+        
+        List params = new ArrayList(2);
+        params.add( arg1 );
+        params.add( arg2 );
+        params.add( arg3 );
+        
+        function.setParameters( params );
+        return function;
+        
+    }
+
+    public Literal literal(Object obj) {
+        try {
+            return new LiteralExpressionImpl(obj);
+        } 
+        catch (IllegalFilterException e) {
+            new IllegalArgumentException().initCause(e);
+        }
+        
+        return null;
+    }
+
+    public Literal literal(byte b) {
+        return new LiteralExpressionImpl(b);
+    }
+
+    public Literal literal(short s) {
+        return new LiteralExpressionImpl(s);
+    }
+
+    public Literal literal(int i) {
+        return new LiteralExpressionImpl(i);
+    }
+
+    public Literal literal(long l) {
+        return new LiteralExpressionImpl(l);
+    }
+
+    public Literal literal(float f) {
+        return new LiteralExpressionImpl(f);
+    }
+
+    public Literal literal(double d) {
+        return new LiteralExpressionImpl(d);
+    }
+
+    public Literal literal(char c) {
+        return new LiteralExpressionImpl(c);
+    }
+
+    public Literal literal(boolean b) {
+        throw new UnsupportedOperationException("Filter api does not support boolean literals");
+    }
+
     
     /**
      * Creates an AttributeExpression using the supplied xpath.
@@ -358,8 +756,7 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
 	    		return new OrImpl(this,children);
 	    	case FilterType.LOGIC_NOT:
 	    		return new NotImpl(this);
-    	}
-    	
+    	}    	
         throw new IllegalFilterException("Must be one of AND,OR,NOT.");
     }
 
@@ -378,7 +775,7 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
      * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
      * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
      */
-    public LogicFilter createLogicFilter(Filter filter, short filterType)
+    public LogicFilter createLogicFilter(org.geotools.filter.Filter filter, short filterType)
         throws IllegalFilterException {
     	
     	List children = new ArrayList();
@@ -413,7 +810,7 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
      * 	{@link org.opengis.filter.FilterFactory#or(Filter, Filter)}
      * 	{@link org.opengis.filter.FilterFactory#not(Filter)}
      */
-    public LogicFilter createLogicFilter(Filter filter1, Filter filter2,
+    public LogicFilter createLogicFilter(org.geotools.filter.Filter  filter1, org.geotools.filter.Filter filter2,
         short filterType) throws IllegalFilterException {
     	
     	List children = new ArrayList();
@@ -485,38 +882,7 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
      * @return The new Function Expression.
      */
     public FunctionExpression createFunctionExpression(String name) {
-        int index = -1;
-
-        if ((index = name.indexOf("Function")) != -1) {
-            name = name.substring(0, index);
-        }
-
-        name = name.toLowerCase().trim();
-
-        char c = name.charAt(0);
-        name = name.replaceFirst("" + c, "" + Character.toUpperCase(c));
-
-        try {
-            //TODO: Replace the following return statement with something that uses 
-            //FactoryFinder to find the function.
-            java.util.Iterator it = org.geotools.factory.FactoryFinder.factories(FunctionExpression.class);
-            String funName = "";
-            FunctionExpression exp = null;
-            while ((funName != "found") && (it.hasNext())){
-                FunctionExpression fe = (FunctionExpression) it.next();
-                funName = fe.getName();
-                if (funName.equalsIgnoreCase(name)){
-                    exp = fe;
-                    funName = "found";
-                }
-            }
-            return exp;
-            
-      
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to create class " + name
-                + "Function", e);  
-        }
+        return (FunctionExpression) functionFinder.findFunction( name );
     }
 
     /**
@@ -540,22 +906,19 @@ public class FilterFactoryImpl extends Expr implements FilterFactory {
 		return null;
 	}
 	
-	public Filter and(Filter f1, Filter f2) {
-		org.opengis.filter.Filter f = and((org.opengis.filter.Filter)f1,(org.opengis.filter.Filter)f2);
-		return (Filter)f;
-	}
-	
-	public Filter or(Filter f1, Filter f2) {
-		org.opengis.filter.Filter f = or((org.opengis.filter.Filter)f1,(org.opengis.filter.Filter)f2);
-		return (Filter)f;
-	}
-	
-	public Filter not(Filter f) {
-		org.opengis.filter.Filter f1 = not((org.opengis.filter.Filter)f);
-		return (Filter)f1;
-	}
-	
 	public SortBy sort(String propertyName, SortOrder order) {
 		return new SortByImpl( property( propertyName ), order );
 	}
+
+    public org.geotools.filter.Filter and( org.geotools.filter.Filter filter1, org.geotools.filter.Filter filter2 ) {
+        return (org.geotools.filter.Filter) and( (Filter) filter1, (Filter) filter2 );         
+    } 
+
+    public org.geotools.filter.Filter not( org.geotools.filter.Filter filter ) {
+        return (org.geotools.filter.Filter) not( (Filter) filter );
+    }
+
+    public org.geotools.filter.Filter or( org.geotools.filter.Filter filter1, org.geotools.filter.Filter filter2 ) {
+        return (org.geotools.filter.Filter) or( (Filter) filter1, (Filter) filter2 );
+    }
 }

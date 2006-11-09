@@ -97,7 +97,7 @@ public class UniqueIntervalFunctionTest extends FunctionTestSupport {
 
         //FIXME: broken (returns index of -1 when the attribute actually exists) 
         //is expr.getValue(feature) broken?
-        Object result = func.getValue(fc);
+        Object result = func.getValue(featureCollection);
         assertNotNull(result);
         System.out.println(result);
     }

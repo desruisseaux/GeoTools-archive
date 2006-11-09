@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @version $Id$ TODO: handle the case where there is more than one geometry and the other geometries have a different CS than the default geometry
  */
 public class ReprojectFeatureResults extends DataFeatureCollection implements FeatureResults {
-    FeatureResults results;
+    FeatureCollection results;
     FeatureType schema;
     MathTransform transform;
 
@@ -90,7 +90,7 @@ public class ReprojectFeatureResults extends DataFeatureCollection implements Fe
      * @throws NullPointerException DOCUMENT ME!
      * @throws IllegalArgumentException
      */
-    public ReprojectFeatureResults(FeatureResults results,
+    public ReprojectFeatureResults(FeatureCollection results,
         CoordinateReferenceSystem destinationCS)
         throws IOException, SchemaException, TransformException, OperationNotFoundException, NoSuchElementException, FactoryException{
         super(results.getSchema().getNamespace()+"/"+results.getSchema().getTypeName(),results.getSchema());
@@ -188,7 +188,7 @@ public class ReprojectFeatureResults extends DataFeatureCollection implements Fe
      * @see org.geotools.data.FeatureResults#getCount()
      */
     public int getCount() throws IOException {
-        return results.getCount();
+        return results.size();
     }
 
     /**
@@ -216,7 +216,7 @@ public class ReprojectFeatureResults extends DataFeatureCollection implements Fe
      * Returns the feature results wrapped by this reprojecting feature results
      *
      */
-    public FeatureResults getOrigin() {
+    public FeatureCollection getOrigin() {
         return results;
     }
 }

@@ -503,7 +503,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
         try {
             rbc = getReadChannel(prjURL);
         } catch (IOException e) {
-            LOGGER.warning("projection (.prj) for shapefile: "+shpURL.toString()+" is not available");
+            LOGGER.fine("projection (.prj) for shapefile: "+shpURL.toString()+" is not available");
         }
 
         if (rbc == null) {
@@ -905,7 +905,7 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     public FeatureSource getFeatureSource(final String typeName)
         throws IOException {
         final FeatureType featureType = getSchema(typeName);
-
+        
         if (isWriteable) {
             if (getLockingManager() != null) {
                 return new AbstractFeatureLocking() {

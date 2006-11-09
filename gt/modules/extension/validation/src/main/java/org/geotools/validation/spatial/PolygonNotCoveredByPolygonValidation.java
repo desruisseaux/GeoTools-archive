@@ -75,8 +75,8 @@ public class PolygonNotCoveredByPolygonValidation
         FeatureSource polySource1 = (FeatureSource) layers.get(getPolygonTypeRef());
         FeatureSource polySource2 = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
 
-        Object[] poly1 = polySource1.getFeatures().collection().toArray();
-        Object[] poly2 = polySource2.getFeatures().collection().toArray();
+        Object[] poly1 = polySource1.getFeatures().toArray();
+        Object[] poly2 = polySource2.getFeatures().toArray();
 
         if (!envelope.contains(polySource1.getBounds())) {
             results.error((Feature) poly1[0],

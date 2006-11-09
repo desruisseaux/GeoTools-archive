@@ -78,8 +78,8 @@ public class PolygonBoundaryCoveredByPolygonValidation
         FeatureSource polySource = (FeatureSource) layers.get(getPolygonTypeRef());
         FeatureSource polyrSource = (FeatureSource) layers.get(getRestrictedPolygonTypeRef());
 
-        Object[] polys = polyrSource.getFeatures().collection().toArray();
-        Object[] polyRs = polySource.getFeatures().collection().toArray();
+        Object[] polys = polyrSource.getFeatures().toArray();
+        Object[] polyRs = polySource.getFeatures().toArray();
 
         if (!envelope.contains(polySource.getBounds())) {
             results.error((Feature) polys[0],

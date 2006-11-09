@@ -34,7 +34,7 @@ import org.geotools.filter.FilterFactoryFinder;
  */
 public class FunctionTestSupport extends TestCase {
     
-    protected FeatureCollection fc;
+    protected FeatureCollection featureCollection;
     protected FilterFactory fac = FilterFactoryFinder.createFilterFactory();
     protected ExpressionBuilder builder = new ExpressionBuilder();
     protected FeatureType dataType;
@@ -69,7 +69,7 @@ public class FunctionTestSupport extends TestCase {
         store.createSchema(dataType);
         store.addFeatures(testFeatures);
         
-        fc = store.getFeatureSource("test1").getFeatures().collection();
+        featureCollection = store.getFeatureSource("test1").getFeatures();
         
     }
 }

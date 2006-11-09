@@ -17,15 +17,21 @@
  */
 package org.geotools.filter.function;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
+import org.opengis.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.util.ProgressListener;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Literal;
 
 /**
  * Parent for classifiers which break a feature collection into the specified number of classes.
@@ -36,10 +42,11 @@ import org.geotools.util.ProgressListener;
  */
 public abstract class ClassificationFunction extends FunctionExpressionImpl implements FunctionExpression {
 
-    FeatureCollection fc = null;
-    int classNum;
-    Expression expr; 
+    FeatureCollection featureCollection = null;    
     ProgressListener progress;
+    
+    Expression[] arguments = new Expression[2];
+    List parameters = Arrays.asList( arguments );
     
     /** Creates a new instance of ClassificationFunction */
     public ClassificationFunction() {
@@ -49,51 +56,77 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
         return 2;
     }
     
+    /**
+     * Will return -1 if not a literal constant.
+     * 
+     * @return
+     */
     public int getNumberOfClasses(){
-        return classNum;
+        Expression expr = arguments[1];
+        Object value = null;
+        if( expr != null && expr instanceof Literal ){
+            Literal literal = (Literal) expr;
+            value = literal.getValue();
+        }
+        else if( featureCollection != null ){
+            value = expr.evaluate( featureCollection );            
+        }
+        if( value != null && value instanceof Integer){
+            return ((Integer)value).intValue();
+        }
+        return -1;        
     }
-    
-    public void setNumberOfClasses(int i){
-        classNum = i;
+    public void setNumberOfClasses(int slots ){
+        FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );         
+        arguments[1] = (Expression) ff.literal( slots );        
     }
     
     public FeatureCollection getCollection() {
-    	return fc;
+    	return featureCollection;
     }
     
     public void setCollection (FeatureCollection fc) {
-    	this.fc = fc;
+    	this.featureCollection = fc;
     }
-    
-    public Expression getExpression(){
-        return expr;
-    }
-    
-    public void setExpression(Expression e){
-        expr = e;
-    }
-    
+        
     public ProgressListener getProgressListener() {
-    	return progress;
+        return progress;
     }
     
     public void setProgressListener(ProgressListener progress) {
-    	this.progress = progress;
+        this.progress = progress;
     }
     
+    public Expression getExpression(){
+        return arguments[0];
+    }
+    
+    public void setExpression(Expression e){
+        arguments[0] = e;
+    }
+
     public Expression[] getArgs(){
-        Expression[] ret = new Expression[2];
-        ret[0] = expr;
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        ret[1] = ff.createLiteralExpression(classNum);
-        return ret;
+        return arguments;
+    }
+    /**
+     * Returns the function parameters.
+     */
+    public List getParameters() {
+        return parameters;
     }
     
+    /**
+     * Sets the function paramters.
+     */
+    public void setParameters(List params) {
+        parameters.set(0, params.get(0));
+        parameters.set(1, params.get(1));        
+    }
     public abstract String getName();
     
     public void setArgs(Expression[] args){
-        expr = args[0];
-        classNum = ((Number) ((LiteralExpression) args[1]).getLiteral()).intValue();
+        arguments[0] = args[0];
+        arguments[1] = args[1];        
     }
     
     public abstract Object evaluate(Feature feature);

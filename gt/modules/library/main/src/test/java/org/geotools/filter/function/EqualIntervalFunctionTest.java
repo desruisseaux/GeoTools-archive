@@ -18,9 +18,13 @@ package org.geotools.filter.function;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Expression;
+import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.parser.ParseException;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 
 /**
  *
@@ -30,6 +34,8 @@ import org.geotools.filter.parser.ParseException;
 public class EqualIntervalFunctionTest extends FunctionTestSupport {
    
     
+    private static final FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+
     public EqualIntervalFunctionTest(String testName) {
         super(testName);
     }
@@ -47,35 +53,23 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
      * Test of getName method, of class org.geotools.filter.functions.EqualIntervalFunction.
      */
     public void testInstance() {
-        FunctionExpression equInt = FilterFactoryFinder.createFilterFactory().createFunctionExpression("EqualInterval");
+        Function equInt = ff.createFunctionExpression("EqualInterval");        
         assertNotNull(equInt);
+        assertEquals("test get name", "EqualInterval",equInt.getName());
     }
-    
-    
-    /**
-     * Test of getName method, of class org.geotools.filter.functions.EqualIntervalFunction.
-     */
-    public void testGetName() {
-        FunctionExpression equInt = FilterFactoryFinder.createFilterFactory().createFunctionExpression("EqualInterval");
-        System.out.println("testGetName");
-        assertEquals("EqualInterval",equInt.getName());
-    }
-    
+        
     /**
      * Test of setNumberOfClasses method, of class org.geotools.filter.functions.EqualIntervalFunction.
      */
-    public void testSetNumberOfClasses() throws Exception{
-        System.out.println("testSetNumberOfClasses");
+    public void testSetNumberOfClasses() throws Exception{        
+        PropertyName property = ff.property("foo");
+        Literal literal = ff.literal(3);
         
-        Expression classes = (Expression)builder.parse(dataType, "3");
-        Expression exp = (Expression)builder.parse(dataType, "foo");
-        EqualIntervalFunction func = (EqualIntervalFunction)fac.createFunctionExpression("EqualInterval");
-        func.setArgs(new Expression[]{exp,classes});
+        EqualIntervalFunction func = (EqualIntervalFunction) ff.function("EqualInterval", property, literal );
         assertEquals(3,func.getNumberOfClasses());
-        classes = (Expression)builder.parse(dataType, "12");
-        func.setArgs(new Expression[]{exp,classes});
-        assertEquals(12,func.getNumberOfClasses());
-        
+                        
+        func.getParameters().set(1, ff.literal(12) );
+        assertEquals(12,func.getNumberOfClasses());        
     }
     
     /**
@@ -88,13 +82,7 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
         FunctionExpression func = fac.createFunctionExpression("EqualInterval");
         func.setArgs(new Expression[]{exp,classes});
         
-        FeatureIterator list = fc.features();
-        while(list.hasNext()){
-            Feature f = list.next();
-            int slot = ((Number)func.getValue(f)).intValue();
-            System.out.println(slot);
-        }
-        
+        Object slot = func.evaluate( featureCollection );        
     }
     
     /**
@@ -107,16 +95,13 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
         FunctionExpression func = fac.createFunctionExpression("EqualInterval");
         func.setArgs(new Expression[]{exp,classes});
         
-        FeatureIterator list = fc.features();
-        while(list.hasNext()){
-            Feature f = list.next();
-            int slot = ((Number)func.getValue(f)).intValue();
-            int value = ((Number)f.getAttribute("foo")).intValue();
-            if(value < 46){
-                assertEquals(0,slot);
-            } else{
-                assertEquals(1,slot);
-            }
-        }
+        FeatureIterator list = featureCollection.features();
+        int slot = ((Number)func.evaluate( featureCollection )).intValue();
+        
+//        if(value < 46){
+//            assertEquals(0,slot);
+//        } else{
+//            assertEquals(1,slot);
+//        }
     }
 }

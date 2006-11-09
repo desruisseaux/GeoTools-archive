@@ -124,7 +124,7 @@ public class MysqlTestSuite extends TestCase {
      public void testGet() throws IOException {
         LOGGER.info("starting type enforcement tests...");
         try {
-	       	    collection = mysql.getFeatures( tFilter).collection();
+	       	    collection = mysql.getFeatures( tFilter);
 	     assertEquals(4, collection.size());
 	} catch(DataSourceException e) {
             LOGGER.info("...threw data source exception: " + e.getMessage());    
@@ -187,12 +187,12 @@ public class MysqlTestSuite extends TestCase {
 
     public void testRemove() throws IOException {
 	try {
-	    FeatureCollection delFeatures = mysql.getFeatures(tFilter).collection();
+	    FeatureCollection delFeatures = mysql.getFeatures(tFilter);
 	    mysql.removeFeatures(tFilter);
-	    collection = mysql.getFeatures(tFilter).collection();
+	    collection = mysql.getFeatures(tFilter);
 	    assertEquals(0, collection.size());
 	    mysql.addFeatures( DataUtilities.collection(delFeatures));
-	    collection = mysql.getFeatures(tFilter).collection();
+	    collection = mysql.getFeatures(tFilter);
 	    assertEquals(4, collection.size());
 	} catch (DataSourceException e){
 	    fail("Data source exception " + e);
@@ -207,11 +207,11 @@ public class MysqlTestSuite extends TestCase {
 	    mysql.modifyFeatures(lampAttr[0], tBulbs, tFilter);
 	    //mysql.modifyFeatures(lampAttr[1], geom, tFilter);
 	    //do a geom test when we figure out how to get the filters to work
-	    collection = mysql.getFeatures(tFilter).collection();
+	    collection = mysql.getFeatures(tFilter);
 	    assertEquals(tBulbs, 
 			 (Integer) collection.features().next().getAttribute("NUM_BULBS"));
 	    mysql.modifyFeatures(lampAttr[0], restBulbs, tFilter);
-	    collection = mysql.getFeatures(tFilter).collection();
+	    collection = mysql.getFeatures(tFilter);
 	    assertEquals(restBulbs, 
 	    	 (Integer) collection.features().next().getAttribute("NUM_BULBS"));
 	} catch (DataSourceException e) {

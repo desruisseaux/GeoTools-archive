@@ -54,7 +54,6 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
@@ -499,7 +498,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
 			labelCache.startLayer();
 			try {
 				// mapExtent = this.context.getAreaOfInterest();
-				FeatureResults results = queryLayer(currLayer, envelope,
+                FeatureCollection results = queryLayer(currLayer, envelope,
 						destinationCrs);
 
 				// extract the feature type stylers from the style object
@@ -629,11 +628,11 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 * @throws IllegalAttributeException
 	 * @see MapLayer#setQuery(org.geotools.data.Query)
 	 */
-	FeatureResults queryLayer(MapLayer currLayer, Envelope envelope,
+    FeatureCollection queryLayer(MapLayer currLayer, Envelope envelope,
 			CoordinateReferenceSystem destinationCrs)
 			throws IllegalFilterException, IOException,
 			IllegalAttributeException {
-		FeatureResults results = null;
+        FeatureCollection results = null;
 		FeatureSource featureSource = currLayer.getFeatureSource();
 		FeatureType schema = featureSource.getSchema();
 		Query query = Query.ALL;
@@ -1037,7 +1036,7 @@ public class LiteRenderer implements Renderer, Renderer2D {
 	 *             DOCUMENT ME!
 	 */
 	private void processStylers(final Graphics2D graphics,
-			final FeatureResults features,
+			final FeatureCollection features,
 			final FeatureTypeStyle[] featureStylers, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs,
 			CoordinateReferenceSystem sourceCrs) throws IOException,

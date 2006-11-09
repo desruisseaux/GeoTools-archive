@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
+import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -37,14 +38,14 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * @author wolf
  * @source $URL$
  */
-public final class IndexedFeatureResults implements FeatureResults {
+public final class IndexedFeatureResults extends DataFeatureCollection implements FeatureCollection {
 	STRtree index = new STRtree();
 	FeatureType schema;
 	Envelope bounds;
 	int count;
 	private Envelope queryBounds;
 
-	public IndexedFeatureResults(FeatureResults results) throws IOException,
+	public IndexedFeatureResults(FeatureCollection results) throws IOException,
 			IllegalAttributeException {
 		// copy results attributes
 		this.schema = results.getSchema();
@@ -74,7 +75,7 @@ public final class IndexedFeatureResults implements FeatureResults {
 	/**
 	 * @see org.geotools.data.FeatureResults#getSchema()
 	 */
-	public FeatureType getSchema() throws IOException {
+	public FeatureType getSchema() {
 		return this.schema;
 	}
 

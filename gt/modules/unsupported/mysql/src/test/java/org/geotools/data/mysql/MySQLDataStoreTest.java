@@ -358,7 +358,7 @@ public class MySQLDataStoreTest extends TestCase {
         Envelope fBounds = source.getBounds();
         LOGGER.info("Bounds of source is " + fBounds);
 
-        FeatureResults results = source.getFeatures(query);
+        FeatureCollection results = source.getFeatures(query);
         LOGGER.info("bounds from feature results is " + results.getBounds());
     }
 

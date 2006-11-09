@@ -22,7 +22,6 @@ import java.net.MalformedURLException;
 import junit.framework.AssertionFailedError;
 
 import org.geotools.TestData;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
@@ -110,7 +109,7 @@ public class ShapefileRTreeReadWriteTest extends TestCaseSupport {
 		store.addFeatures( one );
 
 		s = new IndexedShapefileDataStore(tmp.toURL());
-		assertEquals(one.getCount()*2, store.getCount(Query.ALL));
+		assertEquals(one.size()*2, store.getCount(Query.ALL));
 	}
     
 	void test(String f) throws Exception {

@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -70,10 +70,10 @@ public class OverlapsIntegrityTest extends SpatialTestCase
 		Filter filter;
 		
 		filter = OverlapsIntegrity.filterBBox( new Envelope(), line.getSchema() );
-		assertEquals( "with empty envelope", 1, line.getFeatures( filter ).getCount() );
+		assertEquals( "with empty envelope", 1, line.getFeatures( filter ).size() );
 		
 		filter = OverlapsIntegrity.filterBBox( new Envelope(-1,3,-2,3), line.getSchema() );
-		assertEquals( "with envelope", 4, line.getFeatures( filter ).getCount() );	
+		assertEquals( "with envelope", 4, line.getFeatures( filter ).size() );	
 		
 		Envelope all = line.getBounds();
 		if( all == null ){
@@ -82,13 +82,15 @@ public class OverlapsIntegrityTest extends SpatialTestCase
 		}
 		int counter = 0;
 		filter = OverlapsIntegrity.filterBBox( all, line.getSchema() );
-		for( FeatureReader r=line.getFeatures().reader(); r.hasNext(); ){
+        FeatureIterator r=line.getFeatures().features();
+		for( ; r.hasNext(); ){
 			System.out.println("Loop counter: " +  ++counter);
 			Feature victim = r.next();
 			System.out.println("Found line number: " + victim.getID());
 			assertTrue( "feature "+victim.getID(), filter.evaluate( victim ));
 		}
-		assertEquals( "count of all features", 4, line.getFeatures( filter ).getCount() );
+        r.close();
+		assertEquals( "count of all features", 4, line.getFeatures( filter ).size() );
 	}
 	
 	public void testValidate()

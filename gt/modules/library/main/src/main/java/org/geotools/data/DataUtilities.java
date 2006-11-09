@@ -44,6 +44,7 @@ import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypeFactory;
@@ -728,41 +729,20 @@ public class DataUtilities {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns collection if non empty.
      *
-     * @param collection DOCUMENT ME!
+     * @param collection
      *
-     * @return DOCUMENT ME!
+     * @return provided collection
      *
-     * @throws IOException DOCUMENT ME!
+     * @throws IOException Raised if collection was empty
      */
-    public static FeatureResults results(final FeatureCollection collection)
+    public static FeatureCollection results(final FeatureCollection collection)
         throws IOException {
         if (collection.size() == 0) {
             throw new IOException("Provided collection was empty");
         }
-
-        return new FeatureResults() {
-                public FeatureType getSchema(){
-                    return collection.features().next().getFeatureType();
-                }
-
-                public FeatureReader reader() throws IOException {
-                    return DataUtilities.reader(collection);
-                }
-
-                public Envelope getBounds(){
-                    return collection.getBounds();
-                }
-
-                public int getCount(){
-                    return collection.size();
-                }
-
-                public FeatureCollection collection(){
-                    return collection;
-                }
-            };
+        return collection;
     }
 
     /**
@@ -824,8 +804,7 @@ public class DataUtilities {
      * @return FeatureCollection
      */
     public static FeatureCollection collection(FeatureReader reader) throws IOException {
-        FeatureCollection collection = FeatureCollections.newCollection();
-        
+        FeatureCollection collection = FeatureCollections.newCollection();        
         try {
             while( reader.hasNext() ) {
                 try {
@@ -835,6 +814,32 @@ public class DataUtilities {
                 } catch (IllegalAttributeException e) {
                     throw (IOException) new IOException().initCause( e );
                 }                
+            }
+        }
+        finally {
+            reader.close();
+        }
+        return collection;
+    }
+    /**
+     * Copies the provided reader into a FeatureCollection, reader will be closed.
+     * <p>
+     * Often used when gathering features for FeatureStore:<pre><code>
+     * featureStore.addFeatures( DataUtilities.collection(reader));
+     * </code></pre>
+     * 
+     * @param features Array of features
+     * @return FeatureCollection
+     */
+    public static FeatureCollection collection(FeatureIterator reader) throws IOException {
+        FeatureCollection collection = FeatureCollections.newCollection();        
+        try {
+            while( reader.hasNext() ) {
+                try {
+                    collection.add( reader.next() );
+                } catch (NoSuchElementException e) {
+                    throw (IOException) new IOException("EOF").initCause( e );
+                }               
             }
         }
         finally {
