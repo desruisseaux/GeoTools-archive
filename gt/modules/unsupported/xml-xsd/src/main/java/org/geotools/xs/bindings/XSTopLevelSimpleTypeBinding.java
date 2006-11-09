@@ -15,6 +15,7 @@
  */
 package org.geotools.xs.bindings;
 
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -54,7 +55,7 @@ import javax.xml.namespace.QName;
  *
  * @generated
  */
-public class XSTopLevelSimpleTypeBinding implements ComplexBinding {
+public class XSTopLevelSimpleTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -104,24 +105,4 @@ public class XSTopLevelSimpleTypeBinding implements ComplexBinding {
         return null;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
-    }
 }

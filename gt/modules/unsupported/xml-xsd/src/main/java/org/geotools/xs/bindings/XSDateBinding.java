@@ -62,6 +62,11 @@ import javax.xml.namespace.QName;
  * @generated
  */
 public class XSDateBinding implements SimpleBinding {
+	
+	public XSDateBinding() {
+		DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
+	}
+	
     /**
      * @generated
      */
@@ -100,12 +105,11 @@ public class XSDateBinding implements SimpleBinding {
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
     	
-    	DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
-    	
-    	//check the context 
     	return DatatypeConverter.parseDate( (String) value );
-    	
-    	//return DateFormat.getInstance().parse( (String) value );
     }
-
+    
+    public String encode(Object object, String value) throws Exception {
+    	return DatatypeConverter.printDate( (Calendar) object );
+    }
+    
 }

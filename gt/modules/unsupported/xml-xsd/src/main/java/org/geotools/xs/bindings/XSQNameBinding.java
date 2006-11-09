@@ -66,6 +66,8 @@ public class XSQNameBinding implements SimpleBinding {
     public XSQNameBinding(NamespaceSupport namespaceSupport) {
         this.namespaceSupport = namespaceSupport;
         namespaceContext = new NamespaceSupportWrappper();
+        
+        DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
     }
 
     /**
@@ -105,9 +107,8 @@ public class XSQNameBinding implements SimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
-
-        QName qName = DatatypeConverter.parseQName((String) value,
+        
+    	QName qName = DatatypeConverter.parseQName((String) value,
                 namespaceContext);
 
         if (qName != null) {
@@ -131,6 +132,10 @@ public class XSQNameBinding implements SimpleBinding {
         return new QName(null, s);
     }
 
+    public String encode(Object object, String value) throws Exception {
+    	return DatatypeConverter.printQName( (QName) object, namespaceContext );
+    }
+    
     /**
      * NamespaceContext wrapper around namespace support.
      */
