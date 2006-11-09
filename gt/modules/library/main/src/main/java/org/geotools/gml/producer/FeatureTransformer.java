@@ -198,21 +198,29 @@ public class FeatureTransformer extends TransformerBase {
 
         if (prefixGml && (gmlAtts == null)) {
             gmlAtts = new HashSet();
-            gmlAtts.add("pointProperty");
-            gmlAtts.add("geometryProperty");
-            gmlAtts.add("polygonProperty");
-            gmlAtts.add("lineStringProperty");
-            gmlAtts.add("multiPointProperty");
-            gmlAtts.add("multiLineStringProperty");
-            gmlAtts.add("multiPolygonProperty");
-            gmlAtts.add("description");
-            gmlAtts.add("name");
-
-            //boundedBy is done in handleAttribute to make use of the writeBounds
-            //code.
+           loadGmlAttributes( gmlAtts );
         }
     }
 
+    /**
+     * Template method for determining which attributes to prefix with gml.
+     * @param gmlAtts Set of strings corresponding to element names on a type.
+     */
+    protected void loadGmlAttributes( Set gmlAtts ) {
+    	 gmlAtts.add("pointProperty");
+         gmlAtts.add("geometryProperty");
+         gmlAtts.add("polygonProperty");
+         gmlAtts.add("lineStringProperty");
+         gmlAtts.add("multiPointProperty");
+         gmlAtts.add("multiLineStringProperty");
+         gmlAtts.add("multiPolygonProperty");
+         gmlAtts.add("description");
+         gmlAtts.add("name");
+
+         //boundedBy is done in handleAttribute to make use of the writeBounds
+         //code.
+    }
+    
     /**
      * Sets whether a gml:boundedBy element should automatically be generated
      * and included.  The element will not be updateable, and is simply
