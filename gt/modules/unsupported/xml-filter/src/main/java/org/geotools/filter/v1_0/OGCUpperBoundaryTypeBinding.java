@@ -41,7 +41,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCUpperBoundaryTypeBinding implements ComplexBinding {
+public class OGCUpperBoundaryTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */

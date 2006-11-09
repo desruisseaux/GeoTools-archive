@@ -36,7 +36,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCSpatialOpsTypeBinding implements ComplexBinding {
+public class OGCSpatialOpsTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */

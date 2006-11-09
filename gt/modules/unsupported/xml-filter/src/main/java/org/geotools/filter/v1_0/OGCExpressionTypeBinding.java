@@ -38,7 +38,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCExpressionTypeBinding implements ComplexBinding {
+public class OGCExpressionTypeBinding extends AbstractComplexBinding {
     FilterFactory filterFactory;
 
     public OGCExpressionTypeBinding(FilterFactory filterFactory) {

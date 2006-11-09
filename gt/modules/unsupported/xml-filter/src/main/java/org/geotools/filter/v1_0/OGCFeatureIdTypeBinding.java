@@ -43,7 +43,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCFeatureIdTypeBinding implements ComplexBinding {
+public class OGCFeatureIdTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCFeatureIdTypeBinding(FilterFactory factory) {
@@ -98,26 +98,5 @@ public class OGCFeatureIdTypeBinding implements ComplexBinding {
         URI fid = (URI) node.getAttribute("fid").getValue();
 
         return factory.featureId(fid.toString());
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

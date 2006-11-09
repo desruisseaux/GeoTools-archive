@@ -26,7 +26,7 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.FeatureId;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -52,7 +52,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class OGCFilterTypeBinding implements ComplexBinding {
+public class OGCFilterTypeBinding extends AbstractComplexBinding {
     FilterFactory factory;
 
     public OGCFilterTypeBinding(FilterFactory factory) {
@@ -113,26 +113,5 @@ public class OGCFilterTypeBinding implements ComplexBinding {
         }
 
         return node.getChildValue(Filter.class);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

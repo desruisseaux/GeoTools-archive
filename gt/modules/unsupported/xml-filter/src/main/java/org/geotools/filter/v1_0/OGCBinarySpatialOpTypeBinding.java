@@ -26,7 +26,7 @@ import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.filter.FilterFactory;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -57,7 +57,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class OGCBinarySpatialOpTypeBinding implements ComplexBinding {
+public class OGCBinarySpatialOpTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
     private GeometryFactory gFactory;
 

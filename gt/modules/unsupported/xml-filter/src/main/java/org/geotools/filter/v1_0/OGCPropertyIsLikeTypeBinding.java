@@ -53,7 +53,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCPropertyIsLikeTypeBinding implements ComplexBinding {
+public class OGCPropertyIsLikeTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCPropertyIsLikeTypeBinding(FilterFactory factory) {

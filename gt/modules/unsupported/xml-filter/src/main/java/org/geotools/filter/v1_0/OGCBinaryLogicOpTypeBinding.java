@@ -50,7 +50,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCBinaryLogicOpTypeBinding implements ComplexBinding {
+public class OGCBinaryLogicOpTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCBinaryLogicOpTypeBinding(FilterFactory factory) {
@@ -117,26 +117,5 @@ public class OGCBinaryLogicOpTypeBinding implements ComplexBinding {
         } else {
             throw new IllegalStateException(name);
         }
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

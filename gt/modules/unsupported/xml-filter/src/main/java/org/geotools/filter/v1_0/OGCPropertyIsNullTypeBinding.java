@@ -48,7 +48,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCPropertyIsNullTypeBinding implements ComplexBinding {
+public class OGCPropertyIsNullTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCPropertyIsNullTypeBinding(FilterFactory factory) {

@@ -49,7 +49,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCPropertyIsBetweenTypeBinding implements ComplexBinding {
+public class OGCPropertyIsBetweenTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCPropertyIsBetweenTypeBinding(FilterFactory factory) {

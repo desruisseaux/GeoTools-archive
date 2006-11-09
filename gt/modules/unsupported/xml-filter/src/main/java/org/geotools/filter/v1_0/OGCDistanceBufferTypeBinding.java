@@ -24,7 +24,7 @@ import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.LiteralExpression;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -53,7 +53,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class OGCDistanceBufferTypeBinding implements ComplexBinding {
+public class OGCDistanceBufferTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCDistanceBufferTypeBinding(FilterFactory factory) {

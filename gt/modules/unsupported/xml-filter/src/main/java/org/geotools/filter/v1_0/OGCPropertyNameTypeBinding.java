@@ -44,7 +44,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCPropertyNameTypeBinding implements ComplexBinding {
+public class OGCPropertyNameTypeBinding extends AbstractComplexBinding {
     FilterFactory factory;
 
     public OGCPropertyNameTypeBinding(FilterFactory factory) {
@@ -99,26 +99,5 @@ public class OGCPropertyNameTypeBinding implements ComplexBinding {
         String xpath = Filters.asString(expression);
 
         return factory.property(xpath);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

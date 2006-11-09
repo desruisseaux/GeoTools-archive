@@ -49,7 +49,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCBBOXTypeBinding implements ComplexBinding {
+public class OGCBBOXTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCBBOXTypeBinding(FilterFactory factory) {
@@ -106,26 +106,5 @@ public class OGCBBOXTypeBinding implements ComplexBinding {
 
         return factory.bbox(propertyName.getPropertyName(), box.getMinX(), box.getMinY(),
             box.getMaxX(), box.getMaxY(), null);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

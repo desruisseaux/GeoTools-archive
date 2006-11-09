@@ -47,7 +47,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCBinaryComparisonOpTypeBinding implements ComplexBinding {
+public class OGCBinaryComparisonOpTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCBinaryComparisonOpTypeBinding(FilterFactory factory) {

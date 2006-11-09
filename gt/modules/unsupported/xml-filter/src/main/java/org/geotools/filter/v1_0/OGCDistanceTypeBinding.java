@@ -38,7 +38,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCDistanceTypeBinding implements ComplexBinding {
+public class OGCDistanceTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */

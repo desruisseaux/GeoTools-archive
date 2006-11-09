@@ -48,7 +48,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCFunctionTypeBinding implements ComplexBinding {
+public class OGCFunctionTypeBinding extends AbstractComplexBinding {
     private FilterFactory factory;
 
     public OGCFunctionTypeBinding(FilterFactory factory) {

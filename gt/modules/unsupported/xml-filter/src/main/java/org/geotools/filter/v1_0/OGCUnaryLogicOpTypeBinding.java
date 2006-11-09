@@ -50,7 +50,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCUnaryLogicOpTypeBinding implements ComplexBinding {
+public class OGCUnaryLogicOpTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */

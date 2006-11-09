@@ -41,7 +41,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class OGCLowerBoundaryTypeBinding implements ComplexBinding {
+public class OGCLowerBoundaryTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
