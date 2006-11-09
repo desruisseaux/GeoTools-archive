@@ -2,8 +2,8 @@ package org.geotools.tile;
 
 import java.awt.Rectangle;
 
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.filter.spatial.BBOX;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.tile.cache.TileRange;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -39,7 +39,7 @@ public class TileSet {
      * @param request
      * @return
      */
-    GridCoverage getTile( int row, int col ){
+    GridCoverage2D getTile( int row, int col ){
         // delegate out to TileStratagy to handle
         // this request.        
         return null;
