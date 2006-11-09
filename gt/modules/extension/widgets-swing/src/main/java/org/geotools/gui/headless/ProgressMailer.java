@@ -43,9 +43,11 @@ import javax.mail.internet.AddressException;
 
 // Geotools dependencies
 import org.geotools.util.ProgressListener;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -292,5 +294,12 @@ public class ProgressMailer implements ProgressListener {
         final CharArrayWriter buffer = new CharArrayWriter();
         exception.printStackTrace(new PrintWriter(buffer));
         send("exceptionOccurred", VocabularyKeys.EXCEPTION, buffer.toString());
+    }
+
+    public void setTask( InternationalString task ) {
+        setDescription( task.toString() );
+    }
+    public InternationalString getTask() {
+        return new SimpleInternationalString( getDescription() );
     }
 }

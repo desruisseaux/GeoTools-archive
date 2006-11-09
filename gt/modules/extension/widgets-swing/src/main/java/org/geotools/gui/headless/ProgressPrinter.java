@@ -27,7 +27,10 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.AbstractInternationalString;
 import org.geotools.util.ProgressListener;
+import org.geotools.util.SimpleInternationalString;
+import org.opengis.util.InternationalString;
 
 
 /**
@@ -421,5 +424,11 @@ public class ProgressPrinter implements ProgressListener {
                         break;
             }
         }
+    }
+    public void setTask( InternationalString task ) {
+        setDescription( task.toString() );
+    }
+    public InternationalString getTask() {
+        return new SimpleInternationalString( getDescription() );
     }
 }

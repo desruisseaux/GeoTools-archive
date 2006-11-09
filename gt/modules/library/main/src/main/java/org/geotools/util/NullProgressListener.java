@@ -15,6 +15,8 @@
  */
 package org.geotools.util;
 
+import org.opengis.util.InternationalString;
+
 
 /**
  * A default progress listener implementation suitable for
@@ -83,5 +85,14 @@ public class NullProgressListener implements ProgressListener {
 
     public void exceptionOccurred(Throwable exception) {
         //do nothing
+    }
+
+    public InternationalString getTask() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setTask( InternationalString task ) {
+        // do nothing        
     }
 }

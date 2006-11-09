@@ -101,8 +101,10 @@ package org.geotools.util;
  * @see org.geotools.gui.headless.ProgressMailer
  * @see org.geotools.gui.swing.ProgressWindow
  * @see javax.swing.ProgressMonitor
+ * 
+ * @deprecated Please use org.opengis.util.ProgressListener
  */
-public interface ProgressListener {
+public interface ProgressListener extends org.opengis.util.ProgressListener {
     /**
      * Returns the description for the lengthly operation to be reported, or {@code null} if none.
      */
