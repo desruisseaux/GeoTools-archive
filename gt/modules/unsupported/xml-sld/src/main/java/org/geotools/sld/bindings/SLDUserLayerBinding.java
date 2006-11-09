@@ -55,7 +55,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDUserLayerBinding implements ComplexBinding {
+public class SLDUserLayerBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDUserLayerBinding(StyleFactory styleFactory) {
@@ -131,26 +131,5 @@ public class SLDUserLayerBinding implements ComplexBinding {
         }
 
         return userLayer;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

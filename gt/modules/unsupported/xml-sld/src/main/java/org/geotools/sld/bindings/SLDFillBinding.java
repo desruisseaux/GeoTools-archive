@@ -26,7 +26,7 @@ import org.geotools.sld.CssParameter;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
 import org.geotools.styling.StyleFactory;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -58,7 +58,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class SLDFillBinding implements ComplexBinding {
+public class SLDFillBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDFillBinding(StyleFactory styleFactory) {
@@ -138,26 +138,5 @@ public class SLDFillBinding implements ComplexBinding {
         }
 
         return fill;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

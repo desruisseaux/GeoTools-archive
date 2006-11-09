@@ -54,7 +54,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDShadedReliefBinding implements ComplexBinding {
+public class SLDShadedReliefBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
     FilterFactory filterFactory;
 
@@ -122,26 +122,5 @@ public class SLDShadedReliefBinding implements ComplexBinding {
         }
 
         return shadedRelief;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

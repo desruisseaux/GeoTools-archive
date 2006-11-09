@@ -51,7 +51,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDExternalGraphicBinding implements ComplexBinding {
+public class SLDExternalGraphicBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDExternalGraphicBinding(StyleFactory styleFactory) {
@@ -106,26 +106,5 @@ public class SLDExternalGraphicBinding implements ComplexBinding {
         String format = (String) node.getChildValue("Format");
 
         return styleFactory.createExternalGraphic(uri.toURL(), format);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

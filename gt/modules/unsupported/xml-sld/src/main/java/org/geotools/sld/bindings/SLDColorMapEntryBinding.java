@@ -47,7 +47,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDColorMapEntryBinding implements ComplexBinding {
+public class SLDColorMapEntryBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
     FilterFactory filterFactory;
 
@@ -122,26 +122,5 @@ public class SLDColorMapEntryBinding implements ComplexBinding {
         }
 
         return entry;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

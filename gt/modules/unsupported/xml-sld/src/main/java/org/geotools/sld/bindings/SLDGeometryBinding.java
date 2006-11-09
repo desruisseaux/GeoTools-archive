@@ -48,7 +48,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDGeometryBinding implements ComplexBinding {
+public class SLDGeometryBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -94,26 +94,5 @@ public class SLDGeometryBinding implements ComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return node.getChildValue(PropertyName.class);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

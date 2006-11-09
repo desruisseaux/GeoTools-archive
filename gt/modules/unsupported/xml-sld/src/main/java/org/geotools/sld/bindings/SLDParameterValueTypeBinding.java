@@ -51,7 +51,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDParameterValueTypeBinding implements ComplexBinding {
+public class SLDParameterValueTypeBinding extends AbstractComplexBinding {
     FilterFactory filterFactory;
 
     public SLDParameterValueTypeBinding(FilterFactory filterFactory) {
@@ -121,27 +121,6 @@ public class SLDParameterValueTypeBinding implements ComplexBinding {
             }
         }
 
-        return null;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
         return null;
     }
 }

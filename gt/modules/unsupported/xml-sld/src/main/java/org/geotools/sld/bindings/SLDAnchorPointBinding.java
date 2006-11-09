@@ -52,7 +52,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDAnchorPointBinding implements ComplexBinding {
+public class SLDAnchorPointBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDAnchorPointBinding(StyleFactory styleFactory) {
@@ -107,26 +107,5 @@ public class SLDAnchorPointBinding implements ComplexBinding {
         Expression y = (Expression) node.getChildValue("AnchorPointY");
 
         return styleFactory.createAnchorPoint(x, y);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

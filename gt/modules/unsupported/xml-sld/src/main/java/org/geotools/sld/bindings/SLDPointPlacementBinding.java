@@ -54,7 +54,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDPointPlacementBinding implements ComplexBinding {
+public class SLDPointPlacementBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDPointPlacementBinding(StyleFactory styleFactory) {
@@ -115,26 +115,5 @@ public class SLDPointPlacementBinding implements ComplexBinding {
         Expression rotation = (Expression) node.getChildValue("Rotation");
 
         return styleFactory.createPointPlacement(anchorPoint, displacement, rotation);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

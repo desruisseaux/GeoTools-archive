@@ -51,7 +51,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDLayerFeatureConstraintsBinding implements ComplexBinding {
+public class SLDLayerFeatureConstraintsBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDLayerFeatureConstraintsBinding(StyleFactory styleFactory) {
@@ -106,26 +106,5 @@ public class SLDLayerFeatureConstraintsBinding implements ComplexBinding {
 
         return styleFactory.createLayerFeatureConstraints((FeatureTypeConstraint[]) ftc.toArray(
                 new FeatureTypeConstraint[ftc.size()]));
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

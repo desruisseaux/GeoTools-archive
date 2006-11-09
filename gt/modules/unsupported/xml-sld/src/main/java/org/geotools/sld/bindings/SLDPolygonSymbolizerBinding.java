@@ -58,7 +58,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDPolygonSymbolizerBinding implements ComplexBinding {
+public class SLDPolygonSymbolizerBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDPolygonSymbolizerBinding(StyleFactory styleFactory) {
@@ -128,26 +128,5 @@ public class SLDPolygonSymbolizerBinding implements ComplexBinding {
         }
 
         return ps;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

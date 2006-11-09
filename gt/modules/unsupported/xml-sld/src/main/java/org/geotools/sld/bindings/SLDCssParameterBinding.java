@@ -55,7 +55,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDCssParameterBinding implements ComplexBinding {
+public class SLDCssParameterBinding extends AbstractComplexBinding {
     FilterFactory filterFactory;
 
     public SLDCssParameterBinding(FilterFactory filterFactory) {
@@ -127,26 +127,5 @@ public class SLDCssParameterBinding implements ComplexBinding {
         }
 
         return parameter;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

@@ -50,7 +50,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDRemoteOWSBinding implements ComplexBinding {
+public class SLDRemoteOWSBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDRemoteOWSBinding(StyleFactory styleFactory) {
@@ -103,26 +103,5 @@ public class SLDRemoteOWSBinding implements ComplexBinding {
         throws Exception {
         return styleFactory.createRemoteOWS((String) node.getChildValue("Service"),
             ((URI) node.getChildValue("OnlineResource")).toString());
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

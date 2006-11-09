@@ -55,7 +55,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDLineSymbolizerBinding implements ComplexBinding {
+public class SLDLineSymbolizerBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDLineSymbolizerBinding(StyleFactory styleFactory) {
@@ -120,26 +120,5 @@ public class SLDLineSymbolizerBinding implements ComplexBinding {
         }
 
         return ls;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

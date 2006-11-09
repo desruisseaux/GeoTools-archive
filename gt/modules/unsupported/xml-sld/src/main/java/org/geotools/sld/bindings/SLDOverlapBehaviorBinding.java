@@ -52,7 +52,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDOverlapBehaviorBinding implements ComplexBinding {
+public class SLDOverlapBehaviorBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -117,27 +117,6 @@ public class SLDOverlapBehaviorBinding implements ComplexBinding {
             return OverlapBehavior.RANDOM;
         }
 
-        return null;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
         return null;
     }
 }

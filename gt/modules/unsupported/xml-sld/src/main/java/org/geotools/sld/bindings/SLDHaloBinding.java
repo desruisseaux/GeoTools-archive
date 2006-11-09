@@ -52,7 +52,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDHaloBinding implements ComplexBinding {
+public class SLDHaloBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDHaloBinding(StyleFactory styleFactory) {
@@ -105,26 +105,5 @@ public class SLDHaloBinding implements ComplexBinding {
         throws Exception {
         return styleFactory.createHalo((Fill) node.getChildValue("Fill"),
             (Expression) node.getChildValue("Radius"));
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

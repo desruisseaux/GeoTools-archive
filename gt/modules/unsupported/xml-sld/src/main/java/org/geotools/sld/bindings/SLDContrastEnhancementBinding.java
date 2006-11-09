@@ -22,7 +22,7 @@ import javax.xml.namespace.QName;
 import org.geotools.filter.FilterFactory;
 import org.geotools.styling.ContrastEnhancement;
 import org.geotools.styling.StyleFactory;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -58,7 +58,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class SLDContrastEnhancementBinding implements ComplexBinding {
+public class SLDContrastEnhancementBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
     FilterFactory filterFactory;
 
@@ -127,26 +127,5 @@ public class SLDContrastEnhancementBinding implements ComplexBinding {
         }
 
         return ce;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

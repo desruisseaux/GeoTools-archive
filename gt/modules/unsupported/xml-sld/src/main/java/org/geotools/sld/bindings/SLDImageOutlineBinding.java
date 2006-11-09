@@ -54,7 +54,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDImageOutlineBinding implements ComplexBinding {
+public class SLDImageOutlineBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDImageOutlineBinding(StyleFactory styleFactory) {
@@ -110,26 +110,5 @@ public class SLDImageOutlineBinding implements ComplexBinding {
         //  &lt;xsd:element ref="sld:PolygonSymbolizer"/&gt;
         //&lt;/xsd:choice&gt;
         return styleFactory.createImageOutline((Symbolizer) node.getChildValue(Symbolizer.class));
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

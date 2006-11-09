@@ -56,7 +56,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDNamedLayerBinding implements ComplexBinding {
+public class SLDNamedLayerBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDNamedLayerBinding(StyleFactory styleFactory) {
@@ -128,26 +128,5 @@ public class SLDNamedLayerBinding implements ComplexBinding {
         }
 
         return namedLayer;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

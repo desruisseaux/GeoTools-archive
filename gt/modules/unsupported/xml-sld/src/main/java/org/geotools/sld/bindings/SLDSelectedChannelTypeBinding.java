@@ -44,7 +44,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDSelectedChannelTypeBinding implements ComplexBinding {
+public class SLDSelectedChannelTypeBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDSelectedChannelTypeBinding(StyleFactory styleFactory) {
@@ -98,26 +98,5 @@ public class SLDSelectedChannelTypeBinding implements ComplexBinding {
         return styleFactory.createSelectedChannelType((String) node.getChildValue(
                 "SourceChannelName"),
             (ContrastEnhancement) node.getChildValue("ContrastEnhancement"));
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

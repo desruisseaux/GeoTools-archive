@@ -63,7 +63,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDRuleBinding implements ComplexBinding {
+public class SLDRuleBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDRuleBinding(StyleFactory styleFactory) {
@@ -163,26 +163,5 @@ public class SLDRuleBinding implements ComplexBinding {
         rule.setSymbolizers((Symbolizer[]) syms.toArray(new Symbolizer[syms.size()]));
 
         return rule;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

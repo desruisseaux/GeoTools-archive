@@ -64,7 +64,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDTextSymbolizerBinding implements ComplexBinding {
+public class SLDTextSymbolizerBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDTextSymbolizerBinding(StyleFactory styleFactory) {
@@ -149,26 +149,5 @@ public class SLDTextSymbolizerBinding implements ComplexBinding {
         }
 
         return ts;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

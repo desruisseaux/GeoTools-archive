@@ -53,7 +53,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDFontBinding implements ComplexBinding {
+public class SLDFontBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDFontBinding(StyleFactory styleFactory) {
@@ -153,26 +153,5 @@ public class SLDFontBinding implements ComplexBinding {
         }
 
         return styleFactory.createFont(family, style, weight, size);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

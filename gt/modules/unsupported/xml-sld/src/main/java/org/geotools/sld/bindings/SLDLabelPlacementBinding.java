@@ -51,7 +51,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDLabelPlacementBinding implements ComplexBinding {
+public class SLDLabelPlacementBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDLabelPlacementBinding(StyleFactory styleFactory) {
@@ -107,26 +107,5 @@ public class SLDLabelPlacementBinding implements ComplexBinding {
         //      &lt;xsd:element ref="sld:LinePlacement"/&gt;
         //&lt;/xsd:choice&gt;
         return node.getChildValue(LabelPlacement.class);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

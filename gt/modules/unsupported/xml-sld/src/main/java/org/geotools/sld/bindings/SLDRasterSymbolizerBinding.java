@@ -68,7 +68,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDRasterSymbolizerBinding implements ComplexBinding {
+public class SLDRasterSymbolizerBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDRasterSymbolizerBinding(StyleFactory styleFactory) {
@@ -165,26 +165,5 @@ public class SLDRasterSymbolizerBinding implements ComplexBinding {
         }
 
         return rs;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

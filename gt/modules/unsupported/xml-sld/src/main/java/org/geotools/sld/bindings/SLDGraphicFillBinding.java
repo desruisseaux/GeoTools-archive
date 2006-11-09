@@ -49,7 +49,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDGraphicFillBinding implements ComplexBinding {
+public class SLDGraphicFillBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -95,26 +95,5 @@ public class SLDGraphicFillBinding implements ComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return node.getChildValue("Graphic");
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

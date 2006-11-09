@@ -58,7 +58,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDChannelSelectionBinding implements ComplexBinding {
+public class SLDChannelSelectionBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDChannelSelectionBinding(StyleFactory styleFactory) {
@@ -124,24 +124,5 @@ public class SLDChannelSelectionBinding implements ComplexBinding {
         cs.setRGBChannels(rgb);
 
         return cs;
-    }
-
-    /**
-     * <!-- begin-user-doc --> <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        // TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc --> <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        // TODO: implement
-        return null;
     }
 }

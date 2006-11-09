@@ -65,7 +65,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDStrokeBinding implements ComplexBinding {
+public class SLDStrokeBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDStrokeBinding(StyleFactory styleFactory) {
@@ -203,26 +203,5 @@ public class SLDStrokeBinding implements ComplexBinding {
 
         return styleFactory.createStroke(color, width, opacity, lineJoin, lineCap, dash,
             dashOffset, graphicFill, graphicStroke);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

@@ -60,7 +60,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDStyledLayerDescriptorBinding implements ComplexBinding {
+public class SLDStyledLayerDescriptorBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDStyledLayerDescriptorBinding(StyleFactory styleFactory) {
@@ -147,26 +147,5 @@ public class SLDStyledLayerDescriptorBinding implements ComplexBinding {
         //&lt;xsd:attribute name="version" type="xsd:string" use="required" fixed="1.0.0"/&gt;
         //TODO: no version?
         return sld;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

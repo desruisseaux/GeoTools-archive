@@ -49,7 +49,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class SLDExtentBinding implements ComplexBinding {
+public class SLDExtentBinding extends AbstractComplexBinding {
     StyleFactory styleFactory;
 
     public SLDExtentBinding(StyleFactory styleFactory) {
@@ -104,26 +104,5 @@ public class SLDExtentBinding implements ComplexBinding {
         String valu = (String) node.getChildValue("Value");
 
         return styleFactory.createExtent(name, valu);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }
