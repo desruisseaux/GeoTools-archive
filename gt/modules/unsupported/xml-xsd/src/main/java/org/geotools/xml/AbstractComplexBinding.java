@@ -15,7 +15,11 @@
  */
 package org.geotools.xml;
 
+import javax.xml.namespace.QName;
+
 import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -41,5 +45,46 @@ public abstract class AbstractComplexBinding implements ComplexBinding {
      */
     public int getExecutionMode() {
         return OVERRIDE;
+    }
+    
+    /**
+     * Performs the encoding of the object into its xml representation.
+     * <p>
+     * Complex objects are encoded as elements in a document, any attributes
+     * on the element must be created within this method. Child elements may
+     * also be created withing this method.
+     * </p>
+     * <p>
+     * The document containing the element may be used to create child
+     * nodes for the element (elements or attributes).
+     * </p>
+     *
+     * @param object The object being encoded.
+     * @param document The document containing the encoded element.
+     *
+     */
+    public Element encode(Object object, Document document, Element value) 
+    	throws Exception {
+    	
+    	return value;
+    }
+
+    /**
+     * Returns a child object which matches the specified qualified name.
+     *
+     * <p>This method should just return null in the event that the object being
+     * encoded is an leaf in its object model.</p>
+     *
+     * <p>This method should return an array in the event that the qualified
+     * name mapps to multiple children</p>
+     *
+     * @param object The object being encoded.
+     * @param name The name of the child.
+     *
+     * @return The childn to be encoded or null if no such child exists.
+     */
+    public Object getChild(Object object, QName name) {
+    	//do nothing, subclasses should override
+    	return null;
     }
 }

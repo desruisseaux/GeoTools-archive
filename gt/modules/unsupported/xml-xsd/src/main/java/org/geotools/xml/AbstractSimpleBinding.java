@@ -32,4 +32,18 @@ public abstract class AbstractSimpleBinding implements SimpleBinding {
     public int getExecutionMode() {
         return AFTER;
     }
+    
+    /**
+     * Performs the encoding of the object as a String.
+     *
+     * @param object The object being encoded, never null.
+     * @param value The string returned from another binding in the type
+     * hierachy, which could be null.
+     *
+     * @return A String representing the object.
+     */
+    public String encode(Object object, String value) throws Exception {
+    	//does nothing, subclasses should override
+    	return null;
+    }
 }

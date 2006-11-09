@@ -79,24 +79,27 @@ public interface ComplexBinding extends Binding {
 
     /**
      * Performs the encoding of the object into its xml representation.
+     *
      * <p>
      * Complex objects are encoded as elements in a document, any attributes
      * on the element must be created within this method. Child elements may
      * also be created withing this method.
      * </p>
+     *
      * <p>
      * The document containing the element may be used to create child
-     * nodes for the element (elements or attributes).
+     * nodes for the element (elements or attributes), or a new element for 
+     * the object itself.
      * </p>
      *
      * @param object The object being encoded.
-     * @param element The element representing the encoded object.
      * @param document The document containing the encoded element.
+     * @param value The object as encoded by the parent binding.
+     * 
+     * @return The element for the objcet being encoded, or <code>null</code>
      *
      */
-
-    //void encode(Object object, Element element, Document document) 
-    //	throws Exception;
+    Element encode(Object object, Document document, Element value) throws Exception;
 
     /**
      * Returns a child object which matches the specified qualified name.
@@ -112,6 +115,5 @@ public interface ComplexBinding extends Binding {
      *
      * @return The childn to be encoded or null if no such child exists.
      */
-
-    //Object getChild(Object object, QName name);
+    Object getChild(Object object, QName name);
 }

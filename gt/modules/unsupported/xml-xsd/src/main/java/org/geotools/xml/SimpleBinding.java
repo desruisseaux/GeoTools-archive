@@ -110,6 +110,5 @@ public interface SimpleBinding extends Binding {
      *
      * @return A String representing the object.
      */
-
-    //String encode(Object object, String value) throws Exception;
+    String encode(Object object, String value) throws Exception;
 }
