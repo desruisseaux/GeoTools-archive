@@ -35,7 +35,7 @@ public class TestConfiguration extends Configuration {
     }
 
     public String getSchemaFileURL() {
-        return getClass().getResource("AbstractFeatureTypeBindingTest.xsd").toString();
+        return getClass().getResource("test.xsd").toString();
     }
 
     public BindingConfiguration getBindingConfiguration() {
