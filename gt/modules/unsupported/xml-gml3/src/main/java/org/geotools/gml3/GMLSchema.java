@@ -15,6 +15,7 @@
  */
 package org.geotools.gml3;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
@@ -11682,7 +11683,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ABSTRACTGEOMETRYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("AbstractGeometryType", java.lang.Object.class);
+        .newAttributeType("AbstractGeometryType", Geometry.class);
 
     /**
      * <p>
