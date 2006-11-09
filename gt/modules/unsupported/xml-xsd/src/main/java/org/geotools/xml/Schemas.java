@@ -248,109 +248,42 @@ public class Schemas {
     }
 
     /**
-     * Returns a list of all child element declarations of the specified
-     * element.
+     * Returns a list of all child element particles that corresponde to element declarations of 
+     * the specified type.
      * <p>
-     *         The <code>includeParents</code> flag controls if this method should
+     * The <code>includeParents</code> flag controls if this method should
      * returns those elements defined on parent types.
      * </p>
-     * @param type           The parent element
-     * @param includeParents flag indicating if parent types should be processed
      * 
-     * @return A list of @link XSDElementDeclaration objects, one for each
-     * child element.
+     * @param type THe type.
+     * @param includeParents flag indicating if parent types should be processed
+     *  
+     * @return A list of {@link XSDParticle}.
      */
-    public static final List getChildElementDeclarations( XSDTypeDefinition type, 
-                                                          boolean includeParents) {
-        final ArrayList elements = new ArrayList();
+    public static final List getChildElementParticles( XSDTypeDefinition type, boolean includeParents ) {
+        final ArrayList particles = new ArrayList();
 
         TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
-                public boolean visit(XSDTypeDefinition type) {
-                    //simple types dont have children
-                    if (type instanceof XSDSimpleTypeDefinition) {
-                        return true;
-                    }
-
-                    XSDComplexTypeDefinition cType = (XSDComplexTypeDefinition) type;
-
-                    ElementVisitor visitor = new ElementVisitor() {
-                            public void visit(XSDParticle particle) {
-                                //element declaration, add to list
-                                XSDElementDeclaration decl = (XSDElementDeclaration) particle
-                                    .getContent();
-
-                                if (!decl.isElementDeclarationReference()) {
-                                    elements.add(decl);
-                                } else {
-                                    elements.add(decl
-                                        .getResolvedElementDeclaration());
-                                }
-                            }
-                        };
-
-                    visitElements(cType, visitor);
-
+            public boolean visit(XSDTypeDefinition type) {
+                //simple types dont have children
+                if (type instanceof XSDSimpleTypeDefinition) {
                     return true;
-
-                    //				
-                    //				//simple content cant define children
-                    //				if (cType.getContent() == null || 
-                    //						(cType.getContent() instanceof XSDSimpleTypeDefinition))
-                    //					return true;
-                    //						
-                    //				//use a queue to simulate the recursion
-                    //				LinkedList queue = new LinkedList();
-                    //				queue.addLast(cType.getContent());
-                    //				
-                    //				while(!queue.isEmpty()) {
-                    //					XSDParticle particle = (XSDParticle)queue.removeFirst();
-                    //					
-                    //					//analyze type of particle content
-                    //					int pType = XSDUtil.nodeType(particle.getElement()); 
-                    //					if (pType == XSDConstants.ELEMENT_ELEMENT) {
-                    //						//element declaration, add to list
-                    //						XSDElementDeclaration decl = 
-                    //							(XSDElementDeclaration)particle.getContent();
-                    //						
-                    //						if (!decl.isElementDeclarationReference())
-                    //							elements.add(decl);
-                    //						else  
-                    //							elements.add(decl.getResolvedElementDeclaration());
-                    //					}
-                    //					else {
-                    //						//model group
-                    //						XSDModelGroup grp = null;
-                    //						switch(pType) {
-                    //							case XSDConstants.GROUP_ELEMENT:
-                    //								XSDModelGroupDefinition grpDef 
-                    //									= (XSDModelGroupDefinition)particle.getContent();
-                    //								if (grpDef.isModelGroupDefinitionReference())
-                    //									grpDef = grpDef.getResolvedModelGroupDefinition();
-                    //								
-                    //								grp = grpDef.getModelGroup();
-                    //								
-                    //								break;
-                    //								
-                    //							case XSDConstants.CHOICE_ELEMENT:
-                    //							case XSDConstants.ALL_ELEMENT:
-                    //							case XSDConstants.SEQUENCE_ELEMENT:	
-                    //								grp = (XSDModelGroup) particle.getContent();
-                    //								break;
-                    //						}
-                    //						
-                    //						if (grp != null) {
-                    //							//enque all particles in the group
-                    //							List parts = grp.getParticles();
-                    //							for (Iterator itr = parts.iterator(); itr.hasNext();) {
-                    //								queue.addLast(itr.next());
-                    //							}
-                    //						}
-                    //					}
-                    //				} //while
-                    //				
-                    //				return true;
                 }
-            };
+
+                XSDComplexTypeDefinition cType = (XSDComplexTypeDefinition) type;
+
+                ElementVisitor visitor = new ElementVisitor() {
+                    public void visit(XSDParticle particle) {
+                    	//element declaration, add to list
+                    	particles.add( particle );
+                    }
+                };
+
+                visitElements(cType, visitor);
+
+                return true;
+            }
+        };
 
         if (includeParents) {
             //walk up the type hierarchy of the element to generate a list of 
@@ -362,7 +295,41 @@ public class Schemas {
             visitor.visit(type);
         }
 
-        return elements;
+        return particles;
+        
+    }
+    
+    /**
+     * Returns a list of all child element declarations of the specified
+     * type.
+     * <p>
+     *         The <code>includeParents</code> flag controls if this method should
+     * returns those elements defined on parent types.
+     * </p>
+     * @param type           The type
+     * @param includeParents flag indicating if parent types should be processed
+     * 
+     * @return A list of @link XSDElementDeclaration objects, one for each
+     * child element.
+     */
+    public static final List getChildElementDeclarations( XSDTypeDefinition type, 
+                                                          boolean includeParents) {
+    	
+    	List particles = getChildElementParticles( type, includeParents );
+    	List elements = new ArrayList();
+    	for ( Iterator p = particles.iterator(); p.hasNext(); ) {
+    		XSDParticle particle = (XSDParticle) p.next();
+    		XSDElementDeclaration decl = (XSDElementDeclaration) particle.getContent();
+
+	        if (decl.isElementDeclarationReference()) {
+	            decl = decl.getResolvedElementDeclaration();
+	        }
+	        
+	        elements.add( decl );
+    	}
+    	
+    
+    	return elements;
     }
 
     /**
