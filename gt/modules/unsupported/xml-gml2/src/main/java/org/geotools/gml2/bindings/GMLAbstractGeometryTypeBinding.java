@@ -54,7 +54,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class GMLAbstractGeometryTypeBinding implements ComplexBinding {
+public class GMLAbstractGeometryTypeBinding extends AbstractComplexBinding {
     Logger logger;
 
     public GMLAbstractGeometryTypeBinding(Logger logger) {
@@ -124,26 +124,5 @@ public class GMLAbstractGeometryTypeBinding implements ComplexBinding {
         }
 
         return value;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

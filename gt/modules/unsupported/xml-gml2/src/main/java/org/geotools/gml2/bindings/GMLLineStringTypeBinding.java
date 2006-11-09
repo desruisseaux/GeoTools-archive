@@ -57,7 +57,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class GMLLineStringTypeBinding implements ComplexBinding {
+public class GMLLineStringTypeBinding extends AbstractComplexBinding {
     CoordinateSequenceFactory csFactory;
     GeometryFactory gFactory;
 
@@ -143,26 +143,5 @@ public class GMLLineStringTypeBinding implements ComplexBinding {
         }
 
         throw new RuntimeException("Could not find coordinates to build linestring");
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

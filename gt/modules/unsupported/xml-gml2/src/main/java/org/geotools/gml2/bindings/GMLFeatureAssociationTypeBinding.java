@@ -55,7 +55,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class GMLFeatureAssociationTypeBinding implements ComplexBinding {
+public class GMLFeatureAssociationTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -103,26 +103,5 @@ public class GMLFeatureAssociationTypeBinding implements ComplexBinding {
         return node.getChildValue(Feature.class);
 
         //TODO: xlink and remoteSchema attributes, hard to do because of streaming
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

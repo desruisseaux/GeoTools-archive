@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -53,7 +53,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class GMLMultiGeometryPropertyTypeBinding implements ComplexBinding {
+public class GMLMultiGeometryPropertyTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -99,26 +99,5 @@ public class GMLMultiGeometryPropertyTypeBinding implements ComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return (GeometryCollection) value;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

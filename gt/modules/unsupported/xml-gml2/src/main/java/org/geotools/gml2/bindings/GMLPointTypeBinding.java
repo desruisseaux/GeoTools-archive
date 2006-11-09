@@ -22,7 +22,7 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -56,7 +56,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class GMLPointTypeBinding implements ComplexBinding {
+public class GMLPointTypeBinding extends AbstractComplexBinding {
     GeometryFactory gFactory;
 
     public GMLPointTypeBinding(GeometryFactory gFactory) {
@@ -120,26 +120,5 @@ public class GMLPointTypeBinding implements ComplexBinding {
         }
 
         throw new RuntimeException("Could not find a coordinate");
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

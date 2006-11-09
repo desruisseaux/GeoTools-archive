@@ -54,7 +54,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class GMLPolygonTypeBinding implements ComplexBinding {
+public class GMLPolygonTypeBinding extends AbstractComplexBinding {
     GeometryFactory gFactory;
 
     public GMLPolygonTypeBinding(GeometryFactory gFactory) {
@@ -116,26 +116,5 @@ public class GMLPolygonTypeBinding implements ComplexBinding {
         }
 
         return gFactory.createPolygon(shell, holes);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

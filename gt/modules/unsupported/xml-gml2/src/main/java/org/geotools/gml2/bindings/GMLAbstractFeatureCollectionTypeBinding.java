@@ -50,7 +50,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class GMLAbstractFeatureCollectionTypeBinding implements ComplexBinding {
+public class GMLAbstractFeatureCollectionTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */

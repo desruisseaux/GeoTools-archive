@@ -76,7 +76,7 @@ import org.geotools.xs.bindings.XS;
  *
  * @generated
  */
-public class GMLAbstractFeatureTypeBinding implements ComplexBinding {
+public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
     //JD: TODO: This should be part of the framework, make it part of the binding
     // class to publish the type of objects they create
     //JD: Why not just use Binding#getType() ?

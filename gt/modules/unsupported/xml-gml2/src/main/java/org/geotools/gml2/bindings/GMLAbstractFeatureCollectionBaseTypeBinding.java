@@ -54,7 +54,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class GMLAbstractFeatureCollectionBaseTypeBinding implements ComplexBinding {
+public class GMLAbstractFeatureCollectionBaseTypeBinding extends AbstractComplexBinding {
     FeatureCollections fcFactory;
 
     public GMLAbstractFeatureCollectionBaseTypeBinding(FeatureCollections fcFactory) {

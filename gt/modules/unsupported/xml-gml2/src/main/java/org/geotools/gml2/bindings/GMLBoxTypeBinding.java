@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -57,7 +57,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class GMLBoxTypeBinding implements ComplexBinding {
+public class GMLBoxTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -136,26 +136,5 @@ public class GMLBoxTypeBinding implements ComplexBinding {
         }
 
         throw new RuntimeException("Could not find coordinates for envelope");
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

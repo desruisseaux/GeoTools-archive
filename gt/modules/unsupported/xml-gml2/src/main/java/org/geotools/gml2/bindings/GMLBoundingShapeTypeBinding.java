@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Envelope;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -51,7 +51,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class GMLBoundingShapeTypeBinding implements ComplexBinding {
+public class GMLBoundingShapeTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -107,26 +107,5 @@ public class GMLBoundingShapeTypeBinding implements ComplexBinding {
 
         //has to be a valid bounding box
         return (Envelope) node.getChildValue(0);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

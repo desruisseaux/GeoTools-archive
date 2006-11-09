@@ -22,7 +22,7 @@ import java.util.Iterator;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -57,7 +57,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class GMLGeometryAssociationTypeBinding implements ComplexBinding {
+public class GMLGeometryAssociationTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -105,26 +105,5 @@ public class GMLGeometryAssociationTypeBinding implements ComplexBinding {
         throws Exception {
         //TODO: xlink and remoteSchema attributes, hard to do because of streaming
         return node.getChildValue(Geometry.class);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

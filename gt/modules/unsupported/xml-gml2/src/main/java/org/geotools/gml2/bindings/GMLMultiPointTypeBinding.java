@@ -54,7 +54,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class GMLMultiPointTypeBinding implements ComplexBinding {
+public class GMLMultiPointTypeBinding extends AbstractComplexBinding {
     GeometryFactory gFactory;
 
     public GMLMultiPointTypeBinding(GeometryFactory gFactory) {
@@ -113,26 +113,5 @@ public class GMLMultiPointTypeBinding implements ComplexBinding {
         }
 
         return gFactory.createMultiPoint(points);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

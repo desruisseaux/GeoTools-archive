@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -52,7 +52,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class GMLCoordTypeBinding implements ComplexBinding {
+public class GMLCoordTypeBinding extends AbstractComplexBinding {
     CoordinateSequenceFactory csFactory;
 
     public GMLCoordTypeBinding(CoordinateSequenceFactory csFactory) {
@@ -135,26 +135,5 @@ public class GMLCoordTypeBinding implements ComplexBinding {
         }
 
         return seq;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

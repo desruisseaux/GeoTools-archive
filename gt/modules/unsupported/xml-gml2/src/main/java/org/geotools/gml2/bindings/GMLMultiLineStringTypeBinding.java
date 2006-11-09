@@ -55,7 +55,7 @@ import org.geotools.xml.*;
  *
  * @generated
  */
-public class GMLMultiLineStringTypeBinding implements ComplexBinding {
+public class GMLMultiLineStringTypeBinding extends AbstractComplexBinding {
     GeometryFactory gFactory;
 
     public GMLMultiLineStringTypeBinding(GeometryFactory gFactory) {
@@ -114,26 +114,5 @@ public class GMLMultiLineStringTypeBinding implements ComplexBinding {
         }
 
         return gFactory.createMultiLineString(lines);
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }

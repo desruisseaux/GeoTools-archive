@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.xml.*;
-import org.geotools.xml.ComplexBinding;
+import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -54,7 +54,7 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class GMLPolygonPropertyTypeBinding implements ComplexBinding {
+public class GMLPolygonPropertyTypeBinding extends AbstractComplexBinding {
     /**
      * @generated
      */
@@ -101,26 +101,5 @@ public class GMLPolygonPropertyTypeBinding implements ComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return (Polygon) value;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void encode(Object object, Element element, Document document) {
-        //TODO: implement
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public Object getChild(Object object, QName name) {
-        //TODO: implement
-        return null;
     }
 }
