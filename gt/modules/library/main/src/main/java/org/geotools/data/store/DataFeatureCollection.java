@@ -474,7 +474,6 @@ public abstract class DataFeatureCollection implements FeatureCollection {
                 while( reader.hasNext() ){
                     Feature feature = reader.next();
                     Feature copy = schema.duplicate( feature );
-                    copy.setParent( this );
                     list.add( copy );
                 }
                 return list;
@@ -515,7 +514,6 @@ public abstract class DataFeatureCollection implements FeatureCollection {
                     feature = (Feature) i.next();    
                     
                     Feature newFeature = writer.next(); // grab a "new" Feature
-                    newFeature.setParent( this );
                     Object values[] = feature.getAttributes( null );
                     for( int a=0; a<values.length; a++){
                         newFeature.setAttribute( a, values[a] );                        

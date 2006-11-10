@@ -20,8 +20,6 @@ package org.geotools.renderer.lite;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import java.util.List;
@@ -30,8 +28,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -194,27 +190,42 @@ public class CustomGlyphRenderer implements GlyphRenderer {
         Graphics2D imageGraphic;
         
         //calculate maximum value of barHeight + barUncertainty & use that instead of "barHeight + barUncertainty"
-        if (!maxFound){
-            maxFound = true;
-            FeatureCollection fc = feature.getParent();
-            FeatureIterator features = fc.features();
-            while (features.hasNext()){
-                Feature next = features.next();
-                Expression tempExp = (Expression) list.getPropertyValue("bar height");
-                int temp1 = 0;
-                if (tempExp != null){
-                    temp1 = ((Number) tempExp.getValue(next)).intValue();
-                }
-                tempExp = (Expression) list.getPropertyValue("bar uncertainty");
-                int temp2 = 0;
-                if (tempExp != null){
-                    temp2 = ((Number) tempExp.getValue(next)).intValue();
-                }
-                if (temp1 + temp2 > maxBarHeight){
-                    maxBarHeight = temp1 + temp2;
-                }
-            }
+        Expression tempExp = (Expression) list.getPropertyValue("bar height");
+        int temp1 = 0;
+        if (tempExp != null){
+            temp1 = ((Number) tempExp.getValue(feature)).intValue();
         }
+        tempExp = (Expression) list.getPropertyValue("bar uncertainty");
+        int temp2 = 0;
+        if (tempExp != null){
+            temp2 = ((Number) tempExp.getValue(feature)).intValue();
+        }
+        if (temp1 + temp2 > maxBarHeight){
+            maxBarHeight = temp1 + temp2;
+        }
+        
+//chorner: feature.getParent is no more... is this needed?        
+//        if (!maxFound){
+//            maxFound = true;
+//            FeatureCollection fc = feature.getParent();
+//            FeatureIterator features = fc.features();
+//            while (features.hasNext()){
+//                Feature next = features.next();
+//                Expression tempExp = (Expression) list.getPropertyValue("bar height");
+//                int temp1 = 0;
+//                if (tempExp != null){
+//                    temp1 = ((Number) tempExp.getValue(next)).intValue();
+//                }
+//                tempExp = (Expression) list.getPropertyValue("bar uncertainty");
+//                int temp2 = 0;
+//                if (tempExp != null){
+//                    temp2 = ((Number) tempExp.getValue(next)).intValue();
+//                }
+//                if (temp1 + temp2 > maxBarHeight){
+//                    maxBarHeight = temp1 + temp2;
+//                }
+//            }
+//        }
         
         circleCenterX = Math.max(pointerLength, radius);
         circleCenterY = Math.max(maxBarHeight, Math.max(pointerLength, radius));

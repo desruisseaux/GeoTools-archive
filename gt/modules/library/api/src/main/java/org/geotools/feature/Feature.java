@@ -149,24 +149,6 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public interface Feature {
     /**
-     * Gets the feature collection this feature is stored in.
-     *
-     * @deprecated Please don't use, a Feature can be in more then one collection
-     * @return The collection that is the parent of this feature.
-     */
-    FeatureCollection getParent();
-
-    /**
-     * Sets the parent collection this feature is stored in, if it is not
-     * already set.  If it is set then this method does nothing.
-     *
-     * NOTE: Please don't use, a Feature can be in more then on collection
-     *
-     * @param collection the collection to be set as parent.
-     */
-    void setParent(FeatureCollection collection);
-
-    /**
      * Gets a reference to the schema for this feature.
      *
      * @return A reference to this feature's schema.

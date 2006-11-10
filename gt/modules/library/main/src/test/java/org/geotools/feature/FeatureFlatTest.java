@@ -153,15 +153,6 @@ public class FeatureFlatTest extends TestCase {
         assertTrue("Clone was not equal", feature.equals(clone));
     }
 
-    public void testOneWayCollectionMembership() {
-        Feature f = SampleFeatureFixtures.createFeature();
-        FeatureCollection fc = FeatureCollections.newCollection();
-        f.setParent(fc);
-        assertNotNull(f.getParent());
-        f.setParent(FeatureCollections.newCollection());
-        assertSame(f.getParent(), fc);
-    }
-
     public void testToStringWontThrow() throws IllegalAttributeException {
         SimpleFeature f = (SimpleFeature)SampleFeatureFixtures.createFeature();
         f.setAttributes(new Object[f.getNumberOfAttributes()]);

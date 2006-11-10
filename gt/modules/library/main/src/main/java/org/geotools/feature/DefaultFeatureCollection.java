@@ -218,7 +218,6 @@ public class DefaultFeatureCollection implements FeatureCollection {
         				" mix of features");
         }
         //TODO check inheritance with FeatureType here!!!
-        feature.setParent(this);        
         contents.put( ID, feature );
         if(fire) {
                 fireChange(feature, CollectionEvent.FEATURES_ADDED);
@@ -637,7 +636,6 @@ public class DefaultFeatureCollection implements FeatureCollection {
             contents.clear();
             for( Iterator i = nw.iterator(); i.hasNext(); ){
                 Feature feature = (Feature) i.next();    
-                feature.setParent( this );
                 contents.put( feature.getID(), feature );
             }
 			fireChange(nw,0);

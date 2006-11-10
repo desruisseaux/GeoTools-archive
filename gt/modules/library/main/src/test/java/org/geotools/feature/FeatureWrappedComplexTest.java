@@ -161,15 +161,6 @@ public class FeatureWrappedComplexTest extends TestCase {
         }
     }
 
-    public void testOneWayCollectionMembership() {
-        Feature f = testFeature;
-        FeatureCollection fc = FeatureCollections.newCollection();
-        f.setParent(fc);
-        assertNotNull(f.getParent());
-        f.setParent(FeatureCollections.newCollection());
-        assertSame(f.getParent(), fc);
-    }
-
     public void testEquals() throws Exception {
         //todo
     }

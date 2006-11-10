@@ -184,9 +184,6 @@ public abstract class FeatureState {
             try {
 	            while( i.hasNext() ){
 	                Feature feature = (Feature) i.next();                
-	                if( data instanceof FeatureCollection ){
-	                	feature.setParent( (FeatureCollection) data );
-	                }
 	                data.add( feature );
 	            }
             }

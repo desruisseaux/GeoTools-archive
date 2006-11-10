@@ -129,17 +129,10 @@ public class Collection_SumFunction extends FunctionExpressionImpl
     }
 
     public Object evaluate(Feature feature) {
-		FeatureCollection featureCollection;
-
-		if (feature instanceof FeatureCollection) {
-			featureCollection = (FeatureCollection) feature;
-		} else {
-			featureCollection = feature.getParent();
-		}
-		if (featureCollection == null) {
-			// we don't got no parent
+		if (feature == null) {
 			return new Integer(0); // no features were visited in the making of this answer
 		}
+		FeatureCollection featureCollection = (FeatureCollection) feature;
 		synchronized (featureCollection) {
 			if (featureCollection != previousFeatureCollection) {
 				previousFeatureCollection = featureCollection;
