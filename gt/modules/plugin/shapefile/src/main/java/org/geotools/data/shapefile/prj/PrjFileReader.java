@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.CharBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
@@ -27,6 +28,7 @@ import java.nio.charset.CharsetDecoder;
 
 import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.resources.NIOUtilities;
 import org.opengis.referencing.FactoryException;
 
 
@@ -116,6 +118,13 @@ public class PrjFileReader {
     }
     
     public void close() throws IOException {
+        if( buffer!=null ){
+            if( buffer instanceof MappedByteBuffer ){
+                NIOUtilities.clean(buffer);
+            }
+            buffer=null;
+        }
+
     	if( channel.isOpen()){
     		channel.close();
     		streamLogger.close();

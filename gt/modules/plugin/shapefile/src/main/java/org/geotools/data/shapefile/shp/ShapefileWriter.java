@@ -100,6 +100,8 @@ public class ShapefileWriter {
    */ 
   private void checkShapeBuffer(int size) {
     if (shapeBuffer.capacity() < size) {
+        if( shapeBuffer!=null )
+            NIOUtilities.clean(shapeBuffer);
         shapeBuffer = ByteBuffer.allocateDirect(size);
     }
   }

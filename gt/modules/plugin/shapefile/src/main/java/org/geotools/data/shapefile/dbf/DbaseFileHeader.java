@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.resources.NIOUtilities;
+
 /** Class to represent the header of a Dbase III file.
  * Creation date: (5/15/2001 5:15:30 PM)
  * @source $URL$
@@ -452,6 +454,7 @@ public class DbaseFileHeader {
     
     // if the header is bigger than our 1K, reallocate
     if (headerLength > in.capacity()) {
+        NIOUtilities.clean( in );
       in = ByteBuffer.allocateDirect(headerLength - 10);
     }
     in.limit(headerLength - 10);
@@ -519,6 +522,7 @@ public class DbaseFileHeader {
     //in.skipBytes(1);
     in.position(in.position() + 1);
     
+    NIOUtilities.clean(in);
     
     fields = new DbaseField[lfields.size()];
     fields = (DbaseField[]) lfields.toArray(fields);
@@ -614,6 +618,8 @@ public class DbaseFileHeader {
     while ( (r-= out.write(buffer)) > 0) {
       ; // do nothing
     }
+    
+    NIOUtilities.clean(buffer);
   }
   
   /** Get a simple representation of this header.

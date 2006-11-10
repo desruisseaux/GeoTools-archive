@@ -182,6 +182,7 @@ public class ShapefileReader {
 		buffer.flip();
 		ShapefileHeader header = new ShapefileHeader();
 		header.read(buffer, strict);
+                NIOUtilities.clean(buffer);
 		return header;
 	}
 
@@ -424,6 +425,7 @@ public class ShapefileReader {
 				// ensure enough capacity for one more record header
 				buffer = ensureCapacity(buffer, recordLength + 8, useMemoryMappedBuffer);
 				buffer.put(old);
+                                NIOUtilities.clean(old);
 				fill(buffer, channel);
 				buffer.position(0);
 			} else

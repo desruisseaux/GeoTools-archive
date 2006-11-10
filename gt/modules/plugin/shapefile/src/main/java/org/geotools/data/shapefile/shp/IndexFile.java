@@ -114,6 +114,8 @@ public class IndexFile {
 	    buffer.flip();
 	    header = new ShapefileHeader();
 	    header.read(buffer, true);
+            
+            NIOUtilities.clean(buffer);
 	  }
 	  
 	  private void readRecords(ReadableByteChannel channel) throws IOException {
@@ -128,6 +130,7 @@ public class IndexFile {
 	    content = new int[ records ];
 	    IntBuffer ints = buffer.asIntBuffer();
 	    ints.get(content);
+            NIOUtilities.clean(buffer);
 	  }
 	  
 	  private void readRecord(int index) throws IOException {

@@ -17,9 +17,11 @@ package org.geotools.data.shapefile.indexed;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+
 import org.geotools.data.shapefile.StreamLogging;
-import org.geotools.data.shapefile.shp.IndexFile;
+import org.geotools.resources.NIOUtilities;
 
 /**
  * The Writer writes out the fid and record number of features to the fid
@@ -133,7 +135,15 @@ public class IndexedFidWriter {
             writeHeader();
         } finally {
             try{
-                channel.close();
+
+                if( writeBuffer!=null ){
+                    if( writeBuffer instanceof MappedByteBuffer ){
+                        NIOUtilities.clean(writeBuffer);
+                    }
+                }
+
+                if( channel.isOpen() )
+                    channel.close();
                 streamLogger.close();
             }finally{
                 reader.close();

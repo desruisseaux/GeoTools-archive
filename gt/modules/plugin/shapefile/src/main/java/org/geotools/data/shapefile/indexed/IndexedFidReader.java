@@ -17,6 +17,7 @@ package org.geotools.data.shapefile.indexed;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.NoSuchElementException;
@@ -25,6 +26,7 @@ import java.util.logging.Logger;
 import org.geotools.data.FIDReader;
 import org.geotools.data.shapefile.StreamLogging;
 import org.geotools.data.shapefile.shp.ShapefileReader;
+import org.geotools.resources.NIOUtilities;
 
 
 /**
@@ -221,11 +223,16 @@ public class IndexedFidReader implements FIDReader {
 
     public void close() throws IOException {
         try {
+            if( buffer!=null ){
+                if( buffer instanceof MappedByteBuffer ){
+                    NIOUtilities.clean(buffer);
+                }
+            }
             if (reader != null)
                 reader.close();
         } finally {
-            readChannel.close();
-            streamLogger.close();
+                readChannel.close();
+                streamLogger.close();
         }
     }
 
