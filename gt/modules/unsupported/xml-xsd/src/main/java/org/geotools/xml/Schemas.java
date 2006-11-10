@@ -173,7 +173,8 @@ public class Schemas {
     	
         //check for case of file url, make sure it is an absolute reference
         if (new File(location).exists()) {
-            location = new File(location).getCanonicalPath();
+        	location = new File( location ).getCanonicalFile().toURI().toString();
+            //location = new File(location).getCanonicalPath();
         }
 
         URI uri = URI.createURI(location);
