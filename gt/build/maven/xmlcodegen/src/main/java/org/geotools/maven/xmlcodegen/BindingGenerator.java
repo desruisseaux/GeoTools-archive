@@ -180,7 +180,7 @@ public class BindingGenerator extends AbstractGenerator {
     }
 
     boolean target(XSDNamedComponent c, XSDSchema schema) {
-        return c.getTargetNamespace().equals(schema.getTargetNamespace());
+    	return c.getTargetNamespace().equals(schema.getTargetNamespace());
     }
 
     void generate(XSDNamedComponent c, XSDSchema schema) {

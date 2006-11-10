@@ -21,6 +21,10 @@ import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.Schemas;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -43,16 +47,27 @@ public class SchemaLocationResolverGenerator extends AbstractGenerator {
         ArrayList includes = new ArrayList();
         ArrayList namespaces = new ArrayList();
 
-        includes.add(new File(schema.getSchemaLocation()));
+        try {
+			includes.add(new File(new URI(schema.getSchemaLocation())));
+		} 
+        catch (URISyntaxException e1) {
+        	throw new RuntimeException ( e1 );
+		}
         namespaces.add(schema.getTargetNamespace());
 
         List included = Schemas.getIncludes(schema);
 
         for (Iterator i = included.iterator(); i.hasNext();) {
             XSDInclude include = (XSDInclude) i.next();
-
-            includes.add(new File(include.getSchemaLocation()));
-            namespaces.add(include.getSchema().getTargetNamespace());
+            
+            try {
+				includes.add(new File(new URI(include.getSchemaLocation())));
+			} 
+            catch (URISyntaxException e) {
+            	throw new RuntimeException( e );
+			}
+			 
+			namespaces.add(include.getSchema().getTargetNamespace());
         }
 
         try {

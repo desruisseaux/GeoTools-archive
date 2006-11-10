@@ -302,8 +302,8 @@ public class BindingGeneratorMojo extends AbstractMojo {
 		
 		//schema location resolver
 		if ( generateSchemaLocationResolver ) {
-			getLog().info( "Generating schema location resolver...");
 			SchemaLocationResolverGenerator slrg = new SchemaLocationResolverGenerator();
+			getLog().info( "Generating schema location resolver to " + outputDirectory.getAbsolutePath() );
 			slrg.setLocation( outputDirectory.getAbsolutePath() );
 			slrg.setOverwriting( overwriteExistingFiles );
 			slrg.setPackageBase( destinationPackage );

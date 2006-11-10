@@ -150,6 +150,8 @@ public abstract class AbstractGenerator {
     protected void copy(File file) throws IOException {
         File dest = new File(outputLocation(), file.getName());
 
+        logger.info( "Copying " + file + " to " + dest );
+        
         //check for existing file
         if (dest.exists() && !overwriting) {
             logger.warning("Generated file: " + dest + " already exists.");
