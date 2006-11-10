@@ -42,25 +42,19 @@ import javax.vecmath.MismatchedSizeException;
  *
  * @author jezekjan
  */
-public class ParamCalculatorTest extends TestCase {
+public class MathTransformBuilderTest extends TestCase {
     /**
      * Run the suite from the command line.
-     *
-     * @param args
      */
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(ParamCalculatorTest.class);
+        junit.textui.TestRunner.run(suite());
     }
 
     /**
      * Returns the test suite.
-     *
-     * @return test suite
      */
     public static Test suite() {
-        TestSuite suite = new TestSuite(ParamCalculatorTest.class);
-
-        return suite;
+        return new TestSuite(MathTransformBuilderTest.class);
     }
 
     /**
@@ -134,7 +128,11 @@ public class ParamCalculatorTest extends TestCase {
         MathTransformBuilder ppc = new RubberSheetBuilder(ptSrc, ptDst, quad);
 
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
-        assertTrue(ppc.getStandardDeviation() < 0.00001);
+        assertTrue(ppc.getErrorStatistics().rms() < 0.00001);
+
+        // Tests the formatting, but do not display to console for not polluting
+        // the output device. We just check that at least one axis title is there.
+        assertTrue(ppc.toString().indexOf(" x ") >= 0);
     }
 
     public void testProjectiveCalculator() throws MismatchedSizeException,
@@ -145,7 +143,7 @@ public class ParamCalculatorTest extends TestCase {
         MathTransformBuilder ppc = new ProjectiveTransformBuilder(ptSrc, ptDst);
         //System.out.println(ppc.getMathTransform().toWKT());
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
-        assertTrue(ppc.getStandardDeviation() < 0.00001);
+        assertTrue(ppc.getErrorStatistics().rms() < 0.00001);
     }
 
     public void testAffineCalculator() throws MismatchedSizeException,
@@ -155,7 +153,7 @@ public class ParamCalculatorTest extends TestCase {
         DirectPosition[] ptDst = generateCoords(3, 2312);
         MathTransformBuilder ppc = new AffineTransformBuilder(ptSrc, ptDst);
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
-        assertTrue(ppc.getStandardDeviation() < 0.00001);
+        assertTrue(ppc.getErrorStatistics().rms() < 0.00001);
     }
 
     public void testSimilarCalculator() throws MismatchedSizeException,
@@ -166,12 +164,12 @@ public class ParamCalculatorTest extends TestCase {
         MathTransformBuilder ppc = new SimilarTransformBuilder(ptSrc, ptDst);
         //System.out.println(ppc.getMMatrix());
         transformTest(ppc.getMathTransform(), ptSrc, ptDst);
-        assertTrue(ppc.getStandardDeviation() < 0.00001);
+        assertTrue(ppc.getErrorStatistics().rms() < 0.00001);
     }
 
     public void testCalculationException() throws TransformException {
         // The exception should be thrown when the number of points is not the same
-        DirectPosition[] ptSrc = generateCoords(2);
+        DirectPosition[] ptSrc = generateCoords(4);
         DirectPosition[] ptDst = generateCoords(3);
 
         try {
@@ -192,7 +190,7 @@ public class ParamCalculatorTest extends TestCase {
 
         // The exception should be thrown when the CRS of all points is not the same
         ptSrc = generateCoords(4);
-        ptSrc[0] = new DirectPosition2D(12, 12);
+        ptSrc[0] = new DirectPosition2D(DefaultGeographicCRS.WGS84);
         ptDst = generateCoords(4);
 
         try {

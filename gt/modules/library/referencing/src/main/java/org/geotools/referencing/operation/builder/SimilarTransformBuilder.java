@@ -51,18 +51,14 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
     /**
      * Creates SimilarTransformBuilder for the set of properties.
-     * 
-     * 
+     *
      * @param sourcePoints Set of source points
      * @param targetPoints Set of destination points
      */
     public SimilarTransformBuilder(DirectPosition[] ptSrc, DirectPosition[] ptDst)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        this.targetPoints = ptDst;
-        this.sourcePoints = ptSrc;
-
-        checkPoints();
-        super.checkCRS();
+        setTargetPoints(ptDst);
+        setSourcePoints(ptSrc);
     }
 
     /**
@@ -79,7 +75,8 @@ public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
      * @return double array of parameters
      */
     public double[] generateMMatrix() {
-        //super.checkPoints(2 , 2);
+        final DirectPosition[] sourcePoints = getSourcePoints();
+        final DirectPosition[] targetPoints = getTargetPoints();
         GeneralMatrix A = new GeneralMatrix(2 * sourcePoints.length, 4);
         GeneralMatrix X = new GeneralMatrix(2 * sourcePoints.length, 1);
 

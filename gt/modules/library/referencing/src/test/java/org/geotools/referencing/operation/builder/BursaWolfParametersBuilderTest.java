@@ -31,25 +31,19 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 
-public class BursaWolfParamCalculatorTest extends TestCase {
+public class BursaWolfParametersBuilderTest extends TestCase {
 	/**
      * Run the suite from the command line.
-     *
-     * @param args
      */
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(BursaWolfParamCalculatorTest.class);
+        junit.textui.TestRunner.run(suite());
     }
 
     /**
      * Returns the test suite.
-     *
-     * @return test suite
      */
     public static Test suite() {
-        TestSuite suite = new TestSuite(BursaWolfParamCalculatorTest.class);
-
-        return suite;
+        return new TestSuite(BursaWolfParametersBuilderTest.class);
     }
 
     /**
@@ -152,6 +146,6 @@ public class BursaWolfParamCalculatorTest extends TestCase {
         assertEquals(BWPT.getBursaWolfParameters(null).ez, bwp.ez, 1E-2);
         assertEquals(BWPT.getBursaWolfParameters(null).ppm, bwp.ppm, 1E-2);
 
-        assertEquals(BWPT.getStandardDeviation(), 0, 1E-2);
+        assertEquals(BWPT.getErrorStatistics().rms(), 0, 1E-2);
     }
 }

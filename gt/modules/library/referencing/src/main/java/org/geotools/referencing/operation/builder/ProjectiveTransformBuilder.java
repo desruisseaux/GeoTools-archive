@@ -18,9 +18,9 @@ package org.geotools.referencing.operation.builder;
 // J2SE and extensions
 import javax.vecmath.MismatchedSizeException;
 
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -68,12 +68,8 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
      */
     public ProjectiveTransformBuilder(DirectPosition[] ptSrc, DirectPosition[] ptDst)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        this.targetPoints = ptDst;
-        this.sourcePoints = ptSrc;
-
-        checkPoints();
-
-        checkCRS();
+        setTargetPoints(ptDst);
+        setSourcePoints(ptSrc);
     }
 
     /**
@@ -86,17 +82,11 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Checking of the Coordinate Reference System.
-     *
-     * @throws MismatchedReferenceSystemException if the system is not the
-     *         {@linkplain DefaultEngineeringCRS}.
+     * Returns the required coordinate system type, which is
+     * {@linkplain CartesianCS cartesian CS}.
      */
-    protected void checkCRS() throws MismatchedReferenceSystemException {
-        if ((targetPoints[0].getCoordinateReferenceSystem() != DefaultEngineeringCRS.CARTESIAN_2D)
-                && (targetPoints[0].getCoordinateReferenceSystem() != null)) {
-            throw new MismatchedReferenceSystemException(
-                "DefaultEngineeringCRS.CARTESIAN_2D is expected for this method");
-        }
+    public Class/*<? extends CartesianCS>*/ getCoordinateSystemType() {
+        return CartesianCS.class;
     }
 
     /**
@@ -106,7 +96,8 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
      * @return double array of parameters
      */
     protected double[] generateMMatrix() {
-        // super.checkPoints(3, 2);
+        final DirectPosition[] sourcePoints = getSourcePoints();
+        final DirectPosition[] targetPoints = getTargetPoints();
         GeneralMatrix A = new GeneralMatrix(2 * sourcePoints.length, 8);
         GeneralMatrix X = new GeneralMatrix(2 * sourcePoints.length, 1);
 

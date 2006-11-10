@@ -73,10 +73,9 @@ public class RubberSheetBuilder extends MathTransformBuilder {
     public RubberSheetBuilder(DirectPosition[] ptSrc,
         DirectPosition[] ptDst, Quadrilateral quad)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException, TriangulationException {
-        this.targetPoints = ptDst;
-        this.sourcePoints = ptSrc;
+        setTargetPoints(ptDst);
+        setSourcePoints(ptSrc);
 
-        checkPoints();
         checkQuad(quad);
 
         MappedPosition[] vectors = new MappedPosition[ptSrc.length];
@@ -110,7 +109,13 @@ public class RubberSheetBuilder extends MathTransformBuilder {
      * @throws MismatchedReferenceSystemException
      */
     private void checkQuad(Quadrilateral quad) throws MismatchedReferenceSystemException {
-        CoordinateReferenceSystem crs = sourcePoints[0].getCoordinateReferenceSystem();
+        CoordinateReferenceSystem crs;
+        try {
+            crs = getSourceCRS();
+        } catch (FactoryException e) {
+            // Can't fetch the CRS. Use the one from the first quad point instead.
+            crs = quad.p0.getCoordinateReferenceSystem();
+        }
 
         if ((quad.p0.getCoordinateReferenceSystem() != crs)
                 || (quad.p1.getCoordinateReferenceSystem() != crs)

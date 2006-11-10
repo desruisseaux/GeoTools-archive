@@ -18,11 +18,11 @@ package org.geotools.referencing.operation.builder;
 // J2SE and extensions
 import javax.vecmath.MismatchedSizeException;
 
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.GeocentricTranslation;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.DirectPosition;
@@ -84,11 +84,8 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      */
     public BursaWolfParametersBuilder(DirectPosition[] ptsSrc,
         DirectPosition[] ptsDst) throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        this.sourcePoints = ptsSrc;
-        this.targetPoints = ptsDst;
-
-        checkPoints();
-        checkCRS();
+        setSourcePoints(ptsSrc);
+        setTargetPoints(ptsDst);
 
         x = new GeneralMatrix(ptsSrc.length, 3);
         X = new GeneralMatrix(ptsSrc.length, 3);
@@ -113,20 +110,11 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Checking of the Coordinate Reference System of the {@linkplain
-     * MathTransformBuilder#sourcePoints} and the {@linkplain
-     * MathTransformBuilder#targetPoints}.
-     * 
-     * 
-     * 
-     * @throws MismatchedReferenceSystemException if the CRS is wrong.
+     * Returns the required coordinate system type, which is
+     * {@linkplain CartesianCS cartesian CS}.
      */
-    protected void checkCRS() throws MismatchedReferenceSystemException {
-        if ((targetPoints[0].getCoordinateReferenceSystem() != DefaultEngineeringCRS.CARTESIAN_3D)
-                && (targetPoints[0].getCoordinateReferenceSystem() != null)) {
-            throw new MismatchedReferenceSystemException(
-                "DefaultEngineeringCRS.CARTESIAN_3D is expected for this method");
-        }
+    public Class/*<? extends CartesianCS>*/ getCoordinateSystemType() {
+        return CartesianCS.class;
     }
 
     /**
@@ -135,6 +123,8 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      * @return x matrix.
      */
     protected GeneralMatrix getx() {
+        final DirectPosition[] sourcePoints = getSourcePoints();
+        final DirectPosition[] targetPoints = getTargetPoints();
         GeneralMatrix x = new GeneralMatrix(3 * sourcePoints.length, 1);
 
         for (int j = 0; j < (x.getNumRow()); j = j + 3) {
@@ -152,6 +142,8 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      * @return the X matrix
      */
     protected GeneralMatrix getX() {
+        final DirectPosition[] sourcePoints = getSourcePoints();
+        final DirectPosition[] targetPoints = getTargetPoints();
         GeneralMatrix X = new GeneralMatrix(3 * sourcePoints.length, 1);
 
         for (int j = 0; j < (X.getNumRow()); j = j + 3) {
@@ -305,7 +297,7 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      * @return the l matrix.
      */
     protected GeneralMatrix getl() {
-        GeneralMatrix l = new GeneralMatrix(3 * sourcePoints.length, 1);
+        GeneralMatrix l = new GeneralMatrix(3 * getMappedPositions().size(), 1);
         GeneralMatrix R = new GeneralMatrix(3, 3);
         GeneralMatrix T = new GeneralMatrix(3, 1, new double[] { -dx, -dy, -dz });
         GeneralMatrix qMatrix = new GeneralMatrix(1, 1, new double[] { q });
@@ -330,7 +322,7 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      * @return matrix
      */
     protected GeneralMatrix specialMul(GeneralMatrix R, GeneralMatrix x) {
-        GeneralMatrix dRx = new GeneralMatrix(3 * sourcePoints.length, 1);
+        GeneralMatrix dRx = new GeneralMatrix(3 * getMappedPositions().size(), 1);
 
         for (int i = 0; i < x.getNumRow(); i = i + 3) {
             GeneralMatrix subMatrix = new GeneralMatrix(3, 1);
@@ -352,7 +344,7 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      * @return matrix
      */
     private GeneralMatrix specialSub(GeneralMatrix R, GeneralMatrix x) {
-        GeneralMatrix dRx = new GeneralMatrix(3 * sourcePoints.length, 1);
+        GeneralMatrix dRx = new GeneralMatrix(3 * getMappedPositions().size(), 1);
 
         for (int i = 0; i < x.getNumRow(); i = i + 3) {
             GeneralMatrix subMatrix = new GeneralMatrix(3, 1);
@@ -370,7 +362,8 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      * @return A mtarix
      */
     protected GeneralMatrix getA() {
-        GeneralMatrix A = new GeneralMatrix(3 * sourcePoints.length, 7);
+        final int size = getMappedPositions().size();
+        GeneralMatrix A = new GeneralMatrix(3 * size, 7);
         GeneralMatrix DT = new GeneralMatrix(3, 3);
 
         // the partial derivative with respect to dx,dy,dz. 
@@ -385,10 +378,10 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
             DT.copySubMatrix(0, 0, 3, 3, i, 0, A);
         }
 
-        getDRalfa().copySubMatrix(0, 0, 3 * sourcePoints.length, 1, 0, 3, A);
-        getDRbeta().copySubMatrix(0, 0, 3 * sourcePoints.length, 1, 0, 4, A);
-        getDRgamma().copySubMatrix(0, 0, 3 * sourcePoints.length, 1, 0, 5, A);
-        getDq().copySubMatrix(0, 0, 3 * sourcePoints.length, 1, 0, 6, A);
+        getDRalfa().copySubMatrix(0, 0, 3 * size, 1, 0, 3, A);
+        getDRbeta().copySubMatrix(0, 0, 3 * size, 1, 0, 4, A);
+        getDRgamma().copySubMatrix(0, 0, 3 * size, 1, 0, 5, A);
+        getDq().copySubMatrix(0, 0, 3 * size, 1, 0, 6, A);
 
         return A;
     }

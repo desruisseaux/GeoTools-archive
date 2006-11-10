@@ -21,6 +21,9 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 /**
  * DirectPosition associated with another DirectPosition.
+ *
+ * @deprecated Moved to the {@link org.geotools.referencing.operation.builder} package.
+ *             We will try to use a single {@code MappedPosition} object later, if possible.
  */
 public class MappedPosition extends DirectPosition2D {
     /**  */

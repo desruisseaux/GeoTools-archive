@@ -239,10 +239,10 @@
       <!-- TODO: This dependencies should be removed when we
                  will be allowed to compile for JSE 1.5. -->
     </dependency>
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-		</dependency>
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+      </dependency>
   </dependencies>
 
 

@@ -56,18 +56,13 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
     /**
      * Creates AffineTransformBuilder for the set of properties.
      * 
-     * 
-     * 
      * @param sourcePoints Set of source points
      * @paramtargetPointst Set of destination points
      */
     public AffineTransformBuilder(DirectPosition[] ptSrc, DirectPosition[] ptDst)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        this.targetPoints = ptDst;
-        this.sourcePoints = ptSrc;
-
-        checkPoints();
-        super.checkCRS();
+        setTargetPoints(ptDst);
+        setSourcePoints(ptSrc);
     }
 
     /**
@@ -84,7 +79,8 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
      * @return double array of parameters
      */
     protected double[] generateMMatrix() {
-        // super.checkPoints(3, 2);
+        final DirectPosition[] sourcePoints = getSourcePoints();
+        final DirectPosition[] targetPoints = getTargetPoints();
         GeneralMatrix A = new GeneralMatrix(2 * sourcePoints.length, 6);
         GeneralMatrix X = new GeneralMatrix(2 * sourcePoints.length, 1);
 

@@ -739,7 +739,7 @@ public class TableWriter extends FilterWriter {
     /**
      * Ecrit vers le flot spécifié toutes les cellules qui avaient été disposées
      * dans le tableau. Ces cellules seront automatiquement alignées en colonnes.
-     * Cette méthode peut Štre appelée plusieurs fois pour écrire le mŠme tableau
+     * Cette méthode peut être appelée plusieurs fois pour écrire le même tableau
      * par exemple vers plusieurs flots.
      *
      * @param  out Flot vers où écrire les données.
