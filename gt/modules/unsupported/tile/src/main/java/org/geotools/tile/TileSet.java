@@ -2,7 +2,6 @@ package org.geotools.tile;
 
 import java.awt.Rectangle;
 
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.tile.cache.TileRange;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -17,32 +16,22 @@ import com.vividsolutions.jts.geom.Envelope;
  * <li>getZoomLevel().getRows();
  * </ul>
  */
-public class TileSet {    
-    ZoomLevel level;
+public abstract class TileSet {
     TileMap context;
+    ZoomLevel level; // valid according to metadata
+    TileDraw draw; // provided from stratagy
     
-    TileSet( TileMap tilemap, ZoomLevel zoom ){
-        level = zoom;
-        context = tilemap;
+    protected TileSet( TileMap context, ZoomLevel level, TileDraw draw ){
+        this.level = level;
+        this.context = context;
+        this.draw = draw;
     }
     
-    TileMap getTileMap(){
+    public TileMap getTileMap(){
         return context;
     }
-    ZoomLevel getZoomLevel(){
+    public ZoomLevel getZoomLevel(){
         return level;
-    }
-
-    /**
-     * Direct request for tile, non caching.
-     * 
-     * @param request
-     * @return
-     */
-    GridCoverage2D getTile( int row, int col ){
-        // delegate out to TileStratagy to handle
-        // this request.        
-        return null;
     }
     
     /**
@@ -50,20 +39,26 @@ public class TileSet {
      * @param bbox Understood to match CRS
      * @return
      */
-    TileRange getTileRange( Rectangle range ){
+    public TileRange getTileRange( Rectangle range ){
+        
         // delegate to cache for access policy
         // delegate to stratagy object for render & access
         return null;
     }
+    
     /**
      * Request tiles in a provided range
      * 
      * @param bbox Understood to match CRS
      * @return
      */
-    TileRange getTileRange( Envelope bbox ){
-        // delegate to cache for access policy
-        // delegate to stratagy object for render & access
-        return null;
+    public TileRange getTileRange( Envelope bbox ){
+        // TODO: caclate range based on bbox metadata
+        int x=1;
+        int y=1;
+        int w=1;
+        int h=1;
+        Rectangle range = new Rectangle(x,y,w,h);
+        return getTileRange( range );
     }
 }
