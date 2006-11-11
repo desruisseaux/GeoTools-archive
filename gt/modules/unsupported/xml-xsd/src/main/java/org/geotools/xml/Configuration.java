@@ -362,7 +362,8 @@ public abstract class Configuration {
     		Configuration dependency = (Configuration) d.next();
     		
     		BindingConfiguration bindings = dependency.getBindingConfiguration();
-    		bindings.configure( container );
+    		if ( bindings != null ) 
+    			bindings.configure( container );
     	}
     
     	//call template method, create a new container to allow subclass to override bindings
