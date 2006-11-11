@@ -81,16 +81,18 @@ public interface ComplexBinding extends Binding {
      * Performs the encoding of the object into its xml representation.
      *
      * <p>
-     * Complex objects are encoded as elements in a document, any attributes
-     * on the element must be created within this method. Child elements may
-     * also be created withing this method.
+     * Complex objects are encoded as elements in a document. The <param>value</param>
+     * parameter is the encoded element, created by the parent binding. For the 
+     * first binding in the execution chain this is just an empty element ( no 
+     * children or attributes ). The binding has the choice to return <param>value</param>
+     * or to create a new element to return.
      * </p>
      *
-     * <p>
-     * The document containing the element may be used to create child
-     * nodes for the element (elements or attributes), or a new element for 
-     * the object itself.
-     * </p>
+     *	<p>
+     * This method may choose to create child elements and attributes for the element. 
+     * Or as an alternative return the object values for these contructs in 
+     * {@link #getProperty(Object, QName)}. 
+     *	</p>
      *
      * @param object The object being encoded.
      * @param document The document containing the encoded element.
@@ -99,21 +101,27 @@ public interface ComplexBinding extends Binding {
      * @return The element for the objcet being encoded, or <code>null</code>
      *
      */
-    Element encode(Object object, Document document, Element value) throws Exception;
+    Element encode(Object object, Document document, Element value) 
+    	throws Exception;
 
     /**
-     * Returns a child object which matches the specified qualified name.
+     * Returns a property of a particular object which corresponds to the 
+     * specified name.
      *
+     * </p>
      * <p>This method should just return null in the event that the object being
      * encoded is an leaf in its object model.</p>
      *
-     * <p>This method should return an array in the event that the qualified
-     * name mapps to multiple children</p>
+     * <p>
+     * For multi-values properties ( maxOccurs > 0 ), this method may return an 
+     * instance of {@link java.util.Collection}, {@link java.util.Iterator}, or 
+     * an array.
+     * </p>
      *
      * @param object The object being encoded.
-     * @param name The name of the child.
+     * @param name The name of the property to obtain.
      *
-     * @return The childn to be encoded or null if no such child exists.
+     * @return The value of the property, or <code>null</code>.
      */
-    Object getChild(Object object, QName name);
+    Object getProperty(Object object, QName name);
 }
