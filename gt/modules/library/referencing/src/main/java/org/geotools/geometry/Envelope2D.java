@@ -103,7 +103,22 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         super(x, y, width, height);
         setCoordinateReferenceSystem(crs);
     }
-
+    /**
+     * Constructs two-dimensional envelope defined by the specified coordinates. Despite
+     * their name, the (<var>x</var>,<var>y</var>) coordinates don't need to be oriented
+     * toward ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}).
+     * Those parameter names simply match the {@linkplain #x x} and {@linkplain #y y} fields.
+     * The actual axis orientations are determined by the specified CRS.
+     * See the {@linkplain Envelope2D class javadoc} for details.
+     */
+    public Envelope2D( DirectPosition2D a, DirectPosition2D b )
+    {
+        this( a.getCoordinateReferenceSystem(),
+              Math.min( a.x, b.x ),
+              Math.min( a.y, b.y ),
+              Math.abs( a.x- b.x ),
+              Math.abs( a.x- b.x ) );        
+    }
     /**
      * Returns the coordinate reference system in which the coordinates are given.
      *
