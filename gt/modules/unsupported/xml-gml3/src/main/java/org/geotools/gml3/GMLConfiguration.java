@@ -20,6 +20,7 @@ import org.picocontainer.MutablePicoContainer;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+import org.geotools.gml2.FeaturePropertyExtractor;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.gml3.bindings.GML;
 import org.geotools.gml3.bindings.GMLBindingConfiguration;
@@ -91,6 +92,7 @@ public class GMLConfiguration extends Configuration {
         super.configureContext(container);
 
         container.registerComponentInstance(new FeatureTypeCache());
+        container.registerComponentImplementation(FeaturePropertyExtractor.class);
 
         //factories
         container.registerComponentInstance(CoordinateSequenceFactory.class,
