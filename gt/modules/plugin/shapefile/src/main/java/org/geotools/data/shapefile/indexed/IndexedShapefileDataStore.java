@@ -111,6 +111,12 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 	public static final byte TREE_QIX = 2;
 
+    private static final Object FIX_LOCK = new Object();
+
+    private static final Object GRX_LOCK = new Object();
+
+    private static final Object QIX_LOCK = new Object();
+
 	final URL treeURL;
 
 	public URL fixURL;
@@ -504,22 +510,40 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		Arrays.sort(fids);
 		IndexedFidReader reader = null;
 		try {
-			if (isLocal()) {
-				if (!(new File(fixURL.getFile()).exists()) && createIndex )
-					FidIndexer.generate(shpURL);
-				else if( !createIndex )
-					return null;
+			File indexFile = new File(fixURL.getFile());
+            if (isLocal()) {
+                synchronized (FIX_LOCK) {
+                    File shpFile = new File( shpURL.getPath() );
+    
+                    // remove index file if it is out of date.
+                    if( indexFile.exists() && indexFile.lastModified()<shpFile.lastModified() ){
+                        if( !indexFile.delete() ){
+                            indexFile.deleteOnExit();
+                            fixURL=null;
+                            return null;
+                        }
+                    }
+    
+                    
+    				if (!(indexFile.exists())  )
+    					FidIndexer.generate(shpURL);
+                }
 			} else {
 				return null;
 			}
+            if (!(indexFile.exists()) ){
+                fixURL=null;
+                return null; 
+            }
+            
 			reader = new IndexedFidReader(getCurrentTypeName(),
 					getReadChannel(fixURL));
 			if (reader.getRemoves() >= reader.getCount() / 2) {
-				File file = new File(fixURL.getFile());
-				file.deleteOnExit();
+				indexFile.deleteOnExit();
 			}
 
 		} catch (Exception e) {
+            fixURL=null;
 			return null;
 		}
 
@@ -683,29 +707,48 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 * @throws DataSourceException
 	 *             DOCUMENT ME!
 	 */
-	protected synchronized RTree openRTree() throws IOException {
+	protected RTree openRTree() throws IOException {
 		if (rtree == null) {
 			if (!this.isLocal()) {
 				return null;
 			}
 
-			File file = new File(treeURL.getPath());
-
-			if (!file.exists() || (file.length() == 0)) {
-				if (this.createIndex) {
-					try {
-						this.buildRTree();
-					} catch (TreeException e) {
-						createIndex=false;
-						return null;
-					}
-				} else {
-					return null;
-				}
-			}
-
-			try {
-				FileSystemPageStore fps = new FileSystemPageStore(file);
+			File treeFile = new File(treeURL.getPath());
+			File shpFile = new File( shpURL.getPath() );
+            synchronized (GRX_LOCK) {
+    
+                // remove index file if it is out of date.
+                if( treeFile.exists() && treeFile.lastModified()<shpFile.lastModified() ){
+                    if( !treeFile.delete() ){
+                        treeFile.deleteOnExit();
+                        createIndex=false;
+                        treeType=TREE_NONE;
+                        return null;
+                    }
+                }
+    
+    			if (!treeFile.exists() || (treeFile.length() == 0)) {
+    				if (this.createIndex) {
+    					try {
+    						this.buildRTree();
+    					} catch (TreeException e) {
+    						createIndex=false;
+    						return null;
+    					}
+    				} else {
+    					return null;
+    				}
+    			}
+    
+    
+                if (!treeFile.exists() || (treeFile.length() == 0)) {
+                    createIndex=false;
+                    treeType=TREE_NONE;
+                    return null;
+                }
+            }
+            try {
+				FileSystemPageStore fps = new FileSystemPageStore(treeFile);
 				rtree = new RTree(fps);
 			} catch (TreeException re) {
 				throw new DataSourceException("Error opening RTree", re);
@@ -722,25 +765,45 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	 *
 	 * @throws StoreException
 	 */
-	protected synchronized QuadTree openQuadTree() throws StoreException {
+	protected QuadTree openQuadTree() throws StoreException {
 		QuadTree quadTree=null;
 		if (quadTree == null) {
-			File file = new File(treeURL.getPath());
+            File treeFile = new File(treeURL.getPath());
+            File shpFile = new File( shpURL.getPath() );
+            synchronized (QIX_LOCK) {
 
-			if (!file.exists() || (file.length() == 0)) {
-				if (this.createIndex) {
-					try {
-						this.buildQuadTree();
-					} catch (TreeException e) {
-						createIndex=false;
-						return null;
-					}
-				} else {
-					return null;
-				}
-			}
-
-			FileSystemIndexStore store = new FileSystemIndexStore(file);
+                // remove index file if it is out of date.
+                if( treeFile.exists() && treeFile.lastModified()<shpFile.lastModified() ){
+                    if( !treeFile.delete() ){
+                        createIndex=false;
+                        treeType=TREE_NONE;
+                        return null;
+                    }
+                }
+                
+    			if (!treeFile.exists() || (treeFile.length() == 0)) {
+    				if (this.createIndex) {
+    					try {
+    						this.buildQuadTree();
+    					} catch (TreeException e) {
+    						createIndex=false;
+                            treeType=TREE_NONE;
+    						return null;
+    					}
+    				} else {
+    					return null;
+    				}
+    			}
+    
+    
+                if (!treeFile.exists() || (treeFile.length() == 0)) {
+                    createIndex=false;
+                    treeType=TREE_NONE;
+                    return null;
+                }
+            }
+            
+			FileSystemIndexStore store = new FileSystemIndexStore(treeFile);
 			try {
 				quadTree = store.load(openIndexFile(shxURL));
 			} catch (IOException e) {
