@@ -82,4 +82,13 @@ public class PointPropertyTypeBinding extends AbstractComplexBinding {
         //TODO: xlink
         return node.getChildValue(Point.class);
     }
+
+    public Object getProperty(Object object, QName name) {
+        if (GML.Point.equals(name)) {
+            //return the point, which is the object passed in
+            return object;
+        }
+
+        return null;
+    }
 }

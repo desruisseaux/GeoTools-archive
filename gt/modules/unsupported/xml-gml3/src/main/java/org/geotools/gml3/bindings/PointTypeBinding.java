@@ -15,12 +15,16 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.geotools.geometry.DirectPosition2D;
 import org.geotools.xml.*;
 
 
@@ -113,6 +117,20 @@ public class PointTypeBinding extends AbstractComplexBinding {
         if (node.hasChild(CoordinateSequence.class)) {
             return gFactory.createPoint((CoordinateSequence) node.getChildValue(
                     CoordinateSequence.class));
+        }
+
+        return null;
+    }
+
+    public Object getProperty(Object object, QName name) {
+        if (GML.pos.equals(name)) {
+            Point point = (Point) object;
+
+            DirectPosition2D dp = new DirectPosition2D();
+            dp.setOrdinate(0, point.getX());
+            dp.setOrdinate(1, point.getY());
+
+            return dp;
         }
 
         return null;

@@ -16,7 +16,11 @@
 package org.geotools.gml3.bindings;
 
 import java.net.URI;
+import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
@@ -26,8 +30,18 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.eclipse.xsd.XSDComplexTypeDefinition;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDTypeDefinition;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.DefaultFeatureTypeFactory;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.referencing.CRS;
+import org.geotools.xml.Binding;
+import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Node;
+import org.geotools.xml.Schemas;
 
 
 /**
@@ -37,6 +51,73 @@ import org.geotools.xml.Node;
  *
  */
 public class GML3ParsingUtils {
+	
+	/**
+	 * Turns a xml type definition into a geotools feature type.
+	 * @param type The xml schema tupe.
+	 * 
+	 * @return The corresponding geotools feature type.
+	 */
+	public static FeatureType featureType( XSDElementDeclaration element, BindingFactory bindingFactory ) 
+		throws Exception {
+		
+		FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
+        ftBuilder.setName( element.getName() );
+        ftBuilder.setNamespace(new URI(element.getTargetNamespace()));
+
+        //build the feaure type by walking through the elements of the 
+        // actual xml schema type
+        List children = Schemas.getChildElementDeclarations(element);
+
+        for (Iterator itr = children.iterator(); itr.hasNext();) {
+            XSDElementDeclaration property = (XSDElementDeclaration) itr.next();
+
+            //ignore the attributes provided by gml, change this for new feature model
+            if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
+                if ("boundedBy".equals(property.getName())) {
+                    continue;
+                }
+
+                if ("location".equals(property.getName())) {
+                    continue;
+                }
+
+                if ("name".equals(property.getName())) {
+                    continue;
+                }
+
+                if ("description".equals(property.getName())) {
+                    continue;
+                }
+
+                if ("metaDataProperty".equals(property.getName())) {
+                    continue;
+                }
+            }
+
+            XSDTypeDefinition type = property.getType();
+
+            QName qName = new QName(type.getTargetNamespace(), type.getName());
+
+            Binding binding = bindingFactory.createBinding(qName);
+
+            if (binding == null) {
+                throw new RuntimeException("Could not find binding for " + qName);
+            }
+
+            Class theClass = binding.getType();
+
+            if (theClass == null) {
+                throw new RuntimeException("Could not find class for " + qName);
+            }
+
+            //call method with most parameter
+            ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));
+        }
+
+        return ftBuilder.getFeatureType();
+	}
+	
     static CoordinateReferenceSystem crs(Node node) {
         if (node.getAttribute("srsName") != null) {
             URI srs = (URI) node.getAttributeValue("srsName");

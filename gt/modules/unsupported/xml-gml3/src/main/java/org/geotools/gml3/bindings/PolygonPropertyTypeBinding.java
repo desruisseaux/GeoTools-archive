@@ -76,4 +76,13 @@ public class PolygonPropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(Polygon.class);
     }
+
+    public Object getProperty(Object object, QName name) {
+        if (GML.Polygon.equals(name)) {
+            //return the polygon, which is the object passed in
+            return object;
+        }
+
+        return null;
+    }
 }

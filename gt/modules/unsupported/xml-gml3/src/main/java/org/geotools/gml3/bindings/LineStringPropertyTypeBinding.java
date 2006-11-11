@@ -15,6 +15,9 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.LineString;
 import org.geotools.xml.*;
@@ -81,5 +84,14 @@ public class LineStringPropertyTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return node.getChildValue(LineString.class);
+    }
+
+    public Object getProperty(Object object, QName name) {
+        if (GML.LineString.equals(name)) {
+            //return the line string, which is the object passed in
+            return object;
+        }
+
+        return null;
     }
 }

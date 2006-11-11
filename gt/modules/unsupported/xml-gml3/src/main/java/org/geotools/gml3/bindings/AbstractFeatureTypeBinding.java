@@ -15,19 +15,20 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDTypeDefinition;
-import java.net.URI;
 import java.util.Iterator;
-import java.util.List;
+
 import javax.xml.namespace.QName;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
+
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.gml2.FeatureTypeCache;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.BindingFactory;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -103,61 +104,63 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
         FeatureType fType = ftCache.get(decl.getName());
 
         if (fType == null) {
-            FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
-            ftBuilder.setName(decl.getName());
-            ftBuilder.setNamespace(new URI(decl.getTargetNamespace()));
+        	fType = GML3ParsingUtils.featureType( decl, bindingFactory );
+        	
+//            FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
+//            ftBuilder.setName(decl.getName());
+//            ftBuilder.setNamespace(new URI(decl.getTargetNamespace()));
+//
+//            //build the feaure type by walking through the elements of the 
+//            // actual xml schema type
+//            List children = Schemas.getChildElementDeclarations(decl);
+//
+//            for (Iterator itr = children.iterator(); itr.hasNext();) {
+//                XSDElementDeclaration property = (XSDElementDeclaration) itr.next();
+//
+//                //ignore the attributes provided by gml, change this for new feature model
+//                if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
+//                    if ("boundedBy".equals(property.getName())) {
+//                        continue;
+//                    }
+//
+//                    if ("location".equals(property.getName())) {
+//                        continue;
+//                    }
+//
+//                    if ("name".equals(property.getName())) {
+//                        continue;
+//                    }
+//
+//                    if ("description".equals(property.getName())) {
+//                        continue;
+//                    }
+//
+//                    if ("metaDataProperty".equals(property.getName())) {
+//                        continue;
+//                    }
+//                }
+//
+//                XSDTypeDefinition type = property.getType();
+//
+//                QName qName = new QName(type.getTargetNamespace(), type.getName());
+//
+//                Binding binding = bindingFactory.createBinding(qName);
+//
+//                if (binding == null) {
+//                    throw new RuntimeException("Could not find binding for " + qName);
+//                }
+//
+//                Class theClass = binding.getType();
+//
+//                if (theClass == null) {
+//                    throw new RuntimeException("Could not find class for " + qName);
+//                }
+//
+//                //call method with most parameter
+//                ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));
+//            }
 
-            //build the feaure type by walking through the elements of the 
-            // actual xml schema type
-            List children = Schemas.getChildElementDeclarations(decl);
-
-            for (Iterator itr = children.iterator(); itr.hasNext();) {
-                XSDElementDeclaration property = (XSDElementDeclaration) itr.next();
-
-                //ignore the attributes provided by gml, change this for new feature model
-                if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
-                    if ("boundedBy".equals(property.getName())) {
-                        continue;
-                    }
-
-                    if ("location".equals(property.getName())) {
-                        continue;
-                    }
-
-                    if ("name".equals(property.getName())) {
-                        continue;
-                    }
-
-                    if ("description".equals(property.getName())) {
-                        continue;
-                    }
-
-                    if ("metaDataProperty".equals(property.getName())) {
-                        continue;
-                    }
-                }
-
-                XSDTypeDefinition type = property.getType();
-
-                QName qName = new QName(type.getTargetNamespace(), type.getName());
-
-                Binding binding = bindingFactory.createBinding(qName);
-
-                if (binding == null) {
-                    throw new RuntimeException("Could not find binding for " + qName);
-                }
-
-                Class theClass = binding.getType();
-
-                if (theClass == null) {
-                    throw new RuntimeException("Could not find class for " + qName);
-                }
-
-                //call method with most parameter
-                ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));
-            }
-
-            fType = ftBuilder.getFeatureType();
+            //fType = ftBuilder.getFeatureType();
             ftCache.put(fType);
         }
 
@@ -174,5 +177,18 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
         }
 
         return f;
+    }
+
+    public Element encode(Object object, Document document, Element value) throws Exception {
+        Feature feature = (Feature) object;
+        FeatureType featureType = feature.getFeatureType();
+
+        String namespace = featureType.getNamespace().toString();
+        String typeName = featureType.getTypeName();
+
+        Element encoding = document.createElementNS(namespace, typeName);
+        encoding.setAttributeNS(null, "fid", feature.getID());
+
+        return encoding;
     }
 }

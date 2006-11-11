@@ -15,6 +15,8 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import java.net.URI;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -103,5 +105,26 @@ public class DirectPositionTypeBinding extends AbstractComplexBinding {
         }
 
         return dp;
+    }
+
+    public Element encode(Object object, Document document, Element value) throws Exception {
+        DirectPosition dp = (DirectPosition) object;
+
+        double[] coordinates = dp.getCoordinates();
+
+        StringBuffer sb = new StringBuffer();
+
+        for (int i = 0; i < coordinates.length; i++) {
+            sb.append(String.valueOf(coordinates[i]));
+
+            if (i != (coordinates.length - 1)) {
+                sb.append(" ");
+            }
+        }
+
+        Element pos = document.createElementNS(GML.pos.getNamespaceURI(), GML.pos.getLocalPart());
+        pos.appendChild(document.createTextNode(sb.toString()));
+
+        return pos;
     }
 }

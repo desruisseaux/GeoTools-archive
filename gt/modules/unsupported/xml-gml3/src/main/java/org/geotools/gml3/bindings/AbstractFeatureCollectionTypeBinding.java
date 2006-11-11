@@ -90,4 +90,15 @@ public class AbstractFeatureCollectionTypeBinding extends AbstractComplexBinding
 
         return featureCollection;
     }
+
+    public Object getProperty(Object object, QName name) {
+        //just return the features themselves
+        if (GML.featureMembers.equals(name)) {
+            FeatureCollection fc = (FeatureCollection) object;
+
+            return fc.toArray(new Feature[fc.size()]);
+        }
+
+        return null;
+    }
 }

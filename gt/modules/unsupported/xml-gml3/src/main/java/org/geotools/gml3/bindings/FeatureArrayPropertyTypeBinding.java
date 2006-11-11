@@ -72,4 +72,9 @@ public class FeatureArrayPropertyTypeBinding extends AbstractComplexBinding {
 
         return features.toArray(new Feature[features.size()]);
     }
+
+    public Object getProperty(Object object, QName name) {
+        //passed in should be Feature[], just pass it back
+        return object;
+    }
 }

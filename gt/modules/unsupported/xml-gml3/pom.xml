@@ -117,6 +117,24 @@
           </execution>
         </executions>
       </plugin>
+			<plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>gt2-xmlcodegen</artifactId>
+				<configuration>
+          <schemaLocation>gml.xsd</schemaLocation>
+					<schemaSourceDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-gml3/src/main/resources/org/geotools/gml3/bindings</schemaSourceDirectory>
+          <schemaLookupDirectories>
+            <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-xsd/src/main/resources/org/geotools/xlink/bindings/</schemaLookupDirectory>
+            <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-gml3/src/main/resources/org/geotools/gml3/bindings/smil</schemaLookupDirectory>
+          </schemaLookupDirectories>
+          <generateConfiguration>false</generateConfiguration>
+          <generateBindingInterface>false</generateBindingInterface>
+          <generateSchemaLocationResolver>false</generateSchemaLocationResolver>          <includes>
+            <include>BoundingShapeType</include>
+          </includes>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
