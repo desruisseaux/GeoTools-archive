@@ -761,15 +761,15 @@
           <version>2.1</version>
           <configuration>
             <descriptors>
-              <descriptor>maven/assembly/binaryDist.xml</descriptor>
-              <descriptor>maven/assembly/sourceDist.xml</descriptor>
+              <descriptor>build/maven/assembly/binaryDist.xml</descriptor>
+              <descriptor>build/maven/assembly/sourceDist.xml</descriptor>
             </descriptors>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.1.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1036,7 +1036,7 @@
             <taglet>
               <tagletClass>org.geotools.maven.taglet.Tutorial</tagletClass>
               <tagletArtifact>
-                <groupId>org.geotools</groupId>
+                <groupId>org.geotools.maven</groupId>
                 <artifactId>gt2-javadoc</artifactId>
                 <version>${project.version}</version>
               </tagletArtifact>
@@ -1044,7 +1044,7 @@
             <taglet>
               <tagletClass>org.geotools.maven.taglet.Source</tagletClass>
               <tagletArtifact>
-                <groupId>org.geotools</groupId>
+                <groupId>org.geotools.maven</groupId>
                 <artifactId>gt2-javadoc</artifactId>
                 <version>${project.version}</version>
               </tagletArtifact>

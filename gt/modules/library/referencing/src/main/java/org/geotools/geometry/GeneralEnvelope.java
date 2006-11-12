@@ -25,7 +25,11 @@ import javax.units.ConversionException;
 
 // OpenGIS dependencies
 import org.opengis.util.Cloneable;
+import org.opengis.coverage.grid.GridRange;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.datum.PixelInCell;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -82,6 +86,82 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     private CoordinateReferenceSystem crs;
 
     /**
+     * Constructs an empty envelope of the specified dimension.
+     * All ordinates are initialized to 0 and the coordinate reference
+     * system is undefined.
+     */
+    public GeneralEnvelope(final int dimension) {
+        ordinates = new double[dimension*2];
+    }
+
+    /**
+     * Constructs one-dimensional envelope defined by a range of values.
+     *
+     * @param min The minimal value.
+     * @param max The maximal value.
+     */
+    public GeneralEnvelope(final double min, final double max) {
+        ordinates = new double[] {min, max};
+        checkCoherence();
+    }
+
+    /**
+     * Constructs a envelope defined by two positions.
+     *
+     * @param  minDP Minimum ordinate values.
+     * @param  maxDP Maximum ordinate values.
+     * @throws MismatchedDimensionException if the two positions don't have the same dimension.
+     * @throws IllegalArgumentException if an ordinate value in the minimum point is not
+     *         less than or equal to the corresponding ordinate value in the maximum point.
+     */
+    public GeneralEnvelope(final double[] minDP, final double[] maxDP)
+            throws IllegalArgumentException
+    {
+        ensureNonNull("minDP", minDP);
+        ensureNonNull("maxDP", maxDP);
+        ensureSameDimension(minDP.length, maxDP.length);
+        ordinates = new double[minDP.length + maxDP.length];
+        System.arraycopy(minDP, 0, ordinates, 0,            minDP.length);
+        System.arraycopy(maxDP, 0, ordinates, minDP.length, maxDP.length);
+        checkCoherence();
+    }
+
+    /**
+     * Constructs a envelope defined by two positions. The coordinate
+     * reference system is inferred from the supplied direct position.
+     *
+     * @param  minDP Point containing minimum ordinate values.
+     * @param  maxDP Point containing maximum ordinate values.
+     * @throws MismatchedDimensionException if the two positions don't have the same dimension.
+     * @throws MismatchedReferenceSystemException if the two positions don't use the same CRS.
+     * @throws IllegalArgumentException if an ordinate value in the minimum point is not
+     *         less than or equal to the corresponding ordinate value in the maximum point.
+     */
+    public GeneralEnvelope(final GeneralDirectPosition minDP, final GeneralDirectPosition maxDP)
+            throws IllegalArgumentException
+    {
+//  Uncomment next lines if Sun fixes RFE #4093999
+//      ensureNonNull("minDP", minDP);
+//      ensureNonNull("maxDP", maxDP);
+        this(minDP.ordinates, maxDP.ordinates);
+        crs = getCoordinateReferenceSystem(minDP, maxDP);
+        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, ordinates.length/2);
+    }
+
+    /**
+     * Constructs an empty envelope with the specified coordinate reference system.
+     * All ordinates are initialized to 0.
+     *
+     * @since 2.2
+     */
+    public GeneralEnvelope(final CoordinateReferenceSystem crs) {
+//  Uncomment next line if Sun fixes RFE #4093999
+//      ensureNonNull("envelope", envelope);
+        this(crs.getCoordinateSystem().getDimension());
+        this.crs = crs;
+    }
+
+    /**
      * Constructs a new envelope with the same data than the specified envelope.
      */
     public GeneralEnvelope(final Envelope envelope) {
@@ -121,84 +201,8 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     }
 
     /**
-     * Constructs an empty envelope with the specified coordinate reference system.
-     * All ordinates are initialized to 0.
-     *
-     * @since 2.2
-     */
-    public GeneralEnvelope(final CoordinateReferenceSystem crs) {
-//  Uncomment next line if Sun fixes RFE #4093999
-//      ensureNonNull("envelope", envelope);
-        this(crs.getCoordinateSystem().getDimension());
-        this.crs = crs;
-    }
-
-    /**
-     * Constructs an empty envelope of the specified dimension.
-     * All ordinates are initialized to 0.
-     */
-    public GeneralEnvelope(final int dimension) {
-        ordinates = new double[dimension*2];
-    }
-
-    /**
-     * Constructs one-dimensional envelope defined by a range of values.
-     *
-     * @param min The minimal value.
-     * @param max The maximal value.
-     */
-    public GeneralEnvelope(final double min, final double max) {
-        ordinates = new double[] {min, max};
-        checkCoherence();
-    }
-
-    /**
-     * Constructs a envelope defined by two positions.
-     *
-     * @param  minDP Minimum ordinate values.
-     * @param  maxDP Maximum ordinate values.
-     * @throws MismatchedDimensionException if the two positions don't have the same dimension.
-     * @throws IllegalArgumentException if an ordinate value in the minimum point is not
-     *         less than or equal to the corresponding ordinate value in the maximum point.
-     */
-    public GeneralEnvelope(final double[] minDP, final double[] maxDP)
-            throws IllegalArgumentException
-    {
-        ensureNonNull("minDP", minDP);
-        ensureNonNull("maxDP", maxDP);
-        if (minDP.length != maxDP.length) {
-            throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                new Integer(minDP.length), new Integer(maxDP.length)));
-        }
-        ordinates = new double[minDP.length + maxDP.length];
-        System.arraycopy(minDP, 0, ordinates, 0,            minDP.length);
-        System.arraycopy(maxDP, 0, ordinates, minDP.length, maxDP.length);
-        checkCoherence();
-    }
-
-    /**
-     * Constructs a envelope defined by two positions.
-     *
-     * @param  minDP Point containing minimum ordinate values.
-     * @param  maxDP Point containing maximum ordinate values.
-     * @throws MismatchedDimensionException if the two positions don't have the same dimension.
-     * @throws MismatchedReferenceSystemException if the two positions don't use the same CRS.
-     * @throws IllegalArgumentException if an ordinate value in the minimum point is not
-     *         less than or equal to the corresponding ordinate value in the maximum point.
-     */
-    public GeneralEnvelope(final GeneralDirectPosition minDP, final GeneralDirectPosition maxDP)
-            throws IllegalArgumentException
-    {
-//  Uncomment next lines if Sun fixes RFE #4093999
-//      ensureNonNull("minDP", minDP);
-//      ensureNonNull("maxDP", maxDP);
-        this(minDP.ordinates, maxDP.ordinates);
-        crs = getCoordinateReferenceSystem(minDP, maxDP);
-        GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, ordinates.length/2);
-    }
-
-    /**
      * Constructs two-dimensional envelope defined by a {@link Rectangle2D}.
+     * The coordinate reference system is initially undefined.
      */
     public GeneralEnvelope(final Rectangle2D rect) {
         ensureNonNull("rect", rect);
@@ -207,6 +211,63 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             rect.getMaxX(), rect.getMaxY()
         };
         checkCoherence();
+    }
+
+    /**
+     * Creates an envelope for a grid range transformed using the specified math transform.
+     *
+     * @param gridRange The grid range.
+     * @param gridType  Whatever grid range coordinates map to pixel center or pixel corner.
+     * @param gridToCRS The transform (usually affine) from grid range to the envelope CRS.
+     * @param crs       The envelope CRS, or {@code null} if unknow.
+     *
+     * @throws MismatchedDimensionException If one of the supplied object doesn't have
+     *         a dimension compatible with the other objects.
+     * @throws IllegalArgumentException if an argument is illegal for some other reason,
+     *         including failure to use the provided math transform.
+     *
+     * @since 2.3
+     */
+    public GeneralEnvelope(final GridRange           gridRange,
+                           final PixelInCell         gridType,
+                           final MathTransform       gridToCRS,
+                           final CoordinateReferenceSystem crs)
+            throws IllegalArgumentException
+    {
+        ensureNonNull("gridRange", gridRange);
+        ensureNonNull("gridToCRS", gridToCRS);
+        final int dimRange  = gridRange.getDimension();
+        final int dimSource = gridToCRS.getSourceDimensions();
+        final int dimTarget = gridToCRS.getTargetDimensions();
+        ensureSameDimension(dimRange, dimSource);
+        ensureSameDimension(dimRange, dimTarget);
+        ordinates = new double[dimSource*2];
+        final double offset;
+        if (PixelInCell.CELL_CENTER.equals(gridType)) {
+            offset = 0.5;
+        } else if (PixelInCell.CELL_CORNER.equals(gridType)) {
+            offset = 0.0;
+        } else {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "gridType", gridType));
+        }
+        for (int i=0; i<dimSource; i++) {
+            // According OpenGIS specification, GridGeometry maps pixel's center.
+            // We want a bounding box for all pixels, not pixel's centers. Offset by
+            // 0.5 (use -0.5 for maximum too, not +0.5, since maximum is exclusive).
+            setRange(i, gridRange.getLower(i)-offset, gridRange.getUpper(i)-offset);
+        }
+        final GeneralEnvelope transformed;
+        try {
+            transformed = CRS.transform(gridToCRS, this);
+        } catch (TransformException exception) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
+                                    Utilities.getShortClassName(gridToCRS))/*, exception*/);
+            // TODO: uncomment the exception cause when we will be allowed to target J2SE 1.5.
+        }
+        assert transformed.ordinates.length == this.ordinates.length;
+        System.arraycopy(transformed.ordinates, 0, this.ordinates, 0, ordinates.length);
+        setCoordinateReferenceSystem(crs);
     }
 
     /**
@@ -221,6 +282,18 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     {
         if (object == null) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NULL_ARGUMENT_$1, name));
+        }
+    }
+
+    /**
+     * Make sure the specified dimensions are identical.
+     */
+    private static void ensureSameDimension(final int dim1, final int dim2)
+            throws MismatchedDimensionException
+    {
+        if (dim1 != dim2) {
+            throw new MismatchedDimensionException(Errors.format(
+                    ErrorKeys.MISMATCHED_DIMENSION_$2, new Integer(dim1), new Integer(dim2)));
         }
     }
 

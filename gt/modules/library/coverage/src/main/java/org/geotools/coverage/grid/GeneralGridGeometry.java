@@ -21,7 +21,6 @@ import java.awt.geom.AffineTransform;  // For javadoc
 import java.awt.image.BufferedImage;   // For javadoc
 import java.awt.image.RenderedImage;   // For javadoc
 import java.io.Serializable;
-import java.util.MissingResourceException;
 
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
@@ -197,37 +196,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         this.gridRange = gridRange;
         this.gridToCRS = gridToCRS;
         if (gridRange!=null && gridToCRS!=null) {
-            /*
-             * Checks arguments.
-             */
-            final int dimRange  = gridRange.getDimension();
-            final int dimSource = gridToCRS.getSourceDimensions();
-            final int dimTarget = gridToCRS.getTargetDimensions();
-            if (dimRange != dimSource) {
-                throw new MismatchedDimensionException(format(dimRange, dimSource));
-            }
-            if (dimRange != dimTarget) {
-                throw new MismatchedDimensionException(format(dimRange, dimTarget));
-            }
-            /*
-             * Computes the envelope.
-             */
-            GeneralEnvelope envelope = new GeneralEnvelope(dimSource);
-            for (int i=0; i<dimSource; i++) {
-                // According OpenGIS specification, GridGeometry maps pixel's center.
-                // We want a bounding box for all pixels, not pixel's centers. Offset by
-                // 0.5 (use -0.5 for maximum too, not +0.5, since maximum is exclusive).
-                envelope.setRange(i, gridRange.getLower(i)-0.5, gridRange.getUpper(i)-0.5);
-            }
-            try {
-                envelope = org.geotools.referencing.CRS.transform(gridToCRS, envelope);
-            } catch (TransformException exception) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.BAD_TRANSFORM_$1,
-                                        Utilities.getShortClassName(gridToCRS))/*, exception*/);
-                // TODO: uncomment the exception cause when we will be allowed to target J2SE 1.5.
-            }
-            envelope.setCoordinateReferenceSystem(crs);
-            this.envelope = envelope;
+            envelope = new GeneralEnvelope(gridRange, PixelInCell.CELL_CENTER, gridToCRS, crs);
         } else if (crs != null) {
             envelope = new GeneralEnvelope(crs);
             envelope.setToNull();
@@ -554,16 +523,18 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * @deprecated Replaced by {@code new GeneralGridGeometry(gridRange, ...).getEnvelope()}.
+     * @deprecated Use {@link GeneralEnvelope(GridRange, PixelInCell, MathTransform,
+     *             CoordinateReferenceSystem)} instead.
      *
      * @since 2.3
      */
     public static GeneralEnvelope getEnvelope(final GridRange gridRange,
             final MathTransform gridToCRS, final CoordinateReferenceSystem crs,
             final boolean halfPix) throws MismatchedDimensionException,
-            IllegalArgumentException, MissingResourceException
+            IllegalArgumentException
     {
-        return (GeneralEnvelope) new GeneralGridGeometry(gridRange, gridToCRS, crs).getEnvelope();
+        return new GeneralEnvelope(gridRange, halfPix ? PixelInCell.CELL_CENTER :
+                PixelInCell.CELL_CORNER, gridToCRS, crs);
     }
 
     /**
@@ -667,11 +638,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                     return candidate;
                 }
             }
-            final Matrix matrix = MatrixFactory.create(dimension + 1);
-            for (int i=0; i<dimension; i++) {
-                matrix.setElement(i, dimension, -0.5);
-            }
-            final MathTransform mt = ProjectiveTransform.create(matrix);
+            final MathTransform mt = ProjectiveTransform.createTranslation(dimension, -0.5);
             if (dimension < translations.length) {
                 translations[dimension] = mt;
             }

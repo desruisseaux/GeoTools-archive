@@ -316,7 +316,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * and <var>y</var> axis. This method assumes that the specified affine transform
      * is built from arbitrary translations, scales or rotations, but no shear. It
      * returns {@code +1} if the (<var>x</var>, <var>y</var>) axis order seems to be
-     * preserved, {@code -1) if the transform seems to swap axis to the (<var>y</var>,
+     * preserved, {@code -1} if the transform seems to swap axis to the (<var>y</var>,
      * <var>x</var>) axis order, or {@code 0} if this method can not make a decision.
      */
     public static int getSwapXY(final AffineTransform tr) {

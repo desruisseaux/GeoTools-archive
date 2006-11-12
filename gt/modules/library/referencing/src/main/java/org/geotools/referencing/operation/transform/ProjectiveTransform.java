@@ -172,6 +172,44 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     }
 
     /**
+     * Creates a transform that apply a uniform scale along all axis.
+     *
+     * @param dimension The input and output dimensions.
+     * @param scale The scale factor.
+     *
+     * @since 2.3
+     */
+    public static LinearTransform createScale(final int dimension, final double scale) {
+        if (scale == 1) {
+            return IdentityTransform.create(dimension);
+        }
+        final Matrix matrix = new GeneralMatrix(dimension + 1);
+        for (int i=0; i<dimension; i++) {
+            matrix.setElement(i, i, scale);
+        }
+        return create(matrix);
+    }
+
+    /**
+     * Creates a transform that apply the same translation along all axis.
+     *
+     * @param dimension The input and output dimensions.
+     * @param offset The translation.
+     *
+     * @since 2.3
+     */
+    public static LinearTransform createTranslation(final int dimension, final double offset) {
+        if (offset == 0) {
+            return IdentityTransform.create(dimension);
+        }
+        final Matrix matrix = new GeneralMatrix(dimension + 1);
+        for (int i=0; i<dimension; i++) {
+            matrix.setElement(i, dimension, offset);
+        }
+        return create(matrix);
+    }
+
+    /**
      * Creates a matrix that keep only a subset of the ordinate values.
      * The dimension of source coordinates is {@code sourceDim} and
      * the dimension of target coordinates is {@code toKeep.length}.
