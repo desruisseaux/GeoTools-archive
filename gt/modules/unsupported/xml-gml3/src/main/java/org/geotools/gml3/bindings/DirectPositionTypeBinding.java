@@ -107,7 +107,8 @@ public class DirectPositionTypeBinding extends AbstractComplexBinding {
         return dp;
     }
 
-    public Element encode(Object object, Document document, Element value) throws Exception {
+    public Element encode(Object object, Document document, Element value)
+        throws Exception {
         DirectPosition dp = (DirectPosition) object;
 
         double[] coordinates = dp.getCoordinates();

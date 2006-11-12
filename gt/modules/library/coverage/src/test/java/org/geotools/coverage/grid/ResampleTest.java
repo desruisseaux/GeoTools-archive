@@ -122,7 +122,7 @@ public final class ResampleTest extends GridCoverageTest {
      */
     private static AffineTransform getAffineTransform(final GridCoverage2D coverage) {
         AffineTransform tr;
-        tr = (AffineTransform)((GridGeometry2D)coverage.getGridGeometry()).getGridToCoordinateSystem2D();
+        tr = (AffineTransform)((GridGeometry2D)coverage.getGridGeometry()).getGridToCRS2D();
         tr = new AffineTransform(tr); // Change the type to the default Java2D implementation.
         return tr;
     }

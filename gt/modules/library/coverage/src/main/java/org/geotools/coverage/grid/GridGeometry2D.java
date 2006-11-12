@@ -23,13 +23,17 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Locale;
 
 // OpenGIS dependencies
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.grid.GridRange;
+import org.opengis.metadata.spatial.PixelOrientation;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
@@ -42,8 +46,10 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.factory.FactoryGroup;
+import org.geotools.referencing.operation.matrix.MatrixFactory;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -74,6 +80,18 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * Helpers methods for 2D CRS creation. Will be constructed only when first needed.
      */
     private static FactoryGroup FACTORY_GROUP;
+
+    /**
+     * The offset for various pixel orientations.
+     */
+    private static Map/*<PixelOrientation, Point2D.Double>*/ ORIENTATIONS = new HashMap(8);
+    static {
+        ORIENTATIONS.put(PixelOrientation.CENTER,      new Point2D.Double( 0.0,  0.0));
+        ORIENTATIONS.put(PixelOrientation.UPPER_LEFT,  new Point2D.Double(-0.5, -0.5));
+        ORIENTATIONS.put(PixelOrientation.UPPER_RIGHT, new Point2D.Double( 0.5, -0.5));
+        ORIENTATIONS.put(PixelOrientation.LOWER_LEFT,  new Point2D.Double(-0.5,  0.5));
+        ORIENTATIONS.put(PixelOrientation.LOWER_RIGHT, new Point2D.Double( 0.5,  0.5));
+    }
 
     /**
      * The two-dimensional part of the coordinate reference system.
@@ -484,6 +502,13 @@ public class GridGeometry2D extends GeneralGridGeometry {
     }
     
     /**
+     * @deprecated Renamed as {@link #getGridToCRS2D()}.
+     */
+    public MathTransform2D getGridToCoordinateSystem2D() throws InvalidGridGeometryException {
+        return getGridToCRS2D();
+    }
+    
+    /**
      * Returns a math transform for the two dimensional part. This is a convenience method for
      * working on horizontal data while ignoring vertical or temporal dimensions.
      *
@@ -494,17 +519,77 @@ public class GridGeometry2D extends GeneralGridGeometry {
      * @throws InvalidGridGeometryException if a two-dimensional transform is not available
      *         for this grid geometry.
      *
-     * @see #getGridToCoordinateSystem
+     * @see #getGridToCRS
+     *
+     * @since 2.3
      */
-    public MathTransform2D getGridToCoordinateSystem2D() throws InvalidGridGeometryException {
+    public MathTransform2D getGridToCRS2D() throws InvalidGridGeometryException {
         if (gridToCRS2D != null) {
             return gridToCRS2D;
         }
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.NO_TRANSFORM2D_AVAILABLE));
     }
+
+    /**
+     * Returns a math transform for the two dimensional part. This method is similar
+     * to {@link #getGridToCRS2D()} except that the transform may maps a pixel corner
+     * instead of pixel center.
+     *
+     * @param  orientation The pixel part to map. The default value is
+     *         {@link PixelOrientation#CENTER CENTER}.
+     * @return The transform which allows for the transformations from grid coordinates
+     *         to real world earth coordinates.
+     * @throws InvalidGridGeometryException if a two-dimensional transform is not available
+     *         for this grid geometry.
+     *
+     * @since 2.3
+     */
+    public MathTransform2D getGridToCRS2D(final PixelOrientation orientation) {
+        final int xdim = (gridDimensionX < gridDimensionY) ? 0 : 1;
+        return (MathTransform2D) translate(getGridToCRS2D(), orientation, xdim, xdim | 1);
+    }
+
+    /**
+     * Returns a math transform mapping the specified pixel part.
+     *
+     * @param  orientation The pixel part to map. The default value is
+     *         {@link PixelOrientation#CENTER CENTER}.
+     * @return The transform which allows for the transformations from grid coordinates
+     *         to real world earth coordinates.
+     * @throws InvalidGridGeometryException if a transform is not available
+     *         for this grid geometry.
+     *
+     * @since 2.3
+     */
+    public MathTransform getGridToCRS(final PixelOrientation orientation) {
+        return translate(getGridToCRS(), orientation, gridDimensionX, gridDimensionY);
+    }
+
+    /**
+     * Translates the specified math transform according the specified pixel orientation.
+     * The {@code gridToCRS} math transform is assumed maps the pixel centers.
+     */
+    private static MathTransform translate(final MathTransform gridToCRS,
+                                           final PixelOrientation orientation,
+                                           final int gridDimensionX, final int gridDimensionY)
+    {
+        if (PixelOrientation.CENTER.equals(orientation)) {
+            return gridToCRS;
+        }
+        final Point2D.Double offset = (Point2D.Double) ORIENTATIONS.get(orientation);
+        if (offset == null) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "orientation", orientation));
+        }
+        final int dimension = gridToCRS.getSourceDimensions();
+        final Matrix matrix = MatrixFactory.create(dimension + 1);
+        matrix.setElement(gridDimensionX, dimension, offset.x);
+        matrix.setElement(gridDimensionY, dimension, offset.y);
+        return ConcatenatedTransform.create(ProjectiveTransform.create(matrix), gridToCRS);
+    }
     
     /**
-     * Transforms a point using the inverse of {@link #getGridToCoordinateSystem2D()}.
+     * Transforms a point using the inverse of {@link #getGridToCRS2D()}.
      *
      * @param  point The point in logical coordinate system.
      * @return A new point in the grid coordinate system.

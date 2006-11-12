@@ -28,9 +28,11 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -114,6 +116,12 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     public static final int GRID_TO_CRS = 8;
 
     /**
+     * A buffer of math transforms created by {@link #getHalfPixelTranslation}.
+     * Each element in this array will be created when first needed.
+     */
+    private static final MathTransform[] translations = new MathTransform[8];
+
+    /**
      * The valid coordinate range of a grid coverage, or {@code null} if none. The lowest valid
      * grid coordinate is zero for {@link BufferedImage}, but may be non-zero for arbitrary
      * {@link RenderedImage}. A grid with 512 cells can have a minimum coordinate of 0 and
@@ -142,8 +150,8 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
 
     /**
      * The math transform (usually an affine transform), or {@code null} if none.
-     * This math transform maps pixel center to "real world" coordinate using the
-     * following line:
+     * This math transform maps {@linkplain PixelInCell#CELL_CENTER pixel center}
+     * to "real world" coordinate using the following line:
      *
      * <pre>gridToCRS.transform(pixels, point);</pre>
      */
@@ -162,36 +170,15 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         envelope.setCoordinateReferenceSystem(crs);
     }
 
-	/**
-	 * Constructs a new grid geometry from a math transform.
-	 * 
-	 * @param gridRange
-	 *            The valid coordinate range of a grid coverage, or {@code null}
-	 *            if none.
-	 * @param gridToCRS
-	 *            The math transform which allows for the transformations from
-	 *            grid coordinates (pixel's <em>center</em>) to real world
-	 *            earth coordinates.
-	 * 
-	 * @deprecated Replaced by
-	 *             <code>{@linkplain #GeneralGridGeometry(GridRange, MathTransform,
-	 *             CoordinateReferenceSystem) GeneralGridGeometry}(gridRange, gridToCRS, null)</code>.
-	 */
-	public GeneralGridGeometry(final GridRange gridRange,
-			final MathTransform gridToCRS) {
-		this(gridRange, gridToCRS, (CoordinateReferenceSystem) null);
-	}
-
-	/**
-	 * Constructs a new grid geometry from a
-	 * {@linkplain MathTransform math transform}. This is the most general
-     * the most general constructor, the one that gives the maximal control on the grid geometry
-     * to be created.
+    /**
+     * Constructs a new grid geometry from a {@linkplain MathTransform math transform}.
+     * This is the most general constructor, the one that gives the maximal control over
+     * the grid geometry to be created.
      *
      * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
      * @param gridToCRS The math transform which allows for the transformations from
      *        grid coordinates (pixel's <em>center</em>) to real world earth coordinates.
-     *        May be {@code null} (but this is not recommanded).
+     *        May be {@code null}, but this is not recommanded.
      * @param crs The coordinate reference system for the "real world" coordinates, or {@code null}
      *        if unknown. This CRS is given to the {@linkplain #getEnvelope envelope}.
      *
@@ -209,21 +196,6 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     {
         this.gridRange = gridRange;
         this.gridToCRS = gridToCRS;
-		envelope = getEnvelope(gridRange, gridToCRS, crs, true);
-	}
-
-	/**
-	 * @param gridRange
-	 * @param gridToCRS
-	 * @param crs
-	 * @throws MismatchedDimensionException
-	 * @throws IllegalArgumentException
-	 * @throws MissingResourceException
-	 */
-	public static GeneralEnvelope getEnvelope(final GridRange gridRange,
-			final MathTransform gridToCRS, final CoordinateReferenceSystem crs,
-			final boolean halfPix) throws MismatchedDimensionException,
-			IllegalArgumentException, MissingResourceException {
         if (gridRange!=null && gridToCRS!=null) {
             /*
              * Checks arguments.
@@ -255,13 +227,12 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                 // TODO: uncomment the exception cause when we will be allowed to target J2SE 1.5.
             }
             envelope.setCoordinateReferenceSystem(crs);
-            return envelope;
-		} else if (crs != null) {
-			GeneralEnvelope retEnvelope = new GeneralEnvelope(crs);
-			retEnvelope.setToNull();
-			return retEnvelope;
+            this.envelope = envelope;
+        } else if (crs != null) {
+            envelope = new GeneralEnvelope(crs);
+            envelope.setToNull();
         } else {
-			return null;
+            envelope = null;
         }
     }
 
@@ -312,20 +283,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
         this(gridRange, userRange, reverse(cs), swapXY(cs));
     }
 
-	/**
-	 * Constructs a new grid geometry from an envelope.
-	 * 
-	 * @deprecated Replaced by
-	 *             {@code GeneralGridGeometry(gridRange, userRange, reverse, false)}.
-	 *             Users just need to append the {@code false} argument value,
-	 *             so this constructor will be removed in a future version in
-	 *             order to keep the API lighter.
-	 */
-	public GeneralGridGeometry(final GridRange gridRange,
-			final Envelope userRange, final boolean[] reverse) {
-		this(gridRange, userRange, reverse, false);
-	}
-	/**
+    /**
      * Constructs a new grid geometry from an {@linkplain Envelope envelope}. An
      * {@linkplain AffineTransform affine transform} will be computed automatically from the
      * specified envelope. The two last arguments ({@code swapXY} and {@code reverse}) are hints
@@ -404,27 +362,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     {
         this.gridRange = gridRange;
         this.envelope  = new GeneralEnvelope(userRange);
-		gridToCRS = getTransform(gridRange, userRange, reverse, swapXY, true);
-	}
-
-	/**
-	 * @param gridRange
-	 * @param userRange
-	 * @param reverse
-	 * @param swapXY
-	 * @param halfPix
-	 * 
-	 * @return a MathTransform
-	 * 
-	 * @throws MismatchedDimensionException
-	 */
-	public static MathTransform getTransform(final GridRange gridRange,
-                                    			final Envelope userRange, 
-                                    			final boolean[] reverse,
-                                    			final boolean swapXY, 
-                                    			boolean halfPix)
-                                    			throws MismatchedDimensionException {
-		/*
+        /*
          * Checks arguments validity. Grid range and envelope dimensions must match.
          * We are more tolerant for the coordinate system dimension (if any), since
          * it is only an optional hint for interchanging axis in a more common order.
@@ -458,21 +396,41 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                 scale  = -scale;
                 offset = userRange.getMaximum(j);
             }
-			offset -= scale * (gridRange.getLower(i) - (halfPix ? 0.5 : 0));
+            offset -= scale * (gridRange.getLower(i) -  0.5);
             matrix.setElement(j, j,         0.0   );
             matrix.setElement(j, i,         scale );
             matrix.setElement(j, dimension, offset);
         }
-		return ProjectiveTransform.create(matrix);
+        gridToCRS = ProjectiveTransform.create(matrix);
     }
 
-	public static MathTransform getTransform(final GridRange gridRange,
-			final Envelope userRange, boolean halfPix)
-			throws MismatchedDimensionException {
-		final CoordinateSystem cs = getCoordinateSystem(userRange);
-		return getTransform(gridRange, userRange, reverse(cs), swapXY(cs),
-				halfPix);
-	}
+    /**
+     * @deprecated Replaced by {@code new GeneralGridGeometry(gridRange, ...).getGridToCRS(...)}.
+     *
+     * @since 2.3
+     */
+    public static MathTransform getTransform(final GridRange gridRange, final Envelope userRange, 
+            final boolean[] reverse, final boolean swapXY, final boolean halfPix)
+            throws MismatchedDimensionException
+    {
+        return new GeneralGridGeometry(gridRange, userRange, reverse, swapXY).getGridToCRS(
+                halfPix ? PixelInCell.CELL_CENTER : PixelInCell.CELL_CORNER);
+    }
+
+    /**
+     * @deprecated Replaced by {@code new GeneralGridGeometry(gridRange, ...).getGridToCRS(...)}.
+     *
+     * @since 2.3
+     */
+    public static MathTransform getTransform(final GridRange gridRange,
+                                             final Envelope  userRange,
+                                             boolean halfPix)
+            throws MismatchedDimensionException
+    {
+        final CoordinateSystem cs = getCoordinateSystem(userRange);
+        return getTransform(gridRange, userRange, reverse(cs), swapXY(cs), halfPix);
+    }
+
     /**
      * Returns the coordinate system in use with the specified envelope. This method
      * is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
@@ -495,8 +453,10 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     /**
      * Applies heuristic rules in order to determine which axis should be reversed. This
      * method is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
+     *
+     * @since 2.3
      */
-	static public boolean[] reverse(final CoordinateSystem cs) {
+    public static boolean[] reverse(final CoordinateSystem cs) {
         if (cs == null) {
             return null;
         }
@@ -516,8 +476,10 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     /**
      * Applies heuristic rules in order to determine if the two first axis should be interchanged.
      * This method is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
+     *
+     * @since 2.3
      */
-	static public boolean swapXY(final CoordinateSystem cs) {
+    public static boolean swapXY(final CoordinateSystem cs) {
         boolean swapXY = false;
         if (cs!=null && cs.getDimension() >= 2) {
             swapXY = AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&
@@ -592,6 +554,19 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
+     * @deprecated Replaced by {@code new GeneralGridGeometry(gridRange, ...).getEnvelope()}.
+     *
+     * @since 2.3
+     */
+    public static GeneralEnvelope getEnvelope(final GridRange gridRange,
+            final MathTransform gridToCRS, final CoordinateReferenceSystem crs,
+            final boolean halfPix) throws MismatchedDimensionException,
+            IllegalArgumentException, MissingResourceException
+    {
+        return (GeneralEnvelope) new GeneralGridGeometry(gridRange, gridToCRS, crs).getEnvelope();
+    }
+
+    /**
      * Returns the valid coordinate range of a grid coverage. The lowest valid grid coordinate is
      * zero for {@link BufferedImage}, but may be non-zero for arbitrary {@link RenderedImage}. A
      * grid with 512 cells can have a minimum coordinate of 0 and maximum of 512, with 511 as the
@@ -614,9 +589,16 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * Returns the math transform which allows for the transformations from grid coordinates to
-     * real world earth coordinates. The transform is often an affine transformation. The coordinate
-     * reference system of the real world coordinates is given by
+     * @deprecated Renamed as {@link #getGridToCRS()}.
+     */
+    public MathTransform getGridToCoordinateSystem() throws InvalidGridGeometryException {
+        return getGridToCRS();
+    }
+
+    /**
+     * Returns the transform from grid coordinates to real world earth coordinates.
+     * The transform is often an affine transform. The coordinate reference system of the
+     * real world coordinates is given by
      * {@link org.opengis.coverage.Coverage#getCoordinateReferenceSystem}.
      * <p>
      * <strong>Note:</strong> OpenGIS requires that the transform maps <em>pixel centers</em>
@@ -628,15 +610,73 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *         <code>{@linkplain #isDefined isDefined}({@linkplain #GRID_TO_CRS})</code>
      *         returned {@code false}).
      *
-     * @see GridGeometry2D#getGridToCoordinateSystem2D
+     * @see GridGeometry2D#getGridToCRS2D()
+     *
+     * @since 2.3
      */
-    public MathTransform getGridToCoordinateSystem() throws InvalidGridGeometryException {
+    public MathTransform getGridToCRS() throws InvalidGridGeometryException {
         if (gridToCRS != null) {
             assert isDefined(GRID_TO_CRS);
             return gridToCRS;
         }
         assert !isDefined(GRID_TO_CRS);
         throw new InvalidGridGeometryException(Errors.format(ErrorKeys.UNSPECIFIED_TRANSFORM));
+    }
+
+    /**
+     * Returns the transform from grid coordinates to real world earth coordinates.
+     * This is similar to {@link #getGridToCRS()} except that the transform may maps
+     * other parts than {@linkplain PixelInCell#CELL_CENTER pixel center}.
+     *
+     * @param  halfPixel The pixel part to map.
+     * @return The transform (never {@code null}).
+     * @throws InvalidGridGeometryException if this grid geometry has no transform (i.e.
+     *         <code>{@linkplain #isDefined isDefined}({@linkplain #GRID_TO_CRS})</code>
+     *         returned {@code false}).
+     *
+     * @since 2.3
+     */
+    public MathTransform getGridToCRS(final PixelInCell halfPixel)
+            throws InvalidGridGeometryException
+    {
+        final MathTransform gridToCRS = getGridToCoordinateSystem();
+        if (PixelInCell.CELL_CENTER.equals(halfPixel)) {
+            return gridToCRS;
+        }
+        if (!PixelInCell.CELL_CORNER.equals(halfPixel)) {
+            throw new IllegalArgumentException(Errors.format(
+                    ErrorKeys.ILLEGAL_ARGUMENT_$2, "halfPixel", halfPixel));
+        }
+        return ConcatenatedTransform.create(
+                getHalfPixelTranslation(gridToCRS.getSourceDimensions()), gridToCRS);
+    }
+
+    /**
+     * Returns an affine transform holding a translation from the
+     * {@linkplain PixelInCell#CELL_CENTER pixel center} to the
+     * {@linkplain PixelInCell#CELL_CORNER pixel corner}. The
+     * translation terms are set to exactly -0.5.
+     *
+     * @param dimension The dimension.
+     */
+    private static MathTransform getHalfPixelTranslation(final int dimension) {
+        synchronized (translations) {
+            if (dimension < translations.length) {
+                final MathTransform candidate = translations[dimension];
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+            final Matrix matrix = MatrixFactory.create(dimension + 1);
+            for (int i=0; i<dimension; i++) {
+                matrix.setElement(i, dimension, -0.5);
+            }
+            final MathTransform mt = ProjectiveTransform.create(matrix);
+            if (dimension < translations.length) {
+                translations[dimension] = mt;
+            }
+            return mt;
+        }
     }
 
     /**

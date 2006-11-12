@@ -51,8 +51,8 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.geotools.resources.XMath;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.geometry.XDimension2D;
-import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 
 
 /**

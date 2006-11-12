@@ -254,21 +254,10 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
          */
         Category nodata = Category.NODATA;
         final long nodataBits = Double.doubleToRawLongBits(Double.NaN);
+        final String noDataName = Vocabulary.format(VocabularyKeys.NODATA).trim();
         for (int i=categoriesLength; --i>=0;) {
             final Category candidate = categories[i];
-            ////////
-            //
-            //
-            final String candidateName=candidate.getName().toString().trim();
-            final String noDataName=Vocabulary.formatInternational(VocabularyKeys.NODATA).toString().trim();
-            if(candidateName.equalsIgnoreCase(noDataName)){
-            	nodata = candidate;
-            	break;
-            }
-            	
-            //
-            //
-            ////////
+            final String candidateName = candidate.getName().toString().trim();
             final double value = candidate.geophysics(true).minimum;
             if (Double.isNaN(value)) {
                 nodata = candidate;
@@ -276,6 +265,13 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
                     // Give a preference for the standard Double.NaN.
                     // We should have only one such value, since the
                     // range check above prevents range overlapping.
+                    break;
+                }
+                // If the category name is "No data" (in both current locale and in
+                // English), we assume that this is the category we were looking for.
+                if (candidateName.equalsIgnoreCase(noDataName) || 
+                    candidateName.equalsIgnoreCase("No data"))
+                {
                     break;
                 }
             }
@@ -289,19 +285,6 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
         Category main = null;
         for (int i=categoriesLength; --i>=0;) {
             final Category candidate = categories[i];
-            ////////
-            //
-            //
-            final String candidateName=candidate.getName().toString().trim();
-            final String noDataName=Vocabulary.formatInternational(VocabularyKeys.NODATA).toString().trim();
-            if(candidateName.equalsIgnoreCase(noDataName)){
-            	nodata = candidate;
-            	continue;
-            }
-            	
-            //
-            //
-            ////////            
             if (candidate.isQuantitative()) {
                 final Category candidatePeer = candidate.geophysics(false);
                 final double candidateRange = candidatePeer.maximum - candidatePeer.minimum;
@@ -845,26 +828,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Gets the dimension of input points, which is 1.
-     *
-     * @deprecated Replaced by {@link #getSourceDimensions}.
-     */
-    public final int getDimSource() {
-        return 1;
-    }
-    
-    /**
-     * Gets the dimension of input points, which is 1.
      */
     public final int getSourceDimensions() {
-        return 1;
-    }
-    
-    /**
-     * Gets the dimension of output points, which is 1.
-     *
-     * @deprecated Replaced by {@link #getTargetDimensions}.
-     */
-    public final int getDimTarget() {
         return 1;
     }
     

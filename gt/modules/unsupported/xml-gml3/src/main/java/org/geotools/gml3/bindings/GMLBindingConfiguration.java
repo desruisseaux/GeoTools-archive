@@ -39,7 +39,7 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(GML.AbstractRingPropertyType,
             AbstractRingPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.BoundingShapeType,
-                BoundingShapeTypeBinding.class);
+            BoundingShapeTypeBinding.class);
         //container.registerComponentImplementation(GML.COORDINATESTYPE,CoordinatesTypeBinding.class);
         container.registerComponentImplementation(GML.CoordinatesType,
             GMLCoordinatesTypeBinding.class);

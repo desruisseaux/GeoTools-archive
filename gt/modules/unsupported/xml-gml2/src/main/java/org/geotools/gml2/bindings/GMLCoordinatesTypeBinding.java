@@ -90,7 +90,7 @@ public class GMLCoordinatesTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-      	return CoordinateSequence.class;
+        return CoordinateSequence.class;
     }
 
     /**

@@ -30,6 +30,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;
@@ -154,54 +155,45 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
     /**
      * Constructs a envelope defined by two positions.
      *
-     * @param  minCP Minimum ordinate values.
-     * @param  maxCP Maximum ordinate values.
+     * @param  minDP Minimum ordinate values.
+     * @param  maxDP Maximum ordinate values.
      * @throws MismatchedDimensionException if the two positions don't have the same dimension.
      * @throws IllegalArgumentException if an ordinate value in the minimum point is not
      *         less than or equal to the corresponding ordinate value in the maximum point.
      */
-    public GeneralEnvelope(final double[] minCP, final double[] maxCP)
-            throws MismatchedDimensionException
+    public GeneralEnvelope(final double[] minDP, final double[] maxDP)
+            throws IllegalArgumentException
     {
-        ensureNonNull("minCP", minCP);
-        ensureNonNull("maxCP", maxCP);
-        if (minCP.length != maxCP.length) {
+        ensureNonNull("minDP", minDP);
+        ensureNonNull("maxDP", maxDP);
+        if (minDP.length != maxDP.length) {
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2,
-                                new Integer(minCP.length), new Integer(maxCP.length)));
+                                new Integer(minDP.length), new Integer(maxDP.length)));
         }
-        ordinates = new double[minCP.length + maxCP.length];
-        System.arraycopy(minCP, 0, ordinates, 0,            minCP.length);
-        System.arraycopy(maxCP, 0, ordinates, minCP.length, maxCP.length);
+        ordinates = new double[minDP.length + maxDP.length];
+        System.arraycopy(minDP, 0, ordinates, 0,            minDP.length);
+        System.arraycopy(maxDP, 0, ordinates, minDP.length, maxDP.length);
         checkCoherence();
     }
 
     /**
      * Constructs a envelope defined by two positions.
      *
-     * @param  minCP Point containing minimum ordinate values.
-     * @param  maxCP Point containing maximum ordinate values.
+     * @param  minDP Point containing minimum ordinate values.
+     * @param  maxDP Point containing maximum ordinate values.
      * @throws MismatchedDimensionException if the two positions don't have the same dimension.
+     * @throws MismatchedReferenceSystemException if the two positions don't use the same CRS.
      * @throws IllegalArgumentException if an ordinate value in the minimum point is not
      *         less than or equal to the corresponding ordinate value in the maximum point.
      */
-    public GeneralEnvelope(final GeneralDirectPosition minCP, final GeneralDirectPosition maxCP)
-            throws MismatchedDimensionException
+    public GeneralEnvelope(final GeneralDirectPosition minDP, final GeneralDirectPosition maxDP)
+            throws IllegalArgumentException
     {
 //  Uncomment next lines if Sun fixes RFE #4093999
-//      ensureNonNull("minCP", minCP);
-//      ensureNonNull("maxCP", maxCP);
-        this(minCP.ordinates, maxCP.ordinates);
-        final CoordinateReferenceSystem crs1 = minCP.getCoordinateReferenceSystem();
-        final CoordinateReferenceSystem crs2 = maxCP.getCoordinateReferenceSystem();
-        if (crs1 == null) {
-            crs = crs2;
-        } else {
-            crs = crs1;
-            if (crs2!=null && !CRS.equalsIgnoreMetadata(crs1, crs2)) {
-                throw new IllegalArgumentException(
-                          Errors.format(ErrorKeys.ILLEGAL_COORDINATE_REFERENCE_SYSTEM));
-            }
-        }
+//      ensureNonNull("minDP", minDP);
+//      ensureNonNull("maxDP", maxDP);
+        this(minDP.ordinates, maxDP.ordinates);
+        crs = getCoordinateReferenceSystem(minDP, maxDP);
         GeneralDirectPosition.checkCoordinateReferenceSystemDimension(crs, ordinates.length/2);
     }
 
@@ -247,6 +239,30 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
                 throw new IllegalArgumentException(Errors.format(
                         ErrorKeys.ILLEGAL_ENVELOPE_ORDINATE_$1, new Integer(i)));
             }
+        }
+    }
+
+    /**
+     * Returns the common CRS of specified points.
+     *
+     * @param  minDP The first position.
+     * @param  maxDP The second position.
+     * @return Their common CRS, or {@code null} if none.
+     * @throws MismatchedReferenceSystemException if the two positions don't use the same CRS.
+     */
+    static CoordinateReferenceSystem getCoordinateReferenceSystem(final DirectPosition minDP,
+            final DirectPosition maxDP) throws MismatchedReferenceSystemException
+    {
+        final CoordinateReferenceSystem crs1 = minDP.getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem crs2 = maxDP.getCoordinateReferenceSystem();
+        if (crs1 == null) {
+            return crs2;
+        } else {
+            if (crs2!=null && !crs1.equals(crs2)) {
+                throw new MismatchedReferenceSystemException(
+                          Errors.format(ErrorKeys.MISMATCHED_COORDINATE_REFERENCE_SYSTEM));
+            }
+            return crs1;
         }
     }
 

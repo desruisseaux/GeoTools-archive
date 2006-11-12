@@ -36,12 +36,12 @@ import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.operation.matrix.Matrix2;
 import org.geotools.referencing.operation.matrix.Matrix3;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.wkt.Formatter;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.resources.Formattable;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.geometry.XAffineTransform;
 
 
 /**

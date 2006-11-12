@@ -51,9 +51,9 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.geometry.TransformedDirectPosition;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.matrix.AffineTransform2D;
 import org.geotools.display.event.ReferencedEvent;
 

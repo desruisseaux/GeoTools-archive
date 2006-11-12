@@ -74,11 +74,11 @@ import org.opengis.referencing.crs.DerivedCRS;
 import org.geotools.util.RangeSet;
 import org.geotools.resources.GraphicsUtilities;
 import org.geotools.resources.geometry.XRectangle2D;
-import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 
 
 /**

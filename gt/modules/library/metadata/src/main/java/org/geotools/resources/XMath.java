@@ -144,7 +144,10 @@ public final class XMath {
      *     0 if <var>x</var> is null or {@code NaN} and
      *    +1 if <var>x</var> is positive.
      *
-     * @todo Remove this method when we will be allowed to use J2SE 1.5.
+     * @todo Consider removing this method when we will be allowed to use J2SE 1.5.
+     *       Note: the J2SE 1.5 method is actually not an exact replacement (it
+     *       returns a double type instead, which may lead to tricky issues relative
+     *       to NaN and negative zero).
      */
     public static int sgn(final double x) {
         if (x>0) return +1;

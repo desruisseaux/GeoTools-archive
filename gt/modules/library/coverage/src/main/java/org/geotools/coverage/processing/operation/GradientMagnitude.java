@@ -37,7 +37,7 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.OperationJAI;
-import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.util.NumberRange;
 
 
@@ -319,7 +319,7 @@ public class GradientMagnitude extends OperationJAI {
             double scaleMask2 = 1;
             if (sources.length != 0) {
                 final MathTransform2D mtr;
-                mtr = ((GridGeometry2D) sources[0].getGridGeometry()).getGridToCoordinateSystem2D();
+                mtr = ((GridGeometry2D) sources[0].getGridGeometry()).getGridToCRS2D();
                 if (mtr instanceof AffineTransform) {
                     final AffineTransform tr = (AffineTransform) mtr;
                     final double scaleX = XAffineTransform.getScaleX0(tr);

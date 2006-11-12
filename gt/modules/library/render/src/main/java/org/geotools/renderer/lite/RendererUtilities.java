@@ -50,9 +50,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * 
  * @author dblasby
- * @author Simone Giannecchini *
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/gt/module/render/src/org/geotools/renderer/lite/RendererUtilities.java $
+ * @author Simone Giannecchini
+ * @source $URL$
  */
 public final class RendererUtilities {
 

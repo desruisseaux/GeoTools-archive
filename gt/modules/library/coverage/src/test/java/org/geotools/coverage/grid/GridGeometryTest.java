@@ -84,10 +84,10 @@ public class GridGeometryTest extends TestCase {
         gg = new GridGeometry2D(new GeneralGridRange(lower,upper), identity, null);
         assertTrue(identity.isIdentity());
         assertTrue(gg.getGridToCoordinateSystem().isIdentity());
-        assertTrue(gg.getGridToCoordinateSystem2D().isIdentity());
+        assertTrue(gg.getGridToCRS2D().isIdentity());
         assertEquals(3, gg.getGridToCoordinateSystem().getSourceDimensions());
-        assertEquals(2, gg.getGridToCoordinateSystem2D().getSourceDimensions());
-        assertTrue(gg.getGridToCoordinateSystem2D() instanceof AffineTransform);
+        assertEquals(2, gg.getGridToCRS2D().getSourceDimensions());
+        assertTrue(gg.getGridToCRS2D() instanceof AffineTransform);
     }
 
     /**
@@ -101,7 +101,7 @@ public class GridGeometryTest extends TestCase {
         final GridGeometry2D gg;
         gg = new GridGeometry2D(new GeneralGridRange(lower,upper),
                                 new GeneralEnvelope(minimum, maximum), null, false);
-        final AffineTransform tr = (AffineTransform) gg.getGridToCoordinateSystem2D();
+        final AffineTransform tr = (AffineTransform) gg.getGridToCRS2D();
         assertEquals(AffineTransform.TYPE_UNIFORM_SCALE |
                      AffineTransform.TYPE_TRANSLATION, tr.getType());
 

@@ -56,7 +56,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.geom.RectangularShape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.geometry.XDimension2D;
 import org.geotools.resources.Utilities;
 

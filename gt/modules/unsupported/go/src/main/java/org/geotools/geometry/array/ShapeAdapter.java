@@ -27,7 +27,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 
 // Geotools dependencies
-import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 
 
 /**

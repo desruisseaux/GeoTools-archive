@@ -24,6 +24,7 @@ import org.opengis.util.Cloneable;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;  // For javadoc
 
@@ -103,6 +104,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
         super(x, y, width, height);
         setCoordinateReferenceSystem(crs);
     }
+
     /**
      * Constructs two-dimensional envelope defined by the specified coordinates. Despite
      * their name, the (<var>x</var>,<var>y</var>) coordinates don't need to be oriented
@@ -110,15 +112,30 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
      * Those parameter names simply match the {@linkplain #x x} and {@linkplain #y y} fields.
      * The actual axis orientations are determined by the specified CRS.
      * See the {@linkplain Envelope2D class javadoc} for details.
+     * <p>
+     * The {@code minDP} and {@code maxDP} arguments usually contains the minimal and maximal
+     * ordinate values respectively, but this is not mandatory. The ordinates will be rearanged
+     * as needed.
+     *
+     * @param minDP The fist position.
+     * @param maxDP The second position.
+     * @throws MismatchedReferenceSystemException if the two positions don't use the same CRS.
+     *
+     * @since 2.4
      */
-    public Envelope2D( DirectPosition2D a, DirectPosition2D b )
+    public Envelope2D(final DirectPosition2D minDP, final DirectPosition2D maxDP)
+            throws MismatchedReferenceSystemException
     {
-        this( a.getCoordinateReferenceSystem(),
-              Math.min( a.x, b.x ),
-              Math.min( a.y, b.y ),
-              Math.abs( a.x- b.x ),
-              Math.abs( a.x- b.x ) );        
+//  Uncomment next lines if Sun fixes RFE #4093999
+//      ensureNonNull("minDP", minDP);
+//      ensureNonNull("maxDP", maxDP);
+        super(Math.min(minDP.x,  maxDP.x),
+              Math.min(minDP.y,  maxDP.y),
+              Math.abs(maxDP.x - minDP.x),
+              Math.abs(maxDP.y - minDP.y));
+        setCoordinateReferenceSystem(GeneralEnvelope.getCoordinateReferenceSystem(minDP, maxDP));
     }
+
     /**
      * Returns the coordinate reference system in which the coordinates are given.
      *
@@ -150,6 +167,9 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
      * dimension for all points within the {@code Envelope}.
      *
      * @return The lower corner.
+     *
+     * @todo Change the return type to {@link DirectPosition2D} when we will
+     *       be allowed to compile for J2SE 1.5.
      */
     public DirectPosition getLowerCorner() {
         return new DirectPosition2D(crs, getMinX(), getMinY());
@@ -160,6 +180,9 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
      * dimension for all points within the {@code Envelope}.
      *
      * @return The upper corner.
+     *
+     * @todo Change the return type to {@link DirectPosition2D} when we will
+     *       be allowed to compile for J2SE 1.5.
      */
     public DirectPosition getUpperCorner() {
         return new DirectPosition2D(crs, getMaxX(), getMaxY());

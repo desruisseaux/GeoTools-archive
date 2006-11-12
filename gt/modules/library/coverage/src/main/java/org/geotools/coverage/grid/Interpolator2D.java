@@ -195,7 +195,7 @@ public final class Interpolator2D extends GridCoverage2D {
         if (fallback!=null && fallback!=this) {
             this.toGrid = fallback.toGrid;
         } else try {
-            final MathTransform2D transform = gridGeometry.getGridToCoordinateSystem2D();
+            final MathTransform2D transform = gridGeometry.getGridToCRS2D();
             // Note: If we want nearest-neighbor interpolation, we need to add the
             //       following line (assuming the transform is an 'AffineTransform'):
             //

@@ -61,6 +61,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation           .BasicTest                .suite());
         suite.addTest(org.geotools.referencing.operation           .Transform3DTest          .suite());
         suite.addTest(org.geotools.referencing.operation           .TransformationTest       .suite());
+        suite.addTest(org.geotools.referencing.operation.matrix    .XAffineTransformTest     .suite());
         suite.addTest(org.geotools.referencing.operation.transform .MathTransformTest        .suite());
         suite.addTest(org.geotools.referencing.operation.transform .GeocentricTransformTest  .suite());
         suite.addTest(org.geotools.referencing.operation.transform .GeocentricTranslationTest.suite());

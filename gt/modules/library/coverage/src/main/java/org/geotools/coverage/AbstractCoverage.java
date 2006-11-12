@@ -67,9 +67,9 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.io.LineWriter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.XArray;
-import org.geotools.resources.geometry.XAffineTransform;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
@@ -943,9 +943,9 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements
 		 * @return A render context initialized with an affine transform from
 		 *         the coverage to the grid coordinate system. This transform is
 		 *         the inverse of
-		 *         {@link org.geotools.coverage.grid.GridGeometry2D#getGridToCoordinateSystem2D}.
+		 *         {@link org.geotools.coverage.grid.GridGeometry2D#getGridToCRS2D}.
 		 * 
-		 * @see org.geotools.coverage.grid.GridGeometry2D#getGridToCoordinateSystem2D
+		 * @see org.geotools.coverage.grid.GridGeometry2D#getGridToCRS2D
 		 */
 		protected RenderContext createRenderContext(
 				final Rectangle2D gridBounds, final RenderingHints hints) {

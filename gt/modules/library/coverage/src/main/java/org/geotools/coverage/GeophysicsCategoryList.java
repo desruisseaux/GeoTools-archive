@@ -89,7 +89,7 @@ final class GeophysicsCategoryList extends CategoryList {
     private transient FieldPosition dummy;
 
     /**
-     * Construct a category list using the specified array of categories.
+     * Constructs a category list using the specified array of categories.
      *
      * @param  categories The list of categories. Elements should be
      *                    instances of {@link GeophysicsCategory}
@@ -110,7 +110,7 @@ final class GeophysicsCategoryList extends CategoryList {
     }
     
     /**
-     * Compute the smallest number of fraction digits necessary to resolve all
+     * Computes the smallest number of fraction digits necessary to resolve all
      * quantitative values. This method assume that geophysics values in the range
      * {@code Category.geophysics(true).getRange} are stored as integer sample
      * values in the range {@code Category.geophysics(false).getRange}.

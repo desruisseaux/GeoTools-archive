@@ -15,12 +15,13 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.eclipse.xsd.XSDComplexTypeDefinition;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDTypeDefinition;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.xml.namespace.QName;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
@@ -30,9 +31,6 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
-import org.eclipse.xsd.XSDComplexTypeDefinition;
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -51,18 +49,16 @@ import org.geotools.xml.Schemas;
  *
  */
 public class GML3ParsingUtils {
-	
-	/**
-	 * Turns a xml type definition into a geotools feature type.
-	 * @param type The xml schema tupe.
-	 * 
-	 * @return The corresponding geotools feature type.
-	 */
-	public static FeatureType featureType( XSDElementDeclaration element, BindingFactory bindingFactory ) 
-		throws Exception {
-		
-		FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
-        ftBuilder.setName( element.getName() );
+    /**
+     * Turns a xml type definition into a geotools feature type.
+     * @param type The xml schema tupe.
+     *
+     * @return The corresponding geotools feature type.
+     */
+    public static FeatureType featureType(XSDElementDeclaration element,
+        BindingFactory bindingFactory) throws Exception {
+        FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
+        ftBuilder.setName(element.getName());
         ftBuilder.setNamespace(new URI(element.getTargetNamespace()));
 
         //build the feaure type by walking through the elements of the 
@@ -116,8 +112,8 @@ public class GML3ParsingUtils {
         }
 
         return ftBuilder.getFeatureType();
-	}
-	
+    }
+
     static CoordinateReferenceSystem crs(Node node) {
         if (node.getAttribute("srsName") != null) {
             URI srs = (URI) node.getAttributeValue("srsName");

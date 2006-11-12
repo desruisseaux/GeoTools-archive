@@ -301,7 +301,7 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 		// World File values
 		// It is worthwhile to note that we have to keep into account the fact
 		// that the axis could be swapped (LAT,lon) therefore when getting
-		// xPixSize and yPixSize we need to look for it a thte right place
+		// xPixSize and yPixSize we need to look for it a the right place
 		// inside the grid to world transform.
 		//
 		// ////////////////////////////////////////////////////////////////////

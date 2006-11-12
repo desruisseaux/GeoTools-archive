@@ -182,7 +182,7 @@ public class GridCoverageFactory extends AbstractFactory {
                                  final GridSampleDimension[] bands,
                                  final Map                   properties)
     {
-        final MathTransform transform = gridGeometry.getGridToCoordinateSystem2D();
+        final MathTransform transform = gridGeometry.getGridToCRS2D();
         if (!(transform instanceof AffineTransform)) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.NOT_AN_AFFINE_TRANSFORM));
         }

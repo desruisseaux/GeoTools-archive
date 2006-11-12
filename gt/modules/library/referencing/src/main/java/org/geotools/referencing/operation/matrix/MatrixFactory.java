@@ -21,10 +21,10 @@ import org.opengis.referencing.operation.Matrix;
 
 
 /**
- * Static utility methods for creating matrix. This factory selected one of the {@link Matrix1},
+ * Static utility methods for creating matrix. This factory selects one of the {@link Matrix1},
  * {@link Matrix2}, {@link Matrix3}, {@link Matrix4} or {@link GeneralMatrix} implementation
- * according the desired matrix size. If the matrix size is know at compile time, invoke directly
- * the constructor of the appropriate class instead.
+ * according the desired matrix size. Note that if the matrix size is know at compile time,
+ * it may be more efficient to invoke directly the constructor of the appropriate class instead.
  *
  * @since 2.2
  * @source $URL$

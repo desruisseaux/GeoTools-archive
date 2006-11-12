@@ -259,7 +259,7 @@ public class OperationJAI extends Operation2D {
      *
      *   <li>Ensures that every sources {@code GridCoverage2D}s use the same coordinate reference
      *       system (at least for the two-dimensional part) with the same
-     *       {@link GridGeometry2D#getGridToCoordinateSystem2D gridToCRS} relationship.</li>
+     *       {@link GridGeometry2D#getGridToCRS2D gridToCRS} relationship.</li>
      *
      *   <li>Invokes {@link #deriveGridCoverage}.
      *       The sources in the {@code ParameterBlock} are {@link RenderedImage} objects
@@ -320,12 +320,12 @@ public class OperationJAI extends Operation2D {
         GridCoverage2D coverage = sources[PRIMARY_SOURCE_INDEX];
         final CoordinateReferenceSystem crs = coverage.getCoordinateReferenceSystem2D();
         // TODO: remove the cast when we will be allowed to compile for J2SE 1.5.
-        final MathTransform2D gridToCRS = ((GridGeometry2D) coverage.getGridGeometry()).getGridToCoordinateSystem2D();
+        final MathTransform2D gridToCRS = ((GridGeometry2D) coverage.getGridGeometry()).getGridToCRS2D();
         for (int i=0; i<sources.length; i++) {
             final GridCoverage2D source = sources[i];
             if (!CRS.equalsIgnoreMetadata(crs, source.getCoordinateReferenceSystem2D()) ||
                 !CRS.equalsIgnoreMetadata(gridToCRS,
-                    ((GridGeometry2D) source.getGridGeometry()).getGridToCoordinateSystem2D()))
+                    ((GridGeometry2D) source.getGridGeometry()).getGridToCRS2D()))
             {
                 throw new IllegalArgumentException(Errors.format(ErrorKeys.INCOMPATIBLE_GRID_GEOMETRY));
             }
@@ -443,7 +443,7 @@ public class OperationJAI extends Operation2D {
         }
         if (gridToCrs2D == null) {
             // TODO: Remove cast when we will be allowed to compile for J2SE 1.5.
-            gridToCrs2D = ((GridGeometry2D) primarySource.getGridGeometry()).getGridToCoordinateSystem2D();
+            gridToCrs2D = ((GridGeometry2D) primarySource.getGridGeometry()).getGridToCRS2D();
         }
         /*
          * 'crs2D' is the two dimensional part of the target CRS. Now for each source coverages,
@@ -497,8 +497,8 @@ public class OperationJAI extends Operation2D {
              * Constructs the 'gridToCRS' transform in the same way than the CRS:
              * leading and trailing dimensions (if any) are preserved.
              */
-            final MathTransform toSource2D = geometry.getGridToCoordinateSystem2D();
-            final MathTransform toSource   = geometry.getGridToCoordinateSystem();
+            final MathTransform toSource2D = geometry.getGridToCRS2D();
+            final MathTransform toSource   = geometry.getGridToCRS();
             MathTransform toTarget;
             if (CRS.equalsIgnoreMetadata(gridToCrs2D, toSource2D)) {
                 toTarget  = toSource;

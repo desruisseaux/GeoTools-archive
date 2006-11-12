@@ -28,7 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import org.geotools.resources.geometry.XAffineTransform;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
+
 
 /**
  * Apply an arbitrary {@link AffineTransform} on a {@link Shape}. This class is

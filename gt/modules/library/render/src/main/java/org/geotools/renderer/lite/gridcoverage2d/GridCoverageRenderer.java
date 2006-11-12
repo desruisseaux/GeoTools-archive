@@ -339,7 +339,7 @@ public final class GridCoverageRenderer {
 		//
 		// //
 		final AffineTransform croppedCoverageGridToWorldTransform = (AffineTransform) ((GridGeometry2D) croppedGridCoverage
-				.getGridGeometry()).getGridToCoordinateSystem2D();
+				.getGridGeometry()).getGridToCRS2D();
 		final double actualScaleX = lonFirst ? croppedCoverageGridToWorldTransform
 				.getScaleX()
 				: croppedCoverageGridToWorldTransform.getShearY();
@@ -527,7 +527,7 @@ public final class GridCoverageRenderer {
 		// ///////////////////////////////////////////////////////////////////
 		final AffineTransform finalGCgridToWorld = new AffineTransform(
 				(AffineTransform) ((GridGeometry2D) recoloredGridCoverage
-						.getGridGeometry()).getGridToCoordinateSystem2D());
+						.getGridGeometry()).getGridToCRS2D());
 		if (!(finalGCgridToWorld instanceof AffineTransform)) {
 			throw new UnsupportedOperationException(
 					"Non-affine transformations not yet implemented"); // TODO
