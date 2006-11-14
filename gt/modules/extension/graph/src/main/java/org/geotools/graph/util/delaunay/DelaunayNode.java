@@ -43,7 +43,8 @@ public class DelaunayNode extends BasicXYNode{
                 (this.getCoordinate().x == ((DelaunayNode)o).getCoordinate().x) &&
                 (this.getCoordinate().y == ((DelaunayNode)o).getCoordinate().y));
     }
-    
+
+/*    waiting until we use 1.5 and Math.log10 becomes available!
     private double roundToSigDigs(double d, int digits){
         if (d == 0){
             return 0;
@@ -57,9 +58,11 @@ public class DelaunayNode extends BasicXYNode{
             return ret;
         }
     }    
+*/    
     
     public String toString(){
-        return "(" + roundToSigDigs(this.getCoordinate().x, 5) + "," + roundToSigDigs(this.getCoordinate().y, 5) + ")";
+//        return "(" + roundToSigDigs(this.getCoordinate().x, 5) + "," + roundToSigDigs(this.getCoordinate().y, 5) + ")";
+	return "(" + this.getCoordinate().x + "," + this.getCoordinate().y + ")"
     }
     
 }
