@@ -17,9 +17,11 @@ package org.geotools.graph.util.delaunay;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.awt.Dimension;
+import java.io.FileReader;
 import java.util.Random;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.graph.structure.Graph;
 
 /**
@@ -39,22 +41,57 @@ public class DelaunayTest {
      */
     public static void main(String[] args) {
         Graph g;
-        boolean useRandom = false;
-        if (useRandom){
-            g = DelaunayTriangulator.triangulate(createRandomNodes(250, 250, 250, 0));
-        } else {
-            g = DelaunayTriangulator.triangulate(createStateNodes());
-        }
-        LOGGER.fine("Graph supposedly is " + g);
-        
+        boolean debug = false;
+        //for debug purposes
+//        System.out.println("long edges:");
+//        java.util.Iterator edgeIt = g.getEdges().iterator();
+//        while (edgeIt.hasNext()){
+//            DelaunayEdge next = (DelaunayEdge) edgeIt.next();
+//            if (next.getEuclideanDistance() > 50){
+//                System.out.println(next.toString());
+//            }
+//        }
+        //end debug
         JFrame frame = new JFrame();
-        GraphViewer viewer = new GraphViewer();
-        viewer.setGraph(g);
-        frame.getContentPane().add(viewer);
+        DelaunayTriangulator triangulator = new DelaunayTriangulator();
+        if (debug){
+            AddAPointTriangulator aapt = new AddAPointTriangulator(AutoClustUtils.featureCollectionToNodeArray(createBrunsdonNodes()));            
+            frame.getContentPane().add(aapt);
+        } else {
+            boolean useRandom = false;
+            if (useRandom){
+                triangulator.setNodeArray(createRandomNodes(250, 250, 250, 0));
+            } else {
+                triangulator.setNodeArray(AutoClustUtils.featureCollectionToNodeArray(createBrunsdonNodes()));
+            }
+            g = triangulator.getTriangulation();
+            LOGGER.fine("Graph supposedly is " + g);            
+            GraphViewer viewer = new GraphViewer();
+            viewer.setGraph(g);
+            frame.getContentPane().add(viewer);
+        }
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(new Dimension(400, 400));
         frame.setVisible(true);
         
+    }
+    
+    public static DelaunayNode[] createEdgeTestNodes(){
+        DelaunayNode[] nodeArray = new DelaunayNode[10];
+        for (int i = 0; i < 10; i++){
+            nodeArray[i] = new DelaunayNode();
+        }
+        nodeArray[0].setCoordinate(new Coordinate(10,30));
+        nodeArray[1].setCoordinate(new Coordinate(15,35));
+        nodeArray[2].setCoordinate(new Coordinate(20,40));
+        nodeArray[3].setCoordinate(new Coordinate(15,45));
+        nodeArray[4].setCoordinate(new Coordinate(10,50));
+        nodeArray[5].setCoordinate(new Coordinate(5,45));
+        nodeArray[6].setCoordinate(new Coordinate(0,40));
+        nodeArray[7].setCoordinate(new Coordinate(5,35));
+        nodeArray[8].setCoordinate(new Coordinate(5,40));
+        nodeArray[9].setCoordinate(new Coordinate(15,40));
+        return nodeArray;        
     }
     
     public static DelaunayNode[] createStateNodes(){
@@ -136,6 +173,70 @@ public class DelaunayTest {
 
         return nodeArray;
     }
+    
+    public static FeatureCollection createBrunsdonNodes(){
+        FeatureCollection coll = null;
+        boolean useAll = true;
+        
+        try{
+            FileReader dataReader = new FileReader("C:/jconley/data/popset1b.csv");           
+            edu.psu.geovista.io.csv.CSVParser csvp = new edu.psu.geovista.io.csv.CSVParser(dataReader);
+            String[][] data = csvp.getAllValues();
+            double[][] all = new double[data.length-1][data[0].length];
+            for (int i = 1; i < data.length; i++){
+                for (int j = 0; j < data[i].length; j++){
+                    all[i-1][j] = Double.parseDouble(data[i][j]);
+                }
+            } 
+
+            coll = org.geotools.feature.FeatureCollections.newCollection();
+
+            for (int i = 0; i < all.length; i++){
+                if (useAll){
+                    com.vividsolutions.jts.geom.Coordinate coord = new com.vividsolutions.jts.geom.Coordinate(all[i][0]*0.03, all[i][1]*0.03);
+                    com.vividsolutions.jts.geom.GeometryFactory fact = new com.vividsolutions.jts.geom.GeometryFactory();
+                    com.vividsolutions.jts.geom.Point p = fact.createPoint(coord);
+
+                    java.util.ArrayList features = new java.util.ArrayList();
+                    org.geotools.feature.AttributeType[] pointAttribute = new org.geotools.feature.AttributeType[3];
+                    pointAttribute[0] = org.geotools.feature.AttributeTypeFactory.newAttributeType("centre", com.vividsolutions.jts.geom.Point.class);
+                    pointAttribute[1] = org.geotools.feature.AttributeTypeFactory.newAttributeType("population",Double.class);
+                    pointAttribute[2] = org.geotools.feature.AttributeTypeFactory.newAttributeType("target",Double.class);
+
+                    org.geotools.feature.FeatureType pointType = org.geotools.feature.FeatureTypeFactory.newFeatureType(pointAttribute,"testPoint");
+
+                    org.geotools.feature.Feature pointFeature = pointType.create(new Object[]{p,
+                                                                                              new Double(all[i][2]),
+                                                                                              new Double(all[i][3])});
+                    coll.add(pointFeature);                     
+                } else {                
+                    if (all[i][3] > 0){
+                        com.vividsolutions.jts.geom.Coordinate coord = new com.vividsolutions.jts.geom.Coordinate(all[i][0]*3, all[i][1]*3);
+                        com.vividsolutions.jts.geom.GeometryFactory fact = new com.vividsolutions.jts.geom.GeometryFactory();
+                        com.vividsolutions.jts.geom.Point p = fact.createPoint(coord);
+
+                        java.util.ArrayList features = new java.util.ArrayList();
+                        org.geotools.feature.AttributeType[] pointAttribute = new org.geotools.feature.AttributeType[3];
+                        pointAttribute[0] = org.geotools.feature.AttributeTypeFactory.newAttributeType("centre", com.vividsolutions.jts.geom.Point.class);
+                        pointAttribute[1] = org.geotools.feature.AttributeTypeFactory.newAttributeType("population",Double.class);
+                        pointAttribute[2] = org.geotools.feature.AttributeTypeFactory.newAttributeType("target",Double.class);
+
+                        org.geotools.feature.FeatureType pointType = org.geotools.feature.FeatureTypeFactory.newFeatureType(pointAttribute,"testPoint");
+
+                        org.geotools.feature.Feature pointFeature = pointType.create(new Object[]{p,
+                                                                                                  new Double(all[i][2]),
+                                                                                                  new Double(all[i][3])});
+                        coll.add(pointFeature);                
+                    }
+                }
+            }
+ 
+        } catch (Exception e){
+//            e.printStackTrace();
+            System.out.println("Error message: " + e.getMessage());
+        }
+        return coll;
+    }    
     
     private static boolean arrayContains(DelaunayNode node, DelaunayNode[] nodes, int index){
         boolean ret = false;

@@ -43,19 +43,36 @@ import org.geotools.math.Line;
  */
 public class DelaunayTriangulator {
    
-    public static DelaunayNode temp1, temp2, temp3;
+    public DelaunayNode temp1, temp2, temp3;
+    private DelaunayNode[] nodes;
+    private Vector triangleList;
     private static final Logger LOGGER = Logger.getLogger("org.geotools.graph");
     
     /** Creates a new instance of delaunayTriangulator */
     public DelaunayTriangulator() {
     }
     
-    public static Graph triangulate(FeatureCollection fc){
+    public void setNodeArray(DelaunayNode[] nodeArray){
+        nodes = nodeArray;
+    }
+    
+    public DelaunayNode[] getNodeArray(){
+        return nodes;
+    }
+    
+    public void setFeatureCollection(FeatureCollection data){
+        nodes = featuresToNodes(data);
+    }
+    
+    public Vector getTriangles(){
+        return triangleList;
+    }
+    
+    public DelaunayNode[] featuresToNodes(FeatureCollection fc){
         FeatureIterator iter = fc.features();
         int size = fc.size();
         DelaunayNode[] nodes = new DelaunayNode[size];
         int index = 0;
-        int duplicates = 0;
         while (iter.hasNext()){
             Feature next = iter.next();
             Geometry geom = next.getDefaultGeometry();
@@ -78,8 +95,8 @@ public class DelaunayTriangulator {
         for (int i = 0; i < index; i++){
             trimmed[i] = nodes[i];
         }
-        
-        return triangulate(trimmed);
+
+        return trimmed;
     }
     
     private static boolean arrayContains(DelaunayNode node, DelaunayNode[] nodes, int index){
@@ -97,7 +114,7 @@ public class DelaunayTriangulator {
         return ret;
     }
     
-    public static Graph triangulate(DelaunayNode[] nodes){
+    public Graph getTriangulation(){
         //this algorithm is from "Computational Geometry: Algorithms and Applications" by M. de Berg et al., 
         //written in 1997 and printed by Springer-Verlag (New York).  Pseudocode from section 9.3 (pp. 190-194).
         //A few additional checks for degenerate cases were needed.  They're commented below.        
@@ -122,7 +139,7 @@ public class DelaunayTriangulator {
         temp3 = tempNodes[nodes.length+2];
         
         //initialize triangulation to the bounding triangle
-        Vector triangleList = new Vector();
+        triangleList = new Vector();
         DelaunayEdge e1 = new DelaunayEdge(tempNodes[nodes.length], tempNodes[nodes.length+1]);
         DelaunayEdge e2 = new DelaunayEdge(tempNodes[nodes.length], tempNodes[nodes.length+2]);
         DelaunayEdge e3 = new DelaunayEdge(tempNodes[nodes.length+1], tempNodes[nodes.length+2]); 
@@ -149,42 +166,50 @@ public class DelaunayTriangulator {
         
         //add nodes one at a time.
         for (int i = 0; i < nodes.length; i++){
-            insertNode(tempNodes[i], triangleList);
+            System.out.println("triangulating node " + i);
+            triangleList = insertNode(tempNodes[i], triangleList);
         }
-        
+
+        Graph g = triangleListToGraph(triangleList);
+                
+        return g;  
+    }
+    
+    public Graph triangleListToGraph(Vector tList){
         //turn what I've got into a proper GeoTools2 Graph!        
         //But don't include the three temporary nodes and all incident edges.
         Vector edgeList = new Vector();
-        Iterator triangleIterator = triangleList.iterator();
+        Vector nodeList = new Vector();
+        Iterator triangleIterator = tList.iterator();
         while(triangleIterator.hasNext()){
             Triangle next = (Triangle) triangleIterator.next();
             Edge[] edges = next.getEdges();
             for (int i = 0; i < 3; i++){
-                if (!((((DelaunayEdge) edges[i]).hasEndPoint(tempNodes[nodes.length])) ||        //this test ensures that we don't
-                      (((DelaunayEdge) edges[i]).hasEndPoint(tempNodes[nodes.length+1])) ||      //add to the edge list any edges referring                        
-                      (((DelaunayEdge) edges[i]).hasEndPoint(tempNodes[nodes.length+2])))){      //to the temporary nodes
+                if (!(((DelaunayEdge) edges[i]).hasEndPoint(temp1) ||      //this test ensures that we don't
+                      ((DelaunayEdge) edges[i]).hasEndPoint(temp2) ||      //add to the edge list any edges referring                        
+                      ((DelaunayEdge) edges[i]).hasEndPoint(temp3))){      //to the temporary nodes
                     if (!(edgeList.contains(edges[i]))){
                         edgeList.add(edges[i]);
+                        edges[i].getNodeA().add(edges[i]);
+                        edges[i].getNodeB().add(edges[i]);
+                        if (!(nodeList.contains(edges[i].getNodeA()))){
+                            nodeList.add(edges[i].getNodeA());
+                        }
+                        if (!(nodeList.contains(edges[i].getNodeB()))){
+                            nodeList.add(edges[i].getNodeB());
+                        }                        
                     }
                 }
             }
         }
         
-        Vector nodeList = new Vector();
-        
-        for (int i = 0; i < nodes.length; i++){
-            nodeList.add(nodes[i]);
-        }
-        
-        Graph g = new BasicGraph(nodeList, edgeList);
-                
-        return g;  
+        return new BasicGraph(nodeList, edgeList);        
     }
     
-    private static void insertNode(DelaunayNode newNode, Vector triangleList){
+    public Vector insertNode(DelaunayNode newNode, Vector tList){
         //find triangle containing node or if node is on an edge, the two triangles bordering that edge.
         //this finding-the-triangle section can be given better efficiency using the method on pp. 192-193 of book mentioned above.
-        Iterator triangleIterator = triangleList.iterator();
+        Iterator triangleIterator = tList.iterator();
         Triangle contains = null;
         Triangle borderA = null;
         Triangle borderB = null;  //Note: assuming it's on the border of two triangles rather than at the intersection of 3 or more.
@@ -194,18 +219,15 @@ public class DelaunayTriangulator {
             int relation = next.relate(newNode);
             switch (relation){
                 case Triangle.INSIDE:
+//                    System.out.println(newNode + " is inside " + next);
                     contains = next;
                     notDone = false;
                     break;
                 
                 case Triangle.ON_EDGE:
-                    if (borderA == null){
-                        borderA = next;
-                        notDone = true;
-                    } else {
-                        borderB = next;
-                        notDone = false;
-                    }
+                    borderA = next;
+                    borderB = ((DelaunayEdge) next.getBoundaryEdge(newNode)).getOtherFace(next);
+//                    System.out.println(newNode + " is on the border between " + borderA + " and " + borderB);
                     break;
                 
                 case Triangle.OUTSIDE:
@@ -261,18 +283,19 @@ public class DelaunayTriangulator {
             newEdgeP_2.setFaceA(newTriangleP_0_2);
             newEdgeP_2.setFaceB(newTriangleP_1_2);
             
-            triangleList.remove(contains);
-            triangleList.add(newTriangleP_0_1);
-            triangleList.add(newTriangleP_0_2);
-            triangleList.add(newTriangleP_1_2);
+            tList.remove(contains);
+            tList.add(newTriangleP_0_1);
+            tList.add(newTriangleP_0_2);
+            tList.add(newTriangleP_1_2);
             LOGGER.finer("was inside " + contains);
-            LOGGER.finer("triangle List now is " + triangleList);
-            
+            LOGGER.finer("triangle List now is " + tList);
+//            System.out.println("triangle List now is " + tList);
             //Make any necessary adjustments to other triangles.
-            legalizeEdge(newTriangleP_0_1, oldEdge0_1, newNode, triangleList);
-            legalizeEdge(newTriangleP_0_2, oldEdge0_2, newNode, triangleList);
-            legalizeEdge(newTriangleP_1_2, oldEdge1_2, newNode, triangleList);
-            
+            legalizeEdge(newTriangleP_0_1, oldEdge0_1, newNode, tList);
+            legalizeEdge(newTriangleP_0_2, oldEdge0_2, newNode, tList);
+            legalizeEdge(newTriangleP_1_2, oldEdge1_2, newNode, tList);
+            LOGGER.finer("after legalization, triangle list now is: " + triangleList); 
+//            System.out.println("after legalization, triangle list now is: " + triangleList);
             
         } else if ((borderA != null) && (borderB != null)){
             //check to see that borderA and borderB share an edge.  If not, whinge.
@@ -323,30 +346,32 @@ public class DelaunayTriangulator {
             
             shared.disconnect();
             
-            triangleList.remove(borderA);
-            triangleList.remove(borderB);
-            triangleList.add(newTriangleP_A_1);
-            triangleList.add(newTriangleP_A_2);
-            triangleList.add(newTriangleP_B_1);
-            triangleList.add(newTriangleP_B_2);
+            tList.remove(borderA);
+            tList.remove(borderB);
+            tList.add(newTriangleP_A_1);
+            tList.add(newTriangleP_A_2);
+            tList.add(newTriangleP_B_1);
+            tList.add(newTriangleP_B_2);
             LOGGER.finer("bordered " + borderA + " and " + borderB);
-            LOGGER.finer("triangle list now is " + triangleList);
+            LOGGER.finer("triangle list now is " + tList);
             
-            legalizeEdge(newTriangleP_A_1, oldEdgeA_1, newNode, triangleList);
-            legalizeEdge(newTriangleP_A_2, oldEdgeA_2, newNode, triangleList);
-            legalizeEdge(newTriangleP_B_1, oldEdgeB_1, newNode, triangleList);
-            legalizeEdge(newTriangleP_B_2, oldEdgeB_2, newNode, triangleList);
-            
+            legalizeEdge(newTriangleP_A_1, oldEdgeA_1, newNode, tList);
+            legalizeEdge(newTriangleP_A_2, oldEdgeA_2, newNode, tList);
+            legalizeEdge(newTriangleP_B_1, oldEdgeB_1, newNode, tList);
+            legalizeEdge(newTriangleP_B_2, oldEdgeB_2, newNode, tList);
+            LOGGER.finer("after legalization, triangle list now is: " + triangleList); 
         } else {
             throw new RuntimeException("What the?  It isn't in any triangle or on any borders?");
-        }        
+        }  
+        return tList;      
     }
  
-    private static void legalizeEdge(Triangle t, DelaunayEdge e, DelaunayNode p, Vector triangleList){
+    private void legalizeEdge(Triangle t, DelaunayEdge e, DelaunayNode p, Vector triangleList){
         LOGGER.fine("legalizing " + t + " and " + e.getOtherFace(t));
         if (isIllegal(t, e, p)){
             Triangle otherFace = e.getOtherFace(t);  
             LOGGER.finer("switch internal edge");
+//            System.out.println("switch internal edge");
             DelaunayNode fourthCorner = (DelaunayNode) otherFace.getThirdNode(e);
             DelaunayNode eNodeA = (DelaunayNode) e.getNodeA();
             DelaunayNode eNodeB = (DelaunayNode) e.getNodeB();
@@ -367,6 +392,7 @@ public class DelaunayTriangulator {
             
             if (rejectSwap(t, otherFace, newTriangleP_A_4, newTriangleP_B_4)){ //Degenerate case.  Explained in the method rejectSwap
                 LOGGER.finer("Rejected swap of " + t + " and " + otherFace);
+//                System.out.println("Rejected swap of " + t + " and " + otherFace);
             } else {                         
                 edgeP_A.setOtherFace(newTriangleP_A_4, farSideP_A);
                 edgeP_B.setOtherFace(newTriangleP_B_4, farSideP_B);
@@ -384,19 +410,21 @@ public class DelaunayTriangulator {
                 triangleList.add(newTriangleP_B_4);
                 LOGGER.finer("swapped " + t + " and " + otherFace);
                 LOGGER.finer("new triangles are " + newTriangleP_A_4 + " and " + newTriangleP_B_4);
-                LOGGER.finer("Triangle list now is: " + triangleList);          
-
+                LOGGER.finer("Triangle list now is: " + triangleList);     
+//                System.out.println("swapped " + t + " and " + otherFace);
+//                System.out.println("new triangles are " + newTriangleP_A_4 + " and " + newTriangleP_B_4);
+//                System.out.println("Triangle list now is: " + triangleList);
                 legalizeEdge(newTriangleP_A_4, edgeA_4, p, triangleList);
-                legalizeEdge(newTriangleP_B_4, edgeB_4, p, triangleList);   
+                legalizeEdge(newTriangleP_B_4, edgeB_4, p, triangleList);  
             }
         }
     }
     
-    private static boolean isTemporary(DelaunayNode n){
+    private boolean isTemporary(DelaunayNode n){
         return ((n.equals(temp1)) || (n.equals(temp2)) || (n.equals(temp3)));
     }
     
-    private static boolean isIllegal(Triangle t, DelaunayEdge e, DelaunayNode p){
+    private boolean isIllegal(Triangle t, DelaunayEdge e, DelaunayNode p){
         DelaunayNode eNodeA = (DelaunayNode) e.getNodeA();
         DelaunayNode eNodeB = (DelaunayNode) e.getNodeB();
 
@@ -437,6 +465,7 @@ public class DelaunayTriangulator {
             Point2D.Double point = new Point2D.Double(farNode.getCoordinate().x, farNode.getCoordinate().y);
             if (circum.contains(point)){
                 LOGGER.finer("Illegal by case 2");
+//                System.out.println("Illegal by case 2");
                 return true;
             } else {
                 return false;
@@ -444,6 +473,7 @@ public class DelaunayTriangulator {
         } else if (numTemporary == 1){
             if (isTemporary(eNodeA) || isTemporary(eNodeB)){
                 LOGGER.finer("Illegal by case 3");
+//                System.out.println("Illegal by case 3");
                 return true;
             } else {
                 return false;
@@ -455,6 +485,7 @@ public class DelaunayTriangulator {
                 return false;
             } else {
                 LOGGER.finer("Illegal by case 4");
+//                System.out.println("Illegal by case 4");
                 return true;
             }
         } else {
@@ -462,7 +493,7 @@ public class DelaunayTriangulator {
         }
     }
     
-    private static int whichSpecialNode(DelaunayNode a, DelaunayNode b){
+    private int whichSpecialNode(DelaunayNode a, DelaunayNode b){
         if ((a.equals(temp1)) || (b.equals(temp1))){
             return 1;
         } else if ((a.equals(temp2)) || (b.equals(temp2))){
@@ -509,7 +540,7 @@ public class DelaunayTriangulator {
         
         //radius is the distance to the three points (which is hopefully the same!)        
         double radius = intersection.distance(a.getCoordinate().x, a.getCoordinate().y);
-        
+                
         //convert from center-radius to the java format
         Ellipse2D.Double circle = new Ellipse2D.Double(intersection.getX()-radius, 
                                                        intersection.getY()-radius, 
@@ -519,17 +550,16 @@ public class DelaunayTriangulator {
         return circle;  
     }
     
-    private static boolean rejectSwap(Triangle oldFirst, Triangle oldSecond, Triangle newFirst, Triangle newSecond){
+    private boolean rejectSwap(Triangle oldFirst, Triangle oldSecond, Triangle newFirst, Triangle newSecond){
         //I want to reject the swap if the new edge intersects any other edges in the graph, which can happen in
         //the case where A or B (i or j in the book) is one of the bounding triangle points.  This (I think)
-        //is equivalent to ensuring that the area of the new triangles is entirely contained within the area
-        //of the old triangles.  Therefore, if I add up the area of the new triangles and it's more than the area
-        //of the old triangles, reject it because I just broke the planarity of the triangulation.
+        //is equivalent to ensuring that the areas of the new triangles is the same as the areas of the old triangles.
         double oldArea = oldFirst.getArea() + oldSecond.getArea();
         double newArea = newFirst.getArea() + newSecond.getArea();
         double diff = newArea - oldArea;
-        double tolerance = 0.05;
-        return (diff > tolerance);        
+//        System.out.println("area difference is " + diff);
+        double tolerance = 0.000001;
+        return (diff > tolerance);   
     }
     
 }

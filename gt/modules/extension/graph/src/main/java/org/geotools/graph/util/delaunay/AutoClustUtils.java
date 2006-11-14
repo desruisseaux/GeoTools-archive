@@ -15,10 +15,16 @@
  */
 package org.geotools.graph.util.delaunay;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Logger;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;
 import org.geotools.graph.structure.Node;
@@ -36,7 +42,7 @@ public class AutoClustUtils {
     public AutoClustUtils() {
     }
     
-    public static Vector findConnectedComponents(Collection nodes, Collection edges){
+    public static Vector findConnectedComponents(final Collection nodes, final Collection edges){
         Vector components = new Vector();
         Vector nodesVisited = new Vector();
         
@@ -56,32 +62,34 @@ public class AutoClustUtils {
         return components;
     }
     
-    private static void expandComponent(Node node, Collection edges, Collection componentNodes, Collection componentEdges){
+    private static void expandComponent(final Node node, final Collection edges, final Collection componentNodes, final Collection componentEdges){
         if (componentNodes.contains(node)){
             //base case.  I've already expanded on node, so no need to repeat the process.
-            LOGGER.fine("I've already expanded from " + node);
+//            LOGGER.fine("I've already expanded from " + node);
         } else {
             componentNodes.add(node);
-            LOGGER.finer("Adding " + node + " to component");
+//            LOGGER.finer("Adding " + node + " to component");
             Vector adjacentEdges = findAdjacentEdges(node, edges);  //yes, I know node.getEdges() should do this, but this method could be out of data by the time I use this in AutoClust
+            adjacentEdges.trimToSize();
             componentEdges.addAll(adjacentEdges);  
-            LOGGER.finer("Adding " + adjacentEdges + " to component");
+//            LOGGER.finer("Adding " + adjacentEdges + " to component");
             
             Iterator aeIt = adjacentEdges.iterator();
             while (aeIt.hasNext()){
                 Edge next = (Edge) aeIt.next();
-                LOGGER.finer("looking at edge " + next);
+//                LOGGER.finer("looking at edge " + next);
                 Node additionalNode = next.getOtherNode(node);
-                LOGGER.finer("its other node is " + additionalNode);
+//                LOGGER.finer("its other node is " + additionalNode);
                 if (additionalNode == null){
                     throw new RuntimeException("I tried to get the other node of this edge " + next + " but it doesn't have " + node);
                 }
                 expandComponent(additionalNode, edges, componentNodes, componentEdges);
             }
+            adjacentEdges.clear();
         }
     }
     
-    public static Vector findAdjacentEdges(Node node, Collection edges){
+    public static Vector findAdjacentEdges(final Node node, final Collection edges){
         Vector ret = new Vector();
         Iterator it = edges.iterator();
         while (it.hasNext()){
@@ -92,5 +100,50 @@ public class AutoClustUtils {
         }
         return ret;
     }
+    
+    public static DelaunayNode[] featureCollectionToNodeArray(FeatureCollection fc){
+        FeatureIterator iter = fc.features();
+        int size = fc.size();
+        DelaunayNode[] nodes = new DelaunayNode[size];
+        int index = 0;
+        while (iter.hasNext()){
+            Feature next = iter.next();
+            Geometry geom = next.getDefaultGeometry();
+            Point centroid;
+            if (geom instanceof Point){
+                centroid = (Point) geom;
+            } else {
+                centroid = geom.getCentroid();
+            }
+            DelaunayNode node = new DelaunayNode();   
+            node.setCoordinate(centroid.getCoordinate()); 
+            node.setFeature(next);
+            if (!(arrayContains(node, nodes, index))){
+                nodes[index] = node;
+                index++;                
+            }                  
+        }
+        
+        DelaunayNode[] trimmed = new DelaunayNode[index];
+        for (int i = 0; i < index; i++){
+            trimmed[i] = nodes[i];
+        }
+        return trimmed;
+    }
+    
+    public static boolean arrayContains(DelaunayNode node, DelaunayNode[] nodes, int index){
+        boolean ret = false;
+        boolean done = false;
+        int i = 0;
+        while (!(done)){
+            if (i < index){
+                done = ret = (nodes[i].equals(node));
+                i++;
+            } else {
+                done = true;
+            }
+        }
+        return ret;
+    }    
     
 }

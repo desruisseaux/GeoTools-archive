@@ -16,7 +16,12 @@
 package org.geotools.graph.util.delaunay;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import java.awt.Polygon;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Node;
 import org.geotools.graph.structure.line.XYNode;
@@ -29,11 +34,12 @@ public class Triangle {
     
     Edge edge1, edge2, edge3;
     Node node1, node2, node3;
+    GeometryFactory fact = new GeometryFactory();    
     
     public final static int OUTSIDE = 0;
     public final static int INSIDE = 1;
     public final static int ON_EDGE = 2;
-    private final static double TOLERANCE = 0.01;    
+    private final static double TOLERANCE = 0.0001;    
     
     /** Creates a new instance of Triangle */
     public Triangle(Edge e1, Edge e2, Edge e3) {
@@ -147,25 +153,49 @@ public class Triangle {
             (!(node3 instanceof XYNode))){
             throw new RuntimeException("I can't perform a relate function on a non-spatial triangle");
         }
-        Polygon p = new Polygon(new int[]{(int) Math.round(((XYNode)node1).getCoordinate().x),
-                                          (int) Math.round(((XYNode)node2).getCoordinate().x),
-                                          (int) Math.round(((XYNode)node3).getCoordinate().x)},
-                                new int[]{(int) Math.round(((XYNode)node1).getCoordinate().y),
-                                          (int) Math.round(((XYNode)node2).getCoordinate().y),
-                                          (int) Math.round(((XYNode)node3).getCoordinate().y)},
-                                3);
-        if (p.contains(n.getCoordinate().x, n.getCoordinate().y)){
-            ret = INSIDE;
-        } else if (p.contains(n.getCoordinate().x - TOLERANCE, 
-                              n.getCoordinate().y - TOLERANCE,
-                              TOLERANCE * 2,
-                              TOLERANCE * 2)){
+        LinearRing lr = fact.createLinearRing(new Coordinate[]{((XYNode)node1).getCoordinate(), ((XYNode)node2).getCoordinate(), ((XYNode)node3).getCoordinate(), ((XYNode)node1).getCoordinate()});
+        Polygon poly = fact.createPolygon(lr, null);
+        Point nPoint = fact.createPoint(n.getCoordinate());
+        
+        Line2D.Double line12 = new Line2D.Double(((XYNode)node1).getCoordinate().x, ((XYNode)node1).getCoordinate().y, ((XYNode)node2).getCoordinate().x, ((XYNode)node2).getCoordinate().y);
+        Line2D.Double line13 = new Line2D.Double(((XYNode)node1).getCoordinate().x, ((XYNode)node1).getCoordinate().y, ((XYNode)node3).getCoordinate().x, ((XYNode)node3).getCoordinate().y);
+        Line2D.Double line23 = new Line2D.Double(((XYNode)node2).getCoordinate().x, ((XYNode)node2).getCoordinate().y, ((XYNode)node3).getCoordinate().x, ((XYNode)node3).getCoordinate().y);
+        Point2D.Double point2D = new Point2D.Double(n.getCoordinate().x, n.getCoordinate().y);
+        if ((line12.ptSegDist(point2D) <= TOLERANCE) ||
+            (line13.ptSegDist(point2D) <= TOLERANCE) ||
+            (line23.ptSegDist(point2D) <= TOLERANCE)){
             ret = ON_EDGE;
+        } else if (poly.contains(nPoint)){
+            ret = INSIDE;
         } else {
             ret = OUTSIDE;
         }
         return ret;
     }            
+    
+    public Edge getBoundaryEdge(XYNode n){
+        if (!(relate(n) == ON_EDGE)){
+            throw new RuntimeException("Can't get the boundary edge for a point that isn't on an edge.");
+        }
+        Point2D.Double point = new Point2D.Double(n.getCoordinate().x, n.getCoordinate().y);
+        Line2D.Double line1 = new Line2D.Double(((XYNode) edge1.getNodeA()).getCoordinate().x, ((XYNode) edge1.getNodeA()).getCoordinate().y,
+                                                ((XYNode) edge1.getNodeB()).getCoordinate().x, ((XYNode) edge1.getNodeB()).getCoordinate().y);
+        Line2D.Double line2 = new Line2D.Double(((XYNode) edge2.getNodeA()).getCoordinate().x, ((XYNode) edge2.getNodeA()).getCoordinate().y,
+                                                ((XYNode) edge2.getNodeB()).getCoordinate().x, ((XYNode) edge2.getNodeB()).getCoordinate().y);
+        Line2D.Double line3 = new Line2D.Double(((XYNode) edge3.getNodeA()).getCoordinate().x, ((XYNode) edge3.getNodeA()).getCoordinate().y,
+                                                ((XYNode) edge3.getNodeB()).getCoordinate().x, ((XYNode) edge3.getNodeB()).getCoordinate().y);   
+        Edge ret = null;
+        if (line1.ptSegDist(point) <= TOLERANCE){
+            ret = edge1;
+        } else if (line2.ptSegDist(point) <= TOLERANCE){
+            ret = edge2;
+        } else if (line3.ptSegDist(point) <= TOLERANCE){
+            ret = edge3;
+        } else {
+            throw new RuntimeException("So...  node " + n + " is on an edge of " + this.toString() + " but isn't on any of its edges: " + edge1 + ", " + edge2 + ", or " + edge3);
+        }
+        return ret;
+    }
     
     public Node getThirdNode(Edge e){
         if (e.getNodeA().equals(node1)){            

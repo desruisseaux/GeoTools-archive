@@ -21,6 +21,7 @@ import java.awt.Graphics;
 import java.lang.RuntimeException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Vector;
 import javax.swing.JPanel;
 import org.geotools.graph.structure.Edge;
 import org.geotools.graph.structure.Graph;
@@ -30,23 +31,45 @@ import org.geotools.graph.structure.line.XYNode;
  *
  * @author jfc173
  */
-public class GraphViewer extends JPanel {
+public class GraphViewer extends JPanel{
     
     Graph graph;
     Collection nodes;
-    int minX, minY;
+    double minX, minY;
+    int xScaling = 4;
+    int yScaling = 4;
+    int xOffset = 0;
+    int yOffset = 0;
+    boolean colorEdges = false;
     Color[] nodeColors = new Color[]{Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.MAGENTA, Color.LIGHT_GRAY, Color.GRAY, Color.DARK_GRAY, Color.BLACK};
+    Vector shortEdges, longEdges, otherEdges;
     
     /** Creates a new instance of GraphViewer */
-    public GraphViewer() {        
+    public GraphViewer() {  
+    }
+    
+    public void setXScaling(int i){
+        xScaling = i;
+    }
+    
+    public int getXScaling(){
+        return xScaling;
+    }
+    
+    public void setYScaling(int i){
+        yScaling = i;
+    }
+    
+    public int getYScaling(){
+        return yScaling;
     }
     
     public void setGraph(Graph gr){
         graph = gr;
         nodes = graph.getNodes();
         Iterator it = nodes.iterator();
-        minX = 0;
-        minY = 0;
+        minX = Double.MAX_VALUE;
+        minY = Double.MAX_VALUE;
         while (it.hasNext()){
             Object next = it.next();
             if (!(next instanceof XYNode)){
@@ -54,17 +77,36 @@ public class GraphViewer extends JPanel {
             }
             Coordinate coord = ((XYNode) next).getCoordinate();
             if (coord.x < minX){
-                minX = (int) Math.round(coord.x);
+                minX = coord.x;
             }
             if (coord.y < minY){
-                minY = (int) Math.round(coord.y);
+                minY = coord.y;
             }
-        }
+        }        
+    }
+    
+    public void setColorEdges(boolean b){
+        colorEdges = b;
+    }
+    
+    public void setShortEdges(Vector l){
+        shortEdges = l;
+    }
+    
+    public void setLongEdges(Vector l){
+        longEdges = l;
+    }
+    
+    public void setOtherEdges(Vector l){
+        otherEdges = l;
     }
     
     public void paintComponent(Graphics g){
         int i = 0;
-        int scaling = 4;
+        xOffset = (int) Math.round(xScaling - minX*xScaling);
+        yOffset = (int) Math.round(yScaling - minY*yScaling);
+        System.out.println("xOffset is " + xOffset);
+        System.out.println("yOffset is " + yOffset);
         Iterator it = nodes.iterator();
         while (it.hasNext()){
             Object next = it.next();
@@ -74,7 +116,10 @@ public class GraphViewer extends JPanel {
             Coordinate coord = ((XYNode) next).getCoordinate();
 //            g.setColor(nodeColors[i]);
 //            i++; //this works if there are no more than 10 nodes.
-            g.fillOval((int) Math.round(coord.x*scaling-2) - minX*scaling, (int) Math.round(coord.y*scaling-2) - minY*scaling, 4, 4);
+            g.fillOval((int) Math.round(xOffset+coord.x*xScaling-2), 
+                       (int) Math.round(yOffset+coord.y*yScaling-2), 
+                       4, 
+                       4);          
         }
         
         g.setColor(Color.RED);        
@@ -87,11 +132,22 @@ public class GraphViewer extends JPanel {
             }
             Coordinate coordA = ((XYNode) next.getNodeA()).getCoordinate();
             Coordinate coordB = ((XYNode) next.getNodeB()).getCoordinate();
-            g.drawLine((int) Math.round(coordA.x*scaling) - minX*scaling,
-                       (int) Math.round(coordA.y*scaling) - minY*scaling,
-                       (int) Math.round(coordB.x*scaling) - minX*scaling,
-                       (int) Math.round(coordB.y*scaling) - minY*scaling);
+            if (colorEdges){
+                if (shortEdges.contains(next)){
+                    g.setColor(Color.RED);
+                } else if (longEdges.contains(next)){
+                    g.setColor(Color.GREEN);
+                } else if (otherEdges.contains(next)){
+                    g.setColor(Color.BLACK);
+                } else {
+                    g.setColor(Color.YELLOW);
+                }                
+            }
+            g.drawLine((int) Math.round(xOffset+coordA.x*xScaling),
+                       (int) Math.round(yOffset+coordA.y*yScaling),
+                       (int) Math.round(xOffset+coordB.x*xScaling),
+                       (int) Math.round(yOffset+coordB.y*yScaling));
         }
     }
-    
+   
 }

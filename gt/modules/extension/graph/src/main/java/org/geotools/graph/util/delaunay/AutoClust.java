@@ -50,6 +50,7 @@ public class AutoClust {
         HashMap map = new HashMap();
         Collection nodes = d.getNodes();
         Collection edges = d.getEdges();
+        showGraph(nodes, edges, 0);
         Iterator nodeIt = nodes.iterator();
         double[] localDevs = new double[nodes.size()];
         int index = 0;
@@ -84,6 +85,11 @@ public class AutoClust {
         }
         double meanStDev = total/localDevs.length;
         
+        //these three are for coloring the graph in the poster, not for algorithmic purposes
+        Vector allShortEdges = new Vector();
+        Vector allLongEdges = new Vector();
+        Vector allOtherEdges = new Vector();
+        
         Iterator anotherNodeIt = nodes.iterator();
         while (anotherNodeIt.hasNext()){
             DelaunayNode next = (DelaunayNode) anotherNodeIt.next();
@@ -111,8 +117,27 @@ public class AutoClust {
             }
             acd.setShortEdges(shortEdges);
             acd.setLongEdges(longEdges);
-            acd.setOtherEdges(otherEdges);
+            acd.setOtherEdges(otherEdges);            
+                     
+            allLongEdges.addAll(longEdges);
+            allShortEdges.addAll(shortEdges);
+            allOtherEdges.addAll(otherEdges);
         }
+        
+        //for the poster
+        Graph gp = new BasicGraph(nodes, edges);
+        javax.swing.JFrame frame = new javax.swing.JFrame();
+        GraphViewer viewer = new GraphViewer();
+        viewer.setLongEdges(allLongEdges);
+        viewer.setShortEdges(allShortEdges);
+        viewer.setOtherEdges(allOtherEdges);
+        viewer.setColorEdges(true);
+        viewer.setGraph(gp);
+        frame.getContentPane().add(viewer);
+        frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        frame.setSize(new java.awt.Dimension(800, 800));
+        frame.setTitle("Assigned edge categories");
+        frame.setVisible(true); 
         
         //Phase I
         Iterator nodeIt3 = nodes.iterator();
@@ -130,7 +155,7 @@ public class AutoClust {
         LOGGER.fine("End of phase one and ");
         LOGGER.fine("Nodes are " + nodes);
         LOGGER.fine("Edges are " + edges);                
-//        showGraph(nodes, edges, 1);        
+        showGraph(nodes, edges, 1);        
         Vector connectedComponents = AutoClustUtils.findConnectedComponents(nodes, edges);
         
         //Phase II
@@ -195,7 +220,7 @@ public class AutoClust {
         LOGGER.fine("End of phase two and ");
         LOGGER.fine("Nodes are " + nodes);
         LOGGER.fine("Edges are " + edges);   
-//        showGraph(nodes, edges, 2);
+        showGraph(nodes, edges, 2);
         connectedComponents = AutoClustUtils.findConnectedComponents(nodes, edges);
         
         //Phase III
@@ -237,7 +262,7 @@ public class AutoClust {
         LOGGER.fine("End of phase three and ");
         LOGGER.fine("Nodes are " + nodes);
         LOGGER.fine("Edges are " + edges);    
-//        showGraph(nodes, edges, 3);
+        showGraph(nodes, edges, 3);
         connectedComponents = AutoClustUtils.findConnectedComponents(nodes, edges);
         
         return new BasicGraph(nodes, edges);
@@ -269,7 +294,7 @@ public class AutoClust {
         frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         frame.setSize(new java.awt.Dimension(800, 800));
         frame.setTitle("Phase " + phase);
-        frame.setVisible(true);        
+        frame.setVisible(true); 
     }
     
 }

@@ -44,8 +44,22 @@ public class DelaunayNode extends BasicXYNode{
                 (this.getCoordinate().y == ((DelaunayNode)o).getCoordinate().y));
     }
     
+    private double roundToSigDigs(double d, int digits){
+        if (d == 0){
+            return 0;
+        } else {
+            double log = Math.log10(d);
+            int digitsLeftOfDecimal = (int) Math.ceil(log);
+            int digitsToMoveLeft = digits - digitsLeftOfDecimal;
+            double movedD = d*Math.pow(10, digitsToMoveLeft);
+            double rounded = Math.rint(movedD);
+            double ret = rounded / Math.pow(10, digitsToMoveLeft);
+            return ret;
+        }
+    }    
+    
     public String toString(){
-        return "(" + Math.round(this.getCoordinate().x) + "," + Math.round(this.getCoordinate().y) + ")";
+        return "(" + roundToSigDigs(this.getCoordinate().x, 5) + "," + roundToSigDigs(this.getCoordinate().y, 5) + ")";
     }
     
 }
