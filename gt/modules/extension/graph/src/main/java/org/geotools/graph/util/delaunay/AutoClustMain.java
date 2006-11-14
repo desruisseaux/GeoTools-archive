@@ -41,11 +41,11 @@ public class AutoClustMain {
         // TODO code application logic here
         boolean useRandom = true;
         DelaunayTriangulator triangulator = new DelaunayTriangulator();
-        if (useRandom){
+//        if (useRandom){
             triangulator.setNodeArray(DelaunayTest.createRandomNodes(250, 180, 180, 100));
-        } else {
-            triangulator.setFeatureCollection(loadCSVData());
-        }
+ //       } else {
+ //           triangulator.setFeatureCollection(loadCSVData());
+ //       }
         Graph triangulation = triangulator.getTriangulation();
         
         JFrame tframe = new JFrame();
@@ -71,7 +71,8 @@ public class AutoClustMain {
         frame.setTitle("Final");
         frame.setVisible(true);
     }
-    
+
+/*    
     private static FeatureCollection loadCSVData(){
         FeatureCollection coll = null;
         boolean useAll = true;
@@ -135,5 +136,5 @@ public class AutoClustMain {
         }
         return coll; 
     }
-    
+*/    
 }
