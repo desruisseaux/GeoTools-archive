@@ -498,8 +498,10 @@ public class GridCoverageFactory extends AbstractFactory {
         /*
          * Makes sure that the specified envelope has a CRS.
          * If no CRS were specified, a default one is used.
+         *
+         * TODO: use a more direct method if GeoAPI 2.1 add a Envelope.getCRS() method.
          */
-        if (GridGeometry2D.getCoordinateSystem(envelope) == null) {
+        if (envelope.getLowerCorner().getCoordinateReferenceSystem() == null) {
             final GeneralEnvelope e = new GeneralEnvelope(envelope);
             e.setCoordinateReferenceSystem(getDefaultCRS(e.getDimension()));
             envelope = e;

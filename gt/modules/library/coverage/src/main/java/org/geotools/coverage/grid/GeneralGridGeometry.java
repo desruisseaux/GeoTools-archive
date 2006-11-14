@@ -38,7 +38,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
@@ -170,16 +170,17 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * Constructs a new grid geometry from a {@linkplain MathTransform math transform}.
-     * This is the most general constructor, the one that gives the maximal control over
-     * the grid geometry to be created.
+     * Constructs a new grid geometry from a {@linkplain MathTransform math transform}
+     * mapping {@linkplain PixelInCell#CELL_CENTER pixel center}. This is the most general
+     * constructor, the one that gives the maximal control over the grid geometry to be created.
      *
      * @param gridRange The valid coordinate range of a grid coverage, or {@code null} if none.
-     * @param gridToCRS The math transform which allows for the transformations from
-     *        grid coordinates (pixel's <em>center</em>) to real world earth coordinates.
-     *        May be {@code null}, but this is not recommanded.
-     * @param crs The coordinate reference system for the "real world" coordinates, or {@code null}
-     *        if unknown. This CRS is given to the {@linkplain #getEnvelope envelope}.
+     * @param gridToCRS The math transform which allows for the transformations from grid
+     *                  coordinates (pixel's <em>center</em>) to real world earth coordinates.
+     *                  May be {@code null}, but this is not recommanded.
+     * @param crs       The coordinate reference system for the "real world" coordinates, or
+     *                  {@code null} if unknown. This CRS is given to the
+     *                  {@linkplain #getEnvelope envelope}.
      *
      * @throws MismatchedDimensionException if the math transform or the CRS doesn't have
      *         consistent dimensions.
@@ -208,20 +209,13 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     /**
      * Constructs a new grid geometry from an {@linkplain Envelope envelope}. An {@linkplain
      * AffineTransform affine transform} will be computed automatically from the specified
-     * envelope using heuristic rules described below.
+     * envelope using heuristic rules described in {@link GridToEnvelopeMapper} javadoc.
+     * More specifically, heuristic rules are applied for:
      * <p>
-     * This convenience constructor assumes that axis order in the supplied {@code gridRange}
-     * argument matches exactly axis order in the supplied {@code userRange} argument. In other
-     * words, if axis order in the underlying image is (<var>column</var>, <var>row</var>) (which
-     * is the case for a majority of images), then the envelope given to this constructor should
-     * probably have a (<var>longitude</var>, <var>latitude</var>) or
-     * (<var>easting</var>, <var>northing</var>) axis order.
-     * <p>
-     * An exception to the above rule applies for CRS using exactly the following axis order:
-     * ({@link AxisDirection#NORTH NORTH}|{@link AxisDirection#SOUTH SOUTH},
-     * {@link AxisDirection#EAST EAST}|{@link AxisDirection#WEST WEST}).
-     * An example of such CRS is {@code EPSG:4326}. This convenience constructor will
-     * interchange automatically the (<var>y</var>,<var>x</var>) axis for such CRS.
+     * <ul>
+     *   <li>{@linkplain GridToEnvelopeMapper#getSwapXY axis swapping}</li>
+     *   <li>{@linkplain GridToEnvelopeMapper#getReverseAxis axis reversal}</li>
+     * </ul>
      *
      * @param gridRange The valid coordinate range of a grid coverage.
      * @param userRange The corresponding coordinate range in user coordinate. This rectangle must
@@ -230,7 +224,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *                  lower right corner must coincide with the lower right corner of the last
      *                  pixel.
      *
-     * @throws MismatchedDimensionException if the grid range and the CRS doesn't have
+     * @throws MismatchedDimensionException if the grid range and the envelope doesn't have
      *         consistent dimensions.
      *
      * @since 2.2
@@ -238,65 +232,12 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     public GeneralGridGeometry(final GridRange gridRange, final Envelope userRange)
             throws MismatchedDimensionException
     {
-        this(gridRange, userRange, getCoordinateSystem(userRange));
+        this(gridRange, userRange, null, false, true);
     }
 
     /**
-     * Work around for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private GeneralGridGeometry(final GridRange gridRange, final Envelope userRange,
-                                final CoordinateSystem cs)
-            throws MismatchedDimensionException
-    {
-        this(gridRange, userRange, reverse(cs), swapXY(cs));
-    }
-
-    /**
-     * Constructs a new grid geometry from an {@linkplain Envelope envelope}. An
-     * {@linkplain AffineTransform affine transform} will be computed automatically from the
-     * specified envelope. The two last arguments ({@code swapXY} and {@code reverse}) are hints
-     * about the affine transform to be created: the {@code reverse} argument tells which (if any)
-     * axis from <cite>user</cite> space (not grid space) should have their direction reversed, and
-     * the {@code swapXY} argument tells if the two first axis should be interchanged.
-     * <p>
-     * This constructor is convenient when the following conditions are meet:
-     * <p>
-     * <ul>
-     *   <li><p>Pixels coordinates (usually (<var>x</var>,<var>y</var>) integer values inside
-     *       the rectangle specified by the {@code gridRange} argument) are expressed in some
-     *       {@linkplain CoordinateReferenceSystem coordinate reference system} known at compile
-     *       time. This is often the case; for example the CRS attached to {@link BufferedImage}
-     *       has always ({@linkplain AxisDirection#COLUMN_POSITIVE column},
-     *       {@linkplain AxisDirection#ROW_POSITIVE row}) axis, with the origin (0,0) in the upper
-     *       left corner, and row values increasing down.</p></li>
-     *
-     *   <li><p>"Real world" coordinates (inside the envelope specified by the {@code userRange}
-     *       argument) are expressed in arbitrary <em>horizontal</em> coordinate reference system.
-     *       Axis directions may be ({@linkplain AxisDirection#NORTH North},
-     *       {@linkplain AxisDirection#WEST West}), or ({@linkplain AxisDirection#EAST East},
-     *       {@linkplain AxisDirection#NORTH North}), <cite>etc.</cite>.</p></li>
-     * </ul>
-     * <p>
-     * In such case (and assuming that the image's CRS has the same characteristics than the
-     * {@link BufferedImage}'s CRS described above):
-     * <p>
-     * <ul>
-     *   <li><p>{@code swapXY} shall be set to {@code true} if the "real world" axis order is
-     *       ({@linkplain AxisDirection#NORTH North}, {@linkplain AxisDirection#EAST East}) instead
-     *       of ({@linkplain AxisDirection#EAST East}, {@linkplain AxisDirection#NORTH North}). This
-     *       axis swapping is necessary for mapping the ({@linkplain AxisDirection#COLUMN_POSITIVE
-     *       column}, {@linkplain AxisDirection#ROW_POSITIVE row}) axis order associated to the
-     *       image CRS.</p></li>
-     *
-     *   <li><p>In addition, the "real world" axis directions shall be reversed (by setting
-     *       {@code reverse[dimension]} to {@code true}) if their direction is
-     *       {@link AxisDirection#WEST WEST} (<var>x</var> axis) or
-     *       {@link AxisDirection#NORTH NORTH} (<var>y</var> axis), in order to get them oriented
-     *       toward the {@link AxisDirection#EAST EAST} or {@link AxisDirection#SOUTH SOUTH}
-     *       direction respectively. The later may seems unatural, but it reflects the fact
-     *       that row values are increasing down in an {@link BufferedImage}'s CRS.</p></li>
-     * </ul>
+     * Constructs a new grid geometry from an {@linkplain Envelope envelope}. This convenience
+     * constructor delegates the work to {@link GridToEnvelopeMapper}; see its javadoc for details.
      * <p>
      * If this convenience constructor do not provides suffisient control on axis order or reversal,
      * then an affine transform shall be created explicitly and the grid geometry shall be created
@@ -318,7 +259,7 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
      *                  system has axis in the (<var>y</var>,<var>x</var>) order. The {@code reverse}
      *                  parameter then apply to axis after the swap.
      *
-     * @throws MismatchedDimensionException if the grid range and the CRS doesn't have
+     * @throws MismatchedDimensionException if the grid range and the envelope doesn't have
      *         consistent dimensions.
      *
      * @since 2.2
@@ -329,52 +270,31 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                                final boolean   swapXY)
             throws MismatchedDimensionException
     {
-        this.gridRange = gridRange;
-        this.envelope  = new GeneralEnvelope(userRange);
-        /*
-         * Checks arguments validity. Grid range and envelope dimensions must match.
-         * We are more tolerant for the coordinate system dimension (if any), since
-         * it is only an optional hint for interchanging axis in a more common order.
-         */
-        final int dimension = gridRange.getDimension();
-        final int userDim   = userRange.getDimension();
-        if (userDim != dimension) {
-            throw new MismatchedDimensionException(format(dimension, userDim));
-        }
-        if (reverse!=null && reverse.length!=dimension) {
-            throw new MismatchedDimensionException(format(dimension, reverse.length));
-        }
-        /*
-         * Setup the multi-dimensional affine transform for use with OpenGIS.
-         * According OpenGIS specification, transforms must map pixel center.
-         * This is done by adding 0.5 to grid coordinates.
-         */
-        final Matrix matrix = MatrixFactory.create(dimension+1);
-        for (int i=0; i<dimension; i++) {
-            // NOTE: i is a dimension in the 'gridRange' space (source coordinates).
-            //       j is a dimension in the 'userRange' space (target coordinates).
-            int j = i;
-            if (swapXY && j<=1) {
-                j = 1-j;
-            }
-            double scale = userRange.getLength(j) / gridRange.getLength(i);
-            double offset;
-            if (reverse==null || !reverse[j]) {
-                offset = userRange.getMinimum(j);
-            } else {
-                scale  = -scale;
-                offset = userRange.getMaximum(j);
-            }
-            offset -= scale * (gridRange.getLower(i) -  0.5);
-            matrix.setElement(j, j,         0.0   );
-            matrix.setElement(j, i,         scale );
-            matrix.setElement(j, dimension, offset);
-        }
-        gridToCRS = ProjectiveTransform.create(matrix);
+        this(gridRange, userRange, reverse, swapXY, false);
     }
 
     /**
-     * @deprecated Replaced by {@code new GeneralGridGeometry(gridRange, ...).getGridToCRS(...)}.
+     * Implementation of heuristic constructors.
+     */
+    GeneralGridGeometry(final GridRange gridRange,
+                        final Envelope  userRange,
+                        final boolean[] reverse,
+                        final boolean   swapXY,
+                        final boolean   automatic)
+            throws MismatchedDimensionException
+    {
+        this.gridRange = gridRange;
+        this.envelope  = new GeneralEnvelope(userRange);
+        final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper(gridRange, userRange);
+        if (!automatic) {
+            mapper.setReverseAxis(reverse);
+            mapper.setSwapXY(swapXY);
+        }
+        gridToCRS = mapper.createTransform();
+    }
+
+    /**
+     * @deprecated Replaced by {@link GridToEnvelopeMapper}.
      *
      * @since 2.3
      */
@@ -382,12 +302,15 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
             final boolean[] reverse, final boolean swapXY, final boolean halfPix)
             throws MismatchedDimensionException
     {
-        return new GeneralGridGeometry(gridRange, userRange, reverse, swapXY).getGridToCRS(
-                halfPix ? PixelInCell.CELL_CENTER : PixelInCell.CELL_CORNER);
+        final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper(gridRange, userRange);
+        mapper.setGridType(halfPix ? PixelInCell.CELL_CENTER : PixelInCell.CELL_CORNER);
+        mapper.setReverseAxis(reverse);
+        mapper.setSwapXY(swapXY);
+        return mapper.createTransform();
     }
 
     /**
-     * @deprecated Replaced by {@code new GeneralGridGeometry(gridRange, ...).getGridToCRS(...)}.
+     * @deprecated Replaced by {@link GridToEnvelopeMapper}.
      *
      * @since 2.3
      */
@@ -396,34 +319,17 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                                              boolean halfPix)
             throws MismatchedDimensionException
     {
-        final CoordinateSystem cs = getCoordinateSystem(userRange);
-        return getTransform(gridRange, userRange, reverse(cs), swapXY(cs), halfPix);
+        final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper(gridRange, userRange);
+        mapper.setGridType(halfPix ? PixelInCell.CELL_CENTER : PixelInCell.CELL_CORNER);
+        return mapper.createTransform();
     }
 
     /**
-     * Returns the coordinate system in use with the specified envelope. This method
-     * is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
-     *
-     * @todo Avoid the call to {@code getLowerCorner()} if we provide a
-     *       {@code getCoordinateReferenceSystem()} directly in GeoAPI
-     *       envelope interface.
-     */
-    static CoordinateSystem getCoordinateSystem(final Envelope envelope) {
-        if (envelope != null) {
-            final CoordinateReferenceSystem crs;
-            crs = envelope.getLowerCorner().getCoordinateReferenceSystem();
-            if (crs != null) {
-                return crs.getCoordinateSystem();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Applies heuristic rules in order to determine which axis should be reversed. This
-     * method is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
+     * Applies heuristic rules in order to determine which axis should be reversed.
      *
      * @since 2.3
+     *
+     * @deprecated Use {@link org.geotools.referencing.cs.AbstractCS#swapAndScaleAxis} instead.
      */
     public static boolean[] reverse(final CoordinateSystem cs) {
         if (cs == null) {
@@ -444,9 +350,12 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
 
     /**
      * Applies heuristic rules in order to determine if the two first axis should be interchanged.
-     * This method is invoked by the {@link #GeneralGridGeometry(GridRange,Envelope)} constructor.
      *
      * @since 2.3
+     *
+     * @deprecated Use {@link org.geotools.referencing.cs.AbstractCS#swapAndScaleAxis} instead
+     *             or {@link org.geotools.referencing.operation.matrix.XMatrixTransform#getSwapXY}
+     *             instead.
      */
     public static boolean swapXY(final CoordinateSystem cs) {
         boolean swapXY = false;
@@ -455,13 +364,6 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
                      AxisDirection.EAST .equals(cs.getAxis(1).getDirection().absolute());
         }
         return swapXY;
-    }
-
-    /**
-     * Formats an error message for mismatched dimension.
-     */
-    private static String format(final int dim1, final int dim2) {
-        return Errors.format(ErrorKeys.MISMATCHED_DIMENSION_$2, new Integer(dim1), new Integer(dim2));
     }
 
     /**

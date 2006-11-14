@@ -208,18 +208,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
     public GridGeometry2D(final GridRange gridRange, final Envelope userRange)
             throws IllegalArgumentException, MismatchedDimensionException
     {
-        this(gridRange, userRange, getCoordinateSystem(userRange));
-    }
-
-    /**
-     * Work around for RFE #4093999 in Sun's bug database
-     * ("Relax constraint on placement of this()/super() call in constructors").
-     */
-    private GridGeometry2D(final GridRange gridRange, final Envelope userRange,
-                           final CoordinateSystem cs)
-            throws MismatchedDimensionException
-    {
-        this(gridRange, userRange, reverse(cs), swapXY(cs));
+        this(gridRange, userRange, null, false, true);
     }
 
     /**
@@ -248,7 +237,20 @@ public class GridGeometry2D extends GeneralGridGeometry {
                           final boolean   swapXY)
             throws IllegalArgumentException, MismatchedDimensionException
     {
-        super(gridRange, userRange, reverse, swapXY);
+        this(gridRange, userRange, reverse, swapXY, false);
+    }
+
+    /**
+     * Implementation of heuristic constructors.
+     */
+    private GridGeometry2D(final GridRange gridRange,
+                           final Envelope  userRange,
+                           final boolean[] reverse,
+                           final boolean   swapXY,
+                           final boolean   automatic)
+            throws IllegalArgumentException, MismatchedDimensionException
+    {
+        super(gridRange, userRange, reverse, swapXY, automatic);
         final int[] dimensions;
         dimensions     = new int[4];
         gridToCRS2D    = getMathTransform2D(gridToCRS, gridRange, dimensions);
