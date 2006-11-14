@@ -84,14 +84,14 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         return new FeatureAttributeType(name, type, isNillable,1,1);
     }
     
-    protected Filter length(int fieldLength){
+    protected Filter length(int fieldLength, String attributeXPath){
         LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
         if( length == null ) {
             // TODO: Help Richard! ff.createFunctionExpression cannot find Length!
             return null;
         }
         
-        length.setArgs(new Expression[]{null});
+        length.setArgs(new Expression[]{ff.createAttributeExpression(attributeXPath)});
         CompareFilter cf = null;
         try {
             cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
@@ -108,7 +108,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
      */
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, int fieldLength, Object defaultValue) {
-        Filter f = length( fieldLength );
+        Filter f = length( fieldLength, name );
         
         if (Number.class.isAssignableFrom(clazz)) {
             return new NumericAttributeType(
