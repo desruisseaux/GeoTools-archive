@@ -1332,7 +1332,7 @@ public final class StreamingRenderer implements GTRenderer {
         // The correct value is in sourceCrs.
 
         // this is the reader's CRS
-        CoordinateReferenceSystem rCS = features.getFeatureType().getDefaultGeometry().getCoordinateSystem();
+        CoordinateReferenceSystem rCS = features.getSchema().getDefaultGeometry().getCoordinateSystem();
 
         // sourceCrs == source's real SRS
         // if we need to recode the incoming geometries
