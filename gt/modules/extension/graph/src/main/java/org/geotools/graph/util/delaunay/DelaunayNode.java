@@ -62,7 +62,7 @@ public class DelaunayNode extends BasicXYNode{
     
     public String toString(){
 //        return "(" + roundToSigDigs(this.getCoordinate().x, 5) + "," + roundToSigDigs(this.getCoordinate().y, 5) + ")";
-	return "(" + this.getCoordinate().x + "," + this.getCoordinate().y + ")"
+	return "(" + this.getCoordinate().x + "," + this.getCoordinate().y + ")";
     }
     
 }
