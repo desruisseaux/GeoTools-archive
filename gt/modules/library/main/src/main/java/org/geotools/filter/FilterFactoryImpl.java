@@ -43,6 +43,7 @@ import org.geotools.filter.spatial.IntersectsImpl;
 import org.geotools.filter.spatial.OverlapsImpl;
 import org.geotools.filter.spatial.TouchesImpl;
 import org.geotools.filter.spatial.WithinImpl;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
@@ -925,5 +926,15 @@ public class FilterFactoryImpl implements FilterFactory {
 
     public org.geotools.filter.Filter or( org.geotools.filter.Filter filter1, org.geotools.filter.Filter filter2 ) {
         return (org.geotools.filter.Filter) or( (Filter) filter1, (Filter) filter2 );
+    }
+    
+    public Beyond beyond( Expression geometry1, Geometry geometry2, double distance, String units ) {
+        return beyond( geometry1, literal( geometry2), distance, units );        
+    }
+    public PropertyName property( Name name ) {
+        return property( name.toString() ); // uses full URI for justin
+    }
+    public Within within( Expression geometry1, Geometry geometry2 ) {
+        return within( geometry1, literal( geometry2 ));
     }
 }

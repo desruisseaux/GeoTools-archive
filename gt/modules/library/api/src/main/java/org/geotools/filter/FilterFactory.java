@@ -54,7 +54,7 @@ import org.geotools.feature.FeatureType;
  *
  * @deprecated use {@link org.opengis.filter.FilterFactory}
  */
-public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory {
+public interface FilterFactory extends Factory, org.opengis.filter.FilterFactory2 {
     /**
      * Creates a logic filter from two filters and a type.
      *
