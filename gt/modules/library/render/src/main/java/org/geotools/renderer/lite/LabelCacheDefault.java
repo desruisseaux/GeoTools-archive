@@ -18,7 +18,7 @@
 package org.geotools.renderer.lite;
 
 import java.awt.AlphaComposite;
-import java.awt.Color; 
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -62,49 +62,49 @@ import com.vividsolutions.jts.precision.EnhancedPrecisionOp;
 
 /**
  * Default LabelCache Implementation
- * 
+ *
  * DJB (major changes on May 11th, 2005): 1.The old version of the labeler, if
  * given a *set* of points, lines, or polygons justed labels the first item in
  * the set. The sets are formed when you want to only put a single "Main St" on
  * the map even if you have a bunch of small "Main St" segments.
- * 
+ *
  * I changed this to be much much wiser.
- * 
+ *
  * Basically, the new way looks at the set of geometries that its going to put a
  * label on and find the "best" one that represents it. That geometry is then
  * labeled (see below for details on where that label is placed).
- * 
+ *
  * 2. I changed the actual drawing routines;
- * 
+ *
  * 1. get the "representative geometry" 2. for points, label as before 3. for
  * lines, find the middle point on the line (old version just averaged start and
  * end points) and centre label on that point (rotated) 4. for polygon, put the
  * label in the middle
- * 
+ *
  * 3.
- * 
+ *
  * ie. for lines, try the label at the 1/3, 1/2, and 2/3 location. Metric is how
  * close the label bounding box is to the line.
- * 
+ *
  * ie. for polygons, bisect the polygon (about the centroid) in to North, South,
  * East and West polygons. Use the location that has the label best inside the
  * polygon.
- * 
+ *
  * After this is done, you can start doing constraint relaxation...
- * 
+ *
  * 4. TODO: deal with labels going off the edge of the screen (much reduced
  * now). 5. TODO: add a "minimum quality" parameter (ie. if you're labeling a
  * tiny polygon with a tiny label, dont bother). Metrics are descibed in #3. 6.
  * TODO: add ability for SLD to tweak parameters (ie. "always label").
- * 
- * 
+ *
+ *
  * ------------------------------------------------------------------------------------------
  * I've added extra functionality; a) priority -- if you set the <Priority> in a
  * TextSymbolizer, then you can control the order of labelling ** see mailing
  * list for more details b) <VendorOption name="group">no</VendorOption> ---
  * turns off grouping for this symbolizer c) <VendorOption name="spaceAround">5</VendorOption> --
  * do not put labels within 5 pixels of this label.
- * 
+ *
  * @author jeichar
  * @author dblasby
  * @source $URL$
@@ -158,7 +158,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 * evaluate it: 1. if its missing --> DEFAULT_PRIORITY 2. if its a number,
 	 * return that number 3. if its not a number, convert to string and try to
 	 * parse the number; return the number 4. otherwise, return DEFAULT_PRIORITY
-	 * 
+	 *
 	 * @param symbolizer
 	 * @param feature
 	 */
@@ -261,9 +261,9 @@ public final class LabelCacheDefault implements LabelCache {
 	/**
 	 * pull space around from the sybolizer options - defaults to
 	 * DEFAULT_SPACEAROUND.
-	 * 
+	 *
 	 * <0 means "I can overlap other labels" be careful with this.
-	 * 
+	 *
 	 * @param symbolizer
 	 */
 	private int getSpaceAround(TextSymbolizer symbolizer) {
@@ -280,7 +280,7 @@ public final class LabelCacheDefault implements LabelCache {
 	/**
 	 * look at the options in the symbolizer for "group". return its value if
 	 * not present, return "DEFAULT_GROUP"
-	 * 
+	 *
 	 * @param symbolizer
 	 */
 	private boolean isGrouping(TextSymbolizer symbolizer) {
@@ -301,8 +301,8 @@ public final class LabelCacheDefault implements LabelCache {
 	/**
 	 * return a list with all the values in priority order. Both grouped and
 	 * non-grouped
-	 * 
-	 * 
+	 *
+	 *
 	 */
 	public List orderedLabels() {
 		Collection c = labelCache.values();
@@ -350,8 +350,13 @@ public final class LabelCacheDefault implements LabelCache {
 				Geometry geom = labelItem.getGeometry();
 
 				AffineTransform oldTransform = graphics.getTransform();
-				AffineTransform tempTransform = new AffineTransform(
-						oldTransform);
+				/*
+				* Just use identity for tempTransform because display area is 0,0,width,height
+				* and oldTransform may have a different origin. OldTransform will be used later
+				* for drawing.
+				* -rg & je
+				*/
+ 				AffineTransform tempTransform = new AffineTransform();
 
 				Geometry representativeGeom = null;
 
@@ -419,7 +424,14 @@ public final class LabelCacheDefault implements LabelCache {
 					continue;
 
 				try {
-					graphics.setTransform(tempTransform);
+					/*
+					* Merge the tempTransform with the transform provided by graphics. This is the
+					* proper transform that should be used for drawing.
+					* -je & rg
+					*/
+					AffineTransform newTransform = new AffineTransform(oldTransform);
+					newTransform.concatenate(tempTransform);
+ 				    graphics.setTransform(newTransform);
 
 					if (labelItem.getTextStyle().getGraphic() != null) {
 
@@ -512,12 +524,12 @@ public final class LabelCacheDefault implements LabelCache {
 	 * 1.0 2. lines ALWAYS RETURNS 1.0 (modify polygon method to handle rotated
 	 * labels) 3. polygon + assume: polylabels are unrotated + assume: polygon
 	 * could be invalid + dont worry about holes
-	 * 
+	 *
 	 * like to RETURN area of intersection between polygon and label bounds, but
 	 * thats expensive and likely to give us problems due to invalid polygons
 	 * SO, use a sample method - make a few points inside the label and see if
 	 * they're "close to" the polygon The method sucks, but works well...
-	 * 
+	 *
 	 * @param glyphVector
 	 * @param tempTransform
 	 * @param representativeGeom
@@ -572,7 +584,7 @@ public final class LabelCacheDefault implements LabelCache {
 
 	/**
 	 * Remove holes from a polygon
-	 * 
+	 *
 	 * @param polygon
 	 */
 	private Polygon simplifyPoly(Polygon polygon) {
@@ -590,7 +602,7 @@ public final class LabelCacheDefault implements LabelCache {
 
 	/**
 	 * Returns true if any part of the label is offscreen (even by a tinny bit)
-	 * 
+	 *
 	 * @param glyphVector
 	 * @param tempTransform
 	 */
@@ -603,7 +615,7 @@ public final class LabelCacheDefault implements LabelCache {
 
 	/**
 	 * Determines whether labelItems overlaps a previously rendered label.
-	 * 
+	 *
 	 * @param glyphs
 	 *            list of bounds of previously rendered glyphs/shields.
 	 * @param bounds
@@ -642,11 +654,11 @@ public final class LabelCacheDefault implements LabelCache {
 
 	/**
 	 * This handles point and line placement.
-	 * 
+	 *
 	 * 1. lineplacement -- calculate a rotation and location (and does the perp
 	 * offset) 2. pointplacement -- reduce line to a point and ignore the
 	 * calculated rotation
-	 * 
+	 *
 	 * @param glyphVector
 	 * @param line
 	 * @param textStyle
@@ -715,7 +727,7 @@ public final class LabelCacheDefault implements LabelCache {
 	/**
 	 * Simple to paint a point (or set of points) Just choose the first one and
 	 * paint it!
-	 * 
+	 *
 	 */
 	private Geometry paintPointLabel(GlyphVector glyphVector,
 			LabelCacheItem labelItem, AffineTransform tempTransform,
@@ -761,7 +773,7 @@ public final class LabelCacheDefault implements LabelCache {
 
 	/**
 	 * returns the representative geometry (for further processing)
-	 * 
+	 *
 	 * TODO: handle lineplacement for a polygon (perhaps we're supposed to grab
 	 * the outside line and label it, but spec is unclear)
 	 */
@@ -828,13 +840,13 @@ public final class LabelCacheDefault implements LabelCache {
 	}
 
 	/**
-	 * 
+	 *
 	 * 1. get a list of points from the input geometries that are inside the
 	 * displayGeom NOTE: lines and polygons are reduced to their centroids (you
 	 * shouldnt really calling this with lines and polys) 2. choose the most
 	 * "central" of the points METRIC - choose anyone TODO: change metric to be
 	 * "closest to the centoid of the possible points"
-	 * 
+	 *
 	 * @param geoms
 	 *            list of Point or MultiPoint (any other geometry types are
 	 *            rejected
@@ -877,18 +889,18 @@ public final class LabelCacheDefault implements LabelCache {
 	 * convert polygons to their exterior ring (you shouldnt be calling this
 	 * function with points and polys) 2. join the lines together 3. clip
 	 * resulting lines to display geometry 4. return longest line
-	 * 
+	 *
 	 * NOTE: the joining has multiple solution. For example, consider a Y (3
 	 * lines): * * 1 2 * * * 3 * solutions are: 1->2 and 3 1->3 and 2 2->3 and 1
-	 * 
+	 *
 	 * (see mergeLines() below for detail of the algorithm; its basically a
 	 * greedy algorithm that should form the 'longest' possible route through
 	 * the linework)
-	 * 
+	 *
 	 * NOTE: we clip after joining because there could be connections "going on"
 	 * outside the display bbox
-	 * 
-	 * 
+	 *
+	 *
 	 * @param geoms
 	 * @param displayGeometry
 	 *            must be poly
@@ -973,10 +985,10 @@ public final class LabelCacheDefault implements LabelCache {
 
 	/**
 	 * try to be more robust dont bother returning points
-	 * 
+	 *
 	 * This will try to solve robustness problems, but read code as to what it
 	 * does. It might return the unclipped line if there's a problem!
-	 * 
+	 *
 	 * @param line
 	 * @param bbox
 	 *            MUST BE A BOUNDING BOX
@@ -1038,7 +1050,7 @@ public final class LabelCacheDefault implements LabelCache {
 	 * 1. make a list of all the polygons clipped to the displayGeometry NOTE:
 	 * reject any points or lines 2. choose the largest of the clipped
 	 * geometries
-	 * 
+	 *
 	 * @param geoms
 	 * @param displayGeometry
 	 */
@@ -1110,11 +1122,11 @@ public final class LabelCacheDefault implements LabelCache {
 	 * try to do a more robust way of clipping a polygon to a bounding box. This
 	 * might return the orginal polygon if it cannot clip TODO: this is a bit
 	 * simplistic, there's lots more to do.
-	 * 
+	 *
 	 * @param poly
 	 * @param bbox
 	 * @param displayGeomEnv
-	 * 
+	 *
 	 * @return a MutliPolygon
 	 */
 	public MultiPolygon clipPolygon(Polygon poly, Polygon bbox,
@@ -1179,7 +1191,7 @@ public final class LabelCacheDefault implements LabelCache {
 	/**
 	 * see middlePoint() find the segment that the point is apart of, and return
 	 * the slope.
-	 * 
+	 *
 	 * @param l
 	 * @param percent
 	 */
@@ -1217,8 +1229,8 @@ public final class LabelCacheDefault implements LabelCache {
 	/**
 	 * calculate the middle of a line. The returning point will be x% (0.5 =
 	 * 50%) along the line and on the line.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param l
 	 * @param percent
 	 *            0=start, 0.5=middle, 1.0=end
@@ -1303,11 +1315,11 @@ public final class LabelCacheDefault implements LabelCache {
 	 * issolated), add it to "result" 2. otherwise, merge it at the start/end
 	 * with the LONGEST line there. 3. remove the original line, and the lines
 	 * it merged with from the hashtables 4. go again, with the merged line
-	 * 
+	 *
 	 * @param edges
 	 * @param nodes
 	 * @param result
-	 * 
+	 *
 	 */
 	public void processNodes(List edges, Hashtable nodes, ArrayList result) {
 		int index = 0; // index into edges
@@ -1409,18 +1421,18 @@ public final class LabelCacheDefault implements LabelCache {
 	 * merges a set of lines together into a (usually) smaller set. This one's
 	 * pretty dumb, we use the JTS method (which doesnt merge on degree 3 nodes)
 	 * and try to construct less lines.
-	 * 
+	 *
 	 * There's multiple solutions, but we do this the easy way. Usually you will
 	 * not be given more than 3 lines (especially after jts is finished with).
-	 * 
+	 *
 	 * Find a line, find a lines that it "connects" to and add it. Keep going.
-	 * 
+	 *
 	 * DONE: be smarter - use length so the algorithm becomes greedy.
-	 * 
+	 *
 	 * This isnt 100% correct, but usually it does the right thing.
-	 * 
+	 *
 	 * NOTE: this is O(N^2), but N tends to be <10
-	 * 
+	 *
 	 * @param lines
 	 */
 	Collection mergeLines2(Collection lines) {
@@ -1506,7 +1518,7 @@ public final class LabelCacheDefault implements LabelCache {
 	/**
 	 * given a list, return a new list thats the same as the first, but has no
 	 * null values in it.
-	 * 
+	 *
 	 * @param l
 	 */
 	ArrayList removeNulls(List l) {
@@ -1535,7 +1547,7 @@ public final class LabelCacheDefault implements LabelCache {
 	/**
 	 * if possible, merge the two lines together (ie. their start/end points are
 	 * equal) returns null if not possible
-	 * 
+	 *
 	 * @param major
 	 * @param minor
 	 */
@@ -1575,7 +1587,7 @@ public final class LabelCacheDefault implements LabelCache {
 
 	/**
 	 * sorts a list of LineStrings by length (long=1st)
-	 * 
+	 *
 	 */
 	private final class LineLengthComparator implements java.util.Comparator {
 		public int compare(Object o1, Object o2) // note order - this sort
