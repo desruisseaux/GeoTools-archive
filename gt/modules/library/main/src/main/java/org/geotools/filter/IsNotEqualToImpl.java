@@ -17,9 +17,11 @@ package org.geotools.filter;
 
 import org.geotools.feature.Feature;
 import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.PropertyIsNotEqualTo;
 import org.opengis.filter.expression.Expression;
 
-public class IsNotEqualToImpl extends CompareFilterImpl {
+public class IsNotEqualToImpl extends CompareFilterImpl
+	implements PropertyIsNotEqualTo {
 
 	protected IsNotEqualToImpl(FilterFactory factory) {
 		this(factory,null,null);
@@ -44,8 +46,7 @@ public class IsNotEqualToImpl extends CompareFilterImpl {
 	}
 	
 	public Object accept(FilterVisitor visitor, Object extraData) {
-		//TODO: JD: do we need a PropertyIsNotEqualTo interface?
-		throw new UnsupportedOperationException();
+		return visitor.visit( this, extraData );
 	}
 
 }

@@ -56,6 +56,7 @@ import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.PropertyIsNotEqualTo;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.Expression;
@@ -154,6 +155,10 @@ public class FilterFactoryImpl implements FilterFactory {
         return new IsEqualsToImpl(this,expr1,expr2);
     }
 
+    public PropertyIsNotEqualTo notEqual(Expression expr1, Expression expr2) {
+        return new IsNotEqualToImpl(this,expr1,expr2);
+    }
+    
     public PropertyIsGreaterThan greater(Expression expr1, Expression expr2) {
         return new IsGreaterThanImpl(this,expr1,expr2);
     }

@@ -31,6 +31,7 @@ import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNotEqualTo;
 import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.spatial.BBOX;
@@ -136,6 +137,11 @@ public class FilterVisitorFilterWrapper implements FilterVisitor {
 		return extraData;
 	}
 
+	public Object visit(PropertyIsNotEqualTo filter, Object extraData) {
+		visitCompareFilter(filter);
+		return extraData;
+	}
+	
 	public Object visit(PropertyIsGreaterThan filter, Object extraData) {
 		visitCompareFilter(filter);
 		return extraData;
