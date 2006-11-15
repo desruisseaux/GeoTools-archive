@@ -16,18 +16,13 @@
 package org.geotools.data.crs;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
+import java.util.Iterator;
 
-import org.geotools.data.DataSourceException;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
-import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.collection.AbstractFeatureCollection;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -63,59 +58,62 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  * @version $Id$
  */
-public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
+public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollection {
     FeatureCollection results;
-    FeatureType schema;
-    private FeatureType startingType;
+    //FeatureType schema;
 
-    public ForceCoordinateSystemFeatureResults(FeatureCollection results,
+    public ForceCoordinateSystemFeatureResults(FeatureCollection results,            
         CoordinateReferenceSystem forcedCS) throws IOException, SchemaException {
-        if (forcedCS == null) {
-            throw new NullPointerException("CoordinateSystem required");
-        }
-
-        startingType = results.getSchema();
-        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry()
-                                                   .getCoordinateSystem();
-
-        //make sure we have the real original 
-        if ( results instanceof ReprojectFeatureResults ) {
-        	originalCs = ((ReprojectFeatureResults) results).getOrigin().getSchema()
-        		.getDefaultGeometry().getCoordinateSystem();
-        }
+        super( forceType( origionalType( results ), forcedCS ) );
         
-        if ( results instanceof ForceCoordinateSystemFeatureResults ) {
-        	originalCs = ((ForceCoordinateSystemFeatureResults) results).getOrigin().getSchema()
-    			.getDefaultGeometry().getCoordinateSystem();
-        }
-        
-        if (!forcedCS.equals(originalCs)) {
-            this.schema = FeatureTypes.transform(startingType, forcedCS);
-        }
-
         this.results = results;
 
-        // Optimization: if the source is again a ForceCoordinateSystemFeatureResults,
-        // we just "eat" it since it does not do anything useful and creates unecessary
-        // feature objects
         if (results instanceof ForceCoordinateSystemFeatureResults) {
+            // Optimization: if the source is again a ForceCoordinateSystemFeatureResults,
+            // we just "eat" it since it does not do anything useful and creates unecessary
+            // feature objects
+            
             ForceCoordinateSystemFeatureResults forced = (ForceCoordinateSystemFeatureResults) results;
             this.results = forced.getOrigin();
         }
     }
-
-   
-    public FeatureType getSchema(){
-        if( schema==null )
-            return startingType;
-        return schema;
+    
+    private static FeatureType origionalType( FeatureCollection results ){
+        while( true ){
+            if ( results instanceof ReprojectFeatureResults ) {
+                results = ((ReprojectFeatureResults) results).getOrigin();
+            }        
+            if ( results instanceof ForceCoordinateSystemFeatureResults ) {
+                results = ((ForceCoordinateSystemFeatureResults) results).getOrigin();
+            }
+            break;
+        }
+        return results.getSchema();
     }
-
-    /**
-     * @see org.geotools.data.FeatureResults#reader()
-     */
-    public FeatureReader reader() throws IOException {
-        return new ForceCoordinateSystemFeatureReader(results.reader(), schema);
+    
+    private static FeatureType forceType( FeatureType startingType, CoordinateReferenceSystem forcedCS ) throws SchemaException{
+        if (forcedCS == null) {
+            throw new NullPointerException("CoordinateSystem required");
+        }
+        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry().getCoordinateSystem();
+        
+        if (forcedCS.equals(originalCs)) {
+            return startingType;
+        }
+        else {
+            return FeatureTypes.transform(startingType, forcedCS);
+        }
+    }
+   
+    protected Iterator openIterator() {
+        return new ForceCoordinateSystemIterator( results.features(), getSchema() );
+    }
+    protected void closeIterator( Iterator close ) {
+        if( close == null ) return;
+        if( close instanceof ForceCoordinateSystemIterator){
+            ForceCoordinateSystemIterator iterator = (ForceCoordinateSystemIterator) close;
+            iterator.close();
+        }
     }
 
     /**
@@ -125,33 +123,30 @@ public class ForceCoordinateSystemFeatureResults extends DataFeatureCollection {
         return results.getBounds();
     }
 
-    /**
-     * @see org.geotools.data.FeatureResults#getCount()
-     */
-    public int getCount() throws IOException {
+    public int size() {
         return results.size();
     }
 
     /**
      * @see org.geotools.data.FeatureResults#collection()
      */
-    public FeatureCollection collection() throws IOException {
-        FeatureCollection collection = FeatureCollections.newCollection();
-
-        try {
-            FeatureReader reader = reader();
-
-            while (reader.hasNext()) {
-                collection.add(reader.next());
-            }
-        } catch (NoSuchElementException e) {
-            throw new DataSourceException("This should not happen", e);
-        } catch (IllegalAttributeException e) {
-            throw new DataSourceException("This should not happen", e);
-        }
-
-        return collection;
-    }
+//    public FeatureCollection collection() throws IOException {
+//        FeatureCollection collection = FeatureCollections.newCollection();
+//
+//        try {
+//            FeatureReader reader = reader();
+//
+//            while (reader.hasNext()) {
+//                collection.add(reader.next());
+//            }
+//        } catch (NoSuchElementException e) {
+//            throw new DataSourceException("This should not happen", e);
+//        } catch (IllegalAttributeException e) {
+//            throw new DataSourceException("This should not happen", e);
+//        }
+//
+//        return collection;
+//    }
 
     /**
      * Returns the feature results wrapped by this

@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 
@@ -52,11 +52,11 @@ public final class IndexedFeatureResults extends DataFeatureCollection implement
 		
 				
 		// load features into the index
-		FeatureReader reader = null;
+		FeatureIterator reader = null;
 		bounds = new Envelope();
 		count = 0;
 		try {
-			reader = results.reader();
+			reader = results.features();
 			Feature f;
 			Envelope env;
 			while (reader.hasNext()) {

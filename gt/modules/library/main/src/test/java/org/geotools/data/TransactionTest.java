@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.filter.Filter;
@@ -86,7 +87,7 @@ public class TransactionTest extends TestCase {
 
 	private void count(FeatureStore store, int expected) throws IOException, IllegalAttributeException {
 		int i=0;
-        for( FeatureReader reader=store.getFeatures().reader();
+        for( FeatureIterator reader=store.getFeatures().features();
         reader.hasNext();){
             reader.next();
             i++;

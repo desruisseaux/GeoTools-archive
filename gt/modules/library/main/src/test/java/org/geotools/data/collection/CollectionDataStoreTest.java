@@ -435,13 +435,13 @@ public class CollectionDataStoreTest extends DataTestCase {
         assertEquals(2, half.size());
         assertEquals(1, half.getSchema().getAttributeCount());
 
-        FeatureReader reader = half.reader();
-        FeatureType type = reader.getFeatureType();
+        FeatureIterator reader = half.features();
+        FeatureType type = half.getSchema();
         reader.close();
 
         FeatureType actual = half.getSchema();
-
-        assertEquals(type.getTypeName(), actual.getTypeName());
+        String name = type.getTypeName();
+        assertEquals(name, actual.getTypeName());
         assertEquals(type.getNamespace(), actual.getNamespace());
         assertEquals(type.getAttributeCount(), actual.getAttributeCount());
 

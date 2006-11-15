@@ -725,6 +725,28 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         assertEquals( "covers", count, array.length );
         return true;
     }
+    boolean covers(FeatureIterator reader, Feature[] array)
+        throws NoSuchElementException, IOException {
+        Feature feature;
+        int count = 0;
+
+        try {
+            while (reader.hasNext()) {
+                feature = reader.next();
+
+                assertNotNull("feature", feature );
+                if (!containsFeature(array, feature)) {
+                    fail("feature "+feature.getID()+" not listed");
+                    return false;
+                }
+                count++;
+            }
+        } finally {
+            reader.close();
+        }
+        assertEquals( "covers", count, array.length );
+        return true;
+    }
 
     boolean coversLax(FeatureReader reader, Feature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
@@ -744,10 +766,30 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         } finally {
             reader.close();
         }
-
         return count == array.length;
     }
 
+
+    boolean coversLax(FeatureIterator reader, Feature[] array)
+        throws NoSuchElementException, IOException, IllegalAttributeException {
+        Feature feature;
+        int count = 0;
+
+        try {
+            while (reader.hasNext()) {
+                feature = reader.next();
+
+                if (!containsLax(array, feature)) {
+                    return false;
+                }
+
+                count++;
+            }
+        } finally {
+            reader.close();
+        }
+        return count == array.length;
+    }
     void dump(FeatureReader reader)
         throws NoSuchElementException, IOException, IllegalAttributeException {
         Feature feature;
@@ -1082,8 +1124,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         assertEquals(2, half.size());
         assertEquals(1, half.getSchema().getAttributeCount());
 
-        FeatureReader reader = half.reader();
-        FeatureType type = reader.getFeatureType();
+        FeatureIterator reader = half.features();
+        FeatureType type = half.getSchema();
         reader.close();
 
         FeatureType actual = half.getSchema();
@@ -1114,7 +1156,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         FeatureCollection all = river.getFeatures();
         assertEquals(2, all.size());
         assertEquals(riverBounds, all.getBounds());
-        assertTrue("RIVERS", covers(all.reader(), riverFeatures));
+        assertTrue("RIVERS", covers(all.features(), riverFeatures));
 
         FeatureCollection expected = DataUtilities.collection(riverFeatures);
         assertCovers("ALL", expected, all);
@@ -1209,7 +1251,7 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         FINAL[i] = newRoad;
 
         // start of with ORIGINAL
-        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
+        assertTrue(covers(road.getFeatures().features(), ORIGIONAL));
 
         // road1 removes road.rd1 on t1
         // -------------------------------
@@ -1217,8 +1259,8 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         road1.removeFeatures(rd1Filter);
 
         // still have ORIGIONAL and t1 has REMOVE
-        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
-        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
+        assertTrue(covers(road.getFeatures().features(), ORIGIONAL));
+        assertTrue(covers(road1.getFeatures().features(), REMOVE));
 
         // road2 adds road.rd4 on t2
         // ----------------------------
@@ -1227,9 +1269,9 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         road2.addFeatures(collection);
 
         // We still have ORIGIONAL, t1 has REMOVE, and t2 has ADD
-        assertTrue(covers(road.getFeatures().reader(), ORIGIONAL));
-        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
-        assertTrue(coversLax(road2.getFeatures().reader(), ADD));
+        assertTrue(covers(road.getFeatures().features(), ORIGIONAL));
+        assertTrue(covers(road1.getFeatures().features(), REMOVE));
+        assertTrue(coversLax(road2.getFeatures().features(), ADD));
 
         // commit t1
         // ---------
@@ -1239,9 +1281,9 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
 
         // We now have REMOVE, as does t1 (which has not additional diffs)
         // t2 will have FINAL
-        assertTrue(covers(road.getFeatures().reader(), REMOVE));
-        assertTrue(covers(road1.getFeatures().reader(), REMOVE));
-        assertTrue(coversLax(road2.getFeatures().reader(), FINAL));
+        assertTrue(covers(road.getFeatures().features(), REMOVE));
+        assertTrue(covers(road1.getFeatures().features(), REMOVE));
+        assertTrue(coversLax(road2.getFeatures().features(), FINAL));
 
         // commit t2
         // ---------
@@ -1249,9 +1291,9 @@ public abstract class AbstractDataStoreTest extends DataTestCase {
         t2.commit();
 
         // We now have Number( remove one and add one)
-        assertTrue(coversLax(road.getFeatures().reader(), FINAL));
-        assertTrue(coversLax(road1.getFeatures().reader(), FINAL));
-        assertTrue(coversLax(road2.getFeatures().reader(), FINAL));
+        assertTrue(coversLax(road.getFeatures().features(), FINAL));
+        assertTrue(coversLax(road1.getFeatures().features(), FINAL));
+        assertTrue(coversLax(road2.getFeatures().features(), FINAL));
     }
 
     boolean isLocked(String typeName, String fid) {

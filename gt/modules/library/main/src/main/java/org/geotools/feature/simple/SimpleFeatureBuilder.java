@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.feature.AbstractFeatureCollection;
 import org.geotools.feature.Feature;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.simple.SimpleFeature;

@@ -720,11 +720,8 @@ public class DataUtilities {
                 + "this exception should not happen", e);
         }
     }
-
-    // @TODO: remove all the IOExceptions from these methods, they don't make sense
-    // see the source(...) code for examples on how to do it
-    public static FeatureResults results(Feature[] featureArray)
-        throws IOException {
+    
+    public static FeatureCollection results(Feature[] featureArray){
         return results(collection(featureArray));
     }
 
@@ -737,10 +734,9 @@ public class DataUtilities {
      *
      * @throws IOException Raised if collection was empty
      */
-    public static FeatureCollection results(final FeatureCollection collection)
-        throws IOException {
+    public static FeatureCollection results(final FeatureCollection collection){
         if (collection.size() == 0) {
-            throw new IOException("Provided collection was empty");
+            //throw new IOException("Provided collection was empty");
         }
         return collection;
     }

@@ -16,6 +16,7 @@
 package org.geotools.data.crs;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.geotools.data.DataSourceException;
@@ -25,10 +26,12 @@ import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.collection.AbstractFeatureCollection;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -69,7 +72,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  * @version $Id$ TODO: handle the case where there is more than one geometry and the other geometries have a different CS than the default geometry
  */
-public class ReprojectFeatureResults extends DataFeatureCollection implements FeatureResults {
+public class ReprojectFeatureResults extends AbstractFeatureCollection {
     FeatureCollection results;
     FeatureType schema;
     MathTransform transform;
@@ -92,66 +95,80 @@ public class ReprojectFeatureResults extends DataFeatureCollection implements Fe
      */
     public ReprojectFeatureResults(FeatureCollection results,
         CoordinateReferenceSystem destinationCS)
-        throws IOException, SchemaException, TransformException, OperationNotFoundException, NoSuchElementException, FactoryException{
-        super(results.getSchema().getNamespace()+"/"+results.getSchema().getTypeName(),results.getSchema());
-        if (destinationCS == null) {
-            throw new NullPointerException("CoordinateSystem required");
-        }
-
-        FeatureType type = results.getSchema();
-        CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
-                                                   .getCoordinateSystem();
+        throws IOException, SchemaException, TransformException, OperationNotFoundException, NoSuchElementException, FactoryException {
         
-        //make sure we have the real original 
-        if ( results instanceof ReprojectFeatureResults ) {
-        	originalCs = ((ReprojectFeatureResults) results).getOrigin().getSchema()
-        		.getDefaultGeometry().getCoordinateSystem();
-        }
+        super( forceType( origionalType( results ), destinationCS ) );
+                        
+        this.results = origionalCollection( results );        
+        this.schema = getSchema();
         
-        if ( results instanceof ForceCoordinateSystemFeatureResults ) {
-        	originalCs = ((ForceCoordinateSystemFeatureResults) results).getOrigin().getSchema()
-    			.getDefaultGeometry().getCoordinateSystem();
-        }
+        CoordinateReferenceSystem originalCs = results.getSchema().getDefaultGeometry().getCoordinateSystem();
         
-        if (destinationCS.equals(originalCs)) {
-            throw new IllegalArgumentException("CoordinateSystem "
-                + destinationCS + " already used (check before using wrapper)");
+        if (destinationCS.equals(originalCs)) {                       
+            //this.transform = null; // identity?
+            this.transform = FactoryFinder.getCoordinateOperationFactory(null).createOperation(originalCs,destinationCS).getMathTransform();
         }
-
-        this.schema = FeatureTypes.transform(type, destinationCS);
-        this.results = results;
-        
-        this.transform = FactoryFinder.getCoordinateOperationFactory(null).createOperation(originalCs,destinationCS).getMathTransform();
-
-        // Optimization 1: if the wrapped results is a forced cs results we
-        // "eat" it to avoid useless feature object creation
-        if (results instanceof ForceCoordinateSystemFeatureResults) {
-            ForceCoordinateSystemFeatureResults forced = (ForceCoordinateSystemFeatureResults) results;
-            this.results = forced.getOrigin();
-        }
-
-        // Optimization 2: if the wrapped results is a reproject results we
-        // concatenate the transforms and get the original results
-        if (results instanceof ReprojectFeatureResults) {
-            ReprojectFeatureResults reproject = (ReprojectFeatureResults) results;
-            this.results = reproject.getOrigin();
-            this.transform = FactoryFinder.getMathTransformFactory(null).createConcatenatedTransform(reproject.transform,
-                    transform);
+        else {
+            this.transform = FactoryFinder.getCoordinateOperationFactory(null).createOperation(originalCs,destinationCS).getMathTransform();            
         }
     }
 
+    private static FeatureCollection origionalCollection( FeatureCollection results ){
+        while( true ){
+            if ( results instanceof ReprojectFeatureResults ) {
+                results = ((ReprojectFeatureResults) results).getOrigin();
+            }        
+            if ( results instanceof ForceCoordinateSystemFeatureResults ) {
+                results = ((ForceCoordinateSystemFeatureResults) results).getOrigin();
+            }
+            break;
+        }
+        return results;
+    }
+    private static FeatureType origionalType( FeatureCollection results ){
+        while( true ){
+            if ( results instanceof ReprojectFeatureResults ) {
+                results = ((ReprojectFeatureResults) results).getOrigin();
+            }        
+            if ( results instanceof ForceCoordinateSystemFeatureResults ) {
+                results = ((ForceCoordinateSystemFeatureResults) results).getOrigin();
+            }
+            break;
+        }
+        return results.getSchema();
+    }
+    
+    private static FeatureType forceType( FeatureType startingType, CoordinateReferenceSystem forcedCS ) throws SchemaException{
+        if (forcedCS == null) {
+            throw new NullPointerException("CoordinateSystem required");
+        }
+        CoordinateReferenceSystem originalCs = startingType.getDefaultGeometry().getCoordinateSystem();
+        
+        if (forcedCS.equals(originalCs)) {
+            return startingType;
+        }
+        else {
+            return FeatureTypes.transform(startingType, forcedCS);
+        }
+    }
+    
     /**
      * @see org.geotools.data.FeatureResults#getSchema()
      */
     public FeatureType getSchema(){
         return schema;
     }
-
-    /**
-     * @see org.geotools.data.FeatureResults#reader()
-     */
-    public FeatureReader reader() throws IOException {
-        return new ReprojectFeatureReader(results.reader(), schema, transform);
+    
+    protected Iterator openIterator() {
+        return new ReprojectFeatureIterator( results.features(), getSchema(), this.transform );
+    }
+    
+    protected void closeIterator( Iterator close ) {
+        if( close == null ) return;
+        if( close instanceof ReprojectFeatureIterator){
+            ReprojectFeatureIterator iterator = (ReprojectFeatureIterator) close;
+            iterator.close();
+        }
     }
 
     /**
@@ -166,34 +183,37 @@ public class ReprojectFeatureResults extends DataFeatureCollection implements Fe
      * @see org.geotools.data.FeatureResults#getBounds()
      */
     public Envelope getBounds() {
-        try {
+        FeatureIterator r = features();
+        try {            
             Envelope newBBox = new Envelope();
             Envelope internal;
             Feature feature;
 
-            for (FeatureReader r = reader(); r.hasNext();) {
+            while ( r.hasNext()) {
                 feature = r.next();
                 internal = feature.getDefaultGeometry().getEnvelopeInternal();
                 newBBox.expandToInclude(internal);
             }
-
             return newBBox;
         } catch (Exception e) {
             throw new RuntimeException("Exception occurred while computing reprojected bounds",
                 e);
+        }
+        finally {
+            r.close();
         }
     }
 
     /**
      * @see org.geotools.data.FeatureResults#getCount()
      */
-    public int getCount() throws IOException {
+    public int size() {
         return results.size();
     }
 
     /**
      * @see org.geotools.data.FeatureResults#collection()
-     */
+     *
     public FeatureCollection collection() throws IOException {
         FeatureCollection collection = FeatureCollections.newCollection();
 
@@ -210,7 +230,7 @@ public class ReprojectFeatureResults extends DataFeatureCollection implements Fe
         }
 
         return collection;
-    }
+    }*/
 
     /**
      * Returns the feature results wrapped by this reprojecting feature results

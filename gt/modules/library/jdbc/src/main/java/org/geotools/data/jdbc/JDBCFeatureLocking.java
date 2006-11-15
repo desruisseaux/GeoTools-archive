@@ -27,6 +27,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.filter.Filter;
@@ -154,8 +155,8 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
 
         // Could we reduce the Query to only return the FetureID here?
         //
-        FeatureReader reader = getFeatures(query).reader();
-        String typeName = reader.getFeatureType().getTypeName();
+        FeatureIterator reader = getFeatures(query).features();
+        String typeName = query.getTypeName();
         Feature feature;
         int count = 0;
 
@@ -171,9 +172,6 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
                 } catch (NoSuchElementException nosuch) {
                     throw new DataSourceException("Problem with "
                         + query.getHandle() + " while locking", nosuch);
-                } catch (IllegalAttributeException e) {
-                    throw new DataSourceException("Problem with "
-                        + query.getHandle() + " while locking", e);
                 }
             }
         } finally {
@@ -233,8 +231,8 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
 
         // Could we reduce the Query to only return the FetureID here?
         //
-        FeatureReader reader = getFeatures(query).reader();
-        String typeName = reader.getFeatureType().getTypeName();
+        FeatureIterator reader = getFeatures(query).features();
+        String typeName = query.getTypeName();
         Feature feature;
 
         try {
@@ -246,9 +244,6 @@ public class JDBCFeatureLocking extends JDBCFeatureStore
                 } catch (NoSuchElementException nosuch) {
                     throw new DataSourceException("Problem with "
                         + query.getHandle() + " while locking", nosuch);
-                } catch (IllegalAttributeException e) {
-                    throw new DataSourceException("Problem with "
-                        + query.getHandle() + " while locking", e);
                 }
             }
         } finally {

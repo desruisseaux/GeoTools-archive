@@ -39,8 +39,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * Implement a feature collection just based on provision of iterator.
  * <p>
  * Your subclass will need to provide an internal "state" stratagy object
- * used to access collection attributes.
- * 
+ * used to access collection attributes - see the two protected constructors
+ * for details.
+ * </p>
  * @author Jody Garnett, Refractions Research Inc.
  */
 public abstract class AbstractFeatureCollection extends AbstractResourceCollection implements FeatureCollection {
@@ -205,6 +206,7 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
     //
     // FeatureCollection - Legacy
     //
+    /*
     public FeatureReader reader() throws IOException {
         return new DelegateFeatureReader( getSchema(), features() );
     }
@@ -214,4 +216,5 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
     public FeatureCollection collection() throws IOException {
         return this;
     }
+    */
 }

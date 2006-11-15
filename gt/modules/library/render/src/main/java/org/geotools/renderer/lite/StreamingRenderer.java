@@ -46,9 +46,12 @@ import org.geotools.data.Query;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
+import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
@@ -756,14 +759,14 @@ public final class StreamingRenderer implements GTRenderer {
 	/*
 	 * Default visibility for testing purposes
 	 */
-	FeatureResults queryLayer(MapLayer currLayer, FeatureSource source,
+	FeatureCollection queryLayer(MapLayer currLayer, FeatureSource source,
 			FeatureType schema, LiteFeatureTypeStyle[] styles,
 			Envelope mapArea, CoordinateReferenceSystem mapCRS,
 			CoordinateReferenceSystem featCrs, Rectangle screenSize,
 			GeometryAttributeType geometryAttribute)
 			throws IllegalFilterException, IOException,
 			IllegalAttributeException {
-		FeatureResults results = null;
+		FeatureCollection results = null;
 		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
 		Query definitionQuery;
 		MathTransform transform = null;
@@ -1302,48 +1305,60 @@ public final class StreamingRenderer implements GTRenderer {
 		return result;
 	}
 
-	private FeatureReader getReader(FeatureResults features,
+	private FeatureIterator getReader(FeatureCollection features,
 			CoordinateReferenceSystem sourceCrs) throws IOException {
-		FeatureReader reader = features.reader();
-
-		// DJB: dont do reprojection here - do it after decimation
-		// but we ensure that the reader is producing geometries with the
-		// correct CRS
-		// NOTE: it, by default, produces ones that are are tagged with the CRS
-		// of the datastore, which
-		// maybe incorrect.
-		// The correct value is in sourceCrs.
-
-		// this is the reader's CRS
-		final CoordinateReferenceSystem rCS = reader.getFeatureType()
-				.getDefaultGeometry().getCoordinateSystem();
-
-		// sourceCrs == source's real SRS
-
-		// if we need to recode the incoming geometries
-
-		if (rCS != sourceCrs) // not both null or both EXACTLY the same CRS
-		// object
-		{
-			if (sourceCrs != null) // dont re-tag to null, keep the DataStore's
-			// CRS (this shouldnt really happen)
-			{
-				// if the datastore is producing null CRS, we recode.
-				// if the datastore's CRS != real CRS, then we recode
-				if ((rCS == null) || (!rCS.equals(sourceCrs))) {
-					// need to retag the features
-					try {
-						reader = new ForceCoordinateSystemFeatureReader(reader,
-								sourceCrs);
-					} catch (Exception ee) {
-						LOGGER.log(Level.WARNING, ee.getLocalizedMessage(), ee);
-					}
-				}
-			}
-		}
-		return reader;
+        return prepFeatureCollection( features, sourceCrs ).features();
 	}
 
+    /**
+     * Prepair a FeatureCollection for display, this method formally ensured that a FeatureReader
+     * produced the correct CRS and has now been updated to work with FeatureCollection.
+     * <p>
+     * What is really going on is the need to set up for reprojection; but *after* decimation has
+     * occured.
+     * </p>
+     *  
+     * @param features
+     * @param sourceCrs
+     * @return FeatureCollection that produces results with the correct CRS
+     */
+    private FeatureCollection prepFeatureCollection( FeatureCollection features, CoordinateReferenceSystem sourceCrs ) {
+        // DJB: dont do reprojection here - do it after decimation
+        // but we ensure that the reader is producing geometries with
+        // the correct CRS
+        // NOTE: it, by default, produces ones that are are tagged with
+        // the CRS of the datastore, which
+        // maybe incorrect.
+        // The correct value is in sourceCrs.
+
+        // this is the reader's CRS
+        CoordinateReferenceSystem rCS = features.getFeatureType().getDefaultGeometry().getCoordinateSystem();
+
+        // sourceCrs == source's real SRS
+        // if we need to recode the incoming geometries
+
+        if (rCS != sourceCrs) // not both null or both EXACTLY the
+        // same CRS object
+        {
+            if (sourceCrs != null) // dont re-tag to null, keep the
+            // DataStore's CRS (this shouldnt
+            // really happen)
+            {
+                // if the datastore is producing null CRS, we recode.
+                // if the datastore's CRS != real CRS, then we recode
+                if ((rCS == null) || (!rCS.equals(sourceCrs))) {
+                    // need to retag the features
+                    try {
+                        return new ForceCoordinateSystemFeatureResults( features, sourceCrs );
+                    } catch (Exception ee) {
+                        LOGGER.log(Level.WARNING, ee.getLocalizedMessage(), ee);
+                    }
+                }
+            }
+        }
+        return features;
+    }
+    
 	/**
 	 * Applies each feature type styler in turn to all of the features. This
 	 * perhaps needs some explanation to make it absolutely clear.
@@ -1422,26 +1437,22 @@ public final class StreamingRenderer implements GTRenderer {
 		// data
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final FeatureResults features = queryLayer(currLayer, source, schema,
+		final FeatureCollection features = queryLayer(currLayer, source, schema,
 				(LiteFeatureTypeStyle[]) lfts
 						.toArray(new LiteFeatureTypeStyle[lfts.size()]),
 				mapArea, destinationCrs, sourceCrs, screenSize,
 				geometryAttribute);
 
-		final FeatureReader reader = getReader(features, sourceCrs);
+		final FeatureIterator reader = getReader(features, sourceCrs);
 		int n_lfts = lfts.size();
 		final LiteFeatureTypeStyle[] fts_array = (LiteFeatureTypeStyle[]) lfts
 				.toArray(new LiteFeatureTypeStyle[n_lfts]);
 
 		try {
-
 			Feature feature;
 			int t = 0;
-			while (true) {
+			while (!renderingStopRequested) { // loop exit condition tested inside try catch
 				try {
-					if (renderingStopRequested) {
-						break;
-					}
 					if (!reader.hasNext()) {
 						break;
 					}
@@ -1461,7 +1472,6 @@ public final class StreamingRenderer implements GTRenderer {
 					fireErrorEvent(new Exception("Error rendering feature", tr));
 				}
 			}
-
 		} finally {
 			reader.close();
 		}

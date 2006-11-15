@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.visitor.FeatureVisitor;
 import org.geotools.util.ProgressListener;
@@ -91,7 +90,7 @@ import org.geotools.util.ProgressListener;
  * @source $URL$
  * @version $Id$
  */
-public interface FeatureCollection extends ResourceCollection, FeatureResults, Feature {
+public interface FeatureCollection extends ResourceCollection, Feature {
     /**
      * Obtain a FeatureIterator of the Features within this collection.
      * <p>
