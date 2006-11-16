@@ -39,6 +39,8 @@ import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
@@ -511,13 +513,18 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         query.setPropertyNames(new String[0]);
         query.setFilter(unEncodableFilter);
 
-        FeatureResults features = getFeatures(unEncodableFilter);
+        FeatureCollection features = getFeatures(unEncodableFilter);
 
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         FidFilter fidFilter = ff.createFidFilter();
-        for (FeatureReader it = features.reader(); it.hasNext();) {
-            Feature feature = it.next();
-            fidFilter.addFid(feature.getID());
+        FeatureIterator it = features.features();
+        try {
+            while( it.hasNext() ) {
+                Feature feature = it.next();
+                fidFilter.addFid(feature.getID());
+            }
+        } finally {
+          features.close( it );  
         }
         return fidFilter;
     }

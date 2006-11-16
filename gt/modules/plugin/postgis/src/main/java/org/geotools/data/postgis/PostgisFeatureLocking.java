@@ -28,6 +28,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.filter.Filter;
@@ -161,7 +162,7 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
         // Good idea, but it's not working right now, so we're just using the query passed in.
         Query optimizedQuery = new DefaultQuery(typeName, query.getFilter(),
                 query.getMaxFeatures(), Query.NO_NAMES, query.getHandle());
-        FeatureReader reader = getFeatures(query).reader();
+        FeatureIterator reader = getFeatures(query).features();
         Feature feature;
         int count = 0;
         LOGGER.info("got reader from query " + optimizedQuery
@@ -182,9 +183,6 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
                 } catch (NoSuchElementException nosuch) {
                     throw new DataSourceException("Problem with "
                         + query.getHandle() + " while locking", nosuch);
-                } catch (IllegalAttributeException e) {
-                    throw new DataSourceException("Problem with "
-                        + query.getHandle() + " while locking", e);
                 }
             }
         } finally {
@@ -278,8 +276,8 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
 
         // Could we reduce the Query to only return the FetureID here?
         //
-        FeatureReader reader = getFeatures(query).reader();
-        String typeName = reader.getFeatureType().getTypeName();
+        FeatureIterator reader = getFeatures(query).features();
+        String typeName = getSchema().getTypeName();
         Feature feature;
 
         try {
@@ -291,9 +289,6 @@ public class PostgisFeatureLocking extends PostgisFeatureStore
                 } catch (NoSuchElementException nosuch) {
                     throw new DataSourceException("Problem with "
                         + query.getHandle() + " while locking", nosuch);
-                } catch (IllegalAttributeException e) {
-                    throw new DataSourceException("Problem with "
-                        + query.getHandle() + " while locking", e);
                 }
             }
         } finally {
