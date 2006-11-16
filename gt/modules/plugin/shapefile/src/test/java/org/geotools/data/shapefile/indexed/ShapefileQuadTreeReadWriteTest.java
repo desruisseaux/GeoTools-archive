@@ -105,8 +105,6 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 		Map params=new HashMap();
 		params.put( IndexedShapefileDataStoreFactory.URLP.key, url);
 		params.put( IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
-		params.put( IndexedShapefileDataStoreFactory.MEMORY_MAPPED.key, new Boolean(memoryMapped));
-		params.put( IndexedShapefileDataStoreFactory.SPATIAL_INDEX_TYPE.key, IndexedShapefileDataStoreFactory.TREE_QIX);
 		DataStore createDataStore = fac.createDataStore(params);
 		return createDataStore;
 	}

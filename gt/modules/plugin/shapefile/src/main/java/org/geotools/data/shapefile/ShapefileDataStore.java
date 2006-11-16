@@ -58,6 +58,7 @@ import org.geotools.data.shapefile.dbf.DbaseFileHeader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.dbf.DbaseFileWriter;
 import org.geotools.data.shapefile.prj.PrjFileReader;
+import org.geotools.data.shapefile.shp.IndexFile;
 import org.geotools.data.shapefile.shp.JTSUtilities;
 import org.geotools.data.shapefile.shp.ShapeHandler;
 import org.geotools.data.shapefile.shp.ShapeType;
@@ -487,6 +488,27 @@ public class ShapefileDataStore extends AbstractFileDataStore {
 
         return new DbaseFileReader(rbc, useMemoryMappedBuffer);
     }
+    
+
+    /**
+     * Convenience method for opening an index file.
+     * @param shxURL TODO
+     *
+     * @return An IndexFile
+     *
+     * @throws IOException
+     */
+    protected IndexFile openIndexFile(URL shxURL) throws IOException {
+        ReadableByteChannel rbc = getReadChannel(shxURL);
+
+        if (rbc == null) {
+            return null;
+        }
+
+        // return new IndexFile(rbc, this.useMemoryMappedBuffer);
+        return new IndexFile(rbc, false);
+    }
+
 
     /**
      * Convenience method for opening a DbaseFileReader.
@@ -984,43 +1006,58 @@ public class ShapefileDataStore extends AbstractFileDataStore {
     /**
      * @see org.geotools.data.AbstractDataStore#getCount(org.geotools.data.Query)
      */
-    protected int getCount(Query query) throws IOException {
+    public int getCount(Query query) throws IOException {
         if (query.getFilter() == Filter.INCLUDE) {
-            ShapefileReader reader = new ShapefileReader(getReadChannel(shpURL),
-                    readWriteLock);
-            int count = -1;
-
             try {
-                count = reader.getCount(count);
-            } catch (IOException e) {
-                throw e;
-            } finally {
+                IndexFile file = openIndexFile(shxURL);
                 try {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (IOException ioe) {
-                    // do nothing
+                    return file.getRecordCount();
+                } finally {
+                    file.close();
                 }
+            } catch (FileNotFoundException fnfe) {
+
+                // no Index file so use the number of shapefile records
+                ShapefileReader reader = new ShapefileReader(
+                        getReadChannel(shpURL), readWriteLock);
+                int count = -1;
+
+                try {
+                    count = reader.getCount(count);
+                } catch (IOException e) {
+                    throw e;
+                } finally {
+                    try {
+                        if (reader != null) {
+                            reader.close();
+                        }
+                    } catch (IOException ioe) {
+                        // do nothing
+                    }
+                }
+
+                return count;
             }
 
-            return count;
         }
 
         return super.getCount(query);
     }
 
     /**
-     * Attempt to create a DbaseFileHeader for the FeatureType. Note, we cannot
-     * set the number of records until the write has completed.
-     *
-     * @param featureType DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
-     *
-     * @throws IOException DOCUMENT ME!
-     * @throws DbaseFileException DOCUMENT ME!
-     */
+	 * Attempt to create a DbaseFileHeader for the FeatureType. Note, we cannot
+	 * set the number of records until the write has completed.
+	 * 
+	 * @param featureType
+	 *            DOCUMENT ME!
+	 * 
+	 * @return DOCUMENT ME!
+	 * 
+	 * @throws IOException
+	 *             DOCUMENT ME!
+	 * @throws DbaseFileException
+	 *             DOCUMENT ME!
+	 */
     protected static DbaseFileHeader createDbaseHeader(FeatureType featureType)
         throws IOException, DbaseFileException {
         DbaseFileHeader header = new DbaseFileHeader();

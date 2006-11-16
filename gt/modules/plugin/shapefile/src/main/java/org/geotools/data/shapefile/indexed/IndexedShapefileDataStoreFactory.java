@@ -39,49 +39,19 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class IndexedShapefileDataStoreFactory
     implements org.geotools.data.FileDataStoreFactorySpi {
-    public static final Byte TREE_NONE = new Byte(IndexedShapefileDataStore.TREE_NONE);
-    public static final Byte TREE_GRX = new Byte(IndexedShapefileDataStore.TREE_GRX);
-    public static final Byte TREE_QIX = new Byte(IndexedShapefileDataStore.TREE_QIX);
+
     public static final Param NAMESPACEP = new Param("namespace", URI.class,
             "uri to a the namespace", false); //not required
     public static final Param URLP = new Param("shapefile url", URL.class,
             "url to a .shp file");
-    public static final Param MEMORY_MAPPED = new Param("memory mapped buffer",
-            Boolean.class, "enable/disable the use of memory-mapped io", false);
     public static final Param CREATE_SPATIAL_INDEX = new Param("create spatial index",
             Boolean.class,
             "enable/disable the automatic creation of spatial index", false);
-    public static final Param SPATIAL_INDEX_TYPE = new Param("index type",
-            Byte.class,
-            "select type of index to use or none: Valid values are: TREE_GRX (RTREE), TREE_QIX (QUADTREE), TREE_NONE (no indexing), ",
-            false) {
-    	
-    	public Object parse(String text) throws Throwable {
-    		Object value = null;
-    		try {
-    			value = super.parse(text);
-    		}
-    		catch(Throwable t) {}
-    		
-    		if (value == null && text != null) {
-    			text = text.trim();
-    			if ("TREE_GRX".equalsIgnoreCase(text) || "RTREE".equalsIgnoreCase(text))
-    				return TREE_GRX;
-    			if ("TREE_QIX".equalsIgnoreCase(text) || "QUADTREE".equalsIgnoreCase(text)) 
-    				return TREE_QIX;
-    			if ("TREE_NONE".equalsIgnoreCase(text) || "NO INDEX".equalsIgnoreCase(text))
-    				return TREE_NONE;
-    		}
-    		
-    		return value;
-    	}
-    };
+  
     private final static Map HINTS = new HashMap();
 
     static {
         HINTS.put(CREATE_SPATIAL_INDEX, Boolean.valueOf(true));
-        HINTS.put(MEMORY_MAPPED, Boolean.valueOf(true));
-        HINTS.put(SPATIAL_INDEX_TYPE, TREE_GRX);
     }
 
     private Map liveStores = new HashMap();
@@ -104,19 +74,6 @@ public class IndexedShapefileDataStoreFactory
                 URL url = (URL) URLP.lookUp(params);
                 accept = canProcess(url);
             } catch (IOException ioe) {
-                accept = false;
-            }
-        }
-
-        if (params.containsKey(SPATIAL_INDEX_TYPE.key)) {
-            Byte type;
-
-            try {
-                type = (Byte) SPATIAL_INDEX_TYPE.lookUp(params);
-                accept = accept
-                    && (type.equals(TREE_GRX) || type.equals(TREE_QIX)
-                    || type.equals(TREE_NONE));
-            } catch (Exception e) {
                 accept = false;
             }
         }
@@ -164,12 +121,6 @@ public class IndexedShapefileDataStoreFactory
         try {
             url = (URL) URLP.lookUp(params);
 
-            Boolean mm = (Boolean) MEMORY_MAPPED.lookUp(params);
-
-            if (mm == null) {
-                mm = Boolean.FALSE;
-            }
-
             Boolean idx = (Boolean) CREATE_SPATIAL_INDEX.lookUp(params);
 
             if (idx == null) {
@@ -177,14 +128,9 @@ public class IndexedShapefileDataStoreFactory
             }
 
             URI namespace = (URI) NAMESPACEP.lookUp(params);
-            Byte type = (Byte) SPATIAL_INDEX_TYPE.lookUp(params);
-
-            if (type == null) {
-                type = new Byte(IndexedShapefileDataStore.TREE_QIX);
-            }
 
             ds = new IndexedShapefileDataStore(url, namespace,
-                    mm.booleanValue(), idx.booleanValue(), type.byteValue());
+                    false, idx.booleanValue(), IndexedShapefileDataStore.TREE_QIX);
             liveStores.put(params, ds);
         } catch (MalformedURLException mue) {
             throw new DataSourceException("Unable to attatch datastore to "
@@ -260,8 +206,7 @@ public class IndexedShapefileDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            URLP, NAMESPACEP, MEMORY_MAPPED, CREATE_SPATIAL_INDEX,
-            SPATIAL_INDEX_TYPE
+            URLP, NAMESPACEP, CREATE_SPATIAL_INDEX
         };
     }
 
@@ -296,7 +241,6 @@ public class IndexedShapefileDataStoreFactory
         throws IOException {
         Map params = new HashMap();
         params.put(URLP.key, url);
-        params.put(MEMORY_MAPPED.key, new Boolean(memorymapped));
 
         return createDataStore(params);
     }

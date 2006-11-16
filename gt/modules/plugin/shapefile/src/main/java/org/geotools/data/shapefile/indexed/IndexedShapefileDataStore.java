@@ -661,25 +661,6 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	}
 
 	/**
-	 * Convenience method for opening an index file.
-	 * @param shxURL TODO
-	 *
-	 * @return An IndexFile
-	 *
-	 * @throws IOException
-	 */
-	protected IndexFile openIndexFile(URL shxURL) throws IOException {
-		ReadableByteChannel rbc = getReadChannel(shxURL);
-
-		if (rbc == null) {
-			return null;
-		}
-
-		// return new IndexFile(rbc, this.useMemoryMappedBuffer);
-		return new IndexFile(rbc, false);
-	}
-
-	/**
 	 * Convenience method for opening a DbaseFileReader.
 	 *
 	 * @return A new DbaseFileReader
@@ -694,7 +675,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			return null;
 		}
 
-		return new IndexedDbaseFileReader(rbc, this.useMemoryMappedBuffer);
+		return new IndexedDbaseFileReader(rbc, false);
 	}
 
 	/**
@@ -1048,37 +1029,8 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			};
 		}
 	}
-
-	/**
-	 * @see org.geotools.data.AbstractDataStore#getCount(org.geotools.data.Query)
-	 */
-	protected int getCount(Query query) throws IOException {
-		if (query.getFilter() == Filter.INCLUDE) {
-			ShapefileReader reader = new ShapefileReader(
-					getReadChannel(shpURL), readWriteLock);
-			int count = -1;
-
-			try {
-				count = reader.getCount(count);
-			} catch (IOException e) {
-				throw e;
-			} finally {
-				try {
-					if (reader != null) {
-						reader.close();
-					}
-				} catch (IOException ioe) {
-					// do nothing
-				}
-			}
-
-			return count;
-		}
-
-		return super.getCount(query);
-	}
-
-	/**
+        
+        /**
 	 * Builds the RTree index
 	 *
 	 * @throws TreeException

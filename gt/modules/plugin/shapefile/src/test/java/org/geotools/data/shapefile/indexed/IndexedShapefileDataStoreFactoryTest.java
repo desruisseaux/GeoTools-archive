@@ -48,14 +48,6 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
         Map map = new HashMap();
         map.put(IndexedShapefileDataStoreFactory.URLP.key,
             TestData.url(ShapefileDataStoreTest.STATE_POP));
-        map.put(IndexedShapefileDataStoreFactory.SPATIAL_INDEX_TYPE.key,
-            IndexedShapefileDataStoreFactory.TREE_NONE);
-        assertTrue(factory.canProcess(map));
-        map.put(IndexedShapefileDataStoreFactory.SPATIAL_INDEX_TYPE.key,
-            new Byte((byte) 30));
-        assertFalse(factory.canProcess(map));
-        map.put(IndexedShapefileDataStoreFactory.SPATIAL_INDEX_TYPE.key,
-            new Byte(IndexedShapefileDataStore.TREE_NONE));
         assertTrue(factory.canProcess(map));
     }
 
@@ -63,48 +55,19 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
      * Test method for 'org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory.createDataStore(Map)'
      */
     public void testCreateDataStoreMap() throws Exception {
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_NONE, true,
-            true);
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_NONE, false,
-            true);
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_NONE, true,
-            false);
+        testCreateDataStore(true);
 
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_QIX, true,
-            true);
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_QIX, false,
-            true);
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_QIX, true,
-            false);
+        IndexedShapefileDataStore ds1 = testCreateDataStore(true);
+        IndexedShapefileDataStore ds2 = testCreateDataStore(true);
 
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_GRX, true,
-            true);
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_GRX, false,
-            true);
-        testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_GRX, true,
-            false);
+        assertSame(ds1, ds2);
 
-        IndexedShapefileDataStore ds1 = testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_GRX,
-                true, true);
-        IndexedShapefileDataStore ds2 = testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_GRX,
-                true, true);
-
-        assertEquals(ds1, ds2);
-
-        ds2 = testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_GRX,
-                true, false);
-        assertNotSame(ds1, ds2);
-        ds2 = testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_GRX,
-                false, true);
-        assertNotSame(ds1, ds2);
-        ds2 = testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_NONE,
-                true, true);
+        ds2 = testCreateDataStore(false);
         assertNotSame(ds1, ds2);
     }
 
-    private IndexedShapefileDataStore testCreateDataStore(Byte treeType,
-        boolean memorymapped, boolean createIndex) throws Exception {
-        return testCreateDataStore(false, treeType, memorymapped, createIndex);
+    private IndexedShapefileDataStore testCreateDataStore(boolean createIndex) throws Exception {
+        return testCreateDataStore(false, createIndex);
     }
 
     public void testNamespace() throws Exception {
@@ -123,19 +86,14 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
                  .getNamespace());
     }
 
-    private IndexedShapefileDataStore testCreateDataStore(boolean newDS,
-        Byte treeType, boolean memorymapped, boolean createIndex)
+    private IndexedShapefileDataStore testCreateDataStore(boolean newDS,boolean createIndex)
         throws Exception {
         copyShapefiles(ShapefileDataStoreTest.STATE_POP);
         Map map = new HashMap();
         map.put(IndexedShapefileDataStoreFactory.URLP.key,
             TestData.url(this, ShapefileDataStoreTest.STATE_POP));
-        map.put(IndexedShapefileDataStoreFactory.SPATIAL_INDEX_TYPE.key,
-            treeType);
         map.put(IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key,
             new Boolean(createIndex));
-        map.put(IndexedShapefileDataStoreFactory.MEMORY_MAPPED.key,
-            new Boolean(memorymapped));
 
         IndexedShapefileDataStore ds;
 
@@ -145,31 +103,28 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
             ds = (IndexedShapefileDataStore) factory.createDataStore(map);
         }
 
-        testDataStore(treeType, memorymapped, createIndex, ds);
+        testDataStore(IndexedShapefileDataStore.TREE_QIX, createIndex, ds);
 
         return ds;
     }
 
-    private void testDataStore(Byte treeType, boolean memorymapped,
+    private void testDataStore(byte treeType, 
         boolean createIndex, IndexedShapefileDataStore ds) {
         assertNotNull(ds);
-        assertEquals(treeType.byteValue(), ds.treeType);
-        assertEquals(treeType.byteValue() != IndexedShapefileDataStore.TREE_NONE,
+        assertEquals(treeType, ds.treeType);
+        assertEquals(treeType != IndexedShapefileDataStore.TREE_NONE,
             ds.useIndex);
         assertEquals(createIndex
-            && (treeType.byteValue() != IndexedShapefileDataStore.TREE_NONE),
+            && (treeType != IndexedShapefileDataStore.TREE_NONE),
             ds.createIndex);
-        assertEquals(memorymapped, ds.isMemoryMapped());
     }
 
     /*
      * Test method for 'org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory.createNewDataStore(Map)'
      */
     public void testCreateNewDataStore() throws Exception {
-        IndexedShapefileDataStore ds1 = testCreateDataStore(IndexedShapefileDataStoreFactory.TREE_GRX,
-                true, true);
-        IndexedShapefileDataStore ds2 = testCreateDataStore(true,
-                IndexedShapefileDataStoreFactory.TREE_GRX, true, true);
+        IndexedShapefileDataStore ds1 = testCreateDataStore(true);
+        IndexedShapefileDataStore ds2 = testCreateDataStore(true, true);
 
         assertNotSame(ds1, ds2);
     }
@@ -189,10 +144,6 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
         assertTrue(infos.contains(
                 IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX));
         assertTrue(infos.contains(IndexedShapefileDataStoreFactory.URLP));
-        assertTrue(infos.contains(
-                IndexedShapefileDataStoreFactory.SPATIAL_INDEX_TYPE));
-        assertTrue(infos.contains(
-                IndexedShapefileDataStoreFactory.MEMORY_MAPPED));
     }
 
     /*
@@ -217,7 +168,7 @@ public class IndexedShapefileDataStoreFactoryTest extends TestCaseSupport {
         copyShapefiles(ShapefileDataStoreTest.STATE_POP);
         DataStore ds = factory.createDataStore(TestData.url(
                     this, ShapefileDataStoreTest.STATE_POP));
-        testDataStore(IndexedShapefileDataStoreFactory.TREE_QIX, false, true,
+        testDataStore(IndexedShapefileDataStore.TREE_QIX, true,
             (IndexedShapefileDataStore) ds);
     }
 
