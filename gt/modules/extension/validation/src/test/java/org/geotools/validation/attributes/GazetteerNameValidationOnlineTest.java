@@ -96,7 +96,7 @@ public class GazetteerNameValidationOnlineTest extends TestCase {
 		try{
 			URL gazetteerURL = new URL("http://cgdi-dev.geoconnections.org/cgi-bin/prototypes/cgdigaz/cgdigaz.cgi?version=1.0&request=GetPlacenameGeometry&wildcards=false&geomtype=bbox&placename="+place);
 			HttpURLConnection gazetteerConnection = (HttpURLConnection)gazetteerURL.openConnection();
-            gazetteerConnection.setConnectTimeout(100);
+//            gazetteerConnection.setConnectTimeout(100);
 			if(!("OK".equals(gazetteerConnection.getResponseMessage())))
 				throw new Exception("An error occured creating the connection to the Gazetteer.");
 			InputStream gazetteerInputStream = gazetteerConnection.getInputStream();
