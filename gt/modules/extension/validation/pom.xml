@@ -130,9 +130,10 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes>
-            <!-- The following test fails with the following exception:
+            <!-- The following tests fail with the following exception:
                  org.geotools.data.DataSourceException: Connection failed -->
             <exclude>**/MemoryLeakOnlineTest.java</exclude>
+            <exclude>**/GazetteerNameValidationOnlineTest.java</exclude>
           </excludes>          
         </configuration>
       </plugin>
