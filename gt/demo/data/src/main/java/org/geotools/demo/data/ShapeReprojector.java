@@ -20,10 +20,12 @@ import java.net.URL;
 
 import javax.swing.JFileChooser;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -99,7 +101,8 @@ public class ShapeReprojector {
             ShapefileDataStore dest = new ShapefileDataStore(f.toURL());
             dest.createSchema(reprojectedSource.getSchema());
             FeatureStore writer = (FeatureStore) dest.getFeatureSource();
-            writer.setFeatures(reprojectedSource.getFeatures().reader());
+            FeatureCollection features = reprojectedSource.getFeatures();
+            writer.setFeatures(DataUtilities.reader( features ));
             
             System.out.println("Reprojected shapefile " + f.getAbsolutePath() + " successfully written");
         } catch (Exception e) {
