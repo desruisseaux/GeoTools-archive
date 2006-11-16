@@ -90,7 +90,7 @@ public class ValidationProcessorTest extends DataTestCase {
 		processor.addValidation( geom );
 				
 		// test the correct roads
-		processor.runFeatureTests( "dataStoreId", this.roadType, DataUtilities.reader(this.roadFeatures), results);
+		processor.runFeatureTests( "dataStoreId", DataUtilities.collection(this.roadFeatures), results);
 		assertTrue(results.getFailedMessages().length == 0);
 		
 		// test the broken road
@@ -104,7 +104,7 @@ public class ValidationProcessorTest extends DataTestCase {
 		Feature[] singleRoad = new Feature[1];
 		singleRoad[0] = this.newRoad;
 		FeatureCollection features = DataUtilities.collection(singleRoad);
-		processor.runFeatureTests( "dataStoreId", this.roadType, DataUtilities.reader(features), results);
+		processor.runFeatureTests( "dataStoreId", features, results);
 		assertTrue( results.getFailedMessages().length > 0 );
 
 

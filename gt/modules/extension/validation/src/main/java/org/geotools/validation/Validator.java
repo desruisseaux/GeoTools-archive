@@ -28,10 +28,11 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Repository;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -52,7 +53,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * <b>Description:</b><br>
  * <p>
- * Feature validation will iterate over a feature reader and test all features
+ * Feature validation will iterate over a feature features and test all features
  * that have a validation test specific to them in the validation processor
  * passed in.<br>
  * 
@@ -97,7 +98,7 @@ public class Validator
 	 * 
 	 * <b>Description:</b><br>
 	 * <p>
-	 * Feature validation will iterate over a feature reader and test all features
+	 * Feature validation will iterate over a feature features and test all features
 	 * that have a validation test specific to them in the validation processor
 	 * passed in.
 	 * </p>
@@ -109,7 +110,7 @@ public class Validator
 	 * @throws IOException
 	 * @throws Exception
 	 */
-	public void featureValidation(String dsid, FeatureReader features, ValidationResults results )
+	public void featureValidation(String dsid, FeatureCollection features, ValidationResults results )
 		throws IOException, Exception//, WfsTransactionException 
 	{
 		//LOGGER.finer("FeatureValidation called on "+dsid+":"+type.getTypeName() ); 
@@ -126,7 +127,7 @@ public class Validator
 		
 		/** Set up our validation results */
 		try {
-			validationProcessor.runFeatureTests(dsid, type, features, results);
+			validationProcessor.runFeatureTests(dsid, features, results);
 		} catch (Exception badIdea) {
 			// ValidationResults should have handled stuff, will redesign :-)
 			throw new DataSourceException("Validation Failed", badIdea);

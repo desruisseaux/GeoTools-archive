@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 
@@ -51,7 +51,7 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 	private String name;
 	private String description;
 	private String[] typeNames;
-	private String uniqueID;
+	//private String uniqueID;
 		
 		
 	/**
@@ -77,7 +77,7 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 		this.name = name;
 		this.description = description;
 		this.typeNames = typeNames;
-		this.uniqueID = uniqueID;
+		//this.uniqueID = uniqueID;
 	}
 
 	/**
@@ -188,12 +188,12 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 		while (it.hasNext())// for each layer
 		{
 			FeatureSource featureSource = (FeatureSource) it.next();
-			FeatureReader reader = featureSource.getFeatures().reader();
+			FeatureIterator features = featureSource.getFeatures().features();
 			try {
 				 
-				while (reader.hasNext())	// for each feature
+				while (features.hasNext())	// for each feature
 				{
-					Feature feature = reader.next();
+					Feature feature = features.next();
 					String fid = feature.getID();
 					if(FIDs.containsKey(fid))	// if a FID like this one already exists
 					{
@@ -205,7 +205,7 @@ public class UniqueFIDIntegrityValidation implements IntegrityValidation {
 				}
 			}
 			finally {
-				reader.close();		// this is an important line	
+				features.close();		// this is an important line	
 			}
 
 		}

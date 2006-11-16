@@ -26,7 +26,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.resources.TestData;
@@ -283,7 +284,7 @@ public class ValidationProcessor {
     }
 
     /**
-     * runFeatureTests  Change: Uses a FeatureReader now instead of a
+     * runFeatureTests  Change: Uses a FeatureIterator now instead of a
      * FeatureCollection.
      * 
      * <p>
@@ -305,16 +306,16 @@ public class ValidationProcessor {
      *
      * @param dsID data Store id.
      * @param type The FeatureTypeInfo of the features being tested.
-     * @param reader The collection of features, of a particulare
+     * @param features The collection of features, of a particulare
      *        FeatureTypeInfo "type", that are to be validated.
      * @param results Storage for the results of the validation tests.
      *
      * @throws Exception FeatureValidations throw Exceptions
      */
-    public void runFeatureTests(String dsID, FeatureType type,
-        FeatureReader reader, ValidationResults results)
+    public void runFeatureTests(String dsID, FeatureCollection collection, ValidationResults results)
         throws Exception {
-    	
+    	FeatureType type = collection.getSchema();
+        
         // check for any tests that are to be performed on ALL features
         ArrayList tests = (ArrayList) featureLookup.get(ANYTYPENAME);
 
@@ -336,21 +337,27 @@ public class ValidationProcessor {
 
         if (tests != null) // if we found some tests to be performed on this FeatureTypeInfo
          {
-        	 while (reader.hasNext()) // iterate through each feature and run the test on it
-             {
-        	 	Feature feature = (Feature) reader.next();
-        	 	
-        	 	// for each test that is to be performed on this feature
-        	 	for (int i = 0; i < tests.size(); i++) {
-        	 		FeatureValidation validator = (FeatureValidation) tests.get(i);
-        	 		results.setValidation(validator);
-                    try {
-                        validator.validate(feature, type, results);
-                    } catch (Throwable e) {
-                        results.error(feature, e.getMessage());
+             FeatureIterator features = collection.features();
+             try {
+            	 while (features.hasNext()) // iterate through each feature and run the test on it
+                 {
+            	 	Feature feature = (Feature) features.next();
+            	 	
+            	 	// for each test that is to be performed on this feature
+            	 	for (int i = 0; i < tests.size(); i++) {
+            	 		FeatureValidation validator = (FeatureValidation) tests.get(i);
+            	 		results.setValidation(validator);
+                        try {
+                            validator.validate(feature, type, results);
+                        } catch (Throwable e) {
+                            results.error(feature, e.getMessage());
+                        }
                     }
                 }
-            }
+             }
+             finally {
+                 collection.close( features );
+             }
         }
     }
 

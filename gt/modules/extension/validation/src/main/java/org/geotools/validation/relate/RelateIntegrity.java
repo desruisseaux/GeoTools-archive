@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Filter;
@@ -163,14 +163,14 @@ public class RelateIntegrity extends RelationIntegrity
 		//JD: fix this!!
 		//filter = (Filter) ff.createBBoxExpression(bBox);
 
-		FeatureResults featureResultsA = featureSourceA.getFeatures(filter);
-		FeatureResults featureResultsB = featureSourceB.getFeatures(filter);
+		FeatureCollection collectionA = featureSourceA.getFeatures(filter);
+		FeatureCollection collectionB = featureSourceB.getFeatures(filter);
 	
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+		FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResultsA.reader();
+			fr1 = collectionA.features();
 
 			if (fr1 == null)
 				return false;
@@ -179,7 +179,7 @@ public class RelateIntegrity extends RelationIntegrity
 			{
 				Feature f1 = fr1.next();
 				Geometry g1 = f1.getDefaultGeometry();
-				fr2 = featureResultsB.reader();
+				fr2 = collectionB.features();
 			
 				while (fr2 != null && fr2.hasNext())
 				{
@@ -194,15 +194,8 @@ public class RelateIntegrity extends RelationIntegrity
 			}
 		}finally
 		{
-			/** Close the connections too the feature readers*/
-			try {
-				fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+			collectionA.close( fr1 );
+            collectionB.close( fr2 );
 		}
 			
 		return success;
@@ -263,13 +256,13 @@ public class RelateIntegrity extends RelationIntegrity
 		//JD: fix this!!
 		//filter = (Filter) ff.createBBoxExpression(bBox);
 
-		FeatureResults featureResults = featureSourceA.getFeatures(filter);
+		FeatureCollection collection = featureSourceA.getFeatures(filter);
 	
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+		FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResults.reader();
+			fr1 = collection.features();
 
 			if (fr1 == null)
 				return false;
@@ -278,7 +271,7 @@ public class RelateIntegrity extends RelationIntegrity
 			{
 				Feature f1 = fr1.next();
 				Geometry g1 = f1.getDefaultGeometry();
-				fr2 = featureResults.reader();
+				fr2 = collection.features();
 			
 				while (fr2 != null && fr2.hasNext())
 				{
@@ -292,19 +285,12 @@ public class RelateIntegrity extends RelationIntegrity
 							success = false;
 						}
 					}
-				}		
+				}	
 			}
 		}finally
 		{
-			/** Close the connections too the feature readers*/
-			try {
-				fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+            collection.close( fr1 );
+            collection.close( fr2 );
 		}
 	
 		return success;

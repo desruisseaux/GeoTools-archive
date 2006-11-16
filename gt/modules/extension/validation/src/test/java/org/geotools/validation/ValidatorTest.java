@@ -25,10 +25,11 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
 
@@ -80,18 +81,18 @@ public class ValidatorTest extends TestCase {
 
     public void testFeatureValidation() throws Exception {
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
-    	FeatureReader reader = lakes.getFeatures().reader();
+    	FeatureCollection features = lakes.getFeatures();
 		DefaultFeatureResults results = new DefaultFeatureResults();    	
-    	fixture.processor.runFeatureTests( "LAKES", lakes.getSchema(), reader, results );
-    	reader.close();    	
+    	fixture.processor.runFeatureTests( "LAKES", features, results );
+    		
     	assertEquals( "lakes test", 0, results.error.size() );
     }
     public Feature createInvalidLake() throws Exception {
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
     	
-    	FeatureReader reader = lakes.getFeatures( new DefaultQuery("lakes", Filter.INCLUDE, 1, null, null) ).reader();
-    	Feature feature = reader.next();
-    	reader.close();
+    	FeatureIterator features = lakes.getFeatures( new DefaultQuery("lakes", Filter.INCLUDE, 1, null, null) ).features();
+    	Feature feature = features.next();
+    	features.close();
     	
     	FeatureType LAKE = lakes.getSchema();
     	Object array[] = new Object[ LAKE.getAttributeCount() ];
@@ -119,11 +120,11 @@ public class ValidatorTest extends TestCase {
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
     	Feature newFeature = createInvalidLake();
     	    	
-    	FeatureReader add = DataUtilities.reader( new Feature[]{ newFeature, } );
+    	FeatureCollection add = DataUtilities.collection( new Feature[]{ newFeature, } );
     	
     	DefaultFeatureResults results = new DefaultFeatureResults();    	
-    	fixture.processor.runFeatureTests( "LAKES", lakes.getSchema(), add, results );
-    	add.close();
+    	fixture.processor.runFeatureTests( "LAKES", add, results );
+    	
     	assertEquals( "lakes test", 2, results.error.size() );
     }
 
@@ -143,9 +144,9 @@ public class ValidatorTest extends TestCase {
     	Validator validator = new Validator( fixture.repository, fixture.processor );
 
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
-    	FeatureReader reader = lakes.getFeatures().reader();
+    	FeatureCollection features = lakes.getFeatures();
     	DefaultFeatureResults results = new DefaultFeatureResults();
-    	validator.featureValidation( "LAKES",reader, results );
+    	validator.featureValidation( "LAKES", features, results );
     	
     	assertEquals( 0, results.error.size() );
     }
@@ -154,18 +155,17 @@ public class ValidatorTest extends TestCase {
     	
     	FeatureSource lakes = fixture.repository.source( "LAKES", "lakes" );
     	Feature newFeature = createInvalidLake();
-    	FeatureReader add = DataUtilities.reader( new Feature[]{ newFeature, } );
-
-    	DefaultFeatureResults results = new DefaultFeatureResults();    	
-    	fixture.processor.runFeatureTests( "LAKES", lakes.getSchema(), add, results );
-    	add.close();
+        
+    	FeatureCollection add = DataUtilities.collection( new Feature[]{ newFeature, } );
+    	DefaultFeatureResults results = new DefaultFeatureResults();
+    	fixture.processor.runFeatureTests( "LAKES", add, results );
+    	
     	System.out.println( results.error );    	
     	assertEquals( "lakes test", 2, results.error.size() );
     	
-    	FeatureReader add2 = DataUtilities.reader( new Feature[]{ newFeature, } );
     	//results = new DefaultFeatureResults();
     	validator.featureValidation( "LAKES", add, results );
-    	assertEquals( "lakes test2", 2, results.error.size() );
+    	assertEquals( "lakes test2", 5, results.error.size() );
     }
     
     public void testIntegrityValidator() throws Exception {

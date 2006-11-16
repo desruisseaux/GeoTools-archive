@@ -70,7 +70,7 @@ public class XMLReaderTest extends TestCase {
         super(s);
     }
 
-	protected FileReader reader() throws FileNotFoundException{
+	protected FileReader features() throws FileNotFoundException{
 		File file = new File( "C:/Java/workspace/geoserver/conf/plugins/Constraint.xml" );
 		if( !file.exists() ){
 			return null;
@@ -80,7 +80,7 @@ public class XMLReaderTest extends TestCase {
     public void testReadPlugIn() {
         try {
             
-            FileReader fr = reader();
+            FileReader fr = features();
             if( fr == null ) return; 
                         
             PlugInDTO dto = XMLReader.readPlugIn(fr);
@@ -105,7 +105,7 @@ public class XMLReaderTest extends TestCase {
     public void testReadTestSuite() {
         try {
             //set-up
-			FileReader fr = reader();
+			FileReader fr = features();
 			if( fr == null ) return; 
 			
             Map m = new HashMap();

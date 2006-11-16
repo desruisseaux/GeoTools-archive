@@ -133,8 +133,7 @@
             <!-- The following test fails with the following exception:
                  org.geotools.data.DataSourceException: Connection failed -->
             <exclude>**/MemoryLeakOnlineTest.java</exclude>
-          </excludes>
-          
+          </excludes>          
         </configuration>
       </plugin>
     </plugins>

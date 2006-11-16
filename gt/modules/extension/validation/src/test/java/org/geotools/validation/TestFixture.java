@@ -20,7 +20,7 @@ import java.io.FilenameFilter;
 import java.util.Map;
 
 import org.geotools.data.DefaultRepository;
-import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.data.Repository;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -85,8 +85,8 @@ public class TestFixture {
         	ShapefileDataStore dataStore = new ShapefileDataStore( shapefile.toURL() );
         	String dataStoreId = dataStore.getTypeNames()[0].toUpperCase();
         	String typeName = dataStore.getTypeNames()[0];
-        	FeatureReader reader = dataStore.getFeatureSource( typeName ).getFeatures().reader();
-        	MemoryDataStore cache = new MemoryDataStore( reader );
+        	FeatureIterator features = dataStore.getFeatureSource( typeName ).getFeatures().features();
+        	MemoryDataStore cache = new MemoryDataStore( features );
         	
         	repository.register( dataStoreId, cache );
         }

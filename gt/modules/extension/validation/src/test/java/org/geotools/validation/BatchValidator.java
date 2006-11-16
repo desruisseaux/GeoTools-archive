@@ -129,7 +129,7 @@ public class BatchValidator {
 			{
 				try
 				{
-					validator.featureValidation(typeNames[p], store.getFeatureSource(typeNames[p]).getFeatures().reader(), null);
+					validator.featureValidation(typeNames[p], store.getFeatureSource(typeNames[p]).getFeatures(), null);
 				} catch (IOException e1)
 				{
 					e1.printStackTrace();
@@ -164,7 +164,7 @@ public class BatchValidator {
 		
 		
 	   	//v.integrityValidation()
-		//v.featureValidation( , fs.getSchema(),fs.getFeatures().reader(), vr);
+		//v.featureValidation( , fs.getSchema(),fs.getFeatures().features(), vr);
 	   	
 		it = dsm.keySet().iterator();
         while (it.hasNext()) 
@@ -185,7 +185,7 @@ public class BatchValidator {
                     //BatchValidationResults vr = new BatchValidationResults();
                     
 //                    v.runFeatureTests( "" /** fix me */, fs.getSchema(),
-//                        fs.getFeatures().reader(), vr);
+//                        fs.getFeatures().features(), vr);
                     //System.out.println("Feature Test Results for " + key + ":"
                     //    + ss[j]);
                     //System.out.println(vr.toString());

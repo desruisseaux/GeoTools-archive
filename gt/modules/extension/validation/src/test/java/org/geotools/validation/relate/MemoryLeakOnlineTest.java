@@ -135,7 +135,7 @@ public class MemoryLeakOnlineTest extends DataTestCase {
 		try
 		{
 			results.setValidation( overlap );
-			//NOTE: seems to die on line 301: fr1 = featureResults.reader(); in OverlapsIntegrity.java - bowens
+			//NOTE: seems to die on line 301: fr1 = featureResults.features(); in OverlapsIntegrity.java - bowens
 			assertFalse(overlap.validate(map, null, results));
 		} catch (Exception e)
 		{

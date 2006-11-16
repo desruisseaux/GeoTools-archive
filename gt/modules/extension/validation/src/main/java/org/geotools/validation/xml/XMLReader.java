@@ -62,7 +62,7 @@ public class XMLReader {
      * PlugInDTO object.
      * </p>
      *
-     * @param inputSource A reader which contains a copy of a valid PlugIn
+     * @param inputSource A features which contains a copy of a valid PlugIn
      *        desciption.
      *
      * @return the resulting dto based on the input provided.
@@ -150,7 +150,7 @@ public class XMLReader {
      * TestSuiteDTO object.
      * </p>
      *
-     * @param inputSource A reader which contains a copy of a valid TestSuite
+     * @param inputSource A features which contains a copy of a valid TestSuite
      *        desciption.
      * @param plugIns A name of plugin names to valid plugin DTOs
      *

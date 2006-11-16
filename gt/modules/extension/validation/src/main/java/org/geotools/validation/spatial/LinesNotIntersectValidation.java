@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.validation.ValidationResults;
@@ -79,13 +79,13 @@ public class LinesNotIntersectValidation extends LineLineAbstractValidation {
         while (it.hasNext()) // for each layer
          {
             FeatureSource featureSource = (FeatureSource) it.next();
-            FeatureReader reader = featureSource.getFeatures().reader();
+            FeatureIterator features = featureSource.getFeatures().features();
 
             try {
-                while (reader.hasNext()) // for each feature
+                while (features.hasNext()) // for each feature
                  {
                     // check if it intersects any of the previous features
-                    Feature feature = reader.next();
+                    Feature feature = features.next();
                     Geometry geom = feature.getDefaultGeometry();
 
                     for (int i = 0; i < geoms.size(); i++) // for each existing geometry
@@ -101,7 +101,7 @@ public class LinesNotIntersectValidation extends LineLineAbstractValidation {
                     geoms.add(geom);
                 }
             } finally {
-                reader.close(); // this is an important line    
+                features.close(); // this is an important line    
             }
         }
 

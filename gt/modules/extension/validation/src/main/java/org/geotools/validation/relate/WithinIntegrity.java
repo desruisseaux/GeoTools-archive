@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Filter;
@@ -134,14 +134,14 @@ public class WithinIntegrity extends RelationIntegrity {
 		//JD: fix this !!
 		//filter = (Filter) ff.createBBoxExpression(bBox);
 
-		FeatureResults featureResultsA = featureSourceA.getFeatures(filter);
-		FeatureResults featureResultsB = featureSourceB.getFeatures(filter);
+		FeatureCollection collectionA = featureSourceA.getFeatures(filter);
+		FeatureCollection collectionB = featureSourceB.getFeatures(filter);
 		
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+		FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResultsA.reader();
+			fr1 = collectionA.features();
 
 			if (fr1 == null)
 				return false;
@@ -150,30 +150,26 @@ public class WithinIntegrity extends RelationIntegrity {
 			{
 				Feature f1 = fr1.next();
 				Geometry g1 = f1.getDefaultGeometry();
-				fr2 = featureResultsB.reader();
-				
-				while (fr2 != null && fr2.hasNext())
-				{
-					Feature f2 = fr2.next();
-					Geometry g2 = f2.getDefaultGeometry();
-					if(g1.within(g2) != expected )
-					{
-						results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" within "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
-						success = false;
-					}
-				}		
+				fr2 = collectionB.features();
+				try {
+    				while (fr2 != null && fr2.hasNext())
+    				{
+    					Feature f2 = fr2.next();
+    					Geometry g2 = f2.getDefaultGeometry();
+    					if(g1.within(g2) != expected )
+    					{
+    						results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" within "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
+    						success = false;
+    					}
+    				}
+                }
+                finally {
+                    collectionB.close( fr2 );
+                }
 			}
 		}finally
 		{
-			/** Close the connections too the feature readers*/
-			try {
-				fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+            collectionA.close( fr1 );
 		}
 				
 		return success;
@@ -222,13 +218,13 @@ public class WithinIntegrity extends RelationIntegrity {
 		//JD: fix this !!
 		//filter = (Filter) ff.createBBoxExpression(bBox);
 
-		FeatureResults featureResults = featureSourceA.getFeatures(filter);
+		FeatureCollection collection = featureSourceA.getFeatures(filter);
 		
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+		FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResults.reader();
+			fr1 = collection.features();
 
 			if (fr1 == null)
 				return false;
@@ -237,33 +233,29 @@ public class WithinIntegrity extends RelationIntegrity {
 			{
 				Feature f1 = fr1.next();
 				Geometry g1 = f1.getDefaultGeometry();
-				fr2 = featureResults.reader();
-				
-				while (fr2 != null && fr2.hasNext())
-				{
-					Feature f2 = fr2.next();
-					Geometry g2 = f2.getDefaultGeometry();
-					if (!f1.getID().equals(f2.getID()))	// if they are the same feature, move onto the next one
-					{
-						if(g1.within(g2) != expected )
-						{
-							results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" within "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
-							success = false;
-						}
-					}
-				}		
+				fr2 = collection.features();
+				try {
+    				while (fr2 != null && fr2.hasNext())
+    				{
+    					Feature f2 = fr2.next();
+    					Geometry g2 = f2.getDefaultGeometry();
+    					if (!f1.getID().equals(f2.getID()))	// if they are the same feature, move onto the next one
+    					{
+    						if(g1.within(g2) != expected )
+    						{
+    							results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" within "+getGeomTypeRefA()+"("+f2.getID()+"), Result was not "+expected );
+    							success = false;
+    						}
+    					}
+    				}
+                }
+                finally {
+                    collection.close( fr2 );
+                }
 			}
 		}finally
 		{
-			/** Close the connections too the feature readers*/
-			try {
-				fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+            collection.close( fr1 );
 		}
 		
 		return success;

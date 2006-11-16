@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -127,46 +129,42 @@ public class ContainsIntegrity extends RelationIntegrity {
 		//JD: fix this !!
 		//filter = (Filter) ff.createBBoxExpression(bBox);
 		
-		FeatureResults featureResultsA = featureSourceA.getFeatures(filter);
-		FeatureResults featureResultsB = featureSourceB.getFeatures(filter);
+		FeatureCollection featureResultsA = featureSourceA.getFeatures(filter);
+        FeatureCollection featureResultsB = featureSourceB.getFeatures(filter);
 		
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+        FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResultsA.reader();
+			fr1 = featureResultsA.features();
 
-			if (fr1 == null)
-				return false;
+			if (fr1 == null) return false;
 						
 			while (fr1.hasNext())
 			{
 				Feature f1 = fr1.next();
 				Geometry g1 = f1.getDefaultGeometry();
-				fr2 = featureResultsB.reader();
-				
-				while (fr2 != null && fr2.hasNext())
-				{
-					Feature f2 = fr2.next();
-					Geometry g2 = f2.getDefaultGeometry();
-					if(g1.contains(g2) != expected)
-					{
-						results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" contains "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
-						success = false;
-					}
-				}		
+				fr2 = featureResultsB.features();
+				try {
+    				while (fr2 != null && fr2.hasNext())
+    				{
+    					Feature f2 = fr2.next();
+    					Geometry g2 = f2.getDefaultGeometry();
+    					if(g1.contains(g2) != expected)
+    					{
+    						results.error( f1, f1.getDefaultGeometry().getGeometryType()+" "+getGeomTypeRefA()+" contains "+getGeomTypeRefB()+"("+f2.getID()+"), Result was not "+expected );
+    						success = false;
+    					}
+    				}
+                }
+                finally {
+                    featureResultsB.close( fr2 );
+                }
 			}
 		}finally
 		{
-			/** Close the connections too the feature readers*/
-			try {
-				fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+            featureResultsA.close( fr1 );
+            featureResultsB.close( fr2 );
 		}
 				
 		return success;
@@ -211,16 +209,13 @@ public class ContainsIntegrity extends RelationIntegrity {
 		FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 		Filter filter = null;
 
-		//JD: fix this !!
-		//filter = (Filter) ff.createBBoxExpression(bBox);
-
-		FeatureResults featureResults = featureSourceA.getFeatures(filter);
+		FeatureCollection featureResults = featureSourceA.getFeatures(filter);
 		
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+        FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResults.reader();
+			fr1 = featureResults.features();
 
 			if (fr1 == null)
 				return false;
@@ -229,7 +224,7 @@ public class ContainsIntegrity extends RelationIntegrity {
 			{
 				Feature f1 = fr1.next();
 				Geometry g1 = f1.getDefaultGeometry();
-				fr2 = featureResults.reader();
+				fr2 = featureResults.features();
 				
 				while (fr2 != null && fr2.hasNext())
 				{
@@ -247,15 +242,9 @@ public class ContainsIntegrity extends RelationIntegrity {
 			}
 		}finally
 		{
-			/** Close the connections to the feature readers*/
-			try {
-				fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+			fr1.close();
+			if (fr2 != null)
+					fr2.close();			
 		}
 		
 		return success;

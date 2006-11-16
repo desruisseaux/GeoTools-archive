@@ -21,11 +21,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.data.FeatureReader;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BBoxExpression;
@@ -168,14 +170,14 @@ public class CrossesIntegrity extends RelationIntegrity
 		//JD: fix this!!
 		//filter = (Filter) ff.createBBoxExpression(bBox);
 
-		FeatureResults featureResultsA = featureSourceA.getFeatures(filter);
-		FeatureResults featureResultsB = featureSourceB.getFeatures(filter);
+		FeatureCollection featureResultsA = featureSourceA.getFeatures(filter);
+        FeatureCollection featureResultsB = featureSourceB.getFeatures(filter);
 		
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+        FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResultsA.reader();
+			fr1 = featureResultsA.features();
 
 			if (fr1 == null)
 				return success;
@@ -184,7 +186,7 @@ public class CrossesIntegrity extends RelationIntegrity
 			{
 				Feature f1 = fr1.next();
 				Geometry g1 = f1.getDefaultGeometry();
-				fr2 = featureResultsB.reader();
+				fr2 = featureResultsB.features();
 				
 				while (fr2 != null && fr2.hasNext())
 				{
@@ -201,15 +203,9 @@ public class CrossesIntegrity extends RelationIntegrity
 			}
 		}finally
 		{
-			/** Close the connections too the feature readers*/
-			try {
-				fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+			fr1.close();
+			if (fr2 != null)
+				fr2.close();		
 		}
 				
 		return success;
@@ -256,13 +252,13 @@ public class CrossesIntegrity extends RelationIntegrity
 		Filter filter = filterBBox(bBox, ft);
 
 		//FeatureResults featureResults = featureSourceA.getFeatures(filter);
-		FeatureResults featureResults = featureSourceA.getFeatures();
+		FeatureCollection featureResults = featureSourceA.getFeatures();
 		
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+        FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResults.reader();
+			fr1 = featureResults.features();
 
 			if (fr1 == null)
 				return success;
@@ -281,8 +277,8 @@ public class CrossesIntegrity extends RelationIntegrity
 				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
 
 				//FeatureResults featureResults2 = featureSourceA.getFeatures(filter2);
-				FeatureResults featureResults2 = featureSourceA.getFeatures();
-				fr2 = featureResults2.reader();	
+				FeatureCollection featureResults2 = featureSourceA.getFeatures();
+				fr2 = featureResults2.features();	
 				while (fr2 != null && fr2.hasNext())
 				{			
 					Feature f2 = fr2.next();
@@ -309,15 +305,9 @@ public class CrossesIntegrity extends RelationIntegrity
 			}
 		}finally
 		{
-			/** Close the connections to the feature readers*/
-			try {
-				fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+			fr1.close();
+			if (fr2 != null)
+				fr2.close();			
 		}
 		
 		return success;

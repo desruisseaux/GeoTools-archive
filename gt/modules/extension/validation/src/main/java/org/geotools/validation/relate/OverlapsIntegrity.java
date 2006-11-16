@@ -22,8 +22,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.data.FeatureSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.Feature;
@@ -172,14 +172,14 @@ public class OverlapsIntegrity extends RelationIntegrity
 		
 		Filter filter = filterBBox(bBox, ft);
 
-		//FeatureResults featureResults = featureSourceA.getFeatures(filter);
-		FeatureResults featureResults = featureSourceA.getFeatures();
+		//FeatureCollection FeatureCollection = featureSourceA.getFeatures(filter);
+		FeatureCollection collectionA = featureSourceA.getFeatures();
 		
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+		FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResults.reader();
+			fr1 = collectionA.features();
 
 			if (fr1 == null)
 				return success;
@@ -192,9 +192,9 @@ public class OverlapsIntegrity extends RelationIntegrity
 				Geometry g1 = f1.getDefaultGeometry();
 				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
 
-				FeatureResults featureResults2 = featureSourceB.getFeatures(filter2);
+				FeatureCollection collectionB = featureSourceB.getFeatures(filter2);
 				
-				fr2 = featureResults2.reader();
+				fr2 = collectionB.features();
 				try 
 				{
 					while (fr2 != null && fr2.hasNext())
@@ -226,22 +226,12 @@ public class OverlapsIntegrity extends RelationIntegrity
 						System.out.println("count: " + counter);
 						
 				}finally{
-					if (fr2 != null)
-						fr2.close();
+					collectionB.close( fr2 );
 				}
 			}// end while 1
 		}finally
 		{
-			/** Close the connections to the feature readers*/
-			try {
-				if (fr1 != null)
-					fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+			collectionA.close( fr1 );
 		}
 		
 		return success;
@@ -292,21 +282,21 @@ public class OverlapsIntegrity extends RelationIntegrity
 		
 		System.out.println("---------------- In Overlaps Integrity ----------------");
 
-		FeatureResults featureResults = null;
+		FeatureCollection collectionA = null;
 		
 		if(bBox != null && !bBox.isNull() && bBox.getHeight() != 0.0 && bBox.getWidth() != 0.0)
 		{
 			Filter filter = filterBBox(bBox, ft);
-			featureResults = featureSourceA.getFeatures(filter);
+			collectionA = featureSourceA.getFeatures(filter);
 		}
 		else
-			featureResults = featureSourceA.getFeatures();
+			collectionA = featureSourceA.getFeatures();
 		
-		FeatureReader fr1 = null;
-		FeatureReader fr2 = null;
+		FeatureIterator fr1 = null;
+		FeatureIterator fr2 = null;
 		try 
 		{
-			fr1 = featureResults.reader();
+			fr1 = collectionA.features();
 			if (fr1 == null)
 				return success;
 		
@@ -318,9 +308,9 @@ public class OverlapsIntegrity extends RelationIntegrity
 				Geometry g1 = f1.getDefaultGeometry();
 				Filter filter2 = filterBBox(g1.getEnvelope().getEnvelopeInternal(), ft);
 
-				FeatureResults featureResults2 = featureSourceA.getFeatures(filter2);
+				FeatureCollection collectionB = featureSourceA.getFeatures(filter2);
 				
-				fr2 = featureResults2.reader();
+				fr2 = collectionB.features();
 				try 
 				{
 					while (fr2 != null && fr2.hasNext())
@@ -355,8 +345,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 					//	System.out.println("count: " + counter);
 						
 				}finally{
-					if (fr2 != null)
-						fr2.close();
+					collectionB.close( fr2 );
 				}
 			}// end while 1
 		}finally
@@ -369,16 +358,7 @@ public class OverlapsIntegrity extends RelationIntegrity
 				System.out.println("########## Validation errors: " + errors);
 			}
 			
-			/** Close the connections to the feature readers*/
-			try {
-				if (fr1 != null)
-					fr1.close();
-				if (fr2 != null)
-					fr2.close();
-			} catch (IOException e4) {
-				e4.printStackTrace();
-				throw e4;
-			}
+            collectionA.close( fr1 );
 		}
 		
 		return success;
