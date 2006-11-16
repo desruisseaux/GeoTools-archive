@@ -38,6 +38,7 @@ public class FunctionTestSupport extends TestCase {
     protected FilterFactory fac = FilterFactoryFinder.createFilterFactory();
     protected ExpressionBuilder builder = new ExpressionBuilder();
     protected FeatureType dataType;
+    protected Feature[] testFeatures;
     
     /** Creates a new instance of FunctionTestSupport */
     public FunctionTestSupport(String testName) {
@@ -49,11 +50,10 @@ public class FunctionTestSupport extends TestCase {
         dataType = DataUtilities.createType("classification.test1",
                 "id:0,foo:int,bar:double");
         
-        
-        double dVal[] = new double[]{2.5,80.433,24.5,9.75,18,53,43.2,16};
         int iVal[] = new int[]{4,90,20,43,29,61,8,12};
+        double dVal[] = new double[]{2.5,80.433,24.5,9.75,18,53,43.2,16};
         
-        Feature[] testFeatures = new Feature[iVal.length];
+        testFeatures = new Feature[iVal.length];
         
         for(int i=0; i< iVal.length; i++){
             testFeatures[i] = dataType.create(new Object[] {
@@ -70,6 +70,9 @@ public class FunctionTestSupport extends TestCase {
         store.addFeatures(testFeatures);
         
         featureCollection = store.getFeatureSource("test1").getFeatures();
-        
+    }
+    
+    public void testEmpty() {
+        //to make tests pass
     }
 }

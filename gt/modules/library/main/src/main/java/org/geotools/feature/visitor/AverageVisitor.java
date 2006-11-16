@@ -23,7 +23,6 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
-
 /**
  * Calculates the Average
  *
@@ -110,7 +109,7 @@ public class AverageVisitor implements FeatureCalc {
     }
 
     public void visit(Feature feature) {
-        Object value = expr.getValue(feature);
+        Object value = expr.evaluate(feature);
 
         if (strategy == null) {
             Class type = value.getClass();

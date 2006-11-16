@@ -22,7 +22,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
@@ -56,27 +55,14 @@ public class LiteralTest extends TestCase {
         LiteralExpression d = new LiteralExpressionImpl(gf.createGeometryCollection(null));
     }
 
-    public void testInvalidConstruction1() throws Exception {
-        try {
-            //Byte was just a convinient object type to create
-            LiteralExpression a = new LiteralExpressionImpl(new java.lang.Byte(
-                        "1"));
-        } catch (IllegalFilterException ife) {
-            return;
-        }
-
-        fail("ExpressionLiterals can not contain non " +
-            "Double, Integer, String or Geometry objects");
-    }
-
-    public void testInvalidConstruction2() throws Exception {
-        try {
-            LiteralExpression a = new LiteralExpressionImpl(new Double(10));
-            LiteralExpression b = new LiteralExpressionImpl(a);
-        } catch (IllegalFilterException ife) {
-            return;
-        }
-
-        fail("ExpressionLiterals can not contain " + "other excepresions");
-    }
+//    public void testInvalidConstruction1() throws Exception {
+//        try {
+//            LiteralExpression a = new LiteralExpressionImpl(new Double(10));
+//            LiteralExpression b = new LiteralExpressionImpl(a);
+//        } catch (IllegalFilterException ife) {
+//            return;
+//        }
+//
+//        fail("ExpressionLiterals can not contain " + "other excepresions");
+//    }
 }

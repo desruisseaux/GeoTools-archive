@@ -254,17 +254,18 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
     }
     
     Object aggregate(String aggregate, Expression expression) throws IOException {
-        Filter filter = (Filter) query.getFilter();
-
-        if (filter == org.geotools.filter.Filter.ALL) {
+        org.opengis.filter.Filter filter = (org.opengis.filter.Filter) query.getFilter();
+        
+        if (org.opengis.filter.Filter.EXCLUDE.equals(filter)) {
             return null;
         }
 
+        
         JDBC1DataStore jdbc = getDataStore();
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(this.getSchema().getTypeName());
 
-        Filter postFilter = (Filter) sqlBuilder.getPostQueryFilter(query.getFilter()); 
-        if (postFilter != null && postFilter != org.geotools.filter.Filter.NONE) {
+        org.opengis.filter.Filter postFilter = (org.opengis.filter.Filter) sqlBuilder.getPostQueryFilter(query.getFilter()); 
+        if (postFilter != null && !org.opengis.filter.Filter.INCLUDE.equals(postFilter)) {
             // this would require postprocessing the filter
             // so we cannot optimize
             return null;

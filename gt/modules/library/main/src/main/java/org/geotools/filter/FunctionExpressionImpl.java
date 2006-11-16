@@ -63,7 +63,7 @@ public abstract class FunctionExpressionImpl
     }
 
     /**
-     * Sets the name of hte function.
+     * Sets the name of the function.
      */
     public void setName(String name) {
     	this.name = name;
@@ -77,7 +77,7 @@ public abstract class FunctionExpressionImpl
     }
     
     /**
-     * Sets the function paramters.
+     * Sets the function parameters.
      */
     public void setParameters(List params) {
     	this.params = params;
@@ -116,11 +116,11 @@ public abstract class FunctionExpressionImpl
      * @see org.opengis.filter.expression.Expression#accept(ExpressionVisitor, Object)
      */
     public Object accept(ExpressionVisitor visitor, Object extraData) {
-    	return visitor.visit(this,extraData);
+    	return visitor.visit(this, extraData);
     }
     
     /**
-     * Returns the implementation hints. The default implementation returns en empty map.
+     * Returns the implementation hints. The default implementation returns an empty map.
      */
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;

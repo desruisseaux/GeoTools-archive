@@ -16,7 +16,7 @@
 package org.geotools.filter.expression;
 
 import org.geotools.feature.Feature;
-import org.geotools.filter.Expression;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
 //
 /**
@@ -40,12 +40,8 @@ import org.opengis.filter.expression.ExpressionVisitor;
  * @author Jody Garnett
  *
  */
-public abstract class ExpressionAbstract implements org.opengis.filter.expression.Expression {
+public abstract class ExpressionAbstract implements Expression {
 	
-	/** Subclass should overide, default implementation returns null */
-	public Object evaluate(Feature feature){
-		return null;
-	}
 	/** Subclass should overide, default implementation returns null */
 	public Object evaluate(Object object) {
 		return null;
@@ -60,14 +56,29 @@ public abstract class ExpressionAbstract implements org.opengis.filter.expressio
 	public Object accept(ExpressionVisitor visitor, Object extraData) {
 		return extraData;
 	}
-	/**
-	 * Helper method for subclasses to reduce null checks
-	 * @param expression
-	 * @param feature
-	 * @return value or null
-	 */
-	protected Object eval( Expression expression, Feature feature ){
-		if( expression == null || feature == null ) return null;
-		return expression.evaluate( feature );
-	}
+
+    /**
+     * Helper method for subclasses to reduce null checks
+     * @param expression
+     * @param feature
+     * @return value or null
+     */
+    protected Object eval( Expression expression, Feature feature ){
+        if( expression == null || feature == null ) return null;
+        return expression.evaluate( feature );
+    }
+
+    /**
+     * Helper method for subclasses to reduce null checks
+     * 
+     * @param expression
+     * @param feature
+     * @return value or null
+     */
+    protected Object eval(org.geotools.filter.Expression expression,
+            Feature feature) {
+        if (expression == null || feature == null)
+            return null;
+        return expression.evaluate(feature);
+    }
 }

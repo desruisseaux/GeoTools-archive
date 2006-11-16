@@ -15,6 +15,11 @@
  */
 package org.geotools.brewer.color;
 
+import java.awt.Color;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
@@ -22,17 +27,16 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
-import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.function.ClassificationFunction;
 import org.geotools.filter.function.EqualIntervalFunction;
+import org.geotools.filter.function.RangedClassifier;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
-import java.io.IOException;
+import org.opengis.filter.Filter;
 
 
 /**
@@ -70,8 +74,6 @@ public class StyleGeneratorTest extends DataTestCase {
     }
 
     public void testComplexExpression() throws Exception {
-        System.out.println("Complex Expression (using Sequential)");
-
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes();
 
@@ -91,28 +93,31 @@ public class StyleGeneratorTest extends DataTestCase {
             expr2.addLeftValue(expr);
             expr2.addRightValue(ff.createLiteralExpression(3));
         } catch (IllegalFilterException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            fail(e.getMessage());
         }
 
         String paletteName = "YlGn"; //type = Sequential
 
         //create the classification function
-        ClassificationFunction classifier = new EqualIntervalFunction();
-        classifier.setNumberOfClasses(2);        
-        classifier.setExpression(expr2);
-        classifier.getValue(0); //recalc classes? (only useful for UniqueInterval)
-        classifier.evaluate(fc);
+        ClassificationFunction function = new EqualIntervalFunction();
+        List params = new ArrayList();
+        params.add(0, expr2); //expression
+        params.add(1, ff.literal(2)); //classes
+        function.setParameters(params);
 
-        //get the fts
-        StyleGenerator sg = new StyleGenerator(brewer.getPalette(paletteName)
-                                                     .getColors(2), classifier,
-                "myfts");
-        FeatureTypeStyle fts = sg.createFeatureTypeStyle(roadFeatures[0].getFeatureType()
-                                                                        .getDefaultGeometry());
+        Object object = function.evaluate(fc);
+        assertTrue(object instanceof RangedClassifier);
+        RangedClassifier classifier = (RangedClassifier) object;
+
+        Color[] colors = brewer.getPalette(paletteName).getColors(2);
+        // get the fts
+        FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(
+                classifier, expr2, colors, "myfts", roadFeatures[0].getFeatureType()
+                        .getDefaultGeometry(), StyleGenerator.ELSEMODE_IGNORE,
+                0.5, null);
         assertNotNull(fts);
 
-        //test each filter
+        // test each filter
         Rule[] rule = fts.getRules();
         assertEquals(2, rule.length);
         //do a preliminary test to make sure each rule's filter returns some results

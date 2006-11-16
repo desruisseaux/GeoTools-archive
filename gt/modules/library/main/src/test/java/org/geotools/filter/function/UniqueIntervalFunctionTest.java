@@ -21,7 +21,7 @@ import org.geotools.filter.FunctionExpression;
 
 
 /**
- * DOCUMENT ME!
+ * Tests UniqueIntervalFunction
  *
  * @author Cory Horner
  * @source $URL$
@@ -56,49 +56,40 @@ public class UniqueIntervalFunctionTest extends FunctionTestSupport {
      */
     public void testGetName() {
         FunctionExpression equInt = FilterFactoryFinder.createFilterFactory()
-                                                 .createFunctionExpression("UniqueInterval");
-        System.out.println("testGetName");
+                .createFunctionExpression("UniqueInterval");
         assertEquals("UniqueInterval", equInt.getName());
     }
 
     /**
      * Test of setNumberOfClasses method, of class
      * org.geotools.filter.function.UniqueIntervalFunction.
-     *
-     * @throws Exception DOCUMENT ME!
      */
-    public void testSetNumberOfClasses() throws Exception {
-        System.out.println("testSetNumberOfClasses");
-
-        Expression classes = (Expression) builder.parse(dataType, "3");
-        Expression exp = (Expression) builder.parse(dataType, "foo");
+    public void testSetClasses() throws Exception {
+        Expression classes = (Expression) builder.parser(dataType, "3");
+        Expression exp = (Expression) builder.parser(dataType, "foo");
         UniqueIntervalFunction func = (UniqueIntervalFunction) fac
             .createFunctionExpression("UniqueInterval");
         func.setArgs(new Expression[] { exp, classes });
-        assertEquals(3, func.getNumberOfClasses());
-        classes = (Expression) builder.parse(dataType, "12");
-        func.setArgs(new Expression[] { exp, classes });
-        assertEquals(12, func.getNumberOfClasses());
+        assertEquals(3, func.getClasses());
+        func.setClasses(12);
+        assertEquals(12, func.getClasses());
     }
 
     /**
      * Test of getValue method, of class
      * org.geotools.filter.function.UniqueIntervalFunction.
-     *
-     * @throws Exception DOCUMENT ME!
      */
-    public void testGetValue() throws Exception {
-        System.out.println("testGetValue");
-
-        Expression classes = (Expression) builder.parse(dataType, "2");
-        Expression exp = (Expression) builder.parse(dataType, "foo");
+    public void testEvaluate() throws Exception {
+        Expression classes = (Expression) builder.parser(dataType, "2");
+        Expression exp = (Expression) builder.parser(dataType, "foo");
         FunctionExpression func = fac.createFunctionExpression("UniqueInterval");
         func.setArgs(new Expression[] { exp, classes });
 
-        //FIXME: broken (returns index of -1 when the attribute actually exists) 
-        //is expr.getValue(feature) broken?
-        Object result = func.getValue(featureCollection);
-        assertNotNull(result);
-        System.out.println(result);
+        Object result = func.evaluate(featureCollection);
+        assertTrue(result instanceof ExplicitClassifier);
+        ExplicitClassifier classifier = (ExplicitClassifier) result;
+        assertEquals(2, classifier.getSize());
+        assertEquals("90, 4, 8, 43", classifier.getTitle(0));
+        assertEquals("61, 29, 20, 12", classifier.getTitle(1));
     }
 }

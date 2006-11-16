@@ -80,7 +80,7 @@ public class SumVisitor implements FeatureCalc {
     }
 
     public void visit(Feature feature) {
-        Object value = expr.getValue(feature);
+        Object value = expr.evaluate(feature);
 
         if (strategy == null) {
             strategy = createStrategy(value.getClass());

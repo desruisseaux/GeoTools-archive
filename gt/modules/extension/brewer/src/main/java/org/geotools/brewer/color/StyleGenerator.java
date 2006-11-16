@@ -15,18 +15,19 @@
  */
 package org.geotools.brewer.color;
 
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.feature.FeatureCollection;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
-import org.opengis.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
@@ -34,10 +35,9 @@ import org.geotools.filter.Filters;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
-import org.geotools.filter.function.ClassificationFunction;
-import org.geotools.filter.function.CustomClassifierFunction;
-import org.geotools.filter.function.ExplicitClassificationFunction;
-import org.geotools.filter.function.RangedClassificationFunction;
+import org.geotools.filter.function.Classifier;
+import org.geotools.filter.function.ExplicitClassifier;
+import org.geotools.filter.function.RangedClassifier;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Graphic;
@@ -48,19 +48,19 @@ import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
+import org.opengis.filter.Filter;
+
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
  * Generates a style/featureTypeStyle using ColorBrewer.
  * <br>
- * WARNING: this is unstable and subject to change.
+ * WARNING: this is unstable and subject to radical change.
  *
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL$
@@ -71,115 +71,11 @@ public class StyleGenerator {
     public final static int ELSEMODE_IGNORE = 0;
     public final static int ELSEMODE_INCLUDEASMIN = 1;
     public final static int ELSEMODE_INCLUDEASMAX = 2;
-    private Color[] colors;
-    private int numClasses;
-    private Expression expression;
-    private FeatureCollection collection;
-    private FilterFactory ff;
-    private StyleFactory sf;
-    private StyleBuilder sb;
-    private ClassificationFunction function;
-    private double opacity = 0.5;
-    private Stroke defaultStroke;
-    private String typeId;
-    private String titleSpacer = " to ";
-    private int elseMode = ELSEMODE_IGNORE;
+    private static FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+    private static StyleFactory sf = StyleFactoryFinder.createStyleFactory();
+    private static StyleBuilder sb = new StyleBuilder(sf, ff);
 
-    /**
-     * Creates an instance of the StyleGenerator with the components it needs.
-     *
-     * @param colors
-     * @param function classificationFunction containing our desired breaks
-     * @param typeId "colorbrewer:"+typeId = SemanticTypeIdentifier
-     */
-    public StyleGenerator(Color[] colors, ClassificationFunction function,
-        String typeId) {
-        this.colors = colors;
-        this.numClasses = function.getNumberOfClasses();
-        this.expression = function.getExpression();
-        this.collection = function.getCollection();
-        this.function = function;
-        this.typeId = typeId;
-        ff = FilterFactoryFinder.createFilterFactory();
-        sf = StyleFactoryFinder.createStyleFactory();
-        sb = new StyleBuilder(sf, ff);
-        defaultStroke = sb.createStroke();
-    }
-
-    public FeatureCollection getCollection() {
-        return collection;
-    }
-
-    public void setCollection(FeatureCollection collection) {
-        this.collection = collection;
-    }
-
-    public Color[] getColors() {
-        return colors;
-    }
-
-    public void setColors(Color[] colors) {
-        this.colors = colors;
-    }
-
-    public Expression getExpression() {
-        return expression;
-    }
-
-    public void setExpression(Expression expression) {
-        this.expression = expression;
-    }
-
-    public int getNumClasses() {
-        return numClasses;
-    }
-
-    public void setNumClasses(int numClasses) {
-        this.numClasses = numClasses;
-    }
-
-    public double getOpacity() {
-        return opacity;
-    }
-
-    public void setOpacity(double opacity) {
-        this.opacity = opacity;
-    }
-
-    public Stroke getDefaultStroke() {
-        return defaultStroke;
-    }
-
-    public void setDefaultStroke(Stroke defaultStroke) {
-        this.defaultStroke = defaultStroke;
-    }
-
-    public ClassificationFunction getClassifier() {
-        return function;
-    }
-
-    public void setClassifier(ClassificationFunction function) {
-        this.function = function;
-    }
-
-    /**
-     * Sets the semantic type identifier, which will be prefixed with "colorbrewer:"
-     * @param typeId
-     */
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
-    }
-
-    /**
-     * Sets the text displayed between ranged values (by default " to ").
-     * @param titleSpacer
-     */
-    public void setTitleSpacer(String titleSpacer) {
-        this.titleSpacer = titleSpacer;
-    }
-
-    public void setElseMode(int elseMode) {
-        this.elseMode = elseMode;
+    protected StyleGenerator() {
     }
 
     /**
@@ -188,7 +84,7 @@ public class StyleGenerator {
      *
      * @param index
      */
-    private Color getColor(int index) {
+    private static Color getColor(int elseMode, Color[] colors, int index) {
         if (elseMode == ELSEMODE_IGNORE) {
             return colors[index];
         } else if (elseMode == ELSEMODE_INCLUDEASMIN) {
@@ -200,7 +96,7 @@ public class StyleGenerator {
         }
     }
 
-    private Color getElseColor() {
+    private static Color getElseColor(int elseMode, Color[] colors) {
         if (elseMode == ELSEMODE_INCLUDEASMIN) {
             return colors[0];
         } else if (elseMode == ELSEMODE_INCLUDEASMAX) {
@@ -210,72 +106,79 @@ public class StyleGenerator {
         }
     }
 
-    public FeatureTypeStyle createFeatureTypeStyle(
-        GeometryAttributeType geometryAttrType) throws IllegalFilterException {
+    /**
+     * Merges a classifier, array of colors and other data into a
+     * FeatureTypeStyle object. Yes, this constructor is insane and likely to
+     * change very soon.
+     * 
+     * @param classifier
+     * @param colors
+     * @param typeId
+     *            semantic type identifier, which will be prefixed with
+     *            "colorbrewer:"
+     * @param geometryAttrType
+     * @param elseMode
+     * @param opacity
+     * @param defaultStroke
+     * @return
+     * @throws IllegalFilterException
+     */
+    public static FeatureTypeStyle createFeatureTypeStyle(
+            Classifier classifier, Expression expression, Color[] colors,
+            String typeId, GeometryAttributeType geometryAttrType,
+            int elseMode, double opacity, Stroke defaultStroke)
+            throws IllegalFilterException {
+        //init nulls
+        if (defaultStroke == null) {
+            defaultStroke = sb.createStroke();
+        }
+        
         //answer goes here
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
 
         // update the number of classes
-        if (elseMode == ELSEMODE_IGNORE) {
-            numClasses = function.getNumberOfClasses();
-        } else {
-            numClasses = function.getNumberOfClasses() + 1;
-        }
+        int numClasses = classifier.getSize();
+//        if (elseMode == ELSEMODE_IGNORE) {
+//            numClasses++;
+//        }
 
         //numeric
-        if (function instanceof RangedClassificationFunction) {
-            RangedClassificationFunction ranged = (RangedClassificationFunction) function;
+        if (classifier instanceof RangedClassifier) {
+            RangedClassifier ranged = (RangedClassifier) classifier;
 
             Object localMin = null;
             Object localMax = null;
 
             // for each class
-            for (int i = 0; i < function.getNumberOfClasses(); i++) {
+            for (int i = 0; i < ranged.getSize(); i++) {
                 // obtain min/max values
                 localMin = ranged.getMin(i);
                 localMax = ranged.getMax(i);
 
-                Rule rule = createRuleRanged(localMin, localMax,
-                        geometryAttrType, i);
+                Rule rule = createRuleRanged(ranged, expression, localMin,
+                        localMax, geometryAttrType, i, elseMode, colors,
+                        opacity, defaultStroke);
                 fts.addRule(rule);
             }
-        } else if (function instanceof ExplicitClassificationFunction) {
-            ExplicitClassificationFunction explicit = (ExplicitClassificationFunction) function;
+        } else if (classifier instanceof ExplicitClassifier) {
+            ExplicitClassifier explicit = (ExplicitClassifier) classifier;
 
             // for each class
-            for (int i = 0; i < function.getNumberOfClasses(); i++) {
-                Set value = (Set) explicit.getValue(i);
-                Rule rule = createRuleExplicit(value, geometryAttrType, i);
+            for (int i = 0; i < explicit.getSize(); i++) {
+                Set value = (Set) explicit.getValues(i);
+                Rule rule = createRuleExplicit(explicit, expression, value,
+                        geometryAttrType, i, elseMode, colors, opacity,
+                        defaultStroke);
                 fts.addRule(rule);
-            }
-        } else if (function instanceof CustomClassifierFunction) {
-            CustomClassifierFunction custom = (CustomClassifierFunction) function;
-
-            // for each class
-            for (int i = 0; i < function.getNumberOfClasses(); i++) {
-                // obtain the set of values for the current bin
-                Rule rule = null;
-
-                if (custom.hasExplicit(i)) {
-                    rule = createRuleExplicit((Set) custom.getValue(i),
-                            geometryAttrType, i);
-                } else if (custom.hasRanged(i)) {
-                    rule = createRuleRanged(custom.getMin(i), custom.getMax(i),
-                            geometryAttrType, i);
-                }
-
-                if (rule != null) {
-                    fts.addRule(rule);
-                }
             }
         } else {
-            LOGGER.log(Level.SEVERE, "Error: Classifier not found");
+            LOGGER.log(Level.SEVERE, "Error: no handler for this Classifier type");
         }
 
         // add an else rule to capture any missing features?
         if (elseMode != ELSEMODE_IGNORE) {
-            Symbolizer symb = createSymbolizer(sb, geometryAttrType,
-                    getElseColor(), opacity, defaultStroke);
+            Symbolizer symb = createSymbolizer(geometryAttrType,
+                    getElseColor(elseMode, colors), opacity, defaultStroke);
             Rule elseRule = sb.createRule(symb);
             elseRule.setIsElseFilter(true);
             elseRule.setTitle("Else");
@@ -313,9 +216,9 @@ public class StyleGenerator {
      * @param defaultStroke stroke used for borders
      *
      */
-    private Symbolizer createSymbolizer(StyleBuilder sb,
-        GeometryAttributeType geometryAttrType, Color color, double opacity,
-        Stroke defaultStroke) {
+    private static Symbolizer createSymbolizer(
+            GeometryAttributeType geometryAttrType, Color color,
+            double opacity, Stroke defaultStroke) {
         Symbolizer symb;
 
         if (defaultStroke == null) {
@@ -336,10 +239,7 @@ public class StyleGenerator {
             Graphic graphic = sb.createGraphic(null, square, null); //, 1, 4, 0);
             symb = sb.createPointSymbolizer(graphic);
 
-            //} else if (geometry instanceof ?Text) {
-            //symb = sb.createTextSymbolizer(colors[i], ?, "");
-            //} else if (geometry instanceof ?Raster) {
-            //symb = sb.createRasterSymbolizer(?, ?);
+            //TODO: handle Text and Raster
         } else {
             //we don't know what the heck you are, *snip snip* you're a line.
             symb = sb.createLineSymbolizer(color);
@@ -356,7 +256,7 @@ public class StyleGenerator {
      *
      * @return Integer(value) if applicable
      */
-    private Object chopInteger(Object value) {
+    private static Object chopInteger(Object value) {
         if ((value instanceof Number) && (value.toString().endsWith(".0"))) {
             return new Integer(((Number) value).intValue());
         } else {
@@ -370,7 +270,7 @@ public class StyleGenerator {
      * @param count
      *
      */
-    private String getRuleName(int count) {
+    private static String getRuleName(int count) {
         String strVal = new Integer(count).toString();
 
         if (strVal.length() == 1) {
@@ -380,8 +280,8 @@ public class StyleGenerator {
         }
     }
 
-    private Rule createRuleRanged(Object localMin, Object localMax,
-        GeometryAttributeType geometryAttrType, int i)
+    private static Rule createRuleRanged(RangedClassifier classifier, Expression expression, Object localMin, Object localMax,
+        GeometryAttributeType geometryAttrType, int i, int elseMode, Color[] colors, double opacity, Stroke defaultStroke)
         throws IllegalFilterException {
         // 1.0 --> 1
         // (this makes our styleExpressions more readable. Note that the
@@ -391,21 +291,11 @@ public class StyleGenerator {
         localMax = chopInteger(localMax);
 
         // generate a title
-        String title = "";
-
-        if (localMin != null) {
-            title = title + localMin;
-        }
-
-        title = title + titleSpacer;
-
-        if (localMax != null) {
-            title = title + localMax;
-        }
+        String title = classifier.getTitle(i);
 
         // construct filters
         Filter filter = null;
-
+        
         if (localMin == localMax) {
             // build filter: =
             CompareFilter eqFilter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
@@ -427,7 +317,7 @@ public class StyleGenerator {
 
             if (localMax != null) {
                 // if this is the global maximum, include the max value
-                if (i == (function.getNumberOfClasses() - 1)) {
+                if (i == (classifier.getSize() - 1)) {
                     hiBoundFilter = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
                 } else {
                     hiBoundFilter = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN);
@@ -449,7 +339,7 @@ public class StyleGenerator {
         }
 
         // create a symbolizer
-        Symbolizer symb = createSymbolizer(sb, geometryAttrType, getColor(i),
+        Symbolizer symb = createSymbolizer(geometryAttrType, getColor(elseMode, colors, i),
                 opacity, defaultStroke);
 
         // create a rule
@@ -461,8 +351,9 @@ public class StyleGenerator {
         return rule;
     }
 
-    private Rule createRuleExplicit(Set value,
-        GeometryAttributeType geometryAttrType, int i) {
+    private static Rule createRuleExplicit(ExplicitClassifier explicit, Expression expression, 
+            Set value, GeometryAttributeType geometryAttrType, int i,
+            int elseMode, Color[] colors, double opacity, Stroke defaultStroke) {
         // create a sub filter for each unique value, and merge them
         // into the logic filter
         Object[] items = value.toArray();
@@ -521,7 +412,7 @@ public class StyleGenerator {
         }
 
         // create the symbolizer
-        Symbolizer symb = createSymbolizer(sb, geometryAttrType, getColor(i),
+        Symbolizer symb = createSymbolizer(geometryAttrType, getColor(elseMode, colors, i),
                 opacity, defaultStroke);
 
         // create the rule

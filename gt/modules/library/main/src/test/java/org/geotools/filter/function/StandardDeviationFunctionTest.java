@@ -60,29 +60,18 @@ public class StandardDeviationFunctionTest extends FunctionTestSupport {
     public void testSetNumberOfClasses() throws Exception{
         LOGGER.finer("testSetNumberOfClasses");
         
-        Expression classes = (Expression)builder.parse(dataType, "3");
-        Expression exp = (Expression)builder.parse(dataType, "foo");
-        StandardDeviationFunction func = (StandardDeviationFunction)fac.createFunctionExpression("StandardDeviation");
+        Expression classes = (Expression) builder.parser(dataType, "3");
+        Expression exp = (Expression) builder.parser(dataType, "foo");
+        StandardDeviationFunction func = (StandardDeviationFunction) fac.createFunctionExpression("StandardDeviation");
         func.setArgs(new Expression[]{exp,classes});
-        assertEquals(3,func.getNumberOfClasses());
-        classes = (Expression)builder.parse(dataType, "12");
+        assertEquals(3, func.getClasses());
+        classes = (Expression) builder.parser(dataType, "12");
         func.setArgs(new Expression[]{exp,classes});
-        assertEquals(12,func.getNumberOfClasses());
-    }
-    
-    public void testCalculateSlot() throws ParseException {
-        LOGGER.finer("testCalculateSlot");
-        Expression classes = (Expression)builder.parse(dataType, "3");
-        Expression exp = (Expression)builder.parse(dataType, "foo");
-        FunctionExpression func = fac.createFunctionExpression("StandardDeviation");
-        func.setArgs(new Expression[]{exp,classes});
-                
-        Object value = func.evaluate( featureCollection );
-        assertNotNull( value );
-        assertEquals( 3, ((Integer)value).intValue() );        
+        assertEquals(12, func.getClasses());
     }
     
     public void XtestGetValue() throws Exception{
+        //doesn't work yet?
         LOGGER.finer("testGetValue");
         Expression classes = (Expression)builder.parse(dataType, "5");
         Expression exp = (Expression)builder.parse(dataType, "foo");

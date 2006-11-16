@@ -9,6 +9,8 @@ C. Brewer, I wonder if it inclusion in a library is cause to comment.
 
 IP:
 - There is a dummy LICENSE.txt file in the module folder...
+- *** Need to add ColorBrewer (TM) license *** 
+
 
 org.geotools.brewer.color
 -------------------------

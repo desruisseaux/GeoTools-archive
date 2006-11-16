@@ -21,13 +21,11 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.UniqueVisitor;
-import org.geotools.filter.Expression;
-import org.geotools.filter.IllegalFilterException;
 import org.geotools.util.NullProgressListener;
 
 
@@ -37,160 +35,98 @@ import org.geotools.util.NullProgressListener;
  * @author Cory Horner
  * @source $URL$
  */
-public class UniqueIntervalFunction extends ExplicitClassificationFunction {
-    Object unique = null; //sorted list of unique values
-    Set[] values = null; //the contents of each bin (set of objects)
-    boolean isValid = false; //we have valid data
-    private int classNum;
+public class UniqueIntervalFunction extends ClassificationFunction {
     
     public UniqueIntervalFunction() {
+        setName("UniqueInterval");
     }
 
-    public String getName() {
-        return "UniqueInterval";
-    }
-
-    private void calculateValues()
-        throws IllegalFilterException, IOException {
-        classNum = getNumberOfClasses();
-    	//use a visitor to grab the unique values
-        UniqueVisitor uniqueVisit = new UniqueVisitor(getExpression());
-		if (progress == null) progress = new NullProgressListener();
-        featureCollection.accepts(uniqueVisit, progress);
-		if (progress.isCanceled()) return;
-
-        CalcResult calcResult = uniqueVisit.getResult();
-        if (calcResult == null) return;
-        List result = calcResult.toList();
-        //sort the results and put them in an array
-        Collections.sort(result, new Comparator() {
-
-            public int compare(Object o1, Object o2) {
-                if (o1 == null) {
-                    if (o2 == null) {
-                        return 0; //equal
+    private Object calculate(FeatureCollection featureCollection) {
+        try {
+            int classNum = getClasses();
+        	//use a visitor to grab the unique values
+            UniqueVisitor uniqueVisit = new UniqueVisitor(getExpression());
+        	if (progress == null) progress = new NullProgressListener();
+                featureCollection.accepts(uniqueVisit, progress);
+        	if (progress.isCanceled()) return null;
+        
+            CalcResult calcResult = uniqueVisit.getResult();
+            if (calcResult == null) return null;
+            List result = calcResult.toList();
+            //sort the results and put them in an array
+            Collections.sort(result, new Comparator() {
+        
+                public int compare(Object o1, Object o2) {
+                    if (o1 == null) {
+                        if (o2 == null) {
+                            return 0; //equal
+                        }
+                        return -1; //less than
+                    } else if (o2 == null) {
+                        return 1;
                     }
-                    return -1; //less than
-                } else if (o2 == null) {
-                    return 1;
+                    if (o1 instanceof String && o2 instanceof String) {
+                        return ((String) o1).compareTo((String) o2);
+                    }
+                    return 0;
                 }
-                if (o1 instanceof String && o2 instanceof String) {
-                    return ((String) o1).compareTo((String) o2);
-                }
-                return 0;
+                
+            });
+            Object[] results = result.toArray();
+            //put the results into their respective slots/bins/buckets
+            Set[] values;
+            if (classNum < results.length) { //put more than one item in each class 
+            	//resize values array
+            	values = new Set[classNum];
+            	//calculate number of items to put in each of the larger bins
+            	int binPop = new Double(Math.ceil((double) results.length / classNum)).intValue();
+            	//determine index of bin where the next bin has one less item
+        		int lastBigBin = results.length % classNum;
+        		if (lastBigBin == 0) lastBigBin = classNum;
+        		else lastBigBin--;
+            	
+            	int itemIndex = 0;
+            	//for each bin
+            	for (int binIndex = 0; binIndex < classNum; binIndex++) {
+            		HashSet val = new HashSet();
+            		//add the items
+            		for (int binItem = 0; binItem < binPop; binItem++) 
+            			val.add(results[itemIndex++]);
+            		if (lastBigBin == binIndex)
+        				binPop--; // decrease the number of items in a bin for the
+        							// next iteration
+            		//store the bin
+            		values[binIndex] = val;
+            	}
+            } else {
+            	if (classNum > results.length) {
+            		classNum = results.length; //chop off a few classes
+            	}
+            	//resize values array
+            	values = new Set[classNum];
+            	//assign straight-across (1 item per class)
+            	for (int i = 0; i < classNum; i++) {
+            		HashSet val = new HashSet();
+            		val.add(results[i]);
+            		values[i] = val;
+            	}
             }
-            
-        });
-        Object[] results = result.toArray();
-        //put the results into their respective slots/bins/buckets
-        if (classNum < results.length) { //put more than one item in each class 
-        	//resize values array
-        	values = new Set[classNum];
-        	//calculate number of items to put in each of the larger bins
-        	int binPop = new Double(Math.ceil((double) results.length / classNum)).intValue();
-        	//determine index of bin where the next bin has one less item
-    		int lastBigBin = results.length % classNum;
-    		if (lastBigBin == 0) lastBigBin = classNum;
-    		else lastBigBin--;
-        	
-        	int itemIndex = 0;
-        	//for each bin
-        	for (int binIndex = 0; binIndex < classNum; binIndex++) {
-        		HashSet val = new HashSet();
-        		//add the items
-        		for (int binItem = 0; binItem < binPop; binItem++) 
-        			val.add(results[itemIndex++]);
-        		if (lastBigBin == binIndex)
-					binPop--; // decrease the number of items in a bin for the
-								// next iteration
-        		//store the bin
-        		values[binIndex] = val;
-        	}
-        } else {
-        	if (classNum > results.length) {
-        		classNum = results.length; //chop off a few classes
-        	}
-        	//resize values array
-        	values = new Set[classNum];
-        	//assign straight-across (1 item per class)
-        	for (int i = 0; i < classNum; i++) {
-        		HashSet val = new HashSet();
-        		val.add(results[i]);
-        		values[i] = val;
-        	}
-        }
-        //save the result (list), finally
-        unique = result;
-        isValid = true;
-    }
-
-    private int calculateSlot(Object val) {
-    	if (val == null) return -1;
-    	if (isValid) { //we have data! 
-    		//for each bin/slot/bucket
-    		for (int i = 0; i < values.length; i++) {
-    			if (values[i].contains(val)) return i;
-    		}
-    	}
-    	return -1;
-    }
-
-    public Object evaluate(Feature feature) {
-		FeatureCollection fcNew;
-
-		if (feature instanceof FeatureCollection) {
-			fcNew = (FeatureCollection) feature;
-		} else {
-			return null;
-		}		
-		if (!fcNew.equals(featureCollection) || !isValid) {
-			featureCollection = fcNew;
-			try {
-				calculateValues();
-			} catch (IllegalFilterException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}		
-        return new Integer(this.classNum);
-    }
-
-    public void setExpression(Expression e) {
-        super.setExpression(e);
-
-        if (featureCollection != null) {
-            try {
-                calculateValues();
-            } catch (Exception e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Determines the value(s) for the indexed slot/bin/bucket.
-     * 
-     * @return the value
-     */
-    public Object getValue(int index) {
-        if (featureCollection == null) {
+            //save the result (list), finally
+            return new ExplicitClassifier(values);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "UniqueIntervalFunction calculate failed", e);
             return null;
         }
+    }
 
-        if (unique == null) {
-            try {
-                calculateValues();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+    public Object evaluate(Object feature) {
+		if (!(feature instanceof FeatureCollection)) {
+			return null;
+		}
+        return calculate((FeatureCollection) feature);
+    }
 
-        //return the set
-        return values[index]; 
+    public int getArgCount() {
+        return 2;
     }
 }

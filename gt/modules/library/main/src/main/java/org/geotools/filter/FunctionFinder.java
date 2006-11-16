@@ -1,10 +1,6 @@
 package org.geotools.filter;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 import org.geotools.factory.Hints;
 import org.opengis.filter.expression.Function;

@@ -3,7 +3,7 @@ package org.geotools.filter.expression;
 import org.geotools.util.Converters;
 
 /**
- * Placeholder value for hte result of an expression.
+ * Placeholder value for the result of an expression.
  * <p>
  * This class holds onto the value of an expression in one form, and converts it on demand
  * into 
@@ -20,9 +20,9 @@ public class Value {
 	Object value;
 	
 	/**
-	 * Creates hte placeholder.
+	 * Creates the placeholder.
 	 * 
-	 * @param value The raw value of hte placeholder.
+	 * @param value The raw value of the placeholder.
 	 */
 	public Value( Object value ) {
 		this.value = value;
@@ -47,7 +47,7 @@ public class Value {
 	 * 
 	 * @param context The type of the object to be converted to.
 	 * 
-	 * @return THe converted object ( an instance of <param>context</param>, or <code>null</code>.
+	 * @return The converted object ( an instance of <param>context</param>, or <code>null</code> ).
 	 */
 	public Object value( Class context ) {
 		return Converters.convert( value, context );

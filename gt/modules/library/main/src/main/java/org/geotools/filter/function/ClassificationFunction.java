@@ -17,21 +17,19 @@
  */
 package org.geotools.filter.function;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.DefaultExpression;
 import org.geotools.filter.Expression;
-import org.opengis.filter.FilterFactory;
+import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
-import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.util.ProgressListener;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Literal;
 
 /**
  * Parent for classifiers which break a feature collection into the specified number of classes.
@@ -40,55 +38,85 @@ import org.opengis.filter.expression.Literal;
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL$
  */
-public abstract class ClassificationFunction extends FunctionExpressionImpl implements FunctionExpression {
+public abstract class ClassificationFunction extends DefaultExpression implements FunctionExpression {
 
-    FeatureCollection featureCollection = null;    
+    protected static final java.util.logging.Logger LOGGER = java.util.logging.Logger
+    .getLogger("org.geotools.filter.function");
+
+    /** function name **/
+    String name;
+    
+    /** function params **/
+    List params = new ArrayList(2);
+    
     ProgressListener progress;
     
-    Expression[] arguments = new Expression[2];
-    List parameters = Arrays.asList( arguments );
-    
-    /** Creates a new instance of ClassificationFunction */
+    /** Creates a new instance of ClassificationFunction.  Subclasses should call setName */
     public ClassificationFunction() {
+        setName("ClassificationFunction");
+        params.add(0, null);
+        params.add(1, null);
     }
     
-    public int getArgCount() {
-        return 2;
+    public abstract int getArgCount();
+    
+    //overriding evaluate(feature) to point at evaluate(object)
+    public Object evaluate(Feature feature) {
+        return evaluate((Object) feature);
+    }
+
+    public abstract Object evaluate(Object arg);
+    
+    /**
+     * @deprecated please use getParameters
+     */
+    public Expression[] getArgs() {
+        List parameters = getParameters();
+        return (Expression[]) parameters.toArray(new Expression[parameters.size()]);
     }
     
     /**
-     * Will return -1 if not a literal constant.
-     * 
-     * @return
+     * @deprecated please use setParameters
      */
-    public int getNumberOfClasses(){
-        Expression expr = arguments[1];
-        Object value = null;
-        if( expr != null && expr instanceof Literal ){
-            Literal literal = (Literal) expr;
-            value = literal.getValue();
+    public void setArgs(Expression[] args) {
+        List parameters = new ArrayList();
+        for (int i = 0; i < args.length; i++) {
+            parameters.add(i, args[i]);
         }
-        else if( featureCollection != null ){
-            value = expr.evaluate( featureCollection );            
-        }
-        if( value != null && value instanceof Integer){
-            return ((Integer)value).intValue();
-        }
-        return -1;        
-    }
-    public void setNumberOfClasses(int slots ){
-        FilterFactory ff = CommonFactoryFinder.getFilterFactory( null );         
-        arguments[1] = (Expression) ff.literal( slots );        
+        setParameters(parameters);
     }
     
-    public FeatureCollection getCollection() {
-    	return featureCollection;
+    /**
+     * Gets the name of this function.
+     *
+     * @return the name of the function.
+     * 
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name of the function.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
     
-    public void setCollection (FeatureCollection fc) {
-    	this.featureCollection = fc;
+    /**
+     * Returns the function parameters (the contents are Expressions, usually attribute expression and literal expression).
+     */
+    public List getParameters() {
+        return params;
     }
-        
+    
+    /**
+     * Sets the function parameters.
+     */
+    public void setParameters(List params) {
+        this.params = params;
+    }
+    
     public ProgressListener getProgressListener() {
         return progress;
     }
@@ -97,67 +125,102 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
         this.progress = progress;
     }
     
-    public Expression getExpression(){
-        return arguments[0];
+    /**
+     * @deprecated use getClasses()
+     */
+    public int getNumberOfClasses() {
+        return getClasses();
     }
     
-    public void setExpression(Expression e){
-        arguments[0] = e;
+    public int getClasses() {
+        LiteralExpression classes = (LiteralExpression) getParameters().get(1);
+        return ((Integer) classes.evaluate(null, Integer.class)).intValue();
     }
 
-    public Expression[] getArgs(){
-        return arguments;
-    }
     /**
-     * Returns the function parameters.
+     * @deprecated use setClasses()
      */
-    public List getParameters() {
-        return parameters;
+    public void setNumberOfClasses(int classes) {
+        setClasses(classes);
     }
-    
-    /**
-     * Sets the function paramters.
-     */
-    public void setParameters(List params) {
-        parameters.set(0, params.get(0));
-        parameters.set(1, params.get(1));        
-    }
-    public abstract String getName();
-    
-    public void setArgs(Expression[] args){
-        arguments[0] = args[0];
-        arguments[1] = args[1];        
-    }
-    
-    public abstract Object evaluate(Feature feature);
-    
-	public Object getValue(int index) {
-		return null;
-	}
 
+    public void setClasses(int classes) {
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+        LiteralExpression expression = ff.createLiteralExpression(classes);
+        getParameters().set(1, expression);
+    }
+    
+    public Expression getExpression() {
+        return (Expression) getParameters().get(0);
+    }
+    
+    public void setExpression(Expression e) {
+        getParameters().set(0, e);
+    }
+    
     /**
-	 * Determines the number of decimal places to truncate the interval at
-	 * (public for testing purposes only).
-	 * 
-	 * @param slotWidth
-	 */
+     * Returns the implementation hints. The default implementation returns an empty map.
+     */
+    public Map getImplementationHints() {
+        return Collections.EMPTY_MAP;
+    }
+    
+    /**
+     * Determines the number of decimal places to truncate the interval at.
+     * 
+     * @param slotWidth
+     */
     protected int decimalPlaces(double slotWidth) {
-    	int val = (new Double(Math.log(1.0/slotWidth)/2.0)).intValue();
-    	if (val < 0) return 0;
-    	else return val+1;
+        String str = Double.toString(slotWidth);
+        if (str.indexOf(".") > -1) {
+            while (str.endsWith("0")) {
+                str = str.substring(0, str.length() - 1);
+            }
+        }
+        int intPart = new Double(Math.floor(slotWidth)).intValue();
+        double decPart = slotWidth - intPart;
+        int intPoints = Integer.toString(intPart).length();
+        int decPoints = str.length() - intPoints;
+        if (str.indexOf(".") > -1) {
+            decPoints--;
+        }
+        if (decPart == 0) {
+            decPoints = 0;
+        }
+        //if there are dec points, show at least one
+        if (intPart == 0) { //if int part is 0, be very specific
+            if (decPoints > 6) {
+                return 5;
+            } else if (decPoints > 0) {
+                return decPoints;
+            } else {
+                return 1;
+            }
+        } else if (decPoints == 0) { //if there are no dec points, don't show any
+            return 0;
+        } else { //aim for a number of digits (not including '.') up to a reasonable limit (5)
+            int chars = intPoints + decPoints;
+            if (chars < 6) {
+                return decPoints;
+            } else if (intPoints > 4) {
+                return 1;
+            } else {
+                return 5 - intPoints;
+            }
+        }
     }
     
     /**
-	 * Truncates a double to a certain number of decimals places. Note:
-	 * truncation at zero decimal places will still show up as x.0, since we're
-	 * using the double type.
-	 * 
-	 * @param value
-	 *            number to round-off
-	 * @param decimalPlaces
-	 *            number of decimal places to leave
-	 * @return the rounded value
-	 */
+     * Truncates a double to a certain number of decimals places. Note:
+     * truncation at zero decimal places will still show up as x.0, since we're
+     * using the double type.
+     * 
+     * @param value
+     *            number to round-off
+     * @param decimalPlaces
+     *            number of decimal places to leave
+     * @return the rounded value
+     */
     protected double round(double value, int decimalPlaces) {
     	double divisor = Math.pow(10, decimalPlaces);
     	double newVal = value * divisor;
@@ -166,13 +229,16 @@ public abstract class ClassificationFunction extends FunctionExpressionImpl impl
     }
     
     /**
-	 * Corrects a round off operation by incrementing or decrementing the
-	 * decimal place (preferably the smallest one).  This should usually be used to adjust the bounds to include a value.  Example: 0.31-->0.44 where 0.44 is the maximum value and end of the range.  We could just make the , round(0.31, 1)=0.3; round(0.44 max value = 0.49
-	 * 
-	 * @param value
-	 * @param decimalPlaces
-	 * @param up
-	 */
+     * Corrects a round off operation by incrementing or decrementing the
+     * decimal place (preferably the smallest one). This should usually be used
+     * to adjust the bounds to include a value. Example: 0.31-->0.44 where 0.44
+     * is the maximum value and end of the range. We could just make the ,
+     * round(0.31, 1)=0.3; round(0.44 max value = 0.49
+     * 
+     * @param value
+     * @param decimalPlaces
+     * @param up
+     */
     protected double fixRound(double value, int decimalPlaces, boolean up) {
     	double divisor = Math.pow(10, decimalPlaces);
     	double newVal = value * divisor;

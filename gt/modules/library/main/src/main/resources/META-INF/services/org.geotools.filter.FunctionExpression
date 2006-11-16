@@ -1,7 +1,10 @@
+org.geotools.filter.AreaFunction
+org.geotools.filter.LengthFunction
+org.geotools.filter.function.ClassifyFunction
 org.geotools.filter.function.EqualIntervalFunction
 org.geotools.filter.function.StandardDeviationFunction
-org.geotools.filter.function.UniqueIntervalFunction
 org.geotools.filter.function.QuantileFunction
+org.geotools.filter.function.UniqueIntervalFunction
 org.geotools.filter.function.Collection_AverageFunction
 org.geotools.filter.function.Collection_BoundsFunction
 org.geotools.filter.function.Collection_CountFunction
@@ -10,8 +13,6 @@ org.geotools.filter.function.Collection_MedianFunction
 org.geotools.filter.function.Collection_MaxFunction
 org.geotools.filter.function.Collection_SumFunction
 org.geotools.filter.function.Collection_UniqueFunction
-org.geotools.filter.AreaFunction
-org.geotools.filter.LengthFunction
 org.geotools.filter.function.FilterFunction_contains
 org.geotools.filter.function.FilterFunction_isEmpty
 org.geotools.filter.function.FilterFunction_parseDouble

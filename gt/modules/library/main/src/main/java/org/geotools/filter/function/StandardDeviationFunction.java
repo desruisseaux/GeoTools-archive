@@ -16,14 +16,12 @@
 package org.geotools.filter.function;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.visitor.AverageVisitor;
 import org.geotools.feature.visitor.CalcResult;
 import org.geotools.feature.visitor.StandardDeviationVisitor;
-import org.geotools.filter.Expression;
-import org.geotools.filter.IllegalFilterException;
 import org.geotools.util.NullProgressListener;
 
 /**
@@ -32,105 +30,64 @@ import org.geotools.util.NullProgressListener;
  * @author Cory Horner, Refractions Research Inc.
  * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/src/org/geotools/filter/function/QuantileFunction.java $
  */
-public class StandardDeviationFunction extends RangedClassificationFunction {
-	double standardDeviation;
-	double average;
-	
-	boolean isValid = false; // we have valid data
-    private int classNum;
+public class StandardDeviationFunction extends ClassificationFunction {
 
+    public int getArgCount() {
+        return 2;
+    }
+    
 	public StandardDeviationFunction() {
+        setName("StandardDeviation");
 	}
 
-	public String getName() {
-		return "StandardDeviation";
+	private Object calculate(FeatureCollection featureCollection) {
+        try {
+            int classNum = getClasses();
+    		// find the average
+    		AverageVisitor averageVisit = new AverageVisitor(getExpression());
+    		if (progress == null) progress = new NullProgressListener();
+                featureCollection.accepts(averageVisit, progress);
+    		if (progress.isCanceled()) return null;
+    		CalcResult calcResult = averageVisit.getResult();
+    		if (calcResult == null) return null;
+    		double average = calcResult.toDouble();
+    		// find the standard deviation
+    		StandardDeviationVisitor sdVisit = new StandardDeviationVisitor(getExpression(), average);
+    		featureCollection.accepts(sdVisit, progress);
+    		if (progress.isCanceled()) return null;
+    		calcResult = sdVisit.getResult();
+    		if (calcResult == null) return null;
+    		double standardDeviation = calcResult.toDouble();
+            //figure out the min and max values
+            Double min[] = new Double[classNum];
+            Double max[] = new Double[classNum];
+            for (int i = 0; i < classNum; i++) {
+                min[i] = getMin(i, classNum, average, standardDeviation);
+                max[i] = getMax(i, classNum, average, standardDeviation);
+            }
+            return new RangedClassifier(min, max);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "StandardDeviationFunction calculate failed", e);
+            return null;
+        }
 	}
 
-	private void calculate() throws IllegalFilterException, IOException {
-        classNum = getNumberOfClasses();
-		// find the average
-		AverageVisitor averageVisit = new AverageVisitor(getExpression());
-		if (progress == null) progress = new NullProgressListener();
-		featureCollection.accepts(averageVisit, progress);
-		if (progress.isCanceled()) return;
-		CalcResult calcResult = averageVisit.getResult();
-		if (calcResult == null) return;
-		average = calcResult.toDouble();
-		// find the standard deviation
-		StandardDeviationVisitor sdVisit = new StandardDeviationVisitor(getExpression(), average);
-		featureCollection.accepts(sdVisit, progress);
-		if (progress.isCanceled()) return;
-		calcResult = sdVisit.getResult();
-		if (calcResult == null) return;
-		standardDeviation = calcResult.toDouble();
-		isValid = true;
-	}
-
-	private int calculateSlot(Object val) {
-		if (val == null)
-			return -1;
-		double value = Double.parseDouble(val.toString());
-		if (isValid) { // we have data!
-			//calculate upper bound of first class
-			double firstBoundary = average - (((classNum / 2.0) - 1) * standardDeviation);
-			for (int i = 0; i < classNum - 1; i++) {
-				if (value < (firstBoundary + (i * standardDeviation))) {
-					return i;
-				}
-			}
-			return classNum - 1; //must be in uppermost class
-		}
-		return -1;
-	}
-
-	public Object evaluate(Feature feature) {
-		FeatureCollection fcNew;
-
-		if (feature instanceof FeatureCollection) {
-			fcNew = (FeatureCollection) feature;
-		} else {
+	public Object evaluate(Object feature) {
+		if (!(feature instanceof FeatureCollection)) {
 			return null;
 		}
-		if (fcNew == null) {
-			return new Integer(0);
-		}
-		if (!fcNew.equals(featureCollection) || !isValid) {
-			featureCollection = fcNew;
-			try {
-				calculate();
-			} catch (IllegalFilterException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}        
-		return new Integer(this.classNum);
+        return calculate((FeatureCollection) feature);
 	}
 
-	public void setExpression(Expression e) {
-		super.setExpression(e);
-
-		if (featureCollection != null) {
-			try {
-				calculate();
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
+	private Double getMin(int index, int numClasses, double average, double standardDeviation) {
+		if (index <= 0 || index >= numClasses)
+			return null;
+		return new Double(average - (((numClasses / 2.0) - index) * standardDeviation));
 	}
 	
-	public Object getMin(int index) {
-		if (index <= 0 || index >= classNum)
+	private Double getMax(int index, int numClasses, double average, double standardDeviation) {
+		if (index < 0 || index >= numClasses - 1)
 			return null;
-		return new Double(average - (((classNum / 2.0) - index) * standardDeviation));
-	}
-	
-	public Object getMax(int index) {
-		if (index < 0 || index >= classNum - 1)
-			return null;
-		return new Double(average - (((classNum / 2.0) - 1 - index) * standardDeviation));
+		return new Double(average - (((numClasses / 2.0) - 1 - index) * standardDeviation));
 	}
 }

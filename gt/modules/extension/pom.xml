@@ -53,7 +53,7 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-<!--<module>brewer</module>-->
+    <module>brewer</module>
     <module>graph</module>
     <module>openoffice</module>
     <module>shapefile-renderer</module>

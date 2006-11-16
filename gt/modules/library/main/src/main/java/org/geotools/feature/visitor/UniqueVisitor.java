@@ -63,7 +63,7 @@ public class UniqueVisitor implements FeatureCalc {
 
     public void visit(Feature feature) {
         //we ignore null attributes
-        Object value = expr.getValue(feature);
+        Object value = expr.evaluate(feature);
         if (value != null) {
         	set.add(value);
         }

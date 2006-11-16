@@ -162,12 +162,7 @@ public class LiteralExpressionImpl extends DefaultExpression
         } else if (literal instanceof Geometry) {
             expressionType = LITERAL_GEOMETRY;
         } else {
-        	
-            
-    		throw new IllegalFilterException(
-	            "Attempted to add a literal with non-supported type "
-	            + "(ie. not Double, Integer, String).")
-        ;
+            expressionType = LITERAL_UNDECLARED;
         }
 
         this.literal = literal;

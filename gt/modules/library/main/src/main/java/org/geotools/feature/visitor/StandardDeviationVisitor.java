@@ -58,7 +58,7 @@ public class StandardDeviationVisitor implements FeatureCalc {
 	}
 
 	public void visit(Feature feature) {
-        Object value = expr.getValue(feature);
+        Object value = expr.evaluate(feature);
 
         if (value == null) {
 			countNull++; // increment the null count

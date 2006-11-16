@@ -29,6 +29,9 @@ public interface ExpressionType {
        (ie. all math types are implemented by ExpressionMath). */
 
     /* Types implemented by ExpressionLiteral */
+    /** Defines a literal expression with an undeclared type. */
+    public static final short LITERAL_UNDECLARED = 115;
+
     /** Defines a literal expression with a declared double type. */
     public static final short LITERAL_DOUBLE = 101;
 

@@ -22,7 +22,6 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
-
 /**
  * Calculates the minimum value of an attribute.
  *
@@ -64,7 +63,7 @@ public class MinVisitor implements FeatureCalc {
      * @param feature the feature to be visited
      */
     public void visit(Feature feature) {
-        Object attribValue = expr.getValue(feature);
+        Object attribValue = expr.evaluate(feature);
 
         if (attribValue == null) {
             return; //attribute is null, therefore skip

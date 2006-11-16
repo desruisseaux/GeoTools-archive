@@ -26,7 +26,6 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
-
 /**
  * Calculates the median of an attribute in all features of a collection
  *
@@ -72,8 +71,9 @@ public class MedianVisitor implements FeatureCalc {
         /**
          * Visitor function
          */
-        if (expr.getValue(feature) instanceof Comparable) {
-            Comparable value = (Comparable) expr.getValue(feature);
+        Object result = expr.evaluate(feature);
+        if (result instanceof Comparable) {
+            Comparable value = (Comparable) result;
             list.add(value);
         } else {
             throw new IllegalStateException("Expression is not comparable!");

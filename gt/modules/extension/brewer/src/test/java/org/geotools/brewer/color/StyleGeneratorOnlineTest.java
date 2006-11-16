@@ -15,7 +15,10 @@
  */
 package org.geotools.brewer.color;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
@@ -28,6 +31,8 @@ import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.function.ClassificationFunction;
+import org.geotools.filter.function.Classifier;
+import org.geotools.filter.function.ExplicitClassifier;
 import org.geotools.filter.function.UniqueIntervalFunction;
 import org.geotools.styling.FeatureTypeStyle;
 
@@ -93,24 +98,26 @@ public class StyleGeneratorOnlineTest extends DataTestCase {
         brewer.loadPalettes();
 
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        AttributeExpression expr = null;
-        expr = ff.createAttributeExpression("authority");
+        AttributeExpression expr = ff.createAttributeExpression("authority");
 
         String paletteName = "YlGn";
 
         //create the classification function
-        ClassificationFunction classifier = new UniqueIntervalFunction();
-        classifier.setNumberOfClasses(7);
-        classifier.setCollection(fc);
-        classifier.setExpression(expr);
-        classifier.getValue(0); 
-
+        ClassificationFunction function = new UniqueIntervalFunction();
+        List params = new ArrayList();
+        params.add(0, expr); //expression
+        params.add(1, ff.literal(7)); //classes
+        function.setParameters(params);
+        Object object = function.evaluate(fc);
+        assertTrue(object instanceof ExplicitClassifier);
+        Classifier classifier = (Classifier) object;
+        
+        Color[] colors = brewer.getPalette(paletteName).getColors(7);
         //get the fts
-        StyleGenerator sg = new StyleGenerator(brewer.getPalette(paletteName)
-                                                     .getColors(7), classifier,
-                "myfts");
-        FeatureTypeStyle fts = sg.createFeatureTypeStyle(roadFeatures[0].getFeatureType()
-                                                                        .getDefaultGeometry());
+        FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(
+                classifier, expr, colors, "myfts", roadFeatures[0].getFeatureType()
+                        .getDefaultGeometry(), StyleGenerator.ELSEMODE_IGNORE,
+                0.5, null);
         assertNotNull(fts);
 
     }

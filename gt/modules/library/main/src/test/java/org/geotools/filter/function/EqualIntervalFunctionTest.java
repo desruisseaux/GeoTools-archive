@@ -21,7 +21,6 @@ import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
-import org.geotools.filter.parser.ParseException;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
@@ -45,7 +44,6 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
     
     public static junit.framework.Test suite() {
         junit.framework.TestSuite suite = new junit.framework.TestSuite(EqualIntervalFunctionTest.class);
-        
         return suite;
     }
     
@@ -61,47 +59,57 @@ public class EqualIntervalFunctionTest extends FunctionTestSupport {
     /**
      * Test of setNumberOfClasses method, of class org.geotools.filter.functions.EqualIntervalFunction.
      */
-    public void testSetNumberOfClasses() throws Exception{        
+    public void testSetClasses() throws Exception{        
         PropertyName property = ff.property("foo");
         Literal literal = ff.literal(3);
         
-        EqualIntervalFunction func = (EqualIntervalFunction) ff.function("EqualInterval", property, literal );
-        assertEquals(3,func.getNumberOfClasses());
+        EqualIntervalFunction func = (EqualIntervalFunction) ff.function("EqualInterval", property, literal);
+        assertEquals(3, func.getClasses());
                         
-        func.getParameters().set(1, ff.literal(12) );
-        assertEquals(12,func.getNumberOfClasses());        
+        func.getParameters().set(1, ff.literal(12));
+        assertEquals(12, func.getClasses());        
     }
     
-    /**
-     * Test of calculateSlot method, of class org.geotools.filter.functions.EqualIntervalFunction.
-     */
-    public void testCalculateSlot() throws ParseException {
-        System.out.println("testCalculateSlot");
-        Expression classes = (Expression)builder.parse(dataType, "3");
-        Expression exp = (Expression)builder.parse(dataType, "foo");
+    public void testEvaluateWithExpressions() throws Exception {
+        Expression classes = (Expression) builder.parser(dataType, "3");
+        Expression expr1 = (Expression) builder.parser(dataType, "foo");
         FunctionExpression func = fac.createFunctionExpression("EqualInterval");
-        func.setArgs(new Expression[]{exp,classes});
+        func.setArgs(new Expression[]{expr1,classes});
         
-        Object slot = func.evaluate( featureCollection );        
+        Object classifier = func.evaluate(featureCollection);
+        assertTrue(classifier instanceof RangedClassifier);
+        RangedClassifier ranged = (RangedClassifier) classifier;
+        //values = 4,90,20,43,29,61,8,12
+        //4..90 = 4..32.67, 32.67..61.33, 61.33..90
+        
+        //correct number of classes
+        assertEquals(3, ranged.getSize());
+        //correct titles
+        assertEquals("4..32.667", ranged.getTitle(0));
+        assertEquals("32.667..61.333", ranged.getTitle(1));
+        assertEquals("61.333..90", ranged.getTitle(2));
+        //check classifier binning
+        assertEquals(0, ranged.classify(new Double(4)));
+        assertEquals(2, ranged.classify(expr1, testFeatures[1])); //90
+        assertEquals(0, ranged.classify(new Double(20)));
+        assertEquals(1, ranged.classify(new Double(43)));
+        assertEquals(0, ranged.classify(new Double(29)));
+        assertEquals(1, ranged.classify(new Double(61)));
+        assertEquals(0, ranged.classify(expr1, testFeatures[6])); //8
+        assertEquals(0, ranged.classify(new Double(12)));
+        
+        //try again with foo        
     }
-    
-    /**
-     * Test of getValue method, of class org.geotools.filter.functions.EqualIntervalFunction.
-     */
-    public void testGetValue() throws Exception{
-        System.out.println("testGetValue");
-        Expression classes = (Expression)builder.parse(dataType, "2");
-        Expression exp = (Expression)builder.parse(dataType, "foo");
-        FunctionExpression func = fac.createFunctionExpression("EqualInterval");
-        func.setArgs(new Expression[]{exp,classes});
+
+    public void testUpgradeExample(){
+        Function function = ff.function("equalInterval", ff.property("foo"), ff.literal(12));        
+        Object value = function.evaluate(featureCollection);
+        assertNotNull("classifier failed", value);
         
-        FeatureIterator list = featureCollection.features();
-        int slot = ((Number)func.evaluate( featureCollection )).intValue();
+        Classifier split = (Classifier) value;
+        Function classify = ff.function("classify", ff.property("foo"), ff.literal(split));
         
-//        if(value < 46){
-//            assertEquals(0,slot);
-//        } else{
-//            assertEquals(1,slot);
-//        }
+        Feature victim = testFeatures[2]; //foo = 20
+        assertEquals("Feature was placed in wrong bin", new Integer(2), classify.evaluate(victim));
     }
 }
