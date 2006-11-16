@@ -766,7 +766,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
     				if (this.createIndex) {
     					try {
     						this.buildQuadTree();
-    					} catch (TreeException e) {
+    					} catch (Throwable e) {
     						createIndex=false;
                             treeType=TREE_NONE;
     						return null;
