@@ -153,7 +153,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         AttributeType att = schema.getAttributeType(0);
         String attName = att.getName();
 
-        FeatureReader reader = fs.getFeatures().reader();
+        FeatureIterator reader = fs.getFeatures().features();
         Object val1 = reader.next().getAttribute(0);
         Object val2 = reader.next().getAttribute(0);
         reader.close();
@@ -186,10 +186,10 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         writer.close();
 
         //was it really removed?
-        reader = ds.getFeatureReader(new DefaultQuery(typeName, or),
+        FeatureReader read = ds.getFeatureReader(new DefaultQuery(typeName, or),
                 Transaction.AUTO_COMMIT);
-        assertFalse(reader.hasNext());
-        reader.close();
+        assertFalse(read.hasNext());
+        read.close();
     }
 
     /**

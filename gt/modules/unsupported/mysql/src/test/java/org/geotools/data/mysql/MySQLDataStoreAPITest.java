@@ -39,7 +39,6 @@ import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLockFactory;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
@@ -927,6 +926,27 @@ public class MySQLDataStoreAPITest extends DataTestCase {
 
         return count == array.length;
     }
+    boolean covers(FeatureIterator reader, Feature[] array)
+    throws NoSuchElementException, IOException, IllegalAttributeException {
+    Feature feature;
+    int count = 0;
+
+    try {
+        while (reader.hasNext()) {
+            feature = reader.next();
+
+            if (!contains(array, feature)) {
+                return false;
+            }
+
+            count++;
+        }
+    } finally {
+        reader.close();
+    }
+
+    return count == array.length;
+}
 
     boolean coversLax(FeatureReader reader, Feature[] array)
         throws NoSuchElementException, IOException, IllegalAttributeException {
@@ -1382,8 +1402,8 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         assertEquals(2, half.size());
         assertEquals(1, half.getSchema().getAttributeCount());
 
-        FeatureReader reader = half.reader();
-        FeatureType type = reader.getFeatureType();
+        FeatureIterator reader = half.features();
+        FeatureType type = half.getSchema();
         reader.close();
 
         FeatureType actual = half.getSchema();
@@ -1418,7 +1438,7 @@ public class MySQLDataStoreAPITest extends DataTestCase {
         FeatureCollection all = river.getFeatures();
         assertEquals(2, all.size());
         assertEquals(riverBounds, all.getBounds());
-        assertTrue("rivers", covers(all.reader(), riverFeatures));
+        assertTrue("rivers", covers(all.features(), riverFeatures));
 
         FeatureCollection expected = DataUtilities.collection(riverFeatures);
         assertCovers("all", expected, all);

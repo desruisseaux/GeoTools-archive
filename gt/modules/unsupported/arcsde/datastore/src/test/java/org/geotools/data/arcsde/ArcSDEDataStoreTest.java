@@ -37,6 +37,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
@@ -185,7 +186,7 @@ public class ArcSDEDataStoreTest extends TestCase {
             	LOGGER.fine("Running iteration #" + i);
             	
                 FeatureCollection res = source.getFeatures(bbox);
-            	FeatureReader reader = res.reader();
+            	FeatureIterator reader = res.features();
 
             	assertNotNull(reader.next());
 
@@ -493,7 +494,7 @@ public class ArcSDEDataStoreTest extends TestCase {
                 assertNotNull(bounds);
                 LOGGER.fine("results bounds: " + bounds);
 
-                FeatureReader reader = results.reader();
+                FeatureIterator reader = results.features();
 
                 /*verify that then features are already being fetched, getBounds and
                  * size still work
@@ -549,7 +550,9 @@ public class ArcSDEDataStoreTest extends TestCase {
 
         //the problem described in GEOT-408 arises in attribute reader, so
         //we must to try fetching features
-        Feature feature = results.reader().next();
+        FeatureIterator iterator = results.features();
+        Feature feature = iterator.next();
+        iterator.close();
         assertNotNull(feature);
 
         //the id must be grabed correctly.
@@ -596,13 +599,14 @@ public class ArcSDEDataStoreTest extends TestCase {
         FeatureCollection results = source.getFeatures(query);
 
         assertEquals(fids.size(), results.size());
-        reader = results.reader();
+        FeatureIterator iterator = results.features();
 
-        while (reader.hasNext()) {
-            String fid = reader.next().getID();
+        while (iterator.hasNext()) {
+            String fid = iterator.next().getID();
             assertTrue("a fid not included in query was returned: " + fid,
                 fids.contains(fid));
         }
+        results.close( iterator );
     }
 
     /**
@@ -792,15 +796,12 @@ public class ArcSDEDataStoreTest extends TestCase {
         assertNotNull(env1);
         assertFalse(env1.isNull());
 
-        FeatureReader reader = results.reader();
+        FeatureIterator reader = results.features();
         assertTrue(reader.hasNext());
 
         try {
             assertNotNull(reader.next());
         } catch (NoSuchElementException ex) {
-            ex.printStackTrace();
-            fail(ex.getMessage());
-        } catch (IllegalAttributeException ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }

@@ -32,6 +32,7 @@ import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Transaction;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SimpleFeature;
@@ -82,6 +83,9 @@ public class MemoryDataStore extends AbstractDataStore {
     public MemoryDataStore(FeatureReader reader) throws IOException {
         addFeatures(reader);
     }
+    public MemoryDataStore(FeatureIterator reader) throws IOException {
+        addFeatures(reader);
+    }
 
     /**
      * Configures MemoryDataStore with FeatureReader.
@@ -124,6 +128,44 @@ public class MemoryDataStore extends AbstractDataStore {
         }
     }
 
+    /**
+     * Configures MemoryDataStore with FeatureReader.
+     *
+     * @param reader New contents to add
+     *
+     * @throws IOException If problems are encountered while adding
+     * @throws DataSourceException See IOException
+     */
+    public void addFeatures(FeatureIterator reader) throws IOException {
+        try {
+            FeatureType featureType;
+            Map featureMap = new HashMap();
+            String typeName;
+            Feature feature;
+
+            feature = reader.next();
+
+            if (feature == null) {
+                throw new IllegalArgumentException("Provided FeatureReader is closed");
+            }
+
+            featureType = feature.getFeatureType();
+            typeName = featureType.getTypeName();
+
+            featureMap.put(feature.getID(), feature);
+
+            while (reader.hasNext()) {
+                feature = reader.next();
+                featureMap.put(feature.getID(), feature);
+            }
+
+            schema.put(typeName, featureType);
+            memory.put(typeName, featureMap);
+        }
+        finally {
+            reader.close();
+        }
+    }
     /**
      * Configures MemoryDataStore with Collection.
      * 
