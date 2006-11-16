@@ -32,7 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.batik.svggen.SVGGeneratorContext;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.geotools.map.MapContext;
-import org.geotools.renderer.lite.LiteRenderer;
+import org.geotools.renderer.lite.StreamingRenderer;
 import org.w3c.dom.Document;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -100,12 +100,14 @@ public class GenerateSVG {
      * @param g2d
      */
     private void renderMap(final MapContext map, final Envelope env, final SVGGraphics2D g2d) throws IOException {
-        LiteRenderer renderer = new LiteRenderer(map);
+        StreamingRenderer renderer = new StreamingRenderer();        
+        renderer.setContext(map);
+        
         Rectangle outputArea = new Rectangle(g2d.getSVGCanvasSize());
         Envelope dataArea = map.getLayerBounds();
-        AffineTransform at = renderer.worldToScreenTransform(dataArea, outputArea);
+                
         LOGGER.finest("rendering map");
-        renderer.paint(g2d, outputArea, at);
+        renderer.paint(g2d, outputArea, dataArea );
     }
 
     /**
