@@ -4,22 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import javax.swing.Icon;
-
-import org.geotools.catalog.AbstractFileService;
 import org.geotools.catalog.Catalog;
 import org.geotools.catalog.DataStoreService;
 import org.geotools.catalog.GeoResource;
 import org.geotools.catalog.ServiceInfo;
 import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi;
-import org.geotools.data.property.PropertyDataStore;
 import org.geotools.data.property.PropertyDataStoreFactory;
 import org.geotools.util.ProgressListener;
 
@@ -33,8 +26,10 @@ public class PropertyService extends DataStoreService {
 
 	File directory;
 	
-	public PropertyService(Catalog parent, Map params, File directory) {
-		super(parent, params);
+	public PropertyService(
+		Catalog parent, Map params, File directory, PropertyDataStoreFactory propDataStoreFactory 
+	) {
+		super(parent, params, propDataStoreFactory );
 		this.directory = directory;
 	}
 
@@ -53,10 +48,6 @@ public class PropertyService extends DataStoreService {
 		return super.resolve( adaptee, monitor );
 	}
 	
-	protected DataStoreFactorySpi createDataStoreFactory() {
-		return new PropertyDataStoreFactory();
-	}
-
 	protected GeoResource createGeoResource(String typeName, DataStore dataStore) {
 		return new PropertyGeoResource( this, typeName );
 	}
