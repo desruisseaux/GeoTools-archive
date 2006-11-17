@@ -17,6 +17,7 @@ package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.xml.*;
 
 
@@ -78,5 +79,20 @@ public class BoundingShapeTypeBinding extends AbstractComplexBinding {
         }
 
         return envelope;
+    }
+
+    public Object getProperty(Object object, QName name) {
+        if (name.equals(GML.Envelope)) {
+            if (object instanceof Envelope) {
+                return object;
+            }
+
+            //check for a polygon
+            if (object instanceof Polygon) {
+                return ((Polygon) object).getEnvelopeInternal();
+            }
+        }
+
+        return null;
     }
 }

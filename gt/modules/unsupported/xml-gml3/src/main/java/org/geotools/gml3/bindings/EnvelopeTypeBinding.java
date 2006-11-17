@@ -15,12 +15,16 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -129,6 +133,35 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
             CoordinateSequence seq = (CoordinateSequence) node.getChildValue(CoordinateSequence.class);
 
             return new ReferencedEnvelope(seq.getX(0), seq.getX(1), seq.getY(0), seq.getY(1), crs);
+        }
+
+        return null;
+    }
+
+    public Element encode(Object object, Document document, Element value)
+        throws Exception {
+        Envelope envelope = (Envelope) object;
+
+        if (envelope.isNull()) {
+            return document.createElementNS(GML.NAMESPACE, GML.Null.getLocalPart());
+        }
+
+        return null;
+    }
+
+    public Object getProperty(Object object, QName name) {
+        Envelope envelope = (Envelope) object;
+
+        if (envelope.isNull()) {
+            return null;
+        }
+
+        if (name.getLocalPart().equals("lowerCorner")) {
+            return new DirectPosition2D(envelope.getMinX(), envelope.getMinY());
+        }
+
+        if (name.getLocalPart().equals("upperCorner")) {
+            return new DirectPosition2D(envelope.getMaxX(), envelope.getMaxY());
         }
 
         return null;
