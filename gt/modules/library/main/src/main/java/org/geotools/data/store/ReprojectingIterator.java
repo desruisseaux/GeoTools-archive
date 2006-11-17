@@ -20,86 +20,97 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class ReprojectingIterator implements Iterator {
 
-	/**
-	 * decorated iterator
-	 */
-	Iterator delegate;
-	/**
-	 * The target coordinate reference system
-	 */
-	CoordinateReferenceSystem target;
-	/**
-	 * schema of reprojected features
-	 */
-	FeatureType schema;
-	/**
-	 * Transformer
-	 */
-	GeometryCoordinateSequenceTransformer tx;
-	
-	public ReprojectingIterator( 
-		Iterator delegate, CoordinateReferenceSystem source, CoordinateReferenceSystem target, 
-		FeatureType schema
-	) throws OperationNotFoundException, FactoryRegistryException, FactoryException {
-		this.delegate = delegate;
-		this.target = target;
-		this.schema = schema;
-		tx = new GeometryCoordinateSequenceTransformer();
-		
-		MathTransform transform = FactoryFinder.getCoordinateOperationFactory(null)
-        	.createOperation(source,target).getMathTransform();
-		tx.setMathTransform( (MathTransform2D) transform );
-	}
-	
-	public Iterator getDelegate() {
-		return delegate;
-	}
-	
-	public void remove() {
-		delegate.remove();
-	}
+    /**
+     * decorated iterator
+     */
+    Iterator delegate;
 
-	public boolean hasNext() {
-		return delegate.hasNext();
-	}
+    /**
+     * The target coordinate reference system
+     */
+    CoordinateReferenceSystem target;
 
-	public Object next() {
-		Feature feature = (Feature) delegate.next();
-		try {
-			return reproject( feature );
-		} 
-		catch (IOException e) {
-			throw new RuntimeException( e );
-		}
-	}
-	
-	Feature reproject( Feature feature ) throws IOException {
-		
-		Object[] attributes = feature.getAttributes( null );
-		
-		for ( int i = 0; i < attributes.length; i++ ) {
-			Object object = attributes[ i ];
-			if ( object instanceof Geometry ) {
-				//do the transformation
-				Geometry geometry = (Geometry) object;
-				try {
-					attributes[ i ] = tx.transform( geometry );
-				} 
-				catch (TransformException e) {
-					String msg = "Error occured transforming " + geometry.toString();
-					throw (IOException) new IOException( msg ).initCause( e );
-				}
-			}
-		}
-		
-		try {
-			return schema.create( attributes, feature.getID() );
-		} 
-		catch (IllegalAttributeException e) {
-			String msg = "Error creating reprojeced feature";
-			throw (IOException) new IOException( msg ).initCause( e );
-		}
-	}
-	
+    /**
+     * schema of reprojected features
+     */
+    FeatureType schema;
+
+    /**
+     * Transformer
+     */
+    GeometryCoordinateSequenceTransformer tx;
+
+    public ReprojectingIterator(Iterator delegate, MathTransform transform,
+            FeatureType schema) throws OperationNotFoundException,
+            FactoryRegistryException, FactoryException {
+        this.delegate = delegate;
+        this.target = target;
+        this.schema = schema;
+
+        tx = new GeometryCoordinateSequenceTransformer();
+        tx.setMathTransform((MathTransform2D) transform);
+    }
+
+    public ReprojectingIterator(Iterator delegate,
+            CoordinateReferenceSystem source, CoordinateReferenceSystem target,
+            FeatureType schema) throws OperationNotFoundException,
+            FactoryRegistryException, FactoryException {
+        this.delegate = delegate;
+        this.target = target;
+        this.schema = schema;
+        tx = new GeometryCoordinateSequenceTransformer();
+
+        MathTransform transform = FactoryFinder.getCoordinateOperationFactory(
+                null).createOperation(source, target).getMathTransform();
+        tx.setMathTransform((MathTransform2D) transform);
+    }
+
+    public Iterator getDelegate() {
+        return delegate;
+    }
+
+    public void remove() {
+        delegate.remove();
+    }
+
+    public boolean hasNext() {
+        return delegate.hasNext();
+    }
+
+    public Object next() {
+        Feature feature = (Feature) delegate.next();
+        try {
+            return reproject(feature);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    Feature reproject(Feature feature) throws IOException {
+
+        Object[] attributes = feature.getAttributes(null);
+
+        for (int i = 0; i < attributes.length; i++) {
+            Object object = attributes[i];
+            if (object instanceof Geometry) {
+                // do the transformation
+                Geometry geometry = (Geometry) object;
+                try {
+                    attributes[i] = tx.transform(geometry);
+                } catch (TransformException e) {
+                    String msg = "Error occured transforming "
+                            + geometry.toString();
+                    throw (IOException) new IOException(msg).initCause(e);
+                }
+            }
+        }
+
+        try {
+            return schema.create(attributes, feature.getID());
+        } catch (IllegalAttributeException e) {
+            String msg = "Error creating reprojeced feature";
+            throw (IOException) new IOException(msg).initCause(e);
+        }
+    }
+
 }
-
