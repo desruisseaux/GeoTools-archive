@@ -1735,4 +1735,26 @@ public class DataUtilities {
 
 		return collection;
 	}
+	
+	/**
+	 * Manually calculates the bounds of a feature collection.
+	 * @param collection
+	 * @return
+	 */
+	public static Envelope bounds( FeatureCollection collection ) {
+		Iterator i = collection.iterator();
+		try {
+			Envelope bounds = new Envelope();
+			if ( !i.hasNext() ) {
+				bounds.setToNull();
+				return bounds;
+			}
+			
+			bounds.init( ( (Feature) i.next() ).getBounds() );
+			return bounds;
+		}
+		finally {
+			collection.close( i );
+		}
+	}
 }
