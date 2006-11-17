@@ -33,8 +33,10 @@ public class PropertyServiceFactory implements ServiceFactory {
 				return null;
 			}
 			
-			if ( file != null)
-				return new PropertyService( catalog, params, file );
+			if ( file != null) {
+				PropertyDataStoreFactory factory = new PropertyDataStoreFactory();
+				return new PropertyService( catalog, params, file, factory );
+			}
 		}
 		
 		return null;
