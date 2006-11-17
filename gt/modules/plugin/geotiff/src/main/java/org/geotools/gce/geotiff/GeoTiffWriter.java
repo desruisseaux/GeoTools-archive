@@ -34,12 +34,12 @@ import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataEncoder;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
 import org.geotools.gce.geotiff.crs_adapters.CRS2GeoTiffMetadataAdapter;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.CRSUtilities;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -275,15 +275,7 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 		// trying to understand the direction of the first axis in order to
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final CoordinateSystem cs;
-		try {
-			cs = CRSUtilities.getCRS2D(crs).getCoordinateSystem();
-		} catch (TransformException e) {
-			final IOException ex = new IOException();
-			ex.initCause(e);
-			throw ex;
-		}
-		boolean lonFirst = !GridGeometry2D.swapXY(cs);
+		boolean lonFirst = (XAffineTransform.getSwapXY(gridToCoord) != -1);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -306,6 +298,15 @@ public final class GeoTiffWriter extends AbstractGridCoverageWriter implements
 				.getShearX());
 		metadata.setModelPixelScale(scaleModelToRasterLongitude,
 				scaleModelToRasterLatitude, 0);
+		// Alternative code, not yet enabled in order to avoid breaking code.
+        // The following code is insensitive to axis order and rotations in the
+        // 'coord' space (not in the 'grid' space, otherwise we would not take
+        // the inverse of the matrix).
+/*
+        final AffineTransform coordToGrid = gridToCoord.createInverse();
+		final double scaleModelToRasterLongitude = 1 / XAffineTransform.getScaleX0(coordToGrid);
+		final double scaleModelToRasterLatitude  = 1 / XAffineTransform.getScaleY0(coordToGrid);
+ */
 	}
 
 	/*

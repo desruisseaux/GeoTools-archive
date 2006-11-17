@@ -56,7 +56,6 @@ import javax.media.jai.RenderedOp;
 import javax.media.jai.TileCache;
 import javax.media.jai.operator.MosaicDescriptor;
 
-import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -74,6 +73,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -81,6 +81,7 @@ import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
@@ -944,11 +945,11 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			intersection.intersects(loadedTilesBoundEnv, true);
 
 			// get the transform for going from world to grid
+            final GridToEnvelopeMapper gridToEnvelopeMapper = new GridToEnvelopeMapper(
+                    new GeneralGridRange(finalLayout.getBounds()), loadedTilesBoundEnv);
+            gridToEnvelopeMapper.setGridType(PixelInCell.CELL_CORNER);
 			try {
-				final MathTransform transform = GeneralGridGeometry
-						.getTransform(
-								new GeneralGridRange(finalLayout.getBounds()),
-								loadedTilesBoundEnv, false).inverse();
+				final MathTransform transform = gridToEnvelopeMapper.createTransform().inverse();
 				final GeneralGridRange finalRange = new GeneralGridRange(
 						CRS.transform(transform, intersection));
 				// CROP

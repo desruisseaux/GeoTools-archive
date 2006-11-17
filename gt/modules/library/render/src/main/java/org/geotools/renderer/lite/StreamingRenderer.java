@@ -66,6 +66,7 @@ import org.geotools.map.MapLayer;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.renderer.GTRenderer;
@@ -229,8 +230,6 @@ public final class StreamingRenderer implements GTRenderer {
 
 	private CoordinateReferenceSystem destinationCrs;
 
-	private boolean lonFirst = true;
-
 	private boolean canTransform;
 
 	/**
@@ -318,6 +317,17 @@ public final class StreamingRenderer implements GTRenderer {
 	private void setScaleDenominator(double scaleDenominator) {
 		this.scaleDenominator = scaleDenominator;
 	}
+
+    /**
+     * Used as a fallback if {@link RendererUtilities#calculateScale} failed.
+     */
+    private void setScaleDenominator(final AffineTransform worldToScreenTransform) {
+        try {
+            setScaleDenominator(XAffineTransform.getScale(worldToScreenTransform.createInverse()));
+        } catch (NoninvertibleTransformException exception) {
+            LOGGER.log(Level.WARNING, exception.getLocalizedMessage(), exception);
+        }
+    }
 
 	/**
 	 * If you call this method from another thread than the one that called
@@ -609,7 +619,6 @@ public final class StreamingRenderer implements GTRenderer {
 		// ////////////////////////////////////////////////////////////////////
 		destinationCrs = mapArea.getCoordinateReferenceSystem();
 		mapExtent = new ReferencedEnvelope(mapArea);
-		lonFirst = !GridGeometry2D.swapXY(destinationCrs.getCoordinateSystem());
 		this.screenSize = paintArea;
 		this.worldToScreenTransform = worldToScreen;
 		error = 0;
@@ -637,17 +646,14 @@ public final class StreamingRenderer implements GTRenderer {
 			// 90 = OGC standard DPI (see SLD spec page 37)
 			setScaleDenominator(RendererUtilities.calculateScale(mapArea,
 					paintArea.width, paintArea.height, 90));
-		} catch (TransformException e) // probably either (1) no CRS (2) error
-		// xforming
+		} catch (TransformException e) // probably either (1) no CRS (2) error xforming
 		{
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			setScaleDenominator(1 / (lonFirst ? worldToScreenTransform
-					.getScaleX() : worldToScreenTransform.getShearY())); // DJB
+            setScaleDenominator(worldToScreenTransform);
 			// old method - the best we can do
 		} catch (FactoryException e) {
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			setScaleDenominator(1 / (lonFirst ? worldToScreenTransform
-					.getScaleX() : worldToScreenTransform.getShearY())); // DJB
+            setScaleDenominator(worldToScreenTransform);
 			// old method - the best we can do
 		}
 

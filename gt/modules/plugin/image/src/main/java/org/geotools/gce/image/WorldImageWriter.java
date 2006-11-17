@@ -36,11 +36,11 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
 import org.geotools.factory.Hints;
 import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
@@ -292,9 +292,9 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 		final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
 				.getCoordinateReferenceSystem());
 		final CoordinateSystem cs = crs.getCoordinateSystem();
-		final boolean lonFirst = !GridGeometry2D.swapXY(cs);
 		final AffineTransform gridToWorld = (AffineTransform) gc
 				.getGridGeometry().getGridToCoordinateSystem();
+		final boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
 
 		// /////////////////////////////////////////////////////////////////////
 		//

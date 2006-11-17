@@ -34,11 +34,11 @@ import javax.units.Unit;
 import org.geotools.coverage.Category;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.wkt.Parser;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.MetadataNameNotFoundException;
@@ -453,7 +453,7 @@ public class ArcGridReader implements GridCoverageReader {
 	private GeneralEnvelope getEnvelope() throws MismatchedDimensionException {
 		final CoordinateSystem cs = coordinateSystem.getCoordinateSystem();
 
-		final boolean lonFirst = !GridGeometry2D.swapXY(cs);
+		final boolean lonFirst = !GridToEnvelopeMapper.swapXY(cs);
 
 		final GeneralEnvelope envelope;
 		if (lonFirst)// lon, lat

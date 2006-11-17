@@ -303,6 +303,21 @@ public class GridToEnvelopeMapper {
     }
 
     /**
+     * Applies heuristic rules in order to determine if the two first axis should be interchanged.
+     *
+     * @deprecated Avoid this method as much as possible. Experience shows that this method is
+     *             often used in a context where it should not, for example in order to select
+     *             the coefficients to read in an affine transform.
+     */
+    public static boolean swapXY(final CoordinateSystem cs) {
+        if (cs!=null && cs.getDimension() >= 2) {
+            return AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&
+                   AxisDirection.EAST .equals(cs.getAxis(1).getDirection().absolute());
+        }
+        return false;
+    }
+
+    /**
      * Returns {@code true} if the two first axis should be interchanged. If
      * <code>{@linkplain #isAutomatic isAutomatic}({@linkplain #SWAP_XY})</code>
      * returns {@code true} (which is the default), then this method make the
@@ -327,11 +342,7 @@ public class GridToEnvelopeMapper {
         if (swapXY == null) {
             boolean value = false;
             if (isAutomatic(SWAP_XY)) {
-                final CoordinateSystem cs = getCoordinateSystem();
-                if (cs!=null && cs.getDimension() >= 2) {
-                    value = AxisDirection.NORTH.equals(cs.getAxis(0).getDirection().absolute()) &&
-                            AxisDirection.EAST .equals(cs.getAxis(1).getDirection().absolute());
-                }
+                value = swapXY(getCoordinateSystem());
             }
             swapXY = Boolean.valueOf(value);
         }

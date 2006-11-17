@@ -35,6 +35,7 @@ import org.geotools.coverage.processing.Operations;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.stream.IOExchange;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -183,7 +184,9 @@ public class ArcGridWriter implements GridCoverageWriter {
 			// check if the coverage needs to be resampled in order to have
 			// square pixels
 			
-			final boolean lonFirst=!GridGeometry2D.swapXY(crs.getCoordinateSystem());
+			AffineTransform gridToWorld = (AffineTransform) gc
+					.getGridGeometry().getGridToCoordinateSystem();
+			final boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
 			gc = reShapeData(((GridCoverage2D) gc), oldEnv.getLength(lonFirst?0:1), // W
 					oldEnv.getLength(lonFirst?1:0) // H
 			);
@@ -195,18 +198,15 @@ public class ArcGridWriter implements GridCoverageWriter {
 			final Envelope newEnv = gc.getEnvelope();
 
 			// trying to prepare the header
-			final CoordinateSystem cs = crs.getCoordinateSystem();
-			final AffineTransform gridToWorld = (AffineTransform) gc
+			gridToWorld = (AffineTransform) gc
 					.getGridGeometry().getGridToCoordinateSystem();
-			final boolean lonFirt = !GridGeometry2D.swapXY(cs);
 
-			final double xl = lonFirt ? newEnv.getLowerCorner().getOrdinate(0)
+			final double xl = lonFirst ? newEnv.getLowerCorner().getOrdinate(0)
 					: newEnv.getLowerCorner().getOrdinate(1);
-			final double yl = !lonFirt ? newEnv.getLowerCorner().getOrdinate(0)
+			final double yl = !lonFirst ? newEnv.getLowerCorner().getOrdinate(0)
 					: newEnv.getLowerCorner().getOrdinate(1);
 
-			final double cellsize = Math.abs(lonFirt ? gridToWorld.getScaleX()
-					: gridToWorld.getShearX());
+			final double cellsize = XAffineTransform.getScaleX0(gridToWorld);
 
 			// writing crs info
 			writeCRSInfo(crs);

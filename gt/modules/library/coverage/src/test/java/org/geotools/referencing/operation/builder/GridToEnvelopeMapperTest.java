@@ -20,6 +20,7 @@ package org.geotools.referencing.operation.builder;
 import java.util.Arrays;
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -35,11 +36,13 @@ import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.geometry.GeneralEnvelope;
 
 
 /**
- * Tests {@link GridToEnvelopeMapper}.
+ * Tests {@link GridToEnvelopeMapper}. This test appears in the coverage module instead
+ * of the referencing module because it need an implementation of {@link GridRange}.
  *
  * @since 2.3
  * @source $URL$
@@ -76,7 +79,7 @@ public class GridToEnvelopeMapperTest extends TestCase {
     /**
      * Various tests.
      */
-    public void testMapper() {
+    public void testMapper() throws NoninvertibleTransformException {
         ///////////////////////////////////////////////////////////////
         ///  Tests the initial state.
         ///
@@ -205,6 +208,8 @@ public class GridToEnvelopeMapperTest extends TestCase {
         assertEquals( 0.0,  tr3.getScaleY(), EPS);
         assertEquals(-0.05, tr3.getShearX(), EPS);
         assertEquals( 0.4,  tr3.getShearY(), EPS);
+        assertEquals( 0.05, XAffineTransform.getScaleX0(tr3), EPS);
+        assertEquals( 0.4,  XAffineTransform.getScaleY0(tr3), EPS);
         assertSame("Transform should be cached", tr3, mapper.createAffineTransform());
 
         // Tests a coordinate transformation.
@@ -213,6 +218,17 @@ public class GridToEnvelopeMapperTest extends TestCase {
         assertSame(point, tr3.transform(point, point));
         assertEquals( 4, point.y, EPS);
         assertEquals(11, point.x, EPS);
+
+        // Tests matrix inversion. Note that compared to the 'tr3' transform, the
+        // factors are not only inversed (1/0.05 = 20, 1/0.4 = 2.5). In addition,
+        // shearX and shearY are interchanged.
+        final AffineTransform tr3i = tr3.createInverse();
+        assertEquals(  0.0, tr3i.getScaleX(), EPS);
+        assertEquals(  0.0, tr3i.getScaleY(), EPS);
+        assertEquals(  2.5, tr3i.getShearX(), EPS);
+        assertEquals(-20,   tr3i.getShearY(), EPS);
+        assertEquals(  2.5, XAffineTransform.getScaleX0(tr3i), EPS);
+        assertEquals( 20,   XAffineTransform.getScaleY0(tr3i), EPS);
 
 
         ///////////////////////////////////////////////////////////////

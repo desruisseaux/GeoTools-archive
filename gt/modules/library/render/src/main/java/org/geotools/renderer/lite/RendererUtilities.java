@@ -21,9 +21,7 @@ import java.awt.geom.Point2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.coverage.grid.GeneralGridGeometry;
 import org.geotools.coverage.grid.GeneralGridRange;
-import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.JTS;
@@ -31,11 +29,13 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.resources.CRSUtilities;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.EngineeringCRS;
 import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
@@ -59,6 +59,14 @@ public final class RendererUtilities {
 			.getLogger(RendererUtilities.class.getName());
 
 	private final static DefaultGeographicCRS GeogCRS = DefaultGeographicCRS.WGS84;;
+
+    /**
+     * Helber class for building affine transforms.
+     */
+    private static final GridToEnvelopeMapper gridToEnvelopeMapper = new GridToEnvelopeMapper();
+    static {
+        gridToEnvelopeMapper.setGridType(PixelInCell.CELL_CORNER);
+    }
 
 	/**
 	 * Utilities classes should not be instantiated.
@@ -125,13 +133,15 @@ public final class RendererUtilities {
 		//
 		// //
 		try {
-			return new AffineTransform((AffineTransform) GridGeometry2D
-					.getTransform(new GeneralGridRange(paintArea), genvelope,
-							false).inverse());
+            synchronized (gridToEnvelopeMapper) {
+                gridToEnvelopeMapper.setGridRange(new GeneralGridRange(paintArea));
+                gridToEnvelopeMapper.setEnvelope(genvelope);
+                return gridToEnvelopeMapper.createAffineTransform().createInverse();
+            }
 		} catch (MismatchedDimensionException e) {
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return null;
-		} catch (org.opengis.referencing.operation.NoninvertibleTransformException e) {
+		} catch (NoninvertibleTransformException e) {
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return null;
 		}
@@ -568,7 +578,7 @@ public final class RendererUtilities {
 	 * @param paintArea
 	 *            The area to paint as a rectangle
 	 * @param destinationCrs
-	 * @return TODO add georeferenced envelope check when merge with trunk will
+	 * @todo add georeferenced envelope check when merge with trunk will
 	 *         be performed
 	 */
 	public static AffineTransform worldToScreenTransform(Envelope mapExtent,
@@ -588,11 +598,16 @@ public final class RendererUtilities {
 			newEnvelope.setCoordinateReferenceSystem(destinationCrs);
 
 			//			
-			// with this static method I can build a world to grid transform
-			// wuthout adding half of a pixel translations
-			return (AffineTransform) GeneralGridGeometry.getTransform(
-					new GeneralGridRange(paintArea), newEnvelope, false)
-					.inverse();
+			// with this method I can build a world to grid transform
+			// without adding half of a pixel translations. The cost
+            // is synchronization. The benefit is reusing the last
+            // transform (instead of creating a new one) if the grid
+            // and envelope are the same one than during last invocation.
+            synchronized (gridToEnvelopeMapper) {
+                gridToEnvelopeMapper.setGridRange(new GeneralGridRange(paintArea));
+                gridToEnvelopeMapper.setEnvelope(newEnvelope);
+            	return (AffineTransform) (gridToEnvelopeMapper.createTransform().inverse());
+            }
 
 		} catch (IndexOutOfBoundsException e) {
 			return null;

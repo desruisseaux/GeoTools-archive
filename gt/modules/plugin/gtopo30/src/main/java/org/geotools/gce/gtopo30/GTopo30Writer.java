@@ -57,6 +57,7 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
 import org.geotools.factory.Hints;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.util.NumberRange;
@@ -415,11 +416,14 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 			// specified
 			final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
 					.getCoordinateReferenceSystem());
-			boolean lonFirst = !GridGeometry2D
-					.swapXY(crs.getCoordinateSystem());
-
+/*
+ * Note from Martin: I suggest to replace all the above lines by the commented code below.
+ * The change need to be tested in order to make sure that I didn't made a mistake in the
+ * mathematic. Note that 'lonFirst' totally vanish.
+ */
 			final AffineTransform gridToWorld = (AffineTransform) gc
 					.getGridGeometry().getGridToCoordinateSystem();
+			boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
 
 			final double geospatialDx = Math.abs((lonFirst) ? gridToWorld
 					.getScaleX() : gridToWorld.getShearY());
@@ -431,6 +435,17 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 					: gridToWorld.getTranslateY();
 			final double yUpperLeft = lonFirst ? gridToWorld.getTranslateY()
 					: gridToWorld.getTranslateX();
+/*
+			final AffineTransform worldToGrid = (AffineTransform) gc
+					.getGridGeometry().getGridToCoordinateSystem().inverse();
+
+			final double geospatialDx = 1 / XAffineTransform.getScaleX0(worldToGrid);
+			final double geospatialDy = 1 / XAffineTransform.getScaleY0(worldToGrid);
+
+			// getting corner coordinates of the left upper corner
+			final double xUpperLeft = -worldToGrid.getTranslateX() * geospatialDx;
+			final double yUpperLeft = -worldToGrid.getTranslateY() * geospatialDy;
+*/
 
 			// calculating the physical resolution over x and y.
 			final int geometryWidth = gc.getGridGeometry().getGridRange()
@@ -909,10 +924,9 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 			// /////////////////////////////////////////////////////////////////////
 			final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
 					.getCoordinateReferenceSystem());
-			boolean lonFirst = !GridGeometry2D
-					.swapXY(crs.getCoordinateSystem());
 			final AffineTransform gridToWorld = (AffineTransform) gc
 					.getGridGeometry().getGridToCoordinateSystem();
+			boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
 
 			// /////////////////////////////////////////////////////////////////////
 			//

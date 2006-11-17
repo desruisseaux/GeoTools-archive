@@ -46,6 +46,8 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.styling.RasterSymbolizer;
@@ -54,6 +56,7 @@ import org.opengis.coverage.grid.GridRange;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -107,6 +110,8 @@ public final class GridCoverageRenderer {
 	private final GeneralEnvelope destinationEnvelope;
 
 	private final Rectangle destinationSize;
+
+    private final GridToEnvelopeMapper gridToEnvelopeMapper;
 
 	private final AffineTransform finalGridToWorld;
 
@@ -172,6 +177,9 @@ public final class GridCoverageRenderer {
 		// ///////////////////////////////////////////////////////////////////
 		this.destinationSize = screenSize;
 		this.destinationCRS = CRSUtilities.getCRS2D(destinationCRS);
+        gridToEnvelopeMapper = new GridToEnvelopeMapper();
+        gridToEnvelopeMapper.setGridType(PixelInCell.CELL_CORNER);
+        gridToEnvelopeMapper.setGridRange(new GeneralGridRange(destinationSize));
 		destinationEnvelope = new GeneralEnvelope(new ReferencedEnvelope(
 				envelope, destinationCRS));
 		// ///////////////////////////////////////////////////////////////////
@@ -183,9 +191,8 @@ public final class GridCoverageRenderer {
 		// source coverage.
 		//
 		// ///////////////////////////////////////////////////////////////////
-		finalGridToWorld = new AffineTransform((AffineTransform) GridGeometry2D
-				.getTransform(new GeneralGridRange(destinationSize),
-						destinationEnvelope, false));
+        gridToEnvelopeMapper.setEnvelope(destinationEnvelope);
+		finalGridToWorld = new AffineTransform(gridToEnvelopeMapper.createAffineTransform());
 		finalWorldToGrid = finalGridToWorld.createInverse();
 
 		// ///////////////////////////////////////////////////////////////////
@@ -314,15 +321,13 @@ public final class GridCoverageRenderer {
 		// ///////////////////////////////////////////////////////////////////
 		AffineTransform finalGridToWorldInGCCRS;
 		if (!GCCRSToDeviceCRSTransform.isIdentity()) {
-			finalGridToWorldInGCCRS = new AffineTransform(
-					(AffineTransform) GridGeometry2D.getTransform(
-							new GeneralGridRange(destinationSize),
-							destinationEnvelopeInSourceGCCRS, false));
+            assert new GeneralGridRange(destinationSize).equals(gridToEnvelopeMapper.getGridRange());
+            gridToEnvelopeMapper.setEnvelope(destinationEnvelopeInSourceGCCRS);
+			finalGridToWorldInGCCRS = new AffineTransform(gridToEnvelopeMapper.createAffineTransform());
 		} else {
 			finalGridToWorldInGCCRS = new AffineTransform(finalGridToWorld);
 		}
-		final boolean lonFirst = !GridGeometry2D.swapXY(CRSUtilities.getCRS2D(
-				sourceCoverageCRS).getCoordinateSystem());
+		final boolean lonFirst = (XAffineTransform.getSwapXY(finalGridToWorldInGCCRS) != -1);
 
 		// ///////////////////////////////////////////////////////////////////
 		//
