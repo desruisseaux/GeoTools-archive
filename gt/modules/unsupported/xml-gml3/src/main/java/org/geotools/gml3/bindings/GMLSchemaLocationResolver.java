@@ -215,6 +215,13 @@ public class GMLSchemaLocationResolver implements XSDSchemaLocationResolver {
             }
         }
 
+        //handle simple features profile as well
+        if ("http://www.opengis.net/gml".equals(namespaceURI)) {
+            if (schemaLocationURI.endsWith("gmlsf.xsd")) {
+                return getClass().getResource("gmlsf.xsd").toString();
+            }
+        }
+
         return null;
     }
 }
