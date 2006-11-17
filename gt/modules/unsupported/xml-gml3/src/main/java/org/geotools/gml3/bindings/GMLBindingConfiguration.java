@@ -45,6 +45,8 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
             GMLCoordinatesTypeBinding.class);
         //container.registerComponentImplementation(GML.COORDTYPE,CoordTypeBinding.class);
         container.registerComponentImplementation(GML.CoordType, GMLCoordTypeBinding.class);
+        container.registerComponentImplementation(GML.CurvePropertyType,
+            CurvePropertyTypeBinding.class);
         container.registerComponentImplementation(GML.DirectPositionListType,
             DirectPositionListTypeBinding.class);
         container.registerComponentImplementation(GML.DirectPositionType,
@@ -62,6 +64,8 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(GML.LineStringPropertyType,
             LineStringPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.LineStringType, LineStringTypeBinding.class);
+        container.registerComponentImplementation(GML.MultiCurvePropertyType,
+            MultiCurvePropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiLineStringPropertyType,
             MultiLineStringPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiLineStringType,
@@ -73,6 +77,8 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
             MultiPolygonPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiPolygonType,
             MultiPolygonTypeBinding.class);
+        container.registerComponentImplementation(GML.MultiSurfacePropertyType,
+            MultiSurfacePropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PointArrayPropertyType,
             PointArrayPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PointPropertyType,
@@ -81,5 +87,7 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(GML.PolygonPropertyType,
             PolygonPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PolygonType, PolygonTypeBinding.class);
+        container.registerComponentImplementation(GML.SurfacePropertyType,
+            SurfacePropertyTypeBinding.class);
     }
 }
