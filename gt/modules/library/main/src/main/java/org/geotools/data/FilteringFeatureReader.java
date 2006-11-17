@@ -64,6 +64,13 @@ public class FilteringFeatureReader implements FeatureReader {
         next = null;
     }
 
+    /**
+     * @return THe delegate reader.
+     */
+    public FeatureReader getDelegate() {
+    	return featureReader;
+    }
+    
     public Feature next()
         throws IOException, IllegalAttributeException, NoSuchElementException {
         Feature f = null;
