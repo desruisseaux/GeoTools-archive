@@ -44,9 +44,12 @@ import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
+import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.opengis.filter.Filter;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.util.SimpleInternationalString;
@@ -89,7 +92,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author jgarnett
  * @source $URL$
  */
-final class ActiveTypeEntry implements TypeEntry {
+public abstract class ActiveTypeEntry implements TypeEntry {
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.store");
     
     /**
@@ -98,7 +101,7 @@ final class ActiveTypeEntry implements TypeEntry {
      * We only refer to partent as a DataSource to keep hacks down.
      * </p>
      */
-    DataStore parent;
+    protected DataStore parent;
     private final FeatureType schema;    
     private final Map metadata;    
     private FeatureListenerManager listeners = new FeatureListenerManager();
@@ -125,7 +128,6 @@ final class ActiveTypeEntry implements TypeEntry {
      */
     public InternationalString getDisplayName() {
         return new SimpleInternationalString( schema.getTypeName() );
-        
     }
 
     /**
@@ -144,7 +146,7 @@ final class ActiveTypeEntry implements TypeEntry {
      * @throws IOException
      */
     public FeatureType getFeatureType() {
-        return null;
+        return schema;
     }
     /**
      * Bounding box for associated Feature Collection, will be calcualted as needed.
@@ -153,12 +155,12 @@ final class ActiveTypeEntry implements TypeEntry {
      * is used to provide this reprojection.
      * </p>
      */
-    public synchronized Envelope getBounds() {        
-        if( bounds != null ) {
-            bounds = createBounds();            
-        }
-        return bounds;        
-    }
+//    public synchronized Envelope getBounds() {        
+//        if( bounds != null ) {
+//            bounds = createBounds();            
+//        }
+//        return bounds;        
+//    }
     /**
      * Override to provide your own optimized calculation of bbox.
      * <p>
@@ -166,62 +168,62 @@ final class ActiveTypeEntry implements TypeEntry {
      * 
      * @return BBox in lat long
      */
-    protected Envelope createBounds() {
-        Envelope bbox;
-        try {
-            FeatureSource source = getFeatureSource();
-            bbox = source.getBounds();
-            if( bbox == null ){
-                bbox = source.getFeatures().getBounds();
-            }
-            try {
-                CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
-                bbox = JTS.toGeographic(bbox,cs);
-            }
-            catch (Error badRepoject ) {
-                badRepoject.printStackTrace();
-            }
-        } catch (Exception e) {
-            bbox = new Envelope();
-        }        
-        return bbox;        
-    }
+//    protected Envelope createBounds() {
+//        Envelope bbox;
+//        try {
+//            FeatureSource source = getFeatureSource();
+//            bbox = source.getBounds();
+//            if( bbox == null ){
+//                bbox = source.getFeatures().getBounds();
+//            }
+//            try {
+//                CoordinateReferenceSystem cs = source.getSchema().getDefaultGeometry().getCoordinateSystem();
+//                bbox = JTS.toGeographic(bbox,cs);
+//            }
+//            catch (Error badRepoject ) {
+//                badRepoject.printStackTrace();
+//            }
+//        } catch (Exception e) {
+//            bbox = new Envelope();
+//        }        
+//        return bbox;        
+//    }
     
     /**
      * TODO summary sentence for getCount ...
      * 
      * @see org.geotools.data.TypeEntry#getCount()
      */
-    public int getCount() {
-        if( count != -1 ) return count;
-        try {
-            FeatureSource source = getFeatureSource();
-            count = source.getCount( Query.ALL );
-            if( count == -1 ){
-                count = source.getFeatures().size();
-            }
-        } catch (IOException e) {
-            bounds = new Envelope();
-        }
-        return count;
-    }
+//    public int getCount() {
+//        if( count != -1 ) return count;
+//        try {
+//            FeatureSource source = getFeatureSource();
+//            count = source.getCount( Query.ALL );
+//            if( count == -1 ){
+//                count = source.getFeatures().size();
+//            }
+//        } catch (IOException e) {
+//            bounds = new Envelope();
+//        }
+//        return count;
+//    }
  
     /**
      * Get unique data name for this CatalogEntry.
      * 
      * @return namespace:typeName
      */
-    public String getDataName() {
-        return schema.getNamespace().toString() + ":"+ schema.getTypeName();
-    }
-    
-    public Object resource() {
-        try {
-            return getFeatureSource();
-        } catch (IOException e) {
-            return null;
-        }
-    }
+//    public String getDataName() {
+//        return schema.getNamespace().toString() + ":"+ schema.getTypeName();
+//    }
+//    
+//    public Object resource() {
+//        try {
+//            return getFeatureSource();
+//        } catch (IOException e) {
+//            return null;
+//        }
+//    }
     
     /**
      * Metadata names from metadata.keySet().
@@ -249,9 +251,9 @@ final class ActiveTypeEntry implements TypeEntry {
     public String getTypeName() {
         return schema.getTypeName();
     }
-    public FeatureType getSchema() {
-        return schema;
-    }
+//    public FeatureType getSchema() {
+//        return schema;
+//    }
     /**
      * Create a new FeatueSource allowing interaction with content.
      * <p>
@@ -268,9 +270,9 @@ final class ActiveTypeEntry implements TypeEntry {
      * 
      * @return FeatureLocking allowing access to content.
      */
-    public FeatureSource getFeatureSource() throws IOException {        
-        return createFeatureSource();
-    }
+//    public FeatureSource getFeatureSource() throws IOException {        
+//        return createFeatureSource();
+//    }
     /**
      * Access a FeatureReader providing access to Feature information.
      * <p>
@@ -288,69 +290,86 @@ final class ActiveTypeEntry implements TypeEntry {
      * </p>
      */
     public FeatureReader reader(Query query, Transaction transaction) throws IOException {
-        Filter filter = query.getFilter();
-        String typeName = query.getTypeName();
-        String propertyNames[] = query.getPropertyNames();
 
-        if (filter == null) {
-            throw new NullPointerException("getFeatureReader requires Filter: "
-                + "did you mean Filter.INCLUDE?");
-        }
-        if( typeName == null ){
-            throw new NullPointerException(
-                "getFeatureReader requires typeName: "
-                + "use getTypeNames() for a list of available types");
-        }
-        if (transaction == null) {
-            throw new NullPointerException(
-                "getFeatureReader requires Transaction: "
-                + "did you mean to use Transaction.AUTO_COMMIT?");
-        }
-        FeatureType featureType = schema;
-
-        if( propertyNames != null || query.getCoordinateSystem() != null ){
-            try {
-                featureType = DataUtilities.createSubType( featureType, propertyNames, query.getCoordinateSystem() );
-            } catch (SchemaException e) {
-                LOGGER.log( Level.FINEST, e.getMessage(), e);
-                throw new DataSourceException( "Could not create Feature Type for query", e );
-
-            }
-        }
-        if ( filter == Filter.EXCLUDE || filter.equals( Filter.EXCLUDE )) {
-            return new EmptyFeatureReader(featureType);
-        }
-        //GR: allow subclases to implement as much filtering as they can,
-        //by returning just it's unsupperted filter
-        filter = getUnsupportedFilter( filter);
-        if(filter == null){
-            throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.INCLUDE?");
-        }
-
-        // This calls our subclass "simple" implementation
-        // All other functionality will be built as a reader around
-        // this class
-        //
-        FeatureReader reader = createReader( query);
-
-        if (!filter.equals( Filter.INCLUDE ) ) {
-            reader = new FilteringFeatureReader(reader, filter);
-        }
-
-        if (transaction != Transaction.AUTO_COMMIT) {
-            Diff diff = state(transaction).diff();
-            reader = new DiffFeatureReader(reader, diff);
-        }
-
-        if (!featureType.equals(reader.getFeatureType())) {
-            LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
-            reader = new ReTypeFeatureReader(reader, featureType);
-        }
-
-        if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
-                reader = new MaxFeatureReader(reader, query.getMaxFeatures());
-        }
-        return reader;
+    	if ( transaction == null ) {
+    		throw new NullPointerException( "Transaction null, did you mean Transaction.AUTO_COMMIT" );
+    	}
+    	
+    	FeatureCollection features = createFeatureSource().getFeatures( query );
+    	FeatureReader reader = new DelegateFeatureReader(
+			features.getSchema(), features.features()
+    	);
+    	
+    	//wrap in diff reader if transaction specified
+    	if ( !transaction.equals( Transaction.AUTO_COMMIT) ) {
+    		reader = new DiffFeatureReader( reader, state( transaction ).diff() );
+    	}
+    	
+    	return reader;
+    	
+//        Filter filter = query.getFilter();
+//        String typeName = query.getTypeName();
+//        String propertyNames[] = query.getPropertyNames();
+//
+//        if (filter == null) {
+//            throw new NullPointerException("getFeatureReader requires Filter: "
+//                + "did you mean Filter.INCLUDE?");
+//        }
+//        if( typeName == null ){
+//            throw new NullPointerException(
+//                "getFeatureReader requires typeName: "
+//                + "use getTypeNames() for a list of available types");
+//        }
+//        if (transaction == null) {
+//            throw new NullPointerException(
+//                "getFeatureReader requires Transaction: "
+//                + "did you mean to use Transaction.AUTO_COMMIT?");
+//        }
+//        FeatureType featureType = schema;
+//
+//        if( propertyNames != null || query.getCoordinateSystem() != null ){
+//            try {
+//                featureType = DataUtilities.createSubType( featureType, propertyNames, query.getCoordinateSystem() );
+//            } catch (SchemaException e) {
+//                LOGGER.log( Level.FINEST, e.getMessage(), e);
+//                throw new DataSourceException( "Could not create Feature Type for query", e );
+//
+//            }
+//        }
+//        if ( filter == Filter.EXCLUDE || filter.equals( Filter.EXCLUDE )) {
+//            return new EmptyFeatureReader(featureType);
+//        }
+//        //GR: allow subclases to implement as much filtering as they can,
+//        //by returning just it's unsupperted filter
+//        filter = getUnsupportedFilter( filter);
+//        if(filter == null){
+//            throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.INCLUDE?");
+//        }
+//
+//        // This calls our subclass "simple" implementation
+//        // All other functionality will be built as a reader around
+//        // this class
+//        //
+//        FeatureReader reader = createReader( query);
+//
+//        if (!filter.equals( Filter.INCLUDE ) ) {
+//            reader = new FilteringFeatureReader(reader, filter);
+//        }
+//
+//        if (transaction != Transaction.AUTO_COMMIT) {
+//            Diff diff = state(transaction).diff();
+//            reader = new DiffFeatureReader(reader, diff);
+//        }
+//
+//        if (!featureType.equals(reader.getFeatureType())) {
+//            LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
+//            reader = new ReTypeFeatureReader(reader, featureType);
+//        }
+//
+//        if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
+//                reader = new MaxFeatureReader(reader, query.getMaxFeatures());
+//        }
+//        return reader;
     }
 
     TypeDiffState state(Transaction transaction) {
@@ -383,27 +402,29 @@ final class ActiveTypeEntry implements TypeEntry {
     //
     // Start of Overrides
     //    
+    public abstract FeatureSource createFeatureSource();
+    
     /**
      * Override to provide readonly access
      * @param schema
      * @return FeatureSource backed by this TypeEntry.
      */
-    protected FeatureSource createFeatureSource() {
-        return new AbstractFeatureSource() {
-            public DataStore getDataStore() {
-                return parent;
-            }
-            public void addFeatureListener( FeatureListener listener ) {
-                listeners.addFeatureListener( this, listener );
-            }
-            public void removeFeatureListener( FeatureListener listener ) {
-                listeners.addFeatureListener( this, listener );
-            }
-            public FeatureType getSchema() {
-                return schema;
-            }
-        };
-    }
+//    protected FeatureSource createFeatureSource() {
+//        return new AbstractFeatureSource() {
+//            public DataStore getDataStore() {
+//                return parent;
+//            }
+//            public void addFeatureListener( FeatureListener listener ) {
+//                listeners.addFeatureListener( this, listener );
+//            }
+//            public void removeFeatureListener( FeatureListener listener ) {
+//                listeners.addFeatureListener( this, listener );
+//            }
+//            public FeatureType getSchema() {
+//                return schema;
+//            }
+//        };
+//    }
     
     /**
      * Create the FeatureSource, override for your own custom implementation.

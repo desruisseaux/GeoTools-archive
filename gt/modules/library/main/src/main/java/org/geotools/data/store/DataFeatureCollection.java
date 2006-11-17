@@ -24,9 +24,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
+import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.DefaultFeatureType;
@@ -77,6 +80,9 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public abstract class DataFeatureCollection implements FeatureCollection {
     
+	/** logger */
+	static Logger LOGGER = Logger.getLogger( "org.geotools.data" );
+	
     /** Internal listener storage list */
     private List listeners = new ArrayList(2);
 
@@ -121,6 +127,10 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         fireChange(features, type);
     }
     
+    public FeatureReader reader() throws IOException {
+    	return new DelegateFeatureReader( getSchema(), features() );
+    }
+    
     //
     // Feature Results methods
     // 
@@ -128,13 +138,11 @@ public abstract class DataFeatureCollection implements FeatureCollection {
     //    
     public abstract FeatureType getSchema();
 
-    public abstract FeatureReader reader() throws IOException;;
-
     public abstract Envelope getBounds();
 
     public abstract int getCount() throws IOException;;
 
-    public abstract FeatureCollection collection() throws IOException;
+    //public abstract FeatureCollection collection() throws IOException;
 
     //
     // Additional Subclass "hooks"
@@ -197,7 +205,14 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      * Iterator may (or may) not support modification.
      */
     final public Iterator iterator() {
-    	Iterator iterator = openIterator();
+    	Iterator iterator;
+		try {
+			iterator = openIterator();
+		} 
+		catch (IOException e) {
+			throw new RuntimeException( e );
+		}
+		
     	open.add( iterator );
     	return iterator;    	    	
     }
@@ -211,7 +226,8 @@ public abstract class DataFeatureCollection implements FeatureCollection {
      * 
      * @return Iterator, should be closed closeIterator 
      */
-    protected Iterator openIterator(){
+    protected Iterator openIterator() throws IOException
+    {    	
     	try {
             return new FeatureWriterIterator( writer() );
         }
@@ -227,16 +243,18 @@ public abstract class DataFeatureCollection implements FeatureCollection {
         }        
     }
 
-    public void close( FeatureIterator iterator) {
-    	iterator.close();
-        open.remove( iterator );        
-    }
-
     final public void close( Iterator close ) {
-    	closeIterator( close );
-        open.remove( close );
+    	try {
+			closeIterator( close );
+		} 
+    	catch (IOException e) {
+			LOGGER.log( Level.WARNING, "Error closing iterator", e );
+		}
+    	open.remove( close );
     }   
-    protected void closeIterator( Iterator close ){
+    
+    protected void closeIterator( Iterator close ) throws IOException
+    {
     	if( close == null ){
             // iterator probably failed during consturction !
         }
@@ -249,6 +267,13 @@ public abstract class DataFeatureCollection implements FeatureCollection {
             iterator.close(); // only needs package visability
         }
     }
+    
+    public void close( FeatureIterator iterator) {
+    	iterator.close();
+        open.remove( iterator );        
+    }
+
+   
     
     /** Default implementation based on getCount() - this may be expensive */
     public int size() {

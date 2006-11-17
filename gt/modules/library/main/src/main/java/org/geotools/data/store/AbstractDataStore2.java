@@ -98,7 +98,7 @@ import org.opengis.filter.Filter;
  * @source $URL$
  */
 public class AbstractDataStore2 implements DataStore {
-    /** The logger for the filter module. */
+    /** The logger for the data module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
 
     /**
@@ -180,7 +180,7 @@ public class AbstractDataStore2 implements DataStore {
     /** Retrive schema information for typeName */
     public FeatureType getSchema(String typeName)
         throws IOException{
-        return entry( typeName ).getSchema();
+        return entry( typeName ).getFeatureType();
     }
 
     /**
@@ -222,7 +222,7 @@ public class AbstractDataStore2 implements DataStore {
      */
     public FeatureSource getFeatureSource( final String typeName )
         throws IOException {        
-        return entry( typeName ).getFeatureSource();        
+        return entry( typeName ).createFeatureSource();        
     }
     
         
@@ -243,9 +243,14 @@ public class AbstractDataStore2 implements DataStore {
      * </p>
      */
     public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
-        String typeName = query.getTypeName();
-        return entry( typeName ).reader( query, transaction );
-    }
+		if( query.getTypeName() == null ){
+		      throw new NullPointerException(
+		          "getFeatureReader requires typeName: "
+		      + "use getTypeNames() for a list of available types");
+		}
+		ActiveTypeEntry entry = entry( query.getTypeName() );
+		return entry.reader( query, transaction );
+	}
 
     /* (non-Javadoc)
      * @see org.geotools.data.DataStore#getFeatureWriter(java.lang.String, org.geotools.filter.Filter, org.geotools.data.Transaction)

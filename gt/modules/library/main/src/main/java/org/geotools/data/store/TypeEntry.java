@@ -64,18 +64,18 @@ public interface TypeEntry {
     /**
      * @return user name for this feature collection
      */
-    public InternationalString getDisplayName();
+    InternationalString getDisplayName();
     
     /**
      * @return Description of this feature collection
      */
-    public InternationalString getDescription();
+    InternationalString getDescription();
     
     /**
      * @return Schema of this feature collection
      * @throws IOException If resoruce is unavailable
      */
-    public FeatureType getFeatureType() throws IOException;
+    FeatureType getFeatureType() throws IOException;
         
     /**
      * Bounding box for associated Feature Collection, will be calcualted as needed.
@@ -85,12 +85,12 @@ public interface TypeEntry {
      * </p>
      * @return Enveloper for this FeatureCollection/FeatureType
      */
-    public Envelope getBounds();
+    //Envelope getBounds();
     
     /** Number of features in associated Feature Collection, will be calcualted as needed 
      * @return number of features, may block while value is calculated, -1 indicates resource is unavailable
      */
-    public int getCount();
+    //public int getCount();
     
     /**
      * Create a new FeatueSource allowing interaction with content.
@@ -109,7 +109,8 @@ public interface TypeEntry {
      * @return FeatureLocking allowing access to content.
      * @throws IOException
      */
-    public FeatureSource getFeatureSource() throws IOException;
+    //FeatureSource getFeatureSource() throws IOException;
+    FeatureSource createFeatureSource() throws IOException;
     
     /**
      * Change notifcation
@@ -117,14 +118,14 @@ public interface TypeEntry {
      * @param newFeature
      * @param transaction
      */
-    public void fireAdded( Feature newFeature, Transaction transaction );
+    void fireAdded( Feature newFeature, Transaction transaction );
     /**
      * Change notifcation
      * 
      * @param removedFeature
      * @param transaction
      */
-    public void fireRemoved( Feature removedFeature, Transaction transaction );
+    void fireRemoved( Feature removedFeature, Transaction transaction );
     /**
      * Change notifcation
      * 
@@ -132,7 +133,7 @@ public interface TypeEntry {
      * @param after
      * @param transaction
      */
-    public void fireChanged( Feature before, Feature after, Transaction transaction ); 
+    void fireChanged( Feature before, Feature after, Transaction transaction ); 
     
     /**
      * Equals based only on resource definition information (not connection information).
@@ -141,7 +142,7 @@ public interface TypeEntry {
      * @param obj
      * @return true if TypeEntry represents the same resource
      */
-    public boolean equals( Object obj );
+    boolean equals( Object obj );
 
     /**
      * This hashcode is *VERY* important!
@@ -161,6 +162,6 @@ public interface TypeEntry {
      * @see java.lang.Object#hashCode()
      * @return hashCode based on resource definition
      */
-    public int hashCode();
+    int hashCode();
 
 }

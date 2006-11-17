@@ -229,6 +229,7 @@ public class TypeDiffState implements State {
      * @throws IOException If typeName is not Manged by this Tansaction State
      */
     public synchronized FeatureReader reader() throws IOException {
+    	
         return new DiffFeatureReader( entry.reader( Query.ALL, transaction ), diffMap );
     }
 
