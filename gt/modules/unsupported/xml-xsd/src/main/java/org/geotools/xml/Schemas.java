@@ -202,7 +202,7 @@ public class Schemas {
 
     /**
      * Returns a list of all child element declarations of the specified
-     * element.
+     * element, no order is guaranteed.
      *
      * @param element The parent element.
      *
@@ -218,7 +218,7 @@ public class Schemas {
 
     /**
      * Returns a list of all child element declarations of the specified
-     * type.
+     * type, no order is guaranteed.
      *
      * @param type The type.
      *
@@ -250,7 +250,7 @@ public class Schemas {
 
     /**
      * Returns a list of all child element particles that corresponde to element declarations of 
-     * the specified type.
+     * the specified type, no order is guaranteed.
      * <p>
      * The <code>includeParents</code> flag controls if this method should
      * returns those elements defined on parent types.
@@ -260,10 +260,11 @@ public class Schemas {
      * @param includeParents flag indicating if parent types should be processed
      *  
      * @return A list of {@link XSDParticle}.
+     * TODO: make this return a set.
      */
     public static final List getChildElementParticles( XSDTypeDefinition type, boolean includeParents ) {
-        final ArrayList particles = new ArrayList();
-
+    	//use a set to ensure that duplicates dont occur as a result of subclassing.
+        final HashSet particles = new HashSet();
         TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
             public boolean visit(XSDTypeDefinition type) {
                 //simple types dont have children
@@ -296,13 +297,13 @@ public class Schemas {
             visitor.visit(type);
         }
 
-        return particles;
+        return new ArrayList( particles );
         
     }
     
     /**
      * Returns a list of all child element declarations of the specified
-     * type.
+     * type, no order is guaranteed.
      * <p>
      *         The <code>includeParents</code> flag controls if this method should
      * returns those elements defined on parent types.
