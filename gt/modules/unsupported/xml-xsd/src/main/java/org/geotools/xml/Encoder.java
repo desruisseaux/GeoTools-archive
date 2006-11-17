@@ -5,10 +5,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,6 +30,7 @@ import org.geotools.xml.impl.BindingFactoryImpl;
 import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.BindingPropertyExtractor;
 import org.geotools.xml.impl.BindingWalker;
+import org.geotools.xml.impl.BindingWalkerFactoryImpl;
 import org.geotools.xml.impl.ElementEncodeExecutor;
 import org.geotools.xml.impl.ElementEncoder;
 import org.geotools.xml.impl.GetPropertyExecutor;
@@ -71,6 +74,14 @@ public class Encoder {
 	/** document serializer **/
 	private XMLSerializer serializer;
 	
+	/** schema location */
+	private HashMap schemaLocations;
+	
+	/**
+	 * Logger logger;
+	 */
+	private Logger logger;
+	
 	public Encoder(Configuration configuration, XSDSchema schema) {
 		this.schema = schema;
 		
@@ -99,11 +110,41 @@ public class Encoder {
         BindingPropertyExtractor extractor = new BindingPropertyExtractor( bindingLoader, context );        
         context.registerComponentInstance( extractor );
         
+        BindingWalkerFactoryImpl bwFactory = new BindingWalkerFactoryImpl( bindingLoader, context );
+        context.registerComponentInstance( bwFactory );
+        
         //pass the context off to the configuration
 		context = configuration.setupContext(context);
 		encoder.setContext( context );
 		extractor.setContext( context );
+		bwFactory.setContext( context );
 		
+		//schema location setup
+		schemaLocations = new HashMap();
+		
+		 // get a logger from the context
+        logger = (Logger) context.getComponentInstanceOfType(Logger.class);
+
+        if (logger == null) {
+            //create a default
+            logger = Logger.getLogger("org.geotools.xml");
+            context.registerComponentInstance(logger);
+        }
+
+	}
+	
+	/**
+	 * Sets the schema location for a particular namespace uri.
+	 * <p>
+	 * Registering a schema location will include it on the "schemaLocation" attribute of the 
+	 * root element of the encoding.
+	 * </p>
+	 * @param namespaceURI A namespace uri.
+	 * @param location A schema location.
+	 *
+	 */
+	public void setSchemaLocation( String namespaceURI, String location ) {
+		schemaLocations.put( namespaceURI, location );
 	}
 	
 	public void write(Object object, QName name, OutputStream out) 
@@ -135,7 +176,6 @@ public class Encoder {
 			
 			namespaces.declarePrefix( pre != null ? pre : "" , ns );
 		}
-		//serializer.startPrefixMapping(null,schema.getTargetNamespace());
 		
 		//create the document
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance(); 
@@ -145,7 +185,6 @@ public class Encoder {
 		catch (ParserConfigurationException e) {
 			new IOException().initCause(e);
 		}
-		
 		//maintain a stack of (encoding,element declaration pairs)
 		Stack encoded = new Stack();
 		encoded.add(new EncodingEntry(object,index.getElementDeclaration(name)));
@@ -211,6 +250,33 @@ public class Encoder {
 				}
 				
 				//write out the leading edge of the element
+				if ( schemaLocations != null ) {
+					//root element, add schema locations if set
+					if ( !schemaLocations.isEmpty() ) {
+						//declare the schema instance mapping
+						serializer.startPrefixMapping( "xsi", XSDUtil.SCHEMA_INSTANCE_URI_2001 );
+						serializer.endPrefixMapping( "xsi" );
+						
+						StringBuffer schemaLocation = new StringBuffer();
+						for ( Iterator e = schemaLocations.entrySet().iterator(); e.hasNext(); ) {
+							Map.Entry tuple = (Map.Entry) e.next();
+							String namespaceURI = (String) tuple.getKey();
+							String location = (String) tuple.getValue();
+							
+							schemaLocation.append( namespaceURI + " " + location );
+							if ( e.hasNext() ) {
+								schemaLocation.append( " " );
+							}
+						}
+						
+						entry.encoding.setAttributeNS( 
+							XSDUtil.SCHEMA_INSTANCE_URI_2001, "xsi:schemaLocation", schemaLocation.toString() 
+						);
+					}
+					
+					schemaLocations = null;
+				}
+				
 				start(entry.encoding);
 				
 				//get children by processing propertyExtractor "extension point"
@@ -250,6 +316,19 @@ public class Encoder {
 							}
 							
 							Object obj = tuple[ 1 ];
+							
+							if ( obj == null ) {
+								if ( particle.getMinOccurs() == 0 ) {
+									//cool
+									continue;
+								}
+								else {
+									//log an error
+									logger.warning( 
+										"Property " + ns + ":"  + local + " not found but minoccurs > 0 "
+									);
+								}
+							}
 							
 							if ( particle.getMaxOccurs() == -1 || particle.getMaxOccurs() > 1 ) {
 								//may have a collection or array, unwrap it
@@ -381,9 +460,8 @@ public class Encoder {
 		
 		String qName = element.getLocalName();
 		
-		if ( namespaces.getPrefix( uri != null ? uri : namespaces.getURI( "" ) ) != null ) {
-			qName = namespaces.getPrefix( uri ) + ":" + qName;
-		}
+		uri = uri != null ? uri : namespaces.getURI( "" );
+		qName = namespaces.getPrefix( uri ) + ":" + qName;
 		
 		DOMAttributes atts = new DOMAttributes(element.getAttributes());
 		serializer.startElement(uri,local,qName,atts);
@@ -405,9 +483,19 @@ public class Encoder {
 				end((Element)node);
 			}
 		}
+		
+		//push a new context for children, declaring the default prefix to be the one of this 
+		// element
+		namespaces.pushContext();
+		if ( uri != null ) {
+			namespaces.declarePrefix( "", uri );	
+		}
 	}
 	
 	protected void end(Element element) throws SAXException {
+		//push off last context
+		namespaces.popContext();
+		
 		String uri = element.getNamespaceURI();
 		String local = element.getLocalName();
 		
