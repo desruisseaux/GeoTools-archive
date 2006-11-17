@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LayerSet Name="Images" ShowOnlyOneLayer="false" ShowAtStartup="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="LayerSet.xsd">
+<LayerSet Name="Images" ShowOnlyOneLayer="false"
+          ShowAtStartup="true"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xsi:noNamespaceSchemaLocation="LayerSet.xsd">
+                    
 	<ChildLayerSet Name="NASA Landsat Imagery" ShowOnlyOneLayer="false" ShowAtStartup="true">
 		<QuadTileSet ShowAtStartup="true">
 			<Name>NLT Landsat7 (Visible Color)</Name>
