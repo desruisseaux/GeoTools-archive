@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author jeichar
  * 
  * TODO Check for a cleaner way to do
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/gml/src/org/geotools/data/gml/GMLDataStore.java $
+ * @source $URL$
  */
 public class FileGMLDataStore extends AbstractDataStore {
 

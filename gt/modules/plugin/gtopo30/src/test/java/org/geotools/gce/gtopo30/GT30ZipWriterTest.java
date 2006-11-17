@@ -35,7 +35,7 @@ import org.opengis.coverage.grid.GridCoverageWriter;
  * complete set of files for the GTOPO30 format in a single zip package.
  * 
  * @author Simone Giannecchini
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/test/org/geotools/gce/gtopo30/GT30ZipWriterTest.java $
+ * @source $URL$
  */
 public class GT30ZipWriterTest extends GT30TestBase {
 	/**

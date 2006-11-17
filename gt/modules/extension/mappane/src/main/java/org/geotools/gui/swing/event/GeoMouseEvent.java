@@ -48,7 +48,7 @@ import org.geotools.geometry.GeneralDirectPosition;
  * &nbsp;}
  * </pre></blockquote>
  *
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/module/migrate/src/org/geotools/gui/swing/event/GeoMouseEvent.java $
+ * @source $URL$
  * @version $Id$
  * @author Cameron Shorter
  */

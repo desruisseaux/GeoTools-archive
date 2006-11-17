@@ -50,7 +50,7 @@ import org.geotools.util.ProgressListener;
 
 /**
  * @since 2.2.0
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureCollection.java $
+ * @source $URL$
  */
 public class JDBCFeatureCollection extends DefaultFeatureResults {
     /** The logger for the filter module. */

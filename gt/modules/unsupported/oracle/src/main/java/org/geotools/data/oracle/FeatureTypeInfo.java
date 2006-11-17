@@ -30,7 +30,7 @@ import org.geotools.feature.FeatureType;
  * Stores information about known FeatureTypes.
  *
  * @author Sean Geoghegan, Defence Science and Technology Organisation.
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/FeatureTypeInfo.java $
+ * @source $URL$
  */
 public class FeatureTypeInfo {
 	private String featureTypeName;

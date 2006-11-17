@@ -43,8 +43,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * Operation applied only on image's colors. This operation work only for source
  * image using an {@link IndexColorModel}.
  * 
- * @source $URL: http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/module/coverage/src/org/geotools/coverage/processing/operation/IndexColorOperation.java $
- * @version $Id: IndexColorOperation.java 18352 2006-03-01 06:13:42Z desruisseaux $
+ * @source $URL$
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 abstract class IndexColorOperation extends Operation2D {

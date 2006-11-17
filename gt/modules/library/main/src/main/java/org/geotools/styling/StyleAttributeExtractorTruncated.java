@@ -37,7 +37,7 @@ import org.geotools.filter.FilterAttributeExtractor;
  *     use this (StyleAttributeExtractorTruncated).
  *
  * @author dblasby
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/src/org/geotools/styling/StyleAttributeExtractor.java $
+ * @source $URL$
  */
 public class StyleAttributeExtractorTruncated extends StyleAttributeExtractor
     implements StyleVisitor {

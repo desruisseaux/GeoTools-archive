@@ -61,7 +61,7 @@ import org.opengis.filter.Filter;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureLocking.java $
+ * @source $URL$
  */
 public class JDBCFeatureLocking extends JDBCFeatureStore
     implements FeatureLocking {

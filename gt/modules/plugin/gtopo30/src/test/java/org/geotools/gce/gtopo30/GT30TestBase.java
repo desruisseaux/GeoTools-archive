@@ -14,7 +14,7 @@ import org.geotools.resources.TestData;
 /**
  * @author Simone Giannecchini
  * 
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/test/org/geotools/gce/gtopo30/GT30TestBase.java $
+ * @source $URL$
  */
 public abstract class GT30TestBase extends TestCase {
 

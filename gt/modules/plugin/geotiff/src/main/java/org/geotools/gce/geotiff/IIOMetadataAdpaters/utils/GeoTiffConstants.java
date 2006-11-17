@@ -18,7 +18,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters.utils;
 /**
  * @author simone
  * 
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/plugin/geotiff/src/org/geotools/gce/geotiff/IIOMetadataAdpaters/utils/GeoTiffConstants.java $
+ * @source $URL$
  */
 public final class GeoTiffConstants {
 	public static final short GTUserDefinedGeoKey = 32767;

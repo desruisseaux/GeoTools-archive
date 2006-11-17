@@ -30,7 +30,7 @@ import org.geotools.filter.Expression;
  * 
  * @author Cory Horner, Refractions Research Inc.
  *
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/src/org/geotools/feature/visitor/QuantileListVisitor.java $
+ * @source $URL$
  */
 public class StandardDeviationVisitor implements FeatureCalc {
 	private Expression expr;

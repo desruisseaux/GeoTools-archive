@@ -8,7 +8,7 @@ import java.util.PropertyResourceBundle;
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/plugin/postgis/test/org/geotools/data/postgis/PostgisTests.java $
+ * @source $URL$
  */
 public class PostgisTests {
 

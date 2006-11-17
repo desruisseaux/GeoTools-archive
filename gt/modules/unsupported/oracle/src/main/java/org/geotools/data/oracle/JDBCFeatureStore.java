@@ -57,7 +57,7 @@ import org.opengis.filter.Filter;
  * @task UPDATE: made modify atomic as an example, I actually have
  *       the beginings of a smart idea in mind. Similar to
  *       SwingUtilities.runLater...
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureStore.java $
+ * @source $URL$
  */
 public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore {
     

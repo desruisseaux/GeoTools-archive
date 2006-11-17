@@ -27,7 +27,7 @@ import org.geotools.filter.parser.ParseException;
 /**
  *
  * @author Cory Horner, Refractions Research
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/test/org/geotools/filter/function/EqualIntervalFunctionTest.java $
+ * @source $URL$
  */
 public class StandardDeviationFunctionTest extends FunctionTestSupport {
     private static final Logger LOGGER = Logger.getLogger(

@@ -15,7 +15,7 @@ import org.geotools.resources.TestData;
 /**
  * @author Giannecchini
  * 
- * @source $URL: http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/plugin/arcgrid/test/org/geotools/gce/arcgrid/ArcGridBaseTestCase.java $
+ * @source $URL$
  */
 public abstract class ArcGridBaseTestCase extends TestCase {
 

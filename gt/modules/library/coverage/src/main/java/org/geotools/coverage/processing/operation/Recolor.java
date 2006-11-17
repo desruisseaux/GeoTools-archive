@@ -41,8 +41,8 @@ import org.opengis.parameter.ParameterValueGroup;
  * colors as <code>Color[]</code>. The <code>null</code> key is a special
  * value meaning "any quantitative category".
  * 
- * @source $URL: http://svn.geotools.org/geotools/branches/coverages_branch/trunk/gt/module/coverage/src/org/geotools/coverage/processing/operation/Recolor.java $
- * @version $Id: Recolor.java 18352 2006-03-01 06:13:42Z desruisseaux $
+ * @source $URL$
+ * @version $Id$
  * @author Martin Desruisseaux
  */
 public final class Recolor extends IndexColorOperation {

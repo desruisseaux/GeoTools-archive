@@ -68,7 +68,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/JDBCFeatureSource.java $
+ * @source $URL$
  */
 public class JDBCFeatureSource implements FeatureSource {
     /** The logger for the filter module. */

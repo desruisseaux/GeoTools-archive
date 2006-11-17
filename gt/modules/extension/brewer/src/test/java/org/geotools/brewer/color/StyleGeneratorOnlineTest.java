@@ -39,7 +39,7 @@ import org.geotools.styling.FeatureTypeStyle;
 
 /**
  *
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/ext/brewer/test/org/geotools/brewer/color/StyleGeneratorOnlineTest.java $
+ * @source $URL$
  */
 public class StyleGeneratorOnlineTest extends DataTestCase {
 

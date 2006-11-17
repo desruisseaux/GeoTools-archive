@@ -25,8 +25,8 @@ import org.geotools.feature.IllegalAttributeException;
  * 
  * @author Sean Geoghegan, Defence Science and Technology Organisation
  * @author $Author: aaime $
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/MutableFIDFeature.java $
- * @version $Id: MutableFIDFeature.java 22347 2006-10-24 01:57:23Z jdeolive $
+ * @source $URL$
+ * @version $Id$
  * Last Modified: $Date: 2004/04/09 15:30:52 $ 
  */
 public class MutableFIDFeature extends DefaultFeature {

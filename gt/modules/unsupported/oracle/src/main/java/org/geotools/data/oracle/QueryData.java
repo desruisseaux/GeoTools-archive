@@ -59,7 +59,7 @@ import org.geotools.feature.GeometryAttributeType;
  * 
  *
  * @author aaime
- * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/QueryData.java $
+ * @source $URL$
  */
 public class QueryData implements AttributeReader, AttributeWriter {
     protected Object[] fidAttributes;
