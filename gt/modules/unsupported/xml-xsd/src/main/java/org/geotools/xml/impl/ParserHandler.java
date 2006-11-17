@@ -23,6 +23,7 @@ import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.BindingFactory;
+import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
@@ -74,6 +75,11 @@ public class ParserHandler extends DefaultHandler {
      * binding factory
      */
     BindingFactory bindingFactory;
+    
+    /**
+     * Binding walker factory
+     */
+    BindingWalkerFactory bindingWalkerFactory;
     
     /** the document handler **/
     DocumentHandler documentHandler;
@@ -152,6 +158,10 @@ public class ParserHandler extends DefaultHandler {
         //binding factory support
         bindingFactory = new BindingFactoryImpl( bindingLoader );
         context.registerComponentInstance( bindingFactory );
+        
+        //binding walker support
+        bindingWalkerFactory = new BindingWalkerFactoryImpl( bindingLoader , context );
+        context.registerComponentInstance( bindingWalkerFactory );
     }
 
     public void startElement(String uri, String localName, String qName,
