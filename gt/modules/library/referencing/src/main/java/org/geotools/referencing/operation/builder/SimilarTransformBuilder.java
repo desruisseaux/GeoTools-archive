@@ -22,7 +22,7 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
-
+import java.util.List;
 
 /**
  * The class for calculating 4 parameters of linear transformation (2D).
@@ -55,10 +55,9 @@ public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
      * @param sourcePoints Set of source points
      * @param targetPoints Set of destination points
      */
-    public SimilarTransformBuilder(DirectPosition[] ptSrc, DirectPosition[] ptDst)
+    public SimilarTransformBuilder(List vectors)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        setTargetPoints(ptDst);
-        setSourcePoints(ptSrc);
+    	super.setMappedPositions(vectors);
     }
 
     /**

@@ -16,6 +16,8 @@
 package org.geotools.referencing.operation.builder;
 
 // J2SE and extensions
+import java.util.List;
+
 import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -66,10 +68,9 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
      * @throws MismatchedReferenceSystemException -if the CRS of {@link #ptSrt} and {@link targetPointst}
      *         have wrong Coordinate Reference System.
      */
-    public ProjectiveTransformBuilder(DirectPosition[] ptSrc, DirectPosition[] ptDst)
+    public ProjectiveTransformBuilder(List pts)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        setTargetPoints(ptDst);
-        setSourcePoints(ptSrc);
+        super.setMappedPositions(pts);
     }
 
     /**

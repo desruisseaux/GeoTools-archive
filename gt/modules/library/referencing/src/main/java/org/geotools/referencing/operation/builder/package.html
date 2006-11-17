@@ -9,6 +9,41 @@
   {@linkplain org.opengis.referencing.operation.MathTransform math transform}
   from a set of points.
 
+<P>
+This package should be used when the we have two datasets that should fit to each other but they don't (unknown coordinate reference system may be the reason). When we are able to specifai the points that are the same on both datasets we should  transform our data by various ways.
+This package lets us to calculate:
+
+<UL>
+<LI> Rubber Sheet transformation
+<LI> Bursa Wolf transformation
+<LI> Projective transformatio
+<LI> Affine transformation
+<LI> Simmilar transformation,
+</UL>
+where the least square method is applyed on the errors betwean target points and transformed source points (in that case that we have more identical points then the neccesary number).
+</P>
+
+<P>
+<H3>Rubber Sheet transform</H3>
+Rubbersheeting transformation is no residual method (it means that there are no deltas on identical points independently on the number of them). The transformation is made in these steps:
+
+<UL>
+
+<LI> The bounding box of the source dataset is divided into triangles where the specified points are the vertices of this triangles. The delaunay triangulation has been implemented for this. These triangles are mapped to the triangles made by destination points.
+</LI>
+
+<LI>
+ There is affine transformation applied on each triangle. The result is that the points on the edge of the triangle are calculated twice, but the result is the same because of the properties of affinity.
+</LI>
+</UL>
+</P>
+
+<P>
+<H3>Bursa Wolf transformation<H3>
+</P>
+
+
+
   <P ALIGN="justify">(todo: add more details there)</P>
   </BODY>
 </HTML>

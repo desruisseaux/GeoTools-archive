@@ -110,7 +110,7 @@ public class RubberSheetTransform extends AbstractMathTransform implements MathT
      */
     public void transform(double[] srcPts, int srcOff, final double[] dstPts,
         int dstOff, int numPts) throws TransformException {
-        MappedPosition ptSrc = null;
+        ExtendedPosition ptSrc = null;
 
         ArrayList arraySrcPts = new ArrayList();
 
@@ -118,7 +118,7 @@ public class RubberSheetTransform extends AbstractMathTransform implements MathT
             final DirectPosition coSrc = new DirectPosition2D(srcPts[srcOff++],
                     srcPts[srcOff++]);
             DirectPosition coDst = new DirectPosition2D(0, 0);
-            ptSrc = new MappedPosition(coSrc, coDst);
+            ptSrc = new ExtendedPosition(coSrc, coDst);
 
             arraySrcPts.add(ptSrc);
         }
@@ -133,7 +133,7 @@ public class RubberSheetTransform extends AbstractMathTransform implements MathT
             // Cicle for transforming points within this triangle
             for (Iterator j = ((ArrayList) trianglestoPoints.get(triangle))
                     .iterator(); j.hasNext();) {
-                MappedPosition co = (MappedPosition) j.next();
+                ExtendedPosition co = (ExtendedPosition) j.next();
                 Point2D ptS = new Point2D.Double(co.x, co.y);
                 Point2D ptD = new Point2D.Double();
                 AT.transform(ptS, ptD);
@@ -145,7 +145,7 @@ public class RubberSheetTransform extends AbstractMathTransform implements MathT
         }
 
         for (Iterator j = arraySrcPts.iterator(); j.hasNext();) {
-            MappedPosition mc = (MappedPosition) j.next();
+            ExtendedPosition mc = (ExtendedPosition) j.next();
             dstPts[dstOff++] = mc.getMappedposition().getCoordinates()[0];
             dstPts[dstOff++] = mc.getMappedposition().getCoordinates()[1];
         }

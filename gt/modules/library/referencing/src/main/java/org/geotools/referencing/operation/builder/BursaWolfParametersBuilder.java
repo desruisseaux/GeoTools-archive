@@ -16,6 +16,8 @@
 package org.geotools.referencing.operation.builder;
 
 // J2SE and extensions
+import java.util.List;
+
 import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.referencing.datum.BursaWolfParameters;
@@ -82,13 +84,11 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
      * @param ptsSrc List of source points (3D - geocentric)
      * @param ptsDst List of destination points (3D - geocentric)    
      */
-    public BursaWolfParametersBuilder(DirectPosition[] ptsSrc,
-        DirectPosition[] ptsDst) throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        setSourcePoints(ptsSrc);
-        setTargetPoints(ptsDst);
+    public BursaWolfParametersBuilder(List/*<MappedPosition>*/ vectors) throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
+       super.setMappedPositions(vectors);
 
-        x = new GeneralMatrix(ptsSrc.length, 3);
-        X = new GeneralMatrix(ptsSrc.length, 3);
+        x = new GeneralMatrix(vectors.size(), 3);
+        X = new GeneralMatrix(vectors.size(), 3);
         x = getx();
         X = getX();
         this.getDxMatrix();

@@ -22,10 +22,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 /**
  * DirectPosition associated with another DirectPosition.
  *
- * @deprecated Moved to the {@link org.geotools.referencing.operation.builder} package.
- *             We will try to use a single {@code MappedPosition} object later, if possible.
  */
-public class MappedPosition extends DirectPosition2D {
+class ExtendedPosition extends DirectPosition2D {
     /**  */
     private static final long serialVersionUID = 4400395722009854165L;
 
@@ -37,7 +35,7 @@ public class MappedPosition extends DirectPosition2D {
      * @param c the original DirectPosition.
      * @param mappedposition the associated DirectPosition.
      */
-    public MappedPosition(DirectPosition c, DirectPosition mappedposition) {
+    public ExtendedPosition(DirectPosition c, DirectPosition mappedposition) {
         super(c);
         this.mappedposition = mappedposition;
     }

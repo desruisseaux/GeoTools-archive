@@ -61,11 +61,11 @@ public class TriangulationFactoryTest extends TestCase {
         DirectPosition sp5 = new DirectPosition2D(14, 16);
         DirectPosition tp5 = new DirectPosition2D(14, 16);
 
-        MappedPosition mtp1 = new MappedPosition(sp1, tp1);
-        MappedPosition mtp2 = new MappedPosition(sp2, tp2);
-        MappedPosition mtp3 = new MappedPosition(sp3, tp3);
-        MappedPosition mtp4 = new MappedPosition(sp4, tp4);
-        MappedPosition mtp5 = new MappedPosition(sp5, tp5);
+        ExtendedPosition mtp1 = new ExtendedPosition(sp1, tp1);
+        ExtendedPosition mtp2 = new ExtendedPosition(sp2, tp2);
+        ExtendedPosition mtp3 = new ExtendedPosition(sp3, tp3);
+        ExtendedPosition mtp4 = new ExtendedPosition(sp4, tp4);
+        ExtendedPosition mtp5 = new ExtendedPosition(sp5, tp5);
         DirectPosition[] vertices = new DirectPosition[1];
         vertices[0] = mtp5;
 

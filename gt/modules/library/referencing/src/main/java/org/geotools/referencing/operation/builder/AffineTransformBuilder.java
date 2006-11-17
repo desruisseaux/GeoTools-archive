@@ -16,6 +16,8 @@
 package org.geotools.referencing.operation.builder;
 
 // J2SE and extensions
+import java.util.List;
+
 import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
@@ -59,10 +61,9 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
      * @param sourcePoints Set of source points
      * @paramtargetPointst Set of destination points
      */
-    public AffineTransformBuilder(DirectPosition[] ptSrc, DirectPosition[] ptDst)
+    public AffineTransformBuilder(List vectors)
         throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        setTargetPoints(ptDst);
-        setSourcePoints(ptSrc);
+        super.setMappedPositions(vectors);
     }
 
     /**

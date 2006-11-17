@@ -15,17 +15,16 @@
  */
 package org.geotools.referencing.operation.builder;
 
-// J2SE and extensions
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.vecmath.MismatchedSizeException;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.builder.algorithm.MapTriangulationFactory;
-import org.geotools.referencing.operation.builder.algorithm.MappedPosition;
 import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
 import org.geotools.referencing.operation.builder.algorithm.RubberSheetTransform;
 import org.geotools.referencing.operation.builder.algorithm.TINTriangle;
@@ -39,7 +38,7 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 
 /**
- * Tha class for calculating the RubberSheet transformation. The
+ * The class for calculating the RubberSheet transformation. The
  * explanation of RubberSheet transformation can be seen <a href =
  * "http://planner.t.u-tokyo.ac.jp/member/fuse/rubber_sheeting.pdf">here</a>.
  *
@@ -54,8 +53,8 @@ public class RubberSheetBuilder extends MathTransformBuilder {
      * AffineTransformation Objects.
      */
     private HashMap trianglesToKeysMap;
-    
-    /**
+
+/**
      * Creates the transformation from specified pairs of points and
      * quadrilateral that deffines the area of transformation.
      * 
@@ -70,25 +69,16 @@ public class RubberSheetBuilder extends MathTransformBuilder {
      * @throws MismatchedReferenceSystemException
      * @throws TriangulationException
      */
-    public RubberSheetBuilder(DirectPosition[] ptSrc,
-        DirectPosition[] ptDst, Quadrilateral quad)
-        throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException, TriangulationException {
-        setTargetPoints(ptDst);
-        setSourcePoints(ptSrc);
+    public RubberSheetBuilder(List vectors, Quadrilateral quad)
+        throws MismatchedSizeException, MismatchedDimensionException,
+            MismatchedReferenceSystemException, TriangulationException {
+        super.setMappedPositions(vectors);
 
         checkQuad(quad);
 
-        MappedPosition[] vectors = new MappedPosition[ptSrc.length];
-        List vectorlist = new ArrayList();
+        //Quadrilateral mQuad = mappedQuad(quad, vectors);
 
-        for (int i = 0; i < ptSrc.length; i++) {
-            vectors[i] = new MappedPosition(ptSrc[i], ptDst[i]);
-            vectorlist.add(vectors[i]);
-        }
-
-        Quadrilateral mQuad = mappedQuad(quad, vectorlist);
-
-        MapTriangulationFactory trianglemap = new MapTriangulationFactory(mQuad,
+        MapTriangulationFactory trianglemap = new MapTriangulationFactory(quad,
                 vectors);
         this.trianglesMap = (HashMap) trianglemap.getTriangleMap();
         this.trianglesToKeysMap = mapTrianglesToKey();
@@ -96,9 +86,11 @@ public class RubberSheetBuilder extends MathTransformBuilder {
 
     /**
      * Returns the minimum number of points required by this builder.
+     *
+     * @return 1
      */
     public int getMinimumPointCount() {
-        return 0;
+        return 1;
     }
 
     /**
@@ -108,8 +100,10 @@ public class RubberSheetBuilder extends MathTransformBuilder {
      *
      * @throws MismatchedReferenceSystemException
      */
-    private void checkQuad(Quadrilateral quad) throws MismatchedReferenceSystemException {
+    private void checkQuad(Quadrilateral quad)
+        throws MismatchedReferenceSystemException {
         CoordinateReferenceSystem crs;
+
         try {
             crs = getSourceCRS();
         } catch (FactoryException e) {
@@ -144,22 +138,24 @@ public class RubberSheetBuilder extends MathTransformBuilder {
      */
     private HashMap mapTrianglesToKey() {
         AffineTransformBuilder calculator;
-
-        // CoordinateList ptlSrc = new CoordinateList();
-        // CoordinateList ptlDst = new CoordinateList();
+        
         HashMap trianglesToKeysMap = (HashMap) trianglesMap.clone();
 
         Iterator it = trianglesToKeysMap.entrySet().iterator();
 
         while (it.hasNext()) {
-            /*
-             * ptlSrc.clear(); ptlDst.clear();
-             */
+            
             Map.Entry a = (Map.Entry) it.next();
+            List pts = new ArrayList();
+
+            for (int i = 1; i <= 3; i++) {
+                pts.add(new MappedPosition(
+                        ((TINTriangle) a.getKey()).getPoints()[i],
+                        ((TINTriangle) a.getValue()).getPoints()[i]));
+            }
 
             try {
-                calculator = new AffineTransformBuilder(((TINTriangle) a.getKey())
-                        .getPoints(), ((TINTriangle) a.getValue()).getPoints());
+                calculator = new AffineTransformBuilder(pts);
                 a.setValue(calculator.getMathTransform());
             } catch (Exception e) {
                 // the numeber of vertices of two triangles is the same. So we
@@ -171,94 +167,12 @@ public class RubberSheetBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Generates mapped quad from destination quad and source quad. The
-     * new vertices of quad are calculated from source quad and difference of
-     * nearest pair of identical points.
-     *
-     * @param sourceQuad the quad that defines the area for triangulating.
-     * @param vectors of identical points (MappedCoordinates).
-     *
-     * @return destination quad
-     */
-    private Quadrilateral mappedQuad(Quadrilateral sourceQuad, List vectors) {
-        if (vectors.isEmpty()) {
-            return (Quadrilateral) sourceQuad.clone();
-        }
-
-        MappedPosition[] mappedVertices = new MappedPosition[4];
-
-        for (int i = 0; i < mappedVertices.length; i++) {
-            mappedVertices[i] = generateCoordFromNearestOne(sourceQuad.getPoints()[i],
-                    vectors);
-        }
-
-        return new Quadrilateral(mappedVertices[0], mappedVertices[1],
-            mappedVertices[2], mappedVertices[3]);
-    }
-
-    /**
-     * Returns the new Coordinate from the nearest one Mapped
-     * Coordinate.
-     *
-     * @param x the original coordinate.
-     * @param vertices List of the MappedPosition.
-     *
-     * @return MappedPosition from the original and new coordinate, so the
-     *         differnce between them is the same as for the nearest one
-     *         MappedPosition.
-     */
-    protected MappedPosition generateCoordFromNearestOne(DirectPosition x,
-        List vertices) {
-        MappedPosition nearestOne = nearestMappedCoordinate(x, vertices);
-
-        double dstX = x.getCoordinates()[0]
-            + (nearestOne.getMappedposition().getCoordinates()[0]
-            - nearestOne.getCoordinates()[0]);
-        double dstY = x.getCoordinates()[1]
-            + (nearestOne.getMappedposition().getCoordinates()[1]
-            - nearestOne.getCoordinates()[1]);
-        DirectPosition dst = new DirectPosition2D(nearestOne
-                .getCoordinateReferenceSystem(), dstX, dstY);
-
-        return new MappedPosition(x, dst);
-    }
-
-    /**
-     * Returns the nearest MappedPosition to specified point P.
-     *
-     * @param dp P point.
-     * @param vertices the List of MappedCoordinates.
-     *
-     * @return the MappedPosition to the x Coordinate.
-     */
-    protected MappedPosition nearestMappedCoordinate(DirectPosition dp,
-        List vertices) {
-        DirectPosition2D x = new DirectPosition2D(dp);
-
-        // Assert.isTrue(vectors.size() > 0);
-        MappedPosition nearestOne = (MappedPosition) vertices.get(0);
-
-        for (Iterator i = vertices.iterator(); i.hasNext();) {
-            MappedPosition candidate = (MappedPosition) i.next();
-
-            if (candidate.toPoint2D().distance(x.toPoint2D()) < nearestOne.toPoint2D()
-                                                                              .distance(x
-                        .toPoint2D())) {
-                nearestOne = candidate;
-            }
-        }
-
-        return nearestOne;
-    }
-
-    /**
      * Returns MathTransform transformation setup as RubberSheet, that
-     * transforms the {@link #sourcePoints} into the {@link #targetPoints} with zero deltas
-     * on these points
-     * 
-     * 
-     * 
+     * transforms the {@link #sourcePoints} into the {@link #targetPoints}
+     * with zero deltas on these points
+     *
      * @return calculated MathTransform
+     *
      * @throws FactoryException when the size of source and destination point
      *         is not the same.
      */
