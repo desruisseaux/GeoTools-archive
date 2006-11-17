@@ -19,6 +19,7 @@ import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDTypeDefinition;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -38,8 +39,10 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.referencing.CRS;
 import org.geotools.xml.Binding;
 import org.geotools.xml.BindingFactory;
+import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.Node;
 import org.geotools.xml.Schemas;
+import org.geotools.xml.impl.BindingWalker;
 
 
 /**
@@ -56,7 +59,7 @@ public class GML3ParsingUtils {
      * @return The corresponding geotools feature type.
      */
     public static FeatureType featureType(XSDElementDeclaration element,
-        BindingFactory bindingFactory) throws Exception {
+        BindingWalkerFactory bwFactory) throws Exception {
         FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
         ftBuilder.setName(element.getName());
         ftBuilder.setNamespace(new URI(element.getTargetNamespace()));
@@ -69,43 +72,42 @@ public class GML3ParsingUtils {
             XSDElementDeclaration property = (XSDElementDeclaration) itr.next();
 
             //ignore the attributes provided by gml, change this for new feature model
-            if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
-                if ("boundedBy".equals(property.getName())) {
-                    continue;
-                }
+            //            if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
+            //                if ("boundedBy".equals(property.getName())) {
+            //                    continue;
+            //                }
+            //
+            //                if ("location".equals(property.getName())) {
+            //                    continue;
+            //                }
+            //
+            //                if ("name".equals(property.getName())) {
+            //                    continue;
+            //                }
+            //
+            //                if ("description".equals(property.getName())) {
+            //                    continue;
+            //                }
+            //
+            //                if ("metaDataProperty".equals(property.getName())) {
+            //                    continue;
+            //                }
+            //            }
+            final ArrayList bindings = new ArrayList();
+            BindingWalker.Visitor visitor = new BindingWalker.Visitor() {
+                    public void visit(Binding binding) {
+                        bindings.add(binding);
+                    }
+                };
 
-                if ("location".equals(property.getName())) {
-                    continue;
-                }
+            bwFactory.createBindingWalker().walk(property, visitor);
 
-                if ("name".equals(property.getName())) {
-                    continue;
-                }
-
-                if ("description".equals(property.getName())) {
-                    continue;
-                }
-
-                if ("metaDataProperty".equals(property.getName())) {
-                    continue;
-                }
+            if (bindings.isEmpty()) {
+                //could not find a binding, use the defaults
+                throw new RuntimeException("Could not find binding for " + property.getQName());
             }
 
-            XSDTypeDefinition type = property.getType();
-
-            QName qName = new QName(type.getTargetNamespace(), type.getName());
-
-            Binding binding = bindingFactory.createBinding(qName);
-
-            if (binding == null) {
-                throw new RuntimeException("Could not find binding for " + qName);
-            }
-
-            Class theClass = binding.getType();
-
-            if (theClass == null) {
-                throw new RuntimeException("Could not find class for " + qName);
-            }
+            Class theClass = ((Binding) bindings.get(0)).getType();
 
             //call method with most parameter
             ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));

@@ -25,6 +25,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.BindingFactory;
+import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
@@ -63,11 +64,11 @@ import org.geotools.xml.Node;
  */
 public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
     FeatureTypeCache ftCache;
-    BindingFactory bindingFactory;
+    BindingWalkerFactory bwFactory;
 
-    public AbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingFactory bindingFactory) {
+    public AbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory) {
         this.ftCache = ftCache;
-        this.bindingFactory = bindingFactory;
+        this.bwFactory = bwFactory;
     }
 
     /**
@@ -102,7 +103,7 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
         FeatureType fType = ftCache.get(decl.getName());
 
         if (fType == null) {
-            fType = GML3ParsingUtils.featureType(decl, bindingFactory);
+            fType = GML3ParsingUtils.featureType(decl, bwFactory);
 
             //            FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
             //            ftBuilder.setName(decl.getName());
