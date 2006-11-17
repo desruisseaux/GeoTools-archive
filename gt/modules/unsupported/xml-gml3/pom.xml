@@ -128,10 +128,11 @@
             <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-gml3/src/main/resources/org/geotools/gml3/bindings/smil</schemaLookupDirectory>
           </schemaLookupDirectories>
           <generateConfiguration>false</generateConfiguration>
+					<generateBindingConfiguration>false</generateBindingConfiguration>
           <generateBindingInterface>false</generateBindingInterface>
-          <generateSchemaLocationResolver>false</generateSchemaLocationResolver>          <includes>
-            <include>BoundingShapeType</include>
-          </includes>
+          <generateSchemaLocationResolver>false</generateSchemaLocationResolver>
+          <!--includes>
+          </includes-->
         </configuration>
       </plugin>
 
