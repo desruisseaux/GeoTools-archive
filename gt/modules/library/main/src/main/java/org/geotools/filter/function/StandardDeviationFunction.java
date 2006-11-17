@@ -28,7 +28,7 @@ import org.geotools.util.NullProgressListener;
  * Breaks a FeatureCollection into classes using the standard deviation classification method.
  * 
  * @author Cory Horner, Refractions Research Inc.
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/src/org/geotools/filter/function/QuantileFunction.java $
+ * @source $URL$
  */
 public class StandardDeviationFunction extends ClassificationFunction {
 

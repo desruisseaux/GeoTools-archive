@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * Determines what queries can be processed server side and which can be processed client side.
  * 
  * @author dzwiers
- * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/module/main/src/org/geotools/data/wfs/WFSFilterVisitor.java $
+ * @source $URL$
  */
 public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, FilterVisitor2 {
 		private static final Logger logger=Logger.getLogger("org.geotools.filter");
