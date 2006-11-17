@@ -32,12 +32,8 @@ import org.geotools.util.ProgressListener;
 
 public class PostGISService extends DataStoreService {
 
-	public PostGISService( Catalog parent, Map params ) {
-		super(parent, params);
-	}
-
-	protected DataStoreFactorySpi createDataStoreFactory() {
-		return new PostgisDataStoreFactory();
+	public PostGISService( Catalog parent, Map params, PostgisDataStoreFactory dataStoreFactory ) {
+		super(parent, params, dataStoreFactory);
 	}
 
 	protected GeoResource createGeoResource( String typeName, DataStore dataStore ) {

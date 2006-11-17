@@ -12,9 +12,10 @@ import org.geotools.data.postgis.PostgisDataStoreFactory;
 
 public class PostGISServiceFactory implements ServiceFactory {
 
-	public Service createService( Catalog parent, URI id, Map params ) {
-		if ( new PostgisDataStoreFactory().canProcess( params ) ) {
-			return new PostGISService( parent, params );	
+	public Service createService( Catalog parent, URI id, Map params ) {	
+		PostgisDataStoreFactory dataStoreFactory = new PostgisDataStoreFactory();
+		if ( dataStoreFactory.canProcess( params ) ) {
+			return new PostGISService( parent, params, dataStoreFactory );	
 		}
 
 		return null;

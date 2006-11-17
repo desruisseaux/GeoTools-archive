@@ -20,12 +20,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 
-import javax.swing.Icon;
-
 import org.geotools.catalog.defaults.DefaultGeoResourceInfo;
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -38,7 +35,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * Resource implementation for resources which can map or resolve to a 
  * {@link org.geotools.data.FeatureSource}.
  * <p>
- * Subclasses must implement the methods:
+ * Subclasses may with to override the methods:
  * <ul>
  * 	<li>{@link #createMetaData(FeatureSource, ProgressListener)}
  * </ul>
@@ -55,7 +52,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  */
-public abstract class FeatureSourceGeoResource extends AbstractGeoResource {
+public class FeatureSourceGeoResource extends AbstractGeoResource {
 
 	/**
 	 * Parent handle

@@ -17,6 +17,8 @@
 package org.geotools.catalog;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +33,7 @@ import org.geotools.util.ProgressListener;
  * Service implementation for services which resolve to a 
  * {@link org.geotools.data.DataStore}.
  * <p>
- * Subclasses must implement the methods:
+ * Subclasses may wish to override the following methods.
  * <ul>
  * 	<li>{@link org.geotools.catalog.Resolve#getIdentifier()}
  * 	<li>{@link #createDataStoreFactory()}
@@ -70,8 +72,13 @@ import org.geotools.util.ProgressListener;
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  */
-public abstract class DataStoreService extends AbstractService {
+public class DataStoreService extends AbstractService {
 
+	/**
+	 * Factory used to create datastores.
+	 */
+	DataStoreFactorySpi dataStoreFactory;
+	
 	/**
 	 * The underying datastore, cached.
 	 */
@@ -82,10 +89,31 @@ public abstract class DataStoreService extends AbstractService {
 	 */
 	ServiceInfo info;
 	
-	public DataStoreService(Catalog parent, Map params) {
+	public DataStoreService(Catalog parent, Map params, DataStoreFactorySpi dataStoreFactory ) {
 		super(parent, params);
+		this.dataStoreFactory = dataStoreFactory;
 	}
 
+	/**
+	 * @return The datastore factory.
+	 */
+	public DataStoreFactorySpi getDataStoreFactory() {
+		return dataStoreFactory;
+	}
+	
+	/**
+	 * Returns a uri constructed from {@link DataStoreFactorySpi#getDisplayName()}, 
+	 * sublcasses may wish to override.
+	 */
+	public URI getIdentifier() {
+		try {
+			return new URI( dataStoreFactory.getDisplayName() );
+		} 
+		catch (URISyntaxException e) {
+			throw new RuntimeException( e );
+		}
+	}
+	
 	/**
 	 * Supports the required Service resolves with an additional resolve to 
 	 * {@link DataStore}.
@@ -181,11 +209,11 @@ public abstract class DataStoreService extends AbstractService {
 
 	protected DataStore dataStore( ProgressListener monitor ) {
 		if ( dataStore == null ) {
-			DataStoreFactorySpi factory = createDataStoreFactory();
-			synchronized ( factory.getClass() ) {
+			
+			synchronized ( dataStoreFactory.getClass() ) {
 				if ( dataStore == null ) {
 					try {
-						dataStore = factory.createDataStore( getConnectionParams() );
+						dataStore = dataStoreFactory.createDataStore( getConnectionParams() );
 						if ( dataStore == null ) {
 							throw new NullPointerException();
 						}
@@ -222,32 +250,26 @@ public abstract class DataStoreService extends AbstractService {
 	 * @return An instance of {@link DefaultServiceInfo}.
 	 */
 	protected ServiceInfo createMetaData( DataStore dataStore, ProgressListener monitor ) {
-        DataStoreFactorySpi factory = createDataStoreFactory();
-        
         return new DefaultServiceInfo( 
-        		factory.getDisplayName(), factory.getDescription(), null, null, 
-        		null, null, null, null
-    		);
+    		dataStoreFactory.getDisplayName(), dataStoreFactory.getDescription(), null, null, 
+    		null, null, null, null
+		);
 	}
 	
 	/**
-	 * Creates the factory used to create the underlying datastore.
-	 * 
-	 * @return THe datastore factory, never null.
-	 */
-	protected abstract DataStoreFactorySpi createDataStoreFactory();
-	
-
-	
-	/**
 	 * Creates the GeoResource handle for a specified feature type name.
-	 * 
+	 * <p>
+	 * Subclasses should override this method if they need to create a custom geo resource.
+	 * The default implementation returns a new instance of {@link FeatureSourceGeoResource}.
+	 * </p>
 	 * @param typeName The name of the feature type.
 	 * @param dataStore The datastore containing the feature type.
 	 * 
 	 * @return The GeoResource handle, or null if it could not be created.
 	 */
-	protected abstract GeoResource createGeoResource( String typeName, DataStore dataStore );
+	protected GeoResource createGeoResource( String typeName, DataStore dataStore ) {
+		return new FeatureSourceGeoResource( this, typeName );
+	}
 	
 	
 }
