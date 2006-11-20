@@ -135,6 +135,20 @@ public class DataUtilitiesTest extends DataTestCase {
         assertEquals("geom", names[0]);
         assertEquals("name", names[1]);
         assertEquals("id", names[2]);
+        
+        // check logic filter
+        NullFilter geomNull = factory.createNullFilter();
+        geomNull.nullCheckValue(geom);
+        names = DataUtilities.attributeNames(geomNull.and(equal));
+        assertEquals(3, names.length);
+        assertEquals("geom", names[0]);
+        assertEquals("name", names[1]);
+        assertEquals("id", names[2]);
+        
+        // check not filter
+        names = DataUtilities.attributeNames(geomNull.not());
+        assertEquals(1, names.length);
+        assertEquals("geom", names[0]);
     }
 
     /*
