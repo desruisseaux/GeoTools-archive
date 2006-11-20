@@ -53,6 +53,9 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
+    <!-- commented out until the 2 bugs in geotools that prevents the 
+         tests to pass are fixed -->
+    <!--module>cql</module-->
     <module>arcsde</module>
     <module>db2</module>
     <module>directory</module>
