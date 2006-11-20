@@ -78,10 +78,10 @@ public class ReportPublisher implements Runnable, FilenameFilter {
 
     /**
      * The maximum directory depth. Used in order to avoid to scan the (very numerous)
-     * project subdirectories. The default value is 2, which is okay for fetching the
-     * {@code module/api/target/site} directory for example.
+     * project subdirectories. The default value is 4, which is okay for fetching the
+     * {@code modules/library/api/target/site} directory for example.
      */
-    private final int maxDepth = 2;
+    private final int maxDepth = 4;
 
     /**
      * The list of modules processed.

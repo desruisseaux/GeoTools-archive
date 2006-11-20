@@ -321,15 +321,15 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * Returns a description for the object identified by the specified code.
      */
-    public InternationalString getDescriptionText(String code) throws FactoryException {
-        return getAuthorityFactory().getDescriptionText(code);
+    public InternationalString getDescriptionText(final String code) throws FactoryException {
+        return getAuthorityFactory().getDescriptionText(toBackingFactoryCode(code));
     }
 
     /**
      * Returns an arbitrary object from a code.
      */
     public IdentifiedObject createObject(final String code) throws FactoryException {
-        IdentifiedObject object = getAuthorityFactory().createObject(code);
+        IdentifiedObject object = getAuthorityFactory().createObject(toBackingFactoryCode(code));
         if (object instanceof Datum) {
             object = replace((Datum) object);
         } else if (object instanceof CoordinateSystem) {
@@ -344,119 +344,119 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * Returns an arbitrary {@linkplain Datum datum} from a code.
      */
     public Datum createDatum(final String code) throws FactoryException {
-        return replace(datumFactory.createDatum(code));
+        return replace(datumFactory.createDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain EngineeringDatum engineering datum} from a code.
      */
     public EngineeringDatum createEngineeringDatum(final String code) throws FactoryException {
-        return (EngineeringDatum) replace(datumFactory.createEngineeringDatum(code));
+        return (EngineeringDatum) replace(datumFactory.createEngineeringDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain ImageDatum image datum} from a code.
      */
     public ImageDatum createImageDatum(final String code) throws FactoryException {
-        return (ImageDatum) replace(datumFactory.createImageDatum(code));
+        return (ImageDatum) replace(datumFactory.createImageDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain VerticalDatum vertical datum} from a code.
      */
     public VerticalDatum createVerticalDatum(final String code) throws FactoryException {
-        return (VerticalDatum) replace(datumFactory.createVerticalDatum(code));
+        return (VerticalDatum) replace(datumFactory.createVerticalDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain TemporalDatum temporal datum} from a code.
      */
     public TemporalDatum createTemporalDatum(final String code) throws FactoryException {
-        return (TemporalDatum) replace(datumFactory.createTemporalDatum(code));
+        return (TemporalDatum) replace(datumFactory.createTemporalDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns a {@linkplain GeodeticDatum geodetic datum} from a code.
      */
     public GeodeticDatum createGeodeticDatum(final String code) throws FactoryException {
-        return (GeodeticDatum) replace(datumFactory.createGeodeticDatum(code));
+        return (GeodeticDatum) replace(datumFactory.createGeodeticDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns an {@linkplain Ellipsoid ellipsoid} from a code.
      */
     public Ellipsoid createEllipsoid(final String code) throws FactoryException {
-        return datumFactory.createEllipsoid(code);
+        return datumFactory.createEllipsoid(toBackingFactoryCode(code));
     }
 
     /**
      * Returns a {@linkplain PrimeMeridian prime meridian} from a code.
      */
     public PrimeMeridian createPrimeMeridian(final String code) throws FactoryException {
-        return datumFactory.createPrimeMeridian(code);
+        return datumFactory.createPrimeMeridian(toBackingFactoryCode(code));
     }
 
     /**
      * Returns a {@linkplain Extent extent} (usually an area of validity) from a code.
      */
     public Extent createExtent(final String code) throws FactoryException {
-        return getFactory("createExtent").createExtent(code);
+        return getFactory("createExtent").createExtent(toBackingFactoryCode(code));
     }
 
     /**
      * Returns an arbitrary {@linkplain CoordinateSystem coordinate system} from a code.
      */
     public CoordinateSystem createCoordinateSystem(final String code) throws FactoryException {
-        return replace(csFactory.createCoordinateSystem(code));
+        return replace(csFactory.createCoordinateSystem(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a cartesian coordinate system from a code.
      */
     public CartesianCS createCartesianCS(final String code) throws FactoryException {
-        return (CartesianCS) replace(csFactory.createCartesianCS(code));
+        return (CartesianCS) replace(csFactory.createCartesianCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a polar coordinate system from a code.
      */
     public PolarCS createPolarCS(final String code) throws FactoryException {
-        return (PolarCS) replace(csFactory.createPolarCS(code));
+        return (PolarCS) replace(csFactory.createPolarCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a cylindrical coordinate system from a code.
      */
     public CylindricalCS createCylindricalCS(final String code) throws FactoryException {
-        return (CylindricalCS) replace(csFactory.createCylindricalCS(code));
+        return (CylindricalCS) replace(csFactory.createCylindricalCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a spherical coordinate system from a code.
      */
     public SphericalCS createSphericalCS(final String code) throws FactoryException {
-        return (SphericalCS) replace(csFactory.createSphericalCS(code));
+        return (SphericalCS) replace(csFactory.createSphericalCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates an ellipsoidal coordinate system from a code.
      */
     public EllipsoidalCS createEllipsoidalCS(final String code) throws FactoryException {
-        return (EllipsoidalCS) replace(csFactory.createEllipsoidalCS(code));
+        return (EllipsoidalCS) replace(csFactory.createEllipsoidalCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a vertical coordinate system from a code.
      */
     public VerticalCS createVerticalCS(final String code) throws FactoryException {
-        return (VerticalCS) replace(csFactory.createVerticalCS(code));
+        return (VerticalCS) replace(csFactory.createVerticalCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a temporal coordinate system from a code.
      */
     public TimeCS createTimeCS(final String code) throws FactoryException {
-        return (TimeCS) replace(csFactory.createTimeCS(code));
+        return (TimeCS) replace(csFactory.createTimeCS(toBackingFactoryCode(code)));
     }
 
     /**
@@ -465,14 +465,14 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
     {
-        return replace(csFactory.createCoordinateSystemAxis(code));
+        return replace(csFactory.createCoordinateSystemAxis(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns an {@linkplain Unit unit} from a code.
      */
     public Unit createUnit(final String code) throws FactoryException {
-        return replace(csFactory.createUnit(code));
+        return replace(csFactory.createUnit(toBackingFactoryCode(code)));
     }
 
     /**
@@ -482,91 +482,91 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
-        return replace(crsFactory.createCoordinateReferenceSystem(code));
+        return replace(crsFactory.createCoordinateReferenceSystem(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a 3D coordinate reference system from a code.
      */
     public CompoundCRS createCompoundCRS(final String code) throws FactoryException {
-        return (CompoundCRS) replace(crsFactory.createCompoundCRS(code));
+        return (CompoundCRS) replace(crsFactory.createCompoundCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a derived coordinate reference system from a code.
      */
     public DerivedCRS createDerivedCRS(final String code) throws FactoryException {
-        return (DerivedCRS) replace(crsFactory.createDerivedCRS(code));
+        return (DerivedCRS) replace(crsFactory.createDerivedCRS(toBackingFactoryCode(code)));
     }
     
     /**
      * Creates a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
      */
     public EngineeringCRS createEngineeringCRS(final String code) throws FactoryException {
-        return (EngineeringCRS) replace(crsFactory.createEngineeringCRS(code));
+        return (EngineeringCRS) replace(crsFactory.createEngineeringCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns a {@linkplain GeographicCRS geographic coordinate reference system} from a code.
      */
     public GeographicCRS createGeographicCRS(final String code) throws FactoryException {
-        return (GeographicCRS) replace(crsFactory.createGeographicCRS(code));
+        return (GeographicCRS) replace(crsFactory.createGeographicCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns a {@linkplain GeocentricCRS geocentric coordinate reference system} from a code.
      */
     public GeocentricCRS createGeocentricCRS(final String code) throws FactoryException {
-        return (GeocentricCRS) replace(crsFactory.createGeocentricCRS(code));
+        return (GeocentricCRS) replace(crsFactory.createGeocentricCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain ImageCRS image coordinate reference system} from a code.
      */
     public ImageCRS createImageCRS(final String code) throws FactoryException {
-        return (ImageCRS) replace(crsFactory.createImageCRS(code));
+        return (ImageCRS) replace(crsFactory.createImageCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns a {@linkplain ProjectedCRS projected coordinate reference system} from a code.
      */
     public ProjectedCRS createProjectedCRS(final String code) throws FactoryException {
-        return (ProjectedCRS) replace(crsFactory.createProjectedCRS(code));
+        return (ProjectedCRS) replace(crsFactory.createProjectedCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
      */
     public TemporalCRS createTemporalCRS(final String code) throws FactoryException {
-        return (TemporalCRS) replace(crsFactory.createTemporalCRS(code));
+        return (TemporalCRS) replace(crsFactory.createTemporalCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
      */
     public VerticalCRS createVerticalCRS(final String code) throws FactoryException {
-        return (VerticalCRS) replace(crsFactory.createVerticalCRS(code));
+        return (VerticalCRS) replace(crsFactory.createVerticalCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a parameter descriptor from a code.
      */
     public ParameterDescriptor createParameterDescriptor(final String code) throws FactoryException {
-        return getFactory("createParameterDescriptor").createParameterDescriptor(code);
+        return getFactory("createParameterDescriptor").createParameterDescriptor(toBackingFactoryCode(code));
     }
 
     /**
      * Creates an operation method from a code.
      */
     public OperationMethod createOperationMethod(final String code) throws FactoryException {
-        return getFactory("createOperationMethod").createOperationMethod(code);
+        return getFactory("createOperationMethod").createOperationMethod(toBackingFactoryCode(code));
     }
 
     /**
      * Creates an operation from a single operation code.
      */
     public CoordinateOperation createCoordinateOperation(final String code) throws FactoryException {
-        return replace(operationFactory.createCoordinateOperation(code));
+        return replace(operationFactory.createCoordinateOperation(toBackingFactoryCode(code)));
     }
 
     /**
@@ -576,6 +576,23 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
                                         final String sourceCode, final String targetCode)
             throws FactoryException
     {
-        return operationFactory.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
+        return operationFactory.createFromCoordinateReferenceSystemCodes(
+                toBackingFactoryCode(sourceCode), toBackingFactoryCode(targetCode));
+    }
+
+    /**
+     * Returns the code to be given to the wrapped factories. This method is automatically
+     * invoked by all {@code create} methods before to forward the code to the
+     * {@linkplain crsFactory CRS}, {@linkplain csFactory CS}, {@linkplain datumFactory datum}
+     * or {@linkplain opFactory operation} factory. The default implementation returns the
+     * {@code code} unchanged.
+     *
+     * @param code The code given to this factory.
+     * @return The code to give to the underlying factories.
+     *
+     * @since 2.4
+     */
+    protected String toBackingFactoryCode(final String code) {
+        return code;
     }
 }

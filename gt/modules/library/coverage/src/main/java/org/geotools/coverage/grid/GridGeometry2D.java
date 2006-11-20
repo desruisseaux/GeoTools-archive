@@ -548,7 +548,7 @@ public class GridGeometry2D extends GeneralGridGeometry {
      */
     public MathTransform2D getGridToCRS2D(final PixelOrientation orientation) {
         final int xdim = (gridDimensionX < gridDimensionY) ? 0 : 1;
-        return (MathTransform2D) translate(getGridToCRS2D(), orientation, xdim, xdim | 1);
+        return (MathTransform2D) translate(getGridToCRS2D(), orientation, xdim, xdim ^ 1);
     }
 
     /**
