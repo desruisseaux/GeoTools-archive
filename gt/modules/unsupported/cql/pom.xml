@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!-- =======================================================================    
+	Maven Project Configuration File                                        
+	
+	The Geotools Project                                                    
+	http://www.geotools.org/                                            
+	
+	Version: $Id$
+	======================================================================= -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.geotools</groupId>
+		<artifactId>gt2-unsupported</artifactId>
+		<version>2.4-SNAPSHOT</version>
+	</parent>
+
+	<!-- =========================================================== -->
+	<!--     Module Description                                      -->
+	<!-- =========================================================== -->
+	<groupId>org.geotools</groupId>
+	<artifactId>gt2-cql</artifactId>
+	<packaging>jar</packaging>
+	<name>OGC CQL to Filter parser</name>
+	<url>http://maven.geotools.fr/reports/modules/unsupported/cql/</url>
+
+	<scm>
+		<connection>
+			scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/cql/
+		</connection>
+		<url>
+			http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/cql/
+		</url>
+	</scm>
+
+	<description>
+		A parser that takes an OGC Common Query Language input string and produces
+		an equivalent org.opengis.filter.Filter.
+	</description>
+
+	<licenses>
+		<license>
+			<name>Lesser General Public License (LGPL)</name>
+			<url>http://www.gnu.org/copyleft/lesser.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+
+	<!-- =========================================================== -->
+	<!--     Developers and Contributors                             -->
+	<!-- =========================================================== -->
+	<developers>
+		<developer>
+			<name>Ian Schneider</name>
+			<id>ians</id>
+			<roles>
+				<role>Original Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Mauricio Pazos</name>
+			<id>mpazos</id>
+			<email>mauricio.pazos@axios.es</email>
+			<organization>Axios Engineering</organization>
+			<roles>
+				<role>Java Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Gabriel Roldan</name>
+			<id>groldan</id>
+			<email>groldan@axios.es</email>
+			<roles>
+				<role>Java Developer</role>
+				<role>Module Maintainer</role>
+			</roles>
+		</developer>
+	</developers>
+
+
+	<!-- ==================================================== -->
+	<!--     Compilation (including non-standard plugins)     -->
+	<!-- ==================================================== -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt2-jjtree-javacc</artifactId>
+				<version>2.4-SNAPSHOT</version>
+				<configuration>
+					<!-- Where to search for .jjt files -->
+					<sourceDirectory>${basedir}/src</sourceDirectory>
+					<!-- Where to search for Node.java -->
+					<nodeDirectory>
+						${basedir}/modified-src
+					</nodeDirectory>
+					<nodePackage>org.geotools.filter.cql</nodePackage>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt2-main</artifactId>
+			<version>2.4-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt2-epsg-wkt</artifactId>
+			<version>2.4-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+</project>
