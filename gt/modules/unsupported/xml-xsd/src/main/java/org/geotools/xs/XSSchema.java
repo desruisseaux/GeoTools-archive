@@ -20,6 +20,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.type.SchemaImpl;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -288,7 +289,7 @@ public class XSSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ANYURI_TYPE = AttributeTypeFactory
-        .newAttributeType("anyURI", java.lang.Object.class);
+        .newAttributeType("anyURI", URI.class);
 
     /**
      * <p>
