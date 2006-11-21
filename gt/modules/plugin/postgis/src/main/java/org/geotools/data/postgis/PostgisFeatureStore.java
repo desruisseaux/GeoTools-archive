@@ -883,7 +883,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         SQLBuilder sqlBuilder = jdbc.getSqlBuilder(schema.getTypeName());
 
         Filter postQueryFilter = sqlBuilder.getPostQueryFilter(query.getFilter());
-        if (postQueryFilter != null && !postQueryFilter.equals(Filter.NONE)) {
+        if (postQueryFilter != null && !postQueryFilter.equals(Filter.INCLUDE)) {
             // this would require postprocessing the filter
             // so we cannot optimize
             return null;
