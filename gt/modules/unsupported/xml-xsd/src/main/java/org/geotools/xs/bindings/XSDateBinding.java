@@ -92,7 +92,7 @@ public class XSDateBinding implements SimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Calendar.class;
+        return Date.class;
     }
 
     /**
@@ -105,11 +105,16 @@ public class XSDateBinding implements SimpleBinding {
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
     	
-    	return DatatypeConverter.parseDate( (String) value );
+    	Calendar calendar =  DatatypeConverter.parseDate( (String) value );
+    	return calendar.getTime();
     }
     
     public String encode(Object object, String value) throws Exception {
-    	return DatatypeConverter.printDate( (Calendar) object );
+    	Date date = (Date) object;
+    	Calendar calendar = Calendar.getInstance();
+    	calendar.setTime( date );
+    	
+    	return DatatypeConverter.printDate( calendar );
     }
     
 }
