@@ -320,7 +320,6 @@ public class Encoder {
 							if ( obj == null ) {
 								if ( particle.getMinOccurs() == 0 ) {
 									//cool
-									continue;
 								}
 								else {
 									//log an error
@@ -328,6 +327,9 @@ public class Encoder {
 										"Property " + ns + ":"  + local + " not found but minoccurs > 0 "
 									);
 								}
+								
+								//skip this regardless
+								continue;
 							}
 							
 							if ( particle.getMaxOccurs() == -1 || particle.getMaxOccurs() > 1 ) {
@@ -340,6 +342,9 @@ public class Encoder {
 								else if ( obj instanceof Collection ) {
 									Collection collection = (Collection) obj;
 									iterator = collection.iterator();
+								}
+								else {
+									iterator = new SingleIterator( obj );
 								}
 								
 								entry.children.add( new Object[]{ child,iterator} );
