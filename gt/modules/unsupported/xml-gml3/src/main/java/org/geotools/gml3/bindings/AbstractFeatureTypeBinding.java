@@ -187,7 +187,7 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
         String typeName = featureType.getTypeName();
 
         Element encoding = document.createElementNS(namespace, typeName);
-        encoding.setAttributeNS(null, "fid", feature.getID());
+        encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getID());
 
         return encoding;
     }
