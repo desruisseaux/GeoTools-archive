@@ -15,6 +15,8 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import java.math.BigInteger;
 import javax.xml.namespace.QName;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -122,5 +124,24 @@ public class DirectPositionListTypeBinding extends AbstractComplexBinding {
         }
 
         return dps;
+    }
+
+    public Element encode(Object object, Document document, Element value)
+        throws Exception {
+        //TODO: remove this when the parser can do lists
+        DirectPosition[] dps = (DirectPosition[]) object;
+        StringBuffer sb = new StringBuffer();
+
+        for (int i = 0; i < dps.length; i++) {
+            sb.append(dps[i].getOrdinate(0) + " " + dps[i].getOrdinate(1));
+
+            if (i < (dps.length - 1)) {
+                sb.append(" ");
+            }
+        }
+
+        value.appendChild(document.createTextNode(sb.toString()));
+
+        return value;
     }
 }
