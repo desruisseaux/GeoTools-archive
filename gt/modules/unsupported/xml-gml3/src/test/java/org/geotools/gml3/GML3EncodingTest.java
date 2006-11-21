@@ -51,8 +51,6 @@ public class GML3EncodingTest extends TestCase {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         encoder.write(fc, TEST.TestFeatureCollection, output);
 
-        System.out.println(new String(output.toByteArray()));
-
         SAXParser saxParser = new SAXParser();
         saxParser.setFeature("http://xml.org/sax/features/validation", true);
         saxParser.setFeature("http://apache.org/xml/features/validation/schema", true);
