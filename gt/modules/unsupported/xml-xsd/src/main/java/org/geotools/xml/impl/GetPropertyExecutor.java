@@ -42,7 +42,13 @@ public class GetPropertyExecutor implements BindingWalker.Visitor {
 		if (binding instanceof ComplexBinding) {
 			ComplexBinding complex = (ComplexBinding)binding;
 			
-			child = complex.getProperty(parent, name);
+			try {
+				child = complex.getProperty(parent, name);
+			} 
+			catch (Exception e) {
+				//TODO: log this
+				child = null;
+			}
 		}
 	}
 

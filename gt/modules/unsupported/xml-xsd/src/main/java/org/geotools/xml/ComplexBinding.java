@@ -123,5 +123,5 @@ public interface ComplexBinding extends Binding {
      *
      * @return The value of the property, or <code>null</code>.
      */
-    Object getProperty(Object object, QName name);
+    Object getProperty(Object object, QName name) throws Exception;
 }

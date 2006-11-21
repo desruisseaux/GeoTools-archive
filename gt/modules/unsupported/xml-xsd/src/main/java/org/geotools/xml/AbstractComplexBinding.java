@@ -65,7 +65,7 @@ public abstract class AbstractComplexBinding implements ComplexBinding {
      * 
      * @see ComplexBinding#getProperty(Object, QName)
      */
-    public Object getProperty(Object object, QName name) {
+    public Object getProperty(Object object, QName name) throws Exception {
     	//do nothing, subclasses should override
     	return null;
     }
