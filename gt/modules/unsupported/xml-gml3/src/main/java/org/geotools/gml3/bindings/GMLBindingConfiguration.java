@@ -64,6 +64,7 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(GML.LineStringPropertyType,
             LineStringPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.LineStringType, LineStringTypeBinding.class);
+        container.registerComponentImplementation(GML.MeasureType, MeasureTypeBinding.class);
         container.registerComponentImplementation(GML.MultiCurvePropertyType,
             MultiCurvePropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiLineStringPropertyType,
