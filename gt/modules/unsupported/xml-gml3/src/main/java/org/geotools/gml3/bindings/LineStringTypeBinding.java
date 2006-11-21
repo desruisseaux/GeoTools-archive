@@ -24,6 +24,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.geotools.geometry.DirectPosition2D;
 import org.geotools.xml.*;
 
 
@@ -120,5 +121,23 @@ public class LineStringTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return GML3ParsingUtils.lineString(node, gFactory, csFactory);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.posList.equals(name)) {
+            LineString line = (LineString) object;
+            Coordinate[] coordinates = line.getCoordinates();
+            DirectPosition[] dps = new DirectPosition[coordinates.length];
+
+            for (int i = 0; i < dps.length; i++) {
+                Coordinate coordinate = coordinates[i];
+                dps[i] = new DirectPosition2D(coordinate.x, coordinate.y);
+            }
+
+            return dps;
+        }
+
+        return null;
     }
 }
