@@ -107,7 +107,8 @@ public class GML3ParsingUtils {
                 throw new RuntimeException("Could not find binding for " + property.getQName());
             }
 
-            Class theClass = ((Binding) bindings.get(0)).getType();
+            //get hte last binding in the chain to execute
+            Class theClass = ((Binding) bindings.get(bindings.size() - 1)).getType();
 
             //call method with most parameter
             ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));
