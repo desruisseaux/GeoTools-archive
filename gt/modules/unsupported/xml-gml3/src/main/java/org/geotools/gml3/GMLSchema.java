@@ -27,6 +27,7 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.type.SchemaImpl;
+import org.geotools.measure.Measure;
 
 
 public class GMLSchema extends SchemaImpl {
@@ -11570,7 +11571,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MEASURETYPE_TYPE = AttributeTypeFactory.newAttributeType("MeasureType",
-            java.lang.Object.class);
+            Measure.class);
 
     /**
      * <p>
