@@ -15,6 +15,9 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.xsd.XSDTypeDefinition;
 
 
@@ -26,24 +29,55 @@ public class TypeWalker {
         this.base = base;
     }
 
+    /**
+     * Walks from the bottom of the type hierachy to the top.
+     */
     public void walk(Visitor visitor) {
-        XSDTypeDefinition type = base;
-
-        while (type != null) {
-            //do the visit, if visitor returns false, break out
+    	List types = types( base );
+    	for ( int i = 0; i < types.size(); i++ ) {
+    		XSDTypeDefinition type = (XSDTypeDefinition) types.get( i );
+    		//do the visit, if visitor returns false, break out
             if (!visitor.visit(type)) {
                 break;
             }
+    	}
+    }
 
-            //get the next type
+    /**
+     * Walks from the top of the type hierachy to the bottom.
+     * 
+     */
+    public void rwalk( Visitor visitor ) {
+        
+    	List types = types( base );
+    	for ( int i = types.size() - 1; i > -1; i-- ) {
+    		XSDTypeDefinition type = (XSDTypeDefinition) types.get( i );
+    		//do the visit, if visitor returns false, break out
+            if (!visitor.visit(type)) {
+                break;
+            }
+    	}
+    	
+    }
+    
+    private List types( XSDTypeDefinition base ) {
+    	ArrayList types = new ArrayList();
+    	
+    	XSDTypeDefinition type = base;
+    	while (type != null) {
+    		types.add( type );
+    		
+    		//get the next type
             if (type.equals(type.getBaseType())) {
                 break;
             }
 
             type = type.getBaseType();
         }
+    	
+    	return types;
     }
-
+    
     public static interface Visitor {
         /**
          * Supplies the current type to the visitor.
