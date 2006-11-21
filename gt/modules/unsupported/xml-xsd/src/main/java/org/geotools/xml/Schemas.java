@@ -260,11 +260,10 @@ public class Schemas {
      * @param includeParents flag indicating if parent types should be processed
      *  
      * @return A list of {@link XSDParticle}.
-     * TODO: make this return a set.
+     * 
      */
     public static final List getChildElementParticles( XSDTypeDefinition type, boolean includeParents ) {
-    	//use a set to ensure that duplicates dont occur as a result of subclassing.
-        final HashSet particles = new HashSet();
+        final ArrayList particles = new ArrayList();
         TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
             public boolean visit(XSDTypeDefinition type) {
                 //simple types dont have children
@@ -277,7 +276,8 @@ public class Schemas {
                 ElementVisitor visitor = new ElementVisitor() {
                     public void visit(XSDParticle particle) {
                     	//element declaration, add to list
-                    	particles.add( particle );
+                    	if ( !particles.contains( particle ) )
+                    		particles.add( particle );
                     }
                 };
 
@@ -291,7 +291,7 @@ public class Schemas {
             //walk up the type hierarchy of the element to generate a list of 
             // possible elements
             TypeWalker walker = new TypeWalker(type);
-            walker.walk(visitor);
+            walker.rwalk(visitor);
         } else {
             //just visit this type
             visitor.visit(type);
