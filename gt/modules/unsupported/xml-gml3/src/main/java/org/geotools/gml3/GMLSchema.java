@@ -11205,7 +11205,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType SURFACEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("SurfacePropertyType", java.lang.Object.class);
+        .newAttributeType("SurfacePropertyType", Polygon.class);
 
     /**
      * <p>
@@ -11955,7 +11955,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType SURFACETYPE_TYPE = AttributeTypeFactory.newAttributeType("SurfaceType",
-            java.lang.Object.class);
+            Polygon.class);
 
     /**
      * <p>
