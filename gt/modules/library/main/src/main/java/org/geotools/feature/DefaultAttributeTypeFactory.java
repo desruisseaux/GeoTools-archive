@@ -130,7 +130,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         boolean isNillable, Filter filter, Object defaultValue, Object metadata) {
 
     	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
-    	length.setArgs(new Expression[]{null});
+    	length.setArgs(new Expression[]{this.ff.createAttributeExpression(name)});
     	if (Number.class.isAssignableFrom(clazz)) {
             return new NumericAttributeType(
                 name, clazz, isNillable,1,1,defaultValue, filter);
@@ -154,7 +154,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
             
         if( Geometry.class.isAssignableFrom( clazz) && metaData instanceof CoordinateReferenceSystem ){
             LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
-            length.setArgs(new Expression[]{null});
+            length.setArgs(new Expression[]{ff.createAttributeExpression(name)});
             CompareFilter cf = null;
             try {
                 cf = ff.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
