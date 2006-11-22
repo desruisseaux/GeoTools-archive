@@ -15,6 +15,8 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.List;
+
 import org.geotools.xml.Binding;
 import org.geotools.xml.BindingFactory;
 import org.picocontainer.ComponentAdapter;

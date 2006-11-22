@@ -1,17 +1,23 @@
 package org.geotools.xml.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDTypeDefinition;
+import org.geotools.xml.Binding;
+import org.geotools.xml.Schemas;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * Utility class to be used by bindings to encode an element.
- * <p>
- * Bindings should not instantiate this class directly, it should be declared as a dependency 
- * in the constructor.
- * </p>
- * 
+ *
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
@@ -26,10 +32,22 @@ public class ElementEncoder {
 	 * The binding context
 	 */
 	private MutablePicoContainer context;
+	/**
+	 * Logger 
+	 */
+	private Logger logger;
 	
-	public ElementEncoder ( BindingLoader bindingLoader, MutablePicoContainer context ) {
+	public ElementEncoder ( BindingLoader bindingLoader, MutablePicoContainer context) {
 		this.bindingLoader = bindingLoader;
 		this.context = context;
+	}
+	
+	/**
+	 * Sets the logger for the encoder to use.
+	 * @param logger
+	 */
+	public void setLogger( Logger logger ) {
+		this.logger = logger;
 	}
 	
 	/**
@@ -42,8 +60,8 @@ public class ElementEncoder {
 	 * @return The encoded value as an element.
 	 */
 	public Element encode( Object value, XSDElementDeclaration element, Document document ) {
-		ElementEncodeExecutor executor = new ElementEncodeExecutor( value, element, document );
 		
+		ElementEncodeExecutor executor = new ElementEncodeExecutor( value, element, document );
 		new BindingWalker( bindingLoader, context ).walk( element, executor );
 		
 		return executor.getEncodedElement();

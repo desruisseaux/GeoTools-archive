@@ -23,6 +23,7 @@ import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDConstants;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.impl.AttributeEncodeExecutor;
@@ -131,6 +132,7 @@ public class Encoder {
             context.registerComponentInstance(logger);
         }
 
+        encoder.setLogger( logger );
 	}
 	
 	/**
@@ -218,6 +220,65 @@ public class Encoder {
 			}
 			else {
 				//start the encoding of the entry
+				
+				//first make sure the element is not abstract
+				if ( entry.element.isAbstract() ) {
+					//look for a non abstract substitute
+					List sub = entry.element.getSubstitutionGroup();
+					if ( sub.size() > 0 ) {
+						//match up by type
+						List matches = new ArrayList();
+						for ( Iterator s = sub.iterator(); s.hasNext(); ) {
+							XSDElementDeclaration e = (XSDElementDeclaration) s.next();
+							if ( e.equals( entry.element ) ) 
+								continue;
+							
+							if ( e.getName() == null ) 
+								continue;
+							
+							//look up hte binding
+							Binding binding = bindingLoader.loadBinding( 
+								new QName( e.getTargetNamespace(), e.getName() ), context 
+							);
+							if ( binding == null ) {
+								//try the type
+								XSDTypeDefinition type = e.getType();
+								if ( type.getName() == null ) 
+									continue;
+								
+								binding = bindingLoader.loadBinding( 
+									new QName( type.getTargetNamespace(), type.getName() ), context 
+								);
+							}
+							
+							if ( binding == null ) 
+								continue;
+							
+							//match up the type
+							if ( binding.getType().isAssignableFrom( entry.object.getClass() ) ) {
+								//we have a match
+								matches.add( e );
+							}
+						}
+						
+						//if one, we are gold
+						if ( matches.size() == 1 ) {
+							entry.element = (XSDElementDeclaration) matches.get( 0 );	
+						}
+						//if multiple we have a problem, jsut die
+						else if ( matches.size() > 0 ) {
+							String msg = "Found multiple non-abstract bindings for " + entry.element.getName();
+							throw new IllegalStateException( msg );
+						}
+						
+						//if zero, just use the absttract element
+					}
+				}
+				
+				if ( entry.element.isAbstract() ) {
+					logger.warning( entry.element.getName() + " is abstract" );
+				}
+				
 				entry.encoding = (Element) encode(entry.object,entry.element);
 				
 				//add any more attributes
@@ -256,6 +317,7 @@ public class Encoder {
 						//declare the schema instance mapping
 						serializer.startPrefixMapping( "xsi", XSDUtil.SCHEMA_INSTANCE_URI_2001 );
 						serializer.endPrefixMapping( "xsi" );
+						namespaces.declarePrefix( "xsi", XSDUtil.SCHEMA_INSTANCE_URI_2001 );
 						
 						StringBuffer schemaLocation = new StringBuffer();
 						for ( Iterator e = schemaLocations.entrySet().iterator(); e.hasNext(); ) {
@@ -361,73 +423,6 @@ public class Encoder {
 						}
 					}
 				}
-//				
-//				List children = 
-//					Schemas.getChildElementParticles( entry.element.getType(), true );
-//				
-//			O:	for (Iterator itr = children.iterator(); itr.hasNext();) {
-//					XSDParticle particle = (XSDParticle) itr.next();
-//					XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
-//					if ( child.isElementDeclarationReference() ) {
-//						child = child.getResolvedElementDeclaration();
-//					}
-//					
-//					//do not encode the element if the parent has already 
-//					// been encoded by the parent
-//					String ns = child.getTargetNamespace();
-//					String local = child.getName();
-//					for (int i = 0; i < entry.encoding.getChildNodes().getLength(); i++) {
-//						Node node = entry.encoding.getChildNodes().item(i);
-//						if (node instanceof Element) {
-//							if (ns != null) {
-//								if (ns.equals(node.getNamespaceURI()) && 
-//									local.equals(node.getLocalName())) {
-//									continue O;
-//								}
-//							}
-//							else {
-//								if (local.equals(node.getLocalName()))
-//									continue O;
-//							}
-//						}
-//					}
-//					
-//					//get the object(s) for this element 
-//					GetChildExecutor executor = 
-//						new GetChildExecutor(entry.object,child);
-//					
-//					new BindingWalker(bindingLoader,context)
-//						.walk(entry.element,executor);
-//					
-//					if (executor.getChildObject() != null) {
-//						if ( particle.getMaxOccurs() == -1 || particle.getMaxOccurs() > 1 ) {
-//							//may have a collection or array, unwrap it
-//							Object obj = executor.getChildObject();
-//							Iterator iterator = null;
-//							if ( obj.getClass().isArray() ) {
-//								Object[] array = (Object[]) obj;
-//								iterator = Arrays.asList( array ).iterator();
-//							}
-//							else if ( obj instanceof Collection ) {
-//								Collection collection = (Collection) obj;
-//								iterator = collection.iterator();
-//							}
-//							
-//							entry.children.add( new Object[]{child,iterator} );
-//						}
-//						else {
-//							//only one, just add the object
-//							entry.children.add(
-//								new Object[]{
-//									child,
-//									new SingleIterator(executor.getChildObject())
-//								}
-//							);
-//						}
-//						
-//					}
-//				}
-				
 				
 			}
 		}
@@ -468,7 +463,7 @@ public class Encoder {
 		uri = uri != null ? uri : namespaces.getURI( "" );
 		qName = namespaces.getPrefix( uri ) + ":" + qName;
 		
-		DOMAttributes atts = new DOMAttributes(element.getAttributes());
+		DOMAttributes atts = new DOMAttributes(element.getAttributes(), namespaces );
 		serializer.startElement(uri,local,qName,atts);
 		
 		//write out any text
@@ -510,93 +505,6 @@ public class Encoder {
 		
 		serializer.endElement(uri,local,qName);	
 	}
-		
-//		
-//		while(!toEncode.isEmpty()) {
-//			object = toEncode.peek();
-//			
-//			//has this object been started
-//			if (started.containsKey(object)) {
-//				//finish it
-//				Element element = (Element)started.get(object);
-//				end(element);
-//				 
-//				//remove the object
-//				started.remove(object);
-//				toEncode.pop();
-//			}
-//			else {
-//				//start the encoding
-//				Encoder encoder = lookupEncoder(object,container);
-//				if (encoder != null) {
-////					//do the encoding
-////					Element element = null;  
-////					try {
-////						if (encoder instanceof ComplexEncoder) {
-////							
-////						}
-////						element = encoder.encode(object, doc);
-////					}
-////					catch(Throwable t) {
-////						new IOException().initCause(t);
-////					}
-////					
-////					start(element);
-////					started.put(object,element);
-////					try {
-////						//throw any children on the stack for encoding
-////						Object[] children = encoder.getChildren(object);
-////						if (children != null && children.length > 0) {
-////							for (int i = 0; i < children.length; i++) {
-////								toEncode.push(children[i]);
-////							}
-////						}
-////					}
-////					catch(Throwable t) {
-////						//TODO: log this
-////						t.printStackTrace();
-////					}
-//				}
-//			}
-//			
-//			serializer.endDocument();
-//		}
-//	}
-//	
-//	
-//	
-//	
-
-//	
-//	protected Encoder lookupEncoder(Object obj, MutablePicoContainer container){
-//		//get all encoders from the container
-//		//TODO: optimize: index encoding by the type of object they encode
-//		List encoders = container.getComponentInstancesOfType(Encoder.class);
-//		
-//		//create a list of candidates
-//		ArrayList candidates = new ArrayList();
-//		for (Iterator itr = encoders.iterator(); itr.hasNext();) {
-//			Encoder encoder = (Encoder)itr.next();
-//			try {
-//				if (encoder.canEncode(obj))
-//					candidates.add(encoder);
-//			}
-//			catch(Throwable t) {
-//				//TODO: log this
-//				t.printStackTrace();
-//			}
-//		}
-//		
-//		if (encoders.isEmpty())
-//			return null;
-//		
-//		if (encoders.size() > 1) {
-//			String msg = "Multiple encoders found for " + obj;
-//			throw new IllegalStateException(msg);
-//		}
-//		
-//		return (Encoder) candidates.get(0);
-//	}
 	
 	private static class NullIterator implements Iterator {
 
@@ -661,9 +569,11 @@ public class Encoder {
 	private static class DOMAttributes implements Attributes {
 
 		NamedNodeMap atts;
-
-		public DOMAttributes(NamedNodeMap atts) {
+		NamespaceSupport namespaces;
+		
+		public DOMAttributes(NamedNodeMap atts, NamespaceSupport namespaces) {
 			this.atts = atts;
+			this.namespaces = namespaces;
 		}
 		
 		public int getLength() {
@@ -676,8 +586,11 @@ public class Encoder {
 
 		public String getQName(int index) {
 			Node n = atts.item(index);
-			if (n.getPrefix() != null && !"".equals(n.getPrefix())) {
-				return n.getPrefix() + ":" + n.getLocalName();
+			String uri = n.getNamespaceURI();
+			String prefix = uri != null ? namespaces.getPrefix( uri ) : null;
+			
+			if ( prefix != null ) {
+				return prefix + ":" + n.getLocalName();
 			}
 			
 			return n.getLocalName();
