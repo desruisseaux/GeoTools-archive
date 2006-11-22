@@ -15,8 +15,6 @@
  */
 package org.geotools.xml;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -25,6 +23,7 @@ import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
+import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.geotools.resources.Utilities;
@@ -348,6 +347,15 @@ public abstract class Configuration {
             }
         }
         return schemaLocator;
+	}
+	
+	/**
+	 * Convenience method for creating an instance of the schema for this configuration.
+	 * 
+	 * @return The schema for this configuration.
+	 */
+	public XSDSchema schema() {
+		return getSchemaLocator().locateSchema( null, getNamespaceURI(), null, null );
 	}
 	
 	/**
