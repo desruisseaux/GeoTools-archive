@@ -15,7 +15,7 @@
 
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-modules</artifactId>
+    <artifactId>gt2-unsupported</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
   
@@ -24,20 +24,20 @@
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-unsupported</artifactId>
-  <packaging>pom</packaging>
-  <name>Geotools Unsupported</name>
-  <url>http://maven.geotools.fr/reports/modules/unsupported/</url>
+  <artifactId>gt2-gml3</artifactId>
+  <packaging>jar</packaging>
+  <name>GML Data Store</name>
+  <url>http://maven.geotools.fr/reports/modules/unsupported/gml3/</url>
   
   <scm>
     <connection>
-      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/
+      scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/gml3/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/</url>
+    <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/gml3/</url>
   </scm>
   
   <description>
-    Unsupported modules for GeoTools.
+		Datastore module based on Geographic Markup Language Version 3.1.1.
   </description>
 
   <licenses>
@@ -47,37 +47,42 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
-  
+
+
   <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
+  <!--     Developers and Contributors                             -->
   <!-- =========================================================== -->
-  <modules>
-    <!-- commented out until the 2 bugs in geotools that prevents the 
-         tests to pass are fixed -->
-    <!--module>cql</module-->
-    <module>arcsde</module>
-    <module>db2</module>
-    <module>directory</module>
-<!-- <module>epsg-extension</module> -->
-    <module>geomedia</module>
-<!-- <module>geometryless</module> -->
-    <module>gml</module>
-    <module>gml3</module>
-    <module>go</module>
-<!--<module>hsql</module>-->
-    <module>jpox</module>
-    <module>mif</module>
-    <module>mysql</module>
-    <module>oracle-spatial</module>
-    <module>tiger</module>
-    <module>tile</module>
-    <module>vpf</module>
-    <module>xml-sld</module>
-    <module>xml-xsd</module>
-    <module>xml-gml2</module>
-    <module>xml-gml3</module>
-    <module>xml-filter</module>
-  </modules>
-  
+  <developers>
+    <developer>
+      <name>Justin Deoliveira</name>
+      <id>jdeolive</id>
+      <email>jdeolive@users.sourceforge.net</email>
+      <organization>TOPP</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <!-- =========================================================== -->
+  <!--     Dependency Management                                   -->
+  <!-- =========================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-xml-gml3</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>xpp3</groupId>
+      <artifactId>xpp3</artifactId>
+    </dependency>
+  </dependencies>
+
 </project>
