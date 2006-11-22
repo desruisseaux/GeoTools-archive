@@ -15,11 +15,20 @@
  */
 package org.geotools.xml.test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 import junit.framework.TestCase;
+
+import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.util.XSDResourceImpl.SchemaLocator;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.DOMParser;
+import org.geotools.xml.Encoder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 
@@ -48,17 +57,6 @@ public abstract class XMLTestSupport extends TestCase {
     	document = docFactory.newDocumentBuilder().newDocument();
     }
     
-    /**
-     * Creates the root element for the document.
-     * <p>
-     * This method is called during setup.
-     * </p>
-     * @param doc Document used to build the root element.
-     *
-     * @return the root element of the instnace document.
-     */
-    //protected abstract Element createRootElement(Document doc);
-
     /**
      * Template method for subclasses to register namespace mappings on the
      * root element of an instance document.
@@ -122,5 +120,32 @@ public abstract class XMLTestSupport extends TestCase {
 	    DOMParser parser = new DOMParser(config, document);
 
         return parser.parse();
+    }
+    
+    /**
+     * Encodes an object, element name pair.
+     * 
+     * @param object The object to encode.
+     * @param element The name of the element to encode.
+     * 
+     * @return The object encoded.
+     * @throws Exception
+     */
+    protected Document encode( Object object, QName element ) throws Exception {
+    	Configuration configuration = createConfiguration();
+    	XSDSchema schema = configuration.getSchemaLocator().locateSchema( 
+			null, configuration.getNamespaceURI(), null, null
+    	);
+    	
+    	Encoder encoder = new Encoder( configuration, schema );
+    	ByteArrayOutputStream output = new ByteArrayOutputStream();
+    	encoder.write( object, element, output );
+    
+    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    	dbf.setNamespaceAware( true );
+    	
+    	return dbf.newDocumentBuilder().parse( 
+			new ByteArrayInputStream( output.toByteArray() )
+		);
     }
 }
