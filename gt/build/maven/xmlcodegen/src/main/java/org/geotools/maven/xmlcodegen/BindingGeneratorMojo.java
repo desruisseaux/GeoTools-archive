@@ -294,7 +294,7 @@ public class BindingGeneratorMojo extends AbstractMojo {
 		if ( includes != null && includes.length > 0 ) {
 			HashSet included = new HashSet( Arrays.asList( includes ) );
 			getLog().info( "Including: " + included ); 
-			generator.setIncludedTypes( included );
+			generator.setIncluded( included );
 		}
 		
 		getLog().info( "Generating bindings...");

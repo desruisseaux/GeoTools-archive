@@ -63,7 +63,7 @@ public class BindingGenerator extends AbstractGenerator {
     boolean generateConfiguration = true;
     boolean generateSchemaLocationResolver = true;
     
-    Set includedTypes = new HashSet();
+    Set included = null;
     
     /**
      * Map of string, class which define the name and type of binding constructor
@@ -99,8 +99,8 @@ public class BindingGenerator extends AbstractGenerator {
         this.generateTypes = generateTypes;
     }
 
-    public void setIncludedTypes(Set includedTypes) {
-		this.includedTypes = includedTypes;
+    public void setIncluded(Set included) {
+		this.included = included;
 	}
     
     public void generate(XSDSchema schema) {
@@ -114,7 +114,7 @@ public class BindingGenerator extends AbstractGenerator {
                 generate(element, schema);
 
                 if (target(element, schema)) {
-                    components.add(element);
+                	components.add(element);
                 }
             }
         }
@@ -124,18 +124,8 @@ public class BindingGenerator extends AbstractGenerator {
 
             for (Iterator t = types.iterator(); t.hasNext();) {
                 XSDTypeDefinition type = (XSDTypeDefinition) t.next();
+                generate( type, schema );
                 
-                if ( !includedTypes.isEmpty() ) {
-                	if ( includedTypes.contains( type.getName() ) ) {
-                		logger.info( "Generating " + type.getName() );
-                		generate( type, schema );
-                	}
-                }
-                else {
-                	generate(type, schema);	
-                }
-                
-
                 if (target(type, schema)) {
                     components.add(type);
                 }
@@ -179,6 +169,10 @@ public class BindingGenerator extends AbstractGenerator {
         }
     }
 
+    boolean included( XSDNamedComponent c ) {
+    	return included != null ? included.contains( c.getName() ) : true;
+    }
+    
     boolean target(XSDNamedComponent c, XSDSchema schema) {
     	return c.getTargetNamespace().equals(schema.getTargetNamespace());
     }
@@ -188,6 +182,11 @@ public class BindingGenerator extends AbstractGenerator {
             return;
         }
 
+        if ( !included( c ) ) {
+        	return;
+        }
+        
+        logger.info( "Generating binding for " + c.getName() );
         try {
             String result = execute("CLASS",
                     new Object[] { c, bindingConstructorArguments });
