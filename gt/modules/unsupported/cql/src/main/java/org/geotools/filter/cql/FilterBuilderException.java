@@ -22,7 +22,7 @@ package org.geotools.filter.cql;
 /**
  *
  * @author  Ian Schneider
- * @source $URL: http://gtsvn.refractions.net/geotools/trunk/gt/module/main/src/org/geotools/filter/parser/FilterBuilderException.java $
+ * @source $URL$
  */
 public class FilterBuilderException extends ParseException {
     
