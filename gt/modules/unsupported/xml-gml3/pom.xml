@@ -131,8 +131,9 @@
 					<generateBindingConfiguration>false</generateBindingConfiguration>
           <generateBindingInterface>false</generateBindingInterface>
           <generateSchemaLocationResolver>false</generateSchemaLocationResolver>
-          <!--includes>
-          </includes-->
+          <includes>
+						<include>AbstractSurfaceType</include>
+          </includes>
         </configuration>
       </plugin>
 

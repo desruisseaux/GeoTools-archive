@@ -69,4 +69,13 @@ public class AbstractRingPropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(LinearRing.class);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML._Ring.equals(name)) {
+            return object;
+        }
+
+        return null;
+    }
 }

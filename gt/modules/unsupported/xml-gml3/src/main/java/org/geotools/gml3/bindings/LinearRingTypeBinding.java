@@ -15,12 +15,15 @@
  */
 package org.geotools.gml3.bindings;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import org.opengis.spatialschema.geometry.DirectPosition;
@@ -113,5 +116,14 @@ public class LinearRingTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return GML3ParsingUtils.linearRing(node, gFactory, csFactory);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.posList.equals(name)) {
+            return GML3EncodingUtils.positions((LineString) object);
+        }
+
+        return null;
     }
 }

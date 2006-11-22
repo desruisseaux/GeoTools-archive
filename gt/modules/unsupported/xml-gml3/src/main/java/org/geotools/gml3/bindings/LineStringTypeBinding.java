@@ -126,16 +126,7 @@ public class LineStringTypeBinding extends AbstractComplexBinding {
     public Object getProperty(Object object, QName name)
         throws Exception {
         if (GML.posList.equals(name)) {
-            LineString line = (LineString) object;
-            Coordinate[] coordinates = line.getCoordinates();
-            DirectPosition[] dps = new DirectPosition[coordinates.length];
-
-            for (int i = 0; i < dps.length; i++) {
-                Coordinate coordinate = coordinates[i];
-                dps[i] = new DirectPosition2D(coordinate.x, coordinate.y);
-            }
-
-            return dps;
+            return GML3EncodingUtils.positions((LineString) object);
         }
 
         return null;

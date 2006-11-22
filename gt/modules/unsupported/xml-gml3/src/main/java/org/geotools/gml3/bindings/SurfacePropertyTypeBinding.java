@@ -75,4 +75,13 @@ public class SurfacePropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(Polygon.class);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML._Surface.equals(name)) {
+            return object;
+        }
+
+        return null;
+    }
 }
