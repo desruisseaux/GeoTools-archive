@@ -80,6 +80,9 @@ public abstract class TestCaseSupport extends TestCase {
             File tf = (File) f.next();
             sibling(tf, "dbf").delete();
             sibling(tf, "shx").delete();
+            sibling(tf, "fix").delete();
+            sibling(tf, "qix").delete();
+            sibling(tf, "grx").delete();
             tf.delete();
             f.remove();
         }

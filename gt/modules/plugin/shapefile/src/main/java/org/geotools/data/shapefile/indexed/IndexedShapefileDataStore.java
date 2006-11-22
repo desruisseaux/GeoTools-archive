@@ -25,6 +25,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -61,6 +62,7 @@ import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileException;
 import org.geotools.data.shapefile.shp.ShapefileReader;
 import org.geotools.data.shapefile.shp.ShapefileWriter;
+import org.geotools.data.shapefile.shp.ShapefileReader.Record;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -69,9 +71,10 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.BasicFeatureTypes;
-import org.geotools.filter.FidFilter;
 import org.opengis.filter.Filter;
+import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterAttributeExtractor;
+import org.geotools.filter.FilterType;
 import org.geotools.filter.Filters;
 import org.geotools.index.Data;
 import org.geotools.index.DataDefinition;
@@ -923,36 +926,69 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 	}
 
 	/**
-	 * @see org.geotools.data.AbstractDataStore#getBounds(org.geotools.data.Query)
-	 */
-	protected Envelope getBounds(Query query) throws IOException {
-		Envelope ret = null;
+     * @see org.geotools.data.AbstractDataStore#getBounds(org.geotools.data.Query)
+     */
+    protected Envelope getBounds(Query query) throws IOException {
+        Envelope ret = null;
 
-		if (query.getFilter() == Filter.INCLUDE) {
-			ret = getBounds();
-		} else if (this.useIndex) {
-			RTree rtree = this.openRTree();
+        Set records=new HashSet();
+        if (query.getFilter() == Filter.INCLUDE || query==Query.ALL) {
+            return getBounds();
+        } else if (this.useIndex) {
+            if (treeType == TREE_GRX) {
+                return getBoundsRTree(query);
+            }
+        }
+        
+        FidFilterParserVisitor visitor=new FidFilterParserVisitor();
+        Filters.accept(query.getFilter(), visitor);
+        if( !visitor.fids.isEmpty() ) {
+            List recordsFound = queryFidIndex((String[]) visitor.fids.toArray(new String[0]));
+            if( recordsFound!=null )
+                records.addAll(recordsFound);
+        }
+        
+        if( records.isEmpty() )
+            return null;
+        
+        ShapefileReader reader=new ShapefileReader(getReadChannel(shpURL), this.readWriteLock);
+        try{
+            ret=new Envelope();
+            for (Iterator iter = records.iterator(); iter.hasNext();) {
+                Data data = (Data) iter.next();
+                reader.goTo(((Long)data.getValue(1)).intValue());
+                Record record = reader.nextRecord();
+                ret.expandToInclude(new Envelope(record.minX, record.maxX, record.minY, record.maxY));
+            }
+            return ret;
+        }finally{
+            reader.close();
+        }
+    }
 
-			if (rtree != null) {
-				try {
-					ret = rtree.getBounds(query.getFilter());
-				} catch (TreeException e) {
-					LOGGER.log(Level.SEVERE, e.getMessage(), e);
-				} catch (UnsupportedFilterException e) {
-					// Ignoring...
-				} finally {
-					try {
-						rtree.close();
-					} catch (Exception ee) {
-					}
-				}
-			}
-		}
+    private Envelope getBoundsRTree( Query query ) throws IOException {
+        Envelope ret=null;
+        
+        RTree rtree = this.openRTree();
 
-		return ret;
-	}
+        if (rtree != null) {
+            try {
+                ret = rtree.getBounds(query.getFilter());
+            } catch (TreeException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            } catch (UnsupportedFilterException e) {
+                // Ignoring...
+            } finally {
+                try {
+                    rtree.close();
+                } catch (Exception ee) {
+                }
+            }
+        }
+        return ret;
+    }
 
-	/**
+    /**
 	 * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
 	 */
 	public FeatureSource getFeatureSource(final String typeName)

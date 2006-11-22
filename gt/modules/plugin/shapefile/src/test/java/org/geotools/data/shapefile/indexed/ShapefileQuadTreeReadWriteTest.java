@@ -26,6 +26,8 @@ import junit.framework.AssertionFailedError;
 
 import org.geotools.TestData;
 import org.geotools.data.DataStore;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
@@ -33,7 +35,13 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
+import org.geotools.filter.FidFilter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.GeometryFilter;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 
@@ -127,8 +135,8 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
 	}
    
     void test(String f) throws Exception {
-        copyShapefiles(f); // Work on File rather than URL from JAR.
-        DataStore s = createDataStore(new IndexedShapefileDataStoreFactory(), TestData.url(f), true);
+        File file=copyShapefiles(f); // Work on File rather than URL from JAR.
+        DataStore s = createDataStore(new IndexedShapefileDataStoreFactory(), new URL("file://"+file.getPath()), true);
         String typeName = s.getTypeNames()[0];
         FeatureSource source = s.getFeatureSource(typeName);
         FeatureType type = source.getSchema();
@@ -209,6 +217,43 @@ public class ShapefileQuadTreeReadWriteTest extends TestCaseSupport {
                 }
             }
         }
+    }
+    
+    
+    /**
+     * Test optimized getBounds().
+     * 
+     * Testing when filter is a bbox filter and a fidfilter
+     * 
+     * @throws Exception
+     */
+    public void testGetBoundsQuery() throws Exception {
+        File file = copyShapefiles("shapes/streams.shp");
+
+        IndexedShapefileDataStoreFactory fac=new IndexedShapefileDataStoreFactory();
+        
+        Map params=new HashMap();
+        params.put( IndexedShapefileDataStoreFactory.URLP.key,  new URL("file://"+file.getPath()));
+        params.put( IndexedShapefileDataStoreFactory.CREATE_SPATIAL_INDEX.key, new Boolean(true));
+        IndexedShapefileDataStore ds = (IndexedShapefileDataStore) fac.createDataStore(params);
+        
+        FilterFactory ff=FilterFactoryFinder.createFilterFactory();
+
+        FeatureCollection features = ds.getFeatureSource().getFeatures(ff.createFidFilter("streams.84"));
+        FeatureIterator iter = features.features();
+        Envelope bounds;
+        try{
+            bounds = iter.next().getBounds();
+        }finally{
+            iter.close();
+        }
+        
+        FidFilter filter = ff.createFidFilter("streams.84");
+        Query query=new DefaultQuery(ds.getCurrentTypeName(), filter);
+        
+        Envelope result = ds.getFeatureSource().getBounds(query);
+        
+        assertEquals(bounds, result);
     }
 
     public static final void main(String[] args) throws Exception {
