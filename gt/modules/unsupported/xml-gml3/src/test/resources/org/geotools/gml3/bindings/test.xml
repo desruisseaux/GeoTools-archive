@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.geotools.org/test test.xsd">
 
 	<gml:featureMember>
-	   <test:TestFeature fid="0">
+	   <test:TestFeature gml:id="fid.0">
 	      <test:geom>
 	        <gml:Point>
 		    	<gml:coord>
@@ -19,7 +19,7 @@
 	</gml:featureMember>
 	
 	<gml:featureMember>
-	   <test:TestFeature fid="1">
+	   <test:TestFeature gml:id="fid.1">
 	      <test:geom>
 	        <gml:Point>
 		    	<gml:coord>
@@ -34,7 +34,7 @@
   	</gml:featureMember>
   	
   	<gml:featureMember>
-	  	<test:TestFeature fid="2">
+	  	<test:TestFeature gml:id="fid.2">
 	      <test:geom>
 	        <gml:Point>
 		    	<gml:coord>
