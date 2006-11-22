@@ -17,6 +17,7 @@ package org.geotools.xml.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -42,6 +43,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
  *
  */
 public abstract class XMLTestSupport extends TestCase {
+	/**
+	 * Logging instance
+	 */
+	protected static Logger logger = Logger.getLogger( "org.geotools.xml.test" );
+	
     /**
      * the instance document
      */
