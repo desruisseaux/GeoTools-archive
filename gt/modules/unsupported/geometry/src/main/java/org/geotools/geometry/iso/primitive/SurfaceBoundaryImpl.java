@@ -1,0 +1,263 @@
+/*
+ * This implementation of the OGC Feature Geometry Abstract Specification
+ * (ISO 19107) is a project of the University of Applied Sciences Cologne
+ * (Fachhochschule Köln) in collaboration with GeoTools and GeoAPI.
+ *
+ * Copyright (C) 2006 University of Applied Sciences Köln
+ *                    (Fachhochschule Köln) and GeoTools
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * For more information, contact:
+ *
+ *     Prof. Dr. Jackson Roehrig
+ *     Institut für Technologie in den Tropen
+ *     Fachhochschule Köln
+ *     Betzdorfer Strasse 2
+ *     D-50679 Köln
+ *     Jackson.Roehrig@fh-koeln.de
+ *
+ *     Sanjay Dominik Jena
+ *     san.jena@gmail.com
+ *
+ */
+
+package org.geotools.geometry.iso.primitive;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.io.GeometryToString;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.complex.Complex;
+import org.opengis.spatialschema.geometry.primitive.Ring;
+import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
+
+/**
+ * The boundary of Surfaces shall be represented as SurfaceBoundary.
+ * 
+ * @author Jackson Roehrig & Sanjay Jena
+ */
+public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
+		SurfaceBoundary {
+
+	/**
+	 * A SurfaceBoundary consists of some number of Rings, corresponding to the
+	 * various components of its boundary. In the normal 2D case, one of these
+	 * rings is distinguished as being the exterior boundary. In a general
+	 * manifold this is not always possible, in which case all boundaries shall
+	 * be listed as interior boundaries, and the exterior will be empty.
+	 * 
+	 * SurfaceBoundary::exterior[0,1] : Ring;
+	 * 
+	 * SurfaceBoundary::interior[0..n] : Ring;
+	 * 
+	 * NOTE The use of exterior and interior here is not intended to invoke the
+	 * definitions of "interior" and "exterior" of geometric objects. The terms
+	 * are in common usage, and reflect a linguistic metaphor that uses the same
+	 * linguistic constructs for the concept of being inside an object to being
+	 * inside a container. In normal mathematical terms, the exterior boundary
+	 * is the one that appears in the Jordan Separation Theorem (Jordan Curve
+	 * Theorem extended beyond 2D). The exterior boundary is the one that
+	 * separates the surface (or solid in 3D) from infinite space. The interior
+	 * boundaries separate the object at hand from other bounded objects. The
+	 * uniqueness of the exterior comes from the uniqueness of unbounded space.
+	 * Essentially, the Jordan Separation Theorem shows that normal 2D or 3D
+	 * space separates into bounded and unbounded pieces by the insertion of a
+	 * ring or shell, respectively. It goes beyond that, but this standard is
+	 * restricted to at most 3 dimensions.
+	 * 
+	 * EXAMPLE 1 If the underlying manifold is an infinite cylinder, then two
+	 * transverse cuts of the cylinder define a compact surface between the
+	 * cuts, and two separate unbounded portions of the cylinders. In this case,
+	 * either cut could reasonably be called exterior. In cases of such
+	 * ambiguity, the standard chooses to list all boundaries in the "interior"
+	 * set. The only guarantee of an exterior boundary being unique is in the
+	 * 2-dimensional plane, E2.
+	 * 
+	 * EXAMPLE 2 Taking the equator of a sphere, and generating a 1 meter
+	 * buffer, we have a surface with two isomorphic boundary components. There
+	 * is no unbiased manner to distinguish one of these as an exterior.
+	 * 
+	 */
+	private Ring exterior = null;
+
+	private List<Ring> interior = null;
+
+	/**
+	 * 
+	 * @param exterior
+	 * @param interior
+	 */
+	public SurfaceBoundaryImpl(FeatGeomFactoryImpl factory, Ring exterior,
+			List<Ring> interior) {
+		super(factory);
+		// TODO The consisty need to checked: Interior rings cannot cross each other or the exterior ring
+		this.exterior = exterior;
+		this.interior = interior;
+	}
+
+//	/**
+//	 * @param factory
+//	 * @param patch
+//	 */
+//	public SurfaceBoundaryImpl(FeatGeomFactoryImpl factory,
+//			ArrayList<? extends SurfacePatchImpl> patch) {
+//		super(factory);
+//		if (patch == null || patch.isEmpty()) {
+//			assert (false);
+//			throw new IllegalArgumentException("Constructor not implemented"); //$NON-NLS-1$
+//		}
+//		// The Exterior Ring of the Surfaceboundary should be calculated considering ALL patches!
+//		this.exterior = patch.get(0).getBoundary().getExterior();
+//		// this.interior = patch[0].boundary().getInterior();
+//
+//	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#clone()
+	 */
+	public SurfaceBoundaryImpl clone() throws CloneNotSupportedException {
+		// Test OK		
+		// Clone exterior ring and interior rings
+		Ring newExterior = (Ring) this.getExterior().clone();
+		List<Ring> newInteriors = new ArrayList<Ring>();
+		Iterator<Ring> interiors = this.getInteriors().iterator();
+		while (interiors.hasNext()) {
+			newInteriors.add((Ring) interiors.next().clone());
+		}
+		// Use the cloned rings to create a new SurfaceBoundary
+		return this.getGeometryFactory().getPrimitiveFactory().createSurfaceBoundary(newExterior, newInteriors);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.primitive.SurfaceBoundary#getExterior()
+	 */
+	public RingImpl getExterior() {
+		// Return exterior ring of this boundary
+		return (RingImpl) this.exterior;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.primitive.SurfaceBoundary#getInteriors()
+	 */
+	public List<Ring> getInteriors() {
+		// Return interior rings of this boundary
+		return this.interior;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getEnvelope()
+	 */
+	public Envelope getEnvelope() {
+		/* Return Envelope of the exterior Ring */
+		return this.exterior.getEnvelope();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.geometry.featgeom.complex.ComplexImpl#createBoundary()
+	 */
+	public Set<Complex> createBoundary() {
+		// Return NULL, because a Boundary does not have a boundary
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.root.Geometry#isSimple()
+	 */
+	public boolean isSimple() {
+		// TODO semantic JR, SJ
+		// the boundary of a surface does not have too be simple in all cases
+		// for example, when an interior ring touches the exterior ring
+		// question is, whether this is allowed or not
+		// TODO implementation
+		// TODO test
+		// TODO documentation
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getClosure()
+	 */
+	public Complex getClosure() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getDimension(org.opengis.spatialschema.geometry.DirectPosition)
+	 */
+	public int getDimension(DirectPosition point) {
+		// TODO What is going to happen with the point parameter?!
+		// The Dimension of a SurfaceBoundary is 1, because a SurfaceBounday consists of Rings.
+		return 1;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getRepresentativePoint()
+	 */
+	public DirectPosition getRepresentativePoint() {
+		// ok
+		// Return representative point of the exterior ring
+		return this.getExterior().getRepresentativePoint();
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return GeometryToString.getString(this);
+	}
+	
+	
+	
+//	/**
+//	 * @return the length of the ring
+//	 */
+//	public double getLength() {
+//		// not tested
+//		double len = 0.0;
+//		if (this.exterior != null)
+//			len = this.getExterior().getLength();
+//		if (this.interior != null) {
+//			for (int i = 0; i < this.interior.size(); ++i) {
+//				RingImpl ring = (RingImpl) this.interior.get(i);
+//				len = len + ring.getLength();
+//			}
+//		}
+//		return len;
+//	}
+
+//Not used!	
+//	/**
+//	 * @param distance
+//	 */
+//	public void split(double distance) {
+//		((RingImpl) this.exterior).split(distance);
+//		if (this.interior != null) {
+//			for (Ring ring : this.interior) {
+//				((RingImpl) ring).split(distance);
+//			}
+//		}
+//	}
+
+}

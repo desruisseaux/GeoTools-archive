@@ -1,0 +1,751 @@
+/*
+ * This implementation of the OGC Feature Geometry Abstract Specification
+ * (ISO 19107) is a project of the University of Applied Sciences Cologne
+ * (Fachhochschule Köln) in collaboration with GeoTools and GeoAPI.
+ *
+ * Copyright (C) 2006 University of Applied Sciences Köln
+ *                    (Fachhochschule Köln) and GeoTools
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * For more information, contact:
+ *
+ *     Prof. Dr. Jackson Roehrig
+ *     Institut für Technologie in den Tropen
+ *     Fachhochschule Köln
+ *     Betzdorfer Strasse 2
+ *     D-50679 Köln
+ *     Jackson.Roehrig@fh-koeln.de
+ *
+ *     Sanjay Dominik Jena
+ *     san.jena@gmail.com
+ *
+ */
+
+package org.geotools.geometry.iso.coordinate;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
+import org.geotools.geometry.iso.primitive.SurfaceBoundaryImpl;
+import org.geotools.geometry.iso.primitive.SurfaceImpl;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
+import org.opengis.spatialschema.geometry.aggregate.MultiPrimitive;
+import org.opengis.spatialschema.geometry.geometry.Arc;
+import org.opengis.spatialschema.geometry.geometry.ArcByBulge;
+import org.opengis.spatialschema.geometry.geometry.ArcString;
+import org.opengis.spatialschema.geometry.geometry.ArcStringByBulge;
+import org.opengis.spatialschema.geometry.geometry.BSplineCurve;
+import org.opengis.spatialschema.geometry.geometry.Geodesic;
+import org.opengis.spatialschema.geometry.geometry.GeodesicString;
+import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
+import org.opengis.spatialschema.geometry.geometry.KnotType;
+import org.opengis.spatialschema.geometry.geometry.LineSegment;
+import org.opengis.spatialschema.geometry.geometry.PointArray;
+import org.opengis.spatialschema.geometry.geometry.Polygon;
+import org.opengis.spatialschema.geometry.geometry.PolyhedralSurface;
+import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.spatialschema.geometry.geometry.Tin;
+import org.opengis.spatialschema.geometry.geometry.Triangle;
+import org.opengis.spatialschema.geometry.geometry.TriangulatedSurface;
+import org.opengis.spatialschema.geometry.primitive.Ring;
+import org.opengis.spatialschema.geometry.primitive.Surface;
+import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
+
+/**
+ * convenience methods to create objects of the coordinate geometry package
+ * using only java native types as parameters
+ * 
+ * @author Jackson Roehrig & Sanjay Jena
+ * 
+ */
+public class CoordinateFactoryImpl implements GeometryFactory {
+
+	// **************************************************************************
+	// **************************************************************************
+	// ***** FACTORY MANAGING METHODS *****
+	// **************************************************************************
+	// **************************************************************************
+
+	private FeatGeomFactoryImpl geometryFactory;
+
+	/**
+	 * @param geometryFactory
+	 */
+	public CoordinateFactoryImpl(FeatGeomFactoryImpl geometryFactory) {
+		this.geometryFactory = geometryFactory;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#getCoordinateReferenceSystem()
+	 */
+	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+		return this.geometryFactory.getCoordinateReferenceSystem();
+	}
+	
+	/**
+	 * Returns the Coordinate Dimension of the used Coordinate System
+	 * (Sanjay)
+	 * 
+	 * @return dimension Coordinate Dimension used in this Factory
+	 */
+	public int getDimension() {
+		//  Test OK
+		return this.geometryFactory.getCoordinateDimension();
+	}
+
+
+	// **************************************************************************
+	// **************************************************************************
+	// ***** METHODS SPECIFIED BY THE GeoAPI *****
+	// **************************************************************************
+	// **************************************************************************
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createDirectPosition()
+	 */
+	public DirectPositionImpl createDirectPosition() {
+		// Test ok
+		return new DirectPositionImpl(this.geometryFactory);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createDirectPosition(double[])
+	 */
+	public DirectPositionImpl createDirectPosition(double[] coord) {
+		// Test ok
+		if (coord == null)
+			throw new IllegalArgumentException("Parameter coord is null"); //$NON-NLS-1$
+		if (coord.length != this.getDimension())
+			throw new MismatchedDimensionException();
+		// Create a DirectPosition which references to a COPY of the given double array
+		return new DirectPositionImpl(this.geometryFactory, coord.clone());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createEnvelope(org.opengis.spatialschema.geometry.DirectPosition, org.opengis.spatialschema.geometry.DirectPosition)
+	 */
+	public Envelope createEnvelope(
+			DirectPosition lowerCorner,
+			DirectPosition upperCorner)
+	throws MismatchedReferenceSystemException, MismatchedDimensionException {
+		// Test ok
+		return new EnvelopeImpl((DirectPosition)lowerCorner.clone(), (DirectPosition)upperCorner.clone());
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createLineSegment(org.opengis.spatialschema.geometry.geometry.Position, org.opengis.spatialschema.geometry.geometry.Position)
+	 */
+	public LineSegment createLineSegment(Position startPoint, Position endPoint)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		// Test ok
+		// Return a LineSegment based on the start and end point.
+		// - The startParam will be initialized with 0.0.
+		// - The parent curve will not be set
+		return createLineSegment(startPoint, endPoint, 0.0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createGeodesic(org.opengis.spatialschema.geometry.geometry.Position,
+	 *      org.opengis.spatialschema.geometry.geometry.Position)
+	 */
+	public Geodesic createGeodesic(Position startPoint, Position endPoint)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		assert false;
+		// Later TODO: semantic SJ, JR, implementation, test, documentation
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createGeodesicString(java.util.List)
+	 */
+	public GeodesicString createGeodesicString(List points)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		assert false;
+		// Later TODO: semantic SJ, JR, implementation, test, documentation
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createArc(org.opengis.spatialschema.geometry.geometry.Position,
+	 *      org.opengis.spatialschema.geometry.geometry.Position,
+	 *      org.opengis.spatialschema.geometry.geometry.Position)
+	 */
+	public Arc createArc(Position startPoint, Position midPoint,
+			Position endPoint) throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		assert false;
+		// Later TODO: semantic SJ, JR, implementation, test, documentation
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createArc(org.opengis.spatialschema.geometry.geometry.Position,
+	 *      org.opengis.spatialschema.geometry.geometry.Position, double,
+	 *      double[])
+	 */
+	public Arc createArc(Position startPoint, Position endPoint, double bulge,
+			double[] normal) throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		assert false;
+		// Later TODO: semantic SJ, JR, implementation, test, documentation
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createArcString(java.util.List)
+	 */
+	public ArcString createArcString(List points)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		assert false;
+		// Later TODO: semantic SJ, JR, implementation, test, documentation
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createArcByBulge(org.opengis.spatialschema.geometry.geometry.Position,
+	 *      org.opengis.spatialschema.geometry.geometry.Position, double,
+	 *      double[])
+	 */
+	public ArcByBulge createArcByBulge(Position startPoint, Position endPoint,
+			double bulge, double[] normal)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		assert false;
+		// Later TODO: semantic SJ, JR, implementation, test, documentation
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createArcStringByBulge(java.util.List,
+	 *      double[], java.util.List)
+	 */
+	public ArcStringByBulge createArcStringByBulge(List points,
+			double[] bulges, List normals)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		assert false;
+		// Later TODO: semantic SJ, JR, implementation, test, documentation
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createBSplineCurve(int,
+	 *      org.opengis.spatialschema.geometry.geometry.PointArray,
+	 *      java.util.List,
+	 *      org.opengis.spatialschema.geometry.geometry.KnotType)
+	 */
+	public BSplineCurve createBSplineCurve(int degree, PointArray points,
+			List knots, KnotType knotSpec)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		assert false;
+		// Later TODO: semantic SJ, JR, implementation, test, documentation
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createPolygon(org.opengis.spatialschema.geometry.primitive.SurfaceBoundary)
+	 */
+	public Polygon createPolygon(SurfaceBoundary boundary)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		// ok
+		// Creates a SurfaceBoundary on basis of the given surface boundary
+		return new PolygonImpl((SurfaceBoundaryImpl)boundary);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createPolygon(org.opengis.spatialschema.geometry.primitive.SurfaceBoundary,
+	 *      org.opengis.spatialschema.geometry.primitive.Surface)
+	 */
+	public Polygon createPolygon(SurfaceBoundary boundary, Surface spanSurface)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		// ok - but implementation in PolygonImpl is not ready yet
+		return new PolygonImpl((SurfaceBoundaryImpl)boundary, (SurfaceImpl)spanSurface);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createTin(java.util.Set,
+	 *      java.util.Set, java.util.Set, double)
+	 */
+	public Tin createTin(Set post, Set stopLines, Set breakLines,
+			double maxLength) throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		// TODO semantic SJ, JR
+		// TODO implementation
+		// TODO test
+		// TODO documentation
+		return null;
+	}
+
+	// COMMENTED OUT BECAUSE THIS METHOD IS DEPRECATED (Sanjay, 24/08/2006)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createSurfaceBoundary(org.opengis.spatialschema.geometry.primitive.Ring,
+	 *      java.util.List)
+	 */
+	// public SurfaceBoundary createSurfaceBoundary(Ring exterior, List
+	// interiors) throws MismatchedReferenceSystemException {
+	// return null;
+	// }
+	
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createPolyhedralSurface(java.util.List)
+	 */
+	public PolyhedralSurface createPolyhedralSurface(List tiles)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		// TODO semantic SJ, JR
+		// TODO implementation
+		// TODO test
+		// TODO documentation
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createMultiPrimitive()
+	 */
+	public MultiPrimitive createMultiPrimitive() {
+		// ok - this method will disappear from GeoAPI soon
+		return this.geometryFactory.getAggregateFactory().createMultiPrimitive(null);
+	}
+
+
+	
+	// **************************************************************************
+	// **************************************************************************
+	// ***** INDIVIDUAL METHODS WHICH ARE NOT SPECIFIED BY GeoAPI           *****
+	// **************************************************************************
+	// **************************************************************************
+
+	/**
+	 * @param dp
+	 * @return DirectPositionImpl
+	 */
+	public DirectPositionImpl createDirectPosition(DirectPosition dp) {
+		return new DirectPositionImpl(this.geometryFactory, dp);
+	}
+
+	/**
+	 * @param coordList
+	 * @param directPositions
+	 * @return Collection<PositionImpl>
+	 */
+	public Collection<DirectPosition> createDirectPositions(
+			Collection<double[]> coordList,
+			Collection<DirectPosition> directPositions) {
+		if (coordList == null || coordList.isEmpty())
+			throw new IllegalArgumentException(""); //$NON-NLS-1$
+		if (directPositions == null)
+			directPositions = new ArrayList<DirectPosition>(coordList.size());
+		for (double[] coords : coordList) {
+			directPositions.add(createDirectPosition(coords));
+		}
+		return directPositions;
+	}
+
+	/**
+	 * Creates a Position with the given ordinates coord. The array coord must
+	 * have at least two elements
+	 * 
+	 * @param coord
+	 *            is the array of ordinates of the position
+	 * @return PositionImpl
+	 */
+	public PositionImpl createPosition(double[] coord) {
+		// TODO Test
+		if (coord.length != this.getDimension())
+			throw new MismatchedDimensionException();
+
+		return (PositionImpl) createPosition(createDirectPosition(coord));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createPosition(org.opengis.spatialschema.geometry.DirectPosition)
+	 */
+	public Position createPosition(DirectPosition dp) {
+		// Test ok
+		return new PositionImpl((DirectPosition) dp.clone());
+	}
+
+	/**
+	 * Creates a new PointArray
+	 * @param positions
+	 * @return PointArrayImpl
+	 */
+	public PointArrayImpl createPointArray(List<? extends Position> positions) {
+		PointArrayImpl pa = null;
+		try {
+			pa = new PointArrayImpl((List<PositionImpl>) positions);
+		} catch(ClassCastException e) {
+			throw new IllegalArgumentException("List contains Position instances which can not be casted to the local geometry Position classes.");
+		}
+		return pa;
+	}
+
+	/**
+	 * Creates an Envelope with the given coordinates.
+	 * @param Coordinate c of a point p. The created envelope will have this coordinate as lower and upper corner
+	 * @return EnvelopeImpl The created envelope will have the coordinate as lower and upper corner.
+	 */
+	public EnvelopeImpl createEnvelope(double[] c) {
+		if (c.length != this.getDimension())
+			throw new MismatchedDimensionException();
+		
+		return new EnvelopeImpl(createDirectPosition(c));
+	}
+	
+	/**
+	 * Creates a new Envelope equal to the given envelope
+	 *  
+	 * @param env
+	 * @return Envelope
+	 */
+	public EnvelopeImpl createEnvelope (Envelope env) {
+		return new EnvelopeImpl(env);
+	}
+
+	/**
+	 * @param coordList
+	 * @param positions
+	 * @return Collection<PositionImpl>
+	 */
+	public List<Position> createPositions(Collection<double[]> coordList,
+			List<Position> positions) {
+		if (coordList == null || coordList.isEmpty())
+			throw new IllegalArgumentException(""); //$NON-NLS-1$
+		if (positions == null)
+			positions = new ArrayList<Position>(coordList.size());
+		for (double[] coords : coordList) {
+			positions.add(createPosition(coords));
+		}
+		return positions;
+	}
+
+	/**
+	 * Creates a line segment between fromPosition and toPosition. The
+	 * coordinate dimension of the segment is fromPosition.length,
+	 * fromPosition.length and toPoint.length must be equal and greater then 1
+	 * 
+	 * This method creates a LineSegment without references to the parent Curve. this will cause NullPointerExceptions in use of some methods
+	 * 
+	 * @param fromPosition
+	 * @param toPosition
+	 * @param startPar
+	 * @return LineSegmentImpl
+	 * @throws MismatchedDimensionException
+	 * @throws IllegalArgumentException
+	 */
+	public LineSegmentImpl createLineSegment(double[] fromPosition,
+			double[] toPosition, double startPar) {
+
+		if (fromPosition == null || toPosition == null)
+			throw new IllegalArgumentException("Start or End parameter is null"); //$NON-NLS-1$;
+		if (fromPosition.length != toPosition.length)
+			throw new MismatchedDimensionException();
+
+		return createLineSegment(
+				this.createPosition(fromPosition),
+				this.createPosition(toPosition),
+				startPar);
+	}
+
+	/**
+	 * Creates a LineSegment with a given value as startParam
+	 * 
+	 * @param p0
+	 * @param p1
+	 * @param startPar
+	 * @return a new LineSegmentImpl
+	 * 
+	 */
+	public LineSegmentImpl createLineSegment(Position p0, Position p1,
+			double startPar) {
+		List<Position> positions = new ArrayList<Position>();
+		positions.add(p0);
+		positions.add(p1);
+		return new LineSegmentImpl(createPointArray(positions), startPar);
+	}
+
+
+	/**
+	 * @param pointArray
+	 * @param startPar
+	 * @return LineStringImpl
+	 */
+	public LineStringImpl createLineString(PointArrayImpl pointArray,
+			double startPar) {
+		if (pointArray == null || pointArray.isEmpty())
+			throw new IllegalArgumentException(""); //$NON-NLS-1$
+		return new LineStringImpl(pointArray, startPar);
+	}
+
+	/**
+	 * Creates LineString from Array of DirectPosition2D
+	 * 
+	 * @param positions
+	 * @param startPar
+	 * @return LineString
+	 */
+	public LineStringImpl createLineString(List<? extends Position> positions,
+			double startPar) {
+		return new LineStringImpl(createPointArray(positions), startPar);
+	}
+
+	/**
+	 * @param coordLists
+	 * @param lineStrings
+	 * @return Collection<LineStringImpl>
+	 */
+	public Collection<LineStringImpl> createLineStrings(
+			Collection<List<double[]>> coordLists,
+			List<LineStringImpl> lineStrings) {
+		if (lineStrings == null)
+			lineStrings = new ArrayList<LineStringImpl>(coordLists.size());
+		CoordinateFactoryImpl cf = this.geometryFactory.getCoordinateFactory();
+		double startPar = 0.0;
+		for (List<double[]> coordList : coordLists) {
+			List<Position> positions = cf.createPositions(coordList, null);
+			PointArrayImpl pai = createPointArray(positions);
+			lineStrings.add(createLineString(pai, startPar));
+			startPar += pai.getDistanceSum();
+		}
+		return lineStrings;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#createLineString(java.util.List)
+	 */
+	public LineStringImpl createLineString(List<Position> positions)
+			throws MismatchedReferenceSystemException,
+			MismatchedDimensionException {
+		return this.createLineString(positions, 0.0);
+	}
+
+	/**
+	 * Creates a Triangle from three DirectPositions Builds the Surface Boundary
+	 * for the Triangle
+	 * 
+	 * @param ts
+	 * @param p1
+	 * @param p2
+	 * @param p3
+	 * @return Triangle
+	 */
+	public TriangleImpl createTriangle(TriangulatedSurface ts,
+			DirectPosition p1, DirectPosition p2, DirectPosition p3) {
+
+		PrimitiveFactoryImpl primFactory = this.geometryFactory
+				.getPrimitiveFactory();
+
+		// Create a SurfaceBoundary for the Triangle
+
+		List<DirectPosition> positionList = new ArrayList<DirectPosition>();
+		positionList.add(p1);
+		positionList.add(p2);
+		positionList.add(p3);
+		positionList.add(p1);
+
+		Ring exterior = primFactory.createRingByDirectPositions(positionList);
+		List<Ring> interiorList = new ArrayList<Ring>();
+
+		SurfaceBoundaryImpl triangleBoundary = primFactory
+				.createSurfaceBoundary(exterior, interiorList);
+
+		return new TriangleImpl(triangleBoundary, ts, new PositionImpl(p1),
+				new PositionImpl(p2), new PositionImpl(p3));
+	}
+
+	// TODO Jackson: geändert durch Sanjay; bitte korrektheit prüfen
+	// TODO SJ: folgende aussage pruefen:
+	// Parameter TriangulatedSurface wurde hinzufgefuegt: Ein Triangle sollte
+	// nicht erzeugt werden, ohne eine Referenz auf das zugehoerige Surface zu
+	// uebernehmen
+	// Die moeglichkeit, triangles zu erzeugen und spaeter die referenz auf den
+	// surface ueber einen setter zu setzen, sollten wir moeglichst vermeiden,
+	// da es unuebersichtlich wird, wann alle notwendigen daten erzeugt sind
+	// generell sollte es ziel sein, dass die Factories nur objekte erzeugen,
+	// welche in sich
+	/**
+	 * @param triangles
+	 * @return ArrayList<Triangle>
+	 */
+	public ArrayList<Triangle> createTriangles(ArrayList<double[][]> triangles) {
+
+		ArrayList<Triangle> result = new ArrayList<Triangle>();
+		for (double[][] triangle : triangles) {
+			double[] coord0 = triangle[0];
+			double[] coord1 = triangle[1];
+			double[] coord2 = triangle[2];
+			result
+					.add(this.createTriangle(null,
+							createDirectPosition(coord0),
+							createDirectPosition(coord1),
+							createDirectPosition(coord2)));
+		}
+		return result;
+	}
+
+	/**
+	 * Converts a List of DirectPosition objects to a List of Position objects
+	 * 
+	 * @param aDirectPositions
+	 *            List of DirectPosition objects
+	 * @return List of Position objects
+	 */
+	public List<Position> createPositions(List<DirectPosition> aDirectPositions) {
+
+		List<Position> rPositions = new LinkedList<Position>();
+		for (int i = 0; i < aDirectPositions.size(); i++) {
+			rPositions.add(this.createPosition(aDirectPositions.get(i)));
+		}
+
+		return rPositions;
+	}
+	
+//	/**
+//	 * 
+//	 * @param p0
+//	 * @param p1
+//	 * @param startPoints
+//	 * @param lineSegments
+//	 * @return ArrayList<LineSegmentImpl>
+//	 */
+//	public Collection<LineSegmentImpl> createLineSegments(
+//			Collection<double[]> p0, Collection<double[]> p1,
+//			Collection<Double> startPoints,
+//			Collection<LineSegmentImpl> lineSegments) {
+//		int s0 = p0.size();
+//		int s1 = p1.size();
+//		if (p0 == null || p1 == null || p0.isEmpty() || p1.isEmpty()
+//				|| s0 != s1)
+//			throw new IllegalArgumentException(""); //$NON-NLS-1$		
+//		if (lineSegments == null)
+//			lineSegments = new ArrayList<LineSegmentImpl>();
+//		Iterator<double[]> it0 = p0.iterator();
+//		Iterator<double[]> it1 = p1.iterator();
+//		Iterator<Double> it2 = startPoints.iterator();
+//		while (it0.hasNext()) {
+//			lineSegments.add(createLineSegment(it0.next(), it1.next(), it2
+//					.next()));
+//		}
+//		return lineSegments;
+//	}
+//
+//	/**
+//	 * @param points
+//	 * @param lineSegments
+//	 * @return Collection<LineSegmentImpl>
+//	 */
+//	public List<LineSegmentImpl> createLineSegments(
+//			Collection<double[][]> points, List<LineSegmentImpl> lineSegments) {
+//		if (points == null || points.isEmpty())
+//			throw new IllegalArgumentException(""); //$NON-NLS-1$		
+//		if (lineSegments == null) {
+//			// TODO
+//			lineSegments = new ArrayList<LineSegmentImpl>(points.size());
+//		}
+//		Iterator<double[][]> it = points.iterator();
+//		while (it.hasNext()) {
+//			double[][] p = it.next();
+//			double[] p0 = p[0];
+//			double[] p1 = p[1];
+//			double startPar = p[2][0];
+//			lineSegments.add(createLineSegment(p0, p1, startPar));
+//		}
+//		return lineSegments;
+//	}
+
+
+	// public Tin createTin(GeoAdvancingFront2D mesh) {
+	//	
+	// Hashtable<GeoPoint2D,Position> ht = new
+	// Hashtable<GeoPoint2D,Position>(mesh.getPosts().size());
+	// ArrayList<Position> controlPoint = new
+	// ArrayList<Position>(mesh.getPosts().size());
+	// for (GeoPoint2D p : mesh.getPosts()) {
+	// Position pos = Factory.createPosition(p.x,p.y);
+	// ht.put(p,pos);
+	// controlPoint.add(pos);
+	// }
+	// ArrayList<Triangle> triangles = new
+	// ArrayList<Triangle>(mesh.getTriangles().size());
+	// for (GeoTriangle2D tri : mesh.getTriangles()) {
+	// GeoPoint2D[] pts = tri.getPoints();
+	// triangles.add(Factory.createTriangle(ht.get(pts[0]),ht.get(pts[1]),ht.get(pts[2])));
+	// }
+	//
+	// ArrayList<LineString> stopLines = new
+	// ArrayList<LineString>(mesh.getStopLines().size());
+	// for ( GeoLine2D line : mesh.getStopLines()) {
+	// GeoPoint2D p0 = line.getStartPoint();
+	// GeoPoint2D p1 = line.getEndPoint();
+	// stopLines.add(Factory.createLineSegment(ht.get(p0),ht.get(p1)));
+	// }
+	//	
+	// ArrayList<LineString> breakLines = new
+	// ArrayList<LineString>(mesh.getBreakLines().size());
+	// for ( GeoLine2D line : mesh.getBreakLines()) {
+	// GeoPoint2D p0 = line.getStartPoint();
+	// GeoPoint2D p1 = line.getEndPoint();
+	// breakLines.add(Factory.createLineSegment(ht.get(p0),ht.get(p1)));
+	// }
+	//
+	// SurfaceBoundary surfBdry =
+	// Factory.createSurfaceBoundary(mesh.getSurface().getBoundariesPoints());
+	//
+	// return new
+	// Tin(surfBdry,controlPoint,stopLines,breakLines,mesh.getMaxLength(),triangles);
+	// }
+
+}
