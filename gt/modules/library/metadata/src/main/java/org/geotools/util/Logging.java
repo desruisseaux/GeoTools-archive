@@ -18,6 +18,7 @@ package org.geotools.util;
 // J2SE dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 import java.util.logging.Handler;           // For javadoc
 import java.util.logging.ConsoleHandler;    // For javadoc
 import java.util.logging.SimpleFormatter;   // For javadoc
@@ -73,7 +74,6 @@ public final class Logging {
      * Note that {@link MonolineFormatter} writes to the {@linkplain System#out standard
      * output stream} instead of the {@linkplain System#err standard error stream}.
      * 
-     * 
      * @throws IllegalStateException is {@link #redirectToCommonsLogging} has been invoked.
      */
     public void forceMonolineConsoleOutput() throws IllegalStateException {
@@ -88,7 +88,6 @@ public final class Logging {
      * <b>Note:</b> Avoid this method as much as possible, since it overrides user's level
      * setting. A user trying to configure his logging properties may find confusing to see
      * his setting ignored.
-     * 
      * 
      * @throws IllegalStateException is {@link #redirectToCommonsLogging} has been invoked.
      */
@@ -129,9 +128,111 @@ public final class Logging {
             }
         } catch (NoClassDefFoundError error) {
             // May occurs if commons-logging is not in the classpath.
-            Utilities.unexpectedException("org.geotools.util", "Logging",
-                    "redirectToCommonsLogging", error);
+            unexpectedException("org.geotools.util", "Logging", "redirectToCommonsLogging", error);
         }
         return false;
+    }
+
+    /**
+     * Invoked when an unexpected error occurs. This method logs a message at the
+     * {@link Level#WARNING WARNING} level to the specified logger. The originating
+     * class name and method name are inferred from the error stack trace, using the
+     * first {@linkplain StackTraceElement stack trace element} for which the class
+     * name is inside a package or sub-package of the logger name. For example if
+     * the logger name is {@code "org.geotools.image"}, then this method will uses
+     * the first stack trace element where the fully qualified class name starts with
+     * {@code "org.geotools.image"} or {@code "org.geotools.image.io"}, but not
+     * {@code "org.geotools.imageio"}.
+     *
+     * @param  logger Where to log the error.
+     * @param  error  The error that occured.
+     * @return {@code true} if the error has been logged, or {@code false} if the logger
+     *         doesn't log anything at the {@link Level#WARNING WARNING} level.
+     */
+    public static boolean unexpectedException(final Logger logger, final Throwable error) {
+        if (logger.isLoggable(Level.WARNING)) {
+            unexpectedException(logger.getName(), null, null, error);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Invoked when an unexpected error occurs. This method logs a message at the
+     * {@link Level#WARNING WARNING} level to the logger for the specified package
+     * name. The originating class name and method name can optionnaly be specified.
+     * If any of them is {@code null}, then it will be inferred from the error stack
+     * trace as in {@link #unexpectedException(Logger, Throwable)}.
+     * <p>
+     * Explicit value for class and method names are sometime preferred to automatic
+     * inference for the following reasons:
+     *
+     * <ul>
+     *   <li><p>Automatic inference is not 100% reliable, since the Java Virtual Machine
+     *       is free to omit stack frame in optimized code.</p></li>
+     *   <li><p>When an exception occured in a private method used internally by a public
+     *       method, we sometime want to log the warning for the public method instead,
+     *       since the user is not expected to know anything about the existence of the
+     *       private method. If a developper really want to know about the private method,
+     *       the stack trace is still available anyway.</p></li>
+     * </ul>
+     * 
+     * @param paquet  The package where the error occurred, or {@code null}. This
+     *                information is used for fetching an appropriate {@link Logger}
+     *                for logging the error.
+     * @param classe  The class where the error occurred, or {@code null}.
+     * @param method  The method where the error occurred, or {@code null}.
+     * @param error   The error.
+     */
+    public static void unexpectedException(String paquet, String classe, String method,
+                                           final Throwable error)
+    {
+        final LogRecord record = Utilities.getLogRecord(error);
+        if (paquet==null || classe==null || method==null) {
+            final StackTraceElement[] elements = error.getStackTrace();
+            for (int i=0; i<elements.length; i++) {
+                final StackTraceElement e = elements[i];
+                final String c = e.getClassName();
+                if (paquet != null) {
+                    if (!c.startsWith(paquet)) {
+                        continue;
+                    }
+                    final int lg = paquet.length();
+                    if (c.length()>lg && Character.isJavaIdentifierPart(c.charAt(lg))) {
+                        continue;
+                    }
+                }
+                if (classe != null) {
+                    if (!c.endsWith(classe)) {
+                        continue;
+                    }
+                    final int lg = c.length() - classe.length() - 1;
+                    if (c.length()>=0 && Character.isJavaIdentifierPart(c.charAt(lg))) {
+                        continue;
+                    }
+                }
+                final String m = e.getMethodName();
+                if (method != null) {
+                    if (!m.equals(method)) {
+                        continue;
+                    }
+                }
+                final int separator = c.lastIndexOf('.');
+                if (paquet == null) {
+                    paquet = (separator >= 1) ? c.substring(0, separator-1) : "";
+                }
+                if (classe == null) {
+                    classe = c.substring(separator + 1);
+                }
+                if (method == null) {
+                    method = m;
+                }
+                break;
+            }
+        }
+        record.setSourceClassName (classe);
+        record.setSourceMethodName(method);
+        record.setThrown          (error );
+        Logger.getLogger(paquet).log(record);
     }
 }

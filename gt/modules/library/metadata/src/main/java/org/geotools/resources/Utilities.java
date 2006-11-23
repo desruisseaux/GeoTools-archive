@@ -195,6 +195,8 @@ compare:for (int i=0; i<c1.length; i++) {
      * @param classe  The class name where the error occurred.
      * @param method  The method name where the error occurred.
      * @param error   The error.
+     *
+     * @deprecated Replaced by {@link org.geotools.util.Logging#unexpectedException}.
      */
     public static void unexpectedException(final String   paquet,
                                            final String   classe,
@@ -235,7 +237,7 @@ compare:for (int i=0; i<c1.length; i++) {
     /**
      * Returns a log record for the specified exception.
      */
-    static LogRecord getLogRecord(final Throwable error) {
+    public static LogRecord getLogRecord(final Throwable error) {
         final StringBuffer buffer = new StringBuffer(getShortClassName(error));
         final String message = error.getLocalizedMessage();
         if (message != null) {
