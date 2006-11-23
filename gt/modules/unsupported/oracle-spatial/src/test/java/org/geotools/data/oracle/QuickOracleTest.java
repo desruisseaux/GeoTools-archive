@@ -88,7 +88,7 @@ public class QuickOracleTest extends DataTestCase {
         String host = resource.getString("host");
         String port = resource.getString("port");        
         String instance = resource.getString("instance");        
-
+        String schema = resource.getString("schema");
         String user = resource.getString("user");
         String password = resource.getString("passwd");
 
@@ -103,6 +103,7 @@ public class QuickOracleTest extends DataTestCase {
         	conn = pool.getConnection();
         }
         catch( Throwable t ){
+                t.printStackTrace();
         	System.out.println("Could not load test fixture, configure "+getClass().getResource("fixture.properties"));
         	t.printStackTrace();
         	return;
@@ -110,7 +111,7 @@ public class QuickOracleTest extends DataTestCase {
         reset();
         
         JDBCDataStoreConfig config =
-        	JDBCDataStoreConfig.createWithNameSpaceAndSchemaName( namespace, instance );                
+        	JDBCDataStoreConfig.createWithNameSpaceAndSchemaName( namespace, schema );                
         
         data = new OracleDataStore(pool, config );
         
@@ -126,7 +127,7 @@ public class QuickOracleTest extends DataTestCase {
     	if( !create ) return;    	
     	Statement st = conn.createStatement();
     	    	
-    	if( st.executeQuery("SELECT TABLE_NAME FROM USER_TABLES WHERE TABLE_NAME = 'ORA_TEST_POINTS'").next()){			
+    	if( st.executeQuery("SELECT TABLE_NAME FROM USER_TABLES WHERE TABLE_NAME = 'ORA_TEST_LINES'").next()){			
 	    	try {
 				st.execute("DROP TABLE ORA_TEST_LINES");
 				st.executeUpdate("DELETE FROM user_sdo_geom_metadata WHERE TABLE_NAME='ORA_TEST_LINES'");    	    	    			

@@ -101,7 +101,7 @@ public class OracleDataStoreTest extends TestCase {
         dstore = new OracleDataStore(cPool, properties.getProperty("schema"), new HashMap());
         dstore.setFIDMapper("ORA_TEST_POINTS", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_POINTS", "ID", Types.INTEGER), "ORA_TEST_POINTS"));
         dstore.setFIDMapper("ORA_TEST_LINES", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_LINES", "ID", Types.INTEGER), "ORA_TEST_LINES"));
-        dstore.setFIDMapper("RA_TEST_POLYGONS", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_POLYGONS", "ID", Types.INTEGER), "ORA_TEST_POLYGONS"));
+        dstore.setFIDMapper("ORA_TEST_POLYGONS", new TypedFIDMapper(new MaxIncFIDMapper("ORA_TEST_POLYGONS", "ID", Types.INTEGER), "ORA_TEST_POLYGONS"));
     }
 
     /*
@@ -147,8 +147,8 @@ public class OracleDataStoreTest extends TestCase {
 					        "MDSYS.SDO_DIM_ARRAY(MDSYS.SDO_DIM_ELEMENT('X',0,-20,0.5),MDSYS.SDO_DIM_ELEMENT('Y',0,10,0.5)),"+
 					    "NULL)");
 //		    	 st.execute("DROP INDEX GEOTOOLS.ORA_TEST_POINTS_SHAPE_IDX");		    	
-		    	st.execute("CREATE INDEX GEOTOOLS.ORA_TEST_POINTS_SHAPE_IDX "+
-		    				"ON GEOTOOLS.ORA_TEST_POINTS (SHAPE) INDEXTYPE IS " +
+		    	st.execute("CREATE INDEX ORA_TEST_POINTS_SHAPE_IDX "+
+		    				"ON ORA_TEST_POINTS (SHAPE) INDEXTYPE IS " +
 		    				"MDSYS.SPATIAL_INDEX PARAMETERS (' SDO_INDX_DIMS=2 LAYER_GTYPE=\"COLLECTION\"') ");		    			    	
 			}
     	}

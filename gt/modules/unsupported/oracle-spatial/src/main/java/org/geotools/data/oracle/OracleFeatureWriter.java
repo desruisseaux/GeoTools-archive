@@ -27,6 +27,7 @@ import oracle.jdbc.OracleConnection;
 import oracle.sql.STRUCT;
 
 import org.geotools.data.DataSourceException;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.JDBCTextFeatureWriter;
 import org.geotools.data.jdbc.MutableFIDFeature;
@@ -102,7 +103,7 @@ public class OracleFeatureWriter extends JDBCTextFeatureWriter {
             for (int i = 0; i < current.getNumberOfAttributes(); i++) {
                 AttributeType type = schema.getAttributeType(i);
 
-                if (type instanceof GeometricAttributeType) {
+                if (type instanceof GeometricAttributeType && !DataUtilities.attributesEqual(current.getAttribute(i), live.getAttribute(i))) {
                     Geometry geometry = (Geometry) current.getAttribute(i);
 
                     if (geometry == null) {

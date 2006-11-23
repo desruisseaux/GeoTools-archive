@@ -50,6 +50,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderOracle;
 import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -335,7 +336,7 @@ public class OracleDataStore extends JDBCDataStore {
 	    		}    		
 	    	}
 	    	Envelope extent = new Envelope(minx,maxx, miny,maxy );
-	    	JTS.ReferencedEnvelope ref = new JTS.ReferencedEnvelope( extent, crs );
+	    	ReferencedEnvelope ref = new ReferencedEnvelope( extent, crs );
 	    	return ref;
 	    }
     	catch( Exception erp ){

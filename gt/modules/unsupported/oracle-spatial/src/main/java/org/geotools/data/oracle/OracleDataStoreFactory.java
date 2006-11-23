@@ -158,7 +158,7 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
         String user = (String) USER.lookUp( params );
         String passwd = (String) PASSWD.lookUp( params );
         String schema = (String) SCHEMA.lookUp( params ); // checks uppercase
-        //String namespace = (String) NAMESPACE.lookUp( params );
+        String namespace = (String) NAMESPACE.lookUp( params );
         String dbtype = (String) DBTYPE.lookUp( params );
         
         if( !"oracle".equals( dbtype )){
@@ -174,7 +174,7 @@ public class OracleDataStoreFactory implements DataStoreFactorySpi {
             ConnectionPool pool = ocFactory.getConnectionPool();
             
             
-            OracleDataStore dataStore = new OracleDataStore(pool, schema, new HashMap());
+            OracleDataStore dataStore = new OracleDataStore(pool, namespace, schema, new HashMap());
 
             return dataStore;
         } catch (SQLException ex) {
