@@ -56,6 +56,11 @@ import javax.xml.namespace.QName;
  * @generated
  */
 public class XSHexBinaryBinding implements SimpleBinding {
+	
+	public XSHexBinaryBinding() {
+		DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
+	}
+	
     /**
      * @generated
      */
@@ -80,7 +85,7 @@ public class XSHexBinaryBinding implements SimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return byte[].class;
     }
 
     /**
@@ -91,11 +96,8 @@ public class XSHexBinaryBinding implements SimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
-
-        byte[] bin = DatatypeConverter.parseHexBinary((String) value);
-
-        return bin;
+        
+    	return DatatypeConverter.parseHexBinary((String) value);
     }
 
     /**
@@ -105,7 +107,6 @@ public class XSHexBinaryBinding implements SimpleBinding {
      * @generated modifiable
      */
     public String encode(Object object, String value) {
-        //TODO: implement
-        return null;
+        return DatatypeConverter.printHexBinary( (byte[]) object );
     }
 }
