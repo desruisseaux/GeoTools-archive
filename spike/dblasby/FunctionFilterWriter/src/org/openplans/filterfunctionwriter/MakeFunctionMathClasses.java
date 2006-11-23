@@ -1,3 +1,5 @@
+package org.openplans.filterfunctionwriter;
+
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
@@ -14,35 +16,47 @@
  *    Lesser General Public License for more details.
  *
  */
-import junit.framework.TestCase;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-
 /**
- * Basic idea:  1. for each method in the Math class (or whatever class you
- * specify - see main() ) 2.       make a .java file put the header in (ie.
- * includes, etc...) put the actual code in (see "emit()" below) put the
- * footer in (ie. finish the class "}") print the entries that should be put
- * in the service info file to the command line Create tests that show the
- * functions work as they should.
- *
- * @author dblasby 
- * @author Kasper Kaergaard, to adapt for the Math package,
- *         and  make unit tests (this should be combined with the original
- *         makefunction for something more generic, but don't have the time
- *         right now).
+ * Basic idea: 1. for each method in the Math class (or whatever class you
+ * specify - see main() ) 2. make a .java file put the header in (ie. includes,
+ * etc...) put the actual code in (see "emit()" below) put the footer in (ie.
+ * finish the class "}") print the entries that should be put in the service
+ * info file to the command line Create tests that show the functions work as
+ * they should.
+ * 
+ * @author dblasby
+ * @author Kasper Kaergaard, to adapt for the Math package, and make unit tests
+ *         (this should be combined with the original makefunction for something
+ *         more generic, but don't have the time right now).
  */
-public class MakeFunctionClasses {
+public class MakeFunctionMathClasses {
     private static final String PACKAGE_DECLARATION = "package org.geotools.filter.function.math;";
-    private static final String PATH_AND_FILE_NAME_PREFIX = "../gt/src/org/geotools/filter/function/math/FilterFunction_";
+
+    private static final String PATH_AND_FILE_NAME_PREFIX = "src/org/geotools/filter/function/math/FilterFunction_";
+
+    private static final String LICENSE = "/*\n"
+            + " *    GeoTools - OpenSource mapping toolkit\n"
+            + " *    http://geotools.org\n"
+            + " *    (C) 2005-2006, GeoTools Project Managment Committee (PMC)\n"
+            + " *    \n"
+            + " *    This library is free software; you can redistribute it and/or\n"
+            + " *    modify it under the terms of the GNU Lesser General Public\n"
+            + " *    License as published by the Free Software Foundation;\n"
+            + " *    version 2.1 of the License.\n"
+            + " *\n"
+            + " *    This library is distributed in the hope that it will be useful,\n"
+            + " *    but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+            + " *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
+            + " *    Lesser General Public License for more details.\n" + " */";
 
     public static void main(String[] args) {
-        MakeFunctionClasses cg = new MakeFunctionClasses();
+        MakeFunctionMathClasses cg = new MakeFunctionMathClasses();
 
         cg.handleClass(Math.class); // parent of all geometry types
     }
@@ -55,7 +69,7 @@ public class MakeFunctionClasses {
                     + ".java");
 
             PrintStream testPrintStream = new PrintStream(new FileOutputStream(
-                        testFile));
+                    testFile));
 
             createTestFileHeader(testPrintStream);
 
@@ -101,36 +115,34 @@ public class MakeFunctionClasses {
     }
 
     private void writeTestMethodInTestFile(PrintStream ps, Method method,
-        String name) {
+            String name) {
         try {
             int argsCount = method.getParameterTypes().length;
-            double[] values = new double[] { 1, -1, 2, -2, Math.PI, 0.5 * Math.PI };
-            String[] literalNames = new String[] {
-                    "literal_1", "literal_m1", "literal_2", "literal_m2",
-                    "literal_pi", "literal_05pi"
-                };
+            double[] values = new double[] { 1, -1, 2, -2, Math.PI,
+                    0.5 * Math.PI };
+            String[] literalNames = new String[] { "literal_1", "literal_m1",
+                    "literal_2", "literal_m2", "literal_pi", "literal_05pi" };
 
             ps.println("");
             ps.println("public void test" + name + "(){");
             ps.println("	try {");
             ps.println("");
             ps.println("		FunctionExpression " + name
-                + "Function = filterFactory.createFunctionExpression(\"" + name
-                + "\");");
+                    + "Function = filterFactory.createFunctionExpression(\""
+                    + name + "\");");
             ps.println("		assertEquals(\"Name is, \",\"" + name + "\"," + name
-                + "Function.getName());");
+                    + "Function.getName());");
             ps.println("		assertEquals(\"Number of arguments, \"," + argsCount
-                + "," + name + "Function.getArgCount());");
+                    + "," + name + "Function.getArgCount());");
             ps.println("");
             ps.println("		Expression[] expressions = new Expression["
-                + argsCount + "];");
-            ps.println("		" + name + "Function.setArgs(expressions);");
+                    + argsCount + "];");
 
             if (method.getParameterTypes().length > 0) {
                 for (int i = 0; i < 6; i++) {
                     String argument = "(" + values[i];
                     ps.println("		expressions[" + 0 + "] = " + literalNames[i]
-                        + ";");
+                            + ";");
 
                     for (int j = 1; j < argsCount; j++) {
                         int k = i + j;
@@ -141,54 +153,85 @@ public class MakeFunctionClasses {
 
                         argument = argument + "," + values[k];
                         ps.println("		expressions[" + j + "] = "
-                            + literalNames[k] + ";");
+                                + literalNames[k] + ";");
                     }
 
                     argument = argument + ")";
 
+                    ps.println("                " + name + "Function.setParameters(java.util.Arrays.asList(expressions));");
+
+                    
                     if (isNumber(method.getReturnType())) {
                         if ((method.getReturnType() == int.class)) {
-                            ps.println("		assertEquals(\"" + method.getName()
-                                + " of " + argument + ":\" ,(int)Math."
-                                + method.getName() + argument + " ,((Integer) "
-                                + name
-                                + "Function.getValue(null)).intValue(),0.00001);");
+                            ps
+                                    .println("		assertEquals(\""
+                                            + method.getName()
+                                            + " of "
+                                            + argument
+                                            + ":\" ,(int)Math."
+                                            + method.getName()
+                                            + argument
+                                            + " ,((Integer) "
+                                            + name
+                                            + "Function.getValue(null)).intValue(),0.00001);");
                         } else if ((method.getReturnType() == double.class)) {
                             ps.println("		double good" + i + " = Math."
-                                + method.getName() + argument + ";");
+                                    + method.getName() + argument + ";");
                             ps.println("		if(Double.isNaN(good" + i + ")){");
-                            ps.println("			assertTrue(\"" + method.getName()
-                                + " of " + argument
-                                + ":\" ,Double.isNaN(((Double) " + name
-                                + "Function.getValue(null)).doubleValue()));");
+                            ps
+                                    .println("			assertTrue(\""
+                                            + method.getName()
+                                            + " of "
+                                            + argument
+                                            + ":\" ,Double.isNaN(((Double) "
+                                            + name
+                                            + "Function.getValue(null)).doubleValue()));");
                             ps.println("        }else{");
-                            ps.println("			assertEquals(\"" + method.getName()
-                                + " of " + argument + ":\" ,(double)Math."
-                                + method.getName() + argument + " ,((Double) "
-                                + name
-                                + "Function.getValue(null)).doubleValue(),0.00001);");
+                            ps
+                                    .println("			assertEquals(\""
+                                            + method.getName()
+                                            + " of "
+                                            + argument
+                                            + ":\" ,(double)Math."
+                                            + method.getName()
+                                            + argument
+                                            + " ,((Double) "
+                                            + name
+                                            + "Function.getValue(null)).doubleValue(),0.00001);");
                             ps.println("		}");
                         } else if ((method.getReturnType() == long.class)) {
-                            ps.println("		assertEquals(\"" + method.getName()
-                                + " of " + argument + ":\" ,(long)Math."
-                                + method.getName() + argument + " ,((Long) "
-                                + name
-                                + "Function.getValue(null)).longValue(),0.00001);");
+                            ps
+                                    .println("		assertEquals(\""
+                                            + method.getName()
+                                            + " of "
+                                            + argument
+                                            + ":\" ,(long)Math."
+                                            + method.getName()
+                                            + argument
+                                            + " ,((Long) "
+                                            + name
+                                            + "Function.getValue(null)).longValue(),0.00001);");
                         } else if ((method.getReturnType() == float.class)) {
-                            ps.println("		assertEquals(\"" + method.getName()
-                                + " of " + argument + ":\" ,(float)Math."
-                                + method.getName() + argument + " ,((Float) "
-                                + name
-                                + "Function.getValue(null)).floatValue(),0.00001);");
+                            ps
+                                    .println("		assertEquals(\""
+                                            + method.getName()
+                                            + " of "
+                                            + argument
+                                            + ":\" ,(float)Math."
+                                            + method.getName()
+                                            + argument
+                                            + " ,((Float) "
+                                            + name
+                                            + "Function.getValue(null)).floatValue(),0.00001);");
                         } else {
                             throw new IllegalArgumentException(
-                                "dont know how to handle this - "
-                                + method.getParameterTypes()[0]);
+                                    "dont know how to handle this - "
+                                            + method.getParameterTypes()[0]);
                         }
                     } else {
                         throw new IllegalArgumentException(
-                            "dont know how to handle this - "
-                            + method.getParameterTypes()[0]);
+                                "dont know how to handle this - "
+                                        + method.getParameterTypes()[0]);
                     }
                 }
             }
@@ -201,7 +244,7 @@ public class MakeFunctionClasses {
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Method name: " + method.getName());
             System.out.println("Parameter Types: "
-                + method.getParameterTypes().length);
+                    + method.getParameterTypes().length);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -232,10 +275,10 @@ public class MakeFunctionClasses {
         ps.println("private FilterFactoryImpl filterFactory;");
         ps.println("protected void setUp() throws Exception {");
         ps.println("super.setUp();");
-        ps.println(
-            "filterFactory = (FilterFactoryImpl) FilterFactoryFinder.createFilterFactory();");
-        ps.println(
-            "literal_1 = (LiteralExpressionImpl) filterFactory.createLiteralExpression();");
+        ps
+                .println("filterFactory = (FilterFactoryImpl) FilterFactoryFinder.createFilterFactory();");
+        ps
+                .println("literal_1 = (LiteralExpressionImpl) filterFactory.createLiteralExpression();");
         ps.println("literal_pi = filterFactory.createLiteralExpression();");
         ps.println("literal_05pi = filterFactory.createLiteralExpression();");
         ps.println("literal_m1 = filterFactory.createLiteralExpression();");
@@ -248,12 +291,12 @@ public class MakeFunctionClasses {
         ps.println("literal_m2.setLiteral(new Double(-2));");
         ps.println("literal_pi.setLiteral(new Double(Math.PI));");
         ps.println("literal_05pi.setLiteral(new Double(0.5*Math.PI));");
-        ps.println(
-            "assertEquals(\"Literal Expression 0.0\",new Double(1.0), literal_1.getLiteral());");
-        ps.println(
-            "assertEquals(\"Literal Expression pi\",new Double(Math.PI), literal_pi.getLiteral());");
-        ps.println(
-            "assertEquals(\"Literal Expression 05pi\",new Double(0.5*Math.PI), literal_05pi.getLiteral());");
+        ps
+                .println("assertEquals(\"Literal Expression 0.0\",new Double(1.0), literal_1.getLiteral());");
+        ps
+                .println("assertEquals(\"Literal Expression pi\",new Double(Math.PI), literal_pi.getLiteral());");
+        ps
+                .println("assertEquals(\"Literal Expression 05pi\",new Double(0.5*Math.PI), literal_05pi.getLiteral());");
         ps.println("");
         ps.println("}");
         ps.println("");
@@ -264,66 +307,38 @@ public class MakeFunctionClasses {
 
     public void emitHeader(Method m, PrintStream printstream, String name) {
         printstream.println(PACKAGE_DECLARATION);
+        printstream.println(LICENSE);
         printstream.println("");
         printstream.println("");
-        printstream.println(
-            "//this code is autogenerated - you shouldnt be modifying it!");
+        printstream
+                .println("//this code is autogenerated - you shouldnt be modifying it!");
         printstream.println("");
 
         printstream.println("import org.geotools.feature.Feature;");
-        printstream.println("import org.geotools.filter.Expression;");
-        printstream.println("import org.geotools.filter.FilterFactory;");
-        printstream.println("import org.geotools.filter.FunctionExpression;");
-        printstream.println(
-            "import org.geotools.filter.FunctionExpressionImpl;");
-        printstream.println("import org.geotools.filter.LiteralExpression;");
+        // printstream.println("import org.geotools.filter.Expression;");
+        // /printstream.println("import org.geotools.filter.FilterFactory;");
+        // /printstream.println("import
+        // org.geotools.filter.FunctionExpression;");
+        printstream
+                .println("import org.geotools.filter.FunctionExpressionImpl;");
+        // printstream.println("import org.geotools.filter.LiteralExpression;");
         printstream.println("");
         printstream.println("");
         printstream.println("public class " + "FilterFunction_" + name
-            + " extends FunctionExpressionImpl implements FunctionExpression ");
+                + " extends FunctionExpressionImpl");
         printstream.println("{");
         printstream.println("");
         printstream.println("");
-        printstream.println(
-            "private Expression[] args; // list of args that this functions needs");
+        printstream.println("   public FilterFunction_" + name + "(){");
+        printstream.println("           super(\"" + name + "\");");
+        printstream.println("   }");
         printstream.println("");
         printstream.println("");
-        printstream.println("public FilterFunction_" + name + "()");
-        printstream.println("{");
-        printstream.println("}");
-        printstream.println("");
-        printstream.println("");
-        printstream.println("public String getName()");
-        printstream.println("{");
-        printstream.println("      return \"" + name + "\";");
-        printstream.println("}");
-        printstream.println("");
-        printstream.println("public int getArgCount()");
-        printstream.println("{");
+        printstream.println("   public int getArgCount(){");
         printstream.println("      return " + m.getParameterTypes().length
-            + ";");
-        printstream.println("}");
+                + ";");
+        printstream.println("   }");
         printstream.println("");
-        printstream.println("public void setArgs(Expression[] args)");
-        printstream.println("{");
-        printstream.println("      this.args = args;");
-        printstream.println("}");
-        printstream.println("");
-        printstream.println("public Expression[] getArgs()");
-        printstream.println("{");
-        printstream.println("       return args;");
-        printstream.println("}");
-        printstream.println("");
-        printstream.println("public String toString()");
-        printstream.println("{");
-        printstream.println("       String result =  \"" + name + "(\";");
-        printstream.println("       for (int t=0;t<args.length;t++)");
-        printstream.println("       {");
-        printstream.println("                result += args[t] +\",\";");
-        printstream.println("       }");
-        printstream.println("       result += \")\";");
-        printstream.println("       return result;");
-        printstream.println("}");
         printstream.println("");
     }
 
@@ -333,93 +348,98 @@ public class MakeFunctionClasses {
     }
 
     public void emitCode(Method m, PrintStream printstream) {
-        printstream.println("public Object getValue(Feature feature)");
-        printstream.println("{");
+        printstream.println("   public Object evaluate(Feature feature){");
 
-        //variable decs
+        // variable decs
         for (int t = 0; t < m.getParameterTypes().length; t++) {
-            printstream.println("      "
-                + formatClassName(m.getParameterTypes()[t]) + "  arg" + t + ";");
+            printstream.println("        "
+                    + formatClassName(m.getParameterTypes()[t]) + "  arg" + t
+                    + ";");
         }
 
         printstream.println("");
         printstream.println("");
 
-        //assignments
+        // assignments
         for (int t = 0; t < m.getParameterTypes().length; t++) {
-            printstream.println(
-                "      try{  //attempt to get value and perform conversion");
-            printstream.print("                arg" + t + " = ");
+            printstream
+                    .println("        try{  //attempt to get value and perform conversion");
+            printstream.print("            arg" + t + " = ");
 
             if (isNumber(m.getParameterTypes()[t])) {
                 if ((m.getParameterTypes()[t] == int.class)) {
-                    printstream.println("((Number) args[" + t
-                        + "].getValue(feature)).intValue();");
+                    printstream.println("((Number) getExpression(" + t
+                            + ").evaluate(feature)).intValue();");
                 } else if ((m.getParameterTypes()[t] == double.class)) {
-                    printstream.println("((Number) args[" + t
-                        + "].getValue(feature)).doubleValue();");
+                    printstream.println("((Number) getExpression(" + t
+                            + ").evaluate(feature)).doubleValue();");
                 } else if ((m.getParameterTypes()[t] == long.class)) {
-                    printstream.println("((Number) args[" + t
-                        + "].getValue(feature)).longValue();");
+                    printstream.println("((Number) getExpression(" + t
+                            + ").evaluate(feature)).longValue();");
                 } else if ((m.getParameterTypes()[t] == float.class)) {
-                    printstream.println("((Number) args[" + t
-                        + "].getValue(feature)).floatValue();");
+                    printstream.println("((Number) getExpression(" + t
+                            + ").evaluate(feature)).floatValue();");
                 } else {
                     throw new IllegalArgumentException(
-                        "dont know how to handle this - "
-                        + m.getParameterTypes()[t]);
+                            "dont know how to handle this - "
+                                    + m.getParameterTypes()[t]);
                 }
             } else if ((m.getParameterTypes()[t] == boolean.class)) {
-                printstream.println("((Boolean) args[" + t
-                    + "].getValue(feature)).booleanValue();");
+                printstream.println("((Boolean) getExpression(" + t
+                        + ").evaluate(feature)).booleanValue();");
             } else if ((m.getParameterTypes()[t] == String.class)) {
-                printstream.println("(args[" + t
-                    + "].getValue(feature)).toString(); // extra protection for strings");
-            } else //class
-             {
+                printstream
+                        .println("(getExpression("
+                                + t
+                                + ").evaluate(feature)).toString(); // extra protection for strings");
+            } else // class
+            {
                 printstream.println("("
-                    + formatClassName(m.getParameterTypes()[t]) + ") args[" + t
-                    + "].getValue(feature);");
+                        + formatClassName(m.getParameterTypes()[t])
+                        + ") getExpression(" + t + ").evaluate(feature);");
             }
 
             printstream.println("      }");
-            printstream.println(
-                "      catch (Exception e) // probably a type error");
-            printstream.println("      {");
-            printstream.println(
-                "            throw new IllegalArgumentException(\"Filter Function problem for function "
-                + m.getName() + " argument #" + t + " - expected type "
-                + formatClassName(m.getParameterTypes()[t]) + "\");");
+            printstream.println("      catch (Exception e){");
+            printstream.println("       // probably a type error");
+            printstream
+                    .println("            throw new IllegalArgumentException(\"Filter Function problem for function "
+                            + m.getName()
+                            + " argument #"
+                            + t
+                            + " - expected type "
+                            + formatClassName(m.getParameterTypes()[t])
+                            + "\");");
             printstream.println("      }");
             printstream.println("");
         }
 
-        //perform computation
+        // perform computation
         if (isNumber(m.getReturnType())) {
             if (m.getReturnType() == int.class) {
                 printstream.print("      return new Integer(Math."
-                    + m.getName() + "(");
+                        + m.getName() + "(");
             }
 
             if (m.getReturnType() == double.class) {
                 printstream.print("      return new Double(Math." + m.getName()
-                    + "(");
+                        + "(");
             }
 
             if (m.getReturnType() == long.class) {
                 printstream.print("      return new Long(Math." + m.getName()
-                    + "(");
+                        + "(");
             }
 
             if (m.getReturnType() == float.class) {
                 printstream.print("      return new Float(Math." + m.getName()
-                    + "(");
+                        + "(");
             }
         } else if (m.getReturnType() == boolean.class) {
             printstream.print("      return new Boolean(Math." + m.getName()
-                + "(");
-        } else //class
-         {
+                    + "(");
+        } else // class
+        {
             printstream.print("      return (Math." + m.getName() + "(");
         }
 
@@ -438,14 +458,14 @@ public class MakeFunctionClasses {
 
     public void writeServiceInfo(Method m, PrintStream printstream, String name) {
         printstream.println("org.geotools.filter.function.math.FilterFunction_"
-            + name);
+                + name);
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @param class1
-     *
+     * 
      * @return
      */
     private boolean isNumber(Class class1) {
