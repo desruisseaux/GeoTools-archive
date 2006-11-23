@@ -514,7 +514,7 @@ public class XSSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType HEXBINARY_TYPE = AttributeTypeFactory
-        .newAttributeType("hexBinary", java.lang.Object.class);
+        .newAttributeType("hexBinary", byte[].class);
 
     /**
      * <p>
