@@ -1,8 +1,8 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
- *
+ *    (C) 2006, GeoTools Project Managment Committee (PMC)
+ *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -19,7 +19,11 @@ package org.geotools.filter.function;
  * Function expression that returns a Boolean indicating if a given property
  * exists in the structure of the object being evaluated.
  * 
+ * @since 2.4
  * @author Gabriel Roldan, Axios Engineering
+ * @author Mauricio Pazos, Axios Engineering
+ * @version $Id$
+ * @source $URL$
  */
 import java.lang.reflect.InvocationTargetException;
 
