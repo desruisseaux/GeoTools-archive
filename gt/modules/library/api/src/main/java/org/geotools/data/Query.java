@@ -225,7 +225,7 @@ public interface Query {
     String getVersion();
 
     /**
-     * Temporarily override the coordinate system.
+     * Specifies the coordinate system that the features being queried are in.
      *
      * <p>
      * This denotes a request to Temporarily to override the coordinate system
@@ -236,9 +236,9 @@ public interface Query {
      *
      * <p>
      * This change is not persistant at all, indeed it is only for the Features
-     * returned by this Query.  It may be used in conjunction with the
-     * reprojection Coordinate System, but this one will always be used first,
-     * the reprojection CS will perform its operation on this cs.
+     * returned by this Query. If used in conjunction with {@link #getCoordinateSystemReproject()}
+     * the reprojection will occur from {@link #getCoordinateSystem()} to
+     * {@link #getCoordinateSystemReproject()}.
      * </p>
      *
      * @return The coordinate system to be returned for Features from this
@@ -260,7 +260,7 @@ public interface Query {
      * </p>
      *
      * <p>
-     * If the datastore has the wrong CS then getOverrideCS() should be set to
+     * If the datastore has the wrong CS then {@link #getCoordinateSystem()} should be set to
      * the CS to be used, this will perform the reprojection on that.
      * </p>
      *
