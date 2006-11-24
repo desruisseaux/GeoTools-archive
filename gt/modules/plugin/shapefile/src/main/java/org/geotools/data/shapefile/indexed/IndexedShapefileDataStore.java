@@ -518,7 +518,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
                 synchronized (FIX_LOCK) {
     
                     // remove index file if it is out of date.
-                    if( isIndexed(fixURL) ){
+                    if( indexFile.exists() && !isIndexed(fixURL) ){
                         if( !indexFile.delete() ){
                             indexFile.deleteOnExit();
                             fixURL=null;
@@ -588,7 +588,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             return false;
         File indexFile = new File(indexURL.getFile());
         File shpFile = new File( shpURL.getPath() );
-        return indexFile.exists() && indexFile.lastModified()<shpFile.lastModified();
+        return indexFile.exists() && indexFile.lastModified()>=shpFile.lastModified();
     }
     
     /**
@@ -717,7 +717,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             synchronized (GRX_LOCK) {
     
                 // remove index file if it is out of date.
-                if( isIndexed(treeURL) ){
+                if( treeFile.exists() && !isIndexed(treeURL) ){
                     if( !treeFile.delete() ){
                         treeFile.deleteOnExit();
                         createIndex=false;
@@ -771,7 +771,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
             synchronized (QIX_LOCK) {
 
                 // remove index file if it is out of date.
-                if( isIndexed(treeURL) ){
+                if( treeFile.exists() && !isIndexed(treeURL) ){
                     if( !treeFile.delete() ){
                         createIndex=false;
                         treeType=TREE_NONE;
