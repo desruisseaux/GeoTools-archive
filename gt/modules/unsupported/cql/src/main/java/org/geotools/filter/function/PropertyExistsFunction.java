@@ -37,7 +37,7 @@ import org.opengis.filter.expression.PropertyName;
 public class PropertyExistsFunction extends FunctionExpressionImpl {
 
     public PropertyExistsFunction() {
-        setName("PropertyExists");
+        super("PropertyExists");
     }
 
     public int getArgCount() {
