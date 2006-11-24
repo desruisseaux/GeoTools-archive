@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
@@ -754,7 +755,7 @@ public class XSSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType ANYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("anyType", java.lang.Object.class);
+        .newAttributeType("anyType", Map.class);
 
     /**
      * <p>
