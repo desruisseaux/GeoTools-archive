@@ -18,6 +18,7 @@
 package org.geotools.filter.function;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,8 +41,7 @@ import org.geotools.filter.visitor.AbstractFilterVisitor;
  * @since 2.2M2
  * @source $URL$
  */
-public class Collection_CountFunction extends FunctionExpressionImpl implements
-		FunctionExpression {
+public class Collection_CountFunction extends FunctionExpressionImpl{
 	/** The logger for the filter module. */
 	private static final Logger LOGGER = Logger
 			.getLogger("org.geotools.filter.function");
@@ -50,16 +50,11 @@ public class Collection_CountFunction extends FunctionExpressionImpl implements
 
 	Object count = null;
 
-	Expression expr;
-
 	/**
 	 * Creates a new instance of Collection_CountFunction
 	 */
 	public Collection_CountFunction() {
-	}
-
-	public String getName() {
-		return "Collection_Count";
+	    super("Collection_Count");
 	}
 
 	public int getArgCount() {
@@ -103,13 +98,10 @@ public class Collection_CountFunction extends FunctionExpressionImpl implements
 	 * @throws IllegalArgumentException
 	 *             DOCUMENT ME!
 	 */
-	public void setArgs(Expression[] args) {
-		if (args.length != 1) {
-			throw new IllegalArgumentException(
-					"Require a single argument for count");
-		}
+	public void setParameters(List args) {
+	    super.setParameters(args);
 
-		expr = args[0];
+                Expression expr = (Expression) getExpression(0);
 
 		// if we see "featureMembers/*/ATTRIBUTE" change to "ATTRIBUTE"
 		expr.accept(new AbstractFilterVisitor() {
@@ -155,27 +147,4 @@ public class Collection_CountFunction extends FunctionExpressionImpl implements
 		return count;
 	}
 
-	public void setExpression(Expression e) {
-		expr = e;
-	}
-
-	/**
-	 * Should be an xPath of the form: featureMembers/asterisk/NAME
-	 * 
-	 */
-	public Expression[] getArgs() {
-		Expression[] ret = new Expression[1];
-		ret[0] = expr;
-
-		return ret;
-	}
-
-	/**
-	 * Return this function as a string.
-	 * 
-	 * @return String representation of this count function.
-	 */
-	public String toString() {
-		return "Collection_Count(" + expr + ")";
-	}
 }

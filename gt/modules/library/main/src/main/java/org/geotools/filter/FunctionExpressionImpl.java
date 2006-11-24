@@ -15,11 +15,14 @@
  */
 package org.geotools.filter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
 
+import org.geotools.filter.Expression;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 /**
@@ -39,9 +42,9 @@ public abstract class FunctionExpressionImpl
     /**
      * Creates a new instance of FunctionExpression
      */
-    protected FunctionExpressionImpl() {
+    protected FunctionExpressionImpl(String name) {
+        this.name = name;
     }
-
 
      /**
      * Gets the type of this expression.
@@ -80,7 +83,16 @@ public abstract class FunctionExpressionImpl
      * Sets the function parameters.
      */
     public void setParameters(List params) {
-    	this.params = params;
+        if(params == null){
+            throw new NullPointerException("params can't be null");
+        }
+        final int argCount = getArgCount();
+        final int paramsSize = params.size();
+        if(argCount != paramsSize){
+            throw new IllegalArgumentException("Expected " + argCount + 
+                    " arguments, got " + paramsSize);
+        }
+    	this.params = new ArrayList(params);
     }
     
     /**
@@ -124,5 +136,43 @@ public abstract class FunctionExpressionImpl
      */
     public Map getImplementationHints() {
         return Collections.EMPTY_MAP;
+    }
+    
+    /**
+     * Creates a String representation of this Function with
+     * the function name and the arguments. The String created
+     * should be good for most subclasses
+     */
+    public String toString(){
+        StringBuffer sb = new StringBuffer();
+        sb.append(getName());
+        sb.append("(");
+        List params = getParameters();
+        if(params != null){
+            org.opengis.filter.expression.Expression exp;
+            for(Iterator it = params.iterator(); it.hasNext();){
+                exp = (Expression) it.next();
+                sb.append("[");
+                sb.append(exp);
+                sb.append("]");
+                if(it.hasNext()){
+                    sb.append(", ");
+                }
+            }
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+    
+    /**
+     * Utility method for subclasses to ask for an argument at a given index
+     * 
+     * @param index
+     * @return
+     */
+    protected org.opengis.filter.expression.Expression getExpression(int index){
+        org.opengis.filter.expression.Expression exp;
+        exp = (org.opengis.filter.expression.Expression) getParameters().get(index);
+        return exp;
     }
 }

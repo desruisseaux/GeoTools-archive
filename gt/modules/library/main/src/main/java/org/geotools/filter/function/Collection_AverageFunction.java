@@ -18,6 +18,8 @@
 package org.geotools.filter.function;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,8 +43,7 @@ import org.geotools.filter.visitor.AbstractFilterVisitor;
  * @since 2.2M2
  * @source $URL$
  */
-public class Collection_AverageFunction extends FunctionExpressionImpl
-    implements FunctionExpression {
+public class Collection_AverageFunction extends FunctionExpressionImpl {
     /** The logger for the filter module. */
     private static final Logger LOGGER = Logger.getLogger(
             "org.geotools.filter.function");
@@ -54,10 +55,7 @@ public class Collection_AverageFunction extends FunctionExpressionImpl
      * Creates a new instance of Collection_AverageFunction
      */
     public Collection_AverageFunction() {
-    }
-
-    public String getName() {
-        return "Collection_Average";
+        super("Collection_Average");
     }
 
     public int getArgCount() {
@@ -100,13 +98,15 @@ public class Collection_AverageFunction extends FunctionExpressionImpl
      *
      * @throws IllegalArgumentException DOCUMENT ME!
      */
-    public void setArgs(Expression[] args) {
-        if (args.length != 1) {
+    public void setParameters(List params){
+        super.setParameters(params);
+        if (params.size() != 1) {
             throw new IllegalArgumentException(
                 "Require a single argument for average");
         }
 
-        expr = args[0];
+        //HACK: remove cast once completely moved to GeoAPI
+        expr = (Expression)getExpression(0);
 
         // if we see "featureMembers/*/ATTRIBUTE" change to "ATTRIBUTE"
         expr.accept(new AbstractFilterVisitor() {
@@ -153,19 +153,9 @@ public class Collection_AverageFunction extends FunctionExpressionImpl
     }
 
     public void setExpression(Expression e) {
-        expr = e;
+        setParameters(Collections.singletonList(e));
     }
 
-    /**
-     * Should be an xPath of the form: featureMembers/asterisk/NAME
-     *
-     */
-    public Expression[] getArgs() {
-        Expression[] ret = new Expression[1];
-        ret[0] = expr;
-
-        return ret;
-    }
 
     /**
      * Return this function as a string.

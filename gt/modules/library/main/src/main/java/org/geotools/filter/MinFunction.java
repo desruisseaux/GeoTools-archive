@@ -18,6 +18,7 @@
 package org.geotools.filter;
 
 import org.geotools.feature.Feature;
+import org.opengis.filter.expression.Expression;
 
 
 /**
@@ -28,21 +29,12 @@ import org.geotools.feature.Feature;
  * @version $Id$
  * @deprecated - use org.geotools.filter.function.math.MinFunction instead
  */
-public class MinFunction extends FunctionExpressionImpl
-    implements FunctionExpression {
-    /** The first expression to evaluate */
-    private Expression expA;
-
-    /** The first expression to evaluate */
-    private Expression expB;
-
-    /** The array of expressions to evaluate */
-    private Expression[] args;
-
+public class MinFunction extends FunctionExpressionImpl{
     /**
      * Creates a new instance of MinFunction
      */
     public MinFunction() {
+        super("Min");
     }
 
     /**
@@ -53,8 +45,11 @@ public class MinFunction extends FunctionExpressionImpl
      * @return Value of the feature object.
      */
     public Object evaluate(Feature feature) {
-        double first = ((Number) expA.getValue(feature)).doubleValue();
-        double second = ((Number) expB.getValue(feature)).doubleValue();
+        org.opengis.filter.expression.Expression expA = (Expression) getParameters().get(0);
+        org.opengis.filter.expression.Expression expB = (Expression) getParameters().get(1);
+        
+        double first = ((Number) expA.evaluate(feature)).doubleValue();
+        double second = ((Number) expB.evaluate(feature)).doubleValue();
 
         return new Double(Math.min(first, second));
     }
@@ -68,41 +63,4 @@ public class MinFunction extends FunctionExpressionImpl
         return 2;
     }
 
-    /**
-     * Gets the name of this function.
-     *
-     * @return the name of the function.
-     */
-    public String getName() {
-        return "Min";
-    }
-
-    /**
-     * Sets the arguments to be evaluated by this function.
-     *
-     * @param args an array of expressions to be evaluated.
-     */
-    public void setArgs(Expression[] args) {
-        expA = args[0];
-        expB = args[1];
-        this.args = args;
-    }
-
-    /**
-     * Gets the arguments to be evaluated by this function.
-     *
-     * @return an array of the args to be evaluated.
-     */
-    public Expression[] getArgs() {
-        return args;
-    }
-
-    /**
-     * Return this function as a string.
-     *
-     * @return String representation of this min function.
-     */
-    public String toString() {
-        return "Min( " + expA + ", " + expB + ")";
-    }
 }

@@ -37,25 +37,17 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author  James
  * @source $URL$
  */
-public class AreaFunction extends FunctionExpressionImpl 
-	implements org.geotools.filter.FunctionExpression { 
+public class AreaFunction extends FunctionExpressionImpl{ 
     
-    /**
-     * Holds the geometry to calculate the area of
-     */
-    private Expression geom;
-    private Expression[] args;
-        
     /** Creates a new instance of AreaFunction */
     public AreaFunction() {
-    }
-    
-    public short getType(){
-        return DefaultExpression.FUNCTION;
+        super("Area");
     }
     
     public Object evaluate(Feature feature) {
-    	Geometry g = (Geometry)geom.evaluate(feature);
+        org.opengis.filter.expression.Expression geom;
+        geom = (org.opengis.filter.expression.Expression)getParameters().get(0);
+        Geometry g = (Geometry)geom.evaluate(feature);
     	
     	return new Double( getArea( g ));
     }
@@ -64,37 +56,7 @@ public class AreaFunction extends FunctionExpressionImpl
         return 1;
     }
     
-    public String getName() {
-        return "Area";
-    }
-    
-    public void setArgs(Expression[] args) {
-    	geom = (Expression)args[0];
-    	this.args = args;
-    }
-    
-    /** Used by FilterVisitors to perform some action on this filter instance.
-     * Typicaly used by Filter decoders, but may also be used by any thing which needs
-     * infomration from filter structure.
-     *
-     * Implementations should always call: visitor.visit(this);
-     *
-     * It is importatant that this is not left to a parent class unless the parents
-     * API is identical.
-     *
-     * 
-     */
 
-    public Expression[] getArgs() {
-        return args;
-    }
-
-    /**
-     * Returns the implementation hints. The default implementation returns en empty map.
-     */
-    public Map getImplementationHints() {
-        return Collections.EMPTY_MAP;
-    }
     /**
      * Returns the area of a GeometryCollection.
      *

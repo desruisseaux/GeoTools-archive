@@ -25,11 +25,13 @@ import java.util.Map;
 import org.geotools.feature.Feature;
 import org.geotools.filter.DefaultExpression;
 import org.geotools.filter.Expression;
+import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.util.ProgressListener;
+import org.opengis.filter.expression.ExpressionVisitor;
 
 /**
  * Parent for classifiers which break a feature collection into the specified number of classes.
@@ -56,9 +58,17 @@ public abstract class ClassificationFunction extends DefaultExpression implement
         setName("ClassificationFunction");
         params.add(0, null);
         params.add(1, null);
+        this.expressionType = ExpressionType.FUNCTION;
     }
     
     public abstract int getArgCount();
+    
+    /**
+     * @see org.opengis.filter.expression.Expression#accept(ExpressionVisitor, Object)
+     */
+    public Object accept(ExpressionVisitor visitor, Object extraData) {
+        return visitor.visit(this, extraData);
+    }
     
     //overriding evaluate(feature) to point at evaluate(object)
     public Object evaluate(Feature feature) {

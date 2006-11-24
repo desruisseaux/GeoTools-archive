@@ -25,7 +25,7 @@ public class ClassifyFunction extends FunctionExpressionImpl {
     //parameters are expression, classifier
     
     public ClassifyFunction() {
-        setName("classify");
+        super("classify");
     }
     
     public int getArgCount() {
