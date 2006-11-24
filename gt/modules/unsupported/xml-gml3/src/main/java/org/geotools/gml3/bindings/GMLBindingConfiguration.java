@@ -16,6 +16,7 @@
 package org.geotools.gml3.bindings;
 
 import org.picocontainer.MutablePicoContainer;
+import sun.java2d.loops.SurfaceType;
 import org.geotools.gml2.bindings.GMLCoordTypeBinding;
 import org.geotools.gml2.bindings.GMLCoordinatesTypeBinding;
 import org.geotools.xml.BindingConfiguration;
@@ -45,8 +46,13 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
             GMLCoordinatesTypeBinding.class);
         //container.registerComponentImplementation(GML.COORDTYPE,CoordTypeBinding.class);
         container.registerComponentImplementation(GML.CoordType, GMLCoordTypeBinding.class);
+        container.registerComponentImplementation(GML.CurveArrayPropertyType,
+            CurveArrayPropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.CurveType, CurveTypeBinding.class);
         container.registerComponentImplementation(GML.CurvePropertyType,
             CurvePropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.CurveSegmentArrayPropertyType,
+            CurveSegmentArrayPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.DirectPositionListType,
             DirectPositionListTypeBinding.class);
         container.registerComponentImplementation(GML.DirectPositionType,
@@ -63,8 +69,12 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(GML.LinearRingType, LinearRingTypeBinding.class);
         container.registerComponentImplementation(GML.LineStringPropertyType,
             LineStringPropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.LineStringSegmentType,
+            LineStringSegmentTypeBinding.class);
         container.registerComponentImplementation(GML.LineStringType, LineStringTypeBinding.class);
+
         container.registerComponentImplementation(GML.MeasureType, MeasureTypeBinding.class);
+        container.registerComponentImplementation(GML.MultiCurveType, MultiCurveTypeBinding.class);
         container.registerComponentImplementation(GML.MultiCurvePropertyType,
             MultiCurvePropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiLineStringPropertyType,
@@ -78,6 +88,8 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
             MultiPolygonPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.MultiPolygonType,
             MultiPolygonTypeBinding.class);
+        container.registerComponentImplementation(GML.MultiSurfaceType,
+            MultiSurfaceTypeBinding.class);
         container.registerComponentImplementation(GML.MultiSurfacePropertyType,
             MultiSurfacePropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PointArrayPropertyType,
@@ -88,6 +100,8 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(GML.PolygonPropertyType,
             PolygonPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.PolygonType, PolygonTypeBinding.class);
+        container.registerComponentImplementation(GML.SurfaceArrayPropertyType,
+            SurfaceArrayPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.SurfacePropertyType,
             SurfacePropertyTypeBinding.class);
     }

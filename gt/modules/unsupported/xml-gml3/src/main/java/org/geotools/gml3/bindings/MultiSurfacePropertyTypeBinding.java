@@ -17,6 +17,7 @@ package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import org.geotools.gml3.MultiSurface;
 import org.geotools.xml.*;
 
 
@@ -62,7 +63,7 @@ public class MultiSurfacePropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return MultiPolygon.class;
+        return MultiSurface.class;
     }
 
     /**
@@ -73,6 +74,6 @@ public class MultiSurfacePropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return node.getChildValue(MultiPolygon.class);
+        return node.getChildValue(MultiSurface.class);
     }
 }

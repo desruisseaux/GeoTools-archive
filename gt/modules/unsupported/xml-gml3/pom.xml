@@ -132,7 +132,7 @@
           <generateBindingInterface>false</generateBindingInterface>
           <generateSchemaLocationResolver>false</generateSchemaLocationResolver>
           <includes>
-						<include>AbstractSurfaceType</include>
+						<include>SurfaceArrayPropertyType</include>
           </includes>
         </configuration>
       </plugin>

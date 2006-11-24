@@ -19,6 +19,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import org.geotools.gml3.Curve;
 
 
 /**
@@ -28,6 +32,8 @@ import javax.xml.namespace.QName;
  *
  */
 public class GML3MockData {
+    static GeometryFactory gf = new GeometryFactory();
+
     static Element point(Document document, Node parent) {
         Element point = element(GML.Point, document, parent);
 
@@ -35,6 +41,10 @@ public class GML3MockData {
         pos.appendChild(document.createTextNode("1.0 2.0 "));
 
         return point;
+    }
+
+    static LineString lineString() {
+        return gf.createLineString(new Coordinate[] { new Coordinate(1, 2), new Coordinate(3, 4) });
     }
 
     static Element lineString(Document document, Node parent) {
@@ -92,6 +102,10 @@ public class GML3MockData {
         posList.appendChild(document.createTextNode("1.0 2.0 3.0 4.0 5.0 6.0 1.0 2.0"));
 
         return linearRing;
+    }
+
+    static Curve curve() {
+        return new Curve(new LineString[] { lineString() }, gf);
     }
 
     static Element polygonWithNoInterior(Document document, Node parent) {

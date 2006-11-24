@@ -17,6 +17,7 @@ package org.geotools.gml3.bindings;
 
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.MultiLineString;
+import org.geotools.gml3.MultiCurve;
 import org.geotools.xml.*;
 
 
@@ -62,7 +63,7 @@ public class MultiCurvePropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return MultiLineString.class;
+        return MultiCurve.class;
     }
 
     /**
@@ -73,6 +74,6 @@ public class MultiCurvePropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return node.getChildValue(MultiLineString.class);
+        return node.getChildValue(MultiCurve.class);
     }
 }

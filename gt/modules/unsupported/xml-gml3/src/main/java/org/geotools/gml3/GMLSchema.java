@@ -1451,7 +1451,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType LINESTRINGSEGMENTARRAYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LineStringSegmentArrayPropertyType", java.lang.Object.class);
+        .newAttributeType("LineStringSegmentArrayPropertyType", LineString[].class);
 
     /**
      * <p>
@@ -3642,7 +3642,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MULTICURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiCurveType",
-            java.lang.Object.class);
+            MultiCurve.class);
 
     /**
      * <p>
@@ -4289,7 +4289,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType CURVEARRAYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CurveArrayPropertyType", java.lang.Object.class);
+        .newAttributeType("CurveArrayPropertyType", Curve[].class);
 
     /**
      * <p>
@@ -4499,7 +4499,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MULTICURVEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiCurvePropertyType", java.lang.Object.class);
+        .newAttributeType("MultiCurvePropertyType", MultiCurve.class);
 
     /**
      * <p>
@@ -6776,7 +6776,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MULTISURFACETYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiSurfaceType",
-            java.lang.Object.class);
+            MultiSurface.class);
 
     /**
      * <p>
@@ -7027,7 +7027,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MULTISURFACEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiSurfacePropertyType", java.lang.Object.class);
+        .newAttributeType("MultiSurfacePropertyType", MultiSurface.class);
 
     /**
      * <p>
@@ -8466,7 +8466,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType CURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("CurveType",
-            java.lang.Object.class);
+            Curve.class);
 
     /**
      * <p>
@@ -9851,7 +9851,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType LINESTRINGSEGMENTTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("LineStringSegmentType", java.lang.Object.class);
+        .newAttributeType("LineStringSegmentType", LineString.class);
 
     /**
      * <p>
@@ -10413,7 +10413,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType CURVEPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("CurvePropertyType",
-            java.lang.Object.class);
+            Curve.class);
 
     /**
      * <p>
