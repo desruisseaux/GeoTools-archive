@@ -516,10 +516,9 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			File indexFile = new File(fixURL.getFile());
             if (isLocal()) {
                 synchronized (FIX_LOCK) {
-                    File shpFile = new File( shpURL.getPath() );
     
                     // remove index file if it is out of date.
-                    if( indexFile.exists() && indexFile.lastModified()<shpFile.lastModified() ){
+                    if( isIndexed(fixURL) ){
                         if( !indexFile.delete() ){
                             indexFile.deleteOnExit();
                             fixURL=null;
@@ -583,6 +582,23 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 
 		return records;
 	}
+
+    private boolean isIndexed( URL indexURL ) {
+        if( !isLocal())
+            return false;
+        File indexFile = new File(indexURL.getFile());
+        File shpFile = new File( shpURL.getPath() );
+        return indexFile.exists() && indexFile.lastModified()<shpFile.lastModified();
+    }
+    
+    /**
+     * Returns true if the indices already exist and do not need to be regenerated.
+     *
+     * @return true if the indices already exist and do not need to be regenerated.
+     */
+    public boolean isIndexed( ){
+        return isIndexed(fixURL) && isIndexed(treeURL);
+    }
 
 	/**
 	 * Queries the spatial index
@@ -698,11 +714,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 			}
 
 			File treeFile = new File(treeURL.getPath());
-			File shpFile = new File( shpURL.getPath() );
             synchronized (GRX_LOCK) {
     
                 // remove index file if it is out of date.
-                if( treeFile.exists() && treeFile.lastModified()<shpFile.lastModified() ){
+                if( isIndexed(treeURL) ){
                     if( !treeFile.delete() ){
                         treeFile.deleteOnExit();
                         createIndex=false;
@@ -753,11 +768,10 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 		QuadTree quadTree=null;
 		if (quadTree == null) {
             File treeFile = new File(treeURL.getPath());
-            File shpFile = new File( shpURL.getPath() );
             synchronized (QIX_LOCK) {
 
                 // remove index file if it is out of date.
-                if( treeFile.exists() && treeFile.lastModified()<shpFile.lastModified() ){
+                if( isIndexed(treeURL) ){
                     if( !treeFile.delete() ){
                         createIndex=false;
                         treeType=TREE_NONE;
@@ -988,7 +1002,7 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
         return ret;
     }
 
-    /**
+        /**
 	 * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
 	 */
 	public FeatureSource getFeatureSource(final String typeName)
