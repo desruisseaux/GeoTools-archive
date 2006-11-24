@@ -20,7 +20,7 @@ public class PojoPropertyAccessorTest extends TestCase {
     public void testDateAccess(){
         Date date = new Date();
         
-        assertEquals( date.getHours(), access.get(date, ff.property( "hours" )) );
+        assertEquals( date.getHours(), access.get( date, "hours" ) );
         
     }
     
