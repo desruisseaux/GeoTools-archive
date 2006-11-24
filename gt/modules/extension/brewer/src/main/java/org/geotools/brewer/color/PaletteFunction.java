@@ -26,6 +26,7 @@ import org.geotools.filter.function.ClassificationFunction;
 
 //import edu.psu.geovista.colorbrewer.OriginalColor;
 import java.awt.Color;
+import java.util.List;
 
 
 /**
@@ -45,6 +46,7 @@ public class PaletteFunction extends FunctionExpressionImpl
     }
 
     public PaletteFunction(FilterFactory factory) {
+        super("Palette");
         ff = factory;
     }
 
@@ -56,21 +58,10 @@ public class PaletteFunction extends FunctionExpressionImpl
         return 2;
     }
 
-    public Expression[] getArgs() {
-        Expression[] ret = new Expression[2];
-        ret[0] = classifier;
-        ret[1] = ff.createLiteralExpression(paletteName);
-
-        return ret;
-    }
-
-    public String getName() {
-        return "Palette";
-    }
-
-    public void setArgs(Expression[] args) {
-        classifier = (ClassificationFunction) args[0];
-        paletteName = ((LiteralExpression) args[1]).getLiteral().toString();
+    public void setParameters(List args) {
+        super.setParameters(args);
+        classifier = (ClassificationFunction) getExpression(0);
+        paletteName = ((LiteralExpression) getExpression(1)).getLiteral().toString();
     }
 
     public Expression getEvaluationExpression() {
