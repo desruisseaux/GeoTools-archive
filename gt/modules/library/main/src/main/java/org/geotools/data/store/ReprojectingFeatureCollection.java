@@ -61,20 +61,30 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
 
     public ReprojectingFeatureCollection(FeatureCollection delegate,
             CoordinateReferenceSystem target) {
-        this.delegate = delegate;
+        this( delegate, delegate.getSchema().getDefaultGeometry().getCoordinateSystem(), target );
+    }
+    
+    public ReprojectingFeatureCollection(
+		FeatureCollection delegate, CoordinateReferenceSystem source, CoordinateReferenceSystem target
+	) {
+    	this.delegate = delegate;
         this.target = target;
         FeatureType schema = delegate.getSchema();
         this.schema = reType(schema, target);
+       
         FeatureType featureType = delegate.getFeatureType();
         this.featureType = reType(featureType, target);
 
-        CoordinateReferenceSystem source = schema.getDefaultGeometry()
-                .getCoordinateSystem();
         if (source == null) {
-            throw new IllegalArgumentException("Could not determine source CRS");
+            throw new NullPointerException("source crs");
         }
+        if ( target == null ) {
+        	throw new NullPointerException("destination crs");
+        }
+        
         this.transform = transform(source, target);
     }
+
 
     private MathTransform transform(CoordinateReferenceSystem source,
             CoordinateReferenceSystem target) {
@@ -110,7 +120,7 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
 
     public Iterator iterator() {
         try {
-            return new ReprojectingIterator(iterator(), transform, schema);
+            return new ReprojectingIterator(delegate.iterator(), transform, schema);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
