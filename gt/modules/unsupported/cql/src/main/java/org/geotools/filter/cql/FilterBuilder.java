@@ -488,18 +488,6 @@ public class FilterBuilder {
                 // routine invocation Geo Operation
                 // ----------------------------------------
             case JJTROUTINEINVOCATION_GEOOP_EQUAL_NODE:
-                return buildBinaryComparasionOperator(JJTCOMPARATIONPREDICATE_EQ_NODE); // TODO
-                // factory
-                // have
-                // problem
-                // to
-                // build
-                // Equals
-                // filter
-                // and
-                // Geometry
-                // parameter
-
             case JJTROUTINEINVOCATION_GEOOP_DISJOINT_NODE:
             case JJTROUTINEINVOCATION_GEOOP_INTERSECT_NODE:
             case JJTROUTINEINVOCATION_GEOOP_TOUCH_NODE:
@@ -688,6 +676,9 @@ public class FilterBuilder {
             BinarySpatialOperator filter = null;
 
             switch (nodeType) {
+            case JJTROUTINEINVOCATION_GEOOP_EQUAL_NODE:
+                filter = ff.equal(property, geom);
+                break;
 
             case JJTROUTINEINVOCATION_GEOOP_DISJOINT_NODE:
                 filter = ff.disjoint(property, geom);
@@ -705,13 +696,11 @@ public class FilterBuilder {
                 break;
 
             case JJTROUTINEINVOCATION_GEOOP_WITHIN_NODE:
-                throw new IllegalStateException(
-                        "Cannot create a within filter until"
-                                + "http://jira.codehaus.org/browse/GEO-92 and "
-                                + "http://jira.codehaus.org/browse/GEOT-1028 "
-                                + "are fixed.");
-                // filter = ff.within(property, geom);
-                // break;
+                //TODO: remove cast once http://jira.codehaus.org/browse/GEO-92 and
+                //http://jira.codehaus.org/browse/GEOT-1028 are fixed.
+                FilterFactoryImpl ffi = (FilterFactoryImpl) ff;
+                filter = ffi.within(property, geom);
+                break;
             case JJTROUTINEINVOCATION_GEOOP_CONTAIN_NODE:
                 filter = ff.contains(property, geom);
                 break;
