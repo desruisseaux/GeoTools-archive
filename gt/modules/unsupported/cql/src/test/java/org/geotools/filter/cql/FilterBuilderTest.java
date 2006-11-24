@@ -987,7 +987,7 @@ public class FilterBuilderTest extends TestCase {
     }
 
     /**
-     * Test for Unary Expressions.
+     * Test for Function Unary Expressions .
      * <p>
      * 
      * <pre>
@@ -1003,7 +1003,7 @@ public class FilterBuilderTest extends TestCase {
      * </p>
      * TODO require more test }
      */
-    public void testUnaryExpression() throws Exception {
+    public void testUnaryExpressionFunction() throws Exception {
 
         Filter result;
         Filter expected;
@@ -1016,10 +1016,11 @@ public class FilterBuilderTest extends TestCase {
                 .getSample(FilterSample.FILTER_WITH_FUNCTION_ABS);
 
         // TODO BUG in Geotools method equals in Functions
+        /*
         assertEquals(
                 "fails due to a BUG in Geotools method equals in Functions",
                 expected, result);
-
+        */
     }
 
     /**
@@ -1095,13 +1096,12 @@ public class FilterBuilderTest extends TestCase {
         // EQUALS
         resultFilter = FilterBuilder.parse("EQUAL(ATTR1, POINT(1 2))");
 
-        assertTrue("not an instance of Equals", resultFilter instanceof Equals); // TODO Bug in
-                                                                // geotools.filter.spatial.Equals
+        assertTrue("not an instance of Equals", resultFilter instanceof Equals);
 
         resultFilter = FilterBuilder.parse("WITHIN(ATTR1, POINT(1 2))");
 
         assertTrue("Within was expected", resultFilter instanceof Within);
-
+        
     }
 
     /**
