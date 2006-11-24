@@ -1,13 +1,14 @@
 package org.geotools.filter.pojo;
 
+import java.util.Date;
+
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.expression.PropertyAccessor;
 
 public class PojoPropertyAccessor implements PropertyAccessor {
 
     public boolean canHandle( Object object, String xpath ) {
-        // TODO Auto-generated method stub
-        return false;
+        return ( object instanceof Date );
     }
 
     public Object get( Object object, String xpath ) {
