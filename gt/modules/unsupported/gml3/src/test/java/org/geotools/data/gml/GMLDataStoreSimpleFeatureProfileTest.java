@@ -2,15 +2,14 @@ package org.geotools.data.gml;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
-
-import junit.framework.TestCase;
 
 public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 
@@ -30,7 +29,7 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 		assertTrue( names.contains( "AggregateGeoFeature" ) );
 	}
 	
-	public void testGetSchema() throws IOException {
+	public void testGetSchema1() throws IOException {
 		FeatureType featureType = 
 			dataStore.getSchema( "PrimitiveGeoFeature" );
 		assertNotNull( featureType );
@@ -40,7 +39,17 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 		assertNotNull( featureType.getAttributeType( "surfaceProperty" ) );
 	}
 	
-	public void testGetFeatures() throws Exception {
+	public void testGetSchema2() throws IOException {
+		FeatureType featureType = 
+			dataStore.getSchema( "AggregateGeoFeature" );
+		assertNotNull( featureType );
+		
+		assertNotNull( featureType.getAttributeType( "multiPointProperty" ) );
+		assertNotNull( featureType.getAttributeType( "multiCurveProperty" ) );
+		assertNotNull( featureType.getAttributeType( "multiSurfaceProperty" ) );
+	}
+	
+	public void testGetFeatures1() throws Exception {
 		FeatureCollection features = dataStore.getFeatureSource( "PrimitiveGeoFeature" ).getFeatures();
 		assertEquals( 4, features.size() );
 		
@@ -49,6 +58,21 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 		try {
 			Feature f = (Feature) iterator.next();
 			assertEquals( "f001", f.getID() );
+		}
+		finally {
+			features.close( iterator );
+		}
+	}
+	
+	public void testGetFeatures2() throws Exception {
+		FeatureCollection features = dataStore.getFeatureSource( "AggregateGeoFeature" ).getFeatures();
+		assertEquals( 3, features.size() );
+		
+		Iterator iterator = features.iterator();
+		assertTrue( iterator.hasNext() );
+		try {
+			Feature f = (Feature) iterator.next();
+			assertEquals( "f005", f.getID() );
 		}
 		finally {
 			features.close( iterator );
