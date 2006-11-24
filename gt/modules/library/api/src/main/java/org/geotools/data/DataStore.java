@@ -169,7 +169,7 @@ public interface DataStore {
      * </p>
      * @param query Query.getTypeName() locates FeatureType being viewed
      *
-     * @return FeatureSource providing opperations for featureType
+     * @return FeatureSource providing operations for featureType
      * @throws IOException If FeatureSource is not available
      * @throws SchemaException If fetureType is not covered by existing schema
      */
@@ -196,7 +196,7 @@ public interface DataStore {
      *
      * @param typeName
      *
-     * @return FeatureSource (or subclass) providing opperations for typeName
+     * @return FeatureSource (or subclass) providing operations for typeName
      */
     FeatureSource getFeatureSource(String typeName) throws IOException;
 
@@ -306,7 +306,7 @@ public interface DataStore {
      *
      * @param query Requested form of the returned Features and the filter used
      *              to constraints the results
-     * @param transaction Transaction this query opperates against
+     * @param transaction Transaction this query operates against
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
@@ -363,7 +363,7 @@ public interface DataStore {
      *
      * @param typeName Indicates featureType to be modified
      * @param filter constraints used to limit the modification
-     * @param transaction Transaction this query opperates against
+     * @param transaction Transaction this query operates against
      *
      * @return FeatureWriter Allows Sequential Modification of featureType
      */
@@ -385,7 +385,7 @@ public interface DataStore {
      * </p>
      *
      * @param typeName Indicates featureType to be modified
-     * @param transaction Transaction to opperates against
+     * @param transaction Transaction to operates against
      *
      * @return FeatureReader Allows Sequential Processing of featureType
      */
@@ -402,7 +402,7 @@ public interface DataStore {
      * </p>
      *
      * @param typeName Indicates featureType to be modified
-     * @param transaction Transaction to opperates against
+     * @param transaction Transaction to operates against
      *
      * @return FeatureWriter that may only be used to append new content
      *
