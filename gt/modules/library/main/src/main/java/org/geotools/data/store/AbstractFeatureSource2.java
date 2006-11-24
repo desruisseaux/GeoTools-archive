@@ -83,6 +83,20 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
              }
          }
        
+         //reprojection 
+         if ( query.getCoordinateSystemReproject() != null ) {
+        	 if ( query.getCoordinateSystem() != null ) {
+        		 features = new ReprojectingFeatureCollection( 
+    				 features, query.getCoordinateSystem(), query.getCoordinateSystemReproject() 
+				 );
+        	 }
+        	 else {
+        		 features = new ReprojectingFeatureCollection( 
+        			features, query.getCoordinateSystemReproject()	 
+        		 );
+        	}
+         }
+         
          //max feature cap
          if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
              features = new SizeCappedFeatureCollection( features, query.getMaxFeatures() );
