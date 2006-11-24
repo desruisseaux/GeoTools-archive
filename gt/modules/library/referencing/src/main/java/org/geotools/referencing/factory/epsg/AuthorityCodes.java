@@ -34,7 +34,7 @@ import java.sql.SQLException;
 import org.opengis.referencing.operation.Projection;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Logging;
 
 
 /**
@@ -350,7 +350,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
                                     final String       method,
                                     final SQLException exception)
     {
-        Utilities.unexpectedException("org.geotools.referencing.factory", classe, method, exception);
+        Logging.unexpectedException("org.geotools.referencing.factory", classe, method, exception);
     }
 
     /**

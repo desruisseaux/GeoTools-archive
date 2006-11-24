@@ -37,6 +37,7 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 import org.geotools.resources.Utilities;
+import org.geotools.util.Logging;
 import org.geotools.util.SimpleInternationalString;
 
 
@@ -122,8 +123,8 @@ public class ResponsiblePartyImpl extends MetadataEntity implements ResponsibleP
             return OGC(role, function, new URI(onlineResource));
         }
         catch (URISyntaxException badContact) {
-            Utilities.unexpectedException("org.geotools.metadata.iso", "ResponsibleParty", "OGC",
-                                          badContact);
+            Logging.unexpectedException("org.geotools.metadata.iso", "ResponsibleParty", "OGC",
+                                        badContact);
             return OGC;
         }
     }

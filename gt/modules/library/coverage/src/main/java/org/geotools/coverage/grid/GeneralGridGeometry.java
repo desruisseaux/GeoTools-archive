@@ -352,21 +352,6 @@ public class GeneralGridGeometry implements GridGeometry, Serializable {
     }
 
     /**
-     * @deprecated Use {@link GeneralEnvelope(GridRange, PixelInCell, MathTransform,
-     *             CoordinateReferenceSystem)} instead.
-     *
-     * @since 2.3
-     */
-    public static GeneralEnvelope getEnvelope(final GridRange gridRange,
-            final MathTransform gridToCRS, final CoordinateReferenceSystem crs,
-            final boolean halfPix) throws MismatchedDimensionException,
-            IllegalArgumentException
-    {
-        return new GeneralEnvelope(gridRange, halfPix ? PixelInCell.CELL_CENTER :
-                PixelInCell.CELL_CORNER, gridToCRS, crs);
-    }
-
-    /**
      * Returns the valid coordinate range of a grid coverage. The lowest valid grid coordinate is
      * zero for {@link BufferedImage}, but may be non-zero for arbitrary {@link RenderedImage}. A
      * grid with 512 cells can have a minimum coordinate of 0 and maximum of 512, with 511 as the

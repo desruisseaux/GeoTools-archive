@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
@@ -1048,16 +1047,8 @@ public class CoverageStack extends AbstractCoverage {
      * @throws PointOutsideCoverageException if {@code coord} is outside coverage.
      * @throws CannotEvaluateException if the computation failed for some other reason.
      */
-    public Set evaluate(final DirectPosition coord)
-    {
-    
-		final double[] array = evaluate(coord, (double[]) null);
-		final int length = array.length;
-		final Set set = new HashSet(length);
-		for(int i=0;i<length;i++)
-			set.add(new Double(array[i]));
-		return set;
-	
+    public Object evaluate(final DirectPosition coord) {
+        return evaluate(coord, (double[]) null);
     }
     
     /**

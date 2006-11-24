@@ -1256,20 +1256,18 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements
 	}
 
 	public Set evaluate(DirectPosition coord, Set set) {
-		final Set tempSet = evaluate(coord);
-		try {
-			if (set == null) {
-				set = new HashSet(tempSet);
-			}
-			else
-				set.addAll(tempSet);
-		} catch (IllegalArgumentException exception) {
-			throw new CannotEvaluateException(formatErrorMessage(set),
-					exception);
-		}
-		return set;
-
+        if (set == null) {
+            set = new HashSet();
+        }
+        final Object array = evaluate(coord);
+        try {
+            final int length = Array.getLength(array);
+            for (int index=0; index<length; index++) {
+                set.add(Array.get(array, index));
+            }
+        } catch (IllegalArgumentException exception) {
+            throw new CannotEvaluateException(formatErrorMessage(set), exception);
+        }
+        return set;
 	}
-	
-
 }

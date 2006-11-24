@@ -556,7 +556,7 @@ public class MonolineFormatter extends Formatter {
      * Invoked when an error occurs during the initialization.
      */
     private static void unexpectedException(final Exception e) {
-        Utilities.unexpectedException("org.geotools.util", "MonolineFormatter", "init", e);
+        Logging.unexpectedException("org.geotools.util", "MonolineFormatter", "init", e);
     }
 
     /**

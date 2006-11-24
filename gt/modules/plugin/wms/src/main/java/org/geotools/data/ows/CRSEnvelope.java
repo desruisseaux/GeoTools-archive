@@ -16,6 +16,7 @@
 package org.geotools.data.ows;
 
 import org.geotools.geometry.GeneralDirectPosition;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 
@@ -56,6 +57,15 @@ public class CRSEnvelope implements Envelope {
         this.maxX = maxX;
         this.minY = minY;
         this.maxY = maxY;
+    }
+
+    /**
+     * Returns the coordinate reference system for this envelope.
+     * Current implementation always return {@code null}, but it
+     * may change in a future version.
+     */
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return null;
     }
 
     /**

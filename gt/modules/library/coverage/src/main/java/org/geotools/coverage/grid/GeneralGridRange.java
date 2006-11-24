@@ -30,6 +30,7 @@ import java.util.Arrays;
 // OpenGIS dependencies
 import org.opengis.coverage.grid.GridRange;
 import org.opengis.coverage.grid.GridGeometry; // For javadoc
+import org.opengis.coverage.grid.GridCoordinates;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
@@ -211,6 +212,18 @@ public class GeneralGridRange implements GridRange, Serializable {
     }
     
     /**
+     * Returns the valid minimum inclusive grid coordinate.
+     * The sequence contains a minimum value for each dimension of the grid coverage.
+     *
+     * @since 2.4
+     *
+     * @todo Returns an immutable, shared copy of the grid coordinates.
+     */
+    public GridCoordinates getLower() {
+        return new GeneralGridCoordinates(index, 0, index.length/2);
+    }
+    
+    /**
      * Returns the valid minimum inclusive grid coordinate along the specified dimension.
      *
      * @see #getLowers
@@ -220,6 +233,18 @@ public class GeneralGridRange implements GridRange, Serializable {
             return index[dimension];
         }
         throw new ArrayIndexOutOfBoundsException(dimension);
+    }
+
+    /**
+     * Returns the valid maximum exclusive grid coordinate.
+     * The sequence contains a maximum value for each dimension of the grid coverage.
+     *
+     * @since 2.4
+     *
+     * @todo Returns an immutable, shared copy of the grid coordinates.
+     */
+    public GridCoordinates getUpper() {
+        return new GeneralGridCoordinates(index, index.length/2, index.length);
     }
     
     /**

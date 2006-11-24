@@ -25,11 +25,15 @@ import java.io.Writer;
 import java.text.Format;
 import java.text.ParseException;
 
-import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+
+// Geotools dependencies
+import org.geotools.util.Logging;
+import org.geotools.resources.Arguments;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -319,8 +323,8 @@ public abstract class AbstractConsole implements Runnable {
         try {
             out.flush();
         } catch (IOException ignore) {
-            Utilities.unexpectedException("org.geotools.referencing.wkt",
-                                          "AbstractConsole", "reportError", ignore);
+            Logging.unexpectedException("org.geotools.referencing.wkt",
+                                        "AbstractConsole", "reportError", ignore);
         }
         err.print(Utilities.getShortClassName(exception));
         err.print(" at line ");
