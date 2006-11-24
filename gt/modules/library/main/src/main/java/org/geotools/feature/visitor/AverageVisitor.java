@@ -15,13 +15,14 @@
  */
 package org.geotools.feature.visitor;
 
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 /**
  * Calculates the Average
@@ -51,9 +52,9 @@ public class AverageVisitor implements FeatureCalc {
      */
     public AverageVisitor(int attributeTypeIndex, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
         AttributeType attributeType = type.getAttributeType(attributeTypeIndex);
-        expr = factory.createAttributeExpression(attributeType.getName());
+        expr = factory.property(attributeType.getName());
         createStrategy(attributeType.getType());
     }
 
@@ -67,9 +68,9 @@ public class AverageVisitor implements FeatureCalc {
      */
     public AverageVisitor(String attrName, FeatureType type)
         throws IllegalFilterException {
-        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        FilterFactory factory = CommonFactoryFinder.getFilterFactory(null);
         AttributeType attributeType = type.getAttributeType(attrName);
-        expr = factory.createAttributeExpression(attributeType.getName());
+        expr = factory.property(attributeType.getName());
         createStrategy(attributeType.getType());
     }
 
@@ -119,8 +120,8 @@ public class AverageVisitor implements FeatureCalc {
         strategy.add(value);
     }
 
-    public Expression getExpression() {
-        return expr;
+    public org.geotools.filter.Expression getExpression() {
+        return (org.geotools.filter.Expression) expr;
     }
 
     /**
