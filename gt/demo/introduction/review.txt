@@ -3,7 +3,7 @@ Demo Introduction
 Module Maintainer: Adrian Custer
 IP Review Adrian Custer, October 6th, 2006
 
-org.geotools.data.introduction
+org.geotools.demo.introduction
 ------------------------------
 This is the base demonstration application, used to illustrate the use of each
 of the subsystems of the Geotools library. This code should be considered part 
