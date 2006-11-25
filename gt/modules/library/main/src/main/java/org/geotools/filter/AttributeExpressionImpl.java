@@ -150,6 +150,22 @@ public class AttributeExpressionImpl extends DefaultExpression
     	return accessor.get( feature, attPath );
     	//return feature.getAttribute(attPath);
     }
+  
+    /**
+     * Gets the value of this property from the passed object.
+     *
+     * @param obj Object from which we need to extract a property value.
+     */
+   public Object evaluate(Object obj) {
+        PropertyAccessor accessor =
+                new PropertyAccessors().findPropertyAccessor( obj, attPath, null );
+
+        if ( accessor == null ) {
+                return null; //JD:not throwing exception to remain backwards compatabile, just returnign null                
+        }        
+        return accessor.get( obj, attPath );
+   }
+   
     
      /**
      * Return this expression as a string.
