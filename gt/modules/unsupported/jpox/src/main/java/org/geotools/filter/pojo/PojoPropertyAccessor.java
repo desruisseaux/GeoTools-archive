@@ -11,7 +11,18 @@ import java.lang.reflect.Method;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.expression.PropertyAccessor;
 
-public class PojoPropertyAccessor implements PropertyAccessor {
+/**
+ * Accessor for working with pojo properties.
+ * <ul>
+ * <li><b>:</b></li>
+ * <li><b>:</b></li>s
+ * </ul>
+ * Examples:<pre><code>
+ * </code></pre>
+ *
+ * @author Jody Garnett, Refractions Research Inc.
+ */
+class PojoPropertyAccessor implements PropertyAccessor {
 
     public boolean canHandle( Object object, String xpath ) {
     	// We can handle everything! ...yeah, right.. ;)
