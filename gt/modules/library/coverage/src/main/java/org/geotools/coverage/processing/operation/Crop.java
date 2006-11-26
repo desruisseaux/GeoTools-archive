@@ -95,8 +95,8 @@ public class Crop extends Operation2D {
 		final Envelope sourceEnvelope = source.getEnvelope();
 		Envelope destinationEnvelope = (Envelope) envelopeParameter.getValue();
         CoordinateReferenceSystem sourceCRS, destinationCRS;
-        sourceCRS = GeneralEnvelope.getCoordinateReferenceSystem(sourceEnvelope);
-        destinationCRS = GeneralEnvelope.getCoordinateReferenceSystem(destinationEnvelope);
+        sourceCRS = sourceEnvelope.getCoordinateReferenceSystem();
+        destinationCRS = destinationEnvelope.getCoordinateReferenceSystem();
 		if (destinationCRS == null) {
             // Do not change the user provided object - clone it first.
             final GeneralEnvelope ge = new GeneralEnvelope(destinationEnvelope);

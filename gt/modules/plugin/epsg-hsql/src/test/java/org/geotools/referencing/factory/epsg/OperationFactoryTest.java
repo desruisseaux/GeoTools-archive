@@ -43,7 +43,6 @@ import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.referencing.operation.AuthorityBackedFactory;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.factory.Hints;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
 
@@ -68,7 +67,7 @@ public class OperationFactoryTest extends TestCase {
         final Arguments arguments = new Arguments(args);
         final boolean log = arguments.getFlag("-log");
         arguments.getRemainingArguments(0);
-        MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
     }
 

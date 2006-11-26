@@ -48,9 +48,9 @@ import org.geotools.util.UnsupportedImplementationException;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.Logging;
 
 
 /**
@@ -318,9 +318,7 @@ public final class CRS {
     public static Envelope getEnvelope(CoordinateReferenceSystem crs) {
         Envelope envelope = getGeographicEnvelope(crs);
         if (envelope != null) {
-            // TODO: Use a more direct method if we provide such method in a future GeoAPI version.
-            final CoordinateReferenceSystem sourceCRS;
-            sourceCRS = envelope.getUpperCorner().getCoordinateReferenceSystem();
+            final CoordinateReferenceSystem sourceCRS = envelope.getCoordinateReferenceSystem();
             if (sourceCRS != null) try {
                 crs = CRSUtilities.getCRS2D(crs);
                 if (!equalsIgnoreMetadata(sourceCRS, crs)) {
@@ -335,8 +333,8 @@ public final class CRS {
                  * returns null, since it is a legal return value according this method contract.
                  */
                 envelope = null;
-                Utilities.unexpectedException("org.geotools.referencing", "CRS",
-                                              "getEnvelope", exception);
+                Logging.unexpectedException("org.geotools.referencing", "CRS",
+                                            "getEnvelope", exception);
             } catch (TransformException exception) {
                 /*
                  * The envelope is probably outside the range of validity for this CRS.
@@ -345,8 +343,8 @@ public final class CRS {
                  * legal return value according this method contract.
                  */
                 envelope = null;
-                Utilities.unexpectedException("org.geotools.referencing", "CRS",
-                                              "getEnvelope", exception);
+                Logging.unexpectedException("org.geotools.referencing", "CRS",
+                                            "getEnvelope", exception);
             }        
         }
         return envelope;
@@ -417,8 +415,8 @@ public final class CRS {
              * Should not occurs, since envelopes are usually already in geographic coordinates.
              * If it occurs anyway, returns null since it is allowed by this method contract.
              */
-            Utilities.unexpectedException("org.geotools.referencing", "CRS",
-                                          "getGeographicBoundingBox", exception);
+            Logging.unexpectedException("org.geotools.referencing", "CRS",
+                                        "getGeographicBoundingBox", exception);
         }
         return null;
     }

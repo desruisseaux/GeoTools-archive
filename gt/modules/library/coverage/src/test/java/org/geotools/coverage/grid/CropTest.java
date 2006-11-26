@@ -62,8 +62,7 @@ public class CropTest extends GridCoverageTest {
 	 */
 	public static void main(String[] args) {
 
-		org.geotools.util.MonolineFormatter
-				.initGeotools(AbstractProcessor.OPERATION);
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(AbstractProcessor.OPERATION);
 		junit.textui.TestRunner.run(CropTest.class);
 
 	}

@@ -31,8 +31,8 @@ import org.opengis.go.display.style.event.GraphicStyleEvent;
 import org.opengis.go.display.style.event.GraphicStyleListener;
 
 // Geotools dependencies
+import org.geotools.util.Logging;
 import org.geotools.resources.XArray;
-import org.geotools.resources.Utilities;
 
 
 /**
@@ -133,7 +133,7 @@ final class GraphicStyleListenerList implements PropertyChangeListener {
             try {
                 listeners[i].styleChanged(event);
             } catch (RuntimeException exception) {
-                Utilities.unexpectedException("org.geotools.display.style",
+                Logging.unexpectedException("org.geotools.display.style",
                         "GraphicStyleListener", "styleChanged", exception);
                 /*
                  * Continues to notify the other listeners, since they may be unrelated

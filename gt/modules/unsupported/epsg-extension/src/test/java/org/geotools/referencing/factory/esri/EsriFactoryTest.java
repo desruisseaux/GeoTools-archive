@@ -75,7 +75,7 @@ public class EsriFactoryTest extends TestCase {
      * @param args the command line arguments.
      */
     public static void main(final String[] args) {
-        org.geotools.util.MonolineFormatter.initGeotools();
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         final Arguments arguments = new Arguments(args);
         if (arguments.getFlag("-verbose")) {
             out = arguments.out;

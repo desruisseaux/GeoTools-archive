@@ -469,15 +469,11 @@ public class GridToEnvelopeMapper {
 
     /**
      * Returns the coordinate system in use with the envelope.
-     *
-     * @todo Avoid the call to {@code getLowerCorner()} if we provide a
-     *       {@code getCoordinateReferenceSystem()} directly in GeoAPI
-     *       envelope interface.
      */
     private CoordinateSystem getCoordinateSystem() {
         if (envelope != null) {
             final CoordinateReferenceSystem crs;
-            crs = envelope.getLowerCorner().getCoordinateReferenceSystem();
+            crs = envelope.getCoordinateReferenceSystem();
             if (crs != null) {
                 return crs.getCoordinateSystem();
             }

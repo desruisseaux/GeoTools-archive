@@ -51,8 +51,7 @@ public class SubsampleAverageTest extends GridCoverageTest {
 	 */
 	public static void main(final String[] args) {
 
-		org.geotools.util.MonolineFormatter
-				.initGeotools(AbstractProcessor.OPERATION);
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(AbstractProcessor.OPERATION);
 		junit.textui.TestRunner.run(SubsampleAverageTest.class);
 	}
 

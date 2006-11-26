@@ -73,6 +73,7 @@ import org.geotools.resources.XArray;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.image.ImageUtilities;
+import org.geotools.util.Logging;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.CommonPointRule;
@@ -922,7 +923,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements
 				// Can't add the property. Too bad, the image has been created
 				// anyway.
 				// Maybe the user know what he is doing...
-				Utilities.unexpectedException("org.geotools.coverage",
+				Logging.unexpectedException("org.geotools.coverage",
 						"AbstractCoverage.Renderable", "createRendering",
 						exception);
 			}

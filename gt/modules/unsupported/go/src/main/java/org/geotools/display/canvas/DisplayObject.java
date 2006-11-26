@@ -31,7 +31,8 @@ import java.beans.PropertyChangeListener;
 
 // OpenGIS dependencies
 import org.opengis.go.display.primitive.Graphic;
-import org.geotools.resources.Utilities;
+
+// Geotools dependencies
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 
@@ -363,7 +364,7 @@ public class DisplayObject {
                                    final String sourceMethodName,
                                    final Exception exception)
     {
-        Utilities.unexpectedException(getLogger().getName(),
+        org.geotools.util.Logging.unexpectedException(getLogger().getName(),
                 sourceClassName, sourceMethodName, exception);
     }
 

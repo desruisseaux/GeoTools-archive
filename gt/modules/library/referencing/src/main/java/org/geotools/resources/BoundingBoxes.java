@@ -76,8 +76,7 @@ public final class BoundingBoxes {
     public static void copy(Envelope envelope, final GeographicBoundingBoxImpl box)
             throws TransformException
     {
-        // TODO: use a more direct way if we add a 'getCRS()' method straight into Envelope.
-        final CoordinateReferenceSystem crs = envelope.getLowerCorner().getCoordinateReferenceSystem();
+        final CoordinateReferenceSystem crs = envelope.getCoordinateReferenceSystem();
         if (crs != null) {
             if (!startsWith(crs, DefaultGeographicCRS.WGS84) &&
                 !startsWith(crs, DefaultGeographicCRS.WGS84_3D))

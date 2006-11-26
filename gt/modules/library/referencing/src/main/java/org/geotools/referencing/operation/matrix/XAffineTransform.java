@@ -356,12 +356,26 @@ public abstract class XAffineTransform extends AffineTransform {
     }
 
     /**
-     * Returns +1 if one axis has been flipped, -1 if none axis has been flipped, or 0 if
-     * unknown. A flipped axis in an axis with direction reversed (typically the <var>y</var>
-     * axis). This method assumes that the specified affine transform is built from arbitrary
-     * translations, scales or rotations, but no shear. Note that it is not possible to
-     * determine which of the <var>x</var> or <var>y</var> axis has been flipped.
+     * Returns {@code -1} if one axis has been flipped, {@code +1} if no axis has been flipped,
+     * or 0 if unknown. A flipped axis in an axis with direction reversed (typically the
+     * <var>y</var> axis). This method assumes that the specified affine transform is built
+     * from arbitrary translations, scales or rotations, but no shear. Note that it is not
+     * possible to determine which of the <var>x</var> or <var>y</var> axis has been flipped.
      * <p>
+     * This method can be used in order to set the sign of a scale according the flipping state.
+     * The example below choose to apply the sign on the <var>y</var> scale, but this is an
+     * arbitrary (while common) choice:
+     *
+     * <blockquote><code>
+     * double scaleX0 = getScaleX0(transform);
+     * double scaleY0 = getScaleY0(transform);
+     * int    flip    = getFlip(transform);
+     * if (flip != 0) {
+     *     scaleY0 *= flip;
+     *     // ... continue the process here.
+     * }
+     * </code></blockquote>
+     *
      * This method is similar to the following code, except that this method
      * distinguish between "unflipped" and "unknow" states.
      *

@@ -264,8 +264,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
         final GeneralEnvelope old;
         synchronized (getTreeLock()) {
             CoordinateReferenceSystem sourceCRS = getObjectiveCRS();
-            CoordinateReferenceSystem targetCRS = newEnvelope.getLowerCorner().getCoordinateReferenceSystem();
-            // TODO: use a shorter path for the above if we allow that in a future GeoAPI version.
+            CoordinateReferenceSystem targetCRS = newEnvelope.getCoordinateReferenceSystem();
             if (targetCRS == null) {
                 targetCRS = sourceCRS;
             }

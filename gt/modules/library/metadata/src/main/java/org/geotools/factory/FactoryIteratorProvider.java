@@ -34,7 +34,7 @@ import java.util.Iterator;
  * @author Martin Desruisseaux
  *
  * @see FactoryRegistry#addFactoryIteratorProvider
- * @see CommonRegistry#addFactoryIteratorProvider
+ * @see CommonFactory#addFactoryIteratorProvider
  */
 public interface FactoryIteratorProvider {
     /**

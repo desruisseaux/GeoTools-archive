@@ -66,7 +66,6 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.Arguments;
 
 
@@ -119,7 +118,7 @@ public class DefaultDataSourceTest extends TestCase {
         verbose = arguments.getFlag("-verbose");
         extensive = true;
         arguments.getRemainingArguments(0);
-        MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         if (gui) {
             junit.swingui.TestRunner.main(new String[] {
                 "-noloading",

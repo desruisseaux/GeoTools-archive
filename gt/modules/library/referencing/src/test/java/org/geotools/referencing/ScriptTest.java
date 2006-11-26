@@ -55,7 +55,7 @@ public class ScriptTest extends TestCase {
      * Run all tests from the command line.
      */
     public static void main(final String[] args) throws Exception {
-        org.geotools.util.MonolineFormatter.initGeotools();
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 

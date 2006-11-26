@@ -41,7 +41,6 @@ import org.opengis.referencing.operation.Matrix;
 // Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.resources.Arguments;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
@@ -93,7 +92,7 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         final boolean log = arguments.getFlag("-log");
         verbose = arguments.getFlag("-verbose");
         arguments.getRemainingArguments(0);
-        MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
     }
 

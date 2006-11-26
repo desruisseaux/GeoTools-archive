@@ -39,7 +39,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.ComponentSampleModelJAI;
 import javax.media.jai.util.Range;
 
-import org.geotools.resources.Utilities;
+import org.geotools.util.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ComponentColorModelJAI;
@@ -125,7 +125,7 @@ public abstract class SimpleImageReader extends ImageReader {
                 streamOrigin = ((ImageInputStream) input).getStreamPosition();
             } catch (IOException exception) {
                 streamOrigin = 0;
-                Utilities.unexpectedException("org.geotools.gcs",
+                Logging.unexpectedException("org.geotools.gcs",
                         "SimpleImageReader", "setInput", exception);
             }
         }

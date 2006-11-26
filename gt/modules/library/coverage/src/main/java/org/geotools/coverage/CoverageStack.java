@@ -557,8 +557,7 @@ public class CoverageStack extends AbstractCoverage {
                 continue;
             }
             final CoordinateReferenceSystem sourceCRS;
-            // TODO: use a more direct way if we add an accessor for that in GeoAPI.
-            sourceCRS = candidate.getLowerCorner().getCoordinateReferenceSystem();
+            sourceCRS = candidate.getCoordinateReferenceSystem();
             if (sourceCRS != null) {
                 final int dim = sourceCRS.getCoordinateSystem().getDimension();
                 if (dim<zDimension || dim>zDimension+1) {

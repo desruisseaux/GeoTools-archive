@@ -79,7 +79,7 @@ public class Envelope2D extends Rectangle2D.Double implements Envelope, Cloneabl
             throw new MismatchedDimensionException(Errors.format(ErrorKeys.NOT_TWO_DIMENSIONAL_$1,
                                                    new Integer(dimension)));
         }
-        setCoordinateReferenceSystem(GeneralEnvelope.getCoordinateReferenceSystem(envelope));
+        setCoordinateReferenceSystem(envelope.getCoordinateReferenceSystem());
     }
 
     /**

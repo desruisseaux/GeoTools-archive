@@ -52,6 +52,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 // Resources
+import org.geotools.util.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -115,9 +116,9 @@ public final class ExceptionMonitor {
                 // Some doesn't want to let us sleep.  Back to work.
             } catch (InvocationTargetException error) {
                 final Throwable e = error.getTargetException();
-                if (e instanceof RuntimeException) throw (RuntimeException)     e;
-                if (e instanceof Error)            throw (Error)                e;
-                Utilities.unexpectedException("org.geotools.gui", "ExceptionMonitor", "show", e);
+                if (e instanceof RuntimeException) throw (RuntimeException) e;
+                if (e instanceof Error)            throw (Error)            e;
+                Logging.unexpectedException("org.geotools.gui", "ExceptionMonitor", "show", e);
             }
         }
     }

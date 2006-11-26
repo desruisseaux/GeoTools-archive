@@ -35,8 +35,8 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 
 // Geotools dependencies
+import org.geotools.util.Logging;
 import org.geotools.io.LineFormat;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -251,7 +251,7 @@ public abstract class TextImageReader extends SimpleImageReader {
             if (reader!=null) try {
                 reader.close();
             } catch (IOException exception) {
-                Utilities.unexpectedException("org.geotools.gcs",
+                Logging.unexpectedException("org.geotools.gcs",
                         "TextImageReader", "close", exception);
             }
         }

@@ -33,7 +33,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.referencing.FactoryFinder;
 
 
@@ -52,7 +51,7 @@ public class AllAuthoritiesFactoryTest extends TestCase {
         final Arguments arguments = new Arguments(args);
         final boolean log = arguments.getFlag("-log");
         arguments.getRemainingArguments(0);
-        MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
     }
 

@@ -41,7 +41,6 @@ import org.geotools.referencing.crs.DefaultTemporalCRS;
 import org.geotools.referencing.crs.DefaultVerticalCRS;
 import org.geotools.referencing.cs.DefaultTimeCS;
 import org.geotools.referencing.datum.DefaultTemporalDatum;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.resources.Arguments;
 
 
@@ -57,7 +56,7 @@ public class FormatTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        MonolineFormatter.initGeotools();
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         final Arguments arguments = new Arguments(args);
         args = arguments.getRemainingArguments(0);
         Locale.setDefault(arguments.locale);

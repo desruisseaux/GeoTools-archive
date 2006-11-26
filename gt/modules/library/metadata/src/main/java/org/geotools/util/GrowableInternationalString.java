@@ -33,6 +33,7 @@ import java.util.Set;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.util.Logging;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -223,8 +224,8 @@ public class GrowableInternationalString extends AbstractInternationalString imp
              * Not a big deal if this operation fails (this is actually just an
              * optimization for reducing memory usage). Log a warning and continue.
              */
-            Utilities.unexpectedException("org.geotools.util", "GrowableInternationalString",
-                                          "canonicalize", exception);
+            Logging.unexpectedException("org.geotools.util", "GrowableInternationalString",
+                                        "canonicalize", exception);
         }
         /*
          * Now canonicalize the locale.

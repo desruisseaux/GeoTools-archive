@@ -254,10 +254,8 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
          */
         Category nodata = Category.NODATA;
         final long nodataBits = Double.doubleToRawLongBits(Double.NaN);
-        final String noDataName = Vocabulary.format(VocabularyKeys.NODATA).trim();
         for (int i=categoriesLength; --i>=0;) {
             final Category candidate = categories[i];
-            final String candidateName = candidate.getName().toString().trim();
             final double value = candidate.geophysics(true).minimum;
             if (Double.isNaN(value)) {
                 nodata = candidate;
@@ -265,13 +263,6 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
                     // Give a preference for the standard Double.NaN.
                     // We should have only one such value, since the
                     // range check above prevents range overlapping.
-                    break;
-                }
-                // If the category name is "No data" (in both current locale and in
-                // English), we assume that this is the category we were looking for.
-                if (candidateName.equalsIgnoreCase(noDataName) || 
-                    candidateName.equalsIgnoreCase("No data"))
-                {
                     break;
                 }
             }

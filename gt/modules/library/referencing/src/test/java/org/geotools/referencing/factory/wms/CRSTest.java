@@ -32,7 +32,6 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 // Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Arguments;
-import org.geotools.util.MonolineFormatter;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
@@ -57,7 +56,7 @@ public class CRSTest extends TestCase {
         final Arguments arguments = new Arguments(args);
         final boolean log = arguments.getFlag("-log");
         arguments.getRemainingArguments(0);
-        MonolineFormatter.initGeotools(log ? Level.CONFIG : null);
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput(log ? Level.CONFIG : null);
         junit.textui.TestRunner.run(suite());
     }
 

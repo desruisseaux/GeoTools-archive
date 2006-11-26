@@ -22,7 +22,7 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Logging;
 
 
 /**
@@ -74,11 +74,11 @@ final class WeakCollectionCleaner extends Thread {
             } catch (InterruptedException exception) {
                 // Somebody doesn't want to lets us sleep... Go back to work.
             } catch (Exception exception) {
-                Utilities.unexpectedException("org.geotools.util", "WeakCollection",
-                                              "remove", exception);
+                Logging.unexpectedException("org.geotools.util", "WeakCollection",
+                                            "remove", exception);
             } catch (AssertionError exception) {
-                Utilities.unexpectedException("org.geotools.util", "WeakCollection",
-                                              "remove", exception);
+                Logging.unexpectedException("org.geotools.util", "WeakCollection",
+                                            "remove", exception);
                 // Do not kill the thread on assertion failure, in order to
                 // keep the same behaviour as if assertions were turned off.
             }

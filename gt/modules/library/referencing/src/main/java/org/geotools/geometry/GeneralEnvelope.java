@@ -171,7 +171,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
             ordinates = (double[]) e.ordinates.clone();
             crs = e.crs;
         } else {
-            crs = getCoordinateReferenceSystem(envelope);
+            crs = envelope.getCoordinateReferenceSystem();
             final int dimension = envelope.getDimension();
             ordinates = new double[2*dimension];
             for (int i=0; i<dimension; i++) {
@@ -343,9 +343,8 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * Returns the coordinate reference system from an arbitrary envelope, or {@code null}
      * if unknown. This method performs some sanity checking for ensuring that the envelope
      * CRS is consistent.
-     * <p>
-     * <strong>NOTE:</strong> This method may be removed in a future version if GeoAPI 2.1
-     * provides a {@code Envelope.getCoordinateReferenceSystem()} method.
+     *
+     * @deprecated Use {@link Envelope#getCoordinateReferenceSystem()} instead.
      *
      * @since 2.3
      */
@@ -685,7 +684,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         ensureNonNull("envelope", envelope);
         final int dim = ordinates.length / 2;
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
-        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             final double min = envelope.getMinimum(i);
             final double max = envelope.getMaximum(i);
@@ -747,7 +746,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         ensureNonNull("envelope", envelope);
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
-        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             double inner = envelope.getMinimum(i);
             double outer = ordinates[i];
@@ -790,7 +789,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         ensureNonNull("envelope", envelope);
         final int dim = ordinates.length/2;
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
-        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             double inner = envelope.getMaximum(i);
             double outer = ordinates[i];
@@ -820,7 +819,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         ensureNonNull("envelope", envelope);
         final int dim = ordinates.length / 2;
         GeneralDirectPosition.ensureDimensionMatch("envelope", envelope.getDimension(), dim);
-        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dim; i++) {
             double min = Math.max(ordinates[i    ], envelope.getMinimum(i));
             double max = Math.min(ordinates[i+dim], envelope.getMaximum(i));
@@ -977,7 +976,7 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         if (envelope.getDimension() != dimension) {
             return false;
         }
-        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dimension; i++) {
             double epsilon = Math.max(getLength(i), envelope.getLength(i));
             epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;

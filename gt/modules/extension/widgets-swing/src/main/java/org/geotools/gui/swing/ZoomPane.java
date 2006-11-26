@@ -58,7 +58,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.geometry.XDimension2D;
-import org.geotools.resources.Utilities;
 
 // Graphics
 import java.awt.Paint;
@@ -97,6 +96,7 @@ import javax.swing.plaf.ComponentUI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.LogRecord;
+import org.geotools.util.Logging;
 
 // Miscellaneous
 import java.util.Arrays;
@@ -2296,9 +2296,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private void unexpectedException(final String methodName,
                                      final NoninvertibleTransformException exception) {
         zoom.setToIdentity();
-        Utilities.unexpectedException("org.geotools.gui",
-                                      "org.geotools.swing.ZoomPane",
-                                      methodName, exception);
+        Logging.unexpectedException("org.geotools.gui", "org.geotools.swing.ZoomPane",
+                                    methodName, exception);
     }
 
     /**
@@ -2310,9 +2309,8 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      */
     private static void unexpectedException(final String methodName,
                                             final RuntimeException exception) {
-        Utilities.unexpectedException("org.geotools.gui",
-                                      "org.geotools.swing.ZoomPane",
-                                      methodName, exception);
+        Logging.unexpectedException("org.geotools.gui", "org.geotools.swing.ZoomPane",
+                                    methodName, exception);
     }
 
     /**

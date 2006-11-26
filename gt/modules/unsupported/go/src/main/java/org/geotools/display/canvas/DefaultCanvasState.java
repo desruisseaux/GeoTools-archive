@@ -88,8 +88,7 @@ public class DefaultCanvasState implements CanvasState, Cloneable, Serializable 
         if (envelope != null) {
             final int dimension = envelope.getDimension();
             center = new GeneralDirectPosition(dimension);
-            // TODO: for the next line, use a more direct way if GeoAPI 2.1 alows that.
-            center.setCoordinateReferenceSystem(envelope.getLowerCorner().getCoordinateReferenceSystem());
+            center.setCoordinateReferenceSystem(envelope.getCoordinateReferenceSystem());
             for (int i=0; i<dimension; i++) {
                 center.ordinates[i] = envelope.getCenter(i);
             }

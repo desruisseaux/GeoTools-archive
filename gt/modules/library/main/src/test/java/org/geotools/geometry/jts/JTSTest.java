@@ -99,7 +99,7 @@ public class JTSTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(String[] args) {
-        org.geotools.util.MonolineFormatter.initGeotools();
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 

@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 // Geotools Dependencies
-import org.geotools.resources.Utilities;
+import org.geotools.util.Logging;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 
@@ -449,7 +449,7 @@ public final class Hints extends RenderingHints {
                 try {
                     valueClass = Class.forName(className);
                 } catch (ClassNotFoundException exception) {
-                    Utilities.unexpectedException("org.geotools.factory",
+                    Logging.unexpectedException("org.geotools.factory",
                             "Hints.Key", "isCompatibleValue", exception);
                     valueClass = Object.class;
                 }

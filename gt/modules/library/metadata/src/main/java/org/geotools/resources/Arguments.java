@@ -33,6 +33,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 
 // Geotools dependencies
+import org.geotools.util.Logging;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -396,8 +397,8 @@ public class Arguments {
             return new InputStreamReader(in, encoding);
         } catch (UnsupportedEncodingException exception) {
             // Should not occurs, since the character encoding was supported in some previous run...
-            Utilities.unexpectedException("org.geotools.resources", "Arguments",
-                                          "getReader", exception);
+            Logging.unexpectedException("org.geotools.resources", "Arguments", "getReader",
+                                        exception);
         }
         return new InputStreamReader(in);
     }
@@ -417,8 +418,8 @@ public class Arguments {
             return new OutputStreamWriter(out, encoding);
         } catch (UnsupportedEncodingException exception) {
             // Should not occurs, since the character encoding was supported in some previous run...
-            Utilities.unexpectedException("org.geotools.resources", "Arguments",
-                                          "getWriter", exception);
+            Logging.unexpectedException("org.geotools.resources", "Arguments", "getWriter",
+                                        exception);
         }
         return new OutputStreamWriter(out);
     }

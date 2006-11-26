@@ -71,9 +71,9 @@ import java.util.Iterator;
 import javax.media.jai.JAI;
 
 // Geotools dependencies
+import org.geotools.util.Logging;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Arguments;
-import org.geotools.resources.Utilities;
 import org.geotools.resources.SwingUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
@@ -215,7 +215,7 @@ public class About extends JPanel {
              * The implementation date can't be parsed. This is not a show-stopper;
              * the "About" dialog box will just not includes the implementation date.
              */
-            Utilities.unexpectedException("org.geotools.gui.swing", "About", "<init>", exception);
+            Logging.unexpectedException("org.geotools.gui.swing", "About", "<init>", exception);
         }
         /*
          * If the user supplied a logo, load it and display it in the dialog's upper part (NORTH).
@@ -403,9 +403,8 @@ public class About extends JPanel {
                 name = name.substring(0, index);
             }
             return manifest.getMainAttributes();
-        } catch (IOException exception) {
-            Utilities.unexpectedException("org.geotools.gui.swing",
-                                          "About", "getAttributes", exception);
+        } catch (IOException e) {
+            Logging.unexpectedException("org.geotools.gui.swing", "About", "getAttributes", e);
         }
         // Use empty manifest attributes.
         return new Attributes();

@@ -104,7 +104,7 @@ public class LocalizationGridTest extends TestCase {
      * Run the suite from the command line.
      */
     public static void main(final String[] args) {
-        org.geotools.util.MonolineFormatter.initGeotools();
+        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
         junit.textui.TestRunner.run(suite());
     }
 

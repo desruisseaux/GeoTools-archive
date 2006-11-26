@@ -25,8 +25,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 // Geotools dependencies
+import org.geotools.util.Logging;
 import org.geotools.factory.Hints;
-import org.geotools.resources.Utilities;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 // PostgreSQL dependencies
@@ -153,16 +153,16 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
         try {
             load(p);
         } catch (IOException exception) {
-            Utilities.unexpectedException("org.geotools.referencing.factory", "DataSource",
-                                          "<init>", exception);
+            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
+                                        "<init>", exception);
         }
         int port;
         try {
             port = Integer.parseInt(p.getProperty("portNumber", "5432"));
         } catch (NumberFormatException exception) {
             port = 5432;
-            Utilities.unexpectedException("org.geotools.referencing.factory", "DataSource",
-                                          "<init>", exception);
+            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
+                                        "<init>", exception);
         }
         setPortNumber  (port);
         setServerName  (p.getProperty("serverName",   server  ));
