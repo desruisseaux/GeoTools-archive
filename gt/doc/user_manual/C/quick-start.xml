@@ -88,7 +88,8 @@
         Most developers also use an Integrated Development Environment (IDE) 
         such as Eclipse or NetBeans, applications which greatly facilitate the 
         development of complex programs. Instructions for the use of those two
-        popular IDEs are presented in <xref linkend="chapter-ideConfig"/> below.
+        popular IDEs are presented in <xref linkend="sect-quick-start-ide"/> 
+        below.
       </para>
     </note>
     
