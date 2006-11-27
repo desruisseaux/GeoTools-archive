@@ -1,5 +1,5 @@
-<chapter id="chapter-feature">
-  <title>System: Feature</title>
+<chapter id="chapter-geomGeoAPI">
+  <title>System: Direct Geometry</title>
 
   <!-- Top Level, a description with the chapter TOC -->
   <para>
@@ -9,7 +9,7 @@
   <!-- Critical Warnings -->
   
   
-  <sect1 id="sect-feature-intro">
+  <sect1 id="sect-geomGeoAPI-intro">
     <title>Introduction</title>
     
     <!--Overview and when not to read the chapter -->
@@ -18,7 +18,7 @@
     
     
     
-    <sect2 id="sect-feature-intro-usage">
+    <sect2 id="sect-geomGeoAPI-intro-usage">
       <title>Usage</title>
       
       <para>
@@ -28,7 +28,7 @@
     
     
     
-    <sect2 id="sect-feature-intro-warnings">
+    <sect2 id="sect-geomGeoAPI-intro-warnings">
       <title>Warnings</title>
       
       <warning>
@@ -40,7 +40,7 @@
     
     
     
-    <sect2 id="sect-feature-intro-model">
+    <sect2 id="sect-geomGeoAPI-intro-model">
       <title>Instance Object Model</title>
       
       <para>
@@ -50,7 +50,7 @@
     
     
     
-    <sect2 id="sect-feature-intro-code">
+    <sect2 id="sect-geomGeoAPI-intro-code">
       <title>Code Layout</title>
       
       <para>
@@ -84,7 +84,7 @@
     
     
     
-    <sect2 id="sect-feature-intro-keyClasses">
+    <sect2 id="sect-geomGeoAPI-intro-keyClasses">
       <title>Key Classes</title>
       
       <para>
@@ -131,7 +131,7 @@
   
   
   
-  <sect1 id="sect-feature-runThrough">
+  <sect1 id="sect-geomGeoAPI-runThrough">
     <title>Run Through</title>
 
     <para>
@@ -152,7 +152,7 @@
   
   
   
-  <sect1 id="sect-feature-resources">
+  <sect1 id="sect-geomGeoAPI-resources">
     <title>Resources</title>
 
     <para>
@@ -173,7 +173,7 @@
   
   
   
-  <sect1 id="sect-feature-practical">
+  <sect1 id="sect-geomGeoAPI-practical">
     <title>Practical Information </title>
 
     <para>
@@ -194,7 +194,7 @@
   
   
   
-  <sect1 id="sect-feature-classes">
+  <sect1 id="sect-geomGeoAPI-classes">
     <title>Principal Classes</title>
 
     <para>
@@ -215,7 +215,7 @@
   
   
   
-  <sect1 id="sect-feature-tutorial">
+  <sect1 id="sect-geomGeoAPI-tutorial">
     <title>Tutorial</title>
 
     <para>
@@ -236,7 +236,7 @@
   
   
   
-  <sect1 id="sect-feature-readon">
+  <sect1 id="sect-geomGeoAPI-readon">
     <title>Reading More</title>
 
     <para>
@@ -257,7 +257,7 @@
   
   
   
-  <sect1 id="sect-feature-extending">
+  <sect1 id="sect-geomGeoAPI-extending">
     <title>Extending</title>
 
     <para>

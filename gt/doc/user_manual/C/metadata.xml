@@ -1,22 +1,278 @@
-<!-- Top Level, a description with the chapter TOC -->
-<para>
+<chapter id="chapter-metadata">
+  <title>System: Metadata</title>
 
-</para>
-
-<sect1 id="sect-metadata-top">
-  <title></title>
-
+  <!-- Top Level, a description with the chapter TOC -->
   <para>
-     
+    A blank to be reused.
   </para>
-<!--
-  <sect2 id="">
-    <title></title>
-
+  
+  <!-- Critical Warnings -->
+  
+  
+  <sect1 id="sect-metadata-intro">
+    <title>Introduction</title>
+    
+    <!--Overview and when not to read the chapter -->
     <para>
     </para>
+    
+    
+    
+    <sect2 id="sect-metadata-intro-usage">
+      <title>Usage</title>
+      
+      <para>
+      </para>
+      
+    </sect2>
+    
+    
+    
+    <sect2 id="sect-metadata-intro-warnings">
+      <title>Warnings</title>
+      
+      <warning>
+        <para>
+        </para>
+      </warning>
+      
+    </sect2>
+    
+    
+    
+    <sect2 id="sect-metadata-intro-model">
+      <title>Instance Object Model</title>
+      
+      <para>
+      </para>
+      
+    </sect2>
+    
+    
+    
+    <sect2 id="sect-metadata-intro-code">
+      <title>Code Layout</title>
+      
+      <para>
+      </para>
+      
+<table>
+<title>Fundamental Terminology</title>
+<tgroup cols="2">
+<thead>
+<row>
+  <entry>Package</entry>
+  <entry>Use</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry>
+    <para>
+    </para>
+  </entry>
+  <entry>
+    <para>
+    </para>
+  </entry>
+</row>
+</tbody>
+</tgroup>
+</table>
 
-  </sect2>
--->
-</sect1>
+    </sect2>
+    
+    
+    
+    <sect2 id="sect-metadata-intro-keyClasses">
+      <title>Key Classes</title>
+      
+      <para>
+      </para>
+          
+<table>
+<title>Key Classes</title>
+<tgroup cols="4">
+<thead>
+<row>
+  <entry>Class</entry>
+  <entry>Interface</entry>
+  <entry>Creation</entry>
+  <entry>Use</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry>
+    <para>
+    </para>
+  </entry>
+  <entry>
+    <para>
+    </para>
+  </entry>
+  <entry>
+    <para>
+    </para>
+  </entry>
+  <entry>
+    <para>
+    </para>
+  </entry>
+</row>
+</tbody>
+</tgroup>
+</table>
 
+    </sect2>
+    
+  </sect1>
+  
+  
+  
+  
+  <sect1 id="sect-metadata-runThrough">
+    <title>Run Through</title>
+
+    <para>
+      
+    </para>
+    <!--
+    <sect2 id="">
+      <title></title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    -->
+  </sect1>
+  
+  
+  
+  
+  <sect1 id="sect-metadata-resources">
+    <title>Resources</title>
+
+    <para>
+      
+    </para>
+    <!--
+    <sect2 id="">
+      <title></title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    -->
+  </sect1>
+  
+  
+  
+  
+  <sect1 id="sect-metadata-practical">
+    <title>Practical Information </title>
+
+    <para>
+      
+    </para>
+    <!--
+    <sect2 id="">
+      <title></title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    -->
+  </sect1>
+  
+  
+  
+  
+  <sect1 id="sect-metadata-classes">
+    <title>Principal Classes</title>
+
+    <para>
+      
+    </para>
+    <!--
+    <sect2 id="">
+      <title></title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    -->
+  </sect1>
+  
+  
+  
+  
+  <sect1 id="sect-metadata-tutorial">
+    <title>Tutorial</title>
+
+    <para>
+      
+    </para>
+    <!--
+    <sect2 id="">
+      <title></title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    -->
+  </sect1>
+  
+  
+  
+  
+  <sect1 id="sect-metadata-readon">
+    <title>Reading More</title>
+
+    <para>
+      
+    </para>
+    <!--
+    <sect2 id="">
+      <title></title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    -->
+  </sect1>
+  
+  
+  
+  
+  <sect1 id="sect-metadata-extending">
+    <title>Extending</title>
+
+    <para>
+      
+    </para>
+    <!--
+    <sect2 id="">
+      <title></title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    -->
+  </sect1>
+
+</chapter>

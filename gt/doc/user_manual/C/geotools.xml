@@ -36,14 +36,16 @@
   <!ENTITY quickstart           SYSTEM "quick-start.xml">
 
   <!ENTITY concepts             SYSTEM "concepts.xml">
-  <!ENTITY geoSci               SYSTEM "geoscience.xml">
+  <!ENTITY science              SYSTEM "science.xml">
   <!ENTITY design               SYSTEM "design.xml">
   
   <!ENTITY libUnits             SYSTEM "libUnits.xml">
   <!ENTITY libJTS               SYSTEM "libJTS.xml">
   
+  <!ENTITY util                 SYSTEM "util.xml">
   <!ENTITY metadata             SYSTEM "metadata.xml">
-  <!ENTITY georeferencing       SYSTEM "geo-referencing.xml">
+  <!ENTITY geomGeoAPI           SYSTEM "geomGeoAPI.xml">
+  <!ENTITY referencing          SYSTEM "referencing.xml">
   <!ENTITY feature              SYSTEM "feature.xml">
   <!ENTITY gridCov              SYSTEM "grid-coverage.xml">
   <!ENTITY queryI               SYSTEM "query-I.xml">
@@ -191,26 +193,21 @@
   &quickstart;
 
   &concepts;
-  &geoSci;
+  &science;
   &design;
 
   &libUnits;
   &libJTS;
-
-  <chapter id="chapter-metadata">
-    <title>Metadata</title>
-    &metadata;
-  </chapter>
-
-  <chapter id="chapter-geoReferencing">
-    <title>Geo-Referencing</title>
-    &georeferencing;
-  </chapter>
-
-  <chapter id="chapter-feature">
-    <title>Features</title>
-    &feature;
-  </chapter>
+  
+  <!-- TO WRITE >
+  <chapter id="chapter-towrite">
+    <title>TO WRITE: </title>
+  </chapter-->
+  &util;
+  &metadata;
+  &geomGeoAPI;
+  &referencing;
+  &feature;
 
   <chapter id="chapter-gridCov">
     <title>Grid Coverages</title>
