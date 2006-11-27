@@ -35,16 +35,13 @@
 
   <!ENTITY quickstart           SYSTEM "quick-start.xml">
 
+  <!ENTITY concepts             SYSTEM "concepts.xml">
+  <!ENTITY geoSci               SYSTEM "geoscience.xml">
   <!ENTITY design               SYSTEM "design.xml">
-
-  <!ENTITY conceptFound         SYSTEM "conceptual-foundations.xml">
-
-  <!ENTITY geoSci               SYSTEM "geospatial-science.xml">
-
-  <!ENTITY ideConfig            SYSTEM "ide-config.xml">
-
-  <!ENTITY geoapiUtil           SYSTEM "geoapiUtil.xml">
-  <!ENTITY geomJTS              SYSTEM "geomJTS.xml">
+  
+  <!ENTITY libUnits             SYSTEM "libUnits.xml">
+  <!ENTITY libJTS               SYSTEM "libJTS.xml">
+  
   <!ENTITY metadata             SYSTEM "metadata.xml">
   <!ENTITY georeferencing       SYSTEM "geo-referencing.xml">
   <!ENTITY feature              SYSTEM "feature.xml">
@@ -192,27 +189,13 @@
   &welcome;
     
   &quickstart;
-  
+
+  &concepts;
+  &geoSci;
   &design;
 
-  &conceptFound;
-
-  <chapter id="chapter-geoSci">
-    <title>Geospatial Science</title>
-    &geoSci;
-  </chapter>
-
-  &ideConfig;
-
-  <chapter id="chapter-geoapiUtil">
-    <title>GeoAPI Utilities</title>
-    &geoapiUtil;
-  </chapter>
-
-  <chapter id="chapter-geomJTS">
-    <title>Geometries</title>
-    &geomJTS;
-  </chapter>
+  &libUnits;
+  &libJTS;
 
   <chapter id="chapter-metadata">
     <title>Metadata</title>

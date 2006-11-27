@@ -572,6 +572,7 @@
 </sect1>
 
 
+
 <!-- TODO: Create an artifact that does this. -->
 <sect1 id="sect-quick-start-firstModule">
     <title>First Module</title>
@@ -585,6 +586,52 @@
 </literallayout>
       with which a user can start.
     </para>
+
+</sect1>
+
+
+<sect1 id="sect-quick-start-ide">
+  <title>IDE</title>
+  
+  <para>
+    This section describes the configuration of a more complete development 
+    environment for the creation of applications or library modules using &geot; 
+    than was provided in the quick introduction in 
+    <xref linkend="sect-quickStart-setup"/>. 
+  </para>
+  
+  <warning>
+    <para>
+      This chapter assumes that the user has setup a Java environment according to 
+      the instructions provided in <xref linkend="sect-quick-start-configJava"/>. 
+    </para>
+  </warning>
+    
+  <para>
+    This chapter describes the configuration of a development environment which
+    uses <emphasis>but does not change</emphasis> the &geot; library .
+  </para>
+
+
+  <sect2 id="sect-ideConfig-eclipse">
+    <title>Eclipse IDE</title>
+
+    <para>
+      To be written...
+    </para>
+
+  </sect2>
+
+
+
+  <sect2 id="sect-ideConfig-netbeans">
+    <title>Netbeans IDE</title>
+
+    <para>
+      To be written...
+    </para>
+
+  </sect2>
 
 </sect1>
 
