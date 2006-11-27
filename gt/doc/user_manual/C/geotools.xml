@@ -47,7 +47,7 @@
   <!ENTITY geomGeoAPI           SYSTEM "geomGeoAPI.xml">
   <!ENTITY referencing          SYSTEM "referencing.xml">
   <!ENTITY feature              SYSTEM "feature.xml">
-  <!ENTITY gridCov              SYSTEM "grid-coverage.xml">
+  <!ENTITY grids                SYSTEM "grids.xml">
   <!ENTITY queryI               SYSTEM "query-I.xml">
   <!ENTITY dataAccess           SYSTEM "data-access.xml">
   <!ENTITY queryII              SYSTEM "query-II.xml">
@@ -208,11 +208,7 @@
   &geomGeoAPI;
   &referencing;
   &feature;
-
-  <chapter id="chapter-gridCov">
-    <title>Grid Coverages</title>
-    &gridCov;
-  </chapter>
+  &grids;
 
   <chapter id="chapter-query-I">
     <title>Queries I: Features</title>
