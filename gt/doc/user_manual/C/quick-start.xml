@@ -1,4 +1,4 @@
-<chapter id="chapter-quickStart">
+<chapter id="chapter-start">
   <title>Quick Start</title>
   
   <!-- Top Level, a description with the chapter TOC -->
@@ -39,7 +39,7 @@
 
 
 
-<sect1 id="sect-quickStart-setup">
+<sect1 id="sect-start-setup">
   <title>Setup</title>
   
   <para>
@@ -64,7 +64,7 @@
 
 
 
-  <sect2 id="sect-quick-start-configJava">
+  <sect2 id="sect-start-configJava">
     <title>Configure Java</title>
 
     <para>
@@ -88,7 +88,7 @@
         Most developers also use an Integrated Development Environment (IDE) 
         such as Eclipse or NetBeans, applications which greatly facilitate the 
         development of complex programs. Instructions for the use of those two
-        popular IDEs are presented in <xref linkend="sect-quick-start-ide"/> 
+        popular IDEs are presented in <xref linkend="sect-start-ide"/> 
         below.
       </para>
     </note>
@@ -151,7 +151,7 @@
 
 
 
-  <sect2 id="sect-quick-start-getGt">
+  <sect2 id="sect-start-getGt">
     <title>Get &geot;</title>
 
     <para>
@@ -171,13 +171,13 @@
     </para>
 
 
-    <sect3 id="sect-quick-start-test">
+    <sect3 id="sect-start-test">
       <title>Test the installation</title>
 
       <para>
         The library is distributed along with a demonstration application. This 
         application is dicussed in more detail in 
-        <xref linkend="sect-quick-start-theDemo"/> below. Here it can serve simply 
+        <xref linkend="sect-start-demo"/> below. Here it can serve simply 
         to establish that things are properly configured.
       </para>
       
@@ -201,7 +201,7 @@
 
 
 
-  <sect2 id="sect-quick-start-archetype">
+  <sect2 id="sect-start-archetype">
     <title>Make an application archetype</title>
 
     <warning>
@@ -222,7 +222,7 @@
       be modified to create a new application.
     </para>
     
-    <sect3 id="sect-quick-start-archetype-getMvn">
+    <sect3 id="sect-start-archetype-getMvn">
       <title>Get Maven 2</title>
       
       <para>
@@ -235,7 +235,7 @@
       
     </sect3>
     
-    <sect3 id="sect-quick-start-archetype-create">
+    <sect3 id="sect-start-archetype-create">
       <title>Create the Archetype</title>
       
       
@@ -316,7 +316,7 @@
 
 
 
-  <sect2 id="sect-quick-start-modExample">
+  <sect2 id="sect-start-modExample">
     <title>Module Example</title>
 
     <para>
@@ -332,8 +332,8 @@
 
 
 
-<sect1 id="sect-quick-start-theDemo">
-    <title>The Demo</title>
+<sect1 id="sect-start-demo">
+    <title>Demo</title>
 
     <para>
       Geotools contains a handy demonstration application which is useful
@@ -342,7 +342,7 @@
       library.
     </para>
 
-  <sect2 id="sect-quick-start-runDemo">
+  <sect2 id="sect-start-runDemo">
       <title>Run the Demo</title>
 
       <para>
@@ -445,7 +445,7 @@
   </sect2>
 
 
-  <sect2 id="sect-quick-start-readDeom">
+  <sect2 id="sect-start-readDeom">
     <title>Read the Code</title>
 
     <para>
@@ -476,7 +476,7 @@
       </para>
     </note>
 
-    <sect3 id="sect-quick-start-readDemo-create">
+    <sect3 id="sect-start-readDemo-create">
       <title>Create FeatureSources</title>
 
       <para>
@@ -485,7 +485,7 @@
     </sect3>
 
 
-    <sect3 id="sect-quick-start-readDemo-style">
+    <sect3 id="sect-start-readDemo-style">
       <title>Style the features</title>
 
       <para>
@@ -494,7 +494,7 @@
     </sect3>
 
 
-    <sect3 id="sect-quick-start-readDemo-render">
+    <sect3 id="sect-start-readDemo-render">
       <title>Render a map</title>
 
       <para>
@@ -503,7 +503,7 @@
     </sect3>
 
 
-    <sect3 id="sect-quick-start-readDemo-project">
+    <sect3 id="sect-start-readDemo-project">
       <title>Project the map</title>
 
       <para>
@@ -512,7 +512,7 @@
     </sect3>
 
 
-    <sect3 id="sect-quick-start-readDemo-filter">
+    <sect3 id="sect-start-readDemo-filter">
       <title>Filter</title>
 
       <para>
@@ -521,7 +521,7 @@
     </sect3>
 
 
-    <sect3 id="sect-quick-start-readDemo-capture">
+    <sect3 id="sect-start-readDemo-capture">
       <title>Capture an image</title>
 
       <para>
@@ -530,7 +530,7 @@
     </sect3>
 
 
-    <sect3 id="sect-quick-start-readDemo-save">
+    <sect3 id="sect-start-readDemo-save">
       <title>Save to a file</title>
 
       <para>
@@ -539,7 +539,7 @@
     </sect3>
 
 
-    <sect3 id="sect-quick-start-readDemo-commit">
+    <sect3 id="sect-start-readDemo-commit">
       <title>Commit to a server</title>
 
       <para>
@@ -548,7 +548,7 @@
     </sect3>
 
 
-    <sect3 id="sect-quick-start-readDemo-analyze">
+    <sect3 id="sect-start-readDemo-analyze">
       <title>Advanced Analysis</title>
 
       <para>
@@ -561,7 +561,7 @@
 </sect1>
 
 
-<sect1 id="sect-quick-start-firstApp">
+<sect1 id="sect-start-firstApp">
     <title>First Application</title>
 
     <para>
@@ -575,7 +575,7 @@
 
 
 <!-- TODO: Create an artifact that does this. -->
-<sect1 id="sect-quick-start-firstModule">
+<sect1 id="sect-start-firstModule">
     <title>First Module</title>
 
     <para>
@@ -591,20 +591,20 @@
 </sect1>
 
 
-<sect1 id="sect-quick-start-ide">
+<sect1 id="sect-start-ide">
   <title>IDE</title>
   
   <para>
     This section describes the configuration of a more complete development 
     environment for the creation of applications or library modules using &geot; 
     than was provided in the quick introduction in 
-    <xref linkend="sect-quickStart-setup"/>. 
+    <xref linkend="sect-start-setup"/>. 
   </para>
   
   <warning>
     <para>
       This chapter assumes that the user has setup a Java environment according to 
-      the instructions provided in <xref linkend="sect-quick-start-configJava"/>. 
+      the instructions provided in <xref linkend="sect-start-configJava"/>. 
     </para>
   </warning>
     
@@ -614,7 +614,7 @@
   </para>
 
 
-  <sect2 id="sect-ideConfig-eclipse">
+  <sect2 id="sect-start-ide-eclipse">
     <title>Eclipse IDE</title>
 
     <para>
@@ -625,7 +625,7 @@
 
 
 
-  <sect2 id="sect-ideConfig-netbeans">
+  <sect2 id="sect-start-ide-netbeans">
     <title>Netbeans IDE</title>
 
     <para>

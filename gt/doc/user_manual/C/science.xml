@@ -36,7 +36,7 @@
 
 
   <sect1 id="sect-geoSci-compGeom">
-    <title>Computational Geometry for GIS</title>
+    <title>Computational Geometry</title>
 
     <para>
        Computational Geometry is the study of the analysis of geometric objects
@@ -61,7 +61,7 @@
 
 
   <sect1 id="sect-geoSci-geodesy">
-    <title>Geodesy for GIS</title>
+    <title>Geodesy</title>
 
     <para>
        Geodesy is the study of the shape of the earth. Its core contribution to 
