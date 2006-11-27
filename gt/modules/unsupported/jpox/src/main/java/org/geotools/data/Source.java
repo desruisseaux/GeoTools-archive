@@ -42,6 +42,12 @@ import org.opengis.util.TypeName;
 public interface Source {
 	
 	/**
+	 * Get the corresponding DataService, that created this Source.
+	 */
+	// Comment this out, if you think it is needed!
+//	DataService getDataService();
+	
+	/**
 	 * Get the complete data of this <code>Source</code> implementation. No filters or 
 	 * queries are applied.
 	 * 
@@ -101,4 +107,8 @@ public interface Source {
 	 */
 
 	TypeName getName();
+	
+	void setTransaction( Transaction t );
+	
+	
 }
