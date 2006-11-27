@@ -13,46 +13,103 @@
   
   
   <sect1 id="sect-design-runtime">
-    <title>Runtime Environment</title>
+    <title>Runtime</title>
     
     <para>
-      The &geot; library runs inside a java virtual machine on one of several 
-      operating systems. 
+      Since Geotools is a Java library, applications using the library will run 
+      in a well defined environment and have one of several contexts dependent 
+      on the purpose of the client application.
     </para>
+    
+    <sect2 id="sect-design-runtime">
+      <title>Environment</title>
+      
+      <para>
+        The &geot; library runs inside a java virtual machine on one of several 
+        operating systems. 
+      </para>
 
-    <para>
-      The environment on which the Geotools library runs is shown in <xref
-      linkend="fig-geotools-environment" />.
-      <figure id="fig-geotools-environment">
-        <title>The Geotools Environment.</title>
-        <screenshot>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="figures/geotools-environment.png" 
-                  format="PNG" />
-            </imageobject>
-            <textobject>
-              <phrase>
-                An image of the components on which the Geotools library runs.
-              </phrase>
-            </textobject>
-      	     <caption>
-          	  <para>
-          	    &geot; is written in Java and therefore runs inside a Java Virtual 
-                machine (VM). The Java VM generally runs through the POSIX layer 
-                on the hardware. The library requires two of the standard Java 
-                extension libraries, Java Advanced Imaging and Java Image I/O.  
-                &geot; uses the GeoAPI project to define a standard API, the JTS 
-                project for robust geometric convolutions, and the definitions 
-                for scientific units provided by JSR-108 or more recently by the
-                JScience project. There are also several external libraries and 
-                code plugins which can be connected to &geot;.
-          	  </para>
-          	</caption>
-          </mediaobject>
-        </screenshot>
-      </figure>
-    </para>
+      <para>
+        The environment on which the Geotools library runs is shown in <xref
+        linkend="fig-geotools-environment" />.
+        <figure id="fig-geotools-environment">
+          <title>The Geotools Environment.</title>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="figures/geotools-environment.png" 
+                    format="PNG" />
+              </imageobject>
+              <textobject>
+                <phrase>
+                  An image of the components on which the Geotools library runs.
+                </phrase>
+              </textobject>
+        	     <caption>
+            	  <para>
+            	    &geot; is written in Java and therefore runs inside a Java Virtual 
+                  machine (VM). The Java VM generally runs through the POSIX layer 
+                  on the hardware. The library requires two of the standard Java 
+                  extension libraries, Java Advanced Imaging and Java Image I/O.  
+                  &geot; uses the GeoAPI project to define a standard API, the JTS 
+                  project for robust geometric convolutions, and the definitions 
+                  for scientific units provided by JSR-108 or more recently by the
+                  JScience project. There are also several external libraries and 
+                  code plugins which can be connected to &geot;.
+            	  </para>
+            	</caption>
+            </mediaobject>
+          </screenshot>
+        </figure>
+      </para>
+    
+    </sect2>
+    
+    
+    
+    <sect2 id="sect-design-archi-userApp">
+      <title>Context</title>
+
+      <!--TODO: make the userAppModel figure. -->
+      <para>
+        Applications built on the &geot; library could use the library to varying 
+        degrees. By considering the state during runtime of an application using 
+        the library extensively, a user might better understand the essential 
+        design of &geot; and therefore better grasp how to start building an 
+        application.
+      </para>
+      
+      <para>
+        Figure <xref linkend="fig-geotools-userAppModel" /> below shows an 
+        overview of the structure of an application during runtime.
+        
+        <figure id="fig-geotools-userAppModel">
+          <title>The structure of an example user application.</title>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="figures/ToDo.png" 
+                    format="PNG" />
+              </imageobject>
+              <textobject>
+                <phrase>
+                  An image of the internal structure of a user application using
+                  the &geot; library.
+                </phrase>
+              </textobject>
+            	<caption>
+            	  <para>
+            	    A user application which uses most of the &geot; library to 
+            	    define and render its geospatial data will contain the systems 
+            	    shown in the figure.
+            	  </para>
+            	</caption>
+            </mediaobject>
+          </screenshot>
+        </figure>
+      </para>
+    
+    </sect2>
     
   </sect1>
 
@@ -486,50 +543,17 @@
   </sect1>
   
   
-  
-  <sect1 id="sect-design-archi-userApp">
-    <title>Runtime Design</title>
-
-    <!--TODO: make the userAppModel figure. -->
-    <para>
-      Applications built on the &geot; library could use the library to varying 
-      degrees. By considering the state during runtime of an application using 
-      the library extensively, a user might better understand the essential 
-      design of &geot; and therefore better grasp how to start building an 
-      application.
-    </para>
+  <sect1>
+    <title>Data Model</title>
     
     <para>
-      Figure <xref linkend="fig-geotools-userAppModel" /> below shows an 
-      overview of the structure of an application during runtime.
-      
-      <figure id="fig-geotools-userAppModel">
-        <title>The structure of an example user application.</title>
-        <screenshot>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="figures/ToDo.png" 
-                  format="PNG" />
-            </imageobject>
-            <textobject>
-              <phrase>
-                An image of the internal structure of a user application using
-                the &geot; library.
-              </phrase>
-            </textobject>
-          	<caption>
-          	  <para>
-          	    A user application which uses most of the &geot; library to 
-          	    define and render its geospatial data will contain the systems 
-          	    shown in the figure.
-          	  </para>
-          	</caption>
-          </mediaobject>
-        </screenshot>
-      </figure>
+      Since Geotools implements the ISO/OGC geospatial standards, applications 
+      using the library are forced to use a similar semantic model for their 
+      data. This section presents the data model of a client desktop 
+      application which uses Geotools.
     </para>
-  
   </sect1>
+  
 
 </chapter>
 

@@ -3,16 +3,17 @@
   
   <!-- Top Level, a description with the chapter TOC -->
   <para>
-    This chapter provides a user with a quick introduction to the geotools 
-    library. The introduction includes an explanation of how to setup a computer 
+    This chapter provides a user with a quick introduction to the Geotools 
+    library. The introduction includes a brief explanation of how to setup a computer 
     system to use the library, a walk through the demonstration application 
-    included with the library, and a walk through two code bundles which can be 
-    used as the basis of of future work: one designed for the creation of an 
+    included with the library, an introduction to two code artifacts which can 
+    be used as the basis of of future work, one designed for the creation of an 
     application using Geotools, the other designed for the creation of a new 
-    library module.
+    library module, and the chapter concludes by explaining how to configure two 
+    popular integrated development environments (IDE) to use the library.
   </para>
 
-  <warning>
+  <note>
     <para>
       The chapter assumes that the programmer understands the following:
       <itemizedlist>
@@ -34,7 +35,7 @@
       programmer uses her own tools to actually develop her programs, each 
       will have to adapt these examples to fit her own needs.
     </para>
-  </warning>
+  </note>
 
 
 
@@ -59,7 +60,9 @@
   
   <para>
     However, users may choose to use the ready prepared skeleton application or 
-    example module provided by the &geot; project, as explained below.
+    example module provided by the &geot; project, as explained later in the  
+    chapter in <xref linkend="sect-start-firstApp"/> and 
+    <xref linkend="sect-start-firstModule"/>.
   </para>
 
 
@@ -152,7 +155,7 @@
 
 
   <sect2 id="sect-start-getGt">
-    <title>Get &geot;</title>
+    <title>Install &geot;</title>
 
     <para>
       &geot; is distributed in three separate pieces: as a binary 
@@ -164,168 +167,44 @@
     <para>
       Most developers get all three components although only the binary 
       distribution is required for this demo. Once the binary distribution is 
-      downloaded, it must be unzipped. Persumably most users will expand the zip
+      downloaded, it must be unzipped. Presumably most users will expand the zip
       archive somewhere in their home directory. Once expanded the binary 
       distribution contains only a series of JAR files, each representing a 
       different component of the final application.
     </para>
 
+  </sect2>
+  
+  
+  
+  <sect2 id="sect-start-test">
+    <title>Test the installation</title>
 
-    <sect3 id="sect-start-test">
-      <title>Test the installation</title>
-
-      <para>
-        The library is distributed along with a demonstration application. This 
-        application is dicussed in more detail in 
-        <xref linkend="sect-start-demo"/> below. Here it can serve simply 
-        to establish that things are properly configured.
-      </para>
-      
-      <para>
-        The application can be run by typing:
+    <para>
+      The demonstration application distributed with the Geotools library can 
+      serve to test the Java configuration and library installation. The demo 
+      itself will be discussed in detail in <xref linkend="sect-start-demo"/> 
+      below. 
+    </para>
+    
+    <para>
+      The demo can be run by typing:
 <literallayout>
   java -jar /path/to/gt2-demo-introduction-VERSION_NUMBER.jar
 </literallayout>
-        where "path/to/" is altered to point to the installation directory of 
-        the JAR files and "VERSION_NUMBER" is the number of the &geot; release. 
-        The command should cause a simple swing application to open with a series 
-        of buttons on the left. The functionality of the setup can be tested by 
-        clicking sequentially on each button to the left of the application. If 
-        everything is setup correctly the application should show some text, draw
-        some maps and then quit.
-      </para>
-      
-    </sect3>
-
-  </sect2>
-
-
-
-  <sect2 id="sect-start-archetype">
-    <title>Make an application archetype</title>
-
-    <warning>
-      <para>
-        This currently does not yet work. The archetype system in Maven 2 is 
-        still quite young and the &geot; project doesn't yet fully understand 
-        even the parts that work. These notes document how the system is 
-        expected to eventually work.
-      </para>
-    </warning>
-      
-    <para>
-      The user can generate, using the Maven 2 build tool, a skeleton 
-      application designed to use the &geot; library and arranged 
-      correctly to be built with maven. This system uses the 'archetype' system 
-      of the maven tool. A user must first obtain maven, create the archetype, 
-      build the archetype, and finally run the archetype. The archetype can then
-      be modified to create a new application.
+      where "<code>path/to/</code>" is altered to point to the installation 
+      directory of the JAR files and "<code>VERSION_NUMBER</code>" is the number 
+      of the &geot; release. 
+      The command should cause a simple swing application to open with a series 
+      of buttons on the left. The functionality of the setup can be tested by 
+      clicking sequentially on each button to the left of the application. If 
+      everything is setup correctly the application should show some text, draw
+      some maps, and then quit all while generating a minimum of text messages.
     </para>
     
-    <sect3 id="sect-start-archetype-getMvn">
-      <title>Get Maven 2</title>
-      
-      <para>
-        The Maven 2 build tool can be obtained from the Apache project. It must
-        be downloaded and unbundled, the Java runtime environment must be 
-        indicated by the <code>JAVA_HOME</code> environmental variable, and 
-        finally the <code>mvn</code> binary can be called, possibly by having 
-        its directory placed on the <code>PATH</code>.
-      </para>
-      
-    </sect3>
-    
-    <sect3 id="sect-start-archetype-create">
-      <title>Create the Archetype</title>
-      
-      
-      <para>
-        The archetype is created by the maven binary tool <code>mvn</code> based 
-        on information obtained in a maven plugin bundle. The approach used here
-        is to first download an archetype creator plugin, next install that to 
-        the local repository (generally .m2/repository/ under a user's home 
-        directory), and finally to create the archetype from the plugin.
-      </para>
-      
-      <para>
-        While an archetype can be created in any directory. It is presumably a 
-        good idea to create a new, separate directory for the files such as 
-        creating a temporary directory in a users home directory. The 
-        instructions which follow all presume a user is working within that 
-        temporary directory.
-      </para>
-      
-      <para>
-        First, the user should download the bundle from the web. The bundle is 
-        available from the repository at Refractions Research as the 
-        <ulink url="http://lists.refractions.net/m2/org/ourgroup/geotools/base/base-1.0-SNAPSHOT.jar"
-               type="http">base-1.0-SNAPSHOT.jar</ulink> JAR file. This file can 
-        be downloaded through a web browser or using a downloading tool like 
-        <code>wget</code>. 
-      </para>
-      
-      <para>
-        Second, the file should be installed into the local repository with 
-<literallayout>
-  mvn install:install-file -DgroupId=org.geotools.maven \ 
-                           -DartifactId=archetype \ 
-                           -Dversion=2.4-SNAPSHOT \ 
-                           -Dpackaging=jar \ 
-                           -Dfile=./base-1.0-SNAPSHOT.jar
-</literallayout>
-        where the <code>2.4-SNAPSHOT</code> should be replaced by the 
-        appropriate version number. This command will involve maven downloading 
-        a number of plugins to get all the tools it needs to perform this task.
-      </para>
-      
-      <para>
-        Third, the archetype itself can be created with the command:
-        <!-- FIXME: no way to get the repository. -->
-<literallayout>
-  mvn archetype:create -Drepository=lists.refractions.net/m2/ \
-                     -DarchetypeGroupId=org.geotools.maven \
-                     -DarchetypeArtifactId=archetype \
-                     -DarchetypeVersion=2.4-SNAPSHOT \
-                     -DgroupId=org.ourgroup.geotools \
-                     -DartifactId=base
-</literallayout>
-        where, again, the <code>2.4-SNAPSHOT</code> can be replaced by the appropriate 
-        version number and where a user can choose appropriate names for the 
-        groupId and artifactId. Here again, maven will download a number of 
-        plugins to generate the artifact. This will result in the creation of a 
-        directory called <code>base/</code> in the local directory. 
-      </para>
-      
-      <para>
-        Fourth, the archetype must be built. The user should first change into 
-        the <code>base/</code> directory which was created during the last step 
-        and then run the command
-<literallayout>
-  mvn install
-</literallayout>
-        which will cause maven to download more artifacts including the entire 
-        set of geotools JAR files and then to build the example application.
-      </para>
-      
-      <para>
-        Finally, the archetype can be run. 
-      </para>
-      
-    </sect3>
   </sect2>
 
 
-
-  <sect2 id="sect-start-modExample">
-    <title>Module Example</title>
-
-    <para>
-      The directory <code>geotools/modules/unsupported/example/</code> contains
-      a directory which should serve as an example to anyone trying to create 
-      their own module.
-    </para>
-
-  </sect2>
 
 </sect1>
 
@@ -336,10 +215,11 @@
     <title>Demo</title>
 
     <para>
-      Geotools contains a handy demonstration application which is useful
-      both to ensure that the libraries are properly installed and to get 
-      programmers started exploring each of the different areas of the 
-      library.
+      Geotools contains a demonstration application which itself is useless but 
+      serves to introduce all of the modules of the Geotools library. When run, 
+      the demo provides a minimal description of what it does; the real utility 
+      of the demo comes from reading the source code along with the descriptions 
+      provided below.
     </para>
 
   <sect2 id="sect-start-runDemo">
@@ -347,13 +227,13 @@
 
       <para>
         Once the Java libraries have been configured and the binary distribution
-        of &geot; installed, a simple demonstration program can be run with the 
-        following command:
+        of &geot; installed, the demo can be run with the following command:
 <literallayout>
   java -jar /path/to/gt2-demo-introduction-VERSION_NUMBER.jar
 </literallayout>
-        where "path/to/" is altered to point to the installation directory of 
-        the JAR files and "VERSION_NUMBER" is the number of the &geot; release.
+        where "<code>path/to/</code>" is altered to point to the installation 
+        directory of the JAR files and "<code>VERSION_NUMBER</code>" is the 
+        number of the &geot; release.
       </para>
 
       <para>
@@ -378,9 +258,9 @@
   	<caption>
   	  <para>
   	    The &geot; demonstration application uses swing components, such 
-              as a label, buttons, and a text area, but also uses the JMapPane
-              component to display geospatial data and provide a simple toolbar 
-              with tools to manipulate those data.
+        as a label, buttons, and a text area, but also uses the JMapPane
+        component to display geospatial data and provide a simple toolbar 
+        with tools to manipulate those data.
   	  </para>
   	</caption>
           </mediaobject>
@@ -562,14 +442,118 @@
 
 
 <sect1 id="sect-start-firstApp">
-    <title>First Application</title>
-
+  <title>First Application</title>
+  
+  <warning>
     <para>
-      A simple prototype directory useful to build applications based on &geot; 
-      can be obtained directly by running Maven2 while connected to the internet 
-      using the archetype idea from Maven2. 
+      This currently does not yet work. The archetype system in Maven 2 is 
+      still quite young and the &geot; project doesn't yet fully understand 
+      even the parts that work. These notes document how the system is 
+      expected to eventually work.
     </para>
-
+  </warning>
+    
+  <para>
+    The user can generate, using the Maven 2 build tool, a skeleton 
+    application designed to use the &geot; library and arranged 
+    correctly to be built with maven. This system uses the 'archetype' system 
+    of the maven tool. A user must first obtain maven, create the archetype, 
+    build the archetype, and finally run the archetype. The archetype can then
+    be modified to create a new application.
+  </para>
+  
+  <sect2 id="sect-start-archetype-getMvn">
+    <title>Get Maven 2</title>
+    
+    <para>
+      The Maven 2 build tool can be obtained from the Apache project. It must
+      be downloaded and unbundled, the Java runtime environment must be 
+      indicated by the <code>JAVA_HOME</code> environmental variable, and 
+      finally the <code>mvn</code> binary can be called, possibly by having 
+      its directory placed on the <code>PATH</code>.
+    </para>
+    
+  </sect2>
+  
+  
+  
+  <sect2 id="sect-start-archetype-create">
+    <title>Create the Archetype</title>
+    
+    <para>
+      The archetype is created by the maven binary tool <code>mvn</code> based 
+      on information obtained in a maven plugin bundle. The approach used here
+      is to first download an archetype creator plugin, next install that to 
+      the local repository (generally .m2/repository/ under a user's home 
+      directory), and finally to create the archetype from the plugin.
+    </para>
+    
+    <para>
+      While an archetype can be created in any directory. It is presumably a 
+      good idea to create a new, separate directory for the files such as 
+      creating a temporary directory in a users home directory. The 
+      instructions which follow all presume a user is working within that 
+      temporary directory.
+    </para>
+    
+    <para>
+      First, the user should download the bundle from the web. The bundle is 
+      available from the repository at Refractions Research as the 
+      <ulink url="http://lists.refractions.net/m2/org/ourgroup/geotools/base/base-1.0-SNAPSHOT.jar"
+              type="http">base-1.0-SNAPSHOT.jar</ulink> JAR file. This file can 
+      be downloaded through a web browser or using a downloading tool like 
+      <code>wget</code>. 
+    </para>
+    
+    <para>
+      Second, the file should be installed into the local repository with 
+<literallayout>
+  mvn install:install-file -DgroupId=org.geotools.maven \ 
+                           -DartifactId=archetype \ 
+                           -Dversion=2.4-SNAPSHOT \ 
+                           -Dpackaging=jar \ 
+                           -Dfile=./base-1.0-SNAPSHOT.jar
+</literallayout>
+      where the <code>2.4-SNAPSHOT</code> should be replaced by the 
+      appropriate version number. This command will involve maven downloading 
+      a number of plugins to get all the tools it needs to perform this task.
+    </para>
+    
+    <para>
+      Third, the archetype itself can be created with the command:
+      <!-- FIXME: no way to get the repository. -->
+<literallayout>
+  mvn archetype:create -Drepository=lists.refractions.net/m2/ \
+                     -DarchetypeGroupId=org.geotools.maven \
+                     -DarchetypeArtifactId=archetype \
+                     -DarchetypeVersion=2.4-SNAPSHOT \
+                     -DgroupId=org.ourgroup.geotools \
+                     -DartifactId=base
+</literallayout>
+      where, again, the <code>2.4-SNAPSHOT</code> can be replaced by the appropriate 
+      version number and where a user can choose appropriate names for the 
+      groupId and artifactId. Here again, maven will download a number of 
+      plugins to generate the artifact. This will result in the creation of a 
+      directory called <code>base/</code> in the local directory. 
+    </para>
+    
+    <para>
+      Fourth, the archetype must be built. The user should first change into 
+      the <code>base/</code> directory which was created during the last step 
+      and then run the command
+<literallayout>
+  mvn install
+</literallayout>
+      which will cause maven to download more artifacts including the entire 
+      set of geotools JAR files and then to build the example application.
+    </para>
+    
+    <para>
+      Finally, the archetype can be run. 
+    </para>
+    
+  </sect2>
+  
 </sect1>
 
 
@@ -595,22 +579,24 @@
   <title>IDE</title>
   
   <para>
-    This section describes the configuration of a more complete development 
-    environment for the creation of applications or library modules using &geot; 
-    than was provided in the quick introduction in 
-    <xref linkend="sect-start-setup"/>. 
+    This section describes the configuration of two popular Integrated 
+    Development Environments (IDE), Eclipse and NetBeans, to use Geotools when 
+    developing new applications. 
   </para>
   
   <warning>
     <para>
-      This chapter assumes that the user has setup a Java environment according to 
-      the instructions provided in <xref linkend="sect-start-configJava"/>. 
+      This section assumes that the user has setup a Java environment according 
+      to the instructions provided in <xref linkend="sect-start-configJava"/>. 
     </para>
   </warning>
     
   <para>
-    This chapter describes the configuration of a development environment which
-    uses <emphasis>but does not change</emphasis> the &geot; library .
+    This section describes the configuration of a development environment which
+    uses <emphasis>but does not change</emphasis> the &geot; library. The 
+    <ulink url="http://docs.codehaus.org/display/GEOT/Home" type="http">&geot; 
+    Developer's Guide</ulink> describes how to configure an IDE to work on the 
+    library source code itself.
   </para>
 
 

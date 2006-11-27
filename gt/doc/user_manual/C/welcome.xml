@@ -1,94 +1,54 @@
 <chapter id="chapter-welcome">
-    <title>Welcome!</title>
+  <title>Welcome!</title>
 
   <!-- This is at the top level to avoid any chapter TOC. -->
 
   <para>
-    Geotools is a code library for Geospatial applications. The 
-    library is intended to provide foundational object classes for 
-    creating geographic information systems. The library is 
-    written in the Java computer language, currently using 
-    version &javaVersion;. For more details, visit the Geotools project 
-    <ulink url="http://www.geotools.org/" type="http">webpage</ulink>.
-  </para>
-
-
-  <para>
-    This manual intends to help people develop software programs which use part
-    or all of the Geotools library to create their own geospatial applications. 
-    These programmers are considered <emphasis>users</emphasis> of the &geot; 
-    library.
-    This manual is intended to help programers learn how to use both the 
-    GeoTools library itself and closely related libraries such as the GeoAPI 
-    and JTS libraries. 
-  </para>
-
-  <warning>
-    <title>WORK IN PROGRESS!</title>
-    <para>
-      The Users' Manual is incomplete. Hopefully a first version will be
-      released with an upcoming version of the Geotools library.
-    </para>
-  </warning>
-
-  <para>
-    &geot; can be used to build applications of many different types including 
+    <emphasis role="bold">Geotools</emphasis>
+    is a Java language code library which provides the classes, 
+    objects, and methods required to implement standards conformant geospatial 
+    applications. Geotools can be used to build applications of many different 
+    types covering most processes of geographic information systems including 
     network server applications and desktop clients. The library consists of 
     various modules which can be combined according to programmer needs. An 
     example client application is included as the &geot; demo shown in <xref
-      linkend="fig-geotools-demo-render" /> .
-      <!-- SYNC WITH QUICKSTART-RUNTHEDEMO -->
-      <figure id="fig-geotools-demo-render">
-        <title>The Geotools Demo showing an unprojected map of the world.</title>
-        <screenshot>
-          <mediaobject>
+    linkend="fig-geotools-demo-render" /> .
+    <!-- SYNC WITH QUICKSTART-RUNTHEDEMO -->
+    <figure id="fig-geotools-demo-render">
+      <title>The Geotools Demo showing an unprojected map of the world.</title>
+      <screenshot>
+        <mediaobject>
           <imageobject>
             <imagedata fileref="figures/geotools-demo-render.png" 
-                       format="PNG" 
-                       width="600px"
-                       scalefit="1"
-                       />
+                        format="PNG" 
+                        width="600px"
+                        scalefit="1"
+                        />
           </imageobject>
           <textobject>
             <phrase>
               A screenshot of the user demo.
             </phrase>
           </textobject>
-  	<caption>
-  	  <para>
-  	    The &geot; demonstration application uses swing components, such 
+          <caption>
+            <para>
+              The &geot; demonstration application uses swing components, such 
               as a label, buttons, and a text area, but also uses the JMapPane
               component to display geospatial data and provide a simple toolbar 
               with tools to manipulate those data.
-  	  </para>
-  	</caption>
-          </mediaobject>
-        </screenshot>
-      </figure>
-    </para>
-
-    <para>
-      This manual will get users started using the geotools codebase. We hope
-      the manual can get users to the point that they can continue on their 
-      own by reading the GeoAPI and Geotools javadocs along with the source 
-      code. Advanced questions should be addressed to the mailing list or 
-      raised in the Internet Relay Chat (IRC) room.
-    </para>
-
-  <note>
-    <title>The Users' Manual vs the Developers' Guide</title>
-    <para>
-      The Users' Manual is <emphasis>not</emphasis> a guide to developing and 
-      improving the &geot; library itself.
-    </para>
-    <para> 
-      The Developers' Guide provides helpful information for those who want to
-      contribute to the library itself. For more information, see the 
-      <ulink url="http://www.geotools.org/Develop/" type="http">developers page
-      </ulink> of the web site.
-    </para>
-  </note>
-
+            </para>
+          </caption>
+        </mediaobject>
+      </screenshot>
+    </figure>
+    Geotools, in the 2.x series of releases, currently uses version 1.4 of the 
+    Java language and therefore does not include generics or other recent 
+    developments of the Java language. The Geotools project
+    <ulink url="http://www.geotools.org/" type="http">webpage</ulink> contains 
+    extensive information about the project and the library including project 
+    news, links to code downloads, and documentation.
+  </para>
+    
   <warning>
     <title>Geotools is a library <emphasis>not</emphasis> an application.</title>
     <para>
@@ -152,7 +112,37 @@
       library itself.
     </para>
   </warning>
+  
+  
+  
+  
+  <!-- The Users' Manual -->
+  <para>
+    <emphasis role="bold">The Geotools Users' Manual</emphasis> documents the 
+    design of the library, explains the use of each modular subsystem, and 
+    provides background to the tutorials distributed with the source code itself 
+    in order to help programers develop new geospatial applications using part 
+    or all of the Geotools library. This manual should help users get started 
+    using the Geotools library, we hope to the point that users can continue on
+    their own by reading the GeoAPI and Geotools javadocs along with the source 
+    code. Advanced questions should be addressed to the mailing list or 
+    raised in the Internet Relay Chat (IRC) room as explained on the project 
+    webpage.
+  </para>
 
+  <note>
+    <title>The Users' Manual vs the Developers' Guide</title>
+    <para>
+      The Users' Manual is <emphasis>not</emphasis> a guide to developing and 
+      improving the &geot; library itself.
+    </para>
+    <para> 
+      The Developers' Guide provides helpful information for those who want to
+      contribute to the library itself. For more information, see the 
+      <ulink url="http://www.geotools.org/Develop/" type="http">developers page
+      </ulink> of the web site.
+    </para>
+  </note>
 
 </chapter>
 
