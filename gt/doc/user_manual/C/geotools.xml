@@ -33,7 +33,7 @@
 
   <!ENTITY welcome              SYSTEM "welcome.xml">
 
-  <!ENTITY quickstart           SYSTEM "quick-start.xml">
+  <!ENTITY start                SYSTEM "start.xml">
 
   <!ENTITY concepts             SYSTEM "concepts.xml">
   <!ENTITY science              SYSTEM "science.xml">
@@ -189,7 +189,7 @@
   
   &welcome;
     
-  &quickstart;
+  &start;
 
   &concepts;
   &science;
