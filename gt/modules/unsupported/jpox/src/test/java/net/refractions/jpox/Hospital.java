@@ -19,7 +19,7 @@ CREATE TABLE bc_hospitals
 
 public class Hospital {
 
-	private int gid;
+	private Integer gid;
 	
 	private Integer id;
 
@@ -34,7 +34,7 @@ public class Hospital {
 		return authority;
 	}
 	
-	public int getGid() {
+	public Integer getGid() {
 		return gid;
 	}
 	
