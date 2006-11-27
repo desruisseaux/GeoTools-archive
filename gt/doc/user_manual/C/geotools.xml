@@ -48,9 +48,8 @@
   <!ENTITY referencing          SYSTEM "referencing.xml">
   <!ENTITY feature              SYSTEM "feature.xml">
   <!ENTITY grids                SYSTEM "grids.xml">
-  <!ENTITY queryI               SYSTEM "query-I.xml">
-  <!ENTITY dataAccess           SYSTEM "data-access.xml">
-  <!ENTITY queryII              SYSTEM "query-II.xml">
+  <!ENTITY storage              SYSTEM "storage.xml">
+  <!ENTITY query                SYSTEM "query.xml">
   <!ENTITY display              SYSTEM "display.xml">
   <!ENTITY advancedGraph        SYSTEM "advanced-graph.xml">
 
@@ -209,26 +208,9 @@
   &referencing;
   &feature;
   &grids;
-
-  <chapter id="chapter-query-I">
-    <title>Queries I: Features</title>
-    &queryI;
-  </chapter>
-
-  <chapter id="chapter-dataAccess">
-    <title>Data Storage</title>
-    &dataAccess;
-  </chapter>
-
-  <chapter id="chapter-query-II">
-    <title>Queries II: Storage</title>
-    &queryII;
-  </chapter>
-
-  <chapter id="chapter-display">
-    <title>Display</title>
-    &display;
-  </chapter>
+  &storage;
+  &query;
+  &display;
 
   <chapter id="chapter-advanced-graph">
     <title>Advanced: Network Graphs</title>
