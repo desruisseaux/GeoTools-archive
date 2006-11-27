@@ -45,6 +45,7 @@
   <!ENTITY util                 SYSTEM "util.xml">
   <!ENTITY metadata             SYSTEM "metadata.xml">
   <!ENTITY geomGeoAPI           SYSTEM "geomGeoAPI.xml">
+  <!ENTITY parameter            SYSTEM "parameter.xml">
   <!ENTITY referencing          SYSTEM "referencing.xml">
   <!ENTITY feature              SYSTEM "feature.xml">
   <!ENTITY grids                SYSTEM "grids.xml">
@@ -205,6 +206,7 @@
   &util;
   &metadata;
   &geomGeoAPI;
+  &parameter;
   &referencing;
   &feature;
   &grids;
