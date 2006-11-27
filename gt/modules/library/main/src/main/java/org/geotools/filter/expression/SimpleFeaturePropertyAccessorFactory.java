@@ -4,6 +4,8 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  * Creates a property accessor for simple features.
  * <p>
@@ -18,7 +20,7 @@ import org.geotools.feature.IllegalAttributeException;
 public class SimpleFeaturePropertyAccessorFactory implements
 		PropertyAccessorFactory {
 
-	public PropertyAccessor createPropertyAccessor(Class type, String xpath, Hints hints) {
+	public PropertyAccessor createPropertyAccessor(Class type, String xpath, Class target, Hints hints) {
 		
 		if ( Feature.class.isAssignableFrom( type ) ) {
 			return new SimpleFeaturePropertyAccessor();
@@ -28,8 +30,8 @@ public class SimpleFeaturePropertyAccessorFactory implements
 	}
 
 	static class SimpleFeaturePropertyAccessor implements PropertyAccessor {
-
-		public boolean canHandle(Object object, String xpath) {
+	    /*
+		public boolean canHandle(Object object, String xpath, Class target) {
 			
 			Feature feature = (Feature) object;
 			
@@ -43,12 +45,13 @@ public class SimpleFeaturePropertyAccessorFactory implements
 				return true;
 			
 			return false;
-		}
+		}*/
 		
-		public Object get(Object object, String xpath) {
-			
+		public Object get(Object object, String xpath, Class target) {
 			Feature feature = (Feature) object;
-		
+			if( "".equals( xpath ) && target == Geometry.class ){
+                            return feature.getDefaultGeometry();
+                        }
 			if ( xpath.matches( "@(\\w+:)?id" ) ) {
 				return feature.getID();
 			}
@@ -61,11 +64,13 @@ public class SimpleFeaturePropertyAccessorFactory implements
 			throw new IllegalArgumentException( "Could not handle expression:" + xpath );
 		}
 
-		public void set(Object object, String xpath, Object value) 
+		public void set(Object object, String xpath, Object value, Class target) 
 			throws IllegalAttributeException {
-			
 			Feature feature = (Feature) object;
-			
+
+                        if( "".equals( xpath ) && target == Geometry.class ){
+                            feature.setDefaultGeometry( (Geometry) value );
+                        }
 			if ( xpath.matches( "@(\\w+:)?id" ) ) {
 				throw new IllegalAttributeException( "feature id is immutable" );
 			}

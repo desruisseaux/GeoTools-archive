@@ -9,6 +9,7 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.Feature;
 import org.geotools.filter.expression.PropertyAccessor;
 import org.geotools.filter.expression.PropertyAccessorFactory;
+import org.geotools.geometry.Geometry;
 
 /**
  * Creates a property accessor for plain old java objects features.
@@ -21,11 +22,14 @@ import org.geotools.filter.expression.PropertyAccessorFactory;
 public class PojoPropertyAccessorFactory implements
 		PropertyAccessorFactory {
     
-    public PropertyAccessor createPropertyAccessor( Class type, String xpath, Hints hints ) {
+    public PropertyAccessor createPropertyAccessor( Class type, String xpath, Class target, Hints hints ) {
         if( Feature.class.isAssignableFrom( type ) ){
             return null; // we are not wanting to work with features
         }
-        if( !xpath.matches("^\\w(\\w)*$")){
+        if( "".equals(xpath) && target == Geometry.class){
+            // request for "default geometry"
+        }
+        else if( !xpath.matches("^\\w(\\w)*$")){
             return null; // that does not look simple
         }
         BeanInfo info;
@@ -35,7 +39,7 @@ public class PojoPropertyAccessorFactory implements
             for ( int i = 0; i < properties.length; i++ ){
                 PropertyDescriptor property = properties[i];
                 if( xpath.equalsIgnoreCase(property.getName()) ){
-                    return new PojoPropertyAccessor();
+                    return new PojoPropertyAccessor( info, property );
                 }
             }
         } catch (IntrospectionException e) {

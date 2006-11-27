@@ -30,10 +30,11 @@ public interface PropertyAccessorFactory {
      *
      * @param type The type of object to be accessed.
      * @param xpath The xpath expression to evaluate.
+     * @param target The kind of result we are expecting (ie Geometry)
      * @param hints Hints to be used when creatign the accessor.
-     *
+     * 
      * @return The property accessor, or <code>null</code> if this factory cannot create
      * an accessor for the specified type.
      */
-    PropertyAccessor createPropertyAccessor(Class type, String xpath, Hints hints);
+    PropertyAccessor createPropertyAccessor(Class type, String xpath, Class target, Hints hints);
 }

@@ -58,6 +58,7 @@
     <module>coverage</module>
     <module>api</module>
     <module>main</module>
+    <module>data</module>
     <module>sample-data</module>
     <module>render</module>
     <module>xml</module>

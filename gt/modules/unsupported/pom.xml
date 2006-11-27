@@ -66,7 +66,7 @@
     <module>gml3</module>
     <module>go</module>
 <!--<module>hsql</module>-->
-<!--<module>jpox</module>-->
+    <module>jpox</module>
     <module>mif</module>
     <module>mysql</module>
     <module>oracle-spatial</module>
