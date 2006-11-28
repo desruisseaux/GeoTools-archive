@@ -17,6 +17,8 @@ package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.expression.Expression;
 import org.geotools.xml.*;
 
 
@@ -49,6 +51,10 @@ public class PropertyIsNotEqualToBinding extends AbstractComplexBinding {
         return OGC.PROPERTYISNOTEQUALTO;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -56,7 +62,7 @@ public class PropertyIsNotEqualToBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return PropertyIsNotEqualTo.class;
     }
 
     /**
@@ -67,7 +73,8 @@ public class PropertyIsNotEqualToBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        Expression[] operands = (Expression[]) value;
+
+        return filterfactory.notEqual(operands[0], operands[1]);
     }
 }
