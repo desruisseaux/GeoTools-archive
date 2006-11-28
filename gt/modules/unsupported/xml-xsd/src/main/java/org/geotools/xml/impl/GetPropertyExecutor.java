@@ -46,8 +46,7 @@ public class GetPropertyExecutor implements BindingWalker.Visitor {
 				child = complex.getProperty(parent, name);
 			} 
 			catch (Exception e) {
-				//TODO: log this
-				child = null;
+				throw new RuntimeException( "Failed to get property: " + name,  e );
 			}
 		}
 	}
