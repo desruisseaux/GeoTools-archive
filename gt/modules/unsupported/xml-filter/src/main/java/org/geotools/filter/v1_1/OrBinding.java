@@ -16,9 +16,9 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Or;
-import org.geotools.filter.Filter;
 import org.geotools.xml.*;
 
 
