@@ -110,5 +110,14 @@ public interface Source {
 	
 	void setTransaction( Transaction t );
 	
-	
+    /**
+     * Clean up any resources, or listeners that made use of this Source of data.
+     * <p>
+     * Please note this Source will not function after this method is called. Any
+     * Transaction.State mementos placed on the current transaction will also be
+     * cleaned up (although the transaction itself will not be canceled - as it
+     * may be in use by others).
+     * </p>
+     */ 
+	void dispose();
 }

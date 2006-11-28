@@ -1,10 +1,21 @@
 package org.geotools.data.jpox;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
+
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.Source;
+import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.type.TypeName;
+import org.opengis.filter.FilterFactory;
 
 import junit.framework.TestCase;
 
@@ -13,28 +24,97 @@ public class JpoxDataServiceTest extends TestCase {
 
 	private static PersistenceManagerFactory pmf;
 	private static PersistenceManager pm;
+    private JpoxDataService data;
+    private FilterFactory ff;
 
 	protected void setUp() throws Exception {
-		
+        InputStream config = JpoxDataServiceTest.class.getResourceAsStream("jdo.properties");
+        Properties properties = new Properties();
+        properties.load( config );
+        
+        data = new JpoxDataService( properties );
+        
+        ff = CommonFactoryFinder.getFilterFactory( null );
 		super.setUp();
 	}
 	
-	public void testAccess() {
-		fail( "Not yet implemented" );
+	public void testData() {        
+        List types = data.getTypes();
+        assertNotNull( types );
+        assertFalse( types.isEmpty() );
+        assertTrue( types.get(0) instanceof TypeName);           
+        
+        TypeName typeName = (TypeName) data.getTypes().get(0);
+        Object descrption = data.describe( typeName );
+        assertNotNull( descrption );
+        assertTrue( descrption instanceof Class );        
 	}
+    
+    public void testSource() throws Exception {        
+        List types = data.getTypes();
+        TypeName typeName = (TypeName) data.getTypes().get(0);
+        Object descrption = data.describe( typeName );
+        
+        // Test "default access" using Transaction.AUTO_COMMIT
+        Source source = data.access(typeName);
+        
+        assertNotNull( source );
+        assertSame( descrption, source.describe() );
+        assertSame( typeName, source.getName() );
+                                
+        Collection content = source.content();
+        assertNotNull( content );
+        assertFalse( content.isEmpty() );
+        
+        // test concurancy - source2 uses seperate Transaction
+        Source source2 = data.access(typeName);
 
-	public void testDescribe() {
-		fail( "Not yet implemented" );
-	}
+        Transaction t = new DefaultTransaction("Source Testing");
+        source2.setTransaction(t);
+                
+        Collection content2 = source2.content();
+        assertNotNull( content2 );
+        assertNotSame( content, content2 );
+        assertEquals( content.size(), content2.size() );
+        
+        content2.clear();
+        assertTrue( content2.isEmpty() );
+        assertFalse( content.isEmpty() );
+        
+        t.rollback();
+        assertFalse( content2.isEmpty() );
+        assertEquals( content.size(), content2.size() );        
+    }
+    
+    public void testSource2() throws Exception {        
+        List types = data.getTypes();
+        TypeName typeName1 = (TypeName) data.getTypes().get(0);
+        TypeName typeName2 = (TypeName) data.getTypes().get(1);
+        
+        Transaction t = new DefaultTransaction("Source Testing");
+        
+        Source source1 = data.access(typeName1);
+        Source source2 = data.access(typeName2);
+        
+        source1.setTransaction( t );
+        source2.setTransaction( t );
+        
+        
+        Collection victoriaGeneral = source1.content( ff.equals( ff.property("NAME"), ff.literal("Victoria General" ) ) );
+        assertEquals( 1, victoriaGeneral.size() );
+        
+        int before = source1.content().size();
+        victoriaGeneral.clear(); // remove single hospital
+        
+        int after = source1.content().size();
+        assertEquals( "remove single", before - 1, after );
+        
+        source2.content().clear();
+        
+        assertEquals( 0, victoriaGeneral.size() );
 
-	public void testGetTypes() {
-		fail( "Not yet implemented" );
-	}
-
-	private static void init() {
-		pmf = JDOHelper.getPersistenceManagerFactory( new File( "src/test/resources/jdo.properties" ) );
-		pm = pmf.getPersistenceManager();
-	}
-	
-	
+        t.rollback();
+        assertEquals( 1, victoriaGeneral.size() ); // no longer empty
+        assertFalse( source2.content().isEmpty() ); // no longered cleared
+        assertEquals( before, source1.content().size() ); // just as before        
 }

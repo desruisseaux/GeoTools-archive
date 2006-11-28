@@ -36,7 +36,8 @@ public class JpoxPojoSource implements Source {
 		JpoxTransactionState state = (JpoxTransactionState)t.getState( JPOX_STATE_KEY );
 		
 		if ( state == null ) {
-			state = new JpoxTransactionState( pm );
+			state = new JpoxTransactionState( pm.getPersistenceManagerFactory().getPersistenceManager() );
+            t.putState( JPOX_STATE_KEY, state );
 		}
 		
 		return state.getJpoxTransaction();
@@ -55,6 +56,7 @@ public class JpoxPojoSource implements Source {
 	}
 
 	public Collection content( Filter filter ) {
+        t().getPersistenceManager();
 		return null;
 	}
 
@@ -73,5 +75,18 @@ public class JpoxPojoSource implements Source {
 	public void setTransaction( org.geotools.data.Transaction t ) {
 		this.t = t;
 	}
-
+    public void dispose() {
+        if( t != null ){
+            JpoxTransactionState state = (JpoxTransactionState)t.getState( JPOX_STATE_KEY );
+            if( state != null ){
+                state.setTransaction( null ); // cleanup!                
+                state = null;
+                t.putState( JPOX_STATE_KEY, null );
+            }
+            t = null;
+        }
+        pm.close();
+        pm = null;
+        pc = null;
+    }
 }
