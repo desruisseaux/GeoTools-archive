@@ -20,7 +20,6 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
-import org.opengis.webservice.SortProperty;
 import org.geotools.xml.*;
 
 
