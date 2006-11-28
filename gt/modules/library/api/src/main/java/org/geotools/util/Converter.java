@@ -32,19 +32,22 @@ public interface Converter {
      * @return <code>true</code> if the conversion can take place with the givem arguments,
      * otherwise <code>false</code>.
      */
-    boolean canConvert(Class source, Class target);
+
+    //boolean canConvert(Class source, Class target);
 
     /**
      * Converts an object to an object of another type.
      * <p>
-     * This method should not be called unless <code>canConvert( object.getClass(), target )<code>
-     * returns <code>true</code>.
+     * If the converstion supplied is not supported this method can either throw an exception or
+     * return <code>null</code>.
      * </p>
      *
      * @param source The original object, never <code>null</code>
      * @param target The type of the converted object.
      *
      * @return An instance of target, or <code>null</code> if the conversion could not take place.
+     *
+     * @throws Exception If the conversion can not take place.
      */
     Object convert(Object source, Class target) throws Exception;
 }
