@@ -36,7 +36,7 @@ public class CommonsConverterFactory implements ConverterFactory {
 	 * @author Justin Deoliveira, The Open Planning Project
 	 *
 	 */
-	class CommonsConverterWrapper implements Converter {
+	static class CommonsConverterWrapper implements Converter {
 
 		org.apache.commons.beanutils.Converter delegate;
 		
@@ -44,10 +44,6 @@ public class CommonsConverterFactory implements ConverterFactory {
 			this.delegate = delegate;
 		}
 		
-		public boolean canConvert(Class source, Class target) {
-			return true;
-		}
-
 		public Object convert(Object source, Class target) throws Exception {
 			return delegate.convert( target, source );
 		}

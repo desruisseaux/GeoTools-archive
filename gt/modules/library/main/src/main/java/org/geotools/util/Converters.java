@@ -43,8 +43,9 @@ public class Converters {
 			Converter converter = factory.createConverter( source.getClass(), target, hints );
 			if ( converter != null ) {
 				try {
-					if ( converter.canConvert( source.getClass(), target ) ) {
-						return converter.convert( source, target );	
+					Object converted = converter.convert( source, target );
+					if ( converted != null ) {
+						return converted;
 					}
 				} 
 				catch (Exception e) {
