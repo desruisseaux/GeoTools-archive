@@ -41,7 +41,7 @@ public class IsGreaterThanImpl extends CompareFilterImpl implements PropertyIsGr
 		Comparable value1 = comparable( values[0] );
 		Comparable value2 = comparable( values[1] );
 		
-		return compare(value1,value2) > 0;
+		return value1 != null && value2 != null && compare(value1,value2) > 0;
 	}
 	
 	public Object accept(FilterVisitor visitor, Object extraData) {
