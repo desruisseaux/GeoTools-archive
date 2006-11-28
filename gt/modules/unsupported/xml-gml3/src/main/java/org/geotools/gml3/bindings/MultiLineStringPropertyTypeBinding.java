@@ -76,4 +76,13 @@ public class MultiLineStringPropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(MultiLineString.class);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.MultiLineString.equals(name)) {
+            return object;
+        }
+
+        return null;
+    }
 }

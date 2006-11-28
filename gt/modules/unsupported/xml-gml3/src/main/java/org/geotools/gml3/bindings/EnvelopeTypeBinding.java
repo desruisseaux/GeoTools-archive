@@ -108,7 +108,7 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
             DirectPosition l = (DirectPosition) node.getChildValue("lowerCorner");
             DirectPosition u = (DirectPosition) node.getChildValue("upperCorner");
 
-            return new ReferencedEnvelope(l.getOrdinate(0), l.getOrdinate(1), u.getOrdinate(0),
+            return new ReferencedEnvelope(l.getOrdinate(0), u.getOrdinate(0), l.getOrdinate(1),
                 u.getOrdinate(1), crs);
         }
 
@@ -117,7 +117,7 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
             Coordinate c1 = (Coordinate) c.get(0);
             Coordinate c2 = (Coordinate) c.get(1);
 
-            return new ReferencedEnvelope(c1.x, c1.y, c2.x, c2.y, crs);
+            return new ReferencedEnvelope(c1.x, c2.x, c1.y, c2.y, crs);
         }
 
         if (node.hasChild(DirectPosition.class)) {
@@ -125,8 +125,8 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
             DirectPosition dp1 = (DirectPosition) dp.get(0);
             DirectPosition dp2 = (DirectPosition) dp.get(1);
 
-            return new ReferencedEnvelope(dp1.getOrdinate(0), dp1.getOrdinate(1),
-                dp2.getOrdinate(0), dp2.getOrdinate(1), crs);
+            return new ReferencedEnvelope(dp1.getOrdinate(0), dp2.getOrdinate(0),
+                dp1.getOrdinate(1), dp2.getOrdinate(1), crs);
         }
 
         if (node.hasChild(CoordinateSequence.class)) {

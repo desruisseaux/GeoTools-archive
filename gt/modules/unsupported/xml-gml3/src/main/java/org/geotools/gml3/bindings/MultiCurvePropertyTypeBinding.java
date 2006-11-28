@@ -76,4 +76,13 @@ public class MultiCurvePropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(MultiCurve.class);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.MultiCurve.equals(name)) {
+            return object;
+        }
+
+        return null;
+    }
 }

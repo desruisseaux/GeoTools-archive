@@ -76,4 +76,13 @@ public class MultiSurfacePropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(MultiSurface.class);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.MultiSurface.equals(name)) {
+            return object;
+        }
+
+        return null;
+    }
 }

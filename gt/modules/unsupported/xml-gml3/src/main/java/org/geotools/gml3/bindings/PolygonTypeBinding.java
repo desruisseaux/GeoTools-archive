@@ -64,6 +64,10 @@ public class PolygonTypeBinding extends AbstractComplexBinding {
         return GML.PolygonType;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->

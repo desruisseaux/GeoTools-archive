@@ -112,6 +112,10 @@ public class LineStringTypeBinding extends AbstractComplexBinding {
         return LineString.class;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->

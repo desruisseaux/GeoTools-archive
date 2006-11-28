@@ -79,6 +79,10 @@ public class MultiCurveTypeBinding extends AbstractComplexBinding {
         return MultiCurve.class;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -96,5 +100,21 @@ public class MultiCurveTypeBinding extends AbstractComplexBinding {
         }
 
         return new MultiCurve((Curve[]) curves.toArray(new Curve[curves.size()]), gf);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.curveMember.equals(name)) {
+            MultiCurve multiCurve = (MultiCurve) object;
+            Curve[] members = new Curve[multiCurve.getNumGeometries()];
+
+            for (int i = 0; i < members.length; i++) {
+                members[i] = (Curve) multiCurve.getGeometryN(i);
+            }
+
+            return members;
+        }
+
+        return null;
     }
 }

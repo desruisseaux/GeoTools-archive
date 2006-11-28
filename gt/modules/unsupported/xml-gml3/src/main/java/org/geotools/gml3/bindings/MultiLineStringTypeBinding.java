@@ -73,6 +73,10 @@ public class MultiLineStringTypeBinding extends AbstractComplexBinding {
         return MultiLineString.class;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -85,5 +89,21 @@ public class MultiLineStringTypeBinding extends AbstractComplexBinding {
 
         return gFactory.createMultiLineString((LineString[]) lines.toArray(
                 new LineString[lines.size()]));
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.lineStringMember.equals(name)) {
+            MultiLineString multiLineString = (MultiLineString) object;
+            LineString[] members = new LineString[multiLineString.getNumGeometries()];
+
+            for (int i = 0; i < members.length; i++) {
+                members[i] = (LineString) multiLineString.getGeometryN(i);
+            }
+
+            return members;
+        }
+
+        return null;
     }
 }

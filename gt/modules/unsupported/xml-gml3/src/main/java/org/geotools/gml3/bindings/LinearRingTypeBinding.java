@@ -107,6 +107,10 @@ public class LinearRingTypeBinding extends AbstractComplexBinding {
         return LinearRing.class;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->

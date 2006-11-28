@@ -86,6 +86,10 @@ public class PointTypeBinding extends AbstractComplexBinding {
         return GML.PointType;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->

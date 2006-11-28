@@ -15,10 +15,16 @@
  */
 package org.geotools.gml3.bindings;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Iterator;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import org.opengis.metadata.Identifier;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.CRS;
 
 
 /**
@@ -38,5 +44,19 @@ public class GML3EncodingUtils {
         }
 
         return dps;
+    }
+
+    static URI crs(CoordinateReferenceSystem crs) {
+        for (Iterator i = crs.getIdentifiers().iterator(); i.hasNext();) {
+            Identifier id = (Identifier) i.next();
+
+            try {
+                return new URI("urn:x-ogc:def:crs:EPSG:6.11.2:" + id.getCode());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return null;
     }
 }

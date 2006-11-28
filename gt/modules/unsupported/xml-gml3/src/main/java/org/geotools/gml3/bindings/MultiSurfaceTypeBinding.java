@@ -96,4 +96,20 @@ public class MultiSurfaceTypeBinding extends AbstractComplexBinding {
 
         return new MultiSurface((Polygon[]) surfaces.toArray(new Polygon[surfaces.size()]), gf);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.surfaceMember.equals(name)) {
+            MultiSurface multiSurface = (MultiSurface) object;
+            Polygon[] members = new Polygon[multiSurface.getNumGeometries()];
+
+            for (int i = 0; i < members.length; i++) {
+                members[i] = (Polygon) multiSurface.getGeometryN(i);
+            }
+
+            return members;
+        }
+
+        return null;
+    }
 }

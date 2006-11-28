@@ -37,6 +37,8 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
             AbstractFeatureTypeBinding.class);
         container.registerComponentImplementation(GML.AbstractFeatureCollectionType,
             AbstractFeatureCollectionTypeBinding.class);
+        container.registerComponentImplementation(GML.AbstractGeometryType,
+            AbstractGeometryTypeBinding.class);
         container.registerComponentImplementation(GML.AbstractRingPropertyType,
             AbstractRingPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.BoundingShapeType,

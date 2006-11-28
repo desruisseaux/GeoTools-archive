@@ -75,4 +75,13 @@ public class MultiPointPropertyTypeBinding extends AbstractComplexBinding {
         throws Exception {
         return node.getChildValue(MultiPoint.class);
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.MultiPoint.equals(name)) {
+            return object;
+        }
+
+        return null;
+    }
 }

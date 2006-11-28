@@ -79,6 +79,10 @@ public class CurveTypeBinding extends AbstractComplexBinding {
         return Curve.class;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->

@@ -17,6 +17,7 @@ package org.geotools.gml3.bindings;
 
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDTypeDefinition;
 import java.net.URI;
 import java.util.ArrayList;
@@ -30,8 +31,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.FeatureType;
@@ -66,10 +70,15 @@ public class GML3ParsingUtils {
 
         //build the feaure type by walking through the elements of the 
         // actual xml schema type
-        List children = Schemas.getChildElementDeclarations(element);
+        List children = Schemas.getChildElementParticles(element.getType(), true);
 
         for (Iterator itr = children.iterator(); itr.hasNext();) {
-            XSDElementDeclaration property = (XSDElementDeclaration) itr.next();
+            XSDParticle particle = (XSDParticle) itr.next();
+            XSDElementDeclaration property = (XSDElementDeclaration) particle.getContent();
+
+            if (property.isElementDeclarationReference()) {
+                property = property.getResolvedElementDeclaration();
+            }
 
             //ignore the attributes provided by gml, change this for new feature model
             //            if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
@@ -110,8 +119,14 @@ public class GML3ParsingUtils {
             //get hte last binding in the chain to execute
             Class theClass = ((Binding) bindings.get(bindings.size() - 1)).getType();
 
-            //call method with most parameter
-            ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));
+            //get the attribute properties
+            int min = particle.getMinOccurs();
+            int max = particle.getMaxOccurs();
+
+            //create the type
+            AttributeType type = AttributeTypeFactory.newAttributeType(property.getName(),
+                    theClass, true, null, null, null, min, max);
+            ftBuilder.addType(type);
         }
 
         return ftBuilder.getFeatureType();
@@ -124,8 +139,7 @@ public class GML3ParsingUtils {
             try {
                 return CRS.decode(srs.toString());
             } catch (Exception e) {
-                //TODO: log this
-                return null;
+                throw new RuntimeException("Could not create crs: " + srs, e);
             }
         }
 

@@ -72,6 +72,10 @@ public class MultiPolygonTypeBinding extends AbstractComplexBinding {
         return MultiPolygon.class;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -83,5 +87,21 @@ public class MultiPolygonTypeBinding extends AbstractComplexBinding {
         List polys = node.getChildValues(Polygon.class);
 
         return gFactory.createMultiPolygon((Polygon[]) polys.toArray(new Polygon[polys.size()]));
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.polygonMember.equals(name)) {
+            MultiPolygon multiPolygon = (MultiPolygon) object;
+            Polygon[] members = new Polygon[multiPolygon.getNumGeometries()];
+
+            for (int i = 0; i < members.length; i++) {
+                members[i] = (Polygon) multiPolygon.getGeometryN(i);
+            }
+
+            return members;
+        }
+
+        return null;
     }
 }

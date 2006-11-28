@@ -77,6 +77,10 @@ public class MultiPointTypeBinding extends AbstractComplexBinding {
         return MultiPoint.class;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -99,5 +103,21 @@ public class MultiPointTypeBinding extends AbstractComplexBinding {
         }
 
         return gFactory.createMultiPoint((Point[]) points.toArray(new Point[points.size()]));
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.pointMember.equals(name)) {
+            MultiPoint multiPoint = (MultiPoint) object;
+            Point[] members = new Point[multiPoint.getNumGeometries()];
+
+            for (int i = 0; i < members.length; i++) {
+                members[i] = (Point) multiPoint.getGeometryN(i);
+            }
+
+            return members;
+        }
+
+        return null;
     }
 }
