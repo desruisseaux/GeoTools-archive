@@ -17,6 +17,7 @@ package org.geotools.xml;
 
 import org.eclipse.xsd.XSDSchema;
 import org.geotools.xml.impl.ParserHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -127,11 +128,12 @@ public class Parser {
     }
 
     /**
-     * Signals the parser to parse the entire instance document. The object
-     * returned from the parse is the object which has been bound to the root
-     * element of the document. This method should only be called once for
-     * a single instance document.
-     *
+     * Parses an instance documented defined by an input stream.
+     * <p>
+     * The object returned from the parse is the object which has been bound to the root
+     * element of the document. This method should only be called once for a single instance document.
+     * </p>
+     * 
      * @return The object representation of the root element of the document.
      *
      * @throws IOException
@@ -139,9 +141,28 @@ public class Parser {
      */
     public Object parse(InputStream input) throws IOException, SAXException {
         parser.parse(input, handler);
-
+        
         return handler.getValue();
     }
+    
+    /**
+     * Parses an instance documented defined by a sax input source.
+     * <p>
+     * The object returned from the parse is the object which has been bound to the root
+     * element of the document. This method should only be called once for a single instance document.
+     * </p>
+     * 
+     * @return The object representation of the root element of the document.
+     *
+     * @throws IOException
+     * @throws SAXException
+     */
+    public Object parse(InputSource source) throws IOException, SAXException {
+    	parser.parse(source, handler);
+        
+        return handler.getValue();
+    }
+    
 
     /**
      * Returns the schema objects referenced by the instance document being
