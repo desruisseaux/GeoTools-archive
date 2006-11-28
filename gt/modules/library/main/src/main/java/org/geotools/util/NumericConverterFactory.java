@@ -51,10 +51,6 @@ public class NumericConverterFactory implements ConverterFactory {
 	
 	class NumericConverter implements Converter {
 
-		public boolean canConvert(Class source, Class target) {
-			return true;
-		}
-
 		public Object convert(Object source, Class target) throws Exception {
 			Number s = (Number) source;
 			
@@ -74,16 +70,16 @@ public class NumericConverterFactory implements ConverterFactory {
 			if ( BigInteger.class.equals( target ) ) {
 				return BigInteger.valueOf( s.longValue() );
 			}
-			if ( BigDecimal.class.equals( target ) ) {
-				return BigDecimal.valueOf( s.longValue() ); 
-			}
-			
+		
 			//floating point
 			if ( Double.class.equals( target ) ) {
 				return new Double( s.doubleValue() );
 			}
 			if ( Float.class.equals( target ) ) {
 				return new Float( s.floatValue() );
+			}
+			if ( BigDecimal.class.equals( target ) ) {
+				return new BigDecimal( s.doubleValue() );
 			}
 			
 			return null;
