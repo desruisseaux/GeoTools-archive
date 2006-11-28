@@ -49,7 +49,7 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 	public void testGet() {
 		assertEquals( new Integer( 1 ), accessor.get( feature, "foo", null ) );
 		assertEquals( new Double( 2.0 ), accessor.get( feature, "bar", null ) );
-		assertEquals( "fid", accessor.get( feature, "@id", null), null );
+		assertEquals( "fid", accessor.get( feature, "@id", null) );
 		assertEquals( "fid", accessor.get( feature, "@gml:id", null) );
 		try {
 			accessor.get( feature, "illegal", null );
