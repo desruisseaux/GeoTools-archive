@@ -70,16 +70,18 @@ public class BindingWalker implements TypeWalker.Visitor {
             if (binding.getExecutionMode() == Binding.OVERRIDE) {
                 return false;
             }
-        } else {
-            //two posibilities
-            if (!bindings.isEmpty()) {
-                //make the last strategy the new root of the hierarchy
-                return false;
-            }
-
-            //else continue on to try to find a strategy further up in 
-            // type hierarchy	
-        }
+        } 
+        //JD: changing to just continue on up
+//        else {
+//            //two posibilities
+//            if (!bindings.isEmpty()) {
+//                //make the last strategy the new root of the hierarchy
+//                return false;
+//            }
+//
+//            //else continue on to try to find a strategy further up in 
+//            // type hierarchy	
+//        }
 
         return true;
     }
