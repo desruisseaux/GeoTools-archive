@@ -51,6 +51,10 @@ public class PropertyIsLessThanBinding extends AbstractComplexBinding {
         return OGC.PROPERTYISLESSTHAN;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
