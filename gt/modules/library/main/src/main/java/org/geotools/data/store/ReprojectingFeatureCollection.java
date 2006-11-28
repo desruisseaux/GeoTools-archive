@@ -19,6 +19,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.DelegateFeatureIterator;
 import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
 import org.geotools.referencing.CRS;
 import org.geotools.util.ProgressListener;
 import org.opengis.filter.Filter;
@@ -57,8 +58,16 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
      */
     FeatureType featureType;
 
+    /**
+     * The target coordinate reference system
+     */
     CoordinateReferenceSystem target;
-
+    
+    /**
+     * Transformer used to transform geometries;
+     */
+    GeometryCoordinateSequenceTransformer transformer;
+    
     public ReprojectingFeatureCollection(FeatureCollection delegate,
             CoordinateReferenceSystem target) {
         this( delegate, delegate.getSchema().getDefaultGeometry().getCoordinateSystem(), target );
@@ -83,8 +92,12 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
         }
         
         this.transform = transform(source, target);
+        transformer = new GeometryCoordinateSequenceTransformer();
     }
 
+    public void setTransformer(GeometryCoordinateSequenceTransformer transformer) {
+		this.transformer = transformer;
+	}  
 
     private MathTransform transform(CoordinateReferenceSystem source,
             CoordinateReferenceSystem target) {
@@ -120,7 +133,7 @@ public class ReprojectingFeatureCollection implements FeatureCollection {
 
     public Iterator iterator() {
         try {
-            return new ReprojectingIterator(delegate.iterator(), transform, schema);
+            return new ReprojectingIterator(delegate.iterator(), transform, schema, transformer);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
