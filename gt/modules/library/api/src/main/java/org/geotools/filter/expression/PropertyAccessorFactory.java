@@ -32,7 +32,7 @@ public interface PropertyAccessorFactory {
      * @param xpath The xpath expression to evaluate.
      * @param target The kind of result we are expecting (ie Geometry)
      * @param hints Hints to be used when creatign the accessor.
-     * 
+     *
      * @return The property accessor, or <code>null</code> if this factory cannot create
      * an accessor for the specified type.
      */

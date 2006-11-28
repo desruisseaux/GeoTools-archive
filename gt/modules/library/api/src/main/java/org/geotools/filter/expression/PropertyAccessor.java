@@ -33,6 +33,7 @@ public interface PropertyAccessor {
      *
      * @return <code>true</code> if the property can be accessed, otherwise <code>false</code>
      */
+
     //boolean canHandle(Object object, String xpath, Class target);
 
     /**

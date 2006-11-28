@@ -26,20 +26,18 @@ public class PropertyAccessors {
 	 * 
 	 * @return A property accessor, or <code>null</code> if one could not be found.
 	 */
-	public PropertyAccessor findPropertyAccessor( Object object, String xpath,  Hints hints ) {
+	public PropertyAccessor findPropertyAccessor( Object object, String xpath, Class target, Hints hints ) {
 		if ( object == null ) 
 			return null;
 		
 		Iterator factories = FactoryRegistry.lookupProviders( PropertyAccessorFactory.class );
 		while( factories.hasNext() ) {
 			PropertyAccessorFactory factory = (PropertyAccessorFactory) factories.next();
-			PropertyAccessor accessor = 
-				factory.createPropertyAccessor( object.getClass(), xpath, hints ); 
-			if ( accessor != null && accessor.canHandle( object, xpath ) ) {
+			PropertyAccessor accessor = factory.createPropertyAccessor( object.getClass(), xpath, target, hints ); 
+			if ( accessor != null ) { //&& accessor.canHandle( object, xpath )
 				return accessor;
 			}
-		}
-		
+		}		
 		return null;
 	}
 }
