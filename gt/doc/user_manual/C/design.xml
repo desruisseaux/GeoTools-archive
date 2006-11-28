@@ -543,7 +543,7 @@
   </sect1>
   
   
-  <sect1>
+  <sect1 id="sect-design-dataModel">
     <title>Data Model</title>
     
     <para>
@@ -552,9 +552,55 @@
       data. This section presents the data model of a client desktop 
       application which uses Geotools.
     </para>
+    
   </sect1>
   
-
+  
+  
+  
+  
+  <sect1 id="sect-design-practical">
+    <title>Practical Info</title>
+    
+    <para>
+      
+    </para>
+    
+    
+    
+    <sect2 id="sect-design-practical-layout">
+      <title>Code Layout</title>
+      
+      <para>
+        
+      </para>
+      
+    </sect2>
+    
+    
+    
+    <sect2 id="sect-design-practical-factory">
+      <title>Factory Systems</title>
+      
+      <para>
+        
+      </para>
+      
+    </sect2>
+    
+    
+    
+    <sect2 id="sect-design-practical-logging">
+      <title>Logging</title>
+      
+      <para>
+        
+      </para>
+      
+    </sect2>
+    
+  </sect1>
+  
 </chapter>
 
 
