@@ -8,13 +8,13 @@ import java.util.Iterator;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class SizeCappedIterator implements Iterator {
+public class MaxFeaturesIterator implements Iterator {
 
 	Iterator delegate;
 	long max;
 	long counter;
 	
-	public SizeCappedIterator( Iterator delegate, long max ) {
+	public MaxFeaturesIterator( Iterator delegate, long max ) {
 		this.delegate = delegate;
 		this.max = max;
 		counter = 0;
@@ -29,7 +29,7 @@ public class SizeCappedIterator implements Iterator {
 	}
 
 	public boolean hasNext() {
-		return delegate.hasNext() && counter <= max; 
+		return delegate.hasNext() && counter < max; 
 	}
 
 	public Object next() {

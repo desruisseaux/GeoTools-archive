@@ -30,12 +30,12 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class SizeCappedFeatureCollection implements FeatureCollection {
+public class MaxFeaturesFeatureCollection implements FeatureCollection {
 
 	FeatureCollection delegate;
 	long max;
 	
-	public SizeCappedFeatureCollection( FeatureCollection delegate, long max ) {
+	public MaxFeaturesFeatureCollection( FeatureCollection delegate, long max ) {
 		this.delegate = delegate;
 		this.max = max;
 	}
@@ -53,11 +53,11 @@ public class SizeCappedFeatureCollection implements FeatureCollection {
 	}
 
 	public Iterator iterator() {
-		return new SizeCappedIterator( delegate.iterator(), max );
+		return new MaxFeaturesIterator( delegate.iterator(), max );
 	}
 	
 	public void close(Iterator close) {
-		Iterator iterator = ((SizeCappedIterator)close).getDelegate();
+		Iterator iterator = ((MaxFeaturesIterator)close).getDelegate();
 		delegate.close( iterator );
 	}
 
