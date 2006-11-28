@@ -40,25 +40,26 @@ public class ReprojectingIterator implements Iterator {
      */
     GeometryCoordinateSequenceTransformer tx;
 
-    public ReprojectingIterator(Iterator delegate, MathTransform transform,
-            FeatureType schema) throws OperationNotFoundException,
-            FactoryRegistryException, FactoryException {
+    public ReprojectingIterator(
+		Iterator delegate, MathTransform transform, FeatureType schema, 
+		GeometryCoordinateSequenceTransformer transformer
+    ) throws OperationNotFoundException, FactoryRegistryException, FactoryException {
         this.delegate = delegate;
-        this.target = target;
+        
         this.schema = schema;
 
-        tx = new GeometryCoordinateSequenceTransformer();
+        tx = transformer;
         tx.setMathTransform((MathTransform2D) transform);
     }
 
-    public ReprojectingIterator(Iterator delegate,
-            CoordinateReferenceSystem source, CoordinateReferenceSystem target,
-            FeatureType schema) throws OperationNotFoundException,
-            FactoryRegistryException, FactoryException {
+    public ReprojectingIterator(
+		Iterator delegate, CoordinateReferenceSystem source, CoordinateReferenceSystem target,
+        FeatureType schema, GeometryCoordinateSequenceTransformer transformer
+    ) throws OperationNotFoundException, FactoryRegistryException, FactoryException {
         this.delegate = delegate;
         this.target = target;
         this.schema = schema;
-        tx = new GeometryCoordinateSequenceTransformer();
+        tx = transformer;
 
         MathTransform transform = FactoryFinder.getCoordinateOperationFactory(
                 null).createOperation(source, target).getMathTransform();
