@@ -84,9 +84,9 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
             String uri = attributes.getURI(i);
             String name = attributes.getLocalName(i);
 
-            if ((uri == null) || "".equals(uri)) {
-                uri = qName.getNamespaceURI(); //assume same as element
-            }
+//            if ((uri == null) || "".equals(uri)) {
+//                uri = qName.getNamespaceURI(); //assume same as element
+//            }
 
             QName attQName = new QName(uri, name);
 
