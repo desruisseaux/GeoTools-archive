@@ -110,6 +110,10 @@ public class BinaryComparisonAbstract extends AbstractFilter
 	 * @return A comparable
 	 */
 	protected Comparable comparable( Object value ){
+		if ( value == null ) {
+			return null;
+		}
+		
 		if( value instanceof Comparable ){
 			return (Comparable) value;
 		}
