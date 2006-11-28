@@ -22,10 +22,12 @@ public class JpoxTransactionState implements State {
 
 	
 	public void commit() throws IOException {
+        // notify my collections that they should kill their cache!
 		pm.currentTransaction().commit();
 	}
 
 	public void rollback() throws IOException {
+        // notify my collections that they should kill their cache!        
 		pm.currentTransaction().rollback();
 	}
 
