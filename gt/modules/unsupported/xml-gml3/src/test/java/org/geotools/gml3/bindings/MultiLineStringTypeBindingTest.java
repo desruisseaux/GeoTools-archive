@@ -16,7 +16,6 @@
 package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import com.vividsolutions.jts.geom.MultiLineString;
 import org.geotools.gml3.GML3TestSupport;
 
@@ -29,5 +28,12 @@ public class MultiLineStringTypeBindingTest extends GML3TestSupport {
         assertNotNull(multiLineString);
 
         assertEquals(2, multiLineString.getNumGeometries());
+    }
+
+    public void testEncode() throws Exception {
+        Document dom = encode(GML3MockData.multiLineString(), GML.MultiLineString);
+        assertEquals(2,
+            dom.getElementsByTagNameNS(GML.NAMESPACE, GML.lineStringMember.getLocalPart())
+               .getLength());
     }
 }

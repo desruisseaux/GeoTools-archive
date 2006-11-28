@@ -22,7 +22,19 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.gml3.Curve;
+import org.geotools.gml3.MultiCurve;
+import org.geotools.gml3.MultiSurface;
+import org.geotools.referencing.CRS;
 
 
 /**
@@ -36,6 +48,7 @@ public class GML3MockData {
 
     static Element point(Document document, Node parent) {
         Element point = element(GML.Point, document, parent);
+        point.setAttribute("srsName", "urn:x-ogc:def:crs:EPSG:6.11.2:4326");
 
         Element pos = element(GML.pos, document, point);
         pos.appendChild(document.createTextNode("1.0 2.0 "));
@@ -43,8 +56,31 @@ public class GML3MockData {
         return point;
     }
 
+    static CoordinateReferenceSystem crs() {
+        try {
+            return CRS.decode("urn:x-ogc:def:crs:EPSG:6.11.2:4326");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static Point point() {
+        Point p = gf.createPoint(new Coordinate(1, 2));
+        p.setUserData(crs());
+
+        return p;
+    }
+
     static LineString lineString() {
         return gf.createLineString(new Coordinate[] { new Coordinate(1, 2), new Coordinate(3, 4) });
+    }
+
+    static Curve curve() {
+        return new Curve(new LineString[] { lineString() }, gf);
+    }
+
+    static MultiCurve multiCurve() {
+        return new MultiCurve(new Curve[] { curve(), curve() }, gf);
     }
 
     static Element lineString(Document document, Node parent) {
@@ -69,6 +105,13 @@ public class GML3MockData {
         posList.appendChild(document.createTextNode("1.0 2.0 3.0 4.0"));
 
         return lineString;
+    }
+
+    static LinearRing linearRing() {
+        return gf.createLinearRing(new Coordinate[] {
+                new Coordinate(1, 1), new Coordinate(2, 2), new Coordinate(3, 3),
+                new Coordinate(1, 1)
+            });
     }
 
     static Element linearRing(Document document, Node parent) {
@@ -104,8 +147,12 @@ public class GML3MockData {
         return linearRing;
     }
 
-    static Curve curve() {
-        return new Curve(new LineString[] { lineString() }, gf);
+    static Polygon polygon() {
+        return gf.createPolygon(linearRing(), null);
+    }
+
+    static MultiSurface multiSurface() {
+        return new MultiSurface(new Polygon[] { polygon(), polygon() }, gf);
     }
 
     static Element polygonWithNoInterior(Document document, Node parent) {
@@ -115,6 +162,10 @@ public class GML3MockData {
         linearRing(document, exterior);
 
         return polygon;
+    }
+
+    static MultiPoint multiPoint() {
+        return gf.createMultiPoint(new Coordinate[] { new Coordinate(1, 1), new Coordinate(2, 2) });
     }
 
     static Element multiPoint(Document document, Node parent) {
@@ -135,6 +186,10 @@ public class GML3MockData {
         return multiPoint;
     }
 
+    static MultiLineString multiLineString() {
+        return gf.createMultiLineString(new LineString[] { lineString(), lineString() });
+    }
+
     static Element multiLineString(Document document, Node parent) {
         Element multiLineString = element(GML.MultiLineString, document, parent);
 
@@ -145,6 +200,10 @@ public class GML3MockData {
         lineString(document, lineStringMember);
 
         return multiLineString;
+    }
+
+    static MultiPolygon multiPolygon() {
+        return gf.createMultiPolygon(new Polygon[] { polygon(), polygon() });
     }
 
     static Element multiPolygon(Document document, Node parent) {

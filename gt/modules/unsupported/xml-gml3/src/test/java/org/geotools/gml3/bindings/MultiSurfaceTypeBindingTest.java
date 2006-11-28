@@ -16,24 +16,13 @@
 package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 import org.geotools.gml3.GML3TestSupport;
 
 
-public class MultiPolygonTypeBindingTest extends GML3TestSupport {
-    public void test() throws Exception {
-        GML3MockData.multiPolygon(document, document);
-
-        MultiPolygon multiPolygon = (MultiPolygon) parse();
-        assertNotNull(multiPolygon);
-        assertEquals(2, multiPolygon.getNumGeometries());
-    }
-
+public class MultiSurfaceTypeBindingTest extends GML3TestSupport {
     public void testEncode() throws Exception {
-        Document dom = encode(GML3MockData.multiPolygon(), GML.MultiPolygon);
+        Document dom = encode(GML3MockData.multiSurface(), GML.MultiSurface);
         assertEquals(2,
-            dom.getElementsByTagNameNS(GML.NAMESPACE, GML.polygonMember.getLocalPart()).getLength());
+            dom.getElementsByTagNameNS(GML.NAMESPACE, GML.Polygon.getLocalPart()).getLength());
     }
 }

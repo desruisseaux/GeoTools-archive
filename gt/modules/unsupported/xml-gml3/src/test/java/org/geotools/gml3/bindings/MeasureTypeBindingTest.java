@@ -15,24 +15,20 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.w3c.dom.Document;
-import com.vividsolutions.jts.geom.MultiPoint;
+import javax.units.BaseUnit;
 import org.geotools.gml3.GML3TestSupport;
+import org.geotools.measure.Measure;
 
 
-public class MultiPointTypeBindingTest extends GML3TestSupport {
-    public void test() throws Exception {
-        GML3MockData.multiPoint(document, document);
+public class MeasureTypeBindingTest extends GML3TestSupport {
+    public void testParser() throws Exception {
+        GML3MockData.element(GML.measure, document, document);
+        document.getDocumentElement().setAttribute("uom", "http://someuri");
+        document.getDocumentElement().appendChild(document.createTextNode("1234"));
 
-        MultiPoint multiPoint = (MultiPoint) parse();
-        assertNotNull(multiPoint);
-
-        assertEquals(4, multiPoint.getNumPoints());
-    }
-
-    public void testEncode() throws Exception {
-        Document dom = encode(GML3MockData.multiPoint(), GML.MultiPoint);
-        assertEquals(2,
-            dom.getElementsByTagNameNS(GML.NAMESPACE, GML.pointMember.getLocalPart()).getLength());
+        Measure measure = (Measure) parse();
+        assertNotNull(measure);
+        assertEquals(1234, measure.doubleValue(), 0.1);
+        assertEquals("http://someuri", ((BaseUnit) measure.getUnit()).getSymbol());
     }
 }

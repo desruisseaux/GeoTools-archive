@@ -16,30 +16,13 @@
 package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Document;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Point;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.gml3.GML3TestSupport;
 
 
-public class PointTypeBindingTest extends GML3TestSupport {
-    public void testPos() throws Exception {
-        GML3MockData.point(document, document);
-
-        Point p = (Point) parse();
-        assertNotNull(p);
-        assertEquals(new Coordinate(1d, 2d), p.getCoordinate());
-
-        assertTrue(p.getUserData() instanceof CoordinateReferenceSystem);
-    }
-
+public class MultiSurfacePropertyTypeBindingTest extends GML3TestSupport {
     public void testEncode() throws Exception {
-        Point p = GML3MockData.point();
-        Document dom = encode(p, GML.Point);
-
+        Document dom = encode(GML3MockData.multiSurface(), GML.multiSurfaceProperty);
         assertEquals(1,
-            dom.getElementsByTagNameNS(GML.NAMESPACE, GML.pos.getLocalPart()).getLength());
-        assertEquals("urn:x-ogc:def:crs:EPSG:6.11.2:4326",
-            dom.getDocumentElement().getAttribute("srsName"));
+            dom.getElementsByTagNameNS(GML.NAMESPACE, GML.MultiSurface.getLocalPart()).getLength());
     }
 }
