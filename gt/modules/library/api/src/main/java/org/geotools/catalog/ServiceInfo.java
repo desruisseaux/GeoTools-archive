@@ -23,8 +23,15 @@ import javax.swing.Icon;
 /**
  * Provides metadata information about a service.
  * <p>
- * A bean - style metadata which must already be loaded. Much of the names and motivation have been
- * taken from Dublin Code and it's application profile for RDF.
+ * Information is provided in the form of a single, simple, Java bean.
+ * You can treat this bean as a "view" on more complete metadata information
+ * that may be accessable via a subclass (or other resolve target). This
+ * bean offers up service metadata information to the the GeoTools catalog
+ * implementations for searching.
+ * </p>
+ * <p>
+ * Much of the names and motivation have been taken from Dublin Code
+ * and it's application profile for RDF.
  * </p>
  *
  * @author David Zwiers, Refractions Research
@@ -50,14 +57,38 @@ public interface ServiceInfo {
     String[] getKeywords();
 
     /**
-     * Returns the service description
+     * Returns the service description.
      *
+     * This use is understood to be in agreement with "dublin-core",
+     * implementors may use either abstract or description as needed.
+     * <p>
+     * Dublin Core:
+     * <quote>
+     * A textual description of the content of the resource, including
+     * abstracts in the case of document-like objects or content
+     * descriptions in the case of visual resources.
+     * </quote>
+     *
+     * When providing actual dublin-core metadata you can gather up
+     * all the description information into a single string for
+     * searching.
+     *
+     * @return Description of visual contents
      */
     String getDescription();
 
     /**
-     * Return the service abstract
+     * Return the service abstract.
      *
+     * This use is understood to be in agreement with OGC Open Web Services,
+     * implementors may use either abstract or description as needed.
+     * <p>
+     * When working with an Open Web Service this method is a direct match,
+     * you may also choose it when providing actual dublin-core information
+     * if the description element is specifically an abstract.
+     * </p>
+     *
+     * @return text Abstract of document-like services
      */
     String getAbstract();
 

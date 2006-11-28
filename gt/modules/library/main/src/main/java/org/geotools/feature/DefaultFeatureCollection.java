@@ -779,7 +779,7 @@ public class DefaultFeatureCollection implements FeatureCollection {
      * @since GeoTools 2.2, Filter 1.1
      */
 	public FeatureCollection subCollection(Filter filter) {
-		if( filter == Filter.EXCLUDE || filter.equals( Filter.EXCLUDE )){
+		if( filter == Filter.INCLUDE ){
 			return this;
 		}		
 		return new SubFeatureCollection( this, filter );

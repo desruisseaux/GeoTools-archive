@@ -38,7 +38,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * @author wolf
  * @source $URL$
  */
-public final class IndexedFeatureResults extends DataFeatureCollection implements FeatureCollection {
+public final class IndexedFeatureResults extends DataFeatureCollection {
 	STRtree index = new STRtree();
 	FeatureType schema;
 	Envelope bounds;

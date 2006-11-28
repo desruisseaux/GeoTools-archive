@@ -196,6 +196,9 @@ public abstract class AbstractFeatureCollection extends AbstractResourceCollecti
     }
     
     public FeatureCollection subCollection( Filter filter ) {
+        if( filter == Filter.INCLUDE ){
+            return this;
+        }        
         return new SubFeatureCollection( this, filter );
     }
 
