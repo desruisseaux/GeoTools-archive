@@ -14,7 +14,9 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 public abstract class AbstractFeatureSource2 implements FeatureSource {
@@ -86,9 +88,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
          //reprojection 
          if ( query.getCoordinateSystemReproject() != null ) {
         	 if ( query.getCoordinateSystem() != null ) {
-        		 features = new ReprojectingFeatureCollection( 
-    				 features, query.getCoordinateSystem(), query.getCoordinateSystemReproject() 
-				 );
+        		 features = reproject( features, query.getCoordinateSystem(), query.getCoordinateSystemReproject() );
         	 }
         	 else {
         		 features = new ReprojectingFeatureCollection( 
@@ -99,7 +99,7 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
          
          //max feature cap
          if (query.getMaxFeatures() != Query.DEFAULT_MAX) {
-             features = new SizeCappedFeatureCollection( features, query.getMaxFeatures() );
+             features = new MaxFeaturesFeatureCollection( features, query.getMaxFeatures() );
          }
          
          return features;
@@ -130,4 +130,17 @@ public abstract class AbstractFeatureSource2 implements FeatureSource {
 		return getFeatures( query ).size();
 	}
 
+	/**
+	 * Template method for reprojecting a feature collection from a source crs to a target crs.
+	 * <p>
+	 * Subclasses may override, the default implementation wraps <param>features</param> in a 
+	 * {@link ReprojectingFeatureCollection}.
+	 * </p>
+	 * @param features The feature collection to be reprojected.
+	 * 
+	 * @return the reprojected feature collection.
+	 */
+	protected FeatureCollection reproject( FeatureCollection features, CoordinateReferenceSystem source, CoordinateReferenceSystem target ) {
+		return new ReprojectingFeatureCollection( features, source, target );
+	}
 }
