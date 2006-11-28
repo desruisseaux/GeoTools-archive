@@ -112,6 +112,7 @@
     <module>introduction</module>
     <module>mappane</module>
     <module>property</module>
+    <module>example</module>
     <module>svgsupport</module>
     <!--module>xml-po</module-->
   </modules>
