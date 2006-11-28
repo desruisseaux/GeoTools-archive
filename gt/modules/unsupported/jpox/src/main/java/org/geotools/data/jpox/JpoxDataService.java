@@ -25,13 +25,13 @@ import java.util.Vector;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.geotools.data.DataService;
+import org.geotools.data.DataAccess;
 import org.geotools.data.Source;
 import org.jpox.PersistenceManagerFactoryImpl;
 import org.opengis.feature.type.TypeName;
 
 
-public class JpoxDataService implements DataService {
+public class JpoxDataService implements DataAccess {
 
 	private Properties jdoProps;
 	
@@ -76,7 +76,7 @@ public class JpoxDataService implements DataService {
 		return getTypesMap().get( typeName );
 	}
 
-	public List getTypes() {
+	public List getTypeNames() {
 		if ( typesList == null ) {
 			typesList = Collections.unmodifiableList( new Vector( getTypesMap().keySet() ) );			
 		}
