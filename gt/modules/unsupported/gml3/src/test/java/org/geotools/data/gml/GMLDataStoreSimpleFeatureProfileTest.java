@@ -7,6 +7,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -23,10 +25,12 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 		dataStore = new GMLDataStore( namespace, location, schemaLocation );
 	}
 	
-	public void testGetTypeNames() {
-		List names = Arrays.asList( dataStore.getTypeNames() ); 
-		assertTrue( names.contains( "PrimitiveGeoFeature" ) );
-		assertTrue( names.contains( "AggregateGeoFeature" ) );
+	public void testGetTypeNames() throws Exception {
+		List names = Arrays.asList( dataStore.getTypeNames() );
+		
+		assertTrue( names.contains( "PrimitiveGeoFeature") );
+		assertTrue( names.contains( "AggregateGeoFeature") );
+		assertTrue( names.contains( "Entit\u00e9G\u00e9n\u00e9rique") );
 	}
 	
 	public void testGetSchema1() throws IOException {
@@ -47,6 +51,14 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 		assertNotNull( featureType.getAttributeType( "multiPointProperty" ) );
 		assertNotNull( featureType.getAttributeType( "multiCurveProperty" ) );
 		assertNotNull( featureType.getAttributeType( "multiSurfaceProperty" ) );
+	}
+	
+	public void testGetSchema3() throws Exception {
+		FeatureType featureType = 
+			dataStore.getSchema( "Entit\u00e9G\u00e9n\u00e9rique" );
+		assertNotNull( featureType );
+		assertNotNull( featureType.getAttributeType( "attribut.G\u00e9om\u00e9trie" ) );
+		
 	}
 	
 	public void testGetFeatures1() throws Exception {
