@@ -47,23 +47,42 @@ public class IsBetweenImpl extends CompareFilterImpl implements BetweenFilter {
 	
 	//@Override
 	public boolean evaluate(Feature feature) {
-		Object[] values = eval( feature );
-		Comparable lower = comparable( values[ 0 ] );
-		Comparable upper = comparable( values[ 1 ] );
-		
 		Value value = new Value( eval( expression, feature ) );
-		Object o = value.value( lower.getClass() );
-		if ( o == null ) {
-			o = value.value( upper.getClass() );
-		}
-		if ( o == null ) {
-			o = value.getValue();
+		if ( value.getValue() == null ) {
+			return false;
 		}
 		
-		Comparable between = comparable( o );
+		//get the boundaries
+		Value lower = new Value( eval( getExpression1(), feature ) );
+		Value upper = new Value( eval( getExpression2(), feature ) );
 		
-		return lower.compareTo( between ) == -1 &&
-		       upper.compareTo( between ) == 1;
+		//first try to evaluate the bounds in terms of the middle
+		Object o = value.getValue();
+		Object l = lower.value( o.getClass() );
+		Object u = upper.value( o.getClass() );
+		if ( l == null || u == null ) {
+			//that didn't work try converting all to same type as lower
+			l = lower.getValue();
+			o = value.value( l.getClass() );
+			u = upper.value( l.getClass() );
+			
+			if ( o == null || u == null ) {
+				//ok last try, try evaluating all in terms of upper
+				u = upper.getValue();
+				o = value.value( u.getClass() );
+				l = lower.value( u.getClass() );
+				
+				if ( o == null || l == null ) {
+					//no dice
+					return false;
+				}
+			}
+		}
+		
+		Comparable lc = comparable( l );
+		Comparable uc = comparable( u );
+		
+		return lc.compareTo( o ) == -1 && uc.compareTo( o ) == 1;
 	}
 
 	public Object accept(FilterVisitor visitor, Object extraData) {
