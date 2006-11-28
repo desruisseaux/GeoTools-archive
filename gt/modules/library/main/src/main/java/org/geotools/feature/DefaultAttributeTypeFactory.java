@@ -129,25 +129,30 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, Filter filter, Object defaultValue, Object metadata) {
 
+    	return createAttributeType( name, clazz, isNillable, filter, defaultValue, metadata, 1, 1);
+    }
+    protected AttributeType createAttributeType(String name, Class clazz, 
+        boolean isNillable, Filter filter, Object defaultValue, Object metadata, int min, int max) {
+
     	LengthFunction length = (LengthFunction)ff.createFunctionExpression("LengthFunction");
     	length.setArgs(new Expression[]{this.ff.createAttributeExpression(name)});
     	if (Number.class.isAssignableFrom(clazz)) {
             return new NumericAttributeType(
-                name, clazz, isNillable,1,1,defaultValue, filter);
+                name, clazz, isNillable,min,max,defaultValue, filter);
         } else if (CharSequence.class.isAssignableFrom(clazz)) {
-            return new TextualAttributeType(name,isNillable,1,1,defaultValue,filter);
+            return new TextualAttributeType(name,isNillable,min,max,defaultValue,filter);
         } else if (java.util.Date.class.isAssignableFrom(clazz)) {
-            return new TemporalAttributeType(name,isNillable,1,1,defaultValue,filter);
+            return new TemporalAttributeType(name,isNillable,min,max,defaultValue,filter);
         } else if (Geometry.class.isAssignableFrom( clazz )){
             if( metadata instanceof CoordinateReferenceSystem )
-                return new GeometricAttributeType(name,clazz,isNillable,1,1, 
+                return new GeometricAttributeType(name,clazz,isNillable,min,max, 
     	 	    defaultValue,(CoordinateReferenceSystem) metadata,filter);
-	    else
-		return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue,null,filter);
-	}        
-        return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue,filter);
+    	    else
+    		return new GeometricAttributeType(name,clazz,isNillable,min,max, defaultValue,null,filter);
+    	}        
+        return new DefaultAttributeType(name, clazz, isNillable,min,max,defaultValue,filter);
     }
-    
+
     protected AttributeType createAttributeType( String name, Class clazz, 
         boolean isNillable, int fieldLength, Object defaultValue, 
         Object metaData ){

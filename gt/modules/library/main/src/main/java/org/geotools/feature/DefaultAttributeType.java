@@ -50,6 +50,7 @@ public class DefaultAttributeType implements AttributeType {
 
     /** Indicates if nulls are allowed for this attribute */
     protected final boolean nillable;
+    /** min/max */
     protected final int min,max;
     protected Object defaultValue;
 
@@ -59,7 +60,7 @@ public class DefaultAttributeType implements AttributeType {
 	 * code, but
 	 */
 	public int getMinOccurs() {
-		return 1;
+		return min;
 	}
 
 	/**
@@ -88,7 +89,8 @@ public class DefaultAttributeType implements AttributeType {
             this.name = (name == null) ? "" : name;
             this.type = (type == null) ? Object.class : type;
             this.nillable = nillable;
-            this.min = min;this.max = max;
+            this.min = min;
+            this.max = max;
             this.defaultValue = defaultValue;
             this.filter = f;
             if(defaultValue!=null && !type.isAssignableFrom(defaultValue.getClass()))
