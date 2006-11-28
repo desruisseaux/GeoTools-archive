@@ -22,9 +22,11 @@ import org.geotools.filter.v1_0.OGCExpressionTypeBinding;
 import org.geotools.filter.v1_0.OGCFilterTypeBinding;
 import org.geotools.filter.v1_0.OGCFunctionTypeBinding;
 import org.geotools.filter.v1_0.OGCLiteralTypeBinding;
+import org.geotools.filter.v1_0.OGCLowerBoundaryTypeBinding;
 import org.geotools.filter.v1_0.OGCPropertyIsBetweenTypeBinding;
 import org.geotools.filter.v1_0.OGCPropertyIsNullTypeBinding;
 import org.geotools.filter.v1_0.OGCPropertyNameTypeBinding;
+import org.geotools.filter.v1_0.OGCUpperBoundaryTypeBinding;
 import org.geotools.xml.BindingConfiguration;
 
 
@@ -86,7 +88,7 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         //container.registerComponentImplementation(OGC.LITERALTYPE,LiteralTypeBinding.class);
         //container.registerComponentImplementation(OGC.LOGICOPSTYPE,LogicOpsTypeBinding.class);
         container.registerComponentImplementation(OGC.LOWERBOUNDARYTYPE,
-            LowerBoundaryTypeBinding.class);
+            OGCLowerBoundaryTypeBinding.class);
         container.registerComponentImplementation(OGC.PROPERTYISBETWEENTYPE,
             OGCPropertyIsBetweenTypeBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISBETWEENTYPE,PropertyIsBetweenTypeBinding.class);
@@ -115,7 +117,7 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(OGC.UNARYLOGICOPTYPE,
             UnaryLogicOpTypeBinding.class);
         container.registerComponentImplementation(OGC.UPPERBOUNDARYTYPE,
-            UpperBoundaryTypeBinding.class);
+            OGCUpperBoundaryTypeBinding.class);
 
         //Elements
         //container.registerComponentImplementation(OGC._ID,_IdBinding.class);
