@@ -80,6 +80,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-epsg-wkt</artifactId>
+      <version>${project.version}</version>
+			<scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>xpp3</groupId>
       <artifactId>xpp3</artifactId>
     </dependency>
