@@ -1,1 +1,2 @@
 org.geotools.referencing.crs.EPSGCRSAuthorityFactory
+org.geotools.referencing.crs.URNEPSGCRSAuthorityFactoryAdapter
