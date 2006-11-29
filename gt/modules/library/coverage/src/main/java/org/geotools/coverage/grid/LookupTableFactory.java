@@ -36,11 +36,10 @@ import org.geotools.util.WeakValueHashMap;
  * A factory for {@link LookupTableJAI} objects built from an array of {@link MathTransform1D}.
  * This factory is used internally by {@link GridCoverage#createGeophysics}.
  *
+ * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @since 2.1
  */
 final class LookupTableFactory {
     /**
@@ -97,8 +96,8 @@ final class LookupTableFactory {
         /*
          * Argument check. Null values are legal but can't be processed by this method.
          */
-    	final int transformsLength=transforms.length;
-        for (int i=0; i<transformsLength; i++) {
+    	final int nbands = transforms.length;
+        for (int i=0; i<nbands; i++) {
             if (transforms[i] == null) {
                 return null;
             }
@@ -150,12 +149,12 @@ final class LookupTableFactory {
                 }
 
                 case DataBuffer.TYPE_DOUBLE: {
-                    final double[][]  data = new double[transformsLength][];
+                    final double[][]  data = new double[nbands][];
                     final double[]  buffer = new double[length];
                     for (int i=length; --i>=0;) {
                         buffer[i] = i;
                     }
-                    for (int i=transformsLength; --i>=0;) {
+                    for (int i=nbands; --i>=0;) {
                         final double[] array = (i==0) ? buffer : (double[])buffer.clone();
                         transforms[i].transform(array, 0, array, 0, array.length);
                         data[i] = array;
@@ -165,7 +164,7 @@ final class LookupTableFactory {
                 }
 
                 case DataBuffer.TYPE_FLOAT: {
-                    final float[][]  data = new float[transformsLength][];
+                    final float[][]  data = new float[nbands][];
                     final float[]  buffer = new float[length];
                     for (int i=length; --i>=0;) {
                         buffer[i] = i;
@@ -180,8 +179,8 @@ final class LookupTableFactory {
                 }
 
                 case DataBuffer.TYPE_INT: {
-                    final int[][] data = new int[transformsLength][];
-                    for (int i=transformsLength; --i>=0;) {
+                    final int[][] data = new int[nbands][];
+                    for (int i=nbands; --i>=0;) {
                         final MathTransform1D tr = transforms[i];
                         final int[] array = new int[length];
                         for (int j=length; --j>=0;) {
@@ -204,8 +203,8 @@ final class LookupTableFactory {
                         minimum = 0;
                         maximum = 0xFFFF;
                     }
-                    final short[][] data = new short[transformsLength][];
-                    for (int i=transformsLength; --i>=0;) {
+                    final short[][] data = new short[nbands][];
+                    for (int i=nbands; --i>=0;) {
                         final MathTransform1D tr = transforms[i];
                         final short[] array = new short[length];
                         for (int j=length; --j>=0;) {
@@ -219,8 +218,8 @@ final class LookupTableFactory {
                 }
 
                 case DataBuffer.TYPE_BYTE: {
-                    final byte[][] data = new byte[transformsLength][];
-                    for (int i=transformsLength; --i>=0;) {
+                    final byte[][] data = new byte[nbands][];
+                    for (int i=nbands; --i>=0;) {
                         final MathTransform1D tr = transforms[i];
                         final byte[] array = new byte[length];
                         for (int j=length; --j>=0;) {
@@ -244,7 +243,7 @@ final class LookupTableFactory {
      */
     public int hashCode() {
         int code = sourceType + 37*targetType;
-        final int length=transforms.length;
+        final int length = transforms.length;
         for (int i=0; i<length; i++) {
             code = code*37 + transforms[i].hashCode();
         }

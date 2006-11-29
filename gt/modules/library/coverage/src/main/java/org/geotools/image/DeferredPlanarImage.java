@@ -410,7 +410,7 @@ public final class DeferredPlanarImage extends PlanarImage
     private void fireTileUpdate(final int tileX, final int tileY, final boolean willBeWritable) {
         final TileObserver[] observers = this.observers; // Avoid the need for synchronisation.
         if (observers != null) {
-        	final int length= observers.length;
+            final int length = observers.length;
             for (int i=0; i<length; i++) {
                 try {
                     observers[i].tileUpdate(this, tileX, tileY, willBeWritable);
@@ -569,7 +569,7 @@ public final class DeferredPlanarImage extends PlanarImage
     public boolean hasTileWriters() {
         final Raster[] pendings = this.pendings; // Avoid the need for synchronisation.
         if (pendings != null) {
-        	final int length=pendings.length;
+            final int length = pendings.length;
             for (int i=0; i<length; i++) {
                 if (pendings[i] != null) {
                     return true;
@@ -598,17 +598,15 @@ public final class DeferredPlanarImage extends PlanarImage
             final int minX = getMinTileX();
             final int minY = getMinTileY();
             final int numX = getNumXTiles();
-            final int length=pendings.length;
-            int x;
-            int y ;
+            final int length = pendings.length;
             for (int i=0; i<length; i++) {
                 if (pendings[i] != null) {
                     if (indices == null) {
-                        indices = new Point[length-i];
+                        indices = new Point[length - i];
                     }
-                    x = i%numX + minX;
-                    y = i/numX + minY;
-                    assert getTileIndice(x,y)==i : i;
+                    final int x = i % numX + minX;
+                    final int y = i / numX + minY;
+                    assert getTileIndice(x,y) == i : i;
                     indices[count++] = new Point(x,y);
                 }
             }

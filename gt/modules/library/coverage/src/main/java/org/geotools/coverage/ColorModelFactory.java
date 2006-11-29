@@ -121,44 +121,40 @@ final class ColorModelFactory {
      * @return The requested color model, suitable for {@link RenderedImage} objects with values
      *         in the <code>{@link CategoryList#getRange}</code> range.
      */
-    public static  ColorModel getColorModel(final Category[] categories,
-                                                        final int type,
-                                                        final int visibleBand,
-                                                        final int numBands)
+    public static ColorModel getColorModel(final Category[] categories, final int type,
+                                           final int visibleBand, final int numBands)
     {
-    	synchronized (colors) {
-	        ColorModelFactory key = new ColorModelFactory(categories, type, visibleBand, numBands);
-	        ColorModel model = (ColorModel) colors.get(key);
-	        if (model == null) {
-	            model = key.getColorModel();
-	            colors.put(key, model);
-	        }
-	        return model;
-    	}
+        synchronized (colors) {
+            ColorModelFactory key = new ColorModelFactory(categories, type, visibleBand, numBands);
+            ColorModel model = (ColorModel) colors.get(key);
+            if (model == null) {
+                model = key.getColorModel();
+                colors.put(key, model);
+            }
+            return model;
+        }
     }
     
     /**
-     * Construct the color model.
+     * Constructs the color model.
      */
     private ColorModel getColorModel() {
-		final int length = categories.length;
-		if (type != DataBuffer.TYPE_BYTE && type != DataBuffer.TYPE_USHORT) {
-			// If the requested type is any type not supported by
-			// IndexColorModel,
-			// fallback on a generic (but very slow!) color model.
-			double min = 0;
-			double max = 1;
-
-			if (length != 0) {
-				min = categories[0].minimum;
-				for (int i = length; --i >= 0;) {
-					final double val = categories[i].maximum;
-					if (!Double.isNaN(val)) {
-						max = val;
-						break;
-					}
-				}
-			}
+        final int length = categories.length;
+        if (type != DataBuffer.TYPE_BYTE && type != DataBuffer.TYPE_USHORT) {
+            // If the requested type is any type not supported by IndexColorModel,
+            // fallback on a generic (but very slow!) color model.
+            double min = 0;
+            double max = 1;
+            if (length != 0) {
+                min = categories[0].minimum;
+                for (int i=length; --i >= 0;) {
+                    final double val = categories[i].maximum;
+                    if (!Double.isNaN(val)) {
+                        max = val;
+                        break;
+                    }
+                }
+            }
             final int  transparency = Transparency.OPAQUE;
             final ColorSpace colors = new ScaledColorSpace(visibleBand, numBands, min, max);
             if (false) {
@@ -186,7 +182,7 @@ final class ColorModelFactory {
             // with something.
             return RasterFactory.createComponentColorModel(type, colors, false, false, transparency);
         }
-		if (numBands == 1 && length == 0) {
+        if (numBands == 1 && length == 0) {
             // Construct a gray scale palette.
             final ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
             final int[] nBits = {DataBuffer.getDataTypeSize(type)};
@@ -196,13 +192,13 @@ final class ColorModelFactory {
          * Computes the number of entries required for the color palette.
          * We take the upper range value of the last category.
          */
-		final int mapSize = (int) Math.round(categories[length - 1].maximum) + 1;
+        final int mapSize = (int) Math.round(categories[length - 1].maximum) + 1;
         final int[]  ARGB = new int[mapSize];
         /*
          * Interpolate the colors in the color palette. Colors that do not fall
          * in the range of a category will be set to a transparent color.
          */
-		for (int i = 0; i < length; i++) {
+        for (int i=0; i<length; i++) {
             final Category category = categories[i];
             ColorUtilities.expand(category.getColors(), ARGB,
                                   (int)Math.round(category.minimum),
@@ -215,9 +211,9 @@ final class ColorModelFactory {
      * Returns a hash code.
      */
     public int hashCode() {
-        int code = 962745549 + (numBands*37 + visibleBand)*37 + categories.length;
 		final int length = categories.length;
-		for (int i = 0; i < length; i++) {
+        int code = 962745549 + (numBands*37 + visibleBand)*37 + length;
+		for (int i=0; i<length; i++) {
             code += categories[i].hashCode();
             // Better be independant of categories order.
         }

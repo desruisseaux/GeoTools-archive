@@ -54,11 +54,21 @@ public class GeneralGridRange implements GridRange, Serializable {
     private static final long serialVersionUID = 1452569710967224145L;
 
     /**
+     * The lower left corner. Will be created only when first needed.
+     */
+    private transient GeneralGridCoordinates lower;
+
+    /**
+     * The upper right corner. Will be created only when first needed.
+     */
+    private transient GeneralGridCoordinates upper;
+
+    /**
      * Minimum and maximum grid ordinates. The first half contains minimum
      * ordinates, while the last half contains maximum ordinates.
      */
     private final int[] index;
-    
+
     /**
      * Check if ordinate values in the minimum index are less than or
      * equal to the corresponding ordinate value in the maximum index.
@@ -78,14 +88,14 @@ public class GeneralGridRange implements GridRange, Serializable {
             }
         }
     }
-    
+
     /**
      * Constructs an initially empty grid range of the specified dimension.
      */
     private GeneralGridRange(final int dimension) {
         index = new int[dimension*2];
     }
-    
+
     /**
      * Constructs one-dimensional grid range.
      *
@@ -96,7 +106,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         index = new int[] {lower, upper};
         checkCoherence();
     }
-    
+
     /**
      * Constructs a new grid range.
      *
@@ -121,7 +131,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         System.arraycopy(upper, 0, index, lower.length, upper.length);
         checkCoherence();
     }
-    
+
     /**
      * Constructs two-dimensional range defined by a {@link Rectangle}.
      */
@@ -132,7 +142,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         };
         checkCoherence();
     }
-    
+
     /**
      * Constructs two-dimensional range defined by a {@link Raster}.
      */
@@ -145,14 +155,14 @@ public class GeneralGridRange implements GridRange, Serializable {
         };
         checkCoherence();
     }
-    
+
     /**
      * Constructs two-dimensional range defined by a {@link RenderedImage}.
      */
     public GeneralGridRange(final RenderedImage image) {
         this(image, 2);
     }
-    
+
     /**
      * Constructs multi-dimensional range defined by a {@link RenderedImage}.
      *
@@ -171,7 +181,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         Arrays.fill(index, dimension+2, index.length, 1);
         checkCoherence();
     }
-    
+
     /**
      * Cast the specified envelope into a grid range. This is sometime useful after an
      * envelope has been transformed from "real world" coordinates to grid coordinates
@@ -203,26 +213,14 @@ public class GeneralGridRange implements GridRange, Serializable {
             index[i + dimension] = (int)Math.round(envelope.getMaximum(i));
         }
     }
-    
+
     /**
      * Returns the number of dimensions.
      */
     public int getDimension() {
         return index.length/2;
     }
-    
-    /**
-     * Returns the valid minimum inclusive grid coordinate.
-     * The sequence contains a minimum value for each dimension of the grid coverage.
-     *
-     * @since 2.4
-     *
-     * @todo Returns an immutable, shared copy of the grid coordinates.
-     */
-    public GridCoordinates getLower() {
-        return new GeneralGridCoordinates(index, 0, index.length/2);
-    }
-    
+
     /**
      * Returns the valid minimum inclusive grid coordinate along the specified dimension.
      *
@@ -236,18 +234,6 @@ public class GeneralGridRange implements GridRange, Serializable {
     }
 
     /**
-     * Returns the valid maximum exclusive grid coordinate.
-     * The sequence contains a maximum value for each dimension of the grid coverage.
-     *
-     * @since 2.4
-     *
-     * @todo Returns an immutable, shared copy of the grid coordinates.
-     */
-    public GridCoordinates getUpper() {
-        return new GeneralGridCoordinates(index, index.length/2, index.length);
-    }
-    
-    /**
      * Returns the valid maximum exclusive grid coordinate along the specified dimension.
      *
      * @see #getUppers
@@ -258,7 +244,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         }
         else throw new ArrayIndexOutOfBoundsException(dimension);
     }
-    
+
     /**
      * Returns the number of integer grid coordinates along the specified dimension.
      * This is equals to {@code getUpper(dimension)-getLower(dimension)}.
@@ -268,7 +254,35 @@ public class GeneralGridRange implements GridRange, Serializable {
     }
 
     /**
+     * Returns the valid minimum inclusive grid coordinate.
+     * The sequence contains a minimum value for each dimension of the grid coverage.
+     *
+     * @since 2.4
+     */
+    public GridCoordinates getLower() {
+        if (lower == null) {
+            lower = new GeneralGridCoordinates.Immutable(index, 0, index.length/2);
+        }
+        return lower;
+    }
+
+    /**
+     * Returns the valid maximum exclusive grid coordinate.
+     * The sequence contains a maximum value for each dimension of the grid coverage.
+     *
+     * @since 2.4
+     */
+    public GridCoordinates getUpper() {
+        if (upper == null) {
+            upper = new GeneralGridCoordinates.Immutable(index, index.length/2, index.length);
+        }
+        return upper;
+    }
+
+    /**
      * Returns the valid minimum inclusive grid coordinates along all dimensions.
+     *
+     * @deprecated Replaced by {@link #getLower}.
      */
     public int[] getLowers() {
         final int[] lo = new int[index.length/2];
@@ -278,13 +292,15 @@ public class GeneralGridRange implements GridRange, Serializable {
 
     /**
      * Returns the valid maximum exclusive grid coordinates along all dimensions.
+     *
+     * @deprecated Replaced by {@link #getUpper}.
      */
     public int[] getUppers() {
         final int[] hi = new int[index.length/2];
         System.arraycopy(index, index.length/2, hi, 0, hi.length);
         return hi;
     }
-    
+
     /**
      * Returns a new grid range that encompass only some dimensions of this grid range.
      * This method copy this grid range's index into a new grid range, beginning at
@@ -312,7 +328,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         System.arraycopy(index, lower+curDim, gridRange.index, newDim, newDim);
         return gridRange;
     }
-    
+
     /**
      * Returns a {@link Rectangle} with the same bounds as this {@code GeneralGridRange}.
      * This is a convenience method for interoperability with Java2D.
@@ -327,7 +343,7 @@ public class GeneralGridRange implements GridRange, Serializable {
                                             new Integer(getDimension())));
         }
     }
-    
+
     /**
      * Returns a hash value for this grid range. This value need not remain
      * consistent between different implementations of the same class.
@@ -341,7 +357,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         }
         return code;
     }
-    
+
     /**
      * Compares the specified object with this grid range for equality.
      */
@@ -352,7 +368,7 @@ public class GeneralGridRange implements GridRange, Serializable {
         }
         return false;
     }
-    
+
     /**
      * Returns a string représentation of this grid range. The returned string is
      * implementation dependent. It is usually provided for debugging purposes.

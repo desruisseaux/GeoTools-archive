@@ -17,7 +17,6 @@
 package org.geotools.coverage.processing.operation;
 
 // J2SE dependencies
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.DataBuffer;
@@ -58,7 +57,6 @@ import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.DimensionFilter;
 import org.geotools.referencing.operation.transform.WarpTransform2D;
 import org.geotools.referencing.operation.transform.IdentityTransform;
