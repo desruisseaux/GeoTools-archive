@@ -32,7 +32,16 @@
       <title>Warnings</title>
       
       <warning>
+        <title></title>
         <para>
+          
+        </para>
+      </warning>
+      
+      <warning>
+        <title></title>
+        <para>
+          
         </para>
       </warning>
       
@@ -57,7 +66,7 @@
       </para>
       
 <table>
-<title>Fundamental Terminology</title>
+<title>Packages and their use</title>
 <tgroup cols="2">
 <thead>
 <row>
