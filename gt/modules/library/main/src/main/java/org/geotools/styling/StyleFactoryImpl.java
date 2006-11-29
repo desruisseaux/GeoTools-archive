@@ -583,7 +583,7 @@ public class StyleFactoryImpl extends AbstractStyleFactory
                     new Integer(10)));
             font.setFontStyle(filterFactory.createLiteralExpression("normal"));
             font.setFontWeight(filterFactory.createLiteralExpression("normal"));
-            font.setFontFamily(filterFactory.createLiteralExpression("serif"));
+            font.setFontFamily(filterFactory.createLiteralExpression("Serif"));
         } catch (org.geotools.filter.IllegalFilterException ife) {
             throw new RuntimeException("Error creating font", ife);
         }
