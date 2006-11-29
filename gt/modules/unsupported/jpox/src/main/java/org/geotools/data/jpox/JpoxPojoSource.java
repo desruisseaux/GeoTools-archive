@@ -7,40 +7,49 @@ import javax.jdo.Query;
 import javax.jdo.Transaction;
 
 import org.geotools.data.Source;
+import org.jpox.PersistenceManagerFactoryImpl;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
-import org.opengis.util.TypeName;
+import org.opengis.feature.type.TypeName;
 
 
 public class JpoxPojoSource implements Source {
 
 	public static final String JPOX_STATE_KEY = "JPOX";
+	private PersistenceManagerFactoryImpl pmf;
 	private PersistenceManager pm;
 	private Class pc;
 	private org.geotools.data.Transaction t;
 	
-	public JpoxPojoSource( PersistenceManager pm, Class pc ) {
-		this.pm = pm;
+	public JpoxPojoSource( PersistenceManagerFactoryImpl pmf, Class pc ) {
+		this.pmf = pmf;
 		this.pc = pc;
+	}
+
+	protected Transaction t() {
+		return getPm().currentTransaction();
+	}
+	
+	protected PersistenceManager getPm() {
+		if ( t == null || t == org.geotools.data.Transaction.AUTO_COMMIT ) {
+			if ( pm == null ) {
+				pm = pmf.getPersistenceManager();
+			}
+			return pm;
+		} 
+		
+		JpoxTransactionState state = (JpoxTransactionState)t.getState( JPOX_STATE_KEY );
+		
+		if ( state == null ) {
+			state = new JpoxTransactionState( pmf.getPersistenceManager() );
+			t.putState( JPOX_STATE_KEY, state );
+		}
+		
+		return state.getPm();
 	}
 
 	public Collection content() {
 		return content( "", Query.JDOQL );
-	}
-
-	protected Transaction t() {
-		if ( t == org.geotools.data.Transaction.AUTO_COMMIT ) {
-			return pm.currentTransaction();
-		} 
-
-		JpoxTransactionState state = (JpoxTransactionState)t.getState( JPOX_STATE_KEY );
-		
-		if ( state == null ) {
-			state = new JpoxTransactionState( pm.getPersistenceManagerFactory().getPersistenceManager() );
-            t.putState( JPOX_STATE_KEY, state );
-		}
-		
-		return state.getJpoxTransaction();
 	}
 	
 	public Collection content( String query, String queryLanguage ) {
@@ -49,7 +58,12 @@ public class JpoxPojoSource implements Source {
 		
 		if ( !isActive ) t().begin();
 		
-		Query q = t().getPersistenceManager().newQuery( query, queryLanguage );
+		Query q = null;
+		if ( query == null || query.equals( "" ) ) {
+			q = t().getPersistenceManager().newQuery();			
+		} else {
+			q = t().getPersistenceManager().newQuery( queryLanguage, query  );
+		}
 		q.setClass( pc );
 
 		return (Collection)q.execute();
@@ -69,7 +83,7 @@ public class JpoxPojoSource implements Source {
 	}
 
 	public TypeName getName() {
-		return null;
+		return new org.geotools.feature.type.TypeName( pc.getCanonicalName() );
 	}
 	
 	public void setTransaction( org.geotools.data.Transaction t ) {

@@ -15,30 +15,33 @@
  */
 package org.geotools.data.jpox;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
 
+import org.geotools.catalog.ServiceInfo;
+import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.DataAccess;
 import org.geotools.data.Source;
 import org.jpox.PersistenceManagerFactoryImpl;
 import org.opengis.feature.type.TypeName;
 
 
-public class JpoxDataService implements DataAccess {
+public class JpoxDataService implements DataAccess/*<Class>*/ {
 
 	private Properties jdoProps;
 	
 	private boolean initialized = false;
 	
 	private PersistenceManagerFactoryImpl pmf;
-	private PersistenceManager pm;
 
 	private List typesList;
 	private Map typesMap;
@@ -61,15 +64,31 @@ public class JpoxDataService implements DataAccess {
 	
 	private void initInternal( PersistenceManagerFactoryImpl pmf ) {
 		this.pmf = pmf;
-		pm = pmf.getPersistenceManager();
 		initialized = true;
+	}
+	
+	public void dispose() {
+		//Close pmf? 
+		pmf = null;
+		jdoProps = null;
+		initialized = false;
+	}
+	
+	public ServiceInfo getInfo() {
+		URI uri = null;
+		try {
+			uri = new URI( pmf.getConnectionURL() );
+		} catch ( URISyntaxException e ) {
+			// TODO: log and move on?
+		}
+		return new DefaultServiceInfo( "JPOX Data Access", "JPOX Data Access for types: " + getTypeNames(), null, uri, null, null, null, null );
 	}
 	
 	public Source access( TypeName typeName ) {
 		Class pc = (Class)describe( typeName );
 		if ( pc == null ) return null;
 		
-		return new JpoxPojoSource( pm, pc );
+		return new JpoxPojoSource( pmf, pc );
 	}
 
 	public Object describe( TypeName typeName ) {
@@ -78,17 +97,19 @@ public class JpoxDataService implements DataAccess {
 
 	public List getTypeNames() {
 		if ( typesList == null ) {
-			typesList = Collections.unmodifiableList( new Vector( getTypesMap().keySet() ) );			
+			typesList = Collections.unmodifiableList( new ArrayList( getTypesMap().keySet() ) );			
 		}
 
 		return typesList;
 	}
 
 	private Map getTypesMap() {
-		if ( typesMap != null ) return typesMap;
-		
 		checkInitialized();
 
+		if ( typesMap != null ) return typesMap;
+
+		typesMap = new HashMap();
+		
 		ClassLoader cl = getClass().getClassLoader();
 		Class c = null;
 		

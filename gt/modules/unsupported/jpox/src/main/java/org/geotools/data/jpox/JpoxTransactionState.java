@@ -42,7 +42,11 @@ public class JpoxTransactionState implements State {
 		}
 	}
 
-	public javax.jdo.Transaction getJpoxTransaction() {
+	PersistenceManager getPm() {
+		return pm;
+	}
+	
+	javax.jdo.Transaction getJpoxTransaction() {
 		return pm.currentTransaction();
 	}
 
