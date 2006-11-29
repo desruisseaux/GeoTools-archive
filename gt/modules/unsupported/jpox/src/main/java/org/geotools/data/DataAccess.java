@@ -23,7 +23,7 @@ import org.opengis.feature.type.TypeName;
 /**
  * Interface providing Open Web Service style access to georesource content.
  * <i>
- * <p>First draft of a DataService interface based on brain storming session with Jody, Thomas, 
+ * <p>First draft of a DataAccess interface based on brain storming session with Jody, Thomas, 
  * Stefan and Cory in Refractions on November 24th. This could become a super set of {@link DataStore} 
  * or eventually replace it(?).</p>
  * 
@@ -42,7 +42,7 @@ public interface DataAccess/*<Content,Description>*/ {
     /**
      * Information about this data acess point.
      * <p>
-     * Contains a human readible description of the service,
+     * Contains a human readable description of the service,
      * with enough information for searching.
      * </p>
      * 
@@ -73,7 +73,7 @@ public interface DataAccess/*<Content,Description>*/ {
      * @param typeName
 	 * @return FeatureType, ResultSetMetaData, Class, whatever?
 	 */
-	Object describe( TypeName typeName );
+	Object /*Description*/ describe( TypeName typeName );
 	
 	/**
 	 * Provides access to the data source for the given type name.
@@ -85,10 +85,10 @@ public interface DataAccess/*<Content,Description>*/ {
     /**
      * Clean up any and all data connections.
      * <p>
-     * Please note the DataAccess instance will *not* be useable
-     * after this method is called. All methods should throw an
-     * InvalidStateException (but probably will just throw a
-     * NullPointerException when implementators are lazy).
+     * Please note the <code>DataAccess</code> instance will <b>not</b>
+     * be useable after this method is called. All methods should throw 
+     * an {@link IllegalStateException} (but probably will just throw a
+     * {@link NullPointerException} when implementators are lazy).
      * 
      */
     void dispose();
