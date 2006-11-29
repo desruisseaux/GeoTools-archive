@@ -23,6 +23,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -30,6 +31,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.spatial.EqualsImpl;
+import org.opengis.filter.Not;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.spatial.Equals;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -389,6 +394,54 @@ public class FilterTest extends TestCase {
     }
     
     
+    /**
+         * A filter is composed of a logic AND bettween a non null check and
+         * a comparison filter, for an AttributeExpression. 
+         * If the AttributeExpression evaluates to null, the short-circuit comparison
+         * in the LogicFilter should return without throwing a NullPointerException.
+         * If short-circuit evaluation would not be done in LogicFilter, then a NullPointerException
+         * would be thrown.
+         *
+         * @throws IllegalFilterException If the constructed filter is not valid.
+        */
+        public void testCompareShortCircuit() throws IllegalFilterException, IllegalAttributeException {
+            FilterFactory ff = (FilterFactory) CommonFactoryFinder.getFilterFactory(null);
+            
+           // Test all integer permutations
+            Expression testAttribute = new AttributeExpressionImpl(testSchema,
+                   "testInteger");
+    
+            NullFilterImpl nullFilter = new NullFilterImpl();
+            nullFilter.nullCheckValue(testAttribute);
+           
+            Filter notNullFilter  = (Filter) ff.not(nullFilter);
+            
+            PropertyIsEqualTo compareFilter = ff.equals( testAttribute, ff.literal(10));
+            
+            
+            testFeature.setAttribute("testInteger", null);
+            assertEquals( false, compareFilter.evaluate( testFeature ) );
+            
+            assertTrue(nullFilter.contains(testFeature));
+            assertFalse(notNullFilter.contains(testFeature));
+            
+            //test AND
+            Filter finalFilter = notNullFilter.and(compareFilter);
+            try{
+               assertFalse(finalFilter.contains(testFeature));
+            }catch(NullPointerException e){
+               fail("Short-circuit evaluation was not performed by LogicFilter: " + e.getMessage());
+            }
+            
+            //test OR
+            finalFilter = nullFilter.or(compareFilter);
+            try{
+               assertTrue(finalFilter.contains(testFeature));
+            }catch(NullPointerException e){
+               fail("Short-circuit evaluation was not performed by LogicFilter: " + e.getMessage());
+            }
+        }
+
 
     /**
      * Test the between operator.
