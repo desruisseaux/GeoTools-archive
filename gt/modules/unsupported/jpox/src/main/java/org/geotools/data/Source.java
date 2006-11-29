@@ -19,7 +19,7 @@ import java.util.Collection;
 
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
-import org.opengis.util.TypeName;
+import org.opengis.feature.type.TypeName;
 
 /**
  * <i>
@@ -39,23 +39,13 @@ import org.opengis.util.TypeName;
  * @version $Id: DataStore.java 22600 2006-11-04 09:37:58Z jgarnett $
  */
 
-public interface Source {
+public interface Source/*<Content,Description>*/ {
 	
 	/**
 	 * Get the corresponding DataService, that created this Source.
 	 */
 	// Comment this out, if you think it is needed!
-//	DataService getDataService();
-	
-	/**
-	 * Get the complete data of this <code>Source</code> implementation. No filters or 
-	 * queries are applied.
-	 * 
-	 * @return A Collection, may be empty, but never <code>null</code>
-	 */
-	
-	Collection content();
-
+//	DataAccess<Content,Description> getDataAccess();
 	
 	/**
 	 * Description of the supported filter capabilities.
@@ -67,23 +57,33 @@ public interface Source {
 
 
 	/**
+	 * Get the complete data of this <code>Source</code> implementation. No filters or 
+	 * queries are applied.
+	 * 
+	 * @return An immutable Collection, may be empty, but never <code>null</code>
+	 */
+	
+	Collection/*<Content>*/ content();
+	
+	
+	/**
 	 * Get the complete data of this <code>Source</code> implementation. No filters are 
 	 * applied.
 	 * 
-	 * @return A Collection, may be empty, but never <code>null</code> 
+	 * @return A immutable Collection, may be empty, but never <code>null</code> 
 	 */
 	
 //	TODO check catalog service web spec. and change param types accordingly
-	Collection content( String query, String queryLanguage ); 
+	Collection/*<Content>*/ content( String query, String queryLanguage ); 
 
 
 	/**
-	 * An filtered collection containing all the data indicated by the filter.
+	 * A collection containing all the data indicated by the filter.
 	 * 
-	 * @return A Collection, may be empty, but never <code>null</code> 
+	 * @return A immutable Collection, may be empty, but never <code>null</code> 
 	 */
 	
-	Collection content( Filter filter );
+	Collection/*<Content>*/ content( Filter filter );
 
 
 	/**
@@ -98,7 +98,7 @@ public interface Source {
 	 * @return FeatureType, ResultSetMetaData, Class, whatever?
 	 */
 
-	Object describe();
+	Object /*Description*/ describe();
 
 	/**
 	 * Names of the type this data source provides.
@@ -107,6 +107,12 @@ public interface Source {
 	 */
 
 	TypeName getName();
+	
+	/**
+     * Provides a transaction for commit/rollback control of this <code>Source</code>.
+	 *
+	 * @param t The transaction
+	 */
 	
 	void setTransaction( Transaction t );
 	
