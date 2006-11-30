@@ -804,11 +804,24 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         Connection dbConnection = null;
 
         try {
-            String sqlStatement = "SELECT * FROM GEOMETRY_COLUMNS WHERE "
-                + "f_table_name='" + tableName + "' AND f_geometry_column='"
-                + geometryColumnName + "';";
+            String dbSchema = config.getDatabaseSchemaName();
+            StringBuffer sql = new StringBuffer();
+            sql.append("SELECT srid FROM geometry_columns WHERE ");
+            if (dbSchema != null && dbSchema.length() > 0) {
+                sql.append("f_table_schema='");
+                sql.append(dbSchema);
+                sql.append("' AND ");
+            }
+            sql.append("f_table_name='");
+            sql.append(tableName);
+            sql.append("' AND f_geometry_column='");
+            sql.append(geometryColumnName);
+            sql.append("';");
+            
+            String sqlStatement = sql.toString();
+            LOGGER.fine("srid statement is " + sqlStatement);
+            
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
-
             Statement statement = dbConnection.createStatement();
             ResultSet result = statement.executeQuery(sqlStatement);
 
@@ -817,14 +830,33 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 JDBCUtils.close(statement);
 
                 return retSrid;
-            } else {
-                String mesg = "No geometry column row for srid in table: "
-                    + tableName + ", geometry column " + geometryColumnName;
-                throw new DataSourceException(mesg);
             }
+            result.close();
+
+            //try asking the first feature for its srid
+            sql = new StringBuffer();
+            sql.append("SELECT SRID(\"");
+            sql.append(geometryColumnName);
+            sql.append("\") FROM \"");
+            if (dbSchema != null && dbSchema.length() > 0) {
+                sql.append(dbSchema);
+                sql.append("\".\"");
+            }
+            sql.append(tableName);
+            sql.append("\" LIMIT 1");
+            sqlStatement = sql.toString();
+            result = statement.executeQuery(sqlStatement);
+            if (result.next()) {
+                int retSrid = result.getInt(1);
+                JDBCUtils.close(statement);
+                return retSrid;
+            }
+            
+            String mesg = "No geometry column row for srid in table: "
+                + tableName + ", geometry column " + geometryColumnName;
+            throw new DataSourceException(mesg);
         } catch (SQLException sqle) {
             String message = sqle.getMessage();
-
             throw new DataSourceException(message, sqle);
         } finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
@@ -969,14 +1001,25 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         throws IOException {
         Connection dbConnection = null;
         Class type = null;
+        int srid = 0;
         try {
             dbConnection = getConnection(Transaction.AUTO_COMMIT);
+            StringBuffer sql = new StringBuffer();
+            sql.append("SELECT type FROM geometry_columns WHERE ");
             String dbSchema = config.getDatabaseSchemaName();
-            String sqlStatement = "SELECT type FROM GEOMETRY_COLUMNS WHERE "
-                + "f_table_schema='" + dbSchema + "' AND f_table_name='"
-                + tableName + "' AND f_geometry_column='" + columnName
-                + "';";
-            LOGGER.fine("geometry sql statement is " + sqlStatement);
+            if (dbSchema != null && dbSchema.length() > 0) {
+                sql.append("f_table_schema='");
+                sql.append(dbSchema);
+                sql.append("' AND ");
+            }
+            sql.append("f_table_name='");
+            sql.append(tableName);
+            sql.append("' AND f_geometry_column='");
+            sql.append(columnName);
+            sql.append("';");
+            
+            String sqlStatement = sql.toString();
+            LOGGER.fine("geometry type sql statement is " + sqlStatement);
 
             String geometryType = null;
 
@@ -988,7 +1031,42 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 geometryType = result.getString("type");
                 LOGGER.fine("geometry type is: " + geometryType);
             }
+            result.close();
 
+            if (geometryType == null) {
+                //no geometry_columns entry, try grabbing a feature
+                sql = new StringBuffer();
+                if (WKBEnabled) {
+                    sql.append("SELECT encode(AsBinary(force_2d(\"");
+                    sql.append(columnName);
+                    sql.append("\"), 'XDR'),'base64') FROM \"");
+                } else {
+                    sql.append("SELECT AsText(\"");
+                    sql.append(columnName);
+                    sql.append("\") FROM \"");
+                }
+                if (dbSchema != null && dbSchema.length() > 0) {
+                    sql.append(dbSchema);
+                    sql.append("\".\"");
+                }
+                sql.append(tableName);
+                sql.append("\" LIMIT 1");
+                sqlStatement = sql.toString();
+                result = statement.executeQuery(sqlStatement);
+                if (result.next()) {
+                    AttributeIO attrIO = getGeometryAttributeIO(null, null);
+                    Object object = attrIO.read(result, 1);
+                    if (object instanceof Geometry) {
+                        Geometry geom = (Geometry) object;
+                        geometryType = geom.getGeometryType().toUpperCase();
+                        type = geom.getClass();
+                        srid = geom.getSRID(); //will return 0 unless we support EWKB
+                    }
+                }
+                result.close();
+            }
+            statement.close();
+            
             if (geometryType == null) {
                 String msg = " no geometry found in the GEOMETRY_COLUMNS table"
                     + " for " + tableName + " of the postgis install.  A row"
@@ -997,9 +1075,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 throw new DataSourceException(msg);
             }
 
-            statement.close();
-
-            type = (Class) GEOM_TYPE_MAP.get(geometryType);
+            if (type == null) {
+                type = (Class) GEOM_TYPE_MAP.get(geometryType);
+            }
 
         } catch (SQLException sqe) {
             throw new IOException("An SQL exception occurred: "
@@ -1007,11 +1085,15 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         } finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
-        
+
+        if (srid < 1) {
+            //try again
+            srid = determineSRID(tableName, columnName);
+        }
         CoordinateReferenceSystem crs = null;
 
         try {
-            crs = getPostgisAuthorityFactory().createCRS(determineSRID(tableName, columnName));
+            crs = getPostgisAuthorityFactory().createCRS(srid);
         } catch (FactoryException e) {
             crs = null;
         }
@@ -1732,7 +1814,6 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
 
 	public FeatureType getSchema(String arg0) throws IOException {
-		//TODO: use the database schema to obtain the feature type?
 		return super.getSchema(arg0);
 	}
     

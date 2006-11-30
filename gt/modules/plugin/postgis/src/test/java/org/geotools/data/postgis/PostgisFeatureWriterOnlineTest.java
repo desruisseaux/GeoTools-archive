@@ -36,6 +36,7 @@ public class PostgisFeatureWriterOnlineTest extends AbstractPostgisOnlineTestCas
         writer.write();
         String id = feature.getID();
         transaction.commit();
+        transaction.close();
         return id;
     }
 }

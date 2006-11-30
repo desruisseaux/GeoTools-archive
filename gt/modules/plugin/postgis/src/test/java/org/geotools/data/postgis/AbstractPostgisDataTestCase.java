@@ -156,8 +156,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
         try {
             Statement s = conn.createStatement();
             s.execute("DROP TABLE " + f.schema + ".road");
-        } catch (Exception ignore) {
-        }
+        } catch (Exception ignore) {}
 
         try {
             Statement s = conn.createStatement();

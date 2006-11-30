@@ -55,7 +55,7 @@ public class PostgisFIDMapperFactory extends DefaultFIDMapperFactory {
         PostgisSQLBuilder sqlb = new PostgisSQLBuilder(new SQLEncoderPostgis(),
                 config);
         String sql = "SELECT " + sqlb.encodeColumnName("oid") + " FROM "
-            + sqlb.encodeTableName(tableName);
+            + sqlb.encodeTableName(tableName) + " LIMIT 1";
         Statement st = null;
 
         try {

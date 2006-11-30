@@ -16,6 +16,7 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
@@ -47,6 +48,20 @@ public class PostgisTests {
         
         if (f.schema == null || "".equals(f.schema.trim()))
         	f.schema = "public";
+        
+        f.wkbEnabled = null;
+        f.looseBbox = null;
+
+        Enumeration keys = resource.getKeys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement().toString();
+            if (key.equalsIgnoreCase("wkbEnabled")) {
+                f.wkbEnabled = new Boolean(resource.getString("wkbEnabled"));
+            } else if (key.equalsIgnoreCase("looseBbox")) {
+                f.looseBbox = new Boolean(resource.getString("looseBbox"));
+            }
+        }
+        
         return f;
 	}
 	
@@ -62,6 +77,8 @@ public class PostgisTests {
 		public String user;
 		public String password;
 		public String schema;
+        public Boolean wkbEnabled;
+        public Boolean looseBbox;
 	}
     
     public static Map getParams(Fixture f) {
@@ -74,6 +91,12 @@ public class PostgisTests {
         params.put(PostgisDataStoreFactory.USER.key, f.user);
         params.put(PostgisDataStoreFactory.PASSWD.key, f.password);
         params.put(PostgisDataStoreFactory.SCHEMA.key,f.schema);
+        if (f.wkbEnabled != null) {
+            params.put(PostgisDataStoreFactory.WKBENABLED.key, f.wkbEnabled);
+        }
+        if (f.looseBbox != null) {
+            params.put(PostgisDataStoreFactory.LOOSEBBOX.key, f.looseBbox);
+        }
 
         return params;
     }

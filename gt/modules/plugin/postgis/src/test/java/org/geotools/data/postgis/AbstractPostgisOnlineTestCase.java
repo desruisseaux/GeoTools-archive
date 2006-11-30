@@ -2,7 +2,6 @@ package org.geotools.data.postgis;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
@@ -45,24 +44,43 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
         //create dummy tables
         Statement st = getConnection().createStatement();
         dropTables(st);
+        purgeGeometryColumns(st);
         createTables(st);
+        setupGeometryColumns(st);
         st.close();
     }
     
-    public Connection getConnection() throws SQLException {
+    public Connection getConnection() throws Exception {
         return ds.getConnectionPool().getConnection();
     }
     
     protected void tearDown() throws Exception {
         Statement st = getConnection().createStatement();
+        purgeGeometryColumns(st);
         dropTables(st);
         st.close();
         //ds.getConnectionPool().close(); //is this killing our other tests?
         super.tearDown();
     }
     
-    protected void createTables(Statement st) throws SQLException {
-        //NOTE: no geometry columns!!!
+    protected void setupGeometryColumns(Statement st) throws Exception {
+        //subclasses should override if they want more or less geometry columns
+        String preSql = "INSERT INTO geometry_columns (f_table_catalog, f_table_schema, f_table_name, f_geometry_column, coord_dimension, srid, type) VALUES ('',";
+        String postSql = ", 'the_geom', 2, 4326, 'POINT')";
+        String sql = preSql + "'public', '" + table1 + "'" + postSql;
+        st.execute(sql);
+        sql = preSql + "'public', '" + table2 + "'" + postSql;
+        st.execute(sql);
+        sql = preSql + "'public', '" + table3 + "'" + postSql;
+        st.execute(sql);
+    }
+    
+    protected void purgeGeometryColumns(Statement st) throws Exception {
+        String sql = "DELETE FROM geometry_columns WHERE f_table_name LIKE 'tmp_pgtest%'";
+        st.execute(sql);
+    }
+    
+    protected void createTables(Statement st) throws Exception {
         createTable1(st);
         createTable2(st);
         createTable3(st);
@@ -71,32 +89,33 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
         createTable6(st);
     }
     
-    protected void createTable1(Statement st) throws SQLException {
+    protected void createTable1(Statement st) throws Exception {
         String sql = "CREATE TABLE " + table1 + "(" + "fid serial NOT NULL,"
-                + "name varchar(10)," + "CONSTRAINT " + table1
+                + "name varchar(10), the_geom geometry, " + "CONSTRAINT " + table1
                 + "_pkey PRIMARY KEY (fid)" + ") WITH OIDS;";
         st.execute(sql);
     }
 
-    protected void createTable2(Statement st) throws SQLException {
+    protected void createTable2(Statement st) throws Exception {
         String sql = "CREATE SEQUENCE " + table2
                 + "_fid_seq INCREMENT 1 MINVALUE 1 "
                 + "MAXVALUE 9223372036854775807 START 1001 CACHE 1;"
                 + "CREATE TABLE " + table2 + "("
                 + "fid int4 NOT NULL DEFAULT nextval('" + table2
-                + "_fid_seq'::text)," + "name varchar(10)," + "CONSTRAINT "
-                + table2 + "_pkey PRIMARY KEY (fid)" + ") WITH OIDS;";
+                + "_fid_seq'::text), name varchar(10), the_geom geometry, "
+                + "CONSTRAINT " + table2 + "_pkey PRIMARY KEY (fid)"
+                + ") WITH OIDS;";
         st.execute(sql);
     }
 
-    protected void createTable3(Statement st) throws SQLException {
-        String sql = "CREATE TABLE " + table3 + "(" + "fid bigserial NOT NULL,"
-                + "name varchar(10)," + "CONSTRAINT " + table3
+    protected void createTable3(Statement st) throws Exception {
+        String sql = "CREATE TABLE " + table3 + "(" + "fid bigserial NOT NULL, "
+                + "name varchar(10), the_geom geometry, " + "CONSTRAINT " + table3
                 + "_pkey PRIMARY KEY (fid)" + ") WITH OIDS;";
         st.execute(sql);
     }
 
-    protected void createTable4(Statement st) throws SQLException {
+    protected void createTable4(Statement st) throws Exception {
         String sql = "CREATE SEQUENCE " + table4
                 + "_fid_seq INCREMENT 1 MINVALUE 1 "
                 + "MAXVALUE 9223372036854775807 START 1000001 CACHE 1;"
@@ -107,7 +126,7 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
         st.execute(sql);
     }
 
-    protected void createTable5(Statement st) throws SQLException{
+    protected void createTable5(Statement st) throws Exception{
         String sql = "CREATE TABLE \"" + table5 + "\" ("
                 + "fid serial NOT NULL," + "name varchar(10),"
                 + "CONSTRAINT \"" + table5 + "_pkey\" PRIMARY KEY (fid)"
@@ -115,7 +134,7 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
         st.execute(sql);
     }
 
-    protected void createTable6(Statement st) throws SQLException {
+    protected void createTable6(Statement st) throws Exception {
         String sql = "CREATE SEQUENCE \"" + table6
                 + "_fid_seq\" INCREMENT 1 MINVALUE 1 "
                 + "MAXVALUE 9223372036854775807 START 1001 CACHE 1;"
@@ -126,7 +145,7 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
         st.execute(sql);
     }
 
-    protected void dropTables(Statement st) throws SQLException {
+    protected void dropTables(Statement st) throws Exception {
         dropTable(st, table1);
         dropTable(st, table2);
         dropSequence(st, table2 + "_fid_seq");
@@ -138,7 +157,7 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
         dropSequence(st, table6 + "_fid_seq");
     }
     
-    protected void dropTable(Statement st, String tableName) throws SQLException {
+    protected void dropTable(Statement st, String tableName) throws Exception {
         String sql = "SELECT COUNT(tablename) FROM pg_tables WHERE tablename = '" + tableName + "'";
         ResultSet rs = st.executeQuery(sql);
         rs.next();
@@ -150,7 +169,7 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
         }
     }
 
-    protected void dropSequence(Statement st, String sequenceName) throws SQLException {
+    protected void dropSequence(Statement st, String sequenceName) throws Exception {
         String sql = "SELECT COUNT(relid) FROM pg_statio_all_sequences WHERE relname = '" + sequenceName + "'";
         ResultSet rs = st.executeQuery(sql);
         rs.next();
