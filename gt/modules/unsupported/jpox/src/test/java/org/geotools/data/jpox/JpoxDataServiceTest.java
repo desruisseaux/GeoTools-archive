@@ -56,7 +56,7 @@ public class JpoxDataServiceTest extends TestCase {
 		assertNotNull( content );
 		assertFalse( content.isEmpty() );
 
-		// test concurancy - source2 uses seperate Transaction
+		// test concurrency - source2 uses seperate Transaction
 		Source source2 = data.access( typeName );
 
 		Transaction t = new DefaultTransaction( "Source Testing" );
@@ -77,20 +77,18 @@ public class JpoxDataServiceTest extends TestCase {
 	}
 
 	public void testSource2() throws Exception {
-//		List types = data.getTypeNames();
 		TypeName typeName1 = (TypeName)data.getTypeNames().get( 0 );
-		TypeName typeName2 = (TypeName)data.getTypeNames().get( 1 );
+//		TypeName typeName2 = (TypeName)data.getTypeNames().get( 1 );
 
 		Transaction t = new DefaultTransaction( "Source Testing" );
 
 		Source source1 = data.access( typeName1 );
-		Source source2 = data.access( typeName2 );
+//		Source source2 = data.access( typeName2 );
 
 		source1.setTransaction( t );
-		source2.setTransaction( t );
+//		source2.setTransaction( t );
 
-		Collection victoriaGeneral = source1.content( ff
-				.equals( ff.property( "NAME" ), ff.literal( "Victoria General" ) ) );
+		Collection victoriaGeneral = source1.content( ff.equals( ff.property( "NAME" ), ff.literal( "Victoria General Hospital" ) ) );
 		assertEquals( 1, victoriaGeneral.size() );
 
 		int before = source1.content().size();
@@ -99,13 +97,13 @@ public class JpoxDataServiceTest extends TestCase {
 		int after = source1.content().size();
 		assertEquals( "remove single", before - 1, after );
 
-		source2.content().clear();
+//		source2.content().clear();
 
 		assertEquals( 0, victoriaGeneral.size() );
 
 		t.rollback();
 		assertEquals( 1, victoriaGeneral.size() ); // no longer empty
-		assertFalse( source2.content().isEmpty() ); // no longered cleared
+//		assertFalse( source2.content().isEmpty() ); // no longered cleared
 		assertEquals( before, source1.content().size() ); // just as before
 	}
 }
