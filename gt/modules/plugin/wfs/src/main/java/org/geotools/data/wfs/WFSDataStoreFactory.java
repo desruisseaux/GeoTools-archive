@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.AbstractDataStoreFactory;
@@ -96,6 +95,14 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             Boolean.class,
             "Indicates that datastore should use gzip to transfer data if the server supports it.  Default is true",
             false);
+    // be lenient about parsing data -- optional
+    /**
+     * Boolean
+     */
+    public static final Param LENIENT = new Param("WFSDataStoreFactory:LENIENT",
+            Boolean.class,
+            "Indicates that datastore should do its best to create features from the provided data even if it does not accurately match the schema.  Errors will be logged but the parsing will continue if this is true.  Default is false",
+            false);
     
     protected Map cache = new HashMap();
     protected static final Logger logger = logger();
@@ -145,6 +152,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         int timeout = 3000;
         int buffer = 10;
         boolean tryGZIP=true;
+        boolean lenient=false;
 
         if (params.containsKey(TIMEOUT.key)) {
             Integer i = (Integer) TIMEOUT.lookUp(params);
@@ -162,6 +170,12 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
             Boolean b = (Boolean) TRY_GZIP.lookUp(params);
             if(b!=null)
                 tryGZIP = b.booleanValue();
+        }
+
+        if (params.containsKey(LENIENT.key)) {
+            Boolean b = (Boolean) LENIENT.lookUp(params);
+            if(b!=null)
+                lenient = b.booleanValue();
         }
 
         if (params.containsKey(USERNAME.key)) {
@@ -183,7 +197,7 @@ public class WFSDataStoreFactory extends AbstractDataStoreFactory {
         DataStore ds = null;
 
         try {
-            ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer, tryGZIP);
+            ds = new WFSDataStore(host, protocol, user, pass, timeout, buffer, tryGZIP, lenient);
             cache.put(params, ds);
         } catch (SAXException e) {
             logger.warning(e.toString());

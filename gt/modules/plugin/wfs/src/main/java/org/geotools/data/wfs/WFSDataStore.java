@@ -115,6 +115,8 @@ public class WFSDataStore extends AbstractDataStore {
     private final boolean tryGZIP;
     protected WFSStrategy strategy;
 
+    private boolean lenient;
+
     /**
      * Construct <code>WFSDataStore</code>.
      *
@@ -124,7 +126,6 @@ public class WFSDataStore extends AbstractDataStore {
     	// not called
     	tryGZIP=true;
     }
-
     /**
      * Construct <code>WFSDataStore</code>.
      *
@@ -140,10 +141,31 @@ public class WFSDataStore extends AbstractDataStore {
      * @throws IOException
      */
     protected WFSDataStore(URL host, Boolean protocol, String username,
-        String password, int timeout, int buffer, boolean tryGZIP)
+        String password, int timeout, int buffer, boolean tryGZIP )
+    throws SAXException, IOException {
+        this( host, protocol, username, password, timeout, buffer, tryGZIP, false);
+    }
+    /**
+     * Construct <code>WFSDataStore</code>.
+     *
+     * @param host - may not yet be a capabilities url
+     * @param protocol - true,false,null (post,get,auto)
+     * @param username - iff password
+     * @param password - iff username
+     * @param timeout - default 3000 (ms)
+     * @param buffer - default 10 (features)
+     * @param tryGZIP - indicates to use GZIP if server supports it.
+     * @param lenient - if true the parsing will be very forgiving to bad data.  Errors will be logged rather than exceptions.
+     * 
+     * @throws SAXException
+     * @throws IOException
+     */
+    protected WFSDataStore(URL host, Boolean protocol, String username,
+        String password, int timeout, int buffer, boolean tryGZIP, boolean lenient)
         throws SAXException, IOException {
         super(true);
 
+        this.lenient=lenient;
         if ((username != null) && (password != null)) {
             auth = new WFSAuthenticator(username, password);
         }
@@ -590,8 +612,10 @@ public class WFSDataStore extends AbstractDataStore {
             }
         }
 
+        WFSFeatureType schema = (WFSFeatureType)getSchema(request.getTypeName());
+        
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, (WFSFeatureType)getSchema(request.getTypeName()));
+                timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), true));
 
         return ft;
     }
@@ -737,9 +761,10 @@ public class WFSDataStore extends AbstractDataStore {
                 transaction.putState(this, ts);
             }
         }
-
+        WFSFeatureType schema = (WFSFeatureType)getSchema(query.getTypeName());
+        
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, (WFSFeatureType)getSchema(query.getTypeName()));
+                timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), true));
 
         return ft;
     }
