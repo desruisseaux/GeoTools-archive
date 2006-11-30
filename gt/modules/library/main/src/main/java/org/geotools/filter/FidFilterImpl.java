@@ -32,7 +32,11 @@ import org.opengis.filter.identity.FeatureId;
  * Defines a feature ID filter, which holds a list of feature IDs. This filter
  * stores a series of feature IDs, which are used to distinguish features
  * uniquely.
- *
+ * <p>
+ * Please note that addAllFids( Collection ) may be a performance hog; uDig makes
+ * use of its own implementation of FidFilter in order to reuse the internal set
+ * of fids between uses.
+ * </p>
  * @author Rob Hranac, TOPP
  * @source $URL$
  * @version $Id$

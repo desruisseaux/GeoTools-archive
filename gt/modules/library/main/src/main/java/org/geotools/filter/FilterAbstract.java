@@ -29,7 +29,7 @@ public class FilterAbstract implements org.opengis.filter.Filter
 	 {
 	
 	/** filter factory **/
-	FilterFactory factory;
+	protected FilterFactory factory;
 	
 	/**
 	 * @param factory FilterFactory injected into the filter.
