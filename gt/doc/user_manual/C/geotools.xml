@@ -22,9 +22,10 @@
 
 
   <!ENTITY geot "Geotools">
-  <!ENTITY geotversion "2.3">
+  <!ENTITY geotversion "2.4">
+  <!ENTITY jtsversion "1.7.1">
   <!ENTITY manversion "0.1">
-  <!ENTITY date "August 2006">
+  <!ENTITY date "November 2006">
   <!ENTITY javaVersion "1.4">
   
 
