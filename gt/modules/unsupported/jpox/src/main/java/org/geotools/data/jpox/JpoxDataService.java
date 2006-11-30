@@ -122,7 +122,7 @@ public class JpoxDataService implements DataAccess/*<Class>*/ {
 				e.printStackTrace();
 				continue;
 			}
-			TypeName typeName = new org.geotools.feature.type.TypeName( c.getCanonicalName() );
+			TypeName typeName = new org.geotools.feature.type.TypeName( c.getName() );
 			typesMap.put( typeName, c );
 		}
 		return typesMap;
