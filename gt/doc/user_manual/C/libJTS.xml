@@ -450,7 +450,7 @@
     </para>
     
     <para>
-<programlisting width="100" >
+<programlisting width="80" >
 import com.vividsolutions.jts.geom.*
 import com.vividsolutions.jts.io.*
 
