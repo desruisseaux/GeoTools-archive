@@ -74,7 +74,6 @@ import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderPostgis;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -251,8 +250,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     protected static String schema(String schema) {
     	if (schema != null && !"".equals(schema))
     		return schema;
-    	
-    	return (String) PostgisDataStoreFactory.SCHEMA.sample;
+
+        return (String) PostgisDataStoreFactory.SCHEMA.sample;
     }
     	
     public PostgisDataStore(ConnectionPool connectionPool,
@@ -278,7 +277,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * 
      */
     protected PostgisSQLBuilder createSQLBuilder() {
-    	return new PostgisSQLBuilder( new SQLEncoderPostgis(), config );
+        PostgisSQLBuilder builder = new PostgisSQLBuilder(new SQLEncoderPostgis(), config);
+        initBuilder(builder);
+        return builder;
     }
 
     /**
@@ -432,7 +433,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 		    	//try the estimated_extent([schema], table, geocolumn) function
 	    	    String q;
                 String dbSchema = config.getDatabaseSchemaName(); 
-                if (dbSchema == null) {
+                if (!schemaEnabled || dbSchema == null || "".equals(dbSchema)) {
                     q = "SELECT AsText(force_2d(envelope(estimated_extent('"+typeName+"','"+geomName+"'))))";
                 } else {
                     q = "SELECT AsText(force_2d(envelope(estimated_extent('"+dbSchema+"','"+typeName+"','"+geomName+"'))))";
@@ -807,7 +808,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             String dbSchema = config.getDatabaseSchemaName();
             StringBuffer sql = new StringBuffer();
             sql.append("SELECT srid FROM geometry_columns WHERE ");
-            if (dbSchema != null && dbSchema.length() > 0) {
+            if (schemaEnabled && dbSchema != null && dbSchema.length() > 0) {
                 sql.append("f_table_schema='");
                 sql.append(dbSchema);
                 sql.append("' AND ");
@@ -838,7 +839,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             sql.append("SELECT SRID(\"");
             sql.append(geometryColumnName);
             sql.append("\") FROM \"");
-            if (dbSchema != null && dbSchema.length() > 0) {
+            if (schemaEnabled && dbSchema != null && dbSchema.length() > 0) {
                 sql.append(dbSchema);
                 sql.append("\".\"");
             }
@@ -1007,7 +1008,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             StringBuffer sql = new StringBuffer();
             sql.append("SELECT type FROM geometry_columns WHERE ");
             String dbSchema = config.getDatabaseSchemaName();
-            if (dbSchema != null && dbSchema.length() > 0) {
+            if (schemaEnabled && dbSchema != null && dbSchema.length() > 0) {
                 sql.append("f_table_schema='");
                 sql.append(dbSchema);
                 sql.append("' AND ");
@@ -1045,7 +1046,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     sql.append(columnName);
                     sql.append("\") FROM \"");
                 }
-                if (dbSchema != null && dbSchema.length() > 0) {
+                if (schemaEnabled && dbSchema != null && dbSchema.length() > 0) {
                     sql.append(dbSchema);
                     sql.append("\".\"");
                 }
@@ -1176,15 +1177,19 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             con.setAutoCommit(false);
             st = con.createStatement();
 
-            StringBuffer statementSQL = new StringBuffer("CREATE TABLE " + sqlb.encodeTableName( tableName ) + 
-            		" (" + sqlb.encodeColumnName( fidColumn ) + " serial PRIMARY KEY,");
-            statementSQL.append(makeSqlCreate(attributeType) + ");");
+            StringBuffer sql = new StringBuffer("CREATE TABLE ");
+			sql.append(sqlb.encodeTableName(tableName));            
+            sql.append(" (\"");
+            sql.append(sqlb.encodeColumnName(fidColumn));
+            sql.append(" serial PRIMARY KEY,");
+            sql.append(makeSqlCreate(attributeType));
+            sql.append(");");
 
-            String sql = statementSQL.toString();
-            LOGGER.info(sql);
+            String sqlStr = sql.toString();
+            LOGGER.info(sqlStr);
 
             if (shouldExecute) {
-                st.execute(sql);
+                st.execute(sqlStr);
             }
 
             //fix from pr: it may be that table existed and then was dropped
@@ -1193,17 +1198,20 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             //Preserving case for table names gives problems, 
             //so convert to lower case
             
-            statementSQL = new StringBuffer(
-                "DELETE FROM GEOMETRY_COLUMNS WHERE f_table_catalog=''"
-                + " AND f_table_schema = '" + dbSchema
-                + "' AND f_table_name = '" + tableName + "';");
+            sql = new StringBuffer("DELETE FROM GEOMETRY_COLUMNS WHERE f_table_catalog=''");
+            sql.append(" AND f_table_schema = '");
+            sql.append(dbSchema);
+            sql.append("'");
+            sql.append("AND f_table_name = '");
+            sql.append(tableName);
+            sql.append("';");
 
             //prints statement for later reuse
-            sql = statementSQL.toString();
-            LOGGER.info(sql);
+            sqlStr = sql.toString();
+            LOGGER.info(sqlStr);
 
             if (shouldExecute) {
-                st.execute(sql);
+                st.execute(sqlStr);
             }
 
             //Ok, so Paolo Rizzi suggested that we get rid of our hand-adding
@@ -1278,46 +1286,73 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 //                    ); //assumes 2-D
                     
                 	//add a row to the geometry_columns table
-                    statementSQL = new StringBuffer(
-                        "INSERT INTO GEOMETRY_COLUMNS VALUES (" + "'',"
-                        + "'" + dbSchema + "'," + "'" + tableName + "',"
-                        + "'" + columnName + "'," + "2," + SRID + ",'"
-                        + typeName + "');");
+                    sql = new StringBuffer("INSERT INTO GEOMETRY_COLUMNS VALUES (");
+                    sql.append("'','");
+                    sql.append(dbSchema);
+                    sql.append("','");
+                    sql.append(tableName);
+                    sql.append("','");
+                    sql.append(columnName);
+                    sql.append("',2,");
+                    sql.append(SRID);
+                    sql.append(",'");
+                    sql.append(typeName);
+                    sql.append("');");
                     
-                    sql = statementSQL.toString();
-                    LOGGER.info(sql);
+                    sqlStr = sql.toString();
+                    LOGGER.info(sqlStr);
 
                     if (shouldExecute) {
-                        st.execute(sql);
+                        st.execute(sqlStr);
                     }
                     
                     //add geometry constaints to the table
                     if (SRID > -1) {
-	                    sql = "ALTER TABLE " + sqlb.encodeTableName( tableName ) + 
-	                    " ADD CONSTRAINT enforce_srid_" + columnName + " CHECK (SRID("
-	                        + sqlb.encodeColumnName( columnName ) + ") = " + SRID + ");"; 
-	                    LOGGER.info(sql);
+                        sql = new StringBuffer("ALTER TABLE ");
+                        sql.append(sqlb.encodeTableName(tableName));
+                        sql.append(" ADD CONSTRAINT enforce_srid_");
+                        sql.append(sqlb.encodeColumnName(columnName));
+                        sql.append(" CHECK (SRID(");
+                        sql.append(sqlb.encodeColumnName(columnName));
+                        sql.append(") = ");
+                        sql.append(SRID);
+                        sql.append(");"); 
+                        sqlStr = sql.toString();
+	                    LOGGER.info(sqlStr);
 	                    if (shouldExecute) {
-	                        st.execute(sql);
+	                        st.execute(sqlStr);
 	                    }
                     }
                     
-                    sql = "ALTER TABLE \"" + dbSchema + "\".\"" + tableName
-                        + "\" ADD CONSTRAINT enforce_dims_" + columnName + " CHECK (ndims("
-                        + sqlb.encodeColumnName( columnName ) + ") = 2);"; 
-                    LOGGER.info(sql);
+                    sql = new StringBuffer("ALTER TABLE ");
+                    sql.append(sqlb.encodeTableName(tableName));
+                    sql.append(" ADD CONSTRAINT enforce_dims_");
+                    sql.append(sqlb.encodeColumnName(columnName));
+                    sql.append(" CHECK (ndims(");
+                    sql.append(sqlb.encodeColumnName(columnName));
+                    sql.append(") = 2);");
+                    sqlStr = sql.toString();
+                    LOGGER.info(sqlStr);
                     if (shouldExecute) {
-                        st.execute(sql);
+                        st.execute(sqlStr);
                     }
 
                     if (!typeName.equals("GEOMETRY")) {
-	                    sql = "ALTER TABLE " + sqlb.encodeTableName( tableName ) 
-	                        + " ADD CONSTRAINT enforce_geotype_" + columnName + " CHECK (geometrytype("
-	                        + sqlb.encodeColumnName( columnName ) + ") = '" + typeName + "'::text OR " 
-	                        + sqlb.encodeColumnName( columnName ) + " IS NULL);"; 
-	                    LOGGER.info(sql);
+                        sql = new StringBuffer("ALTER TABLE ");
+                        sql.append(sqlb.encodeTableName(tableName));
+                        sql.append("\" ADD CONSTRAINT enforce_geotype_");
+                        sql.append(sqlb.encodeColumnName(columnName));
+                        sql.append(" CHECK (geometrytype(");
+                        sql.append(sqlb.encodeColumnName(columnName));
+                        sql.append(") = '");
+                        sql.append(typeName);
+                        sql.append("'::text OR ");
+                        sql.append(sqlb.encodeColumnName(columnName));
+                        sql.append(" IS NULL);"); 
+	                    sqlStr = sql.toString();
+                        LOGGER.info(sqlStr);
 	                    if (shouldExecute) {
-	                        st.execute(sql);
+	                        st.execute(sqlStr);
 	                    }
                     }
 
@@ -1328,17 +1363,21 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 
                 
                 //also build a spatial index on each geometry column.
-                statementSQL = new StringBuffer("CREATE INDEX spatial_"
-                    + tableName + "_" + attributeType[i].getName().toLowerCase()
-                    + " ON " + sqlb.encodeTableName( tableName ) 
-                    + " USING GIST (" + sqlb.encodeColumnName( attributeType[i].getName() ) 
-                    + ");");
-
-                sql = statementSQL.toString();
-                LOGGER.info(sql);
+                sql = new StringBuffer("CREATE INDEX spatial_");
+                sql.append(tableName);
+                sql.append("_");
+                sql.append(attributeType[i].getName().toLowerCase());
+                sql.append(" ON ");
+                sql.append(sqlb.encodeTableName(tableName));
+                sql.append(" USING GIST (\"");
+                sql.append(sqlb.encodeColumnName(attributeType[i].getName()));
+                sql.append("\");");
+                
+                sqlStr = sql.toString();
+                LOGGER.info(sqlStr);
 
                 if (shouldExecute) {
-                    st.execute(sql);
+                    st.execute(sqlStr);
                 }
             }
 
