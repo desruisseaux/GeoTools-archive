@@ -7,14 +7,14 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.simple.SimpleTypeBuilder;
 import org.geotools.feature.simple.SimpleTypeFactoryImpl;
-import org.geotools.filter.expression.SimpleFeaturePropertyAccessorFactory.SimpleFeaturePropertyAccessor;
+import org.geotools.filter.expression.SimpleFeaturePropertyAccessorFactory;
 
 import junit.framework.TestCase;
 
 public class SimpleFeaturePropertyAccessorTest extends TestCase {
 
 	Feature feature;
-	SimpleFeaturePropertyAccessor accessor;
+	PropertyAccessor accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	
 	protected void setUp() throws Exception {
 		SimpleTypeBuilder typeBuilder = new SimpleTypeBuilder( new SimpleTypeFactoryImpl() );
@@ -33,7 +33,7 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		builder.add( new Double( 2.0 ) );
 
 		feature = builder.feature( "fid" );
-		accessor = new SimpleFeaturePropertyAccessor();
+		accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	}
 	
 	
@@ -49,15 +49,10 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 	public void testGet() {
 		assertEquals( new Integer( 1 ), accessor.get( feature, "foo", null ) );
 		assertEquals( new Double( 2.0 ), accessor.get( feature, "bar", null ) );
-		assertEquals( "fid", accessor.get( feature, "@id", null) );
-		assertEquals( "fid", accessor.get( feature, "@gml:id", null) );
-		try {
-			accessor.get( feature, "illegal", null );
-			fail( "Should have thrown IllegalArgumentException for illegal attribute");
-		}
-		catch( IllegalArgumentException e ) {
-			
-		}
+		assertEquals( "fid", SimpleFeaturePropertyAccessorFactory.FID_ACCESS.get( feature, "@id", null) );
+		assertEquals( "fid", SimpleFeaturePropertyAccessorFactory.FID_ACCESS.get( feature, "@gml:id", null) );
+                assertFalse( accessor.canHandle( feature, "illegal", null ) );
+		assertNull( accessor.get( feature, "illegal", null ) );
 	}
 	
 	public void testSet() {

@@ -50,6 +50,8 @@ public class Value {
 	 * @return The converted object ( an instance of <param>context</param>, or <code>null</code> ).
 	 */
 	public Object value( Class context ) {
-		return Converters.convert( value, context );
+            if( context.isInstance( value )) return value;
+            
+            return Converters.convert( value, context );
 	}
 }

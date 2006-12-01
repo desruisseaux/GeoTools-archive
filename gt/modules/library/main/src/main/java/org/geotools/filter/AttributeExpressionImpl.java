@@ -21,6 +21,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.expression.PropertyAccessor;
 import org.geotools.filter.expression.PropertyAccessors;
+import org.geotools.filter.expression.Value;
 import org.opengis.filter.expression.ExpressionVisitor;
 
 
@@ -166,7 +167,18 @@ public class AttributeExpressionImpl extends DefaultExpression
         return accessor.get( obj, attPath, null );
    }
    
-    
+   public Object evaluate(Object obj, Class target) {
+       PropertyAccessor accessor =
+               new PropertyAccessors().findPropertyAccessor( obj, attPath, target, null );
+
+       if ( accessor == null ) {
+               return null; //JD:not throwing exception to remain backwards compatabile, just returnign null                
+       }        
+       Object propertyValue = accessor.get( obj, attPath, null );
+       Value value = new Value( propertyValue );
+       return value.value( target ); // pull into the requested shape
+       
+  } 
      /**
      * Return this expression as a string.
      *

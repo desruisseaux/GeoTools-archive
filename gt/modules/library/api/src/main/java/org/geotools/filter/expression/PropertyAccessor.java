@@ -27,14 +27,17 @@ import org.geotools.feature.IllegalAttributeException;
 public interface PropertyAccessor {
     /**
      * Determines if the property accessor can handle the property denoted by <param>xpath</param>.
+     * <p>
+     * Can be used to perform checks against schema to ensure that the propery accessor
+     * will actually work with the provided instance.
+     * </p>
      *
      * @param object The target object.
      * @param xpath An xpath expression denoting a property of the target object.
      *
      * @return <code>true</code> if the property can be accessed, otherwise <code>false</code>
      */
-
-    //boolean canHandle(Object object, String xpath, Class target);
+    boolean canHandle(Object object, String xpath, Class target);
 
     /**
      * Accesses a property of <param>object</param> via xpath expression.

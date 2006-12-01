@@ -1843,13 +1843,15 @@ public final class StreamingRenderer implements GTRenderer {
             Feature f = (Feature) drawMe;
         
             String geomName = getGeometryPropertyName(s).getPropertyName();        
-            if (geomName != null || "".equals(geomName)) {
-    			return ((GeometryAttributeType) f.getFeatureType()
-    					.getAttributeType(geomName)).getCoordinateSystem();
-    		} else {
-    			return ((GeometryAttributeType) f.getFeatureType()
-    					.getDefaultGeometry()).getCoordinateSystem();
-    		}
+            if (geomName == null || "".equals(geomName)) {
+                FeatureType schema = f.getFeatureType();
+                GeometryAttributeType geom = schema.getDefaultGeometry();
+                return geom.getCoordinateSystem();
+            } else {
+                FeatureType schema = f.getFeatureType();
+                GeometryAttributeType geom = (GeometryAttributeType) schema.getAttributeType( geomName );
+                return geom.getCoordinateSystem();
+            }
         }
         else {
             // need to grab this from source.getInfo().getCRS();
@@ -1862,7 +1864,7 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	private PropertyName getGeometryPropertyName(Symbolizer s) {
-		String geomName = ""; // indicate default geometry!
+		String geomName;
 
 		// TODO: fix the styles, the getGeometryPropertyName should probably be
 		// moved into an
@@ -1876,6 +1878,13 @@ public final class StreamingRenderer implements GTRenderer {
 		} else if (s instanceof TextSymbolizer) {
 			geomName = ((TextSymbolizer) s).getGeometryPropertyName();
 		}
+                else {
+                    geomName = "";
+                }
+                
+                if( geomName == null ){
+                    geomName = ""; // indicate default geometry!
+                }
 		return filterFactory.property(geomName);
 	}
 

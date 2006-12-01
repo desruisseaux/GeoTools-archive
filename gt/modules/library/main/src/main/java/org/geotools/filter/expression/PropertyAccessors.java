@@ -34,7 +34,7 @@ public class PropertyAccessors {
 		while( factories.hasNext() ) {
 			PropertyAccessorFactory factory = (PropertyAccessorFactory) factories.next();
 			PropertyAccessor accessor = factory.createPropertyAccessor( object.getClass(), xpath, target, hints ); 
-			if ( accessor != null ) { //&& accessor.canHandle( object, xpath )
+			if ( accessor != null && accessor.canHandle( object, xpath, target ) ){
 				return accessor;
 			}
 		}		

@@ -9,90 +9,115 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * Creates a property accessor for simple features.
  * <p>
- * The created accessor handles a small subset of xpath expressions, a non-nested 
- * "name" which corresponds to a feature attribute, and "@id", corresponding to 
- * the feature id.
+ * The created accessor handles a small subset of xpath expressions, a
+ * non-nested "name" which corresponds to a feature attribute, and "@id",
+ * corresponding to the feature id.
  * </p>
  * 
  * @author Justin Deoliveira, The Open Planning Project
- *
+ * 
  */
 public class SimpleFeaturePropertyAccessorFactory implements
-		PropertyAccessorFactory {
+        PropertyAccessorFactory {
 
-	public PropertyAccessor createPropertyAccessor(Class type, String xpath, Class target, Hints hints) {
-		
-		if ( Feature.class.isAssignableFrom( type ) ) {
-			return new SimpleFeaturePropertyAccessor();
-		}
-		
-		return null;
-	}
+    /** Single instnace is fine - we are not stateful */
+    
+    static PropertyAccessor ATTRIBUTE_ACCESS = new SimpleFeaturePropertyAccessor();
+    static PropertyAccessor DEFAULT_GEOMETRY_ACCESS = new DefaultGeometrySimpleFeaturePropertyAccessor();
+    static PropertyAccessor FID_ACCESS = new FidSimpleFeaturePropertyAccessor();
 
-	static class SimpleFeaturePropertyAccessor implements PropertyAccessor {
-	    /*
-		public boolean canHandle(Object object, String xpath, Class target) {
-			
-			Feature feature = (Feature) object;
-			
-			//1. check for @[<prefix>:]id
-			if ( xpath.matches( "@(\\w+:)?id" ) ) 
-				return true;
-			
-			//2. check if the xpath matches an attribute in the feature type
-			xpath = simple( xpath );
-			if ( feature.getFeatureType().getAttributeType( xpath ) != null ) 
-				return true;
-			
-			return false;
-		}*/
-		
-		public Object get(Object object, String xpath, Class target) {
-			Feature feature = (Feature) object;
-			if( "".equals( xpath ) && target == Geometry.class ){
-                            return feature.getDefaultGeometry();
-                        }
-			if ( xpath.matches( "@(\\w+:)?id" ) ) {
-				return feature.getID();
-			}
-			
-			xpath = simple( xpath );
-			if ( feature.getFeatureType().getAttributeType( xpath ) != null ) {
-				return feature.getAttribute( xpath );
-			}
-			
-			throw new IllegalArgumentException( "Could not handle expression:" + xpath );
-		}
+    public PropertyAccessor createPropertyAccessor(Class type, String xpath,
+            Class target, Hints hints) {
 
-		public void set(Object object, String xpath, Object value, Class target) 
-			throws IllegalAttributeException {
-			Feature feature = (Feature) object;
+        if (!Feature.class.isAssignableFrom(type))
+            return null; // we only work with simple feature
 
-                        if( "".equals( xpath ) && target == Geometry.class ){
-                            feature.setDefaultGeometry( (Geometry) value );
-                        }
-			if ( xpath.matches( "@(\\w+:)?id" ) ) {
-				throw new IllegalAttributeException( "feature id is immutable" );
-			}
-			
-			xpath = simple( xpath );
-			if ( feature.getFeatureType().getAttributeType( xpath ) != null ) {
-				feature.setAttribute( xpath, value );
-				return;
-			}
-			
-			throw new IllegalArgumentException( "Could not handle expression:" + xpath );
-		}
-		
-		
-		protected String simple( String xpath ) {
-			if ( xpath.indexOf(":") != -1 ) {
-				//JD: we strip off namespace prefix, we need new feature model 
-				// to do this property
-				xpath = xpath.substring(xpath.indexOf(":") + 1);
-	        }
-			
-			return xpath;
-		}
-	}
+        if ("".equals(xpath) && target == Geometry.class)
+            return DEFAULT_GEOMETRY_ACCESS;
+
+        if (xpath.matches("@(\\w+:)?id"))
+            return FID_ACCESS;
+
+        return ATTRIBUTE_ACCESS;
+    }
+
+    /**
+     * We strip off namespace prefix, we need new feature model to do this
+     * property
+     * <ul>
+     * <li>BEFORE: foo:bar
+     * <li>AFTER: bar
+     * </ul>
+     * 
+     * @param xpath
+     * @return xpath with any XML prefixes removed
+     */
+    static String stripPrefix(String xpath) {
+        int split = xpath.indexOf(":");
+        if (split != -1) {
+            return xpath.substring(split + 1);
+        }
+        return xpath;
+    }
+
+    /**
+     * Access to Feature Identifier.
+     * 
+     * @author Jody Garnett, Refractions Research Inc.
+     */
+    static class FidSimpleFeaturePropertyAccessor implements PropertyAccessor {        
+        public boolean canHandle(Object object, String xpath, Class target) {
+            return xpath.matches("@(\\w+:)?id");
+        }
+        public Object get(Object object, String xpath, Class target) {
+            Feature feature = (Feature) object;
+            return feature.getID();
+        }
+
+        public void set(Object object, String xpath, Object value, Class target)
+                throws IllegalAttributeException {
+            throw new IllegalAttributeException("feature id is immutable");            
+        }
+    }
+    static class DefaultGeometrySimpleFeaturePropertyAccessor implements PropertyAccessor {
+        
+        public boolean canHandle(Object object, String xpath, Class target) {
+            return "".equals(xpath) && target == Geometry.class && object instanceof Feature;
+        }
+        public Object get(Object object, String xpath, Class target) {
+            Feature feature = (Feature) object;
+
+            return feature.getDefaultGeometry();
+        }
+
+        public void set(Object object, String xpath, Object value, Class target)
+                throws IllegalAttributeException {
+            Feature feature = (Feature) object;
+
+            feature.setDefaultGeometry((Geometry) value);
+        }
+    }
+
+    static class SimpleFeaturePropertyAccessor implements PropertyAccessor {
+        public boolean canHandle(Object object, String xpath, Class target) {
+            Feature feature = (Feature) object;            
+            
+            xpath = stripPrefix(xpath);        
+            return feature.getFeatureType().getAttributeType(xpath) != null;
+        }
+        
+        public Object get(Object object, String xpath, Class target) {
+            Feature feature = (Feature) object;            
+
+            return feature.getAttribute(xpath);
+        }
+
+        public void set(Object object, String xpath, Object value, Class target)
+                throws IllegalAttributeException {
+            Feature feature = (Feature) object;
+
+            feature.setAttribute(xpath, value);
+        }
+    }
+
 }

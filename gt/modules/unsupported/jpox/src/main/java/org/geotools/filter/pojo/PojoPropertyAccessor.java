@@ -33,12 +33,12 @@ class PojoPropertyAccessor implements PropertyAccessor {
         this.info = info;
         this.property = property;
     }
-    /*
+    
     public boolean canHandle(Object object, String xpath, Class target) {
         // We can handle everything! ...yeah, right.. ;)
         return true;
     }
-    */
+    
     PropertyDescriptor access( String name ){
         if( property != null ) return property;
         PropertyDescriptor[] descriptors = info.getPropertyDescriptors();
