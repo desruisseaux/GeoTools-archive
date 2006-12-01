@@ -65,6 +65,8 @@ public final class GMLBindingConfiguration implements BindingConfiguration {
             FeatureArrayPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.FeaturePropertyType,
             FeaturePropertyTypeBinding.class);
+        container.registerComponentImplementation(GML.GeometryPropertyType,
+            GeometryPropertyTypeBinding.class);
         container.registerComponentImplementation(GML.integerList, IntegerListBinding.class);
         container.registerComponentImplementation(GML.LinearRingPropertyType,
             LinearRingPropertyTypeBinding.class);

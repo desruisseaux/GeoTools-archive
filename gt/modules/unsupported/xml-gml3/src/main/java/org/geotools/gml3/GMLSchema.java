@@ -5542,7 +5542,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType GEOMETRYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("GeometryPropertyType", java.lang.Object.class);
+        .newAttributeType("GeometryPropertyType", Geometry.class);
 
     /**
      * <p>

@@ -138,7 +138,7 @@
           <generateBindingInterface>false</generateBindingInterface>
           <generateSchemaLocationResolver>false</generateSchemaLocationResolver>
           <includes>
-						<include>AbstractGeometryType</include>
+						<include>GeometryPropertyType</include>
           </includes>
         </configuration>
       </plugin>
