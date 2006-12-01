@@ -15,12 +15,13 @@
  */
 package org.geotools.xml.impl.jxpath;
 
-import org.apache.commons.jxpath.DynamicPropertyHandler;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.impl.ElementHandler;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import org.apache.commons.jxpath.DynamicPropertyHandler;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.impl.ElementHandler;
 
 
 /**
