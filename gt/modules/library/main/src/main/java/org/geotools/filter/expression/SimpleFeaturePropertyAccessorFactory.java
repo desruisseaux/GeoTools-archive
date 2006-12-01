@@ -21,7 +21,6 @@ public class SimpleFeaturePropertyAccessorFactory implements
         PropertyAccessorFactory {
 
     /** Single instnace is fine - we are not stateful */
-    
     static PropertyAccessor ATTRIBUTE_ACCESS = new SimpleFeaturePropertyAccessor();
     static PropertyAccessor DEFAULT_GEOMETRY_ACCESS = new DefaultGeometrySimpleFeaturePropertyAccessor();
     static PropertyAccessor FID_ACCESS = new FidSimpleFeaturePropertyAccessor();
@@ -35,10 +34,16 @@ public class SimpleFeaturePropertyAccessorFactory implements
         if ("".equals(xpath) && target == Geometry.class)
             return DEFAULT_GEOMETRY_ACCESS;
 
+        //check for fid access
         if (xpath.matches("@(\\w+:)?id"))
             return FID_ACCESS;
 
-        return ATTRIBUTE_ACCESS;
+        //check for simple property acess
+        if (xpath.matches("(\\w+:)?(\\w+)") ) {
+        	return ATTRIBUTE_ACCESS;	
+        }
+        
+        return null;
     }
 
     /**
