@@ -153,8 +153,13 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public PropertyIsEqualTo equals(Expression expr1, Expression expr2) {
-        return new IsEqualsToImpl(this,expr1,expr2);
+        return equal( expr1,expr2,true);
     }
+    
+    public PropertyIsEqualTo equal(Expression expr1, Expression expr2, boolean matchCase) {
+    	return new IsEqualsToImpl(this,expr1,expr2,matchCase); 
+    }
+    
 
     public PropertyIsNotEqualTo notEqual(Expression expr1, Expression expr2) {
         return new IsNotEqualToImpl(this,expr1,expr2);

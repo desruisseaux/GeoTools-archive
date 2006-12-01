@@ -15,7 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.expression.Value;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.expression.Expression;
@@ -31,15 +30,22 @@ public class BinaryComparisonAbstract extends AbstractFilter
 	protected Expression expression1;
 	protected Expression expression2;
 
+	boolean matchingCase;
+	
 	protected BinaryComparisonAbstract(FilterFactory factory) {
 		this(factory,null,null);
 	}
 	
 	protected BinaryComparisonAbstract(FilterFactory factory, Expression expression1, Expression expression2 ) {
+		this(factory,expression1,expression2,true);
+	}
+	
+	protected BinaryComparisonAbstract(FilterFactory factory, Expression expression1, Expression expression2, boolean matchingCase ) {
 		super(factory);
 		this.expression1 = expression1;
 		this.expression2 = expression2;		
-	}
+		this.matchingCase = matchingCase;
+	} 
 	
 	public Expression getExpression1() {
 		return expression1;
@@ -55,6 +61,10 @@ public class BinaryComparisonAbstract extends AbstractFilter
 	
 	public void setExpression2(Expression expression) {
 		this.expression2 = expression;
+	}
+	
+	public boolean isMatchingCase() {
+		return matchingCase;
 	}
 	
 	public Filter and(org.opengis.filter.Filter filter) {        
