@@ -15,6 +15,13 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+import java.util.logging.Logger;
+
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchema;
@@ -34,12 +41,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.NamespaceSupport;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
-import java.util.logging.Logger;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -154,6 +155,7 @@ public class ParserHandler extends DefaultHandler {
         //setup the namespace support
         namespaces = new NamespaceSupport();
         context.registerComponentInstance(namespaces);
+        context.registerComponentInstance( new NamespaceSupportWrapper( namespaces ) );
         
         //binding factory support
         bindingFactory = new BindingFactoryImpl( bindingLoader );

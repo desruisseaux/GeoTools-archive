@@ -15,15 +15,15 @@
  */
 package org.geotools.xml.impl.jxpath;
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathContextFactory;
 import org.apache.commons.jxpath.JXPathIntrospector;
-import org.apache.commons.jxpath.ri.JXPathContextFactoryReferenceImpl;
-import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.geotools.xml.impl.ElementHandlerImpl;
 import org.geotools.xml.impl.ElementImpl;
-import java.util.Iterator;
 
 
 public class JXPathTest extends TestCase {

@@ -15,6 +15,11 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
@@ -23,19 +28,13 @@ import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
-import org.geotools.xml.BindingFactory;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 import org.picocontainer.defaults.DefaultPicoContainer;
-import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import javax.xml.namespace.QName;
 
 
 public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {

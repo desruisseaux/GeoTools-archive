@@ -15,12 +15,13 @@
  */
 package org.geotools.xml.impl;
 
-import org.geotools.xml.InstanceComponent;
-import org.geotools.xml.Node;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import org.geotools.xml.InstanceComponent;
+import org.geotools.xml.Node;
 
 
 public class NodeImpl implements Node {

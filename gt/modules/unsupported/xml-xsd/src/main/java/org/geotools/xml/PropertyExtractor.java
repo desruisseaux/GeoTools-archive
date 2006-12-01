@@ -1,7 +1,6 @@
 package org.geotools.xml;
 
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 

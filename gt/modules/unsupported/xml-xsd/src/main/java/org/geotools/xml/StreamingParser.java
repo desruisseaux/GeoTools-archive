@@ -15,20 +15,18 @@
  */
 package org.geotools.xml;
 
-import org.geotools.xml.impl.ElementNameStreamingParserHandler;
-import org.geotools.xml.impl.StreamingParserHandler;
-import org.geotools.xml.impl.TypeStreamingParserHandler;
-import org.geotools.xml.impl.jxpath.JXPathStreamingParserHandler;
-import org.xml.sax.SAXException;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.geotools.xml.impl.ElementNameStreamingParserHandler;
+import org.geotools.xml.impl.StreamingParserHandler;
+import org.geotools.xml.impl.TypeStreamingParserHandler;
+import org.geotools.xml.impl.jxpath.JXPathStreamingParserHandler;
+import org.xml.sax.SAXException;
 
 
 /**

@@ -15,15 +15,13 @@
  */
 package org.geotools.xml.impl;
 
-import java.util.List;
+import javax.xml.namespace.QName;
 
 import org.geotools.xml.Binding;
-import org.geotools.xml.BindingFactory;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
-import javax.xml.namespace.QName;
 
 
 public class BindingLoader {

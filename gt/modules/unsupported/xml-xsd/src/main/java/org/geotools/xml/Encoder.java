@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +26,6 @@ import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDTypeDefinition;
-import org.eclipse.xsd.util.XSDConstants;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.impl.AttributeEncodeExecutor;
 import org.geotools.xml.impl.BindingFactoryImpl;
@@ -32,9 +33,9 @@ import org.geotools.xml.impl.BindingLoader;
 import org.geotools.xml.impl.BindingPropertyExtractor;
 import org.geotools.xml.impl.BindingWalker;
 import org.geotools.xml.impl.BindingWalkerFactoryImpl;
-import org.geotools.xml.impl.ElementEncodeExecutor;
 import org.geotools.xml.impl.ElementEncoder;
 import org.geotools.xml.impl.GetPropertyExecutor;
+import org.geotools.xml.impl.NamespaceSupportWrapper;
 import org.geotools.xml.impl.SchemaIndexImpl;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
@@ -133,6 +134,11 @@ public class Encoder {
         }
 
         encoder.setLogger( logger );
+        
+        //namespaces
+        namespaces = new NamespaceSupport();
+        context.registerComponentInstance( namespaces );
+        context.registerComponentInstance( new NamespaceSupportWrapper( namespaces ) );
 	}
 	
 	/**
@@ -162,7 +168,6 @@ public class Encoder {
 		serializer.startDocument();
 		
 		//write out all the namespace prefix value mappings
-		namespaces = new NamespaceSupport();
 		for (Iterator itr = schema.getQNamePrefixToNamespaceMap()
 			.entrySet().iterator(); itr.hasNext();) {
 			
@@ -256,19 +261,55 @@ public class Encoder {
 							
 							//match up the type
 							if ( binding.getType().isAssignableFrom( entry.object.getClass() ) ) {
-								//we have a match
-								matches.add( e );
+								//we have a match, store as an (element,binding) tuple
+								matches.add( new Object[]{e,binding} );
 							}
 						}
 						
 						//if one, we are gold
 						if ( matches.size() == 1 ) {
-							entry.element = (XSDElementDeclaration) matches.get( 0 );	
+							entry.element = (XSDElementDeclaration) ((Object[])matches.get( 0 ))[0];	
 						}
-						//if multiple we have a problem, jsut die
+						//if multiple we have a problem
 						else if ( matches.size() > 0 ) {
-							String msg = "Found multiple non-abstract bindings for " + entry.element.getName();
-							throw new IllegalStateException( msg );
+							//try sorting by the type of the binding
+							Collections.sort( 
+								matches, new Comparator() {
+
+									public int compare(Object o1, Object o2) {
+										Object[] match1 = (Object[]) o1;
+										Object[] match2 = (Object[]) o2;
+										
+										Binding b1 = (Binding) match1[ 1 ];
+										Binding b2 = (Binding) match2[ 1 ];
+										
+										if ( b2.getType().isAssignableFrom( b1.getType() ) ) {
+											return -1;
+										}
+										if ( b1.getType().isAssignableFrom( b2.getType() ) ) {
+											return 1;
+										}
+										
+										return 0;
+									}
+									
+								}
+							);
+							
+							//if first two are not equal we are cool
+							Binding b1 = (Binding) ((Object[])matches.get( 0 ))[1];
+							Binding b2 = (Binding) ((Object[])matches.get( 1 ))[1];
+							
+							if ( !b1.getType().equals( b2.getType() ) ) {
+								entry.element = (XSDElementDeclaration) ((Object[])matches.get( 0 ))[0];
+							}
+							else {
+								//nothing more we can do, cant determine the best binding to 
+								//match to the abstract element
+								String msg = "Found multiple non-abstract bindings for " + entry.element.getName();
+								throw new IllegalStateException( msg );
+							}
+							
 						}
 						
 						//if zero, just use the absttract element

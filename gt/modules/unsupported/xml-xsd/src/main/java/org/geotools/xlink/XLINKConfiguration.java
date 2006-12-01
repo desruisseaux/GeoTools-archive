@@ -1,8 +1,5 @@
 package org.geotools.xlink;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.geotools.xlink.bindings.XLINK;
 import org.geotools.xlink.bindings.XLINKBindingConfiguration;

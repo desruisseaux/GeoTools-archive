@@ -19,18 +19,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import junit.framework.TestCase;
 
 import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.util.XSDResourceImpl.SchemaLocator;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.DOMParser;
 import org.geotools.xml.Encoder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 
 /**

@@ -1,16 +1,8 @@
 package org.geotools.xml.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
-
 import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDTypeDefinition;
-import org.geotools.xml.Binding;
-import org.geotools.xml.Schemas;
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

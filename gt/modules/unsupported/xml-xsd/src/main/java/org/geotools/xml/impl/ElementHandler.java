@@ -15,11 +15,11 @@
  */
 package org.geotools.xml.impl;
 
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import java.util.List;
-import javax.xml.namespace.QName;
 
 
 /**

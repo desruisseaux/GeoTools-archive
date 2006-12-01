@@ -309,6 +309,7 @@ public abstract class Configuration {
 	 * For schema which are defined by multiple files, this method should return the base schema 
 	 * which includes all other files that define the schema.
 	 * </p>
+	 * TODO: rename this to getSchemaConfiguration()
 	 */
 	abstract public String getSchemaFileURL();
 	

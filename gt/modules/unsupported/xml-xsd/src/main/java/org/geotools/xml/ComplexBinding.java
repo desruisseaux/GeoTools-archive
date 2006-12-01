@@ -15,10 +15,11 @@
  */
 package org.geotools.xml;
 
+import javax.xml.namespace.QName;
+
 import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import javax.xml.namespace.QName;
 
 
 /**

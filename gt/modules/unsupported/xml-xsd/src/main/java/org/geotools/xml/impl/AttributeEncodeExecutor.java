@@ -1,15 +1,10 @@
 package org.geotools.xml.impl;
 
 import org.eclipse.xsd.XSDAttributeDeclaration;
-import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.xml.Binding;
-import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.SimpleBinding;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 
 public class AttributeEncodeExecutor implements BindingWalker.Visitor {
 

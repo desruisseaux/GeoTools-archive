@@ -2,9 +2,7 @@ package org.geotools.xml.impl;
 
 import javax.xml.namespace.QName;
 
-import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDNamedComponent;
-import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ComplexBinding;
 

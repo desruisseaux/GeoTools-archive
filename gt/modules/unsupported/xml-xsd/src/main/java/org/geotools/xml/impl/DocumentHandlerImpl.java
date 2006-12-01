@@ -19,9 +19,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
-import javax.xml.namespace.QName;
 
 
 public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler {

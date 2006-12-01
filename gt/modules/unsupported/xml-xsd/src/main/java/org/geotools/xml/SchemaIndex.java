@@ -15,6 +15,8 @@
  */
 package org.geotools.xml;
 
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDAttributeGroupDefinition;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
@@ -22,7 +24,6 @@ import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
-import javax.xml.namespace.QName;
 
 
 public interface SchemaIndex {

@@ -18,10 +18,11 @@ package org.geotools.xml.impl;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
-import javax.xml.namespace.QName;
 
 
 public class AttributeHandlerImpl extends HandlerImpl

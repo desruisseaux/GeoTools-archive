@@ -15,10 +15,6 @@
  */
 package org.geotools.xml;
 
-import org.eclipse.xsd.XSDSchema;
-import org.geotools.xml.impl.ParserHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +27,11 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.eclipse.xsd.XSDSchema;
+import org.geotools.xml.impl.ParserHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 
 /**

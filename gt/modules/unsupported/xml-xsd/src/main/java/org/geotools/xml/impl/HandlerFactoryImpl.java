@@ -15,10 +15,11 @@
  */
 package org.geotools.xml.impl;
 
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.geotools.xml.SchemaIndex;
-import javax.xml.namespace.QName;
 
 
 public class HandlerFactoryImpl implements HandlerFactory {

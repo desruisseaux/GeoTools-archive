@@ -17,10 +17,11 @@ package org.geotools.xml.impl;
 
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
 import org.picocontainer.MutablePicoContainer;
-import javax.xml.namespace.QName;
 
 
 /**

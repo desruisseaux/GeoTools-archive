@@ -15,9 +15,10 @@
  */
 package org.geotools.xml.impl;
 
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
-import javax.xml.namespace.QName;
 
 
 /**

@@ -15,6 +15,11 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDFeature;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
@@ -22,10 +27,6 @@ import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.Binding;
 import org.geotools.xs.bindings.XSAnyTypeBinding;
 import org.picocontainer.MutablePicoContainer;
-import java.util.ArrayList;
-import java.util.Stack;
-import java.util.logging.Logger;
-import javax.xml.namespace.QName;
 
 
 public class BindingWalker implements TypeWalker.Visitor {
