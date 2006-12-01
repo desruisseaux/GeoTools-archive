@@ -15,12 +15,14 @@
  */
 package org.geotools.xs.facets;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+
+import javax.xml.bind.ValidationException;
+
 import org.eclipse.xsd.XSDLengthFacet;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
-import java.lang.reflect.Array;
-import java.util.Collection;
-import javax.xml.bind.ValidationException;
 
 
 /**

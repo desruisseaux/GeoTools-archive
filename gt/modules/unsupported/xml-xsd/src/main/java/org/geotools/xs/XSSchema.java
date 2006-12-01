@@ -15,9 +15,6 @@
  */
 package org.geotools.xs;
 
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.type.SchemaImpl;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -26,6 +23,10 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
+import org.geotools.feature.type.SchemaImpl;
 
 
 public class XSSchema extends SchemaImpl {

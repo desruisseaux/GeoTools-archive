@@ -1,8 +1,5 @@
 package org.geotools.xs;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.geotools.xml.BindingConfiguration;

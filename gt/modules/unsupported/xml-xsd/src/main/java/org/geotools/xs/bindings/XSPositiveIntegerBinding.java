@@ -17,10 +17,11 @@ package org.geotools.xs.bindings;
 
 import java.math.BigInteger;
 
-import org.geotools.xml.InstanceComponent;
-import org.geotools.xml.SimpleBinding;
 import javax.xml.bind.ValidationException;
 import javax.xml.namespace.QName;
+
+import org.geotools.xml.InstanceComponent;
+import org.geotools.xml.SimpleBinding;
 
 
 /**

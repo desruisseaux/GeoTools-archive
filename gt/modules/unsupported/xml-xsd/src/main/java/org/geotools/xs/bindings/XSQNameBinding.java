@@ -15,15 +15,14 @@
  */
 package org.geotools.xs.bindings;
 
-import com.sun.xml.bind.DatatypeConverterImpl;
-import org.geotools.xml.InstanceComponent;
-import org.geotools.xml.SimpleBinding;
-import org.xml.sax.helpers.NamespaceSupport;
-import java.util.Enumeration;
-import java.util.Iterator;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+
+import org.geotools.xml.InstanceComponent;
+import org.geotools.xml.SimpleBinding;
+
+import com.sun.xml.bind.DatatypeConverterImpl;
 
 
 /**
@@ -60,12 +59,11 @@ import javax.xml.namespace.QName;
  * @generated
  */
 public class XSQNameBinding implements SimpleBinding {
-    NamespaceSupport namespaceSupport;
+    
     NamespaceContext namespaceContext;
 
-    public XSQNameBinding(NamespaceSupport namespaceSupport) {
-        this.namespaceSupport = namespaceSupport;
-        namespaceContext = new NamespaceSupportWrappper();
+    public XSQNameBinding(NamespaceContext namespaceContext) {
+        this.namespaceContext = namespaceContext;
         
         DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
     }
@@ -136,35 +134,5 @@ public class XSQNameBinding implements SimpleBinding {
     	return DatatypeConverter.printQName( (QName) object, namespaceContext );
     }
     
-    /**
-     * NamespaceContext wrapper around namespace support.
-     */
-    class NamespaceSupportWrappper implements NamespaceContext {
-        public String getNamespaceURI(String prefix) {
-            return XSQNameBinding.this.namespaceSupport.getURI(prefix);
-        }
-
-        public String getPrefix(String namespaceURI) {
-            return XSQNameBinding.this.namespaceSupport.getPrefix(namespaceURI);
-        }
-
-        public Iterator getPrefixes(String namespaceURI) {
-            final Enumeration e = XSQNameBinding.this.namespaceSupport
-                .getPrefixes(namespaceURI);
-
-            return new Iterator() {
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-
-                    public boolean hasNext() {
-                        return e.hasMoreElements();
-                    }
-
-                    public Object next() {
-                        return e.nextElement();
-                    }
-                };
-        }
-    }
+   
 }
