@@ -34,15 +34,25 @@ import org.opengis.coverage.Coverage;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 
+
 /**
  * This operation is simply a wrapper for the JAI scale operation which allows
  * me to arbitrarly scale and translate a rendered image.
- *  
+ *
+ * @todo Consider refactoring as a {@code OperationJAI} subclass. We could get ride of the
+ *       {@code ScaledGridCoverage2D} class. The main feature to add is the
+ *       copy of interpolation and border extender parameters to the hints.
+ *
+ * @source $URL$
+ * @version $Id$
  * @author Simone Giannecchini
+ * @since 2.3
+ *
+ * @see javax.media.jai.operator.ScaleDescriptor
  */
 public class Scale extends Operation2D {
 	/**
-	 * 
+	 * Serial number for cross-version compatibility.
 	 */
 	private static final long serialVersionUID = -3212656385631097713L;
 

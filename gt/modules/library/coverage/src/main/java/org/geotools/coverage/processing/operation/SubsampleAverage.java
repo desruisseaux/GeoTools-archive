@@ -29,17 +29,22 @@ import org.opengis.coverage.Coverage;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 
+
 /**
+ * TODO: Need documentation
+ *
+ * @todo Consider refactoring as a {@code OperationJAI} subclass. We could get ride of the
+ *       {@code SubsampledAverageGridCoverage2D} class. The main feature to add is the
+ *       copy of interpolation and border extender parameters to the hints.
+ *
+ * @source $URL$
+ * @version $Id$
  * @author Simone Giannecchini
  * @since 2.3
+ *
+ * @see javax.media.jai.operator.SubsampleAverageDescriptor
  */
 public class SubsampleAverage extends Operation2D {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * 
 	 */

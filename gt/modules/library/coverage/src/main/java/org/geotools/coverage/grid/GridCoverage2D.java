@@ -45,7 +45,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -439,7 +438,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Return the value vector as a Set for a given point in the coverage.
+     * Return the value vector for a given point in the coverage.
      * A value for each sample dimension is included in the vector.
      */
     public Object evaluate(final DirectPosition point) throws CannotEvaluateException {
@@ -710,19 +709,33 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     }
 
     /**
-     * Display this coverage in a windows. This convenience method is used for debugging purpose.
-     * The exact appareance of the windows and the tools provided may changes in future versions.
+     * {inheritDoc}
      */
-    public void show() {
-    	final GridCoverage2D gc= geophysics(false);
-    	final StringBuffer buff= new StringBuffer(gc.getName().toString());
-    	final int visibleBandIndex= CoverageUtilities.getVisibleBand(gc);
-    	final SampleDimension visibleBand=gc.getSampleDimension(visibleBandIndex);
-    	final Unit unit= visibleBand.getUnits();
-    	buff.append(" - ").append(visibleBand.getDescription().toString());
-    	if(unit!=null)
-    		buff.append(" (").append(unit.toString()).append(")");
-        gc.show(buff.toString(),gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
+    public void show(String title, final int xAxis, final int yAxis) {
+        final GridCoverage2D displayable = geophysics(false);
+        if (displayable != this) {
+            displayable.show(title, xAxis, yAxis);
+            return;
+        }
+        if (title == null || (title = title.trim()).length() == 0) {
+            final StringBuffer buffer  = new StringBuffer(String.valueOf(getName()));
+            final int visibleBandIndex = CoverageUtilities.getVisibleBand(this);
+            final SampleDimension visibleBand = getSampleDimension(visibleBandIndex);
+            final Unit unit = visibleBand.getUnits();
+            buffer.append(" - ").append(String.valueOf(visibleBand.getDescription()));
+            if (unit != null) {
+                buffer.append(" (").append(unit).append(')');
+            }
+            title = buffer.toString();
+        }
+        super.show(title, xAxis, yAxis);
+    }
+
+    /**
+     * {inheritDoc}
+     */
+    public void show(final String title) {
+        show(title, gridGeometry.axisDimensionX, gridGeometry.axisDimensionY);
     }
 
     /**
@@ -882,8 +895,8 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         final int                      numBands = image.getNumBands();
         final int                   visibleBand = CoverageUtilities.getVisibleBand(image);
         final GridSampleDimension[] targetBands = (GridSampleDimension[]) sampleDimensions.clone();
-        final int length=targetBands.length;
-        assert targetBands.length == numBands : length;
+        final int length = targetBands.length;
+        assert length == numBands : length;
         for (int i=0; i<length; i++) {
             targetBands[i] = targetBands[i].geophysics(geo);
         }

@@ -44,14 +44,14 @@ import org.geotools.util.NumberRange;
 /**
  * Edge detector which computes the magnitude of the image gradient vector in two orthogonal
  * directions. The result of the {@code "GradientMagnitude"} operation may be defined as:
- * <BR>
+ * <p>
  *   <BLOCKQUOTE><CODE>
  *   dst[<var>x</var>][<var>y</var>][<var>b</var>] = {@linkplain Math#sqrt sqrt}(
  *   <strong>SH</strong>(<var>x</var>,<var>y</var>,<var>b</var>)<sup>2</sup> +
  *   <strong>SV</strong>(<var>x</var>,<var>y</var>,<var>b</var>)<sup>2</sup>)
  *   &times; <var>scale</var>
  *   </CODE></BLOCKQUOTE>
- * </BR>
+ * <p>
  * where {@code SH(x,y,b)} and {@code SV(x,y,b)} are the horizontal and vertical gradient images
  * generated from band <var>b</var> of the source image by correlating it with the supplied
  * orthogonal (horizontal and vertical) gradient masks.
@@ -152,7 +152,7 @@ public class GradientMagnitude extends OperationJAI {
      * appears in different colors.
      */
     private static final double DEFAULT_RANGE_SCALE = 1.0;
-    
+
     /**
      * The default color palette for the gradients.
      */
@@ -160,26 +160,26 @@ public class GradientMagnitude extends OperationJAI {
         new Color( 16, 32, 64),
         new Color(192,224,255)
     };
-    
+
     /**
      * A flag indicating that {@link #getNormalizationFactorSquared}
      * should tests the horizontal gradient computed by the supplied kernel.
      */
     private static final int HORIZONTAL = 1;
-    
+
     /**
      * A flag indicating that {@link #getNormalizationFactorSquared}
      * should tests the vertical gradient computed by the supplied kernel.
      */
     private static final int VERTICAL = 2;
-    
+
     /**
      * Constructs a default gradient magnitude operation.
      */
     public GradientMagnitude() {
         super("GradientMagnitude");
     }
-    
+
     /**
      * Returns a scale factor for the supplied kernel. If {@code kernel} computes horizontal
      * grandient, this method returns {@code scaleX}. Otherwise, if {@code kernel} computes
@@ -194,7 +194,7 @@ public class GradientMagnitude extends OperationJAI {
         double factor2 = (factorX*scaleX + factorY*scaleY) / (factorX+factorY);
         return Math.sqrt(factor2);
     }
-    
+
     /**
      * Returns the square of a normalization factor for the supplied kernel.
      * The kernel can be normalized by invoking {@link #divide(KernelJAI,double)}
@@ -239,7 +239,7 @@ public class GradientMagnitude extends OperationJAI {
         }
         return (sumH*sumH) + (sumV*sumV);
     }
-    
+
     /**
      * Returns the normalization factor for the supplied kernel. The kernel can
      * be normalized by invoking {@link #divide(KernelJAI,double)} with this factor.
@@ -266,7 +266,7 @@ public class GradientMagnitude extends OperationJAI {
         factor  = Math.sqrt(factor/2);
         return factor;
     }
-    
+
     /**
      * Divides a kernel by some number.
      *
@@ -277,16 +277,16 @@ public class GradientMagnitude extends OperationJAI {
     private static KernelJAI divide(KernelJAI kernel, final double denominator) {
         if (denominator != 1) {
             final float[] data = kernel.getKernelData();
-			final int length = data.length;
-			for (int i = 0; i < length; i++) {
+            final int length = data.length;
+            for (int i=0; i<length; i++) {
                 data[i] /= denominator;
             }
             kernel = new KernelJAI(kernel.getWidth(),   kernel.getHeight(),
-            kernel.getXOrigin(), kernel.getYOrigin(), data);
+                                   kernel.getXOrigin(), kernel.getYOrigin(), data);
         }
         return kernel;
     }
-    
+
     /**
      * Applies the operation on grid coverage. The default implementation looks for kernels
      * specified in the {@link org.geotools.coverage.processing.OperationJAI.Parameters#parameters
@@ -343,7 +343,7 @@ public class GradientMagnitude extends OperationJAI {
         }
         return super.deriveGridCoverage(sources, parameters);
     }
-    
+
     /**
      * Derives the quantitative category for a band in the destination image.
      * This implementation computes the expected gradient range from the two
@@ -383,7 +383,7 @@ public class GradientMagnitude extends OperationJAI {
         }
         return super.deriveCategory(categories, parameters);
     }
-    
+
     /**
      * Derives the unit of data for a band in the destination image.
      * This method compute {@code sample}/{@code axis} where:

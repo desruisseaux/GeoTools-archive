@@ -38,12 +38,21 @@ import org.opengis.spatialschema.geometry.Envelope;
 /**
  * The crop operation is responsible for selecting geographic subareas of the
  * source coverage.
- * 
+ *
+ * @todo Consider refactoring as a {@code OperationJAI} subclass. We could get ride of the
+ *       {@code CroppedGridCoverage2D} class. The main feature to add is the
+ *       copy of interpolation and border extender parameters to the hints.
+ *
+ * @source $URL$
+ * @version $Id$
  * @author Simone Giannecchini
+ * @since 2.3
+ *
+ * @see javax.media.jai.operator.ScaleDescriptor
  */
 public class Crop extends Operation2D {
 	/**
-	 * 
+	 * Serial number for cross-version compatibility.
 	 */
 	private static final long serialVersionUID = 4466072819239413456L;
 

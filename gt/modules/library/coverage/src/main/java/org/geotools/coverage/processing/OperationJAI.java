@@ -180,9 +180,9 @@ public class OperationJAI extends Operation2D {
         ensureRenderedImage(operation.getDestClass(RENDERED_MODE));
         final Class[] sourceClasses = operation.getSourceClasses(RENDERED_MODE);
         if (sourceClasses != null) {
-			final int length = sourceClasses.length;
-			assert length == operation.getNumSources();
-			for (int i = 0; i < length; i++) {
+            final int length = sourceClasses.length;
+            assert length == operation.getNumSources();
+            for (int i=0; i<length; i++) {
                 ensureRenderedImage(sourceClasses[i]);
             }
         }
@@ -299,8 +299,7 @@ public class OperationJAI extends Operation2D {
         final String[]     sourceNames = operation.getSourceNames();
         final GridCoverage2D[] sources = new GridCoverage2D[sourceNames.length];
         final boolean computeOnGeophysicsValues = computeOnGeophysicsValues(parameters);
-		final int sourceNamesLength = sourceNames.length;
-		for (int i = 0; i < sourceNamesLength; i++) {
+        for (int i=0; i<sourceNames.length; i++) {
             GridCoverage2D source = (GridCoverage2D) parameters.parameter(sourceNames[i]).getValue();
             if (computeOnGeophysicsValues) {
                 final GridCoverage2D old = source;
@@ -452,8 +451,7 @@ public class OperationJAI extends Operation2D {
          * and "tail" CRS will be preserved before and after 'crs2D'.
          */
         final AbstractProcessor processor = getProcessor(hints);
-		final int length = sources.length;
-		for (int i = 0; i < length; i++) {
+        for (int i=0; i<sources.length; i++) {
             final GridCoverage2D            source    = sources[i];
             final GridGeometry2D            geometry  = (GridGeometry2D) source.getGridGeometry();
             final CoordinateReferenceSystem srcCrs2D  = source.getCoordinateReferenceSystem2D();
@@ -580,8 +578,7 @@ public class OperationJAI extends Operation2D {
          * account the visible band.
          */
         final GridSampleDimension[][] list = new GridSampleDimension[sources.length][];
-		final int listlength = list.length;
-		for (int i = 0; i < listlength; i++) {
+        for (int i=0; i<list.length; i++) {
             list[i] = sources[i].getSampleDimensions();
         }
         final GridSampleDimension[] sampleDims = deriveSampleDimension(list, parameters);
@@ -638,7 +635,7 @@ public class OperationJAI extends Operation2D {
          */
         final InternationalString      name = deriveName(sources, primarySourceIndex, parameters);
         final CoordinateReferenceSystem crs = primarySource.getCoordinateReferenceSystem();
-        final MathTransform           toCRS = primarySource.getGridGeometry().getGridToCoordinateSystem();
+        final MathTransform           toCRS = primarySource.getGridGeometry().getGridToCRS();
         final RenderedImage            data = createRenderedImage(parameters.parameters, hints);
         return getFactory(parameters.hints)
                 .create(name,        // The grid coverage name
@@ -657,8 +654,7 @@ public class OperationJAI extends Operation2D {
      */
     private static int getQuantitative(final Category[] categories) {
         int index = -1;
-		final int length = categories.length;
-		for (int i = 0; i < length; i++) {
+        for (int i=0; i<categories.length; i++) {
             if (categories[i].isQuantitative()) {
                 if (index >= 0) {
                     return -1;
@@ -710,8 +706,7 @@ public class OperationJAI extends Operation2D {
          * handle those cases.
          */
         int numBands = 1;
-		final int bandListsLength = bandLists.length;
-		for (int i = 0; i < bandListsLength; i++) {
+        for (int i=0; i<bandLists.length; i++) {
             final int nb = bandLists[i].length;
             if (nb != 1) {
                 if (numBands!=1 && nb!=numBands) {
@@ -784,8 +779,7 @@ public class OperationJAI extends Operation2D {
      */
     protected Category deriveCategory(final Category[] categories, final Parameters parameters) {
         final NumberRange[] ranges = new NumberRange[categories.length];
-		final int rangesLength = ranges.length;
-		for (int i = 0; i < rangesLength; i++) {
+        for (int i=0; i<ranges.length; i++) {
             ranges[i] = categories[i].getRange();
         }
         final NumberRange range = deriveRange(ranges, parameters);
@@ -868,8 +862,7 @@ public class OperationJAI extends Operation2D {
             };
         } else {
             names = new InternationalString[sources.length];
-			final int namesLength = names.length;
-			for (int i = 0; i < namesLength; i++) {
+            for (int i=0; i<names.length; i++) {
                 names[i] = sources[i].getName();
             }
         }

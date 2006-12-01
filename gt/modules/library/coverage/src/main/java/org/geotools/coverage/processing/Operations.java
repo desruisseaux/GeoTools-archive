@@ -34,6 +34,7 @@ import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
+
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -80,6 +81,15 @@ public class Operations {
         }
         // Otherwise, will creates the processor only when first needed.
     }
+
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                 ////////
+    ////////            A R I T H M E T I C   O P E R A T I O N S            ////////
+    ////////                                                                 ////////
+    /////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Adds constants (one for each band) to every sample values of the source coverage.
@@ -199,13 +209,46 @@ public class Operations {
     }
 
     /**
+     * Replaces {@link Float#NaN NaN} values by the weighted average of neighbors values.
+     * This method uses the default padding and validity threshold.
+     *
+     * @param source The source coverage.
+     *
+     * @see org.geotools.coverage.processing.operation.NodataFilter
+     */
+    public GridCoverage nodataFilter(final GridCoverage source) {
+        return (GridCoverage) doOperation("NodataFilter", source);
+    }
+
+    /**
+     * Replaces {@link Float#NaN NaN} values by the weighted average of neighbors values.
+     * 
+     * @param source  The source coverage.
+     * @param padding The number of pixels above, below, to the left and to the right of central
+     *        {@code NaN} pixel to use for computing the average. The default value is 1.
+     * @param validityThreshold The minimal number of valid values required for computing the
+     *        average. The {@code NaN} value will be replaced by the average only if the number
+     *        of valid value is greater than or equals to this threshold. The default value is 4.
+     *
+     * @see org.geotools.coverage.processing.operation.NodataFilter
+     */
+    public GridCoverage nodataFilter(final GridCoverage source,
+                                     final int padding,
+                                     final int validityThreshold)
+    {
+        return (GridCoverage) doOperation("NodataFilter",      source,
+                                          "padding",           new Integer(padding),
+                                          "validityThreshold", new Integer(validityThreshold));
+    }
+
+    /**
      * Specifies the interpolation type to be used to interpolate values for points which fall
      * between grid cells. The default value is nearest neighbor. The new interpolation type
      * operates on all sample dimensions.
      *
      * @param source The source coverage.
-     * @param type The interpolation type. Possible values are {@code "NearestNeighbor"},
-     *        {@code "Bilinear"} and {@code "Bicubic"}.
+     * @param type   The interpolation type. Possible values are {@code "NearestNeighbor"},
+     *               {@code "Bilinear"} and {@code "Bicubic"}.
      *
      * @see org.geotools.coverage.processing.operation.Interpolate
      */
@@ -219,7 +262,7 @@ public class Operations {
      * operates on all sample dimensions.
      *
      * @param source The source coverage.
-     * @param type The interpolation type as a JAI interpolation object.
+     * @param type   The interpolation type as a JAI interpolation object.
      *
      * @see org.geotools.coverage.processing.operation.Interpolate
      */
@@ -234,7 +277,7 @@ public class Operations {
      * See {@link org.geotools.coverage.processing.operation.Interpolate} operation for details.
      *
      * @param source The source coverage.
-     * @param types The interpolation types and their fallback.
+     * @param types  The interpolation types and their fallback.
      *
      * @see org.geotools.coverage.processing.operation.Interpolate
      */
@@ -242,48 +285,18 @@ public class Operations {
         return (GridCoverage) doOperation("Interpolate", source, "Type", types);
     }
 
-	/**
-	 * Recolors a coverage to the specified colormaps.
-	 * 
-	 * @param source
-	 *            The source coverage.
-	 * @param colorMaps
-	 *            The color maps to apply
-	 * @see org.geotools.coverage.processing.operation.Recolor
-	 */
-	public GridCoverage recolor(final GridCoverage source, final Map[] colorMaps) {
-		return (GridCoverage) doOperation("Recolor", source, "ColorMaps",
-				colorMaps);
-	}
-	/**
-     * Resamples a coverage to the specified coordinate reference system.
-     *
-     * @param source The source coverage.
-     * @param crs The target coordinate reference system.
-     *
-     * @see org.geotools.coverage.processing.operation.Resample
-     */
-    public Coverage resample(final Coverage source, final CoordinateReferenceSystem crs) {
-        return doOperation("Resample", source, "CoordinateReferenceSystem", crs);
-    }
-
     /**
-     * Resamples a grid coverage to the specified coordinate reference system and grid geometry.
+     * Recolors a coverage to the specified colormaps.
+     * 
+     * @param source    The source coverage.
+     * @param colorMaps The color maps to apply.
      *
-     * @param source The source coverage.
-     * @param crs The target coordinate reference system, or {@code null} for keeping it unchanged.
-     * @param gridGeometry      The grid geometry, or {@code null} for a default one.
-     * @param interpolationType The interpolation type, or {@code null} for the default one.
+     * @see org.geotools.coverage.processing.operation.Recolor
      *
-     * @see org.geotools.coverage.processing.operation.Resample
+     * @since 2.3
      */
-    public Coverage resample(final GridCoverage  source,
-                             final CoordinateReferenceSystem crs,
-                             final GridGeometry  gridGeometry,
-                             final Interpolation interpolationType)
-    {
-        return doOperation("Resample", source, "CoordinateReferenceSystem", crs,
-                           "GridGeometry", gridGeometry, "InterpolationType", interpolationType);
+    public GridCoverage recolor(final GridCoverage source, final Map[] colorMaps) {
+        return (GridCoverage) doOperation("Recolor", source, "ColorMaps", colorMaps);
     }
 
     /**
@@ -300,159 +313,284 @@ public class Operations {
         return doOperation("SelectSampleDimension", source, "SampleDimensions", sampleDimensions);
     }
 
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                 ////////
+    ////////            R E S A M P L I N G   O P E R A T I O N S            ////////
+    ////////                                                                 ////////
+    /////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * Replaces {@link Float#NaN NaN} values by the weighted average of neighbors values.
-     * This method uses the default padding and validity threshold.
+     * Resamples a coverage to the specified coordinate reference system.
+     *
+     * @param source The source coverage.
+     * @param crs    The target coordinate reference system.
+     *
+     * @see org.geotools.coverage.processing.operation.Resample
+     */
+    public Coverage resample(final Coverage source, final CoordinateReferenceSystem crs) {
+        return doOperation("Resample", source, "CoordinateReferenceSystem", crs);
+    }
+
+    /**
+     * Resamples a grid coverage to the specified coordinate reference system and grid geometry.
+     *
+     * @param source The source coverage.
+     * @param crs The target coordinate reference system, or {@code null} for keeping it unchanged.
+     * @param gridGeometry The grid geometry, or {@code null} for a default one.
+     * @param interpolationType The interpolation type, or {@code null} for the default one.
+     *
+     * @see org.geotools.coverage.processing.operation.Resample
+     */
+    public Coverage resample(final GridCoverage  source,
+                             final CoordinateReferenceSystem crs,
+                             final GridGeometry  gridGeometry,
+                             final Interpolation interpolationType)
+    {
+        return doOperation("Resample",                  source,
+                           "CoordinateReferenceSystem", crs,
+                           "GridGeometry",              gridGeometry,
+                           "InterpolationType",         interpolationType);
+    }
+
+    /**
+     * Crops the image to a specified rectangular area.
+     *
+     * @param source   The source coverage.
+     * @param envelope The rectangular area to keep.
+     *
+     * @see org.geotools.coverage.processing.operation.Crop
+     *
+     * @since 2.3
+     */
+    public Coverage crop(final Coverage Source, final Envelope envelope) {
+        return doOperation("CoverageCrop", Source, "Envelope", envelope);
+    }
+
+    /**
+     * Translates and resizes an image.
+     *
+     * @param source   The source coverage.
+     * @param xScale   The scale factor along the <var>x</var> axis.
+     * @param yScale   The scale factor along the <var>y</var> axis.
+     * @param xTrans   The translation along the <var>x</var> axis.
+     * @param yTrans   The translation along the <var>x</var> axis.
+     *
+     * @see org.geotools.coverage.processing.operation.Scale
+     *
+     * @since 2.3
+     */
+    public GridCoverage scale(final GridCoverage source,
+                              final double xScale, final double yScale,
+                              final double xTrans, final double yTrans)
+    {
+        return scale(source, xScale, yScale, xTrans, yTrans, null, null);
+    }
+
+    /**
+     * Translates and resizes an image.
+     *
+     * @param source   The source coverage.
+     * @param xScale   The scale factor along the <var>x</var> axis.
+     * @param yScale   The scale factor along the <var>y</var> axis.
+     * @param xTrans   The translation along the <var>x</var> axis.
+     * @param yTrans   The translation along the <var>x</var> axis.
+     * @param interpolation The interpolation to use, or {@code null} for the default.
+     *
+     * @see org.geotools.coverage.processing.operation.Scale
+     *
+     * @deprecated Replaced by {@link #scale(GridCoverage,double,double,double,double,
+     *             Interpolation,BorderExtender} with a {@code null} border extender.
+     *
+     * @since 2.3
+     */
+    public GridCoverage scale(final GridCoverage source,
+                              final double xScale, final double yScale,
+                              final double xTrans, final double yTrans,
+                              final Interpolation interpolation)
+    {
+        return scale(source, xScale, yScale, xTrans, yTrans, interpolation, null);
+    }
+
+    /**
+     * Translates and resizes an image.
+     *
+     * @todo The two last arguments can also be provided as hints at {@link #Operations(Hints)}
+     *       construction time. Investigate which way should be encouraged.
+     *
+     * @param source   The source coverage.
+     * @param xScale   The scale factor along the <var>x</var> axis.
+     * @param yScale   The scale factor along the <var>y</var> axis.
+     * @param xTrans   The translation along the <var>x</var> axis.
+     * @param yTrans   The translation along the <var>x</var> axis.
+     * @param interpolation The interpolation to use, or {@code null} for the default.
+     * @param be The border extender, or {@code null} for the default.
+     *
+     * @see org.geotools.coverage.processing.operation.Scale
+     *
+     * @since 2.3
+     */
+    public GridCoverage scale(final GridCoverage source,
+                              final double xScale, final double yScale,
+                              final double xTrans, final double yTrans,
+                              final Interpolation interpolation,
+                              final BorderExtender extender)
+    {
+        return (GridCoverage) doOperation("Scale", source,
+                                          "xScale", new Float(xScale),
+                                          "yScale", new Float(yScale),
+                                          "xTrans", new Float(xTrans),
+                                          "yTrans", new Float(yTrans),
+                                          "Interpolation", interpolation,
+                                          "BorderExtender", extender);
+    }
+
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                 ////////
+    ////////                F I L T E R   O P E R A T I O N S                ////////
+    ////////                                                                 ////////
+    /////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @deprecated Renamed as {@link #subsampleAverage subsampleAverage} (lower case "s").
+     *
+     * @since 2.3
+     */
+    public GridCoverage SubsampleAverage(final GridCoverage source,
+                                         final double scaleX, final double scaleY,
+                                         final Interpolation interpolation,
+                                         final BorderExtender be)
+    {
+        return subsampleAverage(source, scaleX, scaleY, interpolation, be);
+    }
+
+    /**
+     * Subsamples an image by averaging over a moving window
+     *
+     * @todo The two last arguments can also be provided as hints at {@link #Operations(Hints)}
+     *       construction time. Investigate which way should be encouraged.
+     *
+     * @param source   The source coverage.
+     * @param scaleX   The scale factor along the <var>x</var> axis.
+     * @param scaleY   The scale factor along the <var>y</var> axis.
+     * @param interpolation The interpolation to use, or {@code null} for the default.
+     * @param be The border extender, or {@code null} for the default.
+     *
+     * @see org.geotools.coverage.processing.operation.SubsampleAverage
+     *
+     * @since 2.3
+     */
+    public GridCoverage subsampleAverage(final GridCoverage   source,
+                                         final double         scaleX,
+                                         final double         scaleY,
+                                         final Interpolation  interpolation,
+                                         final BorderExtender be)
+    {
+        return (GridCoverage) doOperation("SubsampleAverage", source,
+                                          "scaleX",           new Double(scaleX),
+                                          "scaleY",           new Double(scaleY),
+                                          "Interpolation",    interpolation,
+                                          "BorderExtender",   be);
+    }
+
+    /**
+     * Subsamples an image using the default values. The scale factor is 2 and the
+     * filter is a quadrant symmetric filter generated from a Gaussian kernel.
      *
      * @param source The source coverage.
      *
-     * @see org.geotools.coverage.processing.operation.NodataFilter
+     * @see org.geotools.coverage.processing.operation.FilteredSubsample
+     *
+     * @since 2.3
      */
-    public GridCoverage nodataFilter(final GridCoverage source) {
-        return (GridCoverage) doOperation("NodataFilter", source);
+    public GridCoverage filteredSubsample(final GridCoverage source) {
+        return (GridCoverage) doOperation("FilteredSubsample", source);
     }
 
-	/**
-	 * Replaces {@link Float#NaN NaN} values by the weighted average of
-	 * neighbors values.
-	 * 
-	 * @param source
-	 *            The source coverage.
-	 * 
-	 * @see org.geotools.coverage.processing.operation.NodataFilter
-	 */
-	public GridCoverage nodataFilter(final GridCoverage source,
-			final int padding, final int validityThreshold) {
-		return (GridCoverage) doOperation("NodataFilter", source, "padding",
-				new Integer(padding), "validityThreshold", new Integer(
-						validityThreshold));
-	}
+    /**
+     * Subsamples an image by integral factors.
+     *
+     * @param source   The source coverage.
+     * @param scaleX   The scale factor along the <var>x</var> axis. The default value is 2.
+     * @param scaleY   The scale factor along the <var>y</var> axis. The default value is 2.
+     * @param qsFilter The filter. Default to a quadrant symmetric filter generated from
+     *                 a Gaussian kernel
+     *
+     * @see org.geotools.coverage.processing.operation.FilteredSubsample
+     *
+     * @since 2.3
+     */
+    public GridCoverage filteredSubsample(final GridCoverage source,
+                                          final int          scaleX,
+                                          final int          scaleY,
+                                          final float[]      qsFilter)
+    {
+        return filteredSubsample(source, scaleX, scaleY, qsFilter, null, null);
+    }
 
-	public GridCoverage scale(final GridCoverage source, final double xScale,
-			final double yScale, final double xTrans, final double yTrans) {
-		final AbstractProcessor processor = getProcessor();
-		final Operation operation = processor.getOperation("Scale");
-		final ParameterValueGroup parameters = operation.getParameters();
-		parameters.parameter("Source").setValue(source);
-		try {
-			parameters.parameter("xScale").setValue(new Float(xScale));
-			parameters.parameter("yScale").setValue(new Float(yScale));
-			parameters.parameter("xTrans").setValue(new Float(xTrans));
-			parameters.parameter("yTrans").setValue(new Float(yTrans));
-		} catch (ParameterNotFoundException cause) {
-			throw invalidParameterName(cause);
-		}
-		return (GridCoverage) processor.doOperation(parameters);
+    /**
+     * Subsamples an image by integral factors.
+     *
+     * @param source   The source coverage.
+     * @param scaleX   The scale factor along the <var>x</var> axis. The default value is 2.
+     * @param scaleY   The scale factor along the <var>y</var> axis. The default value is 2.
+     * @param qsFilter The filter. Default to a quadrant symmetric filter generated from
+     *                 a Gaussian kernel
+     * @param interpolation The interpolation to use, or {@code null} for the default.
+     *
+     * @see org.geotools.coverage.processing.operation.FilteredSubsample
+     *
+     * @since 2.3
+     *
+     * @deprecated Replaced by {@link #filteredSubsample(GridCoverage,int,int,float[],
+     *             Interpolation,BorderExtender} with a {@code null} border extender.
+     */
+    public GridCoverage filteredSubsample(final GridCoverage source,
+                                          final int scaleX, final int scaleY,
+                                          final float[] qsFilter,
+                                          final Interpolation interpolation)
+    {
+        return filteredSubsample(source, scaleX, scaleY, qsFilter, interpolation, null);
+    }
 
-	}
-	
-	public GridCoverage filteredSubsample(final GridCoverage source, final int scaleX,
-			final int scaleY, final float[] qsFilter) {
-		final AbstractProcessor processor = getProcessor();
-		final Operation operation = processor.getOperation("FilteredSubsample");
-		final ParameterValueGroup parameters = operation.getParameters();
-		parameters.parameter("Source").setValue(source);
-		try {
-			parameters.parameter("scaleX").setValue(new Integer(scaleX));
-			parameters.parameter("scaleY").setValue(new Integer(scaleY));
-			parameters.parameter("qsFilterArray").setValue(qsFilter);
-		} catch (ParameterNotFoundException cause) {
-			throw invalidParameterName(cause);
-		}
-		return (GridCoverage) processor.doOperation(parameters);
+    /**
+     * Subsamples an image by integral factors.
+     *
+     * @todo The two last arguments can also be provided as hints at {@link #Operations(Hints)}
+     *       construction time. Investigate which way should be encouraged.
+     *
+     * @param source   The source coverage.
+     * @param scaleX   The scale factor along the <var>x</var> axis. The default value is 2.
+     * @param scaleY   The scale factor along the <var>y</var> axis. The default value is 2.
+     * @param qsFilter The filter. Default to a quadrant symmetric filter generated from a
+     *                 Gaussian kernel
+     * @param interpolation The interpolation to use, or {@code null} for the default.
+     * @param be The border extender, or {@code null} for the default.
+     *
+     * @see org.geotools.coverage.processing.operation.FilteredSubsample
+     *
+     * @since 2.3
+     */
+    public GridCoverage filteredSubsample(final GridCoverage   source,
+                                          final int            scaleX,
+                                          final int            scaleY,
+                                          final float[]        qsFilter,
+                                          final Interpolation  interpolation,
+                                          final BorderExtender be)
+    {
+        return (GridCoverage) doOperation("FilteredSubsample", source,
+                                          "scaleX",            new Integer(scaleX),
+                                          "scaleY",            new Integer(scaleY),
+                                          "qsFilterArray",     qsFilter,
+                                          "Interpolation",     interpolation,
+                                          "BorderExtender",    be);
+    }
 
-	}
-	public GridCoverage filteredSubsample(final GridCoverage source, final int scaleX,
-			final int scaleY, final float[] qsFilter,final Interpolation interpolation) {
-		final AbstractProcessor processor = getProcessor();
-		final Operation operation = processor.getOperation("FilteredSubsample");
-		final ParameterValueGroup parameters = operation.getParameters();
-		parameters.parameter("Source").setValue(source);
-		try {
-			parameters.parameter("scaleX").setValue(new Integer(scaleX));
-			parameters.parameter("scaleY").setValue(new Integer(scaleY));
-			parameters.parameter("qsFilterArray").setValue(qsFilter);
-			parameters.parameter("Interpolation").setValue(interpolation);
-		} catch (ParameterNotFoundException cause) {
-			throw invalidParameterName(cause);
-		}
-		return (GridCoverage) processor.doOperation(parameters);
-
-	}
-	public GridCoverage filteredSubsample(final GridCoverage source, final int scaleX,
-			final int scaleY, float[] qsFilter,final Interpolation interpolation,final BorderExtender be) {
-		final AbstractProcessor processor = getProcessor();
-		final Operation operation = processor.getOperation("FilteredSubsample");
-		final ParameterValueGroup parameters = operation.getParameters();
-		parameters.parameter("Source").setValue(source);
-		try {
-			parameters.parameter("scaleX").setValue(new Integer(scaleX));
-			parameters.parameter("scaleY").setValue(new Integer(scaleY));
-			parameters.parameter("qsFilterArray").setValue(qsFilter);
-			parameters.parameter("Interpolation").setValue(interpolation);
-			parameters.parameter("BorderExtender").setValue(be);
-		} catch (ParameterNotFoundException cause) {
-			throw invalidParameterName(cause);
-		}
-		return (GridCoverage) processor.doOperation(parameters);
-
-	}
-	
-	public GridCoverage SubsampleAverage(final GridCoverage source, final double scaleX,
-			final double scaleY,final Interpolation interpolation,final BorderExtender be) {
-		final AbstractProcessor processor = getProcessor();
-		final Operation operation = processor.getOperation("SubsampleAverage");
-		final ParameterValueGroup parameters = operation.getParameters();
-		parameters.parameter("Source").setValue(source);
-		try {
-			parameters.parameter("scaleX").setValue(new Double(scaleX));
-			parameters.parameter("scaleY").setValue(new Double(scaleY));
-			parameters.parameter("Interpolation").setValue(interpolation);
-			parameters.parameter("BorderExtender").setValue(be);
-		} catch (ParameterNotFoundException cause) {
-			throw invalidParameterName(cause);
-		}
-		return (GridCoverage) processor.doOperation(parameters);
-
-	}
-	public GridCoverage scale(final GridCoverage source, final double xScale,
-			final double yScale, final double xTrans, final double yTrans,Interpolation interpolation) {
-		final AbstractProcessor processor = getProcessor();
-		final Operation operation = processor.getOperation("Scale");
-		final ParameterValueGroup parameters = operation.getParameters();
-		parameters.parameter("Source").setValue(source);
-		try {
-			parameters.parameter("xScale").setValue(new Float(xScale));
-			parameters.parameter("yScale").setValue(new Float(yScale));
-			parameters.parameter("xTrans").setValue(new Float(xTrans));
-			parameters.parameter("yTrans").setValue(new Float(yTrans));
-			parameters.parameter("Interpolation").setValue(interpolation);
-		} catch (ParameterNotFoundException cause) {
-			throw invalidParameterName(cause);
-		}
-		return (GridCoverage) processor.doOperation(parameters);
-
-	}
-	
-	public GridCoverage scale(final GridCoverage source, final double xScale,
-			final double yScale, final double xTrans, final double yTrans,Interpolation interpolation, final BorderExtender extender) {
-		final AbstractProcessor processor = getProcessor();
-		final Operation operation = processor.getOperation("Scale");
-		final ParameterValueGroup parameters = operation.getParameters();
-		parameters.parameter("Source").setValue(source);
-		try {
-			parameters.parameter("xScale").setValue(new Float(xScale));
-			parameters.parameter("yScale").setValue(new Float(yScale));
-			parameters.parameter("xTrans").setValue(new Float(xTrans));
-			parameters.parameter("yTrans").setValue(new Float(yTrans));
-			parameters.parameter("Interpolation").setValue(interpolation);
-			parameters.parameter("BorderExtender").setValue(extender);
-		} catch (ParameterNotFoundException cause) {
-			throw invalidParameterName(cause);
-		}
-		return (GridCoverage) processor.doOperation(parameters);
-
-	}
     /**
      * Edge detector which computes the magnitude of the image gradient vector in two orthogonal
      * directions. The default masks are the Sobel ones.
@@ -465,9 +603,6 @@ public class Operations {
         return doOperation("GradientMagnitude", source);
     }
 
-	public Coverage crop(final Coverage Source, final Envelope envelope) {
-		return doOperation("CoverageCrop", Source, "Envelope", envelope);
-	}
     /**
      * Edge detector which computes the magnitude of the image gradient vector in two orthogonal
      * directions.
@@ -483,6 +618,15 @@ public class Operations {
     {
         return doOperation("GradientMagnitude", source, "mask1", mask1, "mask2", mask2);
     }
+
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                 ////////
+    ////////                   H E L P E R   M E T H O D S                   ////////
+    ////////                                                                 ////////
+    /////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Returns the processor, creating one if needed.
@@ -513,111 +657,200 @@ public class Operations {
         parameters.parameter("Source").setValue(source);
         return processor.doOperation(parameters);
     }
-    
+
     /**
      * Applies a process operation with one parameter.
      * This is a helper method for implementation of various convenience methods in this class.
-     *
-     * @param  operationName  Name of the operation to be applied to the coverage.
-     * @param  source         The source coverage.
-     * @param  argumentName1  The name of the first parameter to set.
-     * @param  argumentValue1 The value for the first parameter.
+     * 
+     * @param operationName  Name of the operation to be applied to the coverage.
+     * @param source         The source coverage.
+     * @param argumentName1  The name of the first parameter to setParameterValue.
+     * @param argumentValue1 The value for the first parameter.
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
      */
     protected final Coverage doOperation(final String operationName, final Coverage source,
-                                         final String argumentName1, final Object   argumentValue1)
+                                         final String argumentName1, final Object argumentValue1)
             throws OperationNotFoundException, InvalidParameterNameException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
         final ParameterValueGroup parameters = operation.getParameters();
         parameters.parameter("Source").setValue(source);
-        try {
-            if (argumentValue1!=null) parameters.parameter(argumentName1).setValue(argumentValue1);
-        } catch (ParameterNotFoundException cause) {
-            throw invalidParameterName(cause);
-        }
+        setParameterValue(parameters, argumentName1, argumentValue1);
         return processor.doOperation(parameters);
     }
-    
+
     /**
      * Applies process operation with two parameters.
      * This is a helper method for implementation of various convenience methods in this class.
-     *
-     * @param  operationName  Name of the operation to be applied to the coverage.
-     * @param  source         The source coverage.
-     * @param  argumentName1  The name of the first parameter to set.
-     * @param  argumentValue1 The value for the first parameter.
-     * @param  argumentName2  The name of the second parameter to set.
-     * @param  argumentValue2 The value for the second parameter.
+     * 
+     * @param operationName  Name of the operation to be applied to the coverage.
+     * @param source         The source coverage.
+     * @param argumentName1  The name of the first parameter to setParameterValue.
+     * @param argumentValue1 The value for the first parameter.
+     * @param argumentName2  The name of the second parameter to setParameterValue.
+     * @param argumentValue2 The value for the second parameter.
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
      */
     protected final Coverage doOperation(final String operationName, final Coverage source,
-                                         final String argumentName1, final Object   argumentValue1,
-                                         final String argumentName2, final Object   argumentValue2)
+                                         final String argumentName1, final Object argumentValue1,
+                                         final String argumentName2, final Object argumentValue2)
             throws OperationNotFoundException, InvalidParameterNameException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
         final ParameterValueGroup parameters = operation.getParameters();
         parameters.parameter("Source").setValue(source);
-        try {
-            if (argumentValue1!=null) parameters.parameter(argumentName1).setValue(argumentValue1);
-            if (argumentValue2!=null) parameters.parameter(argumentName2).setValue(argumentValue2);
-        } catch (ParameterNotFoundException cause) {
-            throw invalidParameterName(cause);
-        }
+        setParameterValue(parameters, argumentName1, argumentValue1);
+        setParameterValue(parameters, argumentName2, argumentValue2);
         return processor.doOperation(parameters);
     }
 
     /**
      * Applies a process operation with three parameters.
      * This is a helper method for implementation of various convenience methods in this class.
-     *
-     * @param  operationName  Name of the operation to be applied to the coverage.
-     * @param  source         The source coverage.
-     * @param  argumentName1  The name of the first parameter to set.
-     * @param  argumentValue1 The value for the first parameter.
-     * @param  argumentName2  The name of the second parameter to set.
-     * @param  argumentValue2 The value for the second parameter.
-     * @param  argumentName3  The name of the third parameter to set.
-     * @param  argumentValue3 The value for the third parameter.
+     * 
+     * @param operationName  Name of the operation to be applied to the coverage.
+     * @param source         The source coverage.
+     * @param argumentName1  The name of the first parameter to setParameterValue.
+     * @param argumentValue1 The value for the first parameter.
+     * @param argumentName2  The name of the second parameter to setParameterValue.
+     * @param argumentValue2 The value for the second parameter.
+     * @param argumentName3  The name of the third parameter to setParameterValue.
+     * @param argumentValue3 The value for the third parameter.
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
      */
     protected final Coverage doOperation(final String operationName, final Coverage source,
-                                         final String argumentName1, final Object   argumentValue1,
-                                         final String argumentName2, final Object   argumentValue2,
-                                         final String argumentName3, final Object   argumentValue3)
+                                         final String argumentName1, final Object argumentValue1,
+                                         final String argumentName2, final Object argumentValue2,
+                                         final String argumentName3, final Object argumentValue3)
             throws OperationNotFoundException, InvalidParameterNameException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
         final ParameterValueGroup parameters = operation.getParameters();
         parameters.parameter("Source").setValue(source);
-        try {
-            if (argumentValue1!=null) parameters.parameter(argumentName1).setValue(argumentValue1);
-            if (argumentValue2!=null) parameters.parameter(argumentName2).setValue(argumentValue2);
-            if (argumentValue3!=null) parameters.parameter(argumentName3).setValue(argumentValue3);
-        } catch (ParameterNotFoundException cause) {
-            throw invalidParameterName(cause);
-        }
+        setParameterValue(parameters, argumentName1, argumentValue1);
+        setParameterValue(parameters, argumentName2, argumentValue2);
+        setParameterValue(parameters, argumentName3, argumentValue3);
         return processor.doOperation(parameters);
     }
 
     /**
-     * Converts a "parameter not found" exception into an "invalid parameter name".
+     * Applies a process operation with four parameters.
+     * This is a helper method for implementation of various convenience methods in this class.
+     * 
+     * @param  operationName  Name of the operation to be applied to the coverage.
+     * @param  source         The source coverage.
+     * @return The result as a coverage.
+     * @throws OperationNotFoundException if there is no operation named {@code operationName}.
+     * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     *
+     * @since 2.3
      */
-    private static InvalidParameterNameException invalidParameterName(final ParameterNotFoundException cause) {
-        final String name = cause.getParameterName();
-        final InvalidParameterNameException exception = new InvalidParameterNameException(
-                Errors.format(ErrorKeys.UNKNOW_PARAMETER_NAME_$1, name), name);
-        exception.initCause(cause);
-        return exception;
+    protected final Coverage doOperation(final String operationName, final Coverage source,
+                                         final String argumentName1, final Object argumentValue1,
+                                         final String argumentName2, final Object argumentValue2,
+                                         final String argumentName3, final Object argumentValue3,
+                                         final String argumentName4, final Object argumentValue4)
+            throws OperationNotFoundException, InvalidParameterNameException
+    {
+        final AbstractProcessor processor = getProcessor();
+        final Operation operation = processor.getOperation(operationName);
+        final ParameterValueGroup parameters = operation.getParameters();
+        parameters.parameter("Source").setValue(source);
+        setParameterValue(parameters, argumentName1, argumentValue1);
+        setParameterValue(parameters, argumentName2, argumentValue2);
+        setParameterValue(parameters, argumentName3, argumentValue3);
+        setParameterValue(parameters, argumentName4, argumentValue4);
+        return processor.doOperation(parameters);
+    }
+
+    /**
+     * Applies a process operation with five parameters.
+     * This is a helper method for implementation of various convenience methods in this class.
+     * 
+     * @param  operationName  Name of the operation to be applied to the coverage.
+     * @param  source         The source coverage.
+     * @return The result as a coverage.
+     * @throws OperationNotFoundException if there is no operation named {@code operationName}.
+     * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     *
+     * @since 2.3
+     */
+    protected final Coverage doOperation(final String operationName, final Coverage source,
+                                         final String argumentName1, final Object argumentValue1,
+                                         final String argumentName2, final Object argumentValue2,
+                                         final String argumentName3, final Object argumentValue3,
+                                         final String argumentName4, final Object argumentValue4,
+                                         final String argumentName5, final Object argumentValue5)
+            throws OperationNotFoundException, InvalidParameterNameException
+    {
+        final AbstractProcessor processor = getProcessor();
+        final Operation operation = processor.getOperation(operationName);
+        final ParameterValueGroup parameters = operation.getParameters();
+        parameters.parameter("Source").setValue(source);
+        setParameterValue(parameters, argumentName1, argumentValue1);
+        setParameterValue(parameters, argumentName2, argumentValue2);
+        setParameterValue(parameters, argumentName3, argumentValue3);
+        setParameterValue(parameters, argumentName4, argumentValue4);
+        setParameterValue(parameters, argumentName5, argumentValue5);
+        return processor.doOperation(parameters);
+    }
+
+    /**
+     * Applies a process operation with six parameters.
+     * This is a helper method for implementation of various convenience methods in this class.
+     * 
+     * @param  operationName  Name of the operation to be applied to the coverage.
+     * @param  source         The source coverage.
+     * @return The result as a coverage.
+     * @throws OperationNotFoundException if there is no operation named {@code operationName}.
+     * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     *
+     * @since 2.3
+     */
+    protected final Coverage doOperation(final String operationName, final Coverage source,
+                                         final String argumentName1, final Object argumentValue1,
+                                         final String argumentName2, final Object argumentValue2,
+                                         final String argumentName3, final Object argumentValue3,
+                                         final String argumentName4, final Object argumentValue4,
+                                         final String argumentName5, final Object argumentValue5,
+                                         final String argumentName6, final Object argumentValue6)
+            throws OperationNotFoundException, InvalidParameterNameException
+    {
+        final AbstractProcessor processor = getProcessor();
+        final Operation operation = processor.getOperation(operationName);
+        final ParameterValueGroup parameters = operation.getParameters();
+        parameters.parameter("Source").setValue(source);
+        setParameterValue(parameters, argumentName1, argumentValue1);
+        setParameterValue(parameters, argumentName2, argumentValue2);
+        setParameterValue(parameters, argumentName3, argumentValue3);
+        setParameterValue(parameters, argumentName4, argumentValue4);
+        setParameterValue(parameters, argumentName5, argumentValue5);
+        setParameterValue(parameters, argumentName6, argumentValue6);
+        return processor.doOperation(parameters);
+    }
+
+    /**
+     * Set the specified parameter to the specified value, if not null.
+     */
+    private static void setParameterValue(final ParameterValueGroup parameters, String name, Object value)
+            throws InvalidParameterNameException
+    {
+        if (value != null) try {
+            parameters.parameter(name).setValue(value);
+        } catch (ParameterNotFoundException cause) {
+            final InvalidParameterNameException exception = new InvalidParameterNameException(
+                    Errors.format(ErrorKeys.UNKNOW_PARAMETER_NAME_$1, name), name);
+            exception.initCause(cause);
+            throw exception;
+        }
     }
 }

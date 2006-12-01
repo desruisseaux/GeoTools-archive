@@ -30,12 +30,22 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
+ * TODO: Need documentation
+ *
+ * @todo Consider refactoring as a {@code OperationJAI} subclass. We could get ride of the
+ *       {@code FilteredSubsampledGridCoverage2D} class. The main feature to add is the
+ *       copy of interpolation and border extender parameters to the hints.
+ *
+ * @source $URL$
+ * @version $Id$
  * @author Simone Giannecchini
  * @since 2.3
+ *
+ * @see javax.media.jai.operator.FilteredSubsampleDescriptor
  */
 public class FilteredSubsample extends Operation2D {
 	/**
-	 * 
+	 * Serial number for cross-version compatibility.
 	 */
 	private static final long serialVersionUID = 652535074064952517L;
 
@@ -125,5 +135,4 @@ public class FilteredSubsample extends Operation2D {
 				(hints instanceof Hints) ? (Hints) hints
 						: new Hints(hints));
 	}
-
 }
