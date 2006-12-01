@@ -15,7 +15,19 @@
  */
 package org.geotools.xs;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.util.Map;
+
+import javax.xml.namespace.QName;
+
 import junit.framework.TestCase;
+
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchema;
@@ -30,15 +42,6 @@ import org.geotools.xml.impl.ElementImpl;
 import org.geotools.xs.bindings.XS;
 import org.geotools.xs.bindings.XSBindingConfiguration;
 import org.picocontainer.defaults.DefaultPicoContainer;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.util.Map;
-import javax.xml.namespace.QName;
 
 
 public abstract class TestSchema extends TestCase {

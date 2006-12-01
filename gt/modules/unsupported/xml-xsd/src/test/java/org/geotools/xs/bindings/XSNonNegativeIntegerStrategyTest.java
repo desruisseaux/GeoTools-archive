@@ -15,11 +15,12 @@
  */
 package org.geotools.xs.bindings;
 
-import org.geotools.xs.TestSchema;
-import org.geotools.xs.bindings.XS;
 import java.math.BigInteger;
+
 import javax.xml.bind.ValidationException;
 import javax.xml.namespace.QName;
+
+import org.geotools.xs.TestSchema;
 
 
 public class XSNonNegativeIntegerStrategyTest extends TestSchema {

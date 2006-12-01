@@ -15,11 +15,13 @@
  */
 package org.geotools.xs;
 
+import java.lang.reflect.Field;
+
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xs.bindings.XS;
-import java.lang.reflect.Field;
-import javax.xml.namespace.QName;
 
 
 public class TestSchemaTest extends TestSchema {

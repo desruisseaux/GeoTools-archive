@@ -15,11 +15,11 @@
  */
 package org.geotools.xs.bindings;
 
+import javax.xml.namespace.QName;
+
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xs.TestSchema;
-import org.geotools.xs.bindings.XS;
-import javax.xml.namespace.QName;
 
 
 public class XSAnySimpleTypeStrategyTest extends TestSchema {

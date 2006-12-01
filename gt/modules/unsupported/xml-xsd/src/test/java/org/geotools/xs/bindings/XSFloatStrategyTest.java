@@ -15,9 +15,9 @@
  */
 package org.geotools.xs.bindings;
 
-import org.geotools.xs.TestSchema;
-import org.geotools.xs.bindings.XS;
 import javax.xml.namespace.QName;
+
+import org.geotools.xs.TestSchema;
 
 
 public class XSFloatStrategyTest extends TestSchema {

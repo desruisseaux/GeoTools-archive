@@ -15,7 +15,10 @@
  */
 package org.geotools.xs.bindings;
 
+import java.math.BigDecimal;
+
 import junit.framework.TestCase;
+
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDMaxExclusiveFacet;
 import org.eclipse.xsd.XSDMaxInclusiveFacet;
@@ -33,9 +36,6 @@ import org.eclipse.xsd.impl.XSDTotalDigitsFacetImpl;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 import org.geotools.xml.impl.ElementImpl;
-import org.geotools.xs.bindings.XSDecimalBinding;
-import java.math.BigDecimal;
-import javax.xml.bind.ValidationException;
 
 
 public class XSDecimalStrategyTest extends TestCase {

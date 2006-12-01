@@ -15,10 +15,10 @@
  */
 package org.geotools.xs.bindings;
 
+import javax.xml.namespace.QName;
+
 import org.geotools.xml.ElementInstance;
 import org.geotools.xs.TestSchema;
-import org.geotools.xs.bindings.XS;
-import javax.xml.namespace.QName;
 
 
 public class XSDoubleStrategyTest extends TestSchema {
