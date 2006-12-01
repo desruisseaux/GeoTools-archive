@@ -24,7 +24,6 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.geometry.JTS;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -177,7 +176,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
         try {
             bounds = featureSource.getBounds(query);
         } catch (IOException e1) {
-            return JTS.empty();
+            return new Envelope();
         }
 
         if (bounds != null) {
@@ -200,9 +199,9 @@ public class DefaultFeatureResults extends DataFeatureCollection {
             return bounds;
         } catch (IllegalAttributeException e) {
             //throw new DataSourceException("Could not read feature ", e);
-            return JTS.empty();
+            return new Envelope();
         } catch (IOException e) {
-            return JTS.empty();
+            return new Envelope();
         }
     }
 
@@ -251,9 +250,9 @@ public class DefaultFeatureResults extends DataFeatureCollection {
     public FeatureCollection collection() throws IOException {
         try {
             FeatureCollection collection = FeatureCollections.newCollection();
-            Feature feature;
+            //Feature feature;
             FeatureReader reader = reader();
-            FeatureType type = reader.getFeatureType();
+            //FeatureType type = reader.getFeatureType();
             while (reader.hasNext()) {
                 collection.add(reader.next());
             }

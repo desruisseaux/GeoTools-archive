@@ -30,7 +30,7 @@ import org.opengis.filter.PropertyIsLessThanOrEqualTo;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.LengthFunction;
 import org.geotools.filter.LiteralExpression;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.JTS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;

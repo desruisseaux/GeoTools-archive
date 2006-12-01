@@ -64,7 +64,7 @@ import org.opengis.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.Filters;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.index.quadtree.StoreException;
 import org.geotools.map.DefaultMapContext;
@@ -1380,7 +1380,7 @@ public class ShapefileRenderer implements GTRenderer {
 
 				try {
 					mt = CRS.findMathTransform(dataCRS, destinationCrs, true);
-					bbox = JTS.transform(bbox, mt.inverse(), 10);
+					bbox = JTS.transform(bbox, null, mt.inverse(), 10);
 				} catch (Exception e) {
 					mt = null;
 				}

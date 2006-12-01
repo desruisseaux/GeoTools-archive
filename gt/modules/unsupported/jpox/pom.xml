@@ -96,6 +96,12 @@
 
     <dependency>
       <groupId>org.geotools</groupId>
+      <artifactId>gt2-data</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotools</groupId>
       <artifactId>gt2-postgis</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>

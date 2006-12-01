@@ -49,7 +49,6 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderOracle;
-import org.geotools.geometry.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
@@ -365,7 +364,7 @@ public class OracleDataStore extends JDBCDataStore {
     	String tableName = featureType.getTypeName();
     	Transaction t = new DefaultTransaction("createSchema");
     	
-    	CoordinateReferenceSystem crs = featureType.getDefaultGeometry().getCoordinateSystem();
+    	//CoordinateReferenceSystem crs = featureType.getDefaultGeometry().getCoordinateSystem();
     	// TODO: lookup srid for crs
     	Envelope bounds = new Envelope();
 		bounds.expandToInclude( -180, -90 );

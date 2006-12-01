@@ -1,15 +1,12 @@
 package org.geotools.tile.nasa;
 
-import java.awt.Rectangle;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -17,8 +14,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.media.jai.JAI;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;

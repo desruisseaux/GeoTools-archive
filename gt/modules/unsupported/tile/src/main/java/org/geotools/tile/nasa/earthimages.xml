@@ -28,7 +28,6 @@
 			<TerrainMapped>true</TerrainMapped>
 			<ImageAccessor>
 				<LevelZeroTileSizeDegrees>2.25</LevelZeroTileSizeDegrees>
-
 				<NumberLevels>5</NumberLevels>
 				<TextureSizePixels>512</TextureSizePixels>
 				<ImageFileExtension>jpg</ImageFileExtension>

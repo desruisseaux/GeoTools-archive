@@ -65,7 +65,7 @@ public class JpoxPojoSource implements Source {
 	}
 
 	public TypeName getName() {
-		return new org.geotools.feature.type.TypeName( pc.getCanonicalName() );
+		return new org.geotools.feature.type.TypeName( pc.getName() );
 	}
 	
 	public void setTransaction( org.geotools.data.Transaction t ) {

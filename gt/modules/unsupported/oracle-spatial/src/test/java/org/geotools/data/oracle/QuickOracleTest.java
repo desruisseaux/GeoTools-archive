@@ -25,7 +25,6 @@ import java.util.PropertyResourceBundle;
 import java.util.logging.Logger;
 
 import oracle.sql.ARRAY;
-import oracle.sql.ArrayDescriptor;
 import oracle.sql.Datum;
 import oracle.sql.STRUCT;
 
@@ -35,7 +34,7 @@ import org.geotools.data.jdbc.ConnectionPoolManager;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -239,7 +238,7 @@ public class QuickOracleTest extends DataTestCase {
     		}    		
     	}
     	Envelope extent = new Envelope(minx,maxx, miny,maxy );
-    	JTS.ReferencedEnvelope ref = new JTS.ReferencedEnvelope( extent, crs );
+    	ReferencedEnvelope ref = new ReferencedEnvelope( extent, crs );
     	assertFalse( ref.isNull() );
     }    
     public void testDSSridMethod() throws Exception {

@@ -28,7 +28,7 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.geometry.JTS;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.FactoryFinder;
