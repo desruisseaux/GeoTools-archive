@@ -75,7 +75,7 @@ public class MultiSurfaceTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return MultiSurface.class;
     }
 
     /**
