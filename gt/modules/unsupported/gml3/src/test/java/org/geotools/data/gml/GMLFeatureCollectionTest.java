@@ -26,7 +26,8 @@ public class GMLFeatureCollectionTest extends GMLDataStoreTestSupport {
 		String schemaLocation = getClass().getResource( "test.xsd" ).toString();
 		
 		GMLDataStore dataStore = 
-			new GMLDataStore( "http://www.geotools.org/test", location, schemaLocation );
+			dataStore = new GMLDataStore( location, new ApplicationSchemaConfiguration( "http://www.geotools.org/test", schemaLocation ) );
+		
 		GMLFeatureCollection collection = 
 			new GMLFeatureCollection( (GMLTypeEntry) dataStore.entry( "TestFeature" ) ); 
 			

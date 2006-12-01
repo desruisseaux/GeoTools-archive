@@ -36,43 +36,36 @@ import org.xmlpull.v1.XmlPullParserFactory;
 public class GMLDataStore extends AbstractDataStore2 {
 
 	/**
-	 * Application schema namespace
-	 */
-	String namespace;
-	/**
 	 * Document location
 	 */
 	String location;
 	/**
-	 * Schema location
+	 * Application schema / parser configuration
 	 */
-	String schemaLocation;
-	/**
-	 * The application schema
-	 */
-	XSDSchema schema;
+	Configuration configuration;
 	
 	/**
 	 * Creates a new datastore from an instance document.
+	 * <p>
+	 * Using this constructor forces the datastore to infer the application schema directly 
+	 * from the instance document.
+	 * </p>
 	 * 
-	 * @param namespace The application schema namespace.
 	 * @param location The location ( as a uri ) of the instance document.
 	 */
-	public GMLDataStore ( String namespace, String location ) {
-		this( namespace, location , null );
+	public GMLDataStore ( String location ) {
+		this( location, null );
 	}
 	
 	/**
-	 * Creates a new datastore from an instance document and an application schema location.
+	 * Creates a new datastore from an instance document and application schema configuration.
 	 * 
-	 * @param namespace The application schema namespace.
 	 * @param location The location ( as a uri ) of the instance document.
-	 * @param schemaLocation The location ( as a uri ) of the application schema.
+	 * @param configuration The application schema configuration.
 	 */
-	public GMLDataStore ( String namespace, String location, String schemaLocation ) {
-		this.namespace = namespace;
+	public GMLDataStore( String location, Configuration configuration ) {
 		this.location = location;
-		this.schemaLocation = schemaLocation;
+		this.configuration = configuration;
 	}
 	
 	/**
@@ -83,22 +76,93 @@ public class GMLDataStore extends AbstractDataStore2 {
 	}
 	
 	/**
-	 * @return The location of the application schema.
+	 * @return the application schema configuration
 	 */
-	String getSchemaLocation() {
-		return schemaLocation;
+	Configuration getConfiguration() {
+		return configuration;
+	}
+	
+	/**
+	 * Configuration accessor, which ensures a configuration is returned by infering it from
+	 * the instance document if need be, or throwing an exception otherwise.
+	 * 
+	 * @return
+	 * @throws DataSourceException
+	 */
+	Configuration configuration() throws DataSourceException {
+		if ( configuration == null ) {
+			synchronized ( this ) {
+				if ( configuration == null ) {
+					try {
+						//parse some of the instance document to find out the schema location
+						InputStream input = document();
+						
+						//create stream parser
+						XmlPullParser parser = null;
+						
+						XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+						factory.setNamespaceAware(true);
+						factory.setValidating(false);
+							
+						//parse root element
+						parser = factory.newPullParser();
+						parser.setInput( input, "UTF-8" );
+						parser.nextTag();
+						
+						//look for schema location
+						for ( int i = 0; i < parser.getAttributeCount(); i++ ) {
+							if ( "schemaLocation".equals( parser.getAttributeName( i ) ) ) {
+								String xsiSchemaLocation = parser.getAttributeValue( i );
+								String[] split = xsiSchemaLocation.split( " " );
+								if ( split.length > 2 ) {
+									String msg = "Multiple schemaLocations not supported";
+									throw new DataSourceException( msg );
+								}
+								
+								String namespace = split[ 0 ];
+								String schemaLocation = split[ 1 ];
+								
+								configuration = 
+									new ApplicationSchemaConfiguration( namespace, schemaLocation );
+								
+								break;
+							}
+						}
+						
+						//reset input stream
+						parser.setInput( null );
+						input.close();
+					} 
+					catch (Exception e) {
+						String msg = "Unable to determine schema from instance document";
+						throw new DataSourceException( msg, e );
+					}
+				}
+			}
+		}
+		
+		return configuration;
+	}
+	
+	/**
+	 * @return The location of the application schema.
+	 * 
+	 */
+	String schemaLocation() throws DataSourceException {
+		return configuration().getSchemaFileURL();
 	}
 	
 	protected List createContents() {
 		//TODO: this method should create content lazily.
 		try {
 			List contents = new ArrayList();
-			XSDSchema schema = schema();
+			Configuration configuration = configuration();
+			XSDSchema schema = configuration.schema();
 			
 			//look for elements in the schema which are of type AbstractFeatureType
 			for ( Iterator e = schema.getElementDeclarations().iterator(); e.hasNext(); ) {
 				XSDElementDeclaration element = (XSDElementDeclaration) e.next();
-				if ( !namespace.equals( element.getTargetNamespace() ) ) 
+				if ( !configuration.getNamespaceURI().equals( element.getTargetNamespace() ) ) 
 					continue;
 				
 				final ArrayList isFeatureType = new ArrayList();
@@ -179,94 +243,82 @@ public class GMLDataStore extends AbstractDataStore2 {
 	}
 	
 	/**
-	 * Helper method which returns a parser configuration.
-	 * @return
-	 * @throws IOException
-	 */
-	Configuration configuration() throws IOException {
-		if ( schemaLocation != null ) {
-			//create a custom congfiguraiton
-			return new ApplicationSchemaConfiguration( namespace, schemaLocation );
-		}
-		
-		//just use gml3
-		return new GMLConfiguration();
-	}
-	
-	/**
 	 * Helper method which lazily parses the application schema.
 	 * 
 	 * @throws IOException
 	 */
 	XSDSchema schema() throws IOException {
-		if ( schema == null ) {
-			synchronized ( this ) {
-				if ( schema == null ) {
-					GMLConfiguration configuration = new GMLConfiguration();
-					
-					//get all the necessary schema locations
-					List dependencies = configuration.allDependencies();
-					List resolvers = new ArrayList();
-					for ( Iterator d = dependencies.iterator(); d.hasNext(); ) {
-						Configuration dependency = (Configuration) d.next();
-						XSDSchemaLocationResolver resolver = dependency.getSchemaLocationResolver();
-						if ( resolver != null ) {
-							resolvers.add( resolver );
-						}
-					}
-					
-					//if a schema location was specified, add one for it
-					if ( schemaLocation == null ) {				
-						//parse some of the instance document to find out the schema location
-						InputStream input = document();
-						
-						//create stream parser
-						XmlPullParser parser = null;
-						
-						try {
-							XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-							factory.setNamespaceAware(true);
-							factory.setValidating(false);
-								
-							//parse root element
-							parser = factory.newPullParser();
-							parser.setInput( input, "UTF-8" );
-							parser.nextTag();
-							
-							//look for schema location
-							for ( int i = 0; i < parser.getAttributeCount(); i++ ) {
-								if ( "schemaLocation".equals( parser.getAttributeName( i ) ) ) {
-									String xsiSchemaLocation = parser.getAttributeValue( i );
-									String[] split = xsiSchemaLocation.split( " " );
-									for ( int j = 0; j < split.length; j += 2 ) {
-										if ( namespace.equals( split[ j ] ) ) {
-											schemaLocation = split[ j + 1 ];
-											break;
-										}
-									}
-									
-									break;
-								}
-							}
-							
-							//reset input stream
-							parser.setInput( null );
-							input.close();
-						} 
-						catch (XmlPullParserException e) {
-							throw (IOException) new IOException().initCause( e );
-						}
-					}
-				
-					if ( schemaLocation == null ) {
-						throw new DataSourceException( "Unable to determine application schema location ");
-					}
-					
-					schema = Schemas.parse( schemaLocation, null, resolvers );
-				}
-			}
-		}
-		
-		return schema;
+		return configuration().schema();
 	}
+//	
+//		if ( schema == null ) {
+//			synchronized ( this ) {
+//				if ( schema == null ) {
+//					GMLConfiguration configuration = new GMLConfiguration();
+//					
+//					//get all the necessary schema locations
+//					List dependencies = configuration.allDependencies();
+//					List resolvers = new ArrayList();
+//					for ( Iterator d = dependencies.iterator(); d.hasNext(); ) {
+//						Configuration dependency = (Configuration) d.next();
+//						XSDSchemaLocationResolver resolver = dependency.getSchemaLocationResolver();
+//						if ( resolver != null ) {
+//							resolvers.add( resolver );
+//						}
+//					}
+//					
+//					//if a schema location was specified, add one for it
+//					if ( schemaLocation == null ) {				
+//						//parse some of the instance document to find out the schema location
+//						InputStream input = document();
+//						
+//						//create stream parser
+//						XmlPullParser parser = null;
+//						
+//						try {
+//							XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+//							factory.setNamespaceAware(true);
+//							factory.setValidating(false);
+//								
+//							//parse root element
+//							parser = factory.newPullParser();
+//							parser.setInput( input, "UTF-8" );
+//							parser.nextTag();
+//							
+//							//look for schema location
+//							for ( int i = 0; i < parser.getAttributeCount(); i++ ) {
+//								if ( "schemaLocation".equals( parser.getAttributeName( i ) ) ) {
+//									String xsiSchemaLocation = parser.getAttributeValue( i );
+//									String[] split = xsiSchemaLocation.split( " " );
+//									for ( int j = 0; j < split.length; j += 2 ) {
+//										if ( namespace.equals( split[ j ] ) ) {
+//											schemaLocation = split[ j + 1 ];
+//											break;
+//										}
+//									}
+//									
+//									break;
+//								}
+//							}
+//							
+//							//reset input stream
+//							parser.setInput( null );
+//							input.close();
+//						} 
+//						catch (XmlPullParserException e) {
+//							throw (IOException) new IOException().initCause( e );
+//						}
+//					}
+//				
+//					if ( schemaLocation == null ) {
+//						throw new DataSourceException( "Unable to determine application schema location ");
+//					}
+//					
+//					schema = Schemas.parse( schemaLocation, null, resolvers );
+//				}
+//			}
+//		}
+//		
+//		return schema;
+//	}
 }

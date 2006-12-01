@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.xml.Configuration;
 
 /**
  * Datastore factory for gml datastore.
@@ -15,28 +16,33 @@ import org.geotools.data.DataStoreFactorySpi;
 public class GMLDataStoreFactory implements DataStoreFactorySpi {
 
 	/**
-	 * The application schema namespace.
-	 */
-	public Param NAMESPACE = new Param( "namespace", String.class, "Application schema namespace", true );
-	/**
 	 * The location of the instance document.
 	 */
 	public Param LOCATION = 
 		new Param( "location", String.class, "Instance document location", true );
-	/**
-	 * The location of the application schema.
-	 */
-	public Param SCHEMA_LOCATION = 
-		new Param( "schemaLocation", String.class, "Application schema location", false );
-
 	
-	public DataStore createDataStore(Map params) throws IOException {
-		String namespace = (String) NAMESPACE.lookUp( params );
-		String location = (String) LOCATION.lookUp( params );
-		String schemaLocation = (String) SCHEMA_LOCATION.lookUp( params );
+	/**
+	 * The application schema configuration
+	 */
+	public Param CONFIGURATION =
+		new Param( "configuration", Class.class, "Application schema configuration", false );
+	
 		
+	public DataStore createDataStore(Map params) throws IOException {
+		String location = (String) LOCATION.lookUp( params );
+		Class configuration = (Class) CONFIGURATION.lookUp( params );
+	
 		if ( location != null ) {
-			return new GMLDataStore( namespace, location, schemaLocation );
+			if ( configuration != null ) {
+				try {
+					return new GMLDataStore( location, (Configuration) configuration.newInstance() );
+				} 
+				catch( Exception e ){
+					throw (IOException) new IOException().initCause( e );
+				}
+			}
+			
+			return new GMLDataStore( location );
 		}
 		
 		return null;
@@ -56,12 +62,12 @@ public class GMLDataStoreFactory implements DataStoreFactorySpi {
 
 	public Param[] getParametersInfo() {
 		return new Param[] {
-			NAMESPACE, LOCATION, SCHEMA_LOCATION	
+			LOCATION, CONFIGURATION
 		};
 	}
 
 	public boolean canProcess(Map params) {
-		return params.containsKey( NAMESPACE.key ) && params.containsKey( LOCATION.key );
+		return params.containsKey( LOCATION.key );
 	}
 
 	public boolean isAvailable() {

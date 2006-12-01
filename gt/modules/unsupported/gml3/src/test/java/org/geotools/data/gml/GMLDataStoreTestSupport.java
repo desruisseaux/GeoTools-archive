@@ -10,7 +10,7 @@ public class GMLDataStoreTestSupport extends TestCase {
 		String location = getClass().getResource( "test.xml" ).toString();
 		String schemaLocation = getClass().getResource( "test.xsd" ).toString();
 		
-		dataStore = new GMLDataStore( "http://www.geotools.org/test", location, schemaLocation );
+		dataStore = new GMLDataStore( location, new ApplicationSchemaConfiguration( "http://www.geotools.org/test", schemaLocation ) );
 	}
 	
 }

@@ -7,8 +7,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -18,11 +16,15 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 	GMLDataStore dataStore;
 	
 	protected void setUp() throws Exception {
-		String namespace = "http://cite.opengeospatial.org/gmlsf";
+		
 		String location = getClass().getResource( "dataset-sf0.xml" ).toString();
+		
+		String namespace = "http://cite.opengeospatial.org/gmlsf";
 		String schemaLocation = getClass().getResource( "cite-gmlsf0.xsd" ).toString();
 		
-		dataStore = new GMLDataStore( namespace, location, schemaLocation );
+		dataStore = new GMLDataStore( 
+			location, new ApplicationSchemaConfiguration( namespace, schemaLocation ) 
+		);
 	}
 	
 	public void testGetTypeNames() throws Exception {
