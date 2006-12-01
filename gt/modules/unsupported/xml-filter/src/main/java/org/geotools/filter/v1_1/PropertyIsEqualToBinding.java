@@ -75,6 +75,13 @@ public class PropertyIsEqualToBinding extends AbstractComplexBinding {
         throws Exception {
         Expression[] operands = (Expression[]) value;
 
-        return filterfactory.equals(operands[0], operands[1]);
+        //&lt;xsd:attribute default="true" name="matchCase" type="xsd:boolean" use="optional"/&gt;
+        Boolean matchCase = Boolean.TRUE;
+
+        if (node.hasAttribute("matchCase")) {
+            matchCase = (Boolean) node.getAttributeValue("matchCase");
+        }
+
+        return filterfactory.equal(operands[0], operands[1], matchCase.booleanValue());
     }
 }
