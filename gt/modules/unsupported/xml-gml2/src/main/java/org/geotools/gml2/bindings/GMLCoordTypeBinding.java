@@ -83,7 +83,7 @@ public class GMLCoordTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return CoordinateSequence.class;
     }
 
     /**
