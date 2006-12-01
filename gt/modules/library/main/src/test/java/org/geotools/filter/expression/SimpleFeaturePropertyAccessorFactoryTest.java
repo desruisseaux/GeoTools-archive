@@ -15,8 +15,15 @@ public class SimpleFeaturePropertyAccessorFactoryTest extends TestCase {
 	}
 	
 	public void test() {
+		
+		//make sure features are supported
 		assertNotNull( factory.createPropertyAccessor( Feature.class, "xpath", null, null ) );
 		assertNull( factory.createPropertyAccessor( Map.class , "xpath", null, null ) );
+		
+		//make sure only simple xpath
+		assertNull( factory.createPropertyAccessor( Feature.class, "@xpath", null, null )  );
+		assertNull( factory.createPropertyAccessor( Feature.class, "/xpath", null, null ) );
+		assertNull( factory.createPropertyAccessor( Feature.class, "*[0]", null, null ) );
 	}
 	
 	

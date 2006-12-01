@@ -38,12 +38,10 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 	
 	
 	public void testCanHandle() {
-		//assertTrue( accessor.canHandle( feature, "foo", null ) );
-		//assertTrue( accessor.canHandle( feature, "bar", null ) );
-		//assertTrue( accessor.canHandle( feature, "@id", null ) );
-		//assertTrue( accessor.canHandle( feature, "@gml:id", null ) );
+		assertTrue( accessor.canHandle( feature, "foo", null ) );
+		assertTrue( accessor.canHandle( feature, "bar", null ) );
 		
-		//assertFalse( accessor.canHandle( feature, "illegal", null ) );
+		assertFalse( accessor.canHandle( feature, "illegal", null ) );
 	}
 	
 	public void testGet() {
