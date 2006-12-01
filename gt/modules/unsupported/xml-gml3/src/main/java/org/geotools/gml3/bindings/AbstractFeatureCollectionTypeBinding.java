@@ -96,7 +96,9 @@ public class AbstractFeatureCollectionTypeBinding extends AbstractComplexBinding
         if (GML.featureMembers.equals(name)) {
             FeatureCollection fc = (FeatureCollection) object;
 
-            return fc.toArray(new Feature[fc.size()]);
+            return fc;
+
+            //return fc.toArray(new Feature[fc.size()]);
         }
 
         return null;
