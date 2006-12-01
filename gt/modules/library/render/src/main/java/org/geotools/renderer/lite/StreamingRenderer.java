@@ -25,7 +25,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.collection.ResourceCollection;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
@@ -86,6 +89,7 @@ import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
@@ -288,13 +292,16 @@ public final class StreamingRenderer implements GTRenderer {
 		renderListeners.remove(listener);
 	}
 
-	private void fireFeatureRenderedEvent(Feature feature) {
+	private void fireFeatureRenderedEvent(Object feature) {
+        if( !(feature instanceof Feature)){
+            return;
+        }
 		final Object[] objects = renderListeners.getListeners();
 		final int length = objects.length;
 		RenderListener listener;
 		for (int i = 0; i < length; i++) {
 			listener = (RenderListener) objects[i];
-			listener.featureRenderer(feature);
+			listener.featureRenderer((Feature)feature);
 		}
 	}
 
@@ -1311,9 +1318,13 @@ public final class StreamingRenderer implements GTRenderer {
 		return result;
 	}
 
-	private FeatureIterator getReader(FeatureCollection features,
+	private Collection prepCollection(Collection collection,
 			CoordinateReferenceSystem sourceCrs) throws IOException {
-        return prepFeatureCollection( features, sourceCrs ).features();
+        if( collection instanceof FeatureCollection){
+            // will force content into correct CRS if needed
+            return prepFeatureCollection( (FeatureCollection) collection, sourceCrs );
+        }
+        return collection;
 	}
 
     /**
@@ -1416,8 +1427,10 @@ public final class StreamingRenderer implements GTRenderer {
 		// /////////////////////////////////////////////////////////////////////
 		final FeatureTypeStyle[] featureStylers = currLayer.getStyle()
 				.getFeatureTypeStyles();
-		final FeatureSource source = currLayer.getFeatureSource();
+		
+        final FeatureSource source = currLayer.getFeatureSource();
 		final FeatureType schema = source.getSchema();
+        
 		final GeometryAttributeType geometryAttribute = schema
 				.getDefaultGeometry();
 		final CoordinateReferenceSystem sourceCrs = geometryAttribute
@@ -1437,49 +1450,47 @@ public final class StreamingRenderer implements GTRenderer {
 		if (lfts.size() == 0)
 			return; // nothing to do
 
-		// /////////////////////////////////////////////////////////////////////
+        LiteFeatureTypeStyle[] featureTypeStyleArray = (LiteFeatureTypeStyle[]) lfts.toArray(new LiteFeatureTypeStyle[lfts.size()]);
+        // /////////////////////////////////////////////////////////////////////
 		//
 		// DJB: get a featureresults (so you can get a feature reader) for the
 		// data
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final FeatureCollection features = queryLayer(currLayer, source, schema,
-				(LiteFeatureTypeStyle[]) lfts
-						.toArray(new LiteFeatureTypeStyle[lfts.size()]),
+		final Collection result = queryLayer(currLayer, source, schema,
+				featureTypeStyleArray,
 				mapArea, destinationCrs, sourceCrs, screenSize,
 				geometryAttribute);
 
-		final FeatureIterator reader = getReader(features, sourceCrs);
+        final Collection collection = prepCollection(result, sourceCrs);
+		final Iterator iterator = collection.iterator();        
 		int n_lfts = lfts.size();
 		final LiteFeatureTypeStyle[] fts_array = (LiteFeatureTypeStyle[]) lfts
 				.toArray(new LiteFeatureTypeStyle[n_lfts]);
 
 		try {
-			Feature feature;
+			Object feature;
 			int t = 0;
 			while (!renderingStopRequested) { // loop exit condition tested inside try catch
 				try {
-					if (!reader.hasNext()) {
+					if (!iterator.hasNext()) {
 						break;
 					}
-					feature = reader.next(); // read the feature
+					feature = iterator.next(); // read the content
 					for (t = 0; t < n_lfts; t++) {
-						process(feature, fts_array[t], scaleRange, at,
-								destinationCrs); // draw the feature on the
-						// image(s)
+						process(feature, fts_array[t], scaleRange, at, destinationCrs);
+                        // draw the content on the image(s)
 					}
-				} catch (OutOfMemoryError oom) {
-					// close is actually handled in the finally c
-					// reader.close() ; //DJB -- if we've got an out of memory
-					// error, we pretty much have to abort what we're doing!
-					throw oom;
 				} catch (Throwable tr) {
 					LOGGER.log(Level.SEVERE, tr.getLocalizedMessage(), tr);
 					fireErrorEvent(new Exception("Error rendering feature", tr));
 				}
 			}
 		} finally {
-			reader.close();
+            if( collection instanceof ResourceCollection ){
+                ResourceCollection resource = (ResourceCollection ) collection;
+                resource.close( iterator );
+            }
 		}
 		// have to re-form the image now.
 		// graphics.setTransform( new AffineTransform() );
@@ -1498,10 +1509,10 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	/**
-	 * @param feature
+	 * @param content
 	 * @param style
 	 */
-	final private void process(Feature feature, LiteFeatureTypeStyle style,
+	final private void process(Object content, LiteFeatureTypeStyle style,
 			Range scaleRange, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs)
 			throws TransformException, FactoryException {
@@ -1518,10 +1529,10 @@ public final class StreamingRenderer implements GTRenderer {
 			r = ruleList[t];
 			filter = r.getFilter();
 
-			if ((filter == null) || filter.evaluate(feature)) {
+			if ((filter == null) || filter.evaluate(content)) {
 				doElse = false;
 				symbolizers = r.getSymbolizers();
-				processSymbolizers(graphics, feature, symbolizers, scaleRange,
+				processSymbolizers(graphics, content, symbolizers, scaleRange,
 						at, destinationCrs);
 			}
 		}
@@ -1532,7 +1543,7 @@ public final class StreamingRenderer implements GTRenderer {
 				r = elseRuleList[tt];
 				symbolizers = r.getSymbolizers();
 
-				processSymbolizers(graphics, feature, symbolizers, scaleRange,
+				processSymbolizers(graphics, content, symbolizers, scaleRange,
 						at, destinationCrs);
 
 			}
@@ -1546,7 +1557,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * </p>
 	 * 
 	 * @param graphics
-	 * @param feature
+	 * @param drawMe
 	 *            The feature to be rendered
 	 * @param symbolizers
 	 *            An array of symbolizers which actually perform the rendering.
@@ -1559,7 +1570,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @throws FactoryException
 	 */
 	final private void processSymbolizers(final Graphics2D graphics,
-			final Feature feature, final Symbolizer[] symbolizers,
+			final Object drawMe, final Symbolizer[] symbolizers,
 			Range scaleRange, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs)
 			throws TransformException, FactoryException {
@@ -1577,7 +1588,7 @@ public final class StreamingRenderer implements GTRenderer {
 			// /////////////////////////////////////////////////////////////////
 			if (symbolizers[m] instanceof RasterSymbolizer) {
 
-				renderRaster(graphics, feature,
+				renderRaster(graphics, drawMe,
 						(RasterSymbolizer) symbolizers[m], destinationCrs,
 						scaleRange);
 
@@ -1588,14 +1599,14 @@ public final class StreamingRenderer implements GTRenderer {
 				// FEATURE
 				//
 				// /////////////////////////////////////////////////////////////////
-				g = findGeometry(feature, symbolizers[m]); // pulls the
+				g = findGeometry(drawMe, symbolizers[m]); // pulls the
 				// geometry
 
 				sa = (SymbolizerAssociation) symbolizerAssociationHT
 						.get(symbolizers[m]);
 				if (sa == null) {
 					sa = new SymbolizerAssociation();
-					sa.setCRS(findGeometryCS(feature, symbolizers[m]));
+					sa.setCRS(findGeometryCS(drawMe, symbolizers[m]));
 					try {
 						// DJB: this should never be necessary since we've
 						// already taken care to make sure the reader is
@@ -1636,19 +1647,19 @@ public final class StreamingRenderer implements GTRenderer {
 					fireErrorEvent(new RuntimeException(ae));
 					continue;
 				}
-				if (symbolizers[m] instanceof TextSymbolizer) {
-					labelCache.put((TextSymbolizer) symbolizers[m], feature,
+				if (symbolizers[m] instanceof TextSymbolizer && drawMe instanceof Feature) {
+                    // TODO: double back and make labelCache work with Objects
+					labelCache.put((TextSymbolizer) symbolizers[m], (Feature)drawMe,
 							shape, scaleRange);
 				} else {
-					Style2D style = styleFactory.createStyle(feature,
+					Style2D style = styleFactory.createStyle(drawMe,
 							symbolizers[m], scaleRange);
 					painter.paint(graphics, shape, style, scaleDenominator);
 				}
 
 			}
 		}
-
-		fireFeatureRenderedEvent(feature);
+		fireFeatureRenderedEvent(drawMe);
 	}
 
 	/**
@@ -1698,13 +1709,14 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param scaleRange
 	 * @task make it follow the symbolizer
 	 */
-	private void renderRaster(Graphics2D graphics, Feature feature,
+	private void renderRaster(Graphics2D graphics, Object feature,
 			RasterSymbolizer symbolizer,
 			CoordinateReferenceSystem destinationCRS, Range scaleRange) {
-		if (LOGGER.isLoggable(Level.FINE))
+		if (LOGGER.isLoggable(Level.FINE)){
+            Object grid = filterFactory.property("grid").evaluate( feature );
 			LOGGER.fine(new StringBuffer("rendering Raster for feature ")
-					.append(feature.toString()).append(" - ").append(
-							feature.getAttribute("grid")).toString());
+					.append(feature.toString()).append(" - ").append(grid).toString());
+        }
 
 		try {
 			// /////////////////////////////////////////////////////////////////
@@ -1714,7 +1726,8 @@ public final class StreamingRenderer implements GTRenderer {
 			// rely on the gridocerage renderer itself.
 			//
 			// /////////////////////////////////////////////////////////////////
-			final Object grid = feature.getAttribute("grid");
+		    
+			final Object grid = filterFactory.property("grid").evaluate( feature );
 
 			final GridCoverageRenderer gcr = new GridCoverageRenderer(
 					destinationCRS, mapExtent, screenSize, java2dHints);
@@ -1722,9 +1735,9 @@ public final class StreamingRenderer implements GTRenderer {
 			// //
 			// It is a grid coverage
 			// //
-			if (grid instanceof GridCoverage)
-				gcr.paint(graphics, (GridCoverage2D) feature
-						.getAttribute("grid"), symbolizer);
+			if (grid instanceof GridCoverage2D){
+            	gcr.paint(graphics, (GridCoverage2D) grid, symbolizer);
+            }
 			else if (grid instanceof AbstractGridCoverage2DReader) {
 				// //
 				// It is an AbstractGridCoverage2DReader
@@ -1733,8 +1746,8 @@ public final class StreamingRenderer implements GTRenderer {
 						AbstractGridFormat.READ_GRIDGEOMETRY2D);
 				readGG.setValue(new GridGeometry2D(new GeneralGridRange(
 						screenSize), new GeneralEnvelope(mapExtent)));
-				AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) feature
-						.getAttribute("grid");
+                
+				AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) grid;                
 				GridCoverage2D coverage = (GridCoverage2D) reader
 						.read(new GeneralParameterValue[] { readGG });
 				gcr.paint(graphics, coverage, symbolizer);
@@ -1758,46 +1771,38 @@ public final class StreamingRenderer implements GTRenderer {
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			fireErrorEvent(e);
 		}
-
 	}
 
 	/**
 	 * Finds the geometric attribute requested by the symbolizer
 	 * 
-	 * @param f
+	 * @param drawMe
 	 *            The feature
 	 * @param s
 	 * 
 	 * /** Finds the geometric attribute requested by the symbolizer
 	 * 
-	 * @param f
+	 * @param drawMe
 	 *            The feature
 	 * @param s
 	 *            The symbolizer
 	 * @return The geometry requested in the symbolizer, or the default geometry
 	 *         if none is specified
 	 */
-	private com.vividsolutions.jts.geom.Geometry findGeometry(Feature f,
+	private com.vividsolutions.jts.geom.Geometry findGeometry(Object drawMe,
 			Symbolizer s) {
-		String geomName = getGeometryPropertyName(s);
+		PropertyName geomName = getGeometryPropertyName(s);
 
 		// get the geometry
-		Geometry geom;
-
-		if (geomName == null) {
-			geom = f.getDefaultGeometry();
-		} else {
-			geom = (com.vividsolutions.jts.geom.Geometry) f
-					.getAttribute(geomName);
-		}
+		Geometry geom = (Geometry) geomName.evaluate( drawMe, Geometry.class );
 
 		// if the symbolizer is a point symbolizer generate a suitable location
 		// to place the
 		// point in order to avoid recomputing that location at each rendering
 		// step
-		if (s instanceof PointSymbolizer)
+		if (s instanceof PointSymbolizer){
 			geom = getCentroid(geom); // djb: major simpificatioN
-
+        }
 		return geom;
 	}
 
@@ -1824,30 +1829,40 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	/**
-	 * Finds the geometric attribute coordinate reference system
+	 * Finds the geometric attribute coordinate reference system.
 	 * 
-	 * @param f
-	 *            The feature
-	 * @param s
-	 *            The symbolizer
-	 * @return The geometry requested in the symbolizer, or the default geometry
-	 *         if none is specified
+	 * @param f The feature
+	 * @param s The symbolizer
+	 * @return The geometry requested in the symbolizer, or the default geometry if none is specified
 	 */
 	private org.opengis.referencing.crs.CoordinateReferenceSystem findGeometryCS(
-			Feature f, Symbolizer s) {
-		String geomName = getGeometryPropertyName(s);
+			Object drawMe, Symbolizer s) {
 
-		if (geomName != null) {
-			return ((GeometryAttributeType) f.getFeatureType()
-					.getAttributeType(geomName)).getCoordinateSystem();
-		} else {
-			return ((GeometryAttributeType) f.getFeatureType()
-					.getDefaultGeometry()).getCoordinateSystem();
-		}
+
+        if( drawMe instanceof Feature ){
+            Feature f = (Feature) drawMe;
+        
+            String geomName = getGeometryPropertyName(s).getPropertyName();        
+            if (geomName != null || "".equals(geomName)) {
+    			return ((GeometryAttributeType) f.getFeatureType()
+    					.getAttributeType(geomName)).getCoordinateSystem();
+    		} else {
+    			return ((GeometryAttributeType) f.getFeatureType()
+    					.getDefaultGeometry()).getCoordinateSystem();
+    		}
+        }
+        else {
+            // need to grab this from source.getInfo().getCRS();
+            // really this is preprocessing done in a strange non lazy fashion
+            
+            PropertyName geomName = getGeometryPropertyName(s);
+            Geometry geom = (Geometry) geomName.evaluate( drawMe );            
+            return (org.opengis.referencing.crs.CoordinateReferenceSystem) geom.getUserData(); // ha ha
+        }
 	}
 
-	private String getGeometryPropertyName(Symbolizer s) {
-		String geomName = null;
+	private PropertyName getGeometryPropertyName(Symbolizer s) {
+		String geomName = ""; // indicate default geometry!
 
 		// TODO: fix the styles, the getGeometryPropertyName should probably be
 		// moved into an
@@ -1861,8 +1876,7 @@ public final class StreamingRenderer implements GTRenderer {
 		} else if (s instanceof TextSymbolizer) {
 			geomName = ((TextSymbolizer) s).getGeometryPropertyName();
 		}
-
-		return geomName;
+		return filterFactory.property(geomName);
 	}
 
 	/**

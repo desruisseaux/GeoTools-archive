@@ -83,7 +83,7 @@ public class SVGGlyphRenderer implements GlyphRenderer {
     public java.awt.image.BufferedImage 
          render(org.geotools.styling.Graphic graphic, 
         		org.geotools.styling.ExternalGraphic eg, 
-        		org.geotools.feature.Feature feature,
+        		Object feature,
     		    int height) {
         try {
             BufferedImage img;

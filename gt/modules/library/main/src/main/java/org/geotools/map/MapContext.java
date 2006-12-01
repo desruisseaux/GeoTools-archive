@@ -17,9 +17,11 @@ package org.geotools.map;
 
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Source;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -76,6 +78,16 @@ public interface MapContext {
 	 */
 	void addLayer(FeatureSource featureSource, Style style);
 
+    /**
+     * Add a new layer and trigger a {@link LayerListEvent}.
+     * <p>
+     * The Source interface allows lazy query based access to
+     * a range of geospatial content.
+     * </p>
+     * @param source 
+     */
+    void addLayer(Source source, Style style);
+
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}.
 	 * 
@@ -84,6 +96,13 @@ public interface MapContext {
 	 */
 	void addLayer(FeatureCollection collection, Style style);
 
+    /**
+     * Add a new layer and trigger a {@link LayerListEvent}.
+     * 
+     * @param collection Collection with the new layer that will be added.
+     */
+    void addLayer(Collection collection, Style style);
+    
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}
 	 * 

@@ -93,7 +93,7 @@ public class CustomGlyphRenderer implements GlyphRenderer {
      * @param feature
      * @param height
      */
-    public BufferedImage render(Graphic graphic, ExternalGraphic eg, Feature feature, int height) {
+    public BufferedImage render(Graphic graphic, ExternalGraphic eg, Object feature, int height) {
         Map props = eg.getCustomProperties();
         Set propNames = props.keySet();
         Iterator it = propNames.iterator();
@@ -114,73 +114,73 @@ public class CustomGlyphRenderer implements GlyphRenderer {
         int radius = 50;
         Expression e = (Expression) list.getPropertyValue("radius");
         if (e != null){
-            radius = ((Number) e.getValue(feature)).intValue();
+            radius = ((Number) e.evaluate(feature)).intValue();
         }
         
         Color circleColor = Color.BLUE.darker();
         e = (Expression) list.getPropertyValue("circle color");
         if (e != null){
-            circleColor = Color.decode((String) e.getValue(feature));
+            circleColor = Color.decode((String) e.evaluate(feature));
         }
         
         int barHeight = 150;
         e = (Expression) list.getPropertyValue("bar height");
         if (e != null){
-            barHeight = ((Number) e.getValue(feature)).intValue();
+            barHeight = ((Number) e.evaluate(feature)).intValue();
         }
         
         Color barColor = Color.BLACK;
         e = (Expression) list.getPropertyValue("bar color");
         if (e != null){
-            barColor = Color.decode((String) e.getValue(feature));
+            barColor = Color.decode((String) e.evaluate(feature));
         }
         
         int barUncertainty = 50;
         e = (Expression) list.getPropertyValue("bar uncertainty");
         if (e != null){
-            barUncertainty = ((Number) e.getValue(feature)).intValue();
+            barUncertainty = ((Number) e.evaluate(feature)).intValue();
         }
         
         int barUncWidth = 5;
         e = (Expression) list.getPropertyValue("bar uncertainty width");
         if (e != null){
-            barUncWidth = ((Number) e.getValue(feature)).intValue();
+            barUncWidth = ((Number) e.evaluate(feature)).intValue();
         }
         
         Color barUncColor = Color.GRAY;
         e = (Expression) list.getPropertyValue("bar uncertainty color");
         if (e != null){
-            barUncColor = Color.decode((String) e.getValue(feature));
+            barUncColor = Color.decode((String) e.evaluate(feature));
         }
         
         int pointerDirection = 21;
         e = (Expression) list.getPropertyValue("pointer direction");
         if (e != null){
-            pointerDirection = ((Number) e.getValue(feature)).intValue();
+            pointerDirection = ((Number) e.evaluate(feature)).intValue();
         }
         
         Color pointerColor = Color.RED;
         e = (Expression) list.getPropertyValue("pointer color");
         if (e != null){
-            pointerColor = Color.decode((String) e.getValue(feature));
+            pointerColor = Color.decode((String) e.evaluate(feature));
         }
         
         int pointerLength = 100;
         e = (Expression) list.getPropertyValue("pointer length");
         if (e != null){
-            pointerLength = ((Number) e.getValue(feature)).intValue();
+            pointerLength = ((Number) e.evaluate(feature)).intValue();
         }
         
         int wedgeWidth = 25;
         e = (Expression) list.getPropertyValue("wedge width");
         if (e != null){
-            wedgeWidth = ((Number) e.getValue(feature)).intValue();
+            wedgeWidth = ((Number) e.evaluate(feature)).intValue();
         }
         
         Color wedgeColor = Color.BLUE;
         e = (Expression) list.getPropertyValue("wedge color");
         if (e != null){
-            wedgeColor = Color.decode((String) e.getValue(feature));
+            wedgeColor = Color.decode((String) e.evaluate(feature));
         }
         
         int circleCenterX, circleCenterY, imageHeight, imageWidth;
@@ -193,12 +193,12 @@ public class CustomGlyphRenderer implements GlyphRenderer {
         Expression tempExp = (Expression) list.getPropertyValue("bar height");
         int temp1 = 0;
         if (tempExp != null){
-            temp1 = ((Number) tempExp.getValue(feature)).intValue();
+            temp1 = ((Number) tempExp.evaluate(feature)).intValue();
         }
         tempExp = (Expression) list.getPropertyValue("bar uncertainty");
         int temp2 = 0;
         if (tempExp != null){
-            temp2 = ((Number) tempExp.getValue(feature)).intValue();
+            temp2 = ((Number) tempExp.evaluate(feature)).intValue();
         }
         if (temp1 + temp2 > maxBarHeight){
             maxBarHeight = temp1 + temp2;
@@ -214,12 +214,12 @@ public class CustomGlyphRenderer implements GlyphRenderer {
 //                Expression tempExp = (Expression) list.getPropertyValue("bar height");
 //                int temp1 = 0;
 //                if (tempExp != null){
-//                    temp1 = ((Number) tempExp.getValue(next)).intValue();
+//                    temp1 = ((Number) tempExp.evaluate(next)).intValue();
 //                }
 //                tempExp = (Expression) list.getPropertyValue("bar uncertainty");
 //                int temp2 = 0;
 //                if (tempExp != null){
-//                    temp2 = ((Number) tempExp.getValue(next)).intValue();
+//                    temp2 = ((Number) tempExp.evaluate(next)).intValue();
 //                }
 //                if (temp1 + temp2 > maxBarHeight){
 //                    maxBarHeight = temp1 + temp2;

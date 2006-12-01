@@ -15,23 +15,23 @@
  */
 package org.geotools.data;
 
+
 /**
  * <i>
- * <p>First draft of a Store interface based on brain storming session with Jody, Thomas, 
+ * <p>First draft of a Store interface based on brain storming session with Jody, Thomas,
  * Stefan and Cory in Refractions on November 24th.</p>
- * 
- * <p>The basic idea is to have simple, general interface to access and query data that is in some way or 
- * another spatially enabled. And we don't want the restriction to {@link org.geotools.feature.Feature}, 
- * {@link org.geotools.feature.FeatureType}, {@link org.geotools.data.FeatureSource}, etc. as we have right 
+ *
+ * <p>The basic idea is to have simple, general interface to access and query data that is in some way or
+ * another spatially enabled. And we don't want the restriction to {@link org.geotools.feature.Feature},
+ * {@link org.geotools.feature.FeatureType}, {@link org.geotools.data.FeatureSource}, etc. as we have right
  * now in {@link org.geotools.data.DataStore}.</p>
  * </i>
- * 
+ *
  * <code>Store</code> extends the <code>Source</code> interfaces with writing capabilities.
- * 
+ *
  * @source $URL$
  * @version $Id$
  */
-
 public interface Store extends Source {
-	//TODO
+    //TODO
 }

@@ -17,13 +17,17 @@
  */
 package org.geotools.map;
 
+import java.util.Collection;
+
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureEvent;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.Source;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
+import org.geotools.data.memory.CollectionSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
@@ -40,6 +44,8 @@ import org.opengis.referencing.operation.TransformException;
  * @source $URL$
  */
 public class DefaultMapLayer implements MapLayer {
+    /** Holds value of property Source? */
+    private Source source = null;
 
 	/** Holds value of property FeatureSource. */
 	protected FeatureSource featureSource;
@@ -95,6 +101,18 @@ public class DefaultMapLayer implements MapLayer {
 		this.visible = true;
 	}
 
+    public DefaultMapLayer(Source source, Style style, String title) {
+        
+        if ((source == null) || (style == null) || (title == null)) {
+            throw new NullPointerException();
+        }
+        this.source = source;
+        this.style = style;
+        this.title = title;
+        this.visible = true;
+    }
+    
+    
 	/**
 	 * Creates a new instance of DefaultMapLayer
 	 * 
@@ -107,6 +125,7 @@ public class DefaultMapLayer implements MapLayer {
 		this(featureSource, style, "");
 	}
 
+    
 	/**
 	 * Creates a new instance of DefaultMapLayer using a non-emtpy feature
 	 * collection as a parameter
@@ -123,6 +142,10 @@ public class DefaultMapLayer implements MapLayer {
 		this(DataUtilities.source(collection), style, title);
 	}
 
+    public DefaultMapLayer(Collection collection, Style style,
+            String title) {
+        this( new CollectionSource( collection ), style, title);
+    }
 	/**
 	 * Creates a new instance of DefaultMapLayer using a non-emtpy feature
 	 * collection as a parameter
@@ -136,6 +159,10 @@ public class DefaultMapLayer implements MapLayer {
 		this(DataUtilities.source(collection), style, "");
 	}
 
+    public DefaultMapLayer(Collection collection, Style style) {
+        //this(DataUtilities.source(collection), style, "");
+    }
+    
 	/**
 	 * * Add a new layer and trigger a {@link LayerListEvent}.
 	 * 
@@ -223,6 +250,10 @@ public class DefaultMapLayer implements MapLayer {
 		return this.featureSource;
 	}
 
+    public Source getSource() {
+        return this.source;
+    }
+    
 	/**
 	 * Getter for property style.
 	 * 

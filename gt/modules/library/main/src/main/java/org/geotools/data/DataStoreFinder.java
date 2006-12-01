@@ -90,7 +90,6 @@ public final class DataStoreFinder {
                 continue;
             }
         }
-
         return null;
     }
 

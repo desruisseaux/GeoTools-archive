@@ -20,6 +20,7 @@ package org.geotools.map;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Source;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureCollection;
@@ -268,6 +270,16 @@ public class DefaultMapContext implements MapContext {
 	public void addLayer(FeatureSource featureSource, Style style) {
 		this.addLayer(new DefaultMapLayer(featureSource, style, ""));
 	}
+    
+    public void addLayer(Source source, Style style) {
+        // JG: for later when feature source extends source
+//        if( source instanceof FeatureSource){
+//            addLayer( (FeatureSource) source, style);
+//        }
+        this.addLayer(new DefaultMapLayer(source, style, ""));
+    }
+    
+    
 
 	/**
 	 * Add a new layer and trigger a {@link LayerListEvent}.
@@ -326,6 +338,13 @@ public class DefaultMapContext implements MapContext {
 	public void addLayer(FeatureCollection collection, Style style) {
 		this.addLayer(new DefaultMapLayer(collection, style, ""));
 	}
+    public void addLayer(Collection collection, Style style) {
+        if( collection instanceof FeatureCollection){
+            this.addLayer(new DefaultMapLayer((FeatureCollection)collection, style, ""));
+            return;
+        }
+        this.addLayer(new DefaultMapLayer(collection, style, ""));
+    }
 
 	/**
 	 * Remove a layer and trigger a {@link LayerListEvent}.

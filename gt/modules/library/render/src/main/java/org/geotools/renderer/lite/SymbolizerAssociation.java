@@ -20,6 +20,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform2D;
 
 /**
+ * Seems to be a cache of fun information associated with the Symbolizer.
+ * 
  * @source $URL$
  */
 public class SymbolizerAssociation
