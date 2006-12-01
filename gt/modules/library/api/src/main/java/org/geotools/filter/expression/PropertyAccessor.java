@@ -50,8 +50,10 @@ public interface PropertyAccessor {
      * @param target Target context we intend to access (often null or Geometry.class)
      * @return The property, which might be <code>null</code>
      *
+     * @throws IllegalArgumentException In the even that xpath is not supported.
      */
-    Object get(Object object, String xpath, Class target);
+    Object get(Object object, String xpath, Class target)
+        throws IllegalArgumentException;
 
     /**
      * Sets a property of <param>object</param> via xpath expression.
@@ -63,8 +65,10 @@ public interface PropertyAccessor {
      * @param xpath An xpath expression denoting a property of the target object.
      * @param value The new value to set
      * @param target The target context we intend to update (often null or Geometry.class)
+     *
      * @throws IllegalAttributeException If the value set is not legal for the target object.
+     * @throws IllegalArgumentException In the even that xpath is not supported.
      */
     void set(Object object, String xpath, Object value, Class target)
-        throws IllegalAttributeException;
+        throws IllegalAttributeException, IllegalArgumentException;
 }
