@@ -114,6 +114,7 @@ public class SimpleFeaturePropertyAccessorFactory implements
         public Object get(Object object, String xpath, Class target) {
             Feature feature = (Feature) object;            
 
+            xpath = stripPrefix(xpath);
             return feature.getAttribute(xpath);
         }
 
@@ -121,6 +122,7 @@ public class SimpleFeaturePropertyAccessorFactory implements
                 throws IllegalAttributeException {
             Feature feature = (Feature) object;
 
+            xpath = stripPrefix(xpath);
             feature.setAttribute(xpath, value);
         }
     }
