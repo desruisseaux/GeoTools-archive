@@ -17,10 +17,10 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		
-		String location = getClass().getResource( "dataset-sf0.xml" ).toString();
+		String location = getClass().getResource( "dataset-sf0a.xml" ).toString();
 		
 		String namespace = "http://cite.opengeospatial.org/gmlsf";
-		String schemaLocation = getClass().getResource( "cite-gmlsf0.xsd" ).toString();
+		String schemaLocation = getClass().getResource( "cite-gmlsf0a.xsd" ).toString();
 		
 		dataStore = new GMLDataStore( 
 			location, new ApplicationSchemaConfiguration( namespace, schemaLocation ) 
@@ -65,7 +65,7 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 	
 	public void testGetFeatures1() throws Exception {
 		FeatureCollection features = dataStore.getFeatureSource( "PrimitiveGeoFeature" ).getFeatures();
-		assertEquals( 4, features.size() );
+		assertEquals( 5, features.size() );
 		
 		Iterator iterator = features.iterator();
 		assertTrue( iterator.hasNext() );
@@ -80,7 +80,7 @@ public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 	
 	public void testGetFeatures2() throws Exception {
 		FeatureCollection features = dataStore.getFeatureSource( "AggregateGeoFeature" ).getFeatures();
-		assertEquals( 3, features.size() );
+		assertEquals( 4, features.size() );
 		
 		Iterator iterator = features.iterator();
 		assertTrue( iterator.hasNext() );
