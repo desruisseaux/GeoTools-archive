@@ -180,7 +180,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     	org.opengis.filter.expression.Expression leftGeometry = getExpression1();
     	
     	 if (leftGeometry != null) {
-             Object obj = leftGeometry.evaluate(feature);
+             Object obj = leftGeometry.evaluate(feature,Geometry.class);
 
              //LOGGER.finer("leftGeom = " + o.toString()); 
              return (Geometry) obj;
@@ -197,7 +197,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
     	org.opengis.filter.expression.Expression rightGeometry = getExpression2();
     	
     	 if (rightGeometry != null) {
-             return (Geometry) rightGeometry.evaluate(feature);
+             return (Geometry) rightGeometry.evaluate(feature,Geometry.class);
          } else {
              return feature.getDefaultGeometry();
          }
