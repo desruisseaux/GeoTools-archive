@@ -247,6 +247,34 @@ public class Schemas {
     }
 
     /**
+     * Returns the particle for an element declaration that is part of a type.
+     * 
+     * @param type The type definition.
+     * @param name The naem of the child element declaration.
+     * 
+     * @param includeParents Flag to control wether parent types are included.
+     * 
+     * @return The particle representing the element declaration, or <code>null</code> if it could 
+     * not be found.
+     */
+    public static final XSDParticle getChildElementParticle( XSDTypeDefinition type, String name, boolean includeParents ) {
+    	List particles = getChildElementParticles( type, includeParents );
+    	for ( Iterator p = particles.iterator(); p.hasNext(); ) {
+    		XSDParticle particle = (XSDParticle) p.next();
+    		XSDElementDeclaration element = (XSDElementDeclaration) particle.getContent();
+    		if ( element.isElementDeclarationReference() ) {
+    			element.getResolvedElementDeclaration();
+    		}
+    		
+    		if ( name.equals( element.getName() ) ) {
+    			return particle;
+    		}
+    	}
+    	
+    	return null;
+    }
+    
+    /**
      * Returns a list of all child element particles that corresponde to element declarations of 
      * the specified type, no order is guaranteed.
      * <p>
