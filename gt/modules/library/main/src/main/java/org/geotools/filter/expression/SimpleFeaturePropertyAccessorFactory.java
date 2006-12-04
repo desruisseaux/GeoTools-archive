@@ -28,7 +28,7 @@ public class SimpleFeaturePropertyAccessorFactory implements
     public PropertyAccessor createPropertyAccessor(Class type, String xpath,
             Class target, Hints hints) {
 
-        if (!Feature.class.isAssignableFrom(type))
+        if (!Feature.class.isAssignableFrom(type) || xpath == null)
             return null; // we only work with simple feature
 
         if ("".equals(xpath) && target == Geometry.class)

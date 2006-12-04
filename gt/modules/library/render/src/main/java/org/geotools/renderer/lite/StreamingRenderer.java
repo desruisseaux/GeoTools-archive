@@ -1878,13 +1878,13 @@ public final class StreamingRenderer implements GTRenderer {
 		} else if (s instanceof TextSymbolizer) {
 			geomName = ((TextSymbolizer) s).getGeometryPropertyName();
 		}
-                else {
-                    geomName = "";
-                }
+        else {
+            geomName = "";
+        }
                 
-                if( geomName == null ){
-                    geomName = ""; // indicate default geometry!
-                }
+        if( geomName == null ){
+            geomName = ""; // indicate default geometry!
+        }
 		return filterFactory.property(geomName);
 	}
 
