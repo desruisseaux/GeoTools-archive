@@ -146,6 +146,10 @@ public class XPathPropertyAcessorTest extends TestCase {
 		assertEquals( "fid", o );
 	}
 	
+	public void testEmptyXpath() {
+		assertFalse( accessor( "" ).canHandle( target, "", null ) );
+	}
+	
 	PropertyAccessor accessor( String xpath ) {
 		
 		return new XPathPropertyAccessorFactory().createPropertyAccessor( 

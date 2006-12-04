@@ -44,8 +44,8 @@ public class XPathPropertyAccessorFactory implements PropertyAccessorFactory {
 	static class XPathPropertyAcessor implements PropertyAccessor {
 
 		public boolean canHandle(Object object, String xpath, Class target) {
-			//TODO: some check for a valid xpath expression
-			return true;
+			//TODO: some better check for a valid xpath expression
+			return xpath != null && !"".equals( xpath.trim() );
 		}
 		
 		public Object get(Object object, String xpath, Class target) {
