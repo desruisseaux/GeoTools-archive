@@ -81,7 +81,7 @@ public class XSFloatBinding implements SimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Float.class;
     }
 
     /**

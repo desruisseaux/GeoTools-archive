@@ -74,7 +74,7 @@ public class XSNCNameBinding implements SimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return String.class;
     }
 
     /**
