@@ -25,6 +25,7 @@ import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
+import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
@@ -178,11 +179,16 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
                     handler.getValue()));
         }
 
+        //get the containing type
+        XSDTypeDefinition container = null;
+        if ( getParentHandler().getComponent() != null ) {
+        	container = getParentHandler().getComponent().getTypeDefinition();
+        }
         ParseExecutor executor = new ParseExecutor(element, node,
                 getParentHandler().getContext(), parser );
         new BindingWalker( parser.getBindingLoader(), 
             getParentHandler().getContext()).walk(element.getElementDeclaration(),
-            executor);
+            executor, container );
 
         //cache the parsed value
         value = executor.getValue();

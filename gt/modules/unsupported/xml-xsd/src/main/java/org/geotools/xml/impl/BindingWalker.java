@@ -16,15 +16,20 @@
 package org.geotools.xml.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Stack;
 
 import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDComplexTypeDefinition;
+import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFeature;
+import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.Binding;
+import org.geotools.xml.Schemas;
+import org.geotools.xs.bindings.XS;
 import org.geotools.xs.bindings.XSAnyTypeBinding;
 import org.picocontainer.MutablePicoContainer;
 
@@ -34,6 +39,9 @@ public class BindingWalker implements TypeWalker.Visitor {
     MutablePicoContainer context;
     ArrayList bindings;
 
+    XSDFeature component;
+    XSDTypeDefinition container;
+    
     public BindingWalker(BindingLoader factory, MutablePicoContainer context) {
         this.loader = factory;
         this.context = context;
@@ -41,28 +49,59 @@ public class BindingWalker implements TypeWalker.Visitor {
 
     public boolean visit(XSDTypeDefinition type) {
         //look up the associated binding object for this type
-        Binding binding = null;
-
+        
+    	QName bindingName = null;
         if (type.getName() != null) {
-            QName qName = new QName(type.getTargetNamespace(), type.getName());
-
-            //load the binding into the current context
-            binding = loader.loadBinding(qName, context);
-        } else {
-            //special case check, look for an anonymous complex type 
-            // with simple content
-            if (type instanceof XSDComplexTypeDefinition
-                    && type.getBaseType() instanceof XSDSimpleTypeDefinition) {
-                //we assign the default complex strategy instread of 
-                // delegating to parent, because if we dont, any attributes
-                // defined by the type will not be parsed because simple
-                // types cannot have attributes.
-                //TODO: put this somewhere else, perahps in teh factories
-                // that create the strategy objects
-                binding = new XSAnyTypeBinding();
-            }
+            bindingName = new QName(type.getTargetNamespace(), type.getName());
+        } 
+        else {
+        	//anonymous type, does it belong to a global element
+        	for ( Iterator e = type.getSchema().getElementDeclarations().iterator(); e.hasNext(); ) {
+        		XSDElementDeclaration element = (XSDElementDeclaration) e.next();
+        		if ( type.equals( element.getAnonymousTypeDefinition() ) ) {
+        			//TODO: this naming convention for anonymous types could conflict with 
+        			// other types in the schema
+        			bindingName = new QName( type.getTargetNamespace(), "_" + element.getName() );
+        			break;
+        		}
+        	}
+        	
+        	if ( bindingName == null ) {
+        		//do we have a containing type?
+            	if ( container != null ) {
+            		//get the anonymous element, and look it up in the container type
+            		if ( type.getContainer() instanceof XSDElementDeclaration ) { 
+            			XSDElementDeclaration anonymous = (XSDElementDeclaration) type.getContainer();
+                		XSDParticle particle = 
+                			Schemas.getChildElementParticle( container, anonymous.getName(), true );
+                		if ( particle != null ) {
+                			bindingName = new QName( 
+            					container.getTargetNamespace(), container.getName() + "_" + anonymous.getName() 
+        					);
+                		}
+                	}
+            	}
+        	}
+        	
+        	
+        	if ( bindingName == null ) {
+        		//special case check, look for an anonymous complex type 
+                // with simple content
+                if (type instanceof XSDComplexTypeDefinition
+                        && type.getBaseType() instanceof XSDSimpleTypeDefinition) {
+                    //we assign the default complex binding instread of 
+                    // delegating to parent, because if we dont, any attributes
+                    // defined by the type will not be parsed because simple
+                    // types cannot have attributes.
+                    //TODO: put this somewhere else, perahps in teh factories
+                    // that create the bindings
+                    bindingName = XS.ANYTYPE;
+                }
+        	}
         }
 
+        //load the binding into the current context
+        Binding binding = loader.loadBinding( bindingName, context);
         if (binding != null) {
             //add the strategy
             bindings.add(binding);
@@ -87,9 +126,12 @@ public class BindingWalker implements TypeWalker.Visitor {
         return true;
     }
 
-    public void walk(XSDFeature component, Visitor visitor) {
-        //public void walk(XSDTypeDefinition type, Visitor visitor) {
-        bindings = new ArrayList();
+    public void walk(XSDFeature component, Visitor visitor, XSDTypeDefinition container ) {
+
+    	this.container = container;
+    	this.component = component;
+    	
+    	bindings = new ArrayList();
 
         //first walk the type hierarchy to get the binding objects
         TypeWalker walker = new TypeWalker(component.getType());
@@ -132,91 +174,12 @@ public class BindingWalker implements TypeWalker.Visitor {
             visitor.visit(binding);
         }
     }
+    
+    public void walk(XSDFeature component, Visitor visitor) {
+    	walk( component, visitor, null );
+    	
+    }
 
-    //	public void walk(XSDTypeDefinition type, StrategyVisitor visitor) {
-    //		ArrayList strategies = new ArrayList();
-    //		
-    //		while(type != null) {
-    //			//look up the associated strategy object for this type
-    //			Strategy strategy = null; 
-    //			if (type.getName() != null) {
-    //				QName qName = 
-    //					new QName(type.getTargetNamespace(),type.getName());
-    //				
-    //				//first copy the strategy into the current context
-    //				try {
-    //					context.registerComponentImplementation(
-    //						factory.getStrategy(qName)
-    //					);
-    //				}
-    //				catch(DuplicateComponentKeyRegistrationException e) {
-    //					//ok, just means that we have already registerd the class
-    //				}
-    //				strategy = (Strategy) context.getComponentInstanceOfType(factory.getStrategy(qName));
-    //			}
-    //			else {
-    //				//special case check, look for an anonymous complex type 
-    //				// with simple content
-    //				if (type instanceof XSDComplexTypeDefinition && 
-    //						type.getBaseType() instanceof XSDSimpleTypeDefinition) {
-    //					//we assign the default complex strategy instread of 
-    //					// delegating to parent, because if we dont, any attributes
-    //					// defined by the type will not be parsed because simple
-    //					// types cannot have attributes.
-    //					//TODO: put this somewhere else, perahps in teh factories
-    //					// that create the strategy objects
-    //					strategy = new XSAnyTypeStrategy();
-    //				}
-    //			}
-    //			
-    //			if (strategy != null) {
-    //				//add the strategy
-    //				strategies.add(strategy);
-    //				
-    //				//check execution mode, if override break out
-    //				if (strategy.getExecutionMode() == Strategy.OVERRIDE)
-    //					break;
-    //			}
-    //			else {
-    //				//two posibilities
-    //				if (!strategies.isEmpty()) {
-    //					//make the last strategy the new root of the hierarchy
-    //					break;
-    //				}
-    //				//else continue on to try to find a strategy further up in 
-    //				// type hierarchy	
-    //			}
-    //		
-    //			//get the next base type, if it is equal to this type then we have
-    //			// reached the root of the type hierarchy
-    //			if (type.equals(type.getBaseType()))
-    //				break;
-    //			type = type.getBaseType();
-    //		}
-    //		
-    //		//simulated call stack
-    //		Stack stack = new Stack();
-    //		
-    //		//visit from bottom to top
-    //		for (int i = 0; i < strategies.size(); i++) {
-    //			Strategy strategy = (Strategy) strategies.get(i);
-    //			
-    //			if (strategy.getExecutionMode() == Strategy.AFTER) {
-    //				//put on stack to execute after parent
-    //				stack.push(strategy);
-    //				continue;
-    //			}
-    //			
-    //			//execute the strategy
-    //			visitor.visit(strategy);
-    //		}
-    //		
-    //		//unwind the call stack
-    //		while(!stack.isEmpty()) {
-    //			Strategy strategy = (Strategy)stack.pop();
-    //			visitor.visit(strategy);
-    //		}
-    //	}
     public static interface Visitor {
         void visit(Binding binding);
     }
