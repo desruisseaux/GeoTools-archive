@@ -46,7 +46,7 @@ import org.opengis.filter.FilterVisitor;
 public abstract class CompareFilterImpl extends BinaryComparisonAbstract
     implements CompareFilter {
     /** The logger for the default core module. */
-    private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
+    static final Logger LOGGER = Logger.getLogger("org.geotools.core");
 
     /**
      * Constructor with filter type.
