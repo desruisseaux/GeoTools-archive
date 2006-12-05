@@ -276,7 +276,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         if (!gridGeometry.isDefined(GridGeometry2D.GRID_RANGE)) {
             final GridRange r = new GeneralGridRange(image, dimension);
             if (gridGeometry.isDefined(GridGeometry2D.GRID_TO_CRS)) {
-                gridGeometry = new GridGeometry2D(r, gridGeometry.getGridToCoordinateSystem(), crs);
+                gridGeometry = new GridGeometry2D(r, gridGeometry.getGridToCRS(), crs);
             } else {
                 /*
                  * If the math transform was not explicitly specified by the user, then it will be
@@ -290,7 +290,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
              * Makes sure that the 'gridToCRS' transform is defined.
              * An exception will be thrown otherwise.
              */
-            gridGeometry.getGridToCoordinateSystem();
+            gridGeometry.getGridToCRS();
         }
         this.gridGeometry = gridGeometry;
         assert gridGeometry.isDefined(GridGeometry2D.CRS        |

@@ -65,10 +65,10 @@ import org.geotools.coverage.FactoryFinder;
  */
 public final class ResampleTest extends GridCoverageTest {
     /**
-     * Set to <code>true</code> if the test case should show the projection results
-     * in a windows. This flag is set to <code>true</code> if the test is run from
-     * the command line through the <code>main(String[])</code> method. Otherwise
-     * (for example if it is run from Maven), it is left to <code>false</code>.
+     * Set to {@code true} if the test case should show the projection results
+     * in a windows. This flag is set to {@code true} if the test is run from
+     * the command line through the {@code main(String[])} method. Otherwise
+     * (for example if it is run from Maven), it is left to {@code false}.
      */
     private static boolean SHOW = false;
 
@@ -81,7 +81,7 @@ public final class ResampleTest extends GridCoverageTest {
      * The source grid coverage.
      */
     private GridCoverage2D coverage;
-    
+
     /**
      * Constructs a test case with the given name.
      */
@@ -159,9 +159,9 @@ public final class ResampleTest extends GridCoverageTest {
      * Projects the specified image to the specified CRS.
      * The result will be displayed in a window if {@link #SHOW} is set to {@code true}.
      *
-     * @return The operation name which was applied on the image, or <code>null</code> if none.
+     * @return The operation name which was applied on the image, or {@code null} if none.
      */
-	private void projectTo(final CoordinateReferenceSystem crs,
+    private String projectTo(final CoordinateReferenceSystem crs,
                              final GridGeometry2D       geometry)
     {
         final AbstractProcessor processor = AbstractProcessor.getInstance();
@@ -198,28 +198,30 @@ public final class ResampleTest extends GridCoverageTest {
             // Force computation
             assertNotNull(projected.getRenderedImage().getData());
         }
+        return operation;
     }
 
     /**
      * Tests the "Resample" operation with an identity transform.
      */
     public void testIdentity() {
-		projectTo(coverage.getCoordinateReferenceSystem(), null);
+        assertEquals("Lookup", projectTo(coverage.getCoordinateReferenceSystem(), null));
     }
 
     /**
      * Tests the "Resample" operation with a "Crop" transform.
      */
     public void testCrop() {
-		projectTo(null, new GridGeometry2D(new GeneralGridRange(new Rectangle(
-				50, 50, 200, 200)), (MathTransform) null, null));
+        assertEquals("Crop", projectTo(null, new GridGeometry2D(
+                             new GeneralGridRange(new Rectangle(50,50,200,200)),
+                             (MathTransform)null, null)));
     }
 
     /**
      * Tests the "Resample" operation with a stereographic coordinate system.
      */
     public void testStereographic() {
-		projectTo(getProjectedCRS(coverage), null);
+        assertEquals("Warp", projectTo(getProjectedCRS(coverage), null));
     }
 
     /**
@@ -235,20 +237,20 @@ public final class ResampleTest extends GridCoverageTest {
          * Note: In current Resampler implementation, the affine transform effect tested
          *       on the first line below will not be visible with the simple viewer used
          *       here.  It would be visible however with more elaborated viewer like the
-         *       one provided in the <code>org.geotools.renderer</code> package.
+         *       one provided in the {@code org.geotools.renderer} package.
          */
-		projectTo(crs, null);
-		projectTo(null, new GridGeometry2D(null, tr, null));
+        assertEquals("Lookup", projectTo(crs, null));
+        assertEquals("Affine", projectTo(null, new GridGeometry2D(null, tr, null)));
     }
-    
+
     /**
      * Tests <var>X</var>,<var>Y</var> translation in the {@link GridGeometry} after
      * a "Resample" operation.
      */
     public void testTranslation() throws NoninvertibleTransformException {
         GridCoverage2D grid = coverage;
-		final int transX = -0;
-		final int transY = -0;
+        final int    transX =  -253;
+        final int    transY =  -456;
         final double scaleX =  0.04;
         final double scaleY = -0.04;
         final ParameterBlock block = new ParameterBlock().addSource(grid.getRenderedImage())

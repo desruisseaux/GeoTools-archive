@@ -129,7 +129,7 @@ final class BandSelector2D extends GridCoverage2D {
              * "BandSelect", which make it possible to avoid to copy raster data.
              */
             if (bandIndices != null) {
-            	final int bandIndicesLength=bandIndices.length;
+                final int bandIndicesLength=bandIndices.length;
                 if (bandIndices.length!=bandIndicesLength || !isIdentity(bandIndices)) {
                     targetBands = new GridSampleDimension[bandIndices.length];
                     for (int i=0; i<bandIndicesLength; i++) {
@@ -160,7 +160,7 @@ final class BandSelector2D extends GridCoverage2D {
             final int[] parentIndices = ((BandSelector2D)source).bandIndices;
             if (parentIndices != null) {
                 if (bandIndices != null) {
-                	final int bandIndicesLength=bandIndices.length;
+                    final int bandIndicesLength=bandIndices.length;
                     for (int i=0; i<bandIndicesLength; i++) {
                         bandIndices[i] = parentIndices[bandIndices[i]];
                     }
@@ -228,8 +228,8 @@ final class BandSelector2D extends GridCoverage2D {
      * Returns {@code true} if the specified array contains increasing values 0, 1, 2...
      */
     private static boolean isIdentity(final int[] bands) {
-		final int length = bands.length;
-		for (int i = 0; i < length; i++) {
+        final int length = bands.length;
+        for (int i=0; i<length; i++) {
             if (bands[i] != i) {
                 return false;
             }

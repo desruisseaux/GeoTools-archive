@@ -42,12 +42,12 @@ import org.geotools.resources.image.ImageUtilities;
 
 /**
  * Computes a set of arbitrary linear combinations of the bands of many rendered source images,
- * using a specified matrix. The matrix size ({@code nRows}&times;{@code nColumns}) must be equals
- * to the following:
+ * using a specified matrix. The matrix size ({@code numRows}&times;{@code numColumns}) must be
+ * equals to the following:
  * <p>
  * <ul>
- *   <li>{@code nRows}: the number of desired destination bands.</li>
- *   <li>{@code nColumns}: the total number of source bands (i.e. the
+ *   <li>{@code numRows}: the number of desired destination bands.</li>
+ *   <li>{@code numColumns}: the total number of source bands (i.e. the
  *       sum of the number of source bands in all source images) plus one.</li>
  * </ul>
  * <p>
@@ -136,33 +136,32 @@ public class Combine extends PointOpImage {
     {
         super(images, ImageUtilities.createIntersection(
               (ImageLayout)hints.get(JAI.KEY_IMAGE_LAYOUT), images), hints, false);
-        this.matrix    = matrix = (double[][]) matrix.clone();
-        final int length=matrix.length;
-        this.sources   = new int[length][];
-        this.bands     = new int[length][];
-        this.transform = transform;
-        int numSamples = 0;
+        final int numRows = matrix.length;
+        this.matrix       = matrix = (double[][]) matrix.clone();
+        this.sources      = new int[numRows][];
+        this.bands        = new int[numRows][];
+        this.transform    = transform;
+        int numSamples    = 0;
         for (int i=getNumSources(); --i>=0;) {
             numSamples += getSourceImage(i).getNumBands();
         }
         this.numSamples = numSamples;
         final boolean isSeparable = (transform==null) || transform.isSeparable();
-        int rowLength,sourcesLength;
-        for (int j=0; j<length; j++) {
+        for (int j=0; j<numRows; j++) {
             final double[] row = matrix[j];
-            rowLength=row.length;
-            if (rowLength != numSamples+1) {
+            final int numColumns = row.length;
+            if (numColumns != numSamples+1) {
                 throw new MismatchedSizeException();
             }
             int source   = -1;
             int band     = -1;
             int numBands = 0;
             int count    = 0; // Number of non-zero coefficients.
-            final double[] copy = new double[rowLength  ];
-            final int[] sources = new int   [rowLength-1];
-            final int[]   bands = new int   [rowLength-1];
-            sourcesLength=sources.length;
-            for (int i=0; i<sourcesLength; i++) {
+            final double[] copy = new double[numColumns  ];
+            final int[] sources = new int   [numColumns - 1];
+            final int[]   bands = new int   [numColumns - 1];
+            final int numSources = sources.length;
+            for (int i=0; i<numSources; i++) {
                 if (++band >= numBands) {
                     band = 0;
                     numBands = getSourceImage(++source).getNumBands();
@@ -182,7 +181,7 @@ public class Combine extends PointOpImage {
         /*
          * Set the sample model according the number of destination bands.
          */
-        if (getNumBands() != matrix.length) {
+        if (getNumBands() != numRows) {
             throw new UnsupportedOperationException(
                         "Automatic derivation of SampleModel not yet implemented.");
         }
@@ -209,7 +208,7 @@ public class Combine extends PointOpImage {
         final RectIter[] iters   = new RectIter[images.length];
         final RectIter[] iterRef = new RectIter[numSamples];
         double[]         samples = null;
-        final int length=iters.length;
+        final int length = iters.length;
         for (int i=0; i<length; i++) {
             iters[i] = RectIterFactory.create(images[i], mapDestRect(destRect, i));
         }

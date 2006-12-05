@@ -212,7 +212,7 @@ public class GridCoverageTest extends TestCase {
         final WritableRaster    raster;  // The image's data as a raster.
         final Rectangle2D       bounds;  // The GridCoverage's envelope.
         final GridSampleDimension band;  // The only image's band.
-        band = new GridSampleDimension("a",new Category[] {
+        band = new GridSampleDimension("Temperature", new Category[] {
             new Category("No data",     null, 0),
             new Category("Land",        null, 1),
             new Category("Cloud",       null, 2),
@@ -361,7 +361,7 @@ public class GridCoverageTest extends TestCase {
             }
         }
         final GridSampleDimension[] bands = new GridSampleDimension[] {
-            new GridSampleDimension("a",categories, null)
+            new GridSampleDimension("Measure", categories, null)
         };
         final GeneralEnvelope    envelope = new GeneralEnvelope(bounds);
         final RenderedImage         image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));

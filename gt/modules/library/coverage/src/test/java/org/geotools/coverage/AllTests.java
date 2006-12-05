@@ -48,19 +48,23 @@ public class AllTests extends TestCase {
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("org.geotools.coverage");
-//      suite.addTest(org.geotools.referencing.  AllTests            .suite());
-        suite.addTest(org.geotools.coverage.     CategoryTest        .suite());
-        suite.addTest(org.geotools.coverage.     CategoryListTest    .suite());
-        suite.addTest(org.geotools.coverage.     SampleDimensionTest .suite());
-        suite.addTest(org.geotools.coverage.     ScaledColorSpaceTest.suite());
-        suite.addTest(org.geotools.coverage.grid.GridGeometryTest    .suite());
-        suite.addTest(org.geotools.coverage.grid.SampleTranscoderTest.suite());
-        suite.addTest(org.geotools.coverage.grid.FloatRasterTest     .suite());
-        suite.addTest(org.geotools.coverage.grid.GridCoverageTest    .suite());
-        suite.addTest(org.geotools.coverage.grid.InterpolatorTest    .suite());
-        suite.addTest(org.geotools.coverage.grid.ResampleTest        .suite());
-        suite.addTest(org.geotools.coverage.grid.OperationsTest      .suite());
-        suite.addTest(org.geotools.coverage.io.MetadataBuilderTest   .suite());
+//      suite.addTest(org.geotools.referencing.  AllTests             .suite());
+        suite.addTest(org.geotools.coverage.     CategoryTest         .suite());
+        suite.addTest(org.geotools.coverage.     CategoryListTest     .suite());
+        suite.addTest(org.geotools.coverage.     SampleDimensionTest  .suite());
+        suite.addTest(org.geotools.coverage.     ScaledColorSpaceTest .suite());
+        suite.addTest(org.geotools.coverage.grid.GridGeometryTest     .suite());
+        suite.addTest(org.geotools.coverage.grid.SampleTranscoderTest .suite());
+        suite.addTest(org.geotools.coverage.grid.FloatRasterTest      .suite());
+        suite.addTest(org.geotools.coverage.grid.GridCoverageTest     .suite());
+        suite.addTest(org.geotools.coverage.grid.InterpolatorTest     .suite());
+        suite.addTest(org.geotools.coverage.grid.CropTest             .suite());
+        suite.addTest(org.geotools.coverage.grid.ScaleTest            .suite());
+        suite.addTest(org.geotools.coverage.grid.ResampleTest         .suite());
+        suite.addTest(org.geotools.coverage.grid.FilteredSubsampleTest.suite());
+        suite.addTest(org.geotools.coverage.grid.SubsampleAverageTest .suite());
+        suite.addTest(org.geotools.coverage.grid.OperationsTest       .suite());
+        suite.addTest(org.geotools.coverage.io.MetadataBuilderTest    .suite());
         return suite;
     }
 }

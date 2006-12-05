@@ -34,10 +34,9 @@ import java.io.ObjectInputStream;
 import javax.imageio.ImageReader;
 import javax.imageio.event.IIOReadWarningListener;
 import javax.imageio.event.IIOReadProgressListener;
-
+import javax.media.jai.InterpolationNearest;
 import java.lang.reflect.Array;
 import java.lang.reflect.UndeclaredThrowableException;
-import javax.media.jai.InterpolationNearest;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
@@ -803,7 +802,7 @@ public class CoverageStack extends AbstractCoverage {
         final GridGeometry geometry = element.getGridGeometry();
         if (geometry != null) {
             final GridRange     range     = geometry.getGridRange();
-            final MathTransform transform = geometry.getGridToCoordinateSystem();
+            final MathTransform transform = geometry.getGridToCRS();
             final int           dimension = transform.getSourceDimensions();
             DirectPosition position = new GeneralDirectPosition(dimension);
             for (int i=dimension; --i>=0;) {
@@ -1109,7 +1108,7 @@ public class CoverageStack extends AbstractCoverage {
         dest       = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        final int length=byteBuffer.length;
+        final int length = byteBuffer.length;
         for (int i=0; i<length; i++) {
             dest[i] = (byte)Math.round(dest[i] + ratio*(byteBuffer[i]-dest[i]));
         }
@@ -1145,7 +1144,7 @@ public class CoverageStack extends AbstractCoverage {
         dest      = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        final int length=intBuffer.length;
+        final int length = intBuffer.length;
         for (int i=0; i<length; i++) {
             dest[i] = (int)Math.round(dest[i] + ratio*(intBuffer[i]-dest[i]));
         }
@@ -1180,7 +1179,7 @@ public class CoverageStack extends AbstractCoverage {
         dest        = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        final int length=floatBuffer.length;
+        final int length = floatBuffer.length;
         for (int i=0; i<length; i++) {
             final float lower = dest[i];
             final float upper = floatBuffer[i];
@@ -1231,7 +1230,7 @@ public class CoverageStack extends AbstractCoverage {
         dest         = lower.evaluate(reduce(coord, lower), dest);
         assert !(z<lowerZ || z>upperZ) : z;   // Uses !(...) in order to accepts NaN.
         final double ratio = (z-lowerZ) / (upperZ-lowerZ);
-        final int length=doubleBuffer.length;
+        final int length = doubleBuffer.length;
         for (int i=0; i<length; i++)  {
             final double lower = dest[i];
             final double upper = doubleBuffer[i];

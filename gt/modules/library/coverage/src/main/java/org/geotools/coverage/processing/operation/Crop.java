@@ -60,7 +60,7 @@ public class Crop extends Operation2D {
 	 * The parameter descriptor for the sample dimension indices.
 	 */
 	public static final ParameterDescriptor CROP_ENVELOPE = new DefaultParameterDescriptor(
-			Citations.OGC, "Envelope", GeneralEnvelope.class, // Value class
+			Citations.GEOTOOLS, "Envelope", GeneralEnvelope.class, // Value class
 			null, // Array of valid values
 			null, // Default value
 			null, // Minimal value
@@ -73,7 +73,7 @@ public class Crop extends Operation2D {
 	 * @throws OperationNotFoundException
 	 */
 	public Crop() {
-		super(new DefaultParameterDescriptorGroup(Citations.OGC,
+		super(new DefaultParameterDescriptorGroup(Citations.GEOTOOLS,
 				"CoverageCrop", new ParameterDescriptor[] { SOURCE_0,
 						CROP_ENVELOPE }));
 

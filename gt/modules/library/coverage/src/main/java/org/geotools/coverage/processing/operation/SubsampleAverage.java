@@ -32,17 +32,15 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * TODO: Need documentation
- *
+ * 
+ * 
+ * @author Simone Giannecchini
+ * @version $Id: SubsampleAverage.java 23157 2006-12-01 01:29:53Z desruisseaSubsampleAveragedCoverageator.SubsampleAverageDescriptor
+ * @since 2.3
+ * @source $URL$
  * @todo Consider refactoring as a {@code OperationJAI} subclass. We could get ride of the
  *       {@code SubsampledAverageGridCoverage2D} class. The main feature to add is the
  *       copy of interpolation and border extender parameters to the hints.
- *
- * @source $URL$
- * @version $Id$
- * @author Simone Giannecchini
- * @since 2.3
- *
- * @see javax.media.jai.operator.SubsampleAverageDescriptor
  */
 public class SubsampleAverage extends Operation2D {
 	/**
@@ -116,7 +114,7 @@ public class SubsampleAverage extends Operation2D {
 	 *      org.geotools.factory.Hints)
 	 */
 	public Coverage doOperation(ParameterValueGroup parameters, Hints hints) {
-		return SubsampledAverageGridCoverage2D.create(parameters,
+		return SubsampleAveragedCoverage.create(parameters,
 				(hints instanceof Hints) ? (Hints) hints : new Hints(hints));
 	}
 

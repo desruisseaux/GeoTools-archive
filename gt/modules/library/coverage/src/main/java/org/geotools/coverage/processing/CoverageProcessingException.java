@@ -1,8 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003-2006, Geotools Project Managment Committee (PMC)
- *    (C) 2001, Institut de Recherche pour le Développement
+ *    (C) 2006, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,25 +17,23 @@ package org.geotools.coverage.processing;
 
 
 /**
- * Throws when a "resample" operation has been requested
- * but the specified grid coverage can't be reprojected.
+ * Throws when a coverage operation failed.
  *
+ * @since 2.3
  * @source $URL$
  * @version $Id$
- * @author  Martin Desruisseaux
- *
- * @since 2.1
+ * @author Martin Desruisseaux
  */
-public class CannotReprojectException extends CoverageProcessingException {
+public class CoverageProcessingException extends RuntimeException {
     /**
      * Serial number for interoperability with different versions.
      */
-    private static final long serialVersionUID = -8145425848361056027L;
+    private static final long serialVersionUID = -2199436135615396946L;
 
     /**
      * Creates a new exception without detail message.
      */
-    public CannotReprojectException() {
+    public CoverageProcessingException() {
     }
 
     /**
@@ -44,8 +41,17 @@ public class CannotReprojectException extends CoverageProcessingException {
      *
      * @param message the detail message.
      */
-    public CannotReprojectException(final String message) {
+    public CoverageProcessingException(final String message) {
         super(message);
+    }
+
+    /**
+     * Constructs a new exception with the specified cause.
+     *
+     * @param cause The cause of this exception.
+     */
+    public CoverageProcessingException(final Throwable cause) {
+        super(cause);
     }
 
     /**
@@ -54,7 +60,7 @@ public class CannotReprojectException extends CoverageProcessingException {
      * @param message the detail message.
      * @param cause The cause of this exception.
      */
-    public CannotReprojectException(final String message, final Throwable cause) {
+    public CoverageProcessingException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

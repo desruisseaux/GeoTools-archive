@@ -113,6 +113,8 @@ public final class Registry {
      *
      * @param operation The operation name (e.g. "Affine").
      * @param allowed {@code false} to disallow native acceleration.
+     *
+     * @see <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4906854">JAI bug report 4906854</a>
      */
     public synchronized static void setNativeAccelerationAllowed(final String operation,
                                                                  final boolean  allowed)

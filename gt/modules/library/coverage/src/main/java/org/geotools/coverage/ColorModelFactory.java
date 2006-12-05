@@ -13,9 +13,6 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *    This package contains documentation from OpenGIS specifications.
- *    OpenGIS consortium's work is fully acknowledged here.
  */
 package org.geotools.coverage;
 
@@ -63,7 +60,7 @@ final class ColorModelFactory {
      * The list of categories for the construction of a single instance of a {@link ColorModel}.
      */
     private final Category[] categories;
-    
+
     /**
      * The visible band (usually 0) used for the construction
      * of a single instance of a {@link ColorModel}.
@@ -103,7 +100,7 @@ final class ColorModelFactory {
                                                new Integer(visibleBand)));
         }
     }
-    
+
     /**
      * Returns a color model for a category set. This method builds up the color model
      * from each category's colors (as returned by {@link Category#getColors}).
@@ -134,20 +131,20 @@ final class ColorModelFactory {
             return model;
         }
     }
-    
+
     /**
      * Constructs the color model.
      */
     private ColorModel getColorModel() {
-        final int length = categories.length;
+        final int categoryCount = categories.length;
         if (type != DataBuffer.TYPE_BYTE && type != DataBuffer.TYPE_USHORT) {
             // If the requested type is any type not supported by IndexColorModel,
             // fallback on a generic (but very slow!) color model.
             double min = 0;
             double max = 1;
-            if (length != 0) {
+            if (categoryCount != 0) {
                 min = categories[0].minimum;
-                for (int i=length; --i >= 0;) {
+                for (int i=categoryCount; --i >= 0;) {
                     final double val = categories[i].maximum;
                     if (!Double.isNaN(val)) {
                         max = val;
@@ -182,7 +179,7 @@ final class ColorModelFactory {
             // with something.
             return RasterFactory.createComponentColorModel(type, colors, false, false, transparency);
         }
-        if (numBands == 1 && length == 0) {
+        if (numBands == 1 && categoryCount == 0) {
             // Construct a gray scale palette.
             final ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
             final int[] nBits = {DataBuffer.getDataTypeSize(type)};
@@ -192,13 +189,13 @@ final class ColorModelFactory {
          * Computes the number of entries required for the color palette.
          * We take the upper range value of the last category.
          */
-        final int mapSize = (int) Math.round(categories[length - 1].maximum) + 1;
+        final int mapSize = (int) Math.round(categories[categoryCount - 1].maximum) + 1;
         final int[]  ARGB = new int[mapSize];
         /*
          * Interpolate the colors in the color palette. Colors that do not fall
          * in the range of a category will be set to a transparent color.
          */
-        for (int i=0; i<length; i++) {
+        for (int i=0; i<categoryCount; i++) {
             final Category category = categories[i];
             ColorUtilities.expand(category.getColors(), ARGB,
                                   (int)Math.round(category.minimum),
@@ -211,9 +208,9 @@ final class ColorModelFactory {
      * Returns a hash code.
      */
     public int hashCode() {
-		final int length = categories.length;
-        int code = 962745549 + (numBands*37 + visibleBand)*37 + length;
-		for (int i=0; i<length; i++) {
+        final int categoryCount = categories.length;
+        int code = 962745549 + (numBands*37 + visibleBand)*37 + categoryCount;
+        for (int i=0; i<categoryCount; i++) {
             code += categories[i].hashCode();
             // Better be independant of categories order.
         }

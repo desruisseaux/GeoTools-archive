@@ -1303,8 +1303,6 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
     /**
      * Returns the source data for a coverage. The default implementation
      * returns an empty list.
-     *
-     * @deprecated No replacement.
      */
     public List getSources() {
         return Collections.EMPTY_LIST;

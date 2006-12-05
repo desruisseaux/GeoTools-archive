@@ -206,7 +206,7 @@ public class PaletteFactory {
      * override this method if a more elaborated mechanism is wanted for fetching resources.
      * This is sometime required in the context of applications using particular class loaders.
      *
-     * @param path The name of the resource to load, constructed as {@code directory} + {@code name}
+     * @param name The name of the resource to load, constructed as {@code directory} + {@code name}
      *             + {@code extension} where <var>directory</var> and <var>extension</var> were
      *             specified to the constructor, while {@code name} was given to the
      *             {@link #getColors(String) getColors} method.
@@ -214,12 +214,12 @@ public class PaletteFactory {
      *
      * @since 2.3
      */
-    protected InputStream getResourceAsStream(final String path) {
+    protected InputStream getResourceAsStream(final String name) {
         if (altLoader != null) {
-            return altLoader.getResourceAsStream(path);
+            return altLoader.getResourceAsStream(name);
         }
         if (loader != null) {
-            return loader.getResourceAsStream(path);
+            return loader.getResourceAsStream(name);
         }
         return null;
     }

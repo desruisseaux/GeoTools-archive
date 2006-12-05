@@ -60,7 +60,7 @@ public class Scale extends Operation2D {
 	 * The X scale factor.
 	 */
 	public static final ParameterDescriptor xScale = new DefaultParameterDescriptor(
-			Citations.OGC, "xScale", Float.class, // Value class
+			Citations.GEOTOOLS, "xScale", Float.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
 			new Float(1), // Default value
@@ -73,7 +73,7 @@ public class Scale extends Operation2D {
 	 * The Y scale factor.
 	 */
 	public static final ParameterDescriptor yScale = new DefaultParameterDescriptor(
-			Citations.OGC, "yScale", Float.class, // Value class
+			Citations.GEOTOOLS, "yScale", Float.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
 			new Float(1), // Default value
@@ -86,7 +86,7 @@ public class Scale extends Operation2D {
 	 * The X translation.
 	 */
 	public static final ParameterDescriptor xTrans = new DefaultParameterDescriptor(
-			Citations.OGC, "xTrans", Float.class, // Value class
+			Citations.GEOTOOLS, "xTrans", Float.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
 			new Float(0), // Default value
@@ -99,7 +99,7 @@ public class Scale extends Operation2D {
 	 * The Y translation.
 	 */
 	public static final ParameterDescriptor yTrans = new DefaultParameterDescriptor(
-			Citations.OGC, "yTrans", Float.class, // Value class
+			Citations.GEOTOOLS, "yTrans", Float.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
 			new Float(0), // Default value
@@ -112,7 +112,7 @@ public class Scale extends Operation2D {
 	 * The interpolation method for resampling.
 	 */
 	public static final ParameterDescriptor Interpolation = new DefaultParameterDescriptor(
-			Citations.OGC, "Interpolation", Interpolation.class, // Value
+			Citations.GEOTOOLS, "Interpolation", Interpolation.class, // Value
 			// class
 			// (mandatory)
 			null, // Array of valid values
@@ -126,7 +126,7 @@ public class Scale extends Operation2D {
 	 * The BorderExtender used wth high oerder interpolation methods.
 	 */
 	public static final ParameterDescriptor BorderExtender = new DefaultParameterDescriptor(
-			Citations.OGC, "BorderExtender", BorderExtender.class, // Value
+			Citations.GEOTOOLS, "BorderExtender", BorderExtender.class, // Value
 			// class
 			// (mandatory)
 			null, // Array of valid values
@@ -141,7 +141,7 @@ public class Scale extends Operation2D {
 	 * Default constructor.
 	 */
 	public Scale() {
-		super(new DefaultParameterDescriptorGroup(Citations.OGC, "Scale",
+		super(new DefaultParameterDescriptorGroup(Citations.GEOTOOLS, "Scale",
 				new ParameterDescriptor[] { SOURCE_0, xScale, yScale, xTrans,
 						yTrans, Interpolation, BorderExtender }));
 

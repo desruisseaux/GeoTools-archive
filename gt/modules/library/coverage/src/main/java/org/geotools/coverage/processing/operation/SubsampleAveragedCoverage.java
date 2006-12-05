@@ -58,7 +58,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Simone Giannecchini
  * @since 2.3
  */
-final class SubsampledAverageGridCoverage2D extends GridCoverage2D {
+final class SubsampleAveragedCoverage extends GridCoverage2D {
 
 	/**
 	 * 
@@ -66,11 +66,12 @@ final class SubsampledAverageGridCoverage2D extends GridCoverage2D {
 	private static final long serialVersionUID = 5274708130300017804L;
 
 	/**
-	 * Constructor for a {@link SubsampledAverageGridCoverage2D}.
-	 * @param image
-	 * @param sourceCoverage
-	 */
-	public SubsampledAverageGridCoverage2D(PlanarImage image,
+     * Constructor for a {@link SubsampleAveragedCoverage}.
+     * 
+     * @param image
+     * @param sourceCoverage
+     */
+	public SubsampleAveragedCoverage(PlanarImage image,
 			GridCoverage2D sourceCoverage) {
 		super(sourceCoverage.getName(), image, new GridGeometry2D(
 				new GeneralGridRange(image), sourceCoverage.getEnvelope()),
@@ -131,11 +132,11 @@ final class SubsampledAverageGridCoverage2D extends GridCoverage2D {
 		hints.add(new RenderingHints(JAI.KEY_INTERPOLATION, interpolation));
 		final JAI processor = OperationJAI.getJAI(hints);
 		if (!processor.equals(JAI.getDefaultInstance()))
-			return new SubsampledAverageGridCoverage2D(processor.createNS(
+			return new SubsampleAveragedCoverage(processor.createNS(
 					"SubsampleAverage", pbjSubsampleAverage, hints),
 					sourceCoverage);
 		// no supplied processor
-		return new SubsampledAverageGridCoverage2D(JAI.create(
+		return new SubsampleAveragedCoverage(JAI.create(
 				"SubsampleAverage", pbjSubsampleAverage, hints), sourceCoverage);
 
 	}

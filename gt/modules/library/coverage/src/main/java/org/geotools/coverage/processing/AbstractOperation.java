@@ -153,12 +153,6 @@ public abstract class AbstractOperation implements Operation, Serializable {
      *         may provides hints for the following keys: {@link Hints#COORDINATE_OPERATION_FACTORY}
      *         and {@link Hints#JAI_INSTANCE}.
      * @return The result as a coverage.
-     *
-     * @todo This method was {@code protected} in previous releases. It has been changed to public
-     *       access in Geotools 2.3 for speed improvement in {@code GridCoverageRenderer}, but I'm
-     *       not sure that this is the best way to get this improvement. Consider this method as
-     *       protected; all operations should be done through {@link DefaultProcessor}. This method
-     *       may become protected again in a future release.
      */
     public abstract Coverage doOperation(final ParameterValueGroup parameters, final Hints hints);
 

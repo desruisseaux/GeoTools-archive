@@ -53,7 +53,7 @@ public class FilteredSubsample extends Operation2D {
 	 * 
 	 */
 	public static final ParameterDescriptor scaleX = new DefaultParameterDescriptor(
-			Citations.OGC, "scaleX", Integer.class, // Value class
+			Citations.GEOTOOLS, "scaleX", Integer.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
 			new Integer(2), // Default value
@@ -66,7 +66,7 @@ public class FilteredSubsample extends Operation2D {
 	 * 
 	 */
 	public static final ParameterDescriptor scaleY = new DefaultParameterDescriptor(
-			Citations.OGC, "scaleY", Integer.class, // Value class
+			Citations.GEOTOOLS, "scaleY", Integer.class, // Value class
 			// (mandatory)
 			null, // Array of valid values
 			new Integer(2), // Default value
@@ -79,7 +79,7 @@ public class FilteredSubsample extends Operation2D {
 	 * 
 	 */
 	public static final ParameterDescriptor qsFilter = new DefaultParameterDescriptor(
-			Citations.OGC, "qsFilterArray", float[].class, // Value class
+			Citations.GEOTOOLS, "qsFilterArray", float[].class, // Value class
 			// (mandatory)
 			null, // Array of valid values
 			new float[]{1}, // Default value
@@ -95,8 +95,7 @@ public class FilteredSubsample extends Operation2D {
 	 * 
 	 */
 	public static final ParameterDescriptor Interpolation = new DefaultParameterDescriptor(
-			Citations.OGC, "Interpolation", Interpolation.class, // Value class
-			// (mandatory)
+			Citations.GEOTOOLS, "Interpolation", Interpolation.class, // Value class (mandatory)
 			null, // Array of valid values
 			new InterpolationNearest(), // Default value
 			null, // Minimal value
@@ -109,19 +108,19 @@ public class FilteredSubsample extends Operation2D {
 	 * 
 	 */
 	public static final ParameterDescriptor BorderExtender = new DefaultParameterDescriptor(
-			Citations.OGC, "BorderExtender", BorderExtender.class, // Value class
-			// (mandatory)
+			Citations.GEOTOOLS, "BorderExtender", BorderExtender.class, // Value class (mandatory)
 			null, // Array of valid values
 			BorderExtenderCopy.createInstance(BorderExtenderCopy.BORDER_COPY), // Default value
 			null, // Minimal value
 			null, // Maximal value
 			null, // Unit of measure
 			true); // Parameter is optional
+
 	/**
 	 * 
 	 */
 	public FilteredSubsample() {
-		super(new DefaultParameterDescriptorGroup(Citations.OGC,
+		super(new DefaultParameterDescriptorGroup(Citations.GEOTOOLS,
 				"FilteredSubsample", new ParameterDescriptor[] { SOURCE_0,
 				scaleX ,scaleY,qsFilter,Interpolation,BorderExtender}));
 	}

@@ -204,6 +204,8 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
      * The default implementation throws an {@link UnsupportedOperationException}.
      * We don't know at this time if and when this method will be implemented, since
      * the API is going to change when we will shift to ISO 19123.
+     *
+     * @deprecated Not yet implemented, and maybe will never be implemented.
      */
     public GridPacking getGridPacking() {
         throw new UnsupportedOperationException("Not yet implemented");
@@ -354,6 +356,10 @@ public abstract class AbstractGridCoverage extends AbstractCoverage implements G
     /**
      * Set a block of values for all sample dimensions. The default implementation always throws
      * an exception, since this grid coverage is not editable by default.
+     *
+     * @deprecated This operation can hardly be implemented efficiently in Java with a
+     *             {@code byte[]} argument type, since we can't easily cast an array
+     *             of {@code byte[]} to an array of arbitrary type.
      */
     public void setPackedDataBlock(GridRange gridRange, byte[] values)
             throws InvalidRangeException, GridNotEditableException, ArrayIndexOutOfBoundsException
