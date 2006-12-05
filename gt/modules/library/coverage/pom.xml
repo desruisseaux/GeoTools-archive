@@ -129,7 +129,10 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes>
+            <exclude>org/geotools/coverage/grid/CropTest.java</exclude>
             <exclude>org/geotools/coverage/grid/ScaleTest.java</exclude>
+            <exclude>org/geotools/coverage/grid/FilteredSubsampleTest.java</exclude>
+            <exclude>org/geotools/coverage/grid/SubsampleAverageTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
