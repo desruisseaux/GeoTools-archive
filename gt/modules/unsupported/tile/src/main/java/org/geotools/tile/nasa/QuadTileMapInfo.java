@@ -8,6 +8,7 @@ import javax.swing.Icon;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.tile.TileMapInfo;
 import org.geotools.tile.ZoomLevel;
 import org.jdom.Element;
