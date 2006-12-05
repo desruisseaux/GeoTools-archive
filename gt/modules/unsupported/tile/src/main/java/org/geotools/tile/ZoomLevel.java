@@ -6,11 +6,15 @@ package org.geotools.tile;
  * @author Jody Garnett
  */
 public final class ZoomLevel implements Comparable {
-    private int scaleDenominator;
+    /**
+     * Note we are using scaleDenominator as something like
+     * the "angle" would not translate between coordinate systems.
+     */
+    private double scaleDenominator;    
     private int rows;
     private int cols;
     
-    public ZoomLevel( int scaleDeonmoniator, int rows, int cols ){
+    public ZoomLevel( double scaleDeonmoniator, int rows, int cols ){        
         this.scaleDenominator = scaleDeonmoniator;
         this.rows = rows;
         this.cols = cols;
@@ -20,7 +24,7 @@ public final class ZoomLevel implements Comparable {
      * 
      * @return
      */
-    public int getScaleDenominator(){
+    public double getScaleDenominator(){
         return scaleDenominator;
     }    
     /** Number of rows at this scale */
@@ -31,22 +35,35 @@ public final class ZoomLevel implements Comparable {
     /** Number of cols at this scale */
     public int getNumberOfColumns(){
         return cols;
-    }
+    }    
     public double getRowRatio( int row ){
         return (double)row/(double)rows;
     }
+    
     public double getColRatio( int col ){
         return (double)col/(double)cols;
     }
+    
+    public int getRowFromRatio( double ratio ){
+        return (int)(((double)rows)*ratio);
+    }
+    
+    public int getColFromRatio( double ratio ){
+        return (int)(((double)cols)*ratio);
+    }
+    
     public ZoomLevel zoom( int amount ){
         if( amount == 0 ) return this;
         else if( amount > 0 ){
             int zoom = amount+1;
-            return new ZoomLevel( scaleDenominator*zoom, rows*zoom, cols*zoom);
+            int increase = (int) Math.pow(2.0, amount);
+            return new ZoomLevel( scaleDenominator/zoom,
+                    rows*increase, cols*increase);
         }
         else {
             int zoom = 1-amount;
-            return new ZoomLevel( scaleDenominator/zoom, rows/zoom, cols/zoom);    
+            int increase = (int) Math.pow(2.0, amount);            
+            return new ZoomLevel( scaleDenominator*zoom, rows*increase, cols*increase);    
         }
     }
     public int compareTo( Object o ) {
@@ -55,10 +72,10 @@ public final class ZoomLevel implements Comparable {
         }
         ZoomLevel other = (ZoomLevel) o;
         if( scaleDenominator == other.scaleDenominator ) return 0;        
-        return scaleDenominator < other.scaleDenominator ? -1 : 1;
+        return scaleDenominator < other.scaleDenominator ? 1 : -1;
     }
     public int hashCode() {
-        return scaleDenominator | rows << 2 | cols << 4;
+        return (int) scaleDenominator | cols << 4;
     }
     public boolean equals( Object o ) {
         if( o == null || !(o instanceof ZoomLevel )){
@@ -69,6 +86,6 @@ public final class ZoomLevel implements Comparable {
                rows == other.rows && cols == other.cols;
     }
     public String toString() {
-        return "ZoomLevel["+cols+"x"+rows+" scale:"+scaleDenominator+"]";
+        return "ZoomLevel["+cols+"x"+rows+" scale:"+(long)scaleDenominator+"]";
     }
 }

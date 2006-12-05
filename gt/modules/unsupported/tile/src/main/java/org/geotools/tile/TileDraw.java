@@ -15,6 +15,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
  * @author Jody Garnett, Refractions Research, Inc.
  */
 public abstract class TileDraw {
+     public abstract String name( int row, int col );
      public abstract GridCoverage2D drawPlaceholder( int row, int col );
      public abstract GridCoverage2D drawTile( int row, int col );
 }

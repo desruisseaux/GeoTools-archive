@@ -1,24 +1,20 @@
 package org.geotools.tile.cache;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.geometry.Envelope2D;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.tile.TileDraw;
 import org.geotools.tile.cache.SimpleTileCache.DirectTileRange;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import junit.framework.TestCase;
 
 public class SimpleTileCacheTest extends TestCase {
     SimpleTileCache cache;
@@ -76,6 +72,7 @@ public class SimpleTileCacheTest extends TestCase {
             RenderedImage image=createImage();
             return factory.create( "Grid"+row+"x"+col, image, rectangle );            
         }
+        
         RenderedImage createImage( int row, int col ){
             BufferedImage image = new BufferedImage( 90, 90, BufferedImage.TYPE_INT_ARGB );
             Graphics2D g = (Graphics2D) image.getGraphics();
@@ -111,6 +108,9 @@ public class SimpleTileCacheTest extends TestCase {
             Envelope2D rectangle = createRectangle( row, col );
             RenderedImage image=createImage( row, col );
             return factory.create( "Grid"+row+"x"+col, image, rectangle ); 
+        }
+        public String name( int row, int col ) {
+            return "test("+row+"x"+col+")";
         }        
     }
 }

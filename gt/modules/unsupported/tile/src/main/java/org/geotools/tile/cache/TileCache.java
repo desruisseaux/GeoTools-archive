@@ -4,7 +4,7 @@ import java.awt.Rectangle;
 
 import org.geotools.tile.TileDraw;
 
-interface TileCache {
+public interface TileCache {
     
     /**
      * Create a TileRange capturing the provided range.

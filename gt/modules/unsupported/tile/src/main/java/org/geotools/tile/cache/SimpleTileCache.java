@@ -15,6 +15,8 @@ import org.geotools.util.NullProgressListener;
 import org.geotools.util.SimpleInternationalString;
 import org.opengis.util.ProgressListener;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 /**
  * Default that simply caches on TileRange.
  * <p>
@@ -26,7 +28,9 @@ public class SimpleTileCache implements TileCache {
     DirectTileRange cached = null;
     
     public TileRange createRange( TileDraw draw, Rectangle range ) {
-        DirectTileRange tileRange = new DirectTileRange( draw, range );        
+        Set loaded = cacheHits( draw, range );
+        List tiles = createClearRange(draw, range);
+        DirectTileRange tileRange = new DirectTileRange( draw, range, tiles, loaded );        
         if( tileRange.equals( cached )){
             return cached;            
         }
@@ -36,6 +40,47 @@ public class SimpleTileCache implements TileCache {
         return tileRange;
     }
 
+    synchronized GridCoverage2D cacheHit( String name ){
+        if( cached == null ) return null;
+        for( Iterator i = cached.getTiles().iterator(); i.hasNext(); ){
+            GridCoverage2D tile = (GridCoverage2D) i.next();
+            if( name.equals( tile.getName().toString() )){
+                return tile;
+            }
+        }
+        return null;
+    }
+    synchronized Set cacheHits( TileDraw draw, Rectangle range ) {
+        if( cached == null ) return Collections.EMPTY_SET;        
+        Set hits = new HashSet( range.width*range.height);
+        for( int col = (int)range.x; col<range.getMaxX(); col++){
+            for( int row = (int)range.y; row<range.getMaxY(); row++){
+                String name = draw.name(row, col);
+                if( cached.loaded.contains(name) ){
+                    hits.add( name );
+                }
+            }
+        }
+        return hits;
+    }
+    
+    synchronized List createClearRange( TileDraw draw, Rectangle range ) {
+        List clear = new ArrayList( range.width*range.height);
+        for( int col = (int)range.x; col<range.getMaxX(); col++){
+            for( int row = (int)range.y; row<range.getMaxY(); row++){
+                String name = draw.name(row, col);
+                GridCoverage2D hit = cacheHit( name );
+                if( hit != null ){
+                    clear.add( hit );
+                }
+                else {
+                    clear.add( draw.drawPlaceholder( row, col ) );
+                }
+            }
+        }
+        return clear;
+    }
+    
     public void flushTiles( TileDraw draw ) {
         cached = null;
     }
@@ -51,6 +96,7 @@ public class SimpleTileCache implements TileCache {
     class DirectTileRange implements TileRange {
         private TileDraw draw;
         private Rectangle range;
+
         /**
          * List of GridCoverage2D defined by this TileRange.
          * <p>
@@ -59,7 +105,10 @@ public class SimpleTileCache implements TileCache {
          * </p>
          */
         private List tiles;
-        private boolean isLoaded;
+        
+        /** names of tiles already loaded */
+        Set loaded;
+        boolean isLoaded;
 
         /**
          * Tile range will be created with "placeholders"; to retrive content
@@ -68,25 +117,36 @@ public class SimpleTileCache implements TileCache {
          * @param draw Stratagy object used to produce GridCoverages
          * @param range Range of tiles to produce
          */
-        DirectTileRange( TileDraw draw, Rectangle range ){            
+        DirectTileRange( TileDraw draw, Rectangle range, List tiles, Set loaded ){            
             this.draw = draw;
             this.range = range;
             this.isLoaded = false;
-            this.tiles = createClearRange(draw, range);            
+            this.tiles = tiles;
+            this.loaded = loaded.isEmpty() ? new HashSet() : loaded;
         }
         
-        private List createClearRange( TileDraw draw, Rectangle range ) {
-            List clear = new ArrayList( range.width*range.height);
-            for( int row = (int)range.x; row<=range.getMaxX(); row++){
-                for( int col = (int)range.y; row<=range.getMaxY(); row++){
-                    GridCoverage2D placeholder = draw.drawPlaceholder( row, col );
-                    clear.add( placeholder );
-                }
+        public Rectangle getRange() {
+            return range;
+        }
+        public Envelope getBounds() {
+            Envelope bounds = new Envelope();
+            double x,y;
+            for( Iterator i=tiles.iterator();i.hasNext();){
+                GridCoverage2D tile = (GridCoverage2D) i.next();                
+                Envelope2D area = tile.getEnvelope2D();
+                
+                //System.out.println( tile.getName() + " --> "+ area ); 
+                x = area.getMinX();
+                y = area.getMinY();
+                bounds.expandToInclude( x,y );
+                x = area.getMaxX();
+                y = area.getMaxY();
+                bounds.expandToInclude( x, y );
             }
-            return clear;
+            //System.out.println( range + " --> "+bounds );
+            return bounds;
         }
-        
-        public Envelope2D getBounds() {
+        public Envelope2D getEnvelope2D() {
             Envelope2D bounds = null;
             for( Iterator i=tiles.iterator();i.hasNext();){
                 GridCoverage2D tile = (GridCoverage2D) i.next();
@@ -99,13 +159,16 @@ public class SimpleTileCache implements TileCache {
             }
             return bounds;
         }
+        public String toString() {
+            return "DirectTileRange("+range+")";
+        }
         public boolean equals( Object obj ) {
             if( obj == this ) return true;
             if( obj == null || !(obj instanceof DirectTileRange)){
                 return false;
             }            
             DirectTileRange other = (DirectTileRange) obj;
-            return this.draw == other.draw && this.range == other.range;
+            return this.draw == other.draw && this.range.equals( other.range );
         }
         public int hashCode() {
             return draw.hashCode() | range.hashCode() << 3;
@@ -134,13 +197,14 @@ public class SimpleTileCache implements TileCache {
         /**
          * Refresh tiles; this will update existing contents.
          */
-        public void refresh( ProgressListener monitor ) {            
+        public void refresh( ProgressListener  monitor ) {            
             if( isLoaded ){
+                loaded.clear();
                 fetchTiles(monitor, "Refresh" );
             }
             else {
                 if( monitor == null ) monitor = new NullProgressListener();
-                monitor.setTask( new SimpleInternationalString("Load already in progress"));
+                monitor.setTask( new SimpleInternationalString("Load already in progress") );
                 monitor.isCanceled();
             }
         }
@@ -150,16 +214,33 @@ public class SimpleTileCache implements TileCache {
             
             int count =0;
             int total = range.width * range.height;
-            for( int row = (int)range.x; row<=range.getMaxX(); row++){
-                for( int col = (int)range.y; row<=range.getMaxY(); row++){
-                    monitor.setTask( new SimpleInternationalString( message + " "+row+","+col));                    
-                    GridCoverage2D tile = draw.drawTile(row, col );
-                    tiles.set( count, tile );
-                    count++;
-                    monitor.progress( (float) count / (float) total );                    
+            monitor.started();
+            monitor.setTask( new SimpleInternationalString("Fetch Tiles"));            
+            try {
+                for( int col = (int)range.x; col<range.getMaxX(); col++){
+                    for( int row = (int)range.y; row<range.getMaxY(); row++){
+                        if( monitor.isCanceled() ) {
+                            return;
+                        }
+                        String name = draw.name(row, col);
+                        
+                        if( loaded.contains( name )){
+                            count++;
+                            monitor.progress( (float)count/(float)total );
+                        }
+                        else {
+                            monitor.setTask(new SimpleInternationalString(name));                                                       
+                            GridCoverage2D tile = draw.drawTile(row, col );                            
+                            tiles.set( count, tile );
+                            loaded.add(name);
+                            count++;
+                            monitor.progress( (float)count/(float)total );
+                        }                        
+                    }
                 }
+            } finally{
+                monitor.complete();
             }
-            monitor.complete();
         }                
     }
 }

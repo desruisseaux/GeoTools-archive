@@ -28,6 +28,7 @@
 			<TerrainMapped>true</TerrainMapped>
 			<ImageAccessor>
 				<LevelZeroTileSizeDegrees>2.25</LevelZeroTileSizeDegrees>
+
 				<NumberLevels>5</NumberLevels>
 				<TextureSizePixels>512</TextureSizePixels>
 				<ImageFileExtension>jpg</ImageFileExtension>
@@ -41,6 +42,38 @@
 			<ExtendedInformation>
 				<ToolBarImage>Data\Icons\Interface\nlt-landsat-visible.png</ToolBarImage>
 			</ExtendedInformation>
+		</QuadTileSet>
+
+
+		<QuadTileSet ShowAtStartup="false">
+			<Name>Bathy Example</Name>
+			<DistanceAboveSurface>0</DistanceAboveSurface>
+			<BoundingBox>
+				<North>
+					<Value>90</Value>
+				</North>
+				<South>
+					<Value>-90</Value>
+				</South>
+				<West>
+					<Value>-180</Value>
+				</West>
+				<East>
+					<Value>180</Value>
+				</East>
+			</BoundingBox>
+			<TerrainMapped>true</TerrainMapped>
+			<ImageAccessor>
+				<LevelZeroTileSizeDegrees>36</LevelZeroTileSizeDegrees>
+				<NumberLevels>3</NumberLevels>
+				<TextureSizePixels>512</TextureSizePixels>
+				<ImageFileExtension>jpg</ImageFileExtension>
+				<ImageTileService>
+					<ServerUrl>http://worldwind25.arc.nasa.gov/tile/tile.aspx</ServerUrl>
+					<DataSetName>bmng.topo.bathy.200411</DataSetName>
+					<ServerLogoFilePath>Data\Icons\Interface\meatball.png</ServerLogoFilePath>
+				</ImageTileService>
+			</ImageAccessor>
 		</QuadTileSet>
 		<QuadTileSet ShowAtStartup="false">
 
