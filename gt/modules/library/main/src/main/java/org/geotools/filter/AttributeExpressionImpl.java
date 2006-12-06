@@ -174,7 +174,7 @@ public class AttributeExpressionImpl extends DefaultExpression
        if ( accessor == null ) {
                return null; //JD:not throwing exception to remain backwards compatabile, just returnign null                
        }        
-       Object propertyValue = accessor.get( obj, attPath, null );
+       Object propertyValue = accessor.get( obj, attPath, target );
        Value value = new Value( propertyValue );
        return value.value( target ); // pull into the requested shape
        
