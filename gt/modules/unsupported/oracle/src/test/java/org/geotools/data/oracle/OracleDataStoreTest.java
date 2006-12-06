@@ -313,7 +313,7 @@ public class OracleDataStoreTest extends TestCase {
         filter.addLeftGeometry(right);
         filter.addRightGeometry(left);
         fr = fs.getFeatures(filter);        
-        assertEquals(2, fr.getCount()); // we pass this!
+        assertEquals(2, fr.size()); // we pass this!
     }
     
     public void testPointGeometryConversion() throws Exception {
