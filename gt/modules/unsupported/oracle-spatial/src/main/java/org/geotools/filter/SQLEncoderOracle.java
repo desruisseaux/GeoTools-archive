@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.oracle.sdo.SDO;
+import org.geotools.data.DataSourceException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -229,22 +230,37 @@ public class SQLEncoderOracle extends SQLEncoder {
         throws IOException {
         String mask = (String) SDO_RELATE_MASK_MAP.get(new Short(
                     geomFilter.getFilterType()));
+        AttributeExpression attExpr;
+        LiteralExpression geomExpr;
         Expression left = geomFilter.getLeftGeometry();
         Expression right = geomFilter.getRightGeometry();
+        if (left instanceof AttributeExpression &&
+            right instanceof LiteralExpression) {
+            attExpr = (AttributeExpression) left;
+            geomExpr = (LiteralExpression) right;
+        } else if (right instanceof AttributeExpression &&
+                   left instanceof LiteralExpression) {
+            attExpr = (AttributeExpression) right;
+            geomExpr = (LiteralExpression) left;
+        } else {
+            String err = "Oracle currently supports one geometry and one " +
+                "attribute expr.  You gave: " + left + ", " + right;
+            throw new DataSourceException(err);
+	}
 
-        if (((left != null) || (currentGeomColumnName != null))
-                && (right != null) && (mask != null)) {
+        if (((attExpr != null) || (currentGeomColumnName != null))
+                && (geomExpr != null) && (mask != null)) {
             inGeomFilter = true;
             out.write("SDO_RELATE(");
 
-            if (left != null) {
-                left.accept(this);
+            if (attExpr != null) {
+                attExpr.accept(this);
             } else {
                 out.write("\"" + currentGeomColumnName + "\"");
             }
 
             out.write(",");
-            right.accept(this);
+            geomExpr.accept(this);
             out.write(",'mask=" + mask + " querytype=WINDOW') = 'TRUE' ");
             inGeomFilter = false;
         } else {
@@ -264,6 +280,7 @@ public class SQLEncoderOracle extends SQLEncoder {
         throws IOException {
        //  String mask = (String) SDO_RELATE_MASK_MAP.get(new Short(
        //             geomFilter.getFilterType()));
+        //TODO: don't assume left and right are correct order, see doSdoRelate
         Expression left = geomFilter.getLeftGeometry();
         Expression right = geomFilter.getRightGeometry();
         double distance = geomFilter.getDistance();
