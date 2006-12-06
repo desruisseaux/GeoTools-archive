@@ -17,6 +17,7 @@ package org.geotools.map;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.Source;
 import org.geotools.map.event.MapLayerListener;
 import org.geotools.styling.Style;
 
@@ -32,13 +33,23 @@ import org.geotools.styling.Style;
  */
 public interface MapLayer {
     /**
-     * Get the feature collection for this layer.  If features has not been set
-     * yet, then null is returned.
+     * Get the feature collection for this layer.
      *
-     * @return the features for this layer.
+     * @return The features for this layer, null if not yet set 
+     *         or if {@link Source} is used.
      */
     FeatureSource getFeatureSource();
 
+    /**
+     * Get the data source for this layer.
+     *
+     * @return Data source for this layer, null if not yet set 
+     *         or if {@link FeatureSource} is used
+     */
+    
+    Source getSource();
+
+    
     /**
      * Get the style for this layer.  If style has not been set, then null is
      * returned.
