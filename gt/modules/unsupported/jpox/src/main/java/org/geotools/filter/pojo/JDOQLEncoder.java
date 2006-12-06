@@ -2,7 +2,6 @@ package org.geotools.filter.pojo;
 
 import java.util.Iterator;
 
-import org.geotools.referencing.CRS;
 import org.opengis.filter.And;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
@@ -40,9 +39,6 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 public class JDOQLEncoder implements FilterVisitor, ExpressionVisitor {
 	
@@ -365,7 +361,12 @@ public class JDOQLEncoder implements FilterVisitor, ExpressionVisitor {
 
 	public Object visit(Literal literal, Object obj) {
 		StringBuffer buf = (StringBuffer) obj;
-		buf.append( literal.getValue().toString() );
+		Object value = literal.getValue();
+		if ( value instanceof String ) {
+			buf.append( '"' ).append( value ).append( '"' );
+		} else {
+			buf.append( literal.getValue() );
+		}
 		return buf;
 	}
 
