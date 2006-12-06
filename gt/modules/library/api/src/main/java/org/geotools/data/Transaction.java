@@ -29,7 +29,7 @@ import java.util.Set;
  * </p>
  *
  * <p>
- * All opperations are considered to be working against a Transaction.
+ * All operations are considered to be working against a Transaction.
  * Transaction.AUTO_COMMIT is used to represent an immidiate mode where
  * requests are immidately commited.
  * </p>
@@ -52,20 +52,20 @@ import java.util.Set;
  *     river.setTransaction( t );
  *
  *     t.addAuthorization( lockID );  // provide authoriztion
- *     road.removeFeatures( filter ); // opperate against transaction
- *     river.removeFeature( filter ); // opperate against transaction
+ *     road.removeFeatures( filter ); // operate against transaction
+ *     river.removeFeature( filter ); // operate against transaction
  *
- *     t.commit(); // commit opperations
+ *     t.commit(); // commit operations
  * }
  * catch (IOException io){
- *     t.rollback(); // cancel opperations
+ *     t.rollback(); // cancel operations
  * }
  * finally {
  *     t.close(); // free resources
  * }
  * </code></pre>
  * <p>
- * Example code walkthrough from the (perspective of Tranasction):
+ * Example code walkthrough (from the perspective of Transaction):
  * </p>
  * <ol>
  * <li>A new transaction is created (an instanceof DefaultTransaction with a handle)</li>
@@ -94,14 +94,14 @@ import java.util.Set;
  *     addAuthroization(String) callback invoked with the value of lockID</li>
  * <li>FeatureStore.removeFeatures methods are called on the two DataStores.
  *     <ul>
- *     <li>PostgisFeatureStore.removeFeatures(fitler) handles opperation
+ *     <li>PostgisFeatureStore.removeFeatures(fitler) handles operation
  *         without delegation.
  *         </li>
  *     <li>Most removeFeature(filter) implementations use the implementation
  *         provided by AbstractFeatureStore which delegates to FeatureWriter.
  *         </li>
  *     </ul>
- *     Any of these opperations may make use of the
+ *     Any of these operations may make use of the
  *     Transaction.putProperty( key, value ).
  * <li>The transaction is commited, all of the Transaction.State methods have
  *     there Transaction.State.commit() methods called gicing them a chance
@@ -129,7 +129,7 @@ public interface Transaction {
      *
      * <p>
      * This may be used to provide hints to DataStore implementations, it
-     * opperates as a blackboard for client, FeatureSource communication.
+     * operates as a blackboard for client, FeatureSource communication.
      * </p>
      *
      * <p>
@@ -160,7 +160,7 @@ public interface Transaction {
      *
      * <p>
      * The most common example is a JDBC DataStore saving the required
-     * connection for later opperations.
+     * connection for later operations.
      * </p>
      * <pre><code>
      * ConnectionState implements State {
@@ -205,7 +205,7 @@ public interface Transaction {
      *
      * <p>
      * The most common example is a JDBC DataStore saving the required
-     * connection for later opperations.
+     * connection for later operations.
      * </p>
      *
      * @return Current State externalized by key, or <code>null</code> if not
@@ -295,21 +295,21 @@ public interface Transaction {
      * Provides a Transaction property for this Transasction.
      *
      * <p>
-     * All proceeding FeatureSource (for FeatureReader/Writer) opperations may
+     * All proceeding FeatureSource (for FeatureReader/Writer) operations may
      * make use of the provided property.
      * </p>
      */
     void putProperty(Object key, Object value) throws IOException;
 
     /**
-     * Provides an oppertunity for a Transaction to free an State it maintains.
+     * Provides an opportunity for a Transaction to free an State it maintains.
      * <p>
      * This method should call State.setTransaction( null ) on all State it
      * maintains.
      * </p>
      * <p>
      * It is hoped that FeatureStore implementations that have externalized
-     * their State with the transaction take the oppertunity to revert to
+     * their State with the transaction take the opportunity to revert to
      * Transction.AUTO_COMMIT.
      * </p>
      * @throws IOException

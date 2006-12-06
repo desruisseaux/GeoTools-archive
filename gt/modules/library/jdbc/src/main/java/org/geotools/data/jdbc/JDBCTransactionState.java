@@ -26,7 +26,7 @@ import org.geotools.data.Transaction.State;
 /**
  * Holds a JDBC Connectino for JDBCDataStore.
  * <p>
- * An alternative woudl be to hold the connection pool in the Transaction
+ * An alternative would be to hold the connection pool in the Transaction
  * State and only construct a connection when setTransaction is called.
  * </p>
  * @author Jody Garnett, Refractions Research
@@ -50,9 +50,9 @@ public class JDBCTransactionState implements State {
         }
     }
     /**
-     * Retrive connection for JDBC opperation.
+     * Retrieve connection for JDBC operation.
      * <p>
-     * This connection may be used to issue JDBC opperations against
+     * This connection may be used to issue JDBC operations against
      * this transaction.
      * </p>
      * <p>
@@ -66,7 +66,7 @@ public class JDBCTransactionState implements State {
      */
     public Connection getConnection(){
         // We could make a wrapper to prevent the above
-        // restricted opperations
+        // restricted operations
         return connection;
     }
     /**
@@ -112,7 +112,7 @@ public class JDBCTransactionState implements State {
     /**
      * Commit the maintained state. 
      * <p>
-     * JDBCTransactionState offers native support for this opperation
+     * JDBCTransactionState offers native support for this operation
      * </p>
      * @see org.geotools.data.Transaction.State#commit()
      * @throws IOException
@@ -143,7 +143,7 @@ public class JDBCTransactionState implements State {
     /**
      * Rollback state of Transacstion.
      * <p>
-     * JDBCTransactionState offers native support for this opperation
+     * JDBCTransactionState offers native support for this operation
      * </p>
      * @see org.geotools.data.Transaction.State#rollback()
      * @throws IOException

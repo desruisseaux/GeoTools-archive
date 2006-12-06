@@ -278,7 +278,8 @@ public interface MapContext {
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if an argument is <code>null</code>.
-	 * @deprecated
+	 * @deprecated Please use {@link #setAreaOfInterest(ReferencedEnvelope)} 
+	 *             or {@link #setAreaOfInterest(Envelope, CoordinateReferenceSystem)}
 	 */
 	void setAreaOfInterest(Envelope areaOfInterest)
 			throws IllegalArgumentException;
