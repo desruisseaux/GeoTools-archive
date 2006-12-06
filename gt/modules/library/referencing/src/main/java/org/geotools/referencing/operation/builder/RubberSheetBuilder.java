@@ -38,7 +38,9 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 
 /**
- * The class for calculating the RubberSheet transformation. The
+ * Builds  {@linkplain org.geotools.referencing.operation.builder.RubberSheetBuilder
+ * RubberSheet} transformation from a list of {@linkplain
+ * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}. The
  * explanation of RubberSheet transformation can be seen <a href =
  * "http://planner.t.u-tokyo.ac.jp/member/fuse/rubber_sheeting.pdf">here</a>.
  *
@@ -60,10 +62,8 @@ public class RubberSheetBuilder extends MathTransformBuilder {
      * 
      * 
      * 
-     * @param sourcePoints
-     *            Set of source points
-     * @param targetPoints
-     *            Set of destination points
+     * @param vectors list of {@linkplain org.geotools.referencing.operation.builder.MappedPosition MappedPosition}
+     * 
      * @throws MismatchedSizeException
      * @throws MismatchedDimensionException
      * @throws MismatchedReferenceSystemException
@@ -167,9 +167,7 @@ public class RubberSheetBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Returns MathTransform transformation setup as RubberSheet, that
-     * transforms the {@link #sourcePoints} into the {@link #targetPoints}
-     * with zero deltas on these points
+     * Returns MathTransform transformation setup as RubberSheet.
      *
      * @return calculated MathTransform
      *

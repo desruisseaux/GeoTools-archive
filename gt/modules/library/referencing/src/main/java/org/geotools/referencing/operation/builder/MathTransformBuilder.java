@@ -177,7 +177,7 @@ public abstract class MathTransformBuilder {
     /**
      * Returns the minimum number of points required by this builder. This minimum depends on the
      * algorithm used. For example {@linkplain AffineTransformBuilder affine transform builders}
-     * require at least 3 points, while {@linkplain SimilarParamCalculator similar transform
+     * require at least 3 points, while {@linkplain SimilarTransformBuilder similar transform
      * builders} requires only 2 points.
      */
     public abstract int getMinimumPointCount();
@@ -289,7 +289,7 @@ public abstract class MathTransformBuilder {
      * Convenience method setting the {@linkplain MappedPosition#getSource source points}
      * in mapped positions.
      *
-     * @param  sourcePoints The source points.
+     * @param  points The source points.
      * @throws MismatchedSizeException if the list doesn't have the expected number of points.
      * @throws MismatchedDimensionException if some points doesn't have the
      *         {@linkplain #getDimension expected number of dimensions}.
@@ -672,16 +672,16 @@ public abstract class MathTransformBuilder {
     /**
      * Calculates the math transform immediately.
      *
-     * @return The math transform from the set of {@link #sourcePoints} and {@link #targetPoints}.
+     * @return Math transform from {@link #setMappedPositions MappedPosition}. 
      * @throws FactoryException if the math transform can't be created.
      */
     protected abstract MathTransform computeMathTransform() throws FactoryException;
 
     /**
-     * Returns the calculated math transform. This method {@linkplain #computes the math
+     * Returns the calculated math transform. This method {@linkplain #computeMathTransform the math
      * transform} the first time it is requested.
      *
-     * @return The math transform from the set of {@link #sourcePoints} and {@link #targetPoints}.
+     * @return Math transform from {@link #setMappedPositions MappedPosition}. 
      * @throws FactoryException if the math transform can't be created.
      */
     public final MathTransform getMathTransform() throws FactoryException {

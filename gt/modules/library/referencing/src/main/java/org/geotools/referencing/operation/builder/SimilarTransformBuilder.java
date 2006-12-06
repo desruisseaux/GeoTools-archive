@@ -15,19 +15,22 @@
  */
 package org.geotools.referencing.operation.builder;
 
-// J2SE and extensions
-import javax.vecmath.MismatchedSizeException;
-
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 import java.util.List;
 
+// J2SE and extensions
+import javax.vecmath.MismatchedSizeException;
+
+
 /**
- * The class for calculating 4 parameters of linear transformation (2D).
- * The calculation uses least square method. The similar transform equation:
- * <pre>                                                  
+ * Builds {@linkplain org.opengis.referencing.operation.MathTransform
+ * MathTransform} setup as Similar transformation from a list of {@linkplain
+ * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}.
+ * The The calculation uses least square method. The similar transform
+ * equation:<pre>                                                  
  *  [ x']   [  a -b  Tx  ] [ x ]   [ a*x - b*y + Tx ]
  *  [ y'] = [  b  a  Ty  ] [ y ] = [ b*x + a*y + Ty ] </pre>In the case
  * that we have more identical points we can write it like this (in Matrix):
@@ -49,19 +52,24 @@ import java.util.List;
  * @author Jan Jezek
  */
 public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
-    /**
-     * Creates SimilarTransformBuilder for the set of properties.
+/**
+     * Creates SimilarTransformBuilder for the set of properties. The {@linkplain java.util.List List} of {@linkplain
+     * org.geotools.referencing.operation.builder.MappedPosition MappedPosition} is expected.
      *
-     * @param sourcePoints Set of source points
-     * @param targetPoints Set of destination points
+     * @param vectors list of {@linkplain
+     * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}
      */
     public SimilarTransformBuilder(List vectors)
-        throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-    	super.setMappedPositions(vectors);
+        throws MismatchedSizeException, MismatchedDimensionException,
+            MismatchedReferenceSystemException {
+        super.setMappedPositions(vectors);
     }
 
     /**
-     * Returns the minimum number of points required by this builder, which is 2.
+     * Returns the minimum number of points required by this builder,
+     * which is 2.
+     *
+     * @return DOCUMENT ME!
      */
     public int getMinimumPointCount() {
         return 2;
@@ -92,12 +100,15 @@ public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
         }
 
         for (int j = numRow / 2; j < numRow; j++) {
-            A.setElement(j, 0, sourcePoints[j - (numRow / 2)].getCoordinates()[1]); //Y
-            A.setElement(j, 1, sourcePoints[j - (numRow / 2)].getCoordinates()[0]); //X
+            A.setElement(j, 0,
+                sourcePoints[j - (numRow / 2)].getCoordinates()[1]); //Y
+            A.setElement(j, 1,
+                sourcePoints[j - (numRow / 2)].getCoordinates()[0]); //X
             A.setElement(j, 2, 0);
             A.setElement(j, 3, 1);
 
-            X.setElement(j, 0, targetPoints[j - (numRow / 2)].getCoordinates()[1]);
+            X.setElement(j, 0,
+                targetPoints[j - (numRow / 2)].getCoordinates()[1]);
         }
 
         GeneralMatrix AT = (GeneralMatrix) A.clone();

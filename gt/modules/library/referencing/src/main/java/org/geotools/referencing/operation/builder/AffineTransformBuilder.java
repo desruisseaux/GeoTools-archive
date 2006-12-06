@@ -15,19 +15,19 @@
  */
 package org.geotools.referencing.operation.builder;
 
-// J2SE and extensions
-import java.util.List;
-
-import javax.vecmath.MismatchedSizeException;
-
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
+// J2SE and extensions
+import java.util.List;
+import javax.vecmath.MismatchedSizeException;
+
 
 /**
- * The class for calculating 6 parameters of affine transformation (2D).
+ * Builds {@linkplain org.opengis.referencing.operation.MathTransform MathTransform} setup as Affine transformation from a list of {@linkplain
+ * MappedPosition MappedPosition}.
  * The calculation uses least square method. The Affine transform equation:
  * <pre>                                                       
  *  [ x']   [  m00  m01  m02  ] [ x ]   [ m00x + m01y + m02 ]
@@ -55,19 +55,24 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
     protected AffineTransformBuilder() {
     }
 
-    /**
-     * Creates AffineTransformBuilder for the set of properties.
+/**
+     * Creates AffineTransformBuilder for the set of properties. 
      * 
-     * @param sourcePoints Set of source points
-     * @paramtargetPointst Set of destination points
+     * @param vectors list of {@linkplain
+     * MappedPosition MappedPosition}
      */
     public AffineTransformBuilder(List vectors)
-        throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
+        throws MismatchedSizeException, MismatchedDimensionException,
+            MismatchedReferenceSystemException {
         super.setMappedPositions(vectors);
     }
 
     /**
-     * Returns the minimum number of points required by this builder, which is 3.
+     * Returns the minimum number of points required by this builder,
+     * which is 3.
+     *
+     * @return the minimum number of points required by this builder,
+     * which is 3.
      */
     public int getMinimumPointCount() {
         return 3;
@@ -103,11 +108,14 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
             A.setElement(j, 0, 0);
             A.setElement(j, 1, 0);
             A.setElement(j, 2, 0);
-            A.setElement(j, 3, sourcePoints[j - (numRow / 2)].getCoordinates()[0]);
-            A.setElement(j, 4, sourcePoints[j - (numRow / 2)].getCoordinates()[1]);
+            A.setElement(j, 3,
+                sourcePoints[j - (numRow / 2)].getCoordinates()[0]);
+            A.setElement(j, 4,
+                sourcePoints[j - (numRow / 2)].getCoordinates()[1]);
             A.setElement(j, 5, 1);
 
-            X.setElement(j, 0, targetPoints[j - (numRow / 2)].getCoordinates()[1]);
+            X.setElement(j, 0,
+                targetPoints[j - (numRow / 2)].getCoordinates()[1]);
         }
 
         GeneralMatrix AT = (GeneralMatrix) A.clone();

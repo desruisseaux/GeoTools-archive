@@ -15,11 +15,6 @@
  */
 package org.geotools.referencing.operation.builder;
 
-// J2SE and extensions
-import java.util.List;
-
-import javax.vecmath.MismatchedSizeException;
-
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.opengis.referencing.cs.CartesianCS;
@@ -28,11 +23,18 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
+// J2SE and extensions
+import java.util.List;
+import javax.vecmath.MismatchedSizeException;
+
 
 /**
- * The class for calculating 8 parameters of projective transformation
- * (2D). The calculation uses least square method. Projective transform
- * equation:<pre>  [ x']   [  m00  m01  m02  ] [ x ]   
+ * Builds {@linkplain org.opengis.referencing.operation.MathTransform
+ * MathTransform} setup as Projective transformation from a list of
+ * {@linkplain org.geotools.referencing.operation.builder.MappedPosition
+ * MappedPosition}. The calculation uses least square method. The Projective
+ * transform equation: (2D). The calculation uses least square method.
+ * Projective transform equation:<pre>  [ x']   [  m00  m01  m02  ] [ x ]   
  *  [ y'] = [  m10  m11  m12  ] [ y ]                               
  *  [ 1 ]   [  m20  m21    1  ] [ 1 ]                       
  *    x' = m * x </pre>In the case that we have more identical points we
@@ -57,26 +59,31 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
     protected ProjectiveTransformBuilder() {
     }
 
-    /**
+/**
      * Creates ProjectiveTransformBuilder for the set of properties.        
      * 
      * 
-     * @param sourcePoints Set of source points
-     * @paramtargetPointst Set of destination points
+     * @param vectors list of {@linkplain
+     * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}
      * @throws MismatchedSizeException if the number of properties is not set properly.
      * @throws MismatchedDimensionException if the dimension of properties is not set properly.
-     * @throws MismatchedReferenceSystemException -if the CRS of {@link #ptSrt} and {@link targetPointst}
-     *         have wrong Coordinate Reference System.
+     * @throws MismatchedReferenceSystemException -if there is mismatch in coordinate system in  {@linkplain
+     * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}
      */
-    public ProjectiveTransformBuilder(List pts)
-        throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-        super.setMappedPositions(pts);
+    public ProjectiveTransformBuilder(List vectors)
+        throws MismatchedSizeException, MismatchedDimensionException,
+            MismatchedReferenceSystemException {
+        super.setMappedPositions(vectors);
     }
 
     /**
-     * Returns the minimum number of points required by this builder, which is 4 by default.
-     * Subclasses like {@linkplain AffineTransformBuilder affine transform builders} will reduce
-     * this minimum.
+     * Returns the minimum number of points required by this builder,
+     * which is 4 by default. Subclasses like {@linkplain
+     * AffineTransformBuilder affine transform builders} will reduce this
+     * minimum.
+     *
+     * @return minimum number of points required by this builder,
+     * which is 4 by default.
      */
     public int getMinimumPointCount() {
         return 4;
@@ -85,8 +92,10 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
     /**
      * Returns the required coordinate system type, which is
      * {@linkplain CartesianCS cartesian CS}.
+     *
+     * @return required coordinate system type
      */
-    public Class/*<? extends CartesianCS>*/ getCoordinateSystemType() {
+    public Class /*<? extends CartesianCS>*/ getCoordinateSystemType() {
         return CartesianCS.class;
     }
 
@@ -130,13 +139,16 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
             A.setElement(j, 0, 0);
             A.setElement(j, 1, 0);
             A.setElement(j, 2, 0);
-            A.setElement(j, 3, sourcePoints[j - (numRow / 2)].getCoordinates()[0]);
-            A.setElement(j, 4, sourcePoints[j - (numRow / 2)].getCoordinates()[1]);
+            A.setElement(j, 3,
+                sourcePoints[j - (numRow / 2)].getCoordinates()[0]);
+            A.setElement(j, 4,
+                sourcePoints[j - (numRow / 2)].getCoordinates()[1]);
             A.setElement(j, 5, 1);
             A.setElement(j, 6, -yd * xs);
             A.setElement(j, 7, -yd * ys);
 
-            X.setElement(j, 0, targetPoints[j - (numRow / 2)].getCoordinates()[1]);
+            X.setElement(j, 0,
+                targetPoints[j - (numRow / 2)].getCoordinates()[1]);
         }
 
         return calculateLSM(A, X);

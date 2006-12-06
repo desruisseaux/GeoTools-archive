@@ -15,11 +15,6 @@
  */
 package org.geotools.referencing.operation.builder;
 
-// J2SE and extensions
-import java.util.List;
-
-import javax.vecmath.MismatchedSizeException;
-
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.GeocentricTranslation;
@@ -31,11 +26,17 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
+// J2SE and extensions
+import java.util.List;
+import javax.vecmath.MismatchedSizeException;
+
 
 /**
- * The class for calculating 7 parameters of Bursa Wolf transformation (3D)
- * from any number of identical points using the least square method.
- * Calculated parameters can be used for following operations:<p></p>
+ * Builds {@linkplain org.opengis.referencing.operation.MathTransform
+ * MathTransform} setup as BursaWolf transformation from a list of {@linkplain
+ * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}. The
+ * calculation uses least square method.  Calculated parameters can be used
+ * for following operations:<p></p>
  *  <p>The equations:<pre> X = q * R * x  +  T ,             </pre>Where X
  * is the Matrix of destination points, q is the scale,  R is the rotation
  * Matrix, x is the Matrix of source points  and T is matrix of translation.
@@ -48,7 +49,7 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
  *
  * @author Jan Jezek
  */
-public class BursaWolfParametersBuilder extends MathTransformBuilder {
+public class BursaWolfTransformBuilder extends MathTransformBuilder {
     /** The Geodetic Datum of target reference system */
     private GeodeticDatum targetDatum;
 
@@ -79,13 +80,16 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
     /** Bursa Wolf scaling. */
     private double q = 1;
 
-    /**
-     * Creates a BursaWolfParametersBuilder.
-     * @param ptsSrc List of source points (3D - geocentric)
-     * @param ptsDst List of destination points (3D - geocentric)    
+/**
+     * Creates a BursaWolfTransformBuilder.
+     * 
+     * @param vectors list of {@linkplain
+     * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}
      */
-    public BursaWolfParametersBuilder(List/*<MappedPosition>*/ vectors) throws MismatchedSizeException, MismatchedDimensionException, MismatchedReferenceSystemException {
-       super.setMappedPositions(vectors);
+    public BursaWolfTransformBuilder(List /*<MappedPosition>*/ vectors)
+        throws MismatchedSizeException, MismatchedDimensionException,
+            MismatchedReferenceSystemException {
+        super.setMappedPositions(vectors);
 
         x = new GeneralMatrix(vectors.size(), 3);
         X = new GeneralMatrix(vectors.size(), 3);
@@ -95,7 +99,10 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Returns the minimum number of points required by this builder, which is 3.
+     * Returns the minimum number of points required by this builder,
+     * which is 3.
+     *
+     * @return DOCUMENT ME!
      */
     public int getMinimumPointCount() {
         return 3;
@@ -103,6 +110,9 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
 
     /**
      * Returns the dimension for {@linkplain #getSourceCRS source} and
+     * {@link #getTargetCRS target} CRS, which is 2.
+     *
+     * @return dimension for {@linkplain #getSourceCRS source} and
      * {@link #getTargetCRS target} CRS, which is 2.
      */
     public int getDimension() {
@@ -112,8 +122,10 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
     /**
      * Returns the required coordinate system type, which is
      * {@linkplain CartesianCS cartesian CS}.
+     *
+     * @return coordinate system type
      */
-    public Class/*<? extends CartesianCS>*/ getCoordinateSystemType() {
+    public Class /*<? extends CartesianCS>*/ getCoordinateSystemType() {
         return CartesianCS.class;
     }
 
@@ -510,13 +522,10 @@ public class BursaWolfParametersBuilder extends MathTransformBuilder {
     }
 
     /**
-     * Returns MathtTransform setup as BursaWolf transformation, that
-     * transforms the {@link #sourcePoints} into the  {@link #targetPoints} using the least
-     * square method.
-     * 
-     * 
-     * 
+     * Returns MathtTransform setup as BursaWolf transformation.
+     *
      * @return calculated MathTransform
+     *
      * @throws FactoryException when the size of source and destination point
      *         is not the same or if the number of points is too small to
      *         define such transformation.

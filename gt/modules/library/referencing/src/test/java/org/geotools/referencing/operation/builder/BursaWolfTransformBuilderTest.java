@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Random;
 
 
-public class BursaWolfParametersBuilderTest extends TestCase {
+public class BursaWolfTransformBuilderTest extends TestCase {
     /**
      * Run the suite from the command line.
      *
@@ -47,11 +47,11 @@ public class BursaWolfParametersBuilderTest extends TestCase {
      * @return DOCUMENT ME!
      */
     public static Test suite() {
-        return new TestSuite(BursaWolfParametersBuilderTest.class);
+        return new TestSuite(BursaWolfTransformBuilderTest.class);
     }
 
     /**
-     * Test {@link BursaWolfParametersBuilder}.
+     * Test {@link BursaWolfTransformBuilder}.
      *
      * @throws FactoryException DOCUMENT ME!
      * @throws TransformException DOCUMENT ME!
@@ -100,7 +100,7 @@ public class BursaWolfParametersBuilderTest extends TestCase {
 
         double[] dstPoints = new double[points.length];
 
-        MathTransformBuilder BWPT = new BursaWolfParametersBuilder(vectors);
+        MathTransformBuilder BWPT = new BursaWolfTransformBuilder(vectors);
         BWPT.getMathTransform()
             .transform(points, 0, dstPoints, 0, (points.length / 3));
 
@@ -161,7 +161,7 @@ public class BursaWolfParametersBuilderTest extends TestCase {
             vectors.add(new MappedPosition(ptSrc,ptDst));
         }
 
-        BursaWolfParametersBuilder BWPT = new BursaWolfParametersBuilder(vectors);
+        BursaWolfTransformBuilder BWPT = new BursaWolfTransformBuilder(vectors);
         assertEquals(BWPT.getBursaWolfParameters(null).dx, bwp.dx, 1E-2);
         assertEquals(BWPT.getBursaWolfParameters(null).dy, bwp.dy, 1E-2);
         assertEquals(BWPT.getBursaWolfParameters(null).dz, bwp.dz, 1E-2);
