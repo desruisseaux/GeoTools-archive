@@ -349,8 +349,9 @@ public final class JTS {
             CALCULATORS.put(crs, gc);
         }
         assert crs.equals(gc.getCoordinateReferenceSystem()) : crs;
-        final GeneralDirectPosition pos = POSITIONS[Math.min(POSITIONS.length-1,
+        final GeneralDirectPosition pos = POSITIONS[Math.min(POSITIONS.length - 1,
                                           crs.getCoordinateSystem().getDimension())];
+        pos.setCoordinateReferenceSystem(crs);
         copy(p1, pos.ordinates);
         gc.setStartingPosition(pos);
         copy(p2, pos.ordinates);
