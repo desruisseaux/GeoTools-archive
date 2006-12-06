@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -45,4 +46,15 @@ public class RenderUtilitiesTest extends TestCase {
 		double scale = RendererUtilities.calculateScale(re, 10 * 100, 10 * 100, 2.54);
 		assertEquals(1.0, scale, 0.00001); // no projection deformation here!
 	}
+    
+    /**
+     * The following test is from the tile module where the behavior
+     * of RenderUtilities changed between 2.2. and 2.4.
+     */
+    public void XtestCenterTile() throws Exception {
+        Envelope centerTile = new Envelope( 0, 36, -18, 18 );
+        CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+        double scale = RendererUtilities.calculateScale(centerTile, crs, 512, 512, 72.0 );
+        assertEquals(1.0, scale, 0.00001); // no projection deformation here!
+    }
 }
