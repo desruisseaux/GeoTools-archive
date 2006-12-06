@@ -411,7 +411,7 @@ public class DefaultMapLayer implements MapLayer {
 			listenerList = new javax.swing.event.EventListenerList();
 		}
 
-		if (listenerList.getListenerCount() == 0) {
+		if (listenerList.getListenerCount() == 0 && featureSource != null ) {
 			// enable data source listening
 			featureSource.addFeatureListener(sourceListener);
 		}
@@ -429,7 +429,7 @@ public class DefaultMapLayer implements MapLayer {
 			org.geotools.map.event.MapLayerListener listener) {
 		listenerList.remove(org.geotools.map.event.MapLayerListener.class,
 				listener);
-		if (listenerList.getListenerCount() == 0) {
+		if (listenerList.getListenerCount() == 0 && featureSource != null ) {
 			featureSource.removeFeatureListener(sourceListener);
 		}
 	}
