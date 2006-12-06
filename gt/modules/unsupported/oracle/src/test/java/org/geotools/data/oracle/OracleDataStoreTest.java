@@ -308,6 +308,12 @@ public class OracleDataStoreTest extends TestCase {
         filter.addRightGeometry(right);
         fr = fs.getFeatures(filter);
         assertEquals(2, fr.size()); // we have 4!
+        
+        // check a filter built changing operands order works the same
+        filter.addLeftGeometry(right);
+        filter.addRightGeometry(left);
+        fr = fs.getFeatures(filter);        
+        assertEquals(2, fr.getCount()); // we pass this!
     }
     
     public void testPointGeometryConversion() throws Exception {
