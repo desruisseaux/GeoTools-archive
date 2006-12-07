@@ -7,15 +7,15 @@ import org.apache.commons.jxpath.ri.compiler.NodeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
 
 /**
- * Special node pointer for {@link org.geotools.feature.Feature}.
+ * Special node pointer for {@link org.geotools.feature.FeatureTy}.
  * 
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class FeaturePointer extends NodePointer {
+public class FeatureTypePointer extends NodePointer {
 
 	/**
 	 * The name of hte node.
@@ -23,14 +23,14 @@ public class FeaturePointer extends NodePointer {
 	QName name;
 	
 	/**
-	 * The underlying feature
+	 * The underlying feature type
 	 */
-	Feature feature;
+	FeatureType featureType;
 	
-	protected FeaturePointer(NodePointer parent, Feature feature, QName name ) {
+	protected FeatureTypePointer(NodePointer parent, FeatureType featureType, QName name ) {
 		super(parent);
 		this.name = name;
-		this.feature = feature;
+		this.featureType = featureType;
 	}
 
 	public boolean isLeaf() {
@@ -42,7 +42,7 @@ public class FeaturePointer extends NodePointer {
 	}
 
 	public int getLength() {
-		return feature.getNumberOfAttributes();
+		return featureType.getAttributeCount();
 	}
 
 	public QName getName() {
@@ -54,11 +54,11 @@ public class FeaturePointer extends NodePointer {
 	}
 
 	public Object getImmediateNode() {
-		return feature;
+		return featureType;
 	}
 
 	public void setValue(Object value) {
-		feature = (Feature)value;
+		featureType = (FeatureType)value;
 	}
 
 	public int compareChildNodePointers(NodePointer pointer1,
@@ -72,34 +72,25 @@ public class FeaturePointer extends NodePointer {
 			NodeNameTest nodeNameTest = (NodeNameTest) test;
 			
 			if ( !nodeNameTest.isWildcard() ) {
-				int index = feature.getFeatureType().find( nodeNameTest.getNodeName().getName() );	
+				int index = featureType.find( nodeNameTest.getNodeName().getName() );	
 				if ( index > -1 ) {
-					return new SingleFeaturePropertyIterator( this, index );	
+					return new SingleFeatureTypeAttributeIterator( this, index );	
 				}
 				
 			}
 			else {
-				return new FeaturePropertyIterator( this );	
+				return new FeatureTypeAttributeIterator( this );	
 			}
 		}
 		
 		if ( test instanceof NodeTypeTest ) {
 			NodeTypeTest nodeTypeTest = (NodeTypeTest) test;
 			if ( nodeTypeTest.getNodeType() == Compiler.NODE_TYPE_NODE ) {
-				return new FeaturePropertyIterator( this );
+				return new FeatureTypeAttributeIterator( this );
 			}
 		}
 		
 		return super.childIterator( test, reverse, startWith );
 	}
-	
-	public NodeIterator attributeIterator(QName qname) {
-		if ( qname.getName().equals( "id") || qname.getName().equals( "fid") ) {
-			return new SingleFeaturePropertyIterator( this, -1 );		
-		}
-		
-		return super.attributeIterator( qname );
-	}
-	
 	
 }

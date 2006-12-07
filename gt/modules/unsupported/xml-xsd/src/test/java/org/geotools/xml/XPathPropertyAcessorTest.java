@@ -17,6 +17,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class XPathPropertyAcessorTest extends TestCase {
 
+	FeatureType type;
 	Feature target;
 	
 	protected void setUp() throws Exception {
@@ -26,10 +27,10 @@ public class XPathPropertyAcessorTest extends TestCase {
 		typeBuilder.addAttribute( "name", String.class );
 		typeBuilder.addAttribute( "description", String.class );
 		typeBuilder.addAttribute( "geometry", Geometry.class );
-		FeatureType featureType = typeBuilder.feature();
+		type = typeBuilder.feature();
 		
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder( new SimpleFeatureFactoryImpl() );
-		builder.setType( featureType );
+		builder.setType( type );
 		builder.add( "theName" );
 		builder.add( "theDescription" );
 		builder.add( new GeometryFactory().createPoint( new Coordinate( 0, 0 ) )  );
@@ -51,8 +52,33 @@ public class XPathPropertyAcessorTest extends TestCase {
 		o = accessor.get( target, "geometry", null );
 		assertNotNull( o );
 		assertTrue( o instanceof Point );
+		
+		accessor = accessor( "foo" );
+		o = accessor.get( target, "foo", null );
+		assertNull( o );
 	}
 	
+	public void testSimpleXpathType() {
+		PropertyAccessor accessor = accessor( "name" );
+		Object o = accessor.get( type, "name",null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType("name"), o );
+		
+		accessor = accessor( "description" );
+		o = accessor.get( type, "description", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType("description"), o );
+		
+		accessor = accessor( "geometry" );
+		o = accessor.get( type, "geometry", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "geometry" ), o );
+		
+		accessor = accessor( "foo" );
+		o = accessor.get( type, "foo", null );
+		assertNull( o );
+	}
+
 	public void testSimpleXpathWithNamespace() {
 		PropertyAccessor accessor = accessor( "gml:name" );
 		Object o = accessor.get( target, "gml:name", null );
@@ -70,6 +96,24 @@ public class XPathPropertyAcessorTest extends TestCase {
 		assertTrue( o instanceof Point );
 	}
 
+	public void testSimpleXpathWithNamespaceType() {
+		PropertyAccessor accessor = accessor( "gml:name" );
+		Object o = accessor.get( type, "gml:name", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "name" ), o );
+		
+		accessor = accessor( "gml:description" );
+		o = accessor.get( type, "gml:description", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "description" ), o );
+		
+		accessor = accessor( "test:geometry" );
+		o = accessor.get( type, "test:geometry", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "geometry" ), o );
+	}
+
+	
 	public void testPath() {
 		PropertyAccessor accessor = accessor( "//name" );
 		Object o = accessor.get( target, "//name",  null );
@@ -86,6 +130,24 @@ public class XPathPropertyAcessorTest extends TestCase {
 		assertNotNull( o );
 		assertTrue( o instanceof Point );
 	}
+	
+	public void testPathType() {
+		PropertyAccessor accessor = accessor( "//name" );
+		Object o = accessor.get( type, "//name",  null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "name" ), o );
+		
+		accessor = accessor( "//description" );
+		o = accessor.get( type, "//description", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "description" ), o );
+		
+		accessor = accessor( "//geometry" );
+		o = accessor.get( type, "//geometry",  null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "geometry" ), o );
+	}
+	
 	
 	public void testPathWithNamespace() {
 		PropertyAccessor accessor = accessor( "//gml:name" );
@@ -104,6 +166,23 @@ public class XPathPropertyAcessorTest extends TestCase {
 		assertTrue( o instanceof Point );
 	}
 	
+	public void testPathWithNamespaceType() {
+		PropertyAccessor accessor = accessor( "//gml:name" );
+		Object o = accessor.get( type, "//gml:name", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "name" ), o );
+		
+		accessor = accessor( "//gml:description" );
+		o = accessor.get( type, "//gml:description", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "description" ), o );
+		
+		accessor = accessor( "//test:geometry" );
+		o = accessor.get( type,  "//test:geometry",  null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "geometry" ), o );
+	}
+	
 	public void testIndex() {
 		
 		PropertyAccessor accessor = accessor( "*[1]" );
@@ -120,10 +199,26 @@ public class XPathPropertyAcessorTest extends TestCase {
 		o = accessor.get( target,  "*[3]", null );
 		assertNotNull( o ); 
 		assertTrue( o instanceof Point );
-		
-		
 	}
 	
+	public void testIndexType() {
+		
+		PropertyAccessor accessor = accessor( "*[1]" );
+		Object o = accessor.get( type, "*[1]", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "name" ), o );
+		
+		accessor = accessor( "*[2]" );
+		o = accessor.get( type, "*[2]",null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "description" ), o );
+		
+		accessor = accessor( "*[3]" );
+		o = accessor.get( type,  "*[3]", null );
+		assertNotNull( o ); 
+		assertEquals( type.getAttributeType( "geometry" ), o );
+	}
+
 	public void testPosition() {
 		PropertyAccessor accessor = accessor( "*[position()=1]" );
 		Object o = accessor.get( target, "*[position()=1]", null );
@@ -138,6 +233,22 @@ public class XPathPropertyAcessorTest extends TestCase {
 		o = accessor.get( target, "*[position()=3]", null );
 		assertNotNull( o );
 		assertTrue( o instanceof Point );
+	}
+	
+	public void testPositionType() {
+		PropertyAccessor accessor = accessor( "*[position()=1]" );
+		Object o = accessor.get( type, "*[position()=1]", null );
+		assertEquals( type.getAttributeType( "name" ), o );
+		
+		accessor = accessor( "*[position()=2]" );
+		o = accessor.get( type,  "*[position()=2]", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "description" ), o );
+		
+		accessor = accessor( "*[position()=3]" );
+		o = accessor.get( type, "*[position()=3]", null );
+		assertNotNull( o );
+		assertEquals( type.getAttributeType( "geometry" ), o );
 	}
 	
 	public void testId() {
