@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
 
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
@@ -729,8 +730,9 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
 	     */
 	    public void visit(AttributeExpression expression) {
-	    	// JE: removed deprecated code
-	        if (parent != null  && parent.getAttributeType(expression.getAttributePath()) == null) {
+	    	//JD: use an expression to get at the attribute type intead of accessing directly
+	    	//if (parent != null  && parent.getAttributeType(expression.getAttributePath()) == null) {
+	    	if (parent != null  && expression.evaluate( parent ) == null )  {
 	        	postStack.push(expression);
 	        	return;
 	        }
