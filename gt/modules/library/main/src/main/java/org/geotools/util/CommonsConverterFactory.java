@@ -1,5 +1,8 @@
 package org.geotools.util;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.beanutils.ConvertUtils;
 import org.geotools.factory.Hints;
 
@@ -11,7 +14,24 @@ import org.geotools.factory.Hints;
  *
  */
 public class CommonsConverterFactory implements ConverterFactory {
-
+	
+	//some additional converters 
+	static org.apache.commons.beanutils.Converter uri = new org.apache.commons.beanutils.Converter() {
+		public Object convert( Class target, Object value ) {
+			String string = (String) value;
+			try {
+				return new URI( string );
+			} 
+			catch (URISyntaxException e) { } 
+		
+			return null;
+		}
+	};
+	static {
+		ConvertUtils.register( uri, URI.class );
+	}
+	
+	
 	/**
 	 * Delegates to {@link ConvertUtils#lookup(java.lang.Class)} to create a 
 	 * converter instance.
@@ -49,4 +69,6 @@ public class CommonsConverterFactory implements ConverterFactory {
 		}
 		
 	}
+	
+	
 }
