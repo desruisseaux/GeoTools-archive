@@ -32,6 +32,7 @@ import org.geotools.filter.expression.DivideImpl;
 import org.geotools.filter.expression.MultiplyImpl;
 import org.geotools.filter.expression.SubtractImpl;
 import org.geotools.filter.identity.FeatureIdImpl;
+import org.geotools.filter.identity.GmlObjectIdImpl;
 import org.geotools.filter.spatial.BBOXImpl;
 import org.geotools.filter.spatial.BeyondImpl;
 import org.geotools.filter.spatial.ContainsImpl;
@@ -67,6 +68,7 @@ import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
 import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.identity.GmlObjectId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.BBOX;
@@ -111,6 +113,10 @@ public class FilterFactoryImpl implements FilterFactory {
     public FeatureId featureId(String id) {
         return new FeatureIdImpl( id );
     } 
+    
+    public GmlObjectId gmlObjectId(String id) {
+    	return new GmlObjectIdImpl( id );
+    }
     
     public And and(Filter f, Filter g ) {
         List/*<Filter>*/ list = new ArrayList/*<Filter>*/( 2 );
@@ -161,8 +167,8 @@ public class FilterFactoryImpl implements FilterFactory {
     }
     
 
-    public PropertyIsNotEqualTo notEqual(Expression expr1, Expression expr2) {
-        return new IsNotEqualToImpl(this,expr1,expr2);
+    public PropertyIsNotEqualTo notEqual(Expression expr1, Expression expr2, boolean matchCase) {
+        return new IsNotEqualToImpl(this,expr1,expr2,matchCase);
     }
     
     public PropertyIsGreaterThan greater(Expression expr1, Expression expr2) {
