@@ -64,14 +64,14 @@ public class DefaultSQLBuilder implements SQLBuilder {
     private Filter lastPreFilter = null;
     private Filter lastPostFilter = null;
     
-    /**
-     * Constructs an instance of this class with a default SQLEncoder
-     */
-    public DefaultSQLBuilder() {
-        this(new SQLEncoder());
-    }
+	/**
+	 * Constructs an instance of this class with a default SQLEncoder
+	 */
+	 public DefaultSQLBuilder() {
+	     this(new SQLEncoder());
+	 }
 
-    /**
+   /**
      * Constructs an instance of this class using the encoder class specified.
      * This will typically be from the getSqlBuilder method of a JDBCDataStore
      * subclass.
@@ -99,6 +99,9 @@ public class DefaultSQLBuilder implements SQLBuilder {
     	this.encoder = encoder;
     	this.ft = featureType;
     	this.accessor = accessor;
+    	
+    	//set the feature type on teh encoders
+    	encoder.setFeatureType( featureType );
     }
     
     /**

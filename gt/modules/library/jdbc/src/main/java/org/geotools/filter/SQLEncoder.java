@@ -16,6 +16,8 @@
 package org.geotools.filter;
 
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -125,12 +127,27 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
     /** the fid mapper used to encode the fid filters */
     protected FIDMapper mapper;
 
+    /** the schmema the encoder will be used to be encode sql for */
+    protected FeatureType featureType;
+    
     /**
      * Empty constructor
      */
     public SQLEncoder() {
     }
-
+    
+    /**
+     * Sets the featuretype the encoder is encoding sql for.
+     * <p>
+     * This is used for context for attribute expressions when encoding to sql. 
+     * </p>
+     * 
+     * @param featureType
+     */
+    public void setFeatureType(FeatureType featureType) {
+		this.featureType = featureType;
+	}
+  
     /**
      * Convenience constructor to perform the whole encoding process at once.
      *
@@ -499,7 +516,19 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
         LOGGER.finer("exporting ExpressionAttribute");
 
         try {
-            out.write(escapeName(expression.getAttributePath()));
+        	//JD: evaluate the expression agains the feature type to get at the attribute, then 
+        	// encode the namee
+        	if ( featureType != null ) {
+        		AttributeType attributeType = (AttributeType) expression.evaluate( featureType );
+            	if ( attributeType != null ) {
+            		out.write( escapeName( attributeType.getName() ) );
+            		return;
+            	}
+        	}
+        	
+        	//if thigns are sane, we should get here
+    		out.write(escapeName(expression.getAttributePath()));	
+        	
         } catch (java.io.IOException ioe) {
             throw new RuntimeException("IO problems writing attribute exp", ioe);
         }
