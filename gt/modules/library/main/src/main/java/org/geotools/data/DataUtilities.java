@@ -60,6 +60,7 @@ import org.geotools.filter.FidFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.geotools.filter.FilterVisitor;
+import org.geotools.filter.FilterVisitorFilterWrapper;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.LikeFilter;
@@ -146,65 +147,107 @@ public class DataUtilities {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     *
-     * @return DOCUMENT ME!
+     * Traverses the filter and returns any encoutered property names.
+     * <p>
+     * The feautre type is supplied as contexts used to lookup expressions in cases where the 
+     * attributeName does not match the actual name of the type.
+     * </p>
+     */
+    public static String[] attributeNames( Filter filter, final FeatureType featureType ) {
+    	 if (filter == null) {
+             return new String[0];
+         }
+
+         final Set set = new HashSet();
+         traverse(filter,
+             new DataUtilities.AbstractFilterVisitor() {
+                 public void visit(AttributeExpression attributeExpression) {
+                	//evaluate to get actual attribute type
+                	 if ( featureType != null ) {
+                		 AttributeType type = 
+                			 (AttributeType) attributeExpression.evaluate( featureType );
+                		 if ( type != null ) {
+                			 set.add( type.getName() );
+                			 return;
+                		 }
+                	 }
+                	
+                	 set.add(attributeExpression.getAttributePath());
+                 }
+             });
+
+         if (set.size() == 0) {
+             return new String[0];
+         }
+
+         String[] names = new String[set.size()];
+         int index = 0;
+
+         for (Iterator i = set.iterator(); i.hasNext(); index++) {
+             names[index] = (String) i.next();
+         }
+         return names;
+    }
+    
+    /**
+     * Traverses the filter and returns any encoutered property names.
+     * @deprecated use {@link #attributeNames(Filter, FeatureType)}/
      */
     public static String[] attributeNames(Filter filter) {
-        if (filter == null) {
-            return new String[0];
-        }
-
-        final Set set = new HashSet();
-        traverse(filter,
-            new DataUtilities.AbstractFilterVisitor() {
-                public void visit(AttributeExpression attributeExpression) {
-                    set.add(attributeExpression.getAttributePath());
-                }
-            });
-
-        if (set.size() == 0) {
-            return new String[0];
-        }
-
-        String[] names = new String[set.size()];
-        int index = 0;
-
-        for (Iterator i = set.iterator(); i.hasNext(); index++) {
-            names[index] = (String) i.next();
-        }
-        return names;
+       return attributeNames( filter, null );
     }
 
+    /**
+     * Traverses the expression and returns any encoutered property names.
+     * <p>
+     * The feautre type is supplied as contexts used to lookup expressions in cases where the 
+     * attributeName does not match the actual name of the type.
+     * </p>
+     */
+    public static String[] attributeNames(Expression expression, final FeatureType featureType ) {
+    	 if (expression == null) {
+             return new String[0];
+         }
 
+         final Set set = new HashSet();
+         traverse(expression,
+             new DataUtilities.AbstractFilterVisitor() {
+                 public void visit(AttributeExpression attributeExpression) {
+                	//evaluate to get actual attribute type
+                	 if ( featureType != null ) {
+                		 AttributeType type = 
+                			 (AttributeType) attributeExpression.evaluate( featureType );
+                		 if ( type != null ) {
+                			 set.add( type.getName() );
+                			 return;
+                		 }
+                	 }
+                	
+                	 set.add(attributeExpression.getAttributePath());
+                 }
+             });
+
+         if (set.size() == 0) {
+             return new String[0];
+         }
+
+         String[] names = new String[set.size()];
+         int index = 0;
+
+         for (Iterator i = set.iterator(); i.hasNext(); index++) {
+             names[index] = (String) i.next();
+         }
+         return names;
+    }
+    
+    /**
+     * Traverses the expression and returns any encoutered property names.
+     * @deprecated use {@link #attributeNames(Expression, FeatureType)}/
+     */
     public static String[] attributeNames(Expression expression) {
-        if (expression == null) {
-            return new String[0];
-        }
-
-        final Set set = new HashSet();
-        traverse(expression,
-            new DataUtilities.AbstractFilterVisitor() {
-                public void visit(AttributeExpression attributeExpression) {
-                    set.add(attributeExpression.getAttributePath());
-                }
-            });
-
-        if (set.size() == 0) {
-            return new String[0];
-        }
-
-        String[] names = new String[set.size()];
-        int index = 0;
-
-        for (Iterator i = set.iterator(); i.hasNext(); index++) {
-            names[index] = (String) i.next();
-        }
-        return names;
-        
+       return attributeNames( expression, null );
     }
+    
     /**
      *
      * @param filter DOCUMENT ME!
@@ -285,8 +328,8 @@ public class DataUtilities {
                 }
             };
 
-        ((org.geotools.filter.Filter)filter).accept(traverse);
-
+        filter.accept( new FilterVisitorFilterWrapper( traverse ), null );
+        
         return set;
     }
     /**
