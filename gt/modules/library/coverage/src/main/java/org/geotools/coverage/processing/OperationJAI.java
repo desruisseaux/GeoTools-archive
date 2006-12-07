@@ -274,10 +274,13 @@ public class OperationJAI extends Operation2D {
      * @param  parameters List of name value pairs for the parameters required for the operation.
      * @param  hints A set of rendering hints, or {@code null} if none.
      * @return The result as a grid coverage.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see #deriveGridCoverage
      */
-    public Coverage doOperation(final ParameterValueGroup parameters, final Hints hints) {
+    public Coverage doOperation(final ParameterValueGroup parameters, final Hints hints)
+            throws CoverageProcessingException
+    {
         /*
          * Copies parameter values from the ParameterValues object to the ParameterBlockJAI,
          * except the sources. Note: it would be possible to use the ParameterBlockJAI in the
@@ -754,8 +757,17 @@ public class OperationJAI extends Operation2D {
                 return null;
             }
             if (!oldCategory.equals(newCategory) || !Utilities.equals(oldUnit, newUnit)) {
+                /*
+                 * Create a new sample dimension. Note that we use a null title, not the same
+                 * title than the original sample dimension, because the new sample dimension
+                 * may be quite different. For example the original sample dimension may be
+                 * about "Temperature" in °C units, and the new one about "Gradiant magnitude
+                 * of Temperature" in °C/km units. The GridSampleDimension constructor will
+                 * infers the title from what looks like the "main" category.
+                 */
+                final CharSequence title = null;
                 categoryArray[indexOfQuantitative] = newCategory;
-                result[numBands] = new GridSampleDimension(categoryArray, newUnit);
+                result[numBands] = new GridSampleDimension(title, categoryArray, newUnit);
             } else {
                 // Reuse the category list from the primary source.
                 result[numBands] = sampleDim;

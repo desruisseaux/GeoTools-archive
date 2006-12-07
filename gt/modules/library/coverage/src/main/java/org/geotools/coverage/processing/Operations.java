@@ -96,10 +96,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param constants The constants to add to each band.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.AddConst
      */
-    public Coverage add(final Coverage source, final double[] constants) {
+    public Coverage add(final Coverage source, final double[] constants)
+            throws CoverageProcessingException
+    {
         return doOperation("AddConst", source, "constants", constants);
     }
 
@@ -108,10 +111,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param constants The constants to subtract to each band.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.SubtractConst
      */
-    public Coverage subtract(final Coverage source, final double[] constants) {
+    public Coverage subtract(final Coverage source, final double[] constants)
+            throws CoverageProcessingException
+    {
         return doOperation("SubtractConst", source, "constants", constants);
     }
 
@@ -120,10 +126,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param constants The constants to subtract from.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.SubtractFromConst
      */
-    public Coverage subtractFrom(final Coverage source, final double[] constants) {
+    public Coverage subtractFrom(final Coverage source, final double[] constants)
+            throws CoverageProcessingException
+    {
         return doOperation("SubtractFromConst", source, "constants", constants);
     }
 
@@ -132,10 +141,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param constants The constants to multiply to each band.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.MultiplyConst
      */
-    public Coverage multiply(final Coverage source, final double[] constants) {
+    public Coverage multiply(final Coverage source, final double[] constants)
+            throws CoverageProcessingException
+    {
         return doOperation("MultiplyConst", source, "constants", constants);
     }
 
@@ -144,10 +156,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param constants The constants to divides by.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.DivideByConst
      */
-    public Coverage divideBy(final Coverage source, final double[] constants) {
+    public Coverage divideBy(final Coverage source, final double[] constants)
+            throws CoverageProcessingException
+    {
         return doOperation("DivideByConst", source, "constants", constants);
     }
 
@@ -157,10 +172,13 @@ public class Operations {
      * @param source The source coverage.
      * @param constants The constants to multiply to each band.
      * @param offsets The constants to add to each band.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Rescale
      */
-    public Coverage rescale(final Coverage source, final double[] constants, final double[] offsets) {
+    public Coverage rescale(final Coverage source, final double[] constants, final double[] offsets)
+            throws CoverageProcessingException
+    {
         return doOperation("Rescale", source, "constants", constants, "offsets", offsets);
     }
 
@@ -168,10 +186,11 @@ public class Operations {
      * Inverts the sample values of a coverage.
      *
      * @param source The source coverage.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Invert
      */
-    public Coverage invert(final Coverage source) {
+    public Coverage invert(final Coverage source) throws CoverageProcessingException {
         return doOperation("Invert", source);
     }
 
@@ -179,10 +198,11 @@ public class Operations {
      * Computes the mathematical absolute value of each sample value.
      *
      * @param source The source coverage.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Absolute
      */
-    public Coverage absolute(final Coverage source) {
+    public Coverage absolute(final Coverage source) throws CoverageProcessingException {
         return doOperation("Absolute", source);
     }
 
@@ -190,10 +210,11 @@ public class Operations {
      * Takes the natural logarithm of the sample values of a coverage.
      *
      * @param source The source coverage.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Log
      */
-    public Coverage log(final Coverage source) {
+    public Coverage log(final Coverage source) throws CoverageProcessingException {
         return doOperation("Log", source);
     }
 
@@ -201,10 +222,11 @@ public class Operations {
      * Takes the exponential of the sample values of a coverage.
      *
      * @param source The source coverage.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Exp
      */
-    public Coverage exp(final Coverage source) {
+    public Coverage exp(final Coverage source) throws CoverageProcessingException {
         return doOperation("Exp", source);
     }
 
@@ -213,10 +235,11 @@ public class Operations {
      * This method uses the default padding and validity threshold.
      *
      * @param source The source coverage.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.NodataFilter
      */
-    public GridCoverage nodataFilter(final GridCoverage source) {
+    public GridCoverage nodataFilter(final GridCoverage source) throws CoverageProcessingException {
         return (GridCoverage) doOperation("NodataFilter", source);
     }
 
@@ -229,12 +252,14 @@ public class Operations {
      * @param validityThreshold The minimal number of valid values required for computing the
      *        average. The {@code NaN} value will be replaced by the average only if the number
      *        of valid value is greater than or equals to this threshold. The default value is 4.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.NodataFilter
      */
     public GridCoverage nodataFilter(final GridCoverage source,
                                      final int padding,
                                      final int validityThreshold)
+            throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("NodataFilter",      source,
                                           "padding",           new Integer(padding),
@@ -249,10 +274,13 @@ public class Operations {
      * @param source The source coverage.
      * @param type   The interpolation type. Possible values are {@code "NearestNeighbor"},
      *               {@code "Bilinear"} and {@code "Bicubic"}.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Interpolate
      */
-    public GridCoverage interpolate(final GridCoverage source, final String type) {
+    public GridCoverage interpolate(final GridCoverage source, final String type)
+            throws CoverageProcessingException
+    {
         return (GridCoverage) doOperation("Interpolate", source, "Type", type);
     }
 
@@ -263,10 +291,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param type   The interpolation type as a JAI interpolation object.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Interpolate
      */
-    public GridCoverage interpolate(final GridCoverage source, final Interpolation type) {
+    public GridCoverage interpolate(final GridCoverage source, final Interpolation type)
+            throws CoverageProcessingException
+    {
         return (GridCoverage) doOperation("Interpolate", source, "Type", type);
     }
 
@@ -278,10 +309,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param types  The interpolation types and their fallback.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Interpolate
      */
-    public GridCoverage interpolate(final GridCoverage source, final Interpolation[] types) {
+    public GridCoverage interpolate(final GridCoverage source, final Interpolation[] types)
+            throws CoverageProcessingException
+    {
         return (GridCoverage) doOperation("Interpolate", source, "Type", types);
     }
 
@@ -290,12 +324,15 @@ public class Operations {
      * 
      * @param source    The source coverage.
      * @param colorMaps The color maps to apply.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Recolor
      *
      * @since 2.3
      */
-    public GridCoverage recolor(final GridCoverage source, final Map[] colorMaps) {
+    public GridCoverage recolor(final GridCoverage source, final Map[] colorMaps)
+            throws CoverageProcessingException
+    {
         return (GridCoverage) doOperation("Recolor", source, "ColorMaps", colorMaps);
     }
 
@@ -306,10 +343,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param sampleDimensions The sample dimensions to select.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.SelectSampleDimension
      */
-    public Coverage selectSampleDimension(final Coverage source, final int[] sampleDimensions) {
+    public Coverage selectSampleDimension(final Coverage source, final int[] sampleDimensions)
+            throws CoverageProcessingException
+    {
         return doOperation("SelectSampleDimension", source, "SampleDimensions", sampleDimensions);
     }
 
@@ -327,10 +367,13 @@ public class Operations {
      *
      * @param source The source coverage.
      * @param crs    The target coordinate reference system.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Resample
      */
-    public Coverage resample(final Coverage source, final CoordinateReferenceSystem crs) {
+    public Coverage resample(final Coverage source, final CoordinateReferenceSystem crs)
+            throws CoverageProcessingException
+    {
         return doOperation("Resample", source, "CoordinateReferenceSystem", crs);
     }
 
@@ -341,6 +384,7 @@ public class Operations {
      * @param crs The target coordinate reference system, or {@code null} for keeping it unchanged.
      * @param gridGeometry The grid geometry, or {@code null} for a default one.
      * @param interpolationType The interpolation type, or {@code null} for the default one.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Resample
      */
@@ -348,6 +392,7 @@ public class Operations {
                              final CoordinateReferenceSystem crs,
                              final GridGeometry  gridGeometry,
                              final Interpolation interpolationType)
+            throws CoverageProcessingException
     {
         return doOperation("Resample",                  source,
                            "CoordinateReferenceSystem", crs,
@@ -360,12 +405,15 @@ public class Operations {
      *
      * @param source   The source coverage.
      * @param envelope The rectangular area to keep.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Crop
      *
      * @since 2.3
      */
-    public Coverage crop(final Coverage Source, final Envelope envelope) {
+    public Coverage crop(final Coverage Source, final Envelope envelope)
+            throws CoverageProcessingException
+    {
         return doOperation("CoverageCrop", Source, "Envelope", envelope);
     }
 
@@ -377,6 +425,7 @@ public class Operations {
      * @param yScale   The scale factor along the <var>y</var> axis.
      * @param xTrans   The translation along the <var>x</var> axis.
      * @param yTrans   The translation along the <var>x</var> axis.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Scale
      *
@@ -385,6 +434,7 @@ public class Operations {
     public GridCoverage scale(final GridCoverage source,
                               final double xScale, final double yScale,
                               final double xTrans, final double yTrans)
+            throws CoverageProcessingException
     {
         return scale(source, xScale, yScale, xTrans, yTrans, null, null);
     }
@@ -398,6 +448,7 @@ public class Operations {
      * @param xTrans   The translation along the <var>x</var> axis.
      * @param yTrans   The translation along the <var>x</var> axis.
      * @param interpolation The interpolation to use, or {@code null} for the default.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Scale
      *
@@ -410,6 +461,7 @@ public class Operations {
                               final double xScale, final double yScale,
                               final double xTrans, final double yTrans,
                               final Interpolation interpolation)
+            throws CoverageProcessingException
     {
         return scale(source, xScale, yScale, xTrans, yTrans, interpolation, null);
     }
@@ -427,6 +479,7 @@ public class Operations {
      * @param yTrans   The translation along the <var>x</var> axis.
      * @param interpolation The interpolation to use, or {@code null} for the default.
      * @param be The border extender, or {@code null} for the default.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.Scale
      *
@@ -437,6 +490,7 @@ public class Operations {
                               final double xTrans, final double yTrans,
                               final Interpolation interpolation,
                               final BorderExtender extender)
+            throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("Scale", source,
                                           "xScale", new Float(xScale),
@@ -465,6 +519,7 @@ public class Operations {
                                          final double scaleX, final double scaleY,
                                          final Interpolation interpolation,
                                          final BorderExtender be)
+            throws CoverageProcessingException
     {
         return subsampleAverage(source, scaleX, scaleY, interpolation, be);
     }
@@ -480,6 +535,7 @@ public class Operations {
      * @param scaleY   The scale factor along the <var>y</var> axis.
      * @param interpolation The interpolation to use, or {@code null} for the default.
      * @param be The border extender, or {@code null} for the default.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.SubsampleAverage
      *
@@ -490,6 +546,7 @@ public class Operations {
                                          final double         scaleY,
                                          final Interpolation  interpolation,
                                          final BorderExtender be)
+            throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("SubsampleAverage", source,
                                           "scaleX",           new Double(scaleX),
@@ -503,12 +560,15 @@ public class Operations {
      * filter is a quadrant symmetric filter generated from a Gaussian kernel.
      *
      * @param source The source coverage.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.FilteredSubsample
      *
      * @since 2.3
      */
-    public GridCoverage filteredSubsample(final GridCoverage source) {
+    public GridCoverage filteredSubsample(final GridCoverage source)
+            throws CoverageProcessingException
+    {
         return (GridCoverage) doOperation("FilteredSubsample", source);
     }
 
@@ -520,6 +580,7 @@ public class Operations {
      * @param scaleY   The scale factor along the <var>y</var> axis. The default value is 2.
      * @param qsFilter The filter. Default to a quadrant symmetric filter generated from
      *                 a Gaussian kernel
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.FilteredSubsample
      *
@@ -529,6 +590,7 @@ public class Operations {
                                           final int          scaleX,
                                           final int          scaleY,
                                           final float[]      qsFilter)
+            throws CoverageProcessingException
     {
         return filteredSubsample(source, scaleX, scaleY, qsFilter, null, null);
     }
@@ -542,6 +604,7 @@ public class Operations {
      * @param qsFilter The filter. Default to a quadrant symmetric filter generated from
      *                 a Gaussian kernel
      * @param interpolation The interpolation to use, or {@code null} for the default.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.FilteredSubsample
      *
@@ -554,6 +617,7 @@ public class Operations {
                                           final int scaleX, final int scaleY,
                                           final float[] qsFilter,
                                           final Interpolation interpolation)
+            throws CoverageProcessingException
     {
         return filteredSubsample(source, scaleX, scaleY, qsFilter, interpolation, null);
     }
@@ -571,6 +635,7 @@ public class Operations {
      *                 Gaussian kernel
      * @param interpolation The interpolation to use, or {@code null} for the default.
      * @param be The border extender, or {@code null} for the default.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.FilteredSubsample
      *
@@ -582,6 +647,7 @@ public class Operations {
                                           final float[]        qsFilter,
                                           final Interpolation  interpolation,
                                           final BorderExtender be)
+            throws CoverageProcessingException
     {
         return (GridCoverage) doOperation("FilteredSubsample", source,
                                           "scaleX",            new Integer(scaleX),
@@ -596,10 +662,13 @@ public class Operations {
      * directions. The default masks are the Sobel ones.
      *
      * @param source The source coverage.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.GradientMagnitude
      */
-    public Coverage gradientMagnitude(final Coverage source) {
+    public Coverage gradientMagnitude(final Coverage source)
+            throws CoverageProcessingException
+    {
         return doOperation("GradientMagnitude", source);
     }
 
@@ -610,11 +679,13 @@ public class Operations {
      * @param source The source coverage.
      * @param mask1  The first mask.
      * @param mask2  The second mask, orthogonal to the first one.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @see org.geotools.coverage.processing.operation.GradientMagnitude
      */
     public Coverage gradientMagnitude(final Coverage source,
                                       final KernelJAI mask1, final KernelJAI mask2)
+            throws CoverageProcessingException
     {
         return doOperation("GradientMagnitude", source, "mask1", mask1, "mask2", mask2);
     }
@@ -647,9 +718,10 @@ public class Operations {
      * @param  source The source coverage.
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
+     * @throws CoverageProcessingException if the operation can't be applied.
      */
     protected final Coverage doOperation(final String operationName, final Coverage source)
-            throws OperationNotFoundException
+            throws OperationNotFoundException, CoverageProcessingException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
@@ -669,10 +741,12 @@ public class Operations {
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     * @throws CoverageProcessingException if the operation can't be applied.
      */
     protected final Coverage doOperation(final String operationName, final Coverage source,
                                          final String argumentName1, final Object argumentValue1)
-            throws OperationNotFoundException, InvalidParameterNameException
+            throws OperationNotFoundException, InvalidParameterNameException,
+                   CoverageProcessingException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
@@ -695,11 +769,13 @@ public class Operations {
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     * @throws CoverageProcessingException if the operation can't be applied.
      */
     protected final Coverage doOperation(final String operationName, final Coverage source,
                                          final String argumentName1, final Object argumentValue1,
                                          final String argumentName2, final Object argumentValue2)
-            throws OperationNotFoundException, InvalidParameterNameException
+            throws OperationNotFoundException, InvalidParameterNameException,
+                   CoverageProcessingException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
@@ -725,12 +801,14 @@ public class Operations {
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     * @throws CoverageProcessingException if the operation can't be applied.
      */
     protected final Coverage doOperation(final String operationName, final Coverage source,
                                          final String argumentName1, final Object argumentValue1,
                                          final String argumentName2, final Object argumentValue2,
                                          final String argumentName3, final Object argumentValue3)
-            throws OperationNotFoundException, InvalidParameterNameException
+            throws OperationNotFoundException, InvalidParameterNameException,
+                   CoverageProcessingException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
@@ -751,6 +829,7 @@ public class Operations {
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @since 2.3
      */
@@ -759,7 +838,8 @@ public class Operations {
                                          final String argumentName2, final Object argumentValue2,
                                          final String argumentName3, final Object argumentValue3,
                                          final String argumentName4, final Object argumentValue4)
-            throws OperationNotFoundException, InvalidParameterNameException
+            throws OperationNotFoundException, InvalidParameterNameException,
+                   CoverageProcessingException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
@@ -781,6 +861,7 @@ public class Operations {
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @since 2.3
      */
@@ -790,7 +871,8 @@ public class Operations {
                                          final String argumentName3, final Object argumentValue3,
                                          final String argumentName4, final Object argumentValue4,
                                          final String argumentName5, final Object argumentValue5)
-            throws OperationNotFoundException, InvalidParameterNameException
+            throws OperationNotFoundException, InvalidParameterNameException,
+                   CoverageProcessingException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);
@@ -813,6 +895,7 @@ public class Operations {
      * @return The result as a coverage.
      * @throws OperationNotFoundException if there is no operation named {@code operationName}.
      * @throws InvalidParameterNameException if there is no parameter with the specified name.
+     * @throws CoverageProcessingException if the operation can't be applied.
      *
      * @since 2.3
      */
@@ -823,7 +906,8 @@ public class Operations {
                                          final String argumentName4, final Object argumentValue4,
                                          final String argumentName5, final Object argumentValue5,
                                          final String argumentName6, final Object argumentValue6)
-            throws OperationNotFoundException, InvalidParameterNameException
+            throws OperationNotFoundException, InvalidParameterNameException,
+                   CoverageProcessingException
     {
         final AbstractProcessor processor = getProcessor();
         final Operation operation = processor.getOperation(operationName);

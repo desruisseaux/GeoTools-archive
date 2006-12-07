@@ -210,8 +210,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * set of colors.
      * 
      * @param description
-     *            The sample dimension title or description, or {@code null} if
-     *            none. This is the value to be returned by {@link #getDescription}.
+     *            The sample dimension title or description, or {@code null} for the default
+     *            (the name of what looks like the "main" category). This is the value to be
+     *            returned by {@link #getDescription}.
      * @param categoriesNames
      *            Sequence of category names for the values contained in a
      *            sample dimension, as {@link String} or
@@ -269,8 +270,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * and a default set of colors.
      * 
      * @param description
-     *            The sample dimension title or description, or {@code null} if
-     *            none. This is the value to be returned by {@link #getDescription}.
+     *            The sample dimension title or description, or {@code null} for the default
+     *            (the name of what looks like the "main" category). This is the value to be
+     *            returned by {@link #getDescription}.
      * @param names
      *            Sequence of category names for the values contained in a
      *            sample dimension, as {@link String} or
@@ -340,8 +342,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * array of {@link Category} objects.
      * 
      * @param description
-     *            The sample dimension title or description, or {@code null} if
-     *            none. This is the value to be returned by {@link #getDescription}.
+     *            The sample dimension title or description, or {@code null} for the default
+     *            (the name of what looks like the "main" category). This is the value to be
+     *            returned by {@link #getDescription}.
      * @param type
      *            The grid value data type (which indicate the number of bits
      *            for the data type), or {@code null} for computing it
@@ -616,8 +619,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * geophysics values using arbitrary relation (not necessarly linear).
      * 
      * @param description
-     *            The sample dimension title or description, or {@code null} if
-     *            none. This is the value to be returned by {@link #getDescription}.
+     *            The sample dimension title or description, or {@code null} for the default
+     *            (the name of what looks like the "main" category). This is the value to be
+     *            returned by {@link #getDescription}.
      * @param categories
      *            The list of categories.
      * @param units
@@ -684,8 +688,9 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * Constructs a sample dimension with the specified list of categories.
      * 
      * @param description
-     *            The sample dimension title or description, or {@code null} if
-     *            none. This is the value to be returned by {@link #getDescription}.
+     *            The sample dimension title or description, or {@code null} for the default
+     *            (the name of what looks like the "main" category). This is the value to be
+     *            returned by {@link #getDescription}.
      * @param list
      *            The list of categories, or {@code null}.
      */

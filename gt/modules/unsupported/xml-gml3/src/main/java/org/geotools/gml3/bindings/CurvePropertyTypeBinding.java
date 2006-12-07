@@ -81,8 +81,7 @@ public class CurvePropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-  
-    	return node.getChildValue( LineString.class );
+        return node.getChildValue(LineString.class);
     }
 
     public Object getProperty(Object object, QName name)

@@ -23,6 +23,8 @@ package org.geotools.coverage.processing;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo This exception may become a checked one in a future Geotools version.
  */
 public class CoverageProcessingException extends RuntimeException {
     /**
