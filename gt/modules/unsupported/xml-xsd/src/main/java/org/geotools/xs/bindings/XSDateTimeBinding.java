@@ -61,7 +61,12 @@ import com.sun.xml.bind.DatatypeConverterImpl;
  * @generated
  */
 public class XSDateTimeBinding implements SimpleBinding {
-    /**
+	
+	static {
+		DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);	
+	}
+	
+	/**
      * @generated
      */
     public QName getTarget() {
@@ -75,7 +80,7 @@ public class XSDateTimeBinding implements SimpleBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return OVERRIDE;
     }
 
     /**
@@ -98,8 +103,7 @@ public class XSDateTimeBinding implements SimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        DatatypeConverter.setDatatypeConverter(DatatypeConverterImpl.theInstance);
-
+        
         return DatatypeConverter.parseDateTime((String) value);
     }
 

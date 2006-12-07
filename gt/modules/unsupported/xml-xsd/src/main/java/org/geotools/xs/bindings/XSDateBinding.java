@@ -15,6 +15,7 @@
  */
 package org.geotools.xs.bindings;
 
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -73,7 +74,7 @@ public class XSDateBinding implements SimpleBinding {
     public QName getTarget() {
         return XS.DATE;
     }
-
+    
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -81,7 +82,7 @@ public class XSDateBinding implements SimpleBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return OVERRIDE;
     }
 
     /**
