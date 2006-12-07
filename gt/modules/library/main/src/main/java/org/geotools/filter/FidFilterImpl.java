@@ -25,19 +25,22 @@ import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
 import org.opengis.filter.FilterVisitor;
-import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.identity.Identifier;
 
 
 /**
- * Defines a feature ID filter, which holds a list of feature IDs. This filter
- * stores a series of feature IDs, which are used to distinguish features
- * uniquely.
+ * Defines a ID filter, which holds a list of IDs ( usually feature id;s ). This filter
+ * stores a series of IDs, which are used to distinguish features uniquely.
  * <p>
  * Please note that addAllFids( Collection ) may be a performance hog; uDig makes
  * use of its own implementation of FidFilter in order to reuse the internal set
  * of fids between uses.
  * </p>
  * @author Rob Hranac, TOPP
+ * @author Justin Deoliveira, TOPP
+ * 
+ * TODO: this class shoul be renamed to IdFilterImpl
+ * 
  * @source $URL$
  * @version $Id$
  */
@@ -45,28 +48,12 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
     /** Logger for the default core module. */
     private static final Logger LOGGER = Logger.getLogger("org.geotools.core");
 
-    /** List of the FeatureId. */
+    /** List of the Identifer. */
     private Set fids = new HashSet();
-    
-//    public String getID(){
-//        return (String) fids.iterator().next();
-//    }
-//    
-//    public boolean matches( org.opengis.feature.Feature feature ){
-//        if( feature == null ) return false;
-//        
-//        String FID = feature.getID();
-//        if( FID == null ) return false;
-//        
-//        return FID.equals( getID() );
-//    }
-//    
-//    public boolean matches( Object object ){
-//        return false;
-//    }
     
     /**
      * Empty constructor.
+     * @deprecated use {@link #FidFilterImpl(Set)}
      */
     protected FidFilterImpl() {
     	super(FilterFactoryFinder.createFilterFactory());
@@ -77,6 +64,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
      * Constructor with first fid set
      *
      * @param initialFid The type of comparison.
+     * @deprecated use {@link #FidFilterImpl(Set)}
      */
     protected FidFilterImpl(String initialFid) {
     	super(FilterFactoryFinder.createFilterFactory());
@@ -144,8 +132,8 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
     private Set fids() {
     	HashSet set = new HashSet();
     	for ( Iterator i = fids.iterator(); i.hasNext(); ) {
-    		FeatureId fid = (FeatureId) i.next();
-    		set.add( fid.toString() );
+    		Identifier id = (Identifier) i.next();
+    		set.add( id.toString() );
     	}
     	
     	return set;
@@ -155,6 +143,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
      * Adds a feature ID to the filter.
      *
      * @param fid A single feature ID.
+     * @deprecated
      */
     public final void addFid(String fid) {
     	LOGGER.finest("got fid: " + fid);
@@ -187,7 +176,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
 		}
 		
 		for ( Iterator f = fids.iterator(); f.hasNext(); ) {
-			FeatureId featureId = (FeatureId) f.next();
+			Identifier featureId = (Identifier) f.next();
 			if ( fid.equals( featureId.toString() ) ) {
 				f.remove();
 			}
