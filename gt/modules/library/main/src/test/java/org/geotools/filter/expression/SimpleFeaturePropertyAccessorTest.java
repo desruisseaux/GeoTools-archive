@@ -13,6 +13,7 @@ import junit.framework.TestCase;
 
 public class SimpleFeaturePropertyAccessorTest extends TestCase {
 
+	FeatureType type;
 	Feature feature;
 	PropertyAccessor accessor = SimpleFeaturePropertyAccessorFactory.ATTRIBUTE_ACCESS;
 	
@@ -24,7 +25,7 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		typeBuilder.addAttribute( "foo", Integer.class );
 		typeBuilder.addAttribute( "bar", Double.class );
 		
-		FeatureType type = typeBuilder.feature();
+		type = typeBuilder.feature();
 		
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder( new SimpleFeatureFactoryImpl() );
 		builder.init();
@@ -44,6 +45,13 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		assertFalse( accessor.canHandle( feature, "illegal", null ) );
 	}
 	
+	public void testCanHandleType() {
+		assertTrue( accessor.canHandle( type, "foo", null ) );
+		assertTrue( accessor.canHandle( type, "bar", null ) );
+		
+		assertFalse( accessor.canHandle( type, "illegal", null ) );
+	}
+	
 	public void testGet() {
 		assertEquals( new Integer( 1 ), accessor.get( feature, "foo", null ) );
 		assertEquals( new Double( 2.0 ), accessor.get( feature, "bar", null ) );
@@ -51,6 +59,12 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		assertEquals( "fid", SimpleFeaturePropertyAccessorFactory.FID_ACCESS.get( feature, "@gml:id", null) );
                 assertFalse( accessor.canHandle( feature, "illegal", null ) );
 		assertNull( accessor.get( feature, "illegal", null ) );
+	}
+	
+	public void testGetType() {
+		assertEquals( type.getAttributeType( "foo" ), accessor.get( type, "foo", null ) );
+		assertEquals( type.getAttributeType( "bar" ), accessor.get( type, "bar", null ) );
+		assertNull( accessor.get( type, "illegal", null ) );
 	}
 	
 	public void testSet() {
@@ -73,7 +87,15 @@ public class SimpleFeaturePropertyAccessorTest extends TestCase {
 		}
 		catch( IllegalAttributeException e ) {
 		}
+	}
+	
+	public void testSetType() {
+		try {
+			accessor.set( type, "foo", new Object(), null );
+			fail( "trying to set attribute type should have thrown exception" );
+		} catch (IllegalAttributeException e) {}
 		
 		
 	}
+	
 }
