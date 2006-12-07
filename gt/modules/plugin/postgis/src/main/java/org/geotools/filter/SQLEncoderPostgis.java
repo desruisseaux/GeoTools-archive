@@ -420,10 +420,30 @@ public class SQLEncoderPostgis extends SQLEncoder implements
         	}
         	else
         	{
-        		left.accept(this);
+        		//check for case insentivity (TODO: perhaps move this up to jdbc)
+        		if ( !filter.isMatchingCase() ) {
+        			//only for == or != 
+        			if ( filter.getFilterType() == Filter.COMPARE_EQUALS || 
+        					filter.getFilterType() == Filter.COMPARE_NOT_EQUALS ) {
+        				
+        				//only for strings
+            			if ( left.getType() == Expression.LITERAL_STRING  
+            					|| right.getType() == Expression.LITERAL_STRING ) {
+            				
+            				out.write( "lower(" ); left.accept( this ); out.write( ")");
+            				out.write( " " + type + " " );
+            				out.write( "lower(" ); right.accept( this ); out.write( ")");
+            			
+            				return;
+            			}
+        			}
+        		}
+        		
+    			//normal execution
+    			left.accept(this);
         		out.write(" " + type + " ");
         		right.accept(this);
-        	}
+    		}
         } catch (java.io.IOException ioe) {
             throw new RuntimeException(IO_ERROR, ioe);
         }
