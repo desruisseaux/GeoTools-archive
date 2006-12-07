@@ -17,6 +17,7 @@
  */
 package org.geotools.data.jdbc;
 
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -94,12 +95,21 @@ public class JDBCDataStoreTest extends TestCase {
         
         assertEquals("Name", attrs[0].getName());
         assertEquals(String.class, attrs[0].getType());
+        assertFalse(attrs[0].isNillable());
+        assertEquals(1,attrs[0].getMinOccurs());
+        assertEquals(1,attrs[0].getMaxOccurs());
         
         assertEquals("B", attrs[1].getName());
         assertEquals(Boolean.class, attrs[1].getType());
+        assertTrue(attrs[1].isNillable());
+        assertEquals(0,attrs[1].getMinOccurs());
+        assertEquals(1,attrs[1].getMaxOccurs());
               
         assertEquals("DEC", attrs[2].getName());
-        assertEquals(Double.class, attrs[2].getType());        
+        assertEquals(Double.class, attrs[2].getType());
+        assertTrue(attrs[2].isNillable());
+        assertEquals(0,attrs[2].getMinOccurs());
+        assertEquals(1,attrs[2].getMaxOccurs());
     }
 
 
@@ -211,11 +221,18 @@ public class JDBCDataStoreTest extends TestCase {
         columns.addColumn("TABLE_NAME");
         columns.addColumn("COLUMN_NAME");
         columns.addColumn("DATA_TYPE");
+        columns.addColumn("TYPE_NAME");
+        columns.addColumn("COLUMN_SIZE");
+        columns.addColumn("BUFFER_LENGTH");
+        columns.addColumn("DECIMAL_DIGITS");
+		columns.addColumn("NUM_PREC_RADIX");
+		columns.addColumn("NULLABLE");
         
-        columns.addRow(new Object[]{null, null, "FEATURE_TYPE1", "ID", new Integer(Types.VARCHAR)});
-        columns.addRow(new Object[]{null, null, "FEATURE_TYPE1", "Name", new Integer(Types.VARCHAR)});
-        columns.addRow(new Object[]{null, null, "FEATURE_TYPE1", "B", new Integer(Types.BOOLEAN)});
-        columns.addRow(new Object[]{null, null, "FEATURE_TYPE1", "DEC", new Integer(Types.DOUBLE)});
+        
+        columns.addRow(new Object[]{null, null, "FEATURE_TYPE1", "ID", new Integer(Types.VARCHAR), "varchar", null,null,null,null,new Integer(DatabaseMetaData.columnNoNulls)});
+        columns.addRow(new Object[]{null, null, "FEATURE_TYPE1", "Name", new Integer(Types.VARCHAR), "varchar", null,null,null,null,new Integer(DatabaseMetaData.columnNoNulls)});
+        columns.addRow(new Object[]{null, null, "FEATURE_TYPE1", "B", new Integer(Types.BOOLEAN), "boolean", null,null,null,null,new Integer(DatabaseMetaData.columnNullable)});
+        columns.addRow(new Object[]{null, null, "FEATURE_TYPE1", "DEC", new Integer(Types.DOUBLE), "double", null,null,null,null,new Integer(DatabaseMetaData.columnNullableUnknown)});
         
         return columns;
     }

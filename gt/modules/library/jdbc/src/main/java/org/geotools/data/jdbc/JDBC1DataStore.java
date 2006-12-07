@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataAccess;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -578,16 +579,21 @@ public abstract class JDBC1DataStore implements DataStore {
 			//
 			// check to make sure we have enough for the filter
 			//
-			String[] filterNames = DataUtilities.attributeNames(preFilter);
+			String[] filterNames = DataUtilities.attributeNames(preFilter, featureType);
 
-			Set set = new HashSet();
-			set.addAll(Arrays.asList(requestedNames));
-			set.addAll(Arrays.asList(filterNames));
-
-			if (set.size() == requestedNames.length) {
+			//JD: using a list here to maintain order
+			List list = new ArrayList();
+			list.addAll(Arrays.asList(requestedNames));
+			for ( int i = 0; i < filterNames.length; i++ ) {
+				if ( !list.contains( filterNames[ i ] ) ) {
+					list.add( filterNames[i] );
+				}
+			}
+			
+			if (list.size() == requestedNames.length) {
 				propertyNames = requestedNames;
 			} else {
-				propertyNames = (String[]) set.toArray(new String[set.size()]);
+				propertyNames = (String[]) list.toArray(new String[list.size()]);
 			}
 
 			try {
@@ -647,7 +653,10 @@ public abstract class JDBC1DataStore implements DataStore {
 			try {
 				FeatureType requestType = DataUtilities.createSubType(schema,
 						requestedNames);
-				reader = new ReTypeFeatureReader(reader, requestType);
+				if ( !requestType.equals( reader.getFeatureType() ) ) {
+					reader = new ReTypeFeatureReader(reader, requestType);
+				}
+				
 			} catch (SchemaException schemaException) {
 				throw new DataSourceException("Could not handle query",
 						schemaException);
@@ -937,10 +946,12 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *             if anything goes wrong.
 	 */
 	public SQLBuilder getSqlBuilder(String typeName) throws IOException {
-		SQLEncoder encoder = new SQLEncoder();
+		FeatureType schema = getSchema( typeName );
+		SQLEncoder encoder = new SQLEncoder( );
+		encoder.setFeatureType( schema );
 		encoder.setFIDMapper(getFIDMapper(typeName));
 
-		return new DefaultSQLBuilder(encoder);
+		return new DefaultSQLBuilder(encoder,schema,null);
 	}
 
 	/**
@@ -1228,15 +1239,34 @@ public abstract class JDBC1DataStore implements DataStore {
 		try {
 			final int COLUMN_NAME = 4;
 			final int DATA_TYPE = 5;
-
+			final int NULLABLE = 11;
+			
 			String columnName = rs.getString(COLUMN_NAME);
 			int dataType = rs.getInt(DATA_TYPE);
 			Class type = (Class) TYPE_MAPPINGS.get(new Integer(dataType));
-
+			
+			//check for nullability
+			int nullCode = rs.getInt( NULLABLE );
+			boolean nillable = true;
+			switch( nullCode ) {
+				case DatabaseMetaData.columnNoNulls:
+					nillable = false;
+					break;
+					
+				case DatabaseMetaData.columnNullable:
+					nillable = true;
+					break;
+					
+				case DatabaseMetaData.columnNullableUnknown:
+					nillable = true;
+					break;
+			}
+			
 			if (type == null) {
 				return null;
 			} else {
-				return AttributeTypeFactory.newAttributeType(columnName, type);
+				int min = nillable ? 0 : 1;
+				return AttributeTypeFactory.newAttributeType(columnName, type, nillable, null, null, null, min, 1 );
 			}
 		} catch (SQLException e) {
 			throw new IOException("SQL exception occurred: " + e.getMessage());
