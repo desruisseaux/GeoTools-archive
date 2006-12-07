@@ -129,6 +129,27 @@ public class Schemas {
     }
 
     /**
+     * Finds all {@link XSDSchemaLocationResolver}'s used by the configuration.
+     * 
+     * @param configuration The parser configuration.
+     * 
+     * @return A list of location resolvers, empty if none found.
+     */
+    public static List findSchemaLocationResolvers( Configuration configuration ) {
+    	List all = configuration.allDependencies();
+    	List resolvers = new ArrayList();
+    	for ( Iterator c = all.iterator(); c.hasNext(); ) {
+    		configuration = (Configuration) c.next();
+    		XSDSchemaLocationResolver resolver = configuration.getSchemaLocationResolver();
+    		if ( resolver != null ) {
+    			resolvers.add( resolver );
+    		}
+    	}
+    	
+    	return resolvers;
+    }
+    
+    /**
      * Parses a schema at the specified location.
      *
      * @param location A uri pointing to the location of the schema.
