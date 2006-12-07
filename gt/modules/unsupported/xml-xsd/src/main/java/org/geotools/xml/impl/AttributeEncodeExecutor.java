@@ -1,6 +1,9 @@
 package org.geotools.xml.impl;
 
+import java.util.logging.Logger;
+
 import org.eclipse.xsd.XSDAttributeDeclaration;
+import org.geotools.util.Converters;
 import org.geotools.xml.Binding;
 import org.geotools.xml.SimpleBinding;
 import org.w3c.dom.Attr;
@@ -20,12 +23,16 @@ public class AttributeEncodeExecutor implements BindingWalker.Visitor {
 	/** the document / factory **/
 	Document document;
 	
+	/** logger */
+	Logger logger;
+	
 	public AttributeEncodeExecutor(
-		Object object, XSDAttributeDeclaration attribute, Document document
+		Object object, XSDAttributeDeclaration attribute, Document document, Logger logger
 	) {
 		this.object = object;
 		this.attribute = attribute;
 		this.document = document;
+		this.logger = logger;
 		
 		encoding = document
 			.createAttributeNS(attribute.getTargetNamespace(), attribute.getName());
@@ -37,6 +44,23 @@ public class AttributeEncodeExecutor implements BindingWalker.Visitor {
 	}
 	
 	public void visit(Binding binding) {
+		//ensure the object type matches the type declared on the bindign
+		if ( binding.getType() == null ) {
+			logger.warning( "Binding: " + binding.getTarget() + " does not declare a target type" );
+			return;
+		}
+		if ( !binding.getType().isAssignableFrom( object.getClass() ) ) {
+			//try to convert
+			Object converted = Converters.convert( object, binding.getType() );
+			if ( converted != null ) {
+				object = converted;
+			}
+			else {
+				logger.warning( object + "[ " + object.getClass() + " ] is not of type " + binding.getType() );
+				return;	
+			}
+		}
+			
 		if (binding instanceof SimpleBinding) {
 			SimpleBinding simple = (SimpleBinding)binding;
 			

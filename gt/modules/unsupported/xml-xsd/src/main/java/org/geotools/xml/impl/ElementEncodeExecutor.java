@@ -1,6 +1,9 @@
 package org.geotools.xml.impl;
 
+import java.util.logging.Logger;
+
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.geotools.util.Converters;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.SimpleBinding;
@@ -23,12 +26,16 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
 	/** the document / factory **/
 	Document document;
 	
+	/** logger */
+	Logger logger;
+	
 	public ElementEncodeExecutor(
-		Object object, XSDElementDeclaration element, Document document
+		Object object, XSDElementDeclaration element, Document document, Logger logger
 	) {
 		this.object = object;
 		this.element = element;
 		this.document = document;
+		this.logger = logger;
 		
 //		if ( element.getTargetNamespace() != null ) {
 			encoding = document.createElementNS(element.getTargetNamespace(),element.getName());	
@@ -46,6 +53,25 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
 	}
 	
 	public void visit(Binding binding) {
+		//ensure that the type of the object being encoded matches the type 
+		// of the binding
+		if ( binding.getType() == null ) {
+			logger.warning( "Binding: " + binding.getTarget() + " does not declare a target type" );
+			return;
+		}
+		
+		if ( !binding.getType().isAssignableFrom( object.getClass() ) ) {
+			//try to convert 
+			Object converted = Converters.convert( object, binding.getType() );
+			if ( converted != null ) {
+				object = converted;
+			}
+			else {
+				logger.warning( object + "[ " + object.getClass() + " ] is not of type " + binding.getType() );	
+				return;
+			}
+		}
+			
 		if (binding instanceof ComplexBinding) {
 			ComplexBinding complex = (ComplexBinding)binding;
 			

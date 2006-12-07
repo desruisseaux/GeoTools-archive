@@ -79,6 +79,9 @@ public class Encoder {
 	/** schema location */
 	private HashMap schemaLocations;
 	
+	/** output format */
+	private OutputFormat outputFormat;
+	
 	/**
 	 * Logger logger;
 	 */
@@ -155,15 +158,26 @@ public class Encoder {
 		schemaLocations.put( namespaceURI, location );
 	}
 	
+	/**
+	 * Sets hte output format to be used by the encoder.
+	 * 
+	 * @param outputFormat The output format.
+	 */
+	public void setOutputFormat( OutputFormat outputFormat ) {
+		this.outputFormat = outputFormat;
+	}
+	
 	public void write(Object object, QName name, OutputStream out) 
 		throws IOException, SAXException {
 		
 		//create the document seriaizer
-		OutputFormat format = new OutputFormat();
-		format.setIndent(2);
-		format.setIndenting(true);
+		if ( outputFormat != null ) {
+			serializer = new XMLSerializer( out, outputFormat );
+		}
+		else {
+			serializer = new XMLSerializer( out, new OutputFormat() );	
+		}
 		
-		serializer = new XMLSerializer(out,format);
 		serializer.setNamespaces( true );
 		serializer.startDocument();
 		
@@ -483,7 +497,7 @@ public class Encoder {
 				(XSDAttributeDeclaration)component;
 			
 			AttributeEncodeExecutor encoder = 
-				new AttributeEncodeExecutor(object,attribute,doc);
+				new AttributeEncodeExecutor(object,attribute,doc,logger);
 			
 			new BindingWalker(bindingLoader,bindingLoader.getContainer())
 				.walk(attribute,encoder);

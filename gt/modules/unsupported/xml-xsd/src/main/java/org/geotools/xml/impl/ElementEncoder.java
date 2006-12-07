@@ -53,7 +53,7 @@ public class ElementEncoder {
 	 */
 	public Element encode( Object value, XSDElementDeclaration element, Document document ) {
 		
-		ElementEncodeExecutor executor = new ElementEncodeExecutor( value, element, document );
+		ElementEncodeExecutor executor = new ElementEncodeExecutor( value, element, document,logger );
 		new BindingWalker( bindingLoader, context ).walk( element, executor );
 		
 		return executor.getEncodedElement();
