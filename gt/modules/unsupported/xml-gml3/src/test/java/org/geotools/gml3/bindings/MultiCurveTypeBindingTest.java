@@ -21,7 +21,7 @@ import org.geotools.gml3.GML3TestSupport;
 
 public class MultiCurveTypeBindingTest extends GML3TestSupport {
     public void testEncode() throws Exception {
-        Document dom = encode(GML3MockData.multiCurve(), GML.MultiCurve);
+        Document dom = encode(GML3MockData.multiLineString(), GML.MultiCurve);
         assertEquals(2, dom.getElementsByTagNameNS(GML.NAMESPACE, "curveMember").getLength());
     }
 }

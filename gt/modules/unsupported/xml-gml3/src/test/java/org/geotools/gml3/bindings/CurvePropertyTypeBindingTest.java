@@ -16,15 +16,12 @@
 package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Document;
-import org.geotools.gml3.Curve;
 import org.geotools.gml3.GML3TestSupport;
 
 
 public class CurvePropertyTypeBindingTest extends GML3TestSupport {
     public void testEncode() throws Exception {
-        Curve curve = GML3MockData.curve();
-        Document dom = encode(curve, GML.curveProperty);
-
+        Document dom = encode(GML3MockData.multiLineString(), GML.curveProperty);
         assertEquals(1, dom.getElementsByTagName("gml:Curve").getLength());
     }
 }

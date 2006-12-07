@@ -21,8 +21,10 @@ import org.geotools.gml3.GML3TestSupport;
 
 public class MultiSurfacePropertyTypeBindingTest extends GML3TestSupport {
     public void testEncode() throws Exception {
-        Document dom = encode(GML3MockData.multiSurface(), GML.multiSurfaceProperty);
+        Document dom = encode(GML3MockData.multiPolygon(), GML.multiSurfaceProperty);
         assertEquals(1,
             dom.getElementsByTagNameNS(GML.NAMESPACE, GML.MultiSurface.getLocalPart()).getLength());
+        assertEquals(2,
+            dom.getElementsByTagNameNS(GML.NAMESPACE, GML.surfaceMember.getLocalPart()).getLength());
     }
 }

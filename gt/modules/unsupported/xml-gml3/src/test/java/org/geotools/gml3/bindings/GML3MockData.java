@@ -28,12 +28,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.gml3.Curve;
-import org.geotools.gml3.MultiCurve;
-import org.geotools.gml3.MultiSurface;
 import org.geotools.referencing.CRS;
 
 
@@ -73,14 +68,6 @@ public class GML3MockData {
 
     static LineString lineString() {
         return gf.createLineString(new Coordinate[] { new Coordinate(1, 2), new Coordinate(3, 4) });
-    }
-
-    static Curve curve() {
-        return new Curve(new LineString[] { lineString() }, gf);
-    }
-
-    static MultiCurve multiCurve() {
-        return new MultiCurve(new Curve[] { curve(), curve() }, gf);
     }
 
     static Element lineString(Document document, Node parent) {
@@ -149,10 +136,6 @@ public class GML3MockData {
 
     static Polygon polygon() {
         return gf.createPolygon(linearRing(), null);
-    }
-
-    static MultiSurface multiSurface() {
-        return new MultiSurface(new Polygon[] { polygon(), polygon() }, gf);
     }
 
     static Element polygonWithNoInterior(Document document, Node parent) {

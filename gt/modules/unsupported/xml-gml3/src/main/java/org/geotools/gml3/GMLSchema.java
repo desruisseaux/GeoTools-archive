@@ -3642,7 +3642,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MULTICURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiCurveType",
-            MultiCurve.class);
+            MultiLineString.class);
 
     /**
      * <p>
@@ -4289,7 +4289,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType CURVEARRAYPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("CurveArrayPropertyType", Curve[].class);
+        .newAttributeType("CurveArrayPropertyType", MultiLineString[].class);
 
     /**
      * <p>
@@ -4499,7 +4499,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MULTICURVEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiCurvePropertyType", MultiCurve.class);
+        .newAttributeType("MultiCurvePropertyType", MultiLineString[].class);
 
     /**
      * <p>
@@ -6776,7 +6776,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MULTISURFACETYPE_TYPE = AttributeTypeFactory.newAttributeType("MultiSurfaceType",
-            MultiSurface.class);
+            MultiPolygon.class);
 
     /**
      * <p>
@@ -7027,7 +7027,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType MULTISURFACEPROPERTYTYPE_TYPE = AttributeTypeFactory
-        .newAttributeType("MultiSurfacePropertyType", MultiSurface.class);
+        .newAttributeType("MultiSurfacePropertyType", MultiPolygon.class);
 
     /**
      * <p>
@@ -8466,7 +8466,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType CURVETYPE_TYPE = AttributeTypeFactory.newAttributeType("CurveType",
-            Curve.class);
+            MultiLineString.class);
 
     /**
      * <p>
@@ -10413,7 +10413,7 @@ public class GMLSchema extends SchemaImpl {
      * @generated
      */
     public static final AttributeType CURVEPROPERTYTYPE_TYPE = AttributeTypeFactory.newAttributeType("CurvePropertyType",
-            Curve.class);
+            MultiLineString.class);
 
     /**
      * <p>

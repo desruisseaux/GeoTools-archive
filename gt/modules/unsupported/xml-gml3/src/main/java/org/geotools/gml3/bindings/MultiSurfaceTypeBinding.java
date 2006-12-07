@@ -15,13 +15,14 @@
  */
 package org.geotools.gml3.bindings;
 
-import java.util.Arrays;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.gml3.MultiSurface;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -75,7 +76,7 @@ public class MultiSurfaceTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return MultiSurface.class;
+        return MultiPolygon.class;
     }
 
     /**
@@ -89,18 +90,13 @@ public class MultiSurfaceTypeBinding extends AbstractComplexBinding {
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="gml:surfaceMember"/&gt;
         List surfaces = node.getChildValues(Polygon.class);
 
-        //&lt;element minOccurs="0" ref="gml:surfaceMembers"/&gt;
-        if (node.hasChild(Polygon[].class)) {
-            surfaces.addAll(Arrays.asList((Polygon[]) node.getChildValue(Polygon[].class)));
-        }
-
-        return new MultiSurface((Polygon[]) surfaces.toArray(new Polygon[surfaces.size()]), gf);
+        return gf.createMultiPolygon((Polygon[]) surfaces.toArray(new Polygon[surfaces.size()]));
     }
 
     public Object getProperty(Object object, QName name)
         throws Exception {
         if (GML.surfaceMember.equals(name)) {
-            MultiSurface multiSurface = (MultiSurface) object;
+            MultiPolygon multiSurface = (MultiPolygon) object;
             Polygon[] members = new Polygon[multiSurface.getNumGeometries()];
 
             for (int i = 0; i < members.length; i++) {

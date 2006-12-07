@@ -15,12 +15,12 @@
  */
 package org.geotools.gml3.bindings;
 
-import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.LineString;
-import org.geotools.gml3.Curve;
-import org.geotools.xml.*;
+import com.vividsolutions.jts.geom.MultiLineString;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -60,7 +60,8 @@ public class CurveArrayPropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Curve[].class;
+        //return Curve[].class;
+        return MultiLineString[].class;
     }
 
     /**
@@ -71,18 +72,8 @@ public class CurveArrayPropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        List curves = node.getChildValues(Curve.class);
+        List curves = node.getChildValues(MultiLineString.class);
 
-        //check for line strings as well
-        if (node.hasChild(LineString.class)) {
-            List lines = node.getChildValues(LineString.class);
-
-            for (Iterator l = lines.iterator(); l.hasNext();) {
-                LineString line = (LineString) l.next();
-                curves.add(new Curve(new LineString[] { line }, line.getFactory()));
-            }
-        }
-
-        return curves.toArray(new Curve[curves.size()]);
+        return curves.toArray(new MultiLineString[curves.size()]);
     }
 }

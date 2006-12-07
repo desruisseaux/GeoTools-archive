@@ -47,6 +47,10 @@ public class DoubleListBinding extends AbstractSimpleBinding {
         return GML.doubleList;
     }
 
+    public int getExecutionMode() {
+        return OVERRIDE;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->

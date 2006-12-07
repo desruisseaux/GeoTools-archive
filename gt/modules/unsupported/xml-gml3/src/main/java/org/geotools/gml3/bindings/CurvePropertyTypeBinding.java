@@ -18,7 +18,7 @@ package org.geotools.gml3.bindings;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import org.geotools.gml3.Curve;
+import com.vividsolutions.jts.geom.MultiLineString;
 import org.geotools.xml.*;
 
 
@@ -70,7 +70,7 @@ public class CurvePropertyTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Curve.class;
+        return LineString.class;
     }
 
     /**
@@ -81,20 +81,14 @@ public class CurvePropertyTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //special hack for curves
-        if (node.hasChild(LineString.class)) {
-            LineString line = (LineString) node.getChildValue(LineString.class);
-
-            return new Curve(new LineString[] { line }, line.getFactory());
-        }
-
-        return node.getChildValue(Curve.class);
+  
+    	return node.getChildValue( LineString.class );
     }
 
     public Object getProperty(Object object, QName name)
         throws Exception {
         if (GML._Curve.equals(name)) {
-            return (Curve) object;
+            return object;
         }
 
         return null;

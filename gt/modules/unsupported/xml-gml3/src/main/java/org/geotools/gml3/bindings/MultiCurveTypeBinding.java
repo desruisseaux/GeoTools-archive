@@ -15,14 +15,14 @@
  */
 package org.geotools.gml3.bindings;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.geotools.gml3.Curve;
-import org.geotools.gml3.MultiCurve;
-import org.geotools.xml.*;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -76,7 +76,8 @@ public class MultiCurveTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return MultiCurve.class;
+        //return MultiCurve.class;
+        return MultiLineString.class;
     }
 
     public int getExecutionMode() {
@@ -92,24 +93,20 @@ public class MultiCurveTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         //&lt;element maxOccurs="unbounded" minOccurs="0" ref="gml:curveMember"/&gt;
-        List curves = node.getChildValues(Curve.class);
+        List curves = node.getChildValues(LineString.class);
 
-        //&lt;element minOccurs="0" ref="gml:curveMembers"/&gt;
-        if (node.hasChild(Curve[].class)) {
-            curves.addAll(Arrays.asList((Curve[]) node.getChildValue(Curve[].class)));
-        }
-
-        return new MultiCurve((Curve[]) curves.toArray(new Curve[curves.size()]), gf);
+        return gf.createMultiLineString((LineString[]) curves.toArray(new LineString[curves.size()]));
     }
 
     public Object getProperty(Object object, QName name)
         throws Exception {
         if (GML.curveMember.equals(name)) {
-            MultiCurve multiCurve = (MultiCurve) object;
-            Curve[] members = new Curve[multiCurve.getNumGeometries()];
+            //MultiCurve multiCurve = (MultiCurve) object;
+            MultiLineString multiCurve = (MultiLineString) object;
+            LineString[] members = new LineString[multiCurve.getNumGeometries()];
 
             for (int i = 0; i < members.length; i++) {
-                members[i] = (Curve) multiCurve.getGeometryN(i);
+                members[i] = (LineString) multiCurve.getGeometryN(i);
             }
 
             return members;

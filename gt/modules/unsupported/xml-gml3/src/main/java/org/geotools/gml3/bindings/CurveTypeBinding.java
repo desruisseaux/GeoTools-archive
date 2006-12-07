@@ -15,13 +15,15 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
+
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
+
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import org.geotools.gml3.Curve;
-import org.geotools.xml.*;
+import com.vividsolutions.jts.geom.MultiLineString;
 
 
 /**
@@ -76,7 +78,8 @@ public class CurveTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Curve.class;
+        //return Curve.class;
+        return MultiLineString.class;
     }
 
     public int getExecutionMode() {
@@ -93,13 +96,16 @@ public class CurveTypeBinding extends AbstractComplexBinding {
         throws Exception {
         LineString[] segments = (LineString[]) node.getChildValue("segments");
 
-        return new Curve(segments, gf);
+        return gf.createMultiLineString(segments);
+
+        //return new Curve(segments, gf);
     }
 
     public Object getProperty(Object object, QName name)
         throws Exception {
         if (GML.segments.equals(name)) {
-            Curve curve = (Curve) object;
+            //Curve curve = (Curve) object;
+            MultiLineString curve = (MultiLineString) object;
             LineString[] segments = new LineString[curve.getNumGeometries()];
 
             for (int i = 0; i < segments.length; i++) {
