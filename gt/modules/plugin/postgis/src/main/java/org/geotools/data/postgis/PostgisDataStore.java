@@ -775,6 +775,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             encoder.setDefaultGeometry(geom);
         }
 
+        encoder.setFeatureType( info.getSchema() );
         encoder.setSRID(srid);
         encoder.setLooseBbox(looseBbox);
 
