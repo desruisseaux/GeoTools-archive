@@ -24,7 +24,10 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -101,7 +104,22 @@ public class JDBCFeatureReader implements FeatureReader {
         String fid = mapper.getID(fidAttributes);
 
         for (int i = 0; i < attributes.length; i++) {
-            attributes[i] = queryData.read(i);
+        	Object attribute = queryData.read( i );
+        	
+        	//JD: check for a coordinate system, if present on the type, set on the geometry
+        	// I know this is pretty loose, but its better then nothing
+        	if ( attribute instanceof Geometry && 
+        			queryData.getFeatureType().getAttributeType( i ) instanceof GeometryAttributeType ) {
+        		Geometry geometry = (Geometry) attribute;
+        		GeometryAttributeType geometryType = 
+        			(GeometryAttributeType) queryData.getFeatureType().getAttributeType( i );
+        		
+        		if ( geometryType.getCoordinateSystem() != null ) {
+        			geometry.setUserData( geometryType.getCoordinateSystem() );
+        		}
+        	}
+        	
+            attributes[i] = attribute;
         }
 
         return queryData.getFeatureType().create(attributes, fid);
