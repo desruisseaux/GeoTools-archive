@@ -5,6 +5,7 @@ import org.apache.commons.jxpath.JXPathContextFactory;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.geotools.factory.Hints;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.expression.PropertyAccessor;
 import org.geotools.filter.expression.PropertyAccessorFactory;
@@ -35,6 +36,10 @@ public class XPathPropertyAccessorFactory implements PropertyAccessorFactory {
 			Class target, Hints hints) {
 		
 		if ( Feature.class.isAssignableFrom( type ) ) {
+			return new XPathPropertyAcessor( );
+		}
+		
+		if ( FeatureType.class.isAssignableFrom( type ) ) {
 			return new XPathPropertyAcessor( );
 		}
 		
