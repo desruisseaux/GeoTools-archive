@@ -19,7 +19,6 @@ import org.picocontainer.MutablePicoContainer;
 import org.geotools.filter.v1_0.OGCBBOXTypeBinding;
 import org.geotools.filter.v1_0.OGCDistanceTypeBinding;
 import org.geotools.filter.v1_0.OGCExpressionTypeBinding;
-import org.geotools.filter.v1_0.OGCFilterTypeBinding;
 import org.geotools.filter.v1_0.OGCFunctionTypeBinding;
 import org.geotools.filter.v1_0.OGCLiteralTypeBinding;
 import org.geotools.filter.v1_0.OGCLowerBoundaryTypeBinding;
@@ -68,7 +67,7 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(OGC.EXPRESSIONTYPE, OGCExpressionTypeBinding.class);
 
         container.registerComponentImplementation(OGC.FEATUREIDTYPE, FeatureIdTypeBinding.class);
-        container.registerComponentImplementation(OGC.FILTERTYPE, OGCFilterTypeBinding.class);
+        container.registerComponentImplementation(OGC.FILTERTYPE, FilterTypeBinding.class);
         //container.registerComponentImplementation(OGC.FILTERTYPE,FilterTypeBinding.class);
         container.registerComponentImplementation(OGC.FUNCTIONNAMESTYPE,
             FunctionNamesTypeBinding.class);
