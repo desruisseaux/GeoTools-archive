@@ -17,6 +17,7 @@ package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.identity.GmlObjectId;
 import org.geotools.xml.*;
 
 
@@ -61,7 +62,7 @@ public class GmlObjectIdTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return GmlObjectId.class;
     }
 
     /**
@@ -72,7 +73,7 @@ public class GmlObjectIdTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        //&lt;xsd:attribute ref="gml:id" use="required"/&gt;
+        return filterfactory.gmlObjectId((String) node.getAttributeValue("id"));
     }
 }
