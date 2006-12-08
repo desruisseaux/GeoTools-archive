@@ -99,7 +99,7 @@
 					<nodeDirectory>
 						${basedir}/modified-src
 					</nodeDirectory>
-					<nodePackage>org.geotools.filter.cql</nodePackage>
+					<nodePackage>org.geotools.text.filter</nodePackage>
 				</configuration>
 				<executions>
 					<execution>

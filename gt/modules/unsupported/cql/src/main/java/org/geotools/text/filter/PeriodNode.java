@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.cql;
+package org.geotools.text.filter;
 
 import java.security.InvalidParameterException;
 import java.util.Date;

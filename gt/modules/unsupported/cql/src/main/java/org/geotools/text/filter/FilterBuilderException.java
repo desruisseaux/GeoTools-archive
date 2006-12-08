@@ -16,7 +16,10 @@
  *    Created on October 15, 2003, 1:57 PM
  */
 
-package org.geotools.filter.cql;
+package org.geotools.text.filter;
+
+import org.geotools.text.filter.ParseException;
+import org.geotools.text.filter.Token;
 
 
 /**

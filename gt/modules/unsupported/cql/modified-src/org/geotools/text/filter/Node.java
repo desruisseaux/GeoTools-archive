@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.filter.cql;
+package org.geotools.text.filter;
 
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships

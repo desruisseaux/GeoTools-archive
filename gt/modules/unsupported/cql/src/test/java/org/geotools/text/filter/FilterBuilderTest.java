@@ -14,11 +14,13 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.filter.cql;
+package org.geotools.text.filter;
 
 import junit.framework.TestCase;
 
 import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.text.filter.ParseException;
+import org.geotools.text.filter.FilterBuilder;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsBetween;

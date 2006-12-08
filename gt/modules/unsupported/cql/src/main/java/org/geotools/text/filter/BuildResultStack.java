@@ -13,11 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.cql;
+package org.geotools.text.filter;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
 
+import org.geotools.text.filter.Token;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 

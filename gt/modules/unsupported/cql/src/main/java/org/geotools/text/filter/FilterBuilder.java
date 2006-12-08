@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.geotools.filter.cql;
+package org.geotools.text.filter;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -29,6 +29,12 @@ import org.geotools.factory.Hints;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.IllegalFilterException;
+import org.geotools.text.filter.CQLParser;
+import org.geotools.text.filter.CQLParserTreeConstants;
+import org.geotools.text.filter.Node;
+import org.geotools.text.filter.ParseException;
+import org.geotools.text.filter.Token;
+import org.geotools.text.filter.TokenMgrError;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
