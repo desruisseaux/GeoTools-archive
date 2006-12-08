@@ -16,8 +16,11 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
@@ -52,9 +55,11 @@ import org.geotools.xml.*;
  */
 public class BinarySpatialOpTypeBinding extends AbstractComplexBinding {
     FilterFactory filterfactory;
+    GeometryFactory geometryFactory;
 
-    public BinarySpatialOpTypeBinding(FilterFactory filterfactory) {
+    public BinarySpatialOpTypeBinding(FilterFactory filterfactory, GeometryFactory geometryFactory) {
         this.filterfactory = filterfactory;
+        this.geometryFactory = geometryFactory;
     }
 
     /**
@@ -85,10 +90,22 @@ public class BinarySpatialOpTypeBinding extends AbstractComplexBinding {
         PropertyName name = (PropertyName) node.getChildValue(PropertyName.class);
         Expression spatial = null;
 
-        if (node.getChild(Geometry.class) != null) {
+        if (node.hasChild(Geometry.class)) {
             spatial = filterfactory.literal(node.getChildValue(Geometry.class));
-        } else {
-            spatial = filterfactory.literal(node.getChildValue(Envelope.class));
+        } else if (node.hasChild(Envelope.class)) {
+            //JD: creating an envelope here would break a lot of our code, for instance alot of 
+            // code that encodes a filter into sql will choke on this
+            Envelope envelope = (Envelope) node.getChildValue(Envelope.class);
+            Polygon polygon = geometryFactory.createPolygon(geometryFactory.createLinearRing(
+                        new Coordinate[] {
+                            new Coordinate(envelope.getMinX(), envelope.getMinY()),
+                            new Coordinate(envelope.getMaxX(), envelope.getMinY()),
+                            new Coordinate(envelope.getMaxX(), envelope.getMaxY()),
+                            new Coordinate(envelope.getMinX(), envelope.getMaxY()),
+                            new Coordinate(envelope.getMinX(), envelope.getMinY())
+                        }), null);
+
+            spatial = filterfactory.literal(polygon);
         }
 
         return new Expression[] { name, spatial };
