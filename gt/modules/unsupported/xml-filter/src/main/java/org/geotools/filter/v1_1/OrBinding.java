@@ -74,6 +74,6 @@ public class OrBinding extends AbstractComplexBinding {
         throws Exception {
         Filter[] operands = (Filter[]) value;
 
-        return filterfactory.and(operands[0], operands[1]);
+        return filterfactory.or(operands[0], operands[1]);
     }
 }
