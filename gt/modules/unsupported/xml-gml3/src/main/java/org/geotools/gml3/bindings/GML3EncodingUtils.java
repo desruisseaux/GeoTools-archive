@@ -47,6 +47,10 @@ public class GML3EncodingUtils {
     }
 
     static URI crs(CoordinateReferenceSystem crs) {
+        if (crs == null) {
+            return null;
+        }
+
         for (Iterator i = crs.getIdentifiers().iterator(); i.hasNext();) {
             Identifier id = (Identifier) i.next();
 
