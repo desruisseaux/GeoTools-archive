@@ -123,9 +123,9 @@ public class DirectPositionTypeBinding extends AbstractComplexBinding {
             }
         }
 
-        Element pos = document.createElementNS(GML.pos.getNamespaceURI(), GML.pos.getLocalPart());
-        pos.appendChild(document.createTextNode(sb.toString()));
+        //Element pos = document.createElementNS(GML.pos.getNamespaceURI(), GML.pos.getLocalPart());
+        value.appendChild(document.createTextNode(sb.toString()));
 
-        return pos;
+        return value;
     }
 }
