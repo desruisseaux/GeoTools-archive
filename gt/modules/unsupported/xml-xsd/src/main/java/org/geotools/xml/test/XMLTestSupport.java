@@ -21,6 +21,11 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import junit.framework.TestCase;
 
@@ -152,5 +157,18 @@ public abstract class XMLTestSupport extends TestCase {
     	return dbf.newDocumentBuilder().parse( 
 			new ByteArrayInputStream( output.toByteArray() )
 		);
+    }
+    
+    /**
+     * Convenience method to dump the contents of the document to stdout.
+     * 
+     * 
+     */
+    protected void print( Document dom ) throws Exception {
+    	TransformerFactory txFactory = TransformerFactory.newInstance();
+    	Transformer tx = txFactory.newTransformer();
+    	tx.setOutputProperty( OutputKeys.INDENT, "yes" );
+    	
+    	tx.transform( new DOMSource( dom ), new StreamResult( System.out ) );
     }
 }
