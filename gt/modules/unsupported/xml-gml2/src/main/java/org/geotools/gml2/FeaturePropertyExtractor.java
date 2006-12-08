@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.gml2.bindings.GML;
 import org.geotools.xml.PropertyExtractor;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
@@ -65,6 +66,11 @@ public class FeaturePropertyExtractor implements PropertyExtractor {
 
             if (attribute.isElementDeclarationReference()) {
                 attribute = attribute.getResolvedElementDeclaration();
+            }
+
+            //ignore gml attributes
+            if (GML.NAMESPACE.equals(attribute.getTargetNamespace())) {
+                continue;
             }
 
             //make sure the feature type has an element
