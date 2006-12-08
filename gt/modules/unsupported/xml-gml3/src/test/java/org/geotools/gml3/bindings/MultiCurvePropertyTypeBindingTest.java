@@ -16,9 +16,6 @@
 package org.geotools.gml3.bindings;
 
 import org.w3c.dom.Document;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.geotools.gml3.GML3TestSupport;
 
 
@@ -28,8 +25,5 @@ public class MultiCurvePropertyTypeBindingTest extends GML3TestSupport {
 
         assertEquals(2,
             dom.getElementsByTagNameNS(GML.NAMESPACE, GML.LineString.getLocalPart()).getLength());
-
-        TransformerFactory.newInstance().newTransformer()
-                          .transform(new DOMSource(dom), new StreamResult(System.out));
     }
 }

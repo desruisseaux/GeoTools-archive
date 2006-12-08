@@ -18,10 +18,13 @@ package org.geotools.gml3.bindings;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.Feature;
 import org.geotools.gml3.GML3TestSupport;
@@ -57,5 +60,14 @@ public class AbstractFeatureTypeBindingTest extends GML3TestSupport {
         Integer i = (Integer) f.getAttribute("count");
         assertNotNull(i);
         assertEquals(1, i.intValue());
+    }
+
+    public void testEncode() throws Exception {
+        Document dom = encode(GML3MockData.feature(), TEST.TestFeature);
+
+        assertEquals(1, dom.getElementsByTagName("gml:boundedBy").getLength());
+        assertEquals(1, dom.getElementsByTagName("test:geom").getLength());
+        assertEquals(1, dom.getElementsByTagName("test:count").getLength());
+        assertEquals(1, dom.getElementsByTagName("test:date").getLength());
     }
 }

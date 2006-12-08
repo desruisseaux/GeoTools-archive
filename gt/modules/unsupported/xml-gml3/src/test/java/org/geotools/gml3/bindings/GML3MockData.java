@@ -18,8 +18,10 @@ package org.geotools.gml3.bindings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import java.util.Date;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -28,7 +30,15 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureFactoryImpl;
+import org.geotools.feature.simple.SimpleTypeBuilder;
+import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 
 
@@ -57,6 +67,10 @@ public class GML3MockData {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static Envelope bounds() {
+        return new ReferencedEnvelope(0, 10, 0, 10, crs());
     }
 
     static Point point() {
@@ -210,6 +224,31 @@ public class GML3MockData {
         count.appendChild(document.createTextNode("1"));
 
         return feature;
+    }
+
+    static Feature feature() throws Exception {
+        SimpleTypeBuilder typeBuilder = new SimpleTypeBuilder(new SimpleTypeFactoryImpl());
+        typeBuilder.setName(TEST.TestFeature.getLocalPart());
+        typeBuilder.setNamespaceURI(TEST.TestFeature.getNamespaceURI());
+
+        typeBuilder.addAttribute("name", String.class);
+        typeBuilder.addAttribute("description", String.class);
+        typeBuilder.addAttribute("geom", Point.class);
+        typeBuilder.addAttribute("count", Integer.class);
+        typeBuilder.addAttribute("date", Date.class);
+
+        FeatureType type = typeBuilder.feature();
+
+        SimpleFeatureBuilder builder = new SimpleFeatureBuilder(new SimpleFeatureFactoryImpl());
+        builder.init();
+        builder.setType(type);
+        builder.add("theName");
+        builder.add("theDescription");
+        builder.add(point());
+        builder.add(new Integer(1));
+        builder.add(new Date());
+
+        return builder.feature("fid.1");
     }
 
     static Element featureMember(Document document, Node parent) {
