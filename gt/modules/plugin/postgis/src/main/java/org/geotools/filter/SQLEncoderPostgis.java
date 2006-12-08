@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 import org.geotools.filter.FilterType;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.io.WKTWriter;
 
 
@@ -358,7 +360,18 @@ public class SQLEncoderPostgis extends SQLEncoder implements
     public void visitLiteralGeometry(LiteralExpression expression)
         throws IOException {
         Geometry bbox = (Geometry) expression.getLiteral();
-        String geomText = wkt.write(bbox);
+        String geomText = null;
+        if ( bbox instanceof LinearRing ) {
+        	//postgis does not handle linear rings, convert to just a line string
+        	LineString lineString = new LineString( 
+    			((LinearRing)bbox).getCoordinateSequence(), bbox.getFactory()
+			);
+        	geomText = wkt.write( lineString );
+        }
+        else {
+        	geomText = wkt.write(bbox);	
+        }
+        
         out.write("GeometryFromText('" + geomText + "', " + srid + ")");
     }
 
