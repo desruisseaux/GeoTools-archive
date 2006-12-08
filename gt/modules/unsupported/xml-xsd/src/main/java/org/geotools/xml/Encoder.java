@@ -110,18 +110,13 @@ public class Encoder {
         
         //register the schema index
         context.registerComponentInstance( index );
-        
-        //register a default property extractor
-        BindingPropertyExtractor extractor = new BindingPropertyExtractor( bindingLoader, context );        
-        context.registerComponentInstance( extractor );
-        
         BindingWalkerFactoryImpl bwFactory = new BindingWalkerFactoryImpl( bindingLoader, context );
         context.registerComponentInstance( bwFactory );
         
         //pass the context off to the configuration
 		context = configuration.setupContext(context);
 		encoder.setContext( context );
-		extractor.setContext( context );
+		
 		bwFactory.setContext( context );
 		
 		//schema location setup
@@ -400,6 +395,11 @@ public class Encoder {
 				List propertyExtractors = 
 					Schemas.getComponentInstancesOfType( context, PropertyExtractor.class ); 
 					
+				//add the property extractor for bindings as first
+				propertyExtractors.add( 0, new BindingPropertyExtractor( bindingLoader, context ) );
+		        
+				//TODO: this method of getting at properties wont maintain order very well, need
+				// to come up with a better system that is capable of hanlding feature types
 				for ( Iterator pe = propertyExtractors.iterator(); pe.hasNext(); ) {
 					PropertyExtractor propertyExtractor = (PropertyExtractor) pe.next();
 					if ( propertyExtractor.canHandle( entry.object ) ) {
