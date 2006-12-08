@@ -20,8 +20,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.util.Iterator;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.FeatureTypeCache;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.BindingFactory;
@@ -190,5 +193,33 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
         encoding.setAttributeNS(GML.NAMESPACE, "id", feature.getID());
 
         return encoding;
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Feature feature = (Feature) object;
+
+        if (GML.name.equals(name)) {
+            return feature.getAttribute("name");
+        }
+
+        if (GML.description.equals(name)) {
+            return feature.getAttribute("description");
+        }
+
+        if (GML.boundedBy.equals(name)) {
+            Envelope bounds = feature.getBounds();
+
+            if (bounds instanceof ReferencedEnvelope) {
+                return bounds;
+            }
+
+            CoordinateReferenceSystem crs = (feature.getFeatureType().getDefaultGeometry() != null)
+                ? feature.getFeatureType().getDefaultGeometry().getCoordinateSystem() : null;
+
+            return new ReferencedEnvelope(bounds, crs);
+        }
+
+        return null;
     }
 }
