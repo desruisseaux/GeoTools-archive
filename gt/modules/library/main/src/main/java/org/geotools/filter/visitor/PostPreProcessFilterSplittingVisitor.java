@@ -44,6 +44,7 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
+import org.geotools.filter.expression.FilterVisitorExpressionWrapper;
 import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.IncludeFilter;
 
@@ -518,13 +519,15 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
             // TODO check against tranasaction ?
 	
 	        int i = postStack.size();
-	        Expression leftGeometry = filter.getLeftGeometry();
-	        Expression rightGeometry = filter.getRightGeometry();
+	        org.opengis.filter.expression.Expression leftGeometry = filter.getExpression1();
+	        //Expression leftGeometry = filter.getLeftGeometry();
+	        org.opengis.filter.expression.Expression rightGeometry = filter.getExpression2();
+	        //Expression rightGeometry = filter.getRightGeometry();
 	        if( leftGeometry==null || rightGeometry==null ){
 	        	postStack.push(filter);
 	        	return;
 	        }
-			leftGeometry.accept(this);
+			leftGeometry.accept(new FilterVisitorExpressionWrapper( this ), null );
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
@@ -533,7 +536,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	            return;
 	        }
 	
-			rightGeometry.accept(this);
+			rightGeometry.accept(new FilterVisitorExpressionWrapper( this ), null);
 	
 	        if (i < postStack.size()) {
 	        	preStack.pop(); // left
