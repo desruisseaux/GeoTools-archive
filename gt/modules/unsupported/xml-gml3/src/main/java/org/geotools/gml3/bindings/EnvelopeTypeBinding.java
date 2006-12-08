@@ -91,7 +91,7 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return ReferencedEnvelope.class;
+        return Envelope.class;
     }
 
     /**
@@ -143,7 +143,7 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
         Envelope envelope = (Envelope) object;
 
         if (envelope.isNull()) {
-            return document.createElementNS(GML.NAMESPACE, GML.Null.getLocalPart());
+            value.appendChild(document.createElementNS(GML.NAMESPACE, GML.Null.getLocalPart()));
         }
 
         return null;
@@ -162,6 +162,11 @@ public class EnvelopeTypeBinding extends AbstractComplexBinding {
 
         if (name.getLocalPart().equals("upperCorner")) {
             return new DirectPosition2D(envelope.getMaxX(), envelope.getMaxY());
+        }
+
+        if (name.getLocalPart().equals("srsName") && envelope instanceof ReferencedEnvelope) {
+            return GML3EncodingUtils.crs(((ReferencedEnvelope) envelope)
+                .getCoordinateReferenceSystem());
         }
 
         return null;
