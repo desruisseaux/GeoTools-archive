@@ -24,13 +24,19 @@ import org.geotools.factory.Factory;
  * Constructs a live DataAccess connection from a set of parameters.
  * <p>
  * Parameters are specified using a Java Bean; the DataAccesFinder utility class will take care of
- * allowing you to work with Map<String,Serializable> as a trasfer object of bean properties.
+ * allowing you to work with Map<String,Serializable> as a transfer object of bean properties.
  * </p>
  *
  * @author Jody Garnett
+ * @author Thomas Marti
+ * @author Stefan Schmid
+ * 
+ * @source $URL$
+ * @version $Id$
  */
 public interface DataAccessFactory extends Factory {
-    /**
+
+	/**
      * Display name for this DataAccess in the current locale.
      *
      * @return human readable display name
@@ -41,9 +47,9 @@ public interface DataAccessFactory extends Factory {
      * Test to ensure the correct environment is available for this Factory to function.
      * <p>
      * Implementations usually check such things as availablity of required JDBC drivers,
-     * or Java Advanced Imaging formats that they intended to use.
+     * or Java Advanced Imaging formats that they intend to use.
      * </p>
-     * @return true if needed environment is found
+     * @return <code>true</code>, if needed environment is found
      */
     public boolean isAvailable();
 
@@ -55,27 +61,28 @@ public interface DataAccessFactory extends Factory {
     Object createAccessBean();
 
     /**
-     * Test to see if this factory is suitable for processing this connectionParams
-     * <p>
-     * This method is often an instance of check followed by ensuring required bean properties (ie
-     * connection parameters) are non null.
-     * </p>
+     * <p>Test to see if this factory is suitable for processing this connectionParamsBean.</p>
+     * 
+     * <p>This method is often an <code>instanceof</code> check followed by ensuring required 
+     * bean properties (i.e. connection parameters) are not <code>null</code>.</p>
      *
      * @param connectionPrametersBean
-     * @return <code>true</code> if bean has valid parameters to attempt a connection
+     * @return <code>true</code>, if bean has valid parameters to attempt a connection
      */
     boolean canAccess(Object connectionPrametersBean);
 
     /**
-     * Connect to a physical data storage location and provide DataAccess class for interaction.
-     * <p>
-     * A new DataAccess class is created on each call; end-users should either store this instance
-     * as a Singleton (gasp!) or make use of the GeoTools catalog facilities to manage connections.
+     * <p>Connect to a physical data storage location and provide <code>DataAccess</code> class for 
+     * interaction.</p>
+     * 
+     * <p>A new <code>DataAccess</code> class is created on each call; end-users should either store 
+     * this instance as a Singleton (gasp!) or make use of the GeoTools catalog facilities to manage 
+     * connections.</p>
      *
-     * @param bean Bean capturing connection paramters, should be of the same type as provided by
+     * @param bean Bean capturing connection parameters, should be of the same type as provided by
      *        createConnectionBean
-     * @return The created DataAccess
-     * @throws If there were any problems setting up the connection
+     * @return The created <code>DataAccess</code> instance
+     * @throws IOException If there were any problems setting up the connection
      */
     DataAccess createAccess(Object bean) throws IOException;
 
@@ -89,22 +96,25 @@ public interface DataAccessFactory extends Factory {
     Object createContentBean();
 
     /**
-     * Confirm that this factory is suitable for creating the physical storage
-     * location described by the provided bean.
-     * <p>
-     * Implementations may also chose to check security concerns (such as the ability
-     * to write to disk) as part of this method.
+     * <p>Confirm that this factory is suitable for creating the physical storage
+     * location described by the provided bean.</p>
+     * 
+     * <p>Implementations may also chose to check security concerns (such as the ability
+     * to write to disk) as part of this method.</p>
      *
-     * @param bean
-     * @return <code>true</code> if bean has valid parameters to attempt a connection
+     * @param bean Bean capturing connection/creation parameters, should be of the same 
+     *             type as provided by {@link #createContentBean()}
+     * @return <code>true</code>, if bean has valid parameters to attempt a connection
      */
     boolean canCreateContent(Object bean);
 
     /**
-     * Set up a new physical storage location, and supply a DataAccess class for interaction.
+     * Set up a new physical storage location, and supply a <code>DataAccess</code> class 
+     * for interaction.
      *
-     * @param bean
-     * @return
+     * @param bean Bean capturing connection/creation parameters, should be of the same 
+     *             type as provided by {@link #createContentBean()}
+     * @return The created <code>DataAccess</code> instance
      */
     DataAccess createContent(Object bean);
 }

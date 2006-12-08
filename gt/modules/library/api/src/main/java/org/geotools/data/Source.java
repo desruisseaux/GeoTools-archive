@@ -16,33 +16,28 @@
 package org.geotools.data;
 
 import java.util.Collection;
+
+import org.geotools.catalog.GeoResourceInfo;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
-import org.geotools.catalog.GeoResourceInfo;
-import org.geotools.catalog.ServiceInfo;
 
 
 /**
- * <i>
- * <p>First draft of a Source interface based on brain storming session with Jody, Thomas,
- * Stefan and Cory in Refractions on November 24th.</p>
- *
- * <p>The basic idea is to have simple, general interface to access and query data that is in some way or
- * another spatially enabled. And we don't want the restriction to {@link org.geotools.feature.Feature},
- * {@link org.geotools.feature.FeatureType}, {@link org.geotools.data.FeatureSource}, etc. as we have right
- * now in {@link org.geotools.data.DataStore}.</p>
- * </i>
- *
  * The <code>Source</code> interface provides access to the actual data either filtered/queried or not. Access
- * is purely <b>read-only</b> with this interface.
+ * is purely <strong>read-only</strong> with this interface.
+ * 
+ * @author Jody Garnett
+ * @author Thomas Marti
+ * @author Stefan Schmid
  *
  * @source $URL$
  * @version $Id$
  */
 public interface Source /*<Content,Description>*/ {
-    /**
-     * Information about the data avaialble here.
+
+	/**
+     * Information about the data available here.
      * <p>
      * Focus is on human readable description of the service,
      * with enough information for searching.
@@ -124,12 +119,12 @@ public interface Source /*<Content,Description>*/ {
     void setTransaction(Transaction t);
 
     /**
-     * Clean up any resources, or listeners that made use of this Source of data.
+     * Clean up any resources, listeners, etc that made use of this Source of data.
      * <p>
-     * Please note this Source will not function after this method is called. Any
-     * Transaction.State mementos placed on the current transaction will also be
-     * cleaned up (although the transaction itself will not be canceled - as it
-     * may be in use by others).
+     * Please note this <code>Source</code> will not function after this method is 
+     * called. Any {@link Transaction.State} mementos placed on the current transaction 
+     * will also be cleaned up (although the transaction itself will not be canceled 
+     * - as it may be in use by others).
      * </p>
      */
     void dispose();

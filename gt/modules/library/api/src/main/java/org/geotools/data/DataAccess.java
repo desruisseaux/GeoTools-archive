@@ -21,18 +21,19 @@ import org.geotools.catalog.ServiceInfo;
 
 
 /**
- * Interface providing Open Web Service style access to georesource content.
- * <i>
- * <p>First draft of a DataAccess interface based on brain storming session with Jody, Thomas,
- * Stefan and Cory in Refractions on November 24th. This could become a super set of {@link DataStore}
- * or eventually replace it(?).</p>
+ * <p>Interface providing Open Web Service style access to geo resource content.</p>
+ * 
+ * <p>The basic idea is to have simple, very general interface to access and query 
+ * data that is in some way or another spatially enabled. Extending interfaces can 
+ * add methods that make it easier to access data for their specific model.</p>
+
+ * <p><em>This should become a super interface of {@link DataStore} and eventually 
+ * replace it(?).</em></p>
  *
- * <p>The basic idea is to have simple, general interface to access and query data that is in some way or
- * another spatially enabled. And we don't want the restriction to {@link org.geotools.feature.Feature},
- * {@link org.geotools.feature.FeatureType}, {@link org.geotools.data.FeatureSource}, etc. as we have right
- * now in {@link org.geotools.data.DataStore}.</p>
- * </i>
- *
+ * @author Jody Garnett
+ * @author Thomas Marti
+ * @author Stefan Schmid
+ * 
  * @source $URL$
  * @version $Id$
  */
@@ -63,9 +64,9 @@ public interface DataAccess /*<Content,Description>*/ {
      *   <li>URL: of XSD document when working with XML document</li>
      *   <li>etc...</li>
      * </ul>
-     * Please note this is a *direct* description of the content,
-     * and contains no fluffy human readible concerns (like title)
-     * for that kind of information please use access( typeName ).getInfo()
+     * Please note this is a <strong>direct</strong> description of the 
+     * content, and contains no fluffy human readible concerns (like 
+     * title) for that kind of information please use {@link #getInfo()}.
      *
      * @see Source#getInfo()
      * @param typeName
