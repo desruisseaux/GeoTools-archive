@@ -3,6 +3,7 @@ package org.geotools.maven.xmlcodegen.templates;
 import java.util.*;
 import org.eclipse.xsd.*;
 import org.geotools.xml.*;
+import org.geotools.maven.xmlcodegen.*;
 
 public class BindingInterfaceTemplate
 {
@@ -53,7 +54,7 @@ public class BindingInterfaceTemplate
     stringBuffer.append( ns );
     stringBuffer.append(TEXT_4);
     
-	List types = schema.getTypeDefinitions();
+	List types = GeneratorUtils.allTypes( schema );
 	for (Iterator itr = types.iterator(); itr.hasNext();) {
 		XSDTypeDefinition type = (XSDTypeDefinition)itr.next();
 		if (type.getName() == null) continue;

@@ -20,6 +20,7 @@ import org.eclipse.xsd.XSDAttributeGroupDefinition;
 import org.eclipse.xsd.XSDAttributeUse;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDNamedComponent;
+import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.Schemas;
@@ -120,7 +121,7 @@ public class BindingGenerator extends AbstractGenerator {
         }
 
         if (generateTypes) {
-        	List types = schema.getTypeDefinitions();
+        	List types = GeneratorUtils.allTypes( schema );
 
             for (Iterator t = types.iterator(); t.hasNext();) {
                 XSDTypeDefinition type = (XSDTypeDefinition) t.next();

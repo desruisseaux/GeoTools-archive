@@ -232,10 +232,11 @@ public class SchemaGenerator extends AbstractGenerator {
      * Generates the Geotools schema from the XML schema.
      */
     public void generate() throws Exception {
-        List typeDefs = schema.getTypeDefinitions();
+        List typeDefs = GeneratorUtils.allTypes( schema );
 
         //process simple types
         if (simpleTypes) {
+        	logger.info( "Generting simple types");
             for (Iterator itr = typeDefs.iterator(); itr.hasNext();) {
                 XSDTypeDefinition xsdType = (XSDTypeDefinition) itr.next();
 
@@ -257,6 +258,7 @@ public class SchemaGenerator extends AbstractGenerator {
 
         //process complex types
         if (complexTypes) {
+        	logger.info( "Generting complex types");
             for (Iterator itr = typeDefs.iterator(); itr.hasNext();) {
                 XSDTypeDefinition xsdType = (XSDTypeDefinition) itr.next();
 
@@ -393,17 +395,17 @@ public class SchemaGenerator extends AbstractGenerator {
         }
 
         //first build super type
-        AttributeType superType = null;
-        XSDTypeDefinition baseType = xsdType.getBaseType();
-
-        if ((baseType != null) && !baseType.equals(xsdType)) {
-            if (baseType.getName() != null) {
-                //ignore unamed types
-                //superType = createType((XSDSimpleTypeDefinition)baseType);
-                superType = createType(baseType);
-                assert superType != null;
-            }
-        }
+//        AttributeType superType = null;
+//        XSDTypeDefinition baseType = xsdType.getBaseType();
+//
+//        if ((baseType != null) && !baseType.equals(xsdType)) {
+//            if (baseType.getName() != null) {
+//                //ignore unamed types
+//                //superType = createType((XSDSimpleTypeDefinition)baseType);
+//                superType = createType(baseType);
+//                assert superType != null;
+//            }
+//        }
 
         //TODO: actually derive valus from type
         //		AttributeType gtType = factory.createAttributeType(

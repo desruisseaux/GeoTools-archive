@@ -30,53 +30,8 @@ import org.geotools.xml.Schemas;
  * @author Justin Deoliveira, The Open Planning Project
  * 
  */
-public class BindingGeneratorMojo extends AbstractMojo {
+public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 
-	/**
-	 * The schema to generate bindings for.
-	 * 
-	 * @parameter 
-	 * @required
-	 */
-	private File schemaLocation;
-	
-	/**
-	 * The destination package of the generated source files 
-	 * in the standard dot-seperated naming format.
-	 * 
-	 * @parameter
-	 */
-	private String destinationPackage;
-	
-	/**
-	 * Directory to output generated files to. Default is ${project.build.sourceDirectory}
-	 * 
-	 * @parameter expression="${project.build.sourceDirectory}"
-	 */
-	private File outputDirectory;
-	
-	/**
-	 * Directory containing xml schemas, defualt is ${basedir}/src/main/xsd.
-	 *
-	 * @parameter expression="${basedir}/src/main/xsd"
-	 */
-	private File schemaSourceDirectory;
-	
-	/**
-	 * Additional directories used to locate included and imported schemas.
-	 * 
-	 * @parameter
-	 */
-	private File[] schemaLookupDirectories;
-	
-	/**
-	 * Flag controlling wether files should overide files that already 
-	 * exist with the same name. False by default.
-	 * 
-	 * @param expression="false"
-	 */
-	private boolean overwriteExistingFiles;
-	
 	/**
 	 * Flag controlling wether the interface containg all the binding names should
 	 * be generated, default is true.
@@ -148,114 +103,12 @@ public class BindingGeneratorMojo extends AbstractMojo {
      */
     ConstructorArgument[] constructorArguments;
     
-    /**
-     * The currently executing project
-     * 
-     * @parameter expression="${project}"
-     */
-    MavenProject project;
-    
-	public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 		
-		//list of urls to use as class loading locations
-		List urls = new ArrayList();
-		try {
-			List l = project.getCompileClasspathElements();
-			for ( Iterator i = l.iterator(); i.hasNext(); ) {
-				String element = (String) i.next();
-				File d = new File( element );
-			
-				if ( d.exists() && d.isDirectory() ) {
-					urls.add( d.toURL() );
-				}
-			}
-		} catch (DependencyResolutionRequiredException e) {
-			getLog().error( e );
-			return;
-		} catch (MalformedURLException e) {
-			getLog().error( e );
-			return;
-		}
-		
-		ClassLoader cl = new URLClassLoader( (URL[]) urls.toArray( new URL[ urls.size() ] ) );
-	
-		//check schema source
-		if ( !schemaSourceDirectory.exists() ) {
-			getLog().error( schemaSourceDirectory.getAbsolutePath() + " does not exist" );
-			return;
-		}
-		
-		//check schema
-		if ( !schemaLocation.exists() ) {
-			//check relative to schemaSourceDirectory
-			schemaLocation = new File( schemaSourceDirectory, schemaLocation.getName() );
-			if ( !schemaLocation.exists() ) {
-				getLog().error( "Could not locate schema: " + schemaLocation.getName() );
-				return;
-			}
-		}
-		
-		//add a location resolver which checks the schema source directory
-		XSDSchemaLocationResolver locationResolver = new XSDSchemaLocationResolver() {
-
-			public String resolveSchemaLocation(
-				XSDSchema schema, String namespaceURI, String schemaLocation 
-			) {
-			
-				//check location directlry
-				File file = new File( schemaLocation );  
-				if ( file.exists() ) {
-					getLog().debug( "Resolving " + schemaLocation + " to " + schemaLocation );
-					return schemaLocation;
-				}
-				
-				String fileName = new File( schemaLocation ).getName();
-				
-				//check under teh schema source directory
-				file = new File( schemaSourceDirectory, fileName ); 
-				if ( file.exists() ) {
-					getLog().debug( "Resolving " + schemaLocation + " to " + file.getAbsolutePath() );
-					return file.getAbsolutePath();
-				}
-				
-				//check hte lookup directories
-				if ( schemaLookupDirectories != null ) {
-					for ( int i = 0; i < schemaLookupDirectories.length; i++ ) {
-						File schemaLookupDirectory = schemaLookupDirectories[ i ];
-						file = new File( schemaLookupDirectory, fileName );
-						if ( file.exists() ) {
-							getLog().debug( "Resolving " + schemaLocation + " to " + file.getAbsolutePath() );
-							return file.getAbsolutePath();
-						}
-							
-					}
-				}
-				
-				getLog().warn( "Could not resolve location for: " + schemaLocation );
-				return null;
-			}
-			
-		};
-		
-		//parse the schema
-		XSDSchema xsdSchema = null;
-		try {
-			getLog().info( "Parsing schema: " + schemaLocation );
-			xsdSchema = 
-				Schemas.parse( 
-					schemaLocation.getAbsolutePath(),
-					(XSDSchemaLocator[]) null, new XSDSchemaLocationResolver[]{ locationResolver }
-				);
-			
-			if ( xsdSchema == null ) {
-				throw new NullPointerException();
-			}
-		} 
-		catch (Exception e) {
-			getLog().error( "Failed to parse schema");
-			getLog().error( e );
-			return;
-		}
+    	XSDSchema xsdSchema = schema();
+    	if ( xsdSchema == null ) {
+    		return;
+    	}
 		
 		BindingGenerator generator = new BindingGenerator();
 		generator.setGeneratingBindingConfiguration( generateBindingConfiguration );
@@ -270,6 +123,24 @@ public class BindingGeneratorMojo extends AbstractMojo {
 			generator.setPackageBase( destinationPackage );
 		}
 		
+		//list of urls to use as class loading locations
+		List urls = new ArrayList();
+		try {
+			List l = project.getCompileClasspathElements();
+			for ( Iterator i = l.iterator(); i.hasNext(); ) {
+				String element = (String) i.next();
+				File d = new File( element );
+			
+				if ( d.exists() && d.isDirectory() ) {
+					urls.add( d.toURL() );
+				}
+			}
+		} catch (Exception e) {
+			getLog().error( e );
+			return;
+		}
+		
+		ClassLoader cl = new URLClassLoader( (URL[]) urls.toArray( new URL[ urls.size() ] ) );
 		if ( constructorArguments != null ) {
 			HashMap map = new HashMap();
 			
