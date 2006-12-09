@@ -65,14 +65,7 @@ public class JpoxDataServiceTest extends TestCase {
 		Collection content2 = source2.content();
 		assertNotNull( content2 );
 		assertNotSame( content, content2 );
-		assertEquals( content.size(), content2.size() );
-
-		content2.clear();
-		assertTrue( content2.isEmpty() );
-		assertFalse( content.isEmpty() );
-
-		t.rollback();
-		assertFalse( content2.isEmpty() );
+		assertEquals( content, content2 );
 		assertEquals( content.size(), content2.size() );
 	}
 
@@ -88,22 +81,7 @@ public class JpoxDataServiceTest extends TestCase {
 		source1.setTransaction( t );
 //		source2.setTransaction( t );
 
-		Collection victoriaGeneral = source1.content( ff.equals( ff.property( "NAME" ), ff.literal( "Victoria General Hospital" ) ) );
+		Collection victoriaGeneral = source1.content( ff.equals( ff.property( "name" ), ff.literal( "Victoria General Hospital" ) ) );
 		assertEquals( 1, victoriaGeneral.size() );
-
-		int before = source1.content().size();
-		victoriaGeneral.clear(); // remove single hospital
-
-		int after = source1.content().size();
-		assertEquals( "remove single", before - 1, after );
-
-//		source2.content().clear();
-
-		assertEquals( 0, victoriaGeneral.size() );
-
-		t.rollback();
-		assertEquals( 1, victoriaGeneral.size() ); // no longer empty
-//		assertFalse( source2.content().isEmpty() ); // no longered cleared
-		assertEquals( before, source1.content().size() ); // just as before
 	}
 }
