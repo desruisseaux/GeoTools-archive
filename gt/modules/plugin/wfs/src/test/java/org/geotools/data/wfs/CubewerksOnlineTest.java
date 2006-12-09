@@ -64,6 +64,6 @@ public class CubewerksOnlineTest extends TestCase {
         WFSDataStoreReadTest.doFeatureReader(url,true,true,6);
     }
     public void testFeatureReaderWithFilter() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,true,6);
+        WFSDataStoreReadTest.doFeatureReaderWithQuery(url,true,true,6);
     }
 }

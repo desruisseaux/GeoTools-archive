@@ -61,6 +61,6 @@ public class MapServerOnlineTest extends TestCase {
         WFSDataStoreReadTest.doFeatureReader(url,true,false,0);
     }
     public void testFeatureReaderWithFilter() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,false,0);
+        WFSDataStoreReadTest.doFeatureReaderWithQuery(url,true,false,0);
     }
 }

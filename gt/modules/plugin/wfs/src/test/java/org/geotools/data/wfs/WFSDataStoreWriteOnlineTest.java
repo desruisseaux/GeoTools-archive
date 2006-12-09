@@ -16,7 +16,9 @@
 package org.geotools.data.wfs;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +31,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
@@ -78,7 +81,7 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
     	}
         fr.close();
     	System.out.println("Insert Add Features");
-    	fs.addFeatures(insert);
+    	Set fids1 = fs.addFeatures(insert);
 
     	System.out.println("Insert Read 2");
     	fr = fs.getFeatures().features();
@@ -89,6 +92,36 @@ public class WFSDataStoreWriteOnlineTest extends TestCase {
         fr.close();
     	assertEquals(count1+insert.size(), count2);
 
+        FilterFactory fac=FilterFactoryFinder.createFilterFactory();
+        FidFilter fidfilter = fac.createFidFilter();
+        
+        fidfilter.addAllFids(fids1);
+        
+        System.out.println("Remove Inserted Features");
+        fs.removeFeatures(fidfilter);
+        
+        System.out.println("Insert Read 3");
+        fr = fs.getFeatures().features();
+        count2 = 0;
+        while(fr.hasNext()){
+            count2 ++; fr.next();
+        }
+        fr.close();
+        assertEquals(count1, count2);
+        
+        System.out.println("Insert Add Features");
+        fs.addFeatures(insert);
+
+        System.out.println("Insert Read 2");
+        fr = fs.getFeatures().features();
+        count2 = 0;
+        while(fr.hasNext()){
+            count2 ++; fr.next();
+        }
+        fr.close();
+        assertEquals(count1+insert.size(), count2);
+
+        
     	System.out.println("Insert Commit");
     	t.commit();
 

@@ -27,6 +27,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -75,7 +76,20 @@ class WFSFeatureType implements FeatureType {
     }
 
     public Feature duplicate( Feature original ) throws IllegalAttributeException {
-        return delegate.duplicate(original);
+        if( original == null ) return null;
+        FeatureType featureType = original.getFeatureType();
+        if (!featureType.equals(this)) { 
+        throw new IllegalAttributeException("Feature type " + featureType
+                        + " does not match " + this);
+        }
+        String id = original.getID();
+        int numAtts = featureType.getAttributeCount();
+        Object attributes[] = new Object[numAtts];
+        for (int i = 0; i < numAtts; i++) {
+        AttributeType curAttType = getAttributeType(i);
+            attributes[i] = curAttType.duplicate(original.getAttribute(i));
+        }
+        return featureType.create(attributes, id );
     }
 
     public boolean equals( Object arg0 ) {
@@ -153,7 +167,7 @@ class WFSFeatureType implements FeatureType {
         return delegate.toString();
     }
     
-    private static class LenientFeature implements Feature{
+    private static class LenientFeature implements SimpleFeature, Feature{
 
         /** The unique id of this feature */
         protected String featureId;

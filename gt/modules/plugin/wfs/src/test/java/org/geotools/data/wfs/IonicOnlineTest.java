@@ -61,11 +61,11 @@ public class IonicOnlineTest extends TestCase {
 		}
 	}
 
-	public void testFeatureReaderWithFilter() throws NoSuchElementException,
+	public void testFeatureReaderWithQuery() throws NoSuchElementException,
 			OperationNotSupportedException, IllegalAttributeException,
 			IOException, SAXException {
 		try {
-			WFSDataStoreReadTest.doFeatureReaderWithFilter(url, true, true, 0);
+			WFSDataStoreReadTest.doFeatureReaderWithQuery(url, true, true, 0);
 		} catch (IOException e) {
 			skipHttpErrors(e);
 		}

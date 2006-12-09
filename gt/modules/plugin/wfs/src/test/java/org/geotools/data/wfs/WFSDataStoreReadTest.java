@@ -29,6 +29,7 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AttributeExpression;
@@ -128,7 +129,7 @@ public class WFSDataStoreReadTest extends TestCase {
         }
     }
     
-    public static void doFeatureReaderWithFilter(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
+    public static void doFeatureReaderWithQuery(URL url, boolean get, boolean post, int i) throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
     	if( url == null) return;
     	try{
         System.out.println("FeatureReaderWithFilterTest + "+url);
@@ -139,35 +140,90 @@ public class WFSDataStoreReadTest extends TestCase {
         // take atleast attributeType 3 to avoid the undeclared one .. inherited optional attrs
         
         String[] props;
-        if(ft.getAttributeCount()==1)
-            props = new String[] {ft.getDefaultGeometry().getName()};
-        else
-            props = new String[] {ft.getDefaultGeometry().getName(), ft.getAttributeType(ft.getAttributeCount()-1).getName()};
+        props = new String[] {ft.getDefaultGeometry().getName()};
         
         DefaultQuery query = new DefaultQuery(ft.getTypeName());
         query.setPropertyNames(props);
-        
+        String fid=null;
         if(get){
             // 	get
             FeatureReader fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
-            assertNotNull("FeatureType was null",ft);
-            assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
-            int j=0;while(fr.hasNext()){fr.next();j++;}
-            System.out.println(j+" Features");
-            fr.close();
+            try{
+                assertNotNull("FeatureType was null",ft);
+                
+                FeatureType featureType = fr.getFeatureType();
+                if( ft.getAttributeCount()>1 ){
+                    assertEquals("Query must restrict feature type to only having 1 AttributeType", 1, featureType.getAttributeCount() );
+                }
+                assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && featureType!=null );
+                Feature feature = fr.next();
+                featureType=feature.getFeatureType();
+                if( ft.getAttributeCount()>1 ){
+                    assertEquals("Query must restrict feature type to only having 1 AttributeType", 1, featureType.getAttributeCount() );
+                }
+                assertNotNull( "must have 1 feature ", feature);
+                fid=feature.getID();
+                int j=0;while(fr.hasNext()){ 
+                    fr.next();
+                    j++;
+                }
+                System.out.println(j+" Features");
+            }finally{
+                fr.close();
+            }
         }if(post){
             // 	post
 
             FeatureReader fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
-            assertNotNull("FeatureType was null",ft);
-            assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && fr.getFeatureType()!=null && fr.next()!=null);
-            int j=0;while(fr.hasNext()){fr.next();j++;}
-            System.out.println(j+" Features");
-            fr.close();
+            try{
+                assertNotNull("FeatureType was null",ft);
+                FeatureType featureType = fr.getFeatureType();
+                if( ft.getAttributeCount()>1 ){
+                    assertEquals("Query must restrict feature type to only having 1 AttributeType", 1, featureType.getAttributeCount() );
+                }
+                assertTrue("must have 1 feature -- fair assumption",fr.hasNext() && featureType!=null );
+                Feature feature = fr.next();
+                featureType=feature.getFeatureType();
+                if( ft.getAttributeCount()>1 ){
+                    assertEquals("Query must restrict feature type to only having 1 AttributeType", 1, featureType.getAttributeCount() );
+                }
+                assertNotNull( "must have 1 feature ", feature);
+                fid=feature.getID();
+                int j=0;while(fr.hasNext()){ 
+                    fr.next();
+                    j++;
+                }
+                System.out.println(j+" Features");
+            }finally{
+                fr.close();
+            }
+        }
+
+        // test fid filter 
+        query.setFilter(FilterFactoryFinder.createFilterFactory().createFidFilter(fid));
+        if( get ){
+            FeatureReader fr = wfs.getFeatureReaderGet(query,Transaction.AUTO_COMMIT);
+            try{
+                assertNotNull("FeatureType was null",ft);
+                int j=0;while(fr.hasNext()){ assertEquals(fid,fr.next().getID());j++;}
+                assertEquals( 1,j );
+            }finally{
+                fr.close();
+            }
+        }if (post){
+            FeatureReader fr = wfs.getFeatureReaderPost(query,Transaction.AUTO_COMMIT);
+            try{
+                assertNotNull("FeatureType was null",ft);
+                int j=0;while(fr.hasNext()){ assertEquals(fid,fr.next().getID());j++;}
+                assertEquals( 1,j );
+            }finally{
+                fr.close();
+            }
         }
         }catch(java.net.SocketException se){
             se.printStackTrace();
         }
+        
     }
        /** Request a subset of available properties 
      * @throws IllegalFilterException */

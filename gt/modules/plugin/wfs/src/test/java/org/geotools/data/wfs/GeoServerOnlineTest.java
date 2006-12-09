@@ -68,11 +68,11 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class GeoServerOnlineTest extends TestCase {
 
-    public static final String SERVER_URL = "http://192.168.50.92:8080/geoserver/wfs?REQUEST=GetCapabilities";
-    public static final String TO_EDIT_TYPE = "topp:bc_pubs";
-    public static final String ATTRIBUTE_TO_EDIT = "name";
+    public static final String SERVER_URL = "http://localhost:8080/geoserver/wfs?REQUEST=GetCapabilities";
+    public static final String TO_EDIT_TYPE = "topp:states";
+    public static final String ATTRIBUTE_TO_EDIT = "STATE_FIPS";
     public static final String NEW_EDIT_VALUE = "newN";
-    private static final int EPSG_CODE = 3005;
+    private static final int EPSG_CODE = 4326;
     private URL url = null;
     public void setUp() throws MalformedURLException { 
        url = new URL(SERVER_URL);
@@ -160,7 +160,7 @@ public class GeoServerOnlineTest extends TestCase {
             e.printStackTrace(System.err);
             return;
         }
-        String typeName = "topp:geometrytype";        
+        String typeName = "tiger:poi";        
             FeatureType type = wfs.getSchema( typeName );
             type.getTypeName();
             type.getNamespace();
@@ -198,13 +198,13 @@ public class GeoServerOnlineTest extends TestCase {
         WFSDataStoreReadTest.doFeatureReader(url,true,true,0);
     }
     public void testFeatureReaderWithFilter() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,true,0);
+        WFSDataStoreReadTest.doFeatureReaderWithQuery(url,true,true,0);
     }    
     public void testFeatureReaderWithFilterGET() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,true,false,0);
+        WFSDataStoreReadTest.doFeatureReaderWithQuery(url,true,false,0);
     }
     public void testFeatureReaderWithFilterPOST() throws NoSuchElementException, IllegalAttributeException, IOException, SAXException{
-        WFSDataStoreReadTest.doFeatureReaderWithFilter(url,false,true,0);
+        WFSDataStoreReadTest.doFeatureReaderWithQuery(url,false,true,0);
     } 
 
     // RR change the data?

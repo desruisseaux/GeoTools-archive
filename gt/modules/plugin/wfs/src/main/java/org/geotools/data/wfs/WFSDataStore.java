@@ -42,12 +42,14 @@ import java.util.zip.GZIPInputStream;
 import javax.naming.OperationNotSupportedException;
 
 import org.geotools.data.AbstractDataStore;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
+import org.geotools.data.ReTypeFeatureReader;
 import org.geotools.data.Transaction;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.ows.FeatureSetDescription;
@@ -529,7 +531,7 @@ public class WFSDataStore extends AbstractDataStore {
     }
 
     //  protected for testing
-    protected WFSFeatureReader getFeatureReaderGet(Query request,
+    protected FeatureReader getFeatureReaderGet(Query request,
         Transaction transaction) throws UnsupportedEncodingException, IOException, SAXException{
         URL getUrl = capabilities.getGetFeature().getGet();
 
@@ -614,10 +616,23 @@ public class WFSDataStore extends AbstractDataStore {
 
         WFSFeatureType schema = (WFSFeatureType)getSchema(request.getTypeName());
         
+        FeatureType featureType;
+        try {
+            featureType = DataUtilities.createSubType( schema.delegate, request.getPropertyNames(), 
+                    request.getCoordinateSystem() );
+        } catch (SchemaException e) {
+            featureType=schema.delegate;
+        }
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
                 timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), true));
 
-        return ft;
+
+        if (!featureType.equals(ft.getFeatureType())) {
+            LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
+            return new ReTypeFeatureReader(ft, featureType);
+        }else
+            return ft;
+        
     }
 
     Writer getOutputStream( HttpURLConnection hc ) throws IOException {
@@ -720,7 +735,7 @@ public class WFSDataStore extends AbstractDataStore {
     }
 
     //  protected for testing
-    protected WFSFeatureReader getFeatureReaderPost(Query query,
+    protected FeatureReader getFeatureReaderPost(Query query,
         Transaction transaction) throws SAXException, IOException {
         URL postUrl = capabilities.getGetFeature().getPost();
 
@@ -763,10 +778,22 @@ public class WFSDataStore extends AbstractDataStore {
         }
         WFSFeatureType schema = (WFSFeatureType)getSchema(query.getTypeName());
         
+        FeatureType featureType;
+        try {
+            featureType = DataUtilities.createSubType( schema.delegate, query.getPropertyNames(), 
+                    query.getCoordinateSystem() );
+        } catch (SchemaException e) {
+            featureType=schema.delegate;
+        }
+
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
                 timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), true));
 
-        return ft;
+        if (!featureType.equals(ft.getFeatureType())) {
+            LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
+            return new ReTypeFeatureReader(ft, featureType);
+        }else
+            return ft;
     }
 
     protected FeatureReader getFeatureReader(String typeName)
@@ -943,6 +970,6 @@ public class WFSDataStore extends AbstractDataStore {
 			throw new NullPointerException();
 		fidMap.put(original, finalFid);
 	}
-
+    
 }
 

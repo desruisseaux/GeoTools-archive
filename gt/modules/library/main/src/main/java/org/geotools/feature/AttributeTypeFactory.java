@@ -127,7 +127,7 @@ public abstract class AttributeTypeFactory implements Factory {
      */
     public static AttributeType newAttributeType(String name, Class clazz,
         boolean isNillable) {
-        return defaultInstance().createAttributeType(name, clazz, isNillable,0);
+        return defaultInstance().createAttributeType(name, clazz, isNillable,Integer.MAX_VALUE);
     }
 
     /**

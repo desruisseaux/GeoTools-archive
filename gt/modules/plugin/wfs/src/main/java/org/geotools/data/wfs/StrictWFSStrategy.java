@@ -16,14 +16,12 @@
 package org.geotools.data.wfs;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Query;
@@ -34,7 +32,6 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.FidFilter;
 import org.opengis.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.Filters;
 import org.geotools.xml.XMLHandlerHints;
 import org.geotools.xml.filter.FilterEncodingPreProcessor;
@@ -156,7 +153,7 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
         }
 
         private FeatureReader nextReader() throws IOException {
-            if( filter==null )
+            if( filter==null || filter==Filter.ALL )
                 return null;
 
             DefaultQuery query2=new DefaultQuery(query);

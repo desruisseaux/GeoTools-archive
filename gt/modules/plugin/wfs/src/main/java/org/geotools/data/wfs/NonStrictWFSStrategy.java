@@ -215,7 +215,7 @@ class NonStrictWFSStrategy implements WFSStrategy {
     protected class Data{
         IOException ioException;
         SAXException saxException;
-        WFSFeatureReader reader;
+        FeatureReader reader;
     }
 
 
