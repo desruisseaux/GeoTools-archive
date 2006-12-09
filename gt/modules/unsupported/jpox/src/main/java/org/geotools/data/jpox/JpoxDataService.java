@@ -15,12 +15,12 @@
  */
 package org.geotools.data.jpox;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -32,6 +32,7 @@ import org.geotools.catalog.defaults.DefaultServiceInfo;
 import org.geotools.data.DataAccess;
 import org.geotools.data.Source;
 import org.jpox.PersistenceManagerFactoryImpl;
+import org.jpox.metadata.MetaDataHelper;
 import org.opengis.feature.type.TypeName;
 
 
@@ -54,6 +55,14 @@ public class JpoxDataService implements DataAccess/*<Class>*/ {
 		initInternal( pmf );
 	}
 	
+	public JpoxDataService( String fileName ) {
+		initInternal( (PersistenceManagerFactoryImpl)JDOHelper.getPersistenceManagerFactory( fileName ) );
+	}
+
+	public JpoxDataService( InputStream is ) {
+		initInternal( (PersistenceManagerFactoryImpl)JDOHelper.getPersistenceManagerFactory( is ) );
+	}
+
 	public void initialize() {
 		initialize( jdoProps );
 	}
@@ -81,7 +90,7 @@ public class JpoxDataService implements DataAccess/*<Class>*/ {
 		} catch ( URISyntaxException e ) {
 			// TODO: log and move on?
 		}
-		return new DefaultServiceInfo( "JPOX Data Access", "JPOX Data Access for types: " + getTypeNames(), null, uri, null, null, null, null );
+		return new DefaultServiceInfo( "JPOX Data Access", "JPOX Data Access for types: " + getTypeNames(), null, uri, null, null, new String[] {}, null );
 	}
 	
 	public Source access( TypeName typeName ) {
@@ -112,11 +121,12 @@ public class JpoxDataService implements DataAccess/*<Class>*/ {
 		
 		ClassLoader cl = getClass().getClassLoader();
 		Class c = null;
+
+		String[] classNames = MetaDataHelper.getClassNames( pmf );
 		
-		Iterator it = pmf.getPMFContext().getMetaDataManager().getClassesWithMetaData().iterator();
-		while (it.hasNext()) {
+		for ( int i = 0; i < classNames.length; i++ ) {
 			try {
-				c = cl.loadClass((String)it.next());
+				c = cl.loadClass(classNames[i]);
 			} catch (ClassNotFoundException e) {
 				//TODO: this is bad. Log!
 				e.printStackTrace();
