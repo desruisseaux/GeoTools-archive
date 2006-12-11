@@ -41,20 +41,17 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.Source;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.crs.ForceCoordinateSystemFeatureReader;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
@@ -87,7 +84,6 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
@@ -719,6 +715,43 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	/**
+	 * Queries a given layer's <code>Source</code> instance to be rendered. 
+	 * <p>
+	 * <em><strong>Note: This is proof-of-concept quality only!</strong> At 
+	 * the moment the query is not filtered, that means all objects with all 
+	 * fields are read from the datastore for every call to this method. This 
+	 * method should work like 
+	 * {@link #queryLayer(MapLayer, FeatureSource, FeatureType, LiteFeatureTypeStyle[], Envelope, CoordinateReferenceSystem, CoordinateReferenceSystem, Rectangle, GeometryAttributeType)} 
+	 * and eventually replace it.</em>
+	 * </p>
+	 * 
+	 * @param currLayer The actually processed layer for rendering
+	 * @param source Source to read data from
+	 */
+	//TODO: Implement filtering for bbox and read in only the need attributes 
+	Collection queryLayer(MapLayer currLayer, Source source) {
+		
+		Collection results = null;
+		DefaultQuery query = new DefaultQuery(DefaultQuery.ALL);
+		Query definitionQuery;
+
+		definitionQuery = currLayer.getQuery();
+
+		if (definitionQuery != Query.ALL) {
+			if (query == Query.ALL) {
+				query = new DefaultQuery(definitionQuery);
+			} else {
+				query = new DefaultQuery(DataUtilities.mixQueries(definitionQuery, query, "liteRenderer"));
+			}
+		}
+		
+		results = source.content(query.getFilter());
+
+		return results;
+	}
+		
+	
+	/**
 	 * Queries a given layer's features to be rendered based on the target
 	 * rendering bounding box.
 	 * <p>
@@ -772,6 +805,7 @@ public final class StreamingRenderer implements GTRenderer {
 	/*
 	 * Default visibility for testing purposes
 	 */
+	
 	FeatureCollection queryLayer(MapLayer currLayer, FeatureSource source,
 			FeatureType schema, LiteFeatureTypeStyle[] styles,
 			Envelope mapArea, CoordinateReferenceSystem mapCRS,
@@ -1234,6 +1268,84 @@ public final class StreamingRenderer implements GTRenderer {
 	}
 
 	/**
+	 * <p>Creates a list of <code>LiteFeatureTypeStyle</code>s with:
+	 * <ol type="a">
+	 * <li>out-of-scale rules removed</li>
+	 * <li>incompatible FeatureTypeStyles removed</li>
+	 * </ol>
+	 * </p>
+	 * 
+	 * <p><em><strong>Note:</strong> This method has a lot of duplication with 
+	 * {@link #createLiteFeatureTypeStyles(FeatureTypeStyle[], FeatureType, Graphics2D)}. 
+	 * </em></p>
+	 * 
+	 * @param featureStyles Styles to process
+	 * @param typeDescription The type description that has to be matched
+	 * @return ArrayList<LiteFeatureTypeStyle>
+	 */
+	//TODO: Merge the two createLiteFeatureTypeStyles() methods
+	private ArrayList createLiteFeatureTypeStyles(FeatureTypeStyle[] featureStyles, Object typeDescription, Graphics2D graphics) throws IOException {
+		ArrayList result = new ArrayList();
+		
+		Rule[] rules;
+		ArrayList ruleList = new ArrayList();
+		ArrayList elseRuleList = new ArrayList();
+		Rule r;
+		LiteFeatureTypeStyle lfts;
+		BufferedImage image;
+		int numOfRules;		
+		int itemNumber = 0;
+
+		final int length = featureStyles.length;
+		for (int i = 0; i < length; i++) {
+			FeatureTypeStyle fts = featureStyles[i];
+	
+			if ( typeDescription == null || typeDescription.toString().indexOf( fts.getFeatureTypeName() ) == -1 ) continue; 
+			
+			// get applicable rules at the current scale
+			rules = fts.getRules();
+			ruleList = new ArrayList();
+			elseRuleList = new ArrayList();
+
+			numOfRules = rules.length;
+			for (int j = 0; j < numOfRules; j++) {
+				// getting rule
+				r = rules[j];
+
+				if (isWithInScale(r)) {
+					if (r.hasElseFilter()) {
+						elseRuleList.add(r);
+					} else {
+						ruleList.add(r);
+					}
+				}
+			}
+			if ((ruleList.size() == 0) && (elseRuleList.size() == 0))
+				continue; // DJB: optimization - nothing to render, dont
+			// do anything!!
+
+			if (itemNumber == 0) // we can optimize this one!
+			{
+				lfts = new LiteFeatureTypeStyle(graphics, ruleList,
+						elseRuleList);
+			} else {
+				image = graphics
+						.getDeviceConfiguration()
+						.createCompatibleImage(screenSize.width,
+								screenSize.height, Transparency.TRANSLUCENT);
+				lfts = new LiteFeatureTypeStyle(image, graphics
+						.getTransform(), ruleList, elseRuleList,
+						java2dHints);
+			}
+			result.add(lfts);
+			itemNumber++;			
+			
+		}
+
+		return result;
+	}
+	
+	/**
 	 * creates a list of LiteFeatureTypeStyles a) out-of-scale rules removed b)
 	 * incompatible FeatureTypeStyles removed
 	 * 
@@ -1241,6 +1353,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @param featureStylers
 	 * @param features
 	 * @throws Exception
+	 * @return ArrayList<LiteFeatureTypeStyle>
 	 */
 	private ArrayList createLiteFeatureTypeStyles(
 			FeatureTypeStyle[] featureStyles, FeatureType ftype,
@@ -1425,42 +1538,50 @@ public final class StreamingRenderer implements GTRenderer {
 		// Preparing feature information and styles
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final FeatureTypeStyle[] featureStylers = currLayer.getStyle()
-				.getFeatureTypeStyles();
+		final FeatureTypeStyle[] featureStylers = currLayer.getStyle().getFeatureTypeStyles();
 		
-        final FeatureSource source = currLayer.getFeatureSource();
-		final FeatureType schema = source.getSchema();
+        final FeatureSource featureSource = currLayer.getFeatureSource();
         
-		final GeometryAttributeType geometryAttribute = schema
-				.getDefaultGeometry();
-		final CoordinateReferenceSystem sourceCrs = geometryAttribute
-				.getCoordinateSystem();
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine(new StringBuffer("processing ").append(
-					featureStylers.length).append(" stylers for ").append(
-					currLayer.getFeatureSource().getSchema().getTypeName())
-					.toString());
-		}
-		// transformMap = new HashMap();
-		final NumberRange scaleRange = new NumberRange(scaleDenominator,
-				scaleDenominator);
-		symbolizerAssociationHT = new HashMap();// TODO use clear? MT issues?
-		final ArrayList lfts = createLiteFeatureTypeStyles(featureStylers,
-				schema, graphics);
-		if (lfts.size() == 0)
-			return; // nothing to do
-
-        LiteFeatureTypeStyle[] featureTypeStyleArray = (LiteFeatureTypeStyle[]) lfts.toArray(new LiteFeatureTypeStyle[lfts.size()]);
-        // /////////////////////////////////////////////////////////////////////
-		//
-		// DJB: get a featureresults (so you can get a feature reader) for the
-		// data
-		//
-		// /////////////////////////////////////////////////////////////////////
-		final Collection result = queryLayer(currLayer, source, schema,
+        final Collection result;
+        final CoordinateReferenceSystem sourceCrs;
+        final NumberRange scaleRange = new NumberRange(scaleDenominator,scaleDenominator);
+        symbolizerAssociationHT = new HashMap();// TODO use clear? MT issues?
+        final ArrayList lfts ;
+        
+        if ( featureSource != null ) {
+			final FeatureType schema = featureSource.getSchema();
+	        
+			final GeometryAttributeType geometryAttribute = schema.getDefaultGeometry();
+			sourceCrs = geometryAttribute.getCoordinateSystem();
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine(new StringBuffer("processing ").append(
+						featureStylers.length).append(" stylers for ").append(
+						currLayer.getFeatureSource().getSchema().getTypeName())
+						.toString());
+			}
+			// transformMap = new HashMap();
+			lfts = createLiteFeatureTypeStyles(featureStylers,schema, graphics);
+	
+	        LiteFeatureTypeStyle[] featureTypeStyleArray = (LiteFeatureTypeStyle[]) lfts.toArray(new LiteFeatureTypeStyle[lfts.size()]);
+	        // /////////////////////////////////////////////////////////////////////
+			//
+			// DJB: get a featureresults (so you can get a feature reader) for the
+			// data
+			//
+			// /////////////////////////////////////////////////////////////////////
+        
+        	result = queryLayer(currLayer, featureSource, schema,
 				featureTypeStyleArray,
 				mapArea, destinationCrs, sourceCrs, screenSize,
 				geometryAttribute);
+        } else {
+        	Source source = currLayer.getSource();
+        	result = queryLayer( currLayer, currLayer.getSource() );
+        	sourceCrs = null;
+        	lfts = createLiteFeatureTypeStyles( featureStylers, source.describe(), graphics );
+        }
+
+		if (lfts.size() == 0) return; // nothing to do
 
         final Collection collection = prepCollection(result, sourceCrs);
 		final Iterator iterator = collection.iterator();        
@@ -1478,7 +1599,7 @@ public final class StreamingRenderer implements GTRenderer {
 					}
 					feature = iterator.next(); // read the content
 					for (t = 0; t < n_lfts; t++) {
-						process(feature, fts_array[t], scaleRange, at, destinationCrs);
+						process(currLayer, feature, fts_array[t], scaleRange, at, destinationCrs);
                         // draw the content on the image(s)
 					}
 				} catch (Throwable tr) {
@@ -1510,9 +1631,10 @@ public final class StreamingRenderer implements GTRenderer {
 
 	/**
 	 * @param content
+	 * @param feature 
 	 * @param style
 	 */
-	final private void process(Object content, LiteFeatureTypeStyle style,
+	final private void process(MapLayer currLayer, Object content, LiteFeatureTypeStyle style,
 			Range scaleRange, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs)
 			throws TransformException, FactoryException {
@@ -1532,7 +1654,7 @@ public final class StreamingRenderer implements GTRenderer {
 			if ((filter == null) || filter.evaluate(content)) {
 				doElse = false;
 				symbolizers = r.getSymbolizers();
-				processSymbolizers(graphics, content, symbolizers, scaleRange,
+				processSymbolizers(currLayer, graphics, content, symbolizers, scaleRange,
 						at, destinationCrs);
 			}
 		}
@@ -1543,7 +1665,7 @@ public final class StreamingRenderer implements GTRenderer {
 				r = elseRuleList[tt];
 				symbolizers = r.getSymbolizers();
 
-				processSymbolizers(graphics, content, symbolizers, scaleRange,
+				processSymbolizers(currLayer, graphics, content, symbolizers, scaleRange,
 						at, destinationCrs);
 
 			}
@@ -1555,6 +1677,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * <p>
 	 * This is an internal method and should only be called by processStylers.
 	 * </p>
+	 * @param currLayer 
 	 * 
 	 * @param graphics
 	 * @param drawMe
@@ -1569,7 +1692,7 @@ public final class StreamingRenderer implements GTRenderer {
 	 * @throws TransformException
 	 * @throws FactoryException
 	 */
-	final private void processSymbolizers(final Graphics2D graphics,
+	final private void processSymbolizers(MapLayer currLayer, final Graphics2D graphics,
 			final Object drawMe, final Symbolizer[] symbolizers,
 			Range scaleRange, AffineTransform at,
 			CoordinateReferenceSystem destinationCrs)
@@ -1602,11 +1725,13 @@ public final class StreamingRenderer implements GTRenderer {
 				g = findGeometry(drawMe, symbolizers[m]); // pulls the
 				// geometry
 
+				if ( g == null ) continue;
+				
 				sa = (SymbolizerAssociation) symbolizerAssociationHT
 						.get(symbolizers[m]);
 				if (sa == null) {
 					sa = new SymbolizerAssociation();
-					sa.setCRS(findGeometryCS(drawMe, symbolizers[m]));
+					sa.setCRS(findGeometryCS(currLayer, drawMe, symbolizers[m]));
 					try {
 						// DJB: this should never be necessary since we've
 						// already taken care to make sure the reader is
@@ -1823,20 +1948,22 @@ public final class StreamingRenderer implements GTRenderer {
 				pts[t] = gc.getGeometryN(t).getCentroid().getCoordinate();
 			}
 			return g.getFactory().createMultiPoint(pts);
-		} else {
+		} else if (g != null) {
 			return g.getCentroid();
 		}
+		return null;
 	}
 
 	/**
 	 * Finds the geometric attribute coordinate reference system.
+	 * @param drawMe2 
 	 * 
 	 * @param f The feature
 	 * @param s The symbolizer
 	 * @return The geometry requested in the symbolizer, or the default geometry if none is specified
 	 */
 	private org.opengis.referencing.crs.CoordinateReferenceSystem findGeometryCS(
-			Object drawMe, Symbolizer s) {
+			MapLayer currLayer, Object drawMe, Symbolizer s) {
 
 
         if( drawMe instanceof Feature ){
@@ -1853,14 +1980,11 @@ public final class StreamingRenderer implements GTRenderer {
                 return geom.getCoordinateSystem();
             }
         }
-        else {
-            // need to grab this from source.getInfo().getCRS();
-            // really this is preprocessing done in a strange non lazy fashion
-            
-            PropertyName geomName = getGeometryPropertyName(s);
-            Geometry geom = (Geometry) geomName.evaluate( drawMe );            
-            return (org.opengis.referencing.crs.CoordinateReferenceSystem) geom.getUserData(); // ha ha
+        else if ( currLayer.getSource() != null ) {
+        	return currLayer.getSource().getInfo().getCRS();
         }
+        
+        return null;
 	}
 
 	private PropertyName getGeometryPropertyName(Symbolizer s) {
