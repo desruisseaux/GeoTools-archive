@@ -89,7 +89,7 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.geotools</groupId>
+				<groupId>org.geotools.maven</groupId>
 				<artifactId>gt2-jjtree-javacc</artifactId>
 				<version>2.4-SNAPSHOT</version>
 				<configuration>
