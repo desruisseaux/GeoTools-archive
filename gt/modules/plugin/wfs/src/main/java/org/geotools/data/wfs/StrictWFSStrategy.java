@@ -153,7 +153,7 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
         }
 
         private FeatureReader nextReader() throws IOException {
-            if( filter==null || filter==Filter.ALL )
+            if( filter==null || filter==Filter.INCLUDE )
                 return null;
 
             DefaultQuery query2=new DefaultQuery(query);
