@@ -98,7 +98,7 @@ public class FidFilterVisitor implements FilterVisitor, FilterVisitor2 {
 			break;
 		}
 		case FilterType.LOGIC_NOT:{
-			assert current.size()==1;
+			assert current.size()-stop==1;
 			newFilter=(Filter) current.pop();
 			newFilter=newFilter.not();
 			break;
