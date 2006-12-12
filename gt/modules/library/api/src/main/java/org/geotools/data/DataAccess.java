@@ -22,18 +22,17 @@ import org.geotools.catalog.ServiceInfo;
 
 /**
  * <p>Interface providing Open Web Service style access to geo resource content.</p>
- * 
- * <p>The basic idea is to have simple, very general interface to access and query 
- * data that is in some way or another spatially enabled. Extending interfaces can 
+ *
+ * <p>The basic idea is to have simple, very general interface to access and query
+ * data that is in some way or another spatially enabled. Extending interfaces can
  * add methods that make it easier to access data for their specific model.</p>
-
- * <p><em>This should become a super interface of {@link DataStore} and eventually 
+ * <p><em>This should become a super interface of {@link DataStore} and eventually
  * replace it(?).</em></p>
  *
  * @author Jody Garnett
  * @author Thomas Marti
  * @author Stefan Schmid
- * 
+ *
  * @source $URL$
  * @version $Id$
  */
@@ -64,8 +63,8 @@ public interface DataAccess /*<Content,Description>*/ {
      *   <li>URL: of XSD document when working with XML document</li>
      *   <li>etc...</li>
      * </ul>
-     * Please note this is a <strong>direct</strong> description of the 
-     * content, and contains no fluffy human readible concerns (like 
+     * Please note this is a <strong>direct</strong> description of the
+     * content, and contains no fluffy human readible concerns (like
      * title) for that kind of information please use {@link #getInfo()}.
      *
      * @see Source#getInfo()

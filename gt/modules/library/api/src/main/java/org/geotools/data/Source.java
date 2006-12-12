@@ -16,17 +16,16 @@
 package org.geotools.data;
 
 import java.util.Collection;
-
-import org.geotools.catalog.GeoResourceInfo;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
+import org.geotools.catalog.GeoResourceInfo;
 
 
 /**
  * The <code>Source</code> interface provides access to the actual data either filtered/queried or not. Access
  * is purely <strong>read-only</strong> with this interface.
- * 
+ *
  * @author Jody Garnett
  * @author Thomas Marti
  * @author Stefan Schmid
@@ -35,8 +34,7 @@ import org.opengis.filter.capability.FilterCapabilities;
  * @version $Id$
  */
 public interface Source /*<Content,Description>*/ {
-
-	/**
+    /**
      * Information about the data available here.
      * <p>
      * Focus is on human readable description of the service,
@@ -121,9 +119,9 @@ public interface Source /*<Content,Description>*/ {
     /**
      * Clean up any resources, listeners, etc that made use of this Source of data.
      * <p>
-     * Please note this <code>Source</code> will not function after this method is 
-     * called. Any {@link Transaction.State} mementos placed on the current transaction 
-     * will also be cleaned up (although the transaction itself will not be canceled 
+     * Please note this <code>Source</code> will not function after this method is
+     * called. Any {@link Transaction.State} mementos placed on the current transaction
+     * will also be cleaned up (although the transaction itself will not be canceled
      * - as it may be in use by others).
      * </p>
      */
