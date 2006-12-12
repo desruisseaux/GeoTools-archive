@@ -59,7 +59,6 @@
     <module>shapefile-renderer</module>
     <module>validation</module>
     <module>widgets-swing</module>
-    <module>mappane</module>
   </modules>
 
 
