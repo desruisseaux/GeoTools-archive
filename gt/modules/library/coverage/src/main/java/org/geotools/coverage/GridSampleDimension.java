@@ -1308,6 +1308,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * @see #getPaletteInterpretation
      * @see #getColorInterpretation
      * @see IndexColorModel
+     *
+     * @deprecated No replacement.
      */
     public int[][] getPalette() {
         final ColorModel color = getColorModel();
@@ -1331,6 +1333,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * A palette entry type can be Gray, RGB, CMYK or HLS.
      *
      * @return The type of color palette entry for sample dimensions which have a palette.
+     *
+     * @deprecated No replacement.
      */
     public PaletteInterpretation getPaletteInterpretation() {
         return PaletteInterpretation.RGB;
@@ -1341,6 +1345,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      * A sample dimension can be an index into a color palette or be a color model
      * component. If the sample dimension is not assigned a color interpretation
      * the value is {@link ColorInterpretation#UNDEFINED}.
+     *
+     * @deprecated No replacement.
      */
     public ColorInterpretation getColorInterpretation() {
         // The 'Grid2DSampleDimension' class overrides this method
@@ -1464,6 +1470,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *
      * @see #getMetadataValue
      * @see javax.media.jai.PropertySource#getPropertyNames
+     *
+     * @deprecated Not implemented.
      */
     public String[] getMetaDataNames() {
         return EMPTY_METADATA;
@@ -1478,6 +1486,8 @@ public class GridSampleDimension implements SampleDimension, Serializable {
      *
      * @see #getMetaDataNames
      * @see javax.media.jai.PropertySource#getProperty
+     *
+     * @deprecated Not implemented.
      */
     public String getMetadataValue(String name) throws MetadataNameNotFoundException {
         throw new MetadataNameNotFoundException();
