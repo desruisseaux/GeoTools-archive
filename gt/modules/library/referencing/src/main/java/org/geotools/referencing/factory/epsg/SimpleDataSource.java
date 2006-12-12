@@ -247,4 +247,22 @@ public class SimpleDataSource implements DataSource {
         }
         return factory;
     }
+
+    /**
+     * Not implemented. This method is defined for Java 6 compatibility only.
+     *
+     * @since 2.4
+     */
+    public Object unwrap(final Class type) throws SQLException {
+        throw new SQLException();
+    }
+
+    /**
+     * Not implemented. This method is defined for Java 6 compatibility only.
+     *
+     * @since 2.4
+     */
+    public boolean isWrapperFor(final Class type) throws SQLException {
+        return false;
+    }
 }

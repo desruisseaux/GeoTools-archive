@@ -38,7 +38,7 @@
   
   <description>
     Connection to an EPSG postgreSQL database.
-    This database is built from the SQL scripts delivered by EPSG.
+    This database should be built by the user from the SQL scripts delivered by EPSG.
   </description>
 
   <licenses>
