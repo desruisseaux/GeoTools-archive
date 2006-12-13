@@ -74,6 +74,10 @@ public class PostgisFeatureWriter extends JDBCTextFeatureWriter {
     }
 
     protected String getGeometryInsertText(Geometry geom, int srid) throws IOException {
+    	if( geom == null ) {
+    		return "null";
+    	}
+    	
         if(WKBEnabled) {
             //String wkb = WKBEncoder.encodeGeometryHex(geom);
             String wkb = WKBWriter.bytesToHex( new WKBWriter().write( geom ) );
