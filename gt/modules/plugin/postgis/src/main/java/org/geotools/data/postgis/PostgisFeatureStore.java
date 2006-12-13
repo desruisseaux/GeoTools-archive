@@ -118,6 +118,7 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
 
         AttributeType geomType = featureType.getDefaultGeometry();
         encoder = new SQLEncoderPostgis();
+        encoder.setFeatureType( featureType );
         encoder.setFIDMapper(postgisDataStore.getFIDMapper(featureType.getTypeName()));
 
         if (geomType != null) {
