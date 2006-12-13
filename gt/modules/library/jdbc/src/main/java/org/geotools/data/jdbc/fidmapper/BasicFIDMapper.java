@@ -112,7 +112,7 @@ public class BasicFIDMapper extends AbstractFIDMapper {
     }
 
     /**
-     * This kind of FIDMapper does not generate keys, they must be already
+     * This kind of FIDMapper does not generate keys, they must be alreadyT
      * present in the primary key.
      *
      * @see org.geotools.data.fidmapper.FIDMapper#createID(Connection, Feature,
@@ -120,7 +120,9 @@ public class BasicFIDMapper extends AbstractFIDMapper {
      */
     public String createID(Connection conn, Feature feature, Statement statement)
         throws IOException {
-        return (new UID()).toString();
+    	//JD: replacing no word characters with underscore
+    	//JD: forcing to start with a latter
+        return "fid_" + (new UID()).toString().replaceAll( "\\W","_" );
     }
 
 }
