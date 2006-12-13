@@ -17,6 +17,7 @@ package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 
@@ -48,7 +49,7 @@ import org.geotools.xml.SimpleBinding;
  *
  * @generated
  */
-public class XSNameBinding implements SimpleBinding {
+public class XSNameBinding extends AbstractSimpleBinding {
     /**
      * @generated
      */
@@ -92,14 +93,4 @@ public class XSNameBinding implements SimpleBinding {
         return value;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public String encode(Object object, String value) {
-        //TODO: implement
-        return null;
-    }
 }

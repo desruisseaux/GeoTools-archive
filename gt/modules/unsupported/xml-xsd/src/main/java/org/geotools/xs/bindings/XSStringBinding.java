@@ -69,7 +69,7 @@ public class XSStringBinding implements SimpleBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return OVERRIDE;
     }
 
     /**

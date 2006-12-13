@@ -17,6 +17,7 @@ package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.SimpleBinding;
 
@@ -42,7 +43,7 @@ import org.geotools.xml.SimpleBinding;
  *
  * @generated
  */
-public class XSTokenBinding implements SimpleBinding {
+public class XSTokenBinding extends AbstractSimpleBinding {
     /**
      * @generated
      */
@@ -84,16 +85,5 @@ public class XSTokenBinding implements SimpleBinding {
         throws Exception {
         //Simply return string value, Whitespace facet is already handled    
         return value;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public String encode(Object object, String value) {
-        //TODO: implement
-        return null;
     }
 }
