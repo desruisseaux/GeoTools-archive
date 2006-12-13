@@ -3,12 +3,10 @@ package org.geotools.feature.simple;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.feature.Feature;
 import org.opengis.feature.Attribute;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureCollection;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureFactory;
@@ -21,12 +19,30 @@ import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.GeometryType;
 
 /**
- * This builder will help you put together a SimpleFeature.
+ * A builder used to construct an instanceof {@link org.opengis.feature.simple.SimpleFeature}.
  * <p>
- * Since the simple feature is well simple, this class
- * is not very complicated either! You are required
- * to provide a SimpleFeatureFactory in order to use this
- * builder.
+ * Usage:
+ * <code>
+ * 	<pre>
+ *  //type of features we would like to build ( assume schema = (geom:Point,name:String) )
+ *  SimpleFeatureType featureType = ...  
+ * 
+ *  SimpleFeatureFactory simpleFactory = ...  //factory used to build feature instances
+ * 
+ *  //create the builder
+ *  SimpleFeatureBuilder builder = new SimpleFeatureBuilder( simpleFactory );
+ *  
+ *  //set hte type of created features
+ *  builder.setType( featureType );
+ *  
+ *  //add the attributes
+ *  builder.add( new Point( 0 , 0 ) );
+ *  builder.add( "theName" );
+ *  
+ *  //build the feature
+ *  SimpleFeature feature = builder.build( "fid" );
+ * 	</pre>
+ * </code>
  * </p>
  * 
  * @author Justin Deoliveira
