@@ -22,6 +22,7 @@ import java.util.Iterator;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -169,16 +170,15 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
         //TODO: this could pick up wrong thing, node api needs to be 
         // namespace aware
         String fid = (String) node.getAttributeValue("id");
+        Object[] attributes = new Object[fType.getAttributeCount()];
 
-        //create the feature
-        Feature f = fType.create(new Object[fType.getAttributeCount()], fid);
-
-        for (Iterator itr = node.getChildren().iterator(); itr.hasNext();) {
-            Node child = (Node) itr.next();
-            f.setAttribute(child.getComponent().getName(), child.getValue());
+        for (int i = 0; i < fType.getAttributeCount(); i++) {
+            AttributeType attType = fType.getAttributeType(i);
+            attributes[i] = node.getChildValue(attType.getName());
         }
 
-        return f;
+        //create the feature
+        return fType.create(attributes, fid);
     }
 
     public Element encode(Object object, Document document, Element value)
