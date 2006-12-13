@@ -23,8 +23,11 @@ import org.geotools.catalog.GeoResourceInfo;
 
 
 /**
- * The <code>Source</code> interface provides access to the actual data either filtered/queried or not. Access
+ * A read-only source of geospatial information.
+ * <p>
+ * Access to the spatial information in a filtered/queried or not. Access
  * is purely <strong>read-only</strong> with this interface.
+ * </p>
  *
  * @author Jody Garnett
  * @author Thomas Marti
@@ -32,6 +35,9 @@ import org.geotools.catalog.GeoResourceInfo;
  *
  * @source $URL$
  * @version $Id$
+ * @since 2.4
+ * @deprecated This is a Proposal, we need your feedback!
+ * @author Jody Garnett, Refractions Research Inc.
  */
 public interface Source /*<Content,Description>*/ {
     /**

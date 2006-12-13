@@ -14,6 +14,7 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
@@ -102,20 +103,12 @@ public class ContentDataStore implements DataStore {
           }
           return collection;        
     }
-    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
-        
-        return null;
-    }
 
     public FeatureSource getFeatureSource(String typeName) throws IOException {
         return null;
     }
 
     public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction) throws IOException {
-        return null;
-    }
-
-    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction) throws IOException {
         return null;
     }
 
@@ -139,6 +132,22 @@ public class ContentDataStore implements DataStore {
         return null;
     }
 
-    public void updateSchema(String typeName, FeatureType featureType) throws IOException {
+    public void updateSchema(String typeName, FeatureType featureType) throws IOException {        
     }
+
+    //
+    // low level operations
+    //
+    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
+        FeatureCollection collection = query( query, transaction );
+        
+        return null; // new DelegateFeatureReader( collection.getSchema(), collection.features() );
+    }
+
+    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction) throws IOException {
+        //FeatureCollection collection = query( query, transaction );
+
+        return null; // new DelegateFeatureWriter( collection.getSchema(), collection.features() );
+    }
+
 }

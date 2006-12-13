@@ -21,13 +21,15 @@ import org.geotools.catalog.ServiceInfo;
 
 
 /**
- * <p>Interface providing Open Web Service style access to geo resource content.</p>
+ * Interface providing Open Web Service style access to geo resource content.
  *
- * <p>The basic idea is to have simple, very general interface to access and query
+ * <p>
+ * The basic idea is to have simple, very general interface to access and query
  * data that is in some way or another spatially enabled. Extending interfaces can
  * add methods that make it easier to access data for their specific model.</p>
- * <p><em>This should become a super interface of {@link DataStore} and eventually
- * replace it(?).</em></p>
+ * <p><em>This should become a super interface of {@link DataStore} and may be viewed
+ * as a future direciton for feature access.</em>
+ * </p>
  *
  * @author Jody Garnett
  * @author Thomas Marti
@@ -35,6 +37,9 @@ import org.geotools.catalog.ServiceInfo;
  *
  * @source $URL$
  * @version $Id$
+ * @since 2.4
+ * @deprecated This is a Proposal, we need your feedback!
+ * @author Jody Garnett, Refractions Research Inc.
  */
 public interface DataAccess /*<Content,Description>*/ {
     /**
@@ -53,7 +58,7 @@ public interface DataAccess /*<Content,Description>*/ {
      *
      * @return List<TypeName>, may be emtpy, but never null
      */
-    List /*<TypeName>*/ getTypeNames();
+    List /*<TypeName>*/ getNames();
 
     /**
      * Description of content in an appropriate format.
