@@ -15,6 +15,7 @@
  */
 package org.geotools.filter.v1_1;
 
+import java.net.URI;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.identity.FeatureId;
@@ -82,5 +83,19 @@ public class FeatureIdTypeBinding extends AbstractComplexBinding {
         }
 
         return filterfactory.featureId(fid);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if ("fid".equals(name.getLocalPart())) {
+            FeatureId featureId = (FeatureId) object;
+
+            //&lt;xsd:attribute name="fid" type="xsd:anyURI" use="required"/&gt;
+            if (featureId != null) {
+                return featureId.getID();
+            }
+        }
+
+        return null;
     }
 }
