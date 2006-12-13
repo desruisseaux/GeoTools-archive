@@ -3,7 +3,21 @@
 
   <!-- Top Level, a description with the chapter TOC -->
   <para>
-    A blank to be reused.
+    This chapter introduces the <code>org.opengis.util</code> package from the 
+    GeoAPI project and the <code>org.geotools.util</code> package in the 
+    Metadata module of Geotools.
+  </para>
+  
+  <para>
+    These two packages define interfaces and classes to define core elements of 
+    the base schema defined in the ISO standard specifications. While most of 
+    the basic ISO schema can be implemented using standard Java language 
+    elements, either the primitive data types or the classes in the Java 
+    class libraries, the ISO schema defines some base elements which require 
+    a Geotools implementation. These elements are self-contained structures 
+    which are reused in several different parts of the Geotools library to hold 
+    name elements, elements which may be translated into multiple languages, and 
+    other multi-unit elements. 
   </para>
   
   <!-- Critical Warnings -->
@@ -14,6 +28,132 @@
     
     <!--Overview and when not to read the chapter -->
     <para>
+      The Geotools <code>util</code> package is part of the Geotools Metadata 
+      module. Along with the GeoAPI <code>util</code> package, it defines 
+      computational structures which complement both the Java language 
+      primitives and the Java class library to provide a complete implementation 
+      of the base ISO computational schema.
+    </para>
+    
+    <para>
+      Geotools implements a geographic information 
+      system based on the standards defined by the International Organization 
+      for Standardization (ISO) in their 191xx series of standards. The 
+      fundamental computational structures used by the whole series are defined 
+      in the ISO 19103 Standard "Conceptual 
+      Schema Language" (see <xref linkend="table-iso-standards"/>). Many of 
+      these fundamental elements can be implemented by Geotools using primitives 
+      and objects defined in the Java Language itself. However, some more 
+      advanced structures require their own definition and implementation; those 
+      elements are discussed here.
+    </para>
+    
+    <para>
+      The GeoAPI <code>org.opengis.util</code> package defines several of these 
+      required elements through interfaces and a few classes including:
+      <itemizedlist>
+        <listitem>
+          <para>
+            The <code>Cloneable</code> interface can be used to facilitate 
+            object copying,    
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            the <code>InternationalString</code> interface can encapsulate a 
+            string of characters translated into many languages, 
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            the <code>GenericName</code>, <code>ScopedName</code>, 
+            <code>LocalName</code>, and <code>NameFactory</code> interfaces 
+            are useful to define a name which contains hierarchical elements 
+            similar to the package naming scheme hierarchy such as the 
+            <code>org.geotools.util</code> package name where the name is 
+            divided into several elements separated by a standard separator 
+            character, 
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            and the two enumeration classes <code>CodeList</code> and its 
+            derivative <code>SimpleEnumerationType</code>.
+          </para>
+        </listitem>
+      </itemizedlist>
+      
+    </para>
+    
+    <para>
+      The Geotools <code>org.geotools.util</code> package serves two separate 
+      purposes. On the one hand, the package implements many of the interfaces 
+      of the GeoAPI package. These classes provide Geotools with the core 
+      building blocks through which to define all of the elements in the ISO 
+      geospatial schema. On the other hand, this Geotools package defines 
+      interfaces and classes which provide useful functions to 
+      the library. These utility classes include:
+      <itemizedlist>
+        <listitem>
+          <para>
+            the <code>ProgressListener</code> interface, 
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            the <code>LiteCoordinateSequence</code> class and its associated 
+            factory used to define a compact set of coordinates in the JTS 
+            utility library (see <xref linkend="chapter-geomJTS"/>), 
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            the <code>MonolineFormatter</code>, 
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            the <code>NumberRange</code> and associated <code>RangeSet</code>
+            collection, 
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            and a number of collection elements such as the 
+            <code>CheckedArrayList</code> and <code>WeakHashMap</code> classes.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+    
+    <note>
+      <title>Geotools is not perfectly aligned with GeoAPI</title>
+      <para>
+        In general Geotools provides a straight forward implementation of the 
+        GeoAPI interfaces. For example, <code>org.geotools.util.LocalName</code> 
+        is a direct implementation of <code>org.opengis.util.LocalName</code>. 
+        However, the libraries evolve according to separate criteria so the 
+        relationship between the two projects is not always direct. For example,
+        <code>org.geotools.util.NameFactory</code> does not implement the 
+        convenience methods of <code>org.opengis.util.NameFactory</code> and is 
+        therefore a completely separate class.
+      </para>
+    </note>
+    
+    <para>
+      Jointly these two utility packages and the Java language define the 
+      complete schema of basic elements which will be used to define the 
+      geospatial model implemented in ISO conformant implementations. The rest 
+      of the specifications will assemble all their complex structures out of 
+      these primitive elements. 
+    </para>
+    
+    <para>
+      This chapter can readily be skipped and consulted only when an interface 
+      or class from this package is required. These elements will be of most use 
+      to those delving into the internals of the geographic information system 
+      model; general users of the library will not require using the 
+      <code>util</code> packages.
     </para>
     
     
@@ -22,6 +162,12 @@
       <title>Usage</title>
       
       <para>
+        The interfaces and classes which define elements in the ISO geospatial 
+        schema are used throughout the Geotools library when those elements are 
+        called for in the ISO schema. The classes are used especially in the 
+        metadata and referencing modules. The classes which define collection 
+        types are used throughout the Geotools library wherever such types can 
+        be useful.
       </para>
       
     </sect2>
@@ -32,9 +178,23 @@
       <title>Warnings</title>
       
       <warning>
+        <title>The ISO schema is not complete</title>
+        <para>
+          Geotools follows closely the schema defined in the ISO 191xx series of 
+          standards. This schema however has never been implemented and a number 
+          of questions remain about its completeness and coherency and 
+          about the meaning of particular portions of the standard. The Geotools 
+          schema may therefore be incomplete or may need to change in the future.
+        </para>
+      </warning>
+      
+      <!--
+      <warning>
+        <title></title>
         <para>
         </para>
       </warning>
+      -->
       
     </sect2>
     
@@ -44,6 +204,90 @@
       <title>Instance Object Model</title>
       
       <para>
+        The Geotools instances of each of the ISO schema elements are 
+        relatively simple.
+      </para>
+      
+      <para>
+        The <code>Cloneable</code> interface allows classes to announce their 
+        ability to be fully copied. ...TODO
+      </para>
+      
+      <para>
+        <code>InternationalString</code> elements define a computational 
+        structures which hold a string of characters along with any number of 
+        translations of that string into different languages. The interface can 
+        be thought of as a map between a locale key and a string value.
+      </para>
+      
+      <para>
+        <code>GenericName</code> elements contain component names separated by a 
+        separator character.
+        <figure id="fig-util-model-GenericName">
+          <title>An instance of a GenericName.</title>
+          <screenshot>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="figures/gt_GenericName-Instance.png" 
+                            format="PNG" 
+                            width="400px"
+                            scalefit="1"
+                            />
+              </imageobject>
+              <textobject>
+                <phrase>
+                  An illustration of the GenericName instance org.geotools.util
+                  decomposed into its LocalNames.
+                </phrase>
+              </textobject>
+              <caption>
+                <para>
+                  The <code>GenericName</code> instance 
+                  <code>org.geotools.util</code> is composed of three local 
+                  names.
+                </para>
+              </caption>
+            </mediaobject>
+          </screenshot>
+        </figure>
+        A <code>GenericName</code> may contain two component names, a 
+        <code>LocalName</code> and a <code>GenericName</code> which can be 
+        either a <code>LocalName</code> or a <code>ScopedName</code>. In 
+        <xref linkend="fig-util-model-GenericName"/> the <code>ScopedName</code> 
+        is composed of two <code>LocalName</code> objects.
+      </para>
+      
+      <para>
+        The <code>CodeList</code> hierarchy including 
+        <code>SimpleEnumerationType</code> allows the definition of an 
+        enumerated list of possible alternatives. These two classes use slightly 
+        different semantics.
+      </para>
+      
+      <para>
+        The <code>LiteCoordinateSequence*</code> provides a way to define JTS 
+        CoordinateSequence objects (see <xref linkend="chapter-geomJTS"/>) 
+        without the cost of implementing as many objects as does the default 
+        implementation.
+      </para>
+      
+      <para>
+        The <code>*List</code>, <code>*Map</code>, <code>*Set</code> and 
+        <code>MapEntry</code> classes follow the usual semantics of Java 
+        Collections and should therefore be easily understood.
+      </para>
+      
+      <para>
+        The <code>MonolineFormatter</code> ... TODO
+      </para>
+      
+      <para>
+        The <code>NumberRange</code> class and <code>RangeSet</code> collection 
+        ... TODO
+      </para>
+      
+      <para>
+        The <code>ProgressListener</code> interface... TODO
       </para>
       
     </sect2>
@@ -54,31 +298,9 @@
       <title>Code Layout</title>
       
       <para>
+        The structure of the <code>*.util</code> packages in both GeoAPI and 
+        Geotools are simply a flat directory with all classes in the top level.
       </para>
-      
-<table>
-<title>Fundamental Terminology</title>
-<tgroup cols="2">
-<thead>
-<row>
-  <entry>Package</entry>
-  <entry>Use</entry>
-</row>
-</thead>
-<tbody>
-<row>
-  <entry>
-    <para>
-    </para>
-  </entry>
-  <entry>
-    <para>
-    </para>
-  </entry>
-</row>
-</tbody>
-</tgroup>
-</table>
 
     </sect2>
     
@@ -105,18 +327,75 @@
 <row>
   <entry>
     <para>
+      AbstractInternationalString
     </para>
   </entry>
   <entry>
     <para>
+      InternationalString
     </para>
   </entry>
   <entry>
     <para>
+      <emphasis role="italic">abstract</emphasis>
     </para>
   </entry>
   <entry>
     <para>
+      .toString(Locale l)
+    </para>
+  </entry>
+</row>
+<row>
+  <entry>
+    <para>
+      GenericName
+    </para>
+  </entry>
+  <entry>
+    <para>
+      GenericName
+    </para>
+  </entry>
+  <entry>
+    <para>
+      NameFactory.create(-);
+    </para>
+    <para>
+      new LocalName(-);
+    </para>
+    <para>
+      new ScopedName(-);
+    </para>
+  </entry>
+  <entry>
+    <para>
+      .toString(-)
+    </para>
+    <para>
+      .toInternationalString()
+    </para>
+  </entry>
+</row>
+<row>
+  <entry>
+    <para>
+      CodeList
+    </para>
+  </entry>
+  <entry>
+    <para>
+      <emphasis role="italic">none</emphasis>
+    </para>
+  </entry>
+  <entry>
+    <para>
+      <emphasis role="italic">abstract</emphasis>
+    </para>
+  </entry>
+  <entry>
+    <para>
+      .values()
     </para>
   </entry>
 </row>
@@ -156,18 +435,44 @@
     <title>Resources</title>
 
     <para>
-      
+      The ISO 19103 standard defines the schema required by Geotools and 
+      therefore the behaviour required of the schema classes defined in these
+      utility packages.
     </para>
-    <!--
-    <sect2 id="">
-      <title></title>
-
-      <para>
-        
-      </para>
-
-    </sect2>
-    -->
+    
+    <para>
+      The Cloneable interface is one approach to resolve a design decision made 
+      in the early versions of the Java language. See the <ulink 
+        url="http://java.sun.com/j2se/1.4.2/docs/api/java/lang/Object.html#clone()"
+        type="http">Object.clone()</ulink> method javadocs and the documentation 
+      for the <ulink 
+        url="http://java.sun.com/j2se/1.4.2/docs/api/java/lang/Cloneable.html"
+        type="http">Cloneable</ulink> interface. The subject of cloning java 
+      objects has garnered a great deal of attention, see, for example, the 
+      January 2003 article <ulink 
+        url="http://www.javaworld.com/javaworld/javaqa/2003-01/02-qa-0124-clone.html"
+        type="http">"Attack of the clones"</ulink> by Vladimir Roubtsov on 
+      JavaWorld.com which posits four approaches to cloning objects: clone 
+      methods, copy constructors, copy through serialization and copy through 
+      reflection.
+    </para>
+    
+    <para>
+      The <code>InternationalString</code> structure is relatively straight 
+      forward, operating like a key-value map structure. The 
+      <code>ResourceInternationalString</code> uses the standard Java resource 
+      mechanism documented in the <ulink
+        url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/ResourceBundle.html"
+        type="http">ResourceBundle</ulink> javadoc pages.
+    </para>
+    
+    <para>
+      The classes which implement structured collections, such as sets, hashes, 
+      and maps, follow the general pattern of such structures in the Java 
+      language. The documents for the Java language can therefore help explain 
+      the behaviours of these Geotools utility classes.
+    </para>
+      
   </sect1>
   
   
@@ -177,18 +482,15 @@
     <title>Practical Information </title>
 
     <para>
-      
+      The interfaces and classes in the <code>util</code> packages follow 
+      straightforward java patterns.
     </para>
-    <!--
-    <sect2 id="">
-      <title></title>
-
-      <para>
-        
-      </para>
-
-    </sect2>
-    -->
+    
+    <para>
+      The <code>NameFactory</code> class provides static methods for convenience 
+      through which to instantiate <code>GenericName</code> instances. 
+    </para>
+    
   </sect1>
   
   
@@ -198,18 +500,100 @@
     <title>Principal Classes</title>
 
     <para>
-      
+      The GeoAPI and Geotools <code>util</code> packages contain several groups 
+      of interfaces and classes each unrelated to the others so each can be 
+      discussed separately.
     </para>
-    <!--
-    <sect2 id="">
-      <title></title>
+    
+    <sect2 id="sect-util-classes-Cloneable">
+      <title>Cloneable</title>
 
       <para>
         
       </para>
 
     </sect2>
-    -->
+    
+    
+    <sect2 id="sect-util-classes-IntlString">
+      <title>InternationalString</title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    
+    
+    <sect2 id="sect-util-classes-GenericName">
+      <title>GenericName</title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    
+    
+    <sect2 id="sect-util-classes-CodeList">
+      <title>CodeList</title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    
+    
+    <sect2 id="sect-util-classes-ProgressListener">
+      <title>ProgressListener</title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    
+    
+    <sect2 id="sect-util-classes-LiteCoordinateSequence">
+      <title>LiteCoordinateSequence</title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    
+    
+    <sect2 id="sect-util-classes-NumberRange">
+      <title>NumberRange</title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    
+    
+    <sect2 id="sect-util-classes-MonolineFormatter">
+      <title>MonolineFormatter</title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    
+    
+    <sect2 id="sect-util-classes-listSetMap">
+      <title>Lists, Sets and Maps</title>
+
+      <para>
+        
+      </para>
+
+    </sect2>
+    
   </sect1>
   
   

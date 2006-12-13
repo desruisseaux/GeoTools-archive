@@ -192,18 +192,27 @@
   &welcome;
     
   &start;
-
+  
+  <!--part id="part-background">
+  <title>Background</title-->
   &concepts;
   &science;
   &design;
+  <!--/part-->
 
+  <!--part id="part-libraries">
+  <title>Libraries</title-->
   &libUnits;
   &libJTS;
+  <!--/part-->
   
   <!-- TO WRITE >
   <chapter id="chapter-towrite">
     <title>TO WRITE: </title>
   </chapter-->
+  
+  <!--part id="part-systems">
+  <title>Systems</title-->
   &util;
   &metadata;
   &geomGeoAPI;
@@ -214,11 +223,17 @@
   &storage;
   &query;
   &display;
+  <!--/part-->
+  
+  <!--part id="part-advanced">
+  <title>Advanced</title-->
 
   <chapter id="chapter-advanced-graph">
     <title>Advanced: Network Graphs</title>
     &advancedGraph;
   </chapter>
+  
+  <!--/part-->
 
 
 <!--
