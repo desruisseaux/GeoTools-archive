@@ -1266,7 +1266,12 @@ public abstract class JDBC1DataStore implements DataStore {
 				return null;
 			} else {
 				int min = nillable ? 0 : 1;
-				return AttributeTypeFactory.newAttributeType(columnName, type, nillable, null, null, null, min, 1 );
+				//JD: We would like to set the nillable flag properly here, but there is a lot of 
+				// code that sets the value of an attribute to be null while building a feature, 
+				// think of feature readers that have to copy content, so we always set it to true,
+				// perhaps with the new feature model things like this will be fished out
+				//return AttributeTypeFactory.newAttributeType(columnName, type, nillable, null, null, null, min, 1 );
+				return AttributeTypeFactory.newAttributeType(columnName, type, true, null, null, null, min, 1 );
 			}
 		} catch (SQLException e) {
 			throw new IOException("SQL exception occurred: " + e.getMessage());
