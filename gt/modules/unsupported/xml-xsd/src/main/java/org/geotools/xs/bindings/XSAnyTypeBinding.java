@@ -121,8 +121,8 @@ public class XSAnyTypeBinding extends AbstractComplexBinding {
             string = (String) value;
         }
 
-        if (string != null) {
-            map.put(null, string);
+        if (string != null && !"".equals( string.trim() ) ) {
+            map.put(null, string.trim() );
         }
 
         return map;
