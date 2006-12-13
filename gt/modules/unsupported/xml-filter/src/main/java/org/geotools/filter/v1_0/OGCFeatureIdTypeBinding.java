@@ -99,4 +99,18 @@ public class OGCFeatureIdTypeBinding extends AbstractComplexBinding {
 
         return factory.featureId(fid.toString());
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if ("fid".equals(name.getLocalPart())) {
+            FeatureId featureId = (FeatureId) object;
+
+            //&lt;xsd:attribute name="fid" type="xsd:anyURI" use="required"/&gt;
+            if (featureId != null) {
+                return new URI(featureId.getID());
+            }
+        }
+
+        return null;
+    }
 }
