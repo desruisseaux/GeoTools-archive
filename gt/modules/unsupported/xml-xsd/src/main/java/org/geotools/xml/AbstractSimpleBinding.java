@@ -43,7 +43,7 @@ public abstract class AbstractSimpleBinding implements SimpleBinding {
      * @return A String representing the object.
      */
     public String encode(Object object, String value) throws Exception {
-    	//does nothing, subclasses should override
-    	return null;
+    	//just return the value passed in, subclasses should override to provide new value
+    	return value;
     }
 }
