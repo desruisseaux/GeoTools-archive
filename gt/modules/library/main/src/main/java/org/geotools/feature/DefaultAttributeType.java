@@ -16,6 +16,8 @@
 package org.geotools.feature;
 
 import java.lang.reflect.Array;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -154,9 +156,12 @@ public class DefaultAttributeType implements AttributeType {
      * @return A duplicated Object if the type is mutable or the same Object
      *         if it is immutable or null if the passed Object is null.
      * @throws IllegalAttributeException if the Object cannot be duplicated.
+     * 
      */
     public Object duplicate(Object src) throws IllegalAttributeException {
-        if (src == null) {
+       //JD: this method really needs to be replaced with somethign better
+    	
+    	if (src == null) {
             return null;
         }
 
@@ -174,6 +179,10 @@ public class DefaultAttributeType implements AttributeType {
         
         if (src instanceof Date) {
             return new Date( ((Date)src).getTime() );
+        }
+        
+        if (src instanceof URL || src instanceof URI ) {
+        	return src; //immutable
         }
 
         if (src instanceof Object[]) {
