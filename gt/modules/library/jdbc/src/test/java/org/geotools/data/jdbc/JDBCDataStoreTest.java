@@ -95,19 +95,19 @@ public class JDBCDataStoreTest extends TestCase {
         
         assertEquals("Name", attrs[0].getName());
         assertEquals(String.class, attrs[0].getType());
-        assertFalse(attrs[0].isNillable());
+        
         assertEquals(1,attrs[0].getMinOccurs());
         assertEquals(1,attrs[0].getMaxOccurs());
         
         assertEquals("B", attrs[1].getName());
         assertEquals(Boolean.class, attrs[1].getType());
-        assertTrue(attrs[1].isNillable());
+        
         assertEquals(0,attrs[1].getMinOccurs());
         assertEquals(1,attrs[1].getMaxOccurs());
               
         assertEquals("DEC", attrs[2].getName());
         assertEquals(Double.class, attrs[2].getType());
-        assertTrue(attrs[2].isNillable());
+       
         assertEquals(0,attrs[2].getMinOccurs());
         assertEquals(1,attrs[2].getMaxOccurs());
     }
