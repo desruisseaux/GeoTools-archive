@@ -98,7 +98,7 @@ public abstract class DiffFeatureWriter implements FeatureWriter {
 
                 return current;
             } catch (IllegalAttributeException e) {
-                throw new IOException("Could not modify content");
+                throw (IOException) new IOException("Could not modify content").initCause( e );
             }
         } else {
             // Create new content
