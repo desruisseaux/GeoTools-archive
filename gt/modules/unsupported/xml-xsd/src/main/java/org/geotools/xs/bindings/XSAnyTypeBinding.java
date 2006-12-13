@@ -115,6 +115,7 @@ public class XSAnyTypeBinding extends AbstractComplexBinding {
         mapBinding(map, attributes);
         mapBinding(map, children);
 
+        //TODO: use the whitespace facet
         String string = null;
 
         if ((value != null) && value instanceof String) {
