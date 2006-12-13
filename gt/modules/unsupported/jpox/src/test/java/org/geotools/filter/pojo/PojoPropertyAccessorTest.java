@@ -10,13 +10,14 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.opengis.filter.FilterFactory;
 
 public class PojoPropertyAccessorTest extends TestCase {
-    PojoPropertyAccessor access;
+	protected PojoPropertyAccessorFactory factory;
 
     private FilterFactory ff;
 
+    protected PojoPropertyAccessor access;
+
     protected void setUp() throws Exception {
-        access = null; //new PojoPropertyAccessor();
-        System.out.println(access);
+    	factory = new PojoPropertyAccessorFactory();
         ff = CommonFactoryFinder.getFilterFactory(null);
         super.setUp();
     }

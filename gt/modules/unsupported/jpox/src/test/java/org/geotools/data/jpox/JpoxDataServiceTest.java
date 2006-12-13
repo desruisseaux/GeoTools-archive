@@ -29,12 +29,12 @@ public class JpoxDataServiceTest extends TestCase {
 	}
 
 	public void testData() {
-		List types = data.getTypeNames();
+		List types = data.getNames();
 		assertNotNull( types );
 		assertFalse( types.isEmpty() );
 		assertTrue( types.get( 0 ) instanceof TypeName );
 
-		TypeName typeName = (TypeName)data.getTypeNames().get( 0 );
+		TypeName typeName = (TypeName)data.getNames().get( 0 );
 		Object descrption = data.describe( typeName );
 		assertNotNull( descrption );
 		assertTrue( descrption instanceof Class );
@@ -42,7 +42,7 @@ public class JpoxDataServiceTest extends TestCase {
 
 	public void testSource() throws Exception {
 //		List types = data.getTypeNames();
-		TypeName typeName = (TypeName)data.getTypeNames().get( 0 );
+		TypeName typeName = (TypeName)data.getNames().get( 0 );
 		Object descrption = data.describe( typeName );
 
 		// Test "default access" using Transaction.AUTO_COMMIT
@@ -70,8 +70,8 @@ public class JpoxDataServiceTest extends TestCase {
 	}
 
 	public void testSource2() throws Exception {
-		TypeName typeName1 = (TypeName)data.getTypeNames().get( 0 );
-//		TypeName typeName2 = (TypeName)data.getTypeNames().get( 1 );
+		TypeName typeName1 = (TypeName)data.getNames().get( 0 );
+//		TypeName typeName2 = (TypeName)data.getNames().get( 1 );
 
 		Transaction t = new DefaultTransaction( "Source Testing" );
 

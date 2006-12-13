@@ -90,7 +90,7 @@ public class JpoxDataService implements DataAccess/*<Class>*/ {
 		} catch ( URISyntaxException e ) {
 			// TODO: log and move on?
 		}
-		return new DefaultServiceInfo( "JPOX Data Access", "JPOX Data Access for types: " + getTypeNames(), null, uri, null, null, new String[] {}, null );
+		return new DefaultServiceInfo( "JPOX Data Access", "JPOX Data Access for types: " + getNames(), null, uri, null, null, new String[] {}, null );
 	}
 	
 	public Source access( TypeName typeName ) {
@@ -104,7 +104,7 @@ public class JpoxDataService implements DataAccess/*<Class>*/ {
 		return getTypesMap().get( typeName );
 	}
 
-	public List getTypeNames() {
+	public List getNames() {
 		if ( typesList == null ) {
 			typesList = Collections.unmodifiableList( new ArrayList( getTypesMap().keySet() ) );			
 		}
