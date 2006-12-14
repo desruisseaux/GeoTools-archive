@@ -159,7 +159,7 @@
         <screenshot>
           <mediaobject>
           <imageobject>
-            <imagedata fileref="figures/JTS_Architecture.png" 
+            <imagedata fileref="figures/jts_instance_geom-archi.png" 
                        format="PNG" />
           </imageobject>
           <textobject>
@@ -714,7 +714,7 @@ System.out.println("Do the geometries overalp?   "+ lnG.overlaps(pgG));
           <screenshot>
             <mediaobject>
             <imageobject>
-              <imagedata fileref="figures/JTS_Coordinate.png" 
+              <imagedata fileref="figures/jts_Coordinate.png" 
                          format="PNG" />
             </imageobject>
             <textobject>
@@ -766,7 +766,7 @@ System.out.println("Do the geometries overalp?   "+ lnG.overlaps(pgG));
           <screenshot>
             <mediaobject>
             <imageobject>
-              <imagedata fileref="figures/JTS_Envelope.png" 
+              <imagedata fileref="figures/jts_Envelope.png" 
                          format="PNG" />
             </imageobject>
             <textobject>
@@ -807,7 +807,7 @@ System.out.println("Do the geometries overalp?   "+ lnG.overlaps(pgG));
           <screenshot>
             <mediaobject>
             <imageobject>
-              <imagedata fileref="figures/JTS_Geometry.png" 
+              <imagedata fileref="figures/jts_Geometry.png" 
                          format="PNG" />
             </imageobject>
             <textobject>
