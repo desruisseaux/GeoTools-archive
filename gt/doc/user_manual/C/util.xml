@@ -9,15 +9,18 @@
   </para>
   
   <para>
-    These two packages define interfaces and classes to define core elements of 
-    the base schema defined in the ISO standard specifications. While most of 
-    the basic ISO schema can be implemented using standard Java language 
-    elements, either the primitive data types or the classes in the Java 
-    class libraries, the ISO schema defines some base elements which require 
-    a Geotools implementation. These elements are self-contained structures 
-    which are reused in several different parts of the Geotools library to hold 
-    name elements, elements which may be translated into multiple languages, and 
-    other multi-unit elements. 
+    The Geotools <code>util</code> package has two roles: first, to implement 
+    base elements of the ISO schema and, second, to assemble various utilitarian 
+    classes. The standard ISO geospatial specification defines all of its 
+    complex computational structures from a set of base elements. Most of these 
+    basic elements can be implemented using standard Java language elements, 
+    either the primitive data types or the classes in the Java class libraries. 
+    However, several of the more complex base elements must be implemented by 
+    each geospatial library. These are defined in the GeoAPI interfaces of the 
+    <code>org.opengis.util</code> package and implemented in the GeoAPI classes 
+    of the <code>org.geotools.util</code> package. The Geotools package also 
+    contains a number of utilitarian classes such as derived Collection types 
+    and formatting utilities.
   </para>
   
   <!-- Critical Warnings -->
@@ -32,17 +35,29 @@
       module. Along with the GeoAPI <code>util</code> package, it defines 
       computational structures which complement both the Java language 
       primitives and the Java class library to provide a complete implementation 
-      of the base ISO computational schema.
+      of the base elements in the ISO computational schema. The Geotools package 
+      also contains a number of utilitarian classes which are used throughout 
+      the library.
     </para>
+    
+    <note>
+      <para>
+      This chapter can readily be skipped and consulted only when an interface 
+      or class from this package is required. These elements will be of most use 
+      to those delving into the internals of the geographic information system 
+      model; general users of the library will not require using the 
+      <code>util</code> packages.
+      </para>
+    </note>
     
     <para>
       Geotools implements a geographic information 
       system based on the standards defined by the International Organization 
       for Standardization (ISO) in their 191xx series of standards. The 
-      fundamental computational structures used by the whole series are defined 
+      base computational structures used by the whole series are defined 
       in the ISO 19103 Standard "Conceptual 
       Schema Language" (see <xref linkend="table-iso-standards"/>). Many of 
-      these fundamental elements can be implemented by Geotools using primitives 
+      these base elements can be implemented by Geotools using primitives 
       and objects defined in the Java Language itself. However, some more 
       advanced structures require their own definition and implementation; those 
       elements are discussed here.
@@ -50,12 +65,12 @@
     
     <para>
       The GeoAPI <code>org.opengis.util</code> package defines several of these 
-      required elements through interfaces and a few classes including:
+      base elements through interfaces and classes, including:
       <itemizedlist>
         <listitem>
           <para>
-            The <code>Cloneable</code> interface can be used to facilitate 
-            object copying,    
+            The <code>Cloneable</code> interface which marks objects which can 
+            be duplicated into new independent structures,    
           </para>
         </listitem>
         <listitem>
@@ -69,10 +84,7 @@
             the <code>GenericName</code>, <code>ScopedName</code>, 
             <code>LocalName</code>, and <code>NameFactory</code> interfaces 
             are useful to define a name which contains hierarchical elements 
-            similar to the package naming scheme hierarchy such as the 
-            <code>org.geotools.util</code> package name where the name is 
-            divided into several elements separated by a standard separator 
-            character, 
+            separated by a standard separator character, 
           </para>
         </listitem>
         <listitem>
@@ -88,11 +100,10 @@
     <para>
       The Geotools <code>org.geotools.util</code> package serves two separate 
       purposes. On the one hand, the package implements many of the interfaces 
-      of the GeoAPI package. These classes provide Geotools with the core 
-      building blocks through which to define all of the elements in the ISO 
-      geospatial schema. On the other hand, this Geotools package defines 
-      interfaces and classes which provide useful functions to 
-      the library. These utility classes include:
+      of the GeoAPI package to obtain all of the base elements of the ISO 
+      geospatial schema. On the other hand, this Geotools package defines a 
+      number of utilitarian interfaces and classes which are used elsewhere in 
+      the Geotools library. These utilitarian classes include:
       <itemizedlist>
         <listitem>
           <para>
@@ -129,14 +140,15 @@
     <note>
       <title>Geotools is not perfectly aligned with GeoAPI</title>
       <para>
-        In general Geotools provides a straight forward implementation of the 
+        In general Geotools directly implements the 
         GeoAPI interfaces. For example, <code>org.geotools.util.LocalName</code> 
         is a direct implementation of <code>org.opengis.util.LocalName</code>. 
         However, the libraries evolve according to separate criteria so the 
         relationship between the two projects is not always direct. For example,
         <code>org.geotools.util.NameFactory</code> does not implement the 
         convenience methods of <code>org.opengis.util.NameFactory</code> and is 
-        therefore a completely separate class.
+        therefore a completely separate class. However, future work will correct 
+        these disparities.
       </para>
     </note>
     
@@ -148,13 +160,6 @@
       these primitive elements. 
     </para>
     
-    <para>
-      This chapter can readily be skipped and consulted only when an interface 
-      or class from this package is required. These elements will be of most use 
-      to those delving into the internals of the geographic information system 
-      model; general users of the library will not require using the 
-      <code>util</code> packages.
-    </para>
     
     
     
@@ -178,13 +183,13 @@
       <title>Warnings</title>
       
       <warning>
-        <title>The ISO schema is not complete</title>
+        <title>The Geotools schema may be revised</title>
         <para>
           Geotools follows closely the schema defined in the ISO 191xx series of 
           standards. This schema however has never been implemented and a number 
           of questions remain about its completeness and coherency and 
           about the meaning of particular portions of the standard. The Geotools 
-          schema may therefore be incomplete or may need to change in the future.
+          schema may need to change in the future.
         </para>
       </warning>
       
@@ -209,8 +214,10 @@
         therefore be readily understandable.
       </para>
       
+      
       <sect3>
         <title>InternationalString</title>
+        
         <para>
           <code>InternationalString</code> elements define a computational 
           structures which hold a string of characters along with any number of 
@@ -218,9 +225,12 @@
           can be thought of as a map between a locale key and a string value. 
           The <code>ResourceInternationalString</code> class uses the Java 
           <code>ResourceBundle</code> system to separate out all the different 
-          strings stored for translation into language specific files.
+          strings stored for translation into language specific files. Those 
+          files must therefore be available to the runtime system.
         </para>
+        
       </sect3>
+      
       
       <sect3>
         <title>GenericName</title>
@@ -247,8 +257,8 @@
                 </textobject>
                 <caption>
                   <para>
-                    The <code>GenericName</code> instance 
-                    <code>org.geotools.util</code> is composed of three local 
+                    A <code>GenericName</code> instance of
+                    <code>org.geotools.util</code> composed of three local 
                     names.
                   </para>
                 </caption>
@@ -404,35 +414,36 @@
     
     <para>
       Part of the code example requires that the following resource files be 
-      available at runtime. The <file>Ecosystem.properties</file> file contains:
+      available at runtime. The <filename>Ecosystem.properties</filename> file 
+      contains:
 <programlisting width="50" >
 forest       = big area with mixed age trees;
 woods        = younger trees;
 lake         = body of water;
 prarie       = open grasslands;
 </programlisting>
-       the <file>Ecosystem_en.properties</file> file contains
+       the <filename>Ecosystem_en.properties</filename> file contains
 <programlisting width="50" >
 forest       = forest;
 woods        = woods;
 lake         = lake;
 prarie       = prarie;
 </programlisting>
-       the <file>Ecosystem_en_US.properties</file> file contains
+       the <filename>Ecosystem_en_US.properties</filename> file contains
 <programlisting width="50" >
 forest       = lots o' logs;
 woods        = hunting grounds;
 lake         = drink;
 prarie       = grassland;
 </programlisting>
-       the <file>Ecosystem_fr.properties</file> file contains
+       the <filename>Ecosystem_fr.properties</filename> file contains
 <programlisting width="50" >
 forest       = forêt;
 woods        = bois;
 lake         = lac;
 prarie       = prarie;
 </programlisting>
-       and the <file>Ecosystem_es.properties</file> file contains
+       and the <filename>Ecosystem_es.properties</filename> file contains
 <programlisting width="50" >
 forest       = bosque;
 woods        = bosque;
