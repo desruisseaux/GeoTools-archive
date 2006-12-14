@@ -57,8 +57,10 @@ import org.geotools.filter.Filter;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
+import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.function.FilterFunction_geometryType;
+import org.geotools.filter.function.math.FilterFunction_ceil;
 import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -453,6 +455,80 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         // if the above statement didn't throw an exception, we're content
         assertNotNull(reader);
     }
+    
+    public void testGetFeatureReaderFilterPrePost2() throws IOException, IllegalFilterException {
+        // GEOT-1069, make sure the post filter is run even if the geom property is not requested
+        Transaction t = new DefaultTransaction();
+        FeatureType type = data.getSchema("road");
+        FeatureReader reader;
+
+                FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+                FilterFunction_geometryType geomTypeExpr = new FilterFunction_geometryType();
+                geomTypeExpr.setArgs(new Expression[] { factory
+                                .createAttributeExpression("geom") });
+        
+                CompareFilter filter = factory
+                                .createCompareFilter(FilterType.COMPARE_EQUALS);
+                filter.addLeftValue(geomTypeExpr);
+                filter.addRightValue(factory.createLiteralExpression("Polygon"));
+
+        reader = data.getFeatureReader(type, filter, t);
+        //if the above statement didn't throw an exception, we're content
+        assertNotNull(reader);
+    }
+    
+    public void testGetFeatureReaderRetypeBug() throws Exception {
+        // this is here to avoid http://jira.codehaus.org/browse/GEOT-1069
+        // to come up again
+        
+        Transaction t = new DefaultTransaction();
+        FeatureType type = data.getSchema("river");
+        FeatureReader reader;
+        
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+        CompareFilter cf = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+        cf.addLeftValue(ff.createAttributeExpression("flow"));
+        cf.addRightValue(ff.createLiteralExpression(4.5));
+        
+        DefaultQuery q = new DefaultQuery("river");
+        q.setPropertyNames(new String[] {"geom"});
+        q.setFilter(cf);
+        
+        // with GEOT-1069 an exception is thrown here
+        reader = data.getFeatureReader(q, t);
+        assertTrue(reader.hasNext());
+        assertEquals(1, reader.getFeatureType().getAttributeCount());
+        reader.next();
+        assertFalse(reader.hasNext());
+    }
+    
+    public void testGetFeatureReaderRetypeBug2() throws Exception {
+        // this is here to avoid http://jira.codehaus.org/browse/GEOT-1069
+        // to come up again
+        
+        Transaction t = new DefaultTransaction();
+        FeatureType type = data.getSchema("river");
+        FeatureReader reader;
+        
+        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+        CompareFilter cf = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+        FunctionExpression ceil = new FilterFunction_ceil();
+        ceil.setArgs(new Expression[] {ff.createAttributeExpression("flow")});
+        cf.addLeftValue(ceil);
+        cf.addRightValue(ff.createLiteralExpression(5));
+        
+        DefaultQuery q = new DefaultQuery("river");
+        q.setPropertyNames(new String[] {"geom"});
+        q.setFilter(cf);
+        
+        // with GEOT-1069 an exception is thrown here
+        reader = data.getFeatureReader(q, t);
+        assertTrue(reader.hasNext());
+        assertEquals(1, reader.getFeatureType().getAttributeCount());
+        reader.next();
+        assertFalse(reader.hasNext());
+    }
+    
 
     public void testGetFeatureReaderMutability() throws IOException, IllegalAttributeException {
         FeatureReader reader = reader("road");

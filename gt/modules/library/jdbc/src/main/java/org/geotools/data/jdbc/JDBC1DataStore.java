@@ -577,9 +577,9 @@ public abstract class JDBC1DataStore implements DataStore {
 		} else if (requestedNames.length <= featureType.getAttributeCount()) {
 			// we will need to reType this :-)
 			//
-			// check to make sure we have enough for the filter
+			// check to make sure we have enough for the post filter
 			//
-			String[] filterNames = DataUtilities.attributeNames(preFilter, featureType);
+			String[] filterNames = DataUtilities.attributeNames(postFilter, featureType);
 
 			//JD: using a list here to maintain order
 			List list = new ArrayList();
@@ -599,7 +599,7 @@ public abstract class JDBC1DataStore implements DataStore {
 			try {
 				typeInfo = new FeatureTypeInfo(typeInfo.getFeatureTypeName(),
 						DataUtilities.createSubType(typeInfo.getSchema(),
-								requestedNames), typeInfo.getFIDMapper());
+								propertyNames), typeInfo.getFIDMapper());
 			} catch (SchemaException e1) {
 				throw new DataSourceException("Could not create subtype", e1);
 			}
