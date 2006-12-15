@@ -16,13 +16,12 @@
 package org.geotools.data;
 
 import java.util.Collection;
-
 import org.opengis.filter.Filter;
 
 
 /**
  * A read-write store for geospatial information.
- * 
+ *
  * <p>
  * First draft of a Store interface based on brain storming session with Jody, Thomas,
  * Stefan and Cory in Refractions on November 24th. It has since been reviewed by Jesse who
@@ -44,12 +43,12 @@ import org.opengis.filter.Filter;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public interface Store extends Source {
-    /** Read/Write access to GridCoverage */    
-    public Collection modifiableContent();
-    
-    /** Read/Write access to GridCoverage */    
-    public Collection modifiableContent( Filter filter );
-    
     /** Read/Write access to GridCoverage */
-    public Collection modifiableContent( String filter, String queryLanguage );
+    public Collection modifiableContent();
+
+    /** Read/Write access to GridCoverage */
+    public Collection modifiableContent(Filter filter);
+
+    /** Read/Write access to GridCoverage */
+    public Collection modifiableContent(String filter, String queryLanguage);
 }

@@ -17,7 +17,6 @@ package org.geotools.renderer.shape;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.FeatureResults;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.memory.MemoryDataStore;

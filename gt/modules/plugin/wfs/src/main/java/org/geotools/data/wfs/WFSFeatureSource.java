@@ -23,7 +23,6 @@ import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
-import org.geotools.data.FeatureResults;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureCollection;
@@ -137,7 +136,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @author dzwiers
      */
-    public static class WFSFeatureResults extends DefaultFeatureResults implements FeatureResults {
+    public static class WFSFeatureResults extends DefaultFeatureResults {
         private WFSFeatureSource fs;
         private Query query;
 
