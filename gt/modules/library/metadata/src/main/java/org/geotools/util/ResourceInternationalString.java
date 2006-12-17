@@ -35,6 +35,20 @@ import org.geotools.resources.Utilities;
  * {@linkplain java.util.Properties properties} file with the right suffix ("{@code _en}" for
  * English or "{@code _fr}" for French). This mechanism is explained in J2SE's javadoc for the
  * {@link ResourceBundle#getBundle(String,Locale,ClassLoader) getBundle} static method.
+ * <p>
+ * <b>Example:</b> If a file named "{@code MyResources.properties}" exists in the package
+ * "{@code org.geotools.mypackage}" and contains a line like "{@code MyKey = some value}",
+ * then an international string for "{@code some value}" can be created using the following
+ * code:
+ *
+ * <blockquote><code>
+ * InternationalString value = new ResourceInternationalString(
+ * "org.geotools.mypackage.MyResources", "MyKey");
+ * </code></blockquote>
+ *
+ * The "{@code some value}" string will be localized if the required properties files exist, for
+ * example "{@code MyResources_fr.properties}" for French, "{@code MyResources_it.properties}"
+ * for Italian, <cite>etc.</cite>
  *
  * @since 2.1
  * @source $URL$

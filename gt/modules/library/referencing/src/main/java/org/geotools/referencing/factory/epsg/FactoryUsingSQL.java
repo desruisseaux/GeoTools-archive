@@ -193,9 +193,10 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         }
     }
     /// Datum shift operation methods
-    /** First Bursa-Wolf method. */ private static final int BURSA_WOLF_MIN_CODE = 9603;
-    /**  Last Bursa-Wolf method. */ private static final int BURSA_WOLF_MAX_CODE = 9607;
-    /**   Rotation frame method. */ private static final int ROTATION_FRAME_CODE = 9607;
+    /** First Bursa-Wolf method.   */ private static final int BURSA_WOLF_MIN_CODE = 9603;
+    /**  Last Bursa-Wolf method.   */ private static final int BURSA_WOLF_MAX_CODE = 9607;
+    /**   Rotation frame method.   */ private static final int ROTATION_FRAME_CODE = 9607;
+    /** Dummy operation to ignore. */ private static final int DUMMY_OPERATION     =    1;
 
     /**
      * List of tables and columns to test for codes values.
@@ -1292,6 +1293,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                                  +          " ON CO.TARGET_CRS_CODE = CRS2.COORD_REF_SYS_CODE"
                                  +       " WHERE CO.COORD_OP_METHOD_CODE >= " + BURSA_WOLF_MIN_CODE
                                  +         " AND CO.COORD_OP_METHOD_CODE <= " + BURSA_WOLF_MAX_CODE
+                                 +         " AND CO.COORD_OP_CODE <> " + DUMMY_OPERATION // GEOT-1008
                                  +         " AND CRS1.DATUM_CODE = ?"
                                  +    " ORDER BY CRS2.DATUM_CODE,"
                                  +             " ABS(CO.DEPRECATED), CO.COORD_OP_ACCURACY,"
