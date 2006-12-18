@@ -1180,7 +1180,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
 
             StringBuffer sql = new StringBuffer("CREATE TABLE ");
 			sql.append(sqlb.encodeTableName(tableName));            
-            sql.append(" (\"");
+            sql.append(" (");
             sql.append(sqlb.encodeColumnName(fidColumn));
             sql.append(" serial PRIMARY KEY,");
             sql.append(makeSqlCreate(attributeType));
@@ -1312,7 +1312,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                         sql = new StringBuffer("ALTER TABLE ");
                         sql.append(sqlb.encodeTableName(tableName));
                         sql.append(" ADD CONSTRAINT enforce_srid_");
-                        sql.append(sqlb.encodeColumnName(columnName));
+                        sql.append( columnName );
                         sql.append(" CHECK (SRID(");
                         sql.append(sqlb.encodeColumnName(columnName));
                         sql.append(") = ");
@@ -1328,7 +1328,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     sql = new StringBuffer("ALTER TABLE ");
                     sql.append(sqlb.encodeTableName(tableName));
                     sql.append(" ADD CONSTRAINT enforce_dims_");
-                    sql.append(sqlb.encodeColumnName(columnName));
+                    sql.append(columnName);
                     sql.append(" CHECK (ndims(");
                     sql.append(sqlb.encodeColumnName(columnName));
                     sql.append(") = 2);");
@@ -1341,8 +1341,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                     if (!typeName.equals("GEOMETRY")) {
                         sql = new StringBuffer("ALTER TABLE ");
                         sql.append(sqlb.encodeTableName(tableName));
-                        sql.append("\" ADD CONSTRAINT enforce_geotype_");
-                        sql.append(sqlb.encodeColumnName(columnName));
+                        sql.append(" ADD CONSTRAINT enforce_geotype_");
+                        sql.append(columnName);
                         sql.append(" CHECK (geometrytype(");
                         sql.append(sqlb.encodeColumnName(columnName));
                         sql.append(") = '");
@@ -1370,9 +1370,9 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 sql.append(attributeType[i].getName().toLowerCase());
                 sql.append(" ON ");
                 sql.append(sqlb.encodeTableName(tableName));
-                sql.append(" USING GIST (\"");
+                sql.append(" USING GIST (");
                 sql.append(sqlb.encodeColumnName(attributeType[i].getName()));
-                sql.append("\");");
+                sql.append(");");
                 
                 sqlStr = sql.toString();
                 LOGGER.info(sqlStr);
