@@ -205,12 +205,11 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
             Statement s = conn.createStatement();
 
             //postgis = new PostgisDataSource(connection, FEATURE_TABLE);
-            s.execute("CREATE TABLE " + f.schema + ".lake ( id int )");
+            s.execute("CREATE TABLE " + f.schema + ".lake ( id int ) WITH OIDS");
             s.execute("SELECT AddGeometryColumn('" + f.schema
                 + "', 'lake', 'geom', 0, 'POLYGON', 2);");
             s.execute("ALTER TABLE " + f.schema + ".lake add name varchar;");
-            		
-
+            
             for (int i = 0; i < lakeFeatures.length; i++) {
                 Feature feature = lakeFeatures[i];
 
@@ -291,7 +290,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
                 + "', 'river', 'geom', 0, 'MULTILINESTRING', 2);");
             s.execute("ALTER TABLE " + f.schema + ".river add river varchar");
             s.execute("ALTER TABLE " + f.schema + ".river add flow float8");
-
+            
             for (int i = 0; i < riverFeatures.length; i++) {
                 Feature feature = riverFeatures[i];
                 String fid = feature.getID().substring("river.".length());

@@ -7,6 +7,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.postgis.fidmapper.PostgisFIDMapperFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 
@@ -53,8 +54,14 @@ public class PostgisFeatureReaderOnlineTest extends AbstractPostgisOnlineTestCas
      * @throws Exception
      */
     public void testReadFid() throws Exception {
-        assertEquals(table1+".2000000001",attemptRead(table1)); //int is signed :(
-        assertEquals(table3+".6000000001",attemptRead(table3));
+    	if ( ((PostgisFIDMapperFactory) ds.getFIDMapperFactory() ).isReturningTypedFIDMapper() ) {
+    		assertEquals(table1+".2000000001",attemptRead(table1)); //int is signed :(
+            assertEquals(table3+".6000000001",attemptRead(table3));	
+    	}
+    	else {
+    		assertEquals("2000000001",attemptRead(table1)); //int is signed :(
+            assertEquals("6000000001",attemptRead(table3));
+    	}
     }
 
     /**
