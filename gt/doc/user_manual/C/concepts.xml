@@ -192,7 +192,7 @@
   <entry>
     <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19107.pdf" 
            type="http">19107</ulink></entry>
-  <entry>Feature Geometry</entry>
+  <entry>Spatial Schemal for Feature Geometry</entry>
   <entry>org.opengis.spatialschema.geometry</entry>
   <entry>JTS (org.geotools.geometry)</entry>
   <entry>Abstract Topic 1</entry>
@@ -237,7 +237,7 @@
   <entry>
     <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19112.pdf" 
            type="http">19112</ulink></entry>
-  <entry>Spatial Referencing by Identifier</entry>
+  <entry>Spatial Referencing by Geographical Identifier</entry>
   <entry></entry>
   <entry></entry>
   <entry></entry>
@@ -298,6 +298,42 @@
 </row>
 <row>
   <entry>
+    <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19118.pdf" 
+           type="http">19118</ulink></entry>
+  <entry>Encoding</entry>
+  <entry></entry>
+  <entry></entry>
+  <entry></entry>
+</row>
+<row>
+  <entry>
+    <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19119.pdf" 
+           type="http">19119</ulink></entry>
+  <entry>Services</entry>
+  <entry></entry>
+  <entry></entry>
+  <entry></entry>
+</row>
+<row>
+  <entry>
+    <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19120.pdf" 
+           type="http">19120</ulink></entry>
+  <entry>Functional standards</entry>
+  <entry></entry>
+  <entry></entry>
+  <entry></entry>
+</row>
+<row>
+  <entry>
+    <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19121.pdf" 
+           type="http">19121</ulink></entry>
+  <entry>Imagery and gridded data</entry>
+  <entry></entry>
+  <entry></entry>
+  <entry></entry>
+</row>
+<row>
+  <entry>
     <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19122.pdf" 
            type="http">19122</ulink></entry>
   <entry>Qualifications and Certification of personnel</entry>
@@ -337,6 +373,15 @@
     <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19125-2.pdf" 
            type="http">19125-2</ulink></entry>
   <entry>Simple Feature Access Part2: SQL option</entry>
+  <entry></entry>
+  <entry></entry>
+  <entry></entry>
+</row>
+<row>
+  <entry>
+    <ulink url="http://www.isotc211.org/Outreach/Overview/Factsheet_19125-3.pdf" 
+           type="http">19125-3</ulink></entry>
+  <entry>Simple Feature Access Part3: COM/OLE option</entry>
   <entry></entry>
   <entry></entry>
   <entry></entry>
