@@ -172,6 +172,7 @@ public class SQLEncoderOracle extends SQLEncoder {
         capabilities.addType(FilterCapabilities.FID);
         capabilities.addType(FilterCapabilities.NONE);
         capabilities.addType(FilterCapabilities.ALL);
+        capabilities.addType(FilterCapabilities.LIKE);
         capabilities.addType(FilterCapabilities.SPATIAL_BBOX);
         capabilities.addType(FilterCapabilities.SPATIAL_CONTAINS);
         capabilities.addType(FilterCapabilities.SPATIAL_CROSSES);
