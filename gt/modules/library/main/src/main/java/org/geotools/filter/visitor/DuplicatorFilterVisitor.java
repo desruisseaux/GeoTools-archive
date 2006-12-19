@@ -47,8 +47,8 @@ import org.opengis.filter.IncludeFilter;
  * @source $URL$
  */
 public class DuplicatorFilterVisitor extends AbstractFilterVisitor implements FilterVisitor2 {
-    Stack pages = new Stack(); // need a Stack as Filter structure is recursive
-    FilterFactory ff;
+    protected Stack pages = new Stack(); // need a Stack as Filter structure is recursive
+    protected FilterFactory ff;
 	private boolean strict;
 
     public Stack getPages() {
