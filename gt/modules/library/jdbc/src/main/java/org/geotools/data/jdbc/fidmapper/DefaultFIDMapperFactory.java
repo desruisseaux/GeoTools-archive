@@ -57,7 +57,7 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
     /** The logger for the filter module. */
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.jdbc");
-    private boolean returningTypedFIDMapper = true;
+    protected boolean returningTypedFIDMapper = true;
 
     /** Set if table FID columns are to be returned as business attributes. */
     protected boolean returnFIDColumnsAsAttributes = false;
@@ -406,12 +406,12 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
      * @author Andrea Aime
      */
     protected class ColumnInfo implements Comparable {
-        String colName;
-        int dataType;
-        int size;
-        int decimalDigits;
-        boolean autoIncrement;
-        int keySeq;
+        public String colName;
+        public int dataType;
+        public int size;
+        public int decimalDigits;
+        public boolean autoIncrement;
+        public int keySeq;
 
         /**
          * @see java.lang.Comparable#compareTo(java.lang.Object)

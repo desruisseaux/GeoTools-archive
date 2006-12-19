@@ -1572,7 +1572,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 *
 	 * @throws IOException
 	 */
-	private String[] propertyNames(Query query) throws IOException {
+	protected String[] propertyNames(Query query) throws IOException {
 		String[] names = query.getPropertyNames();
 
 		if ((names == null) || query.retrieveAllProperties()) {

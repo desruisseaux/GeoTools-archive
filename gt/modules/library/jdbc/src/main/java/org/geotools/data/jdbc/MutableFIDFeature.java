@@ -30,7 +30,7 @@ import org.geotools.feature.IllegalAttributeException;
  */
 public class MutableFIDFeature extends DefaultFeature {
 
-  protected MutableFIDFeature(DefaultFeatureType ft, Object[] attributes, String fid)
+  public MutableFIDFeature(DefaultFeatureType ft, Object[] attributes, String fid)
     throws IllegalAttributeException {
     super(ft, attributes, fid);
 
