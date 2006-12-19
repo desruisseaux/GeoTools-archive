@@ -1,34 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- To view in browser, uncomment line below. -->
 
-
-<?xml-stylesheet type="text/xsl" href="/usr/share/xml/docbook/stylesheet/nwalsh/html/docbook.xsl"?>
-<!--
-<?xml-stylesheet type="text/xsl" href="/soft/SVN/geotools/trunk/gt/doc/C/titlepage.xsl"?>
--->
-
-<!-- Validate against one Document Type Definition. -->
-<!--
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
--->
-<!--
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
-"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
-
--->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
-"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+  "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 
-
-  <!ENTITY geot "Geotools">
-  <!ENTITY geotversion "2.4">
-  <!ENTITY jtsversion "1.7.1">
-  <!ENTITY manversion "0.1">
-  <!ENTITY date "November 2006">
-  <!ENTITY javaVersion "1.4">
+  <!ENTITY geot          "Geotools">
+  <!ENTITY geotversion   "2.4">
+  <!ENTITY jtsversion    "1.7.1">
+  <!ENTITY manversion    "0.1">
+  <!ENTITY date          "November 2006">
+  <!ENTITY javaVersion   "1.4">
   
-
   <!ENTITY legal                SYSTEM "legal.xml">
   <!ENTITY legalprovisional     SYSTEM "legalprovisional.xml">
 
@@ -59,7 +40,6 @@
   <!ENTITY about-authors        SYSTEM "about-authors.xml">
   <!ENTITY about-license        SYSTEM "about-license.xml">
   
-
 ]>
 
 
