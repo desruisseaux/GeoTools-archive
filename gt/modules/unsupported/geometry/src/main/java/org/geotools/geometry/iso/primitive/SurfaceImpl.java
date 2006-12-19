@@ -38,18 +38,24 @@
 package org.geotools.geometry.iso.primitive;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
 import org.geotools.geometry.iso.coordinate.SurfacePatchImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
+import org.geotools.geometry.iso.root.GeometryImpl;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.TransfiniteSet;
+import org.opengis.spatialschema.geometry.aggregate.MultiSurface;
 import org.opengis.spatialschema.geometry.complex.Complex;
 import org.opengis.spatialschema.geometry.complex.CompositeSurface;
+import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
 import org.opengis.spatialschema.geometry.primitive.Surface;
 import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
 import org.opengis.spatialschema.geometry.primitive.SurfacePatch;
@@ -125,7 +131,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	public SurfaceImpl(FeatGeomFactoryImpl factory,
 			List<? extends SurfacePatch> patch) {
 		super(factory, null, null, null);
-		this.initializeSurface(patch, null);
+		this.initializeSurface(patch);
 	}
 
 	/**
@@ -153,7 +159,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		// Set Envelope
 		this.envelope = boundary.getEnvelope();
 
-		// TODO Ist es wirklich notwendig, dass wir die SurfacePatches erzeugen?
+		// TODO Is it really necessary to create the surface patches?
 		// Create Surface Patch on basis of the Boundary
 		ArrayList<SurfacePatch> newPatchList = new ArrayList<SurfacePatch>();
 		newPatchList.add((SurfacePatch)this.getGeometryFactory().getCoordinateFactory()
@@ -171,8 +177,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 * @param surfaceBoundary
 	 *            SurfaceBoundary; will be calculated if this parameter is NULL
 	 */
-	private void initializeSurface(List<? extends SurfacePatch> patch,
-			SurfaceBoundaryImpl surfaceBoundary) {
+	private void initializeSurface(List<? extends SurfacePatch> patch) {
 
 		if (patch == null)
 			throw new IllegalArgumentException("Empty array SurfacePatch."); //$NON-NLS-1$
@@ -180,8 +185,9 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		if (patch.isEmpty())
 			throw new IllegalArgumentException("Empty array SurfacePatch."); //$NON-NLS-1$
 
-		// TODO The continuity of the SurfacePatches should be verified here!
-		
+		// Calculate the boundary for the SurfacePatches. The continuity of the SurfacePatches is checked within the creation of the surface boundary
+		this.boundary = this.createBoundary(patch);
+
 		/* Add patches to patch list */
 		ArrayList<SurfacePatch> newPatchList = new ArrayList<SurfacePatch>();
 		for (SurfacePatch p : patch) {
@@ -190,19 +196,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		}
 		this.patch = newPatchList;
 
-		// Calculate the boundary for the SurfacePatches (only if no parameter
-		// was given)
-		if (surfaceBoundary == null) {
-			// TODO JR. Das funktioniert noch nicht - Build the Boundary on
-			// basis of the SurfacePatches
-			// this.setBoundary(new
-			// SurfaceBoundaryImpl((SurfacePatchImpl)patch));
-		} else {
-			this.boundary = surfaceBoundary;
-		}
-
-		// Build the envelope for the Surface on basis of the SurfacePatch
-		// envelopes
+		// Build the envelope for the Surface based on the SurfacePatch envelopes
 		SurfacePatchImpl tFirstPatch = (SurfacePatchImpl) patch.get(0);
 		//this.envelope = new EnvelopeImpl(tFirstPatch.getEnvelope());
 		this.envelope = this.getGeometryFactory().getCoordinateFactory().createEnvelope(tFirstPatch.getEnvelope());
@@ -210,6 +204,38 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 			((EnvelopeImpl) this.envelope).expand(((SurfacePatchImpl) p)
 					.getEnvelope());
 
+	}
+	
+	/**
+	 * Creates a SurfaceBoundary by a list of neigboured patches
+	 * 
+	 * @param patches List of surface patches that represent the surface
+	 * @return the SurfaceBoundary of the surface represented by the set of surface patches
+	 * @throws IllegalArgument Exception if the union of the surface patches is not a surface. That means that the patches are not continuous.
+	 */
+	private SurfaceBoundaryImpl createBoundary(List<? extends SurfacePatch> patches) {
+		
+		if (patches.isEmpty())
+			return null;
+		
+		SurfacePatch firstPatch = patches.get(0);
+		if (patches.size() == 1)
+			return (SurfaceBoundaryImpl) firstPatch.getBoundary();
+
+		Surface firstPatchSurface = this.getGeometryFactory().getPrimitiveFactory().createSurface(firstPatch.getBoundary());
+		Set<OrientableSurface> surfaceList = new HashSet<OrientableSurface>();
+		
+		for (int i=1; i<patches.size(); i++) {
+			SurfacePatch nextPatch = patches.get(i); 
+			surfaceList.add(this.getGeometryFactory().getPrimitiveFactory().createSurface(nextPatch.getBoundary()));
+		}
+		
+		MultiSurface ms = this.getGeometryFactory().getAggregateFactory().createMultiSurface(surfaceList);
+		TransfiniteSet unionResultSurface = firstPatchSurface.union(ms);
+		if (! (unionResultSurface instanceof SurfaceImpl))
+			throw new IllegalArgumentException("Surface patches are not continuous");
+		
+		return (SurfaceBoundaryImpl) ((SurfaceImpl)unionResultSurface).getBoundary();
 	}
 
 	/*
@@ -242,13 +268,8 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 * @param surfaceBoundary -
 	 *            Surface Boundary of the Surface
 	 */
-	protected void setPatches(List<? extends SurfacePatch> surfacePatches,
-			SurfaceBoundaryImpl surfaceBoundary) {
-		// TODO semantic JR
-		// TODO implementation
-		// TODO test
-		// TODO documentation
-		this.initializeSurface(surfacePatches, surfaceBoundary);
+	protected void setPatches(List<? extends SurfacePatch> surfacePatches) {
+		this.initializeSurface(surfacePatches);
 	}
 
 	/*
@@ -328,18 +349,6 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 		// and the exterior ring and the interior rings don´t touch or intersect each other. 
 		IsSimpleOp simpleOp = new IsSimpleOp();
 		return simpleOp.isSimple(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isCycle()
-	 */
-	public boolean isCycle() {
-		// TODO semantic: A surface is a cycle if the exterior ring and the interior rings are closed? that is always the case.
-		// Is that correct?!
-		// Always return true, since open sets are not supported. The boundary of a Surface is always closed.
-		return true;
 	}
 
 	/*

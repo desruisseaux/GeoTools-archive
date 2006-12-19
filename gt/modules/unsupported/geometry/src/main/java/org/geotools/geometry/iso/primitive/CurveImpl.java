@@ -686,19 +686,6 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isCycle()
-	 */
-	public boolean isCycle() {
-		// Test ok
-		// If the Curve is simple and the end point is at the same position as
-		// the start point, then the curve is a cycle
-		return (this.isSimple() && this.getStartPoint().equals(
-				this.getEndPoint()));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.opengis.spatialschema.geometry.primitive.Curve#getSegments()
 	 */
 	public List<CurveSegment> getSegments() {

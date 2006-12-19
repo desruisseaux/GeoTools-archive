@@ -42,7 +42,7 @@ public class SurfaceTest extends TestCase {
 		PrimitiveFactoryImpl tPrimFactory = aGeomFactory.getPrimitiveFactory();
 
 		ArrayList<double[][]> tDoubleList = new ArrayList<double[][]>();
-		tDoubleList.add(new double[][]{{0,0},{100,100},{100,0}});
+		tDoubleList.add(new double[][]{{0,0},{100,100},{0, 100}});
 		tDoubleList.add(new double[][]{{0,100},{100,100},{50,200}});
 		tDoubleList.add(new double[][]{{50,200},{100,100},{150,200}});
 		ArrayList<Triangle> triangleList = tCoordFactory.createTriangles(tDoubleList);
@@ -120,6 +120,7 @@ public class SurfaceTest extends TestCase {
 		assertTrue(dp[0] == 20);
 		assertTrue(dp[1] == 10);
 
+
 		return surface2;
 
 	}
@@ -135,8 +136,8 @@ public class SurfaceTest extends TestCase {
 		System.out.print("\ngetEnvelope: " + surface.getEnvelope());
 		System.out.print("\ngetCoordinateDimension: " + surface.getCoordinateDimension());
 		System.out.print("\ngetDimension: " + surface.getDimension(null));
+		assertTrue(surface.isCycle() == false);
 		
-
 	}
 
 

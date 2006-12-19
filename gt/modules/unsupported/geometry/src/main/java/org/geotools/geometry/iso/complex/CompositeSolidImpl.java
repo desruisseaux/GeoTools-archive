@@ -125,11 +125,6 @@ public class CompositeSolidImpl extends CompositeImpl<SolidImpl> {
 		return false;
 	}
 
-	public boolean isCycle() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	public List getGenerators() {
 		// TODO Auto-generated method stub
 		return null;

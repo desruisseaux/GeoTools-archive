@@ -92,6 +92,8 @@ public class RingTest extends TestCase {
 		double[] dp = ring1.getRepresentativePoint().getCoordinates();
 		assertTrue(dp[0] == 50);
 		assertTrue(dp[1] == 20);
+
+		assertTrue(ring1.isCycle() == true);
 		
 		//PaintGMObject.paint(curve1);
 

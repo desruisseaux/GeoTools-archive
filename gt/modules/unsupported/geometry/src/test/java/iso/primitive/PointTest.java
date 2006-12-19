@@ -57,6 +57,7 @@ public class PointTest extends TestCase {
 		assertTrue(cp1 instanceof CompositePoint);
 		System.out.println("p1.closure() is " + cp1);
 		
+		assertTrue(p1.isCycle() == true);
 
 		
 		double[] coord2 = new double[]{5, 20};

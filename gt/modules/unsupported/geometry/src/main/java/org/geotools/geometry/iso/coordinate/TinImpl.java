@@ -200,7 +200,7 @@ public class TinImpl extends TriangulatedSurfaceImpl {
 		this.breakLines = breakLines;
 		this.stopLines = stopLines;
 		this.maxLength = maxLength;
-		super.setTriangles(triangles, null);
+		super.setTriangles(triangles);
 	}
 
 	/**

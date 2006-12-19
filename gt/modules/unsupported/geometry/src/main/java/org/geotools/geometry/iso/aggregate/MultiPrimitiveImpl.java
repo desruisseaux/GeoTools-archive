@@ -115,14 +115,6 @@ public class MultiPrimitiveImpl extends AggregateImpl implements MultiPrimitive 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isCycle()
-	 */
-	public boolean isCycle() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.opengis.spatialschema.geometry.root.Geometry#getMaximalComplex()
 	 */
 	public Set<Complex> getMaximalComplex() {

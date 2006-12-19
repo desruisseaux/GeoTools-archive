@@ -51,6 +51,8 @@ public class BoundaryTest extends TestCase {
 		DirectPosition dp = curveBoundary1.getRepresentativePoint();
 		assertTrue(dp.getOrdinate(0) == 0);
 		assertTrue(dp.getOrdinate(1) == 0);
+		
+		assertTrue(curveBoundary1.isCycle() == true);
 
 	}
 
@@ -110,7 +112,9 @@ public class BoundaryTest extends TestCase {
 		SurfaceBoundary surfaceBoundary1 = tPrimFactory.createSurfaceBoundary(exteriorring1, interiors);
 		
 		System.out.println(surfaceBoundary1);
-		
+
+		assertTrue(surfaceBoundary1.isCycle() == true);
+
 		
 		// clone()
 		SurfaceBoundary surfaceBoundary2 = null;

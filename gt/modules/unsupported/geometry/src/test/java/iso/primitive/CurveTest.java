@@ -62,6 +62,8 @@ public class CurveTest extends TestCase {
 		CurveImpl curve1 = tPrimFactory.createCurve(tLineList);
 		System.out.println("\nCurve1: " + curve1);
 		
+		assertTrue(curve1.isCycle() == false);
+		
 		// Set curve for further LineString tests
 		line1.setCurve(curve1);
 

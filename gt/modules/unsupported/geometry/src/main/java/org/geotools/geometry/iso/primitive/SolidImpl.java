@@ -175,11 +175,6 @@ public class SolidImpl extends PrimitiveImpl implements Solid {
 		return false;
 	}
 
-	public boolean isCycle() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	public double getArea() {
 		// TODO Auto-generated method stub
 		return 0;

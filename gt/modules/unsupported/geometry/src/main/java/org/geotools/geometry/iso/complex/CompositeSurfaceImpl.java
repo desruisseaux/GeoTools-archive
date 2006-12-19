@@ -170,14 +170,6 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	}
 
 	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isCycle()
-	 */
-	public boolean isCycle() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.opengis.spatialschema.geometry.primitive.OrientableSurface#getComposite()
 	 */
 	public CompositeSurface getComposite() {

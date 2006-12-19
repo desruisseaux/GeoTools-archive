@@ -66,7 +66,7 @@ public abstract class BoundaryImpl extends ComplexImpl implements Boundary {
 	 */
 	public boolean isCycle() {
 		// implementation ok
-		// Boundaries are always a cycle
+		// Boundaries are always a cycle, because their boundary is empty
 		return true;
 	}
 	

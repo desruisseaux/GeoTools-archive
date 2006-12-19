@@ -13,6 +13,8 @@ import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PointImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.primitive.SurfaceImpl;
+import org.opengis.spatialschema.geometry.Boundary;
+import org.opengis.spatialschema.geometry.complex.Complex;
 import org.opengis.spatialschema.geometry.complex.CompositeCurve;
 import org.opengis.spatialschema.geometry.complex.CompositePoint;
 import org.opengis.spatialschema.geometry.complex.CompositeSurface;
@@ -36,29 +38,42 @@ public class ClosureTest extends TestCase {
 		
 		// Point
 		CompositePoint cp = (CompositePoint) this.createPoint().getClosure();
-		System.out.println(cp);
+		//System.out.println(cp);
 		
 		// Curve
 		CompositeCurve cc = (CompositeCurve) this.createCurve().getClosure();
-		System.out.println(cc);
+		//System.out.println(cc);
 		
 		// Surface
 		CompositeSurface cs = (CompositeSurface) this.createSurface().getClosure();
-		System.out.println(cs);
+		//System.out.println(cs);
 
 		
 		// Complexes
 		CompositePoint ncp = (CompositePoint) cp.getClosure();
 		assertTrue(ncp == cp);
-		System.out.println(ncp);
+		//System.out.println(ncp);
 
 		CompositeCurve ncc = (CompositeCurve) cc.getClosure();
 		assertTrue(ncc == cc);
-		System.out.println(ncc);
+		//System.out.println(ncc);
 		
 		CompositeSurface ncs = (CompositeSurface) cs.getClosure();
 		assertTrue(ncs == cs);
-		System.out.println(ncs);
+		//System.out.println(ncs);
+		
+		// Boundaries
+		
+		Complex c = null;
+		Boundary b = null;
+
+		b = this.createCurve().getBoundary();
+		c = b.getClosure();
+		assertTrue(b == c);
+
+		b = this.createSurface().getBoundary();
+		c = b.getClosure();
+		assertTrue(b == c);
 
 	}
 	

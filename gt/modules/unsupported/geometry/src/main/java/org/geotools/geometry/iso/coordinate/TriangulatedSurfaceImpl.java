@@ -92,9 +92,8 @@ public class TriangulatedSurfaceImpl extends PolyhedralSurfaceImpl implements
 	 * @param triangles
 	 * @param surfaceBoundary
 	 */
-	public void setTriangles(ArrayList<TriangleImpl> triangles,
-			SurfaceBoundaryImpl surfaceBoundary) {
-		super.setPatches(triangles, surfaceBoundary);
+	public void setTriangles(ArrayList<TriangleImpl> triangles) {
+		super.setPatches(triangles);
 		// JR eingefügt und aus den TIN Konstruktoren entfernt
 		for (TriangleImpl triangle : triangles) {
 			triangle.setAssociatedSurface(this);

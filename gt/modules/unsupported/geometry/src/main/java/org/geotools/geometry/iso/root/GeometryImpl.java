@@ -868,11 +868,8 @@ public abstract class GeometryImpl implements Geometry {
 		
 		if (this instanceof ComplexImpl) {
 			// Return this Complex instance, because complexes already contain their boundary
+			// CompositePoint, CompositeCurve, CompositeSurface, Ring, CurveBoundary, SurfaceBoundary
 			return (Complex) this;
-		} else
-		if (this instanceof BoundaryImpl) {
-			// Return NULL, because a boundary doesn´t have a boundary and hence cannot be represened by a Complex
-			return null;
 		} else
 		if (this instanceof PointImpl) {
 			return cf.createCompositePoint((Point)this);
@@ -897,6 +894,15 @@ public abstract class GeometryImpl implements Geometry {
 		return null;
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.Geometry#isCycle()
+	 */
+	public boolean isCycle() {
+		// The object is a cycle, if the boundary is empty: isCycle() = boundary().isEmpty()
+		return (this.getBoundary() == null);
+	}
+	
 	
 	/**
 	 * Use this function to cast Geometry instances to a GeometryImpl instance.

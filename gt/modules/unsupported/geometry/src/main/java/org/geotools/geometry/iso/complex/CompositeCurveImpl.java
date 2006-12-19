@@ -241,8 +241,15 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getBoundary()
 	 */
 	public CurveBoundary getBoundary() {
-		// TODO
-		return null;// this.getSubComplexes();
+		// Return start and end point
+		DirectPosition start = ((Curve)this.getGenerators().get(0)).getStartPoint();
+		DirectPosition end = ((Curve)this.getGenerators().get(this.elements.size())).getEndPoint();
+		// Compare start point with end point
+		if (start.equals(end))
+			// the boundary is null if the composite curve is closed
+			return null;
+		else
+			return this.getGeometryFactory().getPrimitiveFactory().createCurveBoundary(start, end);
 	}
 
 	/**
@@ -352,15 +359,6 @@ public class CompositeCurveImpl extends CompositeImpl<OrientableCurveImpl>
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.opengis.spatialschema.geometry.root.Geometry#isCycle()
-	 */
-	public boolean isCycle() {
-		DirectPosition start = ((Curve)this.getGenerators().get(0)).getStartPoint();
-		DirectPosition end = ((Curve)this.getGenerators().get(this.elements.size())).getEndPoint();
-		// Compare start point with end point
-		return (start.equals(end));
-	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.spatialschema.geometry.primitive.OrientableCurve#getComposite()
