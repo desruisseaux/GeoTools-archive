@@ -424,9 +424,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public FeatureReader reader( String typeName ) throws IOException {
-        FeatureType type = data.getSchema(typeName);
-
-        return data.getFeatureReader(type, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        return data.getFeatureReader(new DefaultQuery(typeName, Filter.INCLUDE), Transaction.AUTO_COMMIT);
     }
 
     public FeatureWriter writer( String typeName ) throws IOException {
@@ -440,7 +438,6 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
     public void testGetFeatureReaderFilterPrePost() throws IOException, IllegalFilterException {
         Transaction t = new DefaultTransaction();
-        FeatureType type = data.getSchema("road");
         FeatureReader reader;
 
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
@@ -451,7 +448,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         filter.addLeftValue(geomTypeExpr);
         filter.addRightValue(factory.createLiteralExpression("Polygon"));
 
-        reader = data.getFeatureReader(type, filter, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", filter), t);
         // if the above statement didn't throw an exception, we're content
         assertNotNull(reader);
     }
@@ -459,7 +456,6 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     public void testGetFeatureReaderFilterPrePost2() throws IOException, IllegalFilterException {
         // GEOT-1069, make sure the post filter is run even if the geom property is not requested
         Transaction t = new DefaultTransaction();
-        FeatureType type = data.getSchema("road");
         FeatureReader reader;
 
                 FilterFactory factory = FilterFactoryFinder.createFilterFactory();
@@ -472,7 +468,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
                 filter.addLeftValue(geomTypeExpr);
                 filter.addRightValue(factory.createLiteralExpression("Polygon"));
 
-        reader = data.getFeatureReader(type, filter, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", filter), t);
         //if the above statement didn't throw an exception, we're content
         assertNotNull(reader);
     }
@@ -623,18 +619,18 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureType type = data.getSchema("road");
         FeatureReader reader;
 
-        reader = data.getFeatureReader(type, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
         assertFalse(reader instanceof FilteringFeatureReader);
         assertEquals(type, reader.getFeatureType());
         assertEquals(roadFeatures.length, count(reader));
 
-        reader = data.getFeatureReader(type, Filter.EXCLUDE, Transaction.AUTO_COMMIT);
-        assertTrue(reader instanceof EmptyFeatureReader);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), Transaction.AUTO_COMMIT);
+        assertFalse(reader.hasNext());
 
         assertEquals(type, reader.getFeatureType());
         assertEquals(0, count(reader));
 
-        reader = data.getFeatureReader(type, rd1Filter, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), Transaction.AUTO_COMMIT);
 
         // assertTrue(reader instanceof FilteringFeatureReader);
         assertEquals(type, reader.getFeatureType());
@@ -647,16 +643,16 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureType type = data.getSchema("road");
         FeatureReader reader;
 
-        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
-        assertTrue(reader instanceof EmptyFeatureReader);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
+        assertFalse(reader.hasNext());
         assertEquals(type, reader.getFeatureType());
         assertEquals(0, count(reader));
 
-        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t);
         assertEquals(type, reader.getFeatureType());
         assertEquals(roadFeatures.length, count(reader));
 
-        reader = data.getFeatureReader(type, rd1Filter, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t);
         assertEquals(type, reader.getFeatureType());
         assertEquals(1, count(reader));
 
@@ -671,23 +667,23 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
             }
         }
 
-        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
         assertEquals(0, count(reader));
 
-        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t);
         assertEquals(roadFeatures.length - 1, count(reader));
 
-        reader = data.getFeatureReader(type, rd1Filter, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t);
         assertEquals(0, count(reader));
 
         t.rollback();
-        reader = data.getFeatureReader(type, Filter.EXCLUDE, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
         assertEquals(0, count(reader));
 
-        reader = data.getFeatureReader(type, Filter.INCLUDE, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t);
         assertEquals(roadFeatures.length, count(reader));
 
-        reader = data.getFeatureReader(type, rd1Filter, t);
+        reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t);
         assertEquals(1, count(reader));
     }
 
@@ -1137,7 +1133,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FINAL[i] = newRoad; // will need to update with Fid from database
 
         // start off with ORIGINAL
-        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
         assertTrue("Sanity check failed: before modification reader didn't match original content",
                 covers(reader, ORIGINAL));
 
@@ -1151,10 +1147,10 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
 
         // still have ORIGINAL and t1 has REMOVE
-        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
         assertTrue("Feature deletion managed to leak out of transaction?", covers(reader, ORIGINAL));
 
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t1);
         assertTrue(covers(reader, REMOVE));
 
         // close writer1
@@ -1163,10 +1159,10 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         writer1.close();
 
         // We still have ORIGIONAL and t1 has REMOVE
-        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
         assertTrue(covers(reader, ORIGINAL));
 
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t1);
         assertTrue(covers(reader, REMOVE));
 
         // writer 2 adds road.rd4 on t2
@@ -1178,25 +1174,25 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         // HACK: ?!? update ADD and FINAL with new FID from database
         //
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         newRoad = findFeature(reader, "id", new Integer(4));
         System.out.println("newRoad:" + newRoad);
         ADD[ADD.length - 1] = newRoad;
         FINAL[FINAL.length - 1] = newRoad;
 
         // We still have ORIGINAL and t2 has ADD
-        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
         assertTrue(covers(reader, ORIGINAL));
 
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         assertMatched(ADD, reader); // broken due to FID problem
 
         writer2.close();
 
         // Still have ORIGIONAL and t2 has ADD
-        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
         assertTrue(covers(reader, ORIGINAL));
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         assertTrue(coversLax(reader, ADD));
 
         // commit t1
@@ -1207,11 +1203,11 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         // We now have REMOVE, as does t1 (which has not additional diffs)
         // t2 will have FINAL
-        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
         assertTrue(covers(reader, REMOVE));
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t1);
         assertTrue(covers(reader, REMOVE));
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         assertTrue(coversLax(reader, FINAL));
 
         // commit t2
@@ -1220,14 +1216,14 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         t2.commit();
 
         // We now have Number( remove one and add one)
-        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
-        reader = data.getFeatureReader(road, Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
         assertTrue(coversLax(reader, FINAL));
 
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t1);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t1);
         assertTrue(coversLax(reader, FINAL));
 
-        reader = data.getFeatureReader(road, Filter.INCLUDE, t2);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         assertTrue(coversLax(reader, FINAL));
     }
 
@@ -1618,11 +1614,12 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
     public void testOidFidMapper() throws IOException, IllegalAttributeException {
         // get the schema and make sure the FID mapper is an OID one
-        FIDMapper base = data.getFIDMapper("lake");
+        PostgisDataStore pg = (PostgisDataStore) data;
+        FIDMapper base = pg.getFIDMapper("lake");
         assertTrue(base instanceof OIDFidMapper);
 
         // read features from the database, just check we don't crash and that id's are not null
-        FeatureReader reader = data.getFeatureReader(data.getSchema("lake"), Filter.INCLUDE,
+        FeatureReader reader = pg.getFeatureReader(data.getSchema("lake"), Filter.INCLUDE,
                 Transaction.AUTO_COMMIT);
 
         while( reader.hasNext() ) {

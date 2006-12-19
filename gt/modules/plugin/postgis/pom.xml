@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- =======================================================================    
-        Maven Project Configuration File                                        
-                                                                                
-        The Geotools Project                                                    
-            http://www.geotools.org/                                            
-                                                                                
-        Version: $Id$              
-     ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+  Maven Project Configuration File                                        
+  
+  The Geotools Project                                                    
+  http://www.geotools.org/                                            
+  
+  Version: $Id$              
+  ======================================================================= -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                                http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +18,7 @@
     <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -28,19 +28,21 @@
   <packaging>jar</packaging>
   <name>PostGIS module</name>
   <url>http://maven.geotools.fr/reports/modules/plugin/postgis/</url>
-  
+
   <scm>
     <connection>
       scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/postgis/
     </connection>
-    <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/postgis/</url>
+    <url>
+      http://svn.geotools.org/geotools/trunk/gt/modules/plugin/postgis/
+    </url>
   </scm>
-  
+
   <description>
-    Used to extract and edit features from a PostGIS database.  PostGIS was
-    developed by Refractions Research. It is an extension to the excellent
-    Postgresql database, adding support for Geographic objects.  It is open
-    source and freely available.
+    Used to extract and edit features from a PostGIS database. PostGIS
+    was developed by Refractions Research. It is an extension to the
+    excellent Postgresql database, adding support for Geographic
+    objects. It is open source and freely available.
   </description>
 
   <licenses>
@@ -124,19 +126,32 @@
   </dependencies>
 
   <build>
-		<plugins>
-			<plugin>
+    <plugins>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <excludes>
             <exclude>**/PostgisFeatureStoreOnlineTest.java</exclude>
-						<exclude>${online.skip.pattern}</exclude>
+            <exclude>${online.skip.pattern}</exclude>
             <exclude>${stress.skip.pattern}</exclude>
           </excludes>
-				</configuration>
-			</plugin>
-		</plugins>
+        </configuration>
+      </plugin>
+
+      <!-- build test jar so that tests can be shared with postgis versioned datastore -->
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
 </project>

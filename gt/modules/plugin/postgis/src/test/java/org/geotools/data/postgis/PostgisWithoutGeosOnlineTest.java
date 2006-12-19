@@ -82,7 +82,7 @@ public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
 			filter.addRightGeometry(ff.createBBoxExpression(box));
 			
 			FeatureReader reader = 
-				data.getFeatureReader(type,filter,Transaction.AUTO_COMMIT);
+                            ((PostgisDataStore) data).getFeatureReader(type,filter,Transaction.AUTO_COMMIT);
 			boolean found = false;
 			for (; reader.hasNext();) {
 				Feature f = reader.next();
@@ -95,12 +95,12 @@ public class PostgisWithoutGeosOnlineTest extends AbstractPostgisDataTestCase {
 	}
 	
 	public void testBboxQueryWithLooseBBOX() throws Exception {
-		data.setLooseBbox(true);
+		((PostgisDataStore) data).setLooseBbox(true);
 		_testBboxQuery();
 	}
 	
 	public void testBboxQueryWithoutLooseBBOX() throws Exception {
-		data.setLooseBbox(false);
+            ((PostgisDataStore) data).setLooseBbox(false);
 		_testBboxQuery();
 	}
 }

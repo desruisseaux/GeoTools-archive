@@ -15,6 +15,7 @@
  */
 package org.geotools.data.postgis;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -22,6 +23,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
@@ -37,7 +39,7 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 	
 	PostgisTests.Fixture f;
 	ConnectionPool pool;
-	PostgisDataStore data;
+	DataStore data;
 	PostgisConnectionFactory pcFactory;
 	
 	public AbstractPostgisDataTestCase(String name) {
@@ -57,25 +59,34 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
                 f.port.intValue(), f.database);
         pool = pcFactory.getConnectionPool(f.user, f.password);
 
-        setUpRoadTable();
-        setUpRiverTable();
-        setUpLakeTable();
+        setupDbTables();
 
         if (CHECK_TYPE) {
             checkTypesInDataBase();
             CHECK_TYPE = false; // just once
         }
+       	
+        data = newDataStore();
+        
+    }
 
-        	
-        data = new PostgisDataStore(pool, f.schema, getName(),
+    protected void setupDbTables() throws Exception {
+        setUpRoadTable();
+        setUpRiverTable();
+        setUpLakeTable();
+    }
+
+    protected DataStore newDataStore() throws IOException {
+        PostgisDataStore pg = new PostgisDataStore(pool, f.schema, getName(),
                 PostgisDataStore.OPTIMIZE_SAFE);
-        data.setWKBEnabled(WKB_ENABLED);
-        data.setFIDMapper("road",
+        pg.setWKBEnabled(WKB_ENABLED);
+        pg.setFIDMapper("road",
             new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "road"));
-        data.setFIDMapper("river",
+        pg.setFIDMapper("river",
             new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "river"));
-        data.setFIDMapper("testset",
+        pg.setFIDMapper("testset",
             new TypedFIDMapper(new BasicFIDMapper("gid", 255, true), "testset"));
+        return pg;
     }
     
     
