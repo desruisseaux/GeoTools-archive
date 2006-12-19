@@ -88,7 +88,7 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      *
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query query) {
+    public FeatureCollection getFeatures(Query query) throws IOException {
         return new DefaultFeatureResults(this, query);
     }
     
