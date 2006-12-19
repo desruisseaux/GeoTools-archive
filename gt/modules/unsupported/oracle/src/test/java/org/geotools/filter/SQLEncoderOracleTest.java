@@ -108,4 +108,15 @@ public class SQLEncoderOracleTest extends TestCase {
         value = encoder.encode(fidFilter);
         assertEquals("WHERE FID = '3' OR FID = '1'",value);
     }
+    
+    public void testLikeEncoding() throws Exception {
+        encoder = new SQLEncoderOracle("FID",new HashMap());
+        assertTrue(encoder.getCapabilities().supports(Filter.LIKE));
+        
+        LikeFilter filter = filterFactory.createLikeFilter();
+        filter.setValue(filterFactory.createAttributeExpression("name"));
+        filter.setPattern("Cory%", "%", "?", "\\");
+        System.out.println(encoder.encode(filter));
+        assertEquals("WHERE UPPER(\"name\") LIKE UPPER('Cory%')", encoder.encode(filter));
+    }
 }
