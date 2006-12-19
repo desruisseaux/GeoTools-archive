@@ -67,6 +67,9 @@ public class DefaultQuery implements Query {
     /** Sorting for the query */
     private SortBy[] sortBy;
     
+    /** The version according to WFS 1.0 and 1.1 specs */
+    private String version;
+    
     /** 
     /**
      * No argument constructor.
@@ -367,7 +370,16 @@ public class DefaultQuery implements Query {
      * @return the version of the feature to return, or null for latest. 
      */
     public String getVersion() {
-        return null; 
+        return version; 
+    }
+    
+    /**
+     * @see #getVersion()
+     * @param version
+     * @since 2.4
+     */
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     /**
