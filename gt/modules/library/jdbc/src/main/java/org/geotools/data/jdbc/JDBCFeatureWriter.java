@@ -228,7 +228,7 @@ public class JDBCFeatureWriter implements FeatureWriter {
                 Object liveAtt = live.getAttribute(i);
 
                 if ((live == null)
-                        || !DataUtilities.attributesEqual(currAtt, liveAtt)) {
+                        || !DataUtilities.attributesEqual(liveAtt, currAtt)) {
                     if (LOGGER.isLoggable(Level.INFO)) {
                         LOGGER.info("modifying att# " + i + " to " + currAtt);
                     }

@@ -443,7 +443,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             Object currAtt = current.getAttribute(i);
             Object liveAtt = live.getAttribute(i);
 
-            if (!DataUtilities.attributesEqual(currAtt, liveAtt)) {
+            if (!DataUtilities.attributesEqual(liveAtt, currAtt)) {
                 if (LOGGER.isLoggable(Level.INFO)) {
                     LOGGER.fine("modifying att# " + i + " to " + currAtt);
                 }
