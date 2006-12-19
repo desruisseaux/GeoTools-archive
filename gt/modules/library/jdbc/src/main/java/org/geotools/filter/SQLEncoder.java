@@ -560,6 +560,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
             switch (type) {
             case Expression.LITERAL_DOUBLE:
             case Expression.LITERAL_INTEGER:
+            case Expression.LITERAL_LONG:
                 out.write(literal.toString());
 
                 break;

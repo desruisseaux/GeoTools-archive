@@ -69,6 +69,17 @@ public class LiteralExpressionImpl extends DefaultExpression
                 "LiteralExpressionImpl is broken, it should accept Integers");
         }
     }
+    
+    protected LiteralExpressionImpl(long value) {
+        try {
+            this.setLiteral(new Long(value));
+        } catch (IllegalFilterException ile) {
+            //this is imposible as this is only thrown for
+            //invalid types, and Double is a valid type
+            throw new AssertionError(
+                "LiteralExpressionImpl is broken, it should accept Longs");
+        }
+    }
 
     /**
      * Constructor with literal. This alternative constructor is a convinience
@@ -157,6 +168,8 @@ public class LiteralExpressionImpl extends DefaultExpression
             expressionType = LITERAL_DOUBLE;
         } else if (literal instanceof Integer) {
             expressionType = LITERAL_INTEGER;
+        } else if (literal instanceof Long) {
+            expressionType = LITERAL_LONG;
         } else if (literal instanceof String) {
             expressionType = LITERAL_STRING;
         } else if (literal instanceof Geometry) {
