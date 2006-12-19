@@ -89,6 +89,13 @@ public class DefaultFIDMapperFactory implements FIDMapperFactory {
 	}
     
     /**
+     * Getter for the flog controll wether a "typed" fid mapper should be returned.
+     */
+    public boolean isReturningTypedFIDMapper() {
+		return returningTypedFIDMapper;
+	}
+    
+    /**
      * Gets the appropriate FIDMapper for the specified table.
      *
      * @param catalog
