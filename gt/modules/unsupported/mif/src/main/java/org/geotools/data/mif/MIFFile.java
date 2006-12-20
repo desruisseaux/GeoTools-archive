@@ -1092,7 +1092,7 @@ public class MIFFile {
                                 }
                             }
                         };
-            } else if (atc == Date.class) {
+            } else if (Date.class.isAssignableFrom( atc ) ) {
                 // TODO Check conversion of date values - switch to java.sql.Date
                 fieldValueSetters[i] = new MIFValueSetter("") {
                             protected SimpleDateFormat dateFormat = new SimpleDateFormat(
