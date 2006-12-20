@@ -22,6 +22,7 @@ import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDModelGroup;
 import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
@@ -449,7 +450,25 @@ public class Encoder {
 								continue;
 							}
 							
-							if ( particle.getMaxOccurs() == -1 || particle.getMaxOccurs() > 1 ) {
+							//figure out the maximum number of occurences
+							int maxOccurs = 1;
+							if( particle.isSetMaxOccurs() ) {
+								maxOccurs = particle.getMaxOccurs();
+							}
+							else {
+								//look the containing group
+								if ( particle.eContainer() instanceof XSDModelGroup ) {
+									XSDModelGroup group = (XSDModelGroup) particle.eContainer();
+									if ( group.eContainer() instanceof XSDParticle ) {
+										XSDParticle cParticle = (XSDParticle) group.eContainer();
+										if ( cParticle.isSetMaxOccurs() ) {
+											maxOccurs = cParticle.getMaxOccurs();
+										}
+									}
+								}
+							}
+							
+							if ( maxOccurs == -1 || maxOccurs > 1 ) {
 								//may have a collection or array, unwrap it
 								Iterator iterator = null;
 								if ( obj.getClass().isArray() ) {
