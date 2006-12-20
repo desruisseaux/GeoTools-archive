@@ -1,5 +1,7 @@
 package org.geotools.xml;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,14 +45,38 @@ public class XmlConverterFactory implements ConverterFactory {
 		public Object convert(Object source, Class target) throws Exception {
 			String value = (String)source;
 			
+			Calendar date;
+			//try parsing as dateTime
+			try {
+				date = DatatypeConverter.parseDateTime( value );	
+			}
+			catch( Exception e ) {
+				//try as just date
+				date = DatatypeConverter.parseDate( value );
+			}
+			
+			
+			if ( Calendar.class.equals( target ) ) {
+				return date;
+			}
+			
 			if ( Date.class.isAssignableFrom( target ) ) {
-				return DatatypeConverter.parseDate( value ).getTime();
+				Date time = date.getTime();
+				
+				//check for subclasses
+				if ( java.sql.Date.class.equals( target ) )  {
+					return new java.sql.Date( time.getTime() );
+				}
+				if ( Time.class.equals( target ) ) {
+					return new Time( time.getTime() );
+				}
+				if ( Timestamp.class.equals( target) ) {
+					return new Timestamp( time.getTime() );
+				}
+				
+				return time;
 			}
-			
-			if ( Calendar.class.isAssignableFrom( target ) ) {
-				return DatatypeConverter.parseDateTime( value );
-			}
-			
+		
 			return null;
 		}
 		
