@@ -116,7 +116,8 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         } else if (CharSequence.class.isAssignableFrom(clazz)) {
             return new TextualAttributeType(name,isNillable,1,1,defaultValue,f);
         } else if (java.util.Date.class.isAssignableFrom(clazz)) {
-            return new TemporalAttributeType(name,isNillable,1,1,defaultValue,f);
+            //return new TemporalAttributeType(name,isNillable,1,1,defaultValue,f);
+        	return new TemporalAttributeType(name,clazz,isNillable,1,1,defaultValue,f);
         } else if (Geometry.class.isAssignableFrom( clazz )){
             return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue,null,f);
         }        
@@ -142,7 +143,8 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         } else if (CharSequence.class.isAssignableFrom(clazz)) {
             return new TextualAttributeType(name,isNillable,min,max,defaultValue,filter);
         } else if (java.util.Date.class.isAssignableFrom(clazz)) {
-            return new TemporalAttributeType(name,isNillable,min,max,defaultValue,filter);
+            //return new TemporalAttributeType(name,isNillable,min,max,defaultValue,filter);
+        	return new TemporalAttributeType(name,clazz,isNillable,min,max,defaultValue,filter);
         } else if (Geometry.class.isAssignableFrom( clazz )){
             if( metadata instanceof CoordinateReferenceSystem )
                 return new GeometricAttributeType(name,clazz,isNillable,min,max, 
