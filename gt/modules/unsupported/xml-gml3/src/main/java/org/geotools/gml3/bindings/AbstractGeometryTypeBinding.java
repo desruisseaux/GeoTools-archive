@@ -93,7 +93,7 @@ public class AbstractGeometryTypeBinding extends AbstractComplexBinding {
             }
         }
 
-        return null;
+        return value;
     }
 
     public Object getProperty(Object object, QName name)
