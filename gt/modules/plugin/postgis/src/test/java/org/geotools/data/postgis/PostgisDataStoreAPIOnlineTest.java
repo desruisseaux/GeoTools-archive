@@ -1614,8 +1614,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
     public void testOidFidMapper() throws IOException, IllegalAttributeException {
         // get the schema and make sure the FID mapper is an OID one
-        PostgisDataStore pg = (PostgisDataStore) data;
-        FIDMapper base = pg.getFIDMapper("lake");
+    	FIDMapper mapper = data.getFIDMapper( "lake" );
+    	FIDMapper base = null;
+    	if ( mapper instanceof TypedFIDMapper ) {
+    		base = ((TypedFIDMapper)mapper).getWrappedMapper();
+    	}
+    	else base = mapper;
+    	
         assertTrue(base instanceof OIDFidMapper);
 
         // read features from the database, just check we don't crash and that id's are not null
