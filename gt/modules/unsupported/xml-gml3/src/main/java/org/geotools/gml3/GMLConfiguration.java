@@ -30,6 +30,7 @@ import org.geotools.gml3.smil.SMIL20LANGConfiguration;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
+import org.geotools.xml.Parser;
 
 
 /**
@@ -48,6 +49,10 @@ public class GMLConfiguration extends Configuration {
         //add smil depenedncy
         addDependency(new SMIL20Configuration());
         addDependency(new SMIL20LANGConfiguration());
+
+        //add parser properties
+        getProperties().add(Parser.Properties.PARSE_UNKNOWN_ELEMENTS);
+        getProperties().add(Parser.Properties.PARSE_UNKNOWN_ATTRIBUTES);
     }
 
     /**
