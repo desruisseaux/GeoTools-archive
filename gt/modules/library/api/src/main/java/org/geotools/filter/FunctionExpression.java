@@ -15,6 +15,7 @@
  */
 package org.geotools.filter;
 
+import java.util.List;
 import org.opengis.filter.expression.Function;
 import org.geotools.factory.Factory;
 
@@ -73,7 +74,12 @@ public interface FunctionExpression extends Expression, Factory, Function {
      * Sets the arguments to be evaluated by this function.
      *
      * @param args an array of expressions to be evaluated.
-     * @deprecated use {@link Function#setParameters(List)}
+     * @deprecated use {@link #setParameters(List)}
      */
     void setArgs(Expression[] args);
+
+    /**
+     * Sets the paramters for the function.
+     */
+    void setParameters(List parameters);
 }

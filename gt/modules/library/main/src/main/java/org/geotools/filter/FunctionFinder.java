@@ -1,6 +1,7 @@
 package org.geotools.filter;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.factory.Hints;
 import org.opengis.filter.expression.Function;
@@ -21,19 +22,29 @@ public class FunctionFinder {
     public FunctionFinder( Hints hints ){
         // currently hints are not used, need help :-P
     }
+   
     public Function findFunction( String name ){
+        return findFunction( name, null );
+    }
+
+    public Function findFunction( String name, List/*<Expression>*/ parameters ){
         name = functionName(name);
 
         try {
             for( Iterator it = org.geotools.factory.FactoryFinder.factories(FunctionExpression.class); it.hasNext(); ){
                 FunctionExpression function = (FunctionExpression) it.next();
                 if( name.equalsIgnoreCase( function.getName() ) ){
+                	if ( parameters != null ) {
+                		function.setParameters( parameters );	
+                	}
+                	
                     return function;
                 }
             }
-            for( Iterator i = org.geotools.factory.FactoryFinder.factories(Function.class); i.hasNext(); ){
-                Function function = (Function) i.next();
+            for( Iterator i = org.geotools.factory.FactoryFinder.factories(FunctionImpl.class); i.hasNext(); ){
+                FunctionImpl function = (FunctionImpl) i.next();
                 if( name.equalsIgnoreCase( function.getName() ) ){
+                	function.setParameters( parameters );
                     return function;
                 }
             }
@@ -43,7 +54,7 @@ public class FunctionFinder {
         }
         throw new RuntimeException("Unable to find function " + name );
     }
-
+    
     private String functionName( String name ) {
         int index = -1;
 

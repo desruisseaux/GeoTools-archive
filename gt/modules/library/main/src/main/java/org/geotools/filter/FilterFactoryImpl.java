@@ -399,42 +399,26 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public Function function(String name, Expression[] args) {
-        Function function = functionFinder.findFunction( name );
-        function.setParameters( Arrays.asList(args) );        
+        Function function = functionFinder.findFunction( name, Arrays.asList(args) );
         return function;
     }
 
     public Function function(String name, Expression arg1) {
-        Function function = functionFinder.findFunction( name );
-        
-        List params = new ArrayList(2);
-        params.add( arg1 );
-        
-        function.setParameters( params );
+        Function function = functionFinder.findFunction( name, Arrays.asList( new Expression[]{ arg1 } ) );
         return function;
     }
 
     public Function function(String name, Expression arg1, Expression arg2) {
-        Function function = functionFinder.findFunction( name );
-        
-        List params = new ArrayList(2);
-        params.add( arg1 );
-        params.add( arg2 );
-        
-        function.setParameters( params );
+        Function function = 
+        	functionFinder.findFunction( name, Arrays.asList( new Expression[]{ arg1, arg2 }) );
         return function;
     }
 
     public Function function(String name, Expression arg1, Expression arg2,
             Expression arg3) {
-        Function function = functionFinder.findFunction( name );
+        Function function = 
+        	functionFinder.findFunction( name, Arrays.asList( new Expression[]{ arg1, arg2, arg3 }) );
         
-        List params = new ArrayList(2);
-        params.add( arg1 );
-        params.add( arg2 );
-        params.add( arg3 );
-        
-        function.setParameters( params );
         return function;
         
     }
