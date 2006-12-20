@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
+import org.geotools.gml3.ApplicationSchemaConfiguration;
 
 public class GMLDataStoreSimpleFeatureProfileTest extends TestCase {
 

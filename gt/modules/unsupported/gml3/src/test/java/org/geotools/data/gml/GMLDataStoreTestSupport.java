@@ -1,5 +1,7 @@
 package org.geotools.data.gml;
 
+import org.geotools.gml3.ApplicationSchemaConfiguration;
+
 import junit.framework.TestCase;
 
 public class GMLDataStoreTestSupport extends TestCase {

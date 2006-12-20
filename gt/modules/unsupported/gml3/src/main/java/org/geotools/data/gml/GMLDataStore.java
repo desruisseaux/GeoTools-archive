@@ -18,6 +18,7 @@ import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.store.AbstractDataStore2;
 import org.geotools.feature.FeatureType;
+import org.geotools.gml3.ApplicationSchemaConfiguration;
 import org.geotools.gml3.GMLConfiguration;
 import org.geotools.gml3.bindings.GML;
 import org.geotools.gml3.bindings.GML3ParsingUtils;

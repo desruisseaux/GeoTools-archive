@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.gml3.ApplicationSchemaConfiguration;
 import org.geotools.xml.Configuration;
 
 /**
@@ -57,7 +58,7 @@ import org.geotools.xml.Configuration;
  * <br>
  * A {@link org.geotools.xml.Configuration} is used to specify information about a schema and 
  * configure the xml parser to parse instances of the schema. The 
- * {@link org.geotools.data.gml.ApplicationSchemaConfiguration} is a subclass that can be extented
+ * {@link org.geotools.gml3.ApplicationSchemaConfiguration} is a subclass that can be extented
  * in order to create a configuration specific to an application schema:
  * <pre>
  * <code>

@@ -1,5 +1,7 @@
 package org.geotools.data.gml;
 
+import org.geotools.gml3.ApplicationSchemaConfiguration;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
