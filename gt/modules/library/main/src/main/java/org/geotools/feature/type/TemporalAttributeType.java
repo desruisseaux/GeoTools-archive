@@ -18,6 +18,7 @@ package org.geotools.feature.type;
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.PrimativeAttributeType;
+import org.geotools.util.Converters;
 import org.opengis.filter.Filter;
 
 import java.util.Date;
@@ -35,6 +36,12 @@ public class TemporalAttributeType extends DefaultAttributeType implements Prima
         super(name, java.util.Date.class, nillable, min, max, defaultValue);
         this.filter = filter;
     }
+    public TemporalAttributeType(String name, Class type, boolean nillable, int min, int max, 
+		Object defaultValue, Filter filter ) {
+    	super(name, type, nillable, min, max, defaultValue);
+    	this.filter = filter;
+    }
+    
     private Filter filter;
 
     public Object parse(Object value) throws IllegalArgumentException {
@@ -54,6 +61,14 @@ public class TemporalAttributeType extends DefaultAttributeType implements Prima
             return ((java.util.Calendar) value).getTime();
         }
 
+        //second to last restort, try the converters inteface 
+        //TODO: this single call should replace this entire routine
+        Object converted = Converters.convert( value, type );
+        if ( converted != null ) {
+        	return converted;
+        }
+        
+        //last resort
         try {
             return format.parse(value.toString());
         } catch (java.text.ParseException pe) {
