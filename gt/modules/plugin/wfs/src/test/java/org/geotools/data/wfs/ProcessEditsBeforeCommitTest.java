@@ -34,6 +34,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Contains;
 
@@ -46,12 +47,12 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class ProcessEditsBeforeCommitTest extends TestCase {
 
-	private static final CompareFilter CUSTOM_FILTERALL;
+	private static final PropertyIsEqualTo CUSTOM_FILTERALL;
 	private static FilterFactory filterFac=FilterFactoryFinder.createFilterFactory();
 	static{
-		CUSTOM_FILTERALL=filterFac.createCompareFilter(FilterType.COMPARE_EQUALS);
-		CUSTOM_FILTERALL.setExpression1(filterFac.createLiteralExpression(1));
-		CUSTOM_FILTERALL.setExpression2(filterFac.createLiteralExpression(2));
+		CUSTOM_FILTERALL=filterFac.equals( 
+			filterFac.createLiteralExpression(1), filterFac.createLiteralExpression(2) 
+		);
 	}
 	private WFSTransactionState state;
 	private FeatureType featureType;
