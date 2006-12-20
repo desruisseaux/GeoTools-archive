@@ -54,6 +54,8 @@ public class OGCFilterTest extends TestCase {
         }
 
         Object thing = parser.parse(in);
+        assertEquals(0, parser.getValidationErrors().size());
+
         assertNotNull(thing);
         assertTrue(thing instanceof PropertyIsEqualTo);
 
