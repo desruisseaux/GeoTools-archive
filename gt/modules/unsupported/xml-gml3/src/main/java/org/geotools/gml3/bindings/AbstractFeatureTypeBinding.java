@@ -27,6 +27,7 @@ import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.FeatureTypeCache;
+import org.geotools.util.Converters;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.BindingFactory;
 import org.geotools.xml.BindingWalkerFactory;
@@ -174,7 +175,18 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
 
         for (int i = 0; i < fType.getAttributeCount(); i++) {
             AttributeType attType = fType.getAttributeType(i);
-            attributes[i] = node.getChildValue(attType.getName());
+            Object attValue = node.getChildValue(attType.getName());
+
+            if ((attValue != null) && !attType.getType().isAssignableFrom(attValue.getClass())) {
+                //type mismatch, to try convert
+                Object converted = Converters.convert(attValue, attType.getType());
+
+                if (converted != null) {
+                    attValue = converted;
+                }
+            }
+
+            attributes[i] = attValue;
         }
 
         //create the feature
