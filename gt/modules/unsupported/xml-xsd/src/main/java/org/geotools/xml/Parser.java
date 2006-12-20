@@ -22,14 +22,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
+
+import org.apache.xerces.jaxp.SAXParserFactoryImpl;
+import org.apache.xerces.parsers.SAXParser;
 import org.eclipse.xsd.XSDSchema;
 import org.geotools.xml.impl.ParserHandler;
+import org.geotools.xs.bindings.XS;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -55,23 +61,16 @@ public class Parser {
 
     /** the instance document being parsed */
     private InputStream input;
-
+    
     /**
      * Creats a new instance of the parser.
      *
      * @param configuration The parser configuration, bindings and context
      *
-     * @throws ParserConfigurationException
-     * @throws SAXException
      */
-    public Parser(Configuration configuration)
-        throws ParserConfigurationException, SAXException {
-        SAXParserFactory spf = SAXParserFactory.newInstance();
-        spf.setNamespaceAware(true);
-
-        parser = spf.newSAXParser();
-
-        handler = new ParserHandler(configuration);
+    public Parser(Configuration configuration)  {
+      
+    	handler = new ParserHandler(configuration);
     }
 
     /**
@@ -87,8 +86,7 @@ public class Parser {
      * @deprecated use {@link #Parser(Configuration)} and {@link #parse(InputStream)}.
      */
     public Parser(Configuration configuration, String input)
-        throws ParserConfigurationException, SAXException, IOException,
-            URISyntaxException {
+        throws IOException, URISyntaxException {
         this(configuration,
             new BufferedInputStream(
                 new FileInputStream(new File(new URI(input)))));
@@ -100,13 +98,9 @@ public class Parser {
      * @param configuration Object representing the configuration of the parser.
      * @param input The stream representing the instance document to be parsed.
      *
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     *
      * @deprecated use {@link #Parser(Configuration)} and {@link #parse(InputStream)}.
      */
-    public Parser(Configuration configuration, InputStream input)
-        throws ParserConfigurationException, SAXException {
+    public Parser(Configuration configuration, InputStream input) {
         this(configuration);
         this.input = input;
     }
@@ -121,10 +115,11 @@ public class Parser {
      *
      * @throws IOException
      * @throws SAXException
+     * @throws ParserConfigurationException 
      *
      * @deprecated use {@link #parse(InputStream)}
      */
-    public Object parse() throws IOException, SAXException {
+    public Object parse() throws IOException, SAXException, ParserConfigurationException {
         return parse(input);
     }
 
@@ -139,11 +134,10 @@ public class Parser {
      *
      * @throws IOException
      * @throws SAXException
+     * @throws ParserConfigurationException 
      */
-    public Object parse(InputStream input) throws IOException, SAXException {
-        parser.parse(input, handler);
-        
-        return handler.getValue();
+    public Object parse(InputStream input) throws IOException, SAXException, ParserConfigurationException {
+		return parse( new InputSource( input ) );
     }
     
     /**
@@ -157,14 +151,27 @@ public class Parser {
      *
      * @throws IOException
      * @throws SAXException
+     * @throws ParserConfigurationException 
      */
-    public Object parse(InputSource source) throws IOException, SAXException {
-    	parser.parse(source, handler);
-        
+    public Object parse(InputSource source) throws IOException, SAXException, ParserConfigurationException {
+    	parser = parser();
+    	parser.setContentHandler( handler );
+    	parser.setErrorHandler( handler );
+    	
+    	parser.parse( source );
+    	
         return handler.getValue();
     }
     
-
+    /**
+     * Returns a list of any validation errors that occured while parsing.
+     * 
+     * @return A list of errors, or an empty list if none.
+     */
+    public List getValidationErrors() {
+    	return handler.getValidationErrors();
+    }
+    
     /**
      * Returns the schema objects referenced by the instance document being
      * parsed. This method can only be called after a successful parse has
@@ -179,6 +186,54 @@ public class Parser {
         }
 
         return null;
+    }
+    
+    protected SAXParser parser() throws ParserConfigurationException, SAXException {
+    	//JD: we use xerces directly here because jaxp does seem to allow use to 
+    	// override all the namespaces to validate against
+    	SAXParser parser = new SAXParser();
+    	
+    	//set the appropriate features
+    	parser.setFeature("http://xml.org/sax/features/namespaces", true);
+    	parser.setFeature("http://xml.org/sax/features/validation", true);
+        parser.setFeature("http://apache.org/xml/features/validation/schema",
+            true);
+        parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking",
+            true);
+        
+		//set the schema sources of this configuration, and all dependent ones
+		StringBuffer schemaLocation = new StringBuffer();
+		for( Iterator d = handler.getConfiguration().allDependencies().iterator(); d.hasNext(); ) {
+			Configuration dependency = (Configuration) d.next();
+			
+			//ignore xs namespace
+			if ( XS.NAMESPACE.equals( dependency.getNamespaceURI() ) )
+				continue;
+		
+			//seperate entries by space
+			if ( schemaLocation.length() > 0 ) {
+				schemaLocation.append( " " );
+			}
+			
+			//add the entry
+			schemaLocation.append( dependency.getNamespaceURI() );
+			schemaLocation.append( " " );
+			schemaLocation.append( dependency.getSchemaFileURL() );
+		}
+		
+		//set hte property to map namespaces to schema locations
+		parser.setProperty( 
+			"http://apache.org/xml/properties/schema/external-schemaLocation", 
+			schemaLocation.toString()
+		);
+		
+		//set the default location
+		parser.setProperty( 
+			"http://apache.org/xml/properties/schema/external-noNamespaceSchemaLocation", 
+			handler.getConfiguration().getSchemaFileURL()
+		);
+		
+		return parser;
     }
     
     /**

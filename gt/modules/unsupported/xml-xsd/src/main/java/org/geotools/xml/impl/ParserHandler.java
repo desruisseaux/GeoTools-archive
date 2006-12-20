@@ -15,9 +15,11 @@
  */
 package org.geotools.xml.impl;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -39,6 +41,7 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
@@ -93,11 +96,23 @@ public class ParserHandler extends DefaultHandler {
 
     /** logger **/
     Logger logger;
+    
+    /** list of "errors" that occur while parsing */
+    List errors;
 
     public ParserHandler(Configuration config) {
         this.config = config;
+        errors = new ArrayList();
     }
 
+    public Configuration getConfiguration() {
+		return config;
+	}
+    
+    public List getValidationErrors() {
+    	return errors;
+    }
+    
     public HandlerFactory getHandlerFactory() {
         return handlerFactory;
     }
@@ -366,6 +381,15 @@ public class ParserHandler extends DefaultHandler {
         }
     }
 
+    public void warning(SAXParseException e) throws SAXException {
+    	//errors.add( e );
+    }
+    
+    public void error(SAXParseException e) throws SAXException {
+    	logger.log( Level.WARNING, e.getMessage() );
+    	errors.add( e );
+    }
+    
     public Object getValue() {
         return documentHandler.getValue();
     }
