@@ -166,7 +166,8 @@ class ArcSDEAttributeReader implements AttributeReader {
 	public boolean hasNext() throws IOException {
 		if (!this.hasNextAlreadyCalled) {
 			try {
-				SeRow currentRow = this.query.fetch();
+				SeRow currentRow;
+				currentRow = this.query.fetch();
 				this.hasNextAlreadyCalled = true;
 
 				// ensure closing the query to release the connection, may be
@@ -218,10 +219,18 @@ class ArcSDEAttributeReader implements AttributeReader {
 					}
 				}
 			} catch (SeException ex) {
+				this.currentValues = null;
+				this.hasNextAlreadyCalled = true;
 				this.query.close();
 				LOGGER.log(Level.SEVERE, ex.getSeError().getErrDesc(), ex);
 				throw new DataSourceException("Fetching row:"
 						+ ex.getSeError().getErrDesc(), ex);
+			} catch (DataSourceException dse) {
+				this.currentValues = null;
+				this.hasNextAlreadyCalled = true;
+				this.query.close();
+				LOGGER.log(Level.SEVERE, dse.getLocalizedMessage(), dse);
+				throw dse;
 			}
 		}
 
