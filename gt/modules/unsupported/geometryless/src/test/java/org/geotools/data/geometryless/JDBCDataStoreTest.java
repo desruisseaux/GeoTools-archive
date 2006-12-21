@@ -48,11 +48,12 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+//import org.geotools.filter.CompareFilter;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -74,7 +75,7 @@ public class JDBCDataStoreTest extends TestCase {
     private static String FEATURE_TABLE = "testset";
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     private static GeometryFactory geomFac = new GeometryFactory();
-    private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
+    private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
   
     private FeatureCollection collection = FeatureCollections.newCollection();
     private FeatureType schema;
@@ -82,7 +83,7 @@ public class JDBCDataStoreTest extends TestCase {
     private JDBCConnectionFactory connFactory;
     private JDBCDataStore dstore;
     private ConnectionPool connPool;
-    private CompareFilter tFilter;
+    private PropertyIsEqualTo tFilter;
     private int addId = 32;
     private org.geotools.filter.GeometryFilter geomFilter;
 
@@ -265,26 +266,28 @@ public class JDBCDataStoreTest extends TestCase {
         LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
         FeatureReader reader =
-            dstore.getFeatureReader(schema, Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
         int numFeatures = count(reader);
         assertEquals("Number of features off:", 6, numFeatures);
     }
 
     public void testFilter() throws Exception {
-        CompareFilter test1 = null;
+    	PropertyIsEqualTo test1 = null;
 
         try {
-            test1 = filterFac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-
             Integer testInt = new Integer(0);
-            Expression testLiteral = filterFac.createLiteralExpression(testInt);
-            test1.addLeftValue(testLiteral);
-            test1.addRightValue(filterFac.createAttributeExpression(schema, "pcedflag"));
+            Expression testLiteral = filterFac.literal(testInt);
+            Expression testProperty = filterFac.property("pcedflag");
+        	test1 = filterFac.equals(testLiteral, testProperty);
+
+    
+  //          test1.addLeftValue(testLiteral);
+   //         test1.addRightValue(filterFac.createAttributeExpression(schema, "pcedflag"));
         } catch (IllegalFilterException e) {
             fail("Illegal Filter Exception " + e);
         }
 
-        Query query = new DefaultQuery(FEATURE_TABLE, test1);
+ //       Query query = new DefaultQuery(FEATURE_TABLE, test1);
         FeatureReader reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
         assertEquals("Number of filtered features off:", 2, count(reader));
     }
@@ -328,7 +331,7 @@ public class JDBCDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter("testset", Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter("testset", Filter.INCLUDE, trans);
 
         //count(writer);
         assertEquals(6, count(writer));
@@ -350,7 +353,7 @@ public class JDBCDataStoreTest extends TestCase {
         try {
             String badType = "badType43";
             FeatureWriter writer =
-                dstore.getFeatureWriter(badType, Filter.NONE, Transaction.AUTO_COMMIT);
+                dstore.getFeatureWriter(badType, Filter.INCLUDE, Transaction.AUTO_COMMIT);
             fail("should not have type " + badType);
         } catch (SchemaNotFoundException e) {
             LOGGER.fine("succesfully caught exception: " + e);
@@ -364,7 +367,7 @@ public class JDBCDataStoreTest extends TestCase {
         CompareFilter test1 = null;
 
         try {
-            test1 = filterFac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
+            test1 = filterFac.createCompareFilter(Abstract FilterType.COMPARE_EQUALS);
 
             Integer testInt = new Integer(0);
             Expression testLiteral = filterFac.createLiteralExpression(testInt);
@@ -390,7 +393,7 @@ public class JDBCDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int attKeyPos = 0;
         Integer attKey = new Integer(10);
         String attName = "name";
@@ -409,7 +412,7 @@ public class JDBCDataStoreTest extends TestCase {
         }
 
         //writer.close();
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
 
         while (reader.hasNext()) {
             feature = reader.next();
@@ -433,7 +436,7 @@ public class JDBCDataStoreTest extends TestCase {
     public void testGetFeaturesWriterModifyGeometry()
         throws IOException, IllegalAttributeException {
         FeatureWriter writer =
-            dstore.getFeatureWriter("road", Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         Feature feature;
         Coordinate[] points =
             {
@@ -463,7 +466,7 @@ public class JDBCDataStoreTest extends TestCase {
     public void testGetFeaturesWriterModifyMultipleAtts()
         throws IOException, IllegalAttributeException {
         FeatureWriter writer =
-            dstore.getFeatureWriter("road", Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         Feature feature;
         Coordinate[] points =
             {
@@ -496,7 +499,7 @@ public class JDBCDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int count = 0;
 
         while (writer.hasNext()) {
@@ -516,7 +519,7 @@ public class JDBCDataStoreTest extends TestCase {
         //assertEquals( fixture.roadFeatures.length+1, data.features( "road" ).size() );
         writer.close();
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 7, numFeatures);
         state.rollback();
@@ -552,9 +555,9 @@ public class JDBCDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
 
         //assertEquals("Wrong number of features before delete", 6, numFeatures);
@@ -570,7 +573,7 @@ public class JDBCDataStoreTest extends TestCase {
         }
 
         writer.close();
-        reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 5, numFeatures);
         state.rollback();

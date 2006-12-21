@@ -71,9 +71,15 @@
   <!--     Dependency Management                                   -->
   <!-- =========================================================== -->
   <dependencies>
-    <dependency>
+ <!--    <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+ -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-jdbc</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

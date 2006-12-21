@@ -49,11 +49,14 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.AbstractFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+//import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.filter.PropertyIsEqualTo;
+
+import org.opengis.filter.expression.Expression;
+ import org.opengis.filter.Filter;
+
+import org.opengis.filter.FilterFactory;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -79,7 +82,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     private static String TEST_NS = "http://www.geotools.org/data/postgis";
     private static GeometryFactory geomFac = new GeometryFactory();
     private static String GEOM_NAME = "location";
-    private FilterFactory filterFac = FilterFactoryFinder.createFilterFactory();
+    private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
   
     private FeatureCollection collection = FeatureCollections.newCollection();
     private FeatureType schema;
@@ -87,7 +90,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     private JDBCConnectionFactory connFactory;
     private LocationsXYDataStore dstore;
     private ConnectionPool connPool;
-    private CompareFilter tFilter;
+//    private  tFilter;
     private int addId = 32;
     private org.geotools.filter.GeometryFilter geomFilter;
 
@@ -266,26 +269,28 @@ public class LocationsXYDataStoreTest extends TestCase {
         LOGGER.fine("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
         FeatureReader reader =
-            dstore.getFeatureReader(schema, Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
         int numFeatures = count(reader);
         assertEquals("Number of features off:", 6, numFeatures);
     }
 
     public void testFilter() throws Exception {
-        CompareFilter test1 = null;
+    	PropertyIsEqualTo test1 = null;
 
         try {
-            test1 = filterFac.createCompareFilter(AbstractFilter.COMPARE_EQUALS);
-
             Integer testInt = new Integer(0);
-            Expression testLiteral = filterFac.createLiteralExpression(testInt);
-            test1.addLeftValue(testLiteral);
-            test1.addRightValue(filterFac.createAttributeExpression(schema, "pcedflag"));
+            Expression testLiteral = filterFac.literal(testInt);
+            Expression testProperty = filterFac.property("pcedflag");
+        	test1 = filterFac.equals(testLiteral, testProperty);
+
+    
+  //          test1.addLeftValue(testLiteral);
+   //         test1.addRightValue(filterFac.createAttributeExpression(schema, "pcedflag"));
         } catch (IllegalFilterException e) {
             fail("Illegal Filter Exception " + e);
         }
 
-        Query query = new DefaultQuery(FEATURE_TABLE, test1);
+ //       Query query = new DefaultQuery(FEATURE_TABLE, test1);
         FeatureReader reader = dstore.getFeatureReader(schema, test1, Transaction.AUTO_COMMIT);
         assertEquals("Number of filtered features off:", 2, count(reader));
     }
@@ -295,7 +300,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         LOGGER.info("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 
         FeatureReader reader =
-            dstore.getFeatureReader(schema, Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureReader(schema, Filter.INCLUDE, Transaction.AUTO_COMMIT);
 	Feature feature = reader.next();
 	LOGGER.info("feature is: " + feature);
 	Geometry geom = feature.getDefaultGeometry();
@@ -325,7 +330,7 @@ public class LocationsXYDataStoreTest extends TestCase {
 	String testTable = FEATURE_TABLE;
         LOGGER.info("testTable " + testTable + " has schema " + dstore.getSchema(testTable));
 	String[] propNames = { GEOM_NAME, "gid", "name", "perimeter" }; 
-	Query geomQuery = new DefaultQuery(testTable, Filter.NONE, 500,
+	Query geomQuery = new DefaultQuery(testTable, Filter.INCLUDE, 500,
 					   propNames, "geomFirst");
 					   
         FeatureReader reader =
@@ -372,7 +377,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter("testset", Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter("testset", Filter.INCLUDE, trans);
 
         //count(writer);
         assertEquals(6, count(writer));
@@ -394,7 +399,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         try {
             String badType = "badType43";
             FeatureWriter writer =
-                dstore.getFeatureWriter(badType, Filter.NONE, Transaction.AUTO_COMMIT);
+                dstore.getFeatureWriter(badType, Filter.INCLUDE, Transaction.AUTO_COMMIT);
             fail("should not have type " + badType);
         } catch (SchemaNotFoundException e) {
             LOGGER.fine("succesfully caught exception: " + e);
@@ -434,7 +439,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int attKeyPos = 0;
         Integer attKey = new Integer(10);
         String attName = "name";
@@ -453,7 +458,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         }
 
         //writer.close();
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
 
         while (reader.hasNext()) {
             feature = reader.next();
@@ -477,7 +482,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     public void testGetFeaturesWriterModifyGeometry()
         throws IOException, IllegalAttributeException {
         FeatureWriter writer =
-            dstore.getFeatureWriter("road", Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         Feature feature;
         Coordinate[] points =
             {
@@ -507,7 +512,7 @@ public class LocationsXYDataStoreTest extends TestCase {
     public void testGetFeaturesWriterModifyMultipleAtts()
         throws IOException, IllegalAttributeException {
         FeatureWriter writer =
-            dstore.getFeatureWriter("road", Filter.NONE, Transaction.AUTO_COMMIT);
+            dstore.getFeatureWriter("road", Filter.INCLUDE, Transaction.AUTO_COMMIT);
         Feature feature;
         Coordinate[] points =
             {
@@ -540,7 +545,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
         int count = 0;
 
         while (writer.hasNext()) {
@@ -560,7 +565,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         //assertEquals( fixture.roadFeatures.length+1, data.features( "road" ).size() );
         writer.close();
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 7, numFeatures);
         state.rollback();
@@ -596,9 +601,9 @@ public class LocationsXYDataStoreTest extends TestCase {
         JDBCTransactionState state = new JDBCTransactionState(connPool);
         trans.putState(connPool, state);
 
-        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.NONE, trans);
+        FeatureWriter writer = dstore.getFeatureWriter(FEATURE_TABLE, Filter.INCLUDE, trans);
 
-        FeatureReader reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        FeatureReader reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         int numFeatures = count(reader);
 
         //assertEquals("Wrong number of features before delete", 6, numFeatures);
@@ -614,7 +619,7 @@ public class LocationsXYDataStoreTest extends TestCase {
         }
 
         writer.close();
-        reader = dstore.getFeatureReader(schema, Filter.NONE, trans);
+        reader = dstore.getFeatureReader(schema, Filter.INCLUDE, trans);
         numFeatures = count(reader);
         assertEquals("Wrong number of features after add", 5, numFeatures);
         state.rollback();

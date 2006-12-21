@@ -17,7 +17,7 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.filter.Filter;
+ import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 import org.geotools.filter.SQLEncoderLocationsXY;
 
@@ -72,7 +72,7 @@ public class LocationsXYDataStore extends org.geotools.data.geometryless.JDBCDat
      * @throws IOException if the database cannot be properly accessed
      */
     public FeatureWriter getFeatureWriter(String typeName) throws IOException {
-        return getFeatureWriter(typeName, Filter.NONE, Transaction.AUTO_COMMIT);
+        return getFeatureWriter(typeName, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
 
     /**

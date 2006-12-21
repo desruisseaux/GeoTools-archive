@@ -18,7 +18,7 @@ import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
 import org.geotools.data.jdbc.attributeio.WKTAttributeIO;
 import org.geotools.feature.AttributeType;
-import org.geotools.filter.Filter;
+ import org.opengis.filter.Filter;
 import org.geotools.filter.SQLEncoder;
 
 /**
@@ -131,7 +131,7 @@ public class JDBCDataStore extends org.geotools.data.jdbc.JDBCDataStore {
      * @throws IOException if the database cannot be properly accessed
      */
     public FeatureWriter getFeatureWriter(String typeName) throws IOException {
-        return getFeatureWriter(typeName, Filter.NONE, Transaction.AUTO_COMMIT);
+        return getFeatureWriter(typeName, Filter.INCLUDE, Transaction.AUTO_COMMIT);
     }
 
     /**
