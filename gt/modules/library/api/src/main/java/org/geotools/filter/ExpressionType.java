@@ -43,8 +43,11 @@ public interface ExpressionType {
 
     /** Defines a literal expression with a declared geometry type. */
     public static final short LITERAL_GEOMETRY = 104;
-    
-    /** /** Defines a literal expression with a declared long type. */
+
+    /**
+     *  Defines a literal expression with a declared long type.
+     *  @since 2.4
+     **/
     public static final short LITERAL_LONG = 100;
 
     /* Types implemented by ExpressionMath. */
