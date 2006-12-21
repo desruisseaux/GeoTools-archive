@@ -17,6 +17,8 @@ package org.geotools.filter;
 
 import java.io.StringWriter;
 
+import org.opengis.filter.IncludeFilter;
+
 
 
 /**
@@ -136,6 +138,20 @@ public class SQLEncoderTest extends SQLFilterTestSupport {
         SQLEncoder encoder = new SQLEncoder(output, notFilter);
         LOGGER.fine("test filter is " + notFilter + "\n encoding result is "
             + output.getBuffer());
+    }
+    
+    public void testInclude() throws Exception {
+        StringWriter output = new StringWriter();
+        SQLEncoder encoder = new SQLEncoder();
+        encoder.encode(output, Filter.INCLUDE);
+        assertEquals(output.getBuffer().toString(), "WHERE TRUE");
+    }
+    
+    public void testExclude() throws Exception {
+        StringWriter output = new StringWriter();
+        SQLEncoder encoder = new SQLEncoder();
+        encoder.encode(output, Filter.EXCLUDE);
+        assertEquals(output.getBuffer().toString(), "WHERE FALSE");
     }
 //
 //    /* public void test14() contains geom filter, not supported

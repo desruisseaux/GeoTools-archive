@@ -18,6 +18,8 @@ package org.geotools.filter;
 import org.geotools.data.jdbc.fidmapper.FIDMapper;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.IncludeFilter;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -50,7 +52,7 @@ import java.util.logging.Logger;
  *       errors, which is bad. Probably need a generic visitor exception.
  * @source $URL$
  */
-public class SQLEncoder implements org.geotools.filter.FilterVisitor {
+public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     /** error message for exceptions */
     protected static final String IO_ERROR = "io problem writing filter";
 
@@ -706,5 +708,22 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor {
      */
     public String escapeName(String name) {
         return sqlNameEscape + name + sqlNameEscape;
+    }
+
+    public void visit(IncludeFilter filter) {
+        try {
+            out.write("TRUE");
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException(IO_ERROR, ioe);
+        }
+        
+    }
+
+    public void visit(ExcludeFilter filter) {
+        try {
+            out.write("FALSE");
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException(IO_ERROR, ioe);
+        }
     }
 }

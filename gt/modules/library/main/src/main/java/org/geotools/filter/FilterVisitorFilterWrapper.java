@@ -111,10 +111,14 @@ public class FilterVisitorFilterWrapper implements FilterVisitor {
     public Object visitNullFilter( Object extraData) {        
         return extraData;
     }
-    public Object visit( IncludeFilter filter, Object extraData) {        
+    public Object visit( IncludeFilter filter, Object extraData) {
+        if(delegate instanceof FilterVisitor2)
+            ((FilterVisitor2) delegate).visit(filter);
         return extraData;
     }
-    public Object visit( ExcludeFilter filter, Object extraData) {        
+    public Object visit( ExcludeFilter filter, Object extraData) {   
+        if(delegate instanceof FilterVisitor2)
+            ((FilterVisitor2) delegate).visit(filter);
         return extraData;
     }
 	public Object visit(Not filter, Object extraData) {
