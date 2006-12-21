@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
-import org.geotools.data.EmptyFeatureReader;
 import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLockException;
 import org.geotools.data.FeatureLockFactory;
@@ -908,6 +907,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
                 writer.remove();
             }
         }
+        writer.close();
 
         assertEquals(roadFeatures.length - 1, count("road"));
     }
@@ -951,6 +951,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         writer.write();
 
         assertFalse(writer.hasNext());
+        writer.close();
         assertEquals(roadFeatures.length + 1, count("road"));
     }
 
@@ -1032,6 +1033,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
                 writer.write();
             }
         }
+        writer.close();
 
         feature = (Feature) feature("road", roadFeatures[0].getID());
         assertNotNull(feature);
@@ -1071,7 +1073,6 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     public void testGetFeatureWriterFilter() throws NoSuchElementException, IOException,
             IllegalAttributeException {
         FeatureWriter writer;
-
         writer = data.getFeatureWriter("road", Filter.EXCLUDE, Transaction.AUTO_COMMIT);
 
         // see task above
@@ -1333,7 +1334,16 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(type, actual);
 
         Envelope b = half.getBounds();
-        assertEquals(new Envelope(), b); // empty envelope is expected
+        Envelope expectedBounds = isEnvelopeComputingEnabled() ?  roadBounds :  new Envelope();
+        assertEquals(expectedBounds, b); // empty envelope is expected
+    }
+
+    /**
+     * Return true if the datastore is capable of computing the road bounds given a query
+     * @return
+     */
+    protected boolean isEnvelopeComputingEnabled() {
+        return true;
     }
 
     public void testGetFeatureSourceRiver() throws NoSuchElementException, IOException,
@@ -1381,6 +1391,23 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureCollection results = road.getFeatures(rd1Filter);
         assertEquals("changed", results.features().next().getAttribute("name"));
     }
+    
+    /**
+     * Test with a filter that won't be matched after the modification is done,
+     * was throwing an NPE before the fix
+     * @throws IOException
+     */
+    public void testGetFeatureStoreModifyFeatures3() throws IOException {
+        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        CompareFilter filter = factory.createCompareFilter(Filter.COMPARE_EQUALS);
+        filter.addLeftValue(ff.createAttributeExpression("name"));
+        filter.addRightValue(ff.createLiteralExpression("r1"));
+
+        AttributeType name = roadType.getAttributeType("name");
+        road.modifyFeatures(new AttributeType[]{name,}, new Object[]{"changed",}, filter);
+    }
 
     public void testGetFeatureStoreRemoveFeatures() throws IOException {
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
@@ -1388,6 +1415,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         road.removeFeatures(rd1Filter);
         assertEquals(0, road.getFeatures(rd1Filter).size());
         assertEquals(roadFeatures.length - 1, road.getFeatures().size());
+    }
+    
+    public void testGetFeatureStoreRemoveAllFeatures() throws IOException {
+        FeatureStore road = (FeatureStore) data.getFeatureSource("road");
+
+        road.removeFeatures(Filter.INCLUDE);
+        assertEquals(0, road.getFeatures().size());
     }
 
     public void testGetFeatureStoreAddFeatures() throws IOException {

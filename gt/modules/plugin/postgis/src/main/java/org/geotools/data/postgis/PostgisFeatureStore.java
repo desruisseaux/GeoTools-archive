@@ -474,10 +474,13 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
                 DefaultQuery query=new DefaultQuery(getSchema().getTypeName(), filter);
                 Envelope bounds=bounds(query);
                 statement.executeUpdate(sql);
-                if (bounds!=null && !bounds.isNull())
-                    bounds.expandToInclude(bounds(query));
-                else
+                if (bounds!=null && !bounds.isNull()) {
+                    Envelope afterBounds = bounds(query);
+                    if(afterBounds != null)
+                        bounds.expandToInclude(afterBounds);
+                } else {
                     bounds=bounds(query);
+                }
                 if (bounds!=null && !bounds.isNull())
 	    			getJDBCDataStore().listenerManager.fireFeaturesChanged(getSchema().getTypeName(),
 	    					getTransaction(), bounds, false);
