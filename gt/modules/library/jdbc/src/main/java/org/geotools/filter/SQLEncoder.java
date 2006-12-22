@@ -15,12 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.data.jdbc.fidmapper.FIDMapper;
-import org.geotools.feature.AttributeType;
-import org.geotools.feature.FeatureType;
-import org.opengis.filter.ExcludeFilter;
-import org.opengis.filter.IncludeFilter;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -28,6 +22,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.geotools.data.jdbc.fidmapper.FIDMapper;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.FeatureType;
+import org.geotools.util.Converters;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.IncludeFilter;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Encodes a filter into a SQL WHERE statement.  It should hopefully be generic
@@ -131,6 +134,12 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
 
     /** the schmema the encoder will be used to be encode sql for */
     protected FeatureType featureType;
+    
+    /** 
+     * A type to use as context when encoding literal.
+     * NOTE: when we move to geoapi filter visitor api, this will not be needed.
+     */ 
+    protected Class context = null;
     
     /**
      * Empty constructor
@@ -520,10 +529,14 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
         try {
         	//JD: evaluate the expression agains the feature type to get at the attribute, then 
         	// encode the namee
+        	context = null;
         	if ( featureType != null ) {
         		AttributeType attributeType = (AttributeType) expression.evaluate( featureType );
             	if ( attributeType != null ) {
             		out.write( escapeName( attributeType.getName() ) );
+            		
+            		//provide context for a literal being compared to this attribute
+            		context = attributeType.getType(); 
             		return;
             	}
         	}
@@ -555,34 +568,79 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
     public void visit(LiteralExpression expression) throws RuntimeException {
         LOGGER.finer("exporting LiteralExpression");
 
-        try {
-            Object literal = expression.getLiteral();
-            short type = expression.getType();
+        //type to convert the literal to
+        Class target = null;
+        
+        if ( context != null ) {
+            //first try to evaluate the expression in the context of a type
+        	target = (Class) context;
+        }
+        
+        if ( target == null ) {
+        	//next try and use the filter code
+        	short type = expression.getType();
 
             switch (type) {
             case Expression.LITERAL_DOUBLE:
+            	target = Double.class;
+            	break;
             case Expression.LITERAL_INTEGER:
+            	target = Integer.class; 
+            	break;
             case Expression.LITERAL_LONG:
-                out.write(literal.toString());
-
+                target = Long.class;
                 break;
-
             case Expression.LITERAL_STRING:
-                out.write("'" + literal + "'");
-
+            	target = String.class; 
                 break;
-
             case Expression.LITERAL_GEOMETRY:
-                visitLiteralGeometry(expression);
-
+            	target = Geometry.class;
                 break;
-
             default:
                 throw new RuntimeException("type: " + type + "not supported");
             }
-        } catch (java.io.IOException ioe) {
-            throw new RuntimeException("IO problems writing literal", ioe);
         }
+        
+        try {
+			if ( target == Geometry.class && expression.getLiteral() instanceof Geometry ) {
+				//call this method for backwards compatability with subclasses
+				visitLiteralGeometry( expression );
+				return;
+			}
+			else {
+				//convert the literal to the required type
+				Object literal = expression.evaluate( null, target );
+				if ( literal == null ) {
+					//just use string
+					literal = expression.getLiteral().toString();
+				}
+				
+				//geometry hook
+				if ( literal instanceof Geometry ) {
+					visitLiteralGeometry( expression );
+				}
+				else if ( literal instanceof Number ) {
+					out.write( literal.toString() );
+				}
+				else if ( literal instanceof String ) {
+					out.write( "'" + literal.toString() + "'" );
+					return;
+				}
+				else {
+					//convert back to a string
+					String encoding = (String)Converters.convert( literal, String.class , null );
+					if ( encoding == null ) {
+						//could not convert back to string, use original l value
+						encoding = expression.getLiteral().toString();
+					}
+					
+					out.write( "'" + encoding + "'");
+				}
+			}
+		} catch (IOException e) {
+			 throw new RuntimeException("IO problems writing literal", e);
+		}
+        
     }
 
     /**
@@ -599,7 +657,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
         throw new RuntimeException(
             "Subclasses must implement this method in order to handle geometries");
     }
-
+   
     /**
      * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
      */
