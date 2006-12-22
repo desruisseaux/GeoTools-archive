@@ -190,7 +190,7 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public PropertyIsLike like(Expression expr, String pattern) {
-        return like(expr,pattern,null,null,null);
+        return like(expr,pattern,"*","?","\\");
     }
 
     public PropertyIsLike like(Expression expr, String pattern,
@@ -463,7 +463,7 @@ public class FilterFactoryImpl implements FilterFactory {
     }
 
     public Literal literal(boolean b) {
-        throw new UnsupportedOperationException("Filter api does not support boolean literals");
+    	return b ? new LiteralExpressionImpl( Boolean.TRUE ) : new LiteralExpressionImpl( Boolean.FALSE );
     }
 
     
