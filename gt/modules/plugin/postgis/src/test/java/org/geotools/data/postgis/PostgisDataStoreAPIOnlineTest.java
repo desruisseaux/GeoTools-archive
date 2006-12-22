@@ -1343,7 +1343,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      * @return
      */
     protected boolean isEnvelopeComputingEnabled() {
-        return true;
+        return false;
     }
 
     public void testGetFeatureSourceRiver() throws NoSuchElementException, IOException,
