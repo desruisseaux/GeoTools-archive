@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -1877,7 +1878,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
                 conn = getConnection(Transaction.AUTO_COMMIT);
                 dbInfo = new PostgisDBInfo(conn);
             } catch (IOException e1) {
-                LOGGER.severe("Could not obtain DBInfo object");
+                LOGGER.log(Level.SEVERE, "Could not obtain DBInfo object", e1);
             }
         }
         return dbInfo;
