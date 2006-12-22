@@ -49,6 +49,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -486,5 +487,28 @@ public final class JTS {
         }
         return new Envelope2D(crs2D, envelope.getMinX(), envelope.getMinY(),
                 envelope.getWidth(), envelope.getHeight());
+    }
+    
+    /**
+     * Converts an envelope to a polygon.
+     * <p>
+     * The resulting polygon contains an outer ring with verticies: 
+     * (x1,y1),(x2,y1),(x2,y2),(x1,y2),(x1,y1)
+     * </p>
+     * @param envelope The original envelope.
+     * 
+     * @return The envelope as a polygon.
+     */
+    public static Polygon toGeometry( Envelope e ) {
+    	GeometryFactory gf = new GeometryFactory();
+    	return gf.createPolygon( 
+			gf.createLinearRing( 
+				new Coordinate[] {
+					new Coordinate( e.getMinX(), e.getMinY() ), new Coordinate( e.getMaxX(), e.getMinY() ), 
+					new Coordinate( e.getMaxX(), e.getMaxY() ), new Coordinate( e.getMinX(), e.getMaxY() ), 
+					new Coordinate( e.getMinX(), e.getMinY() )
+				}
+			), null
+    	);
     }
 }
