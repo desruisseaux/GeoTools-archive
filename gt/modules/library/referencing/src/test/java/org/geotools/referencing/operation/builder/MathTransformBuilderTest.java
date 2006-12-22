@@ -26,18 +26,14 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.referencing.crs.AbstractCRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
 import org.geotools.referencing.operation.builder.algorithm.TriangulationException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
 
 /**
@@ -48,6 +44,7 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 public class MathTransformBuilderTest extends TestCase {
     /**
      * Run the suite from the command line.
+     *   
      */
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -55,6 +52,7 @@ public class MathTransformBuilderTest extends TestCase {
 
     /**
      * Returns the test suite.
+     *  
      */
     public static Test suite() {
         return new TestSuite(MathTransformBuilderTest.class);
@@ -63,64 +61,64 @@ public class MathTransformBuilderTest extends TestCase {
     /**
      * Test {@link AffineTransformBuilder}.
      *
-     * @param countOfVertices counf of genareted points
+     * @param numberOfVertices count of generated points
+     * @param seed for random generating.
      *
      * @return points
      */
-    private List generateCoords(int countOfVertices) {
-        return generateCoords(countOfVertices, 435345);
-    }
-
-    private List generateCoords(int countOfVertices, long seed) {
+    private List generateCoords(int numberOfVertices, long seed) {
         CoordinateReferenceSystem crs = DefaultEngineeringCRS.CARTESIAN_2D;
-        return generateCoordsWithCRS(countOfVertices, crs, seed);
+
+        return generateCoordsWithCRS(numberOfVertices, crs, seed);
     }
 
-    private  List generateCoordsWithCRS(int countOfVertices, CoordinateReferenceSystem crs, long seed) {
-    	
-    	
-    	 List vert = new ArrayList();
-         
-         Random randomCoord = new Random(seed);
+    private List generateCoordsWithCRS(int numberOfVertices,
+        CoordinateReferenceSystem crs, long seed) {
+        List vert = new ArrayList();
 
-         for (int i = 0; i < countOfVertices; i++) {
-             double xs = randomCoord.nextDouble() * 1000;
-             double ys = randomCoord.nextDouble() * 1000;
-             double xd = randomCoord.nextDouble() * 1000;
-             double yd = randomCoord.nextDouble() * 1000;
-             MappedPosition p = new MappedPosition(new DirectPosition2D(crs, xs, ys),new DirectPosition2D(crs, xd, yd));
-             vert.add(p);
-         }
+        Random randomCoord = new Random(seed);
 
-         return vert;
+        for (int i = 0; i < numberOfVertices; i++) {
+            double xs = randomCoord.nextDouble() * 1000;
+            double ys = randomCoord.nextDouble() * 1000;
+            double xd = randomCoord.nextDouble() * 1000;
+            double yd = randomCoord.nextDouble() * 1000;
+            MappedPosition p = new MappedPosition(new DirectPosition2D(crs, xs,
+                        ys), new DirectPosition2D(crs, xd, yd));
+            vert.add(p);
+        }
+
+        return vert;
     }
 
     private void transformTest(MathTransform mt, List pts)
-            throws FactoryException, TransformException
-    {
+        throws FactoryException, TransformException {
         double[] points = new double[pts.size() * 2];
         double[] ptCalculated = new double[pts.size() * 2];
 
         for (int i = 0; i < pts.size(); i++) {
-            points[2 * i] = ((MappedPosition)pts.get(i)).getSource().getCoordinates()[0];
-            points[(2 * i) + 1] = ((MappedPosition)pts.get(i)).getSource().getCoordinates()[1];
+            points[2 * i] = ((MappedPosition) pts.get(i)).getSource()
+                             .getCoordinates()[0];
+            points[(2 * i) + 1] = ((MappedPosition) pts.get(i)).getSource()
+                                   .getCoordinates()[1];
         }
 
         mt.transform(points, 0, ptCalculated, 0, pts.size());
 
         for (int i = 0; i < pts.size(); i++) {
-            assertTrue((((MappedPosition)pts.get(i)).getTarget().getCoordinates()[0] - ptCalculated[2 * i]) < 0.001);
-            assertTrue((((MappedPosition)pts.get(i)).getTarget().getCoordinates()[1]
-                - ptCalculated[(2 * i) + 1]) < 0.001);
+            assertTrue((((MappedPosition) pts.get(i)).getTarget()
+                         .getCoordinates()[0] - ptCalculated[2 * i]) < 0.001);
+            assertTrue((((MappedPosition) pts.get(i)).getTarget()
+                         .getCoordinates()[1] - ptCalculated[(2 * i) + 1]) < 0.001);
         }
     }
 
-    public void testRubberCalculator() throws MismatchedSizeException, MismatchedDimensionException,
-                FactoryException, TransformException, TriangulationException
-    {
+    public void testRubberCalculator()
+        throws MismatchedSizeException, MismatchedDimensionException,
+            FactoryException, TransformException, TriangulationException {
         List pts = generateCoords(20, 8324);
-      //  DirectPosition[] ptDst = generateCoords(7, 124);
 
+        //  DirectPosition[] ptDst = generateCoords(7, 124);
         CoordinateReferenceSystem crs = DefaultEngineeringCRS.CARTESIAN_2D;
 
         Quadrilateral quad = new Quadrilateral(new DirectPosition2D(crs, 1000, 0),
@@ -137,75 +135,46 @@ public class MathTransformBuilderTest extends TestCase {
         assertTrue(ppc.toString().indexOf(" x ") >= 0);
     }
 
-    public void testProjectiveCalculator() throws MismatchedSizeException,
-            MismatchedDimensionException, FactoryException, TransformException
-    {
+    public void testProjectiveCalculator()
+        throws MismatchedSizeException, MismatchedDimensionException,
+            FactoryException, TransformException {
         List pts = generateCoords(4, 3243);
-        
+
         MathTransformBuilder ppc = new ProjectiveTransformBuilder(pts);
         //System.out.println(ppc.getMathTransform().toWKT());
         transformTest(ppc.getMathTransform(), pts);
         assertTrue(ppc.getErrorStatistics().rms() < 0.00001);
     }
 
-    public void testAffineCalculator() throws MismatchedSizeException,
-            MismatchedDimensionException, FactoryException, TransformException
-    {
-    	 List pts = generateCoords(3, 2345);        
+    public void testAffineCalculator()
+        throws MismatchedSizeException, MismatchedDimensionException,
+            FactoryException, TransformException {
+        List pts = generateCoords(3, 2345);
         MathTransformBuilder ppc = new AffineTransformBuilder(pts);
         transformTest(ppc.getMathTransform(), pts);
         assertTrue(ppc.getErrorStatistics().rms() < 0.00001);
     }
 
-    public void testSimilarCalculator() throws MismatchedSizeException,
-            MismatchedDimensionException, FactoryException, TransformException
-    {
-   	 List pts = generateCoords(2, 24535);   
-        MathTransformBuilder ppc = new SimilarTransformBuilder(pts);
-        //System.out.println(ppc.getMMatrix());
+    public void testSimilarCalculator()
+        throws MismatchedSizeException, MismatchedDimensionException,
+            FactoryException, TransformException {
+        List pts = generateCoords(2, 24535);
+        MathTransformBuilder ppc = new SimilarTransformBuilder(pts);        
         transformTest(ppc.getMathTransform(), pts);
         assertTrue(ppc.getErrorStatistics().rms() < 0.00001);
     }
 
     public void testCalculationException() throws TransformException {
-        // The exception should be thrown when the number of points is not the same
-      /*  DirectPosition[] ptSrc = generateCoords(4);
-        DirectPosition[] ptDst = generateCoords(3);
-
-        try {
-            new SimilarTransformBuilder(ptSrc, ptDst);
-            fail("Expected MismatchedSizeException");
-        } catch (MismatchedSizeException e) {
-        }
-        */
-        // The exception should be thrown when the number of points is less then neccesary
-    	 List pts = generateCoords(2, 2453655);   
+       
+        // The exception should be thrown when the number of points is less than necessary
+        List pts = generateCoords(2, 2453655);
 
         try {
             new AffineTransformBuilder(pts);
             fail("Expected MismatchedSizeException");
         } catch (MismatchedSizeException e) {
         }
-/*
-        // The exception should be thrown when the CRS of all points is not the same
-        ptSrc = generateCoords(4);
-        ptSrc[0] = new DirectPosition2D(DefaultGeographicCRS.WGS84);
-        ptDst = generateCoords(4);
 
-        try {
-            new AffineTransformBuilder(ptSrc, ptDst);
-            fail("Expected MismatchedReferenceSystemException");
-        } catch (MismatchedReferenceSystemException e) {
-        }
-
-        //The exception should be thrown when the CRS is not null or DefaultEngineeringCRS.CARTESIAN_2D
-        ptSrc = generateCoordsWithCRS(4, DefaultGeographicCRS.WGS84);
-        ptDst = generateCoords(4);
-
-        try {
-            new AffineTransformBuilder(ptSrc, ptDst);
-            fail("Expected MismatchedReferenceSystemException");
-        } catch (MismatchedReferenceSystemException e) {
-        }*/
+        
     }
 }

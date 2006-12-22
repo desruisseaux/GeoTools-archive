@@ -34,20 +34,22 @@ import javax.vecmath.MismatchedSizeException;
 /**
  * Builds {@linkplain org.opengis.referencing.operation.MathTransform
  * MathTransform} setup as BursaWolf transformation from a list of {@linkplain
- * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}. The
- * calculation uses least square method.  Calculated parameters can be used
- * for following operations:<p></p>
+ * org.geotools.referencing.operation.builder.MappedPosition MappedPosition}.
+ * The calculation uses least square method.  Calculated parameters can be
+ * used for following operations:<p></p>
  *  <p>The equations:<pre> X = q * R * x  +  T ,             </pre>Where X
  * is the Matrix of destination points, q is the scale,  R is the rotation
  * Matrix, x is the Matrix of source points  and T is matrix of translation.
  * Expressing the errors, we get this:<pre>        Err =  A * Dx + l </pre>where
  * Err is the Error Matrix, A is Matrix of derivations, Dx is Matrix  of
  * difference changes of 7 parameters, and l is value of DX, DY, DZ for
- * calculated from aproximate values. Using the least square method to
+ * calculated from approximate values. Using the least square method to
  * minimalize the errors we get this result:<pre>
  *  Dx = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>l  </pre></p>
  *
+ * @since 2.4
  * @author Jan Jezek
+ *
  */
 public class BursaWolfTransformBuilder extends MathTransformBuilder {
     /** The Geodetic Datum of target reference system */
@@ -102,18 +104,19 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
      * Returns the minimum number of points required by this builder,
      * which is 3.
      *
-     * @return DOCUMENT ME!
+     * @return the minimum number of points required by this builder which is
+     *         3.
      */
     public int getMinimumPointCount() {
         return 3;
     }
 
     /**
-     * Returns the dimension for {@linkplain #getSourceCRS source} and
+     * Returns the dimension for {@link #getSourceCRS source} and
      * {@link #getTargetCRS target} CRS, which is 2.
      *
-     * @return dimension for {@linkplain #getSourceCRS source} and
-     * {@link #getTargetCRS target} CRS, which is 2.
+     * @return dimension for {@linkplain #getSourceCRS source} and {@link
+     *         #getTargetCRS target} CRS, which is 2.
      */
     public int getDimension() {
         return 3;
@@ -136,7 +139,6 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
      */
     protected GeneralMatrix getx() {
         final DirectPosition[] sourcePoints = getSourcePoints();
-        final DirectPosition[] targetPoints = getTargetPoints();
         GeneralMatrix x = new GeneralMatrix(3 * sourcePoints.length, 1);
 
         for (int j = 0; j < (x.getNumRow()); j = j + 3) {
@@ -225,14 +227,12 @@ public class BursaWolfTransformBuilder extends MathTransformBuilder {
      *         with respect to  alfa.
      */
     protected GeneralMatrix getDRalfa() {
-        //final dervatin dRalfa = R'(alfa)R(beta)R(gamma)*x[3,1]
-        //where x is sub matrix of x[3*number of points, 1]
-        //GeneralMatrix dRalfa = new GeneralMatrix(3 * sourcePoints.size(), 1);
-        // dRa - derivation of submatrix
         GeneralMatrix dRa = new GeneralMatrix(3, 3);
+
         double[] m0 = { 0, 0, 0 };
         double[] m1 = { 0, -Math.sin(alfa), Math.cos(alfa) };
         double[] m2 = { 0, -Math.cos(alfa), -Math.sin(alfa) };
+
         dRa.setRow(0, m0);
         dRa.setRow(1, m1);
         dRa.setRow(2, m2);

@@ -34,8 +34,7 @@ import java.util.Random;
 public class BursaWolfTransformBuilderTest extends TestCase {
     /**
      * Run the suite from the command line.
-     *
-     * @param args DOCUMENT ME!
+     *   
      */
     public static void main(String[] args) {
         junit.textui.TestRunner.run(suite());
@@ -43,8 +42,7 @@ public class BursaWolfTransformBuilderTest extends TestCase {
 
     /**
      * Returns the test suite.
-     *
-     * @return DOCUMENT ME!
+     * 
      */
     public static Test suite() {
         return new TestSuite(BursaWolfTransformBuilderTest.class);
@@ -53,8 +51,6 @@ public class BursaWolfTransformBuilderTest extends TestCase {
     /**
      * Test {@link BursaWolfTransformBuilder}.
      *
-     * @throws FactoryException DOCUMENT ME!
-     * @throws TransformException DOCUMENT ME!
      */
     public void testBursaWolfParamCalculaterXrotation()
         throws FactoryException, TransformException {
@@ -65,17 +61,6 @@ public class BursaWolfTransformBuilderTest extends TestCase {
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
 
-/*        DirectPosition[] ptSrc = new GeneralDirectPosition[3];
-        DirectPosition[] ptDst = new GeneralDirectPosition[3];
-
-        ptSrc[0] = new GeneralDirectPosition(R, 0, 0);
-        ptSrc[1] = new GeneralDirectPosition(0, cos * R, -sin * R);
-        ptSrc[2] = new GeneralDirectPosition(0, sin * R, cos * R);
-
-        ptDst[0] = new GeneralDirectPosition(R, 0, 0);
-        ptDst[1] = new GeneralDirectPosition(0, R, 0);
-        ptDst[2] = new GeneralDirectPosition(0, 0, R);
-*/
         List /*<MappedPosition>*/ vectors = new ArrayList();
 
         vectors.add(new MappedPosition(
@@ -115,9 +100,9 @@ public class BursaWolfTransformBuilderTest extends TestCase {
 
     /**
      * The test that generates random transformation parameters and
-     * source points. The destination poinst are calculated using generated
-     * parameters. Then the parameters are computed by the calculater and
-     * comared with original.
+     * source points. The destination points are calculated using generated
+     * parameters. Then the parameters are computed by the builder and
+     * compared against original.
      *
      * @throws FactoryException DOCUMENT ME!
      * @throws TransformException
@@ -126,11 +111,9 @@ public class BursaWolfTransformBuilderTest extends TestCase {
         throws FactoryException, TransformException {
         double R = 6370000;
         Random random = new Random(143477662);
-        int numberOfPoints = 3 * 10;
-
-        //double[] points = new double[numberOfPoints];
-        DirectPosition ptSrc ;//= new GeneralDirectPosition[numberOfPoints];
-        DirectPosition ptDst ;//= new GeneralDirectPosition[numberOfPoints];
+        
+        DirectPosition ptSrc ;
+        DirectPosition ptDst ;
         List /*<MappedPosition>*/ vectors = new ArrayList();
         
         BursaWolfParameters bwp = new BursaWolfParameters(null);

@@ -26,6 +26,7 @@ import java.util.List;
  * means that there are no alien vertices in  the circumcicle of each
  * triangle. The algorithm that is used is also known as incremental insetion.
  *
+ * @since 2.4
  * @author Jan Jezek
  */
 public class TriangulationFactory {

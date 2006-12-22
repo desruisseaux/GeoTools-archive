@@ -24,6 +24,7 @@ import java.util.List;
 /**
  * A simple four-sided polygon.
  *
+ * @since 2.4
  * @author Jan Jezek
  */
 public class Quadrilateral extends Polygon {

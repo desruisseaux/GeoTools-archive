@@ -36,6 +36,7 @@ import java.util.Iterator;
  * href =
  * "http://planner.t.u-tokyo.ac.jp/member/fuse/rubber_sheeting.pdf">here</a>.
  *
+ * @since 2.4
  * @author Jan Jezek
  *
  * @todo Consider moving this class to the {@linkplain

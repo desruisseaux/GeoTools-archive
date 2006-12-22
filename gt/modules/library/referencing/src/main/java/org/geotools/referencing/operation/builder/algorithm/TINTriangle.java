@@ -24,6 +24,10 @@ import java.util.List;
 
 /**
  * A triangle, with special methods for use with RubberSheetTransform.
+ * 
+ * @since 2.4
+ * @author Jan Jezek
+ * 
  */
 public class TINTriangle extends Polygon {
     /** The first vertex. */

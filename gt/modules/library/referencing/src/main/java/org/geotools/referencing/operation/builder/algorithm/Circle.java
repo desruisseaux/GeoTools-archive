@@ -22,6 +22,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 /**
  * Simple Circle focused on Delaunays triangulation.
  *
+ * @since 2.4
  * @author Jan Jezek
  */
 class Circle {

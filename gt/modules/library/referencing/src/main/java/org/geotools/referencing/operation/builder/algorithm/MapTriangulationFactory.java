@@ -28,6 +28,7 @@ import java.util.Map;
  * Class that implements methods for triangulation for  {@linkplain org.geotools.referencing.operation.builder.RubberSheetBuilder
  * RubberSheeting} transformation. 
  *
+ * @since 2.4
  * @author Jan Jezek
  */
 public class MapTriangulationFactory {

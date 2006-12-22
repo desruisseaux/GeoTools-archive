@@ -23,7 +23,6 @@ import java.util.Map;
 
 import javax.vecmath.MismatchedSizeException;
 
-import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.operation.builder.algorithm.MapTriangulationFactory;
 import org.geotools.referencing.operation.builder.algorithm.Quadrilateral;
 import org.geotools.referencing.operation.builder.algorithm.RubberSheetTransform;
@@ -32,7 +31,6 @@ import org.geotools.referencing.operation.builder.algorithm.TriangulationExcepti
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 
@@ -44,6 +42,7 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
  * explanation of RubberSheet transformation can be seen <a href =
  * "http://planner.t.u-tokyo.ac.jp/member/fuse/rubber_sheeting.pdf">here</a>.
  *
+ * @since 2.4
  * @author Jan Jezek
  */
 public class RubberSheetBuilder extends MathTransformBuilder {
@@ -158,8 +157,9 @@ public class RubberSheetBuilder extends MathTransformBuilder {
                 calculator = new AffineTransformBuilder(pts);
                 a.setValue(calculator.getMathTransform());
             } catch (Exception e) {
-                // the numeber of vertices of two triangles is the same. So we
-                // can ignore...
+                // should never reach here because AffineTransformBuilder(pts)
+            	// should not thorw any Exception.
+            	e.printStackTrace();
             }
         }
 

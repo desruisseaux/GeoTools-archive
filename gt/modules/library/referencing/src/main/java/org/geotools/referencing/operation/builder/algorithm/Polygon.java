@@ -29,6 +29,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * Simple polygons like three - sided (triangle) or four - sided
  * (qadrilateral), that are used for triangulation.
  *
+ * @since 2.4
  * @author Jan Jezek
  */
 class Polygon {

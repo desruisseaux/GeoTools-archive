@@ -22,6 +22,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 /**
  * DirectPosition associated with another DirectPosition.
  *
+ * @since 2.4
+ * @author Jan Jezek
  */
 class ExtendedPosition extends DirectPosition2D {
     /**  */

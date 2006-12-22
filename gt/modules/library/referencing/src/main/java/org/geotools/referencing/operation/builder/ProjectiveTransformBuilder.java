@@ -53,7 +53,9 @@ import javax.vecmath.MismatchedSizeException;
  * <pre><blockquote>
  *  m = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>x'  </blockquote> </pre>
  *
+ * @since 2.4
  * @author Jan Jezek
+ *
  */
 public class ProjectiveTransformBuilder extends MathTransformBuilder {
     protected ProjectiveTransformBuilder() {
@@ -82,8 +84,8 @@ public class ProjectiveTransformBuilder extends MathTransformBuilder {
      * AffineTransformBuilder affine transform builders} will reduce this
      * minimum.
      *
-     * @return minimum number of points required by this builder,
-     * which is 4 by default.
+     * @return minimum number of points required by this builder, which is 4 by
+     *         default.
      */
     public int getMinimumPointCount() {
         return 4;
