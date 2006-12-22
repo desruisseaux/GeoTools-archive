@@ -151,7 +151,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * http://java.sun.com/j2se/1.3/docs/guide/jdbc/getstart/mapping.html#997737
 	 * </p>
 	 */
-	protected static final Map TYPE_MAPPINGS = new HashMap();
+	public static final Map TYPE_MAPPINGS = new HashMap();
 
 	static {
 		TYPE_MAPPINGS.put(new Integer(Types.VARCHAR), String.class);
