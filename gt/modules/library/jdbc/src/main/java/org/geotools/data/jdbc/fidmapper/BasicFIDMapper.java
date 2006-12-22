@@ -122,7 +122,7 @@ public class BasicFIDMapper extends AbstractFIDMapper {
         throws IOException {
     	//JD: replacing no word characters with underscore
     	//JD: forcing to start with a latter
-        return "fid_" + (new UID()).toString().replaceAll( "\\W","_" );
+        return "fid-" + new UID().toString().replaceAll( "\\W","_" );
     }
 
 }
