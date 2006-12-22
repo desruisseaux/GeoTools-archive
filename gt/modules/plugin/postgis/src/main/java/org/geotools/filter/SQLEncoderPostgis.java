@@ -359,7 +359,7 @@ public class SQLEncoderPostgis extends SQLEncoder implements
      */
     public void visitLiteralGeometry(LiteralExpression expression)
         throws IOException {
-        Geometry bbox = (Geometry) expression.getLiteral();
+        Geometry bbox = (Geometry) expression.evaluate( null, Geometry.class );
         String geomText = null;
         if ( bbox instanceof LinearRing ) {
         	//postgis does not handle linear rings, convert to just a line string
