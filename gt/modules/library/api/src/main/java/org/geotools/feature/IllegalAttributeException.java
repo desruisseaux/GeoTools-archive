@@ -65,9 +65,10 @@ public class IllegalAttributeException extends Exception {
     }
 
     public String toString() {
-        if(expected == null && invalid == null)
+        if ((expected == null) && (invalid == null)) {
             return super.toString();
-        
+        }
+
         String message = "IllegalAttribute: "
             + ((expected == null) ? "null" : expected.getType().getName());
 
