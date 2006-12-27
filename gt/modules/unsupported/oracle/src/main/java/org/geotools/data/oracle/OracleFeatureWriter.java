@@ -90,7 +90,7 @@ public class OracleFeatureWriter implements FeatureWriter {
     protected boolean closed;
     protected Object[] fidAttributes;
     
-    public OracleFeatureWriter(FeatureReader fReader, QueryData queryData )
+    public OracleFeatureWriter(FeatureReader reader, QueryData queryData )
         throws IOException {
         this.reader = reader;
         this.queryData = queryData;
