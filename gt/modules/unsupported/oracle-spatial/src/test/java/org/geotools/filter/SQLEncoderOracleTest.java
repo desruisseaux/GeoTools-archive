@@ -73,8 +73,8 @@ public class SQLEncoderOracleTest extends TestCase {
                 new Envelope(-180.0, 180.0, -90.0, 90.0)));
         String value = encoder.encode(filter);
         assertEquals("WHERE SDO_RELATE(\"GEOM\","+
-        		"MDSYS.SDO_GEOMETRY(2003,NULL,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,1),"+
-        		"MDSYS.SDO_ORDINATE_ARRAY(-180.0,-90.0,180.0,-90.0,180.0,90.0,-180.0,90.0,-180.0,-90.0)),"+
+        		"MDSYS.SDO_GEOMETRY(2003,NULL,NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),"+
+        		"MDSYS.SDO_ORDINATE_ARRAY(-180.0,-90.0,180.0,90.0)),"+
         		"'mask=anyinteract querytype=WINDOW') = 'TRUE' ", value);
 
         filter = filterFactory.createGeometryFilter(AbstractFilter.GEOMETRY_CONTAINS);

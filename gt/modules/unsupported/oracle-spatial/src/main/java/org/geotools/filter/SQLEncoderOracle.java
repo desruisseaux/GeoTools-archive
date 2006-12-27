@@ -28,6 +28,7 @@ import org.geotools.data.DataSourceException;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -322,7 +323,11 @@ public class SQLEncoderOracle extends SQLEncoder {
         } else if (LineString.class.isAssignableFrom(geometry.getClass())) {
             return toSDOGeom((LineString) geometry, srid);
         } else if (Polygon.class.isAssignableFrom(geometry.getClass())) {
-            return toSDOGeom((Polygon) geometry, srid);
+            if(geometry.equals(geometry.getEnvelope())) {
+                return toSDOGeom(geometry.getEnvelopeInternal(), srid);
+            } else {
+                return toSDOGeom((Polygon) geometry, srid);
+            }
         } else if (MultiLineString.class.isAssignableFrom(geometry.getClass())) {
             return toSDOGeom((MultiLineString) geometry, srid);
         }
@@ -536,6 +541,41 @@ public class SQLEncoderOracle extends SQLEncoder {
             LOGGER.warning("Polygon contains Interior Rings. "
                 + "These rings will not be included in the query.");
         }
+
+        return buffer.toString();
+    }
+    
+    /**
+     * Converts an Envelope in an SDO SQL geometry construction statement.
+     *
+     * @param envelope The envelope to encode.
+     * @param srid DOCUMENT ME!
+     *
+     * @return An SDO SQL geometry object construction statement
+     */
+    private static String toSDOGeom(Envelope envelope, int srid) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("MDSYS.SDO_GEOMETRY(");
+        buffer.append("2003,");
+
+        if (srid > 0) {
+            LOGGER.fine("Using layer SRID: " + srid);
+            buffer.append(srid);
+        } else {
+            LOGGER.fine("Using NULL SRID: ");
+            buffer.append("NULL");
+        }
+
+        buffer.append(",NULL,MDSYS.SDO_ELEM_INFO_ARRAY(1,1003,3),");
+        buffer.append("MDSYS.SDO_ORDINATE_ARRAY(");
+        buffer.append(envelope.getMinX());
+        buffer.append(",");
+        buffer.append(envelope.getMinY());
+        buffer.append(",");
+        buffer.append(envelope.getMaxX());
+        buffer.append(",");
+        buffer.append(envelope.getMaxY());
+        buffer.append("))");
 
         return buffer.toString();
     }
