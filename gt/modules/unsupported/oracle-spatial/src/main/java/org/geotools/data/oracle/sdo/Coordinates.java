@@ -171,14 +171,10 @@ public class Coordinates {
             return c;
         }
 
-        CoordinateList list = new CoordinateList(sequence.toCoordinateArray());
-
         Coordinate[] array = new Coordinate[toIndex - fromIndex];
         int index = 0;
-
-        for (Iterator i = list.subList(fromIndex, toIndex).iterator();
-                i.hasNext(); index++) {
-            array[index] = (Coordinate) i.next();
+        for(int i = fromIndex; i < toIndex; i++, index++) {
+            array[index] = sequence.getCoordinate(i);
         }
 
         return factory.create(array);
