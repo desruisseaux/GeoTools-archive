@@ -15,15 +15,16 @@
  */
 package org.geotools.styling;
 
-import com.vividsolutions.jts.geom.LineString;
+import java.util.Set;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.filter.AbstractFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
@@ -31,7 +32,7 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
 import org.geotools.filter.IllegalFilterException;
 
-import java.util.Set;
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -198,6 +199,7 @@ public class StyleAttributeExtractorTest extends TestCase {
         stroke.setWidth(filterFactory.createAttributeExpression(testSchema,
                 "testInteger"));
         mark.setStroke(stroke);
+        mark.setWellKnownName(filterFactory.createAttributeExpression(testSchema, "testString"));
 
         Expression opacity = filterFactory.createAttributeExpression(testSchema,
                 "testLong");
@@ -214,12 +216,12 @@ public class StyleAttributeExtractorTest extends TestCase {
                 pointSymb
             });
         assertAttributeName(s,
-            new String[] { "testInteger", "testLong", "testDouble", "testFloat" });
+            new String[] { "testInteger", "testLong", "testDouble", "testFloat", "testString" });
 
         pointSymb.setGeometryPropertyName("testGeometry");
         assertAttributeName(s,
             new String[] {
-                "testInteger", "testLong", "testDouble", "testFloat",
+                "testInteger", "testLong", "testDouble", "testFloat", "testString",
                 "testGeometry"
             });
     }
@@ -251,7 +253,7 @@ public class StyleAttributeExtractorTest extends TestCase {
         assertAttributeName(s,
             new String[] { "testFloat", "testDouble", "testString" });
     }
-
+    
     public void testFont() throws Exception {
         Font font = styleFactory.createFont(filterFactory
                 .createAttributeExpression(testSchema, "testString"),

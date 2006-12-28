@@ -374,6 +374,9 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         if (mark.getSize() != null) {
             mark.getSize().accept(this);
         }
+        
+        if(mark.getWellKnownName() != null)
+            mark.getWellKnownName().accept(this);
     }
 
     /**
