@@ -16,6 +16,7 @@
 package org.geotools.data.collection;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
@@ -55,7 +56,14 @@ public class CollectionDataStore extends AbstractDataStore {
         if (collection.size() == 0) {
             this.featureType = DefaultFeatureType.EMPTY;
         } else {
-            this.featureType = ((Feature) collection.iterator().next()).getFeatureType();
+            Iterator iter = null;
+            try {
+                iter = collection.iterator();
+                this.featureType = ((Feature) iter.next()).getFeatureType();
+            } finally {
+                if (iter != null)
+                    collection.close(iter);
+            }
         }
 
         collection.addListener(new FeatureCollectionListener());
