@@ -622,6 +622,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		}
 
 		String sqlQuery = constructQuery(query, attrTypes);
+		LOGGER.info( sqlQuery );
 		
 		//JD: This is bad, we should not assume we have the right to change the query object
 		((DefaultQuery) query).setFilter(originalFilter);
