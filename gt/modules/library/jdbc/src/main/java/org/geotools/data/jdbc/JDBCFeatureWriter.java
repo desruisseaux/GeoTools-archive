@@ -17,6 +17,9 @@ package org.geotools.data.jdbc;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -277,8 +280,10 @@ public class JDBCFeatureWriter implements FeatureWriter {
         FIDMapper mapper = queryData.getMapper();
 
         // read the new fid into the Feature 
+        Set autoincrementColumns = null;
         if ((mapper.getColumnCount() > 0)
                 && !mapper.returnFIDColumnsAsAttributes()) {
+            autoincrementColumns = Collections.EMPTY_SET;
             String ID = mapper.createID(queryData.getConnection(), mutable, null);
             fidAttributes = mapper.getPKAttributes(ID);
 
@@ -294,13 +299,21 @@ public class JDBCFeatureWriter implements FeatureWriter {
                     }
                 }
             }
+        } else {
+            autoincrementColumns = new HashSet();
+            for (int i = 0; i < mapper.getColumnCount(); i++) {
+                if (mapper.isAutoIncrement(i)) {
+                    autoincrementColumns.add(mapper.getColumnName(i));
+                }
+            }
         }
 
         // set up attributes and write row
         for (int i = 0; i < current.getNumberOfAttributes(); i++) {
             Object currAtt = current.getAttribute(i);
-
-            queryData.write(i, currAtt);
+            String attName = current.getFeatureType().getAttributeType(i).getName();
+            if(!autoincrementColumns.contains(attName)) 
+                queryData.write(i, currAtt);
         }
 
         queryData.doInsert();

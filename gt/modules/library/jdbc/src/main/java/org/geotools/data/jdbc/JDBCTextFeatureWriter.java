@@ -20,6 +20,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -159,17 +163,33 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         StringBuffer statementSQL = new StringBuffer("INSERT INTO " + tableName
                 + " (");
 
+        // either add statements to append non autoincrement colums, or gather
+        // the auto-increment ones
+        Set autoincrementColumns = null;
         if (!mapper.returnFIDColumnsAsAttributes()) {
+            autoincrementColumns = Collections.EMPTY_SET;
             for (int i = 0; i < mapper.getColumnCount(); i++) {
                 if (!mapper.isAutoIncrement(i)) {
                     statementSQL.append(mapper.getColumnName(i)).append(",");
                 }
             }
+        } else {
+            autoincrementColumns = new HashSet();
+            for (int i = 0; i < mapper.getColumnCount(); i++) {
+                if (mapper.isAutoIncrement(i)) {
+                    autoincrementColumns.add(mapper.getColumnName(i));
+                }
+            }
         }
 
+        // encode insertion for attributes, but remember to avoid auto-increment ones, 
+        // they may be included in the feature type as well
         for (int i = 0; i < attributeTypes.length; i++) {
-        	String colName = encodeColumnName(attributeTypes[i].getName());
-            statementSQL.append(colName).append(",");
+            String attName = attributeTypes[i].getName();
+            if(!autoincrementColumns.contains(attName)) {
+                String colName = encodeColumnName(attName);
+                statementSQL.append(colName).append(",");
+            }
         }
 
         statementSQL.setCharAt(statementSQL.length() - 1, ')');
@@ -195,15 +215,18 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         Object[] attributes = feature.getAttributes(null);
 
         for (int i = 0; i < attributeTypes.length; i++) {
+            attrValue = null;
             if (attributeTypes[i] instanceof GeometryAttributeType) {
                 String geomName = attributeTypes[i].getName();
                 int srid = ftInfo.getSRID(geomName);
                 attrValue = getGeometryInsertText((Geometry) attributes[i], srid);
             } else {
-                attrValue = addQuotes(attributes[i]);
+                if(!autoincrementColumns.contains(attributeTypes[i].getName()))
+                    attrValue = addQuotes(attributes[i]);
             }
 
-            statementSQL.append(attrValue + ",");
+            if(attrValue != null)
+                statementSQL.append(attrValue + ",");
         }
 
         statementSQL.setCharAt(statementSQL.length() - 1, ')');
