@@ -389,7 +389,7 @@ public class ImageWorker {
     private RenderingHints getRenderingHints(final int type) {
         /*
          * Get the default hints, which usually contains only informations about tiling.
-         * If the user overrided the rendering hints with an explict color model, keep
+         * If the user overridden the rendering hints with an explict color model, keep
          * the user's choice.
          */
         final RenderingHints hints = getRenderingHints();

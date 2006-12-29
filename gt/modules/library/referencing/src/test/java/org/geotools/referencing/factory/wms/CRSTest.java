@@ -104,14 +104,28 @@ public class CRSTest extends TestCase {
     }
 
     /**
-     * Tests the CRS factory.
+     * Tests the CRS:84 code.
      */
-    public void testCRS() throws FactoryException {
+    public void testCRS84() throws FactoryException {
         GeographicCRS crs = factory.createGeographicCRS("CRS:84");
+        assertSame(crs, factory.createGeographicCRS("84"));
+        assertSame(crs, factory.createGeographicCRS("CRS84"));
+        assertSame(crs, factory.createGeographicCRS("CRS:CRS84"));
+        assertSame(crs, factory.createGeographicCRS("crs : crs84"));
+        assertNotSame(crs, factory.createGeographicCRS("CRS:83"));
         assertFalse(DefaultGeographicCRS.WGS84.equals(crs));
         assertTrue(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
+    }
 
-        crs = factory.createGeographicCRS("CRS:83");
+    /**
+     * Tests the CRS:83 code.
+     */
+    public void testCRS83() throws FactoryException {
+        GeographicCRS crs = factory.createGeographicCRS("CRS:83");
+        assertSame(crs, factory.createGeographicCRS("83"));
+        assertSame(crs, factory.createGeographicCRS("CRS83"));
+        assertSame(crs, factory.createGeographicCRS("CRS:CRS83"));
+        assertNotSame(crs, factory.createGeographicCRS("CRS:84"));
         assertFalse(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
     }
 }

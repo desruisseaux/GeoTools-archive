@@ -164,7 +164,12 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * Completes the set of hints according the value currently set in this object. This method
      * is invoked by {@code BufferedAuthorityFactory} or by {@code DeferredAuthorityFactory} at
      * backing store creation time.
-     *
+     * <p>
+     * The backing store is of course an important dependency. This method gives a chance
+     * to {@link org.geotools.factory.FactoryRegistry} to compare the user-requested hints
+     * (especially {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER}) against the backing store
+     * hints, by following the dependency declared there.
+     * <p>
      * DON'T FORGET to set those hints to {@code null} when {@link DeferredAuthorityFactory}
      * dispose the backing store.
      */

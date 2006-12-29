@@ -238,7 +238,7 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
 
     /**
      * Invoked when the {@link #hints} map should be initialized. This method may
-     * be overriden by subclasses like {@link BufferedCoordinateOperationFactory}.
+     * be overridden by subclasses like {@link BufferedCoordinateOperationFactory}.
      */
     void initializeHints() {
         assert Thread.holdsLock(hints);

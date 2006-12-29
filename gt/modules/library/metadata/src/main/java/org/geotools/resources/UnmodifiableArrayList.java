@@ -79,7 +79,7 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
     /**
      * Returns the index in this list of the first occurence of the specified
      * element, or -1 if the list does not contain this element. This method
-     * is overriden only for performance reason (the default implementation
+     * is overridden only for performance reason (the default implementation
      * would work as well).
      */
     public int indexOf(final Object object) {
@@ -102,7 +102,7 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
     /**
      * Returns the index in this list of the last occurence of the specified
      * element, or -1 if the list does not contain this element. This method
-     * is overriden only for performance reason (the default implementation
+     * is overridden only for performance reason (the default implementation
      * would work as well).
      */
     public int lastIndexOf(final Object object) {
@@ -125,7 +125,7 @@ public class UnmodifiableArrayList extends AbstractList implements Serializable 
 
     /**
      * Returns {@code true} if this collection contains the specified element.
-     * This method is overriden only for performance reason (the default implementation
+     * This method is overridden only for performance reason (the default implementation
      * would work as well).
      */
     public boolean contains(final Object object) {

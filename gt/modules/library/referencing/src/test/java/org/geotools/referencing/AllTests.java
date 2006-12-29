@@ -33,7 +33,9 @@ import junit.textui.TestRunner;
  * @author Martin Desruisseaux
  */
 public class AllTests extends TestCase {
-    /** No need to construct this class. */
+    /**
+     * No need to construct this class.
+     */
     private AllTests() {
     }
 
@@ -46,14 +48,31 @@ public class AllTests extends TestCase {
     }
 
     /**
+     * Add a test suite using reflection. Used in order to add some suites that may or may
+     * not be on the classpath.
+     */
+    private static void addTest(final TestSuite suite, final String tests) {
+        try {
+            final Class c = Class.forName(tests);
+            suite.addTest((Test) c.getMethod("suite", (Class[]) null).invoke(null, (Object[])null));
+        } catch (Exception ignore) {
+            /*
+             * EPSG tests not found on the class path (which may be normal), or method invocation
+             * failed (which should not happen). Ignore, because the addition of those tests here
+             * was just a convenience. All tests will be run at Maven build anyway.
+             */
+        }
+    }
+
+    /**
      * Returns all suites.
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("org.geotools.referencing");
-//      suite.addTest(org.geotools.math                            .AllTests                 .suite());
-        suite.addTest(org.geotools.measure                         .AllTests                 .suite());
-        suite.addTest(org.geotools.parameter                       .AllTests                 .suite());
-//      suite.addTest(org.geotools.factory                         .FactoryRegistryTest      .suite());
+        addTest(suite, "org.geotools.metadata.AllTests");
+        suite.addTest(org.geotools.measure                         .FormatTest               .suite());
+        suite.addTest(org.geotools.parameter                       .ParametersTest           .suite());
+        suite.addTest(org.geotools.parameter                       .ImagingParametersTest    .suite());
         suite.addTest(org.geotools.referencing                     .BasicTest                .suite());
         suite.addTest(org.geotools.referencing                     .CreationTest             .suite());
         suite.addTest(org.geotools.referencing                     .WKTParserTest            .suite());
@@ -72,6 +91,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation.projection.NewZealandMapGridTest    .suite());
         suite.addTest(org.geotools.referencing                     .ScriptTest               .suite());
         suite.addTest(org.geotools.referencing                     .CrsTest                  .suite());
+        suite.addTest(org.geotools.referencing.factory             .URN_ParserTest           .suite());
         suite.addTest(org.geotools.referencing.factory.wms         .AUTOTest                 .suite());
         suite.addTest(org.geotools.referencing.factory.wms         .CRSTest                  .suite());
         /*
@@ -80,16 +100,7 @@ public class AllTests extends TestCase {
          * will be run at plugin/epsg-hsql building time instead). But it is sometime the case
          * when the tests are run from the command line.
          */
-        try {
-            final Class c = Class.forName("org.geotools.referencing.factory.epsg.AllTests");
-            suite.addTest((Test) c.getMethod("suite", (Class[]) null).invoke(null, (Object[])null));
-        } catch (Exception ignore) {
-            /*
-             * EPSG tests not found on the class path (which may be normal), or method invocation
-             * failed (which should not happen). Ignore, because the addition of those tests here
-             * was just a convenience. All tests will be run at Maven build anyway.
-             */
-        }
+        addTest(suite, "org.geotools.referencing.factory.epsg.AllTests");
         /*
          * The following must be tested after the EPSG factory tests, because it may involves more
          * interactions with the EPSG factory.  No work on the database-backed EPSG factory should

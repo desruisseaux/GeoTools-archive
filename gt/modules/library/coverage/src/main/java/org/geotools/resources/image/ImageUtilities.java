@@ -83,7 +83,7 @@ import com.sun.media.jai.util.ImageUtil;
 public final class ImageUtilities {
     /**
      * The default tile size. This default tile size can be
-     * overriden with a call to {@link JAI#setDefaultTileSize}.
+     * overridden with a call to {@link JAI#setDefaultTileSize}.
      */
     private static final Dimension GEOTOOLS_DEFAULT_TILE_SIZE = new Dimension(512,512);
 

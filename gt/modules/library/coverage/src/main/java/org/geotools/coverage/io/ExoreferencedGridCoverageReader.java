@@ -66,7 +66,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      *
      * @param formatName The name for this format. This format name should be
      *        understood by {@link ImageIO#getImageReadersByFormatName(String)},
-     *        unless {@link #getImageReaders} is overriden.
+     *        unless {@link #getImageReaders} is overridden.
      * @param parser The {@link MetadataBuilder} to use for reading geographic metadata.
      */
     public ExoreferencedGridCoverageReader(final String formatName, final MetadataBuilder parser) {
@@ -79,7 +79,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      *
      * @param formatName The name for this format. This format name should be
      *        understood by {@link ImageIO#getImageReadersByFormatName(String)},
-     *        unless {@link #getImageReaders} is overriden.
+     *        unless {@link #getImageReaders} is overridden.
      * @param extension Filename's extensions for file of this format.
      * @param parser The {@link MetadataBuilder} to use for reading geographic metadata.
      */
@@ -110,7 +110,7 @@ public class ExoreferencedGridCoverageReader extends AbstractGridCoverageReader 
      * {@link File} or an {@link URL} object. The input source must
      * be the <em>metadata</em> file or URL. The image file or URL
      * will be derived from the metadata filename by a call to
-     * {@link #toImageFileName}, which may be overriden.
+     * {@link #toImageFileName}, which may be overridden.
      *
      * @param  input The {@link File} or {@link URL} to be read.
      * @param  seekForwardOnly if <code>true</code>, grid coverages

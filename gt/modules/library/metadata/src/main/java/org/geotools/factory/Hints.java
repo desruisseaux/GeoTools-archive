@@ -193,10 +193,17 @@ public final class Hints extends RenderingHints {
      * @deprecated The {@code GridCoverageProcessor} interface is not yet
      *             stable. Avoid dependencies if possible.
      */
-    public static final Key GRID_COVERAGE_PROCESSOR = new Key(
-            "java.lang.Object");
-
+    public static final Key GRID_COVERAGE_PROCESSOR = new Key(Object.class);
     // TODO new Key("org.opengis.coverage.processing.GridCoverageProcessor");
+
+    /**
+     * Tells to the {@link GridCoverageReader} instances to ignore the built-in
+     * overviews when creating a {@link GridCoverage} object during a read. This
+     * hints also implied that no decimation on reading is performed.
+     *
+     * @since 2.3
+     */
+    public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
 
     /**
      * The {@linkplain javax.media.jai.tilecodec.TileEncoder tile encoder} name
@@ -213,7 +220,7 @@ public final class Hints extends RenderingHints {
      * 
      * @since 2.3
      */
-    public static final Key TILE_ENCODING = new Key("java.lang.String");
+    public static final Key TILE_ENCODING = new Key(String.class);
 
     /**
      * The {@link javax.media.jai.JAI} instance to use.
@@ -307,8 +314,7 @@ public final class Hints extends RenderingHints {
      * 
      * @since 2.3
      */
-    public static final Key FORCE_LONGITUDE_FIRST_AXIS_ORDER = new Key(
-            Boolean.class);
+    public static final Key FORCE_LONGITUDE_FIRST_AXIS_ORDER = new Key(Boolean.class);
 
     /**
      * Tells if the {@linkplain org.opengis.referencing.cs.CoordinateSystem coordinate systems}
@@ -332,8 +338,7 @@ public final class Hints extends RenderingHints {
      * 
      * @since 2.3
      */
-    public static final Key FORCE_STANDARD_AXIS_DIRECTIONS = new Key(
-            Boolean.class);
+    public static final Key FORCE_STANDARD_AXIS_DIRECTIONS = new Key(Boolean.class);
 
     /**
      * Tells if the {@linkplain org.opengis.referencing.cs.CoordinateSystem coordinate systems}
@@ -357,19 +362,20 @@ public final class Hints extends RenderingHints {
     public static final Key FORCE_STANDARD_AXIS_UNITS = new Key(Boolean.class);
 
     /**
-     * Tells to the {@link GridCoverageReader} instances to ignore the built-in
-     * overviews when creating a {@link GridCoverage} object during a read. This
-     * hints also implied that no decimation on reading is performed.
+     * Version number of the requested service. This hint is used for example in order to get
+     * a {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS authority factory}
+     * backed by a particular version of EPSG database.
+     *
+     * @since 2.4
      */
-    public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
+    public static final Key VERSION = new Key(String.class);
 
     /**
      * Constructs a new object with keys and values initialized from the
      * specified map (which may be null).
      * 
-     * @param hints
-     *            A map of key/value pairs to initialize the hints, or
-     *            {@code null} if the object should be empty.
+     * @param hints A map of key/value pairs to initialize the hints, or
+     *              {@code null} if the object should be empty.
      */
     public Hints(final Map hints) {
         super(hints);
@@ -378,10 +384,8 @@ public final class Hints extends RenderingHints {
     /**
      * Constructs a new object with the specified key/value pair.
      * 
-     * @param key
-     *            The key of the particular hint property.
-     * @param value
-     *            The value of the hint property specified with {@code key}.
+     * @param key   The key of the particular hint property.
+     * @param value The value of the hint property specified with {@code key}.
      */
     public Hints(final RenderingHints.Key key, final Object value) {
         super(key, value);
@@ -506,17 +510,12 @@ public final class Hints extends RenderingHints {
             while (true) {
                 final Class type;
                 switch (t++) {
-                case 0:
-                    type = Hints.class;
-                    break;
-                case 1:
-                    type = getValueClass();
-                    break;
-                default:
-                    return super.toString();
+                case 0:  type = Hints.class;      break;
+                case 1:  type = getValueClass();  break;
+                default: return super.toString();
                 }
                 final Field[] fields = type.getFields();
-                for (int i = 0; i < fields.length; i++) {
+                for (int i=0; i<fields.length; i++) {
                     final Field f = fields[i];
                     if (Modifier.isStatic(f.getModifiers())) {
                         final Object v;

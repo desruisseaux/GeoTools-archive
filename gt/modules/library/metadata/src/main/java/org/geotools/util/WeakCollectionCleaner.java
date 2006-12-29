@@ -27,7 +27,7 @@ import org.geotools.util.Logging;
 
 /**
  * A thread invoking {@link Reference#clear} on each enqueded reference.
- * This is usefull only if {@code Reference} subclasses has overriden
+ * This is usefull only if {@code Reference} subclasses has overridden
  * their {@code clear()} method in order to perform some cleaning.
  * This thread is used by {@link WeakHashSet} and {@link WeakValueHashMap},
  * which remove their entry from the collection when {@link Reference#clear}
@@ -69,7 +69,7 @@ final class WeakCollectionCleaner extends Thread {
             try {
                 // Block until a reference is enqueded.
                 // Note: To be usefull, the clear() method must have
-                //       been overriden in Reference subclasses.
+                //       been overridden in Reference subclasses.
                 referenceQueue.remove().clear();
             } catch (InterruptedException exception) {
                 // Somebody doesn't want to lets us sleep... Go back to work.

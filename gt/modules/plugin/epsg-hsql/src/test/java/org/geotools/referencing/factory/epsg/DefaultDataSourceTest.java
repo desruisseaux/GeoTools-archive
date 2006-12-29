@@ -151,8 +151,23 @@ public class DefaultDataSourceTest extends TestCase {
             factory = (DefaultFactory) FactoryFinder.getCRSAuthorityFactory("EPSG",
                         new Hints(Hints.CRS_AUTHORITY_FACTORY, DefaultFactory.class));
             extensive |= TestData.isExtensiveTest();
+            if (verbose) {
+                System.out.print("Database version: ");
+                System.out.println(factory.getImplementationHints().get(Hints.VERSION));
+            }
         }
         // No 'tearDown()' method: we rely on the DefaultFactory shutdown hook.
+    }
+
+    /**
+     * Make sure that the factory extracted from the registry in the {@link #setUp} method
+     * is a singleton. It may not be the case when there is a bug in {@code FactoryRegistry}.
+     */
+    public void testRegistry() {
+        final Object candidate = FactoryFinder.getCRSAuthorityFactory("EPSG", null);
+        if (candidate instanceof DefaultFactory) {
+            assertSame(factory, candidate);
+        }
     }
 
     /**
@@ -339,8 +354,8 @@ public class DefaultDataSourceTest extends TestCase {
     public void testAuthorityCodes() throws FactoryException {
         final Set crs = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertFalse(crs.isEmpty());
-        assertTrue (crs.size() > 0);
         assertEquals("Check size() consistency", crs.size(), crs.size());
+        assertTrue(crs.size() > 0); // Must be after the 'assertEquals' above.
 
         final Set geographicCRS = factory.getAuthorityCodes(GeographicCRS.class);
         assertFalse(geographicCRS.isEmpty());
@@ -656,7 +671,10 @@ public class DefaultDataSourceTest extends TestCase {
             try {
                 operation = factory.createCoordinateOperation(code);
             } catch (FactoryException exception) {
-                // Skip unsupported coordinate operations.
+                // Skip unsupported coordinate operations, except if the cause is a SQL exception.
+                if (exception.getCause() instanceof SQLException) {
+                    throw exception;
+                }
                 continue;
             }
             created++;

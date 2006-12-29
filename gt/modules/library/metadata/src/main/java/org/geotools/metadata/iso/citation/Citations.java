@@ -373,6 +373,24 @@ public final class Citations {
         CRS = c;
     }
 
+    /**
+     * URN in the OGC namespace. This citation contains the "URN:OGC:DEF" and "URN:X-OGC:DEF"
+     * {@linkplain Citation#getIdentifiers identifiers} for the "Authority name"
+     * {@linkplain Citation#getIdentifierTypes identifier type}.
+     *
+     * @since 2.4
+     */
+    public static final Citation URN_OGC;
+    static {
+        final CitationImpl c = new CitationImpl("URN in OGC namespace");
+        c.addAuthority("urn:ogc:def");
+        c.addAuthority("urn:x-ogc:def");
+        c.getCitedResponsibleParties().add(ResponsiblePartyImpl.OGC);
+        c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
+        c.freeze();
+        URN_OGC = c;
+    }
+
 
 
 

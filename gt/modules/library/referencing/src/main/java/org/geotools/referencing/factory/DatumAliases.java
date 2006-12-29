@@ -64,6 +64,8 @@ import org.geotools.referencing.datum.BursaWolfParameters;  // For javadoc
 import org.geotools.util.LocalName;
 import org.geotools.util.NameFactory;
 import org.geotools.resources.XArray;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -239,7 +241,7 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
      */
     private void reload() throws IOException {
         assert Thread.holdsLock(this);
-        LOGGER.fine("Loading datum aliases from \""+aliasURL.toString()+"\"."); // TODO: localize
+        LOGGER.log(Logging.format(Level.FINE, LoggingKeys.LOADING_DATUM_ALIASES_$1, aliasURL));
         final BufferedReader in = new BufferedReader(new InputStreamReader(aliasURL.openStream()));
         /*
          * Parses the title line. This line contains authority names as column titles.
@@ -313,11 +315,9 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
 
     /**
      * Logs an {@link IOException}.
-     *
-     * @todo Localize the log message.
      */
     private void log(final IOException exception) {
-        final LogRecord record = new LogRecord(Level.WARNING, "Can't read \"" + aliasURL + "\".");
+        LogRecord record = Logging.format(Level.WARNING, LoggingKeys.CANT_READ_FILE_$1, aliasURL);
         record.setSourceClassName("DatumAliases");
         record.setSourceMethodName("reload");
         record.setThrown(exception);

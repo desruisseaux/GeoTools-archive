@@ -159,7 +159,7 @@ public class NewZealandMapGrid extends MapProjection {
     }
 
     /**
-     * Must be overrided because {@link Provider} uses instances of
+     * Must be overridden because {@link Provider} uses instances of
      * {@link ModifiedParameterDescriptor}. This hack was needed because the New Zeland map
      * projection uses particular default values for parameters like "False Easting", etc.
      */

@@ -40,7 +40,7 @@ import org.geotools.resources.Utilities;
  * operation will produces new {@link GridCoverage2D} with sample values ranging from 0 to some
  * maximal value which may be very different from the source {@link GridCoverage2D} range. By
  * default, most {@linkplain OperationJAI operations} try to guess a raisonable range for output
- * values. This default behavior can be overriden with an explicit {@code RangeSpecifier}
+ * values. This default behavior can be overridden with an explicit {@code RangeSpecifier}
  * argument.
  * <p>
  * All {@code RangeSpecifier}'s properties are optional; it is up to processor's

@@ -68,21 +68,21 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
+public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
                 DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory,
                 CoordinateOperationAuthorityFactory
 {
-    /**
-     * The authority name for this factory.
-     */
-    private static final Citation AUTHORITY = (Citation)
-            new CitationImpl(Vocabulary.format(VocabularyKeys.ALL)).unmodifiable();
-
     /**
      * An instance of {@code AllAuthoritiesFactory} with the
      * {@linkplain GenericName#DEFAULT_SEPARATOR default name separator} and no hints.
      */
     public static AllAuthoritiesFactory DEFAULT = new AllAuthoritiesFactory(null);
+
+    /**
+     * The authority name for this factory.
+     */
+    private static final Citation AUTHORITY = (Citation)
+            new CitationImpl(Vocabulary.format(VocabularyKeys.ALL)).unmodifiable();
 
     /**
      * A set of user-specified factories to try before to delegate to {@link FactoryFinder},
@@ -176,7 +176,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
          * in the sense of Citations.identifierMatches(...). 'factoriesByType' will contains the
          * collection of factories for each (authority,type) pair.
          */
-        int authorityCount=0;
+        int authorityCount = 0;
         final Citation[] authorities = new Citation[factories.size()];
         final List[] factoriesByType = new List[authorities.length * AUTHORIZED_TYPES.length];
         final Map/*<AuthorityFactory,Integer>*/ positions = new IdentityHashMap();
@@ -274,6 +274,14 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
     }
 
     /**
+     * Returns the vendor responsible for creating this factory implementation.
+     * The default implementation returns {@linkplain Citations#GEOTOOLS Geotools}.
+     */
+    public Citation getVendor() {
+        return Citations.GEOTOOLS;
+    }
+
+    /**
      * Returns the organization or party responsible for definition and maintenance of the
      * database. The default implementation returns a citation named "All".
      */
@@ -282,175 +290,10 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
     }
 
     /**
-     * Returns the authority name for the specified code.
-     *
-     * @param  code The code to parse.
-     * @return The authority name.
-     * @throws NoSuchAuthorityCodeException if no authority name has been found.
-     */
-    private String getAuthority(final String code) throws NoSuchAuthorityCodeException {
-        ensureNonNull("code", code);
-        final int split = code.indexOf(separator);
-        if (split >= 0) {
-            return code.substring(0, split).trim();
-        }
-        throw new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.MISSING_AUTHORITY_$1, code),
-                                               Vocabulary.format(VocabularyKeys.UNKNOW), code);
-    }
-
-    /**
-     * Formats the exception to be throw when the user asked for a code from an unknown authority.
-     *
-     * @param  code  The code with an unknown authority.
-     * @param  cause The cause for the exception to be formatted.
-     * @return The formatted exception to be throw.
-     */
-    private NoSuchAuthorityCodeException noSuchAuthority(
-            final String code, final FactoryRegistryException cause)
-    {
-        final String authority;
-        try {
-            authority = getAuthority(code);
-        } catch (NoSuchAuthorityCodeException exception) {
-            return exception;
-        }
-        final NoSuchAuthorityCodeException exception = new NoSuchAuthorityCodeException(
-                Errors.format(ErrorKeys.UNKNOW_AUTHORITY_$1, authority), authority, code);
-        exception.initCause(cause);
-        return exception;
-    }
-
-    /**
-     * Searchs for a user-supplied factory of the given type.
-     *
-     * @param  type      The interface to be implemented.
-     * @param  authority The authority name.
-     * @return The user factory, or {@code null} if none.
-     */
-    private AuthorityFactory getAuthorityFactory(final Class type, final String authority) {
-        if (factories != null) {
-            for (final Iterator it=factories.iterator(); it.hasNext();) {
-                final AuthorityFactory factory = (AuthorityFactory) it.next();
-                if (type.isAssignableFrom(factory.getClass())) {
-                    if (Citations.identifierMatches(factory.getAuthority(), authority)) {
-                        return factory;
-                    }
-                }
-            }    
-        }
-        return null;
-    }
-
-    /**
-     * Returns the datum authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
-     *
-     * @param  code The code to parse.
-     * @return The authority factory.
-     * @throws NoSuchAuthorityCodeException if no authority name has been found.
-     */
-    private DatumAuthorityFactory getDatumAuthorityFactory(final String code)
-            throws NoSuchAuthorityCodeException
-    {
-        final String authority = getAuthority(code);
-        DatumAuthorityFactory factory = (DatumAuthorityFactory) // TODO: remove cast with J2SE 1.5.
-                getAuthorityFactory(DatumAuthorityFactory.class, authority);
-        if (factory == null) try {
-            factory = FactoryFinder.getDatumAuthorityFactory(authority, userHints);
-        } catch (FactoryRegistryException cause) {
-            throw noSuchAuthority(code, cause);
-        }
-        return factory;
-    }
-
-    /**
-     * Returns the CS authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
-     *
-     * @param  code The code to parse.
-     * @return The authority factory.
-     * @throws NoSuchAuthorityCodeException if no authority name has been found.
-     */
-    private CSAuthorityFactory getCSAuthorityFactory(final String code)
-            throws NoSuchAuthorityCodeException
-    {
-        final String authority = getAuthority(code);
-        CSAuthorityFactory factory = (CSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
-                getAuthorityFactory(CSAuthorityFactory.class, authority);
-        if (factory == null) try {
-            factory = FactoryFinder.getCSAuthorityFactory(authority, userHints);
-        } catch (FactoryRegistryException cause) {
-            throw noSuchAuthority(code, cause);
-        }
-        return factory;
-    }
-
-    /**
-     * Returns the CRS authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
-     *
-     * @param  code The code to parse.
-     * @return The authority factory.
-     * @throws NoSuchAuthorityCodeException if no authority name has been found.
-     */
-    private CRSAuthorityFactory getCRSAuthorityFactory(final String code)
-            throws NoSuchAuthorityCodeException
-    {
-        final String authority = getAuthority(code);
-        CRSAuthorityFactory factory = (CRSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
-                getAuthorityFactory(CRSAuthorityFactory.class, authority);
-        if (factory == null) try {
-            factory = FactoryFinder.getCRSAuthorityFactory(authority, userHints);
-        } catch (FactoryRegistryException cause) {
-            throw noSuchAuthority(code, cause);
-        }
-        return factory;
-    }
-
-    /**
-     * Returns the operation authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
-     *
-     * @param  code The code to parse.
-     * @return The authority factory.
-     * @throws NoSuchAuthorityCodeException if no authority name has been found.
-     */
-    private CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(final String code)
-            throws NoSuchAuthorityCodeException
-    {
-        final String authority = getAuthority(code);
-        CoordinateOperationAuthorityFactory factory = (CoordinateOperationAuthorityFactory) // TODO: remove cast with J2SE 1.5.
-                getAuthorityFactory(CoordinateOperationAuthorityFactory.class, authority);
-        if (factory == null) try {
-            factory = FactoryFinder.getCoordinateOperationAuthorityFactory(authority, userHints);
-        } catch (FactoryRegistryException cause) {
-            throw noSuchAuthority(code, cause);
-        }
-        return factory;
-    }
-
-    /**
-     * Returns an authority factory of the given type, where {@code type} is a number ranging
-     * from {@code 0} inclusive to {@value #TYPE_COUNT} exclusive. This method is used when we
-     * need to invoke a method available in more than one factory type.
-     *
-     * @param  code The code to parse.
-     * @param  type The factory type as a number from {@code 0} inclusive to {@value #TYPE_COUNT}
-     *         exclusive.
-     * @return The authority factory.
-     * @throws NoSuchAuthorityCodeException if no authority name has been found.
-     */
-    private AuthorityFactory getAuthorityFactory(final String code, final int type)
-            throws NoSuchAuthorityCodeException
-    {
-        switch (type) {
-            case 0:  return getCRSAuthorityFactory(code);
-            case 1:  return getDatumAuthorityFactory(code);
-            case 2:  return getCSAuthorityFactory(code);
-            case 3:  return getCoordinateOperationAuthorityFactory(code);
-            default: throw new IllegalArgumentException(String.valueOf(type));
-        }
-    }
-
-    /**
-     * The types to be recognized for the {@code factories} argument in constructors. While not
-     * technically necessary, we keep this array consistent with {@link #getAuthorityFactory}.
+     * The types to be recognized for the {@code factories} argument in constructors. Must be
+     * consistent with the index expected by the {@link #getAuthorityFactory(int, String)}
+     * method. This array is declared here (instead of at the begining of this class) in order
+     * to keep it close to the above-cited method.
      */
     private static final Class[] AUTHORIZED_TYPES = new Class[] {
         CRSAuthorityFactory.class,
@@ -460,10 +303,218 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
     };
 
     /**
-     * The upper value (exclusive) allowed for {@link #getAuthorityFactory}. Usually
-     * equals to the {@link #AUTHORIZED_TYPES} array length (but doesn't need to).
+     * Returns an authority factory of the given type, where {@code type} is a number ranging
+     * from {@code 0} inclusive to {@code AUTHORIZED_TYPES.length} exclusive. This method is
+     * used when we need to invoke a method available in more than one factory type.
+     *
+     * @param  type The factory type as a number from {@code 0} inclusive to
+     *         {@code AUTHORIZED_TYPES.length} exclusive.
+     * @param  code The code to parse.
+     * @return The authority factory.
+     * @throws NoSuchAuthorityCodeException if no authority name has been found.
      */
-    private static final int TYPE_COUNT = 4;
+    private AuthorityFactory getAuthorityFactory(final int type, final String code)
+            throws NoSuchAuthorityCodeException
+    {
+        final AuthorityFactory factory;
+        switch (type) {
+            case 0:  factory = getCRSAuthorityFactory(code); break;
+            case 1:  factory = getDatumAuthorityFactory(code); break;
+            case 2:  factory = getCSAuthorityFactory(code); break;
+            case 3:  factory = getCoordinateOperationAuthorityFactory(code); break;
+            default: throw new IllegalArgumentException(String.valueOf(type));
+        }
+        assert AUTHORIZED_TYPES[type].isInstance(factory) : type;
+        return factory;
+    }
+
+    /**
+     * Searchs for a factory of the given type. This method first search in user-supplied
+     * factories. If no user factory is found, then this method request for a factory using
+     * {@link FactoryFinder}. The authority name is inferred from the specified code.
+     *
+     * @param  type The interface to be implemented.
+     * @param  code The code of the object to create.
+     * @return The factory.
+     * @throws NoSuchAuthorityCodeException if no suitable factory were found.
+     */
+    private AuthorityFactory getAuthorityFactory(final Class/*<T extends AuthorityFactory>*/ type,
+                                                 final String code)
+            throws NoSuchAuthorityCodeException
+    {
+        ensureNonNull("code", code);
+        String authority = null;
+        FactoryRegistryException cause = null;
+        for (int split = code.lastIndexOf(separator); split >= 0;
+                 split = code.lastIndexOf(separator, split-1))
+        {
+            /*
+             * Try all possible authority names, begining with the most specific ones.
+             * For example if the code is "urn:ogc:def:crs:EPSG:6.8:4326", then we will
+             * try "urn:ogc:def:crs:EPSG:6.8" first, "urn:ogc:def:crs:EPSG" next, etc.
+             * until a suitable factory is found (searching into user-supplied factories
+             * first).
+             */
+            authority = code.substring(0, split).trim();
+            if (factories != null) {
+                for (final Iterator it=factories.iterator(); it.hasNext();) {
+                    final AuthorityFactory factory = (AuthorityFactory) it.next();
+                    if (type.isAssignableFrom(factory.getClass())) {
+                        if (Citations.identifierMatches(factory.getAuthority(), authority)) {
+                            return factory;
+                        }
+                    }
+                }    
+            }
+            /*
+             * No suitable user-supplied factory. Now query FactoryFinder.
+             */
+            final AuthorityFactory factory;
+            try {
+                if (CRSAuthorityFactory.class.equals(type)) {
+                    factory = FactoryFinder.getCRSAuthorityFactory(authority, userHints);
+                } else if (CSAuthorityFactory.class.equals(type)) {
+                    factory = FactoryFinder.getCSAuthorityFactory(authority, userHints);
+                } else if (DatumAuthorityFactory.class.equals(type)) {
+                    factory = FactoryFinder.getDatumAuthorityFactory(authority, userHints);
+                } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
+                    factory = FactoryFinder.getCoordinateOperationAuthorityFactory(authority, userHints);
+                } else {
+                    continue;
+                }
+            } catch (FactoryRegistryException exception) {
+                cause = exception;
+                continue;
+            }
+            return /*type.cast*/(factory);
+            // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
+        }
+        /*
+         * No factory found. Creates an error message from the most global authority name
+         * (for example "urn" if the code was "urn:ogc:def:crs:EPSG:6.8:4326") and the
+         * corresponding cause. Both the authority and cause may be null if the code didn't
+         * had any authority part.
+         */
+        throw noSuchAuthority(code, authority, cause);
+    }
+
+    /**
+     * Formats the exception to be throw when the user asked for a code from an unknown authority.
+     *
+     * @param  code      The code with an unknown authority.
+     * @param  authority The authority, or {@code null} if none.
+     * @param  cause     The cause for the exception to be formatted, or {@code null} if none.
+     * @return The formatted exception to be throw.
+     */
+    private NoSuchAuthorityCodeException noSuchAuthority(final String code, String authority,
+                                                         final FactoryRegistryException cause)
+    {
+        final String message;
+        if (authority == null) {
+            authority = Vocabulary.format(VocabularyKeys.UNKNOW);
+            message   = Errors.format(ErrorKeys.MISSING_AUTHORITY_$1, code);
+        } else {
+            message = Errors.format(ErrorKeys.UNKNOW_AUTHORITY_$1, authority);
+        }
+        final NoSuchAuthorityCodeException exception;
+        exception = new NoSuchAuthorityCodeException(message, authority, code);
+        exception.initCause(cause);
+        return exception;
+    }
+
+    /**
+     * Returns a generic object authority factory for the specified {@code "AUTHORITY:NUMBER"}
+     * code.
+     * <p>
+     * <b>Note:</b> this method is defined for safety, but should not be used since
+     * most methods that may invoke it in {@link AuthorityFactoryAdapter} are overridden
+     * in {@code AllAuthoritiesFactory}.
+     *
+     * @param  code The code to parse.
+     * @return The authority factory.
+     * @throws NoSuchAuthorityCodeException if no authority name has been found.
+     *
+     * @since 2.4
+     */
+    protected AuthorityFactory getAuthorityFactory(final String code)
+            throws NoSuchAuthorityCodeException
+    {
+        return getAuthorityFactory(AuthorityFactory.class, code);
+    }
+
+    /**
+     * Returns the datum authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
+     *
+     * @param  code The code to parse.
+     * @return The authority factory.
+     * @throws NoSuchAuthorityCodeException if no authority name has been found.
+     *
+     * @since 2.4
+     */
+    protected DatumAuthorityFactory getDatumAuthorityFactory(final String code)
+            throws NoSuchAuthorityCodeException
+    {
+        return (DatumAuthorityFactory) // TODO: remove cast with J2SE 1.5.
+                getAuthorityFactory(DatumAuthorityFactory.class, code);
+    }
+
+    /**
+     * Returns the CS authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
+     *
+     * @param  code The code to parse.
+     * @return The authority factory.
+     * @throws NoSuchAuthorityCodeException if no authority name has been found.
+     *
+     * @since 2.4
+     */
+    protected CSAuthorityFactory getCSAuthorityFactory(final String code)
+            throws NoSuchAuthorityCodeException
+    {
+        return (CSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
+                getAuthorityFactory(CSAuthorityFactory.class, code);
+    }
+
+    /**
+     * Returns the CRS authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
+     *
+     * @param  code The code to parse.
+     * @return The authority factory.
+     * @throws NoSuchAuthorityCodeException if no authority name has been found.
+     *
+     * @since 2.4
+     */
+    protected CRSAuthorityFactory getCRSAuthorityFactory(final String code)
+            throws NoSuchAuthorityCodeException
+    {
+        return (CRSAuthorityFactory) // TODO: remove cast with J2SE 1.5.
+                getAuthorityFactory(CRSAuthorityFactory.class, code);
+    }
+
+    /**
+     * Returns the operation authority factory for the specified {@code "AUTHORITY:NUMBER"} code.
+     *
+     * @param  code The code to parse.
+     * @return The authority factory.
+     * @throws NoSuchAuthorityCodeException if no authority name has been found.
+     *
+     * @since 2.4
+     */
+    protected CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(final String code)
+            throws NoSuchAuthorityCodeException
+    {
+        return (CoordinateOperationAuthorityFactory) // TODO: remove cast with J2SE 1.5.
+                getAuthorityFactory(CoordinateOperationAuthorityFactory.class, code);
+    }
+
+    /**
+     * Returns {@code false} since {@link #getAuthorityCodes} should not be invoked
+     * recursively on instances of {@code AllAuthoritiesFactory} (otherwise we get
+     * a {@link StackOverflowError}.
+     */
+    // @Override
+    final boolean getAuthorityCodesRecursively() {
+        return false;
+    }
 
     /**
      * Returns the set of authority codes of the given type.
@@ -495,14 +546,23 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
              * factory has not already been done in a previous iteration (some implementation
              * apply to more than one factory).
              */
-            for (int i=0; i<TYPE_COUNT; i++) {
+            for (int i=0; i<AUTHORIZED_TYPES.length; i++) {
                 final AuthorityFactory factory;
                 try {
-                    factory = getAuthorityFactory(dummyCode, i);
+                    factory = getAuthorityFactory(i, dummyCode);
                 } catch (NoSuchAuthorityCodeException e) {
                     continue;
                 }
                 if (done.add(factory)) {
+                    if (factory instanceof AbstractAuthorityFactory) {
+                        if (!((AbstractAuthorityFactory) factory).getAuthorityCodesRecursively()) {
+                            /*
+                             * Prevent infinite recursivity: avoid to invoke getAuthorityCodes
+                             * directly or indirectly on any instance of AllAuthoritiesFactory.
+                             */
+                            continue;
+                        }
+                    }
                     for (final Iterator it2=factory.getAuthorityCodes(type).iterator(); it2.hasNext();) {
                         String candidate = ((String) it2.next()).trim();
                         if (candidate.length() < codeBase ||
@@ -535,7 +595,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
         final Set/*<AuthorityFactory>*/ done = new HashSet();
         done.add(this); // Safety for avoiding recursive calls.
         FactoryException failure = null;
-        for (int type=0; type<TYPE_COUNT; type++) {
+        for (int type=0; type<AUTHORIZED_TYPES.length; type++) {
             /*
              * Try all factories, starting with the CRS factory because it is the only one most
              * users care about. If the CRS factory doesn't know about the specified object, then
@@ -543,7 +603,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
              */
             final AuthorityFactory factory;
             try {
-                factory = getAuthorityFactory(code, type);
+                factory = getAuthorityFactory(type, code);
             } catch (NoSuchAuthorityCodeException exception) {
                 if (failure == null) {
                     failure = exception;
@@ -583,7 +643,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
         final Set/*<AuthorityFactory>*/ done = new HashSet();
         done.add(this); // Safety for avoiding recursive calls.
         FactoryException failure = null;
-        for (int type=0; type<TYPE_COUNT; type++) {
+        for (int type=0; type<AUTHORIZED_TYPES.length; type++) {
             /*
              * Try all factories, starting with the CRS factory because it is the only one most
              * users care about. If the CRS factory doesn't know about the specified object, then
@@ -591,7 +651,7 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
              */
             final AuthorityFactory factory;
             try {
-                factory = getAuthorityFactory(code, type);
+                factory = getAuthorityFactory(type, code);
             } catch (NoSuchAuthorityCodeException exception) {
                 if (failure == null) {
                     failure = exception;
@@ -617,266 +677,5 @@ public class AllAuthoritiesFactory extends AbstractAuthorityFactory implements
             failure = noSuchAuthorityCode(IdentifiedObject.class, code);
         }
         throw failure;
-    }
-
-    /**
-     * Returns an arbitrary {@linkplain Datum datum} from a code.
-     *
-     * @see #createGeodeticDatum
-     * @see #createVerticalDatum
-     * @see #createTemporalDatum
-     */
-    public Datum createDatum(final String code) throws FactoryException {
-        return getDatumAuthorityFactory(code).createDatum(code);
-    }
-
-    /**
-     * Creates a {@linkplain EngineeringDatum engineering datum} from a code.
-     *
-     * @see #createEngineeringCRS
-     */
-    public EngineeringDatum createEngineeringDatum(final String code) throws FactoryException {
-        return getDatumAuthorityFactory(code).createEngineeringDatum(code);
-    }
-
-    /**
-     * Creates a {@linkplain ImageDatum image datum} from a code.
-     *
-     * @see #createImageCRS
-     */
-    public ImageDatum createImageDatum(final String code) throws FactoryException {
-        return getDatumAuthorityFactory(code).createImageDatum(code);
-    }
-
-    /**
-     * Creates a {@linkplain VerticalDatum vertical datum} from a code.
-     *
-     * @see #createVerticalCRS
-     */
-    public VerticalDatum createVerticalDatum(final String code) throws FactoryException {
-        return getDatumAuthorityFactory(code).createVerticalDatum(code);
-    }
-
-    /**
-     * Creates a {@linkplain TemporalDatum temporal datum} from a code.
-     *
-     * @see #createTemporalCRS
-     */
-    public TemporalDatum createTemporalDatum(final String code) throws FactoryException {
-        return getDatumAuthorityFactory(code).createTemporalDatum(code);
-    }
-
-    /**
-     * Returns a {@linkplain GeodeticDatum geodetic datum} from a code.
-     *
-     * @see #createEllipsoid
-     * @see #createPrimeMeridian
-     * @see #createGeographicCRS
-     * @see #createProjectedCRS
-     */
-    public GeodeticDatum createGeodeticDatum(final String code) throws FactoryException {
-        return getDatumAuthorityFactory(code).createGeodeticDatum(code);
-    }
-
-    /**
-     * Returns an {@linkplain Ellipsoid ellipsoid} from a code.
-     *
-     * @see #createGeodeticDatum
-     */
-    public Ellipsoid createEllipsoid(final String code) throws FactoryException {
-        return getDatumAuthorityFactory(code).createEllipsoid(code);
-    }
-
-    /**
-     * Returns a {@linkplain PrimeMeridian prime meridian} from a code.
-     *
-     * @see #createGeodeticDatum
-     */
-    public PrimeMeridian createPrimeMeridian(final String code) throws FactoryException {
-        return getDatumAuthorityFactory(code).createPrimeMeridian(code);
-    }
-
-    /**
-     * Returns an arbitrary {@linkplain CoordinateSystem coordinate system} from a code.
-     */
-    public CoordinateSystem createCoordinateSystem(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createCoordinateSystem(code);
-    }
-
-    /**
-     * Creates a cartesian coordinate system from a code.
-     */
-    public CartesianCS createCartesianCS(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createCartesianCS(code);
-    }
-
-    /**
-     * Creates a polar coordinate system from a code.
-     */
-    public PolarCS createPolarCS(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createPolarCS(code);
-    }
-
-    /**
-     * Creates a cylindrical coordinate system from a code.
-     */
-    public CylindricalCS createCylindricalCS(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createCylindricalCS(code);
-    }
-
-    /**
-     * Creates a spherical coordinate system from a code.
-     */
-    public SphericalCS createSphericalCS(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createSphericalCS(code);
-    }
-
-    /**
-     * Creates an ellipsoidal coordinate system from a code.
-     */
-    public EllipsoidalCS createEllipsoidalCS(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createEllipsoidalCS(code);
-    }
-
-    /**
-     * Creates a vertical coordinate system from a code.
-     */
-    public VerticalCS createVerticalCS(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createVerticalCS(code);
-    }
-
-    /**
-     * Creates a temporal coordinate system from a code.
-     */
-    public TimeCS createTimeCS(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createTimeCS(code);
-    }
-
-    /**
-     * Returns a {@linkplain CoordinateSystemAxis coordinate system axis} from a code.
-     */
-    public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
-            throws FactoryException
-    {
-        return getCSAuthorityFactory(code).createCoordinateSystemAxis(code);
-    }
-
-    /**
-     * Returns an {@linkplain Unit unit} from a code.
-     */
-    public Unit createUnit(final String code) throws FactoryException {
-        return getCSAuthorityFactory(code).createUnit(code);
-    }
-
-    /**
-     * Returns an arbitrary {@linkplain CoordinateReferenceSystem coordinate reference system}
-     * from a code.
-     *
-     * @see #createGeographicCRS
-     * @see #createProjectedCRS
-     * @see #createVerticalCRS
-     * @see #createTemporalCRS
-     * @see #createCompoundCRS
-     */
-    public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
-            throws FactoryException
-    {
-        return getCRSAuthorityFactory(code).createCoordinateReferenceSystem(code);
-    }
-
-    /**
-     * Creates a 3D coordinate reference system from a code.
-     */
-    public CompoundCRS createCompoundCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createCompoundCRS(code);
-    }
-
-    /**
-     * Creates a derived coordinate reference system from a code.
-     */
-    public DerivedCRS createDerivedCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createDerivedCRS(code);
-    }
-    
-    /**
-     * Creates a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
-     */
-    public EngineeringCRS createEngineeringCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createEngineeringCRS(code);
-    }
-
-    /**
-     * Returns a {@linkplain GeographicCRS geographic coordinate reference system} from a code.
-     *
-     * @see #createGeodeticDatum
-     */
-    public GeographicCRS createGeographicCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createGeographicCRS(code);
-    }
-
-    /**
-     * Returns a {@linkplain GeocentricCRS geocentric coordinate reference system} from a code.
-     *
-     * @see #createGeodeticDatum
-     */
-    public GeocentricCRS createGeocentricCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createGeocentricCRS(code);
-    }
-
-    /**
-     * Creates a {@linkplain ImageCRS image coordinate reference system} from a code.
-     */
-    public ImageCRS createImageCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createImageCRS(code);
-    }
-
-    /**
-     * Returns a {@linkplain ProjectedCRS projected coordinate reference system} from a code.
-     *
-     * @see #createGeodeticDatum
-     */
-    public ProjectedCRS createProjectedCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createProjectedCRS(code);
-    }
-
-    /**
-     * Creates a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
-     *
-     * @see #createTemporalDatum
-     */
-    public TemporalCRS createTemporalCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createTemporalCRS(code);
-    }
-
-    /**
-     * Creates a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
-     *
-     * @see #createVerticalDatum
-     */
-    public VerticalCRS createVerticalCRS(final String code) throws FactoryException {
-        return getCRSAuthorityFactory(code).createVerticalCRS(code);
-    }
-
-    /**
-     * Creates an operation from a single operation code. 
-     */
-    public CoordinateOperation createCoordinateOperation(final String code) throws FactoryException {
-        return getCoordinateOperationAuthorityFactory(code).createCoordinateOperation(code);
-    }
-
-    /**
-     * Creates an operation from coordinate reference system codes.
-     */
-    public Set/*<CoordinateOperation>*/ createFromCoordinateReferenceSystemCodes(
-                                        final String sourceCode, final String targetCode)
-            throws FactoryException
-    {
-        final String sourceAuthority = getAuthority(sourceCode);
-        final String targetAuthority = getAuthority(targetCode);
-        if (sourceAuthority.equals(targetAuthority)) {
-            return getCoordinateOperationAuthorityFactory(sourceCode)
-                   .createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
-        }
-        return super.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
     }
 }

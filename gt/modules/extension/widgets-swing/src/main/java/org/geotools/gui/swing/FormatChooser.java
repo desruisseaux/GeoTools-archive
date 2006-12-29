@@ -287,7 +287,7 @@ public class FormatChooser extends JPanel {
      * Set the format to configure. The default implementation accept instance of
      * {@link DecimalFormat}, {@link SimpleDateFormat} or {@link AngleFormat}. If
      * more format class are wanted, methods {@link #getPattern} and {@link #setPattern}
-     * should be overriden.
+     * should be overridden.
      *
      * @param  format The format to congifure.
      * @throws IllegalArgumentException if the format is invalid.

@@ -99,7 +99,7 @@ public abstract class PointArray2D implements PointArray, Serializable {
     /**
      * Returns the index of the first valid ordinate.
      *
-     * This method is overriden by all {@code PointArray2D} subclasses in this package.
+     * This method is overridden by all {@code PointArray2D} subclasses in this package.
      * Note that this method is not {@code protected} in this {@code PointArray2D} class
      * because it is used only by {@link #capacity}, which is a package-private helper
      * method for {@link #toFloatArray} implementations only.
@@ -113,7 +113,7 @@ public abstract class PointArray2D implements PointArray, Serializable {
     /**
      * Returns the index after the last valid ordinate.
      *
-     * This method is overriden by all {@code PointArray2D} subclasses in this package.
+     * This method is overridden by all {@code PointArray2D} subclasses in this package.
      * Note that this method is not {@code protected} in this {@code PointArray2D} class
      * because it is used only by {@link #capacity}, which is a package-private helper
      * method for {@link #toFloatArray} implementations only.

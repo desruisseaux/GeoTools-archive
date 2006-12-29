@@ -203,7 +203,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
     /**
      * Construct a new grid coverage with the same parameter than the specified
      * coverage. This constructor is useful when creating a coverage with
-     * identical data, but in which some method has been overriden in order to
+     * identical data, but in which some method has been overridden in order to
      * process data differently (e.g. interpolating them).
      *
      * @param name The name for this coverage, or {@code null} for the same than {@code coverage}.

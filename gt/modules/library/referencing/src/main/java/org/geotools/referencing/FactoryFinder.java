@@ -330,8 +330,9 @@ loop:       for (int i=0; ; i++) {
      * <p>
      * Hints that may be understood includes
      * {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM_FACTORY},
-     * {@link Hints#DATUM_SHIFT_METHOD     DATUM_SHIFT_METHOD} and
-     * {@link Hints#LENIENT_DATUM_SHIFT    LENIENT_DATUM_SHIFT}.
+     * {@link Hints#DATUM_SHIFT_METHOD     DATUM_SHIFT_METHOD},
+     * {@link Hints#LENIENT_DATUM_SHIFT    LENIENT_DATUM_SHIFT} and
+     * {@link Hints#VERSION                VERSION}.
      *
      * @param  hints An optional map of hints, or {@code null} if none.
      * @return The first coordinate operation factory that matches the supplied hints.
@@ -402,7 +403,8 @@ loop:       for (int i=0; ; i++) {
      * Hints that may be understood includes
      * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER},
      * {@link Hints#FORCE_STANDARD_AXIS_UNITS        FORCE_STANDARD_AXIS_UNITS} and
-     * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS   FORCE_STANDARD_AXIS_DIRECTIONS}.
+     * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS   FORCE_STANDARD_AXIS_DIRECTIONS} and
+     * {@link Hints#VERSION                          VERSION}.
      *
      * @param  authority The desired authority (e.g. "EPSG").
      * @param  hints An optional map of hints, or {@code null} if none.
@@ -439,8 +441,9 @@ loop:       for (int i=0; ; i++) {
      * <p>
      * Hints that may be understood includes
      * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER},
-     * {@link Hints#FORCE_STANDARD_AXIS_UNITS        FORCE_STANDARD_AXIS_UNITS} and
-     * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS   FORCE_STANDARD_AXIS_DIRECTIONS}.
+     * {@link Hints#FORCE_STANDARD_AXIS_UNITS        FORCE_STANDARD_AXIS_UNITS},
+     * {@link Hints#FORCE_STANDARD_AXIS_DIRECTIONS   FORCE_STANDARD_AXIS_DIRECTIONS} and
+     * {@link Hints#VERSION                          VERSION}.
      *
      * @param  authority The desired authority (e.g. "EPSG").
      * @param  hints An optional map of hints, or {@code null} if none.

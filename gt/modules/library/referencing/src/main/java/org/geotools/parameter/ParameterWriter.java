@@ -582,7 +582,7 @@ trim:   for (int column=hide.length; --column>=1;) {
      * Format the specified value as a string. This method is automatically invoked
      * by {@code format(...)} methods. The default implementation format
      * {@link Number}, {@link Date} and {@link Angle} object according the
-     * {@linkplain #getLocale current locale}. This method can been overriden if
+     * {@linkplain #getLocale current locale}. This method can been overridden if
      * more objects need to be formatted in a special way.
      *
      * @param  value the value to format.

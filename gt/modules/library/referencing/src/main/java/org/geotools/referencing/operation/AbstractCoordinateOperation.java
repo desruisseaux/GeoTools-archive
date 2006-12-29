@@ -350,7 +350,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
      */
     public static double getAccuracy(final CoordinateOperation operation) {
         if (operation instanceof AbstractCoordinateOperation) {
-            // Maybe the user overrided this method...
+            // Maybe the user overridden this method...
             return ((AbstractCoordinateOperation) operation).getAccuracy();
         }
         return getAccuracy0(operation);

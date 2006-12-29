@@ -315,7 +315,7 @@ public class OperationJAI extends Operation2D {
         }
         /*
          * Ensures that all coverages use the same CRS and has the same 'gridToCRS' relationship.
-         * After the reprojection, the method still checks all CRS in case the user overrided the
+         * After the reprojection, the method still checks all CRS in case the user overridden the
          * {@link #resampleToCommonGeometry} method.
          */
         resampleToCommonGeometry(sources, null, null, hints);

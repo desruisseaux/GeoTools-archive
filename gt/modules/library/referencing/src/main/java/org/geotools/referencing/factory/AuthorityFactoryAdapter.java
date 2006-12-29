@@ -18,6 +18,10 @@ package org.geotools.referencing.factory;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.Map;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -38,8 +42,12 @@ import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
 import org.geotools.factory.AbstractFactory;
 import org.geotools.factory.OptionalFactory;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.Utilities;
 
 
 /**
@@ -60,26 +68,64 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     /**
      * The underlying {@linkplain Datum datum} authority factory,
      * or {@code null} if none.
+     *
+     * @deprecated Use {@link #getDatumAuthorityFactory} instead.
+     *             This field will become private in Geotools 2.5.
      */
     protected final DatumAuthorityFactory datumFactory;
 
     /**
      * The underlying {@linkplain CoordinateSystem coordinate system} authority factory,
      * or {@code null} if none.
+     *
+     * @deprecated Use {@link #getCSAuthorityFactory} instead.
+     *             This field will become private in Geotools 2.5.
      */
     protected final CSAuthorityFactory csFactory;
 
     /**
      * The underlying {@linkplain CoordinateReferenceSystem coordinate reference system}
      * authority factory, or {@code null} if none.
+     *
+     * @deprecated Use {@link #getCRSAuthorityFactory} instead.
+     *             This field will become private in Geotools 2.5.
      */
     protected final CRSAuthorityFactory crsFactory;
 
     /**
      * The underlying {@linkplain CoordinateOperation coordinate operation} authority factory,
      * or {@code null} if none.
+     *
+     * @deprecated Use {@link #getCoordinateOperationAuthorityFactory} instead.
+     *             This field will become private in Geotools 2.5.
      */
     protected final CoordinateOperationAuthorityFactory operationFactory;
+
+    /**
+     * A set of low-level factories to be used if none were found in {@link #datumFactory},
+     * {@link #csFactory}, {@link #crsFactory} or {@link #operationFactory}. Will be created
+     * only when first needed.
+     *
+     * @see #getFactoryGroup
+     */
+    private transient FactoryGroup factories;
+
+    /**
+     * Creates a wrapper around no factory. This constructor should never be used except by
+     * subclasses overriding the <code>get</code><var>Foo</var><code>AuthorityFactory</code>
+     * methods.
+     *
+     * @param priority The priority for this factory, as a number between
+     *        {@link #MINIMUM_PRIORITY MINIMUM_PRIORITY} and
+     *        {@link #MAXIMUM_PRIORITY MAXIMUM_PRIORITY} inclusive.
+     */
+    AuthorityFactoryAdapter(final int priority) {
+        super(priority);
+        datumFactory     = null;
+        csFactory        = null;
+        crsFactory       = null;
+        operationFactory = null;
+    }
 
     /**
      * Creates a wrapper around the specified factory. The {@link #priority priority} field
@@ -160,9 +206,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Returns the {@linkplain #hints hints} extented will all hints specified in dependencies.
-     * This is used by subclasses for fetching a new factory.
      */
-    final Hints hints() {
+    private Hints hints() {
         final Hints extended = new Hints(hints);
         addAll(operationFactory, extended);
         addAll(    datumFactory, extended);
@@ -182,9 +227,9 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
-     * Returns {@code true} if this factory is ready for use. This method checks the
-     * availability of {@link #crsFactory}, {@link #csFactory}, {@link #datumFactory}
-     * and {@link #operationFactory}.
+     * Returns {@code true} if this factory is ready for use. This default implementation
+     * checks the availability of CRS, CS, datum and operation authority factories specified
+     * at construction time.
      */
     public boolean isAvailable() {
         return isAvailable(      crsFactory) &&
@@ -201,8 +246,28 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
+     * Inspects all dependencies in order to determine if {@link #getAuthorityCode}
+     * can be invoked recursively.
+     */
+    // @Override
+    boolean getAuthorityCodesRecursively() {
+        return getAuthorityCodesRecursively(      crsFactory) &&
+               getAuthorityCodesRecursively(       csFactory) &&
+               getAuthorityCodesRecursively(    datumFactory) &&
+               getAuthorityCodesRecursively(operationFactory);
+    }
+
+    /**
+     * Helper method for {@link #getAuthorityCodesRecursively} implementation.
+     */
+    private static boolean getAuthorityCodesRecursively(final AuthorityFactory factory) {
+        return !(factory instanceof AbstractAuthorityFactory) ||
+                ((AbstractAuthorityFactory) factory).getAuthorityCodesRecursively();
+    }
+
+    /**
      * Replaces the specified unit, if applicable.
-     * To be overrided with {@code protected} access by {@link TransformedAuthorityFactory}.
+     * To be overridden with {@code protected} access by {@link TransformedAuthorityFactory}.
      */
     Unit replace(Unit units) throws FactoryException {
         return units;
@@ -210,7 +275,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Replaces (if needed) the specified axis by a new one.
-     * To be overrided with {@code protected} access by {@link TransformedAuthorityFactory}.
+     * To be overridden with {@code protected} access by {@link TransformedAuthorityFactory}.
      */
     CoordinateSystemAxis replace(CoordinateSystemAxis axis) throws FactoryException {
         return axis;
@@ -218,7 +283,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Replaces (if needed) the specified coordinate system by a new one.
-     * To be overrided with {@code protected} access by {@link TransformedAuthorityFactory}.
+     * To be overridden with {@code protected} access by {@link TransformedAuthorityFactory}.
      */
     CoordinateSystem replace(CoordinateSystem cs) throws FactoryException {
         return cs;
@@ -226,7 +291,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Replaces (if needed) the specified datum by a new one.
-     * To be overrided with {@code protected} access by {@link TransformedAuthorityFactory}.
+     * To be overridden with {@code protected} access by {@link TransformedAuthorityFactory}.
      */
     Datum replace(Datum datum) throws FactoryException {
         return datum;
@@ -234,7 +299,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Replaces (if needed) the specified coordinate reference system.
-     * To be overrided with {@code protected} access by {@link TransformedAuthorityFactory}.
+     * To be overridden with {@code protected} access by {@link TransformedAuthorityFactory}.
      */
     CoordinateReferenceSystem replace(CoordinateReferenceSystem crs) throws FactoryException {
         return crs;
@@ -242,21 +307,10 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Replaces (if needed) the specified coordinate operation.
-     * To be overrided with {@code protected} access by {@link TransformedAuthorityFactory}.
+     * To be overridden with {@code protected} access by {@link TransformedAuthorityFactory}.
      */
     CoordinateOperation replace(CoordinateOperation operation) throws FactoryException {
         return operation;
-    }
-
-    /**
-     * Returns the first non-null authority factory.
-     */
-    private AuthorityFactory getAuthorityFactory() {
-        if (      crsFactory != null) return       crsFactory;
-        if (       csFactory != null) return        csFactory;
-        if (    datumFactory != null) return     datumFactory;
-        if (operationFactory != null) return operationFactory;
-        return null;
     }
 
     /**
@@ -264,18 +318,12 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * If there is none of them, then returns {@code null} or throws an exception if {@code caller}
      * is not null.
      */
-    private AbstractAuthorityFactory getFactory(final String caller) throws FactoryException {
-        if (crsFactory instanceof AbstractAuthorityFactory) {
-            return (AbstractAuthorityFactory) crsFactory;
-        }
-        if (csFactory instanceof AbstractAuthorityFactory) {
-            return (AbstractAuthorityFactory) csFactory;
-        }
-        if (datumFactory instanceof AbstractAuthorityFactory) {
-            return (AbstractAuthorityFactory) datumFactory;
-        }
-        if (operationFactory instanceof AbstractAuthorityFactory) {
-            return (AbstractAuthorityFactory) operationFactory;
+    private AbstractAuthorityFactory getGeotoolsFactory(final String caller, final String code)
+            throws FactoryException
+    {
+        final AuthorityFactory candidate = getAuthorityFactory(code);
+        if (candidate instanceof AbstractAuthorityFactory) {
+            return (AbstractAuthorityFactory) candidate;
         }
         if (caller == null) {
             return null;
@@ -290,8 +338,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @throws FactoryException if a failure occured while fetching the engine description.
      */
     public String getBackingStoreDescription() throws FactoryException {
-        final AbstractAuthorityFactory factory = getFactory(null);
-        return (factory!=null) ? factory.getBackingStoreDescription() : null;
+        final AbstractAuthorityFactory factory = getGeotoolsFactory(null, null);
+        return (factory != null) ? factory.getBackingStoreDescription() : null;
     }
 
     /**
@@ -314,22 +362,27 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * 
      * @todo We should returns the union of authority codes from all underlying factories.
      */
-    public Set/*<String>*/ getAuthorityCodes(Class type) throws FactoryException {
-        return getAuthorityFactory().getAuthorityCodes(type);
+    public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
+        return getAuthorityFactory(null).getAuthorityCodes(type);
     }
 
     /**
      * Returns a description for the object identified by the specified code.
      */
     public InternationalString getDescriptionText(final String code) throws FactoryException {
-        return getAuthorityFactory().getDescriptionText(toBackingFactoryCode(code));
+        return getAuthorityFactory(code).getDescriptionText(toBackingFactoryCode(code));
     }
 
     /**
      * Returns an arbitrary object from a code.
+     *
+     * @see #createCoordinateReferenceSystem
+     * @see #createDatum
+     * @see #createEllipsoid
+     * @see #createUnit
      */
     public IdentifiedObject createObject(final String code) throws FactoryException {
-        IdentifiedObject object = getAuthorityFactory().createObject(toBackingFactoryCode(code));
+        IdentifiedObject object = getAuthorityFactory(code).createObject(toBackingFactoryCode(code));
         if (object instanceof Datum) {
             object = replace((Datum) object);
         } else if (object instanceof CoordinateSystem) {
@@ -342,121 +395,155 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
 
     /**
      * Returns an arbitrary {@linkplain Datum datum} from a code.
+     *
+     * @see #createGeodeticDatum
+     * @see #createVerticalDatum
+     * @see #createTemporalDatum
      */
     public Datum createDatum(final String code) throws FactoryException {
-        return replace(datumFactory.createDatum(toBackingFactoryCode(code)));
+        return replace(getDatumAuthorityFactory(code).createDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain EngineeringDatum engineering datum} from a code.
+     *
+     * @see #createEngineeringCRS
      */
     public EngineeringDatum createEngineeringDatum(final String code) throws FactoryException {
-        return (EngineeringDatum) replace(datumFactory.createEngineeringDatum(toBackingFactoryCode(code)));
+        return (EngineeringDatum) replace(getDatumAuthorityFactory(code).
+                createEngineeringDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain ImageDatum image datum} from a code.
+     *
+     * @see #createImageCRS
      */
     public ImageDatum createImageDatum(final String code) throws FactoryException {
-        return (ImageDatum) replace(datumFactory.createImageDatum(toBackingFactoryCode(code)));
+        return (ImageDatum) replace(getDatumAuthorityFactory(code).
+                createImageDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain VerticalDatum vertical datum} from a code.
+     *
+     * @see #createVerticalCRS
      */
     public VerticalDatum createVerticalDatum(final String code) throws FactoryException {
-        return (VerticalDatum) replace(datumFactory.createVerticalDatum(toBackingFactoryCode(code)));
+        return (VerticalDatum) replace(getDatumAuthorityFactory(code).
+                createVerticalDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain TemporalDatum temporal datum} from a code.
+     *
+     * @see #createTemporalCRS
      */
     public TemporalDatum createTemporalDatum(final String code) throws FactoryException {
-        return (TemporalDatum) replace(datumFactory.createTemporalDatum(toBackingFactoryCode(code)));
+        return (TemporalDatum) replace(getDatumAuthorityFactory(code).
+                createTemporalDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns a {@linkplain GeodeticDatum geodetic datum} from a code.
+     *
+     * @see #createEllipsoid
+     * @see #createPrimeMeridian
+     * @see #createGeographicCRS
+     * @see #createProjectedCRS
      */
     public GeodeticDatum createGeodeticDatum(final String code) throws FactoryException {
-        return (GeodeticDatum) replace(datumFactory.createGeodeticDatum(toBackingFactoryCode(code)));
+        return (GeodeticDatum) replace(getDatumAuthorityFactory(code).
+                createGeodeticDatum(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns an {@linkplain Ellipsoid ellipsoid} from a code.
+     *
+     * @see #createGeodeticDatum
      */
     public Ellipsoid createEllipsoid(final String code) throws FactoryException {
-        return datumFactory.createEllipsoid(toBackingFactoryCode(code));
+        return getDatumAuthorityFactory(code).createEllipsoid(toBackingFactoryCode(code));
     }
 
     /**
      * Returns a {@linkplain PrimeMeridian prime meridian} from a code.
+     *
+     * @see #createGeodeticDatum
      */
     public PrimeMeridian createPrimeMeridian(final String code) throws FactoryException {
-        return datumFactory.createPrimeMeridian(toBackingFactoryCode(code));
+        return getDatumAuthorityFactory(code).createPrimeMeridian(toBackingFactoryCode(code));
     }
 
     /**
      * Returns a {@linkplain Extent extent} (usually an area of validity) from a code.
      */
     public Extent createExtent(final String code) throws FactoryException {
-        return getFactory("createExtent").createExtent(toBackingFactoryCode(code));
+        return getGeotoolsFactory("createExtent", code).createExtent(toBackingFactoryCode(code));
     }
 
     /**
      * Returns an arbitrary {@linkplain CoordinateSystem coordinate system} from a code.
      */
     public CoordinateSystem createCoordinateSystem(final String code) throws FactoryException {
-        return replace(csFactory.createCoordinateSystem(toBackingFactoryCode(code)));
+        return replace(getCSAuthorityFactory(code).
+                createCoordinateSystem(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a cartesian coordinate system from a code.
      */
     public CartesianCS createCartesianCS(final String code) throws FactoryException {
-        return (CartesianCS) replace(csFactory.createCartesianCS(toBackingFactoryCode(code)));
+        return (CartesianCS) replace(getCSAuthorityFactory(code).
+                createCartesianCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a polar coordinate system from a code.
      */
     public PolarCS createPolarCS(final String code) throws FactoryException {
-        return (PolarCS) replace(csFactory.createPolarCS(toBackingFactoryCode(code)));
+        return (PolarCS) replace(getCSAuthorityFactory(code).
+                createPolarCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a cylindrical coordinate system from a code.
      */
     public CylindricalCS createCylindricalCS(final String code) throws FactoryException {
-        return (CylindricalCS) replace(csFactory.createCylindricalCS(toBackingFactoryCode(code)));
+        return (CylindricalCS) replace(getCSAuthorityFactory(code).
+                createCylindricalCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a spherical coordinate system from a code.
      */
     public SphericalCS createSphericalCS(final String code) throws FactoryException {
-        return (SphericalCS) replace(csFactory.createSphericalCS(toBackingFactoryCode(code)));
+        return (SphericalCS) replace(getCSAuthorityFactory(code).
+                createSphericalCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates an ellipsoidal coordinate system from a code.
      */
     public EllipsoidalCS createEllipsoidalCS(final String code) throws FactoryException {
-        return (EllipsoidalCS) replace(csFactory.createEllipsoidalCS(toBackingFactoryCode(code)));
+        return (EllipsoidalCS) replace(getCSAuthorityFactory(code).
+                createEllipsoidalCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a vertical coordinate system from a code.
      */
     public VerticalCS createVerticalCS(final String code) throws FactoryException {
-        return (VerticalCS) replace(csFactory.createVerticalCS(toBackingFactoryCode(code)));
+        return (VerticalCS) replace(getCSAuthorityFactory(code).
+                createVerticalCS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a temporal coordinate system from a code.
      */
     public TimeCS createTimeCS(final String code) throws FactoryException {
-        return (TimeCS) replace(csFactory.createTimeCS(toBackingFactoryCode(code)));
+        return (TimeCS) replace(getCSAuthorityFactory(code).
+                createTimeCS(toBackingFactoryCode(code)));
     }
 
     /**
@@ -465,108 +552,129 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     public CoordinateSystemAxis createCoordinateSystemAxis(final String code)
             throws FactoryException
     {
-        return replace(csFactory.createCoordinateSystemAxis(toBackingFactoryCode(code)));
+        return replace(getCSAuthorityFactory(code).
+                createCoordinateSystemAxis(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns an {@linkplain Unit unit} from a code.
      */
     public Unit createUnit(final String code) throws FactoryException {
-        return replace(csFactory.createUnit(toBackingFactoryCode(code)));
+        return replace(getCSAuthorityFactory(code).
+                createUnit(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns an arbitrary {@linkplain CoordinateReferenceSystem coordinate reference system}
      * from a code.
+     *
+     * @see #createGeographicCRS
+     * @see #createProjectedCRS
+     * @see #createVerticalCRS
+     * @see #createTemporalCRS
+     * @see #createCompoundCRS
      */
     public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
-        return replace(crsFactory.createCoordinateReferenceSystem(toBackingFactoryCode(code)));
+        return replace(getCRSAuthorityFactory(code).
+                createCoordinateReferenceSystem(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a 3D coordinate reference system from a code.
      */
     public CompoundCRS createCompoundCRS(final String code) throws FactoryException {
-        return (CompoundCRS) replace(crsFactory.createCompoundCRS(toBackingFactoryCode(code)));
+        return (CompoundCRS) replace(getCRSAuthorityFactory(code).
+                createCompoundCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a derived coordinate reference system from a code.
      */
     public DerivedCRS createDerivedCRS(final String code) throws FactoryException {
-        return (DerivedCRS) replace(crsFactory.createDerivedCRS(toBackingFactoryCode(code)));
+        return (DerivedCRS) replace(getCRSAuthorityFactory(code).
+                createDerivedCRS(toBackingFactoryCode(code)));
     }
     
     /**
      * Creates a {@linkplain EngineeringCRS engineering coordinate reference system} from a code.
      */
     public EngineeringCRS createEngineeringCRS(final String code) throws FactoryException {
-        return (EngineeringCRS) replace(crsFactory.createEngineeringCRS(toBackingFactoryCode(code)));
+        return (EngineeringCRS) replace(getCRSAuthorityFactory(code).
+                createEngineeringCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns a {@linkplain GeographicCRS geographic coordinate reference system} from a code.
      */
     public GeographicCRS createGeographicCRS(final String code) throws FactoryException {
-        return (GeographicCRS) replace(crsFactory.createGeographicCRS(toBackingFactoryCode(code)));
+        return (GeographicCRS) replace(getCRSAuthorityFactory(code).
+                createGeographicCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns a {@linkplain GeocentricCRS geocentric coordinate reference system} from a code.
      */
     public GeocentricCRS createGeocentricCRS(final String code) throws FactoryException {
-        return (GeocentricCRS) replace(crsFactory.createGeocentricCRS(toBackingFactoryCode(code)));
+        return (GeocentricCRS) replace(getCRSAuthorityFactory(code).
+                createGeocentricCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain ImageCRS image coordinate reference system} from a code.
      */
     public ImageCRS createImageCRS(final String code) throws FactoryException {
-        return (ImageCRS) replace(crsFactory.createImageCRS(toBackingFactoryCode(code)));
+        return (ImageCRS) replace(getCRSAuthorityFactory(code).
+                createImageCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Returns a {@linkplain ProjectedCRS projected coordinate reference system} from a code.
      */
     public ProjectedCRS createProjectedCRS(final String code) throws FactoryException {
-        return (ProjectedCRS) replace(crsFactory.createProjectedCRS(toBackingFactoryCode(code)));
+        return (ProjectedCRS) replace(getCRSAuthorityFactory(code).
+                createProjectedCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain TemporalCRS temporal coordinate reference system} from a code.
      */
     public TemporalCRS createTemporalCRS(final String code) throws FactoryException {
-        return (TemporalCRS) replace(crsFactory.createTemporalCRS(toBackingFactoryCode(code)));
+        return (TemporalCRS) replace(getCRSAuthorityFactory(code).
+                createTemporalCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a {@linkplain VerticalCRS vertical coordinate reference system} from a code.
      */
     public VerticalCRS createVerticalCRS(final String code) throws FactoryException {
-        return (VerticalCRS) replace(crsFactory.createVerticalCRS(toBackingFactoryCode(code)));
+        return (VerticalCRS) replace(getCRSAuthorityFactory(code).
+                createVerticalCRS(toBackingFactoryCode(code)));
     }
 
     /**
      * Creates a parameter descriptor from a code.
      */
     public ParameterDescriptor createParameterDescriptor(final String code) throws FactoryException {
-        return getFactory("createParameterDescriptor").createParameterDescriptor(toBackingFactoryCode(code));
+        return getGeotoolsFactory("createParameterDescriptor", code).
+                createParameterDescriptor(toBackingFactoryCode(code));
     }
 
     /**
      * Creates an operation method from a code.
      */
     public OperationMethod createOperationMethod(final String code) throws FactoryException {
-        return getFactory("createOperationMethod").createOperationMethod(toBackingFactoryCode(code));
+        return getGeotoolsFactory("createOperationMethod", code).
+                createOperationMethod(toBackingFactoryCode(code));
     }
 
     /**
      * Creates an operation from a single operation code.
      */
     public CoordinateOperation createCoordinateOperation(final String code) throws FactoryException {
-        return replace(operationFactory.createCoordinateOperation(toBackingFactoryCode(code)));
+        return replace(getCoordinateOperationAuthorityFactory(code).
+                createCoordinateOperation(toBackingFactoryCode(code)));
     }
 
     /**
@@ -576,23 +684,220 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
                                         final String sourceCode, final String targetCode)
             throws FactoryException
     {
-        return operationFactory.createFromCoordinateReferenceSystemCodes(
+        final CoordinateOperationAuthorityFactory factory, check;
+        factory = getCoordinateOperationAuthorityFactory(sourceCode);
+        check   = getCoordinateOperationAuthorityFactory(targetCode);
+        if (factory != check) {
+            /*
+             * No coordinate operation because of mismatched factories. This is not
+             * illegal - the result is an empty set - but it is worth to notify the
+             * user since this case has some chances to be an user error.
+             */
+            final LogRecord record = Logging.format(Level.WARNING,
+                    LoggingKeys.MISMATCHED_COORDINATE_OPERATION_FACTORIES_$2, sourceCode, targetCode);
+            record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
+            record.setSourceClassName("AuthorityFactoryAdapter");
+            LOGGER.log(record);
+            return Collections.EMPTY_SET;
+        }
+        return factory.createFromCoordinateReferenceSystemCodes(
                 toBackingFactoryCode(sourceCode), toBackingFactoryCode(targetCode));
+    }
+
+    /**
+     * Creates an exception for a missing factory.
+     */
+    private static FactoryException missingFactory(final Class category) {
+        return new FactoryException(Errors.format(ErrorKeys.FACTORY_NOT_FOUND_$1,
+                  Utilities.getShortName(category)));
+    }
+
+    /**
+     * For internal use by {@link #getAuthority} and {@link #getVendor} only. Its only purpose
+     * is to catch the {@link FactoryException} for methods that don't allow it. The protected
+     * method should be used instead when this exception is allowed.
+     */
+    private AuthorityFactory getAuthorityFactory() {
+        try {
+            return getAuthorityFactory(null);
+        } catch (FactoryException cause) {
+            IllegalStateException e = new IllegalStateException(
+                    Errors.format(ErrorKeys.UNDEFINED_PROPERTY));
+            e.initCause(cause); // TODO: inline when we will be allowed to compile for J2SE 1.5.
+            throw e;
+        }
+    }
+
+    /**
+     * Returns a generic object factory to use for the specified code. The default implementation
+     * returns one of the factory specified at construction time. Subclasses can override
+     * this method in order to select a different factory implementation depending on the
+     * code value.
+     * <p>
+     * <strong>Note:</strong> The value of the {@code code} argument given to this
+     * method may be {@code null} when a factory is needed for some global task,
+     * like {@link #getAuthorityCodes} method execution.
+     *
+     * @param  code The authority code given to this class. Note that the code to be given
+     *         to the returned factory {@linkplain #toBackingFactoryCode may be different}.
+     * @return A factory for the specified authority code (never {@code null}).
+     * @throws FactoryException if no datum factory were specified at construction time.
+     *
+     * @since 2.4
+     */
+    protected AuthorityFactory getAuthorityFactory(final String code) throws FactoryException {
+        if (      crsFactory != null) return       crsFactory;
+        if (       csFactory != null) return        csFactory;
+        if (    datumFactory != null) return     datumFactory;
+        if (operationFactory != null) return operationFactory;
+        throw missingFactory(AuthorityFactory.class);
+    }
+
+    /**
+     * Returns the datum factory to use for the specified code. The default implementation
+     * always returns the factory specified at construction time. Subclasses can override
+     * this method in order to select a different factory implementation depending on the
+     * code value.
+     *
+     * @param  code The authority code given to this class. Note that the code to be given
+     *         to the returned factory {@linkplain #toBackingFactoryCode may be different}.
+     * @return A factory for the specified authority code (never {@code null}).
+     * @throws FactoryException if no datum factory were specified at construction time.
+     *
+     * @since 2.4
+     */
+    protected DatumAuthorityFactory getDatumAuthorityFactory(final String code)
+            throws FactoryException
+    {
+        if (datumFactory == null) {
+            throw missingFactory(DatumAuthorityFactory.class);
+        }
+        return datumFactory;
+    }
+
+    /**
+     * Returns the coordinate system factory to use for the specified code. The default
+     * implementation always returns the factory specified at construction time. Subclasses
+     * can override this method in order to select a different factory implementation
+     * depending on the code value.
+     *
+     * @param  code The authority code given to this class. Note that the code to be given
+     *         to the returned factory {@linkplain #toBackingFactoryCode may be different}.
+     * @return A factory for the specified authority code (never {@code null}).
+     * @throws FactoryException if no coordinate system factory were specified at construction time.
+     *
+     * @since 2.4
+     */
+    protected CSAuthorityFactory getCSAuthorityFactory(final String code)
+            throws FactoryException
+    {
+        if (csFactory == null) {
+            throw missingFactory(CSAuthorityFactory.class);
+        }
+        return csFactory;
+    }
+
+    /**
+     * Returns the coordinate reference system factory to use for the specified code. The default
+     * implementation always returns the factory specified at construction time. Subclasses can
+     * override this method in order to select a different factory implementation depending on
+     * the code value.
+     *
+     * @param  code The authority code given to this class. Note that the code to be given
+     *         to the returned factory {@linkplain #toBackingFactoryCode may be different}.
+     * @return A factory for the specified authority code (never {@code null}).
+     * @throws FactoryException if no coordinate reference system factory were specified
+     *         at construction time.
+     *
+     * @since 2.4
+     */
+    protected CRSAuthorityFactory getCRSAuthorityFactory(final String code)
+            throws FactoryException
+    {
+        if (crsFactory == null) {
+            throw missingFactory(CRSAuthorityFactory.class);
+        }
+        return crsFactory;
+    }
+
+    /**
+     * Returns the coordinate operation factory to use for the specified code. The default
+     * implementation always returns the factory specified at construction time. Subclasses can
+     * override this method in order to select a different factory implementation depending on
+     * the code value.
+     *
+     * @param  code The authority code given to this class. Note that the code to be given
+     *         to the returned factory {@linkplain #toBackingFactoryCode may be different}.
+     * @return A factory for the specified authority code (never {@code null}).
+     * @throws FactoryException if no coordinate operation factory were specified
+     *         at construction time.
+     *
+     * @since 2.4
+     */
+    protected CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(final String code)
+            throws FactoryException
+    {
+        if (operationFactory == null) {
+            throw missingFactory(CoordinateOperationAuthorityFactory.class);
+        }
+        return operationFactory;
+    }
+
+    /**
+     * Returns a coordinate operation factory for this adapter. This method will try to fetch
+     * this information from the coordinate operation authority factory, or will returns the
+     * default one if no explicit factory were found.
+     */
+    final CoordinateOperationFactory getCoordinateOperationFactory() throws FactoryException {
+        if (operationFactory instanceof Factory) {
+            final Factory factory   = (Factory) operationFactory;
+            final Map     hints     = factory.getImplementationHints();
+            final Object  candidate = hints.get(Hints.COORDINATE_OPERATION_FACTORY);
+            if (candidate instanceof CoordinateOperationFactory) {
+                return (CoordinateOperationFactory) candidate;
+            }
+        }
+        return FactoryFinder.getCoordinateOperationFactory(hints());
+    }
+
+    /**
+     * Suggests a low-level factory group. If {@code crs} is {@code true}, then this method will
+     * try to fetch the factory group from the CRS authority factory. Otherwise it will try to
+     * fetch the factory group from the CS authority factory. This is used by subclasses like
+     * {@link TransformedAuthorityFactory} that need low-level access to factories. Do not change
+     * this method into a public one; we would need a better API before to do such thing.
+     */
+    final FactoryGroup getFactoryGroup(final boolean crs) {
+        final AuthorityFactory factory;
+        if (crs) {
+            factory = crsFactory;
+        } else {
+            factory = csFactory;
+        }
+        if (factory instanceof DirectAuthorityFactory) {
+            return ((DirectAuthorityFactory) factory).factories;
+        }
+        // No predefined factory group. Create one.
+        if (factories == null) {
+            factories = FactoryGroup.createInstance(hints());
+        }
+        return factories;
     }
 
     /**
      * Returns the code to be given to the wrapped factories. This method is automatically
      * invoked by all {@code create} methods before to forward the code to the
-     * {@linkplain crsFactory CRS}, {@linkplain csFactory CS}, {@linkplain datumFactory datum}
-     * or {@linkplain opFactory operation} factory. The default implementation returns the
-     * {@code code} unchanged.
+     * {@linkplain #getCRSAuthorityFactory CRS}, {@linkplain #getCSAuthorityFactory CS},
+     * {@linkplain #getDatumAuthorityFactory datum} or {@linkplain #operationFactory operation}
+     * factory. The default implementation returns the {@code code} unchanged.
      *
-     * @param code The code given to this factory.
+     * @param  code The code given to this factory.
      * @return The code to give to the underlying factories.
+     * @throws FactoryException if the code can't be converted.
      *
      * @since 2.4
      */
-    protected String toBackingFactoryCode(final String code) {
+    protected String toBackingFactoryCode(final String code) throws FactoryException {
         return code;
     }
 }

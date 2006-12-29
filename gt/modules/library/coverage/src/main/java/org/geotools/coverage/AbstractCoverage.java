@@ -1400,7 +1400,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
      * @see PlanarImage#dispose
      */
     public void dispose() {
-        // To be overriden by subclasses.
+        // To be overridden by subclasses.
         //
         // Note: implementing this method in GridCoverage is tricky. We must ensure that:
         //

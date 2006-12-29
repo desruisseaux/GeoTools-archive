@@ -190,7 +190,7 @@ public abstract class AbstractParameter extends Formattable
 
     /**
      * Returns a string representation of this parameter. The default implementation
-     * delegates the work to {@link #write}, which should be overriden by subclasses.
+     * delegates the work to {@link #write}, which should be overridden by subclasses.
      */
     public final String toString() {
         final TableWriter table = new TableWriter(null, 1);
@@ -315,7 +315,7 @@ public abstract class AbstractParameter extends Formattable
     /**
      * Format the inner part of this parameter as
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A>. This method doesn't need to be overriden, since the formatter
+     * Known Text</cite> (WKT)</A>. This method doesn't need to be overridden, since the formatter
      * already know how to {@linkplain Formatter#append(GeneralParameterValue) format parameters}.
      */
     protected final String formatWKT(final Formatter formatter) {

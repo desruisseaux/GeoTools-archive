@@ -118,7 +118,7 @@ public class WeakValueHashMap extends AbstractMap {
 
         /**
          * Clear the reference. The {@link WeakCollectionCleaner} requires that this method is
-         * overriden in order to remove this entry from the enclosing hash map.
+         * overridden in order to remove this entry from the enclosing hash map.
          */
         public void clear() {
             super.clear();

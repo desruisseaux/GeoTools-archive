@@ -566,7 +566,7 @@ public class MonolineFormatter extends Formatter {
      *
      * @todo This class should subclass {@link ConsoleHandler}. Unfortunatly, this is currently
      *       not possible because {@link ConsoleHandler#setOutputStream} close {@link System#err}.
-     *       If this bug get fixed, then {@link #close} no longer need to be overriden.
+     *       If this bug get fixed, then {@link #close} no longer need to be overridden.
      */
     private static final class Stdout extends StreamHandler {
         /**

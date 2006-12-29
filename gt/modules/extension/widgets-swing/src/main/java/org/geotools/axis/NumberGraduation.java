@@ -229,7 +229,7 @@ public class NumberGraduation extends AbstractGraduation {
     }
 
     /**
-     * Constructs or reuses an iterator. This method is overriden by
+     * Constructs or reuses an iterator. This method is overridden by
      * {@link LogarithmicNumberGraduation}.
      */
     NumberIterator getTickIterator(final TickIterator reuse, final Locale locale) {

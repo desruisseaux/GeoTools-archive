@@ -331,7 +331,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
      * For internal use by {@link #createFactory} and {@link #createBackingStore} only.
      */
     private static void log(final LogRecord record) {
-        record.setSourceMethodName(DefaultFactory.class.getName());
+        record.setSourceClassName("DefaultFactory");
         record.setSourceMethodName("createBackingStore"); // The public caller.
         LOGGER.log(record);
     }

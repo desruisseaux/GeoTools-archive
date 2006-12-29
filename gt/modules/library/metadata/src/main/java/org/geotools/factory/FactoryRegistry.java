@@ -125,8 +125,9 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Returns the providers in the registry for the specified category, filter and hints. This
-     * method is similar to <code>{@link #getServiceProviders getServiceProviders}(category)</code>
+     * Returns the providers in the registry for the specified category, filter and hints.
+     * This method is similar to
+     * <code>{@linkplain #getServiceProviders(Class) getServiceProviders}(category)</code>
      * except that only factories matching the specified filter and hints are returned by the
      * iterator.
      *
@@ -210,10 +211,8 @@ public class FactoryRegistry extends ServiceRegistry {
      * @see #getServiceProviders
      * @see FactoryCreator#getServiceProvider
      */
-    public Object getServiceProvider(final Class     category,
-                                     final Filter    filter,
-                                     final Hints     hints,
-                                     final Hints.Key key)
+    public Object getServiceProvider(final Class category, final Filter filter,
+                                     Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
         Class implementation = null;
@@ -226,33 +225,58 @@ public class FactoryRegistry extends ServiceRegistry {
             }
             if (hints!=null && !hints.isEmpty()) {
                 final Object hint = hints.get(key);
-                if (category.isInstance(hint)) {
+                if (hint != null) {
+                    if (category.isInstance(hint)) {
+                        /*
+                         * The factory implementation was given explicitly by the user.
+                         * Nothing to do; we are done.
+                         */
+                        return hint;
+                    }
                     /*
-                     * The factory implementation was given explicitly by the user.
-                     * Nothing to do; we are done.
+                     * Before to pass the hints to the private 'getServiceProvider' method,
+                     * remove the hint for the user-supplied key. This is because this hint
+                     * has been processed by this public 'getServiceProvider' method, and the
+                     * policy is to remove the processed hints before to pass them to child
+                     * dependencies (see the "Check recursively in factory dependencies"
+                     * comment elswhere in this class).
+                     *
+                     * Use case: DefaultDataSourceTest invokes indirectly 'getServiceProvider'
+                     * with a "CRS_AUTHORITY_FACTORY = DefaultFactory.class" hint. However
+                     * DefaultFactory (in the org.geotools.referencing.factory.epsg package)
+                     * is a wrapper around FactoryUsingSQL, and defines this dependency through
+                     * a "CRS_AUTHORITY_FACTORY = FactoryUsingSQL.class" hint. There is no way
+                     * to match this hint for both factories in same time. Since we must choose
+                     * one, we assume that the user is interrested in the most top level one and
+                     * discart this particular hint for the dependencies.
                      */
-                    return hint;
-                }
-                if (hint instanceof Class[]) {
+                    hints = new Hints(hints);
+                    if (hints.remove(key) != hint) {
+                        // Should never happen except on concurrent modification in an other thread.
+                        throw new AssertionError(key);
+                    }
                     /*
-                     * The user accepts many implementation classes. Tries all of them in the
-                     * preference order given by the user. The last class will be tried using
-                     * the "normal" path (oustide the loop) in order to get the error message
-                     * in case of failure.
+                     * If the user accepts many implementation classes, then try all of them in
+                     * the preference order given by the user. The last class (or the singleton
+                     * if the hint was not an array) will be tried using the "normal" path
+                     * (oustide the loop) in order to get the error message in case of failure.
                      */
-                    final Class[] types = (Class[]) hint;
-                    final int length = types.length;
-                    for (int i=0; i<length-1; i++) {
-                        final Object candidate = getServiceProvider(category, types[i], filter, hints);
-                        if (candidate != null) {
-                            return candidate;
+                    if (hint instanceof Class[]) {
+                        final Class[] types = (Class[]) hint;
+                        final int length = types.length;
+                        for (int i=0; i<length-1; i++) {
+                            final Object candidate =
+                                    getServiceProvider(category, types[i], filter, hints);
+                            if (candidate != null) {
+                                return candidate;
+                            }
                         }
+                        if (length != 0) {
+                            implementation = types[length-1]; // Last try to be done below.
+                        }
+                    } else {
+                        implementation = (Class) hint;
                     }
-                    if (length != 0) {
-                        implementation = types[length-1]; // Last try to be done below.
-                    }
-                } else {
-                    implementation = (Class) hint;
                 }
             }
         }
@@ -313,7 +337,7 @@ public class FactoryRegistry extends ServiceRegistry {
 
     /**
      * Returns the providers available in the cache, or {@code null} if none.
-     * To be overrided by {@link FactoryCreator} only.
+     * To be overridden by {@link FactoryCreator} only.
      */
     List/*<Reference>*/ getCachedProviders(final Class category) {
         return null;
@@ -392,13 +416,14 @@ public class FactoryRegistry extends ServiceRegistry {
                 return false;
             }
             /*
-             * Check recursively in factory dependencies, if any. Not that the dependencies will be
-             * checked against a subset of user's hints.  More specifically, all hints processed by
-             * the current pass will NOT be passed to the factories dependencies.   This is because
-             * the same hint may appears in the "parent" factory and a "child" dependency with
-             * different value. For example the FORCE_LONGITUDE_FIRST_AXIS_ORDER hint has the value
-             * TRUE in OrderedAxisAuthorityFactory, but the later is basically a wrapper around the
-             * EPSG DefaultFactory (typically), which has the value FALSE for the same hint.
+             * Check recursively in factory dependencies, if any. Note that the dependencies
+             * will be checked against a subset of user's hints. More specifically, all hints
+             * processed by the current pass will NOT be passed to the factories dependencies.
+             * This is because the same hint may appears in the "parent" factory and a "child"
+             * dependency with different value. For example the FORCE_LONGITUDE_FIRST_AXIS_ORDER
+             * hint has the value TRUE in OrderedAxisAuthorityFactory, but the later is basically
+             * a wrapper around the EPSG DefaultFactory (typically), which has the value FALSE
+             * for the same hint.
              *
              * Additional note: The 'alreadyDone' set is a safety against cyclic dependencies,
              * in order to protect ourself against never-ending loops.
@@ -420,6 +445,7 @@ public class FactoryRegistry extends ServiceRegistry {
                     } else {
                         type = Factory.class; // Kind of unknown factory type...
                     }
+                    // Recursive call to this method for scanning dependencies.
                     if (!isAcceptable(dependency, type, remaining, alreadyDone)) {
                         return false;
                     }

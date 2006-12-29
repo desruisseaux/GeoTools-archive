@@ -66,7 +66,7 @@ import org.geotools.resources.Utilities;
  * overrides the {@link #isRecoverableFailure isRecoverableFailure} method.
  * <p>
  * <h3>Serialization</h3>
- * Serialization of this class force the immediate creation of all
+ * Serialization of this class forces the immediate creation of all
  * {@linkplain IdentifiedObject identified objects} not yet created.
  * The serialized set is disconnected from the {@linkplain #factory underlying factory}.
  * <p>

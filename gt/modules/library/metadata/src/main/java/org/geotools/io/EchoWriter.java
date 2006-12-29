@@ -153,7 +153,7 @@ public class EchoWriter extends FilterWriter {
     public void close() throws IOException {
         synchronized (lock) {
             out .close();
-            echo.close(); // Overriden with an uncloseable version for System.out.
+            echo.close(); // Overridden with an uncloseable version for System.out.
         }
     }
 }

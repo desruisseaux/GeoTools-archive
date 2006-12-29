@@ -719,7 +719,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
         /**
          * Creates the 3D-version of this provider.
-         * This method is overrided by {@link ProviderAbridged}.
+         * This method is overridden by {@link ProviderAbridged}.
          */
         Provider create3D() {
             return new Provider(3, 3, PARAMETERS);
@@ -727,7 +727,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
 
         /**
          * Returns {@code true} for the abridged formulas.
-         * This method is overrided by {@link ProviderAbridged}.
+         * This method is overridden by {@link ProviderAbridged}.
          */
         boolean isAbridged() {
             return false;

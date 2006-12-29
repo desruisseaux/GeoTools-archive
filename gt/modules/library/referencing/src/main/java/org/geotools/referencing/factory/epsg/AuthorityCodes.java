@@ -23,6 +23,9 @@ import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.LogRecord;
 import java.io.Serializable;
 import java.io.ObjectStreamException;
 import java.sql.Connection;
@@ -34,7 +37,8 @@ import java.sql.SQLException;
 import org.opengis.referencing.operation.Projection;
 
 // Geotools dependencies
-import org.geotools.util.Logging;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 
 
 /**
@@ -51,6 +55,11 @@ import org.geotools.util.Logging;
  * @author Martin Desruisseaux
  */
 final class AuthorityCodes extends AbstractSet implements Serializable {
+    /**
+     * The logger name.
+     */
+    private static final String LOGGER = "org.geotools.referencing.factory";
+
     /**
      * The factory which is the owner of this set. One purpose of this field (even if it were not
      * used directly by this class) is to avoid garbage collection of the factory as long as this
@@ -131,11 +140,9 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         final StringBuffer buffer = new StringBuffer("SELECT ");
         buffer.append(table.codeColumn);
         if (table.nameColumn != null) {
-            buffer.append(", ");
-            buffer.append(table.nameColumn);
+            buffer.append(", ").append(table.nameColumn);
         }
-        buffer.append(" FROM ");
-        buffer.append(table.table);
+        buffer.append(" FROM ").append(table.table);
         boolean hasWhere = false;
         Class tableType = table.type;
         if (table.typeColumn != null) {
@@ -144,11 +151,8 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
             for (int i=table.subTypes.length; --i>=0;) {
                 final Class candidate = table.subTypes[i];
                 if (candidate.isAssignableFrom(type)) {
-                    buffer.append(hasWhere ? " OR " : " WHERE (");
-                    buffer.append(table.typeColumn);
-                    buffer.append(" LIKE '");
-                    buffer.append(table.typeNames[i]);
-                    buffer.append("%'");
+                    buffer.append(hasWhere ? " OR " : " WHERE (").append(table.typeColumn)
+                          .append(" LIKE '").append(table.typeNames[i]).append("%'");
                     hasWhere = true;
                     tableType = candidate;
                 }
@@ -160,14 +164,11 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         this.type = tableType;
         isProjection = Projection.class.isAssignableFrom(tableType);
         final int length = buffer.length();
-        buffer.append(" ORDER BY ");
-        buffer.append(table.codeColumn);
+        buffer.append(" ORDER BY ").append(table.codeColumn);
         sqlAll = factory.adaptSQL(buffer.toString());
 
         buffer.setLength(length);
-        buffer.append(hasWhere ? " AND " : " WHERE ");
-        buffer.append(table.codeColumn);
-        buffer.append(" = ?");
+        buffer.append(hasWhere ? " AND " : " WHERE ").append(table.codeColumn).append(" = ?");
         sqlSingle = factory.adaptSQL(buffer.toString());
     }
 
@@ -176,9 +177,24 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      */
     private ResultSet getAll() throws SQLException {
         assert Thread.holdsLock(this);
-        if (queryAll == null) {
-            queryAll = connection.prepareStatement(sqlAll);
+        if (queryAll != null) {
+            try {
+                return queryAll.executeQuery();
+            } catch (SQLException ignore) {
+                /*
+                 * Failed to reuse an existing statement. This problem occurs in some occasions
+                 * with the JDBC-ODBC bridge in Java 6 (the error message is "Invalid handle").
+                 * I'm not sure where the bug come from (didn't noticed it when using HSQL). We
+                 * will try again with a new statement created in the code after this 'catch'
+                 * clause. Note that we set 'queryAll' to null first in case of failure during
+                 * the 'prepareStatement(...)' execution.
+                 */
+                queryAll.close();
+                queryAll = null;
+                recoverableException("getAll", ignore);
+            }
         }
+        queryAll = connection.prepareStatement(sqlAll);
         return queryAll.executeQuery();
     }
 
@@ -226,7 +242,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * This method fetch at most one row instead of counting all rows.
      */
     public synchronized boolean isEmpty() {
-        if (size != -1) { // No need to synchronize
+        if (size != -1) {
             return size == 0;
         }
         boolean empty = true;
@@ -250,7 +266,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
      * Count the number of elements in the underlying result set.
      */
     public synchronized int size() {
-        if (size >= 0) { // No need to synchronize
+        if (size >= 0) {
             return size;
         }
         int count = 0;
@@ -350,7 +366,19 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
                                     final String       method,
                                     final SQLException exception)
     {
-        Logging.unexpectedException("org.geotools.referencing.factory", classe, method, exception);
+        org.geotools.util.Logging.unexpectedException(LOGGER, classe, method, exception);
+    }
+
+    /**
+     * Invoked when a recoverable exception occured.
+     */
+    private static void recoverableException(final String method, final SQLException exception) {
+        // Uses the FINE level instead of WARNING because it may be a recoverable error.
+        LogRecord record = Logging.format(Level.FINE, LoggingKeys.UNEXPECTED_EXCEPTION);
+        record.setSourceClassName("AuthorityCodes");
+        record.setSourceMethodName(method);
+        record.setThrown(exception);
+        Logger.getLogger(LOGGER).log(record);        
     }
 
     /**
@@ -367,6 +395,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
 
         /** Creates a new iterator for the specified result set. */
         Iterator(final ResultSet results) throws SQLException {
+            assert Thread.holdsLock(AuthorityCodes.this);
             this.results = results;
             toNext();
         }
@@ -421,6 +450,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
                      * invoked again,  or closes the statement if getAll() already created a new
                      * statement anyway.
                      */
+                    assert owner != queryAll;
                     if (queryAll == null) {
                         queryAll = owner;
                     } else {

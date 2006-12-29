@@ -61,7 +61,7 @@ import org.geotools.util.NameFactory;
  * <p>
  * The default implementation for all {@code createFoo} methods ultimately invokes
  * {@link #createObject}, which may be the only method that a subclass need to override.
- * However, other methods may be overriden as well for better performances.
+ * However, other methods may be overridden as well for better performances.
  *
  * @since 2.1
  * @source $URL$
@@ -83,10 +83,23 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     }
 
     /**
-     * Returns {@code true} if this factory is available. This method may returns
-     * {@code false} for example if a connection to the EPSG database failed.
+     * Returns {@code true} if this factory is available. This method may returns {@code false}
+     * for example if a connection to the EPSG database failed. This method is defined here for
+     * implementation convenience, but not yet public because not yet applicable. It will be made
+     * public in {@link DeferredAuthorityFactory} and {@link AuthorityFactoryAdapter} subclasses,
+     * which implement the {@link org.geotools.factory.OptionalFactory} interface.
      */
     boolean isAvailable() {
+        return true;
+    }
+
+    /**
+     * Returns {@code true} if {@link AllAuthoritiesFactory} is allowed to invokes
+     * {@link #getAuthorityCodes} recursively. This is always {@code true}, except
+     * for other instances of {@code AllAuthoritiesFactory} or for instances of
+     * {@link AuthorityFactoryAdapter} backed by {@code AllAuthoritiesFactory}.
+     */
+    boolean getAuthorityCodesRecursively() {
         return true;
     }
 
@@ -754,7 +767,7 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
      * @throws FactoryException if an error occured while disposing the factory.
      */
     public void dispose() throws FactoryException {
-        // To be overriden by subclasses.
+        // To be overridden by subclasses.
     }
 
     /**

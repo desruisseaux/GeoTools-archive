@@ -130,7 +130,7 @@ abstract class IndexColorOperation extends Operation2D {
      * Transform the supplied RGB colors. This method is automatically invoked
      * by {@link #doOperation(ParameterList)} for each band in the source
      * {@link GridCoverage}. The {@code ARGB} array contains the ARGB values
-     * from the current source and should be overriden with new ARGB values
+     * from the current source and should be overridden with new ARGB values
      * for the destination image.
      * 
      * @param ARGB

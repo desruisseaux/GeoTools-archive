@@ -27,6 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -445,7 +446,8 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                         VocabularyKeys.DATA_BASE_$3, "EPSG", version, engine));
                 c.setEdition(new SimpleInternationalString(version));
                 c.setEditionDate(date);
-                authority = c;
+                authority = (Citation) c.unmodifiable();
+                hints.put(Hints.VERSION, version);  // For getImplementationHints()
             } else {
                 authority = Citations.EPSG;
             }
@@ -496,6 +498,20 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
             throw new FactoryException(exception);
         }
         return buffer.toString();
+    }
+
+    /**
+     * Returns the implementation hints for this factory. The returned map contains all the
+     * values specified in {@linkplain DirectAuthorityFactory#getImplementationHints subclass},
+     * with the addition of {@link Hints#VERSION VERSION}.
+     */
+    // @Override
+    public Map getImplementationHints() {
+        if (authority == null) {
+            // For the computation of Hints.VERSION.
+            getAuthority();
+        }
+        return super.getImplementationHints();
     }
 
     /**
@@ -595,7 +611,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
             }
         }
         /*
-         * Maybe the user overrided some object creation
+         * Maybe the user overridden some object creation
          * methods with a value for the supplied code.
          */
         final Identifier identifier = createObject(code).getName();
@@ -645,7 +661,9 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     private static String getString(final ResultSet result, final int columnIndex, final String code)
             throws SQLException, FactoryException
     {
-        return getString(result, columnIndex, code, columnIndex);
+        final String value = result.getString(columnIndex);
+        ensureNonNull(result, columnIndex, code);
+        return value.trim();
     }
 
     /**
@@ -658,9 +676,12 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     {
         final String str = result.getString(columnIndex);
         if (result.wasNull()) {
-            final String column = result.getMetaData().getColumnName(columnFault);
+            final ResultSetMetaData metadata = result.getMetaData();
+            final String column = metadata.getColumnName(columnFault);
+            final String table  = metadata.getTableName (columnFault);
             result.close();
-            throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
+            throw new FactoryException(
+                    Errors.format(ErrorKeys.NULL_VALUE_IN_TABLE_$3, code, column, table));
         }
         return str.trim();
     }
@@ -681,11 +702,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
             throws SQLException, FactoryException
     {
         final double value = result.getDouble(columnIndex);
-        if (result.wasNull()) {
-            final String column = result.getMetaData().getColumnName(columnIndex);
-            result.close();
-            throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
-        }
+        ensureNonNull(result, columnIndex, code);
         return value;
     }
 
@@ -705,12 +722,25 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
             throws SQLException, FactoryException
     {
         final int value = result.getInt(columnIndex);
-        if (result.wasNull()) {
-            final String column = result.getMetaData().getColumnName(columnIndex);
-            result.close();
-            throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
-        }
+        ensureNonNull(result, columnIndex, code);
         return value;
+    }
+
+    /**
+     * Make sure that the last result was non-null. Used for {@code getString}, {@code getDouble}
+     * and {@code getInt} methods only.
+     */
+    private static void ensureNonNull(final ResultSet result, final int columnIndex, final String code)
+            throws SQLException, FactoryException
+    {
+        if (result.wasNull()) {
+            final ResultSetMetaData metadata = result.getMetaData();
+            final String column = metadata.getColumnName(columnIndex);
+            final String table  = metadata.getTableName (columnIndex);
+            result.close();
+            throw new FactoryException(
+                    Errors.format(ErrorKeys.NULL_VALUE_IN_TABLE_$3, code, column, table));
+        }
     }
 
     /**
@@ -1111,7 +1141,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                         // Both are null, which is not allowed.
                         final String column = result.getMetaData().getColumnName(3);
                         result.close();
-                        throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_$2, code, column));
+                        throw new FactoryException(Errors.format(ErrorKeys.NULL_VALUE_IN_TABLE_$3, code, column));
                     } else {
                         // We only have semiMinorAxis defined -> it's OK
                         ellipsoid = factories.getDatumFactory().createEllipsoid(
@@ -2691,7 +2721,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * Since the <A HREF="http://www.epsg.org">EPSG database</A> is available mainly in MS-Access
      * format, SQL statements are formatted using some syntax specific to this particular database
      * software (for example "<code>SELECT * FROM [Coordinate Reference System]</code>"). If the
-     * EPSG database is ported to an other software, then this method should be overriden in order
+     * EPSG database is ported to an other software, then this method should be overridden in order
      * to adapt the SQL syntax. For example a subclass connecting to a
      * <cite>PostgreSQL</cite> database could replace all spaces ("&nbsp;") between
      * watching braces ("[" and "]") by underscore ("_").
@@ -2785,7 +2815,9 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      */
     public synchronized void dispose() throws FactoryException {
         final boolean shutdown = SHUTDOWN_THREAD.equals(Thread.currentThread().getName());
+        final boolean isClosed;
         try {
+            isClosed = connection.isClosed();
             for (final Iterator it=authorityCodes.values().iterator(); it.hasNext();) {
                 final AuthorityCodes set = (AuthorityCodes) ((Reference) it.next()).get();
                 if (set != null) {
@@ -2810,7 +2842,14 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         } catch (SQLException exception) {
             throw new FactoryException(exception);
         }
-        LOGGER.log(Logging.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
+        if (!isClosed) {
+            /*
+             * The above code was run inconditionnaly as a safety, even if the connection
+             * was already closed. However we will log a message only if we actually closed
+             * the connection, otherwise the log records are a little bit misleading.
+             */
+            LOGGER.log(Logging.format(Level.FINE, LoggingKeys.CLOSED_EPSG_DATABASE));
+        }
     }
 
     /**

@@ -113,7 +113,7 @@ public class GridCoverageTest extends TestCase {
         final GridCoverage2D coverage = getRandomCoverage();
         assertNotNull(coverage);
         // Not much more test to do here, since most tests has been done
-        // inside 'getRandomCoverage'.  This method will be overriden by
+        // inside 'getRandomCoverage'. This method will be overridden by
         // 'InterpolatorTest', which will perform more tests.
         for (int i=getNumExamples(); --i>=0;) {
             assertNotNull(getExample(i));
@@ -242,7 +242,7 @@ public class GridCoverageTest extends TestCase {
         assertEquals("raw", original.tileEncoding);
         /*
          * Grid coverage construction finished. Now test it. Some tests will not be applicable
-         * if a subclass overrided the 'transform' method are returned a transformed coverage.
+         * if a subclass overridden the 'transform' method are returned a transformed coverage.
          * We detect this case when 'coverage != original'.
          */
         assertSame(coverage.getRenderedImage(), coverage.getRenderableImage(0,1).createDefaultRendering());

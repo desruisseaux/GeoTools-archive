@@ -57,9 +57,17 @@ import org.geotools.referencing.factory.DirectAuthorityFactory;
  */
 public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorityFactory {
     /**
+     * An optional prefix put in front of code. For example a code may be {@code "CRS84"}
+     * instead of a plain {@code "84"}. This is usefull in order to understand URN syntax
+     * like {@code "urn:ogc:def:crs:OGC:1.3:CRS84"}. Must be uppercase for this implementation
+     * (but parsing will be case-insensitive).
+     */
+    private static final String PREFIX = "CRS";
+
+    /**
      * The map of pre-defined CRS.
      */
-    private final Map crsMap = new TreeMap();
+    private final Map/*<Integer,CoordinateReferenceSystem>*/ crsMap = new TreeMap();
 
     /**
      * Constructs a default factory for the {@code CRS} authority.
@@ -113,7 +121,10 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
         final GeodeticDatum datum = factories.getDatumFactory().createGeodeticDatum(
                                     properties, ellipsoid, DefaultPrimeMeridian.GREENWICH);
 
-        properties.put(IdentifiedObject.IDENTIFIERS_KEY, new NamedIdentifier(authority, text));
+        properties.put(IdentifiedObject.IDENTIFIERS_KEY, new NamedIdentifier[] {
+                new NamedIdentifier(authority, text),
+                new NamedIdentifier(authority, PREFIX + text)
+        });
         final CoordinateReferenceSystem crs = factories.getCRSFactory().createGeographicCRS(
                                     properties, datum, DefaultEllipsoidalCS.GEODETIC_2D);
         if (crsMap.put(new Integer(code), crs) != null) {
@@ -174,7 +185,10 @@ public class WebCRSFactory extends DirectAuthorityFactory implements CRSAuthorit
     public CoordinateReferenceSystem createCoordinateReferenceSystem(final String code)
             throws FactoryException
     {
-        final String c = trimAuthority(code);
+        String c = trimAuthority(code).toUpperCase();
+        if (c.startsWith(PREFIX)) {
+            c = c.substring(PREFIX.length());
+        }
         final int i;
         try {
             i = Integer.parseInt(c);

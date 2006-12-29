@@ -283,7 +283,7 @@ public class Parameters {
      * <p>
      * The {@code force} argument said what to do if the named parameter is already set. If the
      * value matches, nothing is done in all case. If there is a mismatch and {@code force} is
-     * {@code true}, then the parameter is overriden with the specified {@code value}. Otherwise,
+     * {@code true}, then the parameter is overridden with the specified {@code value}. Otherwise,
      * the parameter is left unchanged but a warning is logged with the {@link Level#FINE FINE}
      * level.
      *

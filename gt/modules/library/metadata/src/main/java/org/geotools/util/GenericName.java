@@ -119,7 +119,7 @@ public abstract class GenericName implements org.opengis.util.GenericName, Seria
 
     /**
      * Returns the separator character. Default to <code>':'</code>.
-     * This method is overriden by {@link org.geotools.util.ScopedName}.
+     * This method is overridden by {@link org.geotools.util.ScopedName}.
      */
     char getSeparator() {
         return DEFAULT_SEPARATOR;

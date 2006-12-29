@@ -572,7 +572,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      */
     public static Identifier getIdentifier(final IdentifiedObject info, final Citation authority) {
         if (info instanceof AbstractIdentifiedObject) {
-            // Gives a chances to subclasses to get their overriden method invoked.
+            // Gives a chances to subclasses to get their overridden method invoked.
             return ((AbstractIdentifiedObject) info).getIdentifier(authority);
         }
         return getIdentifier0(info, authority);
@@ -647,7 +647,7 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      */
     public static String getName(final IdentifiedObject info, final Citation authority) {
         if (info instanceof AbstractIdentifiedObject) {
-            // Gives a chances to subclasses to get their overriden method invoked.
+            // Gives a chances to subclasses to get their overridden method invoked.
             return ((AbstractIdentifiedObject) info).getName(authority);
         }
         return getName0(info, authority);
