@@ -171,4 +171,8 @@ public class TypedFIDMapper extends AbstractFIDMapper {
     public String getTableSchemaName() {
     	return ((AbstractFIDMapper)getWrappedMapper()).getTableSchemaName();
     }
+    
+    public boolean isVolatile() {
+        return wrappedMapper.isVolatile();
+    }
 }

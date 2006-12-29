@@ -82,6 +82,6 @@ public class NullFIDMapper extends AbstractFIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isVolatile()
      */
     public boolean isVolatile() {
-        return false;
+        return true;
     }
 }

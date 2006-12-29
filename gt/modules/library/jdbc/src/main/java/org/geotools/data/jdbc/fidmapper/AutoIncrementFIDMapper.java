@@ -143,12 +143,4 @@ public class AutoIncrementFIDMapper extends AbstractFIDMapper {
         throws IOException {
         return null;
     }
-
-
-    /**
-     * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isVolatile()
-     */
-    public boolean isVolatile() {
-        return false;
-    }
 }

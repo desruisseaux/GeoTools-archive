@@ -165,7 +165,7 @@ public abstract class AbstractFIDMapper implements FIDMapper {
      * @see org.geotools.data.jdbc.fidmapper.FIDMapper#isVolatile()
      */
     public boolean isVolatile() {
-        return true;
+        return false;
     }
 
     /**
