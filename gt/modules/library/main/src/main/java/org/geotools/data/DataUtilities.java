@@ -17,7 +17,6 @@ package org.geotools.data;
 
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -57,8 +56,6 @@ import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FidFilter;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
 import org.geotools.filter.FilterVisitor;
 import org.geotools.filter.FilterVisitorFilterWrapper;
 import org.geotools.filter.FunctionExpression;
@@ -70,6 +67,8 @@ import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
 import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -395,7 +394,7 @@ public class DataUtilities {
         }
 
         if (typeA == null) {
-            return -1;
+            return -1;  
         }
 
         if (typeB == null) {
