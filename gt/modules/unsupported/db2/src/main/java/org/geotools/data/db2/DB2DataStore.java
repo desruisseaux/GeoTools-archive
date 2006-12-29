@@ -382,7 +382,7 @@ public class DB2DataStore extends JDBCDataStore {
      */
     public FeatureSource getFeatureSource(String typeName)
         throws IOException {
-        if (this.typeHandler.getFIDMapper(typeName).isVolatile()
+        if (!this.typeHandler.getFIDMapper(typeName).isVolatile()
                 || this.allowWriteOnVolatileFIDs) {
             if (getLockingManager() != null) {
                 // Use default JDBCFeatureLocking that delegates all locking

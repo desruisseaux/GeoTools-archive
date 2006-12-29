@@ -648,12 +648,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     }
     
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.geotools.data.DataStore#getFeatureReader(org.geotools.data.Query,
-     *      org.geotools.data.Transaction)
-     */
+   
 
     /**
      * This is a public entry point to the DataStore.
@@ -1622,7 +1617,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      */
     public FeatureSource getFeatureSource(String typeName)
         throws IOException {
-        if (typeHandler.getFIDMapper(typeName).isVolatile()
+        if (!typeHandler.getFIDMapper(typeName).isVolatile()
                 || allowWriteOnVolatileFIDs) {
             LOGGER.fine("get Feature source called on " + typeName);
 
