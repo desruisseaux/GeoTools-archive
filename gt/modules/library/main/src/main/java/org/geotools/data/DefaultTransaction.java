@@ -22,59 +22,66 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.logging.Logger;
 
 /**
  * Quick implementation of Transaction api.
  * <p>
- * Please see Transaction interface for an outline of what this class is all
- * about.
+ * Please see Transaction interface for an outline of what this class is all about.
  * </p>
- *
+ * 
  * @author Jody Garnett, Refractions Research
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/data/DefaultTransaction.java $
  */
 public class DefaultTransaction implements Transaction {
+    /** The logger for the data module. */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+
     /** Records State by key */
     Map stateLookup = new HashMap();
 
     /** Records properties by key */
     Map propertyLookup = new HashMap();
-    
+
     /** Handle used to identify Transaction for the user */
     String handle;
-    
+
     /** Records current Authorizations */
     Set authorizations = new HashSet();
 
     public DefaultTransaction() {
         Throwable t = new Throwable("who called me?");
         StackTraceElement e = t.getStackTrace()[1];
-        handle = e.getClassName()+"."+e.getMethodName()+ " Transaction";
+        handle = e.getClassName() + "." + e.getMethodName() + " Transaction";
     }
-    public DefaultTransaction( String handle ){
+
+    public DefaultTransaction(String handle) {
         this.handle = handle;
     }
+
     /**
      * Remembers Externalized State for a DataSource.
      * 
      * <p>
-     * This is the GOF Momento pattern: a FeatureSource is able to externalize
-     * its internal State required for Transaction support and have this class
-     * manage it. It may retrieve this State with getState( key ).
+     * This is the GOF Momento pattern: a FeatureSource is able to externalize its internal State
+     * required for Transaction support and have this class manage it. It may retrieve this State
+     * with getState( key ).
      * </p>
      * 
      * <p>
-     * In addition several FeatureSource implementations may share State, a
-     * common example is JDBCDataSources keeping a shared JDBC connection
-     * using the JDBC URL as a key.
+     * In addition several FeatureSource implementations may share State, a common example is
+     * JDBCDataSources keeping a shared JDBC connection using the JDBC URL as a key.
      * </p>
-     *
-     * @param key Key used to externalize State
-     * @param state Externalized State (Momeneto)
-     *
-     * @throws IllegalArgumentException When Transaction already using key
-     *
+     * 
+     * @param key
+     *            Key used to externalize State
+     * @param state
+     *            Externalized State (Momeneto)
+     * 
+     * @throws IllegalArgumentException
+     *             When Transaction already using key
+     * 
      * @see org.geotools.data.Transaction#putState(java.lang.Object,
      *      org.geotools.data.Transaction.State)
      */
@@ -84,12 +91,11 @@ public class DefaultTransaction implements Transaction {
 
             if (state == current) {
                 throw new IllegalArgumentException(
-                    "Transaction already has an this State for key: " + key
-                    + ". Please check for existing State before creating your own.");
+                        "Transaction already has an this State for key: " + key
+                                + ". Please check for existing State before creating your own.");
             } else {
-                throw new IllegalArgumentException(
-                    "Transaction already has an entry for key:" + key
-                    + ". Please check for existing State before creating your own.");
+                throw new IllegalArgumentException("Transaction already has an entry for key:"
+                        + key + ". Please check for existing State before creating your own.");
             }
         } else {
             stateLookup.put(key, state);
@@ -103,28 +109,27 @@ public class DefaultTransaction implements Transaction {
      * Removes state from DefaultTransaction's care.
      * 
      * <p>
-     * Currently does not complain if there is no State associated with key to
-     * remove - this may change in the future.
+     * Currently does not complain if there is no State associated with key to remove - this may
+     * change in the future.
      * </p>
-     *
+     * 
      * @param key
-     *
-     * @throws IllegalArgumentException If no State was maintained for supplied
-     *         <code>key</code>
-     *
+     * 
+     * @throws IllegalArgumentException
+     *             If no State was maintained for supplied <code>key</code>
+     * 
      * @see org.geotools.data.Transaction#removeState(java.lang.Object)
      */
     public void removeState(Object key) {
-        if( stateLookup == null){
+        if (stateLookup == null) {
             throw new IllegalStateException("Transaction has been closed");
-        }        
+        }
         if (stateLookup.containsKey(key)) {
             State state = (State) stateLookup.remove(key);
             state.setTransaction(null);
         } else {
-            throw new IllegalArgumentException(
-                "Transaction does not no anything about key:" + key
-                + ". Has this key already been removed?");
+            throw new IllegalArgumentException("Transaction does not no anything about key:" + key
+                    + ". Has this key already been removed?");
         }
     }
 
@@ -132,18 +137,18 @@ public class DefaultTransaction implements Transaction {
      * Returns externalized state or <code>null</code> if not available.
      * 
      * <p>
-     * Used by DataStore implementations to externalize information required
-     * for Transaction support using the GOF Momento pattern.
+     * Used by DataStore implementations to externalize information required for Transaction support
+     * using the GOF Momento pattern.
      * </p>
-     *
+     * 
      * @param key
-     *
+     * 
      * @return Previously externalized State.
-     *
+     * 
      * @see org.geotools.data.Transaction#getState(java.lang.Object)
      */
     public State getState(Object key) {
-        if( stateLookup == null){
+        if (stateLookup == null) {
             throw new IllegalStateException("Transaction has been closed");
         }
         return (State) stateLookup.get(key);
@@ -153,14 +158,15 @@ public class DefaultTransaction implements Transaction {
      * Commits all modifications against this Transaction.
      * 
      * <p>
-     * This implementation will call commit() on all State managed by this
-     * Transaction. This allows DataStores to provide their own implementation
-     * of commit().
+     * This implementation will call commit() on all State managed by this Transaction. This allows
+     * DataStores to provide their own implementation of commit().
      * </p>
-     *
-     * @throws IOException Encountered problem maintaining transaction state
-     * @throws DataSourceException See IOException
-     *
+     * 
+     * @throws IOException
+     *             Encountered problem maintaining transaction state
+     * @throws DataSourceException
+     *             See IOException
+     * 
      * @see org.geotools.data.Transaction#commit()
      */
     public void commit() throws IOException {
@@ -185,23 +191,24 @@ public class DefaultTransaction implements Transaction {
             }
 
             throw new DataSourceException("Commit encountered " + problemCount
-                + " problems - the first was", io);
+                    + " problems - the first was", io);
         }
-        authorizations.clear();        
+        authorizations.clear();
     }
 
     /**
      * Rollsback all modifications against this Transaction.
      * 
      * <p>
-     * This implementation will call rollback() on all State managed by this
-     * Transaction. This allows DataStores to provide their own implementation
-     * of rollback().
+     * This implementation will call rollback() on all State managed by this Transaction. This
+     * allows DataStores to provide their own implementation of rollback().
      * </p>
-     *
-     * @throws IOException Encountered problem maintaining transaction State
-     * @throws DataSourceException IOException
-     *
+     * 
+     * @throws IOException
+     *             Encountered problem maintaining transaction State
+     * @throws DataSourceException
+     *             IOException
+     * 
      * @see org.geotools.data.Transaction#rollback()
      */
     public void rollback() throws IOException {
@@ -225,18 +232,19 @@ public class DefaultTransaction implements Transaction {
                 throw io;
             }
 
-            throw new DataSourceException("Rollback encountered "
-                + problemCount + " problems - the first was", io);
+            throw new DataSourceException("Rollback encountered " + problemCount
+                    + " problems - the first was", io);
         }
         authorizations.clear();
     }
+
     /**
      * Frees all State held by this Transaction.
      */
-    public synchronized void close(){
-        for( Iterator i=stateLookup.values().iterator(); i.hasNext();){
+    public synchronized void close() {
+        for (Iterator i = stateLookup.values().iterator(); i.hasNext();) {
             State state = (State) i.next();
-            state.setTransaction( null );            
+            state.setTransaction(null);
         }
         stateLookup.clear();
         stateLookup = null;
@@ -245,19 +253,20 @@ public class DefaultTransaction implements Transaction {
         propertyLookup.clear();
         propertyLookup = null;
     }
+
     /**
      * The current set of Authorization IDs held by this Transaction.
      * 
      * <p>
      * This set is reset by the next call to commit or rollback.
      * </p>
-     *
+     * 
      * @return Set of Authorization IDs
      */
     public Set getAuthorizations() {
-        if( authorizations == null){
+        if (authorizations == null) {
             throw new IllegalStateException("Transaction has been closed");
-        }        
+        }
         return Collections.unmodifiableSet(authorizations);
     }
 
@@ -267,18 +276,21 @@ public class DefaultTransaction implements Transaction {
      * <p>
      * Remember authorizations are cleared after every commit/rollback.
      * </p>
-     *
-     * @param authID Provided Authorization ID
-     *
-     * @throws IOException Encountered problems maintaing Transaction State
-     * @throws DataSourceException See IOException
-     *
+     * 
+     * @param authID
+     *            Provided Authorization ID
+     * 
+     * @throws IOException
+     *             Encountered problems maintaing Transaction State
+     * @throws DataSourceException
+     *             See IOException
+     * 
      * @see org.geotools.data.Transaction#setAuthorization(java.lang.String)
      */
     public void addAuthorization(String authID) throws IOException {
-        if( authorizations == null){
+        if (authorizations == null) {
             throw new IllegalStateException("Transaction has been closed");
-        }                
+        }
         int problemCount = 0;
         IOException io = null;
         State state;
@@ -299,17 +311,20 @@ public class DefaultTransaction implements Transaction {
             if (problemCount == 1) {
                 throw io;
             }
-            throw new DataSourceException("setAuthorization encountered "
-                + problemCount + " problems - the first was", io);
+            throw new DataSourceException("setAuthorization encountered " + problemCount
+                    + " problems - the first was", io);
         }
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
         return handle;
     }
+
     /**
      * Implementation of getProperty.
      * 
@@ -318,11 +333,12 @@ public class DefaultTransaction implements Transaction {
      * @param key
      */
     public Object getProperty(Object key) {
-        if( propertyLookup == null){
+        if (propertyLookup == null) {
             throw new IllegalStateException("Transaction has been closed");
-        }        
-        return propertyLookup.get( key );
+        }
+        return propertyLookup.get(key);
     }
+
     /**
      * Implementation of addProperty.
      * 
@@ -333,10 +349,19 @@ public class DefaultTransaction implements Transaction {
      * @throws IOException
      */
     public void putProperty(Object key, Object value) throws IOException {
-        if( propertyLookup == null){
+        if (propertyLookup == null) {
             throw new IllegalStateException("Transaction has been closed");
-        }        
-        propertyLookup.put( key, value );        
+        }
+        propertyLookup.put(key, value);
     }
 
+    protected void finalize() throws Throwable {
+        if (stateLookup != null) {
+            LOGGER.severe("There's code leaving transaction unclosed. "
+                    + "Call Transaction.close() after using them to ensure they do not hold state "
+                    + "such as JDCB connections or file handles");
+            close();
+        }
+        super.finalize();
+    }
 }
