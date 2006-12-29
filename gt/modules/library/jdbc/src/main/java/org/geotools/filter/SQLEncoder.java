@@ -177,7 +177,6 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
 
                 //out.write(";"); this should probably be added by client.
             } catch (java.io.IOException ioe) {
-                LOGGER.warning("Unable to export filter: " + ioe);
                 throw new SQLEncoderException("Problem writing filter: ", ioe);
             }
         } else {
@@ -511,7 +510,7 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
                     out.write(" OR ");
                 }
             } catch (java.io.IOException e) {
-                LOGGER.warning("IO Error exporting FID Filter.");
+                throw new RuntimeException(IO_ERROR, e);
             }
         }
     }
