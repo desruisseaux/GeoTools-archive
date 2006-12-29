@@ -103,14 +103,23 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      * Constructor for MemoryDataStoreTest.
      * 
      * @param test
-     * @throws AssertionError DOCUMENT ME!
+     * @throws AssertionError
+     *             DOCUMENT ME!
      */
-    public PostgisDataStoreAPIOnlineTest( String test ) {
+    public PostgisDataStoreAPIOnlineTest(String test) {
         super(test);
 
         if ((victim != null) && !test.equals(victim)) {
             throw new AssertionError("test supressed " + test);
         }
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        // uncomment these lines and put breakpoints in QueryData and DefaultTransaction finalizers
+        // to spot unclosed transactions, readers and writers
+        // Runtime.getRuntime().gc(); Runtime.getRuntime().gc();
+        // Runtime.getRuntime().runFinalization();
     }
 
     /**
@@ -131,7 +140,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         try {
             SimpleFeature f;
 
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 f = (SimpleFeature) reader.next();
 
                 int index = ((Integer) f.getAttribute("id")).intValue() - 1;
@@ -187,7 +196,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      * When the dataStore learns how to preserve our FeatureIds this won't be required.
      * </p>
      * 
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     protected void updateRiverFeaturesFixture() throws Exception {
         Connection conn = pool.getConnection();
@@ -199,7 +209,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         try {
             Feature f;
 
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 f = reader.next();
 
                 int index = ((Integer) f.getAttribute("id")).intValue() - 1;
@@ -240,12 +250,12 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
     }
 
-    boolean contains( Object[] array, Object expected ) {
+    boolean contains(Object[] array, Object expected) {
         if ((array == null) || (array.length == 0)) {
             return false;
         }
 
-        for( int i = 0; i < array.length; i++ ) {
+        for (int i = 0; i < array.length; i++) {
             if (array[i].equals(expected)) {
                 return true;
             }
@@ -254,12 +264,12 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         return false;
     }
 
-    void assertContains( Object[] array, Object expected ) {
+    void assertContains(Object[] array, Object expected) {
         assertFalse(array == null);
         assertFalse(array.length == 0);
         assertNotNull(expected);
 
-        for( int i = 0; i < array.length; i++ ) {
+        for (int i = 0; i < array.length; i++) {
             if (array[i].equals(expected)) {
                 return;
             }
@@ -271,18 +281,20 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     /**
      * Like contain but based on match rather than equals
      * 
-     * @param array DOCUMENT ME!
-     * @param expected DOCUMENT ME!
+     * @param array
+     *            DOCUMENT ME!
+     * @param expected
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
-    boolean containsLax( Feature[] array, Feature expected ) {
+    boolean containsLax(Feature[] array, Feature expected) {
         if ((array == null) || (array.length == 0)) {
             return false;
         }
 
         FeatureType type = expected.getFeatureType();
 
-        for( int i = 0; i < array.length; i++ ) {
+        for (int i = 0; i < array.length; i++) {
             if (match(array[i], expected)) {
                 return true;
             }
@@ -294,14 +306,16 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     /**
      * Compare based on attributes not getID allows comparison of Diff contents
      * 
-     * @param expected DOCUMENT ME!
-     * @param actual DOCUMENT ME!
+     * @param expected
+     *            DOCUMENT ME!
+     * @param actual
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
      */
-    boolean match( Feature expected, Feature actual ) {
+    boolean match(Feature expected, Feature actual) {
         FeatureType type = expected.getFeatureType();
 
-        for( int i = 0; i < type.getAttributeCount(); i++ ) {
+        for (int i = 0; i < type.getAttributeCount(); i++) {
             Object av = actual.getAttribute(i);
             Object ev = expected.getAttribute(i);
 
@@ -333,7 +347,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         // assertEquals( "compare", 0, DataUtilities.compare( expected, actual ));
         assertEquals("attributeCount", expected.getAttributeCount(), actual.getAttributeCount());
 
-        for( int i = 0; i < expected.getAttributeCount(); i++ ) {
+        for (int i = 0; i < expected.getAttributeCount(); i++) {
             AttributeType expectedAttribute = expected.getAttributeType(i);
             AttributeType actualAttribute = actual.getAttributeType(i);
             assertEquals("attribute " + expectedAttribute.getName(), expectedAttribute,
@@ -352,7 +366,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         // assertEquals( "compare", 0, DataUtilities.compare( expected, actual ));
         assertEquals("attributeCount", expected.getAttributeCount(), actual.getAttributeCount());
 
-        for( int i = 0; i < expected.getAttributeCount(); i++ ) {
+        for (int i = 0; i < expected.getAttributeCount(); i++) {
             AttributeType expectedAttribute = expected.getAttributeType(i);
             AttributeType actualAttribute = actual.getAttributeType(i);
             assertEquals("attribute " + expectedAttribute.getName(), expectedAttribute,
@@ -383,7 +397,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         AttributeType at2 = AttributeTypeFactory.newAttributeType("name", String.class, false, 256);
         AttributeType at3 = AttributeTypeFactory.newAttributeType("the_geom", Point.class, false,
                 Filter.INCLUDE, null, crs);
-        AttributeType[] atts = new AttributeType[]{at1, at2, at3};
+        AttributeType[] atts = new AttributeType[] { at1, at2, at3 };
 
         FeatureType newFT = FeatureTypeBuilder.newFeatureType(atts, featureTypeName);
         data.createSchema(newFT);
@@ -392,7 +406,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(3, newSchema.getAttributeCount());
     }
 
-    static public void assertEquals( String message, String expected, String actual ) {
+    static public void assertEquals(String message, String expected, String actual) {
         if (expected == actual) {
             return;
         }
@@ -405,7 +419,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
     }
 
-    void assertCovers( String msg, FeatureCollection c1, FeatureCollection c2 ) {
+    void assertCovers(String msg, FeatureCollection c1, FeatureCollection c2) {
         if (c1 == c2) {
             return;
         }
@@ -416,17 +430,18 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         Feature f;
 
-        for( FeatureIterator i = c1.features(); i.hasNext(); ) {
+        for (FeatureIterator i = c1.features(); i.hasNext();) {
             f = i.next();
             assertTrue(msg + " " + f.getID(), c2.contains(f));
         }
     }
 
-    public FeatureReader reader( String typeName ) throws IOException {
-        return data.getFeatureReader(new DefaultQuery(typeName, Filter.INCLUDE), Transaction.AUTO_COMMIT);
+    public FeatureReader reader(String typeName) throws IOException {
+        return data.getFeatureReader(new DefaultQuery(typeName, Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
     }
 
-    public FeatureWriter writer( String typeName ) throws IOException {
+    public FeatureWriter writer(String typeName) throws IOException {
         return data.getFeatureWriter(typeName, Transaction.AUTO_COMMIT);
     }
 
@@ -441,7 +456,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         FilterFactory factory = FilterFactoryFinder.createFilterFactory();
         FilterFunction_geometryType geomTypeExpr = new FilterFunction_geometryType();
-        geomTypeExpr.setArgs(new Expression[]{factory.createAttributeExpression("geom")});
+        geomTypeExpr.setArgs(new Expression[] { factory.createAttributeExpression("geom") });
 
         CompareFilter filter = factory.createCompareFilter(FilterType.COMPARE_EQUALS);
         filter.addLeftValue(geomTypeExpr);
@@ -450,86 +465,91 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         reader = data.getFeatureReader(new DefaultQuery("road", filter), t);
         // if the above statement didn't throw an exception, we're content
         assertNotNull(reader);
+        reader.close();
+        t.close();
     }
-    
+
     public void testGetFeatureReaderFilterPrePost2() throws IOException, IllegalFilterException {
         // GEOT-1069, make sure the post filter is run even if the geom property is not requested
         Transaction t = new DefaultTransaction();
         FeatureReader reader;
 
-                FilterFactory factory = FilterFactoryFinder.createFilterFactory();
-                FilterFunction_geometryType geomTypeExpr = new FilterFunction_geometryType();
-                geomTypeExpr.setArgs(new Expression[] { factory
-                                .createAttributeExpression("geom") });
-        
-                CompareFilter filter = factory
-                                .createCompareFilter(FilterType.COMPARE_EQUALS);
-                filter.addLeftValue(geomTypeExpr);
-                filter.addRightValue(factory.createLiteralExpression("Polygon"));
+        FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+        FilterFunction_geometryType geomTypeExpr = new FilterFunction_geometryType();
+        geomTypeExpr.setArgs(new Expression[] { factory.createAttributeExpression("geom") });
+
+        CompareFilter filter = factory.createCompareFilter(FilterType.COMPARE_EQUALS);
+        filter.addLeftValue(geomTypeExpr);
+        filter.addRightValue(factory.createLiteralExpression("Polygon"));
 
         reader = data.getFeatureReader(new DefaultQuery("road", filter), t);
-        //if the above statement didn't throw an exception, we're content
+        // if the above statement didn't throw an exception, we're content
         assertNotNull(reader);
+        reader.close();
+        t.close();
     }
-    
+
     public void testGetFeatureReaderRetypeBug() throws Exception {
         // this is here to avoid http://jira.codehaus.org/browse/GEOT-1069
         // to come up again
-        
+
         Transaction t = new DefaultTransaction();
         FeatureType type = data.getSchema("river");
         FeatureReader reader;
-        
+
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         CompareFilter cf = ff.createCompareFilter(Filter.COMPARE_EQUALS);
         cf.addLeftValue(ff.createAttributeExpression("flow"));
         cf.addRightValue(ff.createLiteralExpression(4.5));
-        
+
         DefaultQuery q = new DefaultQuery("river");
-        q.setPropertyNames(new String[] {"geom"});
+        q.setPropertyNames(new String[] { "geom" });
         q.setFilter(cf);
-        
+
         // with GEOT-1069 an exception is thrown here
         reader = data.getFeatureReader(q, t);
         assertTrue(reader.hasNext());
         assertEquals(1, reader.getFeatureType().getAttributeCount());
         reader.next();
         assertFalse(reader.hasNext());
+        reader.close();
+        t.close();
     }
-    
+
     public void testGetFeatureReaderRetypeBug2() throws Exception {
         // this is here to avoid http://jira.codehaus.org/browse/GEOT-1069
         // to come up again
-        
+
         Transaction t = new DefaultTransaction();
         FeatureType type = data.getSchema("river");
         FeatureReader reader;
-        
+
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         CompareFilter cf = ff.createCompareFilter(Filter.COMPARE_EQUALS);
         FunctionExpression ceil = new FilterFunction_ceil();
-        ceil.setArgs(new Expression[] {ff.createAttributeExpression("flow")});
+        ceil.setArgs(new Expression[] { ff.createAttributeExpression("flow") });
         cf.addLeftValue(ceil);
         cf.addRightValue(ff.createLiteralExpression(5));
-        
+
         DefaultQuery q = new DefaultQuery("river");
-        q.setPropertyNames(new String[] {"geom"});
+        q.setPropertyNames(new String[] { "geom" });
         q.setFilter(cf);
-        
+
         // with GEOT-1069 an exception is thrown here
         reader = data.getFeatureReader(q, t);
         assertTrue(reader.hasNext());
         assertEquals(1, reader.getFeatureType().getAttributeCount());
         reader.next();
         assertFalse(reader.hasNext());
+        reader.close();
+        t.close();
     }
-    
 
     public void testGetFeatureReaderMutability() throws IOException, IllegalAttributeException {
         FeatureReader reader = reader("road");
         Feature feature;
 
-        while( reader.hasNext() ) {
+        while (reader.hasNext()) {
             feature = (Feature) reader.next();
             feature.setAttribute("name", null);
         }
@@ -538,7 +558,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         reader = reader("road");
 
-        while( reader.hasNext() ) {
+        while (reader.hasNext()) {
             feature = (Feature) reader.next();
             assertNotNull(feature.getAttribute("name"));
         }
@@ -562,7 +582,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         Feature feature2;
         Feature feature3;
 
-        while( reader1.hasNext() || reader2.hasNext() || reader3.hasNext() ) {
+        while (reader1.hasNext() || reader2.hasNext() || reader3.hasNext()) {
             assertTrue(contains(roadFeatures, reader1.next()));
             assertTrue(contains(roadFeatures, reader2.next()));
 
@@ -618,18 +638,21 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureType type = data.getSchema("road");
         FeatureReader reader;
 
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
         assertFalse(reader instanceof FilteringFeatureReader);
         assertEquals(type, reader.getFeatureType());
         assertEquals(roadFeatures.length, count(reader));
 
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE),
+                Transaction.AUTO_COMMIT);
         assertFalse(reader.hasNext());
 
         assertEquals(type, reader.getFeatureType());
         assertEquals(0, count(reader));
 
-        reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), Transaction.AUTO_COMMIT);
+        reader = data
+                .getFeatureReader(new DefaultQuery("road", rd1Filter), Transaction.AUTO_COMMIT);
 
         // assertTrue(reader instanceof FilteringFeatureReader);
         assertEquals(type, reader.getFeatureType());
@@ -646,61 +669,77 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertFalse(reader.hasNext());
         assertEquals(type, reader.getFeatureType());
         assertEquals(0, count(reader));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t);
         assertEquals(type, reader.getFeatureType());
         assertEquals(roadFeatures.length, count(reader));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t);
         assertEquals(type, reader.getFeatureType());
         assertEquals(1, count(reader));
+        reader.close();
 
         FeatureWriter writer = data.getFeatureWriter("road", Filter.INCLUDE, t);
         Feature feature;
 
-        while( writer.hasNext() ) {
+        while (writer.hasNext()) {
             feature = writer.next();
 
             if (feature.getID().equals(roadFeatures[0].getID())) {
                 writer.remove();
             }
         }
+        writer.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
         assertEquals(0, count(reader));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t);
         assertEquals(roadFeatures.length - 1, count(reader));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t);
         assertEquals(0, count(reader));
+        reader.close();
 
         t.rollback();
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.EXCLUDE), t);
         assertEquals(0, count(reader));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t);
         assertEquals(roadFeatures.length, count(reader));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", rd1Filter), t);
         assertEquals(1, count(reader));
+        reader.close();
+        t.close();
     }
 
     /**
      * Ensure readers contents equal those in the feature array
      * 
-     * @param features DOCUMENT ME!
-     * @param reader DOCUMENT ME!
-     * @throws NoSuchElementException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     * @throws IllegalAttributeException DOCUMENT ME!
+     * @param features
+     *            DOCUMENT ME!
+     * @param reader
+     *            DOCUMENT ME!
+     * @throws NoSuchElementException
+     *             DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws IllegalAttributeException
+     *             DOCUMENT ME!
      */
-    void assertCovered( Feature[] features, FeatureReader reader ) throws NoSuchElementException,
+    void assertCovered(Feature[] features, FeatureReader reader) throws NoSuchElementException,
             IOException, IllegalAttributeException {
         int count = 0;
 
         try {
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 assertContains(features, reader.next());
                 count++;
             }
@@ -717,16 +756,19 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      * Implemented using match on attribute types, not feature id
      * </p>
      * 
-     * @param array DOCUMENT ME!
-     * @param reader DOCUMENT ME!
-     * @throws Exception DOCUMENT ME!
+     * @param array
+     *            DOCUMENT ME!
+     * @param reader
+     *            DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
-    void assertMatched( Feature[] array, FeatureReader reader ) throws Exception {
+    void assertMatched(Feature[] array, FeatureReader reader) throws Exception {
         Feature feature;
         int count = 0;
 
         try {
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 feature = reader.next();
                 assertMatch(array, feature);
                 count++;
@@ -738,13 +780,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals("array not matched by reader", array.length, count);
     }
 
-    void assertMatch( Feature[] array, Feature feature ) {
+    void assertMatch(Feature[] array, Feature feature) {
         assertTrue(array != null);
         assertTrue(array.length != 0);
 
         FeatureType schema = feature.getFeatureType();
 
-        for( int i = 0; i < array.length; i++ ) {
+        for (int i = 0; i < array.length; i++) {
             if (match(array[i], feature)) {
                 return;
             }
@@ -752,7 +794,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         System.out.println("not found:" + feature);
 
-        for( int i = 0; i < array.length; i++ ) {
+        for (int i = 0; i < array.length; i++) {
             System.out.println(i + ":" + array[i]);
         }
 
@@ -762,20 +804,25 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     /**
      * Ensure that FeatureReader reader contains exactly the contents of array.
      * 
-     * @param reader DOCUMENT ME!
-     * @param array DOCUMENT ME!
+     * @param reader
+     *            DOCUMENT ME!
+     * @param array
+     *            DOCUMENT ME!
      * @return DOCUMENT ME!
-     * @throws NoSuchElementException DOCUMENT ME!
-     * @throws IOException DOCUMENT ME!
-     * @throws IllegalAttributeException DOCUMENT ME!
+     * @throws NoSuchElementException
+     *             DOCUMENT ME!
+     * @throws IOException
+     *             DOCUMENT ME!
+     * @throws IllegalAttributeException
+     *             DOCUMENT ME!
      */
-    boolean covers( FeatureReader reader, Feature[] array ) throws NoSuchElementException,
+    boolean covers(FeatureReader reader, Feature[] array) throws NoSuchElementException,
             IOException, IllegalAttributeException {
         Feature feature;
         int count = 0;
 
         try {
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 feature = reader.next();
 
                 if (!contains(array, feature)) {
@@ -791,13 +838,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         return count == array.length;
     }
 
-    boolean covers( FeatureIterator reader, Feature[] array ) throws NoSuchElementException,
+    boolean covers(FeatureIterator reader, Feature[] array) throws NoSuchElementException,
             IOException, IllegalAttributeException {
         Feature feature;
         int count = 0;
 
         try {
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 feature = reader.next();
 
                 if (!contains(array, feature)) {
@@ -812,13 +859,14 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         return count == array.length;
     }
-    boolean coversLax( FeatureReader reader, Feature[] array ) throws NoSuchElementException,
+
+    boolean coversLax(FeatureReader reader, Feature[] array) throws NoSuchElementException,
             IOException, IllegalAttributeException {
         Feature feature;
         int count = 0;
 
         try {
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 feature = reader.next();
 
                 if (!containsLax(array, feature)) {
@@ -834,13 +882,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         return count == array.length;
     }
 
-    void dump( String message, FeatureReader reader ) throws NoSuchElementException, IOException,
+    void dump(String message, FeatureReader reader) throws NoSuchElementException, IOException,
             IllegalAttributeException {
         Feature feature;
         int count = 0;
 
         try {
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 feature = reader.next();
 
                 String msg = message + ": feture " + count + "=" + feature;
@@ -854,8 +902,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
     }
 
-    void dump( String message, Object[] array ) {
-        for( int i = 0; i < array.length; i++ ) {
+    void dump(String message, Object[] array) {
+        for (int i = 0; i < array.length; i++) {
             String msg = message + ": " + i + "=" + array[i];
 
             // LOGGER.info( msg );
@@ -900,7 +948,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureWriter writer = writer("road");
         Feature feature;
 
-        while( writer.hasNext() ) {
+        while (writer.hasNext()) {
             feature = writer.next();
 
             if (feature.getID().equals(roadFeatures[0].getID())) {
@@ -917,7 +965,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         Feature feature;
 
         try {
-            while( writer.hasNext() ) {
+            while (writer.hasNext()) {
                 feature = writer.next();
                 writer.remove();
             }
@@ -928,7 +976,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(0, count("road"));
     }
 
-    public int count( String typeName ) throws IOException {
+    public int count(String typeName) throws IOException {
         // return count(reader(typeName));
         // makes use of optimization if any
         return data.getFeatureSource(typeName).getFeatures().size();
@@ -940,7 +988,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         LOGGER.info("about to call has next on writer " + writer);
 
-        while( writer.hasNext() ) {
+        while (writer.hasNext()) {
             feature = (SimpleFeature) writer.next();
         }
 
@@ -964,20 +1012,26 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      * The provided reader will be closed by this opperations.
      * </p>
      * 
-     * @param reader reader to search through
-     * @param attributeName attributeName, or null for featureID
-     * @param value value to match
+     * @param reader
+     *            reader to search through
+     * @param attributeName
+     *            attributeName, or null for featureID
+     * @param value
+     *            value to match
      * @return Feature
-     * @throws NoSuchElementException if a match could not be found
-     * @throws IOException We could not use reader
-     * @throws IllegalAttributeException if attributeName did not match schema
+     * @throws NoSuchElementException
+     *             if a match could not be found
+     * @throws IOException
+     *             We could not use reader
+     * @throws IllegalAttributeException
+     *             if attributeName did not match schema
      */
-    public Feature findFeature( FeatureReader reader, String attributeName, Object value )
+    public Feature findFeature(FeatureReader reader, String attributeName, Object value)
             throws NoSuchElementException, IOException, IllegalAttributeException {
         Feature f;
 
         try {
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 f = reader.next();
 
                 if (attributeName == null) {
@@ -1001,13 +1055,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         }
     }
 
-    public Feature feature( String typeName, String fid ) throws NoSuchElementException,
-            IOException, IllegalAttributeException {
+    public Feature feature(String typeName, String fid) throws NoSuchElementException, IOException,
+            IllegalAttributeException {
         FeatureReader reader = reader(typeName);
         Feature f;
 
         try {
-            while( reader.hasNext() ) {
+            while (reader.hasNext()) {
                 f = reader.next();
 
                 if (fid.equals(f.getID())) {
@@ -1025,7 +1079,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         FeatureWriter writer = writer("road");
         Feature feature;
 
-        while( writer.hasNext() ) {
+        while (writer.hasNext()) {
             feature = writer.next();
 
             if (feature.getID().equals(roadFeatures[0].getID())) {
@@ -1094,7 +1148,8 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
      * Test two transactions one removing feature, and one adding a feature.
      * 
      * @throws IllegalAttributeException
-     * @throws Exception DOCUMENT ME!
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     public void testGetFeatureWriterTransaction() throws Exception {
         Transaction t1 = new DefaultTransaction();
@@ -1113,7 +1168,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         int index;
         index = 0;
 
-        for( i = 0; i < ORIGINAL.length; i++ ) {
+        for (i = 0; i < ORIGINAL.length; i++) {
             feature = ORIGINAL[i];
 
             if (!feature.getID().equals(roadFeatures[0].getID())) {
@@ -1121,38 +1176,43 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
             }
         }
 
-        for( i = 0; i < ORIGINAL.length; i++ ) {
+        for (i = 0; i < ORIGINAL.length; i++) {
             ADD[i] = ORIGINAL[i];
         }
 
         ADD[i] = newRoad; // will need to update with Fid from database
 
-        for( i = 0; i < REMOVE.length; i++ ) {
+        for (i = 0; i < REMOVE.length; i++) {
             FINAL[i] = REMOVE[i];
         }
 
         FINAL[i] = newRoad; // will need to update with Fid from database
 
         // start off with ORIGINAL
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
         assertTrue("Sanity check failed: before modification reader didn't match original content",
                 covers(reader, ORIGINAL));
+        reader.close();
 
         // writer 1 removes road.rd1 on t1
         // -------------------------------
         // - tests transaction independence from DataStore
-        while( writer1.hasNext() ) {
+        while (writer1.hasNext()) {
             feature = (SimpleFeature) writer1.next();
             assertEquals(roadFeatures[0].getID(), feature.getID());
             writer1.remove();
         }
 
         // still have ORIGINAL and t1 has REMOVE
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
         assertTrue("Feature deletion managed to leak out of transaction?", covers(reader, ORIGINAL));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t1);
         assertTrue(covers(reader, REMOVE));
+        reader.close();
 
         // close writer1
         // --------------
@@ -1160,11 +1220,14 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         writer1.close();
 
         // We still have ORIGIONAL and t1 has REMOVE
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
         assertTrue(covers(reader, ORIGINAL));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t1);
         assertTrue(covers(reader, REMOVE));
+        reader.close();
 
         // writer 2 adds road.rd4 on t2
         // ----------------------------
@@ -1180,21 +1243,28 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         System.out.println("newRoad:" + newRoad);
         ADD[ADD.length - 1] = newRoad;
         FINAL[FINAL.length - 1] = newRoad;
+        reader.close();
 
         // We still have ORIGINAL and t2 has ADD
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
         assertTrue(covers(reader, ORIGINAL));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         assertMatched(ADD, reader); // broken due to FID problem
+        reader.close();
 
         writer2.close();
 
         // Still have ORIGIONAL and t2 has ADD
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
         assertTrue(covers(reader, ORIGINAL));
+        reader.close();
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         assertTrue(coversLax(reader, ADD));
+        reader.close();
 
         // commit t1
         // ---------
@@ -1204,12 +1274,16 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         // We now have REMOVE, as does t1 (which has not additional diffs)
         // t2 will have FINAL
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
         assertTrue(covers(reader, REMOVE));
+        reader.close();
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t1);
         assertTrue(covers(reader, REMOVE));
+        reader.close();
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         assertTrue(coversLax(reader, FINAL));
+        reader.close();
 
         // commit t2
         // ---------
@@ -1217,15 +1291,21 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         t2.commit();
 
         // We now have Number( remove one and add one)
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
-        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), Transaction.AUTO_COMMIT);
+        reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE),
+                Transaction.AUTO_COMMIT);
         assertTrue(coversLax(reader, FINAL));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t1);
         assertTrue(coversLax(reader, FINAL));
+        reader.close();
 
         reader = data.getFeatureReader(new DefaultQuery("road", Filter.INCLUDE), t2);
         assertTrue(coversLax(reader, FINAL));
+        reader.close();
+
+        t1.close();
+        t2.close();
     }
 
     /**
@@ -1309,7 +1389,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(e, some.getBounds());
         assertEquals(some.getSchema(), road.getSchema());
 
-        DefaultQuery query = new DefaultQuery("road", rd12Filter, new String[]{"name"});
+        DefaultQuery query = new DefaultQuery("road", rd12Filter, new String[] { "name" });
 
         FeatureCollection half = road.getFeatures(query);
         assertEquals(2, half.size());
@@ -1325,7 +1405,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(type.getNamespace(), actual.getNamespace());
         assertEquals(type.getAttributeCount(), actual.getAttributeCount());
 
-        for( int i = 0; i < type.getAttributeCount(); i++ ) {
+        for (int i = 0; i < type.getAttributeCount(); i++) {
             assertEquals(type.getAttributeType(i), actual.getAttributeType(i));
         }
 
@@ -1334,12 +1414,13 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(type, actual);
 
         Envelope b = half.getBounds();
-        Envelope expectedBounds = isEnvelopeComputingEnabled() ?  roadBounds :  new Envelope();
+        Envelope expectedBounds = isEnvelopeComputingEnabled() ? roadBounds : new Envelope();
         assertEquals(expectedBounds, b); // empty envelope is expected
     }
 
     /**
      * Return true if the datastore is capable of computing the road bounds given a query
+     * 
      * @return
      */
     protected boolean isEnvelopeComputingEnabled() {
@@ -1376,7 +1457,9 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         road.modifyFeatures(name, changed, rd1Filter);
 
         FeatureCollection results = road.getFeatures(rd1Filter);
-        assertEquals(changed, results.features().next().getAttribute("id"));
+        FeatureIterator features = results.features();
+        assertEquals(changed, features.next().getAttribute("id"));
+        results.close(features);
     }
 
     public void testGetFeatureStoreModifyFeatures2() throws IOException {
@@ -1386,15 +1469,18 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         rd1Filter = factory.createFidFilter(roadFeatures[0].getID());
 
         AttributeType name = roadType.getAttributeType("name");
-        road.modifyFeatures(new AttributeType[]{name,}, new Object[]{"changed",}, rd1Filter);
+        road.modifyFeatures(new AttributeType[] { name, }, new Object[] { "changed", }, rd1Filter);
 
         FeatureCollection results = road.getFeatures(rd1Filter);
-        assertEquals("changed", results.features().next().getAttribute("name"));
+        FeatureIterator features = results.features();
+        assertEquals("changed", features.next().getAttribute("name"));
+        results.close(features);
     }
-    
+
     /**
-     * Test with a filter that won't be matched after the modification is done,
-     * was throwing an NPE before the fix
+     * Test with a filter that won't be matched after the modification is done, was throwing an NPE
+     * before the fix
+     * 
      * @throws IOException
      */
     public void testGetFeatureStoreModifyFeatures3() throws IOException {
@@ -1406,7 +1492,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         filter.addRightValue(ff.createLiteralExpression("r1"));
 
         AttributeType name = roadType.getAttributeType("name");
-        road.modifyFeatures(new AttributeType[]{name,}, new Object[]{"changed",}, filter);
+        road.modifyFeatures(new AttributeType[] { name, }, new Object[] { "changed", }, filter);
     }
 
     public void testGetFeatureStoreRemoveFeatures() throws IOException {
@@ -1416,7 +1502,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertEquals(0, road.getFeatures(rd1Filter).size());
         assertEquals(roadFeatures.length - 1, road.getFeatures().size());
     }
-    
+
     public void testGetFeatureStoreRemoveAllFeatures() throws IOException {
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
@@ -1425,7 +1511,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     }
 
     public void testGetFeatureStoreAddFeatures() throws IOException {
-        FeatureReader reader = DataUtilities.reader(new Feature[]{newRoad,});
+        FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
         road.addFeatures(DataUtilities.collection(reader));
@@ -1434,7 +1520,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
     public void testGetFeatureStoreSetFeatures() throws NoSuchElementException, IOException,
             IllegalAttributeException {
-        FeatureReader reader = DataUtilities.reader(new Feature[]{newRoad,});
+        FeatureReader reader = DataUtilities.reader(new Feature[] { newRoad, });
 
         FeatureStore road = (FeatureStore) data.getFeatureSource("road");
 
@@ -1533,7 +1619,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
     // assertTrue(coversLax(road2.getFeatures().reader(), FINAL));
     // }
 
-    boolean isLocked( String typeName, String fid ) {
+    boolean isLocked(String typeName, String fid) {
         InProcessLockingManager lockingManager = (InProcessLockingManager) data.getLockingManager();
 
         return lockingManager.isLocked(typeName, fid);
@@ -1579,6 +1665,7 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
         t.addAuthorization(lock.getAuthorization());
         road.unLockFeatures();
+        t.close();
     }
 
     public void testLockFeatureInteraction() throws IOException {
@@ -1631,6 +1718,9 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
         assertFalse(isLocked("road", "road.rd1"));
         assertFalse(isLocked("road", "road.rd2"));
         assertFalse(isLocked("road", "road.rd3"));
+
+        t1.close();
+        t2.close();
     }
 
     public void testGetFeatureLockingExpire() throws Exception {
@@ -1648,23 +1738,24 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
 
     public void testOidFidMapper() throws IOException, IllegalAttributeException {
         // get the schema and make sure the FID mapper is an OID one
-    	FIDMapper mapper = ((PostgisDataStore) data).getFIDMapper( "lake" );
-    	FIDMapper base = null;
-    	if ( mapper instanceof TypedFIDMapper ) {
-    		base = ((TypedFIDMapper)mapper).getWrappedMapper();
-    	}
-    	else base = mapper;
-    	
+        FIDMapper mapper = ((PostgisDataStore) data).getFIDMapper("lake");
+        FIDMapper base = null;
+        if (mapper instanceof TypedFIDMapper) {
+            base = ((TypedFIDMapper) mapper).getWrappedMapper();
+        } else
+            base = mapper;
+
         assertTrue(base instanceof OIDFidMapper);
 
         // read features from the database, just check we don't crash and that id's are not null
-        FeatureReader reader = ((PostgisDataStore) data).getFeatureReader(data.getSchema("lake"), Filter.INCLUDE,
-                Transaction.AUTO_COMMIT);
+        FeatureReader reader = ((PostgisDataStore) data).getFeatureReader(data.getSchema("lake"),
+                Filter.INCLUDE, Transaction.AUTO_COMMIT);
 
-        while( reader.hasNext() ) {
+        while (reader.hasNext()) {
             Feature f = reader.next();
             assertNotNull(f.getID());
         }
+        reader.close();
 
         FeatureWriter writer = data.getFeatureWriterAppend("lake", Transaction.AUTO_COMMIT);
         SimpleFeature f = (SimpleFeature) writer.next();

@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 
 import org.geotools.data.AttributeReader;
 import org.geotools.data.AttributeWriter;
@@ -35,60 +36,64 @@ import org.geotools.feature.GeometryAttributeType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-
 /**
- * QueryData holds the ResultSet obtained from the sql query and has the following
- * responsibilities:
+ * QueryData holds the ResultSet obtained from the sql query and has the following responsibilities:
  * 
  * <ul>
- * <li>
- * acts as the attribute reader by using the AttributeIO objects
- * </li>
- * <li>
- * acts as the attribute writer by using the AttributeIO objects
- * </li>
- * <li>
- * manages the resulset, statement and transaction and closes them cleanly if needed
- * </li>
- * <li>
- * provides methods for creating a new row, as well as inserting new ones, that are used by the
- * JDBCFeatureWriter
- * </li>
- * <li>
- * holds the FIDMapper for feature reader and writer to use when building new features
- * </li>
+ * <li> acts as the attribute reader by using the AttributeIO objects </li>
+ * <li> acts as the attribute writer by using the AttributeIO objects </li>
+ * <li> manages the resulset, statement and transaction and closes them cleanly if needed </li>
+ * <li> provides methods for creating a new row, as well as inserting new ones, that are used by the
+ * JDBCFeatureWriter </li>
+ * <li> holds the FIDMapper for feature reader and writer to use when building new features </li>
  * </ul>
  * 
- *
+ * 
  * @author aaime
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/data/jdbc/QueryData.java $
  */
 public class QueryData implements AttributeReader, AttributeWriter {
+    /** The logger for the data module. */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.jdbc");
+
     protected Object[] fidAttributes;
+
     protected FeatureTypeInfo featureTypeInfo;
+
     protected ResultSet resultSet;
+
     protected Connection connection;
+
     protected Transaction transaction;
+
     protected Statement statement;
+
     protected FIDMapper mapper;
+
     protected AttributeIO[] attributeHandlers;
+
     protected int baseIndex;
+
     boolean hasNextCalled = false;
+
     boolean lastNext;
+
     protected FeatureListenerManager listenerManager;
 
     /**
      * Creates a new QueryData object.
-     *
-     * @param featureTypeInfo 
-     * @param parentDataStore 
-     * @param connection 
-     * @param statement 
-     * @param resultSet 
-     * @param transaction 
+     * 
+     * @param featureTypeInfo
+     * @param parentDataStore
+     * @param connection
+     * @param statement
+     * @param resultSet
+     * @param transaction
      */
     public QueryData(FeatureTypeInfo featureTypeInfo, JDBC1DataStore parentDataStore,
-        Connection connection, Statement statement, ResultSet resultSet, Transaction transaction) throws IOException {
+            Connection connection, Statement statement, ResultSet resultSet, Transaction transaction)
+            throws IOException {
         this.featureTypeInfo = featureTypeInfo;
         this.mapper = featureTypeInfo.getFIDMapper();
         this.baseIndex = mapper.getColumnCount() + 1;
@@ -98,14 +103,15 @@ public class QueryData implements AttributeReader, AttributeWriter {
         this.transaction = transaction;
         this.fidAttributes = new Object[mapper.getColumnCount()];
         this.listenerManager = parentDataStore.listenerManager;
-        
+
         AttributeType[] attributeTypes = featureTypeInfo.getSchema().getAttributeTypes();
 
         this.attributeHandlers = new AttributeIO[attributeTypes.length];
 
         for (int i = 0; i < attributeHandlers.length; i++) {
             if (attributeTypes[i] instanceof GeometryAttributeType) {
-                attributeHandlers[i] = parentDataStore.getGeometryAttributeIO(attributeTypes[i], this);
+                attributeHandlers[i] = parentDataStore.getGeometryAttributeIO(attributeTypes[i],
+                        this);
             } else {
                 attributeHandlers[i] = parentDataStore.getAttributeIO(attributeTypes[i]);
             }
@@ -121,9 +127,9 @@ public class QueryData implements AttributeReader, AttributeWriter {
     }
 
     /**
-     * Returns the AttributeIO objects used to parse and encode the column values
-     * stored in the database 
-     *
+     * Returns the AttributeIO objects used to parse and encode the column values stored in the
+     * database
+     * 
      */
     public AttributeIO[] getAttributeHandlers() {
         return attributeHandlers;
@@ -131,7 +137,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public Connection getConnection() {
         return connection;
@@ -139,7 +145,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Returns the FID mapper to be used when reading/writing features
-     *
+     * 
      */
     public FIDMapper getMapper() {
         return mapper;
@@ -147,7 +153,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Returns the current transation
-     *
+     * 
      */
     public Transaction getTransaction() {
         return transaction;
@@ -163,8 +169,8 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Closes the JDBC objects associated to the queryData and reports the sqlException on the LOG
-     *
-     * @param sqlException 
+     * 
+     * @param sqlException
      */
     public void close(SQLException sqlException) {
         JDBCUtils.close(resultSet);
@@ -195,17 +201,18 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Reads a column of the primary key
-     *
-     * @param index the column index among the primary key columns (as reported by the FIDMapper) 
-     *
+     * 
+     * @param index
+     *            the column index among the primary key columns (as reported by the FIDMapper)
+     * 
      * @return fid value
-     *
+     * 
      * @throws IOException
      * @throws DataSourceException
      */
     public Object readFidColumn(int index) throws IOException {
         try {
-            return resultSet.getString(index + 1); //we turn it into a string anyhow...
+            return resultSet.getString(index + 1); // we turn it into a string anyhow...
         } catch (SQLException e) {
             throw new DataSourceException("Error reading fid column " + index, e);
         }
@@ -213,15 +220,16 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Writes a column of the primary key
-     *
-     * @param index the FID column index among the primary key columns (as reported by the FIDMapper)
-     * @param value the column value
-     *
-     * @throws IOException 
-     * @throws DataSourceException 
+     * 
+     * @param index
+     *            the FID column index among the primary key columns (as reported by the FIDMapper)
+     * @param value
+     *            the column value
+     * 
+     * @throws IOException
+     * @throws DataSourceException
      */
-    public void writeFidColumn(int index, Object value)
-        throws IOException {
+    public void writeFidColumn(int index, Object value) throws IOException {
         try {
             if (value == null) {
                 resultSet.updateNull(index + 1);
@@ -235,17 +243,17 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Returns the current feature type
-     *
+     * 
      */
     public FeatureType getFeatureType() {
         return featureTypeInfo.getSchema();
     }
 
     /**
-     * Moves the result set to the insert row. Must be called before writing the
-     * attribute values for the new Feature
-     *
-     * @throws SQLException 
+     * Moves the result set to the insert row. Must be called before writing the attribute values
+     * for the new Feature
+     * 
+     * @throws SQLException
      */
     public void startInsert() throws SQLException {
         resultSet.moveToInsertRow();
@@ -253,8 +261,8 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Deletes the current record in the result set
-     *
-     * @throws SQLException 
+     * 
+     * @throws SQLException
      */
     public void deleteCurrentRow() throws SQLException {
         this.resultSet.deleteRow();
@@ -262,8 +270,8 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Update the current record
-     *
-     * @throws SQLException 
+     * 
+     * @throws SQLException
      */
     public void updateRow() throws SQLException {
         resultSet.updateRow();
@@ -271,8 +279,8 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * Insert a record in the current result set
-     *
-     * @throws SQLException 
+     * 
+     * @throws SQLException
      */
     public void doInsert() throws SQLException {
         resultSet.insertRow();
@@ -280,7 +288,7 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      */
     public FeatureTypeInfo getFeatureTypeInfo() {
         return featureTypeInfo;
@@ -332,20 +340,36 @@ public class QueryData implements AttributeReader, AttributeWriter {
     public FeatureListenerManager getListenerManager() {
         return listenerManager;
     }
-    
+
     /** Call after deleteCurrentRow() */
-    public void fireChangeRemoved(Envelope bounds, boolean isCommit){
-        String typeName = featureTypeInfo.getFeatureTypeName();        
-        listenerManager.fireFeaturesRemoved( typeName, transaction, bounds, isCommit);
+    public void fireChangeRemoved(Envelope bounds, boolean isCommit) {
+        String typeName = featureTypeInfo.getFeatureTypeName();
+        listenerManager.fireFeaturesRemoved(typeName, transaction, bounds, isCommit);
     }
+
     /** Call after updateRow */
-    public void fireFeaturesChanged(Envelope bounds, boolean isCommit){
-        String typeName = featureTypeInfo.getFeatureTypeName();        
+    public void fireFeaturesChanged(Envelope bounds, boolean isCommit) {
+        String typeName = featureTypeInfo.getFeatureTypeName();
         listenerManager.fireFeaturesChanged(typeName, transaction, bounds, isCommit);
     }
+
     /** Call after doUpdate */
-    public void fireFeaturesAdded(Envelope bounds, boolean isCommit){
-        String typeName = featureTypeInfo.getFeatureTypeName();        
+    public void fireFeaturesAdded(Envelope bounds, boolean isCommit) {
+        String typeName = featureTypeInfo.getFeatureTypeName();
         listenerManager.fireFeaturesAdded(typeName, transaction, bounds, isCommit);
+    }
+
+    protected void finalize() throws Throwable {
+        if (!isClosed()) {
+            LOGGER.severe("There's code leaving readers or writers unclosed "
+                    + "(you got an unclosed QueryData object, which is usually "
+                    + "held by a reader or a writer).\n"
+                    + "Call reader/writer.close() after using them to ensure "
+                    + "they do not hold state " + "such as JDCB connections.\n"
+                    + " QueryData was open against feature type: "
+                    + featureTypeInfo.getFeatureTypeName());
+            close();
+        }
+        super.finalize();
     }
 }
