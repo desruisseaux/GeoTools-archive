@@ -409,7 +409,7 @@ public abstract class JDBC1DataStore implements DataStore {
 	 * @see org.geotools.data.DataStore#getFeatureSource(java.lang.String)
 	 */
 	public FeatureSource getFeatureSource(String typeName) throws IOException {
-		if (typeHandler.getFIDMapper(typeName).isVolatile()
+		if (!typeHandler.getFIDMapper(typeName).isVolatile()
 				|| allowWriteOnVolatileFIDs) {
 			if (getLockingManager() != null) {
 				// Use default JDBCFeatureLocking that delegates all locking
