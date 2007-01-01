@@ -404,7 +404,7 @@ public abstract class ReferencedCanvas2D extends ReferencedCanvas {
                 final LogRecord record;
                 record = Logging.getResources(getLocale()).getLogRecord(Level.WARNING,
                                               LoggingKeys.UNEXPECTED_UNIT_$1, unit);
-                record.setSourceClassName ("ReferencedCanvas2D");
+                record.setSourceClassName(ReferencedCanvas2D.class.getName());
                 record.setSourceMethodName("setObjectiveCRS");
                 record.setThrown(exception);
                 getLogger().log(record);

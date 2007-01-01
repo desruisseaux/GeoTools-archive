@@ -393,7 +393,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         final LogRecord record = Logging.format(Level.WARNING,
                                  LoggingKeys.CANT_CREATE_COORDINATE_OPERATION_$1,
                                  factory.getAuthority().getTitle());
-        record.setSourceClassName("AuthorityBackedFactory");
+        record.setSourceClassName(AuthorityBackedFactory.class.getName());
         record.setSourceMethodName("createFromDatabase");
         record.setThrown(exception);
         LOGGER.log(record);

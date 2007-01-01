@@ -1348,7 +1348,7 @@ public class CoverageStack extends AbstractCoverage {
     private void logLoading(final int key, final Object[] parameters) {
         final Locale locale = null;
         final LogRecord record = Vocabulary.getResources(locale).getLogRecord(Level.INFO, key);
-        record.setSourceClassName("CoverageStack");
+        record.setSourceClassName(CoverageStack.class.getName());
         record.setSourceMethodName("evaluate");
         record.setParameters(parameters);
         if (readListener == null) {

@@ -128,7 +128,7 @@ public final class Logging {
             }
         } catch (NoClassDefFoundError error) {
             // May occurs if commons-logging is not in the classpath.
-            unexpectedException("org.geotools.util", "Logging", "redirectToCommonsLogging", error);
+            unexpectedException("org.geotools.util", Logging.class, "redirectToCommonsLogging", error);
         }
         return false;
     }
@@ -151,7 +151,7 @@ public final class Logging {
      */
     public static boolean unexpectedException(final Logger logger, final Throwable error) {
         if (logger.isLoggable(Level.WARNING)) {
-            unexpectedException(logger.getName(), null, null, error);
+            unexpectedException(logger.getName(), (String) null, null, error);
             return true;
         }
         return false;
@@ -176,6 +176,27 @@ public final class Logging {
      *       private method. If a developper really want to know about the private method,
      *       the stack trace is still available anyway.</p></li>
      * </ul>
+     * 
+     * @param paquet  The package where the error occurred, or {@code null}. This
+     *                information is used for fetching an appropriate {@link Logger}
+     *                for logging the error.
+     * @param classe  The class where the error occurred, or {@code null}.
+     * @param method  The method where the error occurred, or {@code null}.
+     * @param error   The error.
+     *
+     * @since 2.4
+     */
+    public static void unexpectedException(final String paquet, final Class classe,
+                                           final String method, final Throwable error)
+    {
+        // TODO: use getSimpleName() or getCanonicalName() when we will be allowed to target J2SE 1.5.
+        unexpectedException(paquet, (classe != null) ? classe.getName() : (String) null, method, error);
+    }
+
+    /**
+     * Same as {@link #unexpectedException(String, Class, String, Throwable)
+     * unexpectedException(..., Class, ...)} except that the class name is
+     * specified as a string.
      * 
      * @param paquet  The package where the error occurred, or {@code null}. This
      *                information is used for fetching an appropriate {@link Logger}

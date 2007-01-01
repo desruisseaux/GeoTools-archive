@@ -31,6 +31,7 @@ import org.opengis.referencing.cs.*;
 import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
+import org.opengis.util.InternationalString;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
@@ -814,8 +815,8 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     protected final NoSuchAuthorityCodeException noSuchAuthorityCode(final Class  type,
                                                                      final String code)
     {
-        final String authority = getAuthority().getTitle().toString();
+        final InternationalString authority = getAuthority().getTitle();
         return new NoSuchAuthorityCodeException(Errors.format(ErrorKeys.NO_SUCH_AUTHORITY_CODE_$3,
-                   code, authority, Utilities.getShortName(type)), authority, code);
+                   code, authority, Utilities.getShortName(type)), authority.toString(), code);
     }
 }

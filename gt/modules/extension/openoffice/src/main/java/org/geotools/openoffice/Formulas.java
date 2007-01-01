@@ -384,7 +384,7 @@ public abstract class Formulas extends WeakBase implements XAddIn, XServiceName,
      */
     protected void reportException(final String method, final Throwable exception) {
         final LogRecord record = new LogRecord(Level.FINE, getLocalizedMessage(exception));
-        record.setSourceClassName (Utilities.getShortClassName(this));
+        record.setSourceClassName (getClass().getName());
         record.setSourceMethodName(method);
         record.setThrown          (exception);
         getLogger().log(record);

@@ -155,7 +155,7 @@ final class URN_Parser {
             final LogRecord record = Logging.format(Level.WARNING,
                     LoggingKeys.MISMATCHED_URN_TYPE_$1, urn);
             // Set the source to the public or protected method.
-            record.setSourceClassName("URN_AuthorityFactory");
+            record.setSourceClassName(URN_AuthorityFactory.class.getName());
             record.setSourceMethodName("get" + Utilities.getShortName(expected));
             AbstractAuthorityFactory.LOGGER.log(record);
         }

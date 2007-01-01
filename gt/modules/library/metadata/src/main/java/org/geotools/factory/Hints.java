@@ -453,7 +453,7 @@ public final class Hints extends RenderingHints {
                     valueClass = Class.forName(className);
                 } catch (ClassNotFoundException exception) {
                     Logging.unexpectedException("org.geotools.factory",
-                            "Hints.Key", "isCompatibleValue", exception);
+                            Key.class, "isCompatibleValue", exception);
                     valueClass = Object.class;
                 }
             }

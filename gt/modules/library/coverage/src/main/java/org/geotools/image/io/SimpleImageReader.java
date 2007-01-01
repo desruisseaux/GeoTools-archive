@@ -126,7 +126,7 @@ public abstract class SimpleImageReader extends ImageReader {
             } catch (IOException exception) {
                 streamOrigin = 0;
                 Logging.unexpectedException("org.geotools.gcs",
-                        "SimpleImageReader", "setInput", exception);
+                        SimpleImageReader.class, "setInput", exception);
             }
         }
     }

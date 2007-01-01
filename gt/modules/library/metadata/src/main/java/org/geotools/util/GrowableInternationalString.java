@@ -224,7 +224,7 @@ public class GrowableInternationalString extends AbstractInternationalString imp
              * Not a big deal if this operation fails (this is actually just an
              * optimization for reducing memory usage). Log a warning and continue.
              */
-            Logging.unexpectedException("org.geotools.util", "GrowableInternationalString",
+            Logging.unexpectedException("org.geotools.util", GrowableInternationalString.class,
                                         "canonicalize", exception);
         }
         /*

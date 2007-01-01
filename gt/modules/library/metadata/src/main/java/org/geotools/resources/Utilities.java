@@ -218,18 +218,18 @@ compare:for (int i=0; i<c1.length; i++) {
      * @param paquet  The package where the error occurred. This information
      *                may be used to fetch an appropriate {@link Logger} for
      *                logging the error.
-     * @param classe  The class name where the error occurred.
+     * @param classe  The class where the error occurred.
      * @param method  The method name where the error occurred.
      * @param error   The error.
      */
     public static void recoverableException(final String   paquet,
-                                            final String   classe,
+                                            final Class    classe,
                                             final String   method,
                                             final Throwable error)
     {
         final LogRecord record = getLogRecord(error);
         record.setLevel(Level.FINER);
-        record.setSourceClassName (classe);
+        record.setSourceClassName (classe.getName());
         record.setSourceMethodName(method);
         Logger.getLogger(paquet).log(record);
     }

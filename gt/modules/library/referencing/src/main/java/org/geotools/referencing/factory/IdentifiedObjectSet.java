@@ -335,7 +335,7 @@ public class IdentifiedObjectSet extends AbstractSet implements Serializable {
     static void log(final FactoryException exception, final String code) {
         final LogRecord record = new LogRecord(Level.FINE,
                 "Failed to create an object for code \"" + code + "\".");
-        record.setSourceClassName("IdentifiedObjectSet");
+        record.setSourceClassName(IdentifiedObjectSet.class.getName());
         record.setSourceMethodName("createObject");
         record.setThrown(exception);
         AbstractAuthorityFactory.LOGGER.log(record);

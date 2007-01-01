@@ -299,7 +299,8 @@ public class PaletteFactory {
             }
         } catch (SecurityException e) {
             // 'getColors' is the public method that invoked this private method.
-            Utilities.recoverableException("org.geotools.image", "PaletteFactory", "getColors", e);
+            Utilities.recoverableException("org.geotools.image",
+                    PaletteFactory.class, "getColors", e);
             return null;
         }
         return getReader(stream);

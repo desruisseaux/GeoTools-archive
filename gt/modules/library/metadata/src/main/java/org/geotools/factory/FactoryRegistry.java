@@ -742,7 +742,7 @@ public class FactoryRegistry extends ServiceRegistry {
         if (showStackTrace) {
             record.setThrown(error);
         }
-        record.setSourceClassName("FactoryRegistry");
+        record.setSourceClassName(FactoryRegistry.class.getName());
         record.setSourceMethodName("scanForPlugins");
         LOGGER.log(record);
     }
@@ -760,7 +760,7 @@ public class FactoryRegistry extends ServiceRegistry {
      */
     private static void log(final String method, final StringBuffer message) {
         final LogRecord record = new LogRecord(Level.CONFIG, message.toString());
-        record.setSourceClassName("FactoryRegistry");
+        record.setSourceClassName(FactoryRegistry.class.getName());
         record.setSourceMethodName(method);
         LOGGER.log(record);
     }

@@ -269,7 +269,8 @@ final class SampleTranscoder extends PointOpImage {
         } catch (IllegalArgumentException exception) {
             final LogRecord record = Logging.format(Level.SEVERE,
                    LoggingKeys.CANT_REGISTER_JAI_OPERATION_$1, OPERATION_NAME);
-            record.setSourceClassName("GridSampleDimension");
+            // Note: GridSampleDimension is the public class that use this transcoder.
+            record.setSourceClassName(GridSampleDimension.class.getName());
             record.setSourceMethodName("<classinit>");
             record.setThrown(exception);
             AbstractGridCoverage.LOGGER.log(record);

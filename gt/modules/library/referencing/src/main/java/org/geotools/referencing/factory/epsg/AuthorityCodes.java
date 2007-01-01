@@ -356,13 +356,13 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     private static void unexpectedException(final String       method,
                                             final SQLException exception)
     {
-        unexpectedException("AuthorityCodes", method, exception);
+        unexpectedException(AuthorityCodes.class, method, exception);
     }
 
     /**
      * Invoked when an exception occured. This method just log a warning.
      */
-    static void unexpectedException(final String       classe,
+    static void unexpectedException(final Class        classe,
                                     final String       method,
                                     final SQLException exception)
     {
@@ -375,7 +375,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     private static void recoverableException(final String method, final SQLException exception) {
         // Uses the FINE level instead of WARNING because it may be a recoverable error.
         LogRecord record = Logging.format(Level.FINE, LoggingKeys.UNEXPECTED_EXCEPTION);
-        record.setSourceClassName("AuthorityCodes");
+        record.setSourceClassName(AuthorityCodes.class.getName());
         record.setSourceMethodName(method);
         record.setThrown(exception);
         Logger.getLogger(LOGGER).log(record);        
@@ -426,7 +426,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
                 toNext();
             } catch (SQLException exception) {
                 results = null;
-                unexpectedException("AuthorityCodes.Iterator", "next", exception);
+                unexpectedException(Iterator.class, "next", exception);
             }
             return current;
         }

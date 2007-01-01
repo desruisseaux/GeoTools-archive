@@ -337,7 +337,7 @@ public class Parameters {
         } else {
             // TODO: localize
             final LogRecord record = new LogRecord(Level.FINE, "Axis length mismatch.");
-            record.setSourceClassName("Parameters");
+            record.setSourceClassName(Parameters.class.getName());
             record.setSourceMethodName("ensureSet");
             Logger.getLogger("org.geotools.parameter").log(record);
         }

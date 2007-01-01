@@ -252,9 +252,9 @@ public final class TransformedShape extends AffineTransform implements Shape {
 			final NoninvertibleTransformException exception, final String method) {
 		final LogRecord record = new LogRecord(Level.WARNING, exception
 				.getLocalizedMessage());
-		record.setSourceClassName("TransformedShape");
+		record.setSourceClassName(TransformedShape.class.getName());
 		record.setSourceMethodName(method);
 		record.setThrown(exception);
-		Logger.getLogger("org.geotools.renderer.j2d").log(record);
+		Logger.getLogger("org.geotools.renderer.lite").log(record);
 	}
 }

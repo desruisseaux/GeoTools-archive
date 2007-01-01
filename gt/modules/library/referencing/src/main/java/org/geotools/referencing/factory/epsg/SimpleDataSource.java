@@ -176,7 +176,7 @@ public class SimpleDataSource implements DataSource {
         final LogRecord log;
         log = JDBC.loadDriver(properties.getProperty("driver", "sun.jdbc.odbc.JdbcOdbcDriver"));
         if (log != null) {
-            log.setSourceClassName("SimpleDataSource");
+            log.setSourceClassName(SimpleDataSource.class.getName());
             log.setSourceMethodName("getConnection");
             ReferencingFactory.LOGGER.log(log);
         }

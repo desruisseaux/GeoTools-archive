@@ -718,7 +718,7 @@ public abstract class AbstractCanvas extends DisplayObject implements Canvas {
      * <p>
      * The default implementation returns the {@linkplain #getDisplayCRS display CRS}, i.e. assumes
      * that the <cite>display to device</cite> transform is the identity transform. Subclasses need
-     * to override this method if they can manage device-dependent transformations. In any cases,
+     * to override this method if they can manage device-dependent transformations. In any case,
      * the device {@linkplain CoordinateReferenceSystem#getCoordinateSystem coordinate system} must
      * be the same one then the display coordinate system (not to be confused with coordinate
      * <em>reference</em> system).

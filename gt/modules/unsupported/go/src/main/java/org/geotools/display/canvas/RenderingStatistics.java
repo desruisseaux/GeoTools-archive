@@ -26,7 +26,6 @@ import javax.units.Unit;
 import javax.units.SI;
 
 // Geotools dependencies
-import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
@@ -200,7 +199,7 @@ final class RenderingStatistics {
                           new Double((double)(rendered-recomputed)/(double)rendered),
                           new Double(resolution/rendered), units));
         }
-        record.setSourceClassName(Utilities.getShortClassName(canvas));
+        record.setSourceClassName(canvas.getClass().getName());
         record.setSourceMethodName("paint");
         return record;
     }

@@ -456,7 +456,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
             statement.close();
         } catch (SQLException exception) {
             org.geotools.util.Logging.unexpectedException(LOGGER.getName(),
-                    "FactoryUsingSQL", "getAuthority", exception);
+                    FactoryUsingSQL.class, "getAuthority", exception);
             return Citations.EPSG;
         }
         return authority;
@@ -1464,7 +1464,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                 } catch (NumberFormatException exception) {
                     // Not a fatal error...
                     org.geotools.util.Logging.unexpectedException(LOGGER.getName(),
-                            "FactoryUsingSQL", "createDatum", exception);
+                            FactoryUsingSQL.class, "createDatum", exception);
                 }
                 final DatumFactory factory = factories.getDatumFactory();
                 final Datum datum;

@@ -318,7 +318,7 @@ public class DatumAliases extends ReferencingFactory implements DatumFactory {
      */
     private void log(final IOException exception) {
         LogRecord record = Logging.format(Level.WARNING, LoggingKeys.CANT_READ_FILE_$1, aliasURL);
-        record.setSourceClassName("DatumAliases");
+        record.setSourceClassName(DatumAliases.class.getName());
         record.setSourceMethodName("reload");
         record.setThrown(exception);
         LOGGER.log(record);

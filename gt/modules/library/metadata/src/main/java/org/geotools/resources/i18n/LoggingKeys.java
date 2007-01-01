@@ -55,6 +55,7 @@ public final class LoggingKeys {
     public static final int EXCESSIVE_MEMORY_USAGE                       =     7;
     public static final int EXCESSIVE_TILE_CACHE_$1                      =     8;
     public static final int FACTORY_IMPLEMENTATIONS_$1                   =    32;
+    public static final int FALLBACK_FACTORY_$1                          =    45;
     public static final int HINT_IGNORED_$1                              =    33;
     public static final int INITIALIZING_TRANSFORMATION_$2               =     9;
     public static final int LOADED_JDBC_DRIVER_$3                        =    29;

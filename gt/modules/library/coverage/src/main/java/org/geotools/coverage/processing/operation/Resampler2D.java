@@ -470,11 +470,11 @@ final class Resampler2D extends GridCoverage2D {
          * The JAI operation sometime returns an image with a bounding box different than what we
          * expected. This is true especially for the "Affine" operation: the JAI documentation said
          * explicitly that xmin, ymin, width and height image layout hints are ignored for this one.
-         * As a safety, we check the bounding box in any cases. If it doesn't matches, then we will
+         * As a safety, we check the bounding box in any case. If it doesn't matches, then we will
          * reconstruct the target grid geometry.
          */
-        final int[] lower = targetGR.getLowers();
-        final int[] upper = targetGR.getUppers();
+        final int[] lower = targetGR.getLower().getCoordinateValues();
+        final int[] upper = targetGR.getUpper().getCoordinateValues();
         lower[xAxis] = targetImage.getMinX();
         lower[yAxis] = targetImage.getMinY();
         upper[xAxis] = targetImage.getMaxX();
@@ -606,7 +606,7 @@ final class Resampler2D extends GridCoverage2D {
      * Log a message.
      */
     static void log(final LogRecord record) {
-        record.setSourceClassName("Resample");
+        record.setSourceClassName(Resample.class.getName());
         record.setSourceMethodName("doOperation");
         AbstractProcessor.LOGGER.log(record);
     }

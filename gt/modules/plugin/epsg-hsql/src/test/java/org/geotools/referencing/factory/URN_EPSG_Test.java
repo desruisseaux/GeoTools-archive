@@ -78,16 +78,26 @@ public class URN_EPSG_Test extends TestCase {
      */
     public void testVersion() throws FactoryException {
         CoordinateReferenceSystem expected = CRS.decode("EPSG:4326");
+        final String version = String.valueOf(CRS.getVersion("EPSG"));
+        final String urn = "urn:ogc:def:crs:EPSG:" + version + ":4326";
         final Versioned test = new Versioned();
+        final int failureCount = FallbackAuthorityFactory.getFailureCount();
         assertNull(test.lastVersion);
-        assertSame(expected, test.createCoordinateReferenceSystem("urn:ogc:def:crs:EPSG:6.8:4326"));
-        assertEquals("6.8", test.lastVersion.toString());
+        assertSame(expected, test.createCoordinateReferenceSystem(urn));
+        assertEquals(version, test.lastVersion.toString());
+        assertEquals("Primary factory should not fail.",
+                failureCount, FallbackAuthorityFactory.getFailureCount());
 
         test.lastVersion = null;
-        assertSame(expected, test.createCoordinateReferenceSystem("urn:ogc:def:crs:EPSG:6.8:4326"));
+        assertSame(expected, test.createCoordinateReferenceSystem(urn));
         assertNull("Should not create a new factory.", test.lastVersion);
+        assertEquals("Primary factory should not fail.",
+                failureCount, FallbackAuthorityFactory.getFailureCount());
+
         assertSame(expected, test.createCoordinateReferenceSystem("urn:ogc:def:crs:EPSG:6.11:4326"));
         assertEquals("6.11", test.lastVersion.toString());
+        assertEquals("Should use the fallback factory.",
+                failureCount + 1, FallbackAuthorityFactory.getFailureCount());
     }
 
     /**

@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import javax.units.Unit;
 
 // OpenGIS dependencies
@@ -41,12 +43,14 @@ import org.opengis.util.InternationalString;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.factory.FactoryNotFoundException;
 
 
 /**
- * A factory which delegates all object creation to a <cite>main</cite> factory, and fallback
- * on an other one if the main factory failed.
+ * A factory which delegates all object creation to a <cite>primary</cite> factory,
+ * and fallback on an other one if the primary factory failed.
  *
  * @since 2.3
  * @source $URL$
@@ -55,9 +59,15 @@ import org.geotools.factory.FactoryNotFoundException;
  */
 public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     /**
-     * The factory to use as a fallback if the main factory failed.
+     * The factory to use as a fallback if the primary factory failed.
      */
     private final AbstractAuthorityFactory fallback;
+
+    /**
+     * The number of time the primary factory failed and the fallback factory was used
+     * instead. This information is provided mostly for debugging and testing purpose.
+     */
+    private static int failureCount;
 
     /**
      * Wraps two authority factories.
@@ -66,15 +76,15 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * {@link DatumAuthorityFactory}, {@link CSAuthorityFactory}, {@link CRSAuthorityFactory}
      * and {@link CoordinateOperationAuthorityFactory} interfaces they choose to implement.
      *
-     * @param main The main factory.
-     * @param fallback The factory to use as a fallback if the main factory failed.
+     * @param primary The primary factory.
+     * @param fallback The factory to use as a fallback if the primary factory failed.
      *
      * @see #create
      */
-    protected FallbackAuthorityFactory(final AuthorityFactory main,
+    protected FallbackAuthorityFactory(final AuthorityFactory primary,
                                        final AuthorityFactory fallback)
     {
-        super(main);
+        super(primary);
         this.fallback = wrap(fallback);
     }
 
@@ -112,11 +122,11 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * Work around for RFE #4093999 in Sun's bug database
      * ("Relax constraint on placement of this()/super() call in constructors").
      */
-    private FallbackAuthorityFactory(final AuthorityFactory main,
+    private FallbackAuthorityFactory(final AuthorityFactory primary,
                                      final Iterator/*<? extends AuthorityFactory>*/ fallbacks)
             throws NoSuchElementException
     {
-        super(main);
+        super(primary);
         AuthorityFactory next = (AuthorityFactory) fallbacks.next();
         if (fallbacks.hasNext()) {
             next = new FallbackAuthorityFactory(next, fallbacks);
@@ -243,7 +253,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
 
     /**
      * Returns the set of authority code for the specified type. The default implementation
-     * returns the union of the authority codes from the <cite>main</cite> and the
+     * returns the union of the authority codes from the <cite>primary</cite> and the
      * <cite>fallback</cite> factories.
      */
     public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
@@ -259,11 +269,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.getDescriptionText(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.getDescriptionText(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("getDescriptionText", exception);
+            return fallback.getDescriptionText(code);
         }
     }
 
@@ -274,11 +281,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createObject(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createObject(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createObject", exception);
+            return fallback.createObject(code);
         }
     }
 
@@ -289,11 +293,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createDatum(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createDatum(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createDatum", exception);
+            return fallback.createDatum(code);
         }
     }
 
@@ -304,11 +305,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createEngineeringDatum(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createEngineeringDatum(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createEngineeringDatum", exception);
+            return fallback.createEngineeringDatum(code);
         }
     }
 
@@ -319,11 +317,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createImageDatum(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createImageDatum(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createImageDatum", exception);
+            return fallback.createImageDatum(code);
         }
     }
 
@@ -334,11 +329,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createVerticalDatum(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createVerticalDatum(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createVerticalDatum", exception);
+            return fallback.createVerticalDatum(code);
         }
     }
 
@@ -349,11 +341,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createTemporalDatum(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createTemporalDatum(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createTemporalDatum", exception);
+            return fallback.createTemporalDatum(code);
         }
     }
 
@@ -364,11 +353,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createGeodeticDatum(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createGeodeticDatum(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createGeodeticDatum", exception);
+            return fallback.createGeodeticDatum(code);
         }
     }
 
@@ -379,11 +365,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createEllipsoid(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createEllipsoid(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createEllipsoid", exception);
+            return fallback.createEllipsoid(code);
         }
     }
 
@@ -394,11 +377,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createPrimeMeridian(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createPrimeMeridian(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createPrimeMeridian", exception);
+            return fallback.createPrimeMeridian(code);
         }
     }
 
@@ -409,11 +389,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createExtent(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createExtent(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createExtent", exception);
+            return fallback.createExtent(code);
         }
     }
 
@@ -424,11 +401,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createCoordinateSystem(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createCoordinateSystem(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createCoordinateSystem", exception);
+            return fallback.createCoordinateSystem(code);
         }
     }
 
@@ -439,11 +413,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createCartesianCS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createCartesianCS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createCartesianCS", exception);
+            return fallback.createCartesianCS(code);
         }
     }
 
@@ -454,11 +425,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createPolarCS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createPolarCS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createPolarCS", exception);
+            return fallback.createPolarCS(code);
         }
     }
 
@@ -469,11 +437,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createCylindricalCS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createCylindricalCS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createCylindricalCS", exception);
+            return fallback.createCylindricalCS(code);
         }
     }
 
@@ -484,11 +449,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createSphericalCS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createSphericalCS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createSphericalCS", exception);
+            return fallback.createSphericalCS(code);
         }
     }
 
@@ -499,11 +461,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createEllipsoidalCS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createEllipsoidalCS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createEllipsoidalCS", exception);
+            return fallback.createEllipsoidalCS(code);
         }
     }
 
@@ -514,11 +473,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createVerticalCS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createVerticalCS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createVerticalCS", exception);
+            return fallback.createVerticalCS(code);
         }
     }
 
@@ -529,11 +485,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createTimeCS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createTimeCS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createTimeCS", exception);
+            return fallback.createTimeCS(code);
         }
     }
 
@@ -546,11 +499,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createCoordinateSystemAxis(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createCoordinateSystemAxis(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createCoordinateSystemAxis", exception);
+            return fallback.createCoordinateSystemAxis(code);
         }
     }
 
@@ -561,11 +511,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createUnit(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createUnit(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createUnit", exception);
+            return fallback.createUnit(code);
         }
     }
 
@@ -579,11 +526,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createCoordinateReferenceSystem(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createCoordinateReferenceSystem(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createCoordinateReferenceSystem", exception);
+            return fallback.createCoordinateReferenceSystem(code);
         }
     }
 
@@ -594,11 +538,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createCompoundCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createCompoundCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createCompoundCRS", exception);
+            return fallback.createCompoundCRS(code);
         }
     }
 
@@ -609,11 +550,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createDerivedCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createDerivedCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createDerivedCRS", exception);
+            return fallback.createDerivedCRS(code);
         }
     }
     
@@ -624,11 +562,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createEngineeringCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createEngineeringCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createEngineeringCRS", exception);
+            return fallback.createEngineeringCRS(code);
         }
     }
 
@@ -639,11 +574,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createGeographicCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createGeographicCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createGeographicCRS", exception);
+            return fallback.createGeographicCRS(code);
         }
     }
 
@@ -654,11 +586,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createGeocentricCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createGeocentricCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createGeocentricCRS", exception);
+            return fallback.createGeocentricCRS(code);
         }
     }
 
@@ -669,11 +598,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createImageCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createImageCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createImageCRS", exception);
+            return fallback.createImageCRS(code);
         }
     }
 
@@ -684,11 +610,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createProjectedCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createProjectedCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createProjectedCRS", exception);
+            return fallback.createProjectedCRS(code);
         }
     }
 
@@ -699,11 +622,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createTemporalCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createTemporalCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createTemporalCRS", exception);
+            return fallback.createTemporalCRS(code);
         }
     }
 
@@ -714,11 +634,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createVerticalCRS(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createVerticalCRS(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createVerticalCRS", exception);
+            return fallback.createVerticalCRS(code);
         }
     }
 
@@ -729,11 +646,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createParameterDescriptor(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createParameterDescriptor(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createParameterDescriptor", exception);
+            return fallback.createParameterDescriptor(code);
         }
     }
 
@@ -744,11 +658,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createOperationMethod(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createOperationMethod(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createOperationMethod", exception);
+            return fallback.createOperationMethod(code);
         }
     }
 
@@ -759,11 +670,8 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createCoordinateOperation(code);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createCoordinateOperation(code);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createCoordinateOperation", exception);
+            return fallback.createCoordinateOperation(code);
         }
     }
 
@@ -777,12 +685,39 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
         try {
             return super.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
         } catch (FactoryException exception) {
-            try {
-                return fallback.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
-            } catch (FactoryException ignore) {
-                throw exception;
-            }
+            notifyFailure("createFromCoordinateReferenceSystemCodes", exception);
+            return fallback.createFromCoordinateReferenceSystemCodes(sourceCode, targetCode);
         }
+    }
+
+    /**
+     * Invoked by <code>create</code><var>Foo</var><code>(String)</code> methods when the
+     * <cite>primary</cite> factory failed to create an object. Note that it doesn't imply
+     * anything about the success of <cite>fallback</cite> factory. The default implementation
+     * log a message to the {@link Level#FINE FINE} level.
+     *
+     * @param method The name of the invoked method.
+     * @param exception The exception that occured. It is often possible to
+     *        get the authority code from some subclasses of this exception.
+     */
+    private static void notifyFailure(final String method, final FactoryException exception) {
+        failureCount++;
+        if (LOGGER.isLoggable(Level.FINE)) {
+            final LogRecord record = Logging.format(Level.FINE,
+                    LoggingKeys.FALLBACK_FACTORY_$1, exception);
+            record.setSourceClassName(FallbackAuthorityFactory.class.getName());
+            record.setSourceMethodName(method);
+            LOGGER.log(record);
+        }
+    }
+
+    /**
+     * Returns the number of time the primary factory failed and the fallback factory was
+     * used instead. This information is provided mostly for debugging and testing purpose.
+     * It is approximative because incrementation is not sychronized.
+     */
+    static int getFailureCount() {
+        return failureCount;
     }
 
     /** For internal use by {@link FallbackAuthorityFactory#create} only. */

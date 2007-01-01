@@ -1084,7 +1084,7 @@ public abstract class AbstractCoverage extends PropertySourceImpl implements Cov
                 // Can't add the property. Too bad, the image has been created
                 // anyway. Maybe the user know what he is doing...
                 Logging.unexpectedException("org.geotools.coverage",
-                        "AbstractCoverage.Renderable", "createRendering", exception);
+                        Renderable.class, "createRendering", exception);
             }
             return image;
         }

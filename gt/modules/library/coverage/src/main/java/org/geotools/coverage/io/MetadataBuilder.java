@@ -1559,7 +1559,7 @@ public class MetadataBuilder {
                 final String message = '"'+text+"\" ellipsoid not yet implemented. Default to WGS 1984.";
                 final LogRecord record = new LogRecord(Level.WARNING, message);
                 record.setSourceMethodName(source);
-                record.setSourceClassName("MetadataBuilder");
+                record.setSourceClassName(MetadataBuilder.class.getName());
                 AbstractGridCoverageReader.LOGGER.log(record);
             }
         }

@@ -134,7 +134,7 @@ final class GraphicStyleListenerList implements PropertyChangeListener {
                 listeners[i].styleChanged(event);
             } catch (RuntimeException exception) {
                 Logging.unexpectedException("org.geotools.display.style",
-                        "GraphicStyleListener", "styleChanged", exception);
+                        GraphicStyleListener.class, "styleChanged", exception);
                 /*
                  * Continues to notify the other listeners, since they may be unrelated
                  * to the faulty one and we don't want to prevent other listeners to work.

@@ -215,7 +215,7 @@ public class About extends JPanel {
              * The implementation date can't be parsed. This is not a show-stopper;
              * the "About" dialog box will just not includes the implementation date.
              */
-            Logging.unexpectedException("org.geotools.gui.swing", "About", "<init>", exception);
+            Logging.unexpectedException("org.geotools.gui.swing", About.class, "<init>", exception);
         }
         /*
          * If the user supplied a logo, load it and display it in the dialog's upper part (NORTH).
@@ -404,7 +404,7 @@ public class About extends JPanel {
             }
             return manifest.getMainAttributes();
         } catch (IOException e) {
-            Logging.unexpectedException("org.geotools.gui.swing", "About", "getAttributes", e);
+            Logging.unexpectedException("org.geotools.gui.swing", About.class, "getAttributes", e);
         }
         // Use empty manifest attributes.
         return new Attributes();

@@ -252,7 +252,7 @@ public abstract class TextImageReader extends SimpleImageReader {
                 reader.close();
             } catch (IOException exception) {
                 Logging.unexpectedException("org.geotools.gcs",
-                        "TextImageReader", "close", exception);
+                        TextImageReader.class, "close", exception);
             }
         }
         reader = null;

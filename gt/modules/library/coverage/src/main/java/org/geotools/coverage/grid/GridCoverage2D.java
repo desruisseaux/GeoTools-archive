@@ -269,7 +269,7 @@ public class GridCoverage2D extends AbstractGridCoverage implements RenderedCove
         /*
          * Computes the grid range if it was not explicitly provided. The range will be inferred
          * from the image size, if needed. The envelope computation (if needed) requires a valid
-         * 'gridToCRS' transform in the GridGeometry object. In any cases, the envelope must be
+         * 'gridToCRS' transform in the GridGeometry object. In any case, the envelope must be
          * non-empty and its dimension must matches the coordinate reference system's dimension.
          */
         final int dimension = crs.getCoordinateSystem().getDimension();
@@ -1101,7 +1101,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                                      LoggingKeys.SAMPLE_TRANSCODE_$3, new Object[] {
                                      getName().toString(locale),
                                      new Integer(geo ? 1 : 0), shortName});
-            record.setSourceClassName("GridCoverage");
+            record.setSourceClassName(GridCoverage2D.class.getName());
             record.setSourceMethodName("geophysics");
             LOGGER.log(record);
         }
@@ -1156,7 +1156,7 @@ testLinear: for (int i=0; i<numBands; i++) {
                                                                 tileEncoding, null, null);
                 final LogRecord record = Logging.format(Level.FINE,
                         LoggingKeys.CREATED_SERIALIZABLE_IMAGE_$2, getName(), tileEncoding);
-                record.setSourceClassName("GridCoverage2D");
+                record.setSourceClassName(GridCoverage2D.class.getName());
                 record.setSourceMethodName("writeObject");
                 LOGGER.log(record);
             }

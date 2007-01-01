@@ -148,6 +148,8 @@ public class ProgressMailer implements ProgressListener {
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated Replaced by {@link #getTask}.
      */
     public String getDescription() {
         return description;
@@ -155,9 +157,29 @@ public class ProgressMailer implements ProgressListener {
 
     /**
      * {@inheritDoc}
+     *
+     * @deprecated Replaced by {@link #setTask}.
      */
     public synchronized void setDescription(final String description) {
         this.description = description;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.3
+     */
+    public void setTask(final InternationalString task) {
+        setDescription(task.toString());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 2.3
+     */
+    public InternationalString getTask() {
+        return new SimpleInternationalString(getDescription());
     }
 
     /**
@@ -181,7 +203,7 @@ public class ProgressMailer implements ProgressListener {
         } catch (MessagingException exception) {
             final LogRecord warning = new LogRecord(Level.WARNING,
                     "CATCH "+Utilities.getShortClassName(exception));
-            warning.setSourceClassName(getClass().getName());
+            warning.setSourceClassName(ProgressMailer.class.getName());
             warning.setSourceMethodName(method);
             warning.setThrown(exception);
             Logger.getLogger("org.geotools.gui.progress").log(warning);
@@ -294,12 +316,5 @@ public class ProgressMailer implements ProgressListener {
         final CharArrayWriter buffer = new CharArrayWriter();
         exception.printStackTrace(new PrintWriter(buffer));
         send("exceptionOccurred", VocabularyKeys.EXCEPTION, buffer.toString());
-    }
-
-    public void setTask( InternationalString task ) {
-        setDescription( task.toString() );
-    }
-    public InternationalString getTask() {
-        return new SimpleInternationalString( getDescription() );
     }
 }

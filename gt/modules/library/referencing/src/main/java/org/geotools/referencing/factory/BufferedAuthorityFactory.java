@@ -240,7 +240,7 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
             }
             final LogRecord record = Logging.format(Level.WARNING,
                     LoggingKeys.UNAVAILABLE_AUTHORITY_FACTORY_$1, title);
-            record.setSourceClassName(Utilities.getShortClassName(this));
+            record.setSourceClassName(getClass().getName());
             record.setSourceMethodName("isAvailable");
             record.setThrown(exception);
             LOGGER.log(record);

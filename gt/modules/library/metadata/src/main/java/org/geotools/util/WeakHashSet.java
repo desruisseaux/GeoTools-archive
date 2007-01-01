@@ -225,7 +225,7 @@ public class WeakHashSet extends AbstractSet {
             final LogRecord record = new LogRecord(level, "Rehash from " + oldTable.length +
                                                                   " to " +    table.length);
             record.setSourceMethodName(augmentation ? "canonicalize" : "remove");
-            record.setSourceClassName("WeakHashSet");
+            record.setSourceClassName(WeakHashSet.class.getName());
             logger.log(record);
         }
         assert valid();

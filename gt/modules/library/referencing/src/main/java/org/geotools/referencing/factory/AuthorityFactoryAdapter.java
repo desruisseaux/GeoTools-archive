@@ -676,7 +676,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
             final LogRecord record = Logging.format(Level.WARNING,
                     LoggingKeys.MISMATCHED_COORDINATE_OPERATION_FACTORIES_$2, sourceCode, targetCode);
             record.setSourceMethodName("createFromCoordinateReferenceSystemCodes");
-            record.setSourceClassName("AuthorityFactoryAdapter");
+            record.setSourceClassName(AuthorityFactoryAdapter.class.getName());
             LOGGER.log(record);
             return Collections.EMPTY_SET;
         }

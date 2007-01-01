@@ -23,6 +23,7 @@ import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
 // Geotools dependencies
+import org.geotools.referencing.factory.URN_EPSG_Test;
 import org.geotools.referencing.factory.OrderedAxisAuthorityFactoryTest;
 
 
@@ -54,6 +55,7 @@ public class AllTests extends TestCase {
         suite.addTest(DefaultDataSourceTest          .suite());
         suite.addTest(OperationFactoryTest           .suite());
         suite.addTest(OrderedAxisAuthorityFactoryTest.suite());
+        suite.addTest(URN_EPSG_Test                  .suite());
         return suite;
     }
 }

@@ -841,7 +841,7 @@ renderOffscreen:while (true) {
                 record = resources.getLogRecord(Level.FINEST,
                                 LoggingKeys.SEND_REPAINT_EVENT_$1, name);
             }
-            record.setSourceClassName("BufferedCanvas2D");
+            record.setSourceClassName(BufferedCanvas2D.class.getName());
             record.setSourceMethodName("repaint");
             logger.log(record);
         }
@@ -886,7 +886,7 @@ renderOffscreen:while (true) {
         final Locale locale = getLocale();
         final LogRecord record = Logging.getResources(locale).getLogRecord(Level.FINE,
                 LoggingKeys.OFFSCREEN_RENDERING_FAILED_$1, graphic.getName());
-        record.setSourceClassName("BufferedCanvas2D");
+        record.setSourceClassName(BufferedCanvas2D.class.getName());
         record.setSourceMethodName("paint");
         record.setThrown(exception);
         getLogger().log(record);

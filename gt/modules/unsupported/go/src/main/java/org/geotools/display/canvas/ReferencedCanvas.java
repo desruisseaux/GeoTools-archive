@@ -387,7 +387,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             final MathTransform transform;
             try {
                 transform = getMathTransform(graphicCRS, objectiveCRS,
-                            "ReferencedCanvas", "getTypicalCellDimension");
+                        ReferencedCanvas.class.getName(), "getTypicalCellDimension");
             } catch (FactoryException exception) {
                 handleException("getTypicalCellDimension", exception);
                 continue;  // Ignores this graphic and continue...
@@ -532,7 +532,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             }
             graphicCRS = referenced.getObjectiveCRS(); // May have changed.
             final Envelope graphicEnvelope = referenced.getEnvelope();
-            graphicEnvelopeChanged(null, graphicEnvelope, graphicCRS, "ReferencedCanvas", "add");
+            graphicEnvelopeChanged(null, graphicEnvelope, graphicCRS,
+                    ReferencedCanvas.class.getName(), "add");
         }
         if (oldEnvelope != null) {
             listeners.firePropertyChange(ENVELOPE_PROPERTY, oldEnvelope, envelope);
@@ -554,7 +555,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
                 final CoordinateReferenceSystem graphicCRS = referenced.getObjectiveCRS();
                 final Envelope graphicEnvelope = referenced.getEnvelope();
                 graphicEnvelopeChanged(graphicEnvelope, null, graphicCRS,
-                                       "ReferencedCanvas", "remove");
+                        ReferencedCanvas.class.getName(), "remove");
             }
         }
         super.remove(graphic);
@@ -596,10 +597,14 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
             }
             graphicEnvelopeChanged((Envelope) event.getOldValue(),
                                    (Envelope) event.getNewValue(),
-                                   crs, "ReferencedGraphic", "setEnvelope");
+                                   crs, ReferencedGraphic.class.getName(), "setEnvelope");
+            // Note: we declare "ReferencedGraphic" instead of "ReferencedCanvas" as the source
+            //       class name because it is the one that trigged the envelope recomputation.
         } else if (propertyName.equalsIgnoreCase(OBJECTIVE_CRS_PROPERTY)) {
             oldEnvelope = new GeneralEnvelope(envelope);
-            computeEnvelope("ReferencedGraphic", "setObjectiveCRS");
+            computeEnvelope(ReferencedGraphic.class.getName(), "setObjectiveCRS");
+            // Note: we declare "ReferencedGraphic" instead of "ReferencedCanvas" as the source
+            //       class name because it is the one that trigged the envelope recomputation.
         } else {
             return;
         }
@@ -824,7 +829,7 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         scaleFactor   = null;
         useDefaultCRS = false;
         updateNormalizationFactor(crs);
-        computeEnvelope("ReferencedCanvas", "setObjectiveCRS");
+        computeEnvelope(ReferencedCanvas.class.getName(), "setObjectiveCRS");
         /*
          * Set the display CRS last because it may fires a property change event,
          * and we don't want to expose our changes before they are completed.
@@ -922,8 +927,8 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
         assert Thread.holdsLock(this);
         final GeneralEnvelope oldProjected, newProjected;
         try {
-            final MathTransform transform = getMathTransform(crs, getObjectiveCRS(),
-                                                             sourceClassName, sourceMethodName);
+            final MathTransform transform =
+                    getMathTransform(crs, getObjectiveCRS(), sourceClassName, sourceMethodName);
             oldProjected = CRS.transform(transform, oldEnvelope);
             newProjected = CRS.transform(transform, newEnvelope);
         } catch (FactoryException exception) {
@@ -1494,13 +1499,13 @@ public abstract class ReferencedCanvas extends AbstractCanvas {
     /**
      * Invoked when an unexpected exception occured. This method is a shortcut for
      * {@link AbstractCanvas#handleException} with {@code sourceClassName} set to
-     * {@code "ReferencedCanvas"}.
+     * {@code "org.geotools.display.canvas.ReferencedCanvas"}.
      *
      * @param  sourceMethodName The caller's method name, for logging purpose.
      * @param  exception        The exception.
      */
     private void handleException(final String sourceMethodName, final Exception exception) {
-        handleException("ReferencedCanvas", sourceMethodName, exception);
+        handleException(ReferencedCanvas.class.getName(), sourceMethodName, exception);
     }
 
     /**

@@ -257,7 +257,7 @@ public class DisplayObject {
                  * We ignore all of them and just try the next class.
                  */
                 final LogRecord record = new LogRecord(Level.FINEST, name);
-                record.setSourceClassName("AbstractCanvas");
+                record.setSourceClassName(DisplayObject.class.getName());
                 record.setSourceMethodName(methodName);
                 record.setThrown(e);
                 getLogger().log(record);

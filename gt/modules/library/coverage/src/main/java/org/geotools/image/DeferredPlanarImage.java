@@ -302,7 +302,7 @@ public final class DeferredPlanarImage extends PlanarImage
         if (LOGGER.isLoggable(Level.FINER)) {
             final LogRecord record = Logging.format(Level.FINER,
                   LoggingKeys.DEFERRED_TILE_PAINTING_$2, new Integer(tileX), new Integer(tileY));
-            record.setSourceClassName(Utilities.getShortClassName(this));
+            record.setSourceClassName(DeferredPlanarImage.class.getName());
             record.setSourceMethodName("getTile");
             LOGGER.log(record);
         }
@@ -426,7 +426,7 @@ public final class DeferredPlanarImage extends PlanarImage
                         message = Utilities.getShortClassName(cause);
                     }
                     final LogRecord record = new LogRecord(Level.WARNING, message);
-                    record.setSourceClassName(Utilities.getShortClassName(observers[i]));
+                    record.setSourceClassName(observers[i].getClass().getName());
                     record.setSourceMethodName("tileUpdate");
                     record.setThrown(cause);
                     LOGGER.log(record);
@@ -498,7 +498,7 @@ public final class DeferredPlanarImage extends PlanarImage
                                        final Throwable        cause)
     {
         final LogRecord record = new LogRecord(Level.WARNING, cause.getLocalizedMessage());
-        record.setSourceClassName(Utilities.getShortClassName(this));
+        record.setSourceClassName(DeferredPlanarImage.class.getName());
         record.setSourceMethodName("getTile");
         record.setThrown(cause);
         LOGGER.log(record);

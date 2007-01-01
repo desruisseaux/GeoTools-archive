@@ -17,7 +17,9 @@ package org.geotools.referencing;
 
 // J2SE dependencies
 import java.util.Set;
+import java.util.Map;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.awt.geom.Rectangle2D;
@@ -28,7 +30,6 @@ import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.Factory;                              // For javadoc
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.*;
@@ -39,6 +40,7 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.factory.Factory;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.factory.FactoryRegistryException;
@@ -50,14 +52,16 @@ import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.util.Version;
 import org.geotools.util.Logging;
 
 
 /**
  * Simple utility class for making use of the {@linkplain CoordinateReferenceSystem
- * coordinate reference system} and associated {@linkplain Factory factory} implementations.
- * This utility class is made up of static final functions. This class is not a factory or a
- * builder. It makes use of the GeoAPI factory interfaces provided by {@link FactoryFinder}.
+ * coordinate reference system} and associated {@linkplain org.opengis.referencing.Factory}
+ * implementations. This utility class is made up of static final functions. This class is
+ * not a factory or a builder. It makes use of the GeoAPI factory interfaces provided by
+ * {@link FactoryFinder}.
  * <p>
  * The following methods may be added in a future version:
  * <ul>
@@ -143,6 +147,31 @@ public final class CRS {
             throw new FactoryNotFoundException(null, exception);
         }
         return factory;
+    }
+
+    /**
+     * Returns the version number of the specified authority database, or {@code null} if
+     * not available.
+     *
+     * @param  authority The authority name (typically {@code "EPSG"}).
+     * @return The version number of the authority database, or {@code null} if unknown.
+     * @throws FactoryRegistryException if no {@link CRSAuthorityFactory} implementation
+     *         was found for the specified authority.
+     *
+     * @since 2.4
+     */
+    public static Version getVersion(final String authority) throws FactoryRegistryException {
+        Object factory = FactoryFinder.getCRSAuthorityFactory(authority, null);
+        final Set guard = new HashSet(); // Safety against never-ending recursivity.
+        while (factory instanceof Factory && guard.add(factory)) {
+            final Map hints = ((Factory) factory).getImplementationHints();
+            final Object version = hints.get(Hints.VERSION);
+            if (version instanceof Version) {
+                return (Version) version;
+            }
+            factory = hints.get(Hints.CRS_AUTHORITY_FACTORY);
+        }
+        return null;
     }
 
     /**
@@ -333,7 +362,7 @@ public final class CRS {
                  * returns null, since it is a legal return value according this method contract.
                  */
                 envelope = null;
-                Logging.unexpectedException("org.geotools.referencing", "CRS",
+                Logging.unexpectedException("org.geotools.referencing", CRS.class,
                                             "getEnvelope", exception);
             } catch (TransformException exception) {
                 /*
@@ -343,7 +372,7 @@ public final class CRS {
                  * legal return value according this method contract.
                  */
                 envelope = null;
-                Logging.unexpectedException("org.geotools.referencing", "CRS",
+                Logging.unexpectedException("org.geotools.referencing", CRS.class,
                                             "getEnvelope", exception);
             }        
         }
@@ -415,7 +444,7 @@ public final class CRS {
              * Should not occurs, since envelopes are usually already in geographic coordinates.
              * If it occurs anyway, returns null since it is allowed by this method contract.
              */
-            Logging.unexpectedException("org.geotools.referencing", "CRS",
+            Logging.unexpectedException("org.geotools.referencing", CRS.class,
                                         "getGeographicBoundingBox", exception);
         }
         return null;

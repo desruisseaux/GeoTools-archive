@@ -274,7 +274,7 @@ public class WeakValueHashMap extends AbstractMap {
             final LogRecord record = new LogRecord(level, "Rehash from " + oldTable.length + 
                                                                   " to " +    table.length);
             record.setSourceMethodName(augmentation ? "canonicalize" : "remove");
-            record.setSourceClassName("WeakValueHashMap");
+            record.setSourceClassName(WeakValueHashMap.class.getName());
             logger.log(record);
         }
         assert valid();

@@ -146,7 +146,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
                  * from the Canvas that own this graphic (in order to use any user supplied hints).
                  */
                 final MathTransform transform;
-                transform = getMathTransform(oldCRS, crs, "ReferencedGraphic", "setObjectiveCRS");
+                transform = getMathTransform(oldCRS, crs, "setObjectiveCRS");
                 if (!transform.isIdentity()) {
                     /*
                      * Transforms the envelope, but do not modify yet the 'envelope' field.
@@ -191,14 +191,12 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
      *
      * @param  sourceCRS The source coordinate reference system.
      * @param  targetCRS The target coordinate reference system.
-     * @param  sourceClassName  The caller class name, for logging purpose only.
      * @param  sourceMethodName The caller method name, for logging purpose only.
      * @return A transform from {@code sourceCRS} to {@code targetCRS}.
      * @throws TransformException if the transform can't be created.
      */
     private MathTransform getMathTransform(final CoordinateReferenceSystem sourceCRS,
                                            final CoordinateReferenceSystem targetCRS,
-                                           final String sourceClassName,
                                            final String sourceMethodName)
             throws TransformException
     {
@@ -206,7 +204,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
             final Canvas owner = getCanvas();
             if (owner instanceof ReferencedCanvas) {
                 return ((ReferencedCanvas) owner).getMathTransform(sourceCRS, targetCRS,
-                       sourceClassName, sourceMethodName);
+                       ReferencedGraphic.class.getName(), sourceMethodName);
             } else {
                 return FactoryFinder.getCoordinateOperationFactory(null)
                        .createOperation(sourceCRS, targetCRS).getMathTransform();
@@ -269,7 +267,7 @@ public abstract class ReferencedGraphic extends AbstractGraphic {
                 targetCRS = sourceCRS;
             }
             final MathTransform mt;
-            mt = getMathTransform(sourceCRS, targetCRS, "ReferencedGraphic", "setEnvelope");
+            mt = getMathTransform(sourceCRS, targetCRS, "setEnvelope");
             old = new GeneralEnvelope(envelope);
             envelope.setEnvelope(CRS.transform(mt, newEnvelope));
             assert envelope.getCoordinateReferenceSystem() == old.getCoordinateReferenceSystem();

@@ -2296,8 +2296,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
     private void unexpectedException(final String methodName,
                                      final NoninvertibleTransformException exception) {
         zoom.setToIdentity();
-        Logging.unexpectedException("org.geotools.gui", "org.geotools.swing.ZoomPane",
-                                    methodName, exception);
+        Logging.unexpectedException("org.geotools.gui", ZoomPane.class, methodName, exception);
     }
 
     /**
@@ -2309,8 +2308,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      */
     private static void unexpectedException(final String methodName,
                                             final RuntimeException exception) {
-        Logging.unexpectedException("org.geotools.gui", "org.geotools.swing.ZoomPane",
-                                    methodName, exception);
+        Logging.unexpectedException("org.geotools.gui", ZoomPane.class, methodName, exception);
     }
 
     /**
@@ -2321,7 +2319,7 @@ public abstract class ZoomPane extends JComponent implements DeformableViewer {
      * @param area The coordinates to log (may be {@code null}).
      */
     private static void log(final String methodName, final Rectangle2D area) {
-        log("ZoomPane", methodName, area);
+        log(ZoomPane.class.getName(), methodName, area);
     }
 
     /**

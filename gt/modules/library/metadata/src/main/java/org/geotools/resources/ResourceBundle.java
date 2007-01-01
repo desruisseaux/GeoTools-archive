@@ -397,6 +397,12 @@ public class ResourceBundle extends java.util.ResourceBundle {
                     }
                     array[i] = s1;
                 }
+            } else if (element instanceof Throwable) {
+                String message = ((Throwable) element).getLocalizedMessage();
+                if (message == null) {
+                    message = Utilities.getShortClassName(element);
+                }
+                array[i] = message;
             }
         }
         return array;
