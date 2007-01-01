@@ -154,6 +154,9 @@ public class AbstractFactory implements Factory, RegisterableService {
      * for selecting a preferred factory when many are found for the same service.
      *
      * @see #getPriority
+     *
+     * @todo Consider deprecating this field. See
+     * <A HREF="http://jira.codehaus.org/browse/GEOT-1100">GEOT-1100</A> for details.
      */
     protected final int priority;
 

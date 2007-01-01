@@ -75,10 +75,10 @@ final class WeakCollectionCleaner extends Thread {
                 // Somebody doesn't want to lets us sleep... Go back to work.
             } catch (Exception exception) {
                 Logging.unexpectedException("org.geotools.util",
-                        "org.geotools.util.WeakCollection", "remove", exception);
+                        WeakCollectionCleaner.class, "remove", exception);
             } catch (AssertionError exception) {
                 Logging.unexpectedException("org.geotools.util",
-                        "org.geotools.util.WeakCollection", "remove", exception);
+                        WeakCollectionCleaner.class, "remove", exception);
                 // Do not kill the thread on assertion failure, in order to
                 // keep the same behaviour as if assertions were turned off.
             }
