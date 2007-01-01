@@ -75,7 +75,7 @@ final class URN_Type {
      * The factory for this type, either as a {@link AuthorityFactory} subinterface
      * or a {@link CodeList}.
      */
-    private final Class type;
+    public final Class type;
 
     /**
      * Creates a new instance of {@code URN_Type}.
@@ -103,5 +103,12 @@ final class URN_Type {
      */
     public boolean isInstance(final AuthorityFactory factory) {
         return type.isInstance(factory);
+    }
+
+    /**
+     * Returns the type name, for formatting and debugging purpose.
+     */
+    public String toString() {
+        return name;
     }
 }

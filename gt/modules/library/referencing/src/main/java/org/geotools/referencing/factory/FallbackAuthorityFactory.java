@@ -141,7 +141,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
      * one element, then a chain of {@code FallbackAuthorityFactory} instances is created.
      *
      * @param  type The interface to implement. Should be one of {@link DatumAuthorityFactory},
-     *         {@link CSAuthorityFactory}, {@link CRSAuthorityFactory} and
+     *         {@link CSAuthorityFactory}, {@link CRSAuthorityFactory} or
      *         {@link CoordinateOperationAuthorityFactory}.
      * @param  factories The factories to wrap, in iteration order.
      * @throws NoSuchElementException if the collection doesn't contains at least one element.
@@ -153,6 +153,44 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
     public static AuthorityFactory create(final Class/*<T extends AuthorityFactory>*/ type,
                                           final Collection/*<T>*/ factories)
             throws FactoryNotFoundException, ClassCastException
+    {
+        return createUnchecked(type, factories);
+        // TODO: use the following line instead when we will be allowed to compile for J2SE 1.5.
+        // return type.cast(createUnchecked(type, factories));
+    }
+
+    /**
+     * Wraps the specified authority factories. If the specified collection contains more than
+     * one element, then a chain of {@code FallbackAuthorityFactory} instances is created. The
+     * type is inferred from the first factory found in the collection.
+     * <p>
+     * Consider using <code>{@linkplain #create(Class, Collection) create}(type, factories)</code>
+     * instead when the type is known at compile time.
+     *
+     * @param  factories The factories to wrap, in iteration order.
+     * @throws NoSuchElementException if the collection doesn't contains at least one element.
+     *
+     * @since 2.4
+     */
+    public static AuthorityFactory create(final Collection factories)
+            throws FactoryNotFoundException
+    {
+        final Class type;
+        if (!factories.isEmpty()) {
+            type = factories.iterator().next().getClass();
+        } else {
+            type = AuthorityFactory.class;
+        }
+        return createUnchecked(type, factories);
+    }
+
+    /**
+     * Implementation of {@link #create(Class, Collection)} without the final check for the
+     * class type. Such check must be avoided for {@link #create(Collection)} implementation.
+     */
+    private static AuthorityFactory createUnchecked(final Class/*<T extends AuthorityFactory>*/ type,
+                                                    final Collection/*<T>*/ factories)
+            throws FactoryNotFoundException
     {
         ensureNonNull("type", type);
         ensureNonNull("factories", factories);
@@ -167,21 +205,39 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
                 break;
             }
             default: {
-                if (CRSAuthorityFactory.class.equals(type)) {
-                    factory = new CRS(factories);
-                } else if (CSAuthorityFactory.class.equals(type)) {
-                    factory = new CS(factories);
-                } else if (DatumAuthorityFactory.class.equals(type)) {
-                    factory = new Datum(factories);
-                } else if (CoordinateOperationAuthorityFactory.class.equals(type)) {
-                    factory = new Operation(factories);
-                } else {
-                    factory = new FallbackAuthorityFactory(factories);
+                int code = 0; // Will be a set of bit flags, as set below.
+                if (CoordinateOperationAuthorityFactory.class.isAssignableFrom(type)) code |= 1;
+                if (                 CSAuthorityFactory.class.isAssignableFrom(type)) code |= 2;
+                if (              DatumAuthorityFactory.class.isAssignableFrom(type)) code |= 4;
+                if (                CRSAuthorityFactory.class.isAssignableFrom(type)) code |= 8;
+                /*
+                 * In the 'switch' statement below, we do not implement all possible combinaisons
+                 * of authority factories. Only a few common combinaisons are listed. Other
+                 * combinaisons will fallback on some reasonable default. We may complete later
+                 * list later if there is a need for that.
+                 */
+                switch (code) {
+                    case 15: factory = new All(factories);                      break;
+                    case 14: //      = new CRS_Datum_CS(factories);             break;
+                    case 13: //      = new CRS_Datum_Operation(factories);      break;
+                    case 12: //      = new CRS_Datum(factories);                break;
+                    case 11: //      = new CRS_CS_Operation(factories);         break;
+                    case 10: //      = new CRS_CS(factories);                   break;
+                    case  9: //      = new CRS_Operation(factories);            break;
+                    case  8: factory = new CRS(factories);                      break;
+                    case  7: //      = new Datum_CS_Operation(factories);       break;
+                    case  6: //      = new Datum_CS(factories);                 break;
+                    case  5: //      = new Datum_Operation(factories);          break;
+                    case  4: factory = new Datum(factories);                    break;
+                    case  3: //      = new CS_Operation(factories);             break;
+                    case  2: factory = new CS(factories);                       break;
+                    case  1: factory = new Operation(factories);                break;
+                    case  0: factory = new FallbackAuthorityFactory(factories); break;
+                    default: throw new AssertionError(code); // Should never happen.
                 }
                 break;
             }
         }
-        // return type.cast(factory);  // TODO: uncomment with J2SE 1.5.
         return factory;
     }
 
@@ -761,6 +817,15 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
             implements CoordinateOperationAuthorityFactory
     {
         Operation(Collection/*<? extends AuthorityFactory>*/ factories) {
+            super(factories);
+        }
+    }
+
+    /** For internal use by {@link FallbackAuthorityFactory#create} only. */
+    private static final class All extends FallbackAuthorityFactory implements CRSAuthorityFactory,
+            CSAuthorityFactory, DatumAuthorityFactory, CoordinateOperationAuthorityFactory
+    {
+        All(Collection/*<? extends AuthorityFactory>*/ factories) {
             super(factories);
         }
     }

@@ -19,6 +19,8 @@ package org.geotools.referencing.factory;
 // J2SE dependencies
 import java.util.Iterator;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -29,10 +31,14 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
 
 // Geotools dependencies
+import org.geotools.util.Version;
 import org.geotools.factory.Hints;
 import org.geotools.factory.Factory;
+import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.metadata.iso.citation.CitationImpl;
 
 
@@ -47,6 +53,17 @@ import org.geotools.metadata.iso.citation.CitationImpl;
  */
 final class URN_Parser {
     /**
+     * The begining parts of the URN, typically {@code "urn:ogc:def:"} and {@code "urn:x-ogc:def:"}.
+     * All elements in the array are treated as synonymous. Those parts are up to, but do not
+     * include, de type part ({@code "crs"}, {@code "cs"}, {@code "datum"}, <cite>etc.</cite>).
+     * They must include a trailing (@value #SEPARATOR} character.
+     */
+    private static final String[] URN_BASES = new String[] {
+        "urn:ogc:def:",
+        "urn:x-ogc:def:"
+    };
+
+    /**
      * The parts separator in the URN.
      */
     private static final char SEPARATOR = ':';
@@ -59,7 +76,7 @@ final class URN_Parser {
     /**
      * The type part of the URN ({@code "crs"}, {@code "cs"}, {@code "datum"}, <cite>etc</cite>).
      */
-    public final String type;
+    public final URN_Type type;
 
     /**
      * The authority part of the URN (typically {@code "EPSG"}).
@@ -69,7 +86,7 @@ final class URN_Parser {
     /**
      * The version part of the URN, or {@code null} if none.
      */
-    public final String version;
+    public final Version version;
 
     /**
      * The code part of the URN.
@@ -79,26 +96,19 @@ final class URN_Parser {
     /**
      * Parses the specified URN.
      *
-     * @param urnBases
-     *          The begining parts of the URN, typically {@code "urn:ogc:def:"} and
-     *          {@code "urn:x-ogc:def:"}. All elements in the array are treated as synonymous.
-     *          Those parts are up to, but do not include, de type part ({@code "crs"},
-     *          {@code "cs"}, {@code "datum"}, <cite>etc.</cite>). They must include a trailing
-     *          separator ({@code :}).
-     * @param urn
-     *          The URN to parse.
+     * @param urn The URN to parse.
      * @throws NoSuchIdentifierException if the URN syntax is invalid.
      *
      * @todo Implementation should be replaced by some mechanism using {@code GenericName}
      *       (at least the call to {@code String.regionMatches}) otherwise this method will
      *       fails if there is spaces around the separator.
      */
-    public URN_Parser(final String[] urnBases, final String urn) throws NoSuchIdentifierException {
+    public URN_Parser(final String urn) throws NoSuchIdentifierException {
         this.urn = urn;
         final String code = urn.trim();
         String type = urn; // To be really assigned later.
-        for (int i=0; i<urnBases.length; i++) {
-            final String urnBase = urnBases[i];
+        for (int i=0; i<URN_BASES.length; i++) {
+            final String urnBase = URN_BASES[i];
             final int typeStart = urnBase.length();
             if (code.regionMatches(true, 0, urnBase, 0, typeStart)) {
                 final int typeEnd = code.indexOf(SEPARATOR, typeStart);
@@ -110,10 +120,10 @@ final class URN_Parser {
                         if (nameEnd >= 0) {
                             final int lastEnd = code.lastIndexOf(SEPARATOR);
                             this.version   = (lastEnd <= nameEnd) ? null
-                                           : code.substring(nameEnd + 1, lastEnd).trim();
+                                           : new Version(code.substring(nameEnd + 1, lastEnd));
                             this.authority = code.substring(typeEnd + 1, nameEnd).trim();
                             this.code      = code.substring(lastEnd + 1).trim();
-                            this.type      = candidate.name;
+                            this.type      = candidate;
                             return;
                         }
                     }
@@ -125,64 +135,6 @@ final class URN_Parser {
     }
 
     /**
-     * Add the separator character to the specified string, if not already presents.
-     */
-    static String addSeparator(String urnBase) {
-        urnBase = (urnBase!=null) ? urnBase.trim() : "";
-        final int length = urnBase.length();
-        if (length == 0 || urnBase.charAt(length - 1) != SEPARATOR) {
-            urnBase += SEPARATOR;
-        }
-        return urnBase;
-    }
-
-    /**
-     * Returns the version of the specified factory, or {@code null} if unknown.
-     */
-    private static String getVersion(final AuthorityFactory factory) {
-        if (factory instanceof Factory) {
-            final Object version = ((Factory) factory).getImplementationHints().get(Hints.VERSION);
-            if (version instanceof CharSequence) {
-                return version.toString();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Creates the authority citation for this factory, derived from the supplied factory.
-     * This is used by {@link #URN_AuthorityFactory(AuthorityFactory, String)} constructor.
-     *
-     * @param factory The factory to wrap.
-     * @param urnBase The begining part of the URN, typically {@code "URN:OGC:DEF"}.
-     */
-    static Citation getAuthority(final AuthorityFactory factory, final String urnBase) {
-        final StringBuffer buffer = new StringBuffer(addSeparator(urnBase));
-        final int                    baseOffset        = buffer.length();
-        final String                 version           = getVersion(factory);
-        final Citation               sourceCitation    = factory.getAuthority();
-        final CitationImpl           targetCitation    = new CitationImpl(sourceCitation);
-        final Collection/*<String>*/ sourceIdentifiers = sourceCitation.getIdentifiers();
-        final Collection/*<String>*/ targetIdentifiers = targetCitation.getIdentifiers();
-        targetIdentifiers.clear();
-        for (final Iterator it=sourceIdentifiers.iterator(); it.hasNext();) {
-            final String name = (String) it.next();
-            for (int i=0; i<URN_Type.MAIN.length; i++) {
-                final URN_Type type = URN_Type.MAIN[i];
-                if (type.isInstance(factory)) {
-                    buffer.setLength(baseOffset);
-                    buffer.append(type.name).append(SEPARATOR).append(name);
-                    if (version != null) {
-                        buffer.append(SEPARATOR).append(version);
-                    }
-                    targetIdentifiers.add(buffer.toString());
-                }
-            }
-        }
-        return (Citation) targetCitation.unmodifiable();
-    }
-
-    /**
      * Returns the concatenation of the {@linkplain #authority} and the {@linkplain #code}.
      */
     public String getAuthorityCode() {
@@ -190,10 +142,29 @@ final class URN_Parser {
     }
 
     /**
-     * Returns the last part of the URN (starting with the {@linkplain #type})
-     * for debugging purpose.
+     * Checks if the type is compatible with the expected one. This method is used as a safety
+     * by {@code getFooAuthorityFactory(String)} methods in {@link URN_AuthorityFactory}. If a
+     * mismatch is found, a warning is logged but no exception is thrown since it doesn't prevent
+     * the class to work in a predicable way. It is just an indication for the user that his URN
+     * may be wrong.
+     */
+    final void logWarningIfTypeMismatch(final Class/*<? extends AuthorityFactory>*/ expected) {
+        if (!expected.isAssignableFrom(type.type)) {
+            // Build a simplified URN, omitting "urn:ogc:def" and version number.
+            final String urn = "..." + SEPARATOR + type + SEPARATOR + authority + SEPARATOR + code;
+            final LogRecord record = Logging.format(Level.WARNING,
+                    LoggingKeys.MISMATCHED_URN_TYPE_$1, urn);
+            // Set the source to the public or protected method.
+            record.setSourceClassName("URN_AuthorityFactory");
+            record.setSourceMethodName("get" + Utilities.getShortName(expected));
+            AbstractAuthorityFactory.LOGGER.log(record);
+        }
+    }
+
+    /**
+     * Returns the URN.
      */
     public String toString() {
-        return type + SEPARATOR + authority + SEPARATOR + version + SEPARATOR + code;
+        return urn;
     }
 }

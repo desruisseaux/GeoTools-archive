@@ -94,16 +94,6 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
     }
 
     /**
-     * Returns {@code true} if {@link AllAuthoritiesFactory} is allowed to invokes
-     * {@link #getAuthorityCodes} recursively. This is always {@code true}, except
-     * for other instances of {@code AllAuthoritiesFactory} or for instances of
-     * {@link AuthorityFactoryAdapter} backed by {@code AllAuthoritiesFactory}.
-     */
-    boolean getAuthorityCodesRecursively() {
-        return true;
-    }
-
-    /**
      * Returns the organization or party responsible for definition and maintenance of the
      * database.
      */

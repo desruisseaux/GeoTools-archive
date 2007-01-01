@@ -54,6 +54,7 @@ public final class AllTests {
         suite.addTest(org.geotools.resources.ResourceBundleTest     .suite());
         suite.addTest(org.geotools.util     .MonolineFormatterTest  .suite());
         suite.addTest(org.geotools.util     .InternationalStringTest.suite());
+        suite.addTest(org.geotools.util     .VersionTest            .suite());
         suite.addTest(org.geotools.util     .RangeSetTest           .suite());
         suite.addTest(org.geotools.util     .DisjointSetTest        .suite());
         suite.addTest(org.geotools.util     .KeySortedListTest      .suite());

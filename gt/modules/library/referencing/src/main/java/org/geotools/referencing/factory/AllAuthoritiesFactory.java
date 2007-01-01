@@ -68,9 +68,8 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
-                DatumAuthorityFactory, CSAuthorityFactory, CRSAuthorityFactory,
-                CoordinateOperationAuthorityFactory
+public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CRSAuthorityFactory,
+        CSAuthorityFactory, DatumAuthorityFactory, CoordinateOperationAuthorityFactory
 {
     /**
      * An instance of {@code AllAuthoritiesFactory} with the
@@ -85,6 +84,18 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
             new CitationImpl(Vocabulary.format(VocabularyKeys.ALL)).unmodifiable();
 
     /**
+     * The types to be recognized for the {@code factories} argument in constructors. Must be
+     * consistent with the types expected by the {@link #getAuthorityFactory(Class, String)}
+     * method.
+     */
+    private static final Class[] AUTHORIZED_TYPES = new Class[] {
+        CRSAuthorityFactory.class,
+        DatumAuthorityFactory.class,
+        CSAuthorityFactory.class,
+        CoordinateOperationAuthorityFactory.class
+    };
+
+    /**
      * A set of user-specified factories to try before to delegate to {@link FactoryFinder},
      * or {@code null} if none.
      */
@@ -94,6 +105,11 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
      * The separator between the authority name and the code. The default value is {@code ':'}.
      */
     private final char separator;
+
+    /**
+     * Guard against infinite recursivity in {@link #getAuthorityCodes}.
+     */
+    private final ThreadLocal/*<Boolean>*/ inProgress = new ThreadLocal();
 
     /**
      * User-supplied hints provided at construction time.
@@ -274,6 +290,15 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
     }
 
     /**
+     * Returns a copy of the hints specified by the user at construction time. It may or may
+     * not be the same than the {@linkplain #getImplementationHints implementation hints} for
+     * this class.
+     */
+    final Hints getUserHints() {
+        return new Hints(userHints);
+    }
+
+    /**
      * Returns the vendor responsible for creating this factory implementation.
      * The default implementation returns {@linkplain Citations#GEOTOOLS Geotools}.
      */
@@ -287,45 +312,6 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
      */
     public Citation getAuthority() {
         return AUTHORITY;
-    }
-
-    /**
-     * The types to be recognized for the {@code factories} argument in constructors. Must be
-     * consistent with the index expected by the {@link #getAuthorityFactory(int, String)}
-     * method. This array is declared here (instead of at the begining of this class) in order
-     * to keep it close to the above-cited method.
-     */
-    private static final Class[] AUTHORIZED_TYPES = new Class[] {
-        CRSAuthorityFactory.class,
-        DatumAuthorityFactory.class,
-        CSAuthorityFactory.class,
-        CoordinateOperationAuthorityFactory.class
-    };
-
-    /**
-     * Returns an authority factory of the given type, where {@code type} is a number ranging
-     * from {@code 0} inclusive to {@code AUTHORIZED_TYPES.length} exclusive. This method is
-     * used when we need to invoke a method available in more than one factory type.
-     *
-     * @param  type The factory type as a number from {@code 0} inclusive to
-     *         {@code AUTHORIZED_TYPES.length} exclusive.
-     * @param  code The code to parse.
-     * @return The authority factory.
-     * @throws NoSuchAuthorityCodeException if no authority name has been found.
-     */
-    private AuthorityFactory getAuthorityFactory(final int type, final String code)
-            throws NoSuchAuthorityCodeException
-    {
-        final AuthorityFactory factory;
-        switch (type) {
-            case 0:  factory = getCRSAuthorityFactory(code); break;
-            case 1:  factory = getDatumAuthorityFactory(code); break;
-            case 2:  factory = getCSAuthorityFactory(code); break;
-            case 3:  factory = getCoordinateOperationAuthorityFactory(code); break;
-            default: throw new IllegalArgumentException(String.valueOf(type));
-        }
-        assert AUTHORIZED_TYPES[type].isInstance(factory) : type;
-        return factory;
     }
 
     /**
@@ -507,16 +493,6 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
     }
 
     /**
-     * Returns {@code false} since {@link #getAuthorityCodes} should not be invoked
-     * recursively on instances of {@code AllAuthoritiesFactory} (otherwise we get
-     * a {@link StackOverflowError}.
-     */
-    // @Override
-    final boolean getAuthorityCodesRecursively() {
-        return false;
-    }
-
-    /**
      * Returns the set of authority codes of the given type.
      *
      * @param  type The spatial reference objects type (may be {@code Object.class}).
@@ -526,58 +502,62 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
      * @throws FactoryException if access to the underlying database failed.
      */
     public Set/*<String>*/ getAuthorityCodes(final Class type) throws FactoryException {
+        if (Boolean.TRUE.equals(inProgress.get())) {
+            /*
+             * 'getAuthorityCodes' is invoking itself (indirectly). Returns an empty set in order
+             * to avoid infinite recursivity. Note that the end result (the output of the caller)
+             * will usually not be empty.
+             */
+            return Collections.EMPTY_SET;
+        }
         final Set/*<String>*/ codes = new LinkedHashSet();
         final Set/*<AuthorityFactory>*/ done = new HashSet();
         done.add(this); // Safety for avoiding recursive calls.
-        for (final Iterator it=FactoryFinder.getAuthorityNames().iterator(); it.hasNext();) {
-            final String authority = (String) it.next();
-            /*
-             * Prepares a buffer with the "AUTHORITY:" part in "AUTHORITY:NUMBER".
-             * We will reuse this buffer in order to prefix the authority name in
-             * front of every codes.
-             */
-            final StringBuffer code = new StringBuffer(authority);
-            code.append(separator);
-            final int codeBase = code.length();
-            code.append("all");
-            final String dummyCode = code.toString();
-            /*
-             * Now scan over all factories. We will process a factory only if this particular
-             * factory has not already been done in a previous iteration (some implementation
-             * apply to more than one factory).
-             */
-            for (int i=0; i<AUTHORIZED_TYPES.length; i++) {
-                final AuthorityFactory factory;
-                try {
-                    factory = getAuthorityFactory(i, dummyCode);
-                } catch (NoSuchAuthorityCodeException e) {
-                    continue;
-                }
-                if (done.add(factory)) {
-                    if (factory instanceof AbstractAuthorityFactory) {
-                        if (!((AbstractAuthorityFactory) factory).getAuthorityCodesRecursively()) {
-                            /*
-                             * Prevent infinite recursivity: avoid to invoke getAuthorityCodes
-                             * directly or indirectly on any instance of AllAuthoritiesFactory.
-                             */
-                            continue;
-                        }
+        inProgress.set(Boolean.TRUE);
+        try {
+            for (final Iterator it=FactoryFinder.getAuthorityNames().iterator(); it.hasNext();) {
+                final String authority = (String) it.next();
+                /*
+                 * Prepares a buffer with the "AUTHORITY:" part in "AUTHORITY:NUMBER".
+                 * We will reuse this buffer in order to prefix the authority name in
+                 * front of every codes.
+                 */
+                final StringBuffer code = new StringBuffer(authority);
+                code.append(separator);
+                final int codeBase = code.length();
+                code.append("all");
+                final String dummyCode = code.toString();
+                /*
+                 * Now scan over all factories. We will process a factory only if this particular
+                 * factory has not already been done in a previous iteration (some implementation
+                 * apply to more than one factory).
+                 */
+                for (int i=0; i<AUTHORIZED_TYPES.length; i++) {
+                    final AuthorityFactory factory;
+                    try {
+                        factory = getAuthorityFactory(AUTHORIZED_TYPES[i], dummyCode);
+                    } catch (NoSuchAuthorityCodeException e) {
+                        continue;
                     }
-                    for (final Iterator it2=factory.getAuthorityCodes(type).iterator(); it2.hasNext();) {
-                        String candidate = ((String) it2.next()).trim();
-                        if (candidate.length() < codeBase ||
-                            Character.isLetterOrDigit (candidate.charAt(codeBase-1)) ||
-                           !authority.equalsIgnoreCase(candidate.substring(0, codeBase-1)))
-                        {
-                            // Prepend the authority code if it was not already presents.
-                            code.setLength(codeBase);
-                            code.append(candidate);
-                            candidate = code.toString();
+                    if (done.add(factory)) {
+                        for (final Iterator it2=factory.getAuthorityCodes(type).iterator(); it2.hasNext();) {
+                            String candidate = ((String) it2.next()).trim();
+                            if (candidate.length() < codeBase ||
+                                Character.isLetterOrDigit (candidate.charAt(codeBase-1)) ||
+                               !authority.equalsIgnoreCase(candidate.substring(0, codeBase-1)))
+                            {
+                                // Prepend the authority code if it was not already presents.
+                                code.setLength(codeBase);
+                                code.append(candidate);
+                                candidate = code.toString();
+                            }
+                            codes.add(candidate);
                         }
-                        codes.add(candidate);
                     }
                 }
             }
+        } finally {
+            inProgress.set(Boolean.FALSE);
         }
         return codes;
     }
@@ -603,7 +583,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
              */
             final AuthorityFactory factory;
             try {
-                factory = getAuthorityFactory(type, code);
+                factory = getAuthorityFactory(AUTHORIZED_TYPES[type], code);
             } catch (NoSuchAuthorityCodeException exception) {
                 if (failure == null) {
                     failure = exception;
@@ -651,7 +631,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements
              */
             final AuthorityFactory factory;
             try {
-                factory = getAuthorityFactory(type, code);
+                factory = getAuthorityFactory(AUTHORIZED_TYPES[type], code);
             } catch (NoSuchAuthorityCodeException exception) {
                 if (failure == null) {
                     failure = exception;

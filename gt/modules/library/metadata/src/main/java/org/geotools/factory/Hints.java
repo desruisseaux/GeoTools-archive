@@ -24,8 +24,6 @@ import java.lang.reflect.Modifier;
 
 // Geotools Dependencies
 import org.geotools.util.Logging;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridCoverageReader;
 
 
 /**
@@ -197,9 +195,9 @@ public final class Hints extends RenderingHints {
     // TODO new Key("org.opengis.coverage.processing.GridCoverageProcessor");
 
     /**
-     * Tells to the {@link GridCoverageReader} instances to ignore the built-in
-     * overviews when creating a {@link GridCoverage} object during a read. This
-     * hints also implied that no decimation on reading is performed.
+     * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to ignore
+     * the built-in overviews when creating a {@link org.opengis.coverage.grid.GridCoverage}
+     * object during a read. This hints also implied that no decimation on reading is performed.
      *
      * @since 2.3
      */
@@ -364,11 +362,12 @@ public final class Hints extends RenderingHints {
     /**
      * Version number of the requested service. This hint is used for example in order to get
      * a {@linkplain org.opengis.referencing.crs.CRSAuthorityFactory CRS authority factory}
-     * backed by a particular version of EPSG database.
+     * backed by a particular version of EPSG database. The value should be an instance of
+     * {@link org.geotools.util.Version}.
      *
      * @since 2.4
      */
-    public static final Key VERSION = new Key(String.class);
+    public static final Key VERSION = new Key("org.geotools.util.Version");
 
     /**
      * Constructs a new object with keys and values initialized from the

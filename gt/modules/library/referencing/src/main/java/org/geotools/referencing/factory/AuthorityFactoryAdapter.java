@@ -246,26 +246,6 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
-     * Inspects all dependencies in order to determine if {@link #getAuthorityCode}
-     * can be invoked recursively.
-     */
-    // @Override
-    boolean getAuthorityCodesRecursively() {
-        return getAuthorityCodesRecursively(      crsFactory) &&
-               getAuthorityCodesRecursively(       csFactory) &&
-               getAuthorityCodesRecursively(    datumFactory) &&
-               getAuthorityCodesRecursively(operationFactory);
-    }
-
-    /**
-     * Helper method for {@link #getAuthorityCodesRecursively} implementation.
-     */
-    private static boolean getAuthorityCodesRecursively(final AuthorityFactory factory) {
-        return !(factory instanceof AbstractAuthorityFactory) ||
-                ((AbstractAuthorityFactory) factory).getAuthorityCodesRecursively();
-    }
-
-    /**
      * Replaces the specified unit, if applicable.
      * To be overridden with {@code protected} access by {@link TransformedAuthorityFactory}.
      */
@@ -729,6 +709,41 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
+     * Returns an authority factory of the specified type. This method delegates to:
+     * <ul>
+     *   <li>{@link #getCRSAuthorityFactory} if {@code type} is
+     *       {@code CRSAuthorityFactory.class};</li>
+     *   <li>{@link #getCSAuthorityFactory} if {@code type} is
+     *       {@code CSAuthorityFactory.class};</li>
+     *   <li>{@link #getDatumAuthorityFactory} if {@code type} is
+     *       {@code DatumAuthorityFactory.class};</li>
+     *   <li>{@link #CoordinateOperationAuthorityFactory} if {@code type} is
+     *       {@code CoordinateOperationAuthorityFactory.class};</li>
+     * </ul>
+     *
+     * @throws IllegalArgumentException if the specified {@code type} is invalid.
+     * @throws FactoryException if no suitable factory were found.
+     */
+    final AuthorityFactory getAuthorityFactory(final String code, final Class type)
+            throws FactoryException
+    {
+        if (CRSAuthorityFactory.class.equals(type)) {
+            return getCRSAuthorityFactory(code);
+        }
+        if (CSAuthorityFactory.class.equals(type)) {
+            return getCSAuthorityFactory(code);
+        }
+        if (DatumAuthorityFactory.class.equals(type)) {
+            return getDatumAuthorityFactory(code);
+        }
+        if (CoordinateOperationAuthorityFactory.class.equals(type)) {
+            return getCoordinateOperationAuthorityFactory(code);
+        }
+        throw new IllegalArgumentException(
+                Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2, "type", type));
+    }
+
+    /**
      * Returns a generic object factory to use for the specified code. The default implementation
      * returns one of the factory specified at construction time. Subclasses can override
      * this method in order to select a different factory implementation depending on the
@@ -741,7 +756,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @param  code The authority code given to this class. Note that the code to be given
      *         to the returned factory {@linkplain #toBackingFactoryCode may be different}.
      * @return A factory for the specified authority code (never {@code null}).
-     * @throws FactoryException if no datum factory were specified at construction time.
+     * @throws FactoryException if no suitable factory were found.
      *
      * @since 2.4
      */

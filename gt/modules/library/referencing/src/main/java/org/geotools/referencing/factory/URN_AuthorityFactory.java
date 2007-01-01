@@ -15,6 +15,12 @@
  */
 package org.geotools.referencing.factory;
 
+// J2SE dependencies
+import java.util.Arrays;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
@@ -27,18 +33,14 @@ import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 
 // Geotools dependencies
+import org.geotools.util.Version;
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 
 
 /**
- * Provides a URN syntax view over an existing authority factory. For example this adapter
- * can provides a view in the {@code "urn:ogc:def:crs:EPSG:6.8"} namespace for an existing
- * authority factory in the {@code "EPSG"} namespace.
- * <p>
- * All constructors are protected because this class must be subclassed in order to determine
- * which of the {@link DatumAuthorityFactory}, {@link CSAuthorityFactory} and
- * {@link CRSAuthorityFactory} interfaces to implement.
+ * Wraps {@linkplain AllAuthoritiesFactory all factories} in a {@code "urn:ogc:def"} URN
+ * name space. An exemple of complete URN is {@code "urn:ogc:def:crs:EPSG:6.8"}.
  *
  * @since 2.4
  * @source $URL$
@@ -49,19 +51,20 @@ import org.geotools.metadata.iso.citation.Citations;
  * @see <A HREF="https://portal.opengeospatial.org/files/?artifact_id=8814">URNs of definitions
  *      in OGC namespace</A>
  */
-public class URN_AuthorityFactory extends AuthorityFactoryAdapter {
+public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRSAuthorityFactory,
+        CSAuthorityFactory, DatumAuthorityFactory, CoordinateOperationAuthorityFactory
+{
     /**
-     * The begining parts of the URN, typically {@code "urn:ogc:def:"} and {@code "urn:x-ogc:def:"}.
-     * All elements in the array are treated as synonymous. Those parts are up to, but do not
-     * include, de type part ({@code "crs"}, {@code "cs"}, {@code "datum"}, <cite>etc.</cite>).
-     * They must include a trailing (@value URN_Parser#SEPARATOR} character.
+     * The backing factory. Will be used as a fallback if no object
+     * is available for some specific version of an EPSG database.
      */
-    private final String[] urnBases;
+    private final AllAuthoritiesFactory factory;
 
     /**
-     * The authority for this factory, to be returned by {@link #getAuthority}.
+     * The authority factories by versions. Factories will be created by
+     * {@link #createVersionedFactory} when first needed.
      */
-    private final Citation authority;
+    private final SortedMap/*<Version,AbstractAuthorityFactory>*/ byVersions = new TreeMap();
 
     /**
      * The last code processed, or {@code null} if none.
@@ -69,69 +72,39 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter {
     private transient URN_Parser last;
 
     /**
-     * Creates a wrapper around the specified factory. The supplied factory is given unchanged
-     * to the {@linkplain AuthorityFactoryAdapter#AuthorityFactoryAdapter(AuthorityFactory)
-     * super class constructor}.
-     * <p>
-     * A default authority citation will be created for this factory. The new
-     * citation will be a copy of the wrapped {@code factory} citation, with all
-     * {@linkplain Citation#getIdentifiers() identifiers} replaced by the following ones:
-     *
-     * <blockquote>
-     * <var>urnBase</var>{@code :}<var>type</var>{@code :}<var>name</var>{@code :}<var>version</var>
-     * </blockquote>
-     *
-     * where:
-     * <ul>
-     *   <li><var>urnBase</var> is the argument supplied to this constructor.</li>
-     *   <li><var>type</var> may be {@code "crs"}, {@code "cs"}, {@code "datum"},
-     *       <cite>etc</cite>.</li>
-     *   <li><var>name</var> is the authority name of the wrapped {@code factory}.</li>
-     *   <li><var>version</var> is inferred from the wrapped {@code factory}.</li>
-     * </ul>
-     *
-     * @param factory   The factory to wrap.
-     * @param urnBase   The begining part of the URN, typically {@code "urn:ogc:def"}.
-     *                  This part is up to, but do not include, de type part ({@code "crs"},
-     *                  {@code "cs"}, {@code "datum"}, <cite>etc.</cite>).
+     * Creates a default wrapper.
      */
-    protected URN_AuthorityFactory(final AuthorityFactory factory, final String urnBase) {
-        this(factory, new String[] {urnBase}, URN_Parser.getAuthority(factory, urnBase));
+    public URN_AuthorityFactory() {
+        this(new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE));
     }
 
     /**
-     * Creates a wrapper around the specified factory using the authority name explicitly given.
+     * Creates a wrapper using the specified hints. For strict compliance with OGC definition
+     * of {@code "urn:ogc:def"} namespace, the supplied hints should contains at least the
+     * {@link Hints#FORCE_LONGITUDE_FIRST_AXIS_ORDER FORCE_LONGITUDE_FIRST_AXIS_ORDER} hint
+     * with value {@link Boolean#FALSE FALSE}.
      *
-     * @param factory
-     *          The factory to wrap.
-     * @param urnBases
-     *          The begining parts of the URN, typically {@code "urn:ogc:def:"} and
-     *          {@code "urn:x-ogc:def:"}. All elements in the array are treated as synonymous.
-     *          Those parts are up to, but do not include, de type part ({@code "crs"},
-     *          {@code "cs"}, {@code "datum"}, <cite>etc.</cite>).
-     * @param authority
-     *          The authority citation for this factory.
+     * @param hints The hints to be given to backing factories.
      */
-    protected URN_AuthorityFactory(final AuthorityFactory factory, String[] urnBases,
-                                   final Citation authority)
-    {
+    public URN_AuthorityFactory(final Hints hints) {
+        this(new AllAuthoritiesFactory(hints));
+    }
+
+    /**
+     * Creates a wrapper around the specified factory. The supplied factory is given unchanged
+     * to the {@linkplain AuthorityFactoryAdapter#AuthorityFactoryAdapter(AuthorityFactory)
+     * super class constructor}.
+     */
+    public URN_AuthorityFactory(final AllAuthoritiesFactory factory) {
         super(factory);
-        ensureNonNull("authority", authority);
-        ensureNonNull("urnBases",  urnBases);
-        this.authority = authority;
-        this.urnBases = urnBases = (String[]) urnBases.clone();
-        for (int i=0; i<urnBases.length; i++) {
-            String urnBase = urnBases[i];
-            ensureNonNull("urnBase", urnBase);
-            urnBases[i] = URN_Parser.addSeparator(urnBase);
-        }
+        this.factory = factory;
     }
 
     /**
      * {@inheritDoc}
      */
     public Citation getAuthority() {
-        return authority;
+        return Citations.URN_OGC;
     }
 
     /**
@@ -149,9 +122,177 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter {
          */
         URN_Parser parser = last;
         if (parser == null || !parser.urn.equals(code)) {
-            last = parser = new URN_Parser(urnBases, code);
+            last = parser = new URN_Parser(code);
         }
         return parser;
+    }
+
+    /**
+     * Returns an object factory for the specified code. This method invokes one of the
+     * <code>get</code><var>Type</var><code>AuthorityFactory</code> methods where
+     * <var>Type</var> is inferred from the code.
+     *
+     * @param  code The authority code given to this class.
+     * @return A factory for the specified authority code (never {@code null}).
+     * @throws FactoryException if no suitable factory were found.
+     */
+    protected AuthorityFactory getAuthorityFactory(final String code) throws FactoryException {
+        if (code != null) {
+            return getAuthorityFactory(code, getParser(code).type.type);
+        } else {
+            return super.getAuthorityFactory(code);
+        }
+    }
+
+    /**
+     * Returns the datum factory to use for the specified URN. If the URN contains a version
+     * string, then this method will try to fetch a factory for that particular version. The
+     * {@link #createVersionedFactory} method may be invoked for that purpose. If no factory
+     * is provided for that specific version, then the
+     * {@linkplain AuthorityFactoryAdapter#getDatumAuthorityFactory default one} is used.
+     *
+     * @param  code The URN given to this class.
+     * @return A factory for the specified URN (never {@code null}).
+     * @throws FactoryException if no datum factory is available.
+     */
+    protected DatumAuthorityFactory getDatumAuthorityFactory(final String code)
+            throws FactoryException
+    {
+        if (code != null) {
+            final URN_Parser parser = getParser(code);
+            parser.logWarningIfTypeMismatch(DatumAuthorityFactory.class);
+            final AuthorityFactory factory = getVersionedFactory(parser);
+            if (factory instanceof DatumAuthorityFactory) {
+                return (DatumAuthorityFactory) factory;
+            }
+        }
+        return super.getDatumAuthorityFactory(code);
+    }
+
+    /**
+     * Returns the coordinate system factory to use for the specified URN. If the URN contains a
+     * version string, then this method will try to fetch a factory for that particular version.
+     * The {@link #createVersionedFactory} method may be invoked for that purpose. If no factory
+     * is provided for that specific version, then the
+     * {@linkplain AuthorityFactoryAdapter#getCSAuthorityFactory default one} is used.
+     *
+     * @param  code The URN given to this class.
+     * @return A factory for the specified URN (never {@code null}).
+     * @throws FactoryException if no coordinate system factory is available.
+     */
+    protected CSAuthorityFactory getCSAuthorityFactory(final String code)
+            throws FactoryException
+    {
+        if (code != null) {
+            final URN_Parser parser = getParser(code);
+            parser.logWarningIfTypeMismatch(CSAuthorityFactory.class);
+            final AuthorityFactory factory = getVersionedFactory(parser);
+            if (factory instanceof CSAuthorityFactory) {
+                return (CSAuthorityFactory) factory;
+            }
+        }
+        return super.getCSAuthorityFactory(code);
+    }
+
+    /**
+     * Returns the coordinate reference system factory to use for the specified URN.
+     * If the URN contains a version string, then this method will try to fetch a factory
+     * for that particular version. The {@link #createVersionedFactory} method may be
+     * invoked for that purpose. If no factory is provided for that specific version, then
+     * the {@linkplain AuthorityFactoryAdapter#getCRSAuthorityFactory default one} is used.
+     *
+     * @param  code The URN given to this class.
+     * @return A factory for the specified URN (never {@code null}).
+     * @throws FactoryException if no coordinate reference system factory is available.
+     */
+    protected CRSAuthorityFactory getCRSAuthorityFactory(final String code)
+            throws FactoryException
+    {
+        if (code != null) {
+            final URN_Parser parser = getParser(code);
+            parser.logWarningIfTypeMismatch(CRSAuthorityFactory.class);
+            final AuthorityFactory factory = getVersionedFactory(parser);
+            if (factory instanceof CRSAuthorityFactory) {
+                return (CRSAuthorityFactory) factory;
+            }
+        }
+        return super.getCRSAuthorityFactory(code);
+    }
+
+    /**
+     * Returns the coordinate operation factory to use for the specified URN. If the URN
+     * contains a version string, then this method will try to fetch a factory for that
+     * particular version. The {@link #createVersionedFactory} method may be invoked for
+     * that purpose. If no factory is provided for that specific version, then the
+     * {@linkplain AuthorityFactoryAdapter#getCoordinateOperationAuthorityFactory default one}
+     * is used.
+     *
+     * @param  code The URN given to this class.
+     * @return A factory for the specified URN (never {@code null}).
+     * @throws FactoryException if no coordinate operation factory is available.
+     */
+    protected CoordinateOperationAuthorityFactory getCoordinateOperationAuthorityFactory(final String code)
+            throws FactoryException
+    {
+        if (code != null) {
+            final URN_Parser parser = getParser(code);
+            parser.logWarningIfTypeMismatch(CoordinateOperationAuthorityFactory.class);
+            final AuthorityFactory factory = getVersionedFactory(parser);
+            if (factory instanceof CoordinateOperationAuthorityFactory) {
+                return (CoordinateOperationAuthorityFactory) factory;
+            }
+        }
+        return super.getCoordinateOperationAuthorityFactory(code);
+    }
+
+    /**
+     * Returns an authority factory for the specified version, or {@code null} if none.
+     * This method invokes {@link #createVersionedFactory} the first time it is invoked
+     * for a given version and cache the factory.
+     *
+     * @throws FactoryException if an error occured while creating the factory.
+     */
+    private AuthorityFactory getVersionedFactory(final URN_Parser parser)
+            throws FactoryException
+    {
+        final Version version = parser.version;
+        if (version == null) {
+            return null;
+        }
+        AuthorityFactory factory;
+        synchronized (byVersions) {
+            factory = (AuthorityFactory) byVersions.get(version);
+            if (factory == null) {
+                factory = createVersionedFactory(version);
+                if (factory != null) {
+                    byVersions.put(version, factory);
+                }
+            }
+        }
+        return factory;
+    }
+
+    /**
+     * Invoked when a factory is requested for a specific version. This method should create
+     * a factory for the exact version specified by the argument, or return {@code null} if
+     * no such factory is available. In the later case, this class will fallback on the factory
+     * specified at {@linkplain #URN_AuthorityFactory(AuthorityFactory, String, Citation)
+     * construction time}.
+     *
+     * @param  version The version for the factory to create.
+     * @return The factory, of {@code null} if there is none for the specified version.
+     * @throws FactoryException if an error occured while creating the factory.
+     */
+    protected AuthorityFactory createVersionedFactory(final Version version)
+            throws FactoryException
+    {
+        final Hints hints = factory.getUserHints();
+        hints.put(Hints.VERSION, version);
+        final List factories = Arrays.asList(new AuthorityFactory[] {
+            new AllAuthoritiesFactory(hints),
+            factory
+        });
+        return FallbackAuthorityFactory.create(factories);
     }
 
     /**
@@ -164,35 +305,5 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter {
      */
     protected String toBackingFactoryCode(final String code) throws FactoryException {
         return getParser(code).getAuthorityCode();
-    }
-
-    /**
-     * A URN syntax view in the {@code "urn:ogc:def"} name space for
-     * {@linkplain AllAuthoritiesFactory all factories}.
-     *
-     * @since 2.4
-     * @source $URL$
-     * @version $Id$
-     * @author Martin Desruisseaux
-     */
-    public static class OGC extends URN_AuthorityFactory implements CRSAuthorityFactory,
-            CSAuthorityFactory, DatumAuthorityFactory, CoordinateOperationAuthorityFactory
-    {
-        /**
-         * Creates a default view.
-         */
-        public OGC() {
-            this(new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE));
-        }
-
-        /**
-         * Creates a view using the specified hints.
-         *
-         * @param hints The hints to be given to backing factories.
-         */
-        public OGC(final Hints hints) {
-            super(new AllAuthoritiesFactory(hints),
-                    new String[] {"urn:ogc:def:", "urn:x-ogc:def:"}, Citations.URN_OGC);
-        }
     }
 }

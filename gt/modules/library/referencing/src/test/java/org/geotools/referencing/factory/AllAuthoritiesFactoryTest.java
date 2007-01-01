@@ -92,14 +92,17 @@ public class AllAuthoritiesFactoryTest extends TestCase {
         actual   = all.createCoordinateReferenceSystem("CRS:84");
         expected = crs.createCoordinateReferenceSystem(    "84");
         assertSame(expected, actual);
+        assertSame(expected, all.createObject("CRS:84"));
 
         actual   = all .createCoordinateReferenceSystem("AUTO:42001,0,0");
         expected = auto.createCoordinateReferenceSystem(     "42001,0,0");
         assertSame(expected, actual);
+        assertSame(expected, all.createObject("AUTO:42001,0,0"));
 
         actual   = all.createCoordinateReferenceSystem("CRS:27");
         expected = crs.createCoordinateReferenceSystem(    "27");
         assertSame(expected, actual);
+        assertSame(expected, all.createObject("CRS:27"));
 
         try {
             all.createCoordinateReferenceSystem("84");

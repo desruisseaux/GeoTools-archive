@@ -55,13 +55,6 @@ public class URN_ParserTest extends TestCase {
     }
 
     /**
-     * The urn bases to test.
-     */
-    private static final String[] URN_BASES = {
-        "urn:ogc:def:"
-    };
-
-    /**
      * Tests the main types.
      */
     public void testMainTypes() {
@@ -75,10 +68,10 @@ public class URN_ParserTest extends TestCase {
      * Parses a valid URN.
      */
     public void testParse() throws NoSuchIdentifierException {
-        final URN_Parser parser = new URN_Parser(URN_BASES, "urn:ogc:def:CRS:EPSG:6.11.2:4326");
-        assertEquals("crs",       parser.type);
+        final URN_Parser parser = new URN_Parser("urn:ogc:def:CRS:EPSG:6.11.2:4326");
+        assertEquals("crs",       parser.type.name);
         assertEquals("EPSG",      parser.authority);
-        assertEquals("6.11.2",    parser.version);
+        assertEquals("6.11.2",    parser.version.toString());
         assertEquals("4326",      parser.code);
         assertEquals("EPSG:4326", parser.getAuthorityCode());
     }
@@ -87,8 +80,8 @@ public class URN_ParserTest extends TestCase {
      * Parses a valid URN without version.
      */
     public void testParseWithoutVersion() throws NoSuchIdentifierException {
-        final URN_Parser parser = new URN_Parser(URN_BASES, "urn:ogc:def:CRS:EPSG:4326");
-        assertEquals("crs",       parser.type);
+        final URN_Parser parser = new URN_Parser("urn:ogc:def:CRS:EPSG:4326");
+        assertEquals("crs",       parser.type.name);
         assertEquals("EPSG",      parser.authority);
         assertNull  (             parser.version);
         assertEquals("4326",      parser.code);
@@ -99,9 +92,9 @@ public class URN_ParserTest extends TestCase {
      * Parses an invalid URN.
      */
     public void testInvalidParse() {
-        final String urn = "urn:x-ogc:def:CRS:EPSG:6.8:4326";
+        final String urn = "urn:ogcx:def:CRS:EPSG:6.8:4326";
         try {
-            new URN_Parser(URN_BASES, urn);
+            new URN_Parser(urn);
             fail();
         } catch (NoSuchIdentifierException e) {
             // This is the expected exception.
@@ -115,7 +108,7 @@ public class URN_ParserTest extends TestCase {
     public void testInvalidType() {
         final String urn = "urn:ogc:def:dummy:EPSG:6.8:4326";
         try {
-            new URN_Parser(URN_BASES, urn);
+            new URN_Parser(urn);
             fail();
         } catch (NoSuchIdentifierException e) {
             // This is the expected exception.

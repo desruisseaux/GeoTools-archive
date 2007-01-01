@@ -86,6 +86,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
 import org.geotools.util.LocalName;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.ScopedName;
+import org.geotools.util.Version;
 
 
 /**
@@ -447,7 +448,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                 c.setEdition(new SimpleInternationalString(version));
                 c.setEditionDate(date);
                 authority = (Citation) c.unmodifiable();
-                hints.put(Hints.VERSION, version);  // For getImplementationHints()
+                hints.put(Hints.VERSION, new Version(version));  // For getImplementationHints()
             } else {
                 authority = Citations.EPSG;
             }

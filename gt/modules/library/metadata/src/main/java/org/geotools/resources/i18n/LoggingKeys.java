@@ -61,6 +61,7 @@ public final class LoggingKeys {
     public static final int LOADING_DATUM_ALIASES_$1                     =    42;
     public static final int LOCALES_DISCARTED                            =    10;
     public static final int MISMATCHED_COORDINATE_OPERATION_FACTORIES_$2 =    40;
+    public static final int MISMATCHED_URN_TYPE_$1                       =    44;
     public static final int NATIVE_ACCELERATION_STATE_$2                 =    11;
     public static final int OFFSCREEN_RENDERING_FAILED_$1                =    12;
     public static final int PAINTING_LAYER_$2                            =    13;
