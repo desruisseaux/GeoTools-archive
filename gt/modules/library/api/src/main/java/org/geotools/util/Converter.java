@@ -21,21 +21,11 @@ package org.geotools.util;
  *
  * @author Justin Deoliveira, The Open Planning Project
  *
+ * @since 2.4
  */
 public interface Converter {
-    /**
-     * Determines if this converter can convert instances of one type into another.
-     *
-     * @param source The type being converted from.
-     * @param terget The type being converted to.
-     *
-     * @return <code>true</code> if the conversion can take place with the givem arguments,
-     * otherwise <code>false</code>.
-     */
-
-    //boolean canConvert(Class source, Class target);
-
-    /**
+   
+	/**
      * Converts an object to an object of another type.
      * <p>
      * If the converstion supplied is not supported this method can either throw an exception or

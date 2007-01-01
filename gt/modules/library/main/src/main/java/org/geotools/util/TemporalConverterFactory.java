@@ -1,8 +1,22 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.util;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -28,29 +42,11 @@ import org.geotools.factory.Hints;
  * to a String.
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
- *
+ * @since 2.4
  */
 public class TemporalConverterFactory implements ConverterFactory {
 
-//	/**
-//	 * Key to specify the format when converting from a Date value to a String.
-//	 */
-//	public static Hints.Key DATE_FORMAT= new Hints.Key( DateFormat.class );
-//	/**
-//	 * Key to specify the format when converting from a Caledar value to a String.
-//	 */
-//	public static Hints.Key DATETIME_FORMAT= new Hints.Key( DateFormat.class );
-	
-	
 	public Converter createConverter(Class source, Class target, Hints hints) {
-		//look for date format hint
-//		DateFormat dateFormat = null;
-//		DateFormat dateTimeFormat = null;
-//		if ( hints != null ) {
-//			dateFormat = (DateFormat) hints.get( DATE_FORMAT );
-//			dateTimeFormat = (DateFormat) hints.get( DATETIME_FORMAT );
-//		}
-		
 		
 		if ( Date.class.isAssignableFrom( source ) ) {
 			// handle all of (java.util.Date,java.sql.Timestamp,and java.sql.Time) -> java.util.Calendar 
