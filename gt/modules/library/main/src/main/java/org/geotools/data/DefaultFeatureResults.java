@@ -74,13 +74,8 @@ public class DefaultFeatureResults extends DataFeatureCollection {
             this.query = query;
         }
         else {
-            this.query = new DefaultQuery(
-                typeName,
-                query.getFilter(),
-                query.getMaxFeatures(),
-                query.getPropertyNames(),
-                query.getHandle()
-            );
+            this.query = new DefaultQuery(query);
+            ((DefaultQuery) this.query).setTypeName(typeName);
             ((DefaultQuery) this.query).setCoordinateSystem(query.getCoordinateSystem());
             ((DefaultQuery) this.query).setCoordinateSystemReproject(query.getCoordinateSystemReproject());
         }

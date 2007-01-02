@@ -179,9 +179,8 @@ public class JDBCFeatureSource implements FeatureSource {
         }
 
         if (request.getTypeName() == null) {
-            request = new DefaultQuery(featureType.getTypeName(),
-                    request.getFilter(), request.getMaxFeatures(),
-                    request.getPropertyNames(), request.getHandle());
+            request = new DefaultQuery(request);
+            ((DefaultQuery) request).setTypeName(featureType.getTypeName());
         }
         return new JDBCFeatureCollection(this, request);
     }

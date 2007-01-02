@@ -805,9 +805,8 @@ public class WFSDataStore extends AbstractDataStore {
         throws IOException {
         if ((query.getTypeName() == null)
                 || !query.getTypeName().equals(typeName)) {
-            Query q = new DefaultQuery(typeName, query.getNamespace(),
-                    query.getFilter(), query.getMaxFeatures(),
-                    query.getPropertyNames(), query.getHandle());
+            Query q = new DefaultQuery(query);
+            ((DefaultQuery) q).setTypeName(typeName);
 
             return getFeatureReader(q, Transaction.AUTO_COMMIT);
         }

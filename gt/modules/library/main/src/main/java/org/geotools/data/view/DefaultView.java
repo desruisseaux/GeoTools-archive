@@ -200,6 +200,7 @@ public class DefaultView implements FeatureSource {
             }
 
             DefaultQuery defaultQuery = new DefaultQuery(typeName, namespace, filter, maxFeatures, propNames, handle);
+            defaultQuery.setSortBy(query.getSortBy());
             return defaultQuery;
         } catch (Exception ex) {
             throw new DataSourceException(
