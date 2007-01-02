@@ -169,7 +169,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         if (!mapper.returnFIDColumnsAsAttributes()) {
             autoincrementColumns = Collections.EMPTY_SET;
             for (int i = 0; i < mapper.getColumnCount(); i++) {
-                if (!mapper.isAutoIncrement(i)) {
+                if (!(mapper.isAutoIncrement(i) && feature.getAttribute(mapper.getColumnName(i)) == null)) {
                     statementSQL.append(mapper.getColumnName(i)).append(",");
                 }
             }
@@ -186,7 +186,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
         // they may be included in the feature type as well
         for (int i = 0; i < attributeTypes.length; i++) {
             String attName = attributeTypes[i].getName();
-            if(!autoincrementColumns.contains(attName)) {
+            if(!autoincrementColumns.contains(attName) || feature.getAttribute(attName) != null) {
                 String colName = encodeColumnName(attName);
                 statementSQL.append(colName).append(",");
             }
@@ -205,7 +205,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             Object[] primaryKey = mapper.getPKAttributes(FID);
 
             for (int i = 0; i < primaryKey.length; i++) {
-                if (!mapper.isAutoIncrement(i)) {
+                if (!mapper.isAutoIncrement(i) || primaryKey[i] != null) {
                     attrValue = addQuotes(primaryKey[i]);
                     statementSQL.append(attrValue).append(",");
                 }
@@ -221,7 +221,7 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 int srid = ftInfo.getSRID(geomName);
                 attrValue = getGeometryInsertText((Geometry) attributes[i], srid);
             } else {
-                if(!autoincrementColumns.contains(attributeTypes[i].getName()))
+                if(!autoincrementColumns.contains(attributeTypes[i].getName()) || attributes[i] != null)
                     attrValue = addQuotes(attributes[i]);
             }
 
