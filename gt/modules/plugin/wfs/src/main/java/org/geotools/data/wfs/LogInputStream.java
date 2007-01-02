@@ -30,16 +30,18 @@ public class LogInputStream extends InputStream {
     private InputStream delegate;
     private Level level;
 
-    StringBuffer buffer=new StringBuffer("Input: "); 
+    StringBuffer buffer=new StringBuffer("Input: ");
+    private Logger logger; 
     
-    public LogInputStream( InputStream in, Level logLevel ) {
+    public LogInputStream( InputStream in, Logger logger, Level logLevel ) {
         this.delegate=in;
+        this.logger=logger;
         this.level=logLevel;
     }
 
     public void close() throws IOException {
         delegate.close();
-        Logger.getLogger("org.geotools.data.wfs").log(level, buffer.toString());
+        logger.log(level, buffer.toString());
         buffer=new StringBuffer("Input: ");
     }
 

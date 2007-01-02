@@ -74,7 +74,6 @@ public class ScreenMap {
         try {
             return ((pixels[index] & mask) != 0) ? true : false;
         } catch (Exception e) {
-            System.out.println("" + x + "," + y); //$NON-NLS-1$ //$NON-NLS-2$
 
             return true;
         }

@@ -24,8 +24,7 @@ package org.geotools.util;
  * @since 2.4
  */
 public interface Converter {
-   
-	/**
+    /**
      * Converts an object to an object of another type.
      * <p>
      * If the converstion supplied is not supported this method can either throw an exception or

@@ -22,7 +22,7 @@ import org.geotools.factory.Hints;
  * Factory used to create instances of {@link Converter}.
  *
  * @author Justin Deoliveira, The Open Planning Project
- * 
+ *
  * @since 2.4
  *
  */

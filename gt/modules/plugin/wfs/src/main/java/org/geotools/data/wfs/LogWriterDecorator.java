@@ -31,22 +31,24 @@ public class LogWriterDecorator extends Writer {
     private Writer delegate;
     private Level level;
 
-    StringBuffer buffer=new StringBuffer("Output: "); 
+    StringBuffer buffer=new StringBuffer("Output: ");
+    private Logger logger; 
     
-    public LogWriterDecorator( Writer w, Level logLevel ) {
+    public LogWriterDecorator( Writer w, Logger logger, Level logLevel ) {
         this.delegate=w;
         this.level=logLevel;
+        this.logger=logger;
     }
 
     public synchronized void close() throws IOException {
         delegate.close();
-        Logger.getLogger("org.geotools.data.wfs").log(level, buffer.toString());
+        logger.log(level, buffer.toString());
         buffer=new StringBuffer("Output: ");
     }
 
     public synchronized void flush() throws IOException {
         delegate.flush();
-        Logger.getLogger("org.geotools.data.wfs").log(level, buffer.toString());
+        logger.log(level, buffer.toString());
         buffer=new StringBuffer("Output: ");
     }
 

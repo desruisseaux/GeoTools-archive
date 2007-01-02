@@ -254,7 +254,11 @@ public class WFSTransactionState implements State {
         // write request
         Writer w = new OutputStreamWriter(os);
         if (Logger.getLogger("org.geotools.data.wfs").isLoggable(Level.FINE)) {
-            w = new LogWriterDecorator(w, Level.FINE);
+            w = new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.wfs"), Level.FINE);
+        }
+        // special logger for communication information only.
+        if( Logger.getLogger("org.geotools.data.communication").isLoggable(Level.INFO) ){
+            w=new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.communication"), Level.INFO);
         }
 
         DocumentWriter.writeDocument(this, WFSSchema.getInstance(), w, hints);

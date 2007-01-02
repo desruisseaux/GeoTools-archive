@@ -493,17 +493,15 @@ public class GMLComplexTypes {
         }
 
         AttributesImpl ai = new AttributesImpl();
-//        String dec;
+        String dec;
         String cs;
         String ts;
-//        dec = ".";
+        dec = ".";
         cs = ",";
         ts = " ";
-        // we're just using defauls so don't add attributes
-        // especially since it breaks map server 4.x
-//        ai.addAttribute("", "decimal", "", "string", dec);
-//        ai.addAttribute("", "cs", "", "string", cs);
-//        ai.addAttribute("", "ts", "", "string", ts);
+        ai.addAttribute("", "decimal", "", "string", dec);
+        ai.addAttribute("", "cs", "", "string", cs);
+        ai.addAttribute("", "ts", "", "string", ts);
 
         if (e == null) {
             output.startElement(GMLSchema.NAMESPACE, "coordinates", ai);
@@ -543,16 +541,15 @@ public class GMLComplexTypes {
         }
 
         AttributesImpl ai = new AttributesImpl();
-//        String dec;
+        String dec;
         String cs;
         String ts;
-//        dec = ".";
+        dec = ".";
         cs = ",";
         ts = " ";
-        // we're using defaults so don't need attributes
-//        ai.addAttribute("", "decimal", "", "string", dec);
-//        ai.addAttribute("", "cs", "", "string", cs);
-//        ai.addAttribute("", "ts", "", "string", ts);
+        ai.addAttribute("", "decimal", "", "string", dec);
+        ai.addAttribute("", "cs", "", "string", cs);
+        ai.addAttribute("", "ts", "", "string", ts);
 
         if (e == null) {
             output.startElement(GMLSchema.NAMESPACE, "coordinates", ai);
