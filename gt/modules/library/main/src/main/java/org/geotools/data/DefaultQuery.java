@@ -151,6 +151,7 @@ public class DefaultQuery implements Query {
     public DefaultQuery(Query query) {
       this(query.getTypeName(), query.getNamespace(), query.getFilter(), query.getMaxFeatures(),
           query.getPropertyNames(), query.getHandle());
+      this.sortBy = query.getSortBy();
       this.coordinateSystem = query.getCoordinateSystem();
       this.coordinateSystemReproject = query.getCoordinateSystemReproject();
     }
@@ -455,7 +456,7 @@ public class DefaultQuery implements Query {
         returnString.append("\n   [properties: ");
 
         if ((properties == null) || (properties.length == 0)) {
-            return returnString + " ALL ]";
+            returnString.append(" ALL ]");
         } else {
             for (int i = 0; i < properties.length; i++) {
                 returnString.append(properties[i]);
@@ -466,9 +467,24 @@ public class DefaultQuery implements Query {
             }
 
             returnString.append("]");
-
-            return returnString.toString();
         }
+        
+        if(sortBy != null && sortBy.length > 0) {
+        returnString.append("\n   [sort by: ");
+            for (int i = 0; i < sortBy.length; i++) {
+                returnString.append(sortBy[i].getPropertyName().getPropertyName());
+                returnString.append(" ");
+                returnString.append(sortBy[i].getSortOrder().name());
+
+                if (i < (sortBy.length - 1)) {
+                    returnString.append(", ");
+                }
+            }
+
+            returnString.append("]");
+        }
+        
+        return returnString.toString();
     }
     /**
      * getCoordinateSystem purpose.
