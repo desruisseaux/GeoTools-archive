@@ -1,0 +1,275 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ * 
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.geotools.data.postgis;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.logging.Logger;
+
+import org.geotools.data.DataSourceException;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.JDBCTransactionState;
+import org.geotools.data.jdbc.JDBCUtils;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.Feature;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.referencing.operation.TransformException;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+
+/**
+ * JDBC Transaction state that holds current revision, modified bounding box and the list of dirty
+ * feature types. On commit, these are update on the db.
+ * 
+ * @author aaime
+ * @since 2.4
+ * 
+ */
+class VersionedJdbcTransactionState extends JDBCTransactionState {
+
+    /** The logger for the postgis module. */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
+
+    private long revision;
+
+    private ReferencedEnvelope bbox;
+
+    private HashSet dirtyTypes;
+
+    private WrappedPostgisDataStore wrapped;
+
+    private Transaction transaction;
+
+    public VersionedJdbcTransactionState(Connection connection, WrappedPostgisDataStore wrapped)
+            throws IOException {
+        super(connection);
+        this.wrapped = wrapped;
+        reset();
+    }
+
+    /**
+     * Resets this state so that a new revision information is ready to be built
+     */
+    private void reset() {
+        this.revision = Long.MIN_VALUE;
+        this.bbox = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
+        this.dirtyTypes = new HashSet();
+    }
+
+    /**
+     * Returns the revision currently created during the transaction, eventually creating the
+     * changesets record if not available
+     * 
+     * @throws IOException
+     */
+    public long getRevision() throws IOException {
+        if (revision == Long.MIN_VALUE) {
+            revision = writeRevision(transaction, bbox);
+        }
+        return revision;
+    }
+
+    /**
+     * Marks the specified type name as dirty, modified during the transaction
+     * 
+     * @param typeName
+     */
+    public void setTypeNameDirty(String typeName) {
+        dirtyTypes.add(typeName);
+    }
+
+    /**
+     * Expands the current lat/lon dirty area
+     * 
+     * @param envelope
+     *            a new dirtied area, expressed in EPSG:4326 crs
+     */
+    public void expandDirtyBounds(Envelope envelope) {
+        bbox.expandToInclude(envelope);
+    }
+
+    public void setTransaction(Transaction transaction) {
+        super.setTransaction(transaction);
+        this.transaction = transaction;
+        if (transaction == null) {
+            // setup for fail fast if anyone tries to keep using this state
+            // object
+            // afer the transaction has been closed
+            bbox = null;
+            dirtyTypes = null;
+        }
+    }
+
+    public void commit() throws IOException {
+        // first, check we touched at least one versioned table
+        if (!dirtyTypes.isEmpty()) {
+            // first write down modified envelope
+            Feature f = null;
+            FeatureWriter writer = null;
+            try {
+                // build filter to extract the appropriate changeset record
+                FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+                Filter revisionFilter = ff.id(Collections.singleton(ff.featureId(String
+                        .valueOf(getRevision()))));
+
+                // get a writer for the changeset record we want to update
+                writer = wrapped.getFeatureWriter(VersionedPostgisDataStore.CHANGESETS,
+                        (org.geotools.filter.Filter) revisionFilter, transaction);
+                if (!writer.hasNext()) {
+                    // who ate my changeset record ?!?
+                    throw new IOException("Could not find the changeset record "
+                            + "that should have been set in the versioned datastore on "
+                            + "versioned jdbc state creation");
+                }
+
+                // update it
+                f = writer.next();
+                f.setDefaultGeometry(toLatLonRectange(bbox));
+                writer.write();
+            } catch (IllegalAttributeException e) {
+                // if this happens there's a programming error
+                throw new IOException("Could not set an attribute in changesets, "
+                        + "most probably the table schema has been tampered with.");
+            } finally {
+                if (writer != null)
+                    writer.close();
+            }
+
+            // then write down the modified feature types
+            Statement st = null;
+            try {
+                st = getConnection().createStatement();
+                for (Iterator it = dirtyTypes.iterator(); it.hasNext();) {
+                    String typeName = (String) it.next();
+                    execute(st, "INSERT INTO " + VersionedPostgisDataStore.TABLESCHANGED + " "
+                            + "SELECT " + revision + ", id " + "FROM "
+                            + VersionedPostgisDataStore.VERSIONEDTABLES + " WHERE SCHEMA = '"
+                            + wrapped.getConfig().getDatabaseSchemaName() + "' " + "AND NAME = '"
+                            + typeName + "'");
+                }
+            } catch (SQLException e) {
+                throw new DataSourceException(
+                        "Error occurred while trying to save modified tables for "
+                                + "this changeset. This should not happen, probaly there's a "
+                                + "bug at work here.", e);
+            } finally {
+                JDBCUtils.close(st);
+            }
+        }
+
+        // aah, all right, now we can really commit this transaction and be happy
+        super.commit();
+        // reset revision, we create a new revision for each new commit
+        reset();
+    }
+
+    public boolean isRevisionSet() {
+        return revision == Long.MIN_VALUE;
+    }
+
+    /**
+     * Takes a referenced envelope and turns it into a lat/lon Polygon
+     * 
+     * @param envelope
+     * @return
+     * @throws TransformException
+     */
+    Geometry toLatLonRectange(ReferencedEnvelope envelope) throws IOException {
+        try {
+            // since we cannot work with a null geometry in commits to
+            // changesets, let's return a very small envelope...
+            // an empty envelope gets turned into a point
+            if (envelope == null)
+                envelope = new ReferencedEnvelope(new Envelope(0, 1, 0, 1),
+                        DefaultGeographicCRS.WGS84);
+            else
+                envelope = envelope.transform(DefaultGeographicCRS.WGS84, true);
+
+            GeometryFactory gf = new GeometryFactory();
+            return gf.toGeometry(envelope);
+        } catch (Exception e) {
+            throw new DataSourceException("An error occurred while trying to builds a "
+                    + "lat/lon polygon equivalent to " + envelope, e);
+        }
+    }
+
+    /**
+     * Stores a commit message in the CHANGESETS table and return the associated revision number.
+     * TODO: this may well be moved to the {@link VersionedJdbcTransactionState} class?
+     * 
+     * @param conn
+     * @return
+     * @throws IOException
+     */
+    protected long writeRevision(Transaction t, ReferencedEnvelope bbox) throws IOException {
+        Feature f = null;
+        FeatureWriter writer = null;
+        String author = (String) t.getProperty(VersionedPostgisDataStore.AUTHOR);
+        String message = (String) t.getProperty(VersionedPostgisDataStore.MESSAGE);
+        try {
+            writer = wrapped.getFeatureWriterAppend(VersionedPostgisDataStore.CHANGESETS, t);
+            f = writer.next();
+            f.setAttribute("author", author);
+            f.setAttribute("message", message);
+            f.setAttribute("date", new Date());
+            f.setDefaultGeometry(toLatLonRectange(bbox));
+            writer.write();
+        } catch (IllegalAttributeException e) {
+            // if this happens there's a programming error
+            throw new IOException("Could not set an attribute in changesets, "
+                    + "most probably the table schema has been tampered with.");
+        } finally {
+            if (writer != null)
+                writer.close();
+        }
+
+        return Long.parseLong(f.getID());
+    }
+
+    /**
+     * Logs the sql at info level, then executes the command
+     * 
+     * @param st
+     * @param sql
+     * @throws SQLException
+     */
+    protected void execute(Statement st, String sql) throws SQLException {
+        LOGGER.fine(sql);
+        st.execute(sql);
+    }
+
+    /**
+     * Returns the transaction associated to this state
+     * 
+     * @return
+     */
+    Transaction getTransaction() {
+        return transaction;
+    }
+}
