@@ -361,12 +361,13 @@ public class QueryData implements AttributeReader, AttributeWriter {
 
     protected void finalize() throws Throwable {
         if (!isClosed()) {
-            LOGGER.severe("There's code leaving readers or writers unclosed "
+            LOGGER.severe("There's code leaving readers, writers or iterators unclosed "
                     + "(you got an unclosed QueryData object, which is usually "
                     + "held by a reader or a writer).\n"
-                    + "Call reader/writer.close() after using them to ensure "
-                    + "they do not hold state " + "such as JDCB connections.\n"
-                    + " QueryData was open against feature type: "
+                    + "Call reader/writer.close() or FeatureCollection.close(iterator) " 
+                    + "after using them to ensure "
+                    + "they do not hold state such as JDCB connections.\n"
+                    + "QueryData was open against feature type: "
                     + featureTypeInfo.getFeatureTypeName());
             close();
         }
