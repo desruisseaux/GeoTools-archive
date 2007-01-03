@@ -48,6 +48,12 @@ public class PostGISAutoIncrementFIDMapper extends AutoIncrementFIDMapper
         public PostGISAutoIncrementFIDMapper(String tableName, String colName, int dataType) {
                 super(tableName, colName, dataType);
         }
+        
+        public PostGISAutoIncrementFIDMapper(String tableName, String colName, int dataType, 
+                boolean returnFIDColumnsAsAttributes) {
+            super(tableName, colName, dataType);
+            this.returnFIDColumnsAsAttributes = returnFIDColumnsAsAttributes; 
+        }
 
         /**
          * Attempts to determine the FID after it was inserted, using three techniques:
