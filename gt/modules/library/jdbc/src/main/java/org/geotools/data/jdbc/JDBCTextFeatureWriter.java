@@ -384,9 +384,9 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
                 try {
                     result = statement.executeQuery(sql);
                     //TODO: read the result
-                    if (result != null) {
-                        System.out.println(result.toString());
-                    }
+//                    if (result != null) {
+//                        System.out.println(result.toString());
+//                    }
                     hasLock = true;
                 } catch (SQLException e) {
                     LOGGER.severe(e.getLocalizedMessage());
