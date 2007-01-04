@@ -49,9 +49,9 @@ import org.xml.sax.helpers.NamespaceSupport;
 /**
  *
  * The main sax event handler used for parsing the input document. This handler
- * maintains a stack of {@link Handler} objects. An object
- * is added to the stack when a startElement event is processed, and popped off
- * the stack when the corresponding endElement event is processed.
+ * maintains a stack of {@link Handler} objects. A handler is purshed onto the stack 
+ * when a startElement event is processed, and popped off the stack when the corresponding 
+ * endElement event is processed.
  *
  * @author Justin Deoliveira,Refractions Research Inc.,jdeolive@refractions.net
  *

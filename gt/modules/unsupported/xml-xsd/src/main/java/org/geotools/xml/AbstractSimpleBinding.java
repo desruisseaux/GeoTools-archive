@@ -15,10 +15,9 @@
  */
 package org.geotools.xml;
 
-
 /**
- * Base class for complex bindings.
- *
+ * Base class for simple bindings.
+ * 
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  *
  */

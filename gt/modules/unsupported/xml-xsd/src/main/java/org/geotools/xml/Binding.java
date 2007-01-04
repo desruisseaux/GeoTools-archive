@@ -22,10 +22,10 @@ import javax.xml.namespace.QName;
  * A specialized handler for a specific type in an xml schema.
  * <p>
  * Bindings have the following responsibilities.
- *         <ul>
- *                 <li>Parsing components from an instance document (elements and attributes)
+ *   <ul>
+ *       <li>Parsing components from an instance document (elements and attributes)
  * into model objects
- *                 <li>Encoding model objects as xml components
+ *       <li>Encoding model objects as xml components
  *  </ul>
  * </p>
  *
@@ -231,7 +231,7 @@ public interface Binding {
     static final int OVERRIDE = 2;
 
     /**
-     * @return The qualified name of the target type.
+     * @return The qualified name of the target for the binding.
      */
     QName getTarget();
     
@@ -244,9 +244,9 @@ public interface Binding {
      * @return The execution mode of the binding, one of the constants AFTER,
      * BEFORE, or OVERRIDE.
      *
-     * @see SimpleBinding#AFTER
-     * @see SimpleBinding#BEFORE
-     * @see SimpleBinding#OVERRIDE
+     * @see Binding#AFTER
+     * @see Binding#BEFORE
+     * @see Binding#OVERRIDE
      */
     int getExecutionMode();
 }
