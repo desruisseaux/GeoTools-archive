@@ -608,20 +608,32 @@ public class SQLEncoder implements org.geotools.filter.FilterVisitor2 {
 			}
 			else {
 				//convert the literal to the required type
-				Object literal = expression.evaluate( null, target );
+				//JD except for numerics, let the database do teh converstion
+				Object literal = null;
+				if ( Number.class.isAssignableFrom( target ) ) {
+					//dont convert
+				}
+				else {
+					//convert
+					literal = expression.evaluate( null, target );
+				}
+				
 				if ( literal == null ) {
 					//just use string
 					literal = expression.getLiteral().toString();
 				}
 				
 				//geometry hook
-				if ( literal instanceof Geometry ) {
+				//if ( literal instanceof Geometry ) {
+				if ( Geometry.class.isAssignableFrom( target ) ) {
 					visitLiteralGeometry( expression );
 				}
-				else if ( literal instanceof Number ) {
+				//else if ( literal instanceof Number ) {
+				else if ( Number.class.isAssignableFrom( target ) ) {
 					out.write( literal.toString() );
 				}
-				else if ( literal instanceof String ) {
+				//else if ( literal instanceof String ) {
+				else if ( String.class.isAssignableFrom( target ) ) {
 					out.write( "'" + literal.toString() + "'" );
 					return;
 				}
