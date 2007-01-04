@@ -455,7 +455,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // try to rollback to revision 4, that is, rollback last deletion
         Transaction t = createTransaction("Mambo", "Gimbo, what did you do? "
                 + "Now I have to rollback your changes!");
-        VersionedPostgisFeatureLocking fs = (VersionedPostgisFeatureLocking) ds
+        VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
         fs.setTransaction(t);
         fs.rollback("4", Filter.INCLUDE);
@@ -475,7 +475,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // try to rollback to revision 3, that is, rollback last deletion and creation
         Transaction t = createTransaction("Mambo", "Gimbo, what did you do? "
                 + "Now I have to rollback your changes!");
-        VersionedPostgisFeatureLocking fs = (VersionedPostgisFeatureLocking) ds
+        VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
         fs.setTransaction(t);
         fs.rollback("3", Filter.INCLUDE);
@@ -501,7 +501,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         // try to rollback to revision 3, that is, rollback last deletion and creation
         Transaction t = createTransaction("Mambo", "Gimbo, what did you do? "
                 + "Now I have to rollback your changes!");
-        VersionedPostgisFeatureLocking fs = (VersionedPostgisFeatureLocking) ds
+        VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
         fs.setTransaction(t);
         fs.rollback("1", Filter.INCLUDE);
@@ -518,7 +518,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
     public void testLog() throws IOException, IllegalAttributeException {
         VersionedPostgisDataStore ds = getDataStore();
         String newId = buildRiverHistory();
-        VersionedPostgisFeatureLocking fs = (VersionedPostgisFeatureLocking) ds
+        VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
 
         // get log only for newly created features
@@ -566,7 +566,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
     public void testDiff() throws IOException, IllegalAttributeException {
         VersionedPostgisDataStore ds = getDataStore();
         String newId = buildRiverHistory();
-        VersionedPostgisFeatureLocking fs = (VersionedPostgisFeatureLocking) ds
+        VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
 
         // forward, deletion changeset
@@ -599,8 +599,8 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         while (fdr.hasNext()) {
             diff = fdr.next();
             assertTrue("Unexpected id: " + diff.getID(), ids.remove(diff.getID()));
-            assertEquals("1", diff.fromVersion);
-            assertEquals("2", diff.toVersion);
+            assertEquals("1", fdr.getFromVersion());
+            assertEquals("2", fdr.getToVersion());
             assertEquals(FeatureDiff.MODIFIED, diff.state);
             if (diff.getID().equals("river.rv1")) {
                 assertEquals(2, diff.getChanges().size());
