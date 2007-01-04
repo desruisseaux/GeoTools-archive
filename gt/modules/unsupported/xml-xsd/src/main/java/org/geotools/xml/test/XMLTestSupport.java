@@ -30,9 +30,12 @@ import javax.xml.transform.stream.StreamResult;
 import junit.framework.TestCase;
 
 import org.eclipse.xsd.XSDSchema;
+import org.geotools.xml.Binding;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.DOMParser;
 import org.geotools.xml.Encoder;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.defaults.DefaultPicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -170,5 +173,24 @@ public abstract class XMLTestSupport extends TestCase {
     	tx.setOutputProperty( OutputKeys.INDENT, "yes" );
     	
     	tx.transform( new DOMSource( dom ), new StreamResult( System.out ) );
+    }
+    
+    /**
+     * Convenience method for obtaining an instance of a binding.
+     * 
+     * @param name The qualified name of the element,attribute,or type the 
+     * binding "binds" to, the key of the binding in the container.
+     * 
+     * @return The binding.
+     */
+    protected Binding binding( QName name ) {
+    	
+    	Configuration configuration = createConfiguration();
+    	
+    	MutablePicoContainer container = new DefaultPicoContainer();
+    	container = configuration.setupContext( container );
+    	container = configuration.setupBindings( container );
+    	
+    	return (Binding) container.getComponentInstance( name );
     }
 }
