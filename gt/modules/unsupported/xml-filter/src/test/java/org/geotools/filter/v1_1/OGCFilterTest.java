@@ -16,37 +16,62 @@
 package org.geotools.filter.v1_1;
 
 import junit.framework.TestCase;
-import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
+import java.io.OutputStream;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.gml3.bindings.GMLBindingConfiguration;
-import org.geotools.gml3.bindings.GMLSchemaLocationResolver;
-import org.geotools.gml3.bindings.smil.SMIL20BindingConfiguration;
-import org.geotools.gml3.bindings.smil.SMIL20SchemaLocationResolver;
-import org.geotools.xlink.bindings.XLINKSchemaLocationResolver;
-import org.geotools.xml.Configuration;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.xml.Encoder;
 import org.geotools.xml.Parser;
-import org.geotools.xs.bindings.XSBindingConfiguration;
 
 
 public class OGCFilterTest extends TestCase {
-    Parser parser;
+    public void testEncode() throws Exception {
+        FilterFactory f = CommonFactoryFinder.getFilterFactory(null);
+        Filter filter = f.equal(f.property("testString"), f.literal(2), false);
 
-    protected void setUp() throws Exception {
-        super.setUp();
+        File file = File.createTempFile("filter", "xml");
+        file.deleteOnExit();
 
-        Configuration configuration = new OGCConfiguration();
-        parser = new Parser(configuration);
+        OutputStream output = new BufferedOutputStream(new FileOutputStream(file));
+        Encoder encoder = new Encoder(new OGCConfiguration());
+
+        encoder.encode(filter, OGC.PROPERTYISEQUALTO, output);
+        output.flush();
+        output.close();
+
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        docFactory.setNamespaceAware(true);
+
+        Document doc = docFactory.newDocumentBuilder().parse(file);
+
+        assertEquals("ogc:PropertyIsEqualTo", doc.getDocumentElement().getNodeName());
+        assertEquals(1, doc.getElementsByTagName("ogc:PropertyName").getLength());
+        assertEquals(1, doc.getElementsByTagName("ogc:Literal").getLength());
+
+        Element propertyName = (Element) doc.getElementsByTagName("ogc:PropertyName").item(0);
+        Element literal = (Element) doc.getElementsByTagName("ogc:Literal").item(0);
+
+        assertEquals("testString", propertyName.getFirstChild().getNodeValue());
+        assertEquals("2", literal.getFirstChild().getNodeValue());
     }
 
-    public void testRun() throws Exception {
+    public void testParse() throws Exception {
+        Parser parser = new Parser(new OGCConfiguration());
         InputStream in = getClass().getResourceAsStream("test1.xml");
 
         if (in == null) {

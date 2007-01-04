@@ -16,9 +16,14 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Not;
+import org.opengis.filter.capability.SpatialOperator;
+import org.opengis.filter.expression.BinaryExpression;
+import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.xml.*;
 
 
@@ -71,5 +76,24 @@ public class NotBinding extends AbstractComplexBinding {
         Filter filter = (Filter) node.getChildValue(Filter.class);
 
         return filterfactory.not(filter);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Not not = (Not) object;
+
+        if (OGC.SPATIALOPS.equals(name) && not.getFilter() instanceof BinarySpatialOperator) {
+            return not.getFilter();
+        }
+
+        if (OGC.LOGICOPS.equals(name) && not.getFilter() instanceof BinaryLogicOperator) {
+            return not.getFilter();
+        }
+
+        if (OGC.COMPARISONOPS.equals(name) && not.getFilter() instanceof BinaryComparisonOperator) {
+            return not.getFilter();
+        }
+
+        return null;
     }
 }

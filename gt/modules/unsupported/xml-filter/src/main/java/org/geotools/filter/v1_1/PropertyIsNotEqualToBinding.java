@@ -51,10 +51,6 @@ public class PropertyIsNotEqualToBinding extends AbstractComplexBinding {
         return OGC.PROPERTYISNOTEQUALTO;
     }
 
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -65,6 +61,10 @@ public class PropertyIsNotEqualToBinding extends AbstractComplexBinding {
         return PropertyIsNotEqualTo.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -73,7 +73,8 @@ public class PropertyIsNotEqualToBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
+        Expression e1 = (Expression) node.getChildValue(0);
+        Expression e2 = (Expression) node.getChildValue(1);
 
         //&lt;xsd:attribute default="true" name="matchCase" type="xsd:boolean" use="optional"/&gt;
         Boolean matchCase = Boolean.TRUE;
@@ -82,6 +83,6 @@ public class PropertyIsNotEqualToBinding extends AbstractComplexBinding {
             matchCase = (Boolean) node.getAttributeValue("matchCase");
         }
 
-        return filterfactory.notEqual(operands[0], operands[1], matchCase.booleanValue());
+        return filterfactory.notEqual(e1, e2, matchCase.booleanValue());
     }
 }

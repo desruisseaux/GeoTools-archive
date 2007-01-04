@@ -113,8 +113,8 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         container.registerComponentImplementation(OGC.SPATIALOPERATORTYPE,
             SpatialOperatorTypeBinding.class);
         //container.registerComponentImplementation(OGC.SPATIALOPSTYPE,SpatialOpsTypeBinding.class);
-        container.registerComponentImplementation(OGC.UNARYLOGICOPTYPE,
-            UnaryLogicOpTypeBinding.class);
+        //container.registerComponentImplementation(OGC.UNARYLOGICOPTYPE,
+        //    UnaryLogicOpTypeBinding.class);
         container.registerComponentImplementation(OGC.UPPERBOUNDARYTYPE,
             OGCUpperBoundaryTypeBinding.class);
 
@@ -138,8 +138,8 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
         //container.registerComponentImplementation(OGC.FILTER,FilterBinding.class);
         container.registerComponentImplementation(OGC.FILTER_CAPABILITIES,
             Filter_CapabilitiesBinding.class);
-        container.registerComponentImplementation(OGC.FUNCTION, FunctionBinding.class);
-        container.registerComponentImplementation(OGC.GMLOBJECTID, GmlObjectIdBinding.class);
+        //container.registerComponentImplementation(OGC.FUNCTION, FunctionBinding.class);
+        //container.registerComponentImplementation(OGC.GMLOBJECTID, GmlObjectIdBinding.class);
         container.registerComponentImplementation(OGC.INTERSECTS, IntersectsBinding.class);
         //container.registerComponentImplementation(OGC.LITERAL,LiteralBinding.class);
         container.registerComponentImplementation(OGC.LOGICALOPERATORS,
@@ -160,7 +160,7 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
             PropertyIsLessThanBinding.class);
         container.registerComponentImplementation(OGC.PROPERTYISLESSTHANOREQUALTO,
             PropertyIsLessThanOrEqualToBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISLIKE, PropertyIsLikeBinding.class);
+        //container.registerComponentImplementation(OGC.PROPERTYISLIKE, PropertyIsLikeBinding.class);
         container.registerComponentImplementation(OGC.PROPERTYISNOTEQUALTO,
             PropertyIsNotEqualToBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISNULL,PropertyIsNullBinding.class);

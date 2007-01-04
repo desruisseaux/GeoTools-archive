@@ -20,6 +20,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.DistanceBufferOperator;
 import org.geotools.xml.*;
 
 
@@ -61,10 +62,6 @@ public class DistanceBufferTypeBinding extends AbstractComplexBinding {
         return OGC.DISTANCEBUFFERTYPE;
     }
 
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -72,7 +69,7 @@ public class DistanceBufferTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Expression[].class;
+        return DistanceBufferOperator.class;
     }
 
     /**
@@ -83,12 +80,23 @@ public class DistanceBufferTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        PropertyName name = (PropertyName) node.getChildValue(PropertyName.class);
-        Geometry geometry = (Geometry) node.getChildValue(Geometry.class);
-        Double distance = (Double) node.getChildValue(Double.class);
+        return null;
+    }
 
-        return new Expression[] {
-            name, filterfactory.literal(geometry), filterfactory.literal(distance)
-        };
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        DistanceBufferOperator operator = (DistanceBufferOperator) object;
+        Object property = OGCUtils.property(operator.getExpression1(), operator.getExpression2(),
+                name);
+
+        if (property != null) {
+            return property;
+        }
+
+        if ("Distance".equals(name.getLocalPart())) {
+            return new Double(operator.getDistance());
+        }
+
+        return null;
     }
 }

@@ -15,9 +15,15 @@
  */
 package org.geotools.filter.v1_1;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.xml.namespace.QName;
+import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.xml.*;
 
 
@@ -66,7 +72,7 @@ public class BinaryLogicOpTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Filter[].class;
+        return BinaryLogicOperator.class;
     }
 
     /**
@@ -77,9 +83,61 @@ public class BinaryLogicOpTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Filter f1 = (Filter) node.getChildValue(0);
-        Filter f2 = (Filter) node.getChildValue(1);
+        return null;
+    }
 
-        return new Filter[] { f1, f2 };
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        BinaryLogicOperator operator = (BinaryLogicOperator) object;
+
+        if (OGC.COMPARISONOPS.equals(name)) {
+            List comparison = new ArrayList();
+
+            for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
+                Filter filter = (Filter) f.next();
+
+                if (filter instanceof BinaryComparisonOperator) {
+                    comparison.add(filter);
+                }
+            }
+
+            if (!comparison.isEmpty()) {
+                return comparison;
+            }
+        }
+
+        if (OGC.SPATIALOPS.equals(name)) {
+            List spatial = new ArrayList();
+
+            for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
+                Filter filter = (Filter) f.next();
+
+                if (filter instanceof BinarySpatialOperator) {
+                    spatial.add(filter);
+                }
+            }
+
+            if (!spatial.isEmpty()) {
+                return spatial;
+            }
+        }
+
+        if (OGC.LOGICOPS.equals(name)) {
+            List logic = new ArrayList();
+
+            for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
+                Filter filter = (Filter) f.next();
+
+                if (filter instanceof BinaryLogicOperator) {
+                    logic.add(filter);
+                }
+            }
+
+            if (!logic.isEmpty()) {
+                return logic;
+            }
+        }
+
+        return null;
     }
 }

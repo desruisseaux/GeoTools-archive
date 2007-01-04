@@ -16,10 +16,10 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.filter.FilterFactory;
 import org.geotools.xml.*;
 
 

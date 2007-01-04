@@ -72,8 +72,7 @@ public class MulBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
-
-        return filterfactory.multiply(operands[0], operands[1]);
+        return filterfactory.multiply((Expression) node.getChildValue(0),
+            (Expression) node.getChildValue(1));
     }
 }

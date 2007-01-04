@@ -16,6 +16,8 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Disjoint;
 import org.geotools.filter.FilterFactory;
@@ -37,10 +39,12 @@ import org.geotools.xml.*;
  * @generated
  */
 public class DisjointBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+    FilterFactory2 filterFactory;
+    GeometryFactory geometryFactory;
 
-    public DisjointBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public DisjointBinding(FilterFactory2 filterFactory, GeometryFactory geometryFactory) {
+        this.filterFactory = filterFactory;
+        this.geometryFactory = geometryFactory;
     }
 
     /**
@@ -48,10 +52,6 @@ public class DisjointBinding extends AbstractComplexBinding {
      */
     public QName getTarget() {
         return OGC.DISJOINT;
-    }
-
-    public int getExecutionMode() {
-        return AFTER;
     }
 
     /**
@@ -64,6 +64,10 @@ public class DisjointBinding extends AbstractComplexBinding {
         return Disjoint.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -72,8 +76,8 @@ public class DisjointBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
+        Expression[] operands = OGCUtils.spatial(node, filterFactory, geometryFactory);
 
-        return filterfactory.disjoint(operands[0], operands[1]);
+        return filterFactory.disjoint(operands[0], operands[1]);
     }
 }

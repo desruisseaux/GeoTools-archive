@@ -16,15 +16,15 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.xml.*;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.geotools.gml3.bindings.GML;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -54,14 +54,6 @@ import org.geotools.xml.*;
  * @generated
  */
 public class BinarySpatialOpTypeBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
-    GeometryFactory geometryFactory;
-
-    public BinarySpatialOpTypeBinding(FilterFactory filterfactory, GeometryFactory geometryFactory) {
-        this.filterfactory = filterfactory;
-        this.geometryFactory = geometryFactory;
-    }
-
     /**
      * @generated
      */
@@ -76,7 +68,7 @@ public class BinarySpatialOpTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Expression[].class;
+        return BinarySpatialOperator.class;
     }
 
     /**
@@ -87,27 +79,13 @@ public class BinarySpatialOpTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        PropertyName name = (PropertyName) node.getChildValue(PropertyName.class);
-        Expression spatial = null;
+        return null;
+    }
 
-        if (node.hasChild(Geometry.class)) {
-            spatial = filterfactory.literal(node.getChildValue(Geometry.class));
-        } else if (node.hasChild(Envelope.class)) {
-            //JD: creating an envelope here would break a lot of our code, for instance alot of 
-            // code that encodes a filter into sql will choke on this
-            Envelope envelope = (Envelope) node.getChildValue(Envelope.class);
-            Polygon polygon = geometryFactory.createPolygon(geometryFactory.createLinearRing(
-                        new Coordinate[] {
-                            new Coordinate(envelope.getMinX(), envelope.getMinY()),
-                            new Coordinate(envelope.getMaxX(), envelope.getMinY()),
-                            new Coordinate(envelope.getMaxX(), envelope.getMaxY()),
-                            new Coordinate(envelope.getMinX(), envelope.getMaxY()),
-                            new Coordinate(envelope.getMinX(), envelope.getMinY())
-                        }), null);
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        BinarySpatialOperator operator = (BinarySpatialOperator) object;
 
-            spatial = filterfactory.literal(polygon);
-        }
-
-        return new Expression[] { name, spatial };
+        return OGCUtils.property(operator.getExpression1(), operator.getExpression2(), name);
     }
 }

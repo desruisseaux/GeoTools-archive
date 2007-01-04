@@ -16,9 +16,10 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.DWithin;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.Filters;
 import org.geotools.xml.*;
 
@@ -38,10 +39,12 @@ import org.geotools.xml.*;
  * @generated
  */
 public class DWithinBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+    FilterFactory2 filterFactory;
+    GeometryFactory geometryFactory;
 
-    public DWithinBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public DWithinBinding(FilterFactory2 filterFactory, GeometryFactory geometryFactory) {
+        this.filterFactory = filterFactory;
+        this.geometryFactory = geometryFactory;
     }
 
     /**
@@ -49,10 +52,6 @@ public class DWithinBinding extends AbstractComplexBinding {
      */
     public QName getTarget() {
         return OGC.DWITHIN;
-    }
-
-    public int getExecutionMode() {
-        return AFTER;
     }
 
     /**
@@ -65,6 +64,10 @@ public class DWithinBinding extends AbstractComplexBinding {
         return DWithin.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -74,9 +77,9 @@ public class DWithinBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         //TODO: units
-        Expression[] operands = (Expression[]) value;
-        double distance = Filters.asDouble(operands[2]);
+        Expression[] operands = OGCUtils.spatial(node, filterFactory, geometryFactory);
+        double distance = ((Double) node.getChildValue("Distance")).doubleValue();
 
-        return filterfactory.dwithin(operands[0], operands[1], distance, null);
+        return filterFactory.dwithin(operands[0], operands[1], distance, null);
     }
 }

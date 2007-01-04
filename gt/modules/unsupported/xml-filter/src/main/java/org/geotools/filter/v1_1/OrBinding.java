@@ -50,10 +50,6 @@ public class OrBinding extends AbstractComplexBinding {
         return OGC.OR;
     }
 
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -64,6 +60,10 @@ public class OrBinding extends AbstractComplexBinding {
         return Or.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -72,8 +72,6 @@ public class OrBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Filter[] operands = (Filter[]) value;
-
-        return filterfactory.or(operands[0], operands[1]);
+        return filterfactory.or(node.getChildValues(Filter.class));
     }
 }

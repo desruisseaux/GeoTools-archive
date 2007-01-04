@@ -16,6 +16,7 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
 import org.geotools.xml.*;
@@ -66,7 +67,7 @@ public class BinaryComparisonOpTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Expression[].class;
+        return BinaryComparisonOperator.class;
     }
 
     /**
@@ -77,9 +78,24 @@ public class BinaryComparisonOpTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression e1 = (Expression) node.getChildValue(0);
-        Expression e2 = (Expression) node.getChildValue(1);
+        //implemented by comcreate elements;
+        return null;
+    }
 
-        return new Expression[] { e1, e2 };
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (OGC.EXPRESSION.equals(name)) {
+            BinaryComparisonOperator op = (BinaryComparisonOperator) object;
+
+            return new Expression[] { op.getExpression1(), op.getExpression2() };
+        }
+
+        if ("matchCase".equals(name.getLocalPart())) {
+            BinaryComparisonOperator op = (BinaryComparisonOperator) object;
+
+            return Boolean.valueOf(op.isMatchingCase());
+        }
+
+        return null;
     }
 }

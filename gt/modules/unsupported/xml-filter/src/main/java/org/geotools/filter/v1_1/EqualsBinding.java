@@ -16,6 +16,8 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Equals;
 import org.geotools.filter.FilterFactory;
@@ -37,10 +39,12 @@ import org.geotools.xml.*;
  * @generated
  */
 public class EqualsBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+    FilterFactory2 filterFactory;
+    GeometryFactory geometryFactory;
 
-    public EqualsBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public EqualsBinding(FilterFactory2 filterFactory, GeometryFactory geometryFactory) {
+        this.filterFactory = filterFactory;
+        this.geometryFactory = geometryFactory;
     }
 
     /**
@@ -72,8 +76,8 @@ public class EqualsBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
+        Expression[] operands = OGCUtils.spatial(node, filterFactory, geometryFactory);
 
-        return filterfactory.equal(operands[0], operands[1]);
+        return filterFactory.equal(operands[0], operands[1]);
     }
 }

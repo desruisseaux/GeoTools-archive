@@ -76,4 +76,15 @@ public class GmlObjectIdTypeBinding extends AbstractComplexBinding {
         //&lt;xsd:attribute ref="gml:id" use="required"/&gt;
         return filterfactory.gmlObjectId((String) node.getAttributeValue("id"));
     }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if ("id".equals(name.getLocalPart())) {
+            GmlObjectId id = (GmlObjectId) object;
+
+            return id.getID();
+        }
+
+        return null;
+    }
 }

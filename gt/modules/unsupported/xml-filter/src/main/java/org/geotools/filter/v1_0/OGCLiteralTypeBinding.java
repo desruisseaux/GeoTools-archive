@@ -107,33 +107,16 @@ public class OGCLiteralTypeBinding extends AbstractComplexBinding {
         }
 
         //2. no child elements, just return the text if any
-        // first try to convert to a differnt format, numeric
-        return factory.literal(convert(value));
+        return factory.literal(value);
     }
 
-    Object convert(Object value) {
-        if (value == null) {
-            return value;
-        }
+    public Element encode(Object object, Document document, Element value)
+        throws Exception {
+        //TODO: use converter api to sreialize?
+        Literal literal = (Literal) object;
 
-        if (value instanceof String) {
-            String string = (String) value;
-
-            //first try integer
-            try {
-                int number = Integer.parseInt(string);
-
-                return new Integer(number);
-            } catch (NumberFormatException ex) {
-            }
-
-            //next try double
-            try {
-                double number = Double.parseDouble(string);
-
-                return new Double(number);
-            } catch (NumberFormatException ex) {
-            }
+        if (literal.getValue() != null) {
+            value.appendChild(document.createTextNode(literal.getValue().toString()));
         }
 
         return value;

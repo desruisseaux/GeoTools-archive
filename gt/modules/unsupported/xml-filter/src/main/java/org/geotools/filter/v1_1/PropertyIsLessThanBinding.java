@@ -51,10 +51,6 @@ public class PropertyIsLessThanBinding extends AbstractComplexBinding {
         return OGC.PROPERTYISLESSTHAN;
     }
 
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -65,6 +61,10 @@ public class PropertyIsLessThanBinding extends AbstractComplexBinding {
         return PropertyIsLessThan.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -73,8 +73,9 @@ public class PropertyIsLessThanBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
+        Expression e1 = (Expression) node.getChildValue(0);
+        Expression e2 = (Expression) node.getChildValue(1);
 
-        return filterfactory.less(operands[0], operands[1]);
+        return filterfactory.less(e1, e2);
     }
 }

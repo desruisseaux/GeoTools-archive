@@ -50,10 +50,6 @@ public class AndBinding extends AbstractComplexBinding {
         return OGC.AND;
     }
 
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -64,6 +60,10 @@ public class AndBinding extends AbstractComplexBinding {
         return And.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -72,8 +72,6 @@ public class AndBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Filter[] operands = (Filter[]) value;
-
-        return filterfactory.and(operands[0], operands[1]);
+        return filterfactory.and(node.getChildValues(Filter.class));
     }
 }

@@ -106,6 +106,14 @@
     </dependency>    
   </dependencies>
 
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <!-- =========================================================== -->
   <!--     Build Configuration                                     -->
@@ -124,6 +132,38 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.geotools.maven</groupId>
+        <artifactId>gt2-xmlcodegen</artifactId>
+        <configuration>
+          <schemaLocation>filter.xsd</schemaLocation>
+          <schemaSourceDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-filter/src/main/resources/org/geotools/filter/v1_1/</schemaSourceDirectory>
+          <schemaLookupDirectories>
+            <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-xsd/src/main/resources/org/geotools/xlink/bindings/</schemaLookupDirectory>
+            <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-gml3/src/main/resources/org/geotools/gml3/bindings/</schemaLookupDirectory>
+            <schemaLookupDirectory>/home/jdeolive/devel/geotools/trunk/modules/unsupported/xml-gml3/src/main/resources/org/geotools/gml3/bindings/smil</schemaLookupDirectory>
+          </schemaLookupDirectories>
+          <generateConfiguration>false</generateConfiguration>
+          <generateBindingConfiguration>false</generateBindingConfiguration>
+          <generateBindingInterface>false</generateBindingInterface>
+          <generateSchemaLocationResolver>false</generateSchemaLocationResolver>
+          <includes>
+            <include>FilterType</include>
+          </includes>
+        </configuration>
+      </plugin>
+			<plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 

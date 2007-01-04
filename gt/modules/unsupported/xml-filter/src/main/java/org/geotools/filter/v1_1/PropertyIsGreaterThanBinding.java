@@ -51,10 +51,6 @@ public class PropertyIsGreaterThanBinding extends AbstractComplexBinding {
         return OGC.PROPERTYISGREATERTHAN;
     }
 
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -65,6 +61,10 @@ public class PropertyIsGreaterThanBinding extends AbstractComplexBinding {
         return PropertyIsGreaterThan.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -73,8 +73,9 @@ public class PropertyIsGreaterThanBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
+        Expression e1 = (Expression) node.getChildValue(0);
+        Expression e2 = (Expression) node.getChildValue(1);
 
-        return filterfactory.greater(operands[0], operands[1]);
+        return filterfactory.greater(e1, e2);
     }
 }

@@ -16,6 +16,8 @@
 package org.geotools.filter.v1_0;
 
 import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
@@ -99,5 +101,16 @@ public class OGCPropertyNameTypeBinding extends AbstractComplexBinding {
         String xpath = Filters.asString(expression);
 
         return factory.property(xpath);
+    }
+
+    public Element encode(Object object, Document document, Element value)
+        throws Exception {
+        PropertyName propertyName = (PropertyName) object;
+
+        if (propertyName.getPropertyName() != null) {
+            value.appendChild(document.createTextNode(propertyName.getPropertyName()));
+        }
+
+        return value;
     }
 }

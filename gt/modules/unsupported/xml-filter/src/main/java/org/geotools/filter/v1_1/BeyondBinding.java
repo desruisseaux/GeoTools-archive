@@ -16,9 +16,11 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Beyond;
-import org.geotools.filter.FilterFactory;
 import org.geotools.filter.Filters;
 import org.geotools.xml.*;
 
@@ -38,10 +40,12 @@ import org.geotools.xml.*;
  * @generated
  */
 public class BeyondBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+    FilterFactory2 filterFactory;
+    GeometryFactory geometryFactory;
 
-    public BeyondBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public BeyondBinding(FilterFactory2 filterFactory, GeometryFactory geometryFactory) {
+        this.filterFactory = filterFactory;
+        this.geometryFactory = geometryFactory;
     }
 
     /**
@@ -49,10 +53,6 @@ public class BeyondBinding extends AbstractComplexBinding {
      */
     public QName getTarget() {
         return OGC.BEYOND;
-    }
-
-    public int getExecutionMode() {
-        return AFTER;
     }
 
     /**
@@ -65,6 +65,10 @@ public class BeyondBinding extends AbstractComplexBinding {
         return Beyond.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -74,9 +78,9 @@ public class BeyondBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         //TODO: units
-        Expression[] operands = (Expression[]) value;
-        double distance = Filters.asDouble(operands[2]);
+        Expression[] operands = OGCUtils.spatial(node, filterFactory, geometryFactory);
+        double distance = ((Double) node.getChildValue(Double.class)).doubleValue();
 
-        return filterfactory.beyond(operands[0], operands[1], distance, null);
+        return filterFactory.beyond(operands[0], operands[1], distance, null);
     }
 }

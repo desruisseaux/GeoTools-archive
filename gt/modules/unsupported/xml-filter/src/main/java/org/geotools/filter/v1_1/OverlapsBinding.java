@@ -16,10 +16,13 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Overlaps;
-import org.geotools.filter.FilterFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -37,10 +40,12 @@ import org.geotools.xml.*;
  * @generated
  */
 public class OverlapsBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+    FilterFactory2 filterFactory;
+    GeometryFactory geometryFactory;
 
-    public OverlapsBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public OverlapsBinding(FilterFactory2 filterFactory, GeometryFactory geometryFactory) {
+        this.filterFactory = filterFactory;
+        this.geometryFactory = geometryFactory;
     }
 
     /**
@@ -48,10 +53,6 @@ public class OverlapsBinding extends AbstractComplexBinding {
      */
     public QName getTarget() {
         return OGC.OVERLAPS;
-    }
-
-    public int getExecutionMode() {
-        return AFTER;
     }
 
     /**
@@ -64,6 +65,10 @@ public class OverlapsBinding extends AbstractComplexBinding {
         return Overlaps.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -72,8 +77,8 @@ public class OverlapsBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
+        Expression[] operands = OGCUtils.spatial(node, filterFactory, geometryFactory);
 
-        return filterfactory.overlaps(operands[0], operands[1]);
+        return filterFactory.overlaps(operands[0], operands[1]);
     }
 }

@@ -16,10 +16,13 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Intersects;
-import org.geotools.filter.FilterFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -37,10 +40,12 @@ import org.geotools.xml.*;
  * @generated
  */
 public class IntersectsBinding extends AbstractComplexBinding {
-    FilterFactory filterfactory;
+    FilterFactory2 filterFactory;
+    GeometryFactory geometryFactory;
 
-    public IntersectsBinding(FilterFactory filterfactory) {
-        this.filterfactory = filterfactory;
+    public IntersectsBinding(FilterFactory2 filterFactory, GeometryFactory geometryFactory) {
+        this.filterFactory = filterFactory;
+        this.geometryFactory = geometryFactory;
     }
 
     /**
@@ -48,10 +53,6 @@ public class IntersectsBinding extends AbstractComplexBinding {
      */
     public QName getTarget() {
         return OGC.INTERSECTS;
-    }
-
-    public int getExecutionMode() {
-        return AFTER;
     }
 
     /**
@@ -64,6 +65,10 @@ public class IntersectsBinding extends AbstractComplexBinding {
         return Intersects.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -72,8 +77,8 @@ public class IntersectsBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
+        Expression[] operands = OGCUtils.spatial(node, filterFactory, geometryFactory);
 
-        return filterfactory.intersects(operands[0], operands[1]);
+        return filterFactory.intersects(operands[0], operands[1]);
     }
 }

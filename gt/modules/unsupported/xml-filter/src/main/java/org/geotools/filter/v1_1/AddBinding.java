@@ -50,10 +50,6 @@ public class AddBinding extends AbstractComplexBinding {
         return OGC.ADD;
     }
 
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -64,6 +60,10 @@ public class AddBinding extends AbstractComplexBinding {
         return Add.class;
     }
 
+    public int getExecutionMode() {
+        return AFTER;
+    }
+
     /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -72,8 +72,7 @@ public class AddBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Expression[] operands = (Expression[]) value;
-
-        return filterfactory.add(operands[0], operands[1]);
+        return filterfactory.add((Expression) node.getChildValue(0),
+            (Expression) node.getChildValue(1));
     }
 }
