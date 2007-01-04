@@ -44,10 +44,6 @@ public class FeatureDiffReader {
 
     private String toVersion;
 
-    private Feature fvFeature;
-
-    private Feature tvFeature;
-
     private FeatureReader deletedReader;
 
     private FeatureReader createdReader;
@@ -69,6 +65,24 @@ public class FeatureDiffReader {
         this.deletedReader = deletedReader;
         this.fvReader = fvReader;
         this.tvReader = tvReader;
+    }
+
+    /**
+     * The first version used to compute the difference
+     * 
+     * @return
+     */
+    public String getFromVersion() {
+        return fromVersion;
+    }
+
+    /**
+     * The second version used to computed the difference
+     * 
+     * @return
+     */
+    public String getToVersion() {
+        return toVersion;
     }
 
     /**
@@ -97,12 +111,12 @@ public class FeatureDiffReader {
                     changes.put(attName, f.getAttribute(attName));
                 }
                 String id = mapper.getUnversionedFid(f.getID());
-                return new FeatureDiff(id, fromVersion, toVersion, FeatureDiff.CREATED, changes);
+                return new FeatureDiff(id, FeatureDiff.CREATED, changes);
             } else if (deletedReader != null) {
                 // no changes, we just need the id
                 Feature f = deletedReader.next();
                 String id = mapper.getUnversionedFid(f.getID());
-                return new FeatureDiff(id, fromVersion, toVersion, FeatureDiff.DELETED, null);
+                return new FeatureDiff(id, FeatureDiff.DELETED, null);
             } else {
                 FeatureDiff diff = lastDiff;
                 lastDiff = null;
@@ -146,7 +160,7 @@ public class FeatureDiffReader {
             // this is harder... we may have features that have changed between fromVersion and
             // toVersion, but which are equal in those two (typical case, rollback). So we really
             // need to compute the diff and move forward if there's no difference at all
-            if(lastDiff != null)
+            if (lastDiff != null)
                 return true;
             if (fvReader != null && tvReader != null) {
                 while (true) {
@@ -170,8 +184,7 @@ public class FeatureDiffReader {
                     }
                     if (!changes.isEmpty()) {
                         String id = mapper.getUnversionedFid(from.getID());
-                        lastDiff = new FeatureDiff(id, fromVersion, toVersion,
-                                FeatureDiff.MODIFIED, changes);
+                        lastDiff = new FeatureDiff(id, FeatureDiff.MODIFIED, changes);
                         return true;
                     }
                 }

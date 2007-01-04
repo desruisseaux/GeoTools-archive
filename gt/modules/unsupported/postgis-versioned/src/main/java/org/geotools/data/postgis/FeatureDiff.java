@@ -43,10 +43,6 @@ public class FeatureDiff {
 
     String ID;
 
-    String fromVersion;
-
-    String toVersion;
-
     int state;
 
     Map changes;
@@ -60,11 +56,9 @@ public class FeatureDiff {
      * @param state
      * @param changes
      */
-    FeatureDiff(String ID, String fromVersion, String toVersion, int state, Map changes) {
+    FeatureDiff(String ID, int state, Map changes) {
         super();
         this.ID = ID;
-        this.fromVersion = fromVersion;
-        this.toVersion = toVersion;
         this.state = state;
         if (state == MODIFIED || state == CREATED)
             this.changes = Collections.unmodifiableMap(changes);
@@ -77,16 +71,6 @@ public class FeatureDiff {
      */
     public Map getChanges() {
         return changes;
-    }
-
-    /**
-     * The start version used to compute the difference (not null only if the state is
-     * {@link #MODIFIED})
-     * 
-     * @return
-     */
-    public String getFromVersion() {
-        return fromVersion;
     }
 
     /**
@@ -110,10 +94,6 @@ public class FeatureDiff {
      */
     public int getState() {
         return state;
-    }
-
-    public String getToVersion() {
-        return toVersion;
     }
 
 }
