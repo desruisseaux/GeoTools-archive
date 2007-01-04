@@ -48,7 +48,7 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
      * This just splits fid filters from non-fid filters.  The {@link StrictFeatureReader} is what does the rest of the 
      * compliance to high compliance.
      */
-    private static final Integer COMPLIANCE_LEVEL = XMLHandlerHints.VALUE_FILTER_COMPLIANCE_MEDIUM;
+    protected static final Integer COMPLIANCE_LEVEL = XMLHandlerHints.VALUE_FILTER_COMPLIANCE_MEDIUM;
 
     public StrictWFSStrategy(WFSDataStore store) {
         super(store);
@@ -76,16 +76,20 @@ class StrictWFSStrategy extends NonStrictWFSStrategy {
      *  
      * @author Jesse
      */
-    private class StrictFeatureReader implements FeatureReader{
+    protected class StrictFeatureReader implements FeatureReader{
 
         private FeatureReader delegate;
-        private Filter filter;
-        private final Query query;
+        protected Filter filter;
+        private Query query;
         private Transaction transaction;
         private Set foundFids=new HashSet();
         private Feature next;
 
         public StrictFeatureReader(Transaction transaction, Query query, Integer level) throws IOException {
+            init(transaction, query, level);
+        }
+
+        protected void init( Transaction transaction, Query query, Integer level ) throws IOException {
             FilterEncodingPreProcessor visitor = new FilterEncodingPreProcessor(level);
             Filters.accept( query.getFilter(), visitor );
             

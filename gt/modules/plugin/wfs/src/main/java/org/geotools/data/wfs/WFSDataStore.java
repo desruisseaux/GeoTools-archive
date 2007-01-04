@@ -83,6 +83,7 @@ import org.geotools.xml.schema.Element;
 import org.geotools.xml.schema.Schema;
 import org.geotools.xml.wfs.WFSSchema;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -186,7 +187,13 @@ public class WFSDataStore extends AbstractDataStore {
         this.bufferSize = buffer;
         this.tryGZIP=tryGZIP;
         findCapabilities(host);
-        strategy=new StrictWFSStrategy(this);
+        determineCorrectStrategy(host);
+    }
+    private void determineCorrectStrategy(URL host) {
+        if( host.toString().matches("mapserv") )
+            strategy=new MapServerWFSStrategy(this);
+        else
+            strategy=new StrictWFSStrategy(this);
     }
     
     private void findCapabilities(URL host) throws SAXException, IOException {
@@ -626,7 +633,7 @@ public class WFSDataStore extends AbstractDataStore {
             featureType=schema.delegate;
         }
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), true));
+                timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), lenient));
 
 
         if (!featureType.equals(ft.getFeatureType())) {
@@ -791,7 +798,7 @@ public class WFSDataStore extends AbstractDataStore {
         }
 
         WFSFeatureReader ft = WFSFeatureReader.getFeatureReader(is, bufferSize,
-                timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), true));
+                timeout, ts, new WFSFeatureType(schema.delegate, schema.getSchemaURI(), lenient));
 
         if (!featureType.equals(ft.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
@@ -836,7 +843,7 @@ public class WFSDataStore extends AbstractDataStore {
 
         List fts = capabilities.getFeatureTypes(); // FeatureSetDescription
         Iterator i = fts.iterator();
-        String queryName = query.getTypeName().substring(query.getTypeName()
+        String desiredType = query.getTypeName().substring(query.getTypeName()
                                                               .indexOf(":") + 1);
 
         while (i.hasNext()) {
@@ -846,9 +853,20 @@ public class WFSDataStore extends AbstractDataStore {
                                                                                   .indexOf(":")
                     + 1);
 
-            if (queryName.equals(fsdName)) {
+            if (desiredType.equals(fsdName)) {
                 Envelope env = fsd.getLatLongBoundingBox();
-                return new ReferencedEnvelope(env,DefaultGeographicCRS.WGS84);
+                
+                ReferencedEnvelope referencedEnvelope = new ReferencedEnvelope(env,DefaultGeographicCRS.WGS84);
+                
+                try {
+                    return referencedEnvelope.transform(CRS.decode(fsd.getSRS()), true);
+                } catch (NoSuchAuthorityCodeException e) {
+                    return referencedEnvelope;
+                } catch (TransformException e) {
+                    return referencedEnvelope;
+                } catch (FactoryException e) {
+                    return referencedEnvelope;
+                }
             }
         }
 
