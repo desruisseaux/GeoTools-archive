@@ -91,6 +91,8 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
     public long getRevision() throws IOException {
         if (revision == Long.MIN_VALUE) {
             revision = writeRevision(transaction, bbox);
+            transaction.putProperty(VersionedPostgisDataStore.REVISION, new Long(revision));
+            transaction.putProperty(VersionedPostgisDataStore.VERSION, String.valueOf(revision));
         }
         return revision;
     }
