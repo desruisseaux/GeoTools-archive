@@ -51,8 +51,46 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
- * Xml Encoder, taking objects and encoding them as xml.
+ * Encodes objects as xml based on a schema.
+ * <p>
+ * The function of the encoder is to traverse a tree of objects seializing them 
+ * out as xml as it goes. Navigation and serialization of the tree is performed by 
+ * instances of {@link org.geotools.xml.Binding} which are bound to types in the 
+ * schema.
+ * </p>
+ * <br>
+ * <p>
+ * To execute the encoder, one must have 3 bits of information:
+ * <ol>
+ * 	<li>The root object in the tree to be encoded
+ * 	<li>The schema / configuration of the intsance document being encoded.
+ * 	<li>A name of the element defined in the schema which corresponds to the 
+ * 	root object in the tree.
+ * </ol>
+ * </p>
+ * <br>
+ * <p>
+ * As an exmaple, consider the encoding of a {@link org.opengis.filter.Filter} 
+ * instance.
+ * <pre>
+ * 	<code>
+ *  //instantiate hte configuration for the filter schmea
+ *  Configuration configuration = new OGCConfiguration();
+ *  
+ *  //create the encoder
+ *  Encoder encoder = new Encoder( configuration );
+ *  
+ *  //get a filter
+ *  Filter filter = ...;
  * 
+ *  //get the name of the 'filter' element in the schema
+ *  QName name = new QName( "http://www.opengis.net/ogc", "Filter" );
+ *  
+ *  //encode
+ *  encoder.encode( filter, name ); 
+ * 	</code>
+ * </pre>
+ * </p>
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
@@ -88,6 +126,25 @@ public class Encoder {
 	 */
 	private Logger logger;
 	
+	/**
+	 * Creates an encoder from a configuration.
+	 * <p>
+	 * This constructor calls through to {@link #Encoder(Configuration, XSDSchema)}
+	 * obtaining the schema instance from {@link Configuration#schema()}.
+	 * </p>
+	 * @param configuration The encoder configuration.
+	 */
+	public Encoder(Configuration configuration) {
+		this( configuration, configuration.schema() );
+	}
+	
+	/**
+	 * Creates an encoder from a configuration and a specific schema 
+	 * instance.
+	 * 
+	 * @param configuration The encoder configuration.
+	 * @param schema The schema instance.
+	 */
 	public Encoder(Configuration configuration, XSDSchema schema) {
 		this.schema = schema;
 		
@@ -163,9 +220,31 @@ public class Encoder {
 		this.outputFormat = outputFormat;
 	}
 	
+	/**
+	 * @deprecated use {@link #encode(Object, QName, OutputStream)}.
+	 * 
+	 */
 	public void write(Object object, QName name, OutputStream out) 
 		throws IOException, SAXException {
-		
+		encode( object, name, out );
+	}
+	
+	/**
+	 * Encodes an object.
+	 * <p>
+	 * An object is encoded as an object, name pair, where the name is the name 
+	 * of an element declaration in a schema. 
+	 * </p>
+	 * @param object The object being encoded.
+	 * @param name The name of the element being encoded in the schema.
+	 * @param out The output stream.
+	 * 
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	public void encode( Object object, QName name, OutputStream out ) 
+		throws IOException, SAXException {
+	
 		//create the document seriaizer
 		if ( outputFormat != null ) {
 			serializer = new XMLSerializer( out, outputFormat );
