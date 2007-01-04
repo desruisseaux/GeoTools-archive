@@ -30,7 +30,6 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureListener;
-import org.geotools.data.FeatureLock;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
@@ -67,7 +66,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 2.4
  * 
  */
-public class VersionedPostgisFeatureLocking extends AbstractFeatureStore implements FeatureLocking {
+public class VersionedPostgisFeatureStore extends AbstractFeatureStore implements FeatureStore {
 
     private VersionedPostgisDataStore store;
 
@@ -75,64 +74,64 @@ public class VersionedPostgisFeatureLocking extends AbstractFeatureStore impleme
 
     private FeatureType schema;
 
-    public VersionedPostgisFeatureLocking(FeatureType schema, VersionedPostgisDataStore store)
+    public VersionedPostgisFeatureStore(FeatureType schema, VersionedPostgisDataStore store)
             throws IOException {
         this.store = store;
         this.schema = schema;
         this.locking = (FeatureLocking) store.wrapped.getFeatureSource(schema.getTypeName());
     }
 
-    public int lockFeatures(Query query) throws IOException {
-        // check query does not need to work agains anything else than the last
-        // revision (just to avoid users being surprised the specified revision
-        // did not get locked/modified)
-        RevisionInfo ri = new RevisionInfo(query.getVersion());
-        if (ri.isLast())
-            throw new IllegalArgumentException("Cannot work against revisions but "
-                    + "the last one. Do not specify revision information in your write queries.");
-
-        DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query),
-                new RevisionInfo());
-        return locking.lockFeatures(versionedQuery);
-    }
-
-    public int lockFeatures(Filter filter) throws IOException {
-        Filter versionedFilter = (Filter) store.buildVersionedFilter(schema.getTypeName(), filter,
-                new RevisionInfo());
-        return locking.lockFeatures(versionedFilter);
-    }
-
-    public int lockFeatures() throws IOException {
-        return lockFeatures(Filter.INCLUDE);
-    }
-
-    public void setFeatureLock(FeatureLock lock) {
-        locking.setFeatureLock(lock);
-    }
-
-    public void unLockFeatures() throws IOException {
-        unLockFeatures(Filter.INCLUDE);
-    }
-
-    public void unLockFeatures(Filter filter) throws IOException {
-        Filter versionedFilter = (Filter) store.buildVersionedFilter(schema.getTypeName(), filter,
-                new RevisionInfo());
-        locking.unLockFeatures(versionedFilter);
-    }
-
-    public void unLockFeatures(Query query) throws IOException {
-        // check query does not need to work agains anything else than the last
-        // revision (just to avoid users being surprised the specified revision
-        // did not get locked/modified)
-        RevisionInfo ri = new RevisionInfo(query.getVersion());
-        if (ri.isLast())
-            throw new IllegalArgumentException("Cannot work against revisions but "
-                    + "the last one. Do not specify revision information in your write queries.");
-
-        DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query),
-                new RevisionInfo());
-        locking.unLockFeatures(versionedQuery);
-    }
+//    public int lockFeatures(Query query) throws IOException {
+//        // check query does not need to work agains anything else than the last
+//        // revision (just to avoid users being surprised the specified revision
+//        // did not get locked/modified)
+//        RevisionInfo ri = new RevisionInfo(query.getVersion());
+//        if (ri.isLast())
+//            throw new IllegalArgumentException("Cannot work against revisions but "
+//                    + "the last one. Do not specify revision information in your write queries.");
+//
+//        DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query),
+//                new RevisionInfo());
+//        return locking.lockFeatures(versionedQuery);
+//    }
+//
+//    public int lockFeatures(Filter filter) throws IOException {
+//        Filter versionedFilter = (Filter) store.buildVersionedFilter(schema.getTypeName(), filter,
+//                new RevisionInfo());
+//        return locking.lockFeatures(versionedFilter);
+//    }
+//
+//    public int lockFeatures() throws IOException {
+//        return lockFeatures(Filter.INCLUDE);
+//    }
+//
+//    public void setFeatureLock(FeatureLock lock) {
+//        locking.setFeatureLock(lock);
+//    }
+//
+//    public void unLockFeatures() throws IOException {
+//        unLockFeatures(Filter.INCLUDE);
+//    }
+//
+//    public void unLockFeatures(Filter filter) throws IOException {
+//        Filter versionedFilter = (Filter) store.buildVersionedFilter(schema.getTypeName(), filter,
+//                new RevisionInfo());
+//        locking.unLockFeatures(versionedFilter);
+//    }
+//
+//    public void unLockFeatures(Query query) throws IOException {
+//        // check query does not need to work agains anything else than the last
+//        // revision (just to avoid users being surprised the specified revision
+//        // did not get locked/modified)
+//        RevisionInfo ri = new RevisionInfo(query.getVersion());
+//        if (ri.isLast())
+//            throw new IllegalArgumentException("Cannot work against revisions but "
+//                    + "the last one. Do not specify revision information in your write queries.");
+//
+//        DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query),
+//                new RevisionInfo());
+//        locking.unLockFeatures(versionedQuery);
+//    }
 
     public Transaction getTransaction() {
         return locking.getTransaction();

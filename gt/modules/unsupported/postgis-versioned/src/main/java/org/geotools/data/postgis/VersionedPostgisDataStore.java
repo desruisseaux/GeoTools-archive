@@ -101,6 +101,10 @@ public class VersionedPostgisDataStore implements DataStore {
     static final String TABLESCHANGED = "tables_changed";
 
     static final String CHANGESETS = "changesets";
+    
+    static final String REVISION = "revision";
+    
+    static final String VERSION = "version";
 
     static final Class[] SUPPORTED_FID_MAPPERS = new Class[] { BasicFIDMapper.class,
             MultiColumnFIDMapper.class, PostGISAutoIncrementFIDMapper.class };
@@ -297,7 +301,7 @@ public class VersionedPostgisDataStore implements DataStore {
 
     public FeatureSource getFeatureSource(String typeName) throws IOException {
         if (isVersioned(typeName))
-            return new VersionedPostgisFeatureLocking(getSchema(typeName), this);
+            return new VersionedPostgisFeatureStore(getSchema(typeName), this);
 
         return new WrappingPostgisFeatureLocking((FeatureLocking) wrapped
                 .getFeatureSource(typeName), this);
