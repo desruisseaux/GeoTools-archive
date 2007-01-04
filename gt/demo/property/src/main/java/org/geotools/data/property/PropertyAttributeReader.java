@@ -28,6 +28,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
+import org.geotools.util.Converters;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.ParseException;
@@ -55,6 +56,15 @@ import com.vividsolutions.jts.io.WKTReader;
  * fid3=3|Dave|<i>well known text</i>
  * </code></pre>
  *
+ *<p>
+ * May values may be represented by a special tag: <code><null></code>. An empty element: <code>||</code>
+ * is interprested as the empty string:
+ *</p>
+ *<pre>
+ *  <code>
+ *  fid4=4||<null> -> Feature( id=2, name="", geom=null )
+ *  </code>
+ *</pre>
  * @author jgarnett
  * @source $URL$
  */
@@ -250,11 +260,19 @@ public class PropertyAttributeReader implements AttributeReader {
 		try {
 			stringValue = text[index];
 		} catch (RuntimeException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			stringValue = null;
 		}
 
+		//check for special <null> flag
+		if ( "<null>".equals( stringValue ) ) {
+			stringValue = null;
+		}
+		if ( stringValue == null ) {
+			return null;
+		}
+		
+		//parse the value
         Object value = null;
 
         if (attType instanceof GeometryAttributeType) {
@@ -265,7 +283,7 @@ public class PropertyAttributeReader implements AttributeReader {
                     e);
             }
         } else {
-            value = attType.parse(stringValue);
+        	value = Converters.convert( stringValue, attType.getType() );
         }
 
         return value;
