@@ -17,6 +17,8 @@ package org.geotools.xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -63,7 +65,11 @@ import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.impl.SchemaIndexImpl;
 import org.geotools.xml.impl.TypeWalker;
+import org.picocontainer.ComponentAdapter;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.Parameter;
 import org.picocontainer.PicoContainer;
+import org.picocontainer.PicoVisitor;
 
 
 /**
@@ -851,6 +857,42 @@ public class Schemas {
     	}
     	
     	return instances;
+    }
+    
+    /**
+     * Unregisters a component in the container and all parent containers.
+     * 
+     * @param container The container.
+     * @param key The key of the component.
+     * 
+     */
+    public static void unregisterComponent( PicoContainer container, final Object key ) {
+    	//go to the top of the hierachy
+    	while( container.getParent() != null ) {
+    		container = container.getParent();
+    	}
+    	
+    	container.accept( 
+			new PicoVisitor() {
+				public Object traverse(Object node) {
+					return null;
+				}
+
+				public void visitContainer(PicoContainer container) {
+					if ( container instanceof MutablePicoContainer ) {
+						((MutablePicoContainer)container).unregisterComponent( key );
+					}
+					
+				}
+
+				public void visitComponentAdapter(ComponentAdapter adapter) {
+				}
+
+				public void visitParameter(Parameter parameter) {
+				}
+				
+			}
+		);
     }
     
     /**
