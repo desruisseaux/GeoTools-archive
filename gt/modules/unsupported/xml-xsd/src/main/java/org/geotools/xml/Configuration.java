@@ -309,7 +309,7 @@ public abstract class Configuration {
 	 * For schema which are defined by multiple files, this method should return the base schema 
 	 * which includes all other files that define the schema.
 	 * </p>
-	 * TODO: rename this to getSchemaConfiguration()
+	 * TODO: rename this to getSchemaLocation()
 	 */
 	abstract public String getSchemaFileURL();
 	
@@ -376,10 +376,10 @@ public abstract class Configuration {
     	}
     
     	//call template method, create a new container to allow subclass to override bindings
-    	MutablePicoContainer override = new DefaultPicoContainer( container );
-    	configureBindings( override );
+    	container = container.makeChildContainer();
+    	configureBindings( container );
     	
-    	return override;
+    	return container;
     }
     
     /**
@@ -428,8 +428,8 @@ public abstract class Configuration {
         	//add any additional configuration, factories and such
         	// create a new container to allow configurations to override factories in dependant
         	// configurations
-        	container = new DefaultPicoContainer( container );
-            dependency.configureContext( container );
+        	container = container.makeChildContainer(); 
+        	dependency.configureContext( container );
     	}
     	
     	return container;
