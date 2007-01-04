@@ -145,7 +145,17 @@ public class BindingWalker implements TypeWalker.Visitor {
             Binding binding = loader.loadBinding(qName, context);
 
             if (binding != null) {
-                bindings.add(0, binding);
+            	//check for override
+            	if ( binding.getExecutionMode() == Binding.OVERRIDE ) {
+            		//override, clear the binding list
+            		bindings.clear();
+            		bindings.add( binding );
+            	}
+            	else {
+            		//not override, add as first
+            		bindings.add(0, binding);	
+            	}
+                
             }
         }
 
