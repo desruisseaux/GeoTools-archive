@@ -190,7 +190,7 @@ public class WFSDataStore extends AbstractDataStore {
         determineCorrectStrategy(host);
     }
     private void determineCorrectStrategy(URL host) {
-        if( host.toString().matches("mapserv") )
+        if( host.toString().indexOf("mapserv")!=-1 )
             strategy=new MapServerWFSStrategy(this);
         else
             strategy=new StrictWFSStrategy(this);
