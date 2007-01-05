@@ -16,6 +16,7 @@
 package org.geotools.filter;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.logging.Logger;
 
 import org.geotools.filter.FilterType;
@@ -375,6 +376,49 @@ public class SQLEncoderPostgis extends SQLEncoder implements
         out.write("GeometryFromText('" + geomText + "', " + srid + ")");
     }
 
+    public void visit(LikeFilter filter) throws UnsupportedOperationException {
+    	char esc = filter.getEscape().charAt(0);
+    	char multi = filter.getWildcardMulti().charAt(0);
+    	char single = filter.getWildcardSingle().charAt(0);
+    	String pattern = LikeFilterImpl.convertToSQL92(esc,multi,single,filter.getPattern());
+    	
+    	DefaultExpression att = (DefaultExpression) filter.getValue();
+    	
+    	try {
+    		out.write( " ( " );
+	    	att.accept(this);
+	    	
+	    	out.write(" LIKE '");
+	    	out.write(pattern);
+	    	out.write("' ");	
+	    	
+	    	//JD: this is an ugly ugly hack!! hopefully when the new feature model is around we can 
+	    	// fix this
+	    	//check for context for a date
+	    	if ( att instanceof AttributeExpression && context != null 
+	    			&& java.util.Date.class.isAssignableFrom( context ) ) {
+	    		//if it is a date, add additional logic for a timestamp, or a timestamp with 
+	    		// timezone
+	    		out.write( " OR " );
+	    		att.accept( this );
+	    		out.write( " LIKE '" );
+	    		out.write(pattern + " __:__:__'" );	//timestamp
+	    		
+	    		out.write( " OR " );
+	    		att.accept( this );
+	    		out.write( " LIKE '" );
+	    		out.write(pattern + " __:__:_____'" );	//timestamp with time zone
+		    }
+	    	
+	    	out.write( " ) " );
+	    	
+    	} catch (java.io.IOException ioe) {
+            throw new RuntimeException(IO_ERROR, ioe);
+        }    	
+    	
+    	
+    }
+    
     /**
      * Checks to see if the literal is a geometry, and encodes it if it  is, if
      * not just sends to the parent class.
