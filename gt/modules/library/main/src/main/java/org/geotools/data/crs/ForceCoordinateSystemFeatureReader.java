@@ -93,7 +93,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
         CoordinateReferenceSystem originalCs = type.getDefaultGeometry()
                                                    .getCoordinateSystem();
 
-        if (cs.equals(originalCs)) {
+        if (!cs.equals(originalCs)) {
             schema = FeatureTypes.transform(type, cs);
         }
 
