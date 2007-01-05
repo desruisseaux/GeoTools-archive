@@ -101,9 +101,9 @@ public class VersionedPostgisDataStore implements DataStore {
     static final String TABLESCHANGED = "tables_changed";
 
     static final String CHANGESETS = "changesets";
-    
+
     static final String REVISION = "revision";
-    
+
     static final String VERSION = "version";
 
     static final Class[] SUPPORTED_FID_MAPPERS = new Class[] { BasicFIDMapper.class,
@@ -522,16 +522,16 @@ public class VersionedPostgisDataStore implements DataStore {
      * creation, expiration, and lack of feature existance.<br>
      * 
      * <pre>
-     *                        v1                         v2
-     *                        |                          |
-     *               f1 ======]..........................|........... Not returned
-     *               f2 ======][-------------------------|----------- Not returned     
-     *               f3 ======|==].......................|........... Returned (deleted)
-     *               f4 ======|==][----------------------|---]....... Returned (modified)
-     *               f5 ......|.[=======]................|........... Returned (created/deleted)
-     *               f5 ......[=========]................|........... Returned (deleted)
-     *               f5 ......[-------------------][=====|====]...... Returned (modified)
-     *               f6 [-----|----][=============][-----|----------- Returned (modified)
+     *                         v1                         v2
+     *                         |                          |
+     *                f1 ======]..........................|........... Not returned
+     *                f2 ======][-------------------------|----------- Not returned     
+     *                f3 ======|==].......................|........... Returned (deleted)
+     *                f4 ======|==][----------------------|---]....... Returned (modified)
+     *                f5 ......|.[=======]................|........... Returned (created/deleted)
+     *                f5 ......[=========]................|........... Returned (deleted)
+     *                f5 ......[-------------------][=====|====]...... Returned (modified)
+     *                f6 [-----|----][=============][-----|----------- Returned (modified)
      * </pre>
      * 
      * Legend:
@@ -845,7 +845,7 @@ public class VersionedPostgisDataStore implements DataStore {
         // ensure this does not get a typed fid mapper for changesets
         // we want easy extraction of the generated revision
         wrapped.setFIDMapper(CHANGESETS, new PostGISAutoIncrementFIDMapper(CHANGESETS, "revision",
-                Types.BIGINT, true)); 
+                Types.BIGINT, true));
     }
 
     private String[] getVersionedTypeNames() throws IOException {
@@ -981,8 +981,7 @@ public class VersionedPostgisDataStore implements DataStore {
                     + " WHERE SCHEMA = '" + getConfig().getDatabaseSchemaName() + "'" //
                     + " AND NAME='" + typeName + "'");
             if (rs.next()) {
-                // we already have the table listed, it was versioned in the
-                // past
+                // we already have the table listed, it was versioned in the past
                 execute(st, "UPDATE " + sqlb.encodeTableName(VERSIONEDTABLES) //
                         + " SET VERSIONED = TRUE " //
                         + " WHERE SCHEMA = '" + getConfig().getDatabaseSchemaName() + "'" //

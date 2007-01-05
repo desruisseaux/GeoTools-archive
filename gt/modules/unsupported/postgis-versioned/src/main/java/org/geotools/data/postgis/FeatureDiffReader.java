@@ -31,7 +31,8 @@ import org.geotools.feature.IllegalAttributeException;
 /**
  * Provides forward only access to the feature differences
  * 
- * @author Administrator
+ * @author aaime
+ * @since 2.4
  * 
  */
 public class FeatureDiffReader {

@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ * 
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.postgis;
 
 import java.io.IOException;
@@ -12,6 +27,7 @@ import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -179,6 +195,8 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         fw.write();
         fw.close();
         t.commit();
+        assertEquals(new Long(2), t.getProperty(VersionedPostgisDataStore.REVISION));
+        assertEquals("2", t.getProperty(VersionedPostgisDataStore.VERSION));
 
         // write another
         t = createTransaction("gimbo", "second change");
@@ -441,6 +459,16 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertEquals(0, mfids.getDeleted().size());
         assertEquals(0, mfids.getModified().size());
     }
+    
+    public void testModifiedIdsUnversioned() throws IOException, IllegalAttributeException {
+        VersionedPostgisDataStore ds = getDataStore();
+
+        // check we get no modifications out of an unversioned feature type
+        ModifiedFeatureIds mfids = ds.getModifiedFeatureFIDs("river", "1", "5", Filter.INCLUDE, Transaction.AUTO_COMMIT);
+        assertTrue(mfids.getCreated().isEmpty());
+        assertTrue(mfids.getDeleted().isEmpty());
+        assertTrue(mfids.getModified().isEmpty());
+    }
 
     public void testRollbackDeleted() throws IOException, IllegalAttributeException {
         VersionedPostgisDataStore ds = getDataStore();
@@ -513,6 +541,15 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         for (int i = 0; i < riverFeatures.length; i++) {
             assertTrue(fc.contains(riverFeatures[i]));
         }
+    }
+    
+    public void testFeatureStoreUnversioned() throws IOException, IllegalAttributeException {
+        VersionedPostgisDataStore ds = getDataStore();
+
+        // try to get a feature store for an unversioned type, it should be a plain feature store
+        // not the versioned one
+        FeatureStore fs = (FeatureStore) ds.getFeatureSource("river");
+        assertFalse(fs instanceof VersionedPostgisFeatureStore);
     }
 
     public void testLog() throws IOException, IllegalAttributeException {
