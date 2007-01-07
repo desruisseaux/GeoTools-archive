@@ -49,6 +49,7 @@ import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.complex.Complex;
 import org.opengis.spatialschema.geometry.geometry.LineSegment;
 import org.opengis.spatialschema.geometry.primitive.Curve;
@@ -231,6 +232,14 @@ public class RingImpl extends CompositeCurveImpl implements Ring {
 		}
 
 		return rList;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.opengis.spatialschema.geometry.Geometry#getRepresentativePoint()
+	 */
+	public DirectPosition getRepresentativePoint() {
+		// Return the start point of this ring, since it is part of the object
+		return ((CurveImpl)this.getGenerators().get(0)).getStartPoint();
 	}
 
 	/* (non-Javadoc)

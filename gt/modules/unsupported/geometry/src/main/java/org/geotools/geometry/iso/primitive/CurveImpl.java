@@ -474,24 +474,24 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		return this.curveSegments.get(index).forParam(distance);
 	}
 
-	/**
-	 * The operation "constrParam" shall be an alternate representation of the
-	 * curve as the continuous image of a real number interval without the
-	 * restriction that the parameter represents the arc length of the curve,
-	 * nor restrictions between a Curve and its component CurveSegments. The
-	 * most common use of this operation is to expose the constructive equations
-	 * of the underlying curve, especially useful when that curve is used to
-	 * construct a parametric surface.
-	 * 
-	 * GenericCurve::constrParam(cp : Real) : DirectPosition2D
-	 * 
-	 * @param cp
-	 *            a <code>double</code> value
-	 * @return an <code>DirectPosition2D</code> value
-	 */
-	public DirectPosition constrParam(double cp) {
-		return this.forParam(DoubleOperation.mult(cp, this.length()));
-	}
+//	/**
+//	 * The operation "constrParam" shall be an alternate representation of the
+//	 * curve as the continuous image of a real number interval without the
+//	 * restriction that the parameter represents the arc length of the curve,
+//	 * nor restrictions between a Curve and its component CurveSegments. The
+//	 * most common use of this operation is to expose the constructive equations
+//	 * of the underlying curve, especially useful when that curve is used to
+//	 * construct a parametric surface.
+//	 * 
+//	 * GenericCurve::constrParam(cp : Real) : DirectPosition2D
+//	 * 
+//	 * @param cp
+//	 *            a <code>double</code> value
+//	 * @return an <code>DirectPosition2D</code> value
+//	 */
+//	public DirectPosition constrParam(double cp) {
+//		return this.forParam(DoubleOperation.mult(cp, this.length()));
+//	}
 
 
 	/* (non-Javadoc)
@@ -667,8 +667,8 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#getRepresentativePoint()
 	 */
 	public DirectPosition getRepresentativePoint() {
-		// Use start point of this curve as representative point
-		return this.getStartPoint();
+		// Return point in the middle of the curve
+		return this.forConstructiveParam(0.5);
 	}
 
 	/*

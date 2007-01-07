@@ -438,6 +438,7 @@ public class SurfaceImpl extends OrientableSurfaceImpl implements Surface {
 	 */
 	public DirectPosition getRepresentativePoint() {
 		// Return the representative point of the surface´s boundary
+		// TODO Note: This solution is not correct, since the representative point of the surface boundary may not be on the surface
 		return this.getBoundary().getRepresentativePoint();
 	}
 

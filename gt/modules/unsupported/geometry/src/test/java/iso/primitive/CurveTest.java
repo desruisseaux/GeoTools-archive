@@ -160,8 +160,9 @@ public class CurveTest extends TestCase {
 		
 		// ***** getRepresentativePoint()
 		dp = curve1.getRepresentativePoint().getCoordinates();
-		assertTrue(dp[0] == -50);
-		assertTrue(dp[1] == 0.0);
+		//System.out.print("REPRER" + dp);
+		assertTrue(dp[0] == 0);
+		assertTrue(dp[1] == 50);
 		
 		
 		// ***** Curve.Merge(Curve)

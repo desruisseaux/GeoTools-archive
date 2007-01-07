@@ -209,8 +209,8 @@ public class SurfaceBoundaryImpl extends PrimitiveBoundaryImpl implements
 	 */
 	public DirectPosition getRepresentativePoint() {
 		// ok
-		// Return representative point of the exterior ring
-		return this.getExterior().getRepresentativePoint();
+		// Return first point of the exterior ring of the surface boundary
+		return ((CurveImpl)this.getExterior().getGenerators().get(0)).getStartPoint();
 	}
 	
 	/* (non-Javadoc)
