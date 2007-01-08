@@ -1,7 +1,6 @@
 package org.geotools.maven.xmlcodegen;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -11,15 +10,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.DefaultArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectUtils;
 import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
-import org.geotools.xml.Schemas;
 
 /**
  * Generates the bindings and utility classes used to parse xml documents 
@@ -33,31 +31,32 @@ import org.geotools.xml.Schemas;
 public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 
 	/**
-	 * Flag controlling wether the interface containg all the binding names should
-	 * be generated, default is true.
+	 * Flag controlling wether an interface containg all the element, attribute, and 
+	 * type names from the schema should be generated. Inclusion / exclusion filters 
+	 * do not apply.
 	 * 
 	 * @parameter expression="true"
 	 */
-    boolean generateBindingInterface;
+    boolean generateNames;
     
     /**
-	 * Flag controlling wether the binding configuration implementation should 
-	 * be generated, default is true.
+	 * Flag controlling wether the binding configuration ( {@link org.geotools.xml.BindingConfiguration} ) 
+	 * should be generated, default is true.
 	 * 
 	 * @parameter expression="true"
 	 */
     boolean generateBindingConfiguration;
     
     /**
-     * Flag controlling wether a schmea location resolver should be generated, 
-     * the default is true.
+     * Flag controlling wether a schema locator ( {@link XSDSchemaLocator} ) 
+     * should be generated, the default is false.
      * 
-     * @parameter expression="true"
+     * @parameter expression="false"
      */
     boolean generateSchemaLocationResolver;
     
     /**
-     * Flag controlling wether a parser configuration should be generated, 
+     * Flag controlling wether a parser configuration ( {@link org.geotools.xml.Configuration} ) 
      * the default is true.
      * 
      * @parameter expression="true"
@@ -70,7 +69,7 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
      * 
      * @parameter expression="false"
      */
-    boolean generateAttributes;
+    boolean generateAttributeBindings;
     
     /**
      * Flag controlling wether bindings for eleements should be generated, default is
@@ -78,7 +77,7 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
      * 
      * @parameter expression="false"
      */
-    boolean generateElements;
+    boolean generateElementBindings;
     
     /**
      * Flag controlling wether bindings for types should be generated, default is
@@ -86,10 +85,10 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
      * 
      * @parameter expression="true"
      */
-    boolean generateTypes = true;
+    boolean generateTypeBindings;
 	
     /**
-     * List of names of attributes, elements, types to include, if unset all will
+     * List of names of attributes, elements, and types to include, if unset all will
      * be generated.
      * 
      * @parameter
@@ -101,7 +100,24 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
      * 
      * @parameter
      */
-    ConstructorArgument[] constructorArguments;
+    BindingConstructorArgument[] bindingConstructorArguments;
+    
+    /**
+     * The base class for complex bindings. If unspecified {@link org.geotools.xml.AbstractComplexBinding}
+     * is used.
+     * 
+     * @parameter default="org.geotools.xml.AbstractComplexBinding"
+     * 
+     */
+    Class complexBindingBaseClass;
+    
+    /**
+     * The base class for simple bindings. If unspecified {@link org.geotools.xml.AbstractSimpleBinding}
+     * is used.
+     * 
+     * @parameter default="org.geotools.xml.AbstractSimpleBinding"
+     */
+    Class simpleBindingBaseClass;
     
     public void execute() throws MojoExecutionException, MojoFailureException {
 		
@@ -112,10 +128,10 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 		
 		BindingGenerator generator = new BindingGenerator();
 		generator.setGeneratingBindingConfiguration( generateBindingConfiguration );
-		generator.setGeneratingBindingInterface( generateBindingInterface );
-		generator.setGenerateAttributes( generateAttributes );
-		generator.setGenerateElements( generateElements );
-		generator.setGenerateTypes( generateTypes );
+		generator.setGeneratingBindingInterface( generateNames );
+		generator.setGenerateAttributes( generateAttributeBindings );
+		generator.setGenerateElements( generateElementBindings );
+		generator.setGenerateTypes( generateTypeBindings );
 		generator.setOverwriting( overwriteExistingFiles );
 		generator.setLocation( outputDirectory.getAbsolutePath() );
 	
@@ -141,12 +157,12 @@ public class BindingGeneratorMojo extends AbstractGeneratorMojo {
 		}
 		
 		ClassLoader cl = new URLClassLoader( (URL[]) urls.toArray( new URL[ urls.size() ] ) );
-		if ( constructorArguments != null ) {
+		if ( bindingConstructorArguments != null ) {
 			HashMap map = new HashMap();
 			
-			for ( int i = 0; i < constructorArguments.length; i++) {
-				String name = constructorArguments[i].getName();
-				String type = constructorArguments[i].getType();
+			for ( int i = 0; i < bindingConstructorArguments.length; i++) {
+				String name = bindingConstructorArguments[i].getName();
+				String type = bindingConstructorArguments[i].getType();
 				Class clazz = null;
 				
 				try {

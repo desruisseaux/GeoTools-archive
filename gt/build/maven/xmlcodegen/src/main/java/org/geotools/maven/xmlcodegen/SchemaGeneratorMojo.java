@@ -6,7 +6,7 @@ import org.eclipse.xsd.XSDSchema;
 
 
 /**
- * Transforms an xml schema into a geotools schema.
+ * Generates an instance of {@link org.opengis.feature.type.Schema } from an xml schema.
  * 
  * @goal generateSchema
  * 

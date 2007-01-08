@@ -6,7 +6,7 @@ package org.geotools.maven.xmlcodegen;
  * @author Justin Deoliveira, The Open Planning Project
  *
  */
-public class ConstructorArgument {
+public class BindingConstructorArgument {
 
 	String name;
 	

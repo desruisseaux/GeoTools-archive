@@ -1,18 +1,31 @@
 package org.geotools.maven.xmlcodegen;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.net.MalformedURLException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.factory.DefaultArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.tools.ant.taskdefs.optional.sitraka.bytecode.Utils;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
@@ -28,7 +41,7 @@ import org.geotools.xml.Schemas;
 public abstract class AbstractGeneratorMojo extends AbstractMojo {
 
 	/**
-	 * The schema to generate bindings for.
+	 * The .xsd file defining the schema to generate bindings for.
 	 * 
 	 * @parameter 
 	 * @required
@@ -36,22 +49,7 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 	protected File schemaLocation;
 	
 	/**
-	 * The destination package of the generated source files 
-	 * in the standard dot-seperated naming format.
-	 * 
-	 * @parameter
-	 */
-	protected String destinationPackage;
-	
-	/**
-	 * Directory to output generated files to. Default is ${project.build.sourceDirectory}
-	 * 
-	 * @parameter expression="${project.build.sourceDirectory}"
-	 */
-	protected File outputDirectory;
-	
-	/**
-	 * Directory containing xml schemas, defualt is ${basedir}/src/main/xsd.
+	 * Directory containing xml schemas, default is ${basedir}/src/main/xsd.
 	 *
 	 * @parameter expression="${basedir}/src/main/xsd"
 	 */
@@ -63,6 +61,21 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 	 * @parameter
 	 */
 	protected File[] schemaLookupDirectories;
+	
+	/**
+	 * The destination package of the generated source files in the standard dot-seperated 
+	 * naming format.
+	 * 
+	 * @parameter
+	 */
+	protected String destinationPackage;
+	
+	/**
+	 * Directory to output generated files to. Default is ${project.build.sourceDirectory}
+	 * 
+	 * @parameter expression="${project.build.sourceDirectory}"
+	 */
+	protected File outputDirectory;
 	
 	/**
 	 * Flag controlling wether files should overide files that already 
@@ -79,7 +92,34 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
      */
     MavenProject project;
     
+    /**
+     * The local maven repository
+     * 
+     * @parameter expression="${localRepository}" 
+     */
+    ArtifactRepository localRepository;
+    
+    /**
+     * Remote maven repositories
+     *  
+     * @parameter expression="${project.remoteArtifactRepositories}" 
+     */
+    List remoteRepositories;
+    
+    /** 
+     * @component 
+     */
+    ArtifactFactory artifactFactory;
+    
+    /**
+     * @component
+     */
+    ArtifactResolver artifactResolver;
+    
     protected XSDSchema schema() {
+    
+    	getLog().info( artifactFactory.toString() );
+    	
     	//check schema source
 		if ( !schemaSourceDirectory.exists() ) {
 			getLog().error( schemaSourceDirectory.getAbsolutePath() + " does not exist" );
@@ -93,6 +133,66 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 			if ( !schemaLocation.exists() ) {
 				getLog().error( "Could not locate schema: " + schemaLocation.getName() );
 				return null;
+			}
+		}
+		
+		//build an "extended" classloader for "well-known
+		List artifacts = new ArrayList();
+		artifacts.add( 
+			artifactFactory.createArtifact( 
+				"org.geotools", "gt2-xml-gml2", project.getVersion(), null, "jar"
+			) 
+		);
+		artifacts.add( 
+			artifactFactory.createArtifact( 
+				"org.geotools", "gt2-xml-gml3", project.getVersion(), null, "jar"
+			) 
+		);
+		artifacts.add( 
+			artifactFactory.createArtifact( 
+				"org.geotools", "gt2-xml-filter", project.getVersion(), null, "jar"
+			) 
+		);
+		artifacts.add( 
+			artifactFactory.createArtifact( 
+				"org.geotools", "gt2-xml-sld", project.getVersion(), null, "jar"
+			) 
+		);
+	
+		List urls = new ArrayList();
+		for ( Iterator a = artifacts.iterator(); a.hasNext(); ) {
+			Artifact artifact = (Artifact) a.next();
+			try {
+				artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+				urls.add( artifact.getFile().toURL() );
+			} 
+			catch( Exception e ) {
+				getLog().warn( "Unable to resolve " + artifact.getId() );
+			}
+		}
+		
+		ClassLoader ext = 
+			new URLClassLoader( (URL[]) urls.toArray( new URL[ urls.size() ] ), getClass().getClassLoader() );
+	
+		//use extended classloader to load up configuration classes to load schema files
+		// with
+		final List resolvers = new ArrayList();
+		resolvers.add( "org.geotools.xlink.bindings.XLINKSchemaLocationResolver" );
+		resolvers.add( "org.geotools.gml2.bindings.GMLSchemaLocationResolver" );
+		resolvers.add( "org.geotools.gml3.bindings.GMLSchemaLocationResolver" );
+		resolvers.add( "org.geotools.gml3.bindings.smil.SMIL20SchemaLocationResolver" );
+		resolvers.add( "org.geotools.filter.v1_0.OGCSchemaLocationResolver" );
+		resolvers.add( "org.geotools.filter.v1_1.OGCSchemaLocationResolver" );
+		
+		for ( int i = 0; i < resolvers.size(); i++ ) {
+			String className = (String) resolvers.get( i );
+			try {
+				Class clazz = ext.loadClass( className );
+				resolvers.set( i, clazz );
+			} 
+			catch (ClassNotFoundException e) {
+				getLog().debug( "Unable to load " + className );
+				resolvers.set( i , null );
 			}
 		}
 		
@@ -132,7 +232,46 @@ public abstract class AbstractGeneratorMojo extends AbstractMojo {
 					}
 				}
 				
-				getLog().warn( "Could not resolve location for: " + schemaLocation );
+				//check for well known 
+				for ( Iterator i = resolvers.iterator(); i.hasNext(); ) {
+					Class configClass = (Class) i.next();
+					if ( configClass == null ) {
+						continue;
+					}
+					
+					if ( configClass.getResource( fileName ) != null ) {
+						//copy stream to a temp file
+						try {
+							file = File.createTempFile( "xmlcodegen", "xsd" );
+							file.deleteOnExit();
+							
+							getLog().debug( "Copying " + configClass.getResource( fileName ) + " " + file );
+							
+							BufferedOutputStream output = 
+								new BufferedOutputStream( new FileOutputStream ( file ) );
+							InputStream input = configClass.getResourceAsStream( fileName );
+							
+							int b = -1;
+							while ( ( b = input.read() ) != -1 ) {
+								output.write( b );
+							}
+							
+							input.close();
+							output.close();
+							
+							getLog().debug( "Resolving " + schemaLocation + " to " + file.getAbsolutePath() );
+							return file.getAbsolutePath();
+							
+						} 
+						catch (IOException e) {
+							getLog().debug( e );
+							continue;
+						}
+						
+					}
+				}
+				
+				getLog().warn( "Could not resolve location for: " + fileName );
 				return null;
 			}
 			
