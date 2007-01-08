@@ -170,9 +170,13 @@ public class JpoxPojoSource implements Source {
 			String field = getDefaultGeometryField();
 			Rectangle2D bbox = helper.estimateBoundsFromDatastoreMetadata( pc, field, getPm() );
 			if ( bbox == null ) {
-				// Bring out the big guns!
-				bbox = helper.calculateBoundsFromALLDatastoreEntries( pc, field, getPm() );
-				if ( bbox == null ) return null;
+				bbox = helper.calculateBoundsInDatastore( pc, field, getPm() );
+				if ( bbox == null ) {
+					// Bring out the big guns!
+					bbox = helper.calculateBoundsFromALLDatastoreEntries( pc, field, getPm() );
+					if ( bbox == null ) return null;
+				}
+				
 			}
 			
 			return  new ReferencedEnvelope( bbox.getMinX(), bbox.getMaxX(), bbox.getMinY(), bbox.getMaxY(), getCRS() );
