@@ -375,15 +375,15 @@ public final class LabelCacheDefault implements LabelCache {
 
 				// DJB: this is where overlapping labels are forbidden (first
 				// out of the map has priority)
+                Rectangle glyphBounds = glyphVector
+                .getPixelBounds(new FontRenderContext(tempTransform,
+                        true, false), 0, 0);
 
-				if (offscreen(glyphVector, tempTransform, displayArea)) // is
-					// this
-					// offscreen?
+                // is  this offscreen? We assume offscreen as anything that is outside
+                // or crosses the rendering borders, since in tiled rendering
+                // we have to insulate ourself from other tiles
+				if (!(displayArea.contains(glyphBounds))) 
 					continue;
-
-				Rectangle glyphBounds = glyphVector
-						.getPixelBounds(new FontRenderContext(tempTransform,
-								true, false), 0, 0);
 
 				// we wind up using the translated shield location a number of
 				// times, in overlap calculations, offscreen
@@ -393,18 +393,23 @@ public final class LabelCacheDefault implements LabelCache {
 				if (labelItem.getTextStyle().getGraphic() != null) {
 					Rectangle area = labelItem.getTextStyle()
 							.getGraphicDimensions();
-					double[] shieldVerts = new double[] {
-							0.0 - glyphBounds.width / 2.0,
-							-glyphBounds.height / 2.0,
-							area.width - glyphBounds.width / 2.0,
-							area.height - glyphBounds.height / 2.0 }; // translate
-					// centering
-					tempTransform.transform(shieldVerts, 0, shieldVerts, 0, 2);
-					shieldBounds = new Rectangle2D.Double(shieldVerts[0],
-							shieldVerts[1], shieldVerts[2] - shieldVerts[0],
-							shieldVerts[3] - shieldVerts[1]);
-					if (!displayArea.contains(shieldBounds))
-						continue;
+                    Rectangle untransformedBounds = glyphVector.getPixelBounds(
+                            new FontRenderContext(new AffineTransform(),true, false), 0, 0);
+                    // center the graphics on the labels back
+                    double[] shieldVerts = new double[] {
+                            -area.width / 2 + untransformedBounds.x - untransformedBounds.width / 2,
+                            -area.height / 2 + untransformedBounds.y - untransformedBounds.height / 2,
+                            area.width / 2,
+                            area.height / 2}; 
+                    // transform to rendered space
+                    tempTransform.transform(shieldVerts, 0, shieldVerts, 0, 2);
+                    shieldBounds = new Rectangle2D.Double(shieldVerts[0] + glyphBounds.width / 2,
+                            shieldVerts[1] + glyphBounds.height / 2, shieldVerts[2] - shieldVerts[0],
+                            shieldVerts[3] - shieldVerts[1]);
+                    // if glyph is only partially outside of the display area, don't render it
+                    // for the same req
+                    if (!displayArea.contains(shieldBounds))
+                        continue; 
 				}
 
 				int space = labelItem.getSpaceAround();
@@ -512,7 +517,8 @@ public final class LabelCacheDefault implements LabelCache {
 			} catch (Exception e) // the decimation can cause problems - we
 			// try to minimize it
 			{
-				// do nothing
+				e.printStackTrace();
+                // do nothing
 			}
 		}
 		labelCache.clear();
@@ -598,19 +604,6 @@ public final class LabelCacheDefault implements LabelCache {
 		LinearRing r = (LinearRing) outer;
 
 		return outer.getFactory().createPolygon(r, null);
-	}
-
-	/**
-	 * Returns true if any part of the label is offscreen (even by a tinny bit)
-	 *
-	 * @param glyphVector
-	 * @param tempTransform
-	 */
-	private boolean offscreen(GlyphVector glyphVector,
-			AffineTransform tempTransform, Rectangle screen) {
-		Rectangle glyphBounds = glyphVector.getPixelBounds(
-				new FontRenderContext(tempTransform, true, false), 0, 0);
-		return !(screen.contains(glyphBounds));
 	}
 
 	/**
