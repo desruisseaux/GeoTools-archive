@@ -80,6 +80,6 @@ public class ScreenMap {
     }
 
     private int bit(int x, int y) {
-        return (height * y) + x;
+        return (width * y) + x;
     }
 }
