@@ -412,11 +412,14 @@ public final class LabelCacheDefault implements LabelCache {
                         continue; 
 				}
 
+				// take into account radius so that halo do not overwrite other labels
+                // that are too close to the current one
 				int space = labelItem.getSpaceAround();
+                int haloRadius = Math.round(labelItem.getTextStyle().getHaloFill() != null ? 
+                        labelItem.getTextStyle().getHaloRadius() : 0);
 				if (space >= 0) // if <0 then its okay to have overlapping items
-				// (!!)
 				{
-					if (overlappingItems(glyphBounds, glyphs, space))
+					if (overlappingItems(glyphBounds, glyphs, space + haloRadius))
 						continue;
 					if (shieldBounds != null
 							&& overlappingItems(shieldBounds.getBounds(),
@@ -508,16 +511,16 @@ public final class LabelCacheDefault implements LabelCache {
 							if ((shieldBounds != null)) {
 								bounds.add(shieldBounds);
 							}
+                            bounds.grow(haloRadius, haloRadius);
 							glyphs.add(bounds);
 						}
 					}
 				} finally {
 					graphics.setTransform(oldTransform);
 				}
-			} catch (Exception e) // the decimation can cause problems - we
-			// try to minimize it
-			{
-				e.printStackTrace();
+			} catch (Exception e) {
+                // the decimation can cause problems - we
+			    // try to minimize it
                 // do nothing
 			}
 		}
