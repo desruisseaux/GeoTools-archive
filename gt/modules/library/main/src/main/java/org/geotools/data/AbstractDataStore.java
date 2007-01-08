@@ -364,7 +364,7 @@ public abstract class AbstractDataStore implements DataStore {
 
         if (!featureType.equals(reader.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
-            reader = new ReTypeFeatureReader(reader, featureType);
+            reader = new ReTypeFeatureReader(reader, featureType, false);
         }
 
         if (query.getMaxFeatures() != Query.DEFAULT_MAX) {

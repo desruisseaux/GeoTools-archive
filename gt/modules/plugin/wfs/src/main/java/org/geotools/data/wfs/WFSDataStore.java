@@ -638,7 +638,7 @@ public class WFSDataStore extends AbstractDataStore {
 
         if (!featureType.equals(ft.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
-            return new ReTypeFeatureReader(ft, featureType);
+            return new ReTypeFeatureReader(ft, featureType, false);
         }else
             return ft;
         
@@ -802,7 +802,7 @@ public class WFSDataStore extends AbstractDataStore {
 
         if (!featureType.equals(ft.getFeatureType())) {
             LOGGER.fine("Recasting feature type to subtype by using a ReTypeFeatureReader");
-            return new ReTypeFeatureReader(ft, featureType);
+            return new ReTypeFeatureReader(ft, featureType, false);
         }else
             return ft;
     }

@@ -475,7 +475,7 @@ public abstract class JDBC1DataStore implements DataStore {
 		FeatureReader reader = getFeatureReader(query, transaction);
 
 		if (compare == 1) {
-			reader = new ReTypeFeatureReader(reader, requestType);
+			reader = new ReTypeFeatureReader(reader, requestType, false);
 		}
 
 		return reader;
@@ -655,9 +655,8 @@ public abstract class JDBC1DataStore implements DataStore {
 				FeatureType requestType = DataUtilities.createSubType(schema,
 						requestedNames);
 				if ( !requestType.equals( reader.getFeatureType() ) ) {
-					reader = new ReTypeFeatureReader(reader, requestType);
+                    reader = new ReTypeFeatureReader(reader, requestType, false);
 				}
-				
 			} catch (SchemaException schemaException) {
 				throw new DataSourceException("Could not handle query",
 						schemaException);

@@ -699,7 +699,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         FeatureReader reader = getFeatureReader(query, transaction);
         
         if (compare == 1) {
-            reader = new ReTypeFeatureReader(reader, requestType);
+            reader = new ReTypeFeatureReader(reader, requestType, false);
         }
 
         return reader;

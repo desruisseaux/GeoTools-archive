@@ -81,7 +81,7 @@ public class DefaultFIDReader implements FIDReader {
             throw new IOException(CLOSE_MESG);
         }
 
-        buffer.delete(len,buffer.length());
+        buffer.setLength(len);
         buffer.append(++index);
 
         return buffer.toString();

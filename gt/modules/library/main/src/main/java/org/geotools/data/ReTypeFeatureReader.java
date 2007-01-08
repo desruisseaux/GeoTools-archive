@@ -54,6 +54,7 @@ public class ReTypeFeatureReader implements FeatureReader {
     FeatureReader reader;
     FeatureType featureType;
     AttributeType[] types;
+    boolean clone;
 
     /**
      * Constructs a FetureReader that will ReType streaming content.
@@ -62,8 +63,20 @@ public class ReTypeFeatureReader implements FeatureReader {
      * @param featureType Target FeatureType
      */
     public ReTypeFeatureReader(FeatureReader reader, FeatureType featureType) {
+        this(reader, featureType, true);
+    }
+    
+    /**
+     * Constructs a FetureReader that will ReType streaming content.
+     *
+     * @param reader Origional FeatureReader
+     * @param featureType Target FeatureType
+     * @since 2.3
+     */
+    public ReTypeFeatureReader(FeatureReader reader, FeatureType featureType, boolean clone) {
         this.reader = reader;
         this.featureType = featureType;
+        this.clone = clone;
         types = typeAttributes(featureType, reader.getFeatureType());
     }
 
@@ -135,7 +148,10 @@ public class ReTypeFeatureReader implements FeatureReader {
 
         for (int i = 0; i < types.length; i++) {
             xpath = types[i].getName();
-            attributes[i] = types[i].duplicate(next.getAttribute(xpath));
+            if(clone)
+                attributes[i] = types[i].duplicate(next.getAttribute(xpath));
+            else
+                attributes[i] = next.getAttribute(xpath);
         }
 
         return featureType.create(attributes, id);
