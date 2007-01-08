@@ -378,7 +378,7 @@ public class DefaultAttributeType implements AttributeType {
             }
 
             return;
-        } else if (!type.isAssignableFrom(attribute.getClass())) {
+        } else if (type != attribute.getClass() && !type.isAssignableFrom(attribute.getClass())) {
             throw new IllegalArgumentException(attribute.getClass().getName()
                 + " is not an acceptable class for " + getName()
                 + " as it is not assignable from " + type);
