@@ -321,6 +321,17 @@ public final class LabelCacheDefault implements LabelCache {
 	 */
 	public void end(Graphics2D graphics, Rectangle displayArea) {
 		List glyphs = new ArrayList();
+        
+        // Hack: let's reduce the display area width and height by one pixel.
+        // If the rendered image is 256x256, proper rendering of polygons and
+        // lines occurr only if the display area is [0,0; 256,256], yet if you
+        // try to render anything at [x,256] or [256,y] it won't show.
+        // So, to avoid labels that happen to touch the border being cut
+        // by one pixel, we reduce the display area. 
+        // Feels hackish, don't have a better solution at the moment thought
+        displayArea = new Rectangle(displayArea);
+        displayArea.width -= 1;
+        displayArea.height -= 1;
 
 		GeometryFactory factory = new GeometryFactory();
 		Geometry displayGeom = factory.toGeometry(new Envelope(displayArea
