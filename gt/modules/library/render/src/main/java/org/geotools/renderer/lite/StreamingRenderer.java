@@ -15,6 +15,8 @@
  */
 package org.geotools.renderer.lite;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -212,6 +214,8 @@ public final class StreamingRenderer implements GTRenderer {
 	private boolean optimizedDataLoadingEnabledDEFAULT = false;
 
 	private boolean memoryPreloadingEnabledDEFAULT = false;
+    
+    private int renderingBufferDEFAULT = 0;
 
 	/**
 	 * Activates bbox and attribute filtering optimization, that works properly
@@ -520,6 +524,24 @@ public final class StreamingRenderer implements GTRenderer {
 			// DJB old method - the best we can do
 			setScaleDenominator(1 / at.getScaleX());
 		}
+        
+		//////////////////////////////////////////////////////////////////////
+        //
+        // Consider expanding the map extent so that a few more geometries
+        // will be considered, in order to catch those outside of the rendering
+        // bounds whose stroke is so thick that it countributes rendered area
+        //
+        //////////////////////////////////////////////////////////////////////
+        int buffer = getRenderingBuffer();
+        if(buffer > 0) {
+            double bufferX =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleX());
+            double bufferY =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleY());
+            Envelope expandedEnvelope = new Envelope(mapExtent.getMinX() - bufferX, 
+                    mapExtent.getMaxX() + bufferX, mapExtent.getMinY() - bufferY, 
+                    mapExtent.getMaxY() + bufferY);
+            mapExtent = new ReferencedEnvelope(expandedEnvelope, 
+                    mapExtent.getCoordinateReferenceSystem());
+        }
 
 		labelCache.start();
 		final MapLayer[] layers = context.getLayers();
@@ -659,6 +681,24 @@ public final class StreamingRenderer implements GTRenderer {
             setScaleDenominator(worldToScreenTransform);
 			// old method - the best we can do
 		}
+        
+		//////////////////////////////////////////////////////////////////////
+        //
+        // Consider expanding the map extent so that a few more geometries
+        // will be considered, in order to catch those outside of the rendering
+        // bounds whose stroke is so thick that it countributes rendered area
+        //
+        //////////////////////////////////////////////////////////////////////
+        int buffer = getRenderingBuffer();
+        if(buffer > 0) {
+            double bufferX =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleX());
+            double bufferY =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleY());
+            Envelope expandedEnvelope = new Envelope(mapExtent.getMinX() - bufferX, 
+                    mapExtent.getMaxX() + bufferX, mapExtent.getMinY() - bufferY, 
+                    mapExtent.getMaxY() + bufferY);
+            mapExtent = new ReferencedEnvelope(expandedEnvelope, 
+                    mapExtent.getCoordinateReferenceSystem());
+        }
 
 		// ////////////////////////////////////////////////////////////////////
 		//
@@ -2053,6 +2093,24 @@ public final class StreamingRenderer implements GTRenderer {
 			return optimizedDataLoadingEnabledDEFAULT;
 		return result.booleanValue();
 	}
+    
+    /**
+     * <p>
+     * Returns the rendering buffer, a measure in pixels used to expand the geometry search area
+     * enough to capture the geometries that do stay outside of the current rendering bounds but
+     * do affect them because of their large strokes (labels and graphic symbols are handled 
+     * differently, see the label chache).
+     * </p>
+     * 
+     */
+    private int getRenderingBuffer() {
+        if (rendererHints == null)
+            return renderingBufferDEFAULT;
+        Number result = (Number) rendererHints.get("renderingBuffer");
+        if (result == null)
+            return renderingBufferDEFAULT;
+        return result.intValue();
+    }
 
 	/**
 	 * Returns the generalization distance in the screen space.
