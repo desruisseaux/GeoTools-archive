@@ -18,6 +18,7 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -406,6 +407,34 @@ public final class RendererUtilities {
 		// remember, this is the denominator, not the actual scale;
 	}
 
+    /**
+     * First searches the hints for the scale denominator hint otherwise calls 
+     * {@link #calculateScale(Envelope, CoordinateReferenceSystem, int, int, double)}.  If
+     * the hints contains a DPI then that DPI is used otherwise 90 is used (the OGS default).
+     */
+    public static double calculateScale(ReferencedEnvelope envelope, int imageWidth,int imageHeight,
+            Map hints )
+	throws TransformException, FactoryException
+    {
+        
+        if( hints!=null && hints.containsKey("declaredScaleDenominator")){
+            Double scale=(Double) hints.get("declaredScaleDenominator");
+            if( scale.doubleValue()<=0 )
+                throw new IllegalArgumentException("the declaredScaleDenominator must be greater than 0, was: "+scale.doubleValue());
+            return scale.doubleValue();
+        }
+            
+        
+        int dpi;
+        if( hints!=null && hints.containsKey("dpi") ){
+            dpi=((Integer)hints.get("dpi")).intValue();
+        }else{
+            dpi=90;//          90 = OGC standard DPI (see SLD spec page 37)
+        }
+            
+        return calculateScale(envelope, imageWidth, imageHeight, dpi);
+    }
+	
 	/**
 	 * Find the scale denominator of the map. Method: 1. find the diagonal
 	 * distance (meters) 2. find the diagonal distance (pixels) 3. find the

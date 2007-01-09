@@ -215,17 +215,15 @@ public final class StreamingRenderer implements GTRenderer {
     
     private int renderingBufferDEFAULT = 0;
 
-	/**
-	 * Activates bbox and attribute filtering optimization, that works properly
-	 * only if the input feature sources really contain just one feature type.
-	 * This may not be the case if the feature source is based on a generic
-	 * feature collection
-	 */
-	/**
-	 * "optimizedDataLoadingEnabled" - Boolean yes/no (see default
-	 * optimizedDataLoadingEnabledDEFAULT) "memoryPreloadingEnabled" - Boolean
-	 * yes/no (see default memoryPreloadingEnabledDEFAULT)
-	 */
+    /**
+     * "optimizedDataLoadingEnabled" - Boolean  yes/no (see default optimizedDataLoadingEnabledDEFAULT)
+     * "memoryPreloadingEnabled"     - Boolean  yes/no (see default memoryPreloadingEnabledDEFAULT)
+     * "declaredScaleDenominator"    - Double   the value of the scale denominator to use by the renderer.  
+     *                                          by default the value is calculated based on the screen size 
+     *                                          and the displayed area of the map.
+     *  "dpi"                        - Integer  number of dots per inch of the display 90 DPI is the default (as declared by OGC)      
+     *  "forceCRS"                   - CoordinateReferenceSystem declares to the renderer that all layers are of the CRS declared in this hint                               
+     */
 	private Map rendererHints = null;
 
 	private AffineTransform worldToScreenTransform = null;
@@ -514,11 +512,11 @@ public final class StreamingRenderer implements GTRenderer {
 				.getCoordinateReferenceSystem();
 
 		try {
-			// 90 = OGC standard DPI (see SLD spec page 37)
-			setScaleDenominator(RendererUtilities.calculateScale(mapArea,
-					destinationCrs, paintArea.width, paintArea.height, 90));
+			setScaleDenominator(RendererUtilities.calculateScale(mapExtent,
+					paintArea.width, paintArea.height, rendererHints));
 		} catch (Exception e) // probably either (1) no CRS (2) error xforming
 		{
+			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			// DJB old method - the best we can do
 			setScaleDenominator(1 / at.getScaleX());
 		}
@@ -661,9 +659,8 @@ public final class StreamingRenderer implements GTRenderer {
 		}
 
 		try {
-			// 90 = OGC standard DPI (see SLD spec page 37)
 			setScaleDenominator(RendererUtilities.calculateScale(mapArea,
-					paintArea.width, paintArea.height, 90));
+					paintArea.width, paintArea.height, rendererHints));
 		} catch (TransformException e) // probably either (1) no CRS (2) error xforming
 		{
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
