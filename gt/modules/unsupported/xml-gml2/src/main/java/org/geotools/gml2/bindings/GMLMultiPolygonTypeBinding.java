@@ -77,7 +77,7 @@ public class GMLMultiPolygonTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return BEFORE;
+        return AFTER;
     }
 
     /**

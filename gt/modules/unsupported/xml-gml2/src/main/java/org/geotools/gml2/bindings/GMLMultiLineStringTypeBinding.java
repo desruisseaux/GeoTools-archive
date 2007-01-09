@@ -76,7 +76,7 @@ public class GMLMultiLineStringTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return BEFORE;
+        return AFTER;
     }
 
     /**

@@ -75,7 +75,7 @@ public class GMLMultiPointTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return BEFORE;
+        return AFTER;
     }
 
     /**
@@ -107,7 +107,7 @@ public class GMLMultiPointTypeBinding extends AbstractComplexBinding {
         throws Exception {
         GeometryCollection gc = (GeometryCollection) value;
         Point[] points = new Point[gc.getNumGeometries()];
-
+        
         for (int i = 0; i < gc.getNumGeometries(); i++) {
             points[i] = (Point) gc.getGeometryN(i);
         }

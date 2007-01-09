@@ -74,16 +74,6 @@ public class GMLPolygonTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return BEFORE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
         return Polygon.class;
     }

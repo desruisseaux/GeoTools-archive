@@ -73,17 +73,7 @@ public class GMLLineStringTypeBinding extends AbstractComplexBinding {
         return GML.LINESTRINGTYPE;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return BEFORE;
-    }
-
-    /**
+   /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      *
