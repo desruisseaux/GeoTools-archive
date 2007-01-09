@@ -15,8 +15,6 @@
  */
 package org.geotools.renderer.lite;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -534,13 +532,8 @@ public final class StreamingRenderer implements GTRenderer {
         //////////////////////////////////////////////////////////////////////
         int buffer = getRenderingBuffer();
         if(buffer > 0) {
-            double bufferX =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleX());
-            double bufferY =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleY());
-            Envelope expandedEnvelope = new Envelope(mapExtent.getMinX() - bufferX, 
-                    mapExtent.getMaxX() + bufferX, mapExtent.getMinY() - bufferY, 
-                    mapExtent.getMaxY() + bufferY);
-            mapExtent = new ReferencedEnvelope(expandedEnvelope, 
-                    mapExtent.getCoordinateReferenceSystem());
+            mapExtent = new ReferencedEnvelope(expandEnvelope(mapExtent, worldToScreen, buffer), 
+                    mapExtent.getCoordinateReferenceSystem()); 
         }
 
 		labelCache.start();
@@ -691,14 +684,10 @@ public final class StreamingRenderer implements GTRenderer {
         //////////////////////////////////////////////////////////////////////
         int buffer = getRenderingBuffer();
         if(buffer > 0) {
-            double bufferX =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleX());
-            double bufferY =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleY());
-            Envelope expandedEnvelope = new Envelope(mapExtent.getMinX() - bufferX, 
-                    mapExtent.getMaxX() + bufferX, mapExtent.getMinY() - bufferY, 
-                    mapExtent.getMaxY() + bufferY);
-            mapExtent = new ReferencedEnvelope(expandedEnvelope, 
-                    mapExtent.getCoordinateReferenceSystem());
+            mapExtent = new ReferencedEnvelope(expandEnvelope(mapExtent, worldToScreen, buffer), 
+                    mapExtent.getCoordinateReferenceSystem()); 
         }
+        
 
 		// ////////////////////////////////////////////////////////////////////
 		//
@@ -753,6 +742,14 @@ public final class StreamingRenderer implements GTRenderer {
 							.append(error).toString());
 		}
 	}
+
+    private Envelope expandEnvelope(Envelope envelope, AffineTransform worldToScreen, int buffer) {
+        double bufferX =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleX());
+        double bufferY =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleY());
+        return new Envelope(envelope.getMinX() - bufferX, 
+                envelope.getMaxX() + bufferX, envelope.getMinY() - bufferY, 
+                envelope.getMaxY() + bufferY);
+    }
 
 	/**
 	 * Queries a given layer's <code>Source</code> instance to be rendered. 
@@ -850,7 +847,8 @@ public final class StreamingRenderer implements GTRenderer {
 			FeatureType schema, LiteFeatureTypeStyle[] styles,
 			Envelope mapArea, CoordinateReferenceSystem mapCRS,
 			CoordinateReferenceSystem featCrs, Rectangle screenSize,
-			GeometryAttributeType geometryAttribute)
+			GeometryAttributeType geometryAttribute,
+            AffineTransform worldToScreenTransform)
 			throws IllegalFilterException, IOException,
 			IllegalAttributeException {
 		FeatureCollection results = null;
@@ -862,6 +860,17 @@ public final class StreamingRenderer implements GTRenderer {
 		final int length;
 		Filter filter = null;
 		
+        // if map extent are not already expanded by a constant buffer, try to compute a layer
+        // specific one based on stroke widths
+        if(getRenderingBuffer() == 0) {
+            int buffer = findRenderingBuffer(styles);
+            if (buffer > 0) {
+                mapArea = expandEnvelope(mapArea, worldToScreenTransform,
+                        buffer);
+                LOGGER.fine("Expanding rendering area by " + buffer 
+                        + " pixels to consider stroke width");
+            }
+        }
 		ReferencedEnvelope envelope = new ReferencedEnvelope(mapArea, mapCRS);
 		if (isOptimizedDataLoadingEnabled()) {
 			// see what attributes we really need by exploring the styles
@@ -1144,6 +1153,43 @@ public final class StreamingRenderer implements GTRenderer {
 			return memoryPreloadingEnabledDEFAULT;
 		return result.booleanValue();
 	}
+    
+    /**
+     * Returns an estimate of the rendering buffer needed to properly display this
+     * layer taking into consideration the constant stroke sizes in the feature type
+     * styles.
+     * 
+     * @param styles
+     *            the feature type styles to be applied to the layer
+     * @return an estimate of the buffer that should be used to properly display a layer
+     *         rendered with the specified styles 
+     */
+    private int findRenderingBuffer(LiteFeatureTypeStyle[] styles) {
+        final MaxStrokeWidthEstimator rbe = new MaxStrokeWidthEstimator();
+
+        LiteFeatureTypeStyle lfts;
+        Rule[] rules;
+        int rulesLength;
+        final int length = styles.length;
+        for (int t = 0; t < length; t++) {
+            lfts = styles[t];
+            rules = lfts.elseRules;
+            rulesLength = rules.length;
+            for (int j = 0; j < rulesLength; j++) {
+                rbe.visit(rules[j]);
+            }
+            rules = lfts.ruleList;
+            rulesLength = rules.length;
+            for (int j = 0; j < rulesLength; j++) {
+                rbe.visit(rules[j]);
+            }
+        }
+
+        if(!rbe.isEstimateAccurate())
+            LOGGER.warning("Assuming rendering buffer = " + rbe.getBuffer() 
+                    + ", but estimation is not accurate, you may want to set a buffer manually");
+        return rbe.getBuffer();
+    }
 
 	/**
 	 * Inspects the <code>MapLayer</code>'s style and retrieves it's needed
@@ -1613,7 +1659,7 @@ public final class StreamingRenderer implements GTRenderer {
         	result = queryLayer(currLayer, featureSource, schema,
 				featureTypeStyleArray,
 				mapArea, destinationCrs, sourceCrs, screenSize,
-				geometryAttribute);
+				geometryAttribute, at);
         } else {
         	Source source = currLayer.getSource();
         	result = queryLayer( currLayer, currLayer.getSource() );
