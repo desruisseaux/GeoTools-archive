@@ -74,7 +74,7 @@
   <dependencies>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-jdbc</artifactId>
+      <artifactId>gt2-data</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

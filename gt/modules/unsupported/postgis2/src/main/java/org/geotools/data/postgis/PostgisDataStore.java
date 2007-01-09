@@ -10,12 +10,6 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.jdbc.ConnectionPool;
-import org.geotools.data.jdbc.JDBCDataStore;
-import org.geotools.data.jdbc.JDBCDataStoreConfig;
-import org.geotools.data.jdbc.QueryData;
-import org.geotools.data.jdbc.attributeio.AttributeIO;
-import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.opengis.filter.Filter;
@@ -26,15 +20,6 @@ public class PostgisDataStore implements DataStore {
     protected static final Logger LOGGER = Logger.getLogger(
             "org.geotools.data.postgis");
 	
-	protected PostgisDataStore(ConnectionPool arg0, JDBCDataStoreConfig arg1) throws IOException {
-		// TODO Auto-generated constructor stub
-	}
-
-	protected AttributeIO getGeometryAttributeIO(AttributeType arg0, QueryData arg1) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public void createSchema(FeatureType arg0) throws IOException {
 		// TODO Auto-generated method stub
 		
