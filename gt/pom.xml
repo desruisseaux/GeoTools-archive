@@ -42,7 +42,8 @@
   <!--                        "StressTest.java"                    -->
   <!--                                                             -->
   <!--     Example:           mvn -P extensive.tests install       -->
-  <!--                        mvn -P site.build,site               -->
+  <!--                        mvn -P online,stress install         -->
+  <!--                        mvn -P site.build site               -->
   <!--                                                             -->
   <!--     Note that profiles like "site.build" are not mandatory  -->
   <!--     for using the "site" goal. Such profiles just modify    -->
