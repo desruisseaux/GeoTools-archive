@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.geotools.data.DataStore;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DefaultQuery;
@@ -42,15 +41,13 @@ import org.geotools.styling.FeatureTypeStyle;
  * @source $URL$
  */
 public class StyleGeneratorOnlineTest extends DataTestCase {
-
     static boolean WKB_ENABLED = true;
     static boolean CHECK_TYPE = false;
-
     PostgisTests.Fixture f;
     DataStore data;
     Map remote;
     PostgisFeatureCollection fc;
-    
+
     public StyleGeneratorOnlineTest(String arg0) {
         super(arg0);
     }
@@ -63,11 +60,11 @@ public class StyleGeneratorOnlineTest extends DataTestCase {
         super.setUp();
 
         f = PostgisTests.newFixture(getFixtureFile());
-        
+
         remote = new HashMap();
-        remote.put("dbtype","postgis");        
+        remote.put("dbtype", "postgis");
         remote.put("charset", "");
-        remote.put("host",f.host);
+        remote.put("host", f.host);
         remote.put("port", f.port);
         remote.put("database", f.database);
         remote.put("user", f.user);
@@ -76,24 +73,24 @@ public class StyleGeneratorOnlineTest extends DataTestCase {
 
         PostgisDataStoreFactory pdsf = new PostgisDataStoreFactory();
         data = pdsf.createDataStore(remote);
+
         JDBCFeatureSource featureSource = (JDBCFeatureSource) data.getFeatureSource("bc_hospitals");
         fc = new PostgisFeatureCollection(featureSource, DefaultQuery.ALL);
     }
-    
+
     protected void tearDown() throws Exception {
         fc = null;
         data = null;
         super.tearDown();
     }
-    
+
     /**
      * Simple test to ensure unique interval function works on real data
      * containing nulls.
-     * 
+     *
      * @throws Exception
      */
     public void testUniqueInterval() throws Exception {
-
         ColorBrewer brewer = new ColorBrewer();
         brewer.loadPalettes();
 
@@ -108,17 +105,18 @@ public class StyleGeneratorOnlineTest extends DataTestCase {
         params.add(0, expr); //expression
         params.add(1, ff.literal(7)); //classes
         function.setParameters(params);
+
         Object object = function.evaluate(fc);
         assertTrue(object instanceof ExplicitClassifier);
-        Classifier classifier = (Classifier) object;
-        
-        Color[] colors = brewer.getPalette(paletteName).getColors(7);
-        //get the fts
-        FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(
-                classifier, expr, colors, "myfts", roadFeatures[0].getFeatureType()
-                        .getDefaultGeometry(), StyleGenerator.ELSEMODE_IGNORE,
-                0.5, null);
-        assertNotNull(fts);
 
+        Classifier classifier = (Classifier) object;
+
+        Color[] colors = brewer.getPalette(paletteName).getColors(7);
+
+        //get the fts
+        FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(classifier, expr, colors,
+                "myfts", roadFeatures[0].getFeatureType().getDefaultGeometry(),
+                StyleGenerator.ELSEMODE_IGNORE, 0.5, null);
+        assertNotNull(fts);
     }
 }

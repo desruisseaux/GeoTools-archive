@@ -22,7 +22,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import org.opengis.filter.Filter;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.filter.AttributeExpression;
@@ -48,13 +53,6 @@ import org.geotools.styling.StyleBuilder;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 import org.geotools.styling.Symbolizer;
-import org.opengis.filter.Filter;
-
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
@@ -110,7 +108,7 @@ public class StyleGenerator {
      * Merges a classifier, array of colors and other data into a
      * FeatureTypeStyle object. Yes, this constructor is insane and likely to
      * change very soon.
-     * 
+     *
      * @param classifier
      * @param colors
      * @param typeId
@@ -123,24 +121,24 @@ public class StyleGenerator {
      * @return
      * @throws IllegalFilterException
      */
-    public static FeatureTypeStyle createFeatureTypeStyle(
-            Classifier classifier, Expression expression, Color[] colors,
-            String typeId, GeometryAttributeType geometryAttrType,
-            int elseMode, double opacity, Stroke defaultStroke)
-            throws IllegalFilterException {
+    public static FeatureTypeStyle createFeatureTypeStyle(Classifier classifier,
+        Expression expression, Color[] colors, String typeId,
+        GeometryAttributeType geometryAttrType, int elseMode, double opacity, Stroke defaultStroke)
+        throws IllegalFilterException {
         //init nulls
         if (defaultStroke == null) {
             defaultStroke = sb.createStroke();
         }
-        
+
         //answer goes here
         FeatureTypeStyle fts = sf.createFeatureTypeStyle();
 
         // update the number of classes
         int numClasses = classifier.getSize();
-//        if (elseMode == ELSEMODE_IGNORE) {
-//            numClasses++;
-//        }
+
+        //        if (elseMode == ELSEMODE_IGNORE) {
+        //            numClasses++;
+        //        }
 
         //numeric
         if (classifier instanceof RangedClassifier) {
@@ -155,9 +153,8 @@ public class StyleGenerator {
                 localMin = ranged.getMin(i);
                 localMax = ranged.getMax(i);
 
-                Rule rule = createRuleRanged(ranged, expression, localMin,
-                        localMax, geometryAttrType, i, elseMode, colors,
-                        opacity, defaultStroke);
+                Rule rule = createRuleRanged(ranged, expression, localMin, localMax,
+                        geometryAttrType, i, elseMode, colors, opacity, defaultStroke);
                 fts.addRule(rule);
             }
         } else if (classifier instanceof ExplicitClassifier) {
@@ -166,9 +163,8 @@ public class StyleGenerator {
             // for each class
             for (int i = 0; i < explicit.getSize(); i++) {
                 Set value = (Set) explicit.getValues(i);
-                Rule rule = createRuleExplicit(explicit, expression, value,
-                        geometryAttrType, i, elseMode, colors, opacity,
-                        defaultStroke);
+                Rule rule = createRuleExplicit(explicit, expression, value, geometryAttrType, i,
+                        elseMode, colors, opacity, defaultStroke);
                 fts.addRule(rule);
             }
         } else {
@@ -177,8 +173,8 @@ public class StyleGenerator {
 
         // add an else rule to capture any missing features?
         if (elseMode != ELSEMODE_IGNORE) {
-            Symbolizer symb = createSymbolizer(geometryAttrType,
-                    getElseColor(elseMode, colors), opacity, defaultStroke);
+            Symbolizer symb = createSymbolizer(geometryAttrType, getElseColor(elseMode, colors),
+                    opacity, defaultStroke);
             Rule elseRule = sb.createRule(symb);
             elseRule.setIsElseFilter(true);
             elseRule.setTitle("Else");
@@ -199,9 +195,7 @@ public class StyleGenerator {
         }
 
         //our syntax will be: ColorBrewer:id
-        fts.setSemanticTypeIdentifiers(new String[] {
-                "generic:geometry", "colorbrewer:" + typeId
-            });
+        fts.setSemanticTypeIdentifiers(new String[] { "generic:geometry", "colorbrewer:" + typeId });
 
         return fts;
     }
@@ -216,9 +210,8 @@ public class StyleGenerator {
      * @param defaultStroke stroke used for borders
      *
      */
-    private static Symbolizer createSymbolizer(
-            GeometryAttributeType geometryAttrType, Color color,
-            double opacity, Stroke defaultStroke) {
+    private static Symbolizer createSymbolizer(GeometryAttributeType geometryAttrType, Color color,
+        double opacity, Stroke defaultStroke) {
         Symbolizer symb;
 
         if (defaultStroke == null) {
@@ -234,8 +227,7 @@ public class StyleGenerator {
         } else if ((geometryAttrType.getType() == MultiPoint.class)
                 || (geometryAttrType.getType() == Point.class)) {
             Fill fill = sb.createFill(color, opacity);
-            Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, fill,
-                    defaultStroke);
+            Mark square = sb.createMark(StyleBuilder.MARK_SQUARE, fill, defaultStroke);
             Graphic graphic = sb.createGraphic(null, square, null); //, 1, 4, 0);
             symb = sb.createPointSymbolizer(graphic);
 
@@ -280,8 +272,9 @@ public class StyleGenerator {
         }
     }
 
-    private static Rule createRuleRanged(RangedClassifier classifier, Expression expression, Object localMin, Object localMax,
-        GeometryAttributeType geometryAttrType, int i, int elseMode, Color[] colors, double opacity, Stroke defaultStroke)
+    private static Rule createRuleRanged(RangedClassifier classifier, Expression expression,
+        Object localMin, Object localMax, GeometryAttributeType geometryAttrType, int i,
+        int elseMode, Color[] colors, double opacity, Stroke defaultStroke)
         throws IllegalFilterException {
         // 1.0 --> 1
         // (this makes our styleExpressions more readable. Note that the
@@ -295,7 +288,7 @@ public class StyleGenerator {
 
         // construct filters
         Filter filter = null;
-        
+
         if (localMin == localMax) {
             // build filter: =
             CompareFilter eqFilter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
@@ -311,8 +304,7 @@ public class StyleGenerator {
             if (localMin != null) {
                 lowBoundFilter = ff.createCompareFilter(FilterType.COMPARE_GREATER_THAN_EQUAL);
                 lowBoundFilter.addLeftValue(expression); // x
-                lowBoundFilter.addRightValue(ff.createLiteralExpression(
-                        localMin)); // min
+                lowBoundFilter.addRightValue(ff.createLiteralExpression(localMin)); // min
             }
 
             if (localMax != null) {
@@ -328,8 +320,7 @@ public class StyleGenerator {
             }
 
             if ((localMin != null) && (localMax != null)) {
-                andFilter = ff.createLogicFilter(lowBoundFilter, hiBoundFilter,
-                        FilterType.LOGIC_AND);
+                andFilter = ff.createLogicFilter(lowBoundFilter, hiBoundFilter, FilterType.LOGIC_AND);
                 filter = andFilter;
             } else if ((localMin == null) && (localMax != null)) {
                 filter = hiBoundFilter;
@@ -351,9 +342,9 @@ public class StyleGenerator {
         return rule;
     }
 
-    private static Rule createRuleExplicit(ExplicitClassifier explicit, Expression expression, 
-            Set value, GeometryAttributeType geometryAttrType, int i,
-            int elseMode, Color[] colors, double opacity, Stroke defaultStroke) {
+    private static Rule createRuleExplicit(ExplicitClassifier explicit, Expression expression,
+        Set value, GeometryAttributeType geometryAttrType, int i, int elseMode, Color[] colors,
+        double opacity, Stroke defaultStroke) {
         // create a sub filter for each unique value, and merge them
         // into the logic filter
         Object[] items = value.toArray();
@@ -377,17 +368,18 @@ public class StyleGenerator {
             try {
                 filter = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
                 filter.addLeftValue(expression); // the attribute we're looking at
-                
+
                 Expression rExpr;
+
                 if (items[item] == null) {
                     rExpr = ff.createNullFilter().getNullCheckValue();
                 } else {
                     rExpr = ff.createLiteralExpression(items[item]);
                 }
+
                 filter.addRightValue(rExpr);
             } catch (IllegalFilterException e) {
-                LOGGER.log(Level.SEVERE,
-                    "Error during rule filter construction", e);
+                LOGGER.log(Level.SEVERE, "Error during rule filter construction", e);
 
                 return null;
             }
@@ -430,17 +422,17 @@ public class StyleGenerator {
         return rule;
     }
 
-    public static void modifyFTS(FeatureTypeStyle fts, int ruleIndex,
-        String styleExpression) throws IllegalFilterException {
+    public static void modifyFTS(FeatureTypeStyle fts, int ruleIndex, String styleExpression)
+        throws IllegalFilterException {
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
 
         Rule[] rule = fts.getRules();
         Rule thisRule = rule[ruleIndex];
         Filter filter = thisRule.getFilter();
-        short filterType = Filters.getFilterType( filter );
+        short filterType = Filters.getFilterType(filter);
 
         if (filterType == FilterType.LOGIC_AND) { //ranged expression
-                                              //figure out the appropriate values
+                                                  //figure out the appropriate values
 
             String[] newValue = styleExpression.split("\\.\\."); //$NON-NLS-1$
 
@@ -479,9 +471,8 @@ public class StyleGenerator {
             thisRule.setFilter(filter); // style events don't handle filters yet, so fire the change event for filter
 
             //TODO: adjust the previous and next filters (uses isFirst, isLast)
-        } else if ((filterType == FilterType.LOGIC_OR)
-                || (filterType == FilterType.COMPARE_EQUALS)) { //explicit expression 
-                                                            //obtain the expression containing the attribute
+        } else if ((filterType == FilterType.LOGIC_OR) || (filterType == FilterType.COMPARE_EQUALS)) { //explicit expression 
+                                                                                                       //obtain the expression containing the attribute
 
             Expression attrExpression;
 
@@ -493,8 +484,7 @@ public class StyleGenerator {
             }
 
             //recreate the filter with the new values
-            rule[ruleIndex].setFilter(toExplicitFilter(styleExpression,
-                    attrExpression));
+            rule[ruleIndex].setFilter(toExplicitFilter(styleExpression, attrExpression));
 
             //TODO: remove duplicate values from other filters
         } else {
@@ -503,7 +493,7 @@ public class StyleGenerator {
     }
 
     public static String toStyleExpression(Filter filter) {
-        short filterType = Filters.getFilterType( filter );
+        short filterType = Filters.getFilterType(filter);
 
         if (filterType == FilterType.LOGIC_AND) { //looks like a ranged filter
 
@@ -546,10 +536,8 @@ public class StyleGenerator {
      * @return an array with all the filters
      * @throws IllegalFilterException
      */
-    public static Filter[] toFilter(String[] styleExpression,
-                                    FeatureType[] featureType, 
-                                    String[] attributeTypeName)
-        throws IllegalFilterException {
+    public static Filter[] toFilter(String[] styleExpression, FeatureType[] featureType,
+        String[] attributeTypeName) throws IllegalFilterException {
         Filter[] filter = new Filter[styleExpression.length];
 
         // prepare the styleExpressions (fix out if they are ranged, and if so
@@ -585,8 +573,8 @@ public class StyleGenerator {
                 filter[i] = toRangedFilter(styleExpression[i], featureType[i],
                         attributeTypeName[i], upperBoundClosed);
             } else { // specific
-                filter[i] = toExplicitFilter(styleExpression[i],
-                        featureType[i], attributeTypeName[i]);
+                filter[i] = toExplicitFilter(styleExpression[i], featureType[i],
+                        attributeTypeName[i]);
             }
         }
 
@@ -615,9 +603,9 @@ public class StyleGenerator {
      * @return a filter
      * @throws IllegalFilterException
      */
-    public static Filter toRangedFilter(String styleExpression,
-        FeatureType featureType, String attributeTypeName,
-        boolean upperBoundClosed) throws IllegalFilterException {
+    public static Filter toRangedFilter(String styleExpression, FeatureType featureType,
+        String attributeTypeName, boolean upperBoundClosed)
+        throws IllegalFilterException {
         FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         AttributeExpression attrib = ff.createAttributeExpression(attributeTypeName);
         String[] strs = styleExpression.split("\\.\\."); //$NON-NLS-1$
@@ -644,8 +632,7 @@ public class StyleGenerator {
         upperBound.addLeftValue(attrib);
         upperBound.addRightValue(localMax);
 
-        LogicFilter filter = ff.createLogicFilter(lowerBound, upperBound,
-                FilterType.LOGIC_AND);
+        LogicFilter filter = ff.createLogicFilter(lowerBound, upperBound, FilterType.LOGIC_AND);
 
         return filter;
     }
@@ -678,15 +665,14 @@ public class StyleGenerator {
                     "This method currently only supports logical filters with exactly 2 children.");
             }
 
-            if (!(filter1 instanceof CompareFilter)
-                    || !(filter2 instanceof CompareFilter)) {
+            if (!(filter1 instanceof CompareFilter) || !(filter2 instanceof CompareFilter)) {
                 throw new IllegalArgumentException(
                     "Only compare filters as logical filter children are currently supported by this method.");
             }
 
             //find min and max values
-            short filterType1 = Filters.getFilterType( filter1 );
-            short filterType2 = Filters.getFilterType( filter2 );
+            short filterType1 = Filters.getFilterType(filter1);
+            short filterType2 = Filters.getFilterType(filter2);
             Expression min1;
             Expression min2;
             Expression max1;
@@ -728,8 +714,7 @@ public class StyleGenerator {
         } else if (filter instanceof CompareFilter) {
         }
 
-        throw new UnsupportedOperationException(
-            "Don't know how to handle this filter");
+        throw new UnsupportedOperationException("Don't know how to handle this filter");
     }
 
     /**
@@ -757,10 +742,8 @@ public class StyleGenerator {
      * @return a filter
      * @throws IllegalFilterException
      */
-    public static Filter toExplicitFilter(String styleExpression,
-                                          FeatureType featureType, 
-                                          String attributeTypeName)
-        throws IllegalFilterException {
+    public static Filter toExplicitFilter(String styleExpression, FeatureType featureType,
+        String attributeTypeName) throws IllegalFilterException {
         // eliminate spaces after commas
         String expr = styleExpression.replaceAll(",\\s+", ","); //$NON-NLS-1$//$NON-NLS-2$
         String[] attribValue = expr.split(","); //$NON-NLS-1$
@@ -808,8 +791,8 @@ public class StyleGenerator {
      * @return a filter
      * @throws IllegalFilterException
      */
-    public static Filter toExplicitFilter(String styleExpression,
-        Expression attribExpr) throws IllegalFilterException {
+    public static Filter toExplicitFilter(String styleExpression, Expression attribExpr)
+        throws IllegalFilterException {
         // eliminate spaces after commas
         String expr = styleExpression.replaceAll(",\\s+", ","); //$NON-NLS-1$//$NON-NLS-2$
         String[] attribValue = expr.split(","); //$NON-NLS-1$
@@ -850,7 +833,7 @@ public class StyleGenerator {
      * @param filter
      */
     private static String toExplicitStyleExpression(Filter filter) {
-        short filterType = Filters.getFilterType( filter );
+        short filterType = Filters.getFilterType(filter);
         String styleExpression = "";
 
         if (filterType == FilterType.COMPARE_EQUALS) {
@@ -877,8 +860,7 @@ public class StyleGenerator {
 
             while (iterator.hasNext()) {
                 // recursive call
-                styleExpression += toExplicitStyleExpression((Filter) iterator
-                    .next());
+                styleExpression += toExplicitStyleExpression((Filter) iterator.next());
 
                 if (iterator.hasNext()) {
                     styleExpression += ", ";

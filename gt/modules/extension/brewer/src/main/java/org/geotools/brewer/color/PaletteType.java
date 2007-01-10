@@ -18,7 +18,7 @@ package org.geotools.brewer.color;
 
 /**
  * This class doubles as a filter and an identifier for colour palettes.
- * 
+ *
  * @source $URL$
  */
 public class PaletteType {
@@ -41,8 +41,7 @@ public class PaletteType {
      * @param suitableRanged
      * @param suitableUnique
      */
-    public PaletteType(boolean suitableRanged, boolean suitableUnique,
-        String name) {
+    public PaletteType(boolean suitableRanged, boolean suitableUnique, String name) {
         this.name = name;
         this.suitableRanged = suitableRanged;
         this.suitableUnique = suitableUnique;
@@ -70,7 +69,7 @@ public class PaletteType {
 
     /**
      * Deterines if this PaletteType instance is suitable ranged.
-     * 
+     *
      * @return a boolean, true if the paletteType is sutableRanged.
      */
     public boolean isSuitableRanged() {

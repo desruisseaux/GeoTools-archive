@@ -15,6 +15,10 @@
  */
 package org.geotools.brewer.color;
 
+
+//import edu.psu.geovista.colorbrewer.OriginalColor;
+import java.awt.Color;
+import java.util.List;
 import org.geotools.feature.Feature;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactory;
@@ -24,18 +28,13 @@ import org.geotools.filter.FunctionExpressionImpl;
 import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.function.ClassificationFunction;
 
-//import edu.psu.geovista.colorbrewer.OriginalColor;
-import java.awt.Color;
-import java.util.List;
-
 
 /**
  *
  * @author James Macgill
  * @source $URL$
  */
-public class PaletteFunction extends FunctionExpressionImpl
-    implements FunctionExpression {
+public class PaletteFunction extends FunctionExpressionImpl implements FunctionExpression {
     ClassificationFunction classifier;
     String paletteName;
     FilterFactory ff;
@@ -117,8 +116,7 @@ public class PaletteFunction extends FunctionExpressionImpl
 
         BrewerPalette pal = brewer.getPalette(paletteName);
         Color[] colors = pal.getColors(classNum);
-        String color = "#" + intToHex(colors[klass].getRed())
-            + intToHex(colors[klass].getGreen())
+        String color = "#" + intToHex(colors[klass].getRed()) + intToHex(colors[klass].getGreen())
             + intToHex(colors[klass].getBlue());
 
         return color;

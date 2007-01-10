@@ -46,16 +46,11 @@ public class ColorBrewer {
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger
         .getLogger("org.geotools.brewer.color");
     public static final PaletteType ALL = new PaletteType(true, true, "ALL");
-    public static final PaletteType SUITABLE_RANGED = new PaletteType(true,
-            false);
-    public static final PaletteType SUITABLE_UNIQUE = new PaletteType(false,
-            true);
-    public static final PaletteType SEQUENTIAL = new PaletteType(true, false,
-            "SEQUENTIAL");
-    public static final PaletteType DIVERGING = new PaletteType(true, false,
-            "DIVERGING");
-    public static final PaletteType QUALITATIVE = new PaletteType(false, true,
-            "QUALITATIVE");
+    public static final PaletteType SUITABLE_RANGED = new PaletteType(true, false);
+    public static final PaletteType SUITABLE_UNIQUE = new PaletteType(false, true);
+    public static final PaletteType SEQUENTIAL = new PaletteType(true, false, "SEQUENTIAL");
+    public static final PaletteType DIVERGING = new PaletteType(true, false, "DIVERGING");
+    public static final PaletteType QUALITATIVE = new PaletteType(false, true, "QUALITATIVE");
     String name = null;
     String description = null;
     Hashtable palettes = new Hashtable();
@@ -80,10 +75,10 @@ public class ColorBrewer {
     }
 
     /**
-     * Creates a static instance of ColorBrewer containing a subset of the 
+     * Creates a static instance of ColorBrewer containing a subset of the
      * default palettes.
      *
-     * @param  type A PaletteType object which will be used to configure the 
+     * @param  type A PaletteType object which will be used to configure the
      *              returned ColorBrewer.
      * @return The ColorBrewer instance with the palette from the parameter.
      * @throws IOException
@@ -102,9 +97,9 @@ public class ColorBrewer {
 
     /**
      * Returns true if the palette exists in this ColorBrewer
-     * 
-     * @param paletteName A String with the name of the palette 
-     * @return A boolean, true if the ColorBrewer has a palette of the name 
+     *
+     * @param paletteName A String with the name of the palette
+     * @return A boolean, true if the ColorBrewer has a palette of the name
      *         given.
      */
     public boolean hasPalette(String paletteName) {
@@ -150,12 +145,10 @@ public class ColorBrewer {
             }
         }
 
-        return (BrewerPalette[]) palettes.toArray(new BrewerPalette[palettes
-            .size()]);
+        return (BrewerPalette[]) palettes.toArray(new BrewerPalette[palettes.size()]);
     }
 
-    public BrewerPalette[] getPalettes(PaletteType type, int numClasses,
-        int requiredViewers) {
+    public BrewerPalette[] getPalettes(PaletteType type, int numClasses, int requiredViewers) {
         List palettes = new ArrayList();
         Object[] entry = this.palettes.keySet().toArray();
 
@@ -174,8 +167,7 @@ public class ColorBrewer {
                 match = false;
             }
 
-            int[] suitability = pal.getPaletteSuitability()
-                                   .getSuitability(numClasses);
+            int[] suitability = pal.getPaletteSuitability().getSuitability(numClasses);
 
             if (isSet(PaletteSuitability.VIEWER_COLORBLIND, requiredViewers)
                     && (suitability[PaletteSuitability.VIEWER_COLORBLIND] != PaletteSuitability.QUALITY_GOOD)) {
@@ -186,15 +178,13 @@ public class ColorBrewer {
             } else if (isSet(PaletteSuitability.VIEWER_LCD, requiredViewers)
                     && (suitability[PaletteSuitability.VIEWER_LCD] != PaletteSuitability.QUALITY_GOOD)) {
                 match = false;
-            } else if (isSet(PaletteSuitability.VIEWER_PHOTOCOPY,
-                        requiredViewers)
+            } else if (isSet(PaletteSuitability.VIEWER_PHOTOCOPY, requiredViewers)
                     && (suitability[PaletteSuitability.VIEWER_PHOTOCOPY] != PaletteSuitability.QUALITY_GOOD)) {
                 match = false;
             } else if (isSet(PaletteSuitability.VIEWER_PRINT, requiredViewers)
                     && (suitability[PaletteSuitability.VIEWER_PRINT] != PaletteSuitability.QUALITY_GOOD)) {
                 match = false;
-            } else if (isSet(PaletteSuitability.VIEWER_PROJECTOR,
-                        requiredViewers)
+            } else if (isSet(PaletteSuitability.VIEWER_PROJECTOR, requiredViewers)
                     && (suitability[PaletteSuitability.VIEWER_PROJECTOR] != PaletteSuitability.QUALITY_GOOD)) {
                 match = false;
             }
@@ -204,14 +194,13 @@ public class ColorBrewer {
             }
         }
 
-        return (BrewerPalette[]) palettes.toArray(new BrewerPalette[palettes
-            .size()]);
+        return (BrewerPalette[]) palettes.toArray(new BrewerPalette[palettes.size()]);
     }
 
     /**
-     * Generates a String array with the names of the palettes in the 
+     * Generates a String array with the names of the palettes in the
      * ColorBrewer instance.
-     * 
+     *
      * @return A String array with the names of the palettes in the ColorBrewer
      *         instance.
      */
@@ -266,7 +255,7 @@ public class ColorBrewer {
 
     /**
      * Loads the default ColorBrewer palettes.
-     * 
+     *
      * @throws IOException
      */
     public void loadPalettes() {
@@ -276,9 +265,9 @@ public class ColorBrewer {
     }
 
     /**
-     * Loads into the ColorBrewer instance the set of palettes which have the 
-     * PaletteType matching that of the parameter. 
-     * 
+     * Loads into the ColorBrewer instance the set of palettes which have the
+     * PaletteType matching that of the parameter.
+     *
      * @param type The PaletteType for the palettes to load.
      * @throws IOException
      */
@@ -309,8 +298,7 @@ public class ColorBrewer {
         try {
             stream = url.openStream();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE,
-                "couldn't open input stream to load palette", e);
+            LOGGER.log(Level.SEVERE, "couldn't open input stream to load palette", e);
 
             return;
         }
@@ -319,7 +307,7 @@ public class ColorBrewer {
     }
 
     /**
-     * Loads into the ColorBrewer instance the set of palettes matching the 
+     * Loads into the ColorBrewer instance the set of palettes matching the
      * given parameters.
      *
      * @param XMLinput
@@ -334,10 +322,10 @@ public class ColorBrewer {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(stream);
-            this.name = fixToString(document.getElementsByTagName("name").item(0)
-                                            .getFirstChild().toString());
-            this.description = fixToString(document.getElementsByTagName(
-                        "description").item(0).getFirstChild().toString());
+            this.name = fixToString(document.getElementsByTagName("name").item(0).getFirstChild()
+                                            .toString());
+            this.description = fixToString(document.getElementsByTagName("description").item(0)
+                                                   .getFirstChild().toString());
 
             SampleScheme scheme = new SampleScheme();
 
@@ -345,8 +333,7 @@ public class ColorBrewer {
 
             for (int i = 0; i < samples.getLength(); i++) {
                 Node sample = samples.item(i);
-                int size = Integer.parseInt(sample.getAttributes()
-                                                  .getNamedItem("size")
+                int size = Integer.parseInt(sample.getAttributes().getNamedItem("size")
                                                   .getNodeValue());
                 String values = fixToString(sample.getFirstChild().toString());
                 int[] list = new int[size];
@@ -374,8 +361,7 @@ public class ColorBrewer {
                     }
 
                     if (item.getNodeName().equals("description")) {
-                        pal.setDescription(fixToString(
-                                item.getFirstChild().toString()));
+                        pal.setDescription(fixToString(item.getFirstChild().toString()));
                     }
 
                     if (item.getNodeName().equals("colors")) {
@@ -404,8 +390,7 @@ public class ColorBrewer {
                     if (item.getNodeName().equals("suitability")) {
                         NodeList schemeSuitability = item.getChildNodes();
 
-                        for (int k = 0; k < schemeSuitability.getLength();
-                                k++) {
+                        for (int k = 0; k < schemeSuitability.getLength(); k++) {
                             Node palScheme = schemeSuitability.item(k);
 
                             if (palScheme.getNodeName().equals("scheme")) {
@@ -413,8 +398,7 @@ public class ColorBrewer {
                                                                             .getNamedItem("size")
                                                                             .getNodeValue());
 
-                                String values = fixToString(palScheme.getFirstChild()
-                                                                     .toString());
+                                String values = fixToString(palScheme.getFirstChild().toString());
                                 String[] list = new String[6];
                                 StringTokenizer tok = new StringTokenizer(values);
 
@@ -438,8 +422,7 @@ public class ColorBrewer {
         } catch (SAXException sxe) {
             LOGGER.log(Level.SEVERE, "Error during palette parsing", sxe);
         } catch (ParserConfigurationException pce) {
-            LOGGER.log(Level.SEVERE,
-                "Parser with specified options can't be built", pce);
+            LOGGER.log(Level.SEVERE, "Parser with specified options can't be built", pce);
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, "i/o error during palette parsing", ioe);
         }

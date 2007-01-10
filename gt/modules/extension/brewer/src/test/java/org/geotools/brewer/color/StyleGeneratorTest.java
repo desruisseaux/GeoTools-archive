@@ -19,7 +19,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.opengis.filter.Filter;
 import org.geotools.data.DataTestCase;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
@@ -36,7 +36,6 @@ import org.geotools.filter.function.EqualIntervalFunction;
 import org.geotools.filter.function.RangedClassifier;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
-import org.opengis.filter.Filter;
 
 
 /**
@@ -48,15 +47,15 @@ public class StyleGeneratorTest extends DataTestCase {
         super(arg0);
     }
 
-    public void checkFilteredResultNotEmpty(Rule[] rule, FeatureSource fs,
-        String attribName) throws IOException {
+    public void checkFilteredResultNotEmpty(Rule[] rule, FeatureSource fs, String attribName)
+        throws IOException {
         for (int i = 0; i < rule.length; i++) {
             Filter filter = rule[i].getFilter();
             FeatureCollection filteredCollection = fs.getFeatures(filter);
             assertTrue(filteredCollection.size() > 0);
 
-            String filterInfo = "Filter \"" + filter.toString()
-                + "\" contains " + filteredCollection.size() + " element(s) (";
+            String filterInfo = "Filter \"" + filter.toString() + "\" contains "
+                + filteredCollection.size() + " element(s) (";
             FeatureIterator it = filteredCollection.features();
 
             while (it.hasNext()) {
@@ -107,14 +106,15 @@ public class StyleGeneratorTest extends DataTestCase {
 
         Object object = function.evaluate(fc);
         assertTrue(object instanceof RangedClassifier);
+
         RangedClassifier classifier = (RangedClassifier) object;
 
         Color[] colors = brewer.getPalette(paletteName).getColors(2);
+
         // get the fts
-        FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(
-                classifier, expr2, colors, "myfts", roadFeatures[0].getFeatureType()
-                        .getDefaultGeometry(), StyleGenerator.ELSEMODE_IGNORE,
-                0.5, null);
+        FeatureTypeStyle fts = StyleGenerator.createFeatureTypeStyle(classifier, expr2, colors,
+                "myfts", roadFeatures[0].getFeatureType().getDefaultGeometry(),
+                StyleGenerator.ELSEMODE_IGNORE, 0.5, null);
         assertNotNull(fts);
 
         // test each filter
