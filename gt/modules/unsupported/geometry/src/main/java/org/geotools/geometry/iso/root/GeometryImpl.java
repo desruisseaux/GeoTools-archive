@@ -448,31 +448,32 @@ public abstract class GeometryImpl implements Geometry {
 		}
 		
 		boolean rValue = false;
+		rValue = tIM.matches("T*F**F***");
 		
-		if (this instanceof PrimitiveImpl) {
-			if (geom instanceof PrimitiveImpl) {
-				// Primitive / Primitive
-				rValue = tIM.matches("TFF******");
-			} else
-			if (geom instanceof ComplexImpl) {
-				// Primitive / Complex
-				rValue = tIM.matches("T*F******");
-			} else {
-				Assert.isTrue(false);
-			}
-		} else
-		if (this instanceof ComplexImpl) {
-			if (geom instanceof PrimitiveImpl) {
-				// Complex / Primitive
-				rValue = tIM.matches("T***F****");
-			} else
-			if (geom instanceof ComplexImpl) {
-				// Complex / Complex
-				rValue = tIM.matches("T*F**F***");
-			} else {
-				Assert.isTrue(false);
-			}
-		}
+//		if (this instanceof PrimitiveImpl) {
+//			if (geom instanceof PrimitiveImpl) {
+//				// Primitive / Primitive
+//				rValue = tIM.matches("TFF******");
+//			} else
+//			if (geom instanceof ComplexImpl) {
+//				// Primitive / Complex
+//				rValue = tIM.matches("T*F******");
+//			} else {
+//				Assert.isTrue(false);
+//			}
+//		} else
+//		if (this instanceof ComplexImpl) {
+//			if (geom instanceof PrimitiveImpl) {
+//				// Complex / Primitive
+//				rValue = tIM.matches("T***F****");
+//			} else
+//			if (geom instanceof ComplexImpl) {
+//				// Complex / Complex
+//				rValue = tIM.matches("T*F**F***");
+//			} else {
+//				Assert.isTrue(false);
+//			}
+//		}
 		
 		return rValue;	
 	}
@@ -518,38 +519,41 @@ public abstract class GeometryImpl implements Geometry {
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 			return true;
 		
-		String intersectionPatternMatrix = "";
-		if (this instanceof PrimitiveImpl) {
-			if (geom instanceof PrimitiveImpl) {
-				// Primitive / Primitive
-				// Empty: I/I
-				// B/I, I/B, B/B may intersect
-				intersectionPatternMatrix = "F********";
-			} else
-			if (geom instanceof ComplexImpl) {
-				// Primitive / Complex
-				// Empty: I/I, I/B
-				// B/I, B/B may intersect
-				intersectionPatternMatrix = "FF*******";
-			} else {
-				Assert.isTrue(false);
-			}
-		} else
-		if (this instanceof ComplexImpl) {
-			if (geom instanceof PrimitiveImpl) {
-				// Complex / Primitive
-				// Empty: I/I, B/I
-				// I/B, B/B may intersect
-				intersectionPatternMatrix = "F**F*****";
-			} else
-			if (geom instanceof ComplexImpl) {
-				// Complex / Complex
-				// Empty: I/I, B/I, I/B, B/B
-				intersectionPatternMatrix = "FF*FF****";
-			} else {
-				Assert.isTrue(false);
-			}
-		}
+
+//		String intersectionPatternMatrix = "";
+//		if (this instanceof PrimitiveImpl) {
+//			if (geom instanceof PrimitiveImpl) {
+//				// Primitive / Primitive
+//				// Empty: I/I
+//				// B/I, I/B, B/B may intersect
+//				intersectionPatternMatrix = "F********";
+//			} else
+//			if (geom instanceof ComplexImpl) {
+//				// Primitive / Complex
+//				// Empty: I/I, I/B
+//				// B/I, B/B may intersect
+//				intersectionPatternMatrix = "FF*******";
+//			} else {
+//				Assert.isTrue(false);
+//			}
+//		} else
+//		if (this instanceof ComplexImpl) {
+//			if (geom instanceof PrimitiveImpl) {
+//				// Complex / Primitive
+//				// Empty: I/I, B/I
+//				// I/B, B/B may intersect
+//				intersectionPatternMatrix = "F**F*****";
+//			} else
+//			if (geom instanceof ComplexImpl) {
+//				// Complex / Complex
+//				// Empty: I/I, B/I, I/B, B/B
+//				intersectionPatternMatrix = "FF*FF****";
+//			} else {
+//				Assert.isTrue(false);
+//			}
+//		}
+
+		String intersectionPatternMatrix = "FF*FF****";
 
 		try {
 			IntersectionMatrix tIM = RelateOp.relate(this, geom);
@@ -643,38 +647,41 @@ public abstract class GeometryImpl implements Geometry {
 		}
 		
 		boolean rValue = false;
+		rValue = tIM.matches("F***T****")
+	  	  || tIM.matches("FT*******")
+	  	  || tIM.matches("F**T*****");
 		
-		if (this instanceof PrimitiveImpl) {
-			if (geom instanceof PrimitiveImpl) {
-				// Primitive / Primitive
-				rValue = tIM.matches("FT*******")
-					  || tIM.matches("F**T*****");
-			} else
-			if (geom instanceof ComplexImpl) {
-				// Primitive / Complex
-				rValue = tIM.matches("F***T****")
-					  || tIM.matches("FT*******")
-					  || tIM.matches("F**T*****");
-			} else {
-				Assert.isTrue(false);
-			}
-		} else
-		if (this instanceof ComplexImpl) {
-			if (geom instanceof PrimitiveImpl) {
-				// Complex / Primitive
-				rValue = tIM.matches("F***T****")
-				  	  || tIM.matches("FT*******")
-				  	  || tIM.matches("F**T*****");
-			} else
-			if (geom instanceof ComplexImpl) {
-				// Complex / Complex
-				rValue = tIM.matches("F***T****")
-			  	  	  || tIM.matches("FT*******")
-			  	  	  || tIM.matches("F**T*****");
-			} else {
-				Assert.isTrue(false);
-			}
-		}
+//		if (this instanceof PrimitiveImpl) {
+//			if (geom instanceof PrimitiveImpl) {
+//				// Primitive / Primitive
+//				rValue = tIM.matches("FT*******")
+//					  || tIM.matches("F**T*****");
+//			} else
+//			if (geom instanceof ComplexImpl) {
+//				// Primitive / Complex
+//				rValue = tIM.matches("F***T****")
+//					  || tIM.matches("FT*******")
+//					  || tIM.matches("F**T*****");
+//			} else {
+//				Assert.isTrue(false);
+//			}
+//		} else
+//		if (this instanceof ComplexImpl) {
+//			if (geom instanceof PrimitiveImpl) {
+//				// Complex / Primitive
+//				rValue = tIM.matches("F***T****")
+//				  	  || tIM.matches("FT*******")
+//				  	  || tIM.matches("F**T*****");
+//			} else
+//			if (geom instanceof ComplexImpl) {
+//				// Complex / Complex
+//				rValue = tIM.matches("F***T****")
+//			  	  	  || tIM.matches("FT*******")
+//			  	  	  || tIM.matches("F**T*****");
+//			} else {
+//				Assert.isTrue(false);
+//			}
+//		}
 		
 		return rValue;	
 	}
@@ -690,7 +697,14 @@ public abstract class GeometryImpl implements Geometry {
 	 */
 	public boolean overlaps(TransfiniteSet pointSet) {
 		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
+		
+		int d1 = geom.getDimension(null);
+		int d2 = this.getDimension(null);
 
+		// Overlaps only for Point/Point, Curve/Curve, Surface/Surface
+		if (d1 != d2) {
+			return false;
+		}
 		// Return false, if the envelopes doesn´t intersect
 		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
 			return false;
@@ -704,51 +718,91 @@ public abstract class GeometryImpl implements Geometry {
 		}
 		
 		boolean rValue = false;
+		if (d1 == 1)
+			rValue = tIM.matches("1*T***T**");
+		else
+			rValue = tIM.matches("T*T***T**");
+
 		
-		if (this instanceof PrimitiveImpl) {
-			if (geom instanceof PrimitiveImpl) {
-				// Primitive / Primitive
-				if (geom.getDimension(null) == 1)
-					rValue = tIM.matches("1*T***T**");
-				else
-					rValue = tIM.matches("T*T***T**");
-			} else
-			if (geom instanceof ComplexImpl) {
-				// Primitive / Complex
-				if (geom.getDimension(null) == 1)
-					rValue = tIM.matches("1*T***T**");
-				else
-					rValue = tIM.matches("T*T***T**");
-			} else {
-				Assert.isTrue(false);
-			}
-		} else
-		if (this instanceof ComplexImpl) {
-			if (geom instanceof PrimitiveImpl) {
-				// Complex / Primitive
-				if (geom.getDimension(null) == 1)
-					rValue = tIM.matches("1*T***T**");
-				else
-					rValue = tIM.matches("T*T***T**");
-			} else
-			if (geom instanceof ComplexImpl) {
-				// Complex / Complex
-				if (geom.getDimension(null) == 1)
-					rValue = tIM.matches("1*T***T**");
-				else
-					rValue = tIM.matches("T*T***T**");
-			} else {
-				Assert.isTrue(false);
-			}
-		}
+//		if (this instanceof PrimitiveImpl) {
+//			if (geom instanceof PrimitiveImpl) {
+//				// Primitive / Primitive
+//				if (geom.getDimension(null) == 1)
+//					rValue = tIM.matches("1*T***T**");
+//				else
+//					rValue = tIM.matches("T*T***T**");
+//			} else
+//			if (geom instanceof ComplexImpl) {
+//				// Primitive / Complex
+//				if (geom.getDimension(null) == 1)
+//					rValue = tIM.matches("1*T***T**");
+//				else
+//					rValue = tIM.matches("T*T***T**");
+//			} else {
+//				Assert.isTrue(false);
+//			}
+//		} else
+//		if (this instanceof ComplexImpl) {
+//			if (geom instanceof PrimitiveImpl) {
+//				// Complex / Primitive
+//				if (geom.getDimension(null) == 1)
+//					rValue = tIM.matches("1*T***T**");
+//				else
+//					rValue = tIM.matches("T*T***T**");
+//			} else
+//			if (geom instanceof ComplexImpl) {
+//				// Complex / Complex
+//				if (geom.getDimension(null) == 1)
+//					rValue = tIM.matches("1*T***T**");
+//				else
+//					rValue = tIM.matches("T*T***T**");
+//			} else {
+//				Assert.isTrue(false);
+//			}
+//		}
 		
 		return rValue;	
-
 	}
 	
+	public boolean crosses(TransfiniteSet pointSet) {
+		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
+		
+		int d1 = geom.getDimension(null);
+		int d2 = this.getDimension(null);
+
+		// Crosses only for Point/Curve, Curve/Curve, Point/Surface, Curve/Surface
+		if ((d1 == 2 && d2 == 2) || (d1 == 0) && (d2 == 0)) {
+			return false;
+		}
+
+		// Return false, if the envelopes doesn´t intersect
+		if (!((EnvelopeImpl)this.getEnvelope()).intersects(geom.getEnvelope()))
+			return false;
+		
+		IntersectionMatrix tIM = null;
+		try {
+			tIM = RelateOp.relate(this, geom);
+		} catch (UnsupportedDimensionException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		// No distinction between primitive and complex (explanation see thesis)
+		boolean rValue = false;
+		
+		if (d1 == 1 && d2 == 1)
+			rValue = tIM.matches("0********");
+		else
+			rValue = tIM.matches("T*T******");
+		
+		return rValue;
+		
+	}
+	
+	
 //	public boolean covers(TransfiniteSet pointSet) {
-//		// TODO test
-//		// TODO documentation
+//		// TO-DO test
+//		// TO-DO documentation
 //		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
 //
 //		// Return false, if the envelopes doesn´t intersect
@@ -765,8 +819,8 @@ public abstract class GeometryImpl implements Geometry {
 //	}
 	
 //	public boolean coveredBy(TransfiniteSet pointSet) {
-//		// TODO test
-//		// TODO documentation
+//		// TO-DO test
+//		// TO-DO documentation
 //		GeometryImpl geom = GeometryImpl.castToGeometryImpl(pointSet);
 //
 //		// Return false, if the envelopes doesn´t intersect

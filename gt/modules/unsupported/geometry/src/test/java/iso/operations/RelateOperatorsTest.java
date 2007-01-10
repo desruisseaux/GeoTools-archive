@@ -96,7 +96,7 @@ public class RelateOperatorsTest extends TestCase {
 				"C1",
 				curveB,
 				curveC,
-				F, T, F, F, F, F, F, F);
+				F, T, F, F, F, F, T);
 
 		// (C2)
 		// Disjoint
@@ -104,7 +104,7 @@ public class RelateOperatorsTest extends TestCase {
 				"C2",
 				curveB,
 				curveE,
-				F, F, F, F, F, F, F, F);
+				F, F, F, F, F, F, F);
 		
 		// (C3)
 		// Overlap
@@ -112,7 +112,7 @@ public class RelateOperatorsTest extends TestCase {
 				"C3",
 				curveB,
 				curveD,
-				F, T, T, F, F, F, F, F);
+				F, T, T, F, F, F, F);
 		
 		// (C4)
 		// Contains
@@ -120,7 +120,7 @@ public class RelateOperatorsTest extends TestCase {
 				"C4",
 				curveC,
 				curveE,
-				F, T, F, F, T, F, T, F);
+				F, T, F, F, T, F, F);
 
 		// (C5)
 		// Within
@@ -128,16 +128,16 @@ public class RelateOperatorsTest extends TestCase {
 				"C5",
 				curveE,
 				curveC,
-				F, T, F, F, F, T, F, T);
+				F, T, F, F, F, T, F);
 		
 		// (C6)
-		// No Touch (do not touch because primitives do not contain their boundaries)
-		// Boundary Intersect
+		// Touch
+		// Boundary Intersection
 		this.testAndAssertTest(
 				"C6",
 				curveA,
 				curveB,
-				F, F, F, F, F, F, F, F);
+				F, T, F, T, F, F, F);
 		
 		// (C7)
 		// Equals (= within and contains)
@@ -145,7 +145,7 @@ public class RelateOperatorsTest extends TestCase {
 				"C7",
 				curveA,
 				curveA,
-				T, T, F, F, T, T, T, T);
+				T, T, F, F, T, T, F);
 		
 		// (C8)
 		// Touch
@@ -155,7 +155,7 @@ public class RelateOperatorsTest extends TestCase {
 				"C8",
 				curveA,
 				curveH,
-				F, F, F, T, F, F, F, F);
+				F, T, F, T, F, F, F);
 		
 	}
 	
@@ -183,7 +183,7 @@ public class RelateOperatorsTest extends TestCase {
 				"P1",
 				surfaceAwithoutHole,
 				surfaceBwithoutHole,
-				F, T, T, F, F, F, F, F);
+				F, T, T, F, F, F, F);
 
 		// (P2)
 		// Overlap
@@ -192,27 +192,25 @@ public class RelateOperatorsTest extends TestCase {
 				"P2",
 				surfaceAwithHole,
 				surfaceBwithHole,
-				F, T, T, F, F, F, F, F);
+				F, T, T, F, F, F, F);
 
 		// (P3)
 		// Not touches
 		// Polygon Boundary intersects Polygon Boundary: Point-Edge
-		// Polygon does not touch Polygon, because primitives do not contain their boundaries
 		this.testAndAssertTest(
 				"P3",
 				surfaceAwithoutHole,
 				surfaceC,
-				F, F, F, F, F, F, F, F);
+				F, T, F, T, F, F, F);
 
 		// (P4)
 		// Not touches
 		// Polygon Boundary intersects Boundary Polygon in Edge (Edge-Edge Touch)
-		// Polygon does not touch Polygon, because primitives do not contain their boundaries
 		this.testAndAssertTest(
 				"P4",
 				surfaceAwithoutHole,
 				surfaceD,
-				F, F, F, F, F, F, F, F);
+				F, T, F, T, F, F, F);
 		
 		// (P5)
 		// Contains
@@ -222,7 +220,7 @@ public class RelateOperatorsTest extends TestCase {
 				"P5",
 				surfaceAwithoutHole,
 				surfaceE,
-				F, T, F, F, T, F, T, F);
+				F, T, F, F, T, F, F);
 		
 		// (P6)
 		// Contains
@@ -231,7 +229,7 @@ public class RelateOperatorsTest extends TestCase {
 				"P6",
 				surfaceBwithoutHole,
 				surfaceC,
-				F, T, F, F, T, F, T, F);
+				F, T, F, F, T, F, F);
 		
 		// (P7)
 		// Contains
@@ -240,7 +238,7 @@ public class RelateOperatorsTest extends TestCase {
 				"P7",
 				surfaceAwithTwoHoles,
 				surfaceE,
-				F, T, F, F, T, F, T, F);
+				F, T, F, F, T, F, F);
 		
 		// (P8)
 		// Overlap
@@ -249,7 +247,7 @@ public class RelateOperatorsTest extends TestCase {
 				"P8",
 				surfaceBwithHole,
 				surfaceD,
-				F, T, T, F, F, F, F, F);
+				F, T, T, F, F, F, F);
 		
 		// (P9)
 		// Equal (=within and contains)
@@ -257,7 +255,7 @@ public class RelateOperatorsTest extends TestCase {
 				"P9",
 				surfaceBwithHole,
 				surfaceBwithHole,
-				T, T, F, F, T, T, T, T);
+				T, T, F, F, T, T, F);
 		
 	}
 	
@@ -279,17 +277,16 @@ public class RelateOperatorsTest extends TestCase {
 //		4) shouldTouch,
 //		5) shouldContain,
 //		6) shouldbeWithin,
-//		7) shouldCover,
-//		8) shouldBeCoveredBy			
+//		7) shouldCross		
 
 		
 		// (PC1)
-		// Overlaps Intersection
+		// Crosses Intersection
 		this.testAndAssertTest(
 				"PC1",
 				surfaceA,
 				curveA,
-				F, T, T, F, F, F, F, F);
+				F, T, F, F, F, F, T);
 
 		// (PC2)
 		// Disjoint
@@ -297,16 +294,15 @@ public class RelateOperatorsTest extends TestCase {
 				"PC2",
 				surfaceA,
 				curveB,
-				F, F, F, F, F, F, F, F);
+				F, F, F, F, F, F, F);
 
 		// (PC3)
-		// No Touches
-		// Do not touch because primitives does not contain their boundaries
+		// Touches
 		this.testAndAssertTest(
 				"PC3",
 				surfaceA,
 				curveF,
-				F, F, F, F, F, F, F, F);
+				F, T, F, T, F, F, F);
 
 		// (PC4)
 		// Contains
@@ -314,16 +310,15 @@ public class RelateOperatorsTest extends TestCase {
 				"PC4",
 				surfaceA,
 				curveG,
-				F, T, F, F, T, F, T, F);
+				F, T, F, F, T, F, T);
 
 		// (PC5)
 		// Touch: Interior with Boundary
-		// but no Intersect
 		this.testAndAssertTest(
 				"PC5",
 				surfaceA,
 				curveI,
-				F, F, F, T, F, F, F, F);
+				F, T, F, T, F, F, F);
 		
 		
 		
@@ -342,7 +337,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT1",
 				pointA,
 				pointA,
-				T, T, F, F, T, T, T, T);		
+				T, T, F, F, T, T, F);		
 
 		// (PT2)
 		// Disjoint Point-Point
@@ -350,7 +345,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT2",
 				pointA,
 				pointB,
-				F, F, F, F, F, F, F, F);		
+				F, F, F, F, F, F, F);		
 		
 		// (PT3)
 		// Disjoint Point-Curve
@@ -358,7 +353,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT3",
 				pointA,
 				curveF,
-				F, F, F, F, F, F, F, F);		
+				F, F, F, F, F, F, F);		
 		
 		// (PT4)
 		// Disjoint Point-Surface
@@ -366,7 +361,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT4",
 				pointC,
 				surfaceAwithoutHole,
-				F, F, F, F, F, F, F, F);		
+				F, F, F, F, F, F, F);		
 		
 		// (PT5)
 		// Point in Curve, within
@@ -374,7 +369,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT5",
 				pointC,
 				curveF,
-				F, T, F, F, F, T, F, T);		
+				F, T, F, F, F, T, F);		
 		
 		// (PT6)
 		// Point in Curve, Contains, no Touches
@@ -382,7 +377,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT6",
 				curveF,
 				pointC,
-				F, T, F, F, T, F, T, F);		
+				F, T, F, F, T, F, T);		
 
 		// (PT7)
 		// Point touches Curve
@@ -391,7 +386,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT7",
 				curveF,
 				pointD,
-				F, F, F, T, F, F, F, F);		
+				F, T, F, T, F, F, F);		
 		
 
 		
@@ -402,7 +397,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT8",
 				pointB,
 				surfaceAwithoutHole,
-				F, T, F, F, F, T, F, T);		
+				F, T, F, F, F, T, F);		
 		
 		// (PT9)
 		// Point in Surface, contains
@@ -410,7 +405,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT9",
 				surfaceAwithoutHole,
 				pointB,
-				F, T, F, F, T, F, T, F);		
+				F, T, F, F, T, F, T);		
 
 		// (PT10)
 		// Point touches Surface
@@ -419,7 +414,7 @@ public class RelateOperatorsTest extends TestCase {
 				"PT10",
 				surfaceAwithoutHole,
 				pointA,
-				F, F, F, T, F, F, F, F);				
+				F, T, F, T, F, F, F);				
 		
 		
 	}
@@ -434,14 +429,14 @@ public class RelateOperatorsTest extends TestCase {
 				"PCP1",
 				pointA,
 				compPointB,
-				F, F, F, F, F, F, F, F);
+				F, F, F, F, F, F, F);
 		
 		// Equal
 		this.testAndAssertTest(
 				"PCP2",
 				pointA,
 				compPointA,
-				T, T, F, F, T, T, T, T);	
+				T, T, F, F, T, T, F);	
 		
 	}
 	
@@ -457,7 +452,7 @@ public class RelateOperatorsTest extends TestCase {
 				"CSCS1",
 				compSurfAwithoutHole,
 				compSurfBwithoutHole,
-				F, T, T, F, F, F, F, F);				
+				F, T, T, F, F, F, F);				
 		
 	}
 
@@ -473,22 +468,21 @@ public class RelateOperatorsTest extends TestCase {
 //		4) shouldTouch,
 //		5) shouldContain,
 //		6) shouldbeWithin,
-//		7) shouldCover,
-//		8) shouldBeCoveredBy
+//		7) shouldCross,
 		
 		// Disjoint
 		this.testAndAssertTest(
 				"CPCP1",
 				compPointA,
 				compPointB,
-				F, F, F, F, F, F, F, F);				
+				F, F, F, F, F, F, F);				
 
 		// Equal
 		this.testAndAssertTest(
 				"CPCP2",
 				compPointA,
 				compPointA,
-				T, T, F, F, T, T, T, T);				
+				T, T, F, F, T, T, F);				
 
 	}
 
@@ -522,8 +516,7 @@ public class RelateOperatorsTest extends TestCase {
 	 * @param shouldTouch
 	 * @param shouldContain
 	 * @param shouldbeWithin
-	 * @param shouldCover
-	 * @param shouldBeCoveredBy
+	 * @param shouldCross
 	 */
 	private void testAndAssertTest(
 			String testCaseID,
@@ -534,8 +527,7 @@ public class RelateOperatorsTest extends TestCase {
 			boolean shouldTouch,
 			boolean shouldContain,
 			boolean shouldbeWithin,
-			boolean shouldCover,
-			boolean shouldBeCoveredBy) {
+			boolean shouldCross) {
 		
 		System.out.print("\nTestcase : (" + testCaseID + ")");
 		System.out.print("\nGeometry 1 :" + g1);
@@ -577,6 +569,11 @@ public class RelateOperatorsTest extends TestCase {
 		result = g1.within(g2);
 		System.out.println("Within - result: " + result);
 		assertTrue(shouldbeWithin == result);
+
+		// CROSSES
+		result = g1.crosses(g2);
+		System.out.println("Crosses - result: " + result);
+		assertTrue(shouldCross == result);
 
 //		// COVERS
 //		result  = g1.covers(g2);
