@@ -1,3 +1,18 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2006, Geotools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 2.1 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.test;
 
 import java.io.BufferedInputStream;
@@ -44,7 +59,7 @@ public abstract class OnlineTestCase extends TestCase {
 	protected final void setUp() throws Exception {
 		// load the fixture
 		File base = new File( System.getProperty( "user.home" ) + File.separator + ".geotools" );
-		File fixtureFile = new File( base, getFixtureId().replace( '.', File.separatorChar ) );
+		File fixtureFile = new File( base, getFixtureId().replace( '.', File.separatorChar ).concat(".properties") );
 		
 		if ( fixtureFile.exists() ) {
 			InputStream input = new BufferedInputStream( new FileInputStream( fixtureFile ) );
@@ -87,7 +102,7 @@ public abstract class OnlineTestCase extends TestCase {
 	 * Connection method, called from {@link #setUp()}.
 	 * <p>
 	 * Subclasses should do all initialization / connection here. In the event of a connection 
-	 * not being available, this method shoudl throw an exception to abort the test case.
+	 * not being available, this method should throw an exception to abort the test case.
 	 * </p>
 	 * 
 	 * @throws Exception 

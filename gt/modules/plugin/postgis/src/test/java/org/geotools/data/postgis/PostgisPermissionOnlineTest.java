@@ -16,42 +16,24 @@
 package org.geotools.data.postgis;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.geotools.data.DataSourceException;
-import org.geotools.data.DataStore;
 import org.geotools.data.Transaction;
 import org.geotools.filter.Filter;
-
-import junit.framework.TestCase;
 
 /**
  * 
  * @author Justin
  */
-public class PostgisPermissionOnlineTest extends TestCase {
+public class PostgisPermissionOnlineTest extends PostgisOnlineTestCase {
 
-	DataStore dataStore;
 	
-	protected void setUp() throws Exception {
-		PostgisTests.Fixture f = 
-			PostgisTests.newFixture("restricted.properties");
-		
-		Map params = new HashMap();
-
-		params.put(PostgisDataStoreFactory.DBTYPE.key, "postgis");
-		params.put(PostgisDataStoreFactory.HOST.key, f.host);
-		params.put(PostgisDataStoreFactory.PORT.key, f.port);
-		params.put(PostgisDataStoreFactory.DATABASE.key, f.database);
-		params.put(PostgisDataStoreFactory.USER.key, f.user);
-		params.put(PostgisDataStoreFactory.PASSWD.key, f.password);
-		params.put(PostgisDataStoreFactory.SCHEMA.key,f.schema);
-		
-		dataStore = new PostgisDataStoreFactory().createDataStore(params);
+	protected String getFixtureId() {
+		return "postgis.restricted";
 	}
 	
 	public void testGetFeatureSource() throws IOException {
+		
 		try {
 			dataStore.getFeatureSource("restricted");
 			fail("user should not have been able to create featureSource to restricted table");		} 
@@ -85,4 +67,5 @@ public class PostgisPermissionOnlineTest extends TestCase {
 		} 
 		catch (DataSourceException e) {}
 	}
+
 }
