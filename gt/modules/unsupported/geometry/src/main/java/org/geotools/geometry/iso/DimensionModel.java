@@ -76,16 +76,16 @@ public class DimensionModel {
 
 	public static final int THREE_DIMENSIONIAL = 3;
 
-	private int mDimensionModelType = 0;
+	private int dimensionModelType = 0;
 
 	/**
 	 * Creates a Dimension Model according to the desired dimensional type: 2D,
 	 * 2.5D or 3D
 	 * 
-	 * @param aDimensionType
+	 * @param dimensionType
 	 */
-	public DimensionModel(int aDimensionType) {
-		this.mDimensionModelType = aDimensionType;
+	public DimensionModel(int dimensionType) {
+		this.dimensionModelType = dimensionType;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class DimensionModel {
 	 * @return dimension type
 	 */
 	public int getDimensionType() {
-		return this.mDimensionModelType;
+		return this.dimensionModelType;
 	}
 
 	/**
@@ -104,11 +104,11 @@ public class DimensionModel {
 	 * @return coordinate dimension in euclidian space
 	 */
 	public int getCoordinateDimension() {
-		if (this.mDimensionModelType == DimensionModel.TWO_DIMENSIONIAL) {
+		if (this.dimensionModelType == DimensionModel.TWO_DIMENSIONIAL) {
 			return 2;
-		} else if (this.mDimensionModelType == DimensionModel.TWOoFIVE_DIMENSIONIAL) {
+		} else if (this.dimensionModelType == DimensionModel.TWOoFIVE_DIMENSIONIAL) {
 			return 3;
-		} else if (this.mDimensionModelType == DimensionModel.THREE_DIMENSIONIAL) {
+		} else if (this.dimensionModelType == DimensionModel.THREE_DIMENSIONIAL) {
 			return 3;
 		}
 
@@ -122,7 +122,7 @@ public class DimensionModel {
 	 * @return FALSE if the Dimension Model is not of two dimensional type
 	 */
 	public boolean is2D() {
-		return (this.mDimensionModelType == DimensionModel.TWO_DIMENSIONIAL);
+		return (this.dimensionModelType == DimensionModel.TWO_DIMENSIONIAL);
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class DimensionModel {
 	 * @return FALSE if the Dimension Model is not of 2.5 dimensional type
 	 */
 	public boolean is2o5D() {
-		return (this.mDimensionModelType == DimensionModel.TWOoFIVE_DIMENSIONIAL);
+		return (this.dimensionModelType == DimensionModel.TWOoFIVE_DIMENSIONIAL);
 	}
 
 	/**
@@ -142,16 +142,16 @@ public class DimensionModel {
 	 * @return FALSE if the Dimension Model is not of three dimensional type
 	 */
 	public boolean is3D() {
-		return (this.mDimensionModelType == DimensionModel.THREE_DIMENSIONIAL);
+		return (this.dimensionModelType == DimensionModel.THREE_DIMENSIONIAL);
 	}
 	
 	public String toString() {
 		String rString = "";
-		if (this.mDimensionModelType == DimensionModel.TWO_DIMENSIONIAL) {
+		if (this.dimensionModelType == DimensionModel.TWO_DIMENSIONIAL) {
 			rString = "2D";
-		} else if (this.mDimensionModelType == DimensionModel.TWOoFIVE_DIMENSIONIAL) {
+		} else if (this.dimensionModelType == DimensionModel.TWOoFIVE_DIMENSIONIAL) {
 			rString = "2.5D";
-		} else if (this.mDimensionModelType == DimensionModel.THREE_DIMENSIONIAL) {
+		} else if (this.dimensionModelType == DimensionModel.THREE_DIMENSIONIAL) {
 			rString = "3D";
 		}
 		return rString;
