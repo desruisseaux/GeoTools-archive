@@ -15,10 +15,10 @@
  */
 package org.geotools.gml3;
 
+import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
-import org.geotools.xml.SchemaLocationResolver;
 
 
 /**
@@ -27,6 +27,9 @@ import org.geotools.xml.SchemaLocationResolver;
  *
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
+ * 
+ * TODO: do we need multiple schema locations? what about application schemas that are 
+ * split over multiple files?
  *
  */
 public class ApplicationSchemaConfiguration extends Configuration {
@@ -56,6 +59,16 @@ public class ApplicationSchemaConfiguration extends Configuration {
     }
 
     public XSDSchemaLocationResolver getSchemaLocationResolver() {
-        return new SchemaLocationResolver(namespace, schemaLocation);
+        return new XSDSchemaLocationResolver() {
+
+			public String resolveSchemaLocation(XSDSchema schema, String uri, String location) {
+				if ( namespace.equals( uri ) ) {
+					return location;
+				}
+				
+				return null;
+			}
+        	
+        };
     }
 }
