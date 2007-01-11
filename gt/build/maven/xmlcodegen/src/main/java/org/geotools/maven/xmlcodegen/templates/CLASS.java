@@ -45,7 +45,7 @@ public class CLASS
 
   public String generate(Object argument)
   {
-    StringBuffer stringBuffer = new StringBuffer();
+    final StringBuffer stringBuffer = new StringBuffer();
     
 
 	Object[] arguments = (Object[]) argument;

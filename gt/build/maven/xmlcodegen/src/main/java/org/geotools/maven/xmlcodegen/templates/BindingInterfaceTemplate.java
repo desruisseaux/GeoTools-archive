@@ -39,7 +39,7 @@ public class BindingInterfaceTemplate
 
   public String generate(Object argument)
   {
-    StringBuffer stringBuffer = new StringBuffer();
+    final StringBuffer stringBuffer = new StringBuffer();
      	
 	XSDSchema schema = (XSDSchema)argument ;
 	String ns = schema.getTargetNamespace();

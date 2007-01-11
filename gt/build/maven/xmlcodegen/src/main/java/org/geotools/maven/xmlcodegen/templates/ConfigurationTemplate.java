@@ -25,14 +25,12 @@ public class ConfigurationTemplate
   protected final String TEXT_6 = ".NAMESPACE;" + NL + "    }" + NL + "    " + NL + "    /**" + NL + "     * @return the uri to the the ";
   protected final String TEXT_7 = " ." + NL + "     * @generated" + NL + "     */" + NL + "    public String getSchemaFileURL() {" + NL + "        return getSchemaLocationResolver().resolveSchemaLocation( " + NL + "           null, getNamespaceURI(), \"";
   protected final String TEXT_8 = "\"" + NL + "        );" + NL + "    }" + NL + "    " + NL + "    /**" + NL + "     * @return new instanceof {@link ";
-  protected final String TEXT_9 = "BindingConfiguration%>}." + NL + "     */    " + NL + "    public BindingConfiguration getBindingConfiguration() {" + NL + "     \treturn new ";
-  protected final String TEXT_10 = "BindingConfiguration();" + NL + "    }" + NL + "    " + NL + "    /**" + NL + "     * @return A new instance of {@link ";
-  protected final String TEXT_11 = "SchemaLocationResolver%>}." + NL + "     */" + NL + "    public XSDSchemaLocationResolver getSchemaLocationResolver() {" + NL + "    \treturn new ";
-  protected final String TEXT_12 = "SchemaLocationResolver();" + NL + "    }" + NL + "} ";
+  protected final String TEXT_9 = "BindingConfiguration}." + NL + "     */    " + NL + "    public BindingConfiguration getBindingConfiguration() {" + NL + "     \treturn new ";
+  protected final String TEXT_10 = "BindingConfiguration();" + NL + "    }" + NL + "} ";
 
   public String generate(Object argument)
   {
-    StringBuffer stringBuffer = new StringBuffer();
+    final StringBuffer stringBuffer = new StringBuffer();
      	
 	XSDSchema schema = (XSDSchema)argument;
 	String namespace = schema.getTargetNamespace();
@@ -59,10 +57,6 @@ public class ConfigurationTemplate
     stringBuffer.append(TEXT_9);
     stringBuffer.append(prefix);
     stringBuffer.append(TEXT_10);
-    stringBuffer.append(prefix);
-    stringBuffer.append(TEXT_11);
-    stringBuffer.append(prefix);
-    stringBuffer.append(TEXT_12);
     return stringBuffer.toString();
   }
 }
