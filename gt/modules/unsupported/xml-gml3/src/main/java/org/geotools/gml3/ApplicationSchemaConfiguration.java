@@ -27,8 +27,8 @@ import org.geotools.xml.Configuration;
  *
  * </p>
  * @author Justin Deoliveira, The Open Planning Project
- * 
- * TODO: do we need multiple schema locations? what about application schemas that are 
+ *
+ * TODO: do we need multiple schema locations? what about application schemas that are
  * split over multiple files?
  *
  */
@@ -60,15 +60,13 @@ public class ApplicationSchemaConfiguration extends Configuration {
 
     public XSDSchemaLocationResolver getSchemaLocationResolver() {
         return new XSDSchemaLocationResolver() {
+                public String resolveSchemaLocation(XSDSchema schema, String uri, String location) {
+                    if (namespace.equals(uri)) {
+                        return location;
+                    }
 
-			public String resolveSchemaLocation(XSDSchema schema, String uri, String location) {
-				if ( namespace.equals( uri ) ) {
-					return location;
-				}
-				
-				return null;
-			}
-        	
-        };
+                    return null;
+                }
+            };
     }
 }

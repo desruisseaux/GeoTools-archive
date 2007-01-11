@@ -73,7 +73,7 @@ public class GMLLineStringTypeBinding extends AbstractComplexBinding {
         return GML.LINESTRINGTYPE;
     }
 
-   /**
+    /**
      * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
      *
