@@ -29,7 +29,6 @@ import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.geotools.resources.Utilities;
 import org.geotools.xs.XSConfiguration;
 import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.defaults.DefaultPicoContainer;
 import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
 
 /**
@@ -209,7 +208,7 @@ public abstract class Configuration {
      * Holds the schema locator instance for this configuration, which
      * in turn caches the parsed XSDSchema
      */
-    private SchemaLocator schemaLocator;
+    private XSDSchemaLocator schemaLocator;
     
     /**
      * List of parser properties.
@@ -327,14 +326,16 @@ public abstract class Configuration {
 	 * </p>
 	 * @return The schema location resolver, or <code>null</code>
 	 */
-	abstract public XSDSchemaLocationResolver getSchemaLocationResolver();
+	public XSDSchemaLocationResolver getSchemaLocationResolver() {
+		return new SchemaLocationResolver( this );
+	}
 	
 	/**
 	 * Returns a schema locator, used to create imported and included schemas
 	 * when parsing an instance document.
 	 * <p>
 	 * This method may be overriden to return such an instance. The default 
-	 * implementations returns an instanceof {@link SchemaLocator}. This method 
+	 * delegates to {@link #createSchemaLocator()} to and caches the restult. This method 
 	 * may return <code>null</code> to indicate that no such locator should be used.
 	 * </p>
 	 * @return The schema locator, or <code>null</code>
@@ -343,11 +344,23 @@ public abstract class Configuration {
         if(schemaLocator == null){
             synchronized(this){
                 if(schemaLocator == null){
-                    schemaLocator = new SchemaLocator( this );
+                    schemaLocator = createSchemaLocator();
                 }
             }
         }
         return schemaLocator;
+	}
+	
+	/**
+	 * Template method for creating a new instance of {@link XSDSchemaLocator}.
+	 * <p>
+	 * Subclasses may override this method, the default implementation returns 
+	 * a new instance of {@link SchemaLocator}.
+	 * </p>
+	 * 
+	 */
+	protected XSDSchemaLocator createSchemaLocator() {
+		return new SchemaLocator( this );
 	}
 	
 	/**
