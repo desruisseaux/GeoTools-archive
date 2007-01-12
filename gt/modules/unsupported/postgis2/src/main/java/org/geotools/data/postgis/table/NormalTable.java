@@ -2,7 +2,10 @@ package org.geotools.data.postgis.table;
 
 import java.sql.ResultSetMetaData;
 
+import org.geotools.data.postgis.PostgisDataStore;
+import org.geotools.data.store.ContentDataStore;
 import org.geotools.feature.Feature;
+import org.opengis.feature.type.TypeName;
 
 /**
  * Represents a "normal" with primary key and a geometry column.
@@ -15,10 +18,11 @@ import org.geotools.feature.Feature;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public class NormalTable extends Table {
-      public NormalTable( ResultSetMetaData metadata ){
-          super( metadata );
+
+      public NormalTable(PostgisDataStore dataStore, TypeName typeName) {
+          super( dataStore, typeName );)
       }
-      /**
+    /**
        * Maps feaure id to first attribute.
        * <p>
        * FeatureID is formed with TABLE_NAME.ATTRIBUTE_0
