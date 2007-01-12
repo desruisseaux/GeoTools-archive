@@ -17,8 +17,12 @@ import java.util.logging.Logger;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Transaction;
+import org.geotools.data.postgis.collection.FileredTableFeatureList;
+import org.geotools.data.postgis.collection.FilteredTableFeatureCollection;
 import org.geotools.data.postgis.collection.TableFeatureCollection;
 import org.geotools.data.postgis.table.NormalTable;
+import org.geotools.data.postgis.table.TableInfo;
+import org.geotools.data.postgis.table.ViewFeatureCollection;
 import org.geotools.data.store.Content;
 import org.geotools.data.store.ContentDataStore;
 import org.geotools.data.store.ContentEntry;
@@ -83,23 +87,23 @@ public class PostGISContent extends Content {
     }
 
     public FeatureCollection filter(ContentState state, Filter filter) {
-        return SubTableFeatureCollection( this, state, filter );
+        return new FilteredTableFeatureCollection( this, state, filter );
     }
 
     public GeoResourceInfo info(ContentState state) {
-        return null;
+        return new TableInfo( this, state );
     }
 
     public FeatureCollection readonly(ContentState state, Filter filter) {
-        return null;
+        return new ViewFeatureCollection( this, state, filter );
     }
 
     public FeatureList sorted(ContentState state, Filter filter, SortBy sort) {
-        return null;
+        return new FileredTableFeatureList( this, state, filter, sort );
     }
 
     public ContentState state(ContentEntry entry) {
-        return null;
+        return new TableState( this, entry );
     }
     public List getTypeNames() throws IOException {        
         final int TABLE_NAME_COL = 3;

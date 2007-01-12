@@ -1,13 +1,10 @@
-package org.geotools.data.postgis.collection;
+package org.geotools.data.postgis.table;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.geotools.data.postgis.PostGISContent;
-import org.geotools.data.postgis.table.NormalTable;
-import org.geotools.data.postgis.table.Table;
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.CollectionListener;
 import org.geotools.feature.FeatureCollection;
@@ -23,30 +20,17 @@ import org.opengis.filter.sort.SortBy;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
-/**
- * Use a Filter to select out only a portion of the table.
- * <p>
- * This class *will* aqure a ResultSet, but will do so in a lazy
- * fashion (waiting until the first "access"). The
- * ResultSet may be used for random access etc... 
- * until closed/disposed.
- * </p>
- * @author Jody Garnett, Refractions Research Inc.
- */
-public class FilteredTableFeatureCollection implements FeatureCollection {
+public class ViewFeatureCollection implements FeatureCollection {
 
-    private NormalTable table;
-    private ContentState state;
-
-    public FilteredTableFeatureCollection(PostGISContent content, ContentState state2, Filter filter) {
-        this.state = state;
-        table = (NormalTable) state.getEntry();        
+    public ViewFeatureCollection(PostGISContent content, ContentState state, Filter filter) {
     }
 
-    public void accepts(FeatureVisitor visitor, ProgressListener progress) throws IOException {
+    public void accepts(FeatureVisitor visitor, ProgressListener progress)
+            throws IOException {
     }
 
-    public void addListener(CollectionListener listener) throws NullPointerException {
+    public void addListener(CollectionListener listener)
+            throws NullPointerException {
     }
 
     public void close(FeatureIterator close) {
@@ -67,7 +51,8 @@ public class FilteredTableFeatureCollection implements FeatureCollection {
         return null;
     }
 
-    public void removeListener(CollectionListener listener) throws NullPointerException {
+    public void removeListener(CollectionListener listener)
+            throws NullPointerException {
     }
 
     public FeatureList sort(SortBy order) {
@@ -160,13 +145,16 @@ public class FilteredTableFeatureCollection implements FeatureCollection {
         return 0;
     }
 
-    public void setAttribute(int position, Object val) throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+    public void setAttribute(int position, Object val)
+            throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
     }
 
-    public void setAttribute(String xPath, Object attribute) throws IllegalAttributeException {
+    public void setAttribute(String xPath, Object attribute)
+            throws IllegalAttributeException {
     }
 
-    public void setDefaultGeometry(Geometry geometry) throws IllegalAttributeException {
+    public void setDefaultGeometry(Geometry geometry)
+            throws IllegalAttributeException {
     }
-    
+
 }
