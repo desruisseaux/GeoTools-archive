@@ -66,6 +66,7 @@
     <module>mif</module>
     <module>mysql</module>
     <module>oracle-spatial</module>
+    <module>postgis2</module>
     <module>tiger</module>
     <module>tile</module>
     <module>vpf</module>

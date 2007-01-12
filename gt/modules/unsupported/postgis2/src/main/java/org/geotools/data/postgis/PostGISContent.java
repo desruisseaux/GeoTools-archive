@@ -98,7 +98,7 @@ public class PostGISContent extends Content {
         return new ViewFeatureCollection( this, state, filter );
     }
 
-    public FeatureList sorted(ContentState state, Filter filter, SortBy sort) {
+    public FeatureList sorted(ContentState state, Filter filter, List sort) {
         return new FileredTableFeatureList( this, state, filter, sort );
     }
 

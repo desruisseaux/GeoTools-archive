@@ -15,6 +15,9 @@
  */
 package org.geotools.data.store;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureList;
@@ -28,6 +31,12 @@ import org.opengis.filter.sort.SortBy;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public abstract class Content {
+    
+    /**
+     * List of TypeNames indicating available content.
+     * @return List<TypeName>
+     */
+    public abstract List getTypeNames() throws IOException;
     
     /**
      * Summary information, providing access to such metadata as is available.
@@ -88,12 +97,14 @@ public abstract class Content {
      * <ul>
      * <li>getFeatures().sort( sort )
      * <li>getFeatures( filter ).sort( sort )
+     * <li>getFeatures( filter ).sort( sort ).sort( sort1 );
      * </ul>
      * @param state
      * @param filter
+     * @param order List<SortBy> used to determine sort order
      * @return subset of content
      */
-    public abstract FeatureList sorted( ContentState state, Filter filter, SortBy sort );
+    public abstract FeatureList sorted( ContentState state, Filter filter, List order );
     
     /**
      * FeatureCollection optimized for read-only access.

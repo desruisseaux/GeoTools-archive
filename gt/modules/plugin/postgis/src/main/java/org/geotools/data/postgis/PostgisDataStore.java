@@ -1156,6 +1156,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         //our own "fid_tablename".  Later when we load the featureType, we will
         //pretend we didn't see fid_tablename when we return the attributes.
         String fidColumn = lcTableName + "_fid";
+        
         //make sure the fid column doesn't already exist
         for (int i = 0; i < attributeType.length; i++) {
         	if (attributeType[i].getName().equalsIgnoreCase(fidColumn)) {

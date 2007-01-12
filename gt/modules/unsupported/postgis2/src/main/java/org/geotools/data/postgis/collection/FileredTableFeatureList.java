@@ -24,11 +24,20 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class FileredTableFeatureList implements FeatureList {
 
-    public FileredTableFeatureList(PostGISContent content, ContentState state, Filter filter, SortBy sort) {
+    private PostGISContent content;
+    private ContentState state;
+    private Filter filter;
+    private List order;
+
+    public FileredTableFeatureList(PostGISContent content, ContentState state, Filter filter, List order) {
+        this.content = content;
+        this.state = state;
+        this.filter = filter;
+        this.order = order;
     }
 
     public FeatureList subList(Filter filter) {
-        return null;
+        return new ( )
     }
 
     public boolean add(Object arg0) {
@@ -47,6 +56,8 @@ public class FileredTableFeatureList implements FeatureList {
     }
 
     public void clear() {
+        FeatureCollection collection = new FilteredTableFeatureCollection( content, state, filter );
+        collection.clear();
     }
 
     public boolean contains(Object arg0) {
@@ -191,15 +202,15 @@ public class FileredTableFeatureList implements FeatureList {
     }
 
     public void setAttribute(int position, Object val)
-            throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
+        throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
     }
 
     public void setAttribute(String xPath, Object attribute)
-            throws IllegalAttributeException {
+        throws IllegalAttributeException {
     }
 
     public void setDefaultGeometry(Geometry geometry)
-            throws IllegalAttributeException {
+        throws IllegalAttributeException {
     }
 
 }
