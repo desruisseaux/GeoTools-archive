@@ -15,10 +15,8 @@
  */
 package org.geotools.data.postgis;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.geotools.data.DataStore;
+import org.geotools.data.store.ContentDataStore;
 import org.geotools.test.OnlineTestCase;
 
 /**
@@ -29,40 +27,18 @@ import org.geotools.test.OnlineTestCase;
  */
 public abstract class PostgisOnlineTestCase extends OnlineTestCase {
 
-    protected DataStore dataStore;
-
+    protected ContentDataStore dataStore; //today only, you are a contentdatastore
+    protected PostGISContent content;
+    
     protected abstract String getFixtureId();
 
     protected void connect() throws Exception {
-        Map params = new HashMap();
-
-        params.put(PostgisDataStoreFactory.DBTYPE.key, "postgis");
-        params.put(PostgisDataStoreFactory.HOST.key, fixture
-                .getProperty("host"));
-        params.put(PostgisDataStoreFactory.PORT.key, fixture
-                .getProperty("port"));
-        params.put(PostgisDataStoreFactory.SCHEMA.key, fixture
-                .getProperty("schema"));
-        params.put(PostgisDataStoreFactory.DATABASE.key, fixture
-                .getProperty("database"));
-        params.put(PostgisDataStoreFactory.USER.key, fixture
-                .getProperty("user"));
-        params.put(PostgisDataStoreFactory.PASSWD.key, fixture
-                .getProperty("password"));
-
-        if (fixture.containsKey("wkbEnabled")) {
-            params.put(PostgisDataStoreFactory.WKBENABLED.key, fixture
-                    .getProperty("wkbEnabled"));
-        }
-        if (fixture.containsKey("looseBbox")) {
-            params.put(PostgisDataStoreFactory.LOOSEBBOX.key, fixture
-                    .getProperty("looseBbox"));
-        }
-
-        dataStore = new PostgisDataStoreFactory().createDataStore(params);
+        content = new PostGISContent(fixture);
+        dataStore = new PostgisDataStore(content);
     }
 
     protected void disconnect() throws Exception {
+        content = null;
         dataStore = null;
     }
 
