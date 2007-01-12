@@ -62,7 +62,12 @@ public abstract class OnlineTestCase extends TestCase {
         // load the fixture
         File base = new File(System.getProperty("user.home") + File.separator
                 + ".geotools");
-        File fixtureFile = new File(base, getFixtureId().replace('.',
+        String fixtureId = getFixtureId();
+        if( fixtureId == null ){
+            fixture = null; // not available (turn test off)            
+            return;
+        }
+        File fixtureFile = new File(base, fixtureId.replace('.',
                 File.separatorChar).concat(".properties"));
 
         if (fixtureFile.exists()) {
