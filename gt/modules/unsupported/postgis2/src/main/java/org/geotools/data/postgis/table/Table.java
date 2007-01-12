@@ -2,10 +2,11 @@ package org.geotools.data.postgis.table;
 
 import java.sql.ResultSetMetaData;
 
+import org.geotools.data.postgis.PostgisDataStore;
 import org.geotools.data.store.ContentDataStore;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.feature.Feature;
-import org.geotools.feature.type.TypeName;
+import org.opengis.feature.type.TypeName;
 
 /**
  * Captures information on handling a PostGIS table (or view).
@@ -30,9 +31,11 @@ public abstract class Table extends ContentEntry {
      * 
      * @param metadata
      */
-    public Table( ContentDataStore datastore, TypeName typeName ){
-        super( datastore, typeName );
+    public Table(PostgisDataStore dataStore, TypeName typeName) {
+        super( dataStore, typeName );
         METADATA = null; // look up?
     }
+
+
     
 }

@@ -20,7 +20,7 @@ import org.opengis.feature.type.TypeName;
 public class NormalTable extends Table {
 
       public NormalTable(PostgisDataStore dataStore, TypeName typeName) {
-          super( dataStore, typeName );)
+          super( dataStore, typeName );
       }
     /**
        * Maps feaure id to first attribute.
