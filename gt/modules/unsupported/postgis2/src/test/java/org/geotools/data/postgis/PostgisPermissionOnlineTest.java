@@ -27,45 +27,47 @@ import org.geotools.filter.Filter;
  */
 public class PostgisPermissionOnlineTest extends PostgisOnlineTestCase {
 
-	
-	protected String getFixtureId() {
-		return "postgis.restricted";
-	}
-	
-	public void testGetFeatureSource() throws IOException {
-		
-		try {
-			dataStore.getFeatureSource("restricted");
-			fail("user should not have been able to create featureSource to restricted table");		} 
-		catch (DataSourceException e) {}
-	}
-	
-	public void testGetFeatureWriter() throws IOException {
-		try {
-			dataStore.getFeatureWriter("restricted", Filter.EXCLUDE, Transaction.AUTO_COMMIT);
-			fail("user should not have been able to create featureWriter to restricted table");		
-		} 
-		catch (DataSourceException e) {}
-		
-		try {
-			dataStore.getFeatureWriter("restricted", Transaction.AUTO_COMMIT);
-			fail("user should not have been able to create featureWriter to restricted table");		
-		} 
-		catch (DataSourceException e) {}
-		
-		try {
-			dataStore.getFeatureWriterAppend("restricted", Transaction.AUTO_COMMIT);
-			fail("user should not have been able to create featureWriter to restricted table");		
-		} 
-		catch (DataSourceException e) {}
-	}
-	
-	public void testGetSchema() throws IOException {
-		try {
-			dataStore.getSchema("restricted");
-			fail("user should not have been able to create featureWriter to restricted table");		
-		} 
-		catch (DataSourceException e) {}
-	}
+    protected String getFixtureId() {
+        return "postgis.restricted";
+    }
+
+    public void testGetFeatureSource() throws IOException {
+
+        try {
+            dataStore.getFeatureSource("restricted");
+            fail("user should not have been able to create featureSource to restricted table");
+        } catch (DataSourceException e) {
+        }
+    }
+
+    public void testGetFeatureWriter() throws IOException {
+        try {
+            dataStore.getFeatureWriter("restricted", Filter.EXCLUDE,
+                    Transaction.AUTO_COMMIT);
+            fail("user should not have been able to create featureWriter to restricted table");
+        } catch (DataSourceException e) {
+        }
+
+        try {
+            dataStore.getFeatureWriter("restricted", Transaction.AUTO_COMMIT);
+            fail("user should not have been able to create featureWriter to restricted table");
+        } catch (DataSourceException e) {
+        }
+
+        try {
+            dataStore.getFeatureWriterAppend("restricted",
+                    Transaction.AUTO_COMMIT);
+            fail("user should not have been able to create featureWriter to restricted table");
+        } catch (DataSourceException e) {
+        }
+    }
+
+    public void testGetSchema() throws IOException {
+        try {
+            dataStore.getSchema("restricted");
+            fail("user should not have been able to create featureWriter to restricted table");
+        } catch (DataSourceException e) {
+        }
+    }
 
 }
