@@ -10,7 +10,7 @@ import org.geotools.feature.Feature;
  * What is normal?
  * <ul>
  * <li>Single Primary Key as the first column (for Feature ID )
- * <li>Sinjgle Geomety Column with entry in the GEOMETRY_COLUMNS describing CRS and bounds
+ * <li>Single Geometry Column with entry in the GEOMETRY_COLUMNS describing CRS and bounds
  * </ul>
  * @author Jody Garnett, Refractions Research Inc.
  */

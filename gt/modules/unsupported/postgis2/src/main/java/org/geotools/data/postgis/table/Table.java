@@ -9,7 +9,7 @@ import org.geotools.feature.Feature;
  * <p>
  * This class captures the following information for a table or view:
  * <ul>
- * <li>interaction with "geometry columns" (declaired in the GEOMETRY_COLUMNS table
+ * <li>interaction with "geometry columns" (declared in the GEOMETRY_COLUMNS table
  *     or otherwise)
  * <li>interaction with the "feature identifier"
  * </ul>
