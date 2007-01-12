@@ -83,7 +83,7 @@ public class PostGISContent extends Content {
     }
 
     public FeatureCollection filter(ContentState state, Filter filter) {
-        return null;
+        return SubTableFeatureCollection( this, state, filter );
     }
 
     public GeoResourceInfo info(ContentState state) {
