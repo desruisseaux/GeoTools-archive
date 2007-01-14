@@ -187,7 +187,7 @@ public class GMLDataStore extends AbstractDataStore2 {
 				};
 				
 				XSDTypeDefinition type = element.getType().getBaseType();
-				new TypeWalker( type ).walk( visitor );
+				new TypeWalker().walk( type, visitor );
 				
 				if ( !isFeatureType.isEmpty() ) {
 					FeatureType featureType = featureType( element );
