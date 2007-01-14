@@ -109,7 +109,7 @@ public class GML3ParsingUtils {
                     }
                 };
 
-            bwFactory.createBindingWalker().walk(property, visitor);
+            bwFactory.walk(property, visitor);
 
             if (bindings.isEmpty()) {
                 //could not find a binding, use the defaults
