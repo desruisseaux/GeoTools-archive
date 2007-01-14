@@ -15,7 +15,9 @@
  */
 package org.geotools.util;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.factory.Hints;
@@ -29,7 +31,14 @@ import org.geotools.factory.Hints;
 public class Converters {
 
 	/**
+	 * Cached list of converter factories
+	 */
+	static List factories;
+	
+	/**
 	 * Convenience for {@link #convert(Object, Class, Hints)}
+	 * 
+	 * @since 2.4
 	 */
 	public static Object convert( Object source, Class target ) {
 		return convert( source, target, null );
@@ -48,12 +57,14 @@ public class Converters {
 	 * 
 	 * @return The converted value as an instnace of target, or <code>null</code> if a converter 
 	 * could not be found.
+	 * 
+	 * @since 2.4
 	 */
 	public static Object convert( Object source, Class target, Hints hints ) {
 		if ( source == null ) 
 			return null;
 		
-		for ( Iterator i = FactoryRegistry.lookupProviders( ConverterFactory.class ); i.hasNext(); ) {
+		for ( Iterator i = factories().iterator(); i.hasNext(); ) {
 			ConverterFactory factory = (ConverterFactory) i.next();
 			Converter converter = factory.createConverter( source.getClass(), target, hints );
 			if ( converter != null ) {
@@ -74,5 +85,26 @@ public class Converters {
 			return source.toString();
 		}
 		return null;
+	}
+	
+	/**
+	 * Processed the {@link ConverterFactory} extension point.
+	 * 
+	 * @return A list of converter factories.
+	 * @since 2.4 
+	 */
+	static List factories() {
+		if ( factories == null ) {
+			synchronized ( Converters.class ) {
+				if ( factories == null ) {
+					Iterator i = FactoryRegistry.lookupProviders( ConverterFactory.class );
+					factories = new ArrayList();
+					while( i.hasNext() ) factories.add( i.next() );
+				}
+			}
+			
+		}
+		
+		return factories;
 	}
 }
