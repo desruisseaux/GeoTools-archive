@@ -343,8 +343,7 @@ public class Schemas {
         if (includeParents) {
             //walk up the type hierarchy of the element to generate a list of 
             // possible elements
-            TypeWalker walker = new TypeWalker(type);
-            walker.rwalk(visitor);
+            new TypeWalker().rwalk(type,visitor);
         } else {
             //just visit this type
             visitor.visit(type);
@@ -634,54 +633,52 @@ public class Schemas {
         final ArrayList attributes = new ArrayList();
 
         //walk up the type hierarchy of the element to generate a list of atts
-        TypeWalker walker = new TypeWalker(element.getType());
-
         TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
-                public boolean visit(XSDTypeDefinition type) {
-                    //simple types dont have attributes
-                    if (type instanceof XSDSimpleTypeDefinition) {
-                        return true;
-                    }
-
-                    XSDComplexTypeDefinition cType = (XSDComplexTypeDefinition) type;
-
-                    //get all the attribute content (groups,or uses) and add to q 
-                    List attContent = cType.getAttributeContents();
-
-                    for (Iterator itr = attContent.iterator(); itr.hasNext();) {
-                        XSDAttributeGroupContent content = (XSDAttributeGroupContent) itr
-                            .next();
-
-                        if (content instanceof XSDAttributeUse) {
-                            //an attribute, add it to the list
-                            XSDAttributeUse use = (XSDAttributeUse) content;
-                            attributes.add(use.getAttributeDeclaration());
-                        } else if (content instanceof XSDAttributeGroupDefinition) {
-                            //attribute group, add all atts in group to list
-                            XSDAttributeGroupDefinition attGrp = (XSDAttributeGroupDefinition) content;
-
-                            if (attGrp.isAttributeGroupDefinitionReference()) {
-                                attGrp = attGrp
-                                    .getResolvedAttributeGroupDefinition();
-                            }
-
-                            List uses = attGrp.getAttributeUses();
-
-                            for (Iterator aitr = uses.iterator();
-                                    aitr.hasNext();) {
-                                XSDAttributeUse use = (XSDAttributeUse) aitr
-                                    .next();
-                                attributes.add(use.getAttributeDeclaration());
-                            }
-                        }
-                    }
-
+            public boolean visit(XSDTypeDefinition type) {
+                //simple types dont have attributes
+                if (type instanceof XSDSimpleTypeDefinition) {
                     return true;
                 }
-            };
 
-        walker.walk(visitor);
+                XSDComplexTypeDefinition cType = (XSDComplexTypeDefinition) type;
 
+                //get all the attribute content (groups,or uses) and add to q 
+                List attContent = cType.getAttributeContents();
+
+                for (Iterator itr = attContent.iterator(); itr.hasNext();) {
+                    XSDAttributeGroupContent content = (XSDAttributeGroupContent) itr
+                        .next();
+
+                    if (content instanceof XSDAttributeUse) {
+                        //an attribute, add it to the list
+                        XSDAttributeUse use = (XSDAttributeUse) content;
+                        attributes.add(use.getAttributeDeclaration());
+                    } else if (content instanceof XSDAttributeGroupDefinition) {
+                        //attribute group, add all atts in group to list
+                        XSDAttributeGroupDefinition attGrp = (XSDAttributeGroupDefinition) content;
+
+                        if (attGrp.isAttributeGroupDefinitionReference()) {
+                            attGrp = attGrp
+                                .getResolvedAttributeGroupDefinition();
+                        }
+
+                        List uses = attGrp.getAttributeUses();
+
+                        for (Iterator aitr = uses.iterator();
+                                aitr.hasNext();) {
+                            XSDAttributeUse use = (XSDAttributeUse) aitr
+                                .next();
+                            attributes.add(use.getAttributeDeclaration());
+                        }
+                    }
+                }
+
+                return true;
+            }
+        };
+
+        new TypeWalker().walk( element.getType(), visitor );
+        
         return attributes;
     }
 

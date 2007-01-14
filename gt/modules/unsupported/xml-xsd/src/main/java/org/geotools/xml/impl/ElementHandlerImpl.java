@@ -144,9 +144,10 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
             AttributeInstance attribute = element.getAttributes()[i];
             ParseExecutor executor = new ParseExecutor(attribute, null,
                     parent.getContext(), parser );
-            BindingWalker walker = new BindingWalker(parser.getBindingLoader(), 
-                    parent.getContext());
-            walker.walk(attribute.getAttributeDeclaration(), executor);
+            
+            parser.getBindingWalker().walk(
+        		attribute.getAttributeDeclaration(), executor, parent.getContext() 
+    		);
 
             Object parsed = executor.getValue();
             node.addAttribute(new NodeImpl(attribute, parsed));
@@ -161,8 +162,7 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         ((BindingFactoryImpl)parser.getBindingFactory()).setContext( getContext() );
         ContextInitializer initer = new ContextInitializer(element, node,
                 getContext());
-        new BindingWalker( parser.getBindingLoader(), getContext()).walk(element
-            .getElementDeclaration(), initer);
+        parser.getBindingWalker().walk(element .getElementDeclaration(), initer, getContext() );
     }
 
     public void characters(char[] ch, int start, int length)
@@ -186,9 +186,8 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         }
         ParseExecutor executor = new ParseExecutor(element, node,
                 getParentHandler().getContext(), parser );
-        new BindingWalker( parser.getBindingLoader(), 
-            getParentHandler().getContext()).walk(element.getElementDeclaration(),
-            executor, container );
+        parser.getBindingWalker().walk(element.getElementDeclaration(),
+            executor, container,  getParentHandler().getContext() );
 
         //cache the parsed value
         value = executor.getValue();
@@ -209,9 +208,8 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
     private Handler getChildHandlerInternal(QName qName) {
         SchemaIndex index = parser.getSchemaIndex();
 
-        XSDElementDeclaration element = Schemas.getChildElementDeclaration(content,
-                qName);
-
+        XSDElementDeclaration element = index.getChildElement( content, qName );
+        
         if (element != null) {
             //TODO: determine wether the element is complex or simple, and create
             ElementHandler handler = parser.getHandlerFactory()

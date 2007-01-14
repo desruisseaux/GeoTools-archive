@@ -16,6 +16,7 @@
 package org.geotools.xml.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -32,7 +33,6 @@ import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.BindingFactory;
-import org.geotools.xml.BindingWalkerFactory;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
@@ -74,16 +74,14 @@ public class ParserHandler extends DefaultHandler {
 
     /** binding loader */
     BindingLoader bindingLoader;
-
+    
+    /** bindign walker */
+    BindingWalker bindingWalker;
+    
     /**
      * binding factory
      */
     BindingFactory bindingFactory;
-    
-    /**
-     * Binding walker factory
-     */
-    BindingWalkerFactory bindingWalkerFactory;
     
     /** the document handler **/
     DocumentHandler documentHandler;
@@ -97,16 +95,28 @@ public class ParserHandler extends DefaultHandler {
     /** logger **/
     Logger logger;
     
+    /** flag to indicate if the parser should validate or not */
+    boolean validating;
+    
     /** list of "errors" that occur while parsing */
     List errors;
 
     public ParserHandler(Configuration config) {
         this.config = config;
         errors = new ArrayList();
+        validating = false;
     }
 
     public Configuration getConfiguration() {
 		return config;
+	}
+    
+    public boolean isValidating() {
+		return validating;
+	}
+    
+    public void setValidating(boolean validating) {
+		this.validating = validating;
 	}
     
     public List getValidationErrors() {
@@ -121,6 +131,10 @@ public class ParserHandler extends DefaultHandler {
     	return bindingLoader;
     }
 
+    public BindingWalker getBindingWalker() {
+    	return bindingWalker;
+    }
+    
     public BindingFactory getBindingFactory() {
 		return bindingFactory;
 	}
@@ -177,8 +191,7 @@ public class ParserHandler extends DefaultHandler {
         context.registerComponentInstance( bindingFactory );
         
         //binding walker support
-        bindingWalkerFactory = new BindingWalkerFactoryImpl( bindingLoader , context );
-        context.registerComponentInstance( bindingWalkerFactory );
+        context.registerComponentInstance( new BindingWalkerFactoryImpl( bindingLoader , context ) );
     }
 
     public void startElement(String uri, String localName, String qName,
@@ -397,6 +410,7 @@ public class ParserHandler extends DefaultHandler {
     protected void configure(Configuration config) {
         handlerFactory = new HandlerFactoryImpl();
         bindingLoader = new BindingLoader();
+        bindingWalker = new BindingWalker( bindingLoader );
 
         //configure the strategy objects
         MutablePicoContainer container = bindingLoader.getContainer(); 

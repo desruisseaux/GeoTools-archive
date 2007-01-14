@@ -26,6 +26,7 @@ public class ParserTest extends TestCase {
 	
 	public void testParseValid() throws Exception {
 		Parser parser = new Parser( new MLConfiguration() );
+		parser.setValidating( true );
 		parser.parse( MLSchemaLocationResolver.class.getResourceAsStream( "mails.xml" ) );
 	
 		assertEquals( 0, parser.getValidationErrors().size() );
@@ -33,6 +34,7 @@ public class ParserTest extends TestCase {
 	
 	public void testParseInValid() throws Exception {
 		Parser parser = new Parser( new MLConfiguration() );
+		parser.setValidating( true );
 		parser.parse( MLSchemaLocationResolver.class.getResourceAsStream( "mails-invalid.xml" ) );
 	
 		assertFalse( 0 == parser.getValidationErrors().size() );

@@ -164,6 +164,15 @@ public class Parser {
     }
     
     /**
+     * Sets the flag controlling wether the parser should validate or not.
+     * 
+     * @param validating Validation flag, <code>true</code> to validate, otherwise <code>false</code>
+     */
+    public void setValidating( boolean validating ) {
+    	handler.setValidating( validating );
+    }
+    
+    /**
      * Returns a list of any validation errors that occured while parsing.
      * 
      * @return A list of errors, or an empty list if none.
@@ -195,13 +204,15 @@ public class Parser {
     	
     	//set the appropriate features
     	parser.setFeature("http://xml.org/sax/features/namespaces", true);
-    	parser.setFeature("http://xml.org/sax/features/validation", true);
-        parser.setFeature("http://apache.org/xml/features/validation/schema",
-            true);
-        parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking",
-            true);
-        
-		//set the schema sources of this configuration, and all dependent ones
+    	if ( handler.isValidating() ) {
+    		parser.setFeature("http://xml.org/sax/features/validation", true);
+            parser.setFeature("http://apache.org/xml/features/validation/schema",
+                true);
+            parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking",
+                true);
+    	}
+    	
+    	//set the schema sources of this configuration, and all dependent ones
 		StringBuffer schemaLocation = new StringBuffer();
 		for( Iterator d = handler.getConfiguration().allDependencies().iterator(); d.hasNext(); ) {
 			Configuration dependency = (Configuration) d.next();

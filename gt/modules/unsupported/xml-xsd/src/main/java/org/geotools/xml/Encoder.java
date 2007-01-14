@@ -104,6 +104,12 @@ public class Encoder {
 	private BindingLoader bindingLoader;
 	private MutablePicoContainer context;
 	
+	/** binding walker */
+	private BindingWalker bindingWalker;
+	
+	/** property extractors */
+	private List propertyExtractors;
+	
 	/** element encoder */
 	private ElementEncoder encoder;
 	
@@ -155,6 +161,8 @@ public class Encoder {
 			configuration.setupBindings( bindingLoader.getContainer() ) 
 		);
 		
+		bindingWalker = new BindingWalker( bindingLoader );
+		
 		//create the context
 		context = new DefaultPicoContainer();
 		
@@ -163,19 +171,19 @@ public class Encoder {
         context.registerComponentInstance( bindingFactory );
         
         //register the element encoder in the context
-        encoder = new ElementEncoder( bindingLoader, context );
+        encoder = new ElementEncoder( bindingWalker, context );
         context.registerComponentInstance( encoder );
         
         //register the schema index
         context.registerComponentInstance( index );
-        BindingWalkerFactoryImpl bwFactory = new BindingWalkerFactoryImpl( bindingLoader, context );
-        context.registerComponentInstance( bwFactory );
+        
+        //bindign walker support
+        context.registerComponentInstance( new BindingWalkerFactoryImpl( bindingLoader, context ) );
+
         
         //pass the context off to the configuration
 		context = configuration.setupContext(context);
 		encoder.setContext( context );
-		
-		bwFactory.setContext( context );
 		
 		//schema location setup
 		schemaLocations = new HashMap();
@@ -195,6 +203,13 @@ public class Encoder {
         namespaces = new NamespaceSupport();
         context.registerComponentInstance( namespaces );
         context.registerComponentInstance( new NamespaceSupportWrapper( namespaces ) );
+        
+        //property extractors
+		propertyExtractors = 
+			Schemas.getComponentInstancesOfType( context, PropertyExtractor.class ); 
+			
+		//add the property extractor for bindings as first
+		propertyExtractors.add( 0, new BindingPropertyExtractor( this, context ) );
 	}
 	
 	/**
@@ -218,6 +233,20 @@ public class Encoder {
 	 */
 	public void setOutputFormat( OutputFormat outputFormat ) {
 		this.outputFormat = outputFormat;
+	}
+	
+	/**
+	 * @return The walker used to traverse bindings, this method is for internal use only.
+	 */
+	public BindingWalker getBindingWalker() {
+		return bindingWalker;
+	}
+	
+	/**
+	 * @return The index of schema components, this method is for internal use only.
+	 */
+	public SchemaIndex getSchemaIndex() {
+		return index;
 	}
 	
 	/**
@@ -412,7 +441,7 @@ public class Encoder {
 				entry.encoding = (Element) encode(entry.object,entry.element);
 				
 				//add any more attributes
-				List attributes = Schemas.getAttributeDeclarations(entry.element);
+				List attributes = index.getAttributes( entry.element );
 				for (Iterator itr = attributes.iterator(); itr.hasNext();) {
 					XSDAttributeDeclaration attribute = 
 						(XSDAttributeDeclaration)itr.next();
@@ -429,7 +458,7 @@ public class Encoder {
 					GetPropertyExecutor executor = 
 						new GetPropertyExecutor(entry.object,attribute);
 					
-					new BindingWalker(bindingLoader,context).walk(entry.element,executor);
+					bindingWalker.walk(entry.element,executor,context);
 					
 					if (executor.getChildObject() != null) {
 						//encode the attribute
@@ -471,13 +500,6 @@ public class Encoder {
 				
 				start(entry.encoding);
 				
-				//get children by processing propertyExtractor "extension point"
-				List propertyExtractors = 
-					Schemas.getComponentInstancesOfType( context, PropertyExtractor.class ); 
-					
-				//add the property extractor for bindings as first
-				propertyExtractors.add( 0, new BindingPropertyExtractor( bindingLoader, context ) );
-		        
 				//TODO: this method of getting at properties wont maintain order very well, need
 				// to come up with a better system that is capable of hanlding feature types
 				for ( Iterator pe = propertyExtractors.iterator(); pe.hasNext(); ) {
@@ -597,8 +619,7 @@ public class Encoder {
 			AttributeEncodeExecutor encoder = 
 				new AttributeEncodeExecutor(object,attribute,doc,logger);
 			
-			new BindingWalker(bindingLoader,bindingLoader.getContainer())
-				.walk(attribute,encoder);
+			bindingWalker.walk(attribute,encoder,bindingLoader.getContainer());
 			
 			return encoder.getEncodedAttribute();
 		}

@@ -56,7 +56,7 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
 		//ensure that the type of the object being encoded matches the type 
 		// of the binding
 		if ( binding.getType() == null ) {
-			logger.warning( "Binding: " + binding.getTarget() + " does not declare a target type" );
+			logger.fine( "Binding: " + binding.getTarget() + " does not declare a target type" );
 			return;
 		}
 		
@@ -67,7 +67,7 @@ public class ElementEncodeExecutor implements BindingWalker.Visitor {
 				object = converted;
 			}
 			else {
-				logger.warning( object + "[ " + object.getClass() + " ] is not of type " + binding.getType() );	
+				logger.fine( object + "[ " + object.getClass() + " ] is not of type " + binding.getType() );	
 				return;
 			}
 		}

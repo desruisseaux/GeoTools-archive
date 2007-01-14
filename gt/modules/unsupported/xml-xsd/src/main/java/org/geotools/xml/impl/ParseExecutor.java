@@ -65,9 +65,15 @@ public class ParseExecutor implements Visitor {
     }
 
     public void visit(Binding binding) {
-        //reload out of context
+        //reload out of context, we do this so that the binding can pick up any new dependencies
+    	// providedb by this particular context
+    	Class bindingClass = binding.getClass();
         binding = (Binding) context.getComponentInstanceOfType(binding.getClass());
-
+        if ( binding == null ) {
+        	context.registerComponentImplementation( bindingClass );
+        	binding = (Binding) context.getComponentInstanceOfType(bindingClass);
+        }
+        
         //execute the binding
         try {
             Object result = value;
@@ -210,8 +216,7 @@ public class ParseExecutor implements Visitor {
     				
     				//perform the parse
     				ParseExecutor executor = new ParseExecutor( theInstance, null, context, parser );
-    				BindingWalker walker = new BindingWalker( parser.getBindingLoader(), context );
-    				walker.walk( feature, executor );
+    				parser.getBindingWalker().walk( feature, executor, context );
     				
     				parsed.add( executor.getValue() );
     			}

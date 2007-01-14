@@ -16,7 +16,9 @@
 package org.geotools.xml.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 import javax.xml.namespace.QName;
@@ -30,21 +32,25 @@ import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.Binding;
 import org.geotools.xml.Schemas;
 import org.geotools.xs.bindings.XS;
-import org.geotools.xs.bindings.XSAnyTypeBinding;
 import org.picocontainer.MutablePicoContainer;
-
 
 public class BindingWalker implements TypeWalker.Visitor {
     BindingLoader loader;
+    HashMap/*<XSDFeature,BindingExecutionChain>*/ chains;
+    TypeWalker typeWalker;
+    
     MutablePicoContainer context;
     ArrayList bindings;
-
     XSDFeature component;
     XSDTypeDefinition container;
     
-    public BindingWalker(BindingLoader factory, MutablePicoContainer context) {
+    
+    
+    public BindingWalker(BindingLoader factory) {
         this.loader = factory;
-        this.context = context;
+        
+        chains = new HashMap();
+        typeWalker = new TypeWalker();
     }
 
     public boolean visit(XSDTypeDefinition type) {
@@ -103,7 +109,7 @@ public class BindingWalker implements TypeWalker.Visitor {
         //load the binding into the current context
         Binding binding = loader.loadBinding( bindingName, context);
         if (binding != null) {
-            //add the strategy
+            //add the binding
             bindings.add(binding);
 
             //check execution mode, if override break out
@@ -111,86 +117,92 @@ public class BindingWalker implements TypeWalker.Visitor {
                 return false;
             }
         } 
-        //JD: changing to just continue on up
-//        else {
-//            //two posibilities
-//            if (!bindings.isEmpty()) {
-//                //make the last strategy the new root of the hierarchy
-//                return false;
-//            }
-//
-//            //else continue on to try to find a strategy further up in 
-//            // type hierarchy	
-//        }
-
+        
         return true;
     }
 
-    public void walk(XSDFeature component, Visitor visitor, XSDTypeDefinition container ) {
+    public void walk(XSDFeature component, Visitor visitor, XSDTypeDefinition container, MutablePicoContainer context ) {
 
-    	this.container = container;
-    	this.component = component;
+    	BindingExecutionChain chain = (BindingExecutionChain) chains.get( component );
+    	if ( chain == null ) {
+
+        	this.container = container;
+        	this.component = component;
+        	this.context = context;
+        	this.bindings = new ArrayList();
+
+            //first walk the type hierarchy to get the binding objects
+            typeWalker.walk(component.getType(),this);
+
+            //also look up a binding to teh instance itself, if found it will go 
+            // at the bottom of the binding hierarchy
+            if (component.getName() != null) {
+                QName qName = new QName(component.getTargetNamespace(),
+                        component.getName());
+                Binding binding = loader.loadBinding(qName, context);
+
+                if (binding != null) {
+                	//check for override
+                	if ( binding.getExecutionMode() == Binding.OVERRIDE ) {
+                		//override, clear the binding list
+                		bindings.clear();
+                		bindings.add( binding );
+                	}
+                	else {
+                		//not override, add as first
+                		bindings.add(0, binding);	
+                	}
+                    
+                }
+            }	
+            
+            chain = new BindingExecutionChain( bindings );
+            chains.put( component, chain );
+    	}
     	
-    	bindings = new ArrayList();
-
-        //first walk the type hierarchy to get the binding objects
-        TypeWalker walker = new TypeWalker(component.getType());
-        walker.walk(this);
-
-        //also look up a binding to teh instance itself, if found it will go 
-        // at the bottom of the binding hierarchy
-        if (component.getName() != null) {
-            QName qName = new QName(component.getTargetNamespace(),
-                    component.getName());
-            Binding binding = loader.loadBinding(qName, context);
-
-            if (binding != null) {
-            	//check for override
-            	if ( binding.getExecutionMode() == Binding.OVERRIDE ) {
-            		//override, clear the binding list
-            		bindings.clear();
-            		bindings.add( binding );
-            	}
-            	else {
-            		//not override, add as first
-            		bindings.add(0, binding);	
-            	}
-                
-            }
-        }
-
-        //simulated call stack
-        Stack stack = new Stack();
-
-        //visit from bottom to top
-        for (int i = 0; i < bindings.size(); i++) {
-            Binding binding = (Binding) bindings.get(i);
-
-            if (binding.getExecutionMode() == Binding.AFTER) {
-                //put on stack to execute after parent
-                stack.push(binding);
-
-                continue;
-            }
-
-            //execute the strategy
-            visitor.visit(binding);
-        }
-
-        //unwind the call stack
-        while (!stack.isEmpty()) {
-            Binding binding = (Binding) stack.pop();
-
-            visitor.visit(binding);
-        }
+    	chain.execute( visitor );
     }
     
-    public void walk(XSDFeature component, Visitor visitor) {
-    	walk( component, visitor, null );
-    	
+    public void walk(XSDFeature component, Visitor visitor, MutablePicoContainer context ) {
+    	walk( component, visitor, null, context );
     }
 
     public static interface Visitor {
         void visit(Binding binding);
+    }
+    
+    public static class BindingExecutionChain {
+    	List bindings;
+    	
+    	public BindingExecutionChain( List bindings ) {
+    		this.bindings = bindings;
+    	}
+    	
+    	public void execute( Visitor visitor ) {
+    		   //simulated call stack
+            Stack stack = new Stack();
+
+            //visit from bottom to top
+            for (int i = 0; i < bindings.size(); i++) {
+                Binding binding = (Binding) bindings.get(i);
+
+                if (binding.getExecutionMode() == Binding.AFTER) {
+                    //put on stack to execute after parent
+                    stack.push(binding);
+
+                    continue;
+                }
+
+                //execute the strategy
+                visitor.visit(binding);
+            }
+
+            //unwind the call stack
+            while (!stack.isEmpty()) {
+                Binding binding = (Binding) stack.pop();
+
+                visitor.visit(binding);
+            }
+    	}
     }
 }

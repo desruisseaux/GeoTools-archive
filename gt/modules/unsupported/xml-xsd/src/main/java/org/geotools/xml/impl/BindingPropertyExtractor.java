@@ -1,20 +1,17 @@
 package org.geotools.xml.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDParticle;
+import org.geotools.xml.Encoder;
 import org.geotools.xml.PropertyExtractor;
 import org.geotools.xml.Schemas;
-
 import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * Uses {@link org.geotools.xml.ComplexBinding#getProperty(Object, QName)} to obtain 
@@ -25,11 +22,12 @@ import org.w3c.dom.Node;
  */
 public class BindingPropertyExtractor implements PropertyExtractor {
 
-	BindingLoader bindingLoader;
+	Encoder encoder;
 	MutablePicoContainer context;
 	
-	public BindingPropertyExtractor ( BindingLoader bindingLoader, MutablePicoContainer context ) {
-		this.bindingLoader = bindingLoader;
+	
+	public BindingPropertyExtractor ( Encoder encoder, MutablePicoContainer context ) {
+		this.encoder = encoder;
 		this.context = context;
 	}
 	
@@ -42,8 +40,8 @@ public class BindingPropertyExtractor implements PropertyExtractor {
 	}
 	
 	public List properties(Object object, XSDElementDeclaration element) {
-		List children = 
-			Schemas.getChildElementParticles( element.getType(), true );
+		
+		List children = encoder.getSchemaIndex().getChildElementParticles( element );
 		
 		List properties = new ArrayList();
 	O:	for (Iterator itr = children.iterator(); itr.hasNext();) {
@@ -57,8 +55,7 @@ public class BindingPropertyExtractor implements PropertyExtractor {
 			GetPropertyExecutor executor = 
 				new GetPropertyExecutor(object,child);
 			
-			new BindingWalker(bindingLoader,context)
-				.walk(element,executor);
+			encoder.getBindingWalker().walk(element,executor,context);
 			
 			if (executor.getChildObject() != null) {
 				properties.add( new Object[] { particle, executor.getChildObject() });

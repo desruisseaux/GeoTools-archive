@@ -16,23 +16,23 @@
 package org.geotools.xml.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.xsd.XSDTypeDefinition;
 
 
 public class TypeWalker {
-    /** bottom type in hierachy **/
-    XSDTypeDefinition base;
-
-    public TypeWalker(XSDTypeDefinition base) {
-        this.base = base;
-    }
-
+   
+	/**
+	 * Cached type hieracty
+	 */
+	HashMap/*<XSDTypeDefinition,List>*/ cache = new HashMap();
+	
     /**
      * Walks from the bottom of the type hierachy to the top.
      */
-    public void walk(Visitor visitor) {
+    public void walk(XSDTypeDefinition base, Visitor visitor) {
     	List types = types( base );
     	for ( int i = 0; i < types.size(); i++ ) {
     		XSDTypeDefinition type = (XSDTypeDefinition) types.get( i );
@@ -47,7 +47,7 @@ public class TypeWalker {
      * Walks from the top of the type hierachy to the bottom.
      * 
      */
-    public void rwalk( Visitor visitor ) {
+    public void rwalk(XSDTypeDefinition base, Visitor visitor ) {
         
     	List types = types( base );
     	for ( int i = types.size() - 1; i > -1; i-- ) {
@@ -61,21 +61,28 @@ public class TypeWalker {
     }
     
     private List types( XSDTypeDefinition base ) {
-    	ArrayList types = new ArrayList();
     	
-    	XSDTypeDefinition type = base;
-    	while (type != null) {
-    		types.add( type );
-    		
-    		//get the next type
-            if (type.equals(type.getBaseType())) {
-                break;
-            }
+    	List types = (List) cache.get( base );
+    	if ( types == null ) {
+    		types = new ArrayList();
+    		XSDTypeDefinition type = base;
+        	while (type != null) {
+        		types.add( type );
+        		
+        		//get the next type
+                if (type.equals(type.getBaseType())) {
+                    break;
+                }
 
-            type = type.getBaseType();
-        }
+                type = type.getBaseType();
+            }
+        	
+        	cache.put( base, types );
+    	}
+    	
     	
     	return types;
+    	
     }
     
     public static interface Visitor {

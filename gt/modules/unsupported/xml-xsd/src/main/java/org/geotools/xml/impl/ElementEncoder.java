@@ -17,9 +17,9 @@ import org.w3c.dom.Element;
 public class ElementEncoder {
 
 	/**
-	 * The factory used to load bindings.
+	 * The walker used to traverse bindings
 	 */
-	private BindingLoader bindingLoader;
+	private BindingWalker bindingWalker;
 	/**
 	 * The binding context
 	 */
@@ -29,8 +29,8 @@ public class ElementEncoder {
 	 */
 	private Logger logger;
 	
-	public ElementEncoder ( BindingLoader bindingLoader, MutablePicoContainer context) {
-		this.bindingLoader = bindingLoader;
+	public ElementEncoder ( BindingWalker bindingWalker, MutablePicoContainer context) {
+		this.bindingWalker = bindingWalker;
 		this.context = context;
 	}
 	
@@ -54,7 +54,7 @@ public class ElementEncoder {
 	public Element encode( Object value, XSDElementDeclaration element, Document document ) {
 		
 		ElementEncodeExecutor executor = new ElementEncodeExecutor( value, element, document,logger );
-		new BindingWalker( bindingLoader, context ).walk( element, executor );
+		bindingWalker.walk( element, executor, context );
 		
 		return executor.getEncodedElement();
 	}

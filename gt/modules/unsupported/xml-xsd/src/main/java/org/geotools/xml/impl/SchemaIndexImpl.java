@@ -17,22 +17,27 @@ package org.geotools.xml.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.collections.OrderedMap;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDAttributeGroupDefinition;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDImport;
 import org.eclipse.xsd.XSDInclude;
+import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.SchemaIndex;
+import org.geotools.xml.Schemas;
 
 
 public class SchemaIndexImpl implements SchemaIndex {
@@ -49,7 +54,16 @@ public class SchemaIndexImpl implements SchemaIndex {
     HashMap attributeGroupIndex;
     HashMap complexTypeIndex;
     HashMap simpleTypeIndex;
-
+    
+    /**
+	 * Cache of elements to children
+	 */ 
+	HashMap/*<XSDElementDeclaration,OrderedMap>*/ element2children = new HashMap();
+	/**
+	 * Cache of elemnets to attributes
+	 */
+	HashMap/*<XSDElementDeclaratoin,List>*/ element2attributes = new HashMap();
+	
     public SchemaIndexImpl(XSDSchema[] schemas) {
         this.schemas = schemas;
     }
@@ -97,25 +111,72 @@ public class SchemaIndexImpl implements SchemaIndex {
             type = getSimpleTypeDefinition(qName);
         }
 
-        //		if (type == null) {
-        //			//could not find type def, try to resolve
-        //			
-        //			//TODO: this could cause problems, the reason being that the 
-        //			// schema object will always resolve to something, even when 
-        //			// the type can not be found, the default seems to be to just 
-        //			// create a simple type with the namespace, and name
-        //			type = schema.resolveTypeDefinition(
-        //				qName.getNamespaceURI(),qName.getLocalPart()
-        //			);
-        //			if (type instanceof XSDComplexTypeDefinition) {
-        //				//rebuild the complex type index
-        //				complexTypeIndex = null;
-        //			}
-        //			else simpleTypeIndex = null;
-        //		}
         return type;
     }
 
+    protected OrderedMap children( XSDElementDeclaration parent ) {
+    	OrderedMap children = (OrderedMap) element2children.get( parent );
+    	if ( children == null ) {
+    		children = new ListOrderedMap();
+    		for ( Iterator i =  Schemas.getChildElementParticles( parent.getType(), true ).iterator(); i.hasNext(); ) {
+    			XSDParticle particle = (XSDParticle) i.next();
+    			XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
+    			if ( child.isElementDeclarationReference() ) {
+    				child = child.getResolvedElementDeclaration();
+    			}
+    			
+    			QName childName = null;
+    			if ( child.getTargetNamespace() != null ) {
+    				childName = new QName( child.getTargetNamespace(), child.getName() );
+    			}
+    			else if ( parent.getTargetNamespace() != null ) {
+    				childName = new QName( parent.getTargetNamespace(), child.getName() );
+    			}
+    			else if ( parent.getType().getTargetNamespace() != null ) {
+    				childName = new QName( parent.getType().getTargetNamespace(), child.getName() );
+    			}
+    			else {
+    				childName = new QName( null, child.getName() );
+    			}
+    			
+    			children.put( childName, particle );
+    			
+    		}
+    		element2children.put( parent, children );
+    	}
+    	
+    	return children;
+    }
+    
+    public XSDElementDeclaration getChildElement( XSDElementDeclaration parent, QName childName ) {
+    	OrderedMap children = (OrderedMap) children( parent );
+    	XSDParticle particle = (XSDParticle) children.get( childName );
+    	if ( particle != null ) {
+    		XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
+    		if ( child.isElementDeclarationReference() ) {
+    			child = child.getResolvedElementDeclaration();
+    		}
+    		
+    		return child;
+    	}
+    	
+    	return null;
+    }
+    
+    public List getChildElementParticles( XSDElementDeclaration parent ) {
+    	return new ArrayList( children( parent ).values() );
+    }
+    
+    public List getAttributes( XSDElementDeclaration element ) {
+    	List attributes = (List) element2attributes.get( element );
+    	if ( attributes == null ) {
+    		attributes = Schemas.getAttributeDeclarations( element );
+    		element2attributes.put( element, attributes );
+    	}
+    	
+    	return Collections.unmodifiableList( attributes );
+    }
+    
     protected Collection find(Class c) {
         ArrayList found = new ArrayList();
 
