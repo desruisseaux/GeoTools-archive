@@ -408,7 +408,7 @@ public class WFSDataStore extends AbstractDataStore {
     protected FeatureType getSchemaGet(String typeName)
         throws SAXException, IOException {
         URL getUrl = getDescribeFeatureTypeURLGet(typeName);
-        Logger.getLogger("org.geotools.data.communication").info("Output: "+getUrl);
+        Logger.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
         if( getUrl==null )
             return null;
         HttpURLConnection hc = getConnection(getUrl,auth,false);
@@ -425,7 +425,7 @@ public class WFSDataStore extends AbstractDataStore {
 
     private URL getDescribeFeatureTypeURLGet( String typeName ) throws MalformedURLException {
         URL getUrl = capabilities.getDescribeFeatureType().getGet();
-        Logger.getLogger("org.geotools.data.communication").info("Output: "+getUrl);
+        Logger.getLogger("org.geotools.data.communication").fine("Output: "+getUrl);
 
         if (getUrl == null) {
             return null;
@@ -607,7 +607,7 @@ public class WFSDataStore extends AbstractDataStore {
         url += ("&TYPENAME=" + URLEncoder.encode(request.getTypeName(), "UTF-8"));
 
         Logger.getLogger("org.geotools.data.wfs").fine(url);
-        Logger.getLogger("org.geotools.data.communication").info("Output: "+url);
+        Logger.getLogger("org.geotools.data.communication").fine("Output: "+url);
         getUrl = new URL(url);
         HttpURLConnection hc = getConnection(getUrl,auth,false);
 
@@ -653,8 +653,8 @@ public class WFSDataStore extends AbstractDataStore {
             w=new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.wfs"), Level.FINE);
         }
         // special logger for communication information only.
-        if( Logger.getLogger("org.geotools.data.communication").isLoggable(Level.INFO) ){
-            w=new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.communication"), Level.INFO);
+        if( Logger.getLogger("org.geotools.data.communication").isLoggable(Level.FINE) ){
+            w=new LogWriterDecorator(w, Logger.getLogger("org.geotools.data.communication"), Level.FINE);
         }
         return w;
     }
@@ -678,8 +678,8 @@ public class WFSDataStore extends AbstractDataStore {
             is=new LogInputStream(is, WFSDataStoreFactory.logger, Level.FINE);
         }
         // special logger for communication information only.
-        if( Logger.getLogger("org.geotools.data.communication").isLoggable(Level.INFO) ){
-            is=new LogInputStream(is, Logger.getLogger("org.geotools.data.communication"), Level.INFO);
+        if( Logger.getLogger("org.geotools.data.communication").isLoggable(Level.FINE) ){
+            is=new LogInputStream(is, Logger.getLogger("org.geotools.data.communication"), Level.FINE);
         }
         return is;
 	}
