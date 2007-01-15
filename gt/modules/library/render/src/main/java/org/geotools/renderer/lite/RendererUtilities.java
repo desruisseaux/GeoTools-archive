@@ -511,7 +511,10 @@ public final class RendererUtilities {
 					// to project the whole WGS84 envelope in many transforms,
 					// such
 					// as Mercator or Gauss (the transform does diverge)
-				}
+				}catch ( AssertionError ae){
+                                    // same reason as above basically.  For some 
+                                    // projections the assertion will complain.  Nothing can be done about this
+                                }
 			}
 
 			// //
