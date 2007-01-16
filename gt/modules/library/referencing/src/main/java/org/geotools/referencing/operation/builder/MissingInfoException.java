@@ -3,7 +3,11 @@ package org.geotools.referencing.operation.builder;
 import org.opengis.referencing.FactoryException;
 /**
  * Thrown when a required operation can't be performed because some information is missing or isn't set up properly.
- * @author jezekjan
+ * 
+ * @since 2.4
+ * @source $URL$
+ * @version $Id$
+ * @author Jan Jezek
  *
  */
 public class MissingInfoException extends FactoryException {
