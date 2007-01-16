@@ -2,8 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -36,10 +35,15 @@ import org.geotools.data.coverage.grid.GridFormatFactorySpi;
  */
 public class NetcdfFormatFactorySpi implements GridFormatFactorySpi {
     /**
+     * The depth for the raster.
+     */
+    private static final int DEPTH = 0;
+
+    /**
      *
      */
     public NetcdfFormatFactorySpi() {}
-    
+
     /**
      * The format is created if the needed classes in JAI and JAI Image IO are found.
      */
@@ -48,9 +52,11 @@ public class NetcdfFormatFactorySpi implements GridFormatFactorySpi {
             throw new UnsupportedOperationException(
                     "The netCDF plugin requires the JAI and JAI ImageI/O libraries.");
         }
-        return new NetcdfFormat();
+
+        //System.out.println("depth :" + DEPTH);
+        return new NetcdfFormat(DEPTH);
     }
-    
+
     /**
      * Verifies if the JAI and JAI-IO package are installed on your machine and reachables.
      *
@@ -67,7 +73,7 @@ public class NetcdfFormatFactorySpi implements GridFormatFactorySpi {
         }
         return available;
     }
-    
+
     /**
      * Returns the implementation hints. The default implementation returns en
      * empty map.

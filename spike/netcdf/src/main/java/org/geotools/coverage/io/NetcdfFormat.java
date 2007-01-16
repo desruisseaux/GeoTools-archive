@@ -2,8 +2,7 @@
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
  *    (C) 2006, GeoTools Project Managment Committee (PMC)
- *    (C) 2006, Geomatys
- *   
+ *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
  *    License as published by the Free Software Foundation;
@@ -40,17 +39,24 @@ import org.geotools.parameter.ParameterGroup;
  */
 public class NetcdfFormat extends AbstractGridFormat implements Format {
     /**
+     * A temporary variable to store the depth.
+     */
+    private final int depth;
+
+    /**
      * Creates a new instance of NetcdfFormat.
      * Contains the main information about the NetCDF format.
      */
-    public NetcdfFormat() {
+    public NetcdfFormat(final int depth) {        
+        //System.out.println("depth netcdfformat "+ depth);
+        this.depth = depth;
         writeParameters = null;
         mInfo = new HashMap();
         mInfo.put("name", "NetCDF");
-        mInfo.put("description", "NetCDF reader");
+        mInfo.put("description", "NetCDF Coverage Format, profondeur " + depth);
         mInfo.put("vendor", "Geomatys");
-        mInfo.put("version", "1.0.0");
-        mInfo.put("docURL", "http://ftp.unidata.ucar.edu/software/netcdf-java/v2.2.16/javadoc/index.html");
+        mInfo.put("version", "1.0");
+        mInfo.put("docURL", "http://ftp.unidata.ucar.edu/software/netcdf-java/v2.2.16/javadoc/index.html");     
         readParameters = new ParameterGroup(
                 new DefaultParameterDescriptorGroup(mInfo,
                 new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
@@ -74,7 +80,7 @@ public class NetcdfFormat extends AbstractGridFormat implements Format {
      */
     public GridCoverageReader getReader(final Object object, final Hints hints) {
         try {
-            return new NetcdfReader(this, object, null);
+            return new NetcdfReader(this, object, null, depth);
         } catch (DataSourceException ex) {
             throw new RuntimeException(ex); // TODO: trouver une meilleur exception.
         }
@@ -83,6 +89,7 @@ public class NetcdfFormat extends AbstractGridFormat implements Format {
     /**
      * Gets a writer for the netCDF file.
      * Not used in our implementation.
+     *
      * @param object The source in which we will write.
      */
     public GridCoverageWriter getWriter(Object object) {
