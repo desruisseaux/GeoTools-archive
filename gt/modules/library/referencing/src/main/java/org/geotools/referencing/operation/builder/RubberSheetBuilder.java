@@ -43,6 +43,8 @@ import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
  * "http://planner.t.u-tokyo.ac.jp/member/fuse/rubber_sheeting.pdf">here</a>.
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
  */
 public class RubberSheetBuilder extends MathTransformBuilder {
@@ -151,6 +153,7 @@ public class RubberSheetBuilder extends MathTransformBuilder {
                 pts.add(new MappedPosition(
                         ((TINTriangle) a.getKey()).getPoints()[i],
                         ((TINTriangle) a.getValue()).getPoints()[i]));
+                
             }
 
             try {
@@ -158,7 +161,7 @@ public class RubberSheetBuilder extends MathTransformBuilder {
                 a.setValue(calculator.getMathTransform());
             } catch (Exception e) {
                 // should never reach here because AffineTransformBuilder(pts)
-            	// should not thorw any Exception.
+            	// should not throw any Exception.
             	e.printStackTrace();
             }
         }

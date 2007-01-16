@@ -613,7 +613,7 @@ public abstract class MathTransformBuilder {
                         ErrorKeys.MISMATCHED_DIMENSION_$3, label + '[' + i + ']',
                         new Integer(pointDim), new Integer(dimension)));
             }
-            crs = getCoordinateReferenceSystem(point, crs);
+            crs = getCoordinateReferenceSystem(point, crs);           
         }
         if (crs != null) {
             final CoordinateSystem cs = crs.getCoordinateSystem();

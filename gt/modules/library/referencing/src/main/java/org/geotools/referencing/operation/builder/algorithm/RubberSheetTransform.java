@@ -132,12 +132,12 @@ public class RubberSheetTransform extends AbstractMathTransform
 
         HashMap trianglestoPoints = mapTrianglesToPoints((ArrayList) arraySrcPts);
 
-        // Cicle goes throught each triangle
+        // Circle goes trough each triangle
         for (Iterator k = trianglestoPoints.keySet().iterator(); k.hasNext();) {
             TINTriangle triangle = (TINTriangle) k.next();
             AffineTransform AT = (AffineTransform) trianglesToKeysMap.get(triangle);
 
-            // Cicle for transforming points within this triangle
+            // Circle for transforming points within this triangle
             for (Iterator j = ((ArrayList) trianglestoPoints.get(triangle))
                     .iterator(); j.hasNext();) {
                 ExtendedPosition co = (ExtendedPosition) j.next();

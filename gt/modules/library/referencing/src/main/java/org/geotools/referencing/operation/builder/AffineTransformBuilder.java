@@ -26,9 +26,10 @@ import javax.vecmath.MismatchedSizeException;
 
 
 /**
- * Builds {@linkplain org.opengis.referencing.operation.MathTransform MathTransform} setup as Affine transformation from a list of {@linkplain
- * MappedPosition MappedPosition}.
- * The calculation uses least square method. The Affine transform equation:
+ * Builds {@linkplain org.opengis.referencing.operation.MathTransform
+ * MathTransform} setup as Affine transformation from a list of {@linkplain
+ * MappedPosition MappedPosition}. The calculation uses least square method.
+ * The Affine transform equation:
  * <pre>                                                       
  *  [ x']   [  m00  m01  m02  ] [ x ]   [ m00x + m01y + m02 ]
  *  [ y'] = [  m10  m11  m12  ] [ y ] = [ m10x + m11y + m12 ]
@@ -50,8 +51,9 @@ import javax.vecmath.MismatchedSizeException;
  *  m = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>x'  </blockquote> </pre>
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
- * 
  */
 public class AffineTransformBuilder extends ProjectiveTransformBuilder {
     protected AffineTransformBuilder() {
@@ -73,58 +75,14 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
      * Returns the minimum number of points required by this builder,
      * which is 3.
      *
-     * @return the minimum number of points required by this builder,
-     * which is 3.
+     * @return the minimum number of points required by this builder, which is
+     *         3.
      */
     public int getMinimumPointCount() {
         return 3;
     }
 
-    /**
-     * The method returns the array of affine transformation paremeters
-     * m00, m01, m02, m10, m11, m12.
-     *
-     * @return double array of parameters
-     */
-    protected double[] generateMMatrix() {
-        final DirectPosition[] sourcePoints = getSourcePoints();
-        final DirectPosition[] targetPoints = getTargetPoints();
-        GeneralMatrix A = new GeneralMatrix(2 * sourcePoints.length, 6);
-        GeneralMatrix X = new GeneralMatrix(2 * sourcePoints.length, 1);
-
-        int numRow = X.getNumRow();
-
-        // Creates X matrix
-        for (int j = 0; j < (numRow / 2); j++) {
-            A.setElement(j, 0, sourcePoints[j].getCoordinates()[0]);
-            A.setElement(j, 1, sourcePoints[j].getCoordinates()[1]);
-            A.setElement(j, 2, 1);
-            A.setElement(j, 3, 0);
-            A.setElement(j, 4, 0);
-            A.setElement(j, 5, 0);
-
-            X.setElement(j, 0, targetPoints[j].getCoordinates()[0]);
-        }
-
-        for (int j = numRow / 2; j < numRow; j++) {
-            A.setElement(j, 0, 0);
-            A.setElement(j, 1, 0);
-            A.setElement(j, 2, 0);
-            A.setElement(j, 3,
-                sourcePoints[j - (numRow / 2)].getCoordinates()[0]);
-            A.setElement(j, 4,
-                sourcePoints[j - (numRow / 2)].getCoordinates()[1]);
-            A.setElement(j, 5, 1);
-
-            X.setElement(j, 0,
-                targetPoints[j - (numRow / 2)].getCoordinates()[1]);
-        }
-
-        GeneralMatrix AT = (GeneralMatrix) A.clone();
-        AT.transpose();
-
-        return calculateLSM(A, X);
-    }
+   
 
     /**
      * Returns the matrix for Projective transformation setup as
@@ -139,7 +97,7 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
      */
     protected GeneralMatrix getProjectiveMatrix() {
         GeneralMatrix M = new GeneralMatrix(3, 3);
-        double[] param = generateMMatrix();
+        double[] param = calculateLSM();
         double[] m0 = { param[0], param[1], param[2] };
         double[] m1 = { param[3], param[4], param[5] };
         double[] m2 = { 0, 0, 1 };
@@ -148,5 +106,30 @@ public class AffineTransformBuilder extends ProjectiveTransformBuilder {
         M.setRow(2, m2);
 
         return M;
+    }
+
+    protected void fillAMatrix() {
+        
+        super.A = new GeneralMatrix(2 * getSourcePoints().length, 6);
+
+        int numRow = getSourcePoints().length*2;
+
+        // Creates X matrix
+        for (int j = 0; j < (numRow / 2); j++) {
+            A.setRow(j,
+                new double[] {
+        	    getSourcePoints()[j].getCoordinates()[0],
+        	    getSourcePoints()[j].getCoordinates()[1], 1, 0, 0, 0
+                });          
+        }
+
+        for (int j = numRow / 2; j < numRow; j++) {
+            A.setRow(j,
+                    new double[] {0, 0, 0,
+        	    getSourcePoints()[j - (numRow / 2)].getCoordinates()[0],
+        	    getSourcePoints()[j - (numRow / 2)].getCoordinates()[1], 1
+                    });      
+         
+        }      
     }
 }

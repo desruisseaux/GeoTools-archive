@@ -16,7 +16,6 @@
 package org.geotools.referencing.operation.builder;
 
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
-import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.MismatchedReferenceSystemException;
 import java.util.List;
@@ -50,8 +49,9 @@ import javax.vecmath.MismatchedSizeException;
  *  m = (A<sup>T</sup>A)<sup>-1</sup> A<sup>T</sup>x'  </blockquote> </pre>
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
- * 
  */
 public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
 /**
@@ -67,66 +67,39 @@ public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
         super.setMappedPositions(vectors);
     }
 
+    protected void fillAMatrix() {
+        super.A = new GeneralMatrix(2 * getSourcePoints().length, 4);
+
+        int numRow = getSourcePoints().length * 2;
+
+        // Creates X matrix
+        for (int j = 0; j < (numRow / 2); j++) {
+            A.setRow(j,
+                new double[] {
+                    getSourcePoints()[j].getCoordinates()[0],
+                    -getSourcePoints()[j].getCoordinates()[1], 1, 0
+                });
+        }
+
+        for (int j = numRow / 2; j < numRow; j++) {
+            A.setRow(j,
+                new double[] {
+                    getSourcePoints()[j - (numRow / 2)].getCoordinates()[1],
+                    getSourcePoints()[j - (numRow / 2)].getCoordinates()[0], 0,
+                    1
+                });
+        }
+    }
+
     /**
      * Returns the minimum number of points required by this builder,
      * which is 2.
      *
-     * @return DOCUMENT ME!
+     * @return Returns the minimum number of points required by this builder,
+     *         which is 2.
      */
     public int getMinimumPointCount() {
         return 2;
-    }
-
-    /**
-     * The method returns the array of similar transformation.
-     * paremeters a,b, Tx, Ty.
-     *
-     * @return double array of parameters
-     */
-    public double[] generateMMatrix() {
-        final DirectPosition[] sourcePoints = getSourcePoints();
-        final DirectPosition[] targetPoints = getTargetPoints();
-        GeneralMatrix A = new GeneralMatrix(2 * sourcePoints.length, 4);
-        GeneralMatrix X = new GeneralMatrix(2 * sourcePoints.length, 1);
-
-        int numRow = A.getNumRow();
-
-        // Creates A matrix
-        for (int j = 0; j < (numRow / 2); j++) {
-            A.setElement(j, 0, sourcePoints[j].getCoordinates()[0]); //X
-            A.setElement(j, 1, -sourcePoints[j].getCoordinates()[1]); //Y
-            A.setElement(j, 2, 1);
-            A.setElement(j, 3, 0);
-
-            X.setElement(j, 0, targetPoints[j].getCoordinates()[0]);
-        }
-
-        for (int j = numRow / 2; j < numRow; j++) {
-            A.setElement(j, 0,
-                sourcePoints[j - (numRow / 2)].getCoordinates()[1]); //Y
-            A.setElement(j, 1,
-                sourcePoints[j - (numRow / 2)].getCoordinates()[0]); //X
-            A.setElement(j, 2, 0);
-            A.setElement(j, 3, 1);
-
-            X.setElement(j, 0,
-                targetPoints[j - (numRow / 2)].getCoordinates()[1]);
-        }
-
-        GeneralMatrix AT = (GeneralMatrix) A.clone();
-        AT.transpose();
-
-        GeneralMatrix ATA = new GeneralMatrix(4, 4);
-        GeneralMatrix ATX = new GeneralMatrix(4, 1);
-        GeneralMatrix x = new GeneralMatrix(4, 1);
-        ATA.mul(AT, A);
-        ATX.mul(AT, X);
-        ATA.invert();
-        ATX.mul(AT, X);
-        x.mul(ATA, ATX);
-        x.transpose();
-
-        return x.getElements()[0];
     }
 
     /**
@@ -141,8 +114,8 @@ public class SimilarTransformBuilder extends ProjectiveTransformBuilder {
      * @return Matrix M.
      */
     protected GeneralMatrix getProjectiveMatrix() {
-        GeneralMatrix M = new GeneralMatrix(3, 3);
-        double[] param = generateMMatrix();
+        GeneralMatrix M = new GeneralMatrix(3, 3);        
+        double[] param = calculateLSM();
         double[] m0 = { param[0], -param[1], param[2] };
         double[] m1 = { param[1], param[0], param[3] };
         double[] m2 = { 0, 0, 1 };
