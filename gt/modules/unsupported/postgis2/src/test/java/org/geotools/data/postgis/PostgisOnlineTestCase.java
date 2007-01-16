@@ -27,8 +27,8 @@ import org.geotools.test.OnlineTestCase;
  * <li>Postgres installed with "postgres" password :-)
  * <li>PostGIS installed into a "geotools" database :-)
  * </ul>
- * # located in C:\Documents and Settings\USER\.geotools\postgis\typical.properties
  * As indicated by the following example fixture:<pre><code>
+ * # located in C:\Documents and Settings\USER\.geotools\postgis\typical.properties
  * namespace=http://www.geotools.org/data/postgis/
  * host=localhost
  * port=5432
