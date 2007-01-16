@@ -58,7 +58,6 @@ public class FunctionTestSupport extends TestCase {
         
         testFeatures = new Feature[iVal.length];
         GeometryFactory fac=new GeometryFactory();
-        Feature[] testFeatures = new Feature[iVal.length];
         
         for(int i=0; i< iVal.length; i++){
             testFeatures[i] = dataType.create(new Object[] {
