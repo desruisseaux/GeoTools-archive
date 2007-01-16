@@ -41,9 +41,12 @@ public class InternalTranscoder extends org.apache.batik.transcoder.image.ImageT
 
 
 	public java.awt.image.BufferedImage createImage(int width, int height) {
-		return GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getDefaultScreenDevice().getDefaultConfiguration()
-				.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
+        if(GraphicsEnvironment.isHeadless())
+            return new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+        else
+            return GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice().getDefaultConfiguration()
+                .createCompatibleImage(width, height, Transparency.TRANSLUCENT);
 	}
 
 
