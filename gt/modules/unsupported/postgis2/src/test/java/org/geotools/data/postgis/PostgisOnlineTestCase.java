@@ -21,6 +21,22 @@ import org.geotools.test.OnlineTestCase;
 
 /**
  * Abstract class for PostGIS online test cases.
+ * <p>
+ * This test case is currently set up using:
+ * <ol>
+ * <li>Postgres installed with "postgres" password :-)
+ * <li>PostGIS installed into a "geotools" database :-)
+ * </ul>
+ * # located in C:\Documents and Settings\USER\.geotools\postgis\typical.properties
+ * As indicated by the following example fixture:<pre><code>
+ * namespace=http://www.geotools.org/data/postgis/
+ * host=localhost
+ * port=5432
+ * database=geotools
+ * user=postgres
+ * password=postgres
+ * schema=public
+ * </code></pre>
  * 
  * @since 2.4
  * @author Cory Horner, Refractions Research
@@ -33,8 +49,13 @@ public abstract class PostgisOnlineTestCase extends OnlineTestCase {
     protected abstract String getFixtureId();
 
     protected void connect() throws Exception {
-        content = new PostGISContent(fixture);
-        dataStore = new PostgisDataStore(content);
+        try {
+            content = new PostGISContent(fixture);
+            dataStore = new PostgisDataStore(content);
+        } catch (Exception t ){
+            t.printStackTrace();
+            throw (Exception)t;
+        }
     }
 
     protected void disconnect() throws Exception {

@@ -59,14 +59,14 @@ public class PostGISContent extends Content {
     }
     public PostGISContent( PostGISConfig config ) throws SQLException {
         this.configuration = config;
-        String connPath = DRIVER_PATH + "://" + config.getHost() + ":" + config.getHost()+ "/" + config.getDatabase();
+        String connPath = DRIVER_PATH + "://" + config.getHost() + ":" + config.getPort()+ "/" + config.getDatabase();
         
         // Instantiate the driver classes
         try {
             Class.forName(DRIVER_CLASS);
             
             Properties info = new Properties();
-            info.put( "username", config.getUser() );
+            info.put( "user", config.getUser() );
             info.put( "password", config.getPassword() );
             
             connection = DriverManager.getConnection(connPath, info);            
