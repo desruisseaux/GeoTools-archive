@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.geotools.data.DataUtilities;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -6658,8 +6659,23 @@ public class GMLComplexTypes {
         if(type == null)
             type = Object.class;
         
-			// nillable should really be nillable, but in gt2.X nillable in an attribute is equivalent to minOccurs == 0 as well
-        return AttributeTypeFactory.newAttributeType(eg.getName(),type,(eg.isNillable()||eg.getMinOccurs() == 0));
+        // nillable should really be nillable, but in gt2.X nillable in an attribute is equivalent to minOccurs == 0 as well
+		boolean nillable = eg.isNillable()||eg.getMinOccurs() == 0;
+        if( !nillable ){
+            try{
+                Object defaultValue = DataUtilities.defaultValue(type);
+                return AttributeTypeFactory.newAttributeType( eg.getName(), type, nillable, Filter.NONE, defaultValue, null);
+            }catch( IllegalArgumentException e ){
+                // can happen if the type is not supported by the method.  
+                // in this case I'm taking the easy way out and just not 
+                // having a default value.
+                logger.warning("Don't know how to make a default value for: "+type.getSimpleName()
+                        +". Consider making it nillable.");
+                
+                return AttributeTypeFactory.newAttributeType(eg.getName(),type,(nillable));
+            }
+        }
+        return AttributeTypeFactory.newAttributeType(eg.getName(),type,(nillable));
     }
 
     private static AttributeType getAttribute(String name, Choice eg){

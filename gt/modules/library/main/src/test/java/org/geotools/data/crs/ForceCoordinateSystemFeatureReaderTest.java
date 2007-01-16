@@ -9,7 +9,6 @@ import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

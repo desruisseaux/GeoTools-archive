@@ -646,6 +646,74 @@ public class DataUtilities {
     }
 
     /**
+     * Returns a non-null default value for the class that is passed in.  This is a helper class an can't create a 
+     * default class for any type but it does support:
+     * <ul>
+     * <li>String</li>
+     * <li>Object - will return empty string</li>
+     * <li>Number</li>
+     * <li>Character</li>
+     * <li>JTS Geometries</li>
+     * </ul>
+     * 
+     *
+     * @param type
+     * @return
+     */
+    public static Object defaultValue(Class type){
+        if( type==String.class || type==Object.class){
+            return "";
+        }
+        if( type==Integer.class ){
+            return new Integer(0);
+        }
+        if( type==Double.class ){
+            return new Double(0);
+        }
+        if( type==Long.class ){
+            return new Long(0);
+        }
+        if( type==Short.class ){
+            return new Short((short)0);
+        }
+        if( type==Float.class ){
+            return new Float(0.0f);
+        }
+        if( type==Character.class ){
+            return new Character(' ');
+        }
+        
+        GeometryFactory fac=new GeometryFactory();
+        Coordinate coordinate = new Coordinate(0, 0);
+        Point point = fac.createPoint(coordinate);
+
+        if( type==Point.class ){
+            return point;
+        }
+        if( type==MultiPoint.class ){
+            return fac.createMultiPoint(new Point[]{point});
+        }
+        if( type==LineString.class ){
+            return fac.createLineString(new Coordinate[]{coordinate,coordinate,coordinate,coordinate});
+        }
+        LinearRing linearRing = fac.createLinearRing(new Coordinate[]{coordinate,coordinate,coordinate,coordinate});
+        if( type==LinearRing.class ){
+            return linearRing;
+        }
+        if( type==MultiLineString.class ){
+            return fac.createMultiLineString(new LineString[]{linearRing});
+        }
+        Polygon polygon = fac.createPolygon(linearRing, new LinearRing[0]);
+        if( type==Polygon.class ){
+            return polygon;
+        }
+        if( type==MultiPolygon.class ){
+            return fac.createMultiPolygon(new Polygon[]{polygon});
+        }
+        
+        throw new IllegalArgumentException(type+" is not supported by this method");
+    }
+    /**
      * Creates a FeatureReader for testing.
      *
      * @param features Array of features
@@ -660,7 +728,7 @@ public class DataUtilities {
         if ((features == null) || (features.length == 0)) {
             throw new IOException("Provided features where empty");
         }
-
+    
         return new FeatureReader() {
                 Feature[] array = features;
                 int offset = -1;

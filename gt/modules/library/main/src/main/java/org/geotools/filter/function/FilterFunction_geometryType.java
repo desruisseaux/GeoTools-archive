@@ -49,6 +49,10 @@ public class FilterFunction_geometryType extends FunctionExpressionImpl
                     "Filter Function problem for function geometryType argument #0 - expected type Geometry");
         }
 
+        if( arg0 == null )
+            return null;
+        
         return (StaticGeometry.geometryType(arg0));
     }
 }
+

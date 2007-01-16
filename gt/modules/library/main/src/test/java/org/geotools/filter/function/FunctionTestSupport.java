@@ -27,6 +27,9 @@ import org.geotools.filter.ExpressionBuilder;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+
 /**
  *
  * @author James
@@ -48,21 +51,22 @@ public class FunctionTestSupport extends TestCase {
     
     protected void setUp() throws java.lang.Exception {
         dataType = DataUtilities.createType("classification.test1",
-                "id:0,foo:int,bar:double");
+                "id:0,foo:int,bar:double,geom:Point");
         
         int iVal[] = new int[]{4,90,20,43,29,61,8,12};
         double dVal[] = new double[]{2.5,80.433,24.5,9.75,18,53,43.2,16};
         
         testFeatures = new Feature[iVal.length];
+        GeometryFactory fac=new GeometryFactory();
+        Feature[] testFeatures = new Feature[iVal.length];
         
         for(int i=0; i< iVal.length; i++){
             testFeatures[i] = dataType.create(new Object[] {
                 new Integer(i+1),
                         new Integer(iVal[i]),
                         new Double(dVal[i]),
+                        fac.createPoint(new Coordinate( iVal[i], iVal[i]))
             },"classification.t"+(i+1));
-            
-            
         }
         
         MemoryDataStore store = new MemoryDataStore();
