@@ -6664,12 +6664,12 @@ public class GMLComplexTypes {
         if( !nillable ){
             try{
                 Object defaultValue = DataUtilities.defaultValue(type);
-                return AttributeTypeFactory.newAttributeType( eg.getName(), type, nillable, Filter.NONE, defaultValue, null);
+                return AttributeTypeFactory.newAttributeType( eg.getName(), type, nillable, Filter.INCLUDE, defaultValue, null);
             }catch( IllegalArgumentException e ){
                 // can happen if the type is not supported by the method.  
                 // in this case I'm taking the easy way out and just not 
                 // having a default value.
-                logger.warning("Don't know how to make a default value for: "+type.getSimpleName()
+                logger.warning("Don't know how to make a default value for: "+type
                         +". Consider making it nillable.");
                 
                 return AttributeTypeFactory.newAttributeType(eg.getName(),type,(nillable));
