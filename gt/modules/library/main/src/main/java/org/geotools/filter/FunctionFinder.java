@@ -1,7 +1,9 @@
 package org.geotools.filter;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.geotools.factory.Hints;
 import org.opengis.filter.expression.Function;
@@ -18,44 +20,63 @@ import org.opengis.filter.expression.Function;
  * 
  * @author Jody Garnett
  */
-public class FunctionFinder {    
-    public FunctionFinder( Hints hints ){
+public class FunctionFinder {
+    private Map functionExpressionCache;
+
+    private Map functionImplCache;
+
+    public FunctionFinder(Hints hints) {
         // currently hints are not used, need help :-P
     }
-   
-    public Function findFunction( String name ){
-        return findFunction( name, null );
+
+    public Function findFunction(String name) {
+        return findFunction(name, null);
     }
 
-    public Function findFunction( String name, List/*<Expression>*/ parameters ){
+    public Function findFunction(String name, List/* <Expression> */parameters) {
         name = functionName(name);
 
         try {
-            for( Iterator it = org.geotools.factory.FactoryFinder.factories(FunctionExpression.class); it.hasNext(); ){
-                FunctionExpression function = (FunctionExpression) it.next();
-                if( name.equalsIgnoreCase( function.getName() ) ){
-                	if ( parameters != null ) {
-                		function.setParameters( parameters );	
-                	}
-                	
-                    return function;
+            // load the caches at first access
+            if (functionExpressionCache == null) {
+                functionExpressionCache = new HashMap();
+                functionImplCache = new HashMap();
+
+                for (Iterator it = org.geotools.factory.FactoryFinder
+                        .factories(FunctionExpression.class); it.hasNext();) {
+                    FunctionExpression function = (FunctionExpression) it.next();
+                    functionExpressionCache.put(function.getName().toLowerCase(), function.getClass());
+                }
+                for (Iterator i = org.geotools.factory.FactoryFinder.factories(FunctionImpl.class); 
+                        i.hasNext();) {
+                    FunctionImpl function = (FunctionImpl) i.next();
+                    functionImplCache.put(function.getName().toLowerCase(), function.getClass());
                 }
             }
-            for( Iterator i = org.geotools.factory.FactoryFinder.factories(FunctionImpl.class); i.hasNext(); ){
-                FunctionImpl function = (FunctionImpl) i.next();
-                if( name.equalsIgnoreCase( function.getName() ) ){
-                	function.setParameters( parameters );
-                    return function;
-                }
+            
+            // cache lookup
+            Class clazz = (Class) functionExpressionCache.get(name.toLowerCase());
+            if(clazz != null) {
+                FunctionExpression function = (FunctionExpression) clazz.newInstance();
+                if(parameters != null)
+                    function.setParameters(parameters);
+                return function;
             }
+            clazz = (Class) functionImplCache.get(name.toLowerCase());
+            if(clazz != null) {
+                FunctionImpl function = (FunctionImpl) clazz.newInstance();
+                if(parameters != null)
+                    function.setParameters(parameters);
+                return function;
+            }    
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to create class " + name + "Function", e);
         }
-        catch( Exception e ){
-            throw new RuntimeException("Unable to create class " + name + "Function", e );  
-        }
-        throw new RuntimeException("Unable to find function " + name );
+        throw new RuntimeException("Unable to find function " + name);
     }
-    
-    private String functionName( String name ) {
+
+    private String functionName(String name) {
         int index = -1;
 
         if ((index = name.indexOf("Function")) != -1) {
