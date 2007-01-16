@@ -76,6 +76,11 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
       <artifactId>gt2-xml-gml3</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -83,7 +88,7 @@
       <groupId>org.geotools</groupId>
       <artifactId>gt2-epsg-wkt</artifactId>
       <version>${project.version}</version>
-			<scope>test</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>xpp3</groupId>
