@@ -41,6 +41,8 @@ import org.opengis.filter.expression.Multiply;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.expression.Subtract;
 import org.opengis.filter.identity.GmlObjectId;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.spatial.Beyond;
 import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.Crosses;
@@ -368,6 +370,38 @@ public class FilterMockData {
 
     static GmlObjectId gmlObjectId() {
         return f.gmlObjectId("foo");
+    }
+
+    //sorting
+    static Element sortBy(Document document, Node parent) {
+        Element sortBy = element(document, parent, OGC.SORTBY);
+        sortProperty(document, sortBy);
+        sortProperty(document, sortBy);
+
+        return sortBy;
+    }
+
+    static SortBy[] sortBy() {
+        return new SortBy[] { sortProperty(), sortProperty() };
+    }
+
+    static Element sortProperty(Document document, Node parent) {
+        Element sortProperty = element(document, parent, new QName(OGC.NAMESPACE, "SortProperty"));
+        propertyName(document, sortProperty);
+        sortOrder(document, sortProperty);
+
+        return sortProperty;
+    }
+
+    static SortBy sortProperty() {
+        return f.sort("foo", SortOrder.ASCENDING);
+    }
+
+    static Element sortOrder(Document document, Node parent) {
+        Element sortOrder = element(document, parent, new QName(OGC.NAMESPACE, "SortOrder"));
+        sortOrder.appendChild(document.createTextNode("ASC"));
+
+        return sortOrder;
     }
 
     static Element element(Document document, Node parent, QName name) {

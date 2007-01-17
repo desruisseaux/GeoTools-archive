@@ -15,6 +15,7 @@
  */
 package org.geotools.filter.v1_1;
 
+import java.util.List;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
@@ -71,7 +72,20 @@ public class SortByTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
+        //&lt;xsd:element maxOccurs="unbounded" name="SortProperty" type="ogc:SortPropertyType"/&gt;
+        List sortBy = node.getChildValues(SortBy.class);
+
+        return sortBy.toArray(new SortBy[sortBy.size()]);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if ("SortProperty".equals(name.getLocalPart())) {
+            SortBy[] sortBy = (SortBy[]) object;
+
+            return sortBy;
+        }
+
         return null;
     }
 }
