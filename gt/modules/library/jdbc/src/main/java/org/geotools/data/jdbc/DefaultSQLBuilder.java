@@ -291,9 +291,19 @@ public class DefaultSQLBuilder implements SQLBuilder {
      * </p>
      */
     public void sqlOrderBy(StringBuffer sql, SortBy[] sortBy) throws SQLEncoderException {
+    	if ( sortBy == null || sortBy.length == 0 ) 
+    		return;	//nothing to sort on
+    	
     	sql.append( " ORDER BY ");
     	for ( int i = 0; i < sortBy.length; i++ ) {
-    		sql.append( encoder.escapeName( sortBy[i].getPropertyName().getPropertyName() ) );
+    		AttributeType type = (AttributeType) sortBy[i].getPropertyName().evaluate( ft );
+    		if ( type != null ) {
+    			sql.append( encoder.escapeName( type.getName() ) );
+    		}
+    		else {
+    			sql.append( encoder.escapeName( sortBy[i].getPropertyName().getPropertyName() ) );	
+    		}
+    		
     		
     		if ( SortOrder.DESCENDING.equals( sortBy[i].getSortOrder() ) ) {
     			sql.append( " DESC");
