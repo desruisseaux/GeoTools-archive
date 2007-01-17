@@ -1641,9 +1641,11 @@ public class IndexedShapefileDataStore extends ShapefileDataStore {
 							}
 						}
 					}
-				} catch (TreeException e) {
-					LOGGER.log(Level.WARNING, "Error creating RTree", e);
-				}
+                } catch (Throwable e) {
+                    createIndex=false;
+                    treeType=TREE_NONE;
+                    LOGGER.log(Level.WARNING, "Error creating RTree", e);
+                }					
 			}
 		}
 
