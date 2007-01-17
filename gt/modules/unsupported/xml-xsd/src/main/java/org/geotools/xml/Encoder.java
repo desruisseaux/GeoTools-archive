@@ -435,7 +435,7 @@ public class Encoder {
 				}
 				
 				if ( entry.element.isAbstract() ) {
-					logger.warning( entry.element.getName() + " is abstract" );
+					logger.fine( entry.element.getName() + " is abstract" );
 				}
 				
 				entry.encoding = (Element) encode(entry.object,entry.element);
@@ -542,7 +542,7 @@ public class Encoder {
 								}
 								else {
 									//log an error
-									logger.warning( 
+									logger.fine( 
 										"Property " + ns + ":"  + local + " not found but minoccurs > 0 "
 									);
 								}
