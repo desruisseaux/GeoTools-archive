@@ -55,6 +55,7 @@ org.geotools.filter.function.FilterFunction_numGeometries
 org.geotools.filter.function.FilterFunction_getGeometryN
 org.geotools.filter.function.FilterFunction_getX
 org.geotools.filter.function.FilterFunction_getY
+org.geotools.filter.function.FilterFunction_getZ
 org.geotools.filter.function.FilterFunction_pointN
 org.geotools.filter.function.FilterFunction_startPoint
 org.geotools.filter.function.FilterFunction_endPoint
