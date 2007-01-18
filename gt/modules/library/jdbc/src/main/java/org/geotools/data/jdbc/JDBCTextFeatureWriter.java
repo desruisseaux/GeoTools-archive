@@ -219,7 +219,11 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
             if (attributeTypes[i] instanceof GeometryAttributeType) {
                 String geomName = attributeTypes[i].getName();
                 int srid = ftInfo.getSRID(geomName);
-                attrValue = getGeometryInsertText((Geometry) attributes[i], srid);
+                Geometry geometry = (Geometry) attributes[i];
+                if( geometry==null ){
+                    attrValue="NULL";
+                }else
+                    attrValue = getGeometryInsertText(geometry, srid);
             } else {
                 if(!autoincrementColumns.contains(attributeTypes[i].getName()) || attributes[i] != null)
                     attrValue = addQuotes(attributes[i]);
@@ -475,7 +479,11 @@ public abstract class JDBCTextFeatureWriter extends JDBCFeatureWriter {
 				if (attributes[i] instanceof GeometryAttributeType) {
 				    String geomName = attributes[i].getName();
 				    int srid = ftInfo.getSRID(geomName);
-				    attrValue = getGeometryInsertText((Geometry) currAtt, srid);
+				    Geometry geometry = (Geometry) currAtt;
+                    if( geometry == null )
+                        attrValue="NULL";
+                    else
+                        attrValue = getGeometryInsertText(geometry, srid);
 				} else {
 				    attrValue = addQuotes(currAtt);
 				}
