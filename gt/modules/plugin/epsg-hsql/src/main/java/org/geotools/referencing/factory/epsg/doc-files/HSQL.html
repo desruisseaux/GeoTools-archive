@@ -54,6 +54,13 @@ SHUTDOWN COMPACT;</PRE></BLOCKQUOTE></LI>
         <LI>Remove all <CODE>CONSTRAINT ... FOREIGN KEY</CODE> from the <CODE>CREATE TABLE</CODE>
             statements at the begining of the script, and move them as <CODE>ALTER TABLE ... FOREIGN KEY</CODE>
             statements at the end of the script.</LI>
+            
+        <LI>Add the following two index creations at the end of file:
+            <UL>
+              <LI><CODE>CREATE INDEX EPSG_ALIAS_OBJ_CODE ON EPSG_ALIAS(OBJECT_CODE)</CODE></LI>
+              <LI><CODE>CREATE INDEX EPSG_COORDINATEREFERENCESYSTEM ON EPSG_COORDINATEREFERENCESYSTEM(DATUM_CODE)</CODE></LI>
+            </UL>
+        </LI>
 
         <LI>Add <CODE>SHUTDOWN COMPACT</CODE> statement at the end of file.</LI>
 
