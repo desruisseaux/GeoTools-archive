@@ -347,16 +347,25 @@ public abstract class AbstractDataStore implements DataStore {
             throw new NullPointerException("getUnsupportedFilter shouldn't return null. Do you mean Filter.INCLUDE?");
         }
 
+        // There are cases where the readers have to lock.  Take shapefile for example.  Getting a Reader causes
+        // the file to be locked.  However on a commit TransactionStateDiff locks before a writer is obtained.  In order to 
+        // prevent deadlocks either the diff has to obtained first or the reader has to be obtained first.
+        // Because shapefile writes to a buffer first the actual write lock is not flipped until the transaction has most of the work
+        // done.  As a result I suggest getting the diff first then getting the reader.
+        // JE
+        Diff diff=null;
+        if (transaction != Transaction.AUTO_COMMIT) {
+            diff = state(transaction).diff(typeName);
+        }
+        
         // This calls our subclass "simple" implementation
         // All other functionality will be built as a reader around
         // this class
         //
         FeatureReader reader = getFeatureReader(typeName, query);
 
-        if (transaction != Transaction.AUTO_COMMIT) {
-            Diff diff = state(transaction).diff(typeName);
+        if( diff!=null )
             reader = new DiffFeatureReader(reader, diff, query.getFilter());
-        }
 
         if (!filter.equals( Filter.INCLUDE ) ) {
             reader = new FilteringFeatureReader(reader, filter);
