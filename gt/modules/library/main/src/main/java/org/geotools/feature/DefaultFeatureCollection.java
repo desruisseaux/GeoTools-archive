@@ -77,17 +77,19 @@ public class DefaultFeatureCollection implements FeatureCollection {
     private String id; /// fid
 
     /**
-     * This constructor is protected to discourage direct usage...
+     * This contructor should not be used by client code.
      * <p>
      * Opportunistic reuse is encouraged, but only for the purposes
      * of testing or other specialized uses. Normal creation should
      * occur through <code>org.geotools.core.FeatureCollections.newCollection()</code>
      * allowing applications to customize any generated collections.
      * </p>
+     * 
+     * </p>
      * @param id may be null ... feature id
      * @param featureType optional, may be null
      */
-    protected DefaultFeatureCollection(String id, FeatureType featureType) {
+    public DefaultFeatureCollection(String id, FeatureType featureType) {
     	this.id = id;
     	if(featureType == null){
     		List ats = new LinkedList();

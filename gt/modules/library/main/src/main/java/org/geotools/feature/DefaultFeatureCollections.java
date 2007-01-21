@@ -39,6 +39,9 @@ public class DefaultFeatureCollections extends FeatureCollections {
     protected FeatureCollection createCollection() {
         return new DefaultFeatureCollection(null,null);
     }
+    protected FeatureCollection createCollection(String id) {
+        return new DefaultFeatureCollection(id,null);
+    }
     protected FeatureCollection createCollection(String id, FeatureType ft) {
         return new DefaultFeatureCollection(id,ft);
     }

@@ -27,7 +27,9 @@ public class MockFeatureCollections extends org.geotools.feature.FeatureCollecti
     /** Creates a new instance of MockFeatureCollections */
     public MockFeatureCollections() {
     }
-    
+    protected FeatureCollection createCollection(String id) {
+    	return new MockFeatureCollection();
+    }
     protected FeatureCollection createCollection() {
         return new MockFeatureCollection();
     }
