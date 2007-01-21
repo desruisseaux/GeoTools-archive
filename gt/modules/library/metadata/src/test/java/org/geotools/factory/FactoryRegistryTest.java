@@ -93,7 +93,7 @@ public class FactoryRegistryTest extends TestCase {
         assertTrue(registry.setOrdering(DummyFactory.class, (DummyFactory)factory1, (DummyFactory)factory2));
         assertTrue(registry.setOrdering(DummyFactory.class, (DummyFactory)factory2, (DummyFactory)factory3));
         assertTrue(registry.setOrdering(DummyFactory.class, (DummyFactory)factory1, (DummyFactory)factory3));
-        final List factories = new ArrayList(new LazySet(registry.getServiceProviders(DummyFactory.class)));
+        final List factories = new ArrayList(new LazySet(registry.getServiceProviders(DummyFactory.class, null, null)));
         assertTrue(factories.contains(factory1));
         assertTrue(factories.contains(factory2));
         assertTrue(factories.contains(factory3));

@@ -20,6 +20,7 @@ package org.geotools.util;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.util.logging.Logger;
 
 // Geotools dependencies
 import org.geotools.util.Logging;
@@ -40,6 +41,11 @@ import org.geotools.util.Logging;
  */
 final class WeakCollectionCleaner extends Thread {
     /**
+     * The name of the logger to use.
+     */
+    private static final String LOGGER = "org.geotools.util";
+
+    /**
      * The default thread.
      */
     public static final WeakCollectionCleaner DEFAULT = new WeakCollectionCleaner();
@@ -48,10 +54,10 @@ final class WeakCollectionCleaner extends Thread {
      * List of reference collected by the garbage collector.
      * Those elements must be removed from {@link #table}.
      */
-    public final ReferenceQueue referenceQueue = new ReferenceQueue();
+    final ReferenceQueue referenceQueue = new ReferenceQueue();
 
     /**
-     * Construct and stard a new thread as a daemon. This thread will be stoped
+     * Construct and start a new thread as a daemon. This thread will be stoped
      * most of the time.  It will run only some few nanoseconds each time a new
      * {@link WeakReference} is enqueded.
      */
@@ -65,7 +71,10 @@ final class WeakCollectionCleaner extends Thread {
      * Loop to be run during the virtual machine lifetime.
      */
     public void run() {
-        while (true) {
+        // The reference queue should never be null.  However some strange cases (maybe caused
+        // by an anormal JVM state) have been reported on the mailing list. In such case, stop
+        // the daemon instead of writting 50 Mb of log messages.
+        while (referenceQueue != null) {
             try {
                 // Block until a reference is enqueded.
                 // Note: To be usefull, the clear() method must have
@@ -74,14 +83,15 @@ final class WeakCollectionCleaner extends Thread {
             } catch (InterruptedException exception) {
                 // Somebody doesn't want to lets us sleep... Go back to work.
             } catch (Exception exception) {
-                Logging.unexpectedException("org.geotools.util",
+                Logging.unexpectedException(LOGGER,
                         WeakCollectionCleaner.class, "remove", exception);
             } catch (AssertionError exception) {
-                Logging.unexpectedException("org.geotools.util",
+                Logging.unexpectedException(LOGGER,
                         WeakCollectionCleaner.class, "remove", exception);
                 // Do not kill the thread on assertion failure, in order to
                 // keep the same behaviour as if assertions were turned off.
             }
         }
+        Logger.getLogger(LOGGER).severe("Daemon stopped."); // Should never happen.
     }
 }

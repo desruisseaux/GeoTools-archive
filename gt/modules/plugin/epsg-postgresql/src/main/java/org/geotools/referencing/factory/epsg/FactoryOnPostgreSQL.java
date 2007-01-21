@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.util.Properties;
 import java.sql.Connection;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 
 // Geotools dependencies
 import org.geotools.util.Logging;
@@ -30,6 +31,7 @@ import org.geotools.factory.Hints;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 // PostgreSQL dependencies
+import org.postgresql.ds.common.BaseDataSource;
 import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
 
 
@@ -41,7 +43,7 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * <p>
  * <h3>Connection parameters</h3>
  * The preferred way to specify connection parameters is through the JNDI interface.
- * However, this datasource provides the following alternative as a convenience: if an
+ * However, this datasource provides the following alternative as a convenience: if a
  * {@value #CONFIGURATION_FILE} file is found in current directory or in the user's home
  * directory, then the following properties are fetch. Note that the default value may change
  * in a future version if a public server become available.
@@ -101,17 +103,15 @@ import org.postgresql.jdbc3.Jdbc3SimpleDataSource;
  * bundle it with their own distribution if they want to connect their users to an other
  * database.
  *
- * @since 2.2
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Didier Richard
  * @author Martin Desruisseaux
  *
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/How+to+install+the+EPSG+database+in+PostgreSQL
- *
- * @deprecated Replaced by {@link FactoryOnPostgreSQL}.
  */
-public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSource {
+public class FactoryOnPostgreSQL extends DefaultFactory {
     /**
      * The user configuration file. This class search first for the first file found in the
      * following directories:
@@ -125,94 +125,88 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
     /**
      * The schema name, or {@code null} if none.
      */
-    private final String schema;
+    private String schema;
 
     /**
-     * Creates a new instance of this data source.
+     * Creates a new instance of this factory.
      */
-    public PostgreDataSource() {
-        this("localhost", "EPSG", null, "Geotools", "Geotools");
+    public FactoryOnPostgreSQL() {
+        this(null);
     }
 
     /**
-     * Creates a new instance of this data source with the specified default parameters.
-     * If a {@linkplain #CONFIGURATION_FILE configuration file} has been found, then the
-     * user setting will override the arguments supplied to this constructor.
-     *
-     * @param server   The server name.
-     * @param database The database name.
-     * @param schema   The schema name, or {@code null} if none.
-     * @param user     The user name.
-     * @param password The password.
+     * Creates a new instance of this factory with the specified hints.
+     * The priority is set to a lower value than the {@linkplain FactoryOnAccess}'s one
+     * in order to give the priority to any "official" database installed locally by the
+     * user, when available.
      */
-    public PostgreDataSource(final String server,
-                             final String database,
-                             final String schema,
-                             final String user,
-                             final String password)
-    {
-        final Properties p = new Properties();
-        try {
-            load(p);
-        } catch (IOException exception) {
-            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
-                                        "<init>", exception);
-        }
-        int port;
-        try {
-            port = Integer.parseInt(p.getProperty("portNumber", "5432"));
-        } catch (NumberFormatException exception) {
-            port = 5432;
-            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
-                                        "<init>", exception);
-        }
-        setPortNumber  (port);
-        setServerName  (p.getProperty("serverName",   server  ));
-        setDatabaseName(p.getProperty("databaseName", database));
-        setUser        (p.getProperty("user",         user    ));
-        setPassword    (p.getProperty("password",     password));
-        this.schema =  (p.getProperty("schema",       schema  ));
+    public FactoryOnPostgreSQL(final Hints hints) {
+        super(hints, PRIORITY + 5);
     }
 
     /**
      * Loads the {@linkplain #CONFIGURATION_FILE configuration file}.
-     *
-     * @param  The properties in which to stores the configuration informations.
-     * @throws IOException if the configuration file was found, but an error occured while
-     *         reading it.
      */
-    private static void load(final Properties p) throws IOException {
+    private static Properties load() {
+        final Properties p = new Properties();
         File file = new File(CONFIGURATION_FILE);
         if (!file.isFile()) {
             file = new File(System.getProperty("user.home", "."), CONFIGURATION_FILE);
             if (!file.isFile()) {
-                return;
+                // Returns an empty set of properties.
+                return p;
             }
         }
-        final InputStream in = new FileInputStream(file);
-        p.load(in);
-        in.close();
-        return;
+        try {
+            final InputStream in = new FileInputStream(file);
+            p.load(in);
+            in.close();
+        } catch (IOException exception) {
+            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
+                                        "<init>", exception);
+            // Continue. We will try to work with whatever properties are available.
+        }
+        return p;
     }
 
     /**
-     * Returns the priority for this data source. This priority is set to a lower value than
-     * the {@linkplain AccessDataSource}'s one in order to give the priority to any "official"
-     * database installed locally by the user, when available.
+     * Returns a data source for the PostgreSQL database.
      */
-    public int getPriority() {
-        return NORMAL_PRIORITY - 50;
+    protected DataSource createDataSource() throws SQLException {
+        DataSource candidate = super.createDataSource();
+        if (candidate instanceof BaseDataSource) {
+            // Any kind of DataSource from the PostgreSQL driver.
+            return candidate;
+        }
+        final Jdbc3SimpleDataSource source = new Jdbc3SimpleDataSource();
+        final Properties p = load();
+        int portNumber;
+        try {
+            portNumber = Integer.parseInt(p.getProperty("portNumber", "5432"));
+        } catch (NumberFormatException exception) {
+            portNumber = 5432;
+            Logging.unexpectedException("org.geotools.referencing.factory", "DataSource",
+                                        "<init>", exception);
+        }
+        source.setPortNumber  (portNumber);
+        source.setServerName  (p.getProperty("serverName",   "localhost"));
+        source.setDatabaseName(p.getProperty("databaseName", "EPSG"     ));
+        source.setUser        (p.getProperty("user",         "Geotools" ));
+        source.setPassword    (p.getProperty("password",     "Geotools" ));
+        schema = p.getProperty("schema", null);
+        return source;
     }
 
     /**
-     * Open a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
+     * Returns the backing-store factory for PostgreSQL syntax.
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
      * @return The EPSG factory using PostgreSQL syntax.
      * @throws SQLException if connection to the database failed.
      */
-    public AbstractAuthorityFactory createFactory(final Hints hints) throws SQLException {
-        final FactoryUsingAnsiSQL factory = new FactoryUsingAnsiSQL(hints, getConnection());
+    protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
+        final Connection connection = getDataSource().getConnection();
+        final FactoryUsingAnsiSQL factory = new FactoryUsingAnsiSQL(hints, connection);
         if (schema != null) {
             factory.setSchema(schema);
         }

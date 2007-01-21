@@ -69,20 +69,6 @@ import org.geotools.resources.i18n.LoggingKeys;
  */
 public class FactoryRegistry extends ServiceRegistry {
     /**
-     * The default filter without implementation hints.
-     */
-    private static class DefaultFilter implements Filter {
-        public boolean filter(final Object provider) {
-            return !(provider instanceof OptionalFactory) || ((OptionalFactory) provider).isAvailable();
-        }
-    }
-
-    /**
-     * Filters only the factories that are {@linkplain OptionalFactory#isAvailable available}.
-     */
-    static final Filter FILTER = new DefaultFilter();
-
-    /**
      * The logger for all events related to factory registry.
      */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
@@ -99,6 +85,12 @@ public class FactoryRegistry extends ServiceRegistry {
      * an other dependency of the same category).
      */
     private final Set/*<Class>*/ scanningCategories = new HashSet();
+
+    /**
+     * Factories under testing for availablity. This is used by {@link #isAvailable}
+     * as a guard against infinite recursivity.
+     */
+    private final Set/*<Class<? extends OptionalFactory>>*/ testingFactories = new HashSet();
 
     /**
      * Constructs a new registry for the specified categories.
@@ -119,6 +111,8 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param category The category to look for. Usually an interface class
      *                 (not the actual implementation class).
      * @return Factories ready to use for the specified category.
+     *
+     * @deprecated Replaced by {@link #getServiceProviders(Class, Filter, Hints)}.
      */
     public Iterator getServiceProviders(final Class category) {
         return getServiceProviders(category, null, null);
@@ -126,10 +120,9 @@ public class FactoryRegistry extends ServiceRegistry {
 
     /**
      * Returns the providers in the registry for the specified category, filter and hints.
-     * This method is similar to
-     * <code>{@linkplain #getServiceProviders(Class) getServiceProviders}(category)</code>
-     * except that only factories matching the specified filter and hints are returned by the
-     * iterator.
+     * Providers that are not {@linkplain OptionalFactory#isAvailable available} will be
+     * ignored. This method will {@linkplain #scanForPlugins() scan for plugins} the first
+     * time it is invoked for the given category.
      *
      * @param category The category to look for. Usually an interface class
      *                 (not the actual implementation class).
@@ -140,10 +133,44 @@ public class FactoryRegistry extends ServiceRegistry {
      * @since 2.3
      */
     public Iterator getServiceProviders(final Class category, final Filter filter, final Hints hints) {
+        /*
+         * The implementation of this method is very similar to the 'getUnfilteredProviders'
+         * one except for filter handling. See the comments in 'getUnfilteredProviders' for
+         * more implementation details.
+         */
+        if (scanningCategories.contains(category)) {
+            throw new RecursiveSearchException(category);
+        }
+        final Filter hintsFilter = new Filter() {
+            public boolean filter(final Object provider) {
+                return isAcceptable(provider, category, hints, filter);
+            }
+        };
+        Iterator iterator = getServiceProviders(category, hintsFilter, true);
+        if (!iterator.hasNext()) {
+            scanForPlugins(getClassLoaders(), category);
+            iterator = getServiceProviders(category, hintsFilter, true);
+        }
+        return iterator;
+    }
+
+    /**
+     * Implementation of {@link #getServiceProviders(Class, Filter, Hints)} without the filtering
+     * applied by the {@link #isAcceptable(Object, Class, Hints, Filter)} method. If this filtering
+     * is not already presents in the filter given to this method, then it must be applied on the
+     * elements returned by the iterator. The later is preferrable when:
+     * <p>
+     * <ul>
+     *   <li>There is some cheaper tests to perform before {@code isAcceptable}.</li>
+     *   <li>We don't want a restrictive filter in order to avoid trigging a classpath
+     *       scan if this method doesn't found any element to iterate.</li>
+     * </ul>
+     */
+    final Iterator getUnfilteredProviders(final Class category) {
         if (!scanningCategories.isEmpty()) {
             /*
              * The 'scanningCategories' map is almost always empty, so we use the above 'isEmpty()'
-             * check because it is fast. If the map is not empty, then this mean than a scanning is
+             * check because it is fast. If the map is not empty, then this mean that a scanning is
              * under progress, i.e. 'scanForPlugins' is currently being executed. This is okay as
              * long as the user is not asking for one of the categories under scanning. Otherwise,
              * the answer returned by 'getServiceProviders' would be incomplete because not all
@@ -155,24 +182,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 throw new RecursiveSearchException(category);
             }
         }
-        /*
-         * Creates a filter which is the union of the following ones:
-         *
-         *  - A filter for OptionalFactory that declares themself as available.
-         *  - A filter based on user-supplied hints, if any.
-         *  - The user-supplied filter, if any.
-         */
-        final Filter hintsFilter;
-        if (filter==null && (hints == null || hints.isEmpty())) {
-            hintsFilter = FILTER;
-        } else {
-            hintsFilter = new DefaultFilter() {
-                /*@Override*/ public boolean filter(final Object provider) {
-                    return super.filter(provider) && isAcceptable(provider, category, hints, filter);
-                }
-            };
-        }
-        Iterator iterator = getServiceProviders(category, hintsFilter, true);
+        Iterator iterator = getServiceProviders(category, true);
         if (!iterator.hasNext()) {
             /*
              * No plugin. This method is probably invoked the first time for the specified
@@ -180,7 +190,7 @@ public class FactoryRegistry extends ServiceRegistry {
              * Scans the plugin now, but for this category only.
              */
             scanForPlugins(getClassLoaders(), category);
-            iterator = getServiceProviders(category, hintsFilter, true);
+            iterator = getServiceProviders(category, true);
         }
         return iterator;
     }
@@ -208,7 +218,7 @@ public class FactoryRegistry extends ServiceRegistry {
      *         and hints.
      * @throws FactoryRegistryException if a factory can't be returned for some other reason.
      *
-     * @see #getServiceProviders
+     * @see #getServiceProviders(Class, Filter, Hints)
      * @see FactoryCreator#getServiceProvider
      */
     public Object getServiceProvider(final Class category, final Filter filter,
@@ -234,12 +244,12 @@ public class FactoryRegistry extends ServiceRegistry {
                         return hint;
                     }
                     /*
-                     * Before to pass the hints to the private 'getServiceProvider' method,
-                     * remove the hint for the user-supplied key. This is because this hint
-                     * has been processed by this public 'getServiceProvider' method, and the
-                     * policy is to remove the processed hints before to pass them to child
-                     * dependencies (see the "Check recursively in factory dependencies"
-                     * comment elswhere in this class).
+                     * Before to pass the hints to the private 'getServiceImplementation' method,
+                     * remove the hint for the user-supplied key.  This is because this hint has
+                     * been processed by this public 'getServiceProvider' method, and the policy
+                     * is to remove the processed hints before to pass them to child dependencies
+                     * (see the "Check recursively in factory dependencies" comment elswhere in
+                     * this class).
                      *
                      * Use case: DefaultDataSourceTest invokes indirectly 'getServiceProvider'
                      * with a "CRS_AUTHORITY_FACTORY = DefaultFactory.class" hint. However
@@ -266,7 +276,7 @@ public class FactoryRegistry extends ServiceRegistry {
                         final int length = types.length;
                         for (int i=0; i<length-1; i++) {
                             final Object candidate =
-                                    getServiceProvider(category, types[i], filter, hints);
+                                    getServiceImplementation(category, types[i], filter, hints);
                             if (candidate != null) {
                                 return candidate;
                             }
@@ -280,7 +290,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 }
             }
         }
-        final Object candidate = getServiceProvider(category, implementation, filter, hints);
+        final Object candidate = getServiceImplementation(category, implementation, filter, hints);
         if (candidate != null) {
             return candidate;
         }
@@ -290,7 +300,9 @@ public class FactoryRegistry extends ServiceRegistry {
 
     /**
      * Search the first implementation in the registery matching the specified conditions.
-     * This method do not creates new instance if no matching factory is found.
+     * This method is invoked only by the {@link #getServiceProvider(Class, Filter, Hints,
+     * Hints.Key)} public method above; there is no recursivity there. This method do not
+     * creates new instance if no matching factory is found.
      *
      * @param  category       The category to look for. Usually an interface class.
      * @param  implementation The desired class for the implementation, or {@code null} if none.
@@ -298,11 +310,13 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param  hints          A {@linkplain Hints map of hints}, or {@code null} if none.
      * @return A factory for the specified category and hints, or {@code null} if none.
      */
-    private Object getServiceProvider(final Class category, final Class implementation,
-                                      final Filter filter,  final Hints hints)
+    private Object getServiceImplementation(final Class category, final Class implementation,
+                                            final Filter filter,  final Hints hints)
     {
-        for (final Iterator/*<Object>*/ it = getServiceProviders(category); it.hasNext();) {
+        for (final Iterator/*<Object>*/ it=getUnfilteredProviders(category); it.hasNext();) {
             final Object candidate = it.next();
+            // Implementation class must be tested before 'isAcceptable'
+            // in order to avoid StackOverflowError in some situations.
             if (implementation!=null && !implementation.isInstance(candidate)) {
                 continue;
             }
@@ -344,8 +358,13 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Returns {@code true} is the specified {@code factory} meets the requirements specified by a
-     * map of {@code hints} and the filter.
+     * Returns {@code true} is the specified {@code factory} meets the requirements specified by
+     * a map of {@code hints} and the filter. This method is the entry point for the following
+     * public methods:
+     * <ul>
+     *   <li>Singleton {@link #getServiceProvider (Class category, Filter, Hints, Hints.Key)}</li>
+     *   <li>Iterator  {@link #getServiceProviders(Class category, Filter, Hints)}</li>
+     * </ul>
      *
      * @param candidate The factory to checks.
      * @param category  The factory category. Usually an interface.
@@ -361,30 +380,45 @@ public class FactoryRegistry extends ServiceRegistry {
         if (filter!=null && !filter.filter(candidate)) {
             return false;
         }
+        /*
+         * Note: isAvailable(...) must be tested before checking the hints, because in current
+         * Geotools implementation (especially DeferredAuthorityFactory), some hints computation
+         * are deferred until a connection to the database is etablished (which 'isAvailable'
+         * does in order to test the connection).
+         */
+        if (!isAvailable(candidate)) {
+            return false;
+        }
         if (hints != null) {
             if (candidate instanceof Factory) {
-                if (!isAcceptable((Factory) candidate, category, hints, (Set) null)) {
+                if (!usesAcceptableHints((Factory) candidate, category, hints, (Set) null)) {
                     return false;
                 }
             }
         }
+        /*
+         * Checks for optional user conditions supplied in FactoryRegistry subclasses.
+         */
         return isAcceptable(candidate, category, hints);
     }
 
     /**
-     * Returns {@code true} is the specified {@code factory} meets the requirements specified by a
-     * map of {@code hints}.
+     * Returns {@code true} is the specified {@code factory} meets the requirements specified
+     * by a map of {@code hints}. This method checks only the hints; it doesn't check the
+     * {@link Filter}, the {@linkplain OptionalFactory#isAvailable availability} or the
+     * user-overrideable {@link #isAcceptable(Object, Class, Hints)} method. This method
+     * invokes itself recursively.
      *
      * @param factory     The factory to checks.
      * @param category    The factory category. Usually an interface.
      * @param hints       The user requirements ({@code null} not allowed).
      * @param alreadyDone Should be {@code null} except on recursive calls (for internal use only).
-     * @return {@code true} if the {@code factory} meets the user requirements.
+     * @return {@code true} if the {@code factory} meets the hints requirements.
      */
-    private boolean isAcceptable(final Factory factory,
-                                 final Class   category,
-                                 final Hints   hints,
-                                 Set/*<Factory>*/ alreadyDone)
+    private boolean usesAcceptableHints(final Factory factory,
+                                        final Class   category,
+                                        final Hints   hints,
+                                        Set/*<Factory>*/ alreadyDone)
     {
         Hints remaining = null;
         final Map implementationHints = factory.getImplementationHints();
@@ -446,7 +480,7 @@ public class FactoryRegistry extends ServiceRegistry {
                         type = Factory.class; // Kind of unknown factory type...
                     }
                     // Recursive call to this method for scanning dependencies.
-                    if (!isAcceptable(dependency, type, remaining, alreadyDone)) {
+                    if (!usesAcceptableHints(dependency, type, remaining, alreadyDone)) {
                         return false;
                     }
                 }
@@ -456,15 +490,20 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Returns {@code true} if the specified {@code provider} meets the requirements specified by a
-     * map of {@code hints}. This method is invoked automatically when the {@code provider} is known
-     * to meets standard requirements.
-     * <p>
-     * The default implementation always returns {@code true}. Override this method if
-     * more checks are needed, typically for non-Geotools implementation. For example a
-     * JTS geometry factory finder may overrides this method in order to check if a
-     * {@link com.vividsolutions.jts.geom.GeometryFactory} uses the required
-     * {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory}.
+     * Returns {@code true} if the specified {@code provider} meets the requirements specified by
+     * a map of {@code hints}. The default implementation always returns {@code true}. There is no
+     * need to override this method for {@link AbstractFactory} implementations, since their hints
+     * are automatically checked. Override this method for non-Geotools implementations.
+     * For example a JTS geometry factory finder may overrides this method in order to check
+     * if a {@link com.vividsolutions.jts.geom.GeometryFactory} uses the required
+     * {@link com.vividsolutions.jts.geom.CoordinateSequenceFactory}. Such method should be
+     * implemented as below, since this method may be invoked for various kind of objects:
+     *
+     * <blockquote><pre>
+     * if (provider instanceof GeometryFactory) {
+     *     // ... Check the GeometryFactory state here.
+     * }
+     * </pre></blockquote>
      *
      * @param provider The provider to checks.
      * @param category The factory category. Usually an interface.
@@ -473,6 +512,27 @@ public class FactoryRegistry extends ServiceRegistry {
      */
     protected boolean isAcceptable(final Object provider, final Class category, final Hints hints) {
         return true;
+    }
+
+    /**
+     * Returns {@code true} if the specified factory is available.
+     */
+    private boolean isAvailable(final Object provider) {
+        if (!(provider instanceof OptionalFactory)) {
+            return true;
+        }
+        final OptionalFactory factory = (OptionalFactory) provider;
+        final Class type = factory.getClass();
+        if (!testingFactories.add(type)) {
+            throw new RecursiveSearchException(type);
+        }
+        try {
+            return factory.isAvailable();
+        } finally {
+            if (!testingFactories.remove(type)) {
+                throw new AssertionError(type);
+            }
+        }
     }
 
     /**

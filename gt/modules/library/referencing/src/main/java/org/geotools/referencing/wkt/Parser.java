@@ -165,7 +165,7 @@ public class Parser extends MathTransformParser {
     private final Map directions;
 
     /**
-     * A set of predefined axis (usually the {@code AXIS} constant array).
+     * A set of predefined axis (usually the {@code GEOTOOLS_AXIS} constant array).
      */
     private final CoordinateSystemAxis[] predefinedAxis;
     

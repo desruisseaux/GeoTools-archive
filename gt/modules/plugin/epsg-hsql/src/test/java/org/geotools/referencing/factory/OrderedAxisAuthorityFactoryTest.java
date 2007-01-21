@@ -116,10 +116,10 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
     private static OrderedAxisAuthorityFactory getFactory(final Hints hints) {
         CRSAuthorityFactory factory;
         factory = FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
-        assertTrue(factory instanceof LongitudeFirstFactory);
+        assertTrue(factory.getClass().toString(), factory instanceof LongitudeFirstFactory);
         factory = (CRSAuthorityFactory) ((LongitudeFirstFactory) factory).getImplementationHints()
                    .get(Hints.CRS_AUTHORITY_FACTORY);
-        assertTrue(factory instanceof OrderedAxisAuthorityFactory);
+        assertTrue(factory.getClass().toString(), factory instanceof OrderedAxisAuthorityFactory);
         return (OrderedAxisAuthorityFactory) factory;
     }
 
@@ -177,10 +177,12 @@ public class OrderedAxisAuthorityFactoryTest extends TestCase {
         final Hints hints = new Hints(Hints.CRS_AUTHORITY_FACTORY, AbstractAuthorityFactory.class);
         factory0 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
         assertFalse(factory0 instanceof OrderedAxisAuthorityFactory);
+        assertFalse(factory0 instanceof LongitudeFirstFactory);
         hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
         hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.TRUE);
         hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.TRUE);
         factory1 = (AbstractAuthorityFactory) FactoryFinder.getCRSAuthorityFactory(EPSG, hints);
+        assertTrue(factory1 instanceof LongitudeFirstFactory);
         /*
          * The local variables to be used for all remaining tests
          * (usefull to setup in the debugger).

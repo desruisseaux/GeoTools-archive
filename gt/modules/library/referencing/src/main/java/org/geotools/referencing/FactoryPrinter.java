@@ -124,7 +124,8 @@ final class FactoryPrinter implements Comparator {
             /*
              * Write the authorities in a single cell. Same for vendors and implementations.
              */
-            for (final Iterator providers=registry.getServiceProviders(category); providers.hasNext();) {
+            final Iterator providers=registry.getServiceProviders(category, null, null);
+            while (providers.hasNext()) {
                 if (implementations.length() != 0) {
                     table          .write ('\n');
                     vendors        .append('\n');

@@ -28,11 +28,17 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Logging;
+import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 // HSQL dependencies
@@ -56,106 +62,60 @@ import org.hsqldb.jdbc.jdbcDataSource;
  * them.
  * <p>
  * If the EPSG database should be created in a different directory (or already exists in that
- * directory), this directory can be specified in two ways:
- * <p>
- * <ul>
- *   <li>It may be given explicitly as an argument to the {@linkplain #HSQLDataSource(File)
- *       constructor}.</li>
- *   <li>It may be specified as a {@linkplain System#getProperty(String) system property}
- *       nammed {@value #DIRECTORY_KEY}.</li>
- * </ul>
+ * directory), it may be specified as a {@linkplain System#getProperty(String) system property}
+ * nammed {@value #DIRECTORY_KEY}.
  *
- * @since 2.2
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Didier Richard
- *
- * @deprecated Replaced by {@link FactoryOnHSQL}.
  */
-public class HSQLDataSource extends jdbcDataSource implements DataSource {
+public class FactoryOnHSQL extends DefaultFactory {
     /**
      * The key for fetching the database directory from {@linkplain System#getProperty(String)
      * system properties}.
-     *
-     * @since 2.3
      */
     public static final String DIRECTORY_KEY = "EPSG-HSQL.directory";
 
     /**
+     * The name of the SQL file to read in order to create the cached database.
+     */
+    private static final String SQL_FILE = "EPSG.sql";
+
+    /**
      * The database name.
-     *
-     * @since 2.3
      */
     public static final String DATABASE_NAME = "EPSG";
 
     /**
-     * The directory where the database is stored.
+     * The prefix to put in front of URL to the database.
      */
-    private File directory;
+    private static final String PREFIX = "jdbc:hsqldb:file:";
 
     /**
-     * Creates a new instance of this data source. If the {@value #DIRECTORY_KEY}
+     * Creates a new instance of this factory. If the {@value #DIRECTORY_KEY}
      * {@linkplain System#getProperty(String) system property} is defined and contains
      * the name of a directory with a valid {@linkplain File#getParent parent}, then the
      * {@value #DATABASE_NAME} database will be saved in that directory. Otherwise, a
      * temporary directory will be used.
      */
-    public HSQLDataSource() {
-        this(getDirectory());
+    public FactoryOnHSQL() {
+        this(null);
     }
 
     /**
-     * Creates a new instance of this data source using the {@value #DATABASE_NAME} database in the
-     * specified directory. If {@code directory} is {@code null}, then callers are responsible
-     * to invoke {@link #setDatabase} explicitly.
-     *
-     * @param directory The directory for the {@value #DATABASE_NAME} HSQL database,
-     *        or {@code null} if none.
-     *
-     * @since 2.3
-     */
-    public HSQLDataSource(final File directory) {
-        this.directory = directory;
-        if (directory != null) {
-            /*
-             * Constructs the full path to the HSQL database. Note: we do not use
-             * File.toURI() because HSQL doesn't seem to expect an encoded URL
-             * (e.g. "%20" instead of spaces).
-             */
-            final StringBuffer url = new StringBuffer("jdbc:hsqldb:file:");
-            final String path = directory.getAbsolutePath().replace(File.separatorChar, '/');
-            if (path.length()==0 || path.charAt(0)!='/') {
-                url.append('/');
-            }
-            url.append(path);
-            if (url.charAt(url.length()-1) != '/') {
-                url.append('/');
-            }
-            url.append(DATABASE_NAME);
-            setDatabase(url.toString());
-            this.directory = directory;
-        }
-        /*
-         * If the temporary directory do not exists or can't be created,
-         * lets the 'database' attribute unset. If the user do not set it
-         * explicitly (for example through JNDI), an exception will be thrown
-         * when 'getConnection()' will be invoked.
-         */
-        setUser("SA"); // System administrator. No password.
-    }
-
-    /**
-     * Returns the priority for this data source. This priority is set to a lower value than
-     * the {@linkplain AccessDataSource}'s one in order to give the priority to the Access-backed
-     * database, if presents. Priorities are set that way because:
+     * Creates a new instance of this data source using the specified hints. The priority
+     * is set to a lower value than the {@linkplain FactoryOnAccess}'s one in order to give
+     * precedence to the Access-backed database, if presents. Priorities are set that way
+     * because:
      * <ul>
      *   <li>The MS-Access format is the primary EPSG database format.</li>
      *   <li>If a user downloads the MS-Access database himself, he probably wants to use it.</li>
      * </ul>
      */
-    public int getPriority() {
-        return NORMAL_PRIORITY - 30;
+    public FactoryOnHSQL(final Hints hints) {
+        super(hints, PRIORITY + 1);
     }
 
     /**
@@ -198,6 +158,59 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
     }
 
     /**
+     * Extract the directory from the specified data source, or {@code null} if this
+     * information is not available.
+     */
+    private static File getDirectory(final DataSource source) {
+        if (source instanceof jdbcDataSource) {
+            String path = ((jdbcDataSource) source).getDatabase();
+            if (path!=null && PREFIX.regionMatches(true, 0, path, 0, PREFIX.length())) {
+                path = path.substring(PREFIX.length());
+                return new File(path).getParentFile();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a data source for the HSQL database.
+     */
+    protected DataSource createDataSource() throws SQLException {
+        DataSource candidate = super.createDataSource();
+        if (candidate instanceof jdbcDataSource) {
+            return candidate;
+        }
+        final jdbcDataSource source = new jdbcDataSource();
+        File directory = getDirectory();
+        if (directory != null) {
+            /*
+             * Constructs the full path to the HSQL database. Note: we do not use
+             * File.toURI() because HSQL doesn't seem to expect an encoded URL
+             * (e.g. "%20" instead of spaces).
+             */
+            final StringBuffer url = new StringBuffer(PREFIX);
+            final String path = directory.getAbsolutePath().replace(File.separatorChar, '/');
+            if (path.length()==0 || path.charAt(0)!='/') {
+                url.append('/');
+            }
+            url.append(path);
+            if (url.charAt(url.length()-1) != '/') {
+                url.append('/');
+            }
+            url.append(DATABASE_NAME);
+            source.setDatabase(url.toString());
+            assert directory.equals(getDirectory(source)) : url;
+        }
+        /*
+         * If the temporary directory do not exists or can't be created, lets the 'database'
+         * attribute unset. If the user do not set it explicitly (through JNDI or by overrding
+         * this method), an exception will be thrown when 'createBackingStore()' will be invoked.
+         */
+        source.setUser("SA"); // System administrator. No password.
+        return source;
+    }
+
+    /**
      * Returns {@code true} if the database contains data. This method returns {@code false}
      * if an empty EPSG database has been automatically created by HSQL and not yet populated.
      */
@@ -210,20 +223,16 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
     }
 
     /**
-     * Opens a connection to the database. If the cached tables are not available,
+     * Returns the backing-store factory for HSQL syntax. If the cached tables are not available,
      * they will be created now from the SQL scripts bundled in this plugin.
+     *
+     * @param  hints A map of hints, including the low-level factories to use for CRS creation.
+     * @return The EPSG factory using HSQL syntax.
+     * @throws SQLException if connection to the database failed.
      */
-    public Connection getConnection() throws SQLException {
-        final String database = getDatabase();
-        if (database==null || database.trim().length()==0) {
-            /*
-             * The 'database' attribute is unset if the constructor has been unable
-             * to locate the temporary directory, or to create the subdirectory.
-             */
-            // TODO: localize
-            throw new SQLException("Can't write to the database directory.");
-        }
-        Connection connection = super.getConnection();
+    protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
+        final DataSource source = getDataSource();
+        Connection connection = source.getConnection();
         if (!dataExists(connection)) {
             /*
              * HSQL has created automatically an empty database. We need to populate it.
@@ -231,11 +240,12 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
              * a full SQL statement. For this plugin however, we have compressed "INSERT
              * INTO" statements using Compactor class in this package.
              */
-            Logger.getLogger("org.geotools.referencing.factory").config("Creating cached EPSG database."); // TODO: localize
+            Logger.getLogger("org.geotools.referencing.factory").log(
+                    Logging.format(Level.CONFIG, LoggingKeys.CREATING_CACHED_EPSG_DATABASE));
             final Statement statement = connection.createStatement();
             try {
                 final BufferedReader in = new BufferedReader(new InputStreamReader(
-                        HSQLDataSource.class.getResourceAsStream("EPSG.sql"), "ISO-8859-1"));
+                        FactoryOnHSQL.class.getResourceAsStream(SQL_FILE), "ISO-8859-1"));
                 StringBuffer insertStatement = null;
                 String line;
                 while ((line=in.readLine()) != null) {
@@ -276,6 +286,7 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
                 /*
                  * The database has been fully created. Now, make it read-only.
                  */
+                final File directory = getDirectory(source);
                 if (directory != null) {
                     final File file = new File(directory, DATABASE_NAME + ".properties");
                     final InputStream propertyIn = new FileInputStream(file);
@@ -289,40 +300,15 @@ public class HSQLDataSource extends jdbcDataSource implements DataSource {
                 }
             } catch (IOException exception) {
                 statement.close();
-                SQLException e = new SQLException("Can't read the SQL script."); // TODO: localize
+                SQLException e = new SQLException(Errors.format(ErrorKeys.CANT_READ_$1, SQL_FILE));
                 e.initCause(exception);
                 throw e;
             }
             statement.close();
             connection.close();
-            connection = super.getConnection();
+            connection = source.getConnection();
             assert dataExists(connection);
         }
-        return connection;
-    }
-
-    /**
-     * Opens a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
-     *
-     * @param  hints A map of hints, including the low-level factories to use for CRS creation.
-     * @return The EPSG factory using HSQLDB SQL syntax.
-     * @throws SQLException if connection to the database failed.
-     */
-    public AbstractAuthorityFactory createFactory(final Hints hints) throws SQLException {
-        return new FactoryUsingHSQL(hints, getConnection());
-    }
-
-    /**
-     * For compilation with Java 6.
-     */
-    public boolean isWrapperFor(Class type) {
-        return false;
-    }
-
-    /**
-     * For compilation with Java 6.
-     */
-    public Object unwrap(Class type) throws SQLException {
-        throw new SQLException();
+        return new FactoryUsingHSQL(hints, connection);
     }
 }

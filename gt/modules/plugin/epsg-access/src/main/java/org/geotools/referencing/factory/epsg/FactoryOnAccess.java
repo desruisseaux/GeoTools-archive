@@ -19,8 +19,7 @@ package org.geotools.referencing.factory.epsg;
 // J2SE dependencies
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
+import javax.sql.DataSource;
 
 // Geotools dependencies
 import org.geotools.factory.Hints;
@@ -40,41 +39,52 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * bundle it with their own distribution if they want to connect their users to an other
  * database (for example a PostgreSQL database reachable on internet).
  *
- * @since 2.1
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
- *
- * @deprecated Replaced by {@link FactoryOnAccess}.
  */
-public class AccessDataSource extends sun.jdbc.odbc.ee.DataSource implements DataSource {
+public class FactoryOnAccess extends DefaultFactory {
     /**
-     * Creates a new instance of this data source
+     * Creates a new instance of this factory.
      */
-    public AccessDataSource() {
-        setDatabaseName("EPSG");
+    public FactoryOnAccess() {
+        this(null);
     }
 
     /**
-     * Returns the priority for this data source. The default implementation returns
-     * <code>{@linkplain #NORMAL_PRIORITY NORMAL_PRIORITY} - 10</code>.
+     * Creates a new instance of this factory using the specified set of hints.
      */
-    public int getPriority() {
-        return NORMAL_PRIORITY;
+    public FactoryOnAccess(final Hints hints) {
+        super(hints, PRIORITY + 9);
     }
 
     /**
-     * Open a connection and creates an {@linkplain FactoryUsingSQL EPSG factory} for it.
+     * Returns a data source using the JDBC-ODBC bridge for the "EPSG" database.
+     */
+    protected DataSource createDataSource() throws SQLException {
+        DataSource candidate = super.createDataSource();
+        if (candidate == null) {
+            final sun.jdbc.odbc.ee.DataSource source = new sun.jdbc.odbc.ee.DataSource();
+            source.setDatabaseName("EPSG");
+            candidate = source;
+        }
+        return candidate;
+    }
+
+    /**
+     * Returns the backing-store factory for MS-Access syntax.
      *
      * @param  hints A map of hints, including the low-level factories to use for CRS creation.
-     * @return The EPSG factory using MS-Access SQL syntax.
+     * @return The EPSG factory using MS-Access syntax.
      * @throws SQLException if connection to the database failed.
      */
-    public AbstractAuthorityFactory createFactory(final Hints hints) throws SQLException {
+    protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
+        final DataSource source = getDataSource();
         final Connection connection;
         try {
-            connection = getConnection();
-        } catch (NullPointerException exception) {
+            connection = source.getConnection();
+        } catch (RuntimeException exception) {
             /*
              * This try...catch block should NOT be needed. We added it as a workaround because
              * the JDBC-ODBC bridge on Linux throws a NullPointerException when trying to log a

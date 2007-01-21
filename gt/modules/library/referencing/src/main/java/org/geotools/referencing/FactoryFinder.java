@@ -692,7 +692,6 @@ loop:       for (int i=0; ; i++) {
             throws IOException
     {
         final FactoryRegistry registry = getServiceRegistry();
-        registry.getServiceProviders(DatumFactory.class); // Force the initialization of ServiceRegistry
         new FactoryPrinter().list(registry, out, locale);
     }
 

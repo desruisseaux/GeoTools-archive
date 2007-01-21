@@ -121,10 +121,14 @@ public class FactoryCreator extends FactoryRegistry {
          * No existing factory found. Creates one using reflection. First, we
          * check if an implementation class was explicitly specified by the user.
          */
-        if (hints!=null && key!=null) {
+        final Class[] types;
+        if (hints==null || key==null) {
+            types = null;
+        } else {
             final Object hint = hints.get(key);
-            if (hint != null) {
-                final Class[] types;
+            if (hint == null) {
+                types = null;
+            } else {
                 if (hint instanceof Class[]) {
                     types = (Class[]) hint;
                 } else {
@@ -158,12 +162,15 @@ public class FactoryCreator extends FactoryRegistry {
          * Note: all Factory objects should be fully constructed by now,
          * since the super-class has already iterated over all factories.
          */
-        for (final Iterator it=getServiceProviders(category); it.hasNext();) {
+        for (final Iterator it=getUnfilteredProviders(category); it.hasNext();) {
             final Object factory = it.next();
+            final Class implementation = factory.getClass();
+            if (types!=null && !isTypeOf(types, implementation)) {
+                continue;
+            }
             if (filter!=null && !filter.filter(factory)) {
                 continue;
             }
-            final Class implementation = factory.getClass();
             final Object candidate;
             try {
                 candidate = createSafe(category, implementation, hints);
@@ -181,13 +188,25 @@ public class FactoryCreator extends FactoryRegistry {
             if (candidate == null) {
                 continue;
             }
-            if (FILTER.filter(candidate) && isAcceptable(candidate, category, hints, filter)) {
+            if (isAcceptable(candidate, category, hints, filter)) {
                 cache(category, candidate);
                 return candidate;
             }
             dispose(candidate);
         }
         throw notFound;
+    }
+
+    /**
+     * Returns {@code true} if the specified implementation is one of the specified types.
+     */
+    private static boolean isTypeOf(final Class[] types, final Class implementation) {
+        for (int i=0; i<types.length; i++) {
+            if (types[i].isAssignableFrom(implementation)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

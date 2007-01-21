@@ -367,8 +367,8 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
     {
         final CoordinateReferenceSystem oldSrcCRS = operation.getSourceCRS();
         final CoordinateReferenceSystem oldTgtCRS = operation.getTargetCRS();
-        final CoordinateReferenceSystem sourceCRS = replace(oldSrcCRS);
-        final CoordinateReferenceSystem targetCRS = replace(oldTgtCRS);
+        final CoordinateReferenceSystem sourceCRS = (oldSrcCRS != null) ? replace(oldSrcCRS) : null;
+        final CoordinateReferenceSystem targetCRS = (oldTgtCRS != null) ? replace(oldTgtCRS) : null;
         if (Utilities.equals(oldSrcCRS, sourceCRS) && Utilities.equals(oldTgtCRS, targetCRS)) {
             return operation;
         }

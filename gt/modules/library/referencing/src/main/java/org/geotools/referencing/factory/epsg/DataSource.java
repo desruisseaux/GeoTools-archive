@@ -53,6 +53,11 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Experience suggests that subclassing {@code javax.sql.DataSource} is a cause of
+ *             troubles in JEE environments. Subclass directly {@link DefaultFactory} instead.
+ *             NOTE: After the removal of this interface, we will need to unregister
+ *             {@link DefaultFactory} from {@code META-INF/services}.
  */
 public interface DataSource extends javax.sql.DataSource {
     /**

@@ -60,7 +60,6 @@ import org.geotools.referencing.datum.DefaultEllipsoid;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.datum.DefaultPrimeMeridian;
 import org.geotools.referencing.factory.FactoryGroup;
-import org.geotools.referencing.factory.epsg.DefaultFactory;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
@@ -71,12 +70,15 @@ import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.ProjectedCRS;
+import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.cs.CSFactory;
+import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.referencing.datum.DatumFactory;
 import org.opengis.referencing.datum.Ellipsoid;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.datum.PrimeMeridian;
 import org.opengis.referencing.operation.Conversion;
+import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransformFactory;
 
@@ -148,7 +150,11 @@ public final class GeoTiffMetadata2CRSAdapter {
 
 	private CSFactory csFactory;
 
-	private DefaultFactory factory;
+	private DatumAuthorityFactory datumAuthorityFactory;
+
+	private CSAuthorityFactory csAuthorityFactory;
+
+	private CoordinateOperationAuthorityFactory opAuthorityFactory;
 
 	/**
 	 * Creates a new instance of GeoTiffMetadata2CRSAdapter
@@ -164,8 +170,12 @@ public final class GeoTiffMetadata2CRSAdapter {
 	}
 
 	private void initFactory() {
-		if (factory == null)
-			factory = new DefaultFactory(hints);
+		if (datumAuthorityFactory == null)
+			datumAuthorityFactory = FactoryFinder.getDatumAuthorityFactory("EPSG", hints);
+		if (csAuthorityFactory == null)
+			csAuthorityFactory = FactoryFinder.getCSAuthorityFactory("EPSG", hints);
+		if (opAuthorityFactory == null)
+			opAuthorityFactory = FactoryFinder.getCoordinateOperationAuthorityFactory("EPSG", hints);
 	}
 
 	private void initdatumFactory() {
@@ -504,7 +514,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 		} else {
 			parameters = null;
 			initFactory();
-			projection = (Conversion) this.factory
+			projection = (Conversion) opAuthorityFactory
 					.createCoordinateOperation(new StringBuffer("EPSG:")
 							.append(projCode).toString());
 		}
@@ -544,7 +554,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 			final Hints tempHints = hints != null ? (Hints) hints.clone()
 					: new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
 							Boolean.TRUE);
-			tempHints.put(Hints.DATUM_AUTHORITY_FACTORY, factory);
+			tempHints.put(Hints.DATUM_AUTHORITY_FACTORY, datumAuthorityFactory);
 			tempHints.put(Hints.CS_FACTORY, csFactory);
 			tempHints.put(Hints.CRS_FACTORY, crsFactory);
 			tempHints.put(Hints.MATH_TRANSFORM_FACTORY, mtFactory);
@@ -595,10 +605,10 @@ public final class GeoTiffMetadata2CRSAdapter {
 						throw io;
 					}
 				} else {
-					pm = factory.createPrimeMeridian(pmCode);
+					pm = datumAuthorityFactory.createPrimeMeridian(pmCode);
 				}
 			} else {
-				pm = factory.createPrimeMeridian(PM_Greenwich);
+				pm = datumAuthorityFactory.createPrimeMeridian(PM_Greenwich);
 			}
 		} catch (FactoryException fe) {
 			final IOException io = new GeoTiffException(metadata, fe
@@ -678,7 +688,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 			// we are going to use the provided EPSG code
 			try {
 				initFactory();
-				datum = (GeodeticDatum) (factory.createDatum(datumCode));
+				datum = datumAuthorityFactory.createGeodeticDatum(datumCode);
 			} catch (FactoryException fe) {
 				final GeoTiffException ex = new GeoTiffException(metadata, fe
 						.getLocalizedMessage());
@@ -735,7 +745,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 
 		try {
 			initFactory();
-			return factory.createEllipsoid(new StringBuffer("EPSG:").append(
+			return datumAuthorityFactory.createEllipsoid(new StringBuffer("EPSG:").append(
 					ellipsoidKey).toString());
 		} catch (FactoryException fe) {
 			final GeoTiffException ex = new GeoTiffException(metadata, fe
@@ -1289,7 +1299,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 			try {
 				// using epsg code for this unit
 				initFactory();
-				return factory.createUnit(unitCode);
+				return csAuthorityFactory.createUnit(unitCode);
 			} catch (FactoryException fe) {
 				final IOException io = new GeoTiffException(metadata, fe
 						.getLocalizedMessage());
