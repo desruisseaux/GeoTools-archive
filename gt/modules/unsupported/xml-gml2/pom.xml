@@ -25,7 +25,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>gt2-xml-gml2</artifactId>
   <packaging>jar</packaging>
-  <name>GML2 XML module</name>
+  <name>GML2 XML Bindings</name>
   <url>http://maven.geotools.fr/reports/modules/unsupported/xml-gml2/</url>
   
   <scm>
