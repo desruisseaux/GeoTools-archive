@@ -24,41 +24,42 @@ import org.apache.commons.jxpath.JXPathContextFactory;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.geotools.xml.impl.ElementHandlerImpl;
 import org.geotools.xml.impl.ElementImpl;
+import org.geotools.xml.impl.NodeImpl;
 
 
 public class JXPathTest extends TestCase {
-    ElementHandlerImpl root;
-    ElementHandlerImpl child1;
-    ElementHandlerImpl child2;
+    NodeImpl root;
+    NodeImpl child1;
+    NodeImpl child2;
     JXPathContext context;
 
     protected void setUp() throws Exception {
         ElementImpl e = new ElementImpl(null);
         e.setName("root");
-        root = new ElementHandlerImpl(null, null, null);
-        root.setComponent(e);
+        root = new NodeImpl( e );
+        
+        e = new ElementImpl(null);
+        e.setName("child");
+        child1 = new NodeImpl( e );
+        //root.addChild( child1 );
 
         e = new ElementImpl(null);
         e.setName("child");
+        child2 = new NodeImpl(e );
+        //root.addChild( child2 );
 
-        child1 = new ElementHandlerImpl(null, root, null);
-        child1.setComponent(e);
-
-        e = new ElementImpl(null);
-        e.setName("child");
-        child2 = new ElementHandlerImpl(null, root, null);
-        child2.setComponent(e);
-
-        JXPathIntrospector.registerDynamicClass(ElementHandlerImpl.class,
-            ElementHandlerPropertyHandler.class);
-        //JXPathContextReferenceImpl.addNodePointerFactory(new ElementHandlerNodePointerFactory());
+        JXPathIntrospector.registerDynamicClass(NodeImpl.class,
+            NodePropertyHandler.class);
+        
         context = JXPathContextFactory.newInstance().newContext(null, root);
     }
 
     public void testIterate() {
-        root.getChildHandlers().add(child1);
-        root.getChildHandlers().add(child2);
-
+//        root.getChildHandlers().add(child1);
+//        root.getChildHandlers().add(child2);
+    	root.addChild( child1 );
+    	root.addChild( child2 );
+    	
         Iterator itr = context.iterate("child");
         assertTrue(itr.hasNext());
         assertEquals(child1, itr.next());

@@ -35,13 +35,14 @@ public class StreamingParserHandler extends ParserHandler {
 
         if ( stream( handler ) ) {
         	//throw value into buffer
-            buffer.put(handler.getValue());
+            buffer.put(handler.getParseNode().getValue());
 
-            //remove handler from parse tree
+            //remove this node from parse tree
             if (handler.getParentHandler() instanceof ElementHandler) {
-                ElementHandler parent = (ElementHandler) handler
+            	ElementHandler parent = (ElementHandler) handler
                     .getParentHandler();
-                parent.removeChildHandler(handler);
+                ((NodeImpl)parent.getParseNode()).removeChild( handler.getParseNode() );
+            	//parent.endChildHandler(handler);
             } 	
         }
     }

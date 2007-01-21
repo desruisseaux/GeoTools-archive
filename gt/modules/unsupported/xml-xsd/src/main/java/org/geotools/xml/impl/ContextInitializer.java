@@ -24,21 +24,21 @@ import org.picocontainer.MutablePicoContainer;
 
 
 public class ContextInitializer implements Visitor {
-    ElementInstance instance;
+    ElementInstance childInstance;
     Node node;
     MutablePicoContainer context;
 
-    public ContextInitializer(ElementInstance instance, Node node,
+    public ContextInitializer(ElementInstance childInstance, Node node,
         MutablePicoContainer context) {
-        this.instance = instance;
+        this.childInstance = childInstance;
         this.node = node;
         this.context = context;
     }
 
-    public void visit(Binding strategy) {
-        if (strategy instanceof ComplexBinding) {
-            ComplexBinding cStrategy = (ComplexBinding) strategy;
-            cStrategy.initialize(instance, node, context);
+    public void visit(Binding binding) {
+        if ( binding instanceof ComplexBinding ) {
+            ComplexBinding cStrategy = (ComplexBinding) binding;
+            cStrategy.initializeChildContext( childInstance, node, context);
         }
     }
 }

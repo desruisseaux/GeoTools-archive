@@ -39,11 +39,99 @@ import org.picocontainer.defaults.DefaultPicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-
 /**
- * Abstract base class for testing the parsing of instance documents.
+ * Abstract test class to be used to unit test bindings.
  * <p>
- * Instance documents are created using a dom.
+ * Subclasses must implement the {@link #createConfiguration()} method. It must 
+ * return a new instance of {@link Configuration}. Example:
+ * 
+ * <pre>
+ * 	<code>
+ *  public MailTypeBindingTest extends XMLTestSupport {
+ *  	
+ *      protected Configuration createConfiguration() {
+ *         return new MLConfiguration();
+ *      }
+ *  }
+ * 	</code>
+ * </pre>
+ * 
+ * </p>
+ * <p>
+ * The {@link #parse()} method is used to test binding parsing. Subclasses 
+ * should call this from test methods after building up an instance document 
+ * with {@link #document}. Example 
+ * 
+ * <pre>
+ * 	<code>
+ *  public void testParsing() throws Exception {
+ *      //build up an instance document
+ * 
+ *      //the root element
+ *      Element mailElement = document.createElementNS( ML.NAMESPACE, "mail" );
+ *      document.appendChild( mailElement );
+ *      
+ *      mailElement.setAttribute( "id", "someId" );
+ *      ....
+ *      
+ *      //call parse
+ *      Mail mail = (Mail) parse();
+ *      
+ *      //make assertions
+ *      assertEquals( "someId", mail.getId() );
+ *  }
+ * 	</code>
+ * </pre>
+ * </p>
+ * 
+ * <p>
+ * The {@link #encode(Object, QName)} method is used to test binding encoding.
+ * Subclasses should call this method from test methods after creating an 
+ * object to be encoded. Example:
+ * 
+ * <pre>
+ * 	<code>
+ * public void testEncoding() throws Exception {
+ *    //create the mail object
+ *    Mail mail = new Mail( "someId" );
+ *    mail.setEnvelope( ... );
+ *    ....
+ *    
+ *    //call encode
+ *    Document document = encode( mail, new QName( ML.NAMESPACE, "mail" );
+ *    
+ *    //make assertions
+ *    assertEquals( "mail", document.getDocumentElement().getNodeName() );
+ *    assertEquals( "someId", document.getDocumentElement().getAttribute( "id" ) );
+ * }
+ * 	</code>
+ * </pre>
+ * </p>
+ * 
+ * <p>
+ * The {@link #binding(QName)} method is used to obtain an instance of a 
+ * particular binding. Subclasses should call this method to assert other 
+ * properties of the binding, such as type mapping and execution mode. Example:
+ * 
+ * <pre>
+ * 	<code>
+ *  public void testType() {
+ *     //get an instance of the binding
+ *     Binding binding = binding( new QName( ML.NAMESPACE, "MailType" ) );
+ *     
+ *     //make assertions
+ *     assertEquals( Mail.class, binding.getType() );
+ *  }
+ *  
+ *  public void testExecutionMode() {
+ *    //get an instance of the binding
+ *    Binding binding = binding( new QName( ML.NAMESPACE, "MailType" ) );
+ *    
+ *    //make assertions
+ *    assertEquals( Binding.OVERRIDE, binding.getExecutionMode() );
+ *  }
+ * 	</code>
+ * </pre>
  * </p>
  *
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org

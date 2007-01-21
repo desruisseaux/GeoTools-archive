@@ -23,14 +23,16 @@ import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
+import org.geotools.xml.Node;
 
 
 public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler {
     /** factory used to create a handler for the root element **/
     HandlerFactory factory;
 
-    /** handler for root element **/
-    ElementHandler handler;
+    /** root node of the parse tree */
+    Node tree;
+    //ElementHandler handler;
 
     /** the parser */
     ParserHandler parser;
@@ -49,36 +51,45 @@ public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler 
     }
 
     public Object getValue() {
-        //just return the root handler value
-        if (handler != null) {
-            return handler.getValue();
-        }
+    	//jsut return the root of the parse tree's value
+    	if ( tree != null ) {
+    		return tree.getValue();
+    	}
+//    	//just return the root handler value
+//        if (handler != null) {
+//            return handler.getValue();
+//        }
 
         return null;
     }
 
-    public Handler getChildHandler(QName qName) {
+    public Node getParseNode() {
+    	return tree;
+    }
+    
+    public Handler createChildHandler(QName qName) {
         return factory.createElementHandler(qName, this, parser );
     }
     
-    public List getChildHandlers() {
-    	if ( handler == null ) {
-    		return Collections.EMPTY_LIST;
-    	}
-    	
-    	ArrayList list = new ArrayList();
-    	list.add( handler );
-    	
-    	return list;
-    }
+//    public List getChildHandlers() {
+//    	if ( handler == null ) {
+//    		return Collections.EMPTY_LIST;
+//    	}
+//    	
+//    	ArrayList list = new ArrayList();
+//    	list.add( handler );
+//    	
+//    	return list;
+//    }
     
 
-    public void addChildHandler(Handler child) {
-    	this.handler = (ElementHandler) child;
+    public void startChildHandler(Handler child) {
+    	this.tree = child.getParseNode();
+    	//this.handler = (ElementHandler) child;
     }
     
-    public void removeChildHandler(Handler child) {
-    	this.handler = null;
+    public void endChildHandler(Handler child) {
+    	//this.handler = null;
     }
     
     public Handler getParentHandler() {
@@ -86,7 +97,7 @@ public class DocumentHandlerImpl extends HandlerImpl implements DocumentHandler 
         return null;
     }
 
-    public ElementHandler getDocumentElementHandler() {
-        return handler;
-    }
+//    public ElementHandler getDocumentElementHandler() {
+//        return handler;
+//    }
 }

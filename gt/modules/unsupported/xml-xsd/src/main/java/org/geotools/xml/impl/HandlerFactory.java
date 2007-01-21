@@ -67,5 +67,5 @@ public interface HandlerFactory {
      *
      * @return A new attribute handler, or null if one could not be created.
      */
-    AttributeHandler createAttributeHandler(XSDAttributeDeclaration attribute, Handler parent, ParserHandler parser );
+    //AttributeHandler createAttributeHandler(XSDAttributeDeclaration attribute, Handler parent, ParserHandler parser );
 }

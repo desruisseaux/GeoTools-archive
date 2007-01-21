@@ -53,9 +53,25 @@ public interface ComplexBinding extends Binding {
      * @param context The container to be used as context for child strategies.
      *
      */
-    void initialize(ElementInstance instance, Node node,
-        MutablePicoContainer context);
+//    void initialize(ElementInstance instance, Node node,
+//        MutablePicoContainer context);
 
+    /**
+     * Initializes the context for a child element.
+     * <p>
+     * This method is called on the leading edge of a child element. It is used
+     * to create context for the binding of a child element. It is important to 
+     * note that each time this method is called, the <param>node</param> parse
+     * tree will contain different, ie child nodes for those previous elements 
+     * parsed.
+     * </p>
+     * 
+     * @param childinstance The child element instance
+     * @param node The parse node for the parent element.
+     * @param context the context in which the child element will be parsed.
+     */
+    void initializeChildContext( ElementInstance childInstance, Node node,
+            MutablePicoContainer context);
     /**
      * Parses a complex element from an instance document into an object
      * representation.

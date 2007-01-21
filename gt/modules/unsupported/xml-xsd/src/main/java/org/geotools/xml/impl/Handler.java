@@ -21,6 +21,7 @@ import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
+import org.geotools.xml.Node;
 import org.picocontainer.MutablePicoContainer;
 
 
@@ -56,10 +57,15 @@ public interface Handler {
     InstanceComponent getComponent();
 
     /**
+     * @return The parse tree for the handler.
+     */
+    Node getParseNode();
+    
+    /**
      * @return A value which corresponds to an instance of the entity of the
      * handler.
      */
-    Object getValue();
+    //Object getValue();
 
     /**
      * @return The context or container in which the instance is to be parsed in.
@@ -94,24 +100,26 @@ public interface Handler {
      *
      * @return A new handler, or null if one cannot be created.
      */
-    Handler getChildHandler(QName qName);
+    Handler createChildHandler(QName qName);
 
     /**
      * @return The current list of child handlers executing.
      */
-    List getChildHandlers();
+    //List getChildHandlers();
 
     /**
-     * Adds an executing child handler.
+     * Called when a child handler is started, on the leading edge of the 
+     * child element.
      * 
      * @param child The executing child handler.
      */
-    void addChildHandler(Handler child);
+    void startChildHandler(Handler child);
     
     /**
-     * Removes an executing child handler.
+     * Called when a child handler is finished, on the trailing edge of the 
+     * child element.
      * 
      * @param child The executing child handler.
      */
-    void removeChildHandler(Handler child);
+    void endChildHandler(Handler child);
 }

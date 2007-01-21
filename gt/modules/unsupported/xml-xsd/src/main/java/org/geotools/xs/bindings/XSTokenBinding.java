@@ -51,16 +51,7 @@ public class XSTokenBinding extends AbstractSimpleBinding {
         return XS.TOKEN;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
+   
     /**
      * <!-- begin-user-doc -->
      * This binding delegates to its parent binding, which returns objects of
@@ -70,7 +61,7 @@ public class XSTokenBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return String.class;
     }
 
     /**

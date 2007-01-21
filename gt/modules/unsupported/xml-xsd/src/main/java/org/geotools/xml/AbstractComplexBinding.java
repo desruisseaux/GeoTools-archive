@@ -32,7 +32,7 @@ public abstract class AbstractComplexBinding implements ComplexBinding {
     /**
      * Does nothing, subclasses should override this method.
      */
-    public void initialize(ElementInstance instance, Node node,
+    public void initializeChildContext(ElementInstance childInstance, Node node,
         MutablePicoContainer context) {
         //does nothing, subclasses should override
     }

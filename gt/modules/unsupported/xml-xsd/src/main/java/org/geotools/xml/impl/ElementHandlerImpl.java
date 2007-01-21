@@ -29,7 +29,9 @@ import org.eclipse.xsd.XSDTypeDefinition;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
+import org.geotools.xml.ElementInstance;
 import org.geotools.xml.InstanceComponent;
+import org.geotools.xml.Node;
 import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
@@ -55,7 +57,7 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
     Binding strategy;
 
     /** child handlers **/
-    ArrayList childHandlers;
+    //ArrayList childHandlers;
 
     /** parse tree for the element **/
     NodeImpl node;
@@ -69,13 +71,13 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         this.parent = parent;
         this.parser = parser;
 
-        childHandlers = new ArrayList();
+        //childHandlers = new ArrayList();
     }
 
     public void startElement(QName qName, Attributes attributes)
         throws SAXException {
         //clear handler list
-        childHandlers.clear();
+        //childHandlers.clear();
 
         //create the attributes
         List atts = new ArrayList();
@@ -83,10 +85,6 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         for (int i = 0; i < attributes.getLength(); i++) {
             String uri = attributes.getURI(i);
             String name = attributes.getLocalName(i);
-
-//            if ((uri == null) || "".equals(uri)) {
-//                uri = qName.getNamespaceURI(); //assume same as element
-//            }
 
             QName attQName = new QName(uri, name);
 
@@ -160,9 +158,13 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         
         //set the context on the binding factory
         ((BindingFactoryImpl)parser.getBindingFactory()).setContext( getContext() );
-        ContextInitializer initer = new ContextInitializer(element, node,
-                getContext());
-        parser.getBindingWalker().walk(element .getElementDeclaration(), initer, getContext() );
+        
+        //"start" the child handler
+        parent.startChildHandler( this );
+        
+//        ContextInitializer initer = new ContextInitializer(element, node,
+//                getContext());
+//        parser.getBindingWalker().walk(element .getElementDeclaration(), initer, getContext() );
     }
 
     public void characters(char[] ch, int start, int length)
@@ -173,11 +175,11 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
 
     public void endElement( QName qName ) throws SAXException {
         //round up the children
-        for (int i = 0; i < childHandlers.size(); i++) {
-            Handler handler = (Handler) childHandlers.get(i);
-            node.addChild(new NodeImpl(handler.getComponent(),
-                    handler.getValue()));
-        }
+//        for (int i = 0; i < childHandlers.size(); i++) {
+//            Handler handler = (Handler) childHandlers.get(i);
+//            node.addChild(new NodeImpl(handler.getComponent(),
+//                    handler.getValue()));
+//        }
 
         //get the containing type
         XSDTypeDefinition container = null;
@@ -200,11 +202,21 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
                 + ", no value returned from strategy";
             throw new RuntimeException(msg);
         }
-
+        
+        //set the value for this node in the parse tree
+        node.setValue( value );
+        
+        //end this child handler
+        parent.endChildHandler( this );
+        
         //kill the context
         parent.getContext().removeChildContainer(getContext());
     }
 
+    public Handler createChildHandler(QName qName) {
+        return getChildHandlerInternal(qName);
+    }
+    
     private Handler getChildHandlerInternal(QName qName) {
         SchemaIndex index = parser.getSchemaIndex();
 
@@ -244,20 +256,27 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         return null;
     }
     
-    public Handler getChildHandler(QName qName) {
-        return getChildHandlerInternal(qName);
-    }
+//    public List getChildHandlers() {
+//        return childHandlers;
+//    }
 
-    public List getChildHandlers() {
-        return childHandlers;
-    }
-
-    public void addChildHandler(Handler child) {
-    	childHandlers.add(child);
+    public void startChildHandler(Handler child) {
+    	//childHandlers.add(child);
+    	node.addChild( child.getParseNode() );
+    	
+    	//initialize the context for the handler
+    	if ( child instanceof ElementHandler ) {
+    		ElementInstance childInstance = (ElementInstance) child.getComponent();
+    		ContextInitializer initer = new ContextInitializer(childInstance, node,
+                  child.getContext());	
+    		parser.getBindingWalker()
+    			.walk(element.getElementDeclaration(), initer, getContext() );
+    	}
     }
     
-    public void removeChildHandler(Handler child) {
-        childHandlers.remove(child);
+    public void endChildHandler(Handler child) {
+    	//add the node to the parse tree
+    	//childHandlers.remove(child);
     }
 
     public Handler getParentHandler() {
@@ -268,6 +287,10 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         return content;
     }
 
+    public Node getParseNode() {
+    	return node;
+    }
+    
     public XSDElementDeclaration getElementDeclaration() {
         return content;
     }

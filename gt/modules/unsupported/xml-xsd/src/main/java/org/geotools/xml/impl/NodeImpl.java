@@ -336,15 +336,6 @@ public class NodeImpl implements Node {
         return matches;
     }
 
-    //additional methods
-    public void addChild(Node child) {
-        children.add(child);
-    }
-
-    public void addAttribute(Node attribute) {
-        attributes.add(attribute);
-    }
-
     public String toString() {
         return getComponent().getName() + "=" + getValue();
     }
@@ -413,4 +404,37 @@ public class NodeImpl implements Node {
 
         return matches;
     }
+    
+    //additional methods, not part of public api
+    public void addChild(Node child) {
+        children.add(child);
+    }
+
+    public Node removeChild( String name ) {
+    	Node child = getChild( name );
+    	if ( child != null ) {
+    		children.remove( child );
+    	}
+    	
+    	return child;
+    }
+    
+    public void removeChild( Node child ) {
+    	children.remove( child );
+    }
+    
+    public void addAttribute(Node attribute) {
+        attributes.add(attribute);
+    }
+    
+    public Node removeAttribute( String name ) {
+    	Node attribute = getAttribute( name );
+    	if ( attribute != null ) {
+    		attributes.remove( attribute );
+    	}
+    	
+    	return attribute;
+    }
+
+    
 }

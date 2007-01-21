@@ -17,8 +17,8 @@ package org.geotools.xs.bindings;
 
 import javax.xml.namespace.QName;
 
+import org.geotools.xml.AbstractSimpleBinding;
 import org.geotools.xml.InstanceComponent;
-import org.geotools.xml.SimpleBinding;
 
 
 /**
@@ -48,7 +48,7 @@ import org.geotools.xml.SimpleBinding;
  *
  * @generated
  */
-public class XSNMTOKENBinding implements SimpleBinding {
+public class XSNMTOKENBinding extends AbstractSimpleBinding {
     /**
      * @generated
      */
@@ -62,18 +62,8 @@ public class XSNMTOKENBinding implements SimpleBinding {
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
-        return null;
+        return String.class;
     }
 
     /**
@@ -84,18 +74,9 @@ public class XSNMTOKENBinding implements SimpleBinding {
      */
     public Object parse(InstanceComponent instance, Object value)
         throws Exception {
-        //TODO: implement me	
-        return null;
+    
+    	//just return the value passed in
+    	return value;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public String encode(Object object, String value) {
-        //TODO: implement
-        return null;
-    }
 }

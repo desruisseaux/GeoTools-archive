@@ -303,7 +303,7 @@ public class ParserHandler extends DefaultHandler {
         
         //First ask teh parent handler for a child
         Handler parent = (Handler) handlers.peek();
-        ElementHandler handler = (ElementHandler) parent.getChildHandler(qualifiedName);
+        ElementHandler handler = (ElementHandler) parent.createChildHandler(qualifiedName);
 
         if ( handler == null ) {
         	//look for a global element
@@ -345,9 +345,6 @@ public class ParserHandler extends DefaultHandler {
         }
         
         if (handler != null) {
-        	//add the handler to teh list of children
-        	parent.addChildHandler( handler );
-        	
         	//signal the handler to start the element, and place it on the stack
             handler.startElement(qualifiedName, attributes);
             handlers.push(handler);
@@ -404,7 +401,7 @@ public class ParserHandler extends DefaultHandler {
     }
     
     public Object getValue() {
-        return documentHandler.getValue();
+        return documentHandler.getParseNode().getValue();
     }
 
     protected void configure(Configuration config) {

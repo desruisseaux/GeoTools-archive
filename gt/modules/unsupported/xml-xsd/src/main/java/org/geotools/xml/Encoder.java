@@ -572,7 +572,10 @@ public class Encoder {
 							if ( maxOccurs == -1 || maxOccurs > 1 ) {
 								//may have a collection or array, unwrap it
 								Iterator iterator = null;
-								if ( obj.getClass().isArray() ) {
+								if ( obj instanceof Iterator ) {
+									iterator = (Iterator) obj;
+								}
+								else if ( obj.getClass().isArray() ) {
 									Object[] array = (Object[]) obj;
 									iterator = Arrays.asList( array ).iterator();
 								}

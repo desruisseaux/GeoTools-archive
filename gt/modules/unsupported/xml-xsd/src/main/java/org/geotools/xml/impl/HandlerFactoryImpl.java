@@ -45,9 +45,4 @@ public class HandlerFactoryImpl implements HandlerFactory {
         Handler parent, ParserHandler parser ) {
         return new ElementHandlerImpl(element, parent, parser);
     }
-
-    public AttributeHandler createAttributeHandler(
-        XSDAttributeDeclaration attribute, Handler parent, ParserHandler parser ) {
-        return new AttributeHandlerImpl(attribute, parent, parser);
-    }
 }
