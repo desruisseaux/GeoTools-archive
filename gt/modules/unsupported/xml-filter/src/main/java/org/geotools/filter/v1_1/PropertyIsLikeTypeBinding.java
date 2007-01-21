@@ -20,7 +20,9 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -60,7 +62,7 @@ public class PropertyIsLikeTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.PROPERTYISLIKETYPE;
+        return OGC.PropertyIsLikeType;
     }
 
     /**

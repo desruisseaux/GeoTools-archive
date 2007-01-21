@@ -52,7 +52,7 @@ public class OverlapsBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.OVERLAPS;
+        return OGC.Overlaps;
     }
 
     /**

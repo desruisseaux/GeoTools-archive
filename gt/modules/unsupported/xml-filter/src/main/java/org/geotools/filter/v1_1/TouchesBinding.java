@@ -52,7 +52,7 @@ public class TouchesBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.TOUCHES;
+        return OGC.Touches;
     }
 
     /**

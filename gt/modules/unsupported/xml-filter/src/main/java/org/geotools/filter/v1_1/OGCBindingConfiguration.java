@@ -41,137 +41,137 @@ public final class OGCBindingConfiguration implements BindingConfiguration {
     public void configure(MutablePicoContainer container) {
         //Types
         //container.registerComponentImplementation(OGC.ABSTRACTIDTYPE,AbstractIdTypeBinding.class);
-        container.registerComponentImplementation(OGC.ARITHMETICOPERATORSTYPE,
+        container.registerComponentImplementation(OGC.ArithmeticOperatorsType,
             ArithmeticOperatorsTypeBinding.class);
         //container.registerComponentImplementation(OGC.BBOXTYPE,BBOXTypeBinding.class);
-        container.registerComponentImplementation(OGC.BBOXTYPE, OGCBBOXTypeBinding.class);
-        container.registerComponentImplementation(OGC.BINARYCOMPARISONOPTYPE,
+        container.registerComponentImplementation(OGC.BBOXType, OGCBBOXTypeBinding.class);
+        container.registerComponentImplementation(OGC.BinaryComparisonOpType,
             BinaryComparisonOpTypeBinding.class);
-        container.registerComponentImplementation(OGC.BINARYLOGICOPTYPE,
+        container.registerComponentImplementation(OGC.BinaryLogicOpType,
             BinaryLogicOpTypeBinding.class);
-        container.registerComponentImplementation(OGC.BINARYOPERATORTYPE,
+        container.registerComponentImplementation(OGC.BinaryOperatorType,
             BinaryOperatorTypeBinding.class);
-        container.registerComponentImplementation(OGC.BINARYSPATIALOPTYPE,
+        container.registerComponentImplementation(OGC.BinarySpatialOpType,
             BinarySpatialOpTypeBinding.class);
-        container.registerComponentImplementation(OGC.COMPARISONOPERATORSTYPE,
+        container.registerComponentImplementation(OGC.ComparisonOperatorsType,
             ComparisonOperatorsTypeBinding.class);
-        container.registerComponentImplementation(OGC.COMPARISONOPERATORTYPE,
+        container.registerComponentImplementation(OGC.ComparisonOperatorType,
             ComparisonOperatorTypeBinding.class);
         //container.registerComponentImplementation(OGC.COMPARISONOPSTYPE,ComparisonOpsTypeBinding.class);
-        container.registerComponentImplementation(OGC.DISTANCEBUFFERTYPE,
+        container.registerComponentImplementation(OGC.DistanceBufferType,
             DistanceBufferTypeBinding.class);
         //container.registerComponentImplementation(OGC.DISTANCETYPE,DistanceTypeBinding.class);
-        container.registerComponentImplementation(OGC.DISTANCETYPE, OGCDistanceTypeBinding.class);
+        container.registerComponentImplementation(OGC.DistanceType, OGCDistanceTypeBinding.class);
 
         //container.registerComponentImplementation(OGC.EXPRESSIONTYPE, ExpressionTypeBinding.class);
-        container.registerComponentImplementation(OGC.EXPRESSIONTYPE, OGCExpressionTypeBinding.class);
+        container.registerComponentImplementation(OGC.ExpressionType, OGCExpressionTypeBinding.class);
 
-        container.registerComponentImplementation(OGC.FEATUREIDTYPE, FeatureIdTypeBinding.class);
-        container.registerComponentImplementation(OGC.FILTERTYPE, FilterTypeBinding.class);
+        container.registerComponentImplementation(OGC.FeatureIdType, FeatureIdTypeBinding.class);
+        container.registerComponentImplementation(OGC.FilterType, FilterTypeBinding.class);
         //container.registerComponentImplementation(OGC.FILTERTYPE,FilterTypeBinding.class);
-        container.registerComponentImplementation(OGC.FUNCTIONNAMESTYPE,
+        container.registerComponentImplementation(OGC.FunctionNamesType,
             FunctionNamesTypeBinding.class);
-        container.registerComponentImplementation(OGC.FUNCTIONNAMETYPE,
+        container.registerComponentImplementation(OGC.FunctionNameType,
             FunctionNameTypeBinding.class);
-        container.registerComponentImplementation(OGC.FUNCTIONSTYPE, FunctionsTypeBinding.class);
-        container.registerComponentImplementation(OGC.FUNCTIONTYPE, OGCFunctionTypeBinding.class);
+        container.registerComponentImplementation(OGC.FunctionsType, FunctionsTypeBinding.class);
+        container.registerComponentImplementation(OGC.FunctionType, OGCFunctionTypeBinding.class);
         //container.registerComponentImplementation(OGC.FUNCTIONTYPE,FunctionTypeBinding.class);
-        container.registerComponentImplementation(OGC.GEOMETRYOPERANDSTYPE,
+        container.registerComponentImplementation(OGC.GeometryOperandsType,
             GeometryOperandsTypeBinding.class);
-        container.registerComponentImplementation(OGC.GEOMETRYOPERANDTYPE,
+        container.registerComponentImplementation(OGC.GeometryOperandType,
             GeometryOperandTypeBinding.class);
-        container.registerComponentImplementation(OGC.GMLOBJECTIDTYPE, GmlObjectIdTypeBinding.class);
-        container.registerComponentImplementation(OGC.ID_CAPABILITIESTYPE,
+        container.registerComponentImplementation(OGC.GmlObjectIdType, GmlObjectIdTypeBinding.class);
+        container.registerComponentImplementation(OGC.Id_CapabilitiesType,
             Id_CapabilitiesTypeBinding.class);
-        container.registerComponentImplementation(OGC.LITERALTYPE, OGCLiteralTypeBinding.class);
+        container.registerComponentImplementation(OGC.LiteralType, OGCLiteralTypeBinding.class);
         //container.registerComponentImplementation(OGC.LITERALTYPE,LiteralTypeBinding.class);
         //container.registerComponentImplementation(OGC.LOGICOPSTYPE,LogicOpsTypeBinding.class);
-        container.registerComponentImplementation(OGC.LOWERBOUNDARYTYPE,
+        container.registerComponentImplementation(OGC.LowerBoundaryType,
             OGCLowerBoundaryTypeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISBETWEENTYPE,
+        container.registerComponentImplementation(OGC.PropertyIsBetweenType,
             OGCPropertyIsBetweenTypeBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISBETWEENTYPE,PropertyIsBetweenTypeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISLIKETYPE,
+        container.registerComponentImplementation(OGC.PropertyIsLikeType,
             PropertyIsLikeTypeBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISNULLTYPE,PropertyIsNullTypeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISNULLTYPE,
+        container.registerComponentImplementation(OGC.PropertyIsNullType,
             OGCPropertyIsNullTypeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYNAMETYPE,
+        container.registerComponentImplementation(OGC.PropertyNameType,
             OGCPropertyNameTypeBinding.class);
-        container.registerComponentImplementation(OGC.SCALAR_CAPABILITIESTYPE,
+        container.registerComponentImplementation(OGC.Scalar_CapabilitiesType,
             Scalar_CapabilitiesTypeBinding.class);
-        container.registerComponentImplementation(OGC.SORTBYTYPE, SortByTypeBinding.class);
-        container.registerComponentImplementation(OGC.SORTORDERTYPE, SortOrderTypeBinding.class);
-        container.registerComponentImplementation(OGC.SORTPROPERTYTYPE,
+        container.registerComponentImplementation(OGC.SortByType, SortByTypeBinding.class);
+        container.registerComponentImplementation(OGC.SortOrderType, SortOrderTypeBinding.class);
+        container.registerComponentImplementation(OGC.SortPropertyType,
             SortPropertyTypeBinding.class);
-        container.registerComponentImplementation(OGC.SPATIAL_CAPABILITIESTYPE,
+        container.registerComponentImplementation(OGC.Spatial_CapabilitiesType,
             Spatial_CapabilitiesTypeBinding.class);
-        container.registerComponentImplementation(OGC.SPATIALOPERATORNAMETYPE,
+        container.registerComponentImplementation(OGC.SpatialOperatorNameType,
             SpatialOperatorNameTypeBinding.class);
-        container.registerComponentImplementation(OGC.SPATIALOPERATORSTYPE,
+        container.registerComponentImplementation(OGC.SpatialOperatorsType,
             SpatialOperatorsTypeBinding.class);
-        container.registerComponentImplementation(OGC.SPATIALOPERATORTYPE,
+        container.registerComponentImplementation(OGC.SpatialOperatorType,
             SpatialOperatorTypeBinding.class);
         //container.registerComponentImplementation(OGC.SPATIALOPSTYPE,SpatialOpsTypeBinding.class);
         //container.registerComponentImplementation(OGC.UNARYLOGICOPTYPE,
         //    UnaryLogicOpTypeBinding.class);
-        container.registerComponentImplementation(OGC.UPPERBOUNDARYTYPE,
+        container.registerComponentImplementation(OGC.UpperBoundaryType,
             OGCUpperBoundaryTypeBinding.class);
 
         //Elements
         //container.registerComponentImplementation(OGC._ID,_IdBinding.class);
-        container.registerComponentImplementation(OGC.ADD, AddBinding.class);
-        container.registerComponentImplementation(OGC.AND, AndBinding.class);
+        container.registerComponentImplementation(OGC.Add, AddBinding.class);
+        container.registerComponentImplementation(OGC.And, AndBinding.class);
         //container.registerComponentImplementation(OGC.BBOX,BBOXBinding.class);
-        container.registerComponentImplementation(OGC.BEYOND, BeyondBinding.class);
+        container.registerComponentImplementation(OGC.Beyond, BeyondBinding.class);
         //container.registerComponentImplementation(OGC.COMPARISONOPS,ComparisonOpsBinding.class);
-        container.registerComponentImplementation(OGC.CONTAINS, ContainsBinding.class);
-        container.registerComponentImplementation(OGC.CROSSES, CrossesBinding.class);
-        container.registerComponentImplementation(OGC.DISJOINT, DisjointBinding.class);
-        container.registerComponentImplementation(OGC.DIV, DivBinding.class);
-        container.registerComponentImplementation(OGC.DWITHIN, DWithinBinding.class);
+        container.registerComponentImplementation(OGC.Contains, ContainsBinding.class);
+        container.registerComponentImplementation(OGC.Crosses, CrossesBinding.class);
+        container.registerComponentImplementation(OGC.Disjoint, DisjointBinding.class);
+        container.registerComponentImplementation(OGC.Div, DivBinding.class);
+        container.registerComponentImplementation(OGC.DWithin, DWithinBinding.class);
         container.registerComponentImplementation(OGC.EID, EIDBinding.class);
-        container.registerComponentImplementation(OGC.EQUALS, EqualsBinding.class);
+        container.registerComponentImplementation(OGC.Equals, EqualsBinding.class);
         //container.registerComponentImplementation(OGC.EXPRESSION, ExpressionBinding.class);
         //container.registerComponentImplementation(OGC.FEATUREID, FeatureIdBinding.class);
         container.registerComponentImplementation(OGC.FID, FIDBinding.class);
         //container.registerComponentImplementation(OGC.FILTER,FilterBinding.class);
-        container.registerComponentImplementation(OGC.FILTER_CAPABILITIES,
+        container.registerComponentImplementation(OGC.Filter_Capabilities,
             Filter_CapabilitiesBinding.class);
         //container.registerComponentImplementation(OGC.FUNCTION, FunctionBinding.class);
         //container.registerComponentImplementation(OGC.GMLOBJECTID, GmlObjectIdBinding.class);
-        container.registerComponentImplementation(OGC.INTERSECTS, IntersectsBinding.class);
+        container.registerComponentImplementation(OGC.Intersects, IntersectsBinding.class);
         //container.registerComponentImplementation(OGC.LITERAL,LiteralBinding.class);
-        container.registerComponentImplementation(OGC.LOGICALOPERATORS,
+        container.registerComponentImplementation(OGC.LogicalOperators,
             LogicalOperatorsBinding.class);
         //container.registerComponentImplementation(OGC.LOGICOPS,LogicOpsBinding.class);
-        container.registerComponentImplementation(OGC.MUL, MulBinding.class);
-        container.registerComponentImplementation(OGC.NOT, NotBinding.class);
-        container.registerComponentImplementation(OGC.OR, OrBinding.class);
-        container.registerComponentImplementation(OGC.OVERLAPS, OverlapsBinding.class);
+        container.registerComponentImplementation(OGC.Mul, MulBinding.class);
+        container.registerComponentImplementation(OGC.Not, NotBinding.class);
+        container.registerComponentImplementation(OGC.Or, OrBinding.class);
+        container.registerComponentImplementation(OGC.Overlaps, OverlapsBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISBETWEEN,PropertyIsBetweenBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISEQUALTO,
+        container.registerComponentImplementation(OGC.PropertyIsEqualTo,
             PropertyIsEqualToBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISGREATERTHAN,
+        container.registerComponentImplementation(OGC.PropertyIsGreaterThan,
             PropertyIsGreaterThanBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISGREATERTHANOREQUALTO,
+        container.registerComponentImplementation(OGC.PropertyIsGreaterThanOrEqualTo,
             PropertyIsGreaterThanOrEqualToBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISLESSTHAN,
+        container.registerComponentImplementation(OGC.PropertyIsLessThan,
             PropertyIsLessThanBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISLESSTHANOREQUALTO,
+        container.registerComponentImplementation(OGC.PropertyIsLessThanOrEqualTo,
             PropertyIsLessThanOrEqualToBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISLIKE, PropertyIsLikeBinding.class);
-        container.registerComponentImplementation(OGC.PROPERTYISNOTEQUALTO,
+        container.registerComponentImplementation(OGC.PropertyIsNotEqualTo,
             PropertyIsNotEqualToBinding.class);
         //container.registerComponentImplementation(OGC.PROPERTYISNULL,PropertyIsNullBinding.class);
         //        container.registerComponentImplementation(OGC.PROPERTYNAME,
         //            PropertyNameBinding.class);
-        container.registerComponentImplementation(OGC.SIMPLEARITHMETIC,
+        container.registerComponentImplementation(OGC.SimpleArithmetic,
             SimpleArithmeticBinding.class);
         //container.registerComponentImplementation(OGC.SORTBY,SortByBinding.class);
         //container.registerComponentImplementation(OGC.SPATIALOPS,SpatialOpsBinding.class);
-        container.registerComponentImplementation(OGC.SUB, SubBinding.class);
-        container.registerComponentImplementation(OGC.TOUCHES, TouchesBinding.class);
-        container.registerComponentImplementation(OGC.WITHIN, WithinBinding.class);
+        container.registerComponentImplementation(OGC.Sub, SubBinding.class);
+        container.registerComponentImplementation(OGC.Touches, TouchesBinding.class);
+        container.registerComponentImplementation(OGC.Within, WithinBinding.class);
     }
 }

@@ -15,7 +15,6 @@
  */
 package org.geotools.filter.v1_1;
 
-import java.net.URI;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.identity.FeatureId;
@@ -55,7 +54,7 @@ public class FeatureIdTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.FEATUREIDTYPE;
+        return OGC.FeatureIdType;
     }
 
     /**

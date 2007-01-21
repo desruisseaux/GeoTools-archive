@@ -19,7 +19,9 @@ import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Divide;
 import org.opengis.filter.expression.Expression;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -47,7 +49,7 @@ public class DivBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.DIV;
+        return OGC.Div;
     }
 
     /**

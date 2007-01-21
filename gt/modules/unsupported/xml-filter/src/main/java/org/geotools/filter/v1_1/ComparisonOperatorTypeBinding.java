@@ -17,7 +17,8 @@ package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.InstanceComponent;
 
 
 /**
@@ -57,7 +58,7 @@ public class ComparisonOperatorTypeBinding extends AbstractSimpleBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.COMPARISONOPERATORTYPE;
+        return OGC.ComparisonOperatorType;
     }
 
     /**

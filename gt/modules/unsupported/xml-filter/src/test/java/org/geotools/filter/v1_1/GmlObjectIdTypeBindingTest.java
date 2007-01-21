@@ -23,11 +23,11 @@ import org.geotools.xml.Binding;
 
 public class GmlObjectIdTypeBindingTest extends FilterTestSupport {
     public void testType() {
-        assertEquals(GmlObjectId.class, binding(OGC.GMLOBJECTIDTYPE).getType());
+        assertEquals(GmlObjectId.class, binding(OGC.GmlObjectIdType).getType());
     }
 
     public void testExecutionMode() {
-        assertEquals(Binding.OVERRIDE, binding(OGC.GMLOBJECTIDTYPE).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(OGC.GmlObjectIdType).getExecutionMode());
     }
 
     public void testParse() throws Exception {
@@ -39,7 +39,7 @@ public class GmlObjectIdTypeBindingTest extends FilterTestSupport {
     }
 
     public void testEncode() throws Exception {
-        Document doc = encode(FilterMockData.gmlObjectId(), OGC.GMLOBJECTID);
+        Document doc = encode(FilterMockData.gmlObjectId(), OGC.GmlObjectId);
         assertEquals("foo", doc.getDocumentElement().getAttributeNS(GML.NAMESPACE, "id"));
     }
 }

@@ -22,11 +22,11 @@ import org.geotools.xml.Binding;
 
 public class NotBindingTest extends FilterTestSupport {
     public void testType() {
-        assertEquals(Not.class, binding(OGC.NOT).getType());
+        assertEquals(Not.class, binding(OGC.Not).getType());
     }
 
     public void testExecutionMode() {
-        assertEquals(Binding.OVERRIDE, binding(OGC.NOT).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(OGC.Not).getExecutionMode());
     }
 
     public void testParse() throws Exception {
@@ -38,9 +38,9 @@ public class NotBindingTest extends FilterTestSupport {
     }
 
     public void testEncode() throws Exception {
-        Document dom = encode(FilterMockData.not(), OGC.NOT);
+        Document dom = encode(FilterMockData.not(), OGC.Not);
         assertEquals(1,
-            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.PROPERTYISEQUALTO.getLocalPart())
+            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.PropertyIsEqualTo.getLocalPart())
                .getLength());
     }
 }

@@ -19,7 +19,9 @@ import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.BinaryExpression;
 import org.opengis.filter.expression.Expression;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -55,7 +57,7 @@ public class BinaryOperatorTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BINARYOPERATORTYPE;
+        return OGC.BinaryOperatorType;
     }
 
     /**
@@ -83,7 +85,7 @@ public class BinaryOperatorTypeBinding extends AbstractComplexBinding {
         throws Exception {
         BinaryExpression binary = (BinaryExpression) object;
 
-        if (OGC.EXPRESSION.equals(name)) {
+        if (OGC.expression.equals(name)) {
             return new Expression[] { binary.getExpression1(), binary.getExpression2() };
         }
 

@@ -19,7 +19,9 @@ import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.expression.Expression;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -48,7 +50,7 @@ public class PropertyIsGreaterThanOrEqualToBinding extends AbstractComplexBindin
      * @generated
      */
     public QName getTarget() {
-        return OGC.PROPERTYISGREATERTHANOREQUALTO;
+        return OGC.PropertyIsGreaterThanOrEqualTo;
     }
 
     /**

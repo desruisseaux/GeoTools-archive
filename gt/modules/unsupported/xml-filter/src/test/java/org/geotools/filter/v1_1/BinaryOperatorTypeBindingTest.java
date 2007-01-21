@@ -25,11 +25,11 @@ import org.opengis.filter.expression.Subtract;
 
 public class BinaryOperatorTypeBindingTest extends FilterTestSupport {
     public void testBinaryOperatorType() {
-        assertEquals(BinaryExpression.class, binding(OGC.BINARYOPERATORTYPE).getType());
+        assertEquals(BinaryExpression.class, binding(OGC.BinaryOperatorType).getType());
     }
 
     public void testAddType() {
-        assertEquals(Add.class, binding(OGC.ADD).getType());
+        assertEquals(Add.class, binding(OGC.Add).getType());
     }
 
     public void testAddParse() throws Exception {
@@ -42,14 +42,14 @@ public class BinaryOperatorTypeBindingTest extends FilterTestSupport {
     }
 
     public void testAddEncode() throws Exception {
-        Document dom = encode(FilterMockData.add(), OGC.ADD);
+        Document dom = encode(FilterMockData.add(), OGC.Add);
 
         assertEquals(2,
-            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.LITERAL.getLocalPart()).getLength());
+            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.Literal.getLocalPart()).getLength());
     }
 
     public void testSubType() {
-        assertEquals(Subtract.class, binding(OGC.SUB).getType());
+        assertEquals(Subtract.class, binding(OGC.Sub).getType());
     }
 
     public void testSubParse() throws Exception {
@@ -62,13 +62,13 @@ public class BinaryOperatorTypeBindingTest extends FilterTestSupport {
     }
 
     public void testSubEncode() throws Exception {
-        Document dom = encode(FilterMockData.sub(), OGC.SUB);
+        Document dom = encode(FilterMockData.sub(), OGC.Sub);
         assertEquals(2,
-            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.LITERAL.getLocalPart()).getLength());
+            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.Literal.getLocalPart()).getLength());
     }
 
     public void testDivType() {
-        assertEquals(Divide.class, binding(OGC.DIV).getType());
+        assertEquals(Divide.class, binding(OGC.Div).getType());
     }
 
     public void testDivParse() throws Exception {
@@ -81,13 +81,13 @@ public class BinaryOperatorTypeBindingTest extends FilterTestSupport {
     }
 
     public void testDivEncode() throws Exception {
-        Document dom = encode(FilterMockData.div(), OGC.DIV);
+        Document dom = encode(FilterMockData.div(), OGC.Div);
         assertEquals(2,
-            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.LITERAL.getLocalPart()).getLength());
+            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.Literal.getLocalPart()).getLength());
     }
 
     public void testMulType() {
-        assertEquals(Multiply.class, binding(OGC.MUL).getType());
+        assertEquals(Multiply.class, binding(OGC.Mul).getType());
     }
 
     public void testMulParse() throws Exception {
@@ -100,8 +100,8 @@ public class BinaryOperatorTypeBindingTest extends FilterTestSupport {
     }
 
     public void testMulEncode() throws Exception {
-        Document dom = encode(FilterMockData.mul(), OGC.MUL);
+        Document dom = encode(FilterMockData.mul(), OGC.Mul);
         assertEquals(2,
-            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.LITERAL.getLocalPart()).getLength());
+            dom.getElementsByTagNameNS(OGC.NAMESPACE, OGC.Literal.getLocalPart()).getLength());
     }
 }

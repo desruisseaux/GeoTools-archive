@@ -19,7 +19,9 @@ import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -84,10 +86,6 @@ public class OGCDistanceTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         //TODO: return some object capable of representing units
-        if (node.hasAttribute("units")) {
-            String units = (String) node.getAttribute("units").getValue();
-        }
-
         return Double.valueOf((String) value);
     }
 

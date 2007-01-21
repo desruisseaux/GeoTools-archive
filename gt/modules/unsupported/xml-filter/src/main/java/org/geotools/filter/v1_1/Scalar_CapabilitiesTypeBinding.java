@@ -17,7 +17,9 @@ package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -53,7 +55,7 @@ public class Scalar_CapabilitiesTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.SCALAR_CAPABILITIESTYPE;
+        return OGC.Scalar_CapabilitiesType;
     }
 
     /**

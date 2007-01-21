@@ -20,8 +20,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.DWithin;
-import org.geotools.filter.Filters;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -51,7 +52,7 @@ public class DWithinBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.DWITHIN;
+        return OGC.DWithin;
     }
 
     /**

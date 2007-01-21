@@ -19,7 +19,9 @@ import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Expression;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -48,7 +50,7 @@ public class PropertyIsEqualToBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.PROPERTYISEQUALTO;
+        return OGC.PropertyIsEqualTo;
     }
 
     /**

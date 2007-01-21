@@ -30,7 +30,7 @@ public class LiteralTypeBindingTest extends FilterTestSupport {
 
     public void testEncode() throws Exception {
         Literal literal = FilterMockData.literal();
-        Document dom = encode(literal, OGC.LITERAL);
+        Document dom = encode(literal, OGC.Literal);
 
         assertEquals("foo", dom.getDocumentElement().getFirstChild().getNodeValue());
     }

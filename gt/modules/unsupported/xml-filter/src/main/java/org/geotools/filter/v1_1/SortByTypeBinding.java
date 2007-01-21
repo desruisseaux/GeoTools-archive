@@ -19,7 +19,9 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -51,7 +53,7 @@ public class SortByTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.SORTBYTYPE;
+        return OGC.SortByType;
     }
 
     /**

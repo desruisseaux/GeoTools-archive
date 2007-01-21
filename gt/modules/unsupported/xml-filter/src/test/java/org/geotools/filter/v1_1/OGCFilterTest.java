@@ -25,10 +25,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
@@ -50,7 +46,7 @@ public class OGCFilterTest extends TestCase {
         OutputStream output = new BufferedOutputStream(new FileOutputStream(file));
         Encoder encoder = new Encoder(new OGCConfiguration());
 
-        encoder.encode(filter, OGC.PROPERTYISEQUALTO, output);
+        encoder.encode(filter, OGC.PropertyIsEqualTo, output);
         output.flush();
         output.close();
 

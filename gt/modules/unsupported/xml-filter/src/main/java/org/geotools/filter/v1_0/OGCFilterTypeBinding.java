@@ -16,16 +16,10 @@
 package org.geotools.filter.v1_0;
 
 import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import javax.xml.namespace.QName;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.identity.FeatureId;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -53,9 +47,9 @@ import org.geotools.xml.Node;
  * @generated
  */
 public class OGCFilterTypeBinding extends AbstractComplexBinding {
-    FilterFactory factory;
+    FilterFactory2 factory;
 
-    public OGCFilterTypeBinding(FilterFactory factory) {
+    public OGCFilterTypeBinding(FilterFactory2 factory) {
         this.factory = factory;
     }
 

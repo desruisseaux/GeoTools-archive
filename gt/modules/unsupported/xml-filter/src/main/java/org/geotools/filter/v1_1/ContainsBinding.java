@@ -20,7 +20,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.spatial.Contains;
-import org.geotools.filter.FilterFactory;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -53,7 +52,7 @@ public class ContainsBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.CONTAINS;
+        return OGC.Contains;
     }
 
     /**

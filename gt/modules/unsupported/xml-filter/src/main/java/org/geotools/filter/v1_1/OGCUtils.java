@@ -47,7 +47,7 @@ public class OGCUtils {
      * @return the object for the property, or null
      */
     static Object property(Expression e1, Expression e2, QName name) {
-        if (OGC.PROPERTYNAME.equals(name)) {
+        if (OGC.PropertyName.equals(name)) {
             if (e1 instanceof PropertyName) {
                 return e1;
             } else if (e2 instanceof PropertyName) {

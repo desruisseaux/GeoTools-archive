@@ -16,13 +16,13 @@
 package org.geotools.filter.v1_0;
 
 import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -103,7 +103,6 @@ public class OGCBinaryComparisonOpTypeBinding extends AbstractComplexBinding {
         Expression e2 = (Expression) node.getChildValue(1);
 
         String name = instance.getName();
-        short op;
 
         //		<xsd:element name="PropertyIsEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
         if ("PropertyIsEqualTo".equals(name)) {

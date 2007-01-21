@@ -16,12 +16,12 @@
 package org.geotools.filter.v1_0;
 
 import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.xml.*;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -51,6 +51,12 @@ import org.geotools.xml.*;
  * @generated
  */
 public class OGCUnaryLogicOpTypeBinding extends AbstractComplexBinding {
+    FilterFactory filterFactory;
+
+    public OGCUnaryLogicOpTypeBinding(FilterFactory filterFactory) {
+        this.filterFactory = filterFactory;
+    }
+
     /**
      * @generated
      */
@@ -103,7 +109,7 @@ public class OGCUnaryLogicOpTypeBinding extends AbstractComplexBinding {
         if ("not".equalsIgnoreCase(name)) {
             Filter filter = (Filter) node.getChildValue(0);
 
-            return filter.not();
+            return filterFactory.not(filter);
         } else {
             throw new IllegalStateException(name);
         }

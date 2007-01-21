@@ -19,7 +19,9 @@ import javax.xml.namespace.QName;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.Expression;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -57,7 +59,7 @@ public class BinaryComparisonOpTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BINARYCOMPARISONOPTYPE;
+        return OGC.BinaryComparisonOpType;
     }
 
     /**
@@ -84,7 +86,7 @@ public class BinaryComparisonOpTypeBinding extends AbstractComplexBinding {
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        if (OGC.EXPRESSION.equals(name)) {
+        if (OGC.expression.equals(name)) {
             BinaryComparisonOperator op = (BinaryComparisonOperator) object;
 
             return new Expression[] { op.getExpression1(), op.getExpression2() };

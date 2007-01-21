@@ -52,7 +52,7 @@ public class WithinBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.WITHIN;
+        return OGC.Within;
     }
 
     /**

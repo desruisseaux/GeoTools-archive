@@ -16,12 +16,11 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.DistanceBufferOperator;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -59,7 +58,7 @@ public class DistanceBufferTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.DISTANCEBUFFERTYPE;
+        return OGC.DistanceBufferType;
     }
 
     /**

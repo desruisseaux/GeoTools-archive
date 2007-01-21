@@ -15,7 +15,6 @@
  */
 package org.geotools.filter.v1_1;
 
-import com.sun.media.jai.opimage.FFT;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,7 +23,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opengis.filter.And;
-import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.Not;
 import org.opengis.filter.Or;
@@ -71,7 +69,7 @@ public class FilterMockData {
     }
 
     static Element propertyName(String property, Document document, Node parent) {
-        Element propertyName = element(document, parent, OGC.PROPERTYNAME);
+        Element propertyName = element(document, parent, OGC.PropertyName);
         propertyName.appendChild(document.createTextNode(property));
 
         return propertyName;
@@ -90,7 +88,7 @@ public class FilterMockData {
     }
 
     static Element literal(String value, Document document, Node parent) {
-        Element literal = element(document, parent, OGC.LITERAL);
+        Element literal = element(document, parent, OGC.Literal);
         literal.appendChild(document.createTextNode(value));
 
         return literal;
@@ -105,7 +103,7 @@ public class FilterMockData {
     }
 
     static Element propertyIsEqualTo(Document document, Node parent) {
-        return binaryComparisonOp(document, parent, OGC.PROPERTYISEQUALTO);
+        return binaryComparisonOp(document, parent, OGC.PropertyIsEqualTo);
     }
 
     static PropertyIsEqualTo propertyIsEqualTo() {
@@ -113,7 +111,7 @@ public class FilterMockData {
     }
 
     static Element propertyIsNotEqualTo(Document document, Node parent) {
-        return binaryComparisonOp(document, parent, OGC.PROPERTYISNOTEQUALTO);
+        return binaryComparisonOp(document, parent, OGC.PropertyIsNotEqualTo);
     }
 
     static PropertyIsNotEqualTo propertyIsNotEqualTo() {
@@ -121,7 +119,7 @@ public class FilterMockData {
     }
 
     static Element propertyIsLessThan(Document document, Node parent) {
-        return binaryComparisonOp(document, parent, OGC.PROPERTYISLESSTHAN);
+        return binaryComparisonOp(document, parent, OGC.PropertyIsLessThan);
     }
 
     static PropertyIsLessThan propertyIsLessThan() {
@@ -129,7 +127,7 @@ public class FilterMockData {
     }
 
     static Element propertyIsLessThanOrEqualTo(Document document, Node parent) {
-        return binaryComparisonOp(document, parent, OGC.PROPERTYISLESSTHANOREQUALTO);
+        return binaryComparisonOp(document, parent, OGC.PropertyIsLessThanOrEqualTo);
     }
 
     static PropertyIsLessThanOrEqualTo propertyIsLessThanOrEqualTo() {
@@ -137,7 +135,7 @@ public class FilterMockData {
     }
 
     static Element propertyIsGreaterThan(Document document, Node parent) {
-        return binaryComparisonOp(document, parent, OGC.PROPERTYISGREATERTHAN);
+        return binaryComparisonOp(document, parent, OGC.PropertyIsGreaterThan);
     }
 
     static PropertyIsGreaterThan propertyIsGreaterThan() {
@@ -145,7 +143,7 @@ public class FilterMockData {
     }
 
     static Element propertyIsGreaterThanOrEqualTo(Document document, Node parent) {
-        return binaryComparisonOp(document, parent, OGC.PROPERTYISGREATERTHANOREQUALTO);
+        return binaryComparisonOp(document, parent, OGC.PropertyIsGreaterThanOrEqualTo);
     }
 
     static PropertyIsGreaterThanOrEqualTo propertyIsGreaterThanOrEqualTo() {
@@ -162,7 +160,7 @@ public class FilterMockData {
     }
 
     static Element and(Document document, Node parent) {
-        Element and = element(document, parent, OGC.AND);
+        Element and = element(document, parent, OGC.And);
 
         propertyIsEqualTo(document, and);
         propertyIsNotEqualTo(document, and);
@@ -175,7 +173,7 @@ public class FilterMockData {
     }
 
     static Element or(Document document, Node parent) {
-        Element or = element(document, parent, OGC.OR);
+        Element or = element(document, parent, OGC.Or);
 
         propertyIsEqualTo(document, or);
         propertyIsNotEqualTo(document, or);
@@ -192,7 +190,7 @@ public class FilterMockData {
     }
 
     static Element not(Document document, Node parent) {
-        Element not = element(document, parent, OGC.NOT);
+        Element not = element(document, parent, OGC.Not);
         propertyIsEqualTo(document, not);
 
         return not;
@@ -207,11 +205,11 @@ public class FilterMockData {
     }
 
     static Element beyond(Document document, Node parent) {
-        return distanceBufferOperator(document, parent, OGC.BEYOND);
+        return distanceBufferOperator(document, parent, OGC.Beyond);
     }
 
     static Element dwithin(Document document, Node parent) {
-        return distanceBufferOperator(document, parent, OGC.DWITHIN);
+        return distanceBufferOperator(document, parent, OGC.DWithin);
     }
 
     static Element distanceBufferOperator(Document document, Node parent, QName name) {
@@ -223,7 +221,7 @@ public class FilterMockData {
     }
 
     static Element contains(Document document, Node parent) {
-        return binarySpatialOperator(document, parent, OGC.CONTAINS);
+        return binarySpatialOperator(document, parent, OGC.Contains);
     }
 
     static Contains contains() {
@@ -231,7 +229,7 @@ public class FilterMockData {
     }
 
     static Element crosses(Document document, Node parent) {
-        return binarySpatialOperator(document, parent, OGC.CROSSES);
+        return binarySpatialOperator(document, parent, OGC.Crosses);
     }
 
     static Crosses crosses() {
@@ -239,7 +237,7 @@ public class FilterMockData {
     }
 
     static Element disjoint(Document document, Node parent) {
-        return binarySpatialOperator(document, parent, OGC.DISJOINT);
+        return binarySpatialOperator(document, parent, OGC.Disjoint);
     }
 
     static Disjoint disjoint() {
@@ -247,7 +245,7 @@ public class FilterMockData {
     }
 
     static Element equals(Document document, Node parent) {
-        return binarySpatialOperator(document, parent, OGC.EQUALS);
+        return binarySpatialOperator(document, parent, OGC.Equals);
     }
 
     static Equals equals() {
@@ -255,7 +253,7 @@ public class FilterMockData {
     }
 
     static Element intersects(Document document, Node parent) {
-        return binarySpatialOperator(document, parent, OGC.INTERSECTS);
+        return binarySpatialOperator(document, parent, OGC.Intersects);
     }
 
     static Intersects intersects() {
@@ -263,7 +261,7 @@ public class FilterMockData {
     }
 
     static Element overlaps(Document document, Node parent) {
-        return binarySpatialOperator(document, parent, OGC.OVERLAPS);
+        return binarySpatialOperator(document, parent, OGC.Overlaps);
     }
 
     static Overlaps overlaps() {
@@ -271,7 +269,7 @@ public class FilterMockData {
     }
 
     static Element touches(Document document, Node parent) {
-        return binarySpatialOperator(document, parent, OGC.TOUCHES);
+        return binarySpatialOperator(document, parent, OGC.Touches);
     }
 
     static Touches touches() {
@@ -279,7 +277,7 @@ public class FilterMockData {
     }
 
     static Element within(Document document, Node parent) {
-        return binarySpatialOperator(document, parent, OGC.WITHIN);
+        return binarySpatialOperator(document, parent, OGC.Within);
     }
 
     static Within within() {
@@ -321,7 +319,7 @@ public class FilterMockData {
     }
 
     static Element add(Document document, Node parent) {
-        return binaryExpression(document, parent, OGC.ADD);
+        return binaryExpression(document, parent, OGC.Add);
     }
 
     static Add add() {
@@ -329,7 +327,7 @@ public class FilterMockData {
     }
 
     static Element sub(Document document, Node parent) {
-        return binaryExpression(document, parent, OGC.SUB);
+        return binaryExpression(document, parent, OGC.Sub);
     }
 
     static Subtract sub() {
@@ -337,7 +335,7 @@ public class FilterMockData {
     }
 
     static Element mul(Document document, Node parent) {
-        return binaryExpression(document, parent, OGC.MUL);
+        return binaryExpression(document, parent, OGC.Mul);
     }
 
     static Multiply mul() {
@@ -345,7 +343,7 @@ public class FilterMockData {
     }
 
     static Element div(Document document, Node parent) {
-        return binaryExpression(document, parent, OGC.DIV);
+        return binaryExpression(document, parent, OGC.Div);
     }
 
     static Divide div() {
@@ -362,7 +360,7 @@ public class FilterMockData {
 
     // Identifiers
     static Element gmlObjectId(Document document, Node parent) {
-        Element gmlObjectId = element(document, parent, OGC.GMLOBJECTID);
+        Element gmlObjectId = element(document, parent, OGC.GmlObjectId);
         gmlObjectId.setAttributeNS(GML.NAMESPACE, "id", "foo");
 
         return gmlObjectId;
@@ -374,7 +372,7 @@ public class FilterMockData {
 
     //sorting
     static Element sortBy(Document document, Node parent) {
-        Element sortBy = element(document, parent, OGC.SORTBY);
+        Element sortBy = element(document, parent, OGC.SortBy);
         sortProperty(document, sortBy);
         sortProperty(document, sortBy);
 

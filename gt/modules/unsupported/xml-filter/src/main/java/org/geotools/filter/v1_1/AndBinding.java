@@ -19,7 +19,9 @@ import javax.xml.namespace.QName;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -47,7 +49,7 @@ public class AndBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.AND;
+        return OGC.And;
     }
 
     /**

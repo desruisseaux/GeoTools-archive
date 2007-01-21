@@ -18,7 +18,8 @@ package org.geotools.filter.v1_1;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortOrder;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractSimpleBinding;
+import org.geotools.xml.InstanceComponent;
 
 
 /**
@@ -51,7 +52,7 @@ public class SortOrderTypeBinding extends AbstractSimpleBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.SORTORDERTYPE;
+        return OGC.SortOrderType;
     }
 
     /**

@@ -52,7 +52,7 @@ public class IntersectsBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.INTERSECTS;
+        return OGC.Intersects;
     }
 
     /**

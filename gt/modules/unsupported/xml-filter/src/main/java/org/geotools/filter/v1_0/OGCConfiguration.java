@@ -17,8 +17,6 @@ package org.geotools.filter.v1_0;
 
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.picocontainer.MutablePicoContainer;
-import java.net.MalformedURLException;
-import java.net.URL;
 import org.opengis.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.gml2.GMLConfiguration;

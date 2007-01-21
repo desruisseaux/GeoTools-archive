@@ -40,7 +40,7 @@ public class PropertyNameTypeBindingTest extends FilterTestSupport {
 
     public void testEncode() throws Exception {
         PropertyName propertyName = FilterMockData.propertyName("foo");
-        Document dom = encode(propertyName, OGC.PROPERTYNAME);
+        Document dom = encode(propertyName, OGC.PropertyName);
 
         assertEquals("foo", dom.getDocumentElement().getFirstChild().getNodeValue());
     }

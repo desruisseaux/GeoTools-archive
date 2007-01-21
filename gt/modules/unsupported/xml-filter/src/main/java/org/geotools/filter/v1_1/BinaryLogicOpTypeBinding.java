@@ -24,7 +24,9 @@ import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.spatial.BinarySpatialOperator;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -62,7 +64,7 @@ public class BinaryLogicOpTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BINARYLOGICOPTYPE;
+        return OGC.BinaryLogicOpType;
     }
 
     /**
@@ -90,7 +92,7 @@ public class BinaryLogicOpTypeBinding extends AbstractComplexBinding {
         throws Exception {
         BinaryLogicOperator operator = (BinaryLogicOperator) object;
 
-        if (OGC.COMPARISONOPS.equals(name)) {
+        if (OGC.comparisonOps.equals(name)) {
             List comparison = new ArrayList();
 
             for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
@@ -106,7 +108,7 @@ public class BinaryLogicOpTypeBinding extends AbstractComplexBinding {
             }
         }
 
-        if (OGC.SPATIALOPS.equals(name)) {
+        if (OGC.spatialOps.equals(name)) {
             List spatial = new ArrayList();
 
             for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
@@ -122,7 +124,7 @@ public class BinaryLogicOpTypeBinding extends AbstractComplexBinding {
             }
         }
 
-        if (OGC.LOGICOPS.equals(name)) {
+        if (OGC.logicOps.equals(name)) {
             List logic = new ArrayList();
 
             for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {

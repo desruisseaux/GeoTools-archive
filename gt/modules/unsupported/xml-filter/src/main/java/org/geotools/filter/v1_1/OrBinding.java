@@ -19,7 +19,9 @@ import javax.xml.namespace.QName;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Or;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -47,7 +49,7 @@ public class OrBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.OR;
+        return OGC.Or;
     }
 
     /**

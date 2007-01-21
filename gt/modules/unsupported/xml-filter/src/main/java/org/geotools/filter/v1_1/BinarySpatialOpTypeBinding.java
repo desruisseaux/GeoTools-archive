@@ -16,12 +16,7 @@
 package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BinarySpatialOperator;
-import org.geotools.gml3.bindings.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -58,7 +53,7 @@ public class BinarySpatialOpTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.BINARYSPATIALOPTYPE;
+        return OGC.BinarySpatialOpType;
     }
 
     /**

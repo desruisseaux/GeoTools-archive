@@ -21,10 +21,10 @@ import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.Not;
-import org.opengis.filter.capability.SpatialOperator;
-import org.opengis.filter.expression.BinaryExpression;
 import org.opengis.filter.spatial.BinarySpatialOperator;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -52,7 +52,7 @@ public class NotBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.NOT;
+        return OGC.Not;
     }
 
     /**
@@ -82,15 +82,15 @@ public class NotBinding extends AbstractComplexBinding {
         throws Exception {
         Not not = (Not) object;
 
-        if (OGC.SPATIALOPS.equals(name) && not.getFilter() instanceof BinarySpatialOperator) {
+        if (OGC.spatialOps.equals(name) && not.getFilter() instanceof BinarySpatialOperator) {
             return not.getFilter();
         }
 
-        if (OGC.LOGICOPS.equals(name) && not.getFilter() instanceof BinaryLogicOperator) {
+        if (OGC.logicOps.equals(name) && not.getFilter() instanceof BinaryLogicOperator) {
             return not.getFilter();
         }
 
-        if (OGC.COMPARISONOPS.equals(name) && not.getFilter() instanceof BinaryComparisonOperator) {
+        if (OGC.comparisonOps.equals(name) && not.getFilter() instanceof BinaryComparisonOperator) {
             return not.getFilter();
         }
 

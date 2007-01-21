@@ -17,7 +17,9 @@ package org.geotools.filter.v1_1;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -50,7 +52,7 @@ public class SpatialOperatorTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return OGC.SPATIALOPERATORTYPE;
+        return OGC.SpatialOperatorType;
     }
 
     /**

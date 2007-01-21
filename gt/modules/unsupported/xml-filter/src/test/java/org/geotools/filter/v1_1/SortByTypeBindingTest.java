@@ -22,11 +22,11 @@ import org.geotools.xml.Binding;
 
 public class SortByTypeBindingTest extends FilterTestSupport {
     public void testType() {
-        assertEquals(SortBy[].class, binding(OGC.SORTBYTYPE).getType());
+        assertEquals(SortBy[].class, binding(OGC.SortByType).getType());
     }
 
     public void testExecutionMode() {
-        assertEquals(Binding.OVERRIDE, binding(OGC.SORTBYTYPE).getExecutionMode());
+        assertEquals(Binding.OVERRIDE, binding(OGC.SortByType).getExecutionMode());
     }
 
     public void testParse() throws Exception {
@@ -38,7 +38,7 @@ public class SortByTypeBindingTest extends FilterTestSupport {
     }
 
     public void testEncode() throws Exception {
-        Document doc = encode(FilterMockData.sortBy(), OGC.SORTBY);
+        Document doc = encode(FilterMockData.sortBy(), OGC.SortBy);
         assertEquals(2, doc.getElementsByTagNameNS(OGC.NAMESPACE, "SortProperty").getLength());
     }
 }
