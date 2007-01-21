@@ -172,12 +172,12 @@ public class SimpleTypeBuilder {
 	//
 	/** Reset the builder for new conent */
 	public void init() {
-		this.description = null;
-		this.defaultGeom = null;
-		this.local = null;
-		this.memberType = null;
-		this.uri = null;
-		this.crs = null;
+//		this.description = null;
+//		this.defaultGeom = null;
+//		this.local = null;
+//		this.memberType = null;
+//		this.uri = null;
+//		this.crs = null;
 		this.attributes = null;
 
 	}

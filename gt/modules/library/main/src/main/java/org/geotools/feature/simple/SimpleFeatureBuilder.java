@@ -72,8 +72,6 @@ public class SimpleFeatureBuilder  {
 
     public void init(){
     	attributes.clear();
-    	featureType = null;
-    	collectionType = null;
     }
     public void setType( org.geotools.feature.FeatureType featureType ) {
     	this.featureType = featureType;
@@ -85,6 +83,12 @@ public class SimpleFeatureBuilder  {
     	this.collectionType = collectionType;
     }
     /** Call to add the next attribute to the builder. */
+    public void add(Object[] values ) {
+    	for ( int i = 0; i < values.length; i++) {
+    		add( values[ i ] );
+    	}
+    }
+    
     public void add(Object value) {
 		 attributes.add(value);
 	}
