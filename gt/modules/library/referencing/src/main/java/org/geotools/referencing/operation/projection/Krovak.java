@@ -18,23 +18,22 @@ package org.geotools.referencing.operation.projection;
 // J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collection;
+
 import javax.units.NonSI;
+import javax.units.SI;
 import javax.units.Unit;
 
-// OpenGIS dependencies
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.resources.XMath;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
-
-// Geotools dependencies
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
-import org.geotools.resources.XMath;
 
 
 /**
@@ -100,6 +99,8 @@ import org.geotools.resources.XMath;
  *      RemoteSensing.org </A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/guid7.html">Krovak on "Coordinate
  *      Conversions and Transformations including Formulas"</A>
+ * @see <A HREF="http://www.posc.org/Epicentre.2_2/DataModel/ExamplesofUsage/eu_cs34e2.html">Krovak on POSC</A>
+ * 
  */
 public class Krovak extends MapProjection {
     /**
@@ -297,7 +298,7 @@ public class Krovak extends MapProjection {
         public static final ParameterDescriptor LATITUDE_OF_CENTER = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,     "latitude_of_center"),
-                    new NamedIdentifier(Citations.EPSG,    "Latitude of projection center"),
+                    new NamedIdentifier(Citations.EPSG,    "Latitude of projection centre"),
                     new NamedIdentifier(Citations.GEOTIFF, "CenterLat")
                 }, 49.5, -90, 90, NonSI.DEGREE_ANGLE);
 
@@ -309,7 +310,7 @@ public class Krovak extends MapProjection {
         public static final ParameterDescriptor LONGITUDE_OF_CENTER = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,     "longitude_of_center"),
-                    new NamedIdentifier(Citations.EPSG,    "Longitude of projection center"),
+                    new NamedIdentifier(Citations.EPSG,    "Longitude of projection centre"),
                     new NamedIdentifier(Citations.GEOTIFF, "CenterLong")
                 }, 42.5-17.66666666666667, -180, 180, NonSI.DEGREE_ANGLE);
 
@@ -320,7 +321,7 @@ public class Krovak extends MapProjection {
         public static final ParameterDescriptor AZIMUTH = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,     "azimuth"),
-                    new NamedIdentifier(Citations.EPSG,    "Azimuth of the center line"),
+                    new NamedIdentifier(Citations.EPSG,    "Azimuth of initial line"),
                     new NamedIdentifier(Citations.GEOTIFF, "AzimuthAngle")
                 }, 30.28813972222222, 0, 360, NonSI.DEGREE_ANGLE);
 
@@ -342,9 +343,9 @@ public class Krovak extends MapProjection {
         public static final ParameterDescriptor SCALE_FACTOR = createDescriptor(
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,  "scale_factor"),
-                    new NamedIdentifier(Citations.EPSG, "Scale factor on the pseudo standard line"),
+                    new NamedIdentifier(Citations.EPSG, "Scale factor on pseudo standard parallel"),
                     new NamedIdentifier(Citations.GEOTIFF, "ScaleAtCenter")
-                }, 0.9999, 0, Double.POSITIVE_INFINITY, Unit.ONE);
+                }, 0.9999, 0, Double.POSITIVE_INFINITY, Unit.ONE);               
 
         /**
          * The parameters group.
@@ -353,12 +354,13 @@ public class Krovak extends MapProjection {
             new NamedIdentifier(Citations.OGC,     "Krovak"),
             new NamedIdentifier(Citations.GEOTIFF, "Krovak"),
             new NamedIdentifier(Citations.EPSG,    "Krovak Oblique Conformal Conic"),
+            new NamedIdentifier(Citations.EPSG,    "Krovak Oblique Conic Conformal"),
             new NamedIdentifier(Citations.EPSG,    "9819"),
                 },
                 new ParameterDescriptor[] {
                     SEMI_MAJOR, SEMI_MINOR, LATITUDE_OF_CENTER, LONGITUDE_OF_CENTER,
                     AZIMUTH, PSEUDO_STANDARD_PARALLEL, SCALE_FACTOR,
-                    FALSE_EASTING, FALSE_NORTHING
+                    FALSE_EASTING, FALSE_NORTHING 
                 });
 
         /**
