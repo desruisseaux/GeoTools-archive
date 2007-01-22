@@ -23,11 +23,9 @@ import java.util.Iterator;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.geotools.xml.*;
-import org.geotools.xml.AbstractComplexBinding;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
 
 
 /**
@@ -90,7 +88,7 @@ public class GMLGeometryCollectionTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return GeometryCollection.class;
     }
 
     /**
