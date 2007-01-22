@@ -1317,15 +1317,16 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                                          "SELECT CO.COORD_OP_CODE,"
                                  +             " CO.COORD_OP_METHOD_CODE,"
                                  +             " CRS2.DATUM_CODE"
-                                 +      " FROM ([Coordinate_Operation] AS CO"
-                                 + " INNER JOIN [Coordinate Reference System] AS CRS1"
-                                 +          " ON CO.SOURCE_CRS_CODE = CRS1.COORD_REF_SYS_CODE)"
+                                 +       " FROM [Coordinate_Operation] AS CO"
                                  + " INNER JOIN [Coordinate Reference System] AS CRS2"
                                  +          " ON CO.TARGET_CRS_CODE = CRS2.COORD_REF_SYS_CODE"
                                  +       " WHERE CO.COORD_OP_METHOD_CODE >= " + BURSA_WOLF_MIN_CODE
                                  +         " AND CO.COORD_OP_METHOD_CODE <= " + BURSA_WOLF_MAX_CODE
                                  +         " AND CO.COORD_OP_CODE <> " + DUMMY_OPERATION // GEOT-1008
-                                 +         " AND CRS1.DATUM_CODE = ?"
+                                 +         " AND CO.SOURCE_CRS_CODE IN ("
+                                 +      " SELECT CRS1.COORD_REF_SYS_CODE " // GEOT-1129
+                                 +        " FROM [Coordinate Reference System] AS CRS1 "
+                                 +       " WHERE CRS1.DATUM_CODE = ?)"
                                  +    " ORDER BY CRS2.DATUM_CODE,"
                                  +             " ABS(CO.DEPRECATED), CO.COORD_OP_ACCURACY,"
                                  +             " CO.COORD_OP_CODE DESC"); // GEOT-846 fix

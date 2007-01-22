@@ -15,25 +15,24 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
 import java.awt.geom.Point2D;
 import java.util.Collection;
-
 import javax.units.NonSI;
 import javax.units.SI;
 import javax.units.Unit;
 
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.resources.XMath;
-import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.resources.i18n.Errors;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.ConicProjection;
 import org.opengis.referencing.operation.MathTransform;
+
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.resources.XMath;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 
 
 /**
@@ -100,7 +99,6 @@ import org.opengis.referencing.operation.MathTransform;
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/guid7.html">Krovak on "Coordinate
  *      Conversions and Transformations including Formulas"</A>
  * @see <A HREF="http://www.posc.org/Epicentre.2_2/DataModel/ExamplesofUsage/eu_cs34e2.html">Krovak on POSC</A>
- * 
  */
 public class Krovak extends MapProjection {
     /**
@@ -345,7 +343,7 @@ public class Krovak extends MapProjection {
                     new NamedIdentifier(Citations.OGC,  "scale_factor"),
                     new NamedIdentifier(Citations.EPSG, "Scale factor on pseudo standard parallel"),
                     new NamedIdentifier(Citations.GEOTIFF, "ScaleAtCenter")
-                }, 0.9999, 0, Double.POSITIVE_INFINITY, Unit.ONE);               
+                }, 0.9999, 0, Double.POSITIVE_INFINITY, Unit.ONE);
 
         /**
          * The parameters group.
@@ -360,7 +358,7 @@ public class Krovak extends MapProjection {
                 new ParameterDescriptor[] {
                     SEMI_MAJOR, SEMI_MINOR, LATITUDE_OF_CENTER, LONGITUDE_OF_CENTER,
                     AZIMUTH, PSEUDO_STANDARD_PARALLEL, SCALE_FACTOR,
-                    FALSE_EASTING, FALSE_NORTHING 
+                    FALSE_EASTING, FALSE_NORTHING
                 });
 
         /**
