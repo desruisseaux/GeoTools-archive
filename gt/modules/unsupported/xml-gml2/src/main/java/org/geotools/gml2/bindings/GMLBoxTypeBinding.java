@@ -114,9 +114,7 @@ public class GMLBoxTypeBinding extends AbstractComplexBinding {
             CoordinateSequence c1 = (CoordinateSequence) n1.getValue();
             CoordinateSequence c2 = (CoordinateSequence) n2.getValue();
 
-            return new Envelope(c1.getOrdinate(0, CoordinateSequence.X),
-                c2.getOrdinate(0, CoordinateSequence.X), c1.getOrdinate(0, CoordinateSequence.Y),
-                c2.getOrdinate(0, CoordinateSequence.Y));
+            return new Envelope(c1.getX(0), c2.getX(0), c1.getY(0), c2.getY(0) );
         }
 
         if (!coordinates.isEmpty()) {
@@ -130,9 +128,7 @@ public class GMLBoxTypeBinding extends AbstractComplexBinding {
                 throw new RuntimeException("Envelope can have only two coordinates");
             }
 
-            return new Envelope(cs.getOrdinate(0, CoordinateSequence.X),
-                cs.getOrdinate(1, CoordinateSequence.X), cs.getOrdinate(0, CoordinateSequence.Y),
-                cs.getOrdinate(1, CoordinateSequence.Y));
+            return new Envelope(cs.getX(0),cs.getX(1),cs.getY(0),cs.getY(1) );
         }
 
         throw new RuntimeException("Could not find coordinates for envelope");
