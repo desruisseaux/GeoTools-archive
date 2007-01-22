@@ -16,10 +16,15 @@
 package org.geotools.filter.v1_0;
 
 import org.picocontainer.MutablePicoContainer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.xml.namespace.QName;
+import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -100,21 +105,79 @@ public class OGCBinaryLogicOpTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: replace with element bindings
-        Filter f1 = (Filter) node.getChildValue(0);
-        Filter f2 = (Filter) node.getChildValue(1);
+        //implemented by element bindigns
+        return null;
 
-        String name = instance.getName();
+        //        //TODO: replace with element bindings
+        //        Filter f1 = (Filter) node.getChildValue(0);
+        //        Filter f2 = (Filter) node.getChildValue(1);
+        //
+        //        String name = instance.getName();
+        //
+        //        //		<xsd:element name="And" substitutionGroup="ogc:logicOps" type="ogc:BinaryLogicOpType"/>
+        //        if ("And".equals(name)) {
+        //            return factory.and(f1, f2);
+        //        }
+        //        //		<xsd:element name="Or" substitutionGroup="ogc:logicOps" type="ogc:BinaryLogicOpType"/>
+        //        else if ("Or".equals(name)) {
+        //            return factory.or(f1, f2);
+        //        } else {
+        //            throw new IllegalStateException(name);
+        //        }
+    }
 
-        //		<xsd:element name="And" substitutionGroup="ogc:logicOps" type="ogc:BinaryLogicOpType"/>
-        if ("And".equals(name)) {
-            return factory.and(f1, f2);
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        BinaryLogicOperator operator = (BinaryLogicOperator) object;
+
+        if (OGC.comparisonOps.equals(name)) {
+            List comparison = new ArrayList();
+
+            for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
+                Filter filter = (Filter) f.next();
+
+                if (filter instanceof BinaryComparisonOperator) {
+                    comparison.add(filter);
+                }
+            }
+
+            if (!comparison.isEmpty()) {
+                return comparison;
+            }
         }
-        //		<xsd:element name="Or" substitutionGroup="ogc:logicOps" type="ogc:BinaryLogicOpType"/>
-        else if ("Or".equals(name)) {
-            return factory.or(f1, f2);
-        } else {
-            throw new IllegalStateException(name);
+
+        if (OGC.spatialOps.equals(name)) {
+            List spatial = new ArrayList();
+
+            for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
+                Filter filter = (Filter) f.next();
+
+                if (filter instanceof BinarySpatialOperator) {
+                    spatial.add(filter);
+                }
+            }
+
+            if (!spatial.isEmpty()) {
+                return spatial;
+            }
         }
+
+        if (OGC.logicOps.equals(name)) {
+            List logic = new ArrayList();
+
+            for (Iterator f = operator.getChildren().iterator(); f.hasNext();) {
+                Filter filter = (Filter) f.next();
+
+                if (filter instanceof BinaryLogicOperator) {
+                    logic.add(filter);
+                }
+            }
+
+            if (!logic.isEmpty()) {
+                return logic;
+            }
+        }
+
+        return null;
     }
 }

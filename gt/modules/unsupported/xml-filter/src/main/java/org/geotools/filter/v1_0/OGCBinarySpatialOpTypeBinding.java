@@ -17,13 +17,8 @@ package org.geotools.filter.v1_0;
 
 import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -110,63 +105,73 @@ public class OGCBinarySpatialOpTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: replace with element bindings
-        PropertyName e1 = (PropertyName) node.getChildValue(PropertyName.class);
-        Expression e2 = null;
+        //implemented by element bindings
+        return null;
 
-        if (node.hasChild(Geometry.class)) {
-            e2 = factory.literal(node.getChildValue(Geometry.class));
-        } else {
-            //turn bounding box into geometry
-            //TODO: not sure if this should be done here but I am pretty sure filter 
-            // implementation expect this to be a geometry
-            Envelope bbox = (Envelope) node.getChildValue(Envelope.class);
-            e2 = factory.literal(gFactory.createPolygon(gFactory.createLinearRing(
-                            new Coordinate[] {
-                                new Coordinate(bbox.getMinX(), bbox.getMinY()),
-                                new Coordinate(bbox.getMinX(), bbox.getMaxY()),
-                                new Coordinate(bbox.getMaxX(), bbox.getMaxY()),
-                                new Coordinate(bbox.getMaxX(), bbox.getMinY()),
-                                new Coordinate(bbox.getMinX(), bbox.getMinY())
-                            }), null));
-        }
+        //        //TODO: replace with element bindings
+        //        PropertyName e1 = (PropertyName) node.getChildValue(PropertyName.class);
+        //        Expression e2 = null;
+        //
+        //        if (node.hasChild(Geometry.class)) {
+        //            e2 = factory.literal(node.getChildValue(Geometry.class));
+        //        } else {
+        //            //turn bounding box into geometry
+        //            //TODO: not sure if this should be done here but I am pretty sure filter 
+        //            // implementation expect this to be a geometry
+        //            Envelope bbox = (Envelope) node.getChildValue(Envelope.class);
+        //            e2 = factory.literal(gFactory.createPolygon(gFactory.createLinearRing(
+        //                            new Coordinate[] {
+        //                                new Coordinate(bbox.getMinX(), bbox.getMinY()),
+        //                                new Coordinate(bbox.getMinX(), bbox.getMaxY()),
+        //                                new Coordinate(bbox.getMaxX(), bbox.getMaxY()),
+        //                                new Coordinate(bbox.getMaxX(), bbox.getMinY()),
+        //                                new Coordinate(bbox.getMinX(), bbox.getMinY())
+        //                            }), null));
+        //        }
+        //
+        //        String name = instance.getName();
+        //
+        //        //<xsd:element name="Equals" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
+        //        if ("Equals".equals(name)) {
+        //            return factory.equal(e1, e2);
+        //        }
+        //        //<xsd:element name="Disjoint" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
+        //        else if ("Disjoint".equals(name)) {
+        //            return factory.disjoint(e1, e2);
+        //        }
+        //        //<xsd:element name="Touches" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
+        //        else if ("Touches".equals(name)) {
+        //            return factory.touches(e1, e2);
+        //        }
+        //        //<xsd:element name="Within" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
+        //        else if ("Within".equals(name)) {
+        //            //TODO: within method on FilterFactory2 needs to take two expressoins
+        //            return factory.within(e1, e2);
+        //        }
+        //        //<xsd:element name="Overlaps" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
+        //        else if ("Overlaps".equals(name)) {
+        //            return factory.overlaps(e1, e2);
+        //        }
+        //        //<xsd:element name="Crosses" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
+        //        else if ("Crosses".equals(name)) {
+        //            return factory.crosses(e1, e2);
+        //        }
+        //        //<xsd:element name="Intersects" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
+        //        else if ("Intersects".equals(name)) {
+        //            return factory.intersects(e1, e2);
+        //        }
+        //        //<xsd:element name="Contains" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
+        //        else if ("Contains".equals(name)) {
+        //            return factory.contains(e1, e2);
+        //        } else {
+        //            throw new IllegalStateException("Unknown - " + name);
+        //        }
+    }
 
-        String name = instance.getName();
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        BinarySpatialOperator operator = (BinarySpatialOperator) object;
 
-        //<xsd:element name="Equals" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
-        if ("Equals".equals(name)) {
-            return factory.equal(e1, e2);
-        }
-        //<xsd:element name="Disjoint" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
-        else if ("Disjoint".equals(name)) {
-            return factory.disjoint(e1, e2);
-        }
-        //<xsd:element name="Touches" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
-        else if ("Touches".equals(name)) {
-            return factory.touches(e1, e2);
-        }
-        //<xsd:element name="Within" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
-        else if ("Within".equals(name)) {
-            //TODO: within method on FilterFactory2 needs to take two expressoins
-            return factory.within(e1, e2);
-        }
-        //<xsd:element name="Overlaps" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
-        else if ("Overlaps".equals(name)) {
-            return factory.overlaps(e1, e2);
-        }
-        //<xsd:element name="Crosses" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
-        else if ("Crosses".equals(name)) {
-            return factory.crosses(e1, e2);
-        }
-        //<xsd:element name="Intersects" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
-        else if ("Intersects".equals(name)) {
-            return factory.intersects(e1, e2);
-        }
-        //<xsd:element name="Contains" substitutionGroup="ogc:spatialOps" type="ogc:BinarySpatialOpType"/>
-        else if ("Contains".equals(name)) {
-            return factory.contains(e1, e2);
-        } else {
-            throw new IllegalStateException("Unknown - " + name);
-        }
+        return OGCUtils.property(operator.getExpression1(), operator.getExpression2(), name);
     }
 }

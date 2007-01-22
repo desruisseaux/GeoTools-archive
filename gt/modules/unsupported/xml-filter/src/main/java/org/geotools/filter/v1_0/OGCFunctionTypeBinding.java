@@ -68,16 +68,6 @@ public class OGCFunctionTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
         return Function.class;
     }
@@ -109,5 +99,22 @@ public class OGCFunctionTypeBinding extends AbstractComplexBinding {
         String name = (String) node.getAttribute("name").getValue();
 
         return factory.function(name, args);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Function function = (Function) object;
+
+        //&lt;xsd:element maxOccurs="unbounded" minOccurs="0" ref="ogc:expression"/&gt;
+        if (OGC.expression.equals(name)) {
+            return function.getParameters();
+        }
+
+        //&lt;xsd:attribute name="name" type="xsd:string" use="required"/&gt;
+        if ("name".equals(name.getLocalPart())) {
+            return function.getName();
+        }
+
+        return null;
     }
 }

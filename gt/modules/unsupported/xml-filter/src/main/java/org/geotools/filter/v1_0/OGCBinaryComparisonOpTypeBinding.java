@@ -98,38 +98,59 @@ public class OGCBinaryComparisonOpTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: replace with element bindings
-        Expression e1 = (Expression) node.getChildValue(0);
-        Expression e2 = (Expression) node.getChildValue(1);
+        //implemented by comcreate elements;
+        return null;
 
-        String name = instance.getName();
+        //    	//TODO: replace with element bindings
+        //        Expression e1 = (Expression) node.getChildValue(0);
+        //        Expression e2 = (Expression) node.getChildValue(1);
+        //
+        //        String name = instance.getName();
+        //
+        //        //		<xsd:element name="PropertyIsEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
+        //        if ("PropertyIsEqualTo".equals(name)) {
+        //            return factory.equals(e1, e2);
+        //        }
+        //        //		<xsd:element name="PropertyIsNotEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
+        //        else if ("PropertyIsNotEqualTo".equals(name)) {
+        //            //TODO: add geoapi interface
+        //            return factory.not(factory.equals(e1, e2));
+        //        }
+        //        //		<xsd:element name="PropertyIsLessThan" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
+        //        else if ("PropertyIsLessThan".equals(name)) {
+        //            return factory.less(e1, e2);
+        //        }
+        //        //		<xsd:element name="PropertyIsGreaterThan" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
+        //        else if ("PropertyIsGreaterThan".equals(name)) {
+        //            return factory.greater(e1, e2);
+        //        }
+        //        //		<xsd:element name="PropertyIsLessThanOrEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
+        //        else if ("PropertyIsLessThanOrEqualTo".equals(name)) {
+        //            return factory.lessOrEqual(e1, e2);
+        //        }
+        //        //		<xsd:element name="PropertyIsGreaterThanOrEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>		
+        //        else if ("PropertyIsGreaterThanOrEqualTo".equals(name)) {
+        //            return factory.greaterOrEqual(e1, e2);
+        //        } else {
+        //            throw new IllegalStateException(name);
+        //        }
+    }
 
-        //		<xsd:element name="PropertyIsEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
-        if ("PropertyIsEqualTo".equals(name)) {
-            return factory.equals(e1, e2);
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (OGC.expression.equals(name)) {
+            BinaryComparisonOperator op = (BinaryComparisonOperator) object;
+
+            return new Expression[] { op.getExpression1(), op.getExpression2() };
         }
-        //		<xsd:element name="PropertyIsNotEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
-        else if ("PropertyIsNotEqualTo".equals(name)) {
-            //TODO: add geoapi interface
-            return factory.not(factory.equals(e1, e2));
+
+        //filter 1.1 only
+        if ("matchCase".equals(name.getLocalPart())) {
+            BinaryComparisonOperator op = (BinaryComparisonOperator) object;
+
+            return Boolean.valueOf(op.isMatchingCase());
         }
-        //		<xsd:element name="PropertyIsLessThan" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
-        else if ("PropertyIsLessThan".equals(name)) {
-            return factory.less(e1, e2);
-        }
-        //		<xsd:element name="PropertyIsGreaterThan" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
-        else if ("PropertyIsGreaterThan".equals(name)) {
-            return factory.greater(e1, e2);
-        }
-        //		<xsd:element name="PropertyIsLessThanOrEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>
-        else if ("PropertyIsLessThanOrEqualTo".equals(name)) {
-            return factory.lessOrEqual(e1, e2);
-        }
-        //		<xsd:element name="PropertyIsGreaterThanOrEqualTo" substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/>		
-        else if ("PropertyIsGreaterThanOrEqualTo".equals(name)) {
-            return factory.greaterOrEqual(e1, e2);
-        } else {
-            throw new IllegalStateException(name);
-        }
+
+        return null;
     }
 }

@@ -21,6 +21,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
+import org.geotools.gml2.bindings.GML;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -69,27 +70,8 @@ public class OGCBBOXTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return OVERRIDE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
         return BBOX.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -106,5 +88,22 @@ public class OGCBBOXTypeBinding extends AbstractComplexBinding {
 
         return factory.bbox(propertyName.getPropertyName(), box.getMinX(), box.getMinY(),
             box.getMaxX(), box.getMaxY(), null);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        BBOX box = (BBOX) object;
+
+        //&lt;xsd:element ref="ogc:PropertyName"/&gt;
+        if (OGC.PropertyName.equals(name)) {
+            return factory.property(box.getPropertyName());
+        }
+
+        //&lt;xsd:element ref="gml:Box"/&gt;
+        if (GML.Box.equals(name)) {
+            return new Envelope(box.getMinX(), box.getMaxX(), box.getMinY(), box.getMaxY());
+        }
+
+        return null;
     }
 }

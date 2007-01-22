@@ -15,7 +15,6 @@
  */
 package org.geotools.filter.v1_0;
 
-import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
 import org.opengis.filter.expression.Expression;
 import org.geotools.xml.AbstractComplexBinding;
@@ -55,27 +54,8 @@ public class OGCLowerBoundaryTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return OVERRIDE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
         return Expression.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -87,5 +67,15 @@ public class OGCLowerBoundaryTypeBinding extends AbstractComplexBinding {
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         return node.getChildValue(Expression.class);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        //&lt;xsd:element ref="ogc:expression"/&gt;
+        if (OGC.expression.equals(name)) {
+            return object;
+        }
+
+        return null;
     }
 }

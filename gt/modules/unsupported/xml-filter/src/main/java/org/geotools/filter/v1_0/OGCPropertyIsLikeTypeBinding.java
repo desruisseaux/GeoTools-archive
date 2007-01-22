@@ -19,9 +19,9 @@ import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
-import org.geotools.filter.Filters;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -73,27 +73,8 @@ public class OGCPropertyIsLikeTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return OVERRIDE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
-        return PropertyIsBetween.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
+        return PropertyIsLike.class;
     }
 
     /**
@@ -104,15 +85,40 @@ public class OGCPropertyIsLikeTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        PropertyName propertyName = (PropertyName) node.getChildValue(PropertyName.class);
+        PropertyName name = (PropertyName) node.getChildValue(PropertyName.class);
         Literal literal = (Literal) node.getChildValue(Literal.class);
 
-        String wildCard = (String) node.getAttribute("wildCard").getValue();
-        String singleChar = (String) node.getAttribute("singleChar").getValue();
-        String escape = (String) node.getAttribute("escape").getValue();
+        String wildcard = (String) node.getAttributeValue("wildCard");
+        String single = (String) node.getAttributeValue("singleChar");
+        String escape = (String) node.getAttributeValue("escape");
 
-        //TODO: should the factory method take a literal object instead of a 
-        // string
-        return factory.like(propertyName, Filters.asString(literal), wildCard, singleChar, escape);
+        return factory.like(name, literal.toString(), wildcard, single, escape);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        PropertyIsLike isLike = (PropertyIsLike) object;
+
+        if (OGC.PropertyName.equals(name)) {
+            return isLike.getExpression();
+        }
+
+        if (OGC.Literal.equals(name)) {
+            return isLike.getLiteral();
+        }
+
+        if ("wildCard".equals(name.getLocalPart())) {
+            return isLike.getWildCard();
+        }
+
+        if ("singleChar".equals(name.getLocalPart())) {
+            return isLike.getSingleChar();
+        }
+
+        if ("escape".equals(name.getLocalPart())) {
+            return isLike.getEscape();
+        }
+
+        return null;
     }
 }

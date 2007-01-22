@@ -18,8 +18,12 @@ package org.geotools.filter.v1_0;
 import org.picocontainer.MutablePicoContainer;
 import java.util.HashSet;
 import javax.xml.namespace.QName;
+import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.Id;
+import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -66,16 +70,6 @@ public class OGCFilterTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return AFTER;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
         return Filter.class;
     }
@@ -107,5 +101,32 @@ public class OGCFilterTypeBinding extends AbstractComplexBinding {
         }
 
         return node.getChildValue(Filter.class);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Filter filter = (Filter) object;
+
+        //&lt;xsd:element ref="ogc:spatialOps"/&gt;
+        if (OGC.spatialOps.equals(name) && filter instanceof BinarySpatialOperator) {
+            return filter;
+        }
+
+        //&lt;xsd:element ref="ogc:comparisonOps"/&gt;
+        if (OGC.comparisonOps.equals(name) && filter instanceof BinaryComparisonOperator) {
+            return filter;
+        }
+
+        //&lt;xsd:element ref="ogc:logicOps"/&gt;
+        if (OGC.logicOps.equals(name) && filter instanceof BinaryLogicOperator) {
+            return filter;
+        }
+
+        //&lt;xsd:element maxOccurs="unbounded" ref="ogc:_Id"/&gt;
+        if (OGC.FeatureId.equals(name) && filter instanceof Id) {
+            return filter;
+        }
+
+        return null;
     }
 }

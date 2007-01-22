@@ -16,32 +16,25 @@
 package org.geotools.filter.v1_0;
 
 import javax.xml.namespace.QName;
+import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.filter.BinaryLogicOperator;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.PropertyIsNull;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.Not;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.geotools.filter.v1_1.OGC;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
 
 /**
- * Binding object for the type http://www.opengis.net/ogc:PropertyIsNullType.
+ * Binding object for the element http://www.opengis.net/ogc:Not.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:complexType name="PropertyIsNullType"&gt;
- *      &lt;xsd:complexContent&gt;
- *          &lt;xsd:extension base="ogc:ComparisonOpsType"&gt;
- *              &lt;xsd:choice&gt;
- *                  &lt;xsd:element ref="ogc:PropertyName"/&gt;
- *                  &lt;xsd:element ref="ogc:Literal"/&gt;
- *              &lt;/xsd:choice&gt;
- *          &lt;/xsd:extension&gt;
- *      &lt;/xsd:complexContent&gt;
- *  &lt;/xsd:complexType&gt;
+ *  &lt;xsd:element name="Not" substitutionGroup="ogc:logicOps" type="ogc:UnaryLogicOpType"/&gt;
  *
  *          </code>
  *         </pre>
@@ -49,18 +42,18 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class OGCPropertyIsNullTypeBinding extends AbstractComplexBinding {
-    private FilterFactory factory;
+public class OGCNotBinding extends AbstractComplexBinding {
+    FilterFactory filterfactory;
 
-    public OGCPropertyIsNullTypeBinding(FilterFactory factory) {
-        this.factory = factory;
+    public OGCNotBinding(FilterFactory filterfactory) {
+        this.filterfactory = filterfactory;
     }
 
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.PropertyIsNullType;
+        return OGC.Not;
     }
 
     /**
@@ -70,7 +63,7 @@ public class OGCPropertyIsNullTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return PropertyIsNull.class;
+        return Not.class;
     }
 
     /**
@@ -81,19 +74,25 @@ public class OGCPropertyIsNullTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return factory.isNull((Expression) node.getChildValue(Expression.class));
+        Filter filter = (Filter) node.getChildValue(Filter.class);
+
+        return filterfactory.not(filter);
     }
 
     public Object getProperty(Object object, QName name)
         throws Exception {
-        PropertyIsNull isNull = (PropertyIsNull) object;
+        Not not = (Not) object;
 
-        if (OGC.PropertyName.equals(name) && isNull.getExpression() instanceof PropertyName) {
-            return isNull.getExpression();
+        if (OGC.spatialOps.equals(name) && not.getFilter() instanceof BinarySpatialOperator) {
+            return not.getFilter();
         }
 
-        if (OGC.Literal.equals(name) && isNull.getExpression() instanceof Literal) {
-            return isNull.getExpression();
+        if (OGC.logicOps.equals(name) && not.getFilter() instanceof BinaryLogicOperator) {
+            return not.getFilter();
+        }
+
+        if (OGC.comparisonOps.equals(name) && not.getFilter() instanceof BinaryComparisonOperator) {
+            return not.getFilter();
         }
 
         return null;

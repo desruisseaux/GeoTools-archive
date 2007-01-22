@@ -69,16 +69,6 @@ public class OGCPropertyIsBetweenTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public int getExecutionMode() {
-        return OVERRIDE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Class getType() {
         return PropertyIsBetween.class;
     }
@@ -105,5 +95,27 @@ public class OGCPropertyIsBetweenTypeBinding extends AbstractComplexBinding {
         Expression u = (Expression) node.getChildValue(2);
 
         return factory.between(e, l, u);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        PropertyIsBetween between = (PropertyIsBetween) object;
+
+        //&lt;xsd:element ref="ogc:expression"/&gt;
+        if (OGC.expression.equals(name)) {
+            return between.getExpression();
+        }
+
+        //&lt;xsd:element name="LowerBoundary" type="ogc:LowerBoundaryType"/&gt;
+        if ("LowerBoundary".equals(name.getLocalPart())) {
+            return between.getLowerBoundary();
+        }
+
+        //&lt;xsd:element name="UpperBoundary" type="ogc:UpperBoundaryType"/&gt;
+        if ("UpperBoundary".equals(name.getLocalPart())) {
+            return between.getUpperBoundary();
+        }
+
+        return null;
     }
 }

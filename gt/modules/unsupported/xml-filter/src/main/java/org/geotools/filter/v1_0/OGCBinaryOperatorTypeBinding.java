@@ -18,6 +18,7 @@ package org.geotools.filter.v1_0;
 import org.picocontainer.MutablePicoContainer;
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.BinaryExpression;
 import org.opengis.filter.expression.Expression;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
@@ -77,7 +78,7 @@ public class OGCBinaryOperatorTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return Expression.class;
+        return BinaryExpression.class;
     }
 
     /**
@@ -98,32 +99,46 @@ public class OGCBinaryOperatorTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: replace this binding with element bindings
-        Expression e1 = (Expression) node.getChildValue(0);
-        Expression e2 = (Expression) node.getChildValue(1);
+        //implemented by element bindings
+        return null;
 
-        String name = instance.getName();
+        //        //TODO: replace this binding with element bindings
+        //        Expression e1 = (Expression) node.getChildValue(0);
+        //        Expression e2 = (Expression) node.getChildValue(1);
+        //
+        //        String name = instance.getName();
+        //
+        //        // <xsd:element name="Add" substitutionGroup="ogc:expression" type="ogc:BinaryOperatorType"/>
+        //        if ("Add".equals(name)) {
+        //            return factory.add(e1, e2);
+        //        }
+        //
+        //        // <xsd:element name="Sub" substitutionGroup="ogc:expression" type="ogc:BinaryOperatorType"/>
+        //        if ("Sub".equals(name)) {
+        //            return factory.subtract(e1, e2);
+        //        }
+        //
+        //        // <xsd:element name="Mul" substitutionGroup="ogc:expression" type="ogc:BinaryOperatorType"/>
+        //        if ("Mul".equals(name)) {
+        //            return factory.multiply(e1, e2);
+        //        }
+        //
+        //        // <xsd:element name="Div" substitutionGroup="ogc:expression" type="ogc:BinaryOperatorType"/>
+        //        if ("Div".equals(name)) {
+        //            return factory.divide(e1, e2);
+        //        }
+        //
+        //        throw new IllegalStateException("BinaryOpperatorType supports Add, Sub, Mul, Div");
+    }
 
-        // <xsd:element name="Add" substitutionGroup="ogc:expression" type="ogc:BinaryOperatorType"/>
-        if ("Add".equals(name)) {
-            return factory.add(e1, e2);
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        BinaryExpression binary = (BinaryExpression) object;
+
+        if (OGC.expression.equals(name)) {
+            return new Expression[] { binary.getExpression1(), binary.getExpression2() };
         }
 
-        // <xsd:element name="Sub" substitutionGroup="ogc:expression" type="ogc:BinaryOperatorType"/>
-        if ("Sub".equals(name)) {
-            return factory.subtract(e1, e2);
-        }
-
-        // <xsd:element name="Mul" substitutionGroup="ogc:expression" type="ogc:BinaryOperatorType"/>
-        if ("Mul".equals(name)) {
-            return factory.multiply(e1, e2);
-        }
-
-        // <xsd:element name="Div" substitutionGroup="ogc:expression" type="ogc:BinaryOperatorType"/>
-        if ("Div".equals(name)) {
-            return factory.divide(e1, e2);
-        }
-
-        throw new IllegalStateException("BinaryOpperatorType supports Add, Sub, Mul, Div");
+        return null;
     }
 }

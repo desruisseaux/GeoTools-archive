@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter.v1_1;
+package org.geotools.filter.v1_0;
 
 import org.w3c.dom.Document;
 import org.opengis.filter.BinaryComparisonOperator;
@@ -26,7 +26,7 @@ import org.opengis.filter.PropertyIsNotEqualTo;
 import org.geotools.xml.Binding;
 
 
-public class BinaryComparisonOpTypeBindingTest extends org.geotools.filter.v1_0.BinaryComparisonOpTypeBindingTest {
+public class BinaryComparisonOpTypeBindingTest extends FilterTestSupport {
     public void testBinaryComparisonOpType() {
         assertEquals(BinaryComparisonOperator.class, binding(OGC.BinaryComparisonOpType).getType());
     }

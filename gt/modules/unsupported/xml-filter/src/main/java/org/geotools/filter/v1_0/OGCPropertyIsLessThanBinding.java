@@ -17,31 +17,21 @@ package org.geotools.filter.v1_0;
 
 import javax.xml.namespace.QName;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
 
 
 /**
- * Binding object for the type http://www.opengis.net/ogc:PropertyIsNullType.
+ * Binding object for the element http://www.opengis.net/ogc:PropertyIsLessThan.
  *
  * <p>
  *        <pre>
  *         <code>
- *  &lt;xsd:complexType name="PropertyIsNullType"&gt;
- *      &lt;xsd:complexContent&gt;
- *          &lt;xsd:extension base="ogc:ComparisonOpsType"&gt;
- *              &lt;xsd:choice&gt;
- *                  &lt;xsd:element ref="ogc:PropertyName"/&gt;
- *                  &lt;xsd:element ref="ogc:Literal"/&gt;
- *              &lt;/xsd:choice&gt;
- *          &lt;/xsd:extension&gt;
- *      &lt;/xsd:complexContent&gt;
- *  &lt;/xsd:complexType&gt;
+ *  &lt;xsd:element name="PropertyIsLessThan"
+ *      substitutionGroup="ogc:comparisonOps" type="ogc:BinaryComparisonOpType"/&gt;
  *
  *          </code>
  *         </pre>
@@ -49,18 +39,18 @@ import org.geotools.xml.Node;
  *
  * @generated
  */
-public class OGCPropertyIsNullTypeBinding extends AbstractComplexBinding {
-    private FilterFactory factory;
+public class OGCPropertyIsLessThanBinding extends AbstractComplexBinding {
+    FilterFactory filterfactory;
 
-    public OGCPropertyIsNullTypeBinding(FilterFactory factory) {
-        this.factory = factory;
+    public OGCPropertyIsLessThanBinding(FilterFactory filterfactory) {
+        this.filterfactory = filterfactory;
     }
 
     /**
      * @generated
      */
     public QName getTarget() {
-        return OGC.PropertyIsNullType;
+        return OGC.PropertyIsLessThan;
     }
 
     /**
@@ -70,7 +60,11 @@ public class OGCPropertyIsNullTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return PropertyIsNull.class;
+        return PropertyIsLessThan.class;
+    }
+
+    public int getExecutionMode() {
+        return AFTER;
     }
 
     /**
@@ -81,21 +75,9 @@ public class OGCPropertyIsNullTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        return factory.isNull((Expression) node.getChildValue(Expression.class));
-    }
+        Expression e1 = (Expression) node.getChildValue(0);
+        Expression e2 = (Expression) node.getChildValue(1);
 
-    public Object getProperty(Object object, QName name)
-        throws Exception {
-        PropertyIsNull isNull = (PropertyIsNull) object;
-
-        if (OGC.PropertyName.equals(name) && isNull.getExpression() instanceof PropertyName) {
-            return isNull.getExpression();
-        }
-
-        if (OGC.Literal.equals(name) && isNull.getExpression() instanceof Literal) {
-            return isNull.getExpression();
-        }
-
-        return null;
+        return filterfactory.less(e1, e2);
     }
 }
