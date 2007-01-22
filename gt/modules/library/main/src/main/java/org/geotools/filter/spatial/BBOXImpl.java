@@ -82,8 +82,8 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 		return maxy;
 	}
 	
-	public void setMaxY(double miny) {
-		this.miny = miny;
+	public void setMaxY(double maxy) {
+		this.maxy = maxy;
 	}
 	
 	public boolean evaluate(Feature feature) {
