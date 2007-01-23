@@ -15,7 +15,9 @@
  */
 package org.geotools.data;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -113,18 +115,19 @@ public class DataUtilitiesTest extends DataTestCase {
         equal.addRightValue(id);
         names = DataUtilities.attributeNames(equal);
         assertEquals(2, names.length);
-        assertEquals("name", names[0]);
-        assertEquals("id", names[1]);
-
+        List list = Arrays.asList(names);
+        assertTrue(list.contains("name"));
+        assertTrue(list.contains("id"));
+ 
         FunctionExpression fnCall = factory.createFunctionExpression("Max");
         fnCall.setArgs(new Expression[] { id, name });
 
         LikeFilter fn = factory.createLikeFilter();
         fn.setValue(fnCall);
         names = DataUtilities.attributeNames(fn);
-        assertEquals(2, names.length);
-        assertEquals("name", names[0]);
-        assertEquals("id", names[1]);
+        list = Arrays.asList(names);
+        assertTrue(list.contains("name"));
+        assertTrue(list.contains("id"));
 
         BetweenFilter between = factory.createBetweenFilter();
         between.addLeftValue(id);
@@ -132,18 +135,20 @@ public class DataUtilitiesTest extends DataTestCase {
         between.addRightValue(geom);
         names = DataUtilities.attributeNames(between);
         assertEquals(3, names.length);
-        assertEquals("geom", names[0]);
-        assertEquals("name", names[1]);
-        assertEquals("id", names[2]);
+        list = Arrays.asList(names);
+        assertTrue(list.contains("name"));
+        assertTrue(list.contains("id"));
+        assertTrue(list.contains("geom"));
         
         // check logic filter
         NullFilter geomNull = factory.createNullFilter();
         geomNull.nullCheckValue(geom);
         names = DataUtilities.attributeNames(geomNull.and(equal));
         assertEquals(3, names.length);
-        assertEquals("geom", names[0]);
-        assertEquals("name", names[1]);
-        assertEquals("id", names[2]);
+        list = Arrays.asList(names);
+        assertTrue(list.contains("name"));
+        assertTrue(list.contains("id"));
+        assertTrue(list.contains("geom"));
         
         // check not filter
         names = DataUtilities.attributeNames(geomNull.not());

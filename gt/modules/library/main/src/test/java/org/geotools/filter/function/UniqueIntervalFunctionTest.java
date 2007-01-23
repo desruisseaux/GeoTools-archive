@@ -15,6 +15,7 @@
  */
 package org.geotools.filter.function;
 
+import java.util.Arrays;
 import org.geotools.filter.Expression;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FunctionExpression;
@@ -89,7 +90,8 @@ public class UniqueIntervalFunctionTest extends FunctionTestSupport {
         assertTrue(result instanceof ExplicitClassifier);
         ExplicitClassifier classifier = (ExplicitClassifier) result;
         assertEquals(2, classifier.getSize());
-        assertEquals("90, 4, 8, 43", classifier.getTitle(0));
-        assertEquals("61, 29, 20, 12", classifier.getTitle(1));
+        assertEquals(classifier.values[0].size(), classifier.values[1].size());
+        assertFalse(classifier.values[0].removeAll(classifier.values[1]));
+        
     }
 }
