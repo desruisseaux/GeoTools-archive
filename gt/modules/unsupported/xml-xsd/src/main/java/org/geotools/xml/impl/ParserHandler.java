@@ -409,7 +409,7 @@ public class ParserHandler extends DefaultHandler {
         bindingLoader = new BindingLoader();
         bindingWalker = new BindingWalker( bindingLoader );
 
-        //configure the strategy objects
+        //configure the bindings
         MutablePicoContainer container = bindingLoader.getContainer(); 
         container = config.setupBindings( container );
         bindingLoader.setContainer( container );

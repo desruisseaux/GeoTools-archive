@@ -15,6 +15,8 @@
  */
 package org.geotools.xml;
 
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import org.picocontainer.MutablePicoContainer;
@@ -141,4 +143,33 @@ public interface ComplexBinding extends Binding {
      * @return The value of the property, or <code>null</code>.
      */
     Object getProperty(Object object, QName name) throws Exception;
+    
+    /**
+     * Returns a list of properties of the specified object.
+     * <p>
+     * The return list contains a set of {@link QName}, {@link Object} tuples,
+     * each as a two element object array.
+     * </p>
+     * <p>
+     * This method should only be implemented in the case where the encoder 
+     * can not determine what the properties of the object are from the schema.
+     * </p>
+     * <p>
+     * An example would be an object which corresponds to an element in the 
+     * schema which has a the type <code>xs:anyType</code>. Since the content
+     * of this type can be anything the schema has no way to determine what 
+     * the properties are. So in this case this method must specify the 
+     * properties manually as a set of name, object tuples.
+     * </p>
+     * <p>
+     * In the case of a multi-valued property, this method must return a tuple
+     * for each instance of the property, and not a list, iterator, or array
+     * containing all of the instances.
+     * </p>
+     * @param object the object being encoded.
+     * 
+     * @return A list of the properties for the object.
+     *
+     */
+    List/*Object[QName,Object]*/ getProperties( Object object ) throws Exception;
 }

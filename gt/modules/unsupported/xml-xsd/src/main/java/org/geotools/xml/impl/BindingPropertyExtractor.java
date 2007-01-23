@@ -1,12 +1,18 @@
 package org.geotools.xml.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.collections.MultiHashMap;
+import org.apache.commons.collections.MultiMap;
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDParticle;
 import org.geotools.xml.Encoder;
 import org.geotools.xml.PropertyExtractor;
@@ -41,9 +47,11 @@ public class BindingPropertyExtractor implements PropertyExtractor {
 	
 	public List properties(Object object, XSDElementDeclaration element) {
 		
+		List properties = new ArrayList();
+		
+		//first get all the properties that can be infered from teh schema
 		List children = encoder.getSchemaIndex().getChildElementParticles( element );
 		
-		List properties = new ArrayList();
 	O:	for (Iterator itr = children.iterator(); itr.hasNext();) {
 			XSDParticle particle = (XSDParticle) itr.next();
 			XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
@@ -61,6 +69,80 @@ public class BindingPropertyExtractor implements PropertyExtractor {
 				properties.add( new Object[] { particle, executor.getChildObject() });
 			}
 		}
+		
+		//second, get the properties which cannot be infereed from the schema
+		GetPropertiesExecutor executor = new GetPropertiesExecutor( object );
+		encoder.getBindingWalker().walk( element, executor, context );
+		
+		if ( !executor.getProperties().isEmpty() ) {
+			//group into a map of name, list
+			MultiHashMap map = new MultiHashMap();
+			for ( Iterator p = executor.getProperties().iterator(); p.hasNext(); ) {
+				Object[] property = (Object[]) p.next();
+				map.put( property[ 0 ], property[ 1 ] );
+			}
+			
+			//turn each map entry into a particle
+			HashMap particles = new HashMap();
+			for ( Iterator e = map.entrySet().iterator(); e.hasNext(); ) {
+				Map.Entry entry = (Map.Entry) e.next();
+				QName name = (QName) entry.getKey();
+				Collection values = (Collection) entry.getValue();
+				
+				//find hte element 
+				XSDElementDeclaration elementDecl = 
+					encoder.getSchemaIndex().getElementDeclaration( name );
+				if ( elementDecl == null ) {
+					//TODO: resolving like this will return an element no 
+					// matter what, modifying the underlying schema, this might
+					// be dangerous. What we shold do is force the schema to 
+					// resolve all of it simports when the encoder starts
+					elementDecl = 
+						encoder.getSchema().resolveElementDeclaration( name.getNamespaceURI(), name.getLocalPart() );
+				}
+				
+				//wrap it in a particle
+				XSDParticle particle = XSDFactory.eINSTANCE.createXSDParticle();
+				particle.setContent( elementDecl );
+				
+				if ( values.size() > 1 ) {
+					//make a multi property
+					particle.setMaxOccurs( -1 );
+				}
+				else {
+					//single property
+					particle.setMaxOccurs( 1 );
+				}
+				
+				particles.put( name, particle );
+			}
+			
+			//process the particles in order in which we got the properties
+			for ( Iterator p = executor.getProperties().iterator(); p.hasNext(); ) {
+				Object[] property = (Object[]) p.next();
+				QName name = (QName) property[ 0 ];
+				
+				XSDParticle particle = (XSDParticle) particles.get( name );
+				if ( particle == null ) {
+					continue;	//already processed, must be a multi property
+				}
+				
+				Collection values = (Collection) map.get( name );
+				if ( values.size() > 1 ) {
+					//add as is, the encoder will unwrap
+					properties.add( new Object[] { particle, values });
+				}
+				else {
+					//unwrap it
+					properties.add( new Object[] { particle, values.iterator().next() } ); 
+				}
+				
+				//done with this particle
+				particles.remove( name );
+			}
+			
+		}
+		
 		
 		return properties;
 	}
