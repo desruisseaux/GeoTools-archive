@@ -15,14 +15,10 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.math.BigDecimal;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -63,17 +59,7 @@ public class GMLCoordTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.COORDTYPE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
+        return GML.CoordType;
     }
 
     /**
@@ -83,16 +69,7 @@ public class GMLCoordTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return CoordinateSequence.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
+        return Coordinate.class;
     }
 
     /**
@@ -122,18 +99,25 @@ public class GMLCoordTypeBinding extends AbstractComplexBinding {
             z = ((BigDecimal) node.getChild("Z").getValue()).doubleValue();
         }
 
-        //create a coordinate sequence with a single coordinate in it
-        CoordinateSequence seq = csFactory.create(1, dimension);
-        seq.setOrdinate(0, CoordinateSequence.X, x);
+        return new Coordinate(x, y, z);
+    }
 
-        if (y != Double.NaN) {
-            seq.setOrdinate(0, CoordinateSequence.Y, y);
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Coordinate c = (Coordinate) object;
+
+        if ("X".equals(name.getLocalPart())) {
+            return new Double(c.x);
         }
 
-        if (z != Double.NaN) {
-            seq.setOrdinate(0, CoordinateSequence.Z, z);
+        if ("Y".equals(name.getLocalPart())) {
+            return new Double(c.y);
         }
 
-        return seq;
+        if ("Z".equals(name.getLocalPart()) && !new Double(c.z).isNaN()) {
+            return new Double(c.z);
+        }
+
+        return null;
     }
 }

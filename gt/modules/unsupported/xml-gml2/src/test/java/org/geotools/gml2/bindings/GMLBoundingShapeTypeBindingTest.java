@@ -15,47 +15,50 @@
  */
 package org.geotools.gml2.bindings;
 
+import org.w3c.dom.Document;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
+import org.geotools.xml.Binding;
 
 
-public class GMLBoundingShapeTypeBindingTest extends AbstractGMLBindingTest {
-    ElementInstance boundingShape;
-    ElementInstance box;
-    ElementInstance nil;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        boundingShape = createElement(GML.NAMESPACE, "myBoundingShape", GML.BOUNDINGSHAPETYPE, null);
-        box = createElement(GML.NAMESPACE, "Box", GML.BOXTYPE, null);
-        nil = createElement(GML.NAMESPACE, "null", GML.NULLTYPE, null);
+public class GMLBoundingShapeTypeBindingTest extends GMLTestSupport {
+    public void testType() {
+        assertEquals(Envelope.class, binding(GML.BoundingShapeType).getType());
     }
 
-    public void testWithBox() throws Exception {
-        Envelope e = new Envelope();
-        e.expandToInclude(1, 2);
-
-        Node node = createNode(boundingShape, new ElementInstance[] { box }, new Object[] { e },
-                null, null);
-
-        GMLBoundingShapeTypeBinding s = (GMLBoundingShapeTypeBinding) getBinding(GML.BOUNDINGSHAPETYPE);
-
-        Envelope e1 = (Envelope) s.parse(boundingShape, node, null);
-        assertNotNull(e1);
-
-        assertEquals(e1, e);
+    public void testExecutionMode() {
+        assertEquals(Binding.OVERRIDE, binding(GML.BoundingShapeType).getExecutionMode());
     }
 
-    public void testWithNull() throws Exception {
-        Node node = createNode(boundingShape, new ElementInstance[] { nil },
-                new Object[] { "unknown" }, null, null);
+    public void testParseWithBox() throws Exception {
+        GML2MockData.boundedBy(document, document);
 
-        GMLBoundingShapeTypeBinding s = (GMLBoundingShapeTypeBinding) getBinding(GML.BOUNDINGSHAPETYPE);
+        Envelope envelope = (Envelope) parse();
 
-        Envelope e1 = (Envelope) s.parse(boundingShape, node, null);
-        assertNotNull(e1);
-        assertTrue(e1.isNull());
+        assertFalse(envelope.isNull());
+    }
+
+    public void testParseWithNull() throws Exception {
+        GML2MockData.boundedByWithNull(document, document);
+
+        Envelope envelope = (Envelope) parse();
+
+        assertTrue(envelope.isNull());
+    }
+
+    public void testEncodeWithBox() throws Exception {
+        Envelope envelope = new Envelope(1, 2, 3, 4);
+        Document doc = encode(envelope, GML.boundedBy);
+
+        assertEquals(1,
+            doc.getElementsByTagNameNS(GML.NAMESPACE, GML.Box.getLocalPart()).getLength());
+    }
+
+    public void testEncodeWithNull() throws Exception {
+        Envelope envelope = new Envelope();
+        envelope.setToNull();
+
+        Document doc = encode(envelope, GML.boundedBy);
+
+        assertEquals(1, doc.getElementsByTagNameNS(GML.NAMESPACE, "null").getLength());
     }
 }

@@ -16,34 +16,17 @@
 package org.geotools.gml2.bindings;
 
 import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDTypeDefinition;
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.net.URI;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultFeatureTypeFactory;
+import com.vividsolutions.jts.geom.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureFactory;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.gml2.FeatureTypeCache;
-import org.geotools.xml.*;
-import org.geotools.xs.bindings.XS;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.BindingWalkerFactory;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -77,68 +60,22 @@ import org.geotools.xs.bindings.XS;
  * @generated
  */
 public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
-    //JD: TODO: This should be part of the framework, make it part of the binding
-    // class to publish the type of objects they create
-    //JD: Why not just use Binding#getType() ?
-    /** map of xsd type to java class **/
-    private static Map typeMap = new HashMap();
-
-    static {
-        typeMap.put(XS.STRING, String.class);
-        typeMap.put(XS.INT, Integer.class);
-        typeMap.put(XS.INTEGER, Integer.class);
-        typeMap.put(XS.DECIMAL, Double.class);
-        typeMap.put(XS.DOUBLE, Double.class);
-        typeMap.put(XS.FLOAT, Float.class);
-        typeMap.put(XS.SHORT, Short.class);
-        typeMap.put(XS.DATE, Calendar.class);
-        typeMap.put(XS.DATETIME, Calendar.class);
-        typeMap.put(XS.TIME, Calendar.class);
-        typeMap.put(XS.BOOLEAN, Boolean.class);
-        typeMap.put(XS.LONG, Long.class);
-
-        typeMap.put(GML.POINTMEMBERTYPE, Point.class);
-        typeMap.put(GML.POINTPROPERTYTYPE, Point.class);
-        typeMap.put(GML.POINTTYPE, Point.class);
-        typeMap.put(GML.LINESTRINGMEMBERTYPE, LineString.class);
-        typeMap.put(GML.LINESTRINGPROPERTYTYPE, LineString.class);
-        typeMap.put(GML.LINESTRINGTYPE, LineString.class);
-        typeMap.put(GML.LINEARRINGMEMBERTYPE, LinearRing.class);
-        typeMap.put(GML.LINEARRINGTYPE, LinearRing.class);
-        typeMap.put(GML.POLYGONMEMBERTYPE, Polygon.class);
-        typeMap.put(GML.POLYGONPROPERTYTYPE, Polygon.class);
-        typeMap.put(GML.POLYGONTYPE, Polygon.class);
-
-        typeMap.put(GML.MULTIGEOMETRYPROPERTYTYPE, GeometryCollection.class);
-        typeMap.put(GML.MULTIPOINTPROPERTYTYPE, MultiPoint.class);
-        typeMap.put(GML.MULTIPOINTTYPE, MultiPoint.class);
-        typeMap.put(GML.MULTILINESTRINGPROPERTYTYPE, MultiLineString.class);
-        typeMap.put(GML.MULTIPOLYGONPROPERTYTYPE, MultiPolygon.class);
-        typeMap.put(GML.MULTIPOLYGONTYPE, MultiPolygon.class);
-        typeMap.put(GML.FEATUREASSOCIATIONTYPE, Feature.class);
-    }
-
+    /** Cache of feature types */
     FeatureTypeCache ftCache;
 
-    public GMLAbstractFeatureTypeBinding(FeatureTypeCache ftCache) {
+    /** factory for loading bindings */
+    BindingWalkerFactory bwFactory;
+
+    public GMLAbstractFeatureTypeBinding(FeatureTypeCache ftCache, BindingWalkerFactory bwFactory) {
         this.ftCache = ftCache;
+        this.bwFactory = bwFactory;
     }
 
     /**
      * @generated
      */
     public QName getTarget() {
-        return GML.ABSTRACTFEATURETYPE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
+        return GML.AbstractFeatureType;
     }
 
     /**
@@ -148,16 +85,7 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return FeatureType.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
+        return Feature.class;
     }
 
     /**
@@ -175,61 +103,46 @@ public class GMLAbstractFeatureTypeBinding extends AbstractComplexBinding {
         FeatureType fType = ftCache.get(decl.getName());
 
         if (fType == null) {
-            FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
-            ftBuilder.setName(decl.getName());
-            ftBuilder.setNamespace(new URI(decl.getTargetNamespace()));
-
-            //build the feaure type by walking through the elements of the 
-            // actual xml schema type
-            List children = Schemas.getChildElementDeclarations(decl);
-
-            for (Iterator itr = children.iterator(); itr.hasNext();) {
-                XSDElementDeclaration property = (XSDElementDeclaration) itr.next();
-
-                //ignore the attributes provided by gml, change this for new feature model
-                if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
-                    if ("boundedBy".equals(property.getName())) {
-                        continue;
-                    }
-
-                    if ("name".equals(property.getName())) {
-                        continue;
-                    }
-
-                    if ("description".equals(property.getName())) {
-                        continue;
-                    }
-                }
-
-                XSDTypeDefinition type = property.getType();
-
-                QName qName = new QName(type.getTargetNamespace(), type.getName());
-
-                Class theClass = (Class) typeMap.get(qName);
-
-                if (theClass == null) {
-                    throw new RuntimeException("Could not find class for " + qName);
-                }
-
-                //call method with most parameter
-                ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));
-            }
-
-            fType = ftBuilder.getFeatureType();
+            fType = GML2ParsingUtils.featureType(decl, bwFactory);
             ftCache.put(fType);
         }
 
         //fid
         String fid = (String) node.getAttributeValue("fid");
 
-        //create the feature
-        Feature f = fType.create(new Object[fType.getAttributeCount()], fid);
+        //create feature
+        return GML2ParsingUtils.feature(fType, fid, node);
+    }
 
-        for (Iterator itr = node.getChildren().iterator(); itr.hasNext();) {
-            Node child = (Node) itr.next();
-            f.setAttribute(child.getComponent().getName(), child.getValue());
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Feature feature = (Feature) object;
+
+        if (GML.name.equals(name)) {
+            return feature.getAttribute("name");
         }
 
-        return f;
+        if (GML.description.equals(name)) {
+            return feature.getAttribute("description");
+        }
+
+        if (GML.boundedBy.equals(name)) {
+            Envelope bounds = feature.getBounds();
+
+            if (bounds instanceof ReferencedEnvelope) {
+                return bounds;
+            }
+
+            CoordinateReferenceSystem crs = (feature.getFeatureType().getDefaultGeometry() != null)
+                ? feature.getFeatureType().getDefaultGeometry().getCoordinateSystem() : null;
+
+            return new ReferencedEnvelope(bounds, crs);
+        }
+
+        if (feature.getFeatureType().getAttributeType(name.getLocalPart()) != null) {
+            return feature.getAttribute(name.getLocalPart());
+        }
+
+        return null;
     }
 }

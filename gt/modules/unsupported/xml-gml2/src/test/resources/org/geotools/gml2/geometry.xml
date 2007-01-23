@@ -1,6 +1,6 @@
 <gml:MultiGeometry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:gml="http://www.opengis.net/gml"
-	xsi:schemaLocation="http://www.opengis.net/gml geometry.xsd" srsName="">
+	xsi:schemaLocation="http://www.opengis.net/gml geometry.xsd">
 
 	<gml:pointMember>
 		<gml:Point>

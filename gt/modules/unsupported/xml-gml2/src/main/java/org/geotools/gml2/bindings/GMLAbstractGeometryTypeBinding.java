@@ -15,16 +15,15 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.net.URI;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.CRS;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -94,15 +93,6 @@ public class GMLAbstractGeometryTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         if (value instanceof Geometry) {
@@ -124,5 +114,18 @@ public class GMLAbstractGeometryTypeBinding extends AbstractComplexBinding {
         }
 
         return value;
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if ("srsName".equals(name.getLocalPart())) {
+            Geometry geometry = (Geometry) object;
+
+            if (geometry.getUserData() instanceof CoordinateReferenceSystem) {
+                return GML2EncodingUtils.crs((CoordinateReferenceSystem) geometry.getUserData());
+            }
+        }
+
+        return null;
     }
 }

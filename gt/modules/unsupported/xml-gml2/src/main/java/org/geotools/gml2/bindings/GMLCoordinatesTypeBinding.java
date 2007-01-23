@@ -15,14 +15,13 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -70,17 +69,7 @@ public class GMLCoordinatesTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.COORDINATESTYPE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
+        return GML.CoordinatesType;
     }
 
     /**
@@ -91,15 +80,6 @@ public class GMLCoordinatesTypeBinding extends AbstractComplexBinding {
      */
     public Class getType() {
         return CoordinateSequence.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**
@@ -183,5 +163,36 @@ public class GMLCoordinatesTypeBinding extends AbstractComplexBinding {
         }
 
         return seq;
+    }
+
+    public Element encode(Object object, Document document, Element value)
+        throws Exception {
+        CoordinateSequence coordinates = (CoordinateSequence) object;
+        StringBuffer buf = new StringBuffer();
+
+        for (int i = 0; i < coordinates.size(); i++) {
+            Coordinate c = coordinates.getCoordinate(i);
+            buf.append(c.x);
+
+            boolean y = (coordinates.getDimension() > 1) && !new Double(c.y).isNaN();
+
+            if (y) {
+                buf.append("," + c.y);
+            }
+
+            boolean z = y && (coordinates.getDimension() > 2) && !new Double(c.z).isNaN();
+
+            if (z) {
+                buf.append("," + c.z);
+            }
+
+            if (i < (coordinates.size() - 1)) {
+                buf.append(" ");
+            }
+        }
+
+        value.appendChild(document.createTextNode(buf.toString()));
+
+        return value;
     }
 }

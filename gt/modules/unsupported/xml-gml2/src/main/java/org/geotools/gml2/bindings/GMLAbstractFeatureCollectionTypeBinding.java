@@ -15,13 +15,12 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -55,7 +54,7 @@ public class GMLAbstractFeatureCollectionTypeBinding extends AbstractComplexBind
      * @generated
      */
     public QName getTarget() {
-        return GML.ABSTRACTFEATURECOLLECTIONTYPE;
+        return GML.AbstractFeatureCollectionType;
     }
 
     /**
@@ -76,15 +75,6 @@ public class GMLAbstractFeatureCollectionTypeBinding extends AbstractComplexBind
      */
     public Class getType() {
         return FeatureCollection.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**

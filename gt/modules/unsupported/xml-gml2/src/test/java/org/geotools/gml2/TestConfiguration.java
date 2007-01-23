@@ -18,8 +18,6 @@ package org.geotools.gml2;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.picocontainer.MutablePicoContainer;
-import java.net.MalformedURLException;
-import java.net.URL;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
 

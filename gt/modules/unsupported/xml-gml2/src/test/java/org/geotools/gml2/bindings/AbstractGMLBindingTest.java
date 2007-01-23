@@ -38,8 +38,7 @@ import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
-import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.SchemaException;
+import org.geotools.gml2.GMLConfiguration;
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
 import org.geotools.xml.ElementInstance;
@@ -58,13 +57,13 @@ public class AbstractGMLBindingTest extends TestCase {
     AttributeTypeFactory attFactory;
 
     protected void setUp() throws Exception {
-        String loc = GMLSchemaLocationResolver.class.getResource("feature.xsd").toString();
+        String loc = GMLConfiguration.class.getResource("feature.xsd").toString();
 
-        schema = Schemas.parse(loc, null,
-                new XSDSchemaLocationResolver[] { new GMLSchemaLocationResolver() });
+        GMLConfiguration configuration = new GMLConfiguration();
+        schema = configuration.schema();
         container = new DefaultPicoContainer();
 
-        new GMLBindingConfiguration().configure(container);
+        configuration.getBindingConfiguration().configure(container);
 
         ftBuilder = new DefaultFeatureTypeFactory();
         attFactory = new DefaultAttributeTypeFactory();

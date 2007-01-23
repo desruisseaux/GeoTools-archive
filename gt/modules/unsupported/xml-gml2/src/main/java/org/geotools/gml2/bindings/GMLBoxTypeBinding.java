@@ -15,14 +15,11 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.util.List;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -62,17 +59,7 @@ public class GMLBoxTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.BOXTYPE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
+        return GML.BoxType;
     }
 
     /**
@@ -87,15 +74,6 @@ public class GMLBoxTypeBinding extends AbstractComplexBinding {
 
     /**
      * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
-    }
-
-    /**
-     * <!-- begin-user-doc -->
      * This method returns an object of type
      * @link com.vividsolutions.jts.geom.Envelope.
      * <!-- end-user-doc -->
@@ -104,17 +82,15 @@ public class GMLBoxTypeBinding extends AbstractComplexBinding {
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        Envelope e = null;
-
         List coordinates = node.getChildren("coord");
 
         if (!coordinates.isEmpty() && (coordinates.size() == 2)) {
             Node n1 = (Node) coordinates.get(0);
             Node n2 = (Node) coordinates.get(1);
-            CoordinateSequence c1 = (CoordinateSequence) n1.getValue();
-            CoordinateSequence c2 = (CoordinateSequence) n2.getValue();
+            Coordinate c1 = (Coordinate) n1.getValue();
+            Coordinate c2 = (Coordinate) n2.getValue();
 
-            return new Envelope(c1.getX(0), c2.getX(0), c1.getY(0), c2.getY(0) );
+            return new Envelope(c1.x, c2.x, c1.y, c2.y);
         }
 
         if (!coordinates.isEmpty()) {
@@ -128,9 +104,22 @@ public class GMLBoxTypeBinding extends AbstractComplexBinding {
                 throw new RuntimeException("Envelope can have only two coordinates");
             }
 
-            return new Envelope(cs.getX(0),cs.getX(1),cs.getY(0),cs.getY(1) );
+            return new Envelope(cs.getX(0), cs.getX(1), cs.getY(0), cs.getY(1));
         }
 
         throw new RuntimeException("Could not find coordinates for envelope");
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Envelope e = (Envelope) object;
+
+        if (GML.coord.equals(name)) {
+            return new Coordinate[] {
+                new Coordinate(e.getMinX(), e.getMinY()), new Coordinate(e.getMaxX(), e.getMaxY())
+            };
+        }
+
+        return null;
     }
 }

@@ -15,15 +15,14 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -66,7 +65,7 @@ public class GMLMultiPolygonTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.MULTIPOLYGONTYPE;
+        return GML.MultiPolygonType;
     }
 
     /**
@@ -96,15 +95,6 @@ public class GMLMultiPolygonTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         GeometryCollection gc = (GeometryCollection) value;
@@ -114,6 +104,18 @@ public class GMLMultiPolygonTypeBinding extends AbstractComplexBinding {
             polygons[i] = (Polygon) gc.getGeometryN(i);
         }
 
-        return gFactory.createMultiPolygon(polygons);
+        MultiPolygon multiPolygon = gFactory.createMultiPolygon(polygons);
+        multiPolygon.setUserData(gc.getUserData());
+
+        return multiPolygon;
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.polygonMember.equals(name)) {
+            return GML2ParsingUtils.asCollection((MultiPolygon) object);
+        }
+
+        return null;
     }
 }

@@ -15,12 +15,8 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -56,17 +52,7 @@ public class GMLBoundingShapeTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.BOUNDINGSHAPETYPE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
+        return GML.BoundingShapeType;
     }
 
     /**
@@ -76,16 +62,7 @@ public class GMLBoundingShapeTypeBinding extends AbstractComplexBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
+        return Envelope.class;
     }
 
     /**
@@ -107,5 +84,20 @@ public class GMLBoundingShapeTypeBinding extends AbstractComplexBinding {
 
         //has to be a valid bounding box
         return (Envelope) node.getChildValue(0);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Envelope e = (Envelope) object;
+
+        if (GML.Box.equals(name) && !e.isNull()) {
+            return e;
+        }
+
+        if ("null".equals(name.getLocalPart()) && e.isNull()) {
+            return e;
+        }
+
+        return null;
     }
 }

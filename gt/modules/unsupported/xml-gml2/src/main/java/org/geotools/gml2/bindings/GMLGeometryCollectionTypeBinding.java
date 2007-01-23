@@ -15,9 +15,6 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,7 +22,9 @@ import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -68,17 +67,11 @@ public class GMLGeometryCollectionTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.GEOMETRYCOLLECTIONTYPE;
+        return GML.GeometryCollectionType;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public int getExecutionMode() {
-        return AFTER;
+        return BEFORE;
     }
 
     /**
@@ -89,15 +82,6 @@ public class GMLGeometryCollectionTypeBinding extends AbstractComplexBinding {
      */
     public Class getType() {
         return GeometryCollection.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**

@@ -16,20 +16,11 @@
 package org.geotools.gml2;
 
 import junit.framework.TestCase;
-import org.w3c.dom.Document;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.Feature;
 import org.geotools.gml2.bindings.GML;
-import org.geotools.xml.Parser;
 import org.geotools.xml.StreamingParser;
 
 

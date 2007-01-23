@@ -15,12 +15,8 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
-import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -58,7 +54,7 @@ public class GMLMultiGeometryPropertyTypeBinding extends AbstractComplexBinding 
      * @generated
      */
     public QName getTarget() {
-        return GML.MULTIGEOMETRYPROPERTYTYPE;
+        return GML.MultiGeometryPropertyType;
     }
 
     /**
@@ -78,16 +74,7 @@ public class GMLMultiGeometryPropertyTypeBinding extends AbstractComplexBinding 
      * @generated modifiable
      */
     public Class getType() {
-        return null;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
+        return GeometryCollection.class;
     }
 
     /**

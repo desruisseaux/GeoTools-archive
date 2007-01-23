@@ -40,10 +40,7 @@ public class GMLBoxTypeBindingTest extends AbstractGMLBindingTest {
 
     public void testTwoCoord() throws Exception {
         Node node = createNode(box, new ElementInstance[] { coord1, coord2 },
-                new Object[] {
-                    createCoordinateSequence(new Coordinate(1, 2)),
-                    createCoordinateSequence(new Coordinate(3, 4))
-                }, null, null);
+                new Object[] { new Coordinate(1, 2), new Coordinate(3, 4) }, null, null);
 
         GMLBoxTypeBinding s = (GMLBoxTypeBinding) getBinding(GML.BOXTYPE);
         Envelope e = (Envelope) s.parse(box, node, null);

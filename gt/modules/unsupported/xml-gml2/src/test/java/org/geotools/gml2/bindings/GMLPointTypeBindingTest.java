@@ -44,7 +44,7 @@ public class GMLPointTypeBindingTest extends AbstractGMLBindingTest {
 
     public void testParseCoordinate() throws Exception {
         Node node = createNode(point, new ElementInstance[] { coord },
-                new Object[] { createCoordinateSequence(new Coordinate(12.34, 56.78)) }, null, null);
+                new Object[] { new Coordinate(12.34, 56.78) }, null, null);
 
         GMLPointTypeBinding strategy = (GMLPointTypeBinding) container.getComponentInstanceOfType(GMLPointTypeBinding.class);
 

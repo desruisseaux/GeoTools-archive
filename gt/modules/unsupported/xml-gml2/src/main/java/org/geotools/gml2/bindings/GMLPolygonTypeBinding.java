@@ -15,15 +15,14 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import java.util.List;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -65,7 +64,11 @@ public class GMLPolygonTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.POLYGONTYPE;
+        return GML.PolygonType;
+    }
+
+    public int getExecutionMode() {
+        return BEFORE;
     }
 
     /**
@@ -76,15 +79,6 @@ public class GMLPolygonTypeBinding extends AbstractComplexBinding {
      */
     public Class getType() {
         return Polygon.class;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
     }
 
     /**

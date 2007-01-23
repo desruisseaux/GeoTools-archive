@@ -15,14 +15,14 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -61,11 +61,15 @@ public class GMLPointTypeBinding extends AbstractComplexBinding {
         this.gFactory = gFactory;
     }
 
+    public int getExecutionMode() {
+        return BEFORE;
+    }
+
     /**
      * @generated
      */
     public QName getTarget() {
-        return GML.POINTTYPE;
+        return GML.PointType;
     }
 
     /**
@@ -84,21 +88,12 @@ public class GMLPointTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         if (node.getChild("coord") != null) {
-            CoordinateSequence seq = (CoordinateSequence) node.getChild("coord").getValue();
+            Coordinate c = (Coordinate) node.getChild("coord").getValue();
 
-            return gFactory.createPoint(seq);
+            return gFactory.createPoint(c);
         }
 
         if (node.getChild("coordinates") != null) {
@@ -108,5 +103,16 @@ public class GMLPointTypeBinding extends AbstractComplexBinding {
         }
 
         throw new RuntimeException("Could not find a coordinate");
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        Point point = (Point) object;
+
+        if (GML.coord.equals(name)) {
+            return point.getCoordinate();
+        }
+
+        return null;
     }
 }

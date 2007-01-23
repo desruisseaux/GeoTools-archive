@@ -15,13 +15,8 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import java.util.Iterator;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.xml.*;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -62,17 +57,7 @@ public class GMLGeometryAssociationTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.GEOMETRYASSOCIATIONTYPE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
+        return GML.GeometryAssociationType;
     }
 
     /**
@@ -87,15 +72,6 @@ public class GMLGeometryAssociationTypeBinding extends AbstractComplexBinding {
 
     /**
      * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
-    }
-
-    /**
-     * <!-- begin-user-doc -->
      * Returns an object of type @link Geometry.
      * <!-- end-user-doc -->
      *
@@ -105,5 +81,14 @@ public class GMLGeometryAssociationTypeBinding extends AbstractComplexBinding {
         throws Exception {
         //TODO: xlink and remoteSchema attributes, hard to do because of streaming
         return node.getChildValue(Geometry.class);
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML._Geometry.equals(name)) {
+            return object;
+        }
+
+        return null;
     }
 }

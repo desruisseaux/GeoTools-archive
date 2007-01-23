@@ -15,17 +15,13 @@
  */
 package org.geotools.gml2;
 
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.picocontainer.MutablePicoContainer;
-import java.net.MalformedURLException;
-import java.net.URL;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import org.geotools.feature.DefaultFeatureCollections;
 import org.geotools.gml2.bindings.GML;
 import org.geotools.gml2.bindings.GMLBindingConfiguration;
-import org.geotools.gml2.bindings.GMLSchemaLocationResolver;
 import org.geotools.xlink.XLINKConfiguration;
 import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
@@ -69,13 +65,6 @@ public class GMLConfiguration extends Configuration {
     }
 
     /**
-     * @return new instance of {@link GMLSchemaLocationResolver}.
-     */
-    public XSDSchemaLocationResolver getSchemaLocationResolver() {
-        return new GMLSchemaLocationResolver();
-    }
-
-    /**
      * @return URL to the gml2 feauture.xsd file.
      */
     public String getSchemaFileURL() {
@@ -99,6 +88,7 @@ public class GMLConfiguration extends Configuration {
         super.configureContext(container);
 
         container.registerComponentInstance(new FeatureTypeCache());
+
         container.registerComponentInstance(CoordinateSequenceFactory.class,
             CoordinateArraySequenceFactory.instance());
         container.registerComponentImplementation(GeometryFactory.class);

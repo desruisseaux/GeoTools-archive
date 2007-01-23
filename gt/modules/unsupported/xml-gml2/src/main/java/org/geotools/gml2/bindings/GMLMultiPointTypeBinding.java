@@ -15,15 +15,14 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -65,15 +64,9 @@ public class GMLMultiPointTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.MULTIPOINTTYPE;
+        return GML.MultiPointType;
     }
 
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public int getExecutionMode() {
         return AFTER;
     }
@@ -94,15 +87,6 @@ public class GMLMultiPointTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         GeometryCollection gc = (GeometryCollection) value;
@@ -112,6 +96,18 @@ public class GMLMultiPointTypeBinding extends AbstractComplexBinding {
             points[i] = (Point) gc.getGeometryN(i);
         }
 
-        return gFactory.createMultiPoint(points);
+        MultiPoint multiPoint = gFactory.createMultiPoint(points);
+        multiPoint.setUserData(gc.getUserData());
+
+        return multiPoint;
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.pointMember.equals(name)) {
+            return GML2ParsingUtils.asCollection((MultiPoint) object);
+        }
+
+        return null;
     }
 }

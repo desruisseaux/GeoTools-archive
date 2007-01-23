@@ -15,11 +15,9 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
-import org.geotools.xml.*;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.xml.AbstractComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -56,17 +54,7 @@ public class GMLAbstractGeometryCollectionBaseTypeBinding extends AbstractComple
      * @generated
      */
     public QName getTarget() {
-        return GML.ABSTRACTGEOMETRYCOLLECTIONBASETYPE;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public int getExecutionMode() {
-        return AFTER;
+        return GML.AbstractGeometryCollectionBaseType;
     }
 
     /**
@@ -76,16 +64,7 @@ public class GMLAbstractGeometryCollectionBaseTypeBinding extends AbstractComple
      * @generated modifiable
      */
     public Class getType() {
-        return null;
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
+        return GeometryCollection.class;
     }
 
     /**
@@ -96,7 +75,15 @@ public class GMLAbstractGeometryCollectionBaseTypeBinding extends AbstractComple
      */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
-        //TODO: implement
-        return null;
+        if (value instanceof GeometryCollection) {
+            //set an srs if there is one
+            CoordinateReferenceSystem crs = GML2ParsingUtils.crs(node);
+
+            if (crs != null) {
+                ((GeometryCollection) value).setUserData(crs);
+            }
+        }
+
+        return value;
     }
 }

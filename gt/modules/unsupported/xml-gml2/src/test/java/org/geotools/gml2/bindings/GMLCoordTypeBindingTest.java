@@ -18,7 +18,7 @@ package org.geotools.gml2.bindings;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import java.math.BigDecimal;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequenceFactory;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Node;
@@ -51,9 +51,9 @@ public class GMLCoordTypeBindingTest extends AbstractGMLBindingTest {
 
         GMLCoordTypeBinding strategy = (GMLCoordTypeBinding) container.getComponentInstanceOfType(GMLCoordTypeBinding.class);
 
-        CoordinateSequence c = (CoordinateSequence) strategy.parse(coordinate, node, null);
+        Coordinate c = (Coordinate) strategy.parse(coordinate, node, null);
         assertNotNull(c);
-        assertEquals(c.getOrdinate(0, CoordinateSequence.X), 12.34, 0d);
+        assertEquals(c.x, 12.34, 0d);
     }
 
     public void testParse2D() throws Exception {
@@ -62,10 +62,10 @@ public class GMLCoordTypeBindingTest extends AbstractGMLBindingTest {
 
         GMLCoordTypeBinding strategy = (GMLCoordTypeBinding) container.getComponentInstanceOfType(GMLCoordTypeBinding.class);
 
-        CoordinateSequence c = (CoordinateSequence) strategy.parse(coordinate, node, null);
+        Coordinate c = (Coordinate) strategy.parse(coordinate, node, null);
         assertNotNull(c);
-        assertEquals(c.getOrdinate(0, CoordinateSequence.X), 12.34, 0d);
-        assertEquals(c.getOrdinate(0, CoordinateSequence.Y), 56.78, 0d);
+        assertEquals(c.x, 12.34, 0d);
+        assertEquals(c.y, 56.78, 0d);
     }
 
     public void testParse3D() throws Exception {
@@ -74,10 +74,10 @@ public class GMLCoordTypeBindingTest extends AbstractGMLBindingTest {
                 null, null);
         GMLCoordTypeBinding strategy = (GMLCoordTypeBinding) container.getComponentInstanceOfType(GMLCoordTypeBinding.class);
 
-        CoordinateSequence c = (CoordinateSequence) strategy.parse(coordinate, node, null);
+        Coordinate c = (Coordinate) strategy.parse(coordinate, node, null);
         assertNotNull(c);
-        assertEquals(c.getOrdinate(0, CoordinateSequence.X), 12.34, 0d);
-        assertEquals(c.getOrdinate(0, CoordinateSequence.Y), 56.78, 0d);
-        assertEquals(c.getOrdinate(0, CoordinateSequence.Z), 910.11, 0d);
+        assertEquals(c.x, 12.34, 0d);
+        assertEquals(c.y, 56.78, 0d);
+        assertEquals(c.z, 910.11, 0d);
     }
 }

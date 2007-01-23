@@ -15,77 +15,59 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.eclipse.xsd.XSDElementDeclaration;
-import org.eclipse.xsd.XSDFactory;
-import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
-import org.picocontainer.defaults.DefaultPicoContainer;
-import javax.xml.namespace.QName;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
-import org.geotools.gml2.FeatureTypeCache;
-import org.geotools.xml.ElementInstance;
-import org.geotools.xml.Node;
-import org.geotools.xml.SchemaIndex;
-import org.geotools.xml.Schemas;
-import org.geotools.xml.impl.ElementImpl;
-import org.geotools.xml.impl.SchemaIndexImpl;
-import org.geotools.xs.bindings.XS;
+import org.geotools.gml2.TEST;
+import org.geotools.gml2.TestConfiguration;
+import org.geotools.xml.Binding;
+import org.geotools.xml.Configuration;
 
 
-public class GMLAbstractFeatureTypeBindingTest extends AbstractGMLBindingTest {
-    XSDSchema mySchema;
-    SchemaIndex myIndex;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-
-        String loc = getClass().getResource("myFeature.xsd").toString();
-        mySchema = Schemas.parse(loc, null,
-                new XSDSchemaLocationResolver[] { new GMLSchemaLocationResolver() });
-        container = new DefaultPicoContainer();
-
-        container.registerComponentImplementation(FeatureTypeCache.class);
-
-        container.registerComponentImplementation(GMLAbstractFeatureTypeBinding.class);
-        myIndex = new SchemaIndexImpl(new XSDSchema[] { mySchema });
+public class GMLAbstractFeatureTypeBindingTest extends GMLTestSupport {
+    protected Configuration createConfiguration() {
+        return new TestConfiguration();
     }
 
-    public void testSimpleFeature() throws Exception {
-        QName qName = new QName("http://www.geotools.org/my", "MyFeatureType");
+    protected void registerNamespaces(Element root) {
+        super.registerNamespaces(root);
+        root.setAttribute("xmlns:test", TEST.NAMESPACE);
+    }
 
-        XSDElementDeclaration decl = XSDFactory.eINSTANCE.createXSDElementDeclaration();
-        decl.setName("myFeature");
-        decl.setTargetNamespace("http://www.geotools.org/my");
-        decl.setTypeDefinition(myIndex.getComplexTypeDefinition(qName));
+    public void testType() {
+        assertEquals(Feature.class, binding(GML.AbstractFeatureType).getType());
+    }
 
-        ElementInstance feature = new ElementImpl(decl);
-        feature.setName("myFeature");
-        feature.setNamespace("http://www.geotools.org/my");
+    public void testExectionMode() {
+        assertEquals(Binding.OVERRIDE, binding(GML.AbstractFeatureType).getExecutionMode());
+    }
 
-        Node node = createNode(feature,
-                new ElementInstance[] {
-                    createElement("http://www.geotools.org/my", "geom", GML.POINTPROPERTYTYPE, null),
-                    createElement("http://www.geotools.org/my", "count", XS.INTEGER, null)
-                },
-                new Object[] { new GeometryFactory().createPoint(new Coordinate(1, 1)), new Integer(
-                        5) }, null, null);
+    public void testParse() throws Exception {
+        Element feature = GML2MockData.feature(document, document);
+        feature.setAttributeNS(GML.NAMESPACE, "fid", "fid.1");
 
-        GMLAbstractFeatureTypeBinding s = (GMLAbstractFeatureTypeBinding) container
-            .getComponentInstanceOfType(GMLAbstractFeatureTypeBinding.class);
+        Feature f = (Feature) parse();
+        assertNotNull(feature);
 
-        Feature f = (Feature) s.parse(feature, node, null);
-        assertNotNull(f);
+        assertEquals("fid.1", f.getID());
 
-        FeatureType fType = f.getFeatureType();
-        assertNotNull(fType.getAttributeType("geom"));
-        assertNotNull(fType.getAttributeType("count"));
+        Point p = (Point) f.getDefaultGeometry();
+        assertNotNull(p);
+        assertEquals(1.0, p.getX(), 0d);
+        assertEquals(2.0, p.getY(), 0d);
 
-        assertEquals(((Point) f.getAttribute("geom")).getCoordinate(), new Coordinate(1, 1));
-        assertEquals((Integer) f.getAttribute("count"), new Integer(5));
+        Integer i = (Integer) f.getAttribute("count");
+        assertNotNull(i);
+        assertEquals(1, i.intValue());
+    }
+
+    public void testEncode() throws Exception {
+        Document dom = encode(GML2MockData.feature(), TEST.TestFeature);
+
+        assertEquals(1, dom.getElementsByTagName("gml:boundedBy").getLength());
+        assertEquals(1, dom.getElementsByTagName("test:geom").getLength());
+        assertEquals(1, dom.getElementsByTagName("test:count").getLength());
+        assertEquals(1, dom.getElementsByTagName("test:date").getLength());
     }
 }

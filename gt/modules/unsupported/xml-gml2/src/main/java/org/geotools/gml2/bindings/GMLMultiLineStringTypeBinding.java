@@ -15,15 +15,14 @@
  */
 package org.geotools.gml2.bindings;
 
-import org.picocontainer.MutablePicoContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import org.geotools.xml.*;
+import org.geotools.xml.AbstractComplexBinding;
+import org.geotools.xml.ElementInstance;
+import org.geotools.xml.Node;
 
 
 /**
@@ -66,7 +65,7 @@ public class GMLMultiLineStringTypeBinding extends AbstractComplexBinding {
      * @generated
      */
     public QName getTarget() {
-        return GML.MULTILINESTRINGTYPE;
+        return GML.MultiLineString;
     }
 
     /**
@@ -95,15 +94,6 @@ public class GMLMultiLineStringTypeBinding extends AbstractComplexBinding {
      *
      * @generated modifiable
      */
-    public void initialize(ElementInstance instance, Node node, MutablePicoContainer context) {
-    }
-
-    /**
-     * <!-- begin-user-doc -->
-     * <!-- end-user-doc -->
-     *
-     * @generated modifiable
-     */
     public Object parse(ElementInstance instance, Node node, Object value)
         throws Exception {
         GeometryCollection gc = (GeometryCollection) value;
@@ -113,6 +103,18 @@ public class GMLMultiLineStringTypeBinding extends AbstractComplexBinding {
             lines[i] = (LineString) gc.getGeometryN(i);
         }
 
-        return gFactory.createMultiLineString(lines);
+        MultiLineString multiLineString = gFactory.createMultiLineString(lines);
+        multiLineString.setUserData(gc.getUserData());
+
+        return multiLineString;
+    }
+
+    public Object getProperty(Object object, QName name)
+        throws Exception {
+        if (GML.lineStringMember.equals(name)) {
+            return GML2ParsingUtils.asCollection((MultiLineString) object);
+        }
+
+        return null;
     }
 }
