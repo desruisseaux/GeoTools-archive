@@ -34,6 +34,9 @@ import org.geotools.xml.Binding;
 import org.geotools.xml.Configuration;
 import org.geotools.xml.DOMParser;
 import org.geotools.xml.Encoder;
+import org.geotools.xml.impl.BindingFactoryImpl;
+import org.geotools.xml.impl.BindingLoader;
+import org.geotools.xml.impl.BindingWalkerFactoryImpl;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.DefaultPicoContainer;
 import org.w3c.dom.Document;
@@ -275,10 +278,25 @@ public abstract class XMLTestSupport extends TestCase {
     	
     	Configuration configuration = createConfiguration();
     	
-    	MutablePicoContainer container = new DefaultPicoContainer();
-    	container = configuration.setupContext( container );
-    	container = configuration.setupBindings( container );
+    	//create the context
+    	MutablePicoContainer context = new DefaultPicoContainer();
+    	context = configuration.setupContext( context );
     	
-    	return (Binding) container.getComponentInstance( name );
+    	//create the binding container
+    	BindingLoader bindingLoader = new BindingLoader();
+    	MutablePicoContainer container = bindingLoader.getContainer(); 
+        container = configuration.setupBindings( container );
+        bindingLoader.setContainer( container );
+        
+        //register cmponents available to bindings at runtime
+        context.registerComponentInstance( new BindingFactoryImpl( bindingLoader ) );
+        
+        //binding walker support
+        context.registerComponentInstance( new BindingWalkerFactoryImpl( bindingLoader , context ) );
+        
+        //logger
+        context.registerComponentInstance( logger );
+        
+        return bindingLoader.loadBinding( name, context );
     }
 }
