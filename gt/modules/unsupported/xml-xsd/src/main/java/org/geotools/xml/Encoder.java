@@ -250,6 +250,14 @@ public class Encoder {
 	}
 	
 	/**
+	 * @return the schema.
+	 */
+	public XSDSchema getSchema() {
+		return schema;
+	}
+	
+	
+	/**
 	 * @deprecated use {@link #encode(Object, QName, OutputStream)}.
 	 * 
 	 */
