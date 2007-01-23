@@ -76,7 +76,7 @@ public class XSNameBinding extends AbstractSimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return String.class;
     }
 
     /**
