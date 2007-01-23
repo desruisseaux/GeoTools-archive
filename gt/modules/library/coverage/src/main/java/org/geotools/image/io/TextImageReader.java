@@ -451,6 +451,7 @@ public abstract class TextImageReader extends SimpleImageReader {
             }
             suffixes   = EXTENSIONS;
             inputTypes = INPUT_TYPES;
+            vendorName = "Geotools";
         }
         
         /**
