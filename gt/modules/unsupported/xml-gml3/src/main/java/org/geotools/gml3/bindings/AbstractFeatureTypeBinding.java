@@ -109,88 +109,14 @@ public class AbstractFeatureTypeBinding extends AbstractComplexBinding {
 
         if (fType == null) {
             fType = GML3ParsingUtils.featureType(decl, bwFactory);
-
-            //            FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
-            //            ftBuilder.setName(decl.getName());
-            //            ftBuilder.setNamespace(new URI(decl.getTargetNamespace()));
-            //
-            //            //build the feaure type by walking through the elements of the 
-            //            // actual xml schema type
-            //            List children = Schemas.getChildElementDeclarations(decl);
-            //
-            //            for (Iterator itr = children.iterator(); itr.hasNext();) {
-            //                XSDElementDeclaration property = (XSDElementDeclaration) itr.next();
-            //
-            //                //ignore the attributes provided by gml, change this for new feature model
-            //                if (GML.NAMESPACE.equals(property.getTargetNamespace())) {
-            //                    if ("boundedBy".equals(property.getName())) {
-            //                        continue;
-            //                    }
-            //
-            //                    if ("location".equals(property.getName())) {
-            //                        continue;
-            //                    }
-            //
-            //                    if ("name".equals(property.getName())) {
-            //                        continue;
-            //                    }
-            //
-            //                    if ("description".equals(property.getName())) {
-            //                        continue;
-            //                    }
-            //
-            //                    if ("metaDataProperty".equals(property.getName())) {
-            //                        continue;
-            //                    }
-            //                }
-            //
-            //                XSDTypeDefinition type = property.getType();
-            //
-            //                QName qName = new QName(type.getTargetNamespace(), type.getName());
-            //
-            //                Binding binding = bindingFactory.createBinding(qName);
-            //
-            //                if (binding == null) {
-            //                    throw new RuntimeException("Could not find binding for " + qName);
-            //                }
-            //
-            //                Class theClass = binding.getType();
-            //
-            //                if (theClass == null) {
-            //                    throw new RuntimeException("Could not find class for " + qName);
-            //                }
-            //
-            //                //call method with most parameter
-            //                ftBuilder.addType(AttributeTypeFactory.newAttributeType(property.getName(), theClass));
-            //            }
-
-            //fType = ftBuilder.getFeatureType();
             ftCache.put(fType);
         }
 
         //TODO: this could pick up wrong thing, node api needs to be 
         // namespace aware
         String fid = (String) node.getAttributeValue("id");
-        Object[] attributes = new Object[fType.getAttributeCount()];
 
-        for (int i = 0; i < fType.getAttributeCount(); i++) {
-            AttributeType attType = fType.getAttributeType(i);
-            Object attValue = node.getChildValue(attType.getName());
-
-            if ((attValue != null) && !attType.getType().isAssignableFrom(attValue.getClass())) {
-                //type mismatch, to try convert
-                Object converted = Converters.convert(attValue, attType.getType());
-
-                if (converted != null) {
-                    attValue = converted;
-                }
-            }
-
-            attributes[i] = attValue;
-        }
-
-        //create the feature
-        return fType.create(attributes, fid);
+        return GML3ParsingUtils.feature(fType, fid, node);
     }
 
     public Element encode(Object object, Document document, Element value)

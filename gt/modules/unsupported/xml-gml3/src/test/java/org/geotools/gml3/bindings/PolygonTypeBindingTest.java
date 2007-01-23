@@ -23,7 +23,7 @@ import org.geotools.gml3.GML3TestSupport;
 
 public class PolygonTypeBindingTest extends GML3TestSupport {
     public void testNoInterior() throws Exception {
-        GML3MockData.polygonWithNoInterior(document, document);
+        GML3MockData.polygon(document, document);
 
         Polygon polygon = (Polygon) parse();
         assertNotNull(polygon);

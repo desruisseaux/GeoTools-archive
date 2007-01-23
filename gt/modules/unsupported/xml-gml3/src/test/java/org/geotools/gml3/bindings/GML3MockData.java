@@ -152,7 +152,7 @@ public class GML3MockData {
         return gf.createPolygon(linearRing(), null);
     }
 
-    static Element polygonWithNoInterior(Document document, Node parent) {
+    static Element polygon(Document document, Node parent) {
         Element polygon = element(GML.Polygon, document, parent);
 
         Element exterior = element(GML.exterior, document, polygon);
@@ -207,10 +207,10 @@ public class GML3MockData {
         Element multiPolygon = element(GML.MultiPolygon, document, parent);
 
         Element polygonMember = element(GML.polygonMember, document, multiPolygon);
-        polygonWithNoInterior(document, polygonMember);
+        polygon(document, polygonMember);
 
         polygonMember = element(GML.polygonMember, document, multiPolygon);
-        polygonWithNoInterior(document, polygonMember);
+        polygon(document, polygonMember);
 
         return multiPolygon;
     }

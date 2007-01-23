@@ -15,21 +15,11 @@
  */
 package org.geotools.gml3.bindings;
 
-import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.util.XSDSchemaLocationResolver;
-import org.picocontainer.MutablePicoContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import java.net.MalformedURLException;
-import java.net.URL;
-import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
 import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.Feature;
 import org.geotools.gml3.GML3TestSupport;
-import org.geotools.gml3.GMLConfiguration;
-import org.geotools.xml.BindingConfiguration;
 import org.geotools.xml.Configuration;
 
 
