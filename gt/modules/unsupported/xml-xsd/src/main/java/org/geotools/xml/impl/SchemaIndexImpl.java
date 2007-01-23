@@ -26,12 +26,16 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.collections.OrderedMap;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.eclipse.emf.common.notify.Adapter;
+import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDAttributeGroupDefinition;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDImport;
 import org.eclipse.xsd.XSDInclude;
+import org.eclipse.xsd.XSDPackage;
 import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
@@ -66,6 +70,9 @@ public class SchemaIndexImpl implements SchemaIndex {
 	
     public SchemaIndexImpl(XSDSchema[] schemas) {
         this.schemas = schemas;
+        for ( int i = 0; i < schemas.length; i++ ) {
+        	schemas[i].eAdapters().add( new SchemaAdapter());
+        }
     }
 
     public XSDSchema[] getSchemas() {
@@ -117,32 +124,36 @@ public class SchemaIndexImpl implements SchemaIndex {
     protected OrderedMap children( XSDElementDeclaration parent ) {
     	OrderedMap children = (OrderedMap) element2children.get( parent );
     	if ( children == null ) {
-    		children = new ListOrderedMap();
-    		for ( Iterator i =  Schemas.getChildElementParticles( parent.getType(), true ).iterator(); i.hasNext(); ) {
-    			XSDParticle particle = (XSDParticle) i.next();
-    			XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
-    			if ( child.isElementDeclarationReference() ) {
-    				child = child.getResolvedElementDeclaration();
+    		synchronized ( this ) {
+    			if ( children == null ) {
+    				children = new ListOrderedMap();
+    	    		for ( Iterator i =  Schemas.getChildElementParticles( parent.getType(), true ).iterator(); i.hasNext(); ) {
+    	    			XSDParticle particle = (XSDParticle) i.next();
+    	    			XSDElementDeclaration child = (XSDElementDeclaration) particle.getContent();
+    	    			if ( child.isElementDeclarationReference() ) {
+    	    				child = child.getResolvedElementDeclaration();
+    	    			}
+    	    			
+    	    			QName childName = null;
+    	    			if ( child.getTargetNamespace() != null ) {
+    	    				childName = new QName( child.getTargetNamespace(), child.getName() );
+    	    			}
+    	    			else if ( parent.getTargetNamespace() != null ) {
+    	    				childName = new QName( parent.getTargetNamespace(), child.getName() );
+    	    			}
+    	    			else if ( parent.getType().getTargetNamespace() != null ) {
+    	    				childName = new QName( parent.getType().getTargetNamespace(), child.getName() );
+    	    			}
+    	    			else {
+    	    				childName = new QName( null, child.getName() );
+    	    			}
+    	    			
+    	    			children.put( childName, particle );
+    	    			
+    	    		}
+    	    		element2children.put( parent, children );
     			}
-    			
-    			QName childName = null;
-    			if ( child.getTargetNamespace() != null ) {
-    				childName = new QName( child.getTargetNamespace(), child.getName() );
-    			}
-    			else if ( parent.getTargetNamespace() != null ) {
-    				childName = new QName( parent.getTargetNamespace(), child.getName() );
-    			}
-    			else if ( parent.getType().getTargetNamespace() != null ) {
-    				childName = new QName( parent.getType().getTargetNamespace(), child.getName() );
-    			}
-    			else {
-    				childName = new QName( null, child.getName() );
-    			}
-    			
-    			children.put( childName, particle );
-    			
-    		}
-    		element2children.put( parent, children );
+			}
     	}
     	
     	return children;
@@ -199,7 +210,12 @@ public class SchemaIndexImpl implements SchemaIndex {
 
     protected HashMap getElementIndex() {
         if (elementIndex == null) {
-            buildElementIndex();
+        	synchronized ( this ) {
+				if ( elementIndex == null ) {
+					  buildElementIndex();
+				}
+			}
+          
         }
 
         return elementIndex;
@@ -207,7 +223,11 @@ public class SchemaIndexImpl implements SchemaIndex {
 
     protected HashMap getAttributeIndex() {
         if (attributeIndex == null) {
-            buildAttriubuteIndex();
+        	synchronized ( this ) {
+        		if ( attributeIndex == null ) {
+        			buildAttriubuteIndex();	
+        		}
+        	}
         }
 
         return attributeIndex;
@@ -215,23 +235,36 @@ public class SchemaIndexImpl implements SchemaIndex {
 
     protected HashMap getAttributeGroupIndex() {
         if (attributeGroupIndex == null) {
-            buildAttributeGroupIndex();
+        	synchronized ( this ) {
+        		if ( attributeGroupIndex == null ) {
+        			buildAttributeGroupIndex();
+        		}
+			}
+            
         }
 
         return attributeGroupIndex;
     }
 
     protected HashMap getComplexTypeIndex() {
-        if (complexTypeIndex == null) {
-            buildTypeIndex();
-        }
+    	if (complexTypeIndex == null) {
+    		synchronized ( this ) {
+    			if ( complexTypeIndex == null ) {
+    				buildComplexTypeIndex();	
+    			}
+    		}
+    	}
 
         return complexTypeIndex;
     }
 
     protected HashMap getSimpleTypeIndex() {
         if (simpleTypeIndex == null) {
-            buildTypeIndex();
+        	synchronized ( this ) {
+        		if ( simpleTypeIndex == null ) {
+        			buildSimpleTypeIndex();
+        		}
+			}
         }
 
         return simpleTypeIndex;
@@ -290,8 +323,27 @@ public class SchemaIndexImpl implements SchemaIndex {
         }
     }
 
-    protected void buildTypeIndex() {
+    
+    protected void buildComplexTypeIndex() {
         complexTypeIndex = new HashMap();
+        
+        for (int i = 0; i < schemas.length; i++) {
+            XSDSchema schema = schemas[i];
+
+            for (Iterator t = schema.getTypeDefinitions().iterator();
+                    t.hasNext();) {
+                XSDTypeDefinition type = (XSDTypeDefinition) t.next();
+               
+                if (type instanceof XSDComplexTypeDefinition) {
+                	QName qName = new QName(type.getTargetNamespace(),
+                            type.getName());
+                	complexTypeIndex.put(qName, type);
+                }
+            }
+        }
+    }
+    
+    protected void buildSimpleTypeIndex() {
         simpleTypeIndex = new HashMap();
 
         for (int i = 0; i < schemas.length; i++) {
@@ -300,18 +352,63 @@ public class SchemaIndexImpl implements SchemaIndex {
             for (Iterator t = schema.getTypeDefinitions().iterator();
                     t.hasNext();) {
                 XSDTypeDefinition type = (XSDTypeDefinition) t.next();
-                HashMap index = null;
-
-                if (type instanceof XSDComplexTypeDefinition) {
-                    index = complexTypeIndex;
-                } else {
-                    index = simpleTypeIndex;
+                
+                if (type instanceof XSDSimpleTypeDefinition) {
+                	QName qName = new QName(type.getTargetNamespace(),
+                            type.getName());
+                	simpleTypeIndex.put(qName, type);
                 }
-
-                QName qName = new QName(type.getTargetNamespace(),
-                        type.getName());
-                index.put(qName, type);
             }
         }
+    }
+    
+    class SchemaAdapter implements Adapter {
+
+    	Notifier target;
+    	
+    	Notification last;
+    	
+		public Notifier getTarget() {
+			return target;
+		}
+
+		public void setTarget(Notifier target) {
+			this.target = target;
+		}
+		
+		public boolean isAdapterForType(Object object) {
+			return object instanceof XSDSchema;
+		}
+
+		public void notifyChanged(Notification notification) {
+			if ( notification.getEventType() == Notification.ADD ) {
+				switch ( notification.getFeatureID( XSDSchema.class ) ) {
+					case XSDPackage.XSD_SCHEMA__ATTRIBUTE_DECLARATIONS:
+						synchronized ( SchemaIndexImpl.this ) {
+							attributeIndex = null;
+						}
+						break;
+						
+					case XSDPackage.XSD_SCHEMA__ELEMENT_DECLARATIONS:
+						synchronized ( SchemaIndexImpl.this ) {
+							elementIndex = null;
+						}
+						break;
+						
+					case XSDPackage.XSD_SCHEMA__TYPE_DEFINITIONS:
+						synchronized ( SchemaIndexImpl.this ) {
+							complexTypeIndex = null;
+							simpleTypeIndex = null;
+						}
+						break;
+						
+					case XSDPackage.XSD_SCHEMA__ATTRIBUTE_GROUP_DEFINITIONS:
+						synchronized ( SchemaIndexImpl.this ) {
+							attributeGroupIndex = null;
+						}
+						break;
+				}
+			}
+		}
     }
 }
