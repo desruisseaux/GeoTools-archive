@@ -44,12 +44,12 @@ import java.util.StringTokenizer;
 
 /**
  * Resource compiler. This class is run from the command line at compile time only.
- * {@code ResourceCompiler} scans for {@code .properties} files in the current directory and copies
- * their content to {@code .utf} files using UTF8 encoding. It also checks for key validity and
- * checks values for {@link MessageFormat} compatibility. Finally, it creates a {@code FooKeys.java}
+ * {@code ResourceCompiler} scans for {@code .properties} files and copies their content
+ * to {@code .utf} files using UTF8 encoding. It also checks for key validity and checks
+ * values for {@link MessageFormat} compatibility. Finally, it creates a {@code FooKeys.java}
  * source file declaring resource keys as integer constants.
  * <p>
- * This class <strong>must</strong> be run from the root of Java source files.
+ * This class <strong>must</strong> be run from the maven root of Geotools project.
  * <p>
  * {@code ResourceCompiler} and all {@code FooKeys} classes don't need to be included in the final
  * JAR file. They are used at compile time only and no other classes should keep reference to them.
@@ -59,14 +59,32 @@ import java.util.StringTokenizer;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-final class ResourceCompiler implements Comparator {
+public final class ResourceCompiler implements Comparator {
     /**
-     * Extension for properties files.
+     * The base directory for {@code "java"} {@code "resources"} sub-directories.
+     * The directory structure must be consistent with Maven conventions.
+     */
+    private static final File SOURCE_DIRECTORY = new File("modules/library/metadata/src/main");
+
+    /**
+     * The resources to process.
+     */
+    private static final Class[] RESOURCES_TO_PROCESS = {
+        org.geotools.resources.i18n.Descriptions.class,
+        org.geotools.resources.i18n.Vocabulary  .class,
+        org.geotools.resources.i18n.Logging     .class,
+        org.geotools.resources.i18n.Errors      .class
+    };
+
+    /**
+     * Extension for properties source files.
+     * Must be in the {@code SOURCE_DIRECTORY/java} directory.
      */
     private static final String PROPERTIES_EXT = ".properties";
 
     /**
-     * Extension for resource files.
+     * Extension for resource target files.
+     * Will be be in the {@code SOURCE_DIRECTORY/resources} directory.
      */
     private static final String RESOURCES_EXT = ".utf";
 
@@ -361,9 +379,15 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
      */
     private void writeJavaSource(final Class bundleClass) throws IOException {
         final String fullname    = toKeyClass(bundleClass.getName());
-        final String classname   = fullname.substring(fullname.lastIndexOf('.')+1);
-        final String packageName = fullname.substring(0, fullname.lastIndexOf('.'));
-        final File          file = new File(fullname.replace('.', '/') + ".java");
+        final int    packageEnd  = fullname.lastIndexOf('.');
+        final String packageName = fullname.substring(0, packageEnd);
+        final String classname   = fullname.substring(packageEnd + 1);
+        final File   file        = new File(SOURCE_DIRECTORY,
+                "java/" + fullname.replace('.', '/') + ".java");
+        if (!file.getParentFile().isDirectory()) {
+            warning(file, null, "Parent directory not found.", null);
+            return;
+        }
         final BufferedWriter out = new BufferedWriter(new FileWriter(file));
         out.write("/*\n" +
                   " *    GeoTools - OpenSource mapping toolkit\n" +
@@ -449,17 +473,27 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
      * @throws IOException if an input/output operation failed.
      */
     private static void scanForResources(final PrintWriter out, final Class bundleClass) throws IOException {
-        String classname = bundleClass.getName();
-        final File directory = new File(classname.replace('.', '/')).getParentFile();
-        if (!directory.isDirectory()) {
+        final String fullname    = bundleClass.getName();
+        final int    packageEnd  = fullname.lastIndexOf('.');
+        final String packageName = fullname.substring(0, packageEnd);
+        final String classname   = fullname.substring(packageEnd + 1);
+        final String packageDir  = packageName.replace('.', '/');
+        final File   srcDir      = new File(SOURCE_DIRECTORY, "java/"      + packageDir);
+        final File   utfDir      = new File(SOURCE_DIRECTORY, "resources/" + packageDir);
+        if (!srcDir.isDirectory()) {
             out.print('"');
-            out.print(directory.getPath());
+            out.print(srcDir.getPath());
             out.println("\" is not a directory.");
             return;
         }
-        classname = classname.substring(classname.lastIndexOf('.')+1);
+        if (!utfDir.isDirectory()) {
+            out.print('"');
+            out.print(utfDir.getPath());
+            out.println("\" is not a directory.");
+            return;
+        }
         ResourceCompiler compiler = null;
-        final File[] content = directory.listFiles();
+        final File[] content = srcDir.listFiles();
         for (int i=0; i<content.length; i++) {
             final File file = content[i];
             final String filename = file.getName();
@@ -468,9 +502,9 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
                     compiler = new ResourceCompiler(out, bundleClass);
                 }
                 compiler.loadPropertyFile(file);
-                String path = file.getPath();
-                path = path.substring(0, path.length()-PROPERTIES_EXT.length()) + RESOURCES_EXT;
-                compiler.writeUTFFile(new File(path));
+                final File utfFile = new File(utfDir, filename.substring(0,
+                        filename.length() - PROPERTIES_EXT.length()) + RESOURCES_EXT);
+                compiler.writeUTFFile(utfFile);
             }
         }
         if (compiler != null) {
@@ -480,26 +514,19 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
 
     /**
      * Run the resource compiler.
-     *
-     * @param  args List of fully-qualified class name. If none, then a default set is used.
      */
     public static void main(String[] args) {
         final Arguments arguments = new Arguments(args);
         final PrintWriter out = arguments.out;
         args = arguments.getRemainingArguments(0);
-        if (args.length == 0) {
-            args = new String[] {
-                org.geotools.resources.i18n.Descriptions.class.getName(),
-                org.geotools.resources.i18n.Vocabulary  .class.getName(),
-                org.geotools.resources.i18n.Logging     .class.getName(),
-                org.geotools.resources.i18n.Errors      .class.getName()
-            };
+        if (!SOURCE_DIRECTORY.isDirectory()) {
+            out.print(SOURCE_DIRECTORY);
+            out.println(" not found or is not a directory.");
+            return;
         }
-        for (int i=0; i<args.length; i++) {
+        for (int i=0; i<RESOURCES_TO_PROCESS.length; i++) {
             try {
-                scanForResources(out, Class.forName(args[i]));
-            } catch (ClassNotFoundException exception) {
-                out.println(exception.getLocalizedMessage());
+                scanForResources(out, RESOURCES_TO_PROCESS[i]);
             } catch (IOException exception) {
                 out.println(exception.getLocalizedMessage());
             }

@@ -49,18 +49,15 @@ SHUTDOWN COMPACT;</PRE></BLOCKQUOTE></LI>
         <LI>In the table <CODE>EPSG_DATUM</CODE>, change the type of column <CODE>REALIZATION_EPOCH</CODE>
             to <CODE>INTEGER</CODE>.</LI>
 
-        <LI>Copy all <CODE>ALTER TABLE ... FOREIGN KEY</CODE> statements to the end of the script.</LI>
+        <LI>Copy all <CODE>ALTER TABLE &hellip; FOREIGN KEY</CODE> statements to the end of the script.</LI>
 
-        <LI>Remove all <CODE>CONSTRAINT ... FOREIGN KEY</CODE> from the <CODE>CREATE TABLE</CODE>
-            statements at the begining of the script, and move them as <CODE>ALTER TABLE ... FOREIGN KEY</CODE>
+        <LI>Remove all <CODE>CONSTRAINT &hellip; FOREIGN KEY</CODE> from the <CODE>CREATE TABLE</CODE>
+            statements at the begining of the script, and move them as <CODE>ALTER TABLE &hellip; FOREIGN KEY</CODE>
             statements at the end of the script.</LI>
             
-        <LI>Add the following two index creations at the end of file:
-            <UL>
-              <LI><CODE>CREATE INDEX EPSG_ALIAS_OBJ_CODE ON EPSG_ALIAS(OBJECT_CODE)</CODE></LI>
-              <LI><CODE>CREATE INDEX EPSG_COORDINATEREFERENCESYSTEM ON EPSG_COORDINATEREFERENCESYSTEM(DATUM_CODE)</CODE></LI>
-            </UL>
-        </LI>
+        <LI>Add the <CODE>CREATE INDEX &hellip;</CODE> statements <A HREF="IndexCreation.sql">provided here</A>
+                at the end of file. You may remove the comments, semi-collons and extra spaces for saving
+            spaces (they appears in the above file only for readability).</LI>
 
         <LI>Add <CODE>SHUTDOWN COMPACT</CODE> statement at the end of file.</LI>
 
@@ -71,8 +68,12 @@ SHUTDOWN COMPACT;</PRE></BLOCKQUOTE></LI>
 
       <LI><P>Copy the file created in the above step into the
           <CODE>org.geotools.referencing.factory.epsg</CODE> package directory
-          using "<CODE>EPSG.sql</CODE>" filename. Finally, create the JAR file
-          as usual, which should includes the <CODE>EPSG.sql</CODE> script.<P></LI>
+          using "<CODE>EPSG.sql</CODE>" filename.<P></LI>
+
+      <LI><P>Edit the version number in the <CODE>FactoryOnHSQL.VERSION</CODE> field.<P></LI>
+
+      <LI><P>Finally, create the JAR file as usual (<CODE>mvn install</CODE>),
+          which should includes the <CODE>EPSG.sql</CODE> script.<P></LI>
     </UL>
   </BODY>
 </HTML>

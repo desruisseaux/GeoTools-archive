@@ -81,7 +81,7 @@ import org.geotools.resources.Arguments;
  * @author Martin Desruisseaux
  * @author Vadim Semenov
  */
-public class DefaultDataSourceTest extends TestCase {
+public class DefaultFactoryTest extends TestCase {
     /**
      * Set to {@code true} for verbose tests.
      */
@@ -122,7 +122,7 @@ public class DefaultDataSourceTest extends TestCase {
         if (gui) {
             junit.swingui.TestRunner.main(new String[] {
                 "-noloading",
-                DefaultDataSourceTest.class.getName()
+                DefaultFactoryTest.class.getName()
             });
         } else {
             junit.textui.TestRunner.run(suite());
@@ -133,13 +133,13 @@ public class DefaultDataSourceTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(DefaultDataSourceTest.class);
+        return new TestSuite(DefaultFactoryTest.class);
     }
 
     /**
      * Constructs a test case with the given name.
      */
-    public DefaultDataSourceTest(final String name) {
+    public DefaultFactoryTest(final String name) {
         super(name);
     }
 

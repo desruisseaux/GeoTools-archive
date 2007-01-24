@@ -51,7 +51,7 @@ public final class LoggingKeys {
     public static final int CREATED_COORDINATE_OPERATION_$3              =    28;
     public static final int CREATED_DATASOURCE_ENTRY_$1                  =    25;
     public static final int CREATED_SERIALIZABLE_IMAGE_$2                =    35;
-    public static final int CREATING_CACHED_EPSG_DATABASE                =    46;
+    public static final int CREATING_CACHED_EPSG_DATABASE_$1             =    46;
     public static final int DEFERRED_TILE_PAINTING_$2                    =     6;
     public static final int EXCESSIVE_MEMORY_USAGE                       =     7;
     public static final int EXCESSIVE_TILE_CACHE_$1                      =     8;

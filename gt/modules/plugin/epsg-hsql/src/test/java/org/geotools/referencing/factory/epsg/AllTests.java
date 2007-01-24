@@ -52,7 +52,7 @@ public class AllTests extends TestCase {
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("org.geotools.referencing.factory.epsg");
-        suite.addTest(DefaultDataSourceTest          .suite());
+        suite.addTest(DefaultFactoryTest             .suite());
         suite.addTest(OperationFactoryTest           .suite());
         suite.addTest(OrderedAxisAuthorityFactoryTest.suite());
         suite.addTest(URN_EPSG_Test                  .suite());

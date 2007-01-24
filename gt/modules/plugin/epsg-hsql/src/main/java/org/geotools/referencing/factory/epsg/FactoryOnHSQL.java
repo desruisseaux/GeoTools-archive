@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Geotools dependencies
+import org.geotools.util.Version;
 import org.geotools.factory.Hints;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -73,6 +74,16 @@ import org.hsqldb.jdbc.jdbcDataSource;
  */
 public class FactoryOnHSQL extends DefaultFactory {
     /**
+     * Current version of EPSG-HSQL plugin. This is usually the same version number than the
+     * one in the EPSG database bundled in this plugin. However this field may contains
+     * additional minor version number if there is some changes related to the EPSG-HSQL
+     * plugin rather then the EPSG database itself (for example additional database index).
+     *
+     * @since 2.4
+     */
+    public static final Version VERSION = new Version("6.8.0");
+
+    /**
      * The key for fetching the database directory from {@linkplain System#getProperty(String)
      * system properties}.
      */
@@ -92,6 +103,11 @@ public class FactoryOnHSQL extends DefaultFactory {
      * The prefix to put in front of URL to the database.
      */
     private static final String PREFIX = "jdbc:hsqldb:file:";
+
+    /**
+     * The logger name.
+     */
+    private static final String LOGGER = "org.geotools.referencing.factory.epsg";
 
     /**
      * Creates a new instance of this factory. If the {@value #DIRECTORY_KEY}
@@ -147,6 +163,13 @@ public class FactoryOnHSQL extends DefaultFactory {
              * Fallback on the default temporary directory.
              */
         }
+        return getTemporaryDirectory();
+    }
+
+    /**
+     * Returns the directory to uses in the temporary directory folder.
+     */
+    private static File getTemporaryDirectory() {
         File directory = new File(System.getProperty("java.io.tmpdir", "."), "Geotools");
         if (directory.isDirectory() || directory.mkdir()) {
             directory = new File(directory, "Databases/HSQL");
@@ -223,6 +246,60 @@ public class FactoryOnHSQL extends DefaultFactory {
     }
 
     /**
+     * Compares the {@code "epsg.version"} property in the specified file with the expected
+     * {@link #VERSION}. If the version found in the property file is equals or higher than
+     * the expected one, then this method do nothing. Otherwise or if no version information
+     * is found in the property file, then this method clean the temporary directory
+     * containing the cached database.
+     */
+    private static void deleteIfOutdated(final File directory, final File propertyFile) {
+        if (directory == null || !directory.equals(getTemporaryDirectory())) {
+            /*
+             * Never touch to the directory if it is not in the temporary directory.
+             * It may be a user file!
+             */
+            return;
+        }
+        if (propertyFile.isFile()) try {
+            final InputStream propertyIn = new FileInputStream(propertyFile);
+            final Properties properties  = new Properties();
+            properties.load(propertyIn);
+            propertyIn.close();
+            final String version = properties.getProperty("epsg.version");
+            if (version != null) {
+                if (new Version(version).compareTo(VERSION) >= 0) {
+                    return;
+                }
+            }
+        } catch (IOException exception) {
+            /*
+             * Failure to read the property file. This is just a warning, not an error, because
+             * we will attempt to rebuild the whole database. Note: "createBackingStore" is the
+             * public method that invoked this method, so we use it for the logging message.
+             */
+            org.geotools.util.Logging.unexpectedException(LOGGER, FactoryOnHSQL.class,
+                    "createBackingStore", exception);
+        }
+        delete(directory);
+    }
+
+    /**
+     * Deletes the specified directory and all sub-directories. Used for
+     * cleaning the temporary directory containing the cached database only.
+     */
+    private static void delete(final File directory) {
+        if (directory != null) {
+            final File[] files = directory.listFiles();
+            if (files != null) {
+                for (int i=0; i<files.length; i++) {
+                    delete(files[i]);
+                }
+            }
+            directory.delete();
+        }
+    }
+
+    /**
      * Returns the backing-store factory for HSQL syntax. If the cached tables are not available,
      * they will be created now from the SQL scripts bundled in this plugin.
      *
@@ -232,7 +309,10 @@ public class FactoryOnHSQL extends DefaultFactory {
      */
     protected AbstractAuthorityFactory createBackingStore(final Hints hints) throws SQLException {
         final DataSource source = getDataSource();
-        Connection connection = source.getConnection();
+        final File directory    = getDirectory(source);
+        final File propertyFile = new File(directory, DATABASE_NAME + ".properties");
+        deleteIfOutdated(directory, propertyFile);
+        Connection connection   = source.getConnection();
         if (!dataExists(connection)) {
             /*
              * HSQL has created automatically an empty database. We need to populate it.
@@ -240,8 +320,8 @@ public class FactoryOnHSQL extends DefaultFactory {
              * a full SQL statement. For this plugin however, we have compressed "INSERT
              * INTO" statements using Compactor class in this package.
              */
-            Logger.getLogger("org.geotools.referencing.factory").log(
-                    Logging.format(Level.CONFIG, LoggingKeys.CREATING_CACHED_EPSG_DATABASE));
+            Logger.getLogger(LOGGER).log(Logging.format(Level.INFO,
+                    LoggingKeys.CREATING_CACHED_EPSG_DATABASE_$1, VERSION));
             final Statement statement = connection.createStatement();
             try {
                 final BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -286,15 +366,14 @@ public class FactoryOnHSQL extends DefaultFactory {
                 /*
                  * The database has been fully created. Now, make it read-only.
                  */
-                final File directory = getDirectory(source);
                 if (directory != null) {
-                    final File file = new File(directory, DATABASE_NAME + ".properties");
-                    final InputStream propertyIn = new FileInputStream(file);
+                    final InputStream propertyIn = new FileInputStream(propertyFile);
                     final Properties properties  = new Properties();
                     properties.load(propertyIn);
                     propertyIn.close();
+                    properties.put("epsg.version", VERSION.toString());
                     properties.put("readonly", "true");
-                    final OutputStream out = new FileOutputStream(file);
+                    final OutputStream out = new FileOutputStream(propertyFile);
                     properties.store(out, "EPSG database on HSQL");
                     out.close();
                 }

@@ -58,7 +58,7 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
     /**
      * The logger name.
      */
-    private static final String LOGGER = "org.geotools.referencing.factory";
+    private static final String LOGGER = "org.geotools.referencing.factory.epsg";
 
     /**
      * The factory which is the owner of this set. One purpose of this field (even if it were not

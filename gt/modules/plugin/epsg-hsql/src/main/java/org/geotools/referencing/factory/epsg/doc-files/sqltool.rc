@@ -3,7 +3,7 @@
 # copy this file in their home directory. The URL below searchs for an EPSG
 # database  (or creates a new one if no existing database is found)  in the
 # current directory. An absolute URL may be specified instead if wanted.
-# Example: jdbc:hsqldb:file:/tmp/Geotools/Cached databases/EPSG
+# Example: jdbc:hsqldb:file:/tmp/Geotools/Databases/HSQL/EPSG
 #
 # This file doesn't need to be distributed in the JAR file. It is
 # included here only for maintenance of the EPSG database for HSQL.
