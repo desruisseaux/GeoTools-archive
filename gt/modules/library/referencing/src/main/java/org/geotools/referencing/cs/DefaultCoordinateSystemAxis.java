@@ -522,6 +522,27 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
             "y", AxisDirection.DISPLAY_DOWN, Unit.ONE);
 
     /**
+     * Some names to be treated as equivalent. This is needed because axis names are the primary
+     * way to distinguish between {@link CoordinateSystemAxis} instances. Those names are strictly
+     * defined by ISO 19111 as "Geodetic latitude" and "Geodetic longitude" among others, but the
+     * legacy WKT specifications from OGC 01-009 defined the names as "Lon" and "Lat" for the same
+     * axis.
+     * <p>
+     * Keys in this map are names <strong>in lower cases</strong>. Values are the axis that the
+     * name is for. The actual axis instance doesn't matter (the algorithm using this map should
+     * work for any axis instance); it is just a way to differentiate latitude and longitude.
+     */
+    private static final Map/*<String,CoordinateSystemAxis>*/ ALIASES = new HashMap(8);
+    static {
+        ALIASES.put("lat",                GEODETIC_LATITUDE);
+        ALIASES.put("latitude",           GEODETIC_LATITUDE);
+        ALIASES.put("geodetic latitude",  GEODETIC_LATITUDE);
+        ALIASES.put("lon",                GEODETIC_LONGITUDE);
+        ALIASES.put("longitude",          GEODETIC_LONGITUDE);
+        ALIASES.put("geodetic longitude", GEODETIC_LONGITUDE);
+    }
+
+    /**
      * The abbreviation used for this coordinate system axes. This abbreviation is also
      * used to identify the ordinates in coordinate tuple. Examples are "<var>X</var>"
      * and "<var>Y</var>".
@@ -864,6 +885,42 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     }
 
     /**
+     * Returns {@code true} if either the {@linkplain #getName() primary name} or at least
+     * one {@linkplain #getAlias alias} matches the specified string. This method performs
+     * all the searh done by the {@linkplain AbstractIdentifiedObject#nameMatches(String)
+     * super-class}, with the addition of special processing for latitudes and longitudes:
+     * <p>
+     * <ul>
+     *   <li>{@code "Lat"}, {@code "Latitude"} and {@code "Geodetic latitude"} are considered
+     *       equivalent.</li>
+     *   <li>{@code "Lon"}, {@code "Longitude"} and {@code "Geodetic longitude"} are considered
+     *       equivalent.</li>
+     * </ul>
+     * <p>
+     * The above special cases are needed in order to workaround a conflict in specifications:
+     * ISO 19111 explicitly state that the latitude and longitude axis names shall be
+     * "Geodetic latitude" and "Geodetic longitude", will legacy OGC 01-009 (where WKT is defined)
+     * said that the default values shall be "Lat" and "Lon".
+     *
+     * @param  name The name to compare.
+     * @return {@code true} if the primary name of at least one alias
+     *         matches the specified {@code name}.
+     */
+    //@Override
+    public boolean nameMatches(final String name) {
+        if (super.nameMatches(name)) {
+            return true;
+        }
+        /*
+         * The standard comparaisons didn't worked. Check for the special cases.
+         * TODO: replace Object by CoordinateSystemAxis when we will be allowed
+         * to compile for J2SE 1.5.
+         */
+        final Object type = ALIASES.get(name.toLowerCase().trim());
+        return (type != null) && (type == ALIASES.get(getName().getCode().toLowerCase().trim()));
+    }
+
+    /**
      * Compares the specified object with this axis for equality.
      *
      * @param  object The object to compare to {@code this}.
@@ -901,10 +958,13 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
                  *       because in this case a stricter check has already been performed by
                  *       the 'equals' method in the superclass.
                  */
-                if (!nameMatches(that. getName().getCode()) &&
-                    !nameMatches(that, getName().getCode()))
-                {
-                    return false;
+                if (!nameMatches(that.getName().getCode())) {
+                    // The above test checked for special cases ("Lat" / "Lon" aliases, etc.).
+                    // The next line may not, but is tested anyway in case the user overrided
+                    // the 'that.nameMatches(...)' method.
+                    if (!nameMatches(that, getName().getCode())) {
+                        return false;
+                    }
                 }
             }
             return Utilities.equals(this.direction, that.direction) &&

@@ -215,8 +215,14 @@ public class BasicTest extends TestCase {
 
         // Test geocentric
         assertFalse("X",         DefaultCoordinateSystemAxis.X        .equals(DefaultCoordinateSystemAxis.GEOCENTRIC_X,        false));
-        assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,  false));
+        assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,  true ));
+        assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE, true ));
         assertFalse("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE, false));
+ 
+        // Test aliases in the special "longitude" and "latitude" cases.
+        assertTrue ("Longitude", DefaultCoordinateSystemAxis.LONGITUDE.equals(DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,  false));
+        assertTrue ("Latitude",  DefaultCoordinateSystemAxis.LATITUDE .equals(DefaultCoordinateSystemAxis.GEODETIC_LATITUDE,   false));
+        assertFalse("Lon/Lat",   DefaultCoordinateSystemAxis.LATITUDE .equals(DefaultCoordinateSystemAxis.LONGITUDE,           false));
     }
 
     /**
