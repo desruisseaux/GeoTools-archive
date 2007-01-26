@@ -39,6 +39,7 @@ package org.geotools.geometry.iso.coordinate;
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.util.algorithmND.AlgoRectangleND;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 
@@ -100,6 +101,15 @@ public class EnvelopeImpl implements Envelope {
 		// The coordinate dimension of the envelope is the same as the
 		// coordinate dimension of one of his points
 		return this.pMin.getDimension();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.opengis.spatialschema.geometry.Envelope#getCoordinateReferenceSystem()
+	 */
+	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+		return pMin.getCoordinateReferenceSystem();
 	}
 
 	/*

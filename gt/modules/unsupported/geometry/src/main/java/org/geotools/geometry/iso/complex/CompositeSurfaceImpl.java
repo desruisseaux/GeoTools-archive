@@ -83,7 +83,7 @@ public class CompositeSurfaceImpl extends CompositeImpl<OrientableSurfaceImpl>
 	 * @param generator
 	 */
 	public CompositeSurfaceImpl(FeatGeomFactoryImpl factory,
-			List<? extends OrientableSurfaceImpl> generator) {
+			List<? extends OrientableSurface> generator) {
 		super(factory, generator);
 	}
 

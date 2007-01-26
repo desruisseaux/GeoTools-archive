@@ -65,11 +65,11 @@ public class ComplexFactoryImpl implements ComplexFactory {
 	}
 	
 	public CompositeCurve createCompositeCurve(List<OrientableCurve> generator) {
-		return new CompositeCurveImpl(this.geometryFactory, (generator));
+		return new CompositeCurveImpl(this.geometryFactory, generator);
 	}
 
 	public CompositeSurface createCompositeSurface(List<OrientableSurface> generator) {
-		return new CompositeSurfaceImpl(this.geometryFactory, (List<? extends OrientableSurfaceImpl>) generator);
+		return new CompositeSurfaceImpl(this.geometryFactory, generator);
 	}
 
 	
