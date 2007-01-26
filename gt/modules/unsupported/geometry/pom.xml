@@ -150,5 +150,6 @@
       <name>Geotools repository</name>
       <url>http://maven.geotools.fr/repository</url>
     </repository>
+  </repositories>
 
 </project>
