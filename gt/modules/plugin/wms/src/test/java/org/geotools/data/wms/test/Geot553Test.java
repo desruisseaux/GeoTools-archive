@@ -24,7 +24,7 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.CRS;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.spatialschema.geometry.DirectPosition;

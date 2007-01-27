@@ -108,6 +108,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
 
     <!-- this dependency is covered by main (via api) and by epsg-wkt -->
     <!-- because this is confusing to maven we need to give it a clue -->

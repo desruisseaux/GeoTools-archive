@@ -35,7 +35,7 @@ import org.geotools.data.wms.WMSSpecification;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.data.wms.request.GetMapRequest;
 import org.geotools.data.wms.xml.WMSSchema;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.SchemaFactory;
 import org.geotools.xml.handlers.DocumentHandler;

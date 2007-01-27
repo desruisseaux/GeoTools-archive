@@ -46,7 +46,7 @@ import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.expression.AttributeExpression;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.Font;

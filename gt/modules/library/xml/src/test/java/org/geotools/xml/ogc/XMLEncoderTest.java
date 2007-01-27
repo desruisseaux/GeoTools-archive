@@ -40,7 +40,7 @@ import org.geotools.filter.FilterDOMParser;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.NullFilter;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.xml.DocumentFactory;
 import org.geotools.xml.DocumentWriter;
 import org.geotools.xml.SchemaFactory;

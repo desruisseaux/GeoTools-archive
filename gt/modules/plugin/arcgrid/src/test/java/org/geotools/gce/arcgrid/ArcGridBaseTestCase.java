@@ -10,7 +10,7 @@ import java.io.StringWriter;
 
 import junit.framework.TestCase;
 
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 
 /**
  * @author Giannecchini

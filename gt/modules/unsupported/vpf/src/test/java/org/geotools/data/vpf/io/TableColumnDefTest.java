@@ -19,7 +19,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.data.vpf.ifc.DataTypesDefinition;
 import org.geotools.data.vpf.ifc.FileConstants;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 
 // TODO TableInputStream was deprecated in 2.0.x and has been removed 
 // in 2.2.x. This file needs to be updated and tests re-enabled.

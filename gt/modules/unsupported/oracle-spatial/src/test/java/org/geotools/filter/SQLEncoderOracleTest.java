@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 
 
 /**

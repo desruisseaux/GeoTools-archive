@@ -35,7 +35,7 @@ import java.nio.channels.ReadableByteChannel;
  * <p>
  * This file has to live in the {@code org.geotools} root package in order to
  * get access to the {@code org/geotools/test-data} directory. If you don't
- * need this directory, then use the {@link org.geotools.resources.TestData}
+ * need this directory, then use the {@link org.geotools.test.TestData}
  * class provided in the {@code org.geotools.resources} directory.
  *
  * @since 2.2
@@ -44,10 +44,8 @@ import java.nio.channels.ReadableByteChannel;
  * @author Martin Desruisseaux
  *
  * @tutorial http://www.geotools.org/display/GEOT/5.8+Test+Data
- *
- * @todo Move to the {@code org.geotools.test} package.
  */
-public final class TestData extends org.geotools.resources.TestData {
+public final class TestData extends org.geotools.test.TestData {
     /**
      * Do not allow instantiation of this class.
      */

@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 
 import junit.framework.TestCase;
 
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.styling.ExternalGraphic;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;

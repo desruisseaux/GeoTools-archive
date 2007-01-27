@@ -15,7 +15,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 

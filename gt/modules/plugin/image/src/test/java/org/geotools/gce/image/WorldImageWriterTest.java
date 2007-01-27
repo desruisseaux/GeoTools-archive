@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import junit.textui.TestRunner;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.opengis.coverage.grid.Format;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;

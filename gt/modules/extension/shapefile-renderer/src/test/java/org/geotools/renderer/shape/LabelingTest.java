@@ -21,7 +21,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;

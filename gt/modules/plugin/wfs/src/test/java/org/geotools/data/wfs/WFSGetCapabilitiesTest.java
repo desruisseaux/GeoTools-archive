@@ -21,7 +21,7 @@ import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.xml.DocumentFactory;
 import org.xml.sax.SAXException;
 

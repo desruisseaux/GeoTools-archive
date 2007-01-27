@@ -17,7 +17,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 
 //TODO TableInputStream was deprecated in 2.0.x and has been removed 
 //in 2.2.x. This file needs to be updated and tests re-enabled.

@@ -41,7 +41,7 @@ import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.DefaultOperationMethod;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.styling.RasterSymbolizer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleBuilder;

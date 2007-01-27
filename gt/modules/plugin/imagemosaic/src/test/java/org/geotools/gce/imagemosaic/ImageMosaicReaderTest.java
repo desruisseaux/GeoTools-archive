@@ -36,7 +36,7 @@ import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.coverage.grid.GridFormatFinder;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.referencing.NoSuchAuthorityCodeException;

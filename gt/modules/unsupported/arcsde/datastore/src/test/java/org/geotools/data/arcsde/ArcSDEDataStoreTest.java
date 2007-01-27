@@ -824,7 +824,7 @@ public class ArcSDEDataStoreTest extends TestCase {
                 + " param not found in tests configurarion properties file");
         }
 
-        String uri = org.geotools.resources.TestData.url(this, filterFileName).toString();
+        String uri = org.geotools.test.TestData.url(this, filterFileName).toString();
 
         return uri;
     }

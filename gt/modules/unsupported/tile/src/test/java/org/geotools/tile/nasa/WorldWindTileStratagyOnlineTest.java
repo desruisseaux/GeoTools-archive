@@ -26,7 +26,7 @@ import org.geotools.catalog.GeoResource;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.tile.TileMap;
 import org.geotools.tile.TileMapInfo;
 import org.geotools.tile.TileResource;

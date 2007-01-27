@@ -52,7 +52,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.Utilities;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.util.NumberRange;
 
 

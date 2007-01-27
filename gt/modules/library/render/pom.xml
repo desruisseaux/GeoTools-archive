@@ -106,6 +106,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     
     <!-- 
          FROM HERE ON, BATIK DEPENDENCIES - I'VE TRIED WITH 1.6-1 BUT

@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.resources;
+package org.geotools.test;
 
 // J2SE dependencies
 import java.io.BufferedInputStream;
@@ -69,16 +69,14 @@ import java.util.zip.ZipFile;
  * {@link org.geotools.TestData} class from the {@code sample-module} instead
  * of this one.
  *
- * @since 2.0
+ * @since 2.4
  * @source $URL$
  * @version $Id$
  * @author James McGill
- * @author Simone Giannecchiin (simboss)
+ * @author Simone Giannecchiin
  * @author Martin Desruisseaux
  *
  * @tutorial http://www.geotools.org/display/GEOT/5.8+Test+Data
- *
- * @deprecated Moved to {@link org.geotools.test.TestData}.
  */
 public class TestData implements Runnable {
     /**
@@ -147,6 +145,9 @@ public class TestData implements Runnable {
      * Returns {@code true} if the running Java virtual machine is 1.4. This is the lowest
      * Java version currently supported by Geotools. This version will increase in future
      * Geotools version.
+     * <p>
+     * This method is used for some broken JUnit test that are know to run on JSE 1.4 but
+     * not on JSE 1.6 for example.
      */
     public static boolean isBaseJavaPlatform() {
         return System.getProperty("java.version").startsWith("1.4");
@@ -508,7 +509,7 @@ public class TestData implements Runnable {
                         }
                     } catch (SecurityException e) {
                         if (iteration == 0) {
-                            System.err.print(Utilities.getShortClassName(e));
+                            System.err.print(e.getClass().getName());
                             System.err.print(": ");
                         }
                     }

@@ -29,7 +29,7 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.xml.sax.helpers.ParserAdapter;
 
 import com.vividsolutions.jts.geom.Coordinate;

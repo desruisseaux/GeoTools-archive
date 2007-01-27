@@ -26,7 +26,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.filter.ExpressionBuilder;
 import org.opengis.filter.Filter;
 import org.geotools.filter.parser.ParseException;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

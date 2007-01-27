@@ -74,7 +74,7 @@ public class ArcSDEConnectionPoolTest extends TestCase {
 
         Properties conProps = new Properties();
         String propsFile = "testparams.properties";
-        URL conParamsSource = org.geotools.resources.TestData.url(this, propsFile);
+        URL conParamsSource = org.geotools.test.TestData.url(this, propsFile);
         LOGGER.fine("loading connection parameters from "
             + conParamsSource.toExternalForm());
 

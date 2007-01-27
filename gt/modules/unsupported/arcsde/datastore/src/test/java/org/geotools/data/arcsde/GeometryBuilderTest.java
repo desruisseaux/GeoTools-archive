@@ -491,7 +491,7 @@ public class GeometryBuilderTest extends TestCase {
         try {
             LOGGER.fine("loading test data test-data/" + resource);
 
-            InputStream in = org.geotools.resources.TestData.openStream(this, resource);
+            InputStream in = org.geotools.test.TestData.openStream(this, resource);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
             while ((line = reader.readLine()) != null) {

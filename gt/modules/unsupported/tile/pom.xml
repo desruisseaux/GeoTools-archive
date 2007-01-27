@@ -80,6 +80,12 @@
       <artifactId>gt2-render</artifactId>
       <version>${project.version}</version>
     </dependency>    
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

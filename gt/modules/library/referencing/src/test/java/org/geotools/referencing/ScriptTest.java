@@ -33,7 +33,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
 // Geotools dependencies
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 
 
 /**

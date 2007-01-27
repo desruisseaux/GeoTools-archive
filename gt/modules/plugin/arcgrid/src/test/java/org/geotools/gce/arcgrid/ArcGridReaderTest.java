@@ -15,7 +15,7 @@
  */
 package org.geotools.gce.arcgrid;
 
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import java.net.URL;

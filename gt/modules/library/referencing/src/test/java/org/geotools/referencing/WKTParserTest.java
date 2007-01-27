@@ -37,7 +37,7 @@ import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.wkt.MathTransformParser;
 import org.geotools.referencing.wkt.Parser;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 
 
 /**

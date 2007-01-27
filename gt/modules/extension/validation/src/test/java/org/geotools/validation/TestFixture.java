@@ -24,7 +24,7 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.data.Repository;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.validation.xml.XMLReader;
 
 

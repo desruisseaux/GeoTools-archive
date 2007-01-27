@@ -25,7 +25,7 @@ import java.net.URLDecoder;
 import junit.framework.TestCase;
 
 import org.geotools.data.coverage.grid.stream.IOExchange;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 /**
  * @author jeichar
  * @source $URL$

@@ -71,13 +71,6 @@
   <!-- =========================================================== -->
   <dependencies>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt2-referencing</artifactId>
-      <version>${project.version}</version>
-      <!-- We don't really need the referencing module, but we use
-           org.geotools.resources.TestData which is defined there. -->
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>provided</scope>

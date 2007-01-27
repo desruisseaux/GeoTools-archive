@@ -101,10 +101,15 @@
     <dependency>
       <groupId>org.geotools</groupId>
       <artifactId>gt2-sde-dummy</artifactId>
-      <version>2.4-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-      <!-- The version number is specified in the parent POM. -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!--
     <dependency>
       <groupId>com.esri</groupId>

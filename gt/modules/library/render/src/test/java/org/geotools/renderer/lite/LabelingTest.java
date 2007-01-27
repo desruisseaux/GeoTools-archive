@@ -27,7 +27,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;

@@ -29,7 +29,7 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

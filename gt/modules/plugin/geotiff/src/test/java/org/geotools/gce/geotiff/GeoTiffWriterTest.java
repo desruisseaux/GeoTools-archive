@@ -29,7 +29,7 @@ import junit.textui.TestRunner;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.referencing.FactoryException;

@@ -33,7 +33,7 @@ import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.renderer.GTRenderer;
-import org.geotools.resources.TestData;
+import org.geotools.test.TestData;
 
 /**
  * DOCUMENT ME!

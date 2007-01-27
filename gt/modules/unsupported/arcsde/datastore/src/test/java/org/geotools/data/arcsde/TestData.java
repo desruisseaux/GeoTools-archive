@@ -113,7 +113,7 @@ public class TestData {
         this.conProps = new Properties();
 
         String propsFile = "testparams.properties";
-        InputStream in = org.geotools.resources.TestData.openStream(this, propsFile);
+        InputStream in = org.geotools.test.TestData.openStream(this, propsFile);
         // The line above should never returns null. It should thow a
         // FileNotFoundException instead if the resource is not available.
 

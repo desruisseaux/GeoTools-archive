@@ -101,6 +101,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-sample-data</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <!-- The version number is specified in the parent POM. -->
