@@ -640,8 +640,8 @@ public final class CRS {
 
     /**
      * Grab a transform between two Coordinate Reference Systems. This method is similar to
-     * <code>{@linkplain #transform(CoordinateReferenceSystem, CoordinateReferenceSystem)
-     * transform}(sourceCRS, targetCRS)</code>, except that it can optionally tolerate
+     * <code>{@linkplain #findMathTransform(CoordinateReferenceSystem, CoordinateReferenceSystem)
+     * findMathTransform}(sourceCRS, targetCRS)</code>, except that it can optionally tolerate
      * <cite>lenient datum shift</cite>. If the {@code lenient} argument is {@code true},
      * then this method will not throw a "<cite>Bursa-Wolf parameters required</cite>"
      * exception during datum shifts if the Bursa-Wolf paramaters are not specified.

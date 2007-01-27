@@ -26,6 +26,7 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;   // For javadoc
 import javax.swing.table.DefaultTableCellRenderer;
 
 // OpenGIS dependencies

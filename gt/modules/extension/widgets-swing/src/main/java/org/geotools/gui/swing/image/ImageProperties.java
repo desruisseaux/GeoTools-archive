@@ -72,7 +72,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see ParameterEditor
+ * @see org.geotools.gui.swing.ParameterEditor
  * @see OperationTreeBrowser
  */
 public class ImageProperties extends JPanel {

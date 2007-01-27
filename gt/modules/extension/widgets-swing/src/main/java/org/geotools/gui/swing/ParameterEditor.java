@@ -93,9 +93,9 @@ import org.geotools.gui.swing.image.KernelEditor;
  * @version $Id$
  * @author Martin Desruisseaux
  *
- * @see KernelEditor
- * @see ImageProperties
- * @see OperationTreeBrowser
+ * @see org.geotools.gui.swing.image.KernelEditor
+ * @see org.geotools.gui.swing.image.ImageProperties
+ * @see org.geotools.gui.swing.image.OperationTreeBrowser
  *
  * @todo This class do not yet support the edition of parameter value.
  *       We will allow that in a future version. This work is already

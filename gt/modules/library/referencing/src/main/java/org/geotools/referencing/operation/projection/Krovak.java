@@ -289,7 +289,7 @@ public class Krovak extends MapProjection {
      */
     public static class Provider extends AbstractProvider {
         /**
-         * The operation parameter descriptor for the {@linkPlain #latitudeOfOrigin
+         * The operation parameter descriptor for the {@linkplain #latitudeOfOrigin
          * latitude of origin} parameter value. Valid values range is from -90 to 90.
          * Default value is 49.5.
          */
@@ -301,7 +301,7 @@ public class Krovak extends MapProjection {
                 }, 49.5, -90, 90, NonSI.DEGREE_ANGLE);
 
         /**
-         * The operation parameter descriptor for the {@linkPlain #centralMeridian central
+         * The operation parameter descriptor for the {@linkplain #centralMeridian central
          * meridian} parameter value. Valid values range is from -180 to 180. Default value
          * is 24�50' (= 42�50' from Ferro prime meridian).
          */
@@ -313,7 +313,7 @@ public class Krovak extends MapProjection {
                 }, 42.5-17.66666666666667, -180, 180, NonSI.DEGREE_ANGLE);
 
         /**
-         * The operation parameter descriptor for the {@linkPlain #azimuth azimuth} parameter
+         * The operation parameter descriptor for the {@linkplain #azimuth azimuth} parameter
          * value. Valid values range is from -90 to 90. Default value is 30.28813972222.
          */
         public static final ParameterDescriptor AZIMUTH = createDescriptor(
