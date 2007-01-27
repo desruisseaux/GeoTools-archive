@@ -509,10 +509,11 @@ public abstract class MapProjection extends AbstractMathTransform
             }
             if (distance > getToleranceForAssertions(longitude, latitude)) {
                 // Do not fail for NaN values.
-                throw new AssertionError(Errors.format(ErrorKeys.PROJECTION_CHECK_FAILED_$3,
+                throw new AssertionError(Errors.format(ErrorKeys.PROJECTION_CHECK_FAILED_$4,
                           new Double   (distance),
                           new Longitude(longitude - Math.toDegrees(centralMeridian )),
-                          new Latitude (latitude  - Math.toDegrees(latitudeOfOrigin))));
+                          new Latitude (latitude  - Math.toDegrees(latitudeOfOrigin)),
+                          getParameterDescriptors().getName().getCode()));
             }
         } catch (TransformException exception) {
             final AssertionError error = new AssertionError(exception.getLocalizedMessage());
@@ -1015,9 +1016,9 @@ public abstract class MapProjection extends AbstractMathTransform
      * @return The tolerance level for assertions, in meters.
      */
     protected double getToleranceForAssertions(final double longitude, final double latitude) {
-        if (Math.abs(longitude - centralMeridian)/2 +
-            Math.abs(latitude  - latitudeOfOrigin) > 40)
-        {
+        final double delta = Math.abs(longitude - centralMeridian)/2 +
+                             Math.abs(latitude  - latitudeOfOrigin);
+        if (delta > 40) {
             // When far from the valid area, use a larger tolerance.
             return 1;
         }

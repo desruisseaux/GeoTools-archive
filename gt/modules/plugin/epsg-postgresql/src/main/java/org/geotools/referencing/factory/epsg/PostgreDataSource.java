@@ -218,4 +218,18 @@ public class PostgreDataSource extends Jdbc3SimpleDataSource implements DataSour
         }
         return factory;
     }
+
+    /**
+     * For compilation with Java 6.
+     */
+    public boolean isWrapperFor(Class type) {
+        return false;
+    }
+
+    /**
+     * For compilation with Java 6.
+     */
+    public Object unwrap(Class type) throws SQLException {
+        throw new SQLException();
+    }
 }

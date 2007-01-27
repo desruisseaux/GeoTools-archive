@@ -194,7 +194,7 @@ public final class ErrorKeys {
     public static final int POINT_OUTSIDE_HEMISPHERE               =   117;
     public static final int POLE_PROJECTION_$1                     =   118;
     public static final int POLYGON_CLOSED                         =   119;
-    public static final int PROJECTION_CHECK_FAILED_$3             =   181;
+    public static final int PROJECTION_CHECK_FAILED_$4             =   181;
     public static final int RANGE_OVERLAP_$4                       =   120;
     public static final int RECURSIVE_CALL_$1                      =   193;
     public static final int RECURSIVE_CALL_$2                      =   172;

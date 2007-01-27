@@ -48,8 +48,8 @@ public class GML3ParsingUtils {
      *
      * @return The corresponding geotools feature type.
      */
-    public static FeatureType featureType(XSDElementDeclaration element, BindingWalkerFactory bwFactory)
-        throws Exception {
+    public static FeatureType featureType(XSDElementDeclaration element,
+        BindingWalkerFactory bwFactory) throws Exception {
         return GML2ParsingUtils.featureType(element, bwFactory);
     }
 

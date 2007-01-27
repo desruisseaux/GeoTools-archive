@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import com.vividsolutions.jts.geom.GeometryCollection;
-
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -136,22 +135,19 @@ public class GML2ParsingUtils {
 
     public static CoordinateReferenceSystem crs(Node node) {
         if (node.getAttribute("srsName") != null) {
-        	URI srs = (URI) node.getAttributeValue("srsName");
+            URI srs = (URI) node.getAttributeValue("srsName");
 
-        	//TODO: JD, this is a hack until GEOT-1136 has been resolved
-        	if ( "http".equals( srs.getScheme() ) &&
-    			"www.opengis.net".equals( srs.getAuthority() ) && 
-    			"/gml/srs/epsg.xml".equals( srs.getPath() ) && 
-    			srs.getFragment() != null ) {
-        		
-        		try {
-					return CRS.decode( "EPSG:" + srs.getFragment() );
-				} catch (Exception e) {
-					//no nothing, will fail belows
-				}
-        	}
-        	
-        	try {
+            //TODO: JD, this is a hack until GEOT-1136 has been resolved
+            if ("http".equals(srs.getScheme()) && "www.opengis.net".equals(srs.getAuthority())
+                    && "/gml/srs/epsg.xml".equals(srs.getPath()) && (srs.getFragment() != null)) {
+                try {
+                    return CRS.decode("EPSG:" + srs.getFragment());
+                } catch (Exception e) {
+                    //no nothing, will fail belows
+                }
+            }
+
+            try {
                 return CRS.decode(srs.toString());
             } catch (Exception e) {
                 throw new RuntimeException("Could not create crs: " + srs, e);

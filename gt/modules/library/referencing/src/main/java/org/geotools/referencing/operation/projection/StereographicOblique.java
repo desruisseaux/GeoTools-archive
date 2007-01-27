@@ -179,9 +179,24 @@ public class StereographicOblique extends Stereographic {
     }
     
     /**
-     * Compute part of function (3-1) from Snyder
+     * Maximal error (in metres) tolerated for assertions, if enabled.
      */
-    protected final double ssfn(double phi, double sinphi) {
+    protected double getToleranceForAssertions(final double longitude, final double latitude) {
+        final double delta = Math.abs(longitude - centralMeridian)/2 +
+                             Math.abs(latitude  - latitudeOfOrigin);
+        if (delta > 40) {
+            return 0.5;
+        }
+        if (delta > 15) {
+            return 0.1;
+        }
+        return super.getToleranceForAssertions(longitude, latitude);
+    }
+    
+    /**
+     * Computes part of function (3-1) from Snyder
+     */
+    final double ssfn(double phi, double sinphi) {
         sinphi *= excentricity;
         return Math.tan((Math.PI/4.0) + phi/2.0) *
                Math.pow((1-sinphi) / (1+sinphi), excentricity/2.0);

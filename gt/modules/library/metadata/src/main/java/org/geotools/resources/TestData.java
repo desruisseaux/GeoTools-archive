@@ -142,6 +142,15 @@ public class TestData implements Runnable {
     }
 
     /**
+     * Returns {@code true} if the running Java virtual machine is 1.4. This is the lowest
+     * Java version currently supported by Geotools. This version will increase in future
+     * Geotools version.
+     */
+    public static boolean isBaseJavaPlatform() {
+        return System.getProperty("java.version").startsWith("1.4");
+    }
+
+    /**
      * Returns {@code true} if {@value #EXTENSIVE_TEST_KEY} system property is set to
      * {@code true}. Test suites should check this value before to perform lengthly tests.
      */

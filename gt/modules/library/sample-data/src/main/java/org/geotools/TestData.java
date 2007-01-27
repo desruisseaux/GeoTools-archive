@@ -44,6 +44,8 @@ import java.nio.channels.ReadableByteChannel;
  * @author Martin Desruisseaux
  *
  * @tutorial http://www.geotools.org/display/GEOT/5.8+Test+Data
+ *
+ * @todo Move to the {@code org.geotools.test} package.
  */
 public final class TestData extends org.geotools.resources.TestData {
     /**
