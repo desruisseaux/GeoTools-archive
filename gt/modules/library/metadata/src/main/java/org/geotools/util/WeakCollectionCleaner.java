@@ -88,7 +88,7 @@ final class WeakCollectionCleaner extends Thread {
                      * few seconds in order to give the JVM a chance to kill this daemon thread
                      * before the logging at the sever level, and stop the loop.  We do not try
                      * to resume the loop since something is apparently going wrong and we want
-                     * the user to be notified.
+                     * the user to be notified. See GEOT-1138.
                      */
                     sleep(15 * 1000L);
                     break;
