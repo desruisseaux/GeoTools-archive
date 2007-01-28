@@ -91,6 +91,16 @@ public class DefaultFactory extends DeferredAuthorityFactory
     public static final String DATASOURCE_NAME = "jdbc/EPSG";
 
     /**
+     * {@code true} if automatic registration of {@link #DATASOURCE_NAME} is allowed.
+     * Set to {@code false} for now because the registration has not been correctly
+     * tested in JEE environment.
+     *
+     * @todo Consider removing completly the code related to JNDI binding. In such
+     *       case, this field and the {@link #registerInto} field would be removed.
+     */
+    private static final boolean ALLOW_REGISTRATION = false;
+
+    /**
      * The factory registry for EPSG data sources. Will be created only when first needed.
      *
      * @deprecated To remove when other deprecated methods will have been removed.
@@ -432,7 +442,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
          * the "jdbc/EPSG" entry, add it now. In such case, a message is prepared and logged.
          */
         LogRecord record;
-        if (context != null) {
+        if (ALLOW_REGISTRATION && context != null) {
             try {
                 context.bind(DATASOURCE_NAME, source);
                 record = Logging.format(Level.INFO, LoggingKeys.CREATED_DATASOURCE_ENTRY_$1,
