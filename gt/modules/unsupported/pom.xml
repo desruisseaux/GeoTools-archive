@@ -22,7 +22,7 @@
   <groupId>org.geotools</groupId>
   <artifactId>gt2-unsupported</artifactId>
   <packaging>pom</packaging>
-  <name>Geotools Unsupported</name>
+  <name>Geotools unsupported</name>
   <url>http://maven.geotools.fr/reports/modules/unsupported/</url>
   
   <scm>

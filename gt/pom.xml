@@ -1334,10 +1334,10 @@
       <name>codehaus-shapshot-plugins</name>
       <url>http://snapshots.repository.codehaus.org/</url>
       <snapshots>
-         <enabled>true</enabled>
+        <enabled>true</enabled>
       </snapshots>
       <releases>
-         <enabled>false</enabled>
+        <enabled>false</enabled>
       </releases>
     </pluginRepository>
   </pluginRepositories>
@@ -1351,6 +1351,6 @@
     <module>modules</module>
     <module>demo</module>
   </modules>
-  
-  
+
+
 </project>
