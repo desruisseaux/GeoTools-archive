@@ -79,7 +79,21 @@ final class WeakCollectionCleaner extends Thread {
                 // Block until a reference is enqueded.
                 // Note: To be usefull, the clear() method must have
                 //       been overridden in Reference subclasses.
-                referenceQueue.remove().clear();
+                final Reference ref = referenceQueue.remove();
+                if (ref == null) {
+                    /*
+                     * Should never happen according Sun's Javadoc ("Removes the next reference
+                     * object in this queue, blocking until one becomes available."). However a
+                     * null reference seems to be returned during JVM shutdown on Linux. Wait a
+                     * few seconds in order to give the JVM a chance to kill this daemon thread
+                     * before the logging at the sever level, and stop the loop.  We do not try
+                     * to resume the loop since something is apparently going wrong and we want
+                     * the user to be notified.
+                     */
+                    sleep(15 * 1000L);
+                    break;
+                }
+                ref.clear();
             } catch (InterruptedException exception) {
                 // Somebody doesn't want to lets us sleep... Go back to work.
             } catch (Exception exception) {
