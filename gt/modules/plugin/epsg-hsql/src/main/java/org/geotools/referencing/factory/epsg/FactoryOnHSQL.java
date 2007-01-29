@@ -376,6 +376,10 @@ public class FactoryOnHSQL extends DefaultFactory {
                     final OutputStream out = new FileOutputStream(propertyFile);
                     properties.store(out, "EPSG database on HSQL");
                     out.close();
+                    
+                    final File backup = new File(directory, DATABASE_NAME + ".backup");
+                    if(backup.exists())
+                        backup.delete();
                 }
             } catch (IOException exception) {
                 statement.close();
