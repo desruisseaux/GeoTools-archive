@@ -120,4 +120,36 @@ public class AllAuthoritiesFactoryTest extends TestCase {
             assertEquals("FOO", exception.getAuthority());
         }
     }
+
+    /**
+     * Tests the {@code "http://www.opengis.net/gml/srs/"} name space. This requires special
+     * processing by {@link AllAuthoritiesFactory}, since the separator character is not the
+     * usual {@code ':'}.
+     */
+    public void testHttp() throws FactoryException {
+        final CRSAuthorityFactory crs = FactoryFinder.getCRSAuthorityFactory("CRS",  null);
+        final CRSAuthorityFactory all = AllAuthoritiesFactory.DEFAULT;
+        CoordinateReferenceSystem actual, expected;
+
+        actual   = all.createCoordinateReferenceSystem("http://www.opengis.net/gml/srs/CRS#84");
+        expected = crs.createCoordinateReferenceSystem("84");
+        assertSame(expected, actual);
+
+        actual   = all.createCoordinateReferenceSystem("HTTP://WWW.OPENGIS.NET/GML/SRS/crs#84");
+        assertSame(expected, actual);
+
+        try {
+            all.createCoordinateReferenceSystem("http://www.dummy.net/gml/srs/CRS#84");
+            fail("Expected a NoSuchAuthorityCodeException");
+        } catch (NoSuchAuthorityCodeException e) {
+            assertEquals("http://www.dummy.net", e.getAuthority());
+        }
+
+        try {
+            all.createCoordinateReferenceSystem("http://www.opengis.net/gml/dummy/CRS#84");
+            fail("Expected a NoSuchAuthorityCodeException");
+        } catch (NoSuchAuthorityCodeException e) {
+            assertEquals("http://www.opengis.net/gml/srs/", e.getAuthority());
+        }
+    }
 }

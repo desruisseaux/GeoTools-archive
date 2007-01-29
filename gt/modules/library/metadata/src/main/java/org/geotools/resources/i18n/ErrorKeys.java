@@ -119,9 +119,6 @@ public final class ErrorKeys {
     public static final int INSUFFICIENT_POINTS_$2                 =   198;
     public static final int INVALID_WKT_FORMAT                     =   159;
     public static final int IN_$1                                  =    58;
-    public static final int LAT1_EQ_LAT2                           =    59;
-    public static final int LAT1_EQ_ZERO                           =    60;
-    public static final int LAT2_EQ_NEG_90                         =    61;
     public static final int LATITUDE_OUT_OF_RANGE_$1               =    62;
     public static final int LINE_TOO_LONG_$3                       =    63;
     public static final int LINE_TOO_SHORT_$2                      =    64;

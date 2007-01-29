@@ -32,10 +32,12 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.operation.CylindricalProjection;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
+import org.geotools.measure.Latitude;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.resources.i18n.Vocabulary;
@@ -298,15 +300,27 @@ public class ObliqueMercator extends MapProjection {
             longitudeOf2ndPoint = doubleValue(expected, Provider_TwoPoint.LONG_OF_2ND_POINT, parameters);
             ensureLongitudeInRange(Provider_TwoPoint.LONG_OF_2ND_POINT, longitudeOf2ndPoint, true);
             
-            double con = Math.abs(latitudeOf1stPoint);
+            ParameterDescriptor desc = null;
+            Object value = null;
             if (Math.abs(latitudeOf1stPoint - latitudeOf2ndPoint) < EPSILON_LATITUDE) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT1_EQ_LAT2));
+                desc  = Provider_TwoPoint.LAT_OF_1ST_POINT;
+                value = Provider_TwoPoint.LAT_OF_2ND_POINT.getName().getCode();
+                // Exception will be thrown below.
             }
             if (Math.abs(latitudeOf1stPoint) < EPSILON_LATITUDE) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT1_EQ_ZERO));
+                desc  = Provider_TwoPoint.LAT_OF_1ST_POINT;
+                value = new Latitude(latitudeOf1stPoint);
+                // Exception will be thrown below.
             }
             if (Math.abs(latitudeOf2ndPoint + Math.PI/2.0) < EPSILON_LATITUDE) {
-                throw new IllegalArgumentException(Errors.format(ErrorKeys.LAT2_EQ_NEG_90));
+                desc  = Provider_TwoPoint.LAT_OF_2ND_POINT;
+                value = new Latitude(latitudeOf2ndPoint);
+                // Exception will be thrown below.
+            }
+            if (desc != null) {
+                final String name = desc.getName().getCode();
+                throw new InvalidParameterValueException(Errors.format(
+                        ErrorKeys.ILLEGAL_ARGUMENT_$2, name, value), name, value);
             }
         } else {
             latitudeOf1stPoint  = Double.NaN;

@@ -378,8 +378,9 @@ public class FactoryOnHSQL extends DefaultFactory {
                     out.close();
                     
                     final File backup = new File(directory, DATABASE_NAME + ".backup");
-                    if(backup.exists())
+                    if (backup.exists()) {
                         backup.delete();
+                    }
                 }
             } catch (IOException exception) {
                 statement.close();

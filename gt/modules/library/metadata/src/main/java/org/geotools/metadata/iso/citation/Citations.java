@@ -264,7 +264,7 @@ public final class Citations {
     public static final Citation EPSG;
     static {
         final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.EPSG);
-        c.addAuthority("EPSG");
+        c.addAuthority("EPSG", true);
         c.getPresentationForm().add(PresentationForm.TABLE_DIGITAL);
         c.freeze();
         EPSG = c;
@@ -296,7 +296,7 @@ public final class Citations {
     public static final Citation AUTO;
     static { // Sanity check ensure that all @see tags are actually available in the metadata
         final CitationImpl c = new CitationImpl("Automatic Projections");
-        c.addAuthority("AUTO");
+        c.addAuthority("AUTO", false);
         /*
          * Do not put "WMS 1.1.1" and "OGC 01-068r3" as alternative titles. They are alternative
          * titles for the WMS specification (see the WMS constant in this class), not for the
@@ -339,7 +339,7 @@ public final class Citations {
     public static final Citation AUTO2;
     static {
         final CitationImpl c = new CitationImpl("Automatic Projections");
-        c.addAuthority("AUTO2");
+        c.addAuthority("AUTO2", false);
         /*
          * Do not put "WMS 1.3.0" and "OGC 04-024" as alternative titles. They are alternative
          * titles for the WMS specification (see the WMS constant in this class), not for the
@@ -366,7 +366,7 @@ public final class Citations {
     public static final Citation CRS;
     static {
         final CitationImpl c = new CitationImpl("Web Map Service CRS");
-        c.addAuthority("CRS");
+        c.addAuthority("CRS", false);
         c.getCitedResponsibleParties().addAll(AUTO2.getCitedResponsibleParties());
         c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL); // See comment in WMS.
         c.freeze();
@@ -374,21 +374,38 @@ public final class Citations {
     }
 
     /**
-     * URN in the OGC namespace. This citation contains the "URN:OGC:DEF" and "URN:X-OGC:DEF"
-     * {@linkplain Citation#getIdentifiers identifiers} for the "Authority name"
-     * {@linkplain Citation#getIdentifierTypes identifier type}.
+     * URN in the OGC namespace. This citation contains the {@code "urn:ogc:def"} and
+     * {@code "urn:x-ogc:def"} {@linkplain Citation#getIdentifiers identifiers} for the
+     * "Authority name" {@linkplain Citation#getIdentifierTypes identifier type}.
      *
      * @since 2.4
      */
     public static final Citation URN_OGC;
     static {
         final CitationImpl c = new CitationImpl("URN in OGC namespace");
-        c.addAuthority("urn:ogc:def");
-        c.addAuthority("urn:x-ogc:def");
+        c.addAuthority("urn:ogc:def", false);
+        c.addAuthority("urn:x-ogc:def", false);
         c.getCitedResponsibleParties().add(ResponsiblePartyImpl.OGC);
         c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
         c.freeze();
         URN_OGC = c;
+    }
+
+    /**
+     * URL in the OGC namespace. This citation contains the
+     * {@code "http://www.opengis.net"} {@linkplain Citation#getIdentifiers identifiers}
+     * for the "Authority name" {@linkplain Citation#getIdentifierTypes identifier type}.
+     *
+     * @since 2.4
+     */
+    public static final Citation HTTP_OGC;
+    static {
+        final CitationImpl c = new CitationImpl("URL in OGC namespace");
+        c.addAuthority("http://www.opengis.net", false);
+        c.getCitedResponsibleParties().add(ResponsiblePartyImpl.OGC);
+        c.getPresentationForm().add(PresentationForm.DOCUMENT_DIGITAL);
+        c.freeze();
+        HTTP_OGC = c;
     }
 
 

@@ -102,7 +102,9 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     private final Collection/*<AuthorityFactory>*/ factories;
 
     /**
-     * The separator between the authority name and the code. The default value is {@code ':'}.
+     * The separator between the authority name and the code.
+     *
+     * @deprecated Remove this field after we removed the deprecated constructor.
      */
     private final char separator;
 
@@ -118,8 +120,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     private final Hints userHints;
 
     /**
-     * Creates a new factory using the specified hints and the
-     * {@linkplain GenericName#DEFAULT_SEPARATOR default name separator}.
+     * Creates a new factory using the specified hints.
      *
      * @param hints An optional set of hints, or {@code null} if none.
      */
@@ -147,7 +148,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     public AllAuthoritiesFactory(final Hints hints,
                                  final Collection/*<? extends AuthorityFactory>*/ factories)
     {
-        this(hints, factories, GenericName.DEFAULT_SEPARATOR);
+        this(hints, factories, (char) 0);
     }
 
     /**
@@ -159,6 +160,8 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
      * @param factories A set of user-specified factories to try before to delegate
      *        to {@link FactoryFinder}, or {@code null} if none.
      * @param separator The separator between the authority name and the code.
+     *
+     * @deprecated Override the {@link #getSeparator} method instead.
      */
     public AllAuthoritiesFactory(final Hints hints,
                                  final Collection/*<? extends AuthorityFactory>*/ factories,
@@ -290,6 +293,66 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     }
 
     /**
+     * Returns the character separator for the specified code. The default implementation returns
+     * the {@linkplain GenericName#DEFAULT_SEPARATOR default name separator} {@code ':'}, except
+     * if the code looks like a URL (e.g. {@code "http://www.opengis.net/"}), in which case this
+     * method returns {@code '/'}.
+     * <p>
+     * In the current implementation, "looks like a URL" means that the first
+     * non-{@linkplain Character#isLetterOrDigit(char) aplhanumeric} characters
+     * are {@code "://"}. But this heuristic rule may change in future implementations.
+     *
+     * @since 2.4
+     */
+    protected char getSeparator(String code) {
+        if (separator != 0) {
+            // Remove this block after we removed the deprecated separator field.
+            return separator;
+        }
+        code = code.trim();
+        final int length = code.length();
+        for (int i=0; i<length; i++) {
+            if (!Character.isLetterOrDigit(code.charAt(i))) {
+                if (code.regionMatches(i, "://", 0, 3)) {
+                    return '/';
+                }
+                break;
+            }
+        }
+        return GenericName.DEFAULT_SEPARATOR;
+    }
+
+    /**
+     * Returns {@code true} if the specified code can be splitted in a (<cite>authority</code>,
+     * <cite>code</code>) pair at the specified index. The default implementation returns
+     * {@code true} if the first non-whitespace character on each side are valid Java identifiers.
+     * <p>
+     * We may consider to turn this method into a protected one if the users need to override it.
+     */
+    private static boolean canSeparateAt(final String code, final int index) {
+        char c;
+        int i = index;
+        do {
+            if (--i < 0) {
+                return false;
+            }
+            c = code.charAt(i);
+        } while (Character.isWhitespace(c));
+        if (!Character.isJavaIdentifierPart(c)) {
+            return false;
+        }
+        final int length = code.length();
+        i = index;
+        do {
+            if (++i >= length) {
+                return false;
+            }
+            c = code.charAt(i);
+        } while (Character.isWhitespace(c));
+        return Character.isJavaIdentifierPart(c);
+    }
+
+    /**
      * Returns a copy of the hints specified by the user at construction time. It may or may
      * not be the same than the {@linkplain #getImplementationHints implementation hints} for
      * this class.
@@ -331,9 +394,13 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
         ensureNonNull("code", code);
         String authority = null;
         FactoryRegistryException cause = null;
+        final char separator = getSeparator(code);
         for (int split = code.lastIndexOf(separator); split >= 0;
                  split = code.lastIndexOf(separator, split-1))
         {
+            if (!canSeparateAt(code, split)) {
+                continue;
+            }
             /*
              * Try all possible authority names, begining with the most specific ones.
              * For example if the code is "urn:ogc:def:crs:EPSG:6.8:4326", then we will
@@ -516,15 +583,19 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
         inProgress.set(Boolean.TRUE);
         try {
             for (final Iterator it=FactoryFinder.getAuthorityNames().iterator(); it.hasNext();) {
-                final String authority = (String) it.next();
+                final String authority = ((String) it.next()).trim();
+                final char separator = getSeparator(authority);
                 /*
                  * Prepares a buffer with the "AUTHORITY:" part in "AUTHORITY:NUMBER".
                  * We will reuse this buffer in order to prefix the authority name in
                  * front of every codes.
                  */
                 final StringBuffer code = new StringBuffer(authority);
-                code.append(separator);
-                final int codeBase = code.length();
+                int codeBase = code.length();
+                if (codeBase != 0 && code.charAt(codeBase - 1) != separator) {
+                    code.append(separator);
+                    codeBase = code.length();
+                }
                 code.append("all");
                 final String dummyCode = code.toString();
                 /*

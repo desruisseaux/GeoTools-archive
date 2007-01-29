@@ -39,8 +39,11 @@ import org.geotools.metadata.iso.citation.Citations;
 
 
 /**
- * Wraps {@linkplain AllAuthoritiesFactory all factories} in a {@code "urn:ogc:def"} URN
- * name space. An exemple of complete URN is {@code "urn:ogc:def:crs:EPSG:6.8"}.
+ * Wraps {@linkplain AllAuthoritiesFactory all factories} in a {@code "urn:ogc:def"}
+ * name space. An exemple of complete URN is {@code "urn:ogc:def:crs:EPSG:6.8:4326"}.
+ * <p>
+ * Users don't need to create an instance of this class, since one is automatically
+ * registered for use in {@link org.opengis.referencing.FactoryFinder}.
  *
  * @since 2.4
  * @source $URL$
@@ -101,7 +104,8 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the authority, which contains {@code "urn:ogc:def"} and {@code "urn:x-ogc:def"}
+     * identifiers.
      */
     public Citation getAuthority() {
         return Citations.URN_OGC;
@@ -296,8 +300,8 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
     }
 
     /**
-     * Removes the {@code urnBase} from the specified code before to pass it to the wrapped
-     * factories.
+     * Removes the URN base ({@code "urn:ogc:def"}) from the specified code
+     * before to pass it to the wrapped factories.
      *
      * @param  code The code given to this factory.
      * @return The code to give to the underlying factories.
