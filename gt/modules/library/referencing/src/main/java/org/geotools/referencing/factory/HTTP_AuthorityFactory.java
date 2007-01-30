@@ -104,8 +104,14 @@ public class HTTP_AuthorityFactory extends AuthorityFactoryAdapter implements CR
             if (code.indexOf('/') < 0) {
                 final int split = code.indexOf('#');
                 if (split >= 0 && code.indexOf('#', split+1) < 0) {
-                    code = code.substring(0, split).trim() + GenericName.DEFAULT_SEPARATOR +
-                           code.substring(split + 1).trim();
+                    String authority = code.substring(0, split).trim();
+                    final int ext = authority.lastIndexOf('.');
+                    if (ext > 0) {
+                        // Removes the extension part (typically ".xml")
+                        authority = authority.substring(0, ext);
+                    }
+                    code = code.substring(split + 1).trim();
+                    code = authority + GenericName.DEFAULT_SEPARATOR + code;
                     return code;
                 }
             }

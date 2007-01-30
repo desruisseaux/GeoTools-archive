@@ -323,9 +323,16 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     }
 
     /**
-     * Returns {@code true} if the specified code can be splitted in a (<cite>authority</code>,
-     * <cite>code</code>) pair at the specified index. The default implementation returns
-     * {@code true} if the first non-whitespace character on each side are valid Java identifiers.
+     * Returns {@code true} if the specified code can be splitted in a (<cite>authority</cite>,
+     * <cite>code</cite>) pair at the specified index. The default implementation returns
+     * {@code true} if the first non-whitespace character on the left and right side are
+     * valid Java identifiers.
+     * <p>
+     * The purpose of this method is to avoid considering the {@code "//"} part in
+     * {@code "http://www.opengis.net/gml/srs/epsg.xml"} as separators. In case of
+     * failure to parse the code, this restriction will produce and error message
+     * like "<cite>Unknown <code>http://www.opengis.net</code> authority</cite>"
+     * instead of "<cite>Unknown <code>http:</code> authority</cite>".
      * <p>
      * We may consider to turn this method into a protected one if the users need to override it.
      */

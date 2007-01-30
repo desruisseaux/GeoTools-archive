@@ -138,6 +138,9 @@ public class AllAuthoritiesFactoryTest extends TestCase {
         actual   = all.createCoordinateReferenceSystem("HTTP://WWW.OPENGIS.NET/GML/SRS/crs#84");
         assertSame(expected, actual);
 
+        actual   = all.createCoordinateReferenceSystem("http://www.opengis.net/gml/srs/CRS.xml#84");
+        assertSame(expected, actual);
+
         try {
             all.createCoordinateReferenceSystem("http://www.dummy.net/gml/srs/CRS#84");
             fail("Expected a NoSuchAuthorityCodeException");
