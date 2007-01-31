@@ -62,6 +62,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  *
  * @see Envelope2D
  * @see org.geotools.geometry.jts.ReferencedEnvelope
@@ -971,15 +972,50 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * @since 2.3
      */
     public boolean equals(final Envelope envelope, final double eps) {
-        ensureNonNull("envelope", envelope);
+    	return equals(envelope, eps,true);
+    }
+    /**
+     * Compares to the specified envelope for equality up to the specified tolerance value.
+     * The tolerance value {@code eps} can be either relative to the {@linkplain #getLength 
+     * envelope length}along each dimension or can be an absolut value (as for example some
+     * ground resolution of a {@link GridCoverage}. 
+     * 
+     * If <code>relativeToLength</code> is set to true, the actual tolerance value for a given dimension
+     * <var>i</var> is {@code eps}&times;{@code length} where {@code length} is the maximum of
+     * {@linkplain #getLength this envelope length} and the specified envelope length along
+     * dimension <var>i</var>.
+     * 
+     * If <code>relativeToLength</code> is set to false, the actual tolerance value for a given dimension
+     * <var>i</var> is {@code eps}.
+     * 
+     * <p>
+     * Relative tolerance value (as opposed to absolute tolerance value) help to workaround the
+     * fact that tolerance value are CRS dependent. For example the tolerance value need to be
+     * smaller for geographic CRS than for UTM projections, because the former typically has a
+     * range of -180 to 180° while the later can have a range of thousands of meters.
+     * <p>
+     * This method assumes that the specified envelope uses the same CRS than this envelope.
+     * For performance reason, it will no be verified unless J2SE assertions are enabled.
+     *
+     * @see #contains(Envelope, boolean)
+     * @see #intersects(Envelope, boolean)
+     *
+     * @since 2.4
+     */
+    public boolean equals(final Envelope envelope, final double eps,final boolean relativeToLength) {
         final int dimension = getDimension();
         if (envelope.getDimension() != dimension) {
             return false;
         }
-        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
+        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
+        double epsilon;
         for (int i=0; i<dimension; i++) {
-            double epsilon = Math.max(getLength(i), envelope.getLength(i));
-            epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;
+        	if(relativeToLength){
+	            epsilon = Math.max(getLength(i), envelope.getLength(i));
+	            epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;
+        	}
+        	else
+        		epsilon=eps;
             // Comparaison below uses '!' in order to catch NaN values.
             if (!(Math.abs(getMinimum(i) - envelope.getMinimum(i)) <= epsilon &&
                   Math.abs(getMaximum(i) - envelope.getMaximum(i)) <= epsilon))
