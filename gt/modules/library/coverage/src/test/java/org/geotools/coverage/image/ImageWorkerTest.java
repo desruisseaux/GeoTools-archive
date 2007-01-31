@@ -20,10 +20,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
-import org.geotools.coverage.grid.FloatRasterTest;
 import org.geotools.image.ImageWorker;
-import org.geotools.resources.TestData;
-
+import org.geotools.test.TestData;;
 /**
  * Testing {@link ImageWorker} capabilities.
  * 
