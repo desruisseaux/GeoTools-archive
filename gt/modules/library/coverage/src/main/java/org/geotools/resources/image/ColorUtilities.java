@@ -54,6 +54,31 @@ public final class ColorUtilities {
     private ColorUtilities() {
     }
 
+	/**
+	 * Creates an sRGB color with the specified red, green, blue, and alpha
+	 * values in the range (0 - 255).
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if <code>r</code>, <code>g</code>, <code>b</code> or
+	 *             <code>a</code> are outside of the range 0 to 255, inclusive
+	 * @param r
+	 *            the red component
+	 * @param g
+	 *            the green component
+	 * @param b
+	 *            the blue component
+	 * @param a
+	 *            the alpha component
+	 * @see #getRed
+	 * @see #getGreen
+	 * @see #getBlue
+	 * @see #getAlpha
+	 * @see #getRGB
+	 */
+	public static int getIntFromColor(int r, int g, int b, int a) {
+		return ((a & 0xFF) << 24) | ((r & 0xFF) << 16) | ((g & 0xFF) << 8)
+				| ((b & 0xFF) << 0);
+	}
     /**
      * Returns a subarray of the specified color array. The {@code lower} and
      * {@code upper} index will be clamb into the {@code palette} range.
@@ -360,4 +385,62 @@ public final class ColorUtilities {
         }
         return model.getNumComponents();
     }
+	/**
+	 * Tells us if a specific {@link IndexColorModel} contains only gray color
+	 * or not, ignoring alpha information.
+	 * 
+	 * <p>
+	 * Note that if the
+	 * 
+	 * @param icm
+	 *            {@link IndexColorModel} to be inspected.
+	 * @param checkTransparents
+	 *            tells me if I have to include in my search fully transparent
+	 *            pixels.
+	 * @return true if the palette is grayscale, false otherwise.
+	 */
+	public static boolean isGrayPalette(final IndexColorModel icm,
+			final boolean checkTransparents) {
+		int r;
+		int g;
+		int b;
+		int a = 255;
+		final int mapSize = icm.getMapSize();
+		boolean hasAlpha = icm.hasAlpha();
+		boolean gray = true;
+		for (int i = 0; i < mapSize; i++) {
+			// //
+			//
+			// get the color for this pixel including the alpha information only
+			// if it is requested.
+			//
+			// //
+			r = icm.getRed(i);
+			g = icm.getGreen(i);
+			b = icm.getBlue(i);
+			if (hasAlpha && checkTransparents) {
+				// //
+				//
+				// If this entry is transparent and we were not asked to check
+				// transparents pixels, let's leave
+				// if it is requested.
+				//
+				// //
+				a = icm.getAlpha(i);
+				if (a == 0)
+					continue;
+			}
+			
+			// //
+			//
+			// If gray, all components are the same.
+			//
+			// //
+			gray = gray && r == g && g == b;
+			if (!gray)
+				break;
+
+		}
+		return gray;
+	}
 }
