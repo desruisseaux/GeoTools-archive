@@ -55,7 +55,7 @@ public class GT30DecimationTest extends GT30TestBase {
 		// using a big tile cache
 		final JAI jaiDef = JAI.getDefaultInstance();
 		final TileCache cache = jaiDef.getTileCache();
-		cache.setMemoryCapacity(128 * 1024 * 1024);
+		cache.setMemoryCapacity(64 * 1024 * 1024);
 		cache.setMemoryThreshold(1.0f);
 		// final TCTool tool= new TCTool();
 
@@ -93,13 +93,18 @@ public class GT30DecimationTest extends GT30TestBase {
 			gc = ((GridCoverage2D) reader.read((GeneralParameterValue[]) params
 					.values().toArray(new GeneralParameterValue[1])));
 			if(TestData.isInteractiveTest())
+			{
+//				 logging some info
+				logger.info(gc.getCoordinateReferenceSystem2D().toWKT());
+				logger.info(gc.toString());
 				gc.show();
+			}
 			else
+			{
 				gc.getRenderedImage().getData();
+			}
 
-			// logging some info
-			logger.info(gc.getCoordinateReferenceSystem2D().toWKT());
-			logger.info(gc.toString());
+			
 
 		}
 	}

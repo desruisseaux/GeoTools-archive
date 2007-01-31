@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.test.TestData;
+import org.geotools.resources.TestData;
 
 /**
  * @author Simone Giannecchini

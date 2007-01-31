@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -99,7 +100,13 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 	 * @return a GridCoverageWriter object
 	 */
 	public GridCoverageWriter getWriter(final Object destination) {
-		return new GTopo30Writer(destination);
+		try {
+			return new GTopo30Writer(destination);
+		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -111,8 +118,14 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 	 * 
 	 * @return a GridCoverageWriter object
 	 */
-	public GridCoverageWriter getWriter(final Object destination,Hints hints) {
-		return new GTopo30Writer(destination,hints);
+	public GridCoverageWriter getWriter(final Object destination, Hints hints) {
+		try {
+			return new GTopo30Writer(destination, hints);
+		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.WARNING))
+				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			return null;
+		}
 	}
 	/**
 	 * Checks if the GTopo30DataSource supports a given file
@@ -131,8 +144,8 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 			try {
 				urlToUse = ((File) o).toURL();
 			} catch (MalformedURLException e) {
-				if (LOGGER.isLoggable(Level.SEVERE))
-					LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 				return false;
 			}
 		} else if (o instanceof URL) {
@@ -147,8 +160,8 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 				try {
 					urlToUse = new URL((String) o);
 				} catch (MalformedURLException e1) {
-					if (LOGGER.isLoggable(Level.SEVERE))
-						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+					if (LOGGER.isLoggable(Level.FINE))
+						LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 					return false;
 				}
 			}
@@ -160,8 +173,8 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 		try {
 			final GTopo30Reader reader = new GTopo30Reader(urlToUse);
 		} catch (IOException e) {
-			if (LOGGER.isLoggable(Level.SEVERE))
-				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 			return false;
 		}
 

@@ -28,7 +28,9 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,6 +42,7 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileCacheImageOutputStream;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.ImageOutputStreamImpl;
 import javax.media.jai.Histogram;
 import javax.media.jai.ImageLayout;
@@ -55,6 +58,9 @@ import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.Operations;
+import org.geotools.coverage.processing.operation.Resample;
+import org.geotools.coverage.processing.operation.SelectSampleDimension;
+import org.geotools.data.DataSourceException;
 import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
@@ -80,7 +86,8 @@ import com.sun.media.jai.operator.ImageWriteDescriptor;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/src/org/geotools/gce/gtopo30/GTopo30Writer.java $
  */
-final public class GTopo30Writer extends AbstractGridCoverageWriter implements GridCoverageWriter {
+final public class GTopo30Writer extends AbstractGridCoverageWriter implements
+		GridCoverageWriter {
 
 	/** Logger. */
 	private final static Logger LOGGER = Logger
@@ -91,117 +98,138 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 		NoDataReplacerOpImage.register(JAI.getDefaultInstance());
 	}
 
+	/** Cached factory for a {@link SelectSampleDimension} operation. */
+	private final static SelectSampleDimension sdFactory = new SelectSampleDimension();
+
+	/** Cached factory for {@link Resample} operation. */
+	private final static Resample resampleFactory = new Resample();
+
 	/** Standard width for the GIF image. */
 	private final static int GIF_WIDTH = 640;
 
 	/** Standard height for the GIF image. */
 	private final static int GIF_HEIGHT = 480;
 
-	/**
-	 * The destination (can be a File (a directory actually), an URL to a
-	 * directory, a ZipOutputStream or a String representing a directory or an
-	 * URL to a directory.)
-	 */
+	/** Destination for this writer. */
 	private Object destination;
 
 	/**
-	 * Creates a GTopo30Writer.
+	 * Creates a {@link GTopo30Writer}.
 	 * 
 	 * @param dest
-	 *            The destination object can be a File (a directory actually),
-	 *            an URL to a directory, a ZipOutputStream or a String
-	 *            representing a directory or an URL to a directory.
+	 *            The destination object can be a {@link File} (a directory
+	 *            actually), an {@link URL} to a directory, or a String
+	 *            representing a directory or an {@link URL} to a directory.
+	 * @throws DataSourceException
 	 */
-	public GTopo30Writer(final Object dest) {
-		this(dest,null);
-	}/**
-	 * Creates a GTopo30Writer.
-	 * 
-	 * @param dest
-	 *            The destination object can be a File (a directory actually),
-	 *            an URL to a directory, a ZipOutputStream or a String
-	 *            representing a directory or an URL to a directory.
-	 */
-	public GTopo30Writer(final Object dest,final Hints hints) {
-		destination = dest;
+	public GTopo30Writer(final Object dest) throws DataSourceException {
+		this(dest, null);
+	}
 
+	/**
+	 * Creates a {@link GTopo30Writer}.
+	 * 
+	 * @param dest
+	 *            The destination object can be a File (a directory actually),
+	 *            an URL to a directory, or a String representing a directory or
+	 *            an URL to a directory.
+	 * @throws DataSourceException
+	 */
+	public GTopo30Writer(final Object dest, final Hints hints)
+			throws DataSourceException {
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Initial checks
+		//
+		// /////////////////////////////////////////////////////////////////////
 		if (dest == null) {
-			return;
+			throw new NullPointerException("The provided destination is null.");
 		}
 
+		destination = dest;
 		final File temp;
 		final URL url;
 
-		try {
-			// we only accept a directory as a path
-			if (dest instanceof String) {
-				temp = new File((String) dest);
+		// we only accept a directory as a path
+		if (dest instanceof String) {
+			temp = new File((String) dest);
 
-				// if it exists and it is not a directory that 's not good
-				if ((temp.exists() && !temp.isDirectory()) || !temp.exists()) {
-					destination = null; // we cannot write
-				} else if (!temp.exists()) {
-					// well let's create it!
-					if (!temp.mkdir()) {
-						destination = null;
-					} else {
-						destination = temp.getAbsolutePath();
-					}
-				}
-			} else if (dest instanceof File) {
-				temp = (File) dest;
-
-				if (temp.exists() && !temp.isDirectory()) {
-					this.destination = null;
-				} else if (!temp.exists()) {
-					// let's create it
-					if (temp.mkdir()) {
-						destination = temp.getAbsolutePath();
-					} else {
-						destination = null;
-					}
-				}
-			} else if (dest instanceof URL) {
-				url = (URL) dest;
-
-				if (url.getProtocol().compareToIgnoreCase("file") != 0) {
+			// if it exists and it is not a directory that 's not good
+			if ((temp.exists() && !temp.isDirectory()) || !temp.exists()) {
+				destination = null; // we cannot write
+			} else if (!temp.exists()) {
+				// well let's create it!
+				if (!temp.mkdir()) {
 					destination = null;
+				} else {
+					destination = temp.getAbsolutePath();
 				}
-
-				temp = new File(url.getFile());
-
-				if (temp.exists() && !temp.isDirectory()) {
-					destination = null;
-				} else if (!temp.exists()) {
-					// let's create it
-					if (temp.mkdir()) {
-						destination = temp.getAbsolutePath();
-					} else {
-						destination = null;
-					}
-				}
-			} else if (dest instanceof ZipOutputStream) {
-				this.destination = (ZipOutputStream) dest;
-				((ZipOutputStream) destination)
-						.setMethod(ZipOutputStream.DEFLATED);
-				((ZipOutputStream) destination)
-						.setLevel(Deflater.BEST_COMPRESSION);
 			}
-		} catch (Exception e) {
-			if (LOGGER.isLoggable(Level.SEVERE))
+		} else if (dest instanceof File) {
+			temp = (File) dest;
+
+			if (temp.exists() && !temp.isDirectory()) {
+				this.destination = null;
+			} else if (!temp.exists()) {
+				// let's create it
+				if (temp.mkdir()) {
+					destination = temp.getAbsolutePath();
+				} else {
+					destination = null;
+				}
+			}
+		} else if (dest instanceof URL) {
+			url = (URL) dest;
+
+			if (url.getProtocol().compareToIgnoreCase("file") != 0) {
+				destination = null;
+			}
+
+			try {
+				temp = new File(URLDecoder.decode(url.getFile(), "UTF-8)"));
+			} catch (UnsupportedEncodingException e) {
 				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-			destination = null;
+				final DataSourceException ex = new DataSourceException(e);
+				throw ex;
+			}
+
+			if (temp.exists() && !temp.isDirectory()) {
+				destination = null;
+			} else if (!temp.exists()) {
+				// let's create it
+				if (temp.mkdir()) {
+					destination = temp.getAbsolutePath();
+				} else {
+					destination = null;
+				}
+			}
+
+		} else if (dest instanceof ZipOutputStream) {
+			this.destination = (ZipOutputStream) dest;
+			((ZipOutputStream) destination).setMethod(ZipOutputStream.DEFLATED);
+			((ZipOutputStream) destination).setLevel(Deflater.BEST_COMPRESSION);
+
+		} else if (dest instanceof ImageOutputStream) {
+			this.destination = dest;
+		} else {
+			throw new IllegalArgumentException(
+					"The provided destination is of an incorrect type.");
+
 		}
-		
-		// //
+
+		// /////////////////////////////////////////////////////////////////////
 		//
 		// managing hints
 		//
-		// //
+		// /////////////////////////////////////////////////////////////////////
+		if (super.hints == null) {
+			this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+			this.hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
+		}
 		if (hints != null) {
-			if (super.hints == null)
-				this.hints = new Hints(null);
-			hints.add(hints);
+
+			this.hints.add(hints);
 		}
 	}
 
@@ -209,14 +237,14 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getFormat()
 	 */
 	public Format getFormat() {
-		return null;
+		return new GTopo30Format();
 	}
 
 	/**
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#getDestination()
 	 */
 	public Object getDestination() {
-		return null;
+		return destination;
 	}
 
 	/**
@@ -416,11 +444,12 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 			// specified
 			final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
 					.getCoordinateReferenceSystem());
-/*
- * Note from Martin: I suggest to replace all the above lines by the commented code below.
- * The change need to be tested in order to make sure that I didn't made a mistake in the
- * mathematic. Note that 'lonFirst' totally vanish.
- */
+			/*
+			 * Note from Martin: I suggest to replace all the above lines by the
+			 * commented code below. The change need to be tested in order to
+			 * make sure that I didn't made a mistake in the mathematic. Note
+			 * that 'lonFirst' totally vanish.
+			 */
 			final AffineTransform gridToWorld = (AffineTransform) gc
 					.getGridGeometry().getGridToCoordinateSystem();
 			boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
@@ -435,17 +464,18 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 					: gridToWorld.getTranslateY();
 			final double yUpperLeft = lonFirst ? gridToWorld.getTranslateY()
 					: gridToWorld.getTranslateX();
-/*
-			final AffineTransform worldToGrid = (AffineTransform) gc
-					.getGridGeometry().getGridToCoordinateSystem().inverse();
-
-			final double geospatialDx = 1 / XAffineTransform.getScaleX0(worldToGrid);
-			final double geospatialDy = 1 / XAffineTransform.getScaleY0(worldToGrid);
-
-			// getting corner coordinates of the left upper corner
-			final double xUpperLeft = -worldToGrid.getTranslateX() * geospatialDx;
-			final double yUpperLeft = -worldToGrid.getTranslateY() * geospatialDy;
-*/
+			/*
+			 * final AffineTransform worldToGrid = (AffineTransform) gc
+			 * .getGridGeometry().getGridToCoordinateSystem().inverse();
+			 * 
+			 * final double geospatialDx = 1 /
+			 * XAffineTransform.getScaleX0(worldToGrid); final double
+			 * geospatialDy = 1 / XAffineTransform.getScaleY0(worldToGrid);
+			 *  // getting corner coordinates of the left upper corner final
+			 * double xUpperLeft = -worldToGrid.getTranslateX() * geospatialDx;
+			 * final double yUpperLeft = -worldToGrid.getTranslateY() *
+			 * geospatialDy;
+			 */
 
 			// calculating the physical resolution over x and y.
 			final int geometryWidth = gc.getGridGeometry().getGridRange()
@@ -725,6 +755,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 		if (file instanceof File) {
 			out.close();
 		} else {
+			out.flush();
 			((ZipOutputStream) file).closeEntry();
 		}
 
@@ -1072,10 +1103,6 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements G
 
 		final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
 				layout);
-		hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null)); // avoid
-		// caching
-		// this
-		// image
 
 		return JAI.create("format", pbj, hints);
 	}

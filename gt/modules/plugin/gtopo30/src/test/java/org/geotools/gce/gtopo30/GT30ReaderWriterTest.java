@@ -65,7 +65,7 @@ public class GT30ReaderWriterTest extends GT30TestBase {
 		// using a big tile cache
 		final JAI jaiDef = JAI.getDefaultInstance();
 		final TileCache cache = jaiDef.getTileCache();
-		cache.setMemoryCapacity(128 * 1024 * 1024);
+		cache.setMemoryCapacity(64 * 1024 * 1024);
 		cache.setMemoryThreshold(1.0f);
 		// final TCTool tool= new TCTool();
 
@@ -124,14 +124,18 @@ public class GT30ReaderWriterTest extends GT30TestBase {
 			 */
 			// packed view for this coverage
 			GridCoverage2D gc1 = gc.geophysics(false);
-			if(TestData.isInteractiveTest())
+			if (TestData.isInteractiveTest()) {
 				gc1.show();
-			else
+				// logging some info
+				logger.info(gc.getCoordinateReferenceSystem2D().toWKT() + "\n"
+						+ gc.toString());
+				logger.info(gc1.getCoordinateReferenceSystem2D().toWKT() + "\n"
+						+ gc1.toString());
+			} else {
 				gc1.getRenderedImage().getData();
 
-			// logging some info
-			logger.info(gc.getCoordinateReferenceSystem2D().toWKT()+"\n"+gc.toString());
-			logger.info(gc1.getCoordinateReferenceSystem2D().toWKT()+"\n"+gc1.toString());
+			}
+
 		}
 	}
 

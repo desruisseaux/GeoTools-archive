@@ -82,6 +82,8 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 
 import com.sun.media.imageio.stream.RawImageInputStream;
+import com.sun.media.imageioimpl.plugins.raw.RawImageReader;
+import com.sun.media.imageioimpl.plugins.raw.RawImageReaderSpi;
 
 /**
  * This class provides a GridCoverageReader for the GTopo30Format.
@@ -98,6 +100,11 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	/** Logger. */
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.gtopo30");
+	/**
+	 * Cached {@link ImageIO} SPI for creating instances of
+	 * {@link RawImageReader}.
+	 */
+	private final static RawImageReaderSpi imageIOSPI = new RawImageReaderSpi();
 
 	private final static String dmext = ".dem";
 
@@ -186,6 +193,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		if (hints != null)
 			this.hints.add(hints);
 		this.source = source;
+		coverageName = "gtopo30_coverage";
 		// ///////////////////////////////////////////////////////////
 		//
 		// decoding source
@@ -194,7 +202,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		final String filename;
 
 		try {
-			filename = URLDecoder.decode(urlToUse.getFile(), "US-ASCII");
+			filename = URLDecoder.decode(urlToUse.getFile(), "UTF-8");
 		} catch (UnsupportedEncodingException use) {
 			MalformedURLException exception = new MalformedURLException(
 					new StringBuffer("Unable to decode ").append(urlToUse)
@@ -205,6 +213,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		}
 
 		boolean recognized = false;
+		boolean extUpperCase = false;
 
 		if (filename.endsWith(dmext) || filename.endsWith(dhext)
 				|| filename.endsWith(srext) || filename.endsWith(shext)
@@ -219,6 +228,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 					|| filename.endsWith(stext.toUpperCase())
 					|| filename.endsWith(prjext.toUpperCase())) {
 				recognized = true;
+				extUpperCase = true;
 			}
 		}
 
@@ -228,10 +238,14 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		}
 
 		this.coverageName = filename.substring(0, filename.length() - 4);
-		demURL = new URL(urlToUse, this.coverageName + dmext);
-		prjURL = new URL(urlToUse, this.coverageName + prjext);
-		demHeaderURL = new URL(urlToUse, this.coverageName + dhext);
-		statsURL = new URL(urlToUse, this.coverageName + stext);
+		demURL = new URL(urlToUse, this.coverageName
+				+ (!extUpperCase ? dmext : dmext.toUpperCase()));
+		prjURL = new URL(urlToUse, this.coverageName
+				+ (!extUpperCase ? prjext : prjext.toUpperCase()));
+		demHeaderURL = new URL(urlToUse, this.coverageName
+				+ (!extUpperCase ? dhext : dhext.toUpperCase()));
+		statsURL = new URL(urlToUse, this.coverageName
+				+ (!extUpperCase ? stext : stext.toUpperCase()));
 
 		// ///////////////////////////////////////////////////////////
 		//
@@ -249,7 +263,15 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		// Build the coordinate system and the envelope
 		//
 		// ///////////////////////////////////////////////////////////
-		crs = initCRS();
+		final Object tempCRS = this.hints
+				.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+		if (tempCRS != null) {
+			this.crs = (CoordinateReferenceSystem) tempCRS;
+			LOGGER.log(Level.WARNING, new StringBuffer(
+					"Using forced coordinate reference system ").append(
+					crs.toWKT()).toString());
+		} else
+			crs = initCRS();
 		this.originalEnvelope = getBounds(crs);
 
 		// /////////////////////////////////////////////////////////////////////
@@ -506,7 +528,7 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		pbjImageRead.add(null);
 		pbjImageRead.add(null);
 		pbjImageRead.add(readP);
-		pbjImageRead.add(null);
+		pbjImageRead.add(imageIOSPI.createReaderInstance());
 		RenderedOp image = JAI.create("ImageRead", pbjImageRead, hints);
 
 		// sample dimension for this coverage
