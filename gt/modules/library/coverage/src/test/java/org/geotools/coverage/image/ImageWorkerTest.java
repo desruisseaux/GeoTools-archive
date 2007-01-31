@@ -53,7 +53,11 @@ public class ImageWorkerTest extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.worldImage = ImageIO.read(TestData.file(this, "world.PNG"));
+		File fileImage = TestData.file(this, "world.PNG");
+		assertNotNull("Unable to get the test file world.PNG, test data returned null",fileImage);
+		assertTrue("Unable to get the test file world.PNG",fileImage.exists());
+		this.worldImage = ImageIO.read(fileImage);
+		assertNotNull("Returned image was null",worldImage);
 
 	}
 
