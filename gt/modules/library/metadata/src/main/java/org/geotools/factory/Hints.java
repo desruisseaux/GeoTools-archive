@@ -24,6 +24,10 @@ import java.lang.reflect.Modifier;
 
 // Geotools Dependencies
 import org.geotools.util.Logging;
+import org.geotools.resources.Utilities;
+import org.opengis.coverage.grid.Grid;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.coverage.grid.GridCoverageReader;
 
 
 /**
@@ -368,6 +372,18 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static final Key VERSION = new Key("org.geotools.util.Version");
+    /**
+     * Some operation when called on a {@link GridCoverage} that is the non-geophysics
+     * view of another {@link GridCoverage} try to go back to the latter before executing
+     * even if they could execute fine without doing so. The rationale behind this is that 
+     * the non-geophysics view is just the rendered version of a coverage, hence operations
+     * should be applied onto the geophysics companion.
+     * 
+     * However, in some cases like when doing pure rendering, we might want to force this 
+     * operations to work on the non-geophysics view directly, even performing color expansions
+     * as needed. This can be accomplished by settng this hint to true. 
+     */
+    public static final Key REPLACE_NON_GEOPHYSICS_VIEW = new Key(Boolean.class);
 
     /**
      * Constructs a new object with keys and values initialized from the
