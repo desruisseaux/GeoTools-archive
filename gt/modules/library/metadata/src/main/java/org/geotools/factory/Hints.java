@@ -24,10 +24,6 @@ import java.lang.reflect.Modifier;
 
 // Geotools Dependencies
 import org.geotools.util.Logging;
-import org.geotools.resources.Utilities;
-import org.opengis.coverage.grid.Grid;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridCoverageReader;
 
 
 /**
@@ -65,6 +61,12 @@ import org.opengis.coverage.grid.GridCoverageReader;
  * @author Martin Desruisseaux
  */
 public final class Hints extends RenderingHints {
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                        Factories                       ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
     /**
      * The {@link com.vividsolutions.jts.geom.GeometryFactory} instance to use.
      * 
@@ -189,51 +191,13 @@ public final class Hints extends RenderingHints {
     public static final Key FILTER_FACTORY = new Key(
             "org.opengis.filter.FilterFactory");
 
-    /**
-     * The {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
-     * 
-     * @deprecated The {@code GridCoverageProcessor} interface is not yet
-     *             stable. Avoid dependencies if possible.
-     */
-    public static final Key GRID_COVERAGE_PROCESSOR = new Key(Object.class);
-    // TODO new Key("org.opengis.coverage.processing.GridCoverageProcessor");
 
-    /**
-     * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to ignore
-     * the built-in overviews when creating a {@link org.opengis.coverage.grid.GridCoverage}
-     * object during a read. This hints also implied that no decimation on reading is performed.
-     *
-     * @since 2.3
-     */
-    public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
 
-    /**
-     * The {@linkplain javax.media.jai.tilecodec.TileEncoder tile encoder} name
-     * (as a {@link String} value) to use during serialization of image data in
-     * a {@link org.geotools.coverage.grid.GridCoverage2D} object. This encoding
-     * is given to the {@link javax.media.jai.remote.SerializableRenderedImage}
-     * constructor. Valid values include (but is not limited to) {@code "raw"},
-     * {@code "gzip"} and {@code "jpeg"}.
-     * <p>
-     * <strong>Note:</strong> We recommand to avoid the {@code "jpeg"} codec
-     * for grid coverages.
-     * 
-     * @see org.geotools.coverage.FactoryFinder#getGridCoverageFactory
-     * 
-     * @since 2.3
-     */
-    public static final Key TILE_ENCODING = new Key(String.class);
-
-    /**
-     * The {@link javax.media.jai.JAI} instance to use.
-     */
-    public static final Key JAI_INSTANCE = new Key("javax.media.jai.JAI");
-
-    /**
-     * The {@link org.opengis.coverage.SampleDimensionType} to use.
-     */
-    public static final Key SAMPLE_DIMENSION_TYPE = new Key(
-            "org.opengis.coverage.SampleDimensionType");
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////              Coordinate Reference Systems              ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
 
     /**
      * The default {@link org.opengis.referencing.crs.CoordinateReferenceSystem}
@@ -372,18 +336,84 @@ public final class Hints extends RenderingHints {
      * @since 2.4
      */
     public static final Key VERSION = new Key("org.geotools.util.Version");
+
+
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////                                                        ////////
+    ////////                     Grid Coverages                     ////////
+    ////////                                                        ////////
+    ////////////////////////////////////////////////////////////////////////
+
     /**
-     * Some operation when called on a {@link GridCoverage} that is the non-geophysics
-     * view of another {@link GridCoverage} try to go back to the latter before executing
-     * even if they could execute fine without doing so. The rationale behind this is that 
-     * the non-geophysics view is just the rendered version of a coverage, hence operations
-     * should be applied onto the geophysics companion.
+     * The {@link org.opengis.coverage.processing.GridCoverageProcessor} instance to use.
      * 
-     * However, in some cases like when doing pure rendering, we might want to force this 
-     * operations to work on the non-geophysics view directly, even performing color expansions
-     * as needed. This can be accomplished by settng this hint to true. 
+     * @deprecated The {@code GridCoverageProcessor} interface is not yet
+     *             stable. Avoid dependencies if possible.
+     */
+    public static final Key GRID_COVERAGE_PROCESSOR = new Key(Object.class);
+    // TODO new Key("org.opengis.coverage.processing.GridCoverageProcessor");
+
+    /**
+     * Tells to the {@link org.opengis.coverage.grid.GridCoverageReader} instances to ignore
+     * the built-in overviews when creating a {@link org.opengis.coverage.grid.GridCoverage}
+     * object during a read. This hints also implied that no decimation on reading is performed.
+     *
+     * @since 2.3
+     */
+    public static final Key IGNORE_COVERAGE_OVERVIEW = new Key(Boolean.class);
+
+    /**
+     * Forces the {@linkplain org.opengis.coverage.processing.GridCoverageProcessor grid coverage
+     * processor} to perform operations on the non-geophysics view.
+     * <p>
+     * Some operation when called on a {@linkplain org.geotools.coverage.grid.GridCoverage grid
+     * coverage} that is the non-geophysics view of another grid coverage try to go back to the
+     * latter before executing even if they could execute fine without doing so. The rationale
+     * behind this is that the non-geophysics view is just the rendered version of a coverage,
+     * hence operations should be applied onto the geophysics companion.
+     * <p>
+     * However, in some cases like when doing pure rendering of photographic images, we might want
+     * to force this operations to work on the non-geophysics view directly, even performing color
+     * expansions as needed. This can be accomplished by setting this hint to {@code true}. Be
+     * aware that interpolations in non-photographic images (i.e. a colormap like a <cite>Sea
+     * Surface Temperature</cite> image) after color expansions may produce wrong colors.
+     *
+     * @since 2.4
+     *
+     * @todo We may need to find a more accurate name, especially when the enumeration in
+     *       {@link org.geotools.coverage.grid.ViewType} will be ready to work. Maybe
+     *       something like {@code PROCESS_ON_VISUAL_VIEW}.
      */
     public static final Key REPLACE_NON_GEOPHYSICS_VIEW = new Key(Boolean.class);
+
+    /**
+     * The {@linkplain javax.media.jai.tilecodec.TileEncoder tile encoder} name
+     * (as a {@link String} value) to use during serialization of image data in
+     * a {@link org.geotools.coverage.grid.GridCoverage2D} object. This encoding
+     * is given to the {@link javax.media.jai.remote.SerializableRenderedImage}
+     * constructor. Valid values include (but is not limited to) {@code "raw"},
+     * {@code "gzip"} and {@code "jpeg"}.
+     * <p>
+     * <strong>Note:</strong> We recommand to avoid the {@code "jpeg"} codec
+     * for grid coverages.
+     * 
+     * @see org.geotools.coverage.FactoryFinder#getGridCoverageFactory
+     * 
+     * @since 2.3
+     */
+    public static final Key TILE_ENCODING = new Key(String.class);
+
+    /**
+     * The {@link javax.media.jai.JAI} instance to use.
+     */
+    public static final Key JAI_INSTANCE = new Key("javax.media.jai.JAI");
+
+    /**
+     * The {@link org.opengis.coverage.SampleDimensionType} to use.
+     */
+    public static final Key SAMPLE_DIMENSION_TYPE = new Key(
+            "org.opengis.coverage.SampleDimensionType");
 
     /**
      * Constructs a new object with keys and values initialized from the

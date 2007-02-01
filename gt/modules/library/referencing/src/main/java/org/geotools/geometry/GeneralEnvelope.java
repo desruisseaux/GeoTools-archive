@@ -970,24 +970,26 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * @see #intersects(Envelope, boolean)
      *
      * @since 2.3
+     *
+     * @deprecated Use {@link #equals(Envelope, double, boolean)} instead.
      */
     public boolean equals(final Envelope envelope, final double eps) {
-    	return equals(envelope, eps,true);
+    	return equals(envelope, eps, true);
     }
+
     /**
      * Compares to the specified envelope for equality up to the specified tolerance value.
      * The tolerance value {@code eps} can be either relative to the {@linkplain #getLength 
-     * envelope length}along each dimension or can be an absolut value (as for example some
-     * ground resolution of a {@link GridCoverage}. 
-     * 
-     * If <code>relativeToLength</code> is set to true, the actual tolerance value for a given dimension
-     * <var>i</var> is {@code eps}&times;{@code length} where {@code length} is the maximum of
-     * {@linkplain #getLength this envelope length} and the specified envelope length along
-     * dimension <var>i</var>.
-     * 
-     * If <code>relativeToLength</code> is set to false, the actual tolerance value for a given dimension
-     * <var>i</var> is {@code eps}.
-     * 
+     * envelope length} along each dimension or can be an absolute value (as for example some
+     * ground resolution of a {@linkplain org.opengis.coverage.grid.GridCoverage grid coverage}).
+     * <p>
+     * If {@code relativeToLength} is set to {@code true}, the actual tolerance value for a given
+     * dimension <var>i</var> is {@code eps}&times;{@code length} where {@code length} is the
+     * maximum of {@linkplain #getLength this envelope length} and the specified envelope length
+     * along dimension <var>i</var>.
+     * <p>
+     * If {@code relativeToLength} is set to {@code false}, the actual tolerance value for a
+     * given dimension <var>i</var> is {@code eps}.
      * <p>
      * Relative tolerance value (as opposed to absolute tolerance value) help to workaround the
      * fact that tolerance value are CRS dependent. For example the tolerance value need to be
@@ -997,25 +999,33 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
      * This method assumes that the specified envelope uses the same CRS than this envelope.
      * For performance reason, it will no be verified unless J2SE assertions are enabled.
      *
+     * @param envelope The envelope to compare with.
+     * @param eps The tolerance value to use for numerical comparaisons.
+     * @param relativeToLength {@code true} if the tolerance value should be relative to
+     *        axis length, or {@code false} if it is an absolute value.
+     *
      * @see #contains(Envelope, boolean)
      * @see #intersects(Envelope, boolean)
      *
      * @since 2.4
      */
-    public boolean equals(final Envelope envelope, final double eps,final boolean relativeToLength) {
+    public boolean equals(final Envelope envelope, final double eps,
+                          final boolean relativeToLength)
+    {
+        ensureNonNull("envelope", envelope);
         final int dimension = getDimension();
         if (envelope.getDimension() != dimension) {
             return false;
         }
-        assert equalsIgnoreMetadata(crs, getCoordinateReferenceSystem(envelope)) : envelope;
-        double epsilon;
+        assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dimension; i++) {
-        	if(relativeToLength){
-	            epsilon = Math.max(getLength(i), envelope.getLength(i));
-	            epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;
-        	}
-        	else
-        		epsilon=eps;
+            double epsilon;
+            if (relativeToLength) {
+                epsilon = Math.max(getLength(i), envelope.getLength(i));
+                epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;
+            } else {
+                epsilon = eps;
+            }
             // Comparaison below uses '!' in order to catch NaN values.
             if (!(Math.abs(getMinimum(i) - envelope.getMinimum(i)) <= epsilon &&
                   Math.abs(getMaximum(i) - envelope.getMaximum(i)) <= epsilon))
