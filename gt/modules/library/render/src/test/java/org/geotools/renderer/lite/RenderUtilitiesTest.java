@@ -1,5 +1,7 @@
 package org.geotools.renderer.lite;
 
+import java.util.HashMap;
+
 import junit.framework.TestCase;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -47,6 +49,23 @@ public class RenderUtilitiesTest extends TestCase {
 		double scale = RendererUtilities.calculateScale(re, 10 * 100, 10 * 100, 2.54);
 		assertEquals(1.0, scale, 0.00001); // no projection deformation here!
 	}
+    
+    public void testOGCScaleProjected() throws Exception {
+        ReferencedEnvelope re = new ReferencedEnvelope(new Envelope(0, 10,
+                0, 10), DefaultEngineeringCRS.CARTESIAN_2D);
+        int tenMetersPixels = (int) Math.round(10 / 0.00028);
+        double scale = RendererUtilities.calculateOGCScale(re, tenMetersPixels , new HashMap());
+        assertEquals(1.0, scale, 0.0001);
+    }
+    
+    public void testOGCScaleGeographic() throws Exception {
+        // same example as page 29 in the SLD OGC spec, but with the expected scale corrected
+        // since the OGC document contains a very imprecise one
+        ReferencedEnvelope re = new ReferencedEnvelope(new Envelope(0, 2,
+                0, 2), DefaultGeographicCRS.WGS84);
+        double scale = RendererUtilities.calculateOGCScale(re, 600 , new HashMap());
+        assertEquals(1325232.03, scale, 0.01);
+    }
     
     /**
      * The following test is from the tile module where the behavior

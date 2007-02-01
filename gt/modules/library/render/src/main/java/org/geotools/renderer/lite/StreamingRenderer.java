@@ -23,6 +23,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,7 +67,6 @@ import org.geotools.map.MapLayer;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.renderer.GTRenderer;
@@ -133,7 +133,25 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 public final class StreamingRenderer implements GTRenderer {
 
 	private final static int defaultMaxFiltersToSendToDatastore = 5; // default
-
+    
+    /**
+     * Computes the scale as the ratio between map distances and real world distances,
+     * assuming 90dpi and taking into consideration projection deformations and actual
+     * earth shape. <br>
+     * Use this method only when in need of accurate computation. Will break if the
+     * data extent is outside of the currenct projection definition area. 
+     */
+    public static final String SCALE_ACCURATE = "ACCURATE";
+    
+    /**
+     * Very simple and lenient scale computation method that conforms to the OGC SLD 
+     * specification 1.0, page 26. <br>This method is quite approximative, but should
+     * never break and ensure constant scale even on lat/lon unprojected maps (because
+     * in that case scale is computed as if the area was along the equator no matter
+     * what the real position is).
+     */
+    public static final String SCALE_OGC = "OGC";
+    
 	// value
 	public HashMap symbolizerAssociationHT = new HashMap(); // associate a
 
@@ -214,6 +232,8 @@ public final class StreamingRenderer implements GTRenderer {
 	private boolean memoryPreloadingEnabledDEFAULT = false;
     
     private int renderingBufferDEFAULT = 0;
+    
+    private String scaleComputationMethodDEFAULT = SCALE_ACCURATE;
 
     /**
      * "optimizedDataLoadingEnabled" - Boolean  yes/no (see default optimizedDataLoadingEnabledDEFAULT)
@@ -310,27 +330,6 @@ public final class StreamingRenderer implements GTRenderer {
 			listener.errorOccurred(e);
 		}
 	}
-
-	/**
-	 * Setter for property scaleDenominator.
-	 * 
-	 * @param scaleDenominator
-	 *            New value of property scaleDenominator.
-	 */
-	private void setScaleDenominator(double scaleDenominator) {
-		this.scaleDenominator = scaleDenominator;
-	}
-
-    /**
-     * Used as a fallback if {@link RendererUtilities#calculateScale} failed.
-     */
-    private void setScaleDenominator(final AffineTransform worldToScreenTransform) {
-        try {
-            setScaleDenominator(XAffineTransform.getScale(worldToScreenTransform.createInverse()));
-        } catch (NoninvertibleTransformException exception) {
-            LOGGER.log(Level.WARNING, exception.getLocalizedMessage(), exception);
-        }
-    }
 
 	/**
 	 * If you call this method from another thread than the one that called
@@ -511,15 +510,8 @@ public final class StreamingRenderer implements GTRenderer {
 		final CoordinateReferenceSystem destinationCrs = context
 				.getCoordinateReferenceSystem();
 
-		try {
-			setScaleDenominator(RendererUtilities.calculateScale(mapExtent,
-					paintArea.width, paintArea.height, rendererHints));
-		} catch (Exception e) // probably either (1) no CRS (2) error xforming
-		{
-			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-			// DJB old method - the best we can do
-			setScaleDenominator(1 / at.getScaleX());
-		}
+		// compute the scale according to the user specified method
+        scaleDenominator = computeScale(mapExtent, paintArea, rendererHints);
         
 		//////////////////////////////////////////////////////////////////////
         //
@@ -583,7 +575,20 @@ public final class StreamingRenderer implements GTRenderer {
 		}
 	}
 
-	/**
+	private double computeScale(ReferencedEnvelope envelope, Rectangle paintArea, Map hints) {
+        if(getScaleComputationMethod().equals(SCALE_ACCURATE)) {
+            try {
+               return RendererUtilities.calculateScale(envelope,
+                    paintArea.width, paintArea.height, hints);
+            } catch (Exception e) // probably either (1) no CRS (2) error xforming
+            {
+                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            }
+        } 
+        return RendererUtilities.calculateOGCScale(envelope, paintArea.width, hints);
+    }
+
+    /**
 	 * Renders features based on the map layers and their styles as specified in
 	 * the map context using <code>setContext</code>. <p/> This version of
 	 * the method assumes that paint area, enelope and worldToScreen transform
@@ -658,19 +663,8 @@ public final class StreamingRenderer implements GTRenderer {
 			graphics.setTransform(worldToScreenTransform);
 		}
 
-		try {
-			setScaleDenominator(RendererUtilities.calculateScale(mapArea,
-					paintArea.width, paintArea.height, rendererHints));
-		} catch (TransformException e) // probably either (1) no CRS (2) error xforming
-		{
-			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            setScaleDenominator(worldToScreenTransform);
-			// old method - the best we can do
-		} catch (FactoryException e) {
-			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            setScaleDenominator(worldToScreenTransform);
-			// old method - the best we can do
-		}
+        // compute scale according to the user specified method
+        scaleDenominator = computeScale(mapArea, paintArea, rendererHints);
         
 		//////////////////////////////////////////////////////////////////////
         //
@@ -1442,8 +1436,8 @@ public final class StreamingRenderer implements GTRenderer {
 			FeatureTypeStyle[] featureStyles, FeatureType ftype,
 			Graphics2D graphics) throws IOException {
 		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine("creating rules for scale denominator- "
-					+ scaleDenominator);
+			LOGGER.fine("creating rules for scale denominator - "
+					+ NumberFormat.getNumberInstance().format(scaleDenominator));
 		ArrayList result = new ArrayList();
 
 		int itemNumber = 0;
@@ -2153,6 +2147,21 @@ public final class StreamingRenderer implements GTRenderer {
         if (result == null)
             return renderingBufferDEFAULT;
         return result.intValue();
+    }
+    
+    /**
+     * <p>
+     * Returns scale computation algorithm to be used. 
+     * </p>
+     * 
+     */
+    private String getScaleComputationMethod() {
+        if (rendererHints == null)
+            return scaleComputationMethodDEFAULT;
+        String result = (String) rendererHints.get("scaleComputationMethod");
+        if (result == null)
+            return scaleComputationMethodDEFAULT;
+        return result;
     }
 
 	/**

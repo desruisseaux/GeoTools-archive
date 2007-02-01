@@ -35,6 +35,8 @@ import org.geotools.resources.CRSUtilities;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.EngineeringCRS;
+import org.opengis.referencing.crs.GeodeticCRS;
+import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.PixelInCell;
 import org.opengis.referencing.operation.MathTransform;
@@ -406,6 +408,23 @@ public final class RendererUtilities {
 		return diagonalGroundDistance / diagonalPixelDistanceMeters;
 		// remember, this is the denominator, not the actual scale;
 	}
+    
+    final static double OGC_DEGREE_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360;
+    
+    /**
+     * This method performs the computation using the methods suggested by the OGC SLD specification, page 26.
+     * @param envelope
+     * @param imageWidth
+     * @return
+     */
+    public static double calculateOGCScale(ReferencedEnvelope envelope, int imageWidth, Map hints) {
+        // if it's geodetic, we're dealing with lat/lon unit measures
+        if(envelope.getCoordinateReferenceSystem() instanceof GeographicCRS) {
+            return (envelope.getWidth() * OGC_DEGREE_TO_METERS) / (imageWidth / getDpi(hints) * 0.0254);
+        } else {
+            return envelope.getWidth() / (imageWidth / getDpi(hints) * 0.0254);
+        }
+    }
 
     /**
      * First searches the hints for the scale denominator hint otherwise calls 
@@ -424,15 +443,21 @@ public final class RendererUtilities {
             return scale.doubleValue();
         }
             
-        
-        int dpi;
+        return calculateScale(envelope, imageWidth, imageHeight, getDpi(hints));
+    }
+
+    /**
+     * Either gets a DPI from the hints, or return the OGC standard, stating that a pixel is 0.28 mm
+     * (the result is a non integer DPI...)
+     * @param hints 
+     * @return DPI as doubles, to avoid issues with integer trunking in scale computation expression
+     */
+    private static double getDpi(Map hints) {
         if( hints!=null && hints.containsKey("dpi") ){
-            dpi=((Integer)hints.get("dpi")).intValue();
+            return ((Integer)hints.get("dpi")).intValue();
         }else{
-            dpi=90;//          90 = OGC standard DPI (see SLD spec page 37)
+            return  25.4 / 0.28;   // 90 = OGC standard
         }
-            
-        return calculateScale(envelope, imageWidth, imageHeight, dpi);
     }
 	
 	/**
