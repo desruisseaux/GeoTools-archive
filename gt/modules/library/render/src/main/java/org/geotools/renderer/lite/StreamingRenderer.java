@@ -509,6 +509,7 @@ public final class StreamingRenderer implements GTRenderer {
 		// get detstination CRS
 		final CoordinateReferenceSystem destinationCrs = context
 				.getCoordinateReferenceSystem();
+        mapExtent = new ReferencedEnvelope(mapArea, destinationCrs);
 
 		// compute the scale according to the user specified method
         scaleDenominator = computeScale(mapExtent, paintArea, rendererHints);
