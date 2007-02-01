@@ -427,7 +427,7 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 			 * that.
 			 */
 			if (image.getColorModel() instanceof ComponentColorModel) {
-				worker.forceIndexColorModelForGIF();
+				worker.forceIndexColorModelForGIF(false);
 				image = worker.getRenderedImage();
 			} else
 			/**
@@ -436,7 +436,7 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 			 * informations. we have only one full transparent color.
 			 */
 			if (image.getColorModel() instanceof IndexColorModel) {
-				worker.forceIndexColorModelForGIF();
+				worker.forceIndexColorModelForGIF(false);
 				image = worker.getRenderedImage();
 			}
 		}
