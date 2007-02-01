@@ -1156,7 +1156,7 @@ public final class StreamingRenderer implements GTRenderer {
      *         rendered with the specified styles 
      */
     private int findRenderingBuffer(LiteFeatureTypeStyle[] styles) {
-        final MaxStrokeWidthEstimator rbe = new MaxStrokeWidthEstimator();
+        final MetaBufferEstimator rbe = new MetaBufferEstimator();
 
         LiteFeatureTypeStyle lfts;
         Rule[] rules;

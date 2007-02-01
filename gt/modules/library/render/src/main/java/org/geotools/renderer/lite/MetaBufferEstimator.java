@@ -17,6 +17,7 @@ package org.geotools.renderer.lite;
 
 import java.util.logging.Logger;
 
+import org.geotools.filter.Filter;
 import org.geotools.filter.FilterAttributeExtractor;
 import org.geotools.styling.AnchorPoint;
 import org.geotools.styling.ColorMap;
@@ -45,29 +46,26 @@ import org.geotools.styling.StyledLayerDescriptor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.styling.UserLayer;
-import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Literal;
 
 /**
- * Parses a style or part of it and returns the size of the largest stroke whose
- * width is specified with a literal expression.<br>
- * Also provides an indication wheter the stroke width is accurate, or if a non
- * literal width has been found.
+ * Parses a style or part of it and returns the size of the largest stroke and the biggest point
+ * symbolizer whose width is specified with a literal expression.<br>
+ * Also provides an indication wheter the stroke width is accurate, or if a non literal width has
+ * been found.
  */
 
-public class MaxStrokeWidthEstimator extends FilterAttributeExtractor implements
-        StyleVisitor {
+public class MetaBufferEstimator extends FilterAttributeExtractor implements StyleVisitor {
     /** The logger for the rendering module. */
-    private static final Logger LOGGER = Logger
-            .getLogger("org.geotools.rendering");
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.rendering");
 
     boolean estimateAccurate = true;
 
     int buffer = 0;
 
     /**
-     * Should you reuse this extractor multiple time, calling this method will
-     * reset the buffer and flags
+     * Should you reuse this extractor multiple time, calling this method will reset the buffer and
+     * flags
      * 
      */
     public void reset() {
@@ -92,10 +90,10 @@ public class MaxStrokeWidthEstimator extends FilterAttributeExtractor implements
     }
 
     public void visit(Rule rule) {
-        Filter filter = rule.getFilter();
+        Filter filter = (Filter) rule.getFilter();
 
         if (filter != null) {
-            ((org.geotools.filter.Filter)filter).accept(this);
+            filter.accept(this);
         }
 
         Symbolizer[] symbolizers = rule.getSymbolizers();
@@ -198,7 +196,9 @@ public class MaxStrokeWidthEstimator extends FilterAttributeExtractor implements
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.PointSymbolizer)
      */
     public void visit(PointSymbolizer ps) {
-        // nothing to do here
+        if (ps.getGraphic() != null) {
+            ps.getGraphic().accept(this);
+        }
     }
 
     /**
@@ -230,7 +230,21 @@ public class MaxStrokeWidthEstimator extends FilterAttributeExtractor implements
      * @see org.geotools.styling.StyleVisitor#visit(org.geotools.styling.Graphic)
      */
     public void visit(Graphic gr) {
-        // nothing to do here
+        try {
+            if (gr.getSize() != null) {
+                if (gr.getSize() instanceof Literal) {
+                    Literal lw = (Literal) gr.getSize();
+                    int iw = (int) Math.ceil(((Number) lw.evaluate(null, Double.class)).doubleValue());
+                    if (iw > buffer)
+                        buffer = iw;
+                } else {
+                    estimateAccurate = false;
+                }
+            }
+        } catch (ClassCastException e) {
+            estimateAccurate = false;
+            LOGGER.info("Could not parse graphic size, " + "it's a literal but not a Number...");
+        }
     }
 
     /**
