@@ -32,7 +32,46 @@ import org.geotools.xml.StreamingParser;
 
 
 public class GMLApplicationSchemaParsingTest extends TestCase {
-    public void testWithIncorrectSchemaLocation() throws Exception {
+    public void testStreamFeatureWithIncorrectSchemaLocation()
+        throws Exception {
+        InputStream in = getClass().getResourceAsStream("feature.xml");
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+
+        Document document = factory.newDocumentBuilder().parse(in);
+
+        //update hte schema location
+        document.getDocumentElement().removeAttribute("xsi:schemaLocation");
+
+        //reserialize the document
+        File schemaFile = File.createTempFile("test", "xsd");
+        schemaFile.deleteOnExit();
+
+        Transformer tx = TransformerFactory.newInstance().newTransformer();
+        tx.transform(new DOMSource(document), new StreamResult(schemaFile));
+
+        in.close();
+        in = new FileInputStream(schemaFile);
+
+        GMLConfiguration configuration = new GMLConfiguration();
+        configuration.getProperties().add(Parser.Properties.IGNORE_SCHEMA_LOCATION);
+        configuration.getProperties().add(Parser.Properties.PARSE_UNKNOWN_ELEMENTS);
+
+        StreamingParser parser = new StreamingParser(configuration, in, "//TestFeature");
+
+        for (int i = 0; i < 3; i++) {
+            Feature f = (Feature) parser.parse();
+
+            assertNotNull(f);
+        }
+
+        assertNull(parser.parse());
+        in.close();
+    }
+
+    public void testStreamPointWithIncorrectSchemaLocation()
+        throws Exception {
         InputStream in = getClass().getResourceAsStream("feature.xml");
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -72,10 +111,6 @@ public class GMLApplicationSchemaParsingTest extends TestCase {
     }
 
     public void testWithCorrectSchemaLocation() throws Exception {
-        if (true) {
-            return;
-        }
-
         InputStream in = getClass().getResourceAsStream("feature.xml");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
