@@ -102,7 +102,9 @@ public class SimpleFeatureBuilder  {
     	return null;
     }
     public org.geotools.feature.Feature feature( String id ) {
-    	return factory.createSimpleFeature( featureType, id, attributes.toArray() );
+    	Feature feature = factory.createSimpleFeature( featureType, id, attributes.toArray() );
+    	init();
+    	return feature; 
     }
 //    public SimpleFeature feature(String id) {
 //    	return factory.createSimpleFeature( featureType, id, attributes.toArray() );
