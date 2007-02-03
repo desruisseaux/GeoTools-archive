@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDFactory;
+import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
@@ -34,6 +35,7 @@ import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.BindingFactory;
 import org.geotools.xml.Configuration;
+import org.geotools.xml.ElementInstance;
 import org.geotools.xml.Parser;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
@@ -307,13 +309,11 @@ public class ParserHandler extends DefaultHandler {
 
         if ( handler == null ) {
         	//look for a global element
-        	for ( int i = 0; i < schemas.length && handler == null; i++ ) {
-        		XSDElementDeclaration element = 
-        			Schemas.getElementDeclaration( schemas[ i ], qualifiedName );	
-        		if ( element != null ) {
-        			handler = handlerFactory.createElementHandler( element, parent, this );
-        		}
-        	}
+        	XSDElementDeclaration element = 
+        		index.getElementDeclaration( qualifiedName );
+        	if ( element != null ) {
+    			handler = handlerFactory.createElementHandler( element, parent, this );
+    		}
         	
         }
         
@@ -323,6 +323,32 @@ public class ParserHandler extends DefaultHandler {
         	for ( Iterator hf = handlerFactories.iterator(); handler == null && hf.hasNext(); ) {
         		HandlerFactory handlerFactory = (HandlerFactory) hf.next();
         		handler = handlerFactory.createElementHandler( qualifiedName, parent, this );
+        	}
+        }
+        
+        if ( handler == null ) {
+        	//if the type only contains a type of element, just assume the 
+        	// the element is of that type
+        	if( context.getComponentInstance( Parser.Properties.PARSE_UNKNOWN_ELEMENTS ) != null) {
+        		if ( parent.getComponent() instanceof ElementInstance ) {
+            		ElementInstance parentElement = (ElementInstance) parent.getComponent();
+            		List childParticles = 
+            			index.getChildElementParticles( parentElement.getElementDeclaration()  );
+            		if ( childParticles.size() == 1 ) {
+            			XSDParticle particle = 
+            				(XSDParticle) childParticles.iterator().next();
+            			XSDElementDeclaration child = 
+            				(XSDElementDeclaration) particle.getContent();
+            			if ( child.isElementDeclarationReference() ) {
+            				child = child.getResolvedElementDeclaration();
+            			}
+            			
+            			handler = handlerFactory.createElementHandler( 
+        					new QName( child.getTargetNamespace(), child.getName() ), 
+        					parent, this
+            			);
+            		}
+            	}		
         	}
         }
         
