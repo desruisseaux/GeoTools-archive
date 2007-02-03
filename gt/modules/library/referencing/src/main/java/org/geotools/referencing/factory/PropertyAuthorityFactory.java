@@ -42,6 +42,8 @@ import org.geotools.referencing.wkt.Symbols;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.util.DerivedSet;
 import org.geotools.util.SimpleInternationalString;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 
 
 /**
@@ -53,10 +55,6 @@ import org.geotools.util.SimpleInternationalString;
  * This factory doesn't cache any result. Any call to a {@code createFoo} method will trig a new
  * WKT parsing. For caching, this factory should be wrapped in some buffered factory like
  * {@link BufferedAuthorityFactory}.
- * <p>
- * This authority factory has a low priority. By default,
- * {@link org.geotools.referencing.FactoryFinder} will uses it only if it has been unable
- * to get a connection to a more suitable database like EPSG.
  *
  * @since 2.1
  * @source $URL$
@@ -72,6 +70,12 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
      * The authority for this factory.
      */
     private final Citation authority;
+
+    /**
+     * Same as {@link #authority}, but may contains more than one elements in some particular
+     * cases.
+     */
+    private final Citation[] authorities;
     
     /**
      * The properties object for our properties file. Keys are the authority
@@ -99,7 +103,7 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
     private transient Parser parser;
     
     /**
-     * Loads from the specified property file.
+     * Creates a factory for the specified authority from the specified file.
      *
      * @param  factories   The underlying factories used for objects creation.
      * @param  authority   The organization or party responsible for definition and maintenance of
@@ -112,8 +116,41 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
                                     final URL          definitions)
             throws IOException
     {
+        this(factories, new Citation[] {authority}, definitions);
+    }
+    
+    /**
+     * Creates a factory for the specified authorities from the specified file. More than
+     * one authority may be specified when the CRS to create should have more than one
+     * {@linkplain CoordinateReferenceSystem#getIdentifiers identifier}, each with the same
+     * code but different namespace. For example a
+     * {@linkplain org.geotools.referencing.factory.epsg.FactoryESRI factory for CRS defined
+     * by ESRI} uses the {@code "ESRI"} namespace, but also the {@code "EPSG"} namespace
+     * because those CRS are used as extension of the EPSG database. Concequently, the same
+     * CRS can be identified as {@code "ESRI:53001"} and {@code "EPSG:53001"}, where
+     * {@code "53001"} is a unused code in the official EPSG database.
+     *
+     * @param  factories   The underlying factories used for objects creation.
+     * @param  authorities The organizations or party responsible for definition
+     *                     and maintenance of the database.
+     * @param  definitions URL to the definition file.
+     * @throws IOException if the definitions can't be read.
+     *
+     * @since 2.4
+     */
+    public PropertyAuthorityFactory(final FactoryGroup factories,
+                                    final Citation[]   authorities,
+                                    final URL          definitions)
+            throws IOException
+    {
         super(factories, MINIMUM_PRIORITY + 10);
-        this.authority = authority;
+        ensureNonNull("authorities", authorities);
+        if (authorities.length == 0) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ARRAY));
+        }
+        this.authorities = (Citation[]) authorities.clone();
+        authority = authorities[0];
+        ensureNonNull("authority", authority);
         final InputStream in = definitions.openStream();
         this.definitions.load(in);
         in.close();
@@ -342,8 +379,18 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
             Object candidate = properties.get(IdentifiedObject.IDENTIFIERS_KEY);
             if (candidate == null && code != null) {
                 properties = new HashMap(properties);
-                properties.put(IdentifiedObject.IDENTIFIERS_KEY,
-                        new NamedIdentifier(authority, trimAuthority(code)));
+                code = trimAuthority(code);
+                final Object identifiers;
+                if (authorities.length <= 1) {
+                    identifiers = new NamedIdentifier(authority, code);
+                } else {
+                    final NamedIdentifier[] ids = new NamedIdentifier[authorities.length];
+                    for (int i=0; i<ids.length; i++) {
+                        ids[i] = new NamedIdentifier(authorities[i], code);
+                    }
+                    identifiers = ids;
+                }
+                properties.put(IdentifiedObject.IDENTIFIERS_KEY, identifiers);
             }
             return super.alterProperties(properties);
         }

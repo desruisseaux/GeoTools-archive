@@ -17,7 +17,6 @@
 package org.geotools.io;
 
 // Standard I/O
-import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -36,7 +35,7 @@ import org.geotools.resources.Utilities;
  *
  * @since 2.1
  */
-public class NumberedLineWriter extends FilterWriter {
+public class NumberedLineWriter extends IndentedLineWriter {
     /**
      * A default numbered line writer to the {@linkplain System#out standard output stream}.
      * The {@link #close} method on this stream will only flush it without closing it.
@@ -71,19 +70,9 @@ public class NumberedLineWriter extends FilterWriter {
     private int current = 1;
 
     /**
-     * {@code true} if we are about to write a new line.
-     */
-    private boolean newLine = true;
-
-    /**
-     * {@code true} if we are waiting for a '\n' character.
-     */
-    private boolean waitLF;
-
-    /**
      * Constructs a stream which will write line number in front of each line.
      *
-     * @param out a Writer object to provide the underlying stream.
+     * @param out The underlying stream to write to.
      */
     public NumberedLineWriter(final Writer out) {
         super(out);
@@ -108,97 +97,16 @@ public class NumberedLineWriter extends FilterWriter {
     }
 
     /**
-     * Write the specified character. Line number will be written if we are at the
-     * begining of a new line.
+     * Invoked when a new line is begining. The default implementation writes the
+     * current line number.
      *
      * @throws IOException If an I/O error occurs
      */
-    private void doWrite(final int c) throws IOException {
-        if (newLine && (c!='\n' || !waitLF)) {
-            final String number = String.valueOf(current++);
-            out.write('[');
-            out.write(Utilities.spaces(width - number.length()));
-            out.write(number);
-            out.write("] ");
-        }
-        out.write(c);
-        if ((newLine = (c=='\r' || c=='\n')) == true) {
-            waitLF = (c=='\r');
-        }
-    }
-
-    /**
-     * Writes a single character.
-     *
-     * @throws IOException If an I/O error occurs
-     */
-    public void write(final int c) throws IOException {
-        synchronized (lock) {
-            doWrite(c);
-        }
-    }
-    
-    /**
-     * Writes a portion of an array of characters.
-     *
-     * @param  buffer  Buffer of characters to be written
-     * @param  offset  Offset from which to start reading characters
-     * @param  length  Number of characters to be written
-     * @throws IOException  If an I/O error occurs
-     */
-    public void write(final char[] buffer, int offset, final int length) throws IOException {
-        final int upper = offset + length;
-        synchronized (lock) {
-CHECK:      while (offset < upper) {
-                if (newLine) {
-                    doWrite(buffer[offset++]);
-                    continue;
-                }
-                final int lower = offset;
-                do {
-                    final char c = buffer[offset];
-                    if (c=='\r' || c=='\n') {
-                        out.write(buffer, lower, offset-lower);
-                        doWrite(c);
-                        offset++;
-                        continue CHECK;
-                    }
-                } while (++offset < upper);
-                out.write(buffer, lower, offset-lower);
-                break;
-            }
-        }
-    }
-    
-    /**
-     * Writes a portion of a string.
-     *
-     * @param  string  String to be written
-     * @param  offset  Offset from which to start reading characters
-     * @param  length  Number of characters to be written
-     * @throws IOException  If an I/O error occurs
-     */
-    public void write(final String string, int offset, final int length) throws IOException {
-        final int upper = offset + length;
-        synchronized (lock) {
-CHECK:      while (offset < upper) {
-                if (newLine) {
-                    doWrite(string.charAt(offset++));
-                    continue;
-                }
-                final int lower = offset;
-                do {
-                    final char c = string.charAt(offset);
-                    if (c=='\r' || c=='\n') {
-                        out.write(string, lower, offset-lower);
-                        doWrite(c);
-                        offset++;
-                        continue CHECK;
-                    }
-                } while (++offset < upper);
-                out.write(string, lower, offset-lower);
-                break;
-            }
-        }
+    protected void beginNewLine() throws IOException {
+        final String number = String.valueOf(current++);
+        out.write('[');
+        out.write(Utilities.spaces(width - number.length()));
+        out.write(number);
+        out.write("] ");
     }
 }

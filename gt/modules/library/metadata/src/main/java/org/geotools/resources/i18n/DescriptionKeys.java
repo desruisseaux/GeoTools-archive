@@ -35,8 +35,28 @@ public final class DescriptionKeys {
     private DescriptionKeys() {
     }
 
-    public static final int CODEC_GRID              =     0;
-    public static final int CODEC_MATRIX            =     1;
-    public static final int CODEC_RAW               =     2;
-    public static final int STATISTICS_TO_STRING_$6 =     3;
+    /**
+     * Data distributed over a grid
+     */
+    public static final int CODEC_GRID = 0;
+
+    /**
+     * Matrix in text file
+     */
+    public static final int CODEC_MATRIX = 1;
+
+    /**
+     * Raw binary file
+     */
+    public static final int CODEC_RAW = 2;
+
+    /**
+     * Count:	{0}
+Minimum:	{1}
+Maximum:	{2}
+Mean:	{3}
+RMS:	{4}
+Standard deviation:	{5}
+     */
+    public static final int STATISTICS_TO_STRING_$6 = 3;
 }

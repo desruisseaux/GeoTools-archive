@@ -93,7 +93,7 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
                         result.addAll(codes);
                     }
                 }
-			}
+            }
     	}
         return result;
     }

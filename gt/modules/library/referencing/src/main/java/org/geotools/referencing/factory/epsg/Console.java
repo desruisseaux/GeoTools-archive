@@ -83,7 +83,7 @@ final class Console {
         args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         final PrintWriter out = arguments.out;
         final char[] separator = new char[79];
-        Arrays.fill(separator, '_');
+        Arrays.fill(separator, '\u2500');
         /*
          * Constructs and prints each object. In the process, keep all coordinate reference systems.
          * They will be used later for printing math transforms. This is usefull in order to check
@@ -103,6 +103,7 @@ final class Console {
                         }
                     }
                     final Object object = factory.createObject(args[i]);
+                    out.println();
                     out.println(separator);
                     out.println();
                     out.println(object);

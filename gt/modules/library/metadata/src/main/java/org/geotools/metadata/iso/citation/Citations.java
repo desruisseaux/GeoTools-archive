@@ -132,10 +132,11 @@ public final class Citations {
     public static final Citation ESRI;
     static {
         final CitationImpl c = new CitationImpl(ResponsiblePartyImpl.ESRI);
+        c.addAuthority("ESRI", true);
         c.freeze();
         ESRI = c;
     }
-    
+
     /**
      * The <A HREF="http://www.oracle.com">Oracle</A> organisation.
      *

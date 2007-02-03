@@ -16,30 +16,10 @@
  */
 package org.geotools.resources;
 
-// Collections
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Writer;
-import java.io.PrintWriter;
-import java.lang.reflect.Field;
+import java.io.*;
+import java.util.*;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.lang.reflect.Field;
 
 
 /**
@@ -93,6 +73,11 @@ public final class ResourceCompiler implements Comparator {
      * expecting one argument may have a key name like "HELLO_$1".
      */
     private static final String ARGUMENT_COUNT_PREFIX = "_$";
+
+    /**
+     * The maximal length of comment lines.
+     */
+    private static final int COMMENT_LENGTH = 92;
 
     /**
      * Integer IDs allocated to resource keys. This map will be shared for all languages
@@ -166,6 +151,17 @@ public final class ResourceCompiler implements Comparator {
     }
 
     /**
+     * Load the specified property file.
+     */
+    private static Properties loadPropertyFile(final File file) throws IOException {
+        final InputStream input = new FileInputStream(file);
+        final Properties properties = new Properties();
+        properties.load(input);
+        input.close();
+        return properties;
+    }
+
+    /**
      * Loads all properties from a {@code .properties} file. Resource keys are checked for naming
      * conventions (i.e. resources expecting some arguments must have a key name ending with
      * {@code "_$n"} where {@code "n"} is the number of arguments). This method transforms resource
@@ -174,11 +170,8 @@ public final class ResourceCompiler implements Comparator {
      * @param  file The properties file to read.
      * @throws IOException if an input/output operation failed.
      */
-    private void loadPropertyFile(final File file) throws IOException {
-        final InputStream input = new FileInputStream(file);
-        final Properties properties = new Properties();
-        properties.load(input);
-        input.close();
+    private void processPropertyFile(final File file) throws IOException {
+        final Properties properties = loadPropertyFile(file);
         resources.clear();
         for (final Iterator it=properties.entrySet().iterator(); it.hasNext();) {
             final Map.Entry entry = (Map.Entry) it.next();
@@ -248,7 +241,7 @@ public final class ResourceCompiler implements Comparator {
     }
 
     /**
-     * Write UTF file. Method {@link #loadPropertyFile} should be invoked beforehand to
+     * Write UTF file. Method {@link #processPropertyFile} should be invoked beforehand to
      * {@code writeUTFFile}.
      *
      * @param  file The destination file.
@@ -361,16 +354,6 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
     }
 
     /**
-     * Writes {@code count} spaces to the {@code out} stream.
-     * @throws IOException if an input/output operation failed.
-     */
-    private static void writeWhiteSpaces(final Writer out, int count) throws IOException {
-        while (--count>=0) {
-            out.write(' ');
-        }
-    }
-
-    /**
      * Creates a source file for resource keys.
      *
      * @param  bundleClass The resource bundle base class
@@ -388,7 +371,8 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
             warning(file, null, "Parent directory not found.", null);
             return;
         }
-        final BufferedWriter out = new BufferedWriter(new FileWriter(file));
+        final BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(file), "ISO-8859-1"));
         out.write("/*\n" +
                   " *    GeoTools - OpenSource mapping toolkit\n" +
                   " *    http://geotools.org\n" +
@@ -425,25 +409,33 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
         out.write("public final class "); out.write(classname); out.write(" {\n");
         out.write("    private "); out.write(classname); out.write("() {\n");
         out.write("    }\n");
-        out.write("\n");
         final Map.Entry[] entries = (Map.Entry[]) allocatedIDs.entrySet().toArray(new Map.Entry[allocatedIDs.size()]);
         Arrays.sort(entries, this);
-        int maxLength = 0;
-        for (int i=entries.length; --i>=0;) {
-            final int length = ((String) entries[i].getValue()).length();
-            if (length > maxLength) {
-                maxLength = length;
-            }
-        }
         for (int i=0; i<entries.length; i++) {
+            out.write('\n');
             final String key = (String) entries[i].getValue();
             final String ID  = entries[i].getKey().toString();
-            writeWhiteSpaces(out, 4);
-            out.write("public static final int ");
+            String message = (String) resources.get(key);
+            if (message != null) {
+                out.write("    /**\n");
+                while (((message=message.trim()).length()) != 0) {
+                    out.write("     * ");
+                    int stop = message.length();
+                    if (stop > COMMENT_LENGTH) {
+                        stop = COMMENT_LENGTH;
+                        while (stop>20 && !Character.isWhitespace(message.charAt(stop))) {
+                            stop--;
+                        }
+                    }
+                    out.write(message.substring(0, stop).trim());
+                    out.write('\n');
+                    message = message.substring(stop);
+                }
+                out.write("     */\n");
+            }
+            out.write("    public static final int ");
             out.write(key);
-            writeWhiteSpaces(out, maxLength-key.length());
             out.write(" = ");
-            writeWhiteSpaces(out, 5-ID.length());
             out.write(ID);
             out.write(";\n");
         }
@@ -494,6 +486,7 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
         }
         ResourceCompiler compiler = null;
         final File[] content = srcDir.listFiles();
+        File defaultLanguage = null;
         for (int i=0; i<content.length; i++) {
             final File file = content[i];
             final String filename = file.getName();
@@ -501,13 +494,20 @@ search: for (int i=0; i<buffer.length(); i++) { // Length of 'buffer' will vary.
                 if (compiler == null) {
                     compiler = new ResourceCompiler(out, bundleClass);
                 }
-                compiler.loadPropertyFile(file);
-                final File utfFile = new File(utfDir, filename.substring(0,
-                        filename.length() - PROPERTIES_EXT.length()) + RESOURCES_EXT);
+                compiler.processPropertyFile(file);
+                final String noExt = filename.substring(0, filename.length() - PROPERTIES_EXT.length());
+                final File utfFile = new File(utfDir, noExt + RESOURCES_EXT);
                 compiler.writeUTFFile(utfFile);
+                if (noExt.equals(classname)) {
+                    defaultLanguage = file;
+                }
             }
         }
         if (compiler != null) {
+            if (defaultLanguage != null) {
+                compiler.resources.clear();
+                compiler.resources.putAll(loadPropertyFile(defaultLanguage));
+            }
             compiler.writeJavaSource(bundleClass);
         }
     }

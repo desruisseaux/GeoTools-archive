@@ -13,12 +13,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.factory.esri;
+package org.geotools.referencing.factory.epsg;
 
 // JSE dependencies
 import java.util.Set;
-import java.util.Iterator;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
@@ -29,12 +29,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
 // Geotools dependencies
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
-import org.geotools.referencing.factory.esri.FactoryUsingWKT;
 import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.resources.Arguments;
 
 // JUnit dependencies
 import junit.framework.Test;
@@ -43,29 +40,24 @@ import junit.framework.TestSuite;
 
 
 /**
- * Test ESRI CRS support. This class doesn't test the fallback in EPSG namespace.
+ * Tests ESRI CRS support.
  * 
  * @source $URL$
  * @version $Id$
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class EsriFactoryTest extends TestCase {
-    /**
-     * Set to non-null value when run from the command line.
-     */
-    private static PrintWriter out;
-
+public class FactoryEsriTest extends TestCase {
     /**
      * The factory to test.
      */
-    private CRSAuthorityFactory factory;
+    private FactoryESRI factory;
 
     /**
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(EsriFactoryTest.class);
+        return new TestSuite(FactoryEsriTest.class);
     }
 
     /**
@@ -75,12 +67,14 @@ public class EsriFactoryTest extends TestCase {
      * @param args the command line arguments.
      */
     public static void main(final String[] args) {
-        org.geotools.util.Logging.GEOTOOLS.forceMonolineConsoleOutput();
-        final Arguments arguments = new Arguments(args);
-        if (arguments.getFlag("-verbose")) {
-            out = arguments.out;
-        }
         junit.textui.TestRunner.run(suite());
+    }
+
+    /**
+     * Creates a test case with the specified name.
+     */
+    public FactoryEsriTest(final String name) {
+        super(name);
     }
 
     /**
@@ -88,7 +82,7 @@ public class EsriFactoryTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = FactoryFinder.getCRSAuthorityFactory("ESRI", null);
+        factory = (FactoryESRI) FactoryFinder.getCRSAuthorityFactory("ESRI", null);
     }
 
     /**
@@ -98,7 +92,7 @@ public class EsriFactoryTest extends TestCase {
         Citation authority = factory.getAuthority();
         assertNotNull(authority);
         assertEquals("ESRI", authority.getTitle().toString());
-        assertTrue(factory instanceof FactoryUsingWKT);
+        assertTrue(factory instanceof FactoryESRI);
     }
 
     /**
@@ -121,6 +115,29 @@ public class EsriFactoryTest extends TestCase {
         assertEquals(codes.size(), subset.size());
         assertTrue(codes.containsAll(subset));
         assertFalse(codes.contains("26910"));  // This is an EPSG code.
+        // The following number may be adjusted if esri.properties is updated.
+        assertTrue(codes.size() >= 784);
+    }
+
+    /**
+     * Checks for duplication with EPSG-HSQL.
+     */
+    public void testDuplication() throws FactoryException {
+        final StringWriter buffer = new StringWriter();
+        final PrintWriter  writer = new PrintWriter(buffer);
+        final Set duplicated = factory.reportDuplicatedCodes(writer);
+        assertTrue(buffer.toString(), duplicated.isEmpty());
+    }
+
+    /**
+     * Checks for CRS instantiations.
+     */
+    public void testInstantiation() throws FactoryException {
+        final StringWriter buffer = new StringWriter();
+        final PrintWriter  writer = new PrintWriter(buffer);
+        final Set duplicated = factory.reportInstantiationFailures(writer);
+        // The following number may be adjusted if esri.properties is updated.
+        assertTrue(buffer.toString(), duplicated.size() <= 87);
     }
 
     /**
@@ -179,38 +196,14 @@ public class EsriFactoryTest extends TestCase {
         assertSame(crs, factory.createCoordinateReferenceSystem("ESRI:30591"));
         assertSame(crs, factory.createCoordinateReferenceSystem("esri:30591"));
         assertSame(crs, factory.createCoordinateReferenceSystem(" ESRI : 30591 "));
+        assertSame(crs, factory.createCoordinateReferenceSystem("EPSG:30591"));
         assertSame(crs, factory.createObject("30591"));
         final Set identifiers = crs.getIdentifiers();
         assertNotNull(identifiers);
         assertFalse(identifiers.isEmpty());
-        NamedIdentifier expected = new NamedIdentifier(Citations.ESRI, "30591");
-        assertTrue(identifiers.toString(), identifiers.contains(expected));
-    }
 
-    /**
-     * Count the number of CRS successfully created.
-     */
-    public void testSuccessRate() throws FactoryException {
-        Set codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
-        int total = codes.size();
-        int count = 0;
-        for (final Iterator i=codes.iterator(); i.hasNext();) {
-            final String code = (String) i.next();
-            CoordinateReferenceSystem crs;
-            try {
-                crs = factory.createCoordinateReferenceSystem(code);
-            } catch (FactoryException e) {
-                if (out != null) {
-                    out.println("WARNING (CRS: " + code + " ):" + e);
-                }
-                continue;
-            }            
-            assertNotNull(crs);
-            assertSame(crs, factory.createObject(code));
-            count++;
-        }
-        if (out != null) {
-            out.println("success:" + count + "/" + total + " (" + 100f*count/total + "%)");
-        }
+        String asString = identifiers.toString();
+        assertTrue(asString, identifiers.contains(new NamedIdentifier(Citations.ESRI, "30591")));
+        assertTrue(asString, identifiers.contains(new NamedIdentifier(Citations.EPSG, "30591")));
     }
 }

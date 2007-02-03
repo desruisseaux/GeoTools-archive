@@ -83,6 +83,7 @@ import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.io.TableWriter;
 import org.geotools.util.LocalName;
 import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.ScopedName;
@@ -466,39 +467,42 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * Returns a description of the database engine.
      *
      * @throws FactoryException if the database's metadata can't be fetched.
-     *
-     * @todo localize
      */
     public synchronized String getBackingStoreDescription() throws FactoryException {
-        final String lineSeparator = System.getProperty("line.separator", "\n");
-        final StringBuffer  buffer = new StringBuffer();
         final Citation   authority = getAuthority();
-        CharSequence s;
-        if ((s=authority.getEdition()) != null) {
-            buffer.append("EPSG version:    ");
-            buffer.append(s);
-            buffer.append(lineSeparator);
+        final TableWriter    table = new TableWriter(null, " ");
+        final Vocabulary resources = Vocabulary.getResources(null);
+        CharSequence cs;
+        if ((cs=authority.getEdition()) != null) {
+            table.write(resources.getString(VocabularyKeys.VERSION_OF_$1, "EPSG"));
+            table.write(':');
+            table.nextColumn();
+            table.write(cs.toString());
+            table.nextLine();
         }
         try {
+            String s;
             final DatabaseMetaData metadata = connection.getMetaData();
             if ((s=metadata.getDatabaseProductName()) != null) {
-                buffer.append("Database engine: ");
-                buffer.append(s);
+                table.write(resources.getLabel(VocabularyKeys.DATABASE_ENGINE));
+                table.nextColumn();
+                table.write(s);
                 if ((s=metadata.getDatabaseProductVersion()) != null) {
-                    buffer.append(" version ");
-                    buffer.append(s);
+                    table.write(' ');
+                    table.write(resources.getString(VocabularyKeys.VERSION_$1, s));
                 }
-                buffer.append(lineSeparator);
+                table.nextLine();
             }
             if ((s=metadata.getURL()) != null) {
-                buffer.append("Database URL:    ");
-                buffer.append(s);
-                buffer.append(lineSeparator);
+                table.write(resources.getLabel(VocabularyKeys.DATABASE_URL));
+                table.nextColumn();
+                table.write(s);
+                table.nextLine();
             }
         } catch (SQLException exception) {
             throw new FactoryException(exception);
         }
-        return buffer.toString();
+        return table.toString();
     }
 
     /**

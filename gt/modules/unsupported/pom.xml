@@ -55,7 +55,7 @@
     <module>arcsde</module>
     <module>db2</module>
     <module>directory</module>
-<!-- <module>epsg-extension</module> -->
+    <module>epsg-extension</module>
     <module>geomedia</module>
 <!-- <module>geometryless</module> -->
     <module>gml</module>
