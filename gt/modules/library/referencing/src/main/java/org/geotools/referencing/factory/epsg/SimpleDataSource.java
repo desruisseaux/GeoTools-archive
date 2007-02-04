@@ -95,6 +95,9 @@ import org.geotools.resources.JDBC;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Experience suggests that subclassing {@code javax.sql.DataSource} is a cause of
+ *             troubles in JEE environments. Subclass directly {@link DefaultFactory} instead.
  */
 public class SimpleDataSource implements DataSource {
     /**
