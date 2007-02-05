@@ -1,40 +1,25 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2005-2007, GeoTools Project Managment Committee (PMC)
+ * 
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
 package org.geotools.data.postgis;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Map;
 
-import junit.framework.TestCase;
-
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.postgis.PostgisTests.Fixture;
-
-public class PostgisDBInfoOnlineTest extends TestCase {
+public class PostgisDBInfoOnlineTest extends PostgisOnlineTestCase {
     
-    PostgisDataStore ds;
-    Fixture fixture;
-    PostgisDBInfo dbInfo;
-    
-    protected void setUp() throws Exception {
-        super.setUp();
-        //connect
-        fixture = PostgisTests.newFixture("fixture.properties");
-        Map params = PostgisTests.getParams(fixture);
-        ds = (PostgisDataStore) DataStoreFinder.getDataStore(params);
-        dbInfo = ds.getDBInfo();
-    }
-    
-    public Connection getConnection() throws SQLException {
-        return ds.getConnectionPool().getConnection();
-    }
-    
-    protected void tearDown() throws Exception {
-        //ds.getConnectionPool().close();
-        ds = null;
-        super.tearDown();
-    }
-
     public void testVersions() {
+        PostgisDBInfo dbInfo = ((PostgisDataStore) dataStore).getDBInfo();
         assertNotNull(dbInfo);
         
         //postgis version should be 0.* or 1.*
@@ -44,7 +29,11 @@ public class PostgisDBInfoOnlineTest extends TestCase {
         //postgres version should be 7.* or 8.*
         assertTrue(dbInfo.getPostgresVersion().length() > 2);
         assertTrue(dbInfo.getPostgresMajorVersion() == 7 || dbInfo.getPostgresMajorVersion() == 8);
+  
+        dbInfo = null;
     }
-    
 
+    protected String getFixtureId() {
+        return "postgis.typical";
+    }
 }
