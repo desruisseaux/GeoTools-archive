@@ -122,6 +122,13 @@ public class BasicFIDMapper extends AbstractFIDMapper {
         throws IOException {
     	//JD: replacing no word characters with underscore
     	//JD: forcing to start with a latter
+        // According to GML and XML schema standards, FID is a XML ID
+        // (http://www.w3.org/TR/xmlschema-2/#ID), whose acceptable values are those that match an
+        // NCNAME production (http://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-NCName):
+        // NCName ::= (Letter | '_') (NCNameChar)* /* An XML Name, minus the ":" */
+        // NCNameChar ::= Letter | Digit | '.' | '-' | '_' | CombiningChar | Extender
+        // We have to fix the generated UID replacing all non word chars with an _ (it seems
+        // they area all ":")
         return "fid-" + new UID().toString().replaceAll( "\\W","_" );
     }
 
