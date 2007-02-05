@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * Simple Circle focused on Delaunays triangulation.
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
  */
 class Circle {
@@ -36,7 +38,7 @@ class Circle {
     private double tolerance = 0.0001;
 
     /**
-     * Creates a circle with center [0,0] and radius = 0. 
+     * Creates a circle with center [0,0] and radius = 0.
      *
      */
     protected Circle() {

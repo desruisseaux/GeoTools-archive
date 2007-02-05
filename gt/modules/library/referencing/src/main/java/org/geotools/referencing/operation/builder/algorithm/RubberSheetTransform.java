@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,6 +37,8 @@ import java.util.Iterator;
  * "http://planner.t.u-tokyo.ac.jp/member/fuse/rubber_sheeting.pdf">here</a>.
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
  *
  * @todo Consider moving this class to the {@linkplain
@@ -51,9 +53,9 @@ public class RubberSheetTransform extends AbstractMathTransform
      */
     private HashMap trianglesToKeysMap;
 
-/**
+    /**
      * Constructs the RubberSheetTransform.
-     * 
+     *
      * @param trianglesToAffineTransform The HashMap where the keys are the original
      *        {@linkplain org.geotools.referencing.operation.builder.algorithm.TINTriangle}
      *        and values are {@linkplain org.opengis.referencing.operation.MathTransform}.

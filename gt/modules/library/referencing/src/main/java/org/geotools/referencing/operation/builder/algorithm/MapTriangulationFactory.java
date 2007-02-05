@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,21 +25,23 @@ import java.util.Map;
 
 
 /**
- * Class that implements methods for triangulation for  {@linkplain org.geotools.referencing.operation.builder.RubberSheetBuilder
- * RubberSheeting} transformation. 
+ * Implements methods for triangulation for  {@linkplain org.geotools.referencing.operation.builder.RubberSheetBuilder
+ * RubberSheeting} transformation.
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
  */
 public class MapTriangulationFactory {
     private final Quadrilateral quad;
     private final List /*<MappedPosition>*/ vectors;
 
-/**
-     * 
+    /**
+     *
      * @param quad defines the area for transformation.
      * @param vectors represents pairs of identical points.
-     * @throws TriangulationException thrown when the source points are outside the quad. 
+     * @throws TriangulationException thrown when the source points are outside the quad.
      */
     public MapTriangulationFactory(Quadrilateral quad,
         List /*<MappedPosition>*/ vectors) throws TriangulationException {
@@ -59,7 +61,7 @@ public class MapTriangulationFactory {
         Quadrilateral mQuad = mappedQuad(quad, vectors);
 
         ExtendedPosition[] vertices = new ExtendedPosition[vectors.size()];
-       
+
         // converts MappedPosition to ExtendedPosition     
         for (int i = 0; i < vectors.size(); i++) {
             vertices[i] = new ExtendedPosition(((MappedPosition) vectors.get(i))

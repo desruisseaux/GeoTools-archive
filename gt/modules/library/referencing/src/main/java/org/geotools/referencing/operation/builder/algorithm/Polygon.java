@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,14 +15,13 @@
  */
 package org.geotools.referencing.operation.builder.algorithm;
 
+import org.geotools.geometry.DirectPosition2D;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.geotools.geometry.DirectPosition2D;
-import org.opengis.spatialschema.geometry.DirectPosition;
 
 
 /**
@@ -30,20 +29,20 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * (qadrilateral), that are used for triangulation.
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
  */
 class Polygon {
     /** Vertices of this polygon. */
     private DirectPosition[] vertices;
 
-/**
+    /**
      * Creates a polygon using specified vertices.
-     * 
+     *
      * @param coordinates of vertices
      */
     Polygon(DirectPosition[] coordinates) {
-        //  super(factory.getCoordinateSequenceFactory().create(coordinates), factory);
-        //      super(factory.createLinearRing(coordinates), null, factory);
         this.vertices = coordinates;
     }
 
@@ -64,7 +63,7 @@ class Polygon {
     public DirectPosition[] getPoints() {
         return vertices;
     }
-   
+
     /**
      * Returns the LINESTRING representation in WKT.
      *
@@ -72,9 +71,10 @@ class Polygon {
      */
     public String toString() {
         String wkt = "";
-       
+
         for (int i = 0; i < vertices.length; i++) {
-            wkt = wkt + vertices[i].getCoordinates()[0] + " " + vertices[i].getCoordinates()[0];
+            wkt = wkt + vertices[i].getCoordinates()[0] + " "
+                + vertices[i].getCoordinates()[1];
 
             if (i != (vertices.length - 1)) {
                 wkt = wkt + ", ";

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import org.opengis.spatialschema.geometry.DirectPosition;
  * DirectPosition associated with another DirectPosition.
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
  */
 class ExtendedPosition extends DirectPosition2D {
@@ -32,7 +34,7 @@ class ExtendedPosition extends DirectPosition2D {
     /** Coordinate associated with original coordinate. */
     private DirectPosition mappedposition;
 
-/**
+    /**
      * Creates a MappedPosition
      * @param c the original DirectPosition.
      * @param mappedposition the associated DirectPosition.

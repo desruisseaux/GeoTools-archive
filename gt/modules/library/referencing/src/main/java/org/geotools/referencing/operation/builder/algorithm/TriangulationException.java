@@ -15,16 +15,19 @@
  */
 package org.geotools.referencing.operation.builder.algorithm;
 
+
 /**
  * Thrown when it is unable to generate TIN.
- * 
+ *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
  */
 public class TriangulationException extends Exception {
     private static final long serialVersionUID = -3134565178815225915L;
 
-/**
+    /**
      * Constructs an exception with the specified detail message.
      *
      * @param  message The cause for this exception. The cause is saved
@@ -34,7 +37,7 @@ public class TriangulationException extends Exception {
         super(message);
     }
 
-/**
+    /**
      * Constructs an exception with no detail message.
      */
     public TriangulationException() {

@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2002-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002-2005, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ import java.util.List;
  * A simple four-sided polygon.
  *
  * @since 2.4
+ * @source $URL$
+ * @version $Id$
  * @author Jan Jezek
  */
 public class Quadrilateral extends Polygon {
@@ -40,7 +42,7 @@ public class Quadrilateral extends Polygon {
     /** the fourth vetrex */
     public DirectPosition p3;
 
-/**
+    /**
      * Creates a Quadrilateral.
      * @param p0 one vertex
      * @param p1 another vertex
@@ -77,8 +79,19 @@ public class Quadrilateral extends Polygon {
     public List getTriangles() {
         //Assert.isTrue(this.isValid());
         ArrayList triangles = new ArrayList();
-        triangles.add(new TINTriangle(p0, p1, p2));
-        triangles.add(new TINTriangle(p0, p3, p2));
+        TINTriangle trigA = new TINTriangle(p0, p1, p2);
+        TINTriangle trigB = new TINTriangle(p0, p3, p2);
+
+        try {
+            trigA.addAdjacentTriangle(trigB);
+            trigB.addAdjacentTriangle(trigA);
+        } catch (TriangulationException e) {
+            //should never reach here
+            e.printStackTrace();
+        }
+
+        triangles.add(trigA);
+        triangles.add(trigB);
 
         return triangles;
     }
