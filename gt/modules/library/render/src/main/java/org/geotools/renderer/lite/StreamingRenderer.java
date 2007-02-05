@@ -233,7 +233,7 @@ public final class StreamingRenderer implements GTRenderer {
     
     private int renderingBufferDEFAULT = 0;
     
-    private String scaleComputationMethodDEFAULT = SCALE_ACCURATE;
+    private String scaleComputationMethodDEFAULT = SCALE_OGC;
 
     /**
      * "optimizedDataLoadingEnabled" - Boolean  yes/no (see default optimizedDataLoadingEnabledDEFAULT)
