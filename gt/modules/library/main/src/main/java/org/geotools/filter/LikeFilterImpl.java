@@ -405,7 +405,7 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
       *
       * @task REVISIT: could the pattern be null such that a null = null?
       */
-    public boolean evaluate(Feature feature) {
+    public boolean evaluate(Object feature) {
     	//Checks to ensure that the attribute has been set
         if (attribute == null) {
             return false;

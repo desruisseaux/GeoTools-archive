@@ -176,7 +176,7 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
      * Subclass convenience method for returning left expression as a 
      * JTS geometry.
      */
-    protected Geometry getLeftGeometry(Feature feature) {
+    protected Geometry getLeftGeometry(Object feature) {
     	org.opengis.filter.expression.Expression leftGeometry = getExpression1();
     	
     	 if (leftGeometry != null) {
@@ -184,23 +184,25 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
 
              //LOGGER.finer("leftGeom = " + o.toString()); 
              return (Geometry) obj;
-         } else {
-             return feature.getDefaultGeometry();
+         } else if (feature instanceof Feature) {
+             return ((Feature)feature).getDefaultGeometry();
          }
+    	 return null;
     }
     
     /**
      * Subclass convenience method for returning right expression as a 
      * JTS geometry.
      */
-    protected Geometry getRightGeometry(Feature feature) {
+    protected Geometry getRightGeometry(Object feature) {
     	org.opengis.filter.expression.Expression rightGeometry = getExpression2();
     	
     	 if (rightGeometry != null) {
              return (Geometry) rightGeometry.evaluate(feature,Geometry.class);
-         } else {
-             return feature.getDefaultGeometry();
+         } else if(feature instanceof Feature){
+             return ((Feature)feature).getDefaultGeometry();
          }
+    	 return null;
     }
     
     /**
@@ -227,7 +229,9 @@ public abstract class GeometryFilterImpl extends BinaryComparisonAbstract
      *
      * @return Flag confirming whether or not this feature is inside filter.
      */
-    public abstract boolean evaluate(Feature feature);
+    public boolean evaluate(Feature feature) {
+	    return evaluate((Object)feature);
+	}
 
     /**
      * Return this filter as a string.

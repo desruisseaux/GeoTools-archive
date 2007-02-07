@@ -15,9 +15,7 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.FilterVisitor;
-import org.opengis.filter.PropertyIsNull;
 import org.opengis.filter.expression.Expression;
 
 public class IsNullImpl extends CompareFilterImpl implements
@@ -29,7 +27,7 @@ public class IsNullImpl extends CompareFilterImpl implements
 		filterType = FilterType.NULL;
 	}
 
-	public boolean evaluate(Feature feature) {
+	public boolean evaluate(Object feature) {
 		return getExpression().evaluate( feature ) == null;
 	}
 

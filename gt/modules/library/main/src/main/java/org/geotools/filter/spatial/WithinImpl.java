@@ -34,8 +34,8 @@ public class WithinImpl extends GeometryFilterImpl implements Within {
 		this.filterType = GEOMETRY_WITHIN;
 	}
 	
-	public boolean evaluate(Feature feature) {
-		if (!validate(feature))
+	public boolean evaluate(Object feature) {
+		if (feature instanceof Feature && !validate((Feature)feature))
 			return false;
 		
 		Geometry left = getLeftGeometry(feature);

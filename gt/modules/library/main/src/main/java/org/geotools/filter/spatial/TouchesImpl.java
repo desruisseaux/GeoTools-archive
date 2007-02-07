@@ -33,8 +33,8 @@ public class TouchesImpl extends GeometryFilterImpl implements Touches {
 		this.filterType = GEOMETRY_TOUCHES;
 	}
 	
-	public boolean evaluate(Feature feature) {
-		if (!validate(feature))
+	public boolean evaluate(Object feature) {
+		if (feature instanceof Feature && !validate((Feature)feature))
 			return false;
 		
 		Geometry left = getLeftGeometry(feature);

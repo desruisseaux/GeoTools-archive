@@ -25,7 +25,7 @@ import org.opengis.filter.FilterVisitor;
  *
  * @author Jody Garnett
  */
-public class FilterAbstract implements org.opengis.filter.Filter 
+public abstract class FilterAbstract implements org.opengis.filter.Filter 
 	 {
 	
 	/** filter factory **/
@@ -44,7 +44,7 @@ public class FilterAbstract implements org.opengis.filter.Filter
 	 * Default value is false
 	 */
 	public boolean evaluate(Feature feature) {
-		return false;
+		return evaluate((Object)feature);
 	}
 	
 	/**
@@ -52,9 +52,12 @@ public class FilterAbstract implements org.opengis.filter.Filter
 	 *
 	 * Default value is false
 	 */
+        /*force subclass to implement
 	public boolean evaluate(Object object) {
 		return false;
 	}
+        */
+        
 	/**
 	 * Straight call throught to: evaulate( feature )
 	 */

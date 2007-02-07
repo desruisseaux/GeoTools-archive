@@ -71,13 +71,14 @@ public abstract class AbstractFilter extends FilterAbstract implements Filter {
      * which depended on Feature. If the object is not an instance of feature 
      * the super implementation is called.
      */
+    /*
     public boolean evaluate(Object object) {
     	if (object instanceof Feature  || object == null ) {
     		return evaluate((Feature)object);
     	}
     	
-    	return super.evaluate(object);
-    }
+    	return false;
+    }*/
     
     /* todo: replace public abstract void accept(FilterVisitor visitor); */
     /* ************************************************************************

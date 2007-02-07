@@ -40,7 +40,7 @@ public class IsNotEqualToImpl extends CompareFilterImpl
 	}
 
 	//@Override
-	public boolean evaluate(Feature feature) {
+	public boolean evaluate(Object feature) {
 		Object[] values = eval( feature );
 		Object value1 = values[ 0 ];
 		Object value2 = values[ 1 ];

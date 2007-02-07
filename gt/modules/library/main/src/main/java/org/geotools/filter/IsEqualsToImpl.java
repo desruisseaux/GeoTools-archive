@@ -44,7 +44,7 @@ public class IsEqualsToImpl extends CompareFilterImpl implements PropertyIsEqual
     }
 
     // @Override
-    public boolean evaluate(Feature feature) {
+    public boolean evaluate(Object feature) {
         final Object value1 = eval(expression1, feature);
         final Object value2 = eval(expression2, feature);
 

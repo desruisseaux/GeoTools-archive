@@ -16,14 +16,6 @@
 package org.geotools.geometry.jts;
 
 // OpenGIS dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.DirectPosition;
-import org.opengis.spatialschema.geometry.MismatchedDimensionException;
-
-// Geotools dependencies
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralDirectPosition;
@@ -31,8 +23,14 @@ import org.geotools.referencing.CRS;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.BoundingBox;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-// JTS dependencies
 import com.vividsolutions.jts.geom.Envelope;
 
 
@@ -55,7 +53,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @see org.opengis.metadata.extent.GeographicBoundingBox
  */
 public class ReferencedEnvelope extends Envelope implements
-		org.opengis.spatialschema.geometry.Envelope {
+		org.opengis.spatialschema.geometry.Envelope, BoundingBox {
     /**
      * Serial number for compatibility with different versions.
      */
@@ -366,5 +364,54 @@ public class ReferencedEnvelope extends Envelope implements
         buffer.append(GeneralDirectPosition.toString(getUpperCorner()));
         buffer.append(']');
         return buffer.toString();
+    }
+
+    public boolean contains(DirectPosition pos) {
+        return super.contains(pos.getOrdinate(0),pos.getOrdinate(1));
+    }
+
+    public boolean contains(BoundingBox bbox) {
+        return super.contains(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    }
+
+    public CoordinateReferenceSystem crs() {
+        return getCoordinateReferenceSystem();
+    }
+
+    public void include(BoundingBox bbox) {
+        super.expandToInclude(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+        
+    }
+
+    public void include(double x, double y) {
+        super.expandToInclude(x, y);
+    }
+
+    public void init(BoundingBox bbox) {
+        super.init(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    }
+
+    public boolean intersects(BoundingBox bbox) {
+        return super.intersects(new Envelope(bbox.minX(), bbox.maxX(), bbox.minY(), bbox.maxY()));
+    }
+
+    public boolean isEmpty() {
+        return super.isNull();
+    }
+
+    public double maxX() {
+        return super.getMaxX();
+    }
+
+    public double maxY() {
+        return super.getMaxY();
+    }
+
+    public double minX() {
+        return super.getMinX();
+    }
+
+    public double minY() {
+        return super.getMinY();
     }
 }

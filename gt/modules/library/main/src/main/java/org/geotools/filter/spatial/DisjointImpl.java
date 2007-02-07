@@ -34,9 +34,8 @@ public class DisjointImpl extends GeometryFilterImpl implements Disjoint {
 		this.filterType = GEOMETRY_DISJOINT;
 	}
 	
-	public boolean evaluate(Feature feature) {
-		
-		if (!validate(feature))
+	public boolean evaluate(Object feature) {
+		if (feature instanceof Feature && !validate((Feature)feature))
 			return false;
 		
 		Geometry left = getLeftGeometry(feature);

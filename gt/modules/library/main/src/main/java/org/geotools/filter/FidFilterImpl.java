@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.feature.Feature;
+import org.opengis.feature.Attribute;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.identity.Identifier;
 
@@ -220,12 +221,21 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
      * @return <tt>true</tt> if the feature's ID matches an fid held by this filter,
      *         <tt>false</tt> otherwise.
      */
-    public boolean evaluate(Feature feature) {
+    public boolean evaluate(Object feature) {
         if (feature == null) {
             return false;
         }
 
-        return fids().contains(feature.getID());
+        Set fids = fids();
+        String id = null;
+        if(feature instanceof Feature){
+        	id = ((Feature)feature).getID();
+        }else if(feature instanceof Attribute){
+        	id = ((Attribute)feature).getID();
+        }else{
+        	throw new UnsupportedOperationException("should we teach PropertyAccessor the concept of ID?");
+        }
+		return fids.contains(id);
     }
 
     /**

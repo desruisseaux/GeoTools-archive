@@ -24,7 +24,7 @@ import org.opengis.filter.expression.Expression;
  * 
  * @author Justin Deoliveira, The Open Planning Project, jdeolive@openplans.org
  */
-public class BinaryComparisonAbstract extends AbstractFilter 
+public abstract class BinaryComparisonAbstract extends AbstractFilter 
 	implements BinaryComparisonOperator {
 
 	protected Expression expression1;

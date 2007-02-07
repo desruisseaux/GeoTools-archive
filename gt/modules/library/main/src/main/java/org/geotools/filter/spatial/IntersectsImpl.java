@@ -34,8 +34,8 @@ public class IntersectsImpl extends GeometryFilterImpl implements Intersects {
 		this.filterType = GEOMETRY_INTERSECTS;
 	}
 	
-	public boolean evaluate(Feature feature) {
-		if (!validate(feature))
+	public boolean evaluate(Object feature) {
+		if (feature instanceof Feature && !validate((Feature)feature))
 			return false;
 		
 		Geometry left = getLeftGeometry(feature);

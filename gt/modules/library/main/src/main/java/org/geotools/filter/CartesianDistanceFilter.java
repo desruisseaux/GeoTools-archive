@@ -113,16 +113,6 @@ public abstract class CartesianDistanceFilter extends GeometryFilterImpl
     public void setUnits(String units) {
 		this.units = units;
 	}
-
-    /**
-     * Determines whether or not a given feature is 'inside' this filter.
-     *
-     * @param feature Specified feature to examine.
-     *
-     * @return Flag confirming whether or not this feature is inside the
-     *         filter.
-     */
-    public abstract boolean evaluate(Feature feature);
  
     /**
      * Returns a string representation of this filter.

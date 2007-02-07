@@ -85,9 +85,9 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 	public void setMaxY(double maxy) {
 		this.maxy = maxy;
 	}
-	
-	public boolean evaluate(Feature feature) {
-		if (!validate(feature))
+            
+	public boolean evaluate(Object feature) {
+		if (feature instanceof Feature && !validate((Feature)feature))
 			return false;
 		
 		Geometry left = getLeftGeometry(feature);
@@ -112,4 +112,5 @@ public class BBOXImpl extends GeometryFilterImpl implements BBOX {
 	public Object accept(FilterVisitor visitor, Object extraData) {
 		return visitor.visit(this,extraData);
 	}
+
 }

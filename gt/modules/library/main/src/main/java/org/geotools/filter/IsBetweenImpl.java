@@ -46,7 +46,7 @@ public class IsBetweenImpl extends CompareFilterImpl implements BetweenFilter {
 	}
 	
 	//@Override
-	public boolean evaluate(Feature feature) {
+	public boolean evaluate(Object feature) {
 		Value value = new Value( eval( expression, feature ) );
 		if ( value.getValue() == null ) {
 			return false;

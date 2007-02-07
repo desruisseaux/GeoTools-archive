@@ -37,7 +37,7 @@ public class IsLessThenImpl extends CompareFilterImpl implements
 	}
 	
 	//@Override
-	public boolean evaluate(Feature feature) {
+	public boolean evaluate(Object feature) {
 		Object[] values = eval( feature );
 		Comparable value1 = comparable( values[ 0 ] );
 		Comparable value2 = comparable( values[ 1 ] );

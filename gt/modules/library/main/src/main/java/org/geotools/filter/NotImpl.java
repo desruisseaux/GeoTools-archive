@@ -53,7 +53,7 @@ public class NotImpl extends LogicFilterImpl implements Not {
 	}
 	
 	//@Override
-	public boolean evaluate(Feature feature) {
+	public boolean evaluate(Object feature) {
 		return !getFilter().evaluate(feature);
 	}
 	

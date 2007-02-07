@@ -168,7 +168,9 @@ public abstract class CompareFilterImpl extends BinaryComparisonAbstract
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public abstract boolean evaluate(Feature feature);
+    public boolean evaluate(Feature feature){
+    	return evaluate((Object)feature);
+    }
   
     /**
      * Subclass convenience method which compares to instances of comparables

@@ -34,7 +34,7 @@ public class OrImpl extends LogicFilterImpl implements Or {
 		filterType = LOGIC_OR;
 	}
 	
-	public boolean evaluate(Feature feature) {
+	public boolean evaluate(Object feature) {
 		for (Iterator itr = children.iterator(); itr.hasNext();) {
 			Filter filter = (Filter)itr.next();
 			if( filter.evaluate( feature )) {

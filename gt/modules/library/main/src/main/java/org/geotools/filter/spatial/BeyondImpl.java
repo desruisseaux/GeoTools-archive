@@ -36,6 +36,10 @@ public class BeyondImpl extends CartesianDistanceFilter implements Beyond {
 	public boolean evaluate(Feature feature) {
 		if (!validate(feature))
 			return false;
+		return evaluate((Object)feature);
+	}
+
+	public boolean evaluate(Object feature) {
 		
 		Geometry left = getLeftGeometry(feature);
 		Geometry right = getRightGeometry(feature);
@@ -45,8 +49,6 @@ public class BeyondImpl extends CartesianDistanceFilter implements Beyond {
 	
 	public Object accept(FilterVisitor visitor, Object extraData) {
 		return visitor.visit(this,extraData);
-	}
-	
-	 
+	}	 
 
 }

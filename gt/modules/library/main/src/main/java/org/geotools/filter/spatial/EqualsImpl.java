@@ -27,30 +27,30 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class EqualsImpl extends GeometryFilterImpl implements Equals {
 
-	public EqualsImpl(FilterFactory factory,Expression e1,Expression e2) {
-		super(factory,e1,e2);
-		
-		//backwards compat with old type system
+	public EqualsImpl(FilterFactory factory, Expression e1, Expression e2) {
+		super(factory, e1, e2);
+
+		// backwards compat with old type system
 		this.filterType = GEOMETRY_EQUALS;
 	}
-	
-	public boolean evaluate(Feature feature) {
-		if (!validate(feature))
+
+	public boolean evaluate(Object feature) {
+		if (feature instanceof Feature && !validate((Feature)feature))
 			return false;
-		
+
 		Geometry left = getLeftGeometry(feature);
 		Geometry right = getRightGeometry(feature);
-		
+
 		Envelope envLeft = left.getEnvelopeInternal();
 		Envelope envRight = right.getEnvelopeInternal();
-		
-		if(envRight.equals(envLeft))
-            return left.equals(right);
-        else    
-            return false;
+
+		if (envRight.equals(envLeft))
+			return left.equals(right);
+		else
+			return false;
 	}
-	
+
 	public Object accept(FilterVisitor visitor, Object extraData) {
-		return visitor.visit(this,extraData);
+		return visitor.visit(this, extraData);
 	}
 }

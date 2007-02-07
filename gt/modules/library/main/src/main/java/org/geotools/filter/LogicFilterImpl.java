@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.And;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.Or;
@@ -150,16 +149,6 @@ public abstract class LogicFilterImpl extends BinaryLogicAbstract implements Log
     public Iterator getFilterIterator() {
         return children.iterator();
     }
-
-    /**
-     * Determines whether or not a given feature is 'inside' this filter.
-     *
-     * @param feature Specified feature to examine.
-     *
-     * @return Flag confirming whether or not this feature is inside the
-     *         filter.
-     */
-    public abstract boolean evaluate(Feature feature);
    
     /**
      * Implements a logical OR with this filter and returns the merged filter.

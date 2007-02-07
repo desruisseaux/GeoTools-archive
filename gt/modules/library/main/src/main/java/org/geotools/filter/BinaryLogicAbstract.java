@@ -22,7 +22,7 @@ import org.opengis.filter.BinaryLogicOperator;
 /**
  * @author jdeolive
  */
-public class BinaryLogicAbstract extends AbstractFilter implements BinaryLogicOperator {
+public abstract class BinaryLogicAbstract extends AbstractFilter implements BinaryLogicOperator {
 	protected List/*<Filter>*/ children;
 	
 	protected BinaryLogicAbstract(FilterFactory factory, List/*<Filter>*/ children ) {

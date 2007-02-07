@@ -125,7 +125,8 @@ public class BetweenFilterImpl extends CompareFilterImpl
     	setExpression2(upperBounds);
     }
     
-    /**
+
+	/**
      * Determines whether or not a given feature is 'inside' this filter.
      *
      * @param feature Specified feature to examine.
@@ -133,7 +134,7 @@ public class BetweenFilterImpl extends CompareFilterImpl
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public boolean evaluate(Feature feature) {
+    public boolean evaluate(Object feature) {
         if (middleValue == null) {
             return false;
         } else {
@@ -247,4 +248,5 @@ public class BetweenFilterImpl extends CompareFilterImpl
     public Object accept(FilterVisitor visitor, Object extraData) {
     	return visitor.visit(this,extraData);
     }
+
 }

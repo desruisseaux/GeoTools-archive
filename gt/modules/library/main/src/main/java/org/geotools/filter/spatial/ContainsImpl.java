@@ -33,8 +33,8 @@ public class ContainsImpl extends GeometryFilterImpl implements Contains {
 		this.filterType = GEOMETRY_CONTAINS;
 	}
 	
-	public boolean evaluate(Feature feature) {
-		if (!validate(feature))
+	public boolean evaluate(Object feature) {
+		if (feature instanceof Feature && !validate((Feature)feature))
 			return false;
 		
 		Geometry left = getLeftGeometry(feature);

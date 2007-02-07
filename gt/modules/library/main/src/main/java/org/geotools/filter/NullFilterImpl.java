@@ -95,7 +95,7 @@ public class NullFilterImpl extends AbstractFilterImpl implements NullFilter {
      * @return Flag confirming whether or not this feature is inside the
      *         filter.
      */
-    public boolean evaluate(Feature feature) {
+    public boolean evaluate(Object feature) {
     	if (nullCheck == null) {
             return false;
         } else {
