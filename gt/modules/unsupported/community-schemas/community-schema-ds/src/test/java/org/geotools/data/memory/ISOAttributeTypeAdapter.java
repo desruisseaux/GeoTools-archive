@@ -1,0 +1,111 @@
+package org.geotools.data.memory;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
+import org.geotools.feature.GeometryAttributeType;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.TypeName;
+import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.InternationalString;
+
+/**
+ * Adapts a geotools AttributeType to an ISO simple AttributeType
+ * 
+ * @author gabriel
+ * 
+ */
+public class ISOAttributeTypeAdapter implements AttributeType {
+
+    protected TypeName name;
+
+    protected org.geotools.feature.AttributeType adaptee;
+
+    /**
+     * Protected constructor, use
+     * {@link #adapter(String, org.geotools.feature.AttributeType)} to create an
+     * appropriate instance for your geotools attribute type.
+     * 
+     * @param nsUri
+     * @param gtType
+     */
+    protected ISOAttributeTypeAdapter(String nsUri,
+            org.geotools.feature.AttributeType gtType) {
+        this.name = new org.geotools.feature.type.TypeName(nsUri, gtType
+                .getName());
+        this.adaptee = gtType;
+    }
+
+    public Class getBinding() {
+        return adaptee.getType();
+    }
+
+    public Collection getOperations() {
+        return Collections.EMPTY_SET;
+    }
+
+    public Set getRestrictions() {
+        Filter restriction = adaptee.getRestriction();
+        Set restrictions = restriction == null ? Collections.EMPTY_SET
+                : Collections.singleton(restriction);
+        return restrictions;
+    }
+
+    public AttributeType getSuper() {
+        return null;
+    }
+
+    public boolean isAbstract() {
+        return false;
+    }
+
+    public boolean isIdentified() {
+        return false;
+    }
+
+    public InternationalString getDescription() {
+        return null;
+    }
+
+    public TypeName getName() {
+        return name;
+    }
+
+    public Object getUserData(Object key) {
+        return null;
+    }
+
+    public void putUserData(Object key, Object data) {
+        // do nothing
+    }
+
+    private static class ISOGeometryTypeAdapter extends ISOAttributeTypeAdapter
+            implements GeometryType {
+
+        public ISOGeometryTypeAdapter(String nsUri,
+                GeometryAttributeType adaptee) {
+            super(nsUri, adaptee);
+        }
+
+        public CoordinateReferenceSystem getCRS() {
+            return ((GeometryAttributeType) adaptee).getCoordinateSystem();
+        }
+
+    }
+
+    public static AttributeType adapter(String nsUri,
+            org.geotools.feature.AttributeType gtType) {
+        AttributeType attType;
+        if (gtType instanceof GeometryAttributeType) {
+            attType = new ISOGeometryTypeAdapter(nsUri,
+                    (GeometryAttributeType) gtType);
+        } else {
+            attType = new ISOAttributeTypeAdapter(nsUri, gtType);
+        }
+        return attType;
+    }
+
+}
