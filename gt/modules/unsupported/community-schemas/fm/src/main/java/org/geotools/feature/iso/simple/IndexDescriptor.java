@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;

@@ -1,4 +1,4 @@
-package org.geotools.feature.collection;
+package org.geotools.feature.iso.collection;
 
 import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeatureCollection;

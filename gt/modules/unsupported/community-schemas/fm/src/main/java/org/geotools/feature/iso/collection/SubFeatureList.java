@@ -1,4 +1,4 @@
-package org.geotools.feature.collection;
+package org.geotools.feature.iso.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -109,7 +109,7 @@ public class SubFeatureList extends SubFeatureCollection implements FeatureList,
                         Comparable value1 = (Comparable) name.evaluate( feature1 );
                         Comparable value2 = (Comparable) name.evaluate( feature2 );
                         
-                        if( order.getSortOrderType() == SortOrder.ASCENDING ){
+                        if( order.getSortOrder() == SortOrder.ASCENDING ){
                             return value1.compareTo( value2 );
                         }
                         else return value2.compareTo( value1 );                        

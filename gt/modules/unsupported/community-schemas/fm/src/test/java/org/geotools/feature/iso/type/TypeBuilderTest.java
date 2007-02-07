@@ -1,4 +1,4 @@
-package org.geotools.feature.type;
+package org.geotools.feature.iso.type;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -6,8 +6,8 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.TypeBuilder;
-import org.geotools.feature.Types;
+import org.geotools.feature.iso.TypeBuilder;
+import org.geotools.feature.iso.Types;
 import org.geotools.util.GTContainer;
 import org.opengis.feature.type.AssociationType;
 import org.opengis.feature.type.AttributeType;

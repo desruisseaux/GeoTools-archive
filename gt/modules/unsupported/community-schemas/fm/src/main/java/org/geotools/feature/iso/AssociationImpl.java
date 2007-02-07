@@ -1,4 +1,4 @@
-package org.geotools.feature;
+package org.geotools.feature.iso;
 
 import org.geotools.resources.Utilities;
 import org.opengis.feature.Association;

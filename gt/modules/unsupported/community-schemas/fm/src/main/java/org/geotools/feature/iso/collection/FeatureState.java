@@ -1,4 +1,4 @@
-package org.geotools.feature.collection;
+package org.geotools.feature.iso.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +10,7 @@ import java.util.Map;
 import org.geotools.data.collection.ResourceCollection;
 import org.geotools.feature.CollectionEvent;
 import org.geotools.feature.CollectionListener;
-import org.geotools.feature.FeatureImpl;
+import org.geotools.feature.iso.FeatureImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
@@ -92,6 +92,7 @@ public class FeatureState extends FeatureImpl {
      * To let listeners know that something has changed.
      */
     protected void fireChange(Feature[] features, int type) {
+        /*
     	boundsAttribute().set(null); // must recalculate bounds
     	
         CollectionEvent cEvent = new CollectionEvent( 
@@ -101,6 +102,7 @@ public class FeatureState extends FeatureImpl {
         for (int i = 0, ii = listeners.size(); i < ii; i++) {
             ((CollectionListener) listeners.get(i)).collectionChanged(cEvent);
         }
+        */
     }
         
     protected void fireChange(Feature feature, int type) {

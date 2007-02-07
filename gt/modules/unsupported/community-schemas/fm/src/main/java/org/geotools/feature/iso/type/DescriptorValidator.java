@@ -1,11 +1,11 @@
-package org.geotools.feature.type;
+package org.geotools.feature.iso.type;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.Descriptors;
+import org.geotools.feature.iso.Descriptors;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;

@@ -19,7 +19,7 @@
  *
  * Created on March 26, 2003, 1:53 PM
  */
-package org.geotools.feature;
+package org.geotools.feature.iso;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-package org.geotools.feature.type;
+package org.geotools.feature.iso.type;
 
 import java.util.Collection;
 import java.util.HashSet;

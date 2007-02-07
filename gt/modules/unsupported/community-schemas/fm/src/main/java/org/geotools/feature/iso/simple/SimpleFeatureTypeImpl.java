@@ -1,4 +1,4 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.Descriptors;
-import org.geotools.feature.type.FeatureTypeImpl;
+import org.geotools.feature.iso.Descriptors;
+import org.geotools.feature.iso.type.FeatureTypeImpl;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
@@ -50,7 +50,7 @@ public class SimpleFeatureTypeImpl extends FeatureTypeImpl implements
 	}
 
 	public AttributeType get(String name) {
-		return get(new org.geotools.util.Name(name));
+		return get(new org.geotools.feature.Name(name));
 	}
 
 	public AttributeType get(int index) {

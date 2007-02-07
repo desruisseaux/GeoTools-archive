@@ -1,10 +1,10 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.geotools.feature.Types;
+import org.geotools.feature.iso.Types;
 import org.geotools.util.GTContainer;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;

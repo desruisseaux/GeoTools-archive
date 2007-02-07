@@ -1,7 +1,9 @@
 /**
  * 
  */
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
+
+import java.util.List;
 
 import org.opengis.feature.Attribute;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -61,5 +63,9 @@ class IndexAttribute implements Attribute {
 	public Name name() {
 		return descriptor.getName();
 	}
+
+    public Object operation(Name arg0, List arg1) {
+        throw new UnsupportedOperationException("operation not supported yet");
+    }
 
 }

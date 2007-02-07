@@ -1,12 +1,23 @@
-package org.geotools.feature.collection;
+package org.geotools.feature.iso.collection;
 
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
+import org.geotools.feature.CollectionListener;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.visitor.FeatureVisitor;
+import org.geotools.util.ProgressListener;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureCollection;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
+import org.opengis.feature.type.Name;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Implement a SimpleFeatureCollection by burning memory!
@@ -89,5 +100,11 @@ public class MemorySimpleFeatureCollection extends AbstractSimpleFeatureCollecti
             return old;
         }
         return null;
-    };
+    }
+
+    public Object operation(Name arg0, List arg1) {
+        throw new UnsupportedOperationException();
+    }
+
+   
 }

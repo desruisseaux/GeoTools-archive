@@ -14,9 +14,9 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.feature.attribute;
+package org.geotools.feature.iso.attribute;
 
-import org.geotools.feature.AttributeImpl;
+import org.geotools.feature.iso.AttributeImpl;
 import org.opengis.feature.simple.TextAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
 

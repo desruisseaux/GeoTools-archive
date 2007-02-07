@@ -38,7 +38,7 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.geotools.feature.attribute;
+package org.geotools.feature.iso.attribute;
 
 import java.sql.Time;
 import java.sql.Timestamp;

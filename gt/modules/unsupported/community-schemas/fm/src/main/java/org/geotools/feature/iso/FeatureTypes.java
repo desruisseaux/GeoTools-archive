@@ -6,7 +6,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
  */
-package org.geotools.feature;
+package org.geotools.feature.iso;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,10 +18,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.geotools.factory.FactoryConfigurationError;
+import org.geotools.feature.FeatureTypeBuilder;
+import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.SchemaException;
 import org.geotools.filter.CompareFilter;
 import org.geotools.filter.Filter;
 import org.geotools.filter.LengthFunction;
-import org.geotools.filter.expression.LiteralExpression;
+import org.geotools.filter.LiteralExpression;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.resources.Utilities;
 import org.geotools.util.GTContainer;

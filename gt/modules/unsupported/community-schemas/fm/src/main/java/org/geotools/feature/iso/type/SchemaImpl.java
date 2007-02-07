@@ -1,4 +1,4 @@
-package org.geotools.feature.type;
+package org.geotools.feature.iso.type;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public class SchemaImpl implements Schema {
 			if (lookupName == null) 
 				return null;
 			
-			Name name = new org.geotools.util.Name(getURI(), lookupName ); 
+			Name name = new org.geotools.feature.Name(getURI(), lookupName ); 
 			
 			for (Iterator itr = iterator(); itr.hasNext();) {
 				Name n = (Name) itr.next();

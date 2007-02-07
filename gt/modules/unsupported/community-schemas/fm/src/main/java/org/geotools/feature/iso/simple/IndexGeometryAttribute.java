@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;

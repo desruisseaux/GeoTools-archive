@@ -1,4 +1,4 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,10 +6,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.geotools.feature.AttributeFactoryImpl;
-import org.geotools.feature.AttributeImpl;
-import org.geotools.feature.attribute.TextualAttribute;
-import org.geotools.feature.type.AttributeDescriptorImpl;
+import org.geotools.feature.iso.AttributeFactoryImpl;
+import org.geotools.feature.iso.AttributeImpl;
+import org.geotools.feature.iso.attribute.TextualAttribute;
+import org.geotools.feature.iso.type.AttributeDescriptorImpl;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.BooleanAttribute;
@@ -60,19 +60,19 @@ public class SimpleFeatureFactoryImpl extends AttributeFactoryImpl implements
 	
 	public BooleanAttribute createBooleanAttribute(Boolean value,
 			AttributeDescriptor descriptor) {
-		return new org.geotools.feature.attribute.BooleanAttribute(value,
+		return new org.geotools.feature.iso.attribute.BooleanAttribute(value,
 				descriptor);
 	}
 
 	public NumericAttribute createNumericAttribute(Number value,
 			AttributeDescriptor descriptor) {
-		return new org.geotools.feature.attribute.NumericAttribute(value,
+		return new org.geotools.feature.iso.attribute.NumericAttribute(value,
 				descriptor);
 	}
 
 	public TemporalAttribute createTemporalAttribute(Date value,
 			AttributeDescriptor descriptor) {
-		return new org.geotools.feature.attribute.TemporalAttribute(value,
+		return new org.geotools.feature.iso.attribute.TemporalAttribute(value,
 				descriptor);
 	}
 

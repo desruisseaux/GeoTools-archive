@@ -1,13 +1,13 @@
 package org.geotools;
 
-import org.geotools.feature.AttributeFactoryImpl;
-import org.geotools.feature.FeatureTypes;
-import org.geotools.feature.TypeBuilder;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypes;
-import org.geotools.feature.simple.SimpleFeatures;
-import org.geotools.feature.simple.SimpleTypeBuilder;
-import org.geotools.feature.type.TypeFactoryImpl;
+import org.geotools.feature.iso.FeatureTypes;
+import org.geotools.feature.iso.AttributeFactoryImpl;
+import org.geotools.feature.iso.TypeBuilder;
+import org.geotools.feature.iso.simple.SimpleFeatureTypes;
+import org.geotools.feature.iso.simple.SimpleFeatures;
+import org.geotools.feature.iso.simple.SimpleFeatureBuilder;
+import org.geotools.feature.iso.simple.SimpleTypeBuilder;
+import org.geotools.feature.iso.type.TypeFactoryImpl;
 import org.geotools.filter.FilterFactoryImpl;
 import org.picocontainer.defaults.ConstructorInjectionComponentAdapter;
 import org.picocontainer.defaults.DefaultPicoContainer;

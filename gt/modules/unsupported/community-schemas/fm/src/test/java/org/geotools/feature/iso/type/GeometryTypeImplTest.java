@@ -1,10 +1,10 @@
-package org.geotools.feature.type;
+package org.geotools.feature.iso.type;
 
 import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.Types;
+import org.geotools.feature.iso.Types;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.referencing.FactoryException;

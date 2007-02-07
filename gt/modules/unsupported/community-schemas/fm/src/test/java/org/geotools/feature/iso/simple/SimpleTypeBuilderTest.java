@@ -1,4 +1,4 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.List;
 
@@ -6,7 +6,6 @@ import junit.framework.TestCase;
 
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.util.GTContainer;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.picocontainer.defaults.DefaultPicoContainer;
@@ -25,92 +24,93 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public class SimpleTypeBuilderTest extends TestCase {
 
-	/* do you remember gopher? */
-	static final String URI = "gopher://localhost/test/";
+    /* do you remember gopher? */
+    static final String URI = "gopher://localhost/test/";
 
-	DefaultPicoContainer gt;
+    DefaultPicoContainer gt;
 
-	private SimpleTypeBuilder builder;
+    private SimpleTypeBuilder builder;
 
-	protected void setUp() throws Exception {
-		super.setUp();
-		gt = GTContainer.simple();
-		builder = (SimpleTypeBuilder) gt
-				.getComponentInstance(SimpleTypeBuilder.class);
-	}
+    protected void setUp() throws Exception {
+        super.setUp();
+        gt = GTContainer.simple();
+        builder = (SimpleTypeBuilder) gt
+                .getComponentInstance(SimpleTypeBuilder.class);
+    }
 
-	/**
-	 * Defines a simple setup of Address, Fullname, Person and then defines a
-	 * collection of Person as a Country.
-	 * 
-	 * <pre><code>
-	 *     +-------------------+
-	 *     | ROAD (Feature)    |
-	 *     +-------------------+
-	 *     |name: Text         |
-	 *     |route: Route       |
-	 *     +-------------------+
-	 *              *|
-	 *               |members
-	 *               |
-	 *     +--------------------------+
-	 *     | ROADS(FeatureCollection) |
-	 *     +--------------------------+
-	 * </code></pre>
-	 * 
-	 * <p>
-	 * Things to note in this example:
-	 * <ul>
-	 * <li>Definition of "atomic" types like Text and Number that bind directly
-	 * to Java classes
-	 * <li>Definition of "geometry" types like Route that bind to a geometry
-	 * implementation
-	 * <li>Definition of a "simple feature" made of atomic and geometry types
-	 * without support for descriptors or associations
-	 * <li>Definition of a "simple feature collection" able to hold a
-	 * collection of simple feature, but unable to hold attributes itself.
-	 * </ul>
-	 */
-	public void testBuilding() throws Exception {
-		builder.load(new SimpleSchema()); // load java types
-		builder.setNamespaceURI(URI);
-		builder.setCRS(DefaultGeographicCRS.WGS84);
+    /**
+     * Defines a simple setup of Address, Fullname, Person and then defines a
+     * collection of Person as a Country.
+     * 
+     * <pre><code>
+     *      +-------------------+
+     *      | ROAD (Feature)    |
+     *      +-------------------+
+     *      |name: Text         |
+     *      |route: Route       |
+     *      +-------------------+
+     *               *|
+     *                |members
+     *                |
+     *      +--------------------------+
+     *      | ROADS(FeatureCollection) |
+     *      +--------------------------+
+     * </code></pre>
+     * 
+     * <p>
+     * Things to note in this example:
+     * <ul>
+     * <li>Definition of "atomic" types like Text and Number that bind directly
+     * to Java classes
+     * <li>Definition of "geometry" types like Route that bind to a geometry
+     * implementation
+     * <li>Definition of a "simple feature" made of atomic and geometry types
+     * without support for descriptors or associations
+     * <li>Definition of a "simple feature collection" able to hold a
+     * collection of simple feature, but unable to hold attributes itself.
+     * </ul>
+     */
+    public void testBuilding() throws Exception {
+        builder.load(new SimpleSchema()); // load java types
+        builder.setNamespaceURI(URI);
+        builder.setCRS(DefaultGeographicCRS.WGS84);
 
-		builder.setName("ROAD");
-		builder.addAttribute("name", String.class);
-		builder.addGeometry("route", LineString.class);
-		SimpleFeatureType ROAD = builder.feature();
+        builder.setName("ROAD");
+        builder.addAttribute("name", String.class);
+        builder.addGeometry("route", LineString.class);
+        SimpleFeatureType ROAD = builder.feature();
 
-		assertEquals(2, ROAD.getNumberOfAttribtues());
-		assertEquals(LineString.class, ROAD.defaultGeometry().getBinding());
-		assertTrue(List.class.isInstance(ROAD.attributes()));
+        assertEquals(2, ROAD.getNumberOfAttribtues());
+        assertEquals(LineString.class, ROAD.defaultGeometry().getBinding());
+        assertTrue(List.class.isInstance(ROAD.attributes()));
 
-		builder.setName("ROADS");
-		builder.setMember(ROAD);
+        builder.setName("ROADS");
+        builder.setMember(ROAD);
 
-		SimpleFeatureCollectionType ROADS = builder.collection();
-		assertEquals(0, ROADS.attributes().size());
-		assertEquals(ROAD, ROADS.getMemberType());
-	}
+        SimpleFeatureCollectionType ROADS = builder.collection();
+        assertEquals(0, ROADS.attributes().size());
+        assertEquals(ROAD, ROADS.getMemberType());
+    }
 
-	public void testTerse() throws Exception {
-		builder.load(new SimpleSchema()); // load java types
-		builder.setNamespaceURI(URI);
-		builder.setCRS(DefaultGeographicCRS.WGS84);
+    public void testTerse() throws Exception {
+        builder.load(new SimpleSchema()); // load java types
+        builder.setNamespaceURI(URI);
+        builder.setCRS(DefaultGeographicCRS.WGS84);
 
-		SimpleFeatureType ROAD = builder.name("ROAD").attribute("name",
-				String.class).geometry("route", LineString.class).feature();
+        SimpleFeatureType ROAD = builder.name("ROAD").attribute("name",
+                String.class).geometry("route", LineString.class).feature();
 
-		assertEquals(2, ROAD.getNumberOfAttribtues());
-		assertEquals(LineString.class, ROAD.defaultGeometry().getBinding());
-		assertTrue(List.class.isInstance(ROAD.attributes()));
-		assertEquals( DefaultGeographicCRS.WGS84, ROAD.getCRS() );
-		
-		SimpleFeatureCollectionType ROADS = builder.name("ROADS").member(ROAD).collection();
+        assertEquals(2, ROAD.getNumberOfAttribtues());
+        assertEquals(LineString.class, ROAD.defaultGeometry().getBinding());
+        assertTrue(List.class.isInstance(ROAD.attributes()));
+        assertEquals(DefaultGeographicCRS.WGS84, ROAD.getCRS());
 
-		assertEquals(0, ROADS.attributes().size());
-		assertEquals(ROAD, ROADS.getMemberType());
-		assertEquals( DefaultGeographicCRS.WGS84, ROADS.getCRS() );		
-	}
+        SimpleFeatureCollectionType ROADS = builder.name("ROADS").member(ROAD)
+                .collection();
+
+        assertEquals(0, ROADS.attributes().size());
+        assertEquals(ROAD, ROADS.getMemberType());
+        assertEquals(DefaultGeographicCRS.WGS84, ROADS.getCRS());
+    }
 
 }

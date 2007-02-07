@@ -1,10 +1,10 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.type.TypeFactoryImpl;
+import org.geotools.feature.iso.type.TypeFactoryImpl;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleTypeFactory;

@@ -1,9 +1,9 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.Collection;
 import java.util.Date;
 
-import org.geotools.feature.collection.MemorySimpleFeatureCollection;
+import org.geotools.feature.iso.collection.MemorySimpleFeatureCollection;
 import org.opengis.feature.Association;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;

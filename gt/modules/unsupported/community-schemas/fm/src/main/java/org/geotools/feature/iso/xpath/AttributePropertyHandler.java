@@ -1,14 +1,14 @@
 /**
  * 
  */
-package org.geotools.feature.xpath;
+package org.geotools.feature.iso.xpath;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
-import org.geotools.feature.Types;
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.type.AttributeDescriptor;

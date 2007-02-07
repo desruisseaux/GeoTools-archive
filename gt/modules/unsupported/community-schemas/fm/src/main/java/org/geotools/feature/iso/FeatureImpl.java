@@ -1,4 +1,4 @@
-package org.geotools.feature;
+package org.geotools.feature.iso;
 
 import java.util.Collection;
 import java.util.HashMap;

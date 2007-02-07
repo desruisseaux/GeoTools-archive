@@ -1,14 +1,14 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.Types;
-import org.geotools.feature.type.AssociationDescriptorImpl;
-import org.geotools.feature.type.AssociationTypeImpl;
-import org.geotools.feature.type.FeatureCollectionTypeImpl;
+import org.geotools.feature.iso.Types;
+import org.geotools.feature.iso.type.AssociationDescriptorImpl;
+import org.geotools.feature.iso.type.AssociationTypeImpl;
+import org.geotools.feature.iso.type.FeatureCollectionTypeImpl;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AssociationDescriptor;

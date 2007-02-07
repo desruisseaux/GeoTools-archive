@@ -5,13 +5,13 @@
  * Created on July 18, 2003, 12:56 PM
  */
 
-package org.geotools.feature.type;
+package org.geotools.feature.iso.type;
 
 import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.geotools.feature.Types;
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.TypeName;
 

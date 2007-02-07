@@ -1,13 +1,13 @@
 /**
  * 
  */
-package org.geotools.feature.xpath;
+package org.geotools.feature.iso.xpath;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
-import org.geotools.feature.Descriptors;
+import org.geotools.feature.iso.Descriptors;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -37,7 +37,7 @@ public class AttributeDescriptorPropertyHandler implements DynamicPropertyHandle
 
 	/**
 	 * Returns the {@linkplain AttributeDescriptor} contained by the
-	 * {@linkplain org.geotools.feature.impl.ComplexAttributeImpl}
+	 * {@linkplain org.geotools.feature.iso.impl.ComplexAttributeImpl}
 	 * <code>o</code>.
 	 */
 	public Object getProperty(Object o, String propName) {

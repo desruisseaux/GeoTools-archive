@@ -1,8 +1,8 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.Collections;
 
-import org.geotools.feature.FeatureCollectionImpl;
+import org.geotools.feature.iso.FeatureCollectionImpl;
 import org.opengis.feature.simple.SimpleFeatureCollection;
 import org.opengis.feature.simple.SimpleFeatureCollectionType;
 import org.opengis.feature.type.AttributeDescriptor;

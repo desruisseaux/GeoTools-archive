@@ -1,6 +1,6 @@
-package org.geotools.feature.attribute;
+package org.geotools.feature.iso.attribute;
 
-import org.geotools.feature.AttributeImpl;
+import org.geotools.feature.iso.AttributeImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -127,7 +127,7 @@ public class GeometricAttribute extends AttributeImpl implements
 			if (geom != null) {
 				bbox.expandToInclude(geom.getEnvelopeInternal());
 			}
-			bounds = bbox;
+			bounds =  bbox;
 		}
 		return bounds;
 	}

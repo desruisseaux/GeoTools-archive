@@ -1,13 +1,13 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
-import org.geotools.feature.type.AttributeTypeImpl;
-import org.geotools.feature.type.GeometryTypeImpl;
-import org.geotools.feature.type.SchemaImpl;
-import org.geotools.util.TypeName;
+import org.geotools.feature.iso.type.AttributeTypeImpl;
+import org.geotools.feature.iso.type.GeometryTypeImpl;
+import org.geotools.feature.iso.type.SchemaImpl;
+import org.geotools.feature.type.TypeName;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.GeometryType;
 

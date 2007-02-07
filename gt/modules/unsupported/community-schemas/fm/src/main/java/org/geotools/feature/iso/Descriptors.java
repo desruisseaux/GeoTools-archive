@@ -1,4 +1,4 @@
-package org.geotools.feature;
+package org.geotools.feature.iso;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -343,7 +343,7 @@ public class Descriptors {
 	 * @return
 	 */
 	static public AttributeType type(ComplexType schema, String name) {
-		return type(schema,new org.geotools.util.Name(name));
+		return type(schema,new org.geotools.feature.Name(name));
 	}
 
 	/**
@@ -369,7 +369,7 @@ public class Descriptors {
 	 * @return
 	 */
 	static public AttributeDescriptor node(ComplexType schema, String name) {
-		return node(schema,new org.geotools.util.Name(name));
+		return node(schema,new org.geotools.feature.Name(name));
 		
 		/*
 		for (Iterator itr = list(schema).iterator(); itr.hasNext();) {

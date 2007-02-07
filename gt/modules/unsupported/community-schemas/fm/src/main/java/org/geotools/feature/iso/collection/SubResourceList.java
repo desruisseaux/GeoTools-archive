@@ -1,4 +1,4 @@
-package org.geotools.feature.collection;
+package org.geotools.feature.iso.collection;
 
 import java.util.Iterator;
 import java.util.List;

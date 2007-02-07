@@ -1,4 +1,4 @@
-package org.geotools.feature;
+package org.geotools.feature.iso;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.geotools.feature.collection.AbstractFeatureCollection;
-import org.geotools.feature.collection.AbstractResourceCollection;
+import org.geotools.feature.iso.collection.AbstractFeatureCollection;
+import org.geotools.feature.iso.collection.AbstractResourceCollection;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.type.AttributeDescriptor;

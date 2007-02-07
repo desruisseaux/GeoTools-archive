@@ -1,14 +1,14 @@
-package org.geotools.feature;
+package org.geotools.feature.iso;
 
 import java.util.Collection;
 
-import org.geotools.feature.attribute.GeometricAttribute;
+import org.geotools.feature.iso.attribute.GeometricAttribute;
 import org.opengis.feature.Association;
 import org.opengis.feature.Attribute;
-import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
+import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.type.AssociationDescriptor;
 import org.opengis.feature.type.AttributeDescriptor;

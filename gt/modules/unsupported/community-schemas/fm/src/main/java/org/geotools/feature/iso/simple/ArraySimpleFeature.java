@@ -1,4 +1,4 @@
-package org.geotools.feature.simple;
+package org.geotools.feature.iso.simple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -220,4 +220,12 @@ public class ArraySimpleFeature implements SimpleFeature {
 	public void setDefaultGeometry(GeometryAttribute geom) {
 		values[defaultIndex] = geom.get();
 	}
+
+    public Object operation(String arg0, Object arg1) {
+        throw new UnsupportedOperationException("operation not supported yet");
+    }
+
+    public Object operation(Name arg0, List arg1) {
+        throw new UnsupportedOperationException("operation not supported yet");
+    }
 }

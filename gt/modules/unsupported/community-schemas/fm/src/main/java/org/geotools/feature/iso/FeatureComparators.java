@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.feature;
+package org.geotools.feature.iso;
 
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
