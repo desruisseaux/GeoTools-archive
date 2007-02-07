@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -65,11 +66,16 @@ public class Parser {
     /**
      * Creats a new instance of the parser.
      *
-     * @param configuration The parser configuration, bindings and context
+     * @param configuration The parser configuration, bindings and context, 
+     * 	must never be <code>null</code>.
      *
      */
     public Parser(Configuration configuration)  {
       
+    	if ( configuration == null ) {
+    		throw new NullPointerException( "configuration" );
+    	}
+    	
     	handler = new ParserHandler(configuration);
     }
 
@@ -138,6 +144,23 @@ public class Parser {
      */
     public Object parse(InputStream input) throws IOException, SAXException, ParserConfigurationException {
 		return parse( new InputSource( input ) );
+    }
+    
+    /**
+     * Parses an instance documented defined by a reader.
+     * <p>
+     * The object returned from the parse is the object which has been bound to the root
+     * element of the document. This method should only be called once for a single instance document.
+     * </p>
+     * 
+     * @return The object representation of the root element of the document.
+     *
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException 
+     */
+    public Object parse(Reader reader) throws IOException, SAXException, ParserConfigurationException {
+    	return parse( new InputSource( reader ) );
     }
     
     /**
