@@ -58,10 +58,10 @@ public class AttributePropertyHandler implements DynamicPropertyHandler {
 			
 			value = found.size() == 0 ? 
 					null : (found.size() == 1? found.get(0) : found);
-			
-//			if(value == null && propName.equals(complex.getType().getName().getLocalPart())){
-//				value = o;
-//			}
+
+			if(value instanceof Attribute && !(value instanceof ComplexAttribute)){
+				value = ((Attribute)value).get();
+			}
 		}
 		return value;
 	}

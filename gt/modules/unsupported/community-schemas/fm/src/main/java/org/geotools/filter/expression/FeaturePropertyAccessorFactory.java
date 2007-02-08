@@ -6,6 +6,7 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.geotools.factory.Hints;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.iso.ComplexAttributeImpl;
 import org.geotools.feature.iso.FeatureImpl;
 import org.geotools.feature.iso.simple.SimpleFeatureImpl;
 import org.geotools.feature.iso.xpath.AttributePropertyHandler;
@@ -61,11 +62,11 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 			return FID_ACCESS;
 
 		// check for simple property acess
-		if (xpath.matches("(\\w+:)?(\\w+)")) {
+		//if (xpath.matches("(\\w+:)?(\\w+)")) {
 			return ATTRIBUTE_ACCESS;
-		}
+		//}
 
-		return null;
+		//return null;
 	}
 
 	/**
@@ -166,6 +167,8 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 			JXPathIntrospector.registerDynamicClass(FeatureImpl.class,
 					AttributePropertyHandler.class);
 			JXPathIntrospector.registerDynamicClass(SimpleFeatureImpl.class,
+					AttributePropertyHandler.class);
+			JXPathIntrospector.registerDynamicClass(ComplexAttributeImpl.class,
 					AttributePropertyHandler.class);
 		}
 

@@ -413,6 +413,7 @@ public class AttributeBuilder {
     }
     
     protected AttributeDescriptor attributeDescriptor(Name name) {
+    	System.out.println(name);
         PropertyDescriptor descriptor = Types.descriptor((ComplexType)type,name);
         
         if (descriptor == null) {

@@ -128,17 +128,18 @@ public class ComplexAttributeImpl implements ComplexAttribute {
         // JD: this is a farily lenient check, should we be stricter about
         // matching up the namespace
         List/* <Property> */childs = new LinkedList/* <Property> */();
+        
         for (Iterator itr = this.properties.iterator(); itr.hasNext();) {
             Property prop = (Property) itr.next();
-            if (name.getNamespaceURI() != null) {
-
-                if (prop.descriptor().getName().equals(name)) {
+            PropertyDescriptor node = prop.descriptor();
+            Name propName = node.getName();
+			if (name.getNamespaceURI() != null) {
+                if (propName.equals(name)) {
                     childs.add(prop);
                 }
             } else {
                 // just do a local part compare
-                PropertyDescriptor node = prop.descriptor();
-                String localName = node.getName().getLocalPart();
+                String localName = propName.getLocalPart();
                 if (localName.equals(name.getLocalPart())) {
                     childs.add(prop);
                 }
