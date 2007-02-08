@@ -133,8 +133,9 @@ public abstract class ComplexTestData extends TestCase {
         TypeBuilder builder = new TypeBuilder(typeFactory);
         builder.setNamespaceURI(NSURI);
 
-        AttributeType SITENAME = builder.attribute("sitename", String.class)
-                .attribute();
+        builder.setName("sitename");
+        builder.setBinding(String.class);
+        AttributeType SITENAME = builder.attribute();
 
         builder.setName("anzlic_noType");
         builder.setBinding(String.class);
@@ -152,6 +153,9 @@ public abstract class ComplexTestData extends TestCase {
         AttributeType PROJECT_NO = builder.attribute();
 
         builder.setName("wq_plus");
+
+        builder.cardinality(1, 1);
+        builder.addAttribute("sitename", SITENAME);
 
         builder.cardinality(0, 1);
         builder.addAttribute("anzlic_no", ANZLIC_NO);
