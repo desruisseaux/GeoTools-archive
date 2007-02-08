@@ -16,6 +16,7 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
+import java.util.Collection;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Collections;
@@ -95,6 +96,24 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
                 }
             }
     	}
+        return result;
+    }
+    
+    /**
+     * Implementation of {@link CRS#getSupportedAuthorities}. Provided here in order to reduce the
+     * amount of class loading when using {@link CRS} for other purpose than CRS decoding.
+     */
+    static Set/*<String>*/ getSupportedAuthorities() {
+        Set authorityFactories = FactoryFinder.getCRSAuthorityFactories(null);
+        if(authorityFactories.size() == 0)
+            return Collections.EMPTY_SET;
+        Set result = new LinkedHashSet();
+        for (final Iterator i = authorityFactories.iterator(); i.hasNext();) {
+            final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
+            Collection identifiers = factory.getAuthority().getIdentifiers();
+            if(identifiers.size() > 0)
+                result.add((String) identifiers.iterator().next());
+        }
         return result;
     }
 }
