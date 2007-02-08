@@ -15,8 +15,8 @@
  */
 package org.geotools.data.feature;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Source;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.Store;
 
 /**
  * Provides access to features.
@@ -28,6 +28,6 @@ import org.geotools.data.Source;
  * @deprecated This is a Proposal, we need your feedback!
  * @author Jody Garnett, Refractions Research Inc.
  */
-public interface FeatureStore2 extends FeatureSource, Source {
+public interface FeatureStore2 extends FeatureStore, Store {
 
 }
