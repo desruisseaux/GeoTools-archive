@@ -353,6 +353,9 @@ public class StyleAttributeExtractor extends FilterAttributeExtractor
         if (gr.getSize() != null) {
             gr.getSize().accept(this);
         }
+        
+        if (gr.getDisplacement() != null)
+            gr.getDisplacement().accept(this);
     }
 
     /**
