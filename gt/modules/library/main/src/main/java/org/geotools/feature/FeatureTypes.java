@@ -115,8 +115,29 @@ public class FeatureTypes {
             return ANY_LENGTH;
         }
     }
-
+    
+    /**
+     * Forces the specified CRS on all geometry attributes
+     * @param schema the original schema
+     * @param crs the forced crs
+     * @return
+     * @throws SchemaException
+     */
     public static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs )
+        throws SchemaException {
+        return transform(schema, crs, false);
+    }
+    
+    /**
+     * Forces the specified CRS on geometry attributes (all or some, depends on the parameters).  
+     * @param schema the original schema
+     * @param crs the forced crs
+     * @param forceOnlyMissing if true, will force the specified crs only on the attributes that 
+     *        do miss one
+     * @return
+     * @throws SchemaException
+     */
+    public static FeatureType transform( FeatureType schema, CoordinateReferenceSystem crs, boolean forceOnlyMissing)
             throws SchemaException {
         FeatureTypeFactory factory = FeatureTypeFactory.newInstance(schema.getTypeName());
 
@@ -128,16 +149,19 @@ public class FeatureTypes {
             AttributeType attributeType = schema.getAttributeType(i);
             if (attributeType instanceof GeometryAttributeType) {
                 GeometryAttributeType geometryType = (GeometryAttributeType) attributeType;
-                GeometryAttributeType geometry;
+                GeometryAttributeType forced;
 
-                geometry = (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
+                if(forceOnlyMissing && geometryType.getCoordinateSystem() != null)
+                    forced = geometryType;
+                else
+                    forced = (GeometryAttributeType) AttributeTypeFactory.newAttributeType(
                         geometryType.getName(), geometryType.getType(), geometryType.isNillable(),
                         0, geometryType.createDefaultValue(), crs);
 
                 if (defaultGeometryType == null || geometryType == schema.getDefaultGeometry()) {
-                    defaultGeometryType = geometry;
+                    defaultGeometryType = forced;
                 }
-                factory.addType(geometry);
+                factory.addType(forced);
             } else {
                 factory.addType(attributeType);
             }

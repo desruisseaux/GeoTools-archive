@@ -61,21 +61,15 @@ import com.vividsolutions.jts.geom.Envelope;
 public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollection {
     FeatureCollection results;
     //FeatureType schema;
+    
+    public ForceCoordinateSystemFeatureResults(FeatureCollection results,
+            CoordinateReferenceSystem forcedCS) throws IOException, SchemaException {
+        this(results, forcedCS, false);
+    }
 
     public ForceCoordinateSystemFeatureResults(FeatureCollection results,            
-        CoordinateReferenceSystem forcedCS) throws IOException, SchemaException {
-        super( forceType( origionalType( results ), forcedCS ) );
-        
-        this.results = results;
-
-        if (results instanceof ForceCoordinateSystemFeatureResults) {
-            // Optimization: if the source is again a ForceCoordinateSystemFeatureResults,
-            // we just "eat" it since it does not do anything useful and creates unecessary
-            // feature objects
-            
-            ForceCoordinateSystemFeatureResults forced = (ForceCoordinateSystemFeatureResults) results;
-            this.results = forced.getOrigin();
-        }
+        CoordinateReferenceSystem forcedCS, boolean forceOnlyMissing) throws IOException, SchemaException {
+        super( forceType( origionalType( results ), forcedCS, forceOnlyMissing ) );
     }
     
     private static FeatureType origionalType( FeatureCollection results ){
@@ -91,7 +85,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
         return results.getSchema();
     }
     
-    private static FeatureType forceType( FeatureType startingType, CoordinateReferenceSystem forcedCS ) throws SchemaException{
+    private static FeatureType forceType( FeatureType startingType, CoordinateReferenceSystem forcedCS, boolean forceOnlyMissing ) throws SchemaException{
         if (forcedCS == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
@@ -101,7 +95,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
             return startingType;
         }
         else {
-            return FeatureTypes.transform(startingType, forcedCS);
+            return FeatureTypes.transform(startingType, forcedCS, forceOnlyMissing);
         }
     }
    

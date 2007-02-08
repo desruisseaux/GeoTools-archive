@@ -72,7 +72,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
         this.reader = reader;
         this.schema = schema;
     }
-
+    
     /**
      * Builds a new ForceCoordinateSystemFeatureReader
      *
@@ -85,6 +85,21 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
      */
     public ForceCoordinateSystemFeatureReader(FeatureReader reader,
         CoordinateReferenceSystem cs) throws SchemaException {
+        this(reader, cs, false);
+    }
+
+    /**
+     * Builds a new ForceCoordinateSystemFeatureReader
+     *
+     * @param reader
+     * @param cs
+     *
+     * @throws SchemaException
+     * @throws NullPointerException DOCUMENT ME!
+     * @throws IllegalArgumentException DOCUMENT ME!
+     */
+    public ForceCoordinateSystemFeatureReader(FeatureReader reader,
+        CoordinateReferenceSystem cs, boolean forceOnlyMissing) throws SchemaException {
         if (cs == null) {
             throw new NullPointerException("CoordinateSystem required");
         }
@@ -94,7 +109,7 @@ public class ForceCoordinateSystemFeatureReader implements FeatureReader {
                                                    .getCoordinateSystem();
 
         if (!cs.equals(originalCs)) {
-            schema = FeatureTypes.transform(type, cs);
+            schema = FeatureTypes.transform(type, cs, forceOnlyMissing);
         }
 
         this.reader = reader;
