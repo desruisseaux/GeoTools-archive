@@ -1,4 +1,4 @@
-package org.geotools.data.memory;
+package org.geotools.data.feature.memory;
 
 import java.io.IOException;
 import java.util.ArrayList;

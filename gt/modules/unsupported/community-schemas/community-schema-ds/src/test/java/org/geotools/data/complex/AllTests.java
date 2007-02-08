@@ -5,7 +5,7 @@ import junit.framework.TestSuite;
 
 import org.geotools.data.complex.config.XMLConfigReaderTest;
 import org.geotools.data.complex.filter.UnmappingFilterVisitorTest;
-import org.geotools.data.memory.MemoryDataAccessTest;
+import org.geotools.data.feature.memory.MemoryDataAccessTest;
 import org.geotools.filter.IDFunctionExpressionTest;
 import org.geotools.gml.producer.GML3FeatureTransformerTest;
 import org.geotools.gml.schema.SchemaHandlerTest;
