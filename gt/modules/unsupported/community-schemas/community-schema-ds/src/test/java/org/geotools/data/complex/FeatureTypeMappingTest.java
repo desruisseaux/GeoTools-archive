@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.memory.MemoryDataAccess;
+import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.feature.impl.AttributeFactoryImpl;
 import org.geotools.feature.schema.NodeImpl;
 import org.geotools.filter.Expression;

@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.memory;
+package org.geotools.data.feature.memory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +35,10 @@ import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Source;
 import org.geotools.data.Transaction;
 import org.geotools.data.feature.FeatureAccess;
+import org.geotools.data.feature.adapter.GTFeatureTypeAdapter;
+import org.geotools.data.feature.adapter.GTFeaureAdapter;
+import org.geotools.data.feature.adapter.ISOFeatureAdapter;
+import org.geotools.data.feature.adapter.ISOFeatureTypeAdapter;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;

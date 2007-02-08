@@ -18,7 +18,7 @@ import org.geotools.data.Query;
 import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
 import org.geotools.data.complex.config.ComplexDataStoreDTO;
 import org.geotools.data.complex.config.XMLConfigDigester;
-import org.geotools.data.memory.MemoryDataAccess;
+import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.feature.Descriptors;
 import org.geotools.feature.XPath;
 import org.geotools.feature.schema.NodeImpl;

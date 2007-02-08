@@ -1,4 +1,4 @@
-package org.geotools.data.memory;
+package org.geotools.data.feature;
 
 import java.util.ArrayList;
 import java.util.Collection;

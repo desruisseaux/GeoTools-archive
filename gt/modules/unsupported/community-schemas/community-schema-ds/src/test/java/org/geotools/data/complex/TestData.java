@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.memory.MemoryDataAccess;
+import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.iso.TypeBuilder;
 import org.geotools.feature.iso.type.TypeFactoryImpl;

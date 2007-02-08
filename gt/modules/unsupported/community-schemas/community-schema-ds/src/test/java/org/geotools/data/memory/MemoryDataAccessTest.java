@@ -15,6 +15,7 @@ import org.geotools.data.ComplexTestData;
 import org.geotools.data.Query;
 import org.geotools.data.Source;
 import org.geotools.data.feature.FeatureSource2;
+import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Name;
 import org.geotools.feature.iso.AttributeBuilder;

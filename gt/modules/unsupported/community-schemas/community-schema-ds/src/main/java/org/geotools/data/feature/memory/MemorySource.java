@@ -1,4 +1,4 @@
-package org.geotools.data.memory;
+package org.geotools.data.feature.memory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -12,6 +12,7 @@ import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
+import org.geotools.data.feature.FilteringCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;

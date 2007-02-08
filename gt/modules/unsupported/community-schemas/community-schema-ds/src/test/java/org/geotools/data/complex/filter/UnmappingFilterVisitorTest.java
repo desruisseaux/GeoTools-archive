@@ -11,7 +11,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.complex.TestData;
-import org.geotools.data.memory.MemoryDataAccess;
+import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.feature.Descriptors;
 import org.geotools.feature.schema.NodeImpl;
 import org.geotools.feature.type.TypeFactoryImpl;
