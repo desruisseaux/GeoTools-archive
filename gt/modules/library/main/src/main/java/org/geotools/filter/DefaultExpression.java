@@ -55,7 +55,7 @@ public abstract class DefaultExpression extends ExpressionAbstract implements Ex
      * @deprecated use {@link #evaluate(Feature)}.
      */
     public final Object getValue(Feature feature) {
-        return evaluate(feature);
+        return evaluate((Object)feature);
     }
     
     /**
@@ -71,7 +71,7 @@ public abstract class DefaultExpression extends ExpressionAbstract implements Ex
      * @task REVISIT: make abstract?
      */
     public Object evaluate(Feature feature) {
-    	return new Object();
+    	return evaluate((Object)feature);
     }
     
     /**
@@ -83,10 +83,7 @@ public abstract class DefaultExpression extends ExpressionAbstract implements Ex
      * the super implementation is called.
      */
     public Object evaluate(Object object) {
-        if (object instanceof Feature || object == null) {
-    		return evaluate((Feature)object);
-    	}
-    	return null;
+    	return new Object();
     }
     
     /**

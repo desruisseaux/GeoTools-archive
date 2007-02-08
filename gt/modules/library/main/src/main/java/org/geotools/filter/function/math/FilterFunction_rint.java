@@ -30,7 +30,7 @@ public class FilterFunction_rint extends FunctionExpressionImpl {
         return 1;
     }
 
-    public Object evaluate(Feature feature) {
+    public Object evaluate(Object feature) {
         double arg0;
 
         try { // attempt to get value and perform conversion

@@ -46,7 +46,7 @@ public class ClassifyFunction extends FunctionExpressionImpl {
         return (Expression) getParameters().get(0);
     }
     
-    public Object evaluate(Feature feature) {
+    public Object evaluate(Object feature) {
         Classifier classifier = getClassifier( feature );
         Expression expression = getExpression();
         return new Integer(classifier.classify(expression, feature)); 

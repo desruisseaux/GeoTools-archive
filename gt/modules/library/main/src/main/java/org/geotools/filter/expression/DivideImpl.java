@@ -15,7 +15,6 @@
  */
 package org.geotools.filter.expression;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.Filters;
 import org.geotools.filter.MathExpressionImpl;
 import org.geotools.resources.Utilities;
@@ -38,7 +37,7 @@ public class DivideImpl extends MathExpressionImpl implements Divide {
 		expressionType = MATH_DIVIDE;
 	}
 	
-	public Object evaluate(Feature feature) throws IllegalArgumentException {
+	public Object evaluate(Object feature) throws IllegalArgumentException {
 		ensureOperandsSet();
 		
 		double leftDouble = Filters.number( getExpression1().evaluate(feature) );

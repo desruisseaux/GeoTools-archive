@@ -18,12 +18,6 @@
 
 package org.geotools.filter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Collections;
-
-import org.geotools.feature.Feature;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -44,7 +38,7 @@ public class AreaFunction extends FunctionExpressionImpl{
         super("Area");
     }
     
-    public Object evaluate(Feature feature) {
+    public Object evaluate(Object feature) {
         org.opengis.filter.expression.Expression geom;
         geom = (org.opengis.filter.expression.Expression)getParameters().get(0);
         Geometry g = (Geometry)geom.evaluate(feature);

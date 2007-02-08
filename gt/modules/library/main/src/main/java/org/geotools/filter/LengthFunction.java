@@ -15,7 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.expression.Expression;
 
 /**
@@ -41,7 +40,7 @@ public class LengthFunction extends FunctionExpressionImpl {
 	/* (non-Javadoc)
 	 * @see org.geotools.filter.Expression#getValue(org.geotools.feature.Feature)
 	 */
-	public Object evaluate(Feature feature) {
+	public Object evaluate(Object feature) {
 	    Expression ae = (Expression)getParameters().get(0);
             return new Integer(ae.evaluate(feature).toString().length());
 	}

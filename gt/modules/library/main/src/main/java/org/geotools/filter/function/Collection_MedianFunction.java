@@ -123,7 +123,7 @@ public class Collection_MedianFunction extends FunctionExpressionImpl
             });
     }
 
-    public Object evaluate(Feature feature) {
+    public Object evaluate(Object feature) {
 		if (feature == null) {
 			return new Integer(0); // no features were visited in the making of this answer
 		}

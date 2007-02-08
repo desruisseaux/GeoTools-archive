@@ -17,7 +17,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.expression.Expression;
 
 
@@ -44,7 +43,7 @@ public class MinFunction extends FunctionExpressionImpl{
      *
      * @return Value of the feature object.
      */
-    public Object evaluate(Feature feature) {
+    public Object evaluate(Object feature) {
         org.opengis.filter.expression.Expression expA = (Expression) getParameters().get(0);
         org.opengis.filter.expression.Expression expB = (Expression) getParameters().get(1);
         

@@ -15,7 +15,6 @@
  */
 package org.geotools.filter.expression;
 
-import org.geotools.feature.Feature;
 import org.geotools.filter.Filters;
 import org.geotools.filter.MathExpressionImpl;
 import org.geotools.resources.Utilities;
@@ -37,11 +36,11 @@ public class AddImpl extends MathExpressionImpl implements Add {
 		expressionType = MATH_ADD;
 	}
 	
-	public Object evaluate(Feature feature) throws IllegalArgumentException {
+	public Object evaluate(Object feature) throws IllegalArgumentException {
 		ensureOperandsSet();
 		
-		double leftDouble = Filters.number( getExpression1().evaluate((Feature)feature) );
-		double rightDouble = Filters.number( getExpression2().evaluate((Feature)feature) );
+		double leftDouble = Filters.number( getExpression1().evaluate(feature) );
+		double rightDouble = Filters.number( getExpression2().evaluate(feature) );
       
 		return number(leftDouble + rightDouble);
     }

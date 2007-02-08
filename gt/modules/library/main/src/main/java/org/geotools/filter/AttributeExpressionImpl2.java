@@ -106,7 +106,15 @@ public class AttributeExpressionImpl2 extends DefaultExpression
     	return feature.getAttribute(attPath);
     }
     
-    /**
+    /* shouldn't this class dissapear as AttributeExpressionImpl does the job pretty well now?*/
+	public Object evaluate(Object object) {
+		if(object instanceof Feature){
+			return evaluate((Feature)object);
+		}
+		return null;//just to respect old behavoir
+	}
+
+	/**
      * Return this expression as a string.
      *
      * @return String representation of this attribute expression.
@@ -164,4 +172,5 @@ public class AttributeExpressionImpl2 extends DefaultExpression
     public Object accept(ExpressionVisitor visitor, Object extraData) {
     	return visitor.visit(this,extraData);
     }
+
 }

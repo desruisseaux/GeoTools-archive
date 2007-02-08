@@ -18,7 +18,6 @@
 
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
 import org.opengis.filter.expression.ExpressionVisitor;
 import org.opengis.filter.expression.Literal;
 
@@ -36,7 +35,7 @@ public class MapScaleDenominatorImpl extends DefaultExpression implements MapSca
         
     }
     
-    public Object evaluate(Feature f){
+    public Object evaluate(Object f){
         return getValue();
     }
     

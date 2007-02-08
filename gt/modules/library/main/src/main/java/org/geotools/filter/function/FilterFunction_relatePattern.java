@@ -38,7 +38,7 @@ public class FilterFunction_relatePattern extends FunctionExpressionImpl
         return 3;
     }
 
-    public Object evaluate(Feature feature) {
+    public Object evaluate(Object feature) {
         Geometry arg0;
         Geometry arg1;
         String arg2;

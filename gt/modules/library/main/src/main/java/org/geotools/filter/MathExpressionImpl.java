@@ -15,8 +15,6 @@
  */
 package org.geotools.filter;
 
-import org.geotools.feature.Feature;
-import org.opengis.filter.expression.ExpressionVisitor;
 
 
 /**
@@ -163,17 +161,6 @@ public abstract class MathExpressionImpl extends DefaultExpression
     public short getType() {
         return expressionType;
     }
-
-    /**
-     * Returns the value for this expression.
-     *
-     * @param feature Feature to use when return sub expression values.
-     *
-     * @return Value of this expression.
-     *
-     * @throws IllegalArgumentException Feature does not match declared schema.
-     */
-    public abstract Object evaluate(Feature feature) throws IllegalArgumentException;
     
     /** 
      * Convenience method which ensures that both expressions have been 
