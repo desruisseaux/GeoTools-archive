@@ -26,6 +26,7 @@ import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -100,8 +101,7 @@ public class ReprojectFeatureReader implements FeatureReader {
         
         this.schema = FeatureTypes.transform(type, cs);
         this.reader = reader;
-        transformer.setMathTransform((MathTransform2D) FactoryFinder.getCoordinateOperationFactory(null)
-                                     .createOperation(original,cs).getMathTransform());
+        transformer.setMathTransform(CRS.findMathTransform(original, cs, true));
     }
 
     /**
