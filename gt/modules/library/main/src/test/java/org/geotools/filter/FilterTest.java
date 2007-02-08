@@ -15,6 +15,7 @@
  */
 package org.geotools.filter;
 
+import java.lang.reflect.Field;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +25,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
@@ -31,16 +33,13 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.spatial.EqualsImpl;
-import org.opengis.filter.Not;
+import org.geotools.filter.expression.PropertyAccessor;
+import org.geotools.filter.expression.PropertyAccessorFactory;
 import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.spatial.Equals;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 
@@ -761,5 +760,99 @@ public class FilterTest extends TestCase {
         //finaly test noting shortcut
         filter2 = (org.geotools.filter.Filter) filterFalse.not();
         assertTrue(filter2.contains(testFeature));
+    }
+    
+    /**
+     * Test that Filter works over Object as expected, provided there exists a
+     * {@link PropertyAccessor} for the given kind of object. 
+     *
+     */
+    public void testEvaluateNonFeatureObject(){
+    	MockDataObject object = new MockDataObject();
+    	object.intVal = 5;
+    	object.stringVal = "cinco";
+    	
+    	org.opengis.filter.Filter f = fac.greater(fac.property("intVal"), fac.literal(3));
+    	
+    	assertTrue(f.evaluate(object));
+    	
+    	org.opengis.filter.Filter f2 = fac.and(f, fac.equals(fac.property("stringVal"), fac.literal("cinco")));
+    	
+    	assertTrue(f2.evaluate(object));
+
+    	org.opengis.filter.Filter f3 = fac.and(f, fac.equals(fac.property("stringVal"), fac.literal("seis")));
+    	
+    	assertFalse(f3.evaluate(object));
+
+    	org.opengis.filter.Filter f4 = fac.not(fac.and(f, fac.equals(fac.property("stringVal"), fac.literal("cinco"))));
+    	
+    	assertFalse(f4.evaluate(object));
+    }
+    
+    /**
+	 * A simple data object to be used on testing Filter.evaluate(Object)
+	 * through {@link MockPropertyAccessorFactory}
+	 * 
+	 * @author Gabriel Roldan, Axios Engineering
+	 */
+	public static class MockDataObject {
+		public int intVal;
+
+		public String stringVal;
+		
+		public MockDataObject(){
+			this(0, null);
+		}
+		
+		public MockDataObject(int intVal, String stringVal){
+			this.intVal = intVal;
+			this.stringVal = stringVal;
+		}
+	}
+
+	/**
+	 * A {@link PropertyAccessorFactory} intended to be used on testing that the
+	 * Filter implementation works over Object as expected, and not only over
+	 * Feature
+	 * 
+	 * @author Gabriel Roldan, Axios Engineering
+	 */
+	public static class MockPropertyAccessorFactory implements
+			PropertyAccessorFactory {
+
+		public PropertyAccessor createPropertyAccessor(Class type,
+				String xpath, Class target, Hints hints) {
+			if (!MockDataObject.class.equals(type)) {
+				return null;
+			}
+			return new PropertyAccessor() {
+				public boolean canHandle(Object object, String xpath,
+						Class target) {
+					return object instanceof MockDataObject;
+				}
+
+				public Object get(Object object, String xpath, Class target)
+						throws IllegalArgumentException {
+					if (object == null)
+						return null;
+
+					try {
+						Field field = MockDataObject.class.getField(xpath);
+						Object value = field.get(object);
+						return value;
+					} catch (Exception e) {
+						throw (IllegalArgumentException) new IllegalArgumentException(
+								"Illegal property name: " + xpath).initCause(e);
+					}
+				}
+
+				public void set(Object object, String xpath, Object value,
+						Class target) throws IllegalAttributeException,
+						IllegalArgumentException {
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
+    	
     }
 }
