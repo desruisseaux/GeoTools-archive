@@ -15,12 +15,17 @@
  */
 package org.geotools.data.store;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.FeatureListener;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.simple.SimpleTypeBuilder;
+import org.geotools.feature.simple.SimpleTypeFactoryImpl;
+import org.opengis.feature.simple.SimpleTypeFactory;
 
 /**
  * Everything you need to implement your FeatureCollections (captures content
@@ -42,7 +47,7 @@ import org.geotools.data.FeatureListener;
  * <p>
  * @author Jody Garnett, Refractions Research Inc.
  */
-public class ContentState {
+public abstract class ContentState {
 
     /** Cache to be duplicated on each transaction */
     private Map cache = new HashMap();
@@ -123,4 +128,45 @@ public class ContentState {
             throw new AssertionError("ContentState always can be copied");
         }
     }        
+    
+    /**
+     * Accessor for the feature type of the content entry.
+     * <p>
+     * Use {@link #featureType(SimpleTypeFactory)} to create a feature type 
+     * with a particular factory.
+     * </p>
+     * 
+     */
+    final public FeatureType featureType() throws IOException {
+		return featureType( getEntry().getDataStore().getTypeFactory() );
+	}
+	
+	/**
+     * Builds and caches the featureType based on current state.
+     * 
+     * @param factory The factory used to build the feature type.
+     */
+    final public FeatureType featureType( SimpleTypeFactory factory  ) throws IOException {
+    	FeatureType featureType = (FeatureType) get( factory.getClass() );
+    	if ( featureType == null ) {
+    		//build the feature type
+    		featureType = buildFeatureType( factory );
+    		
+    		//cache it
+    		put( factory.getClass(), featureType );
+    	}
+    	
+    	return featureType;
+    }
+    
+    /**
+     * Creates a feature type for the entry.
+     * <p>
+     * An implementation of this method should create a new instance of 
+     * {@link SimpleTypeBuilder}, injecting it with the supplied factory.
+     * </p>
+     * @param factory The factory used to create the feature type.
+     */
+    abstract protected FeatureType buildFeatureType( SimpleTypeFactory factory )
+    	throws IOException;
 }
