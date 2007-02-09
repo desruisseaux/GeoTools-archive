@@ -100,7 +100,7 @@ import org.opengis.filter.spatial.Within;
 public class UnmappingFilterVisitor implements
 		org.opengis.filter.FilterVisitor, ExpressionVisitor {
 	private static final Logger LOGGER = Logger
-			.getLogger(UnmappingFilterVisitor2.class.getPackage().getName());
+			.getLogger(UnmappingFilterVisitor.class.getPackage().getName());
 
 	private Filter unrolled = Filter.INCLUDE;
 
@@ -149,8 +149,8 @@ public class UnmappingFilterVisitor implements
 		this.idMappings = mappings.getIdMappings();
 	}
 
-	private UnmappingFilterVisitor2 copy() {
-		return new UnmappingFilterVisitor2(mappings, attributeMappings);
+	private UnmappingFilterVisitor copy() {
+		return new UnmappingFilterVisitor(mappings, attributeMappings);
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class UnmappingFilterVisitor implements
 		List unrolledFilers = new ArrayList();
 		try {
 			for (Iterator it = filter.getChildren().iterator(); it.hasNext();) {
-				UnmappingFilterVisitor2 helper = copy();
+				UnmappingFilterVisitor helper = copy();
 				Filter next = (Filter) it.next();
 				helper.visit(next);
 				Filter unrolled = helper.getUnrolledFilter();
@@ -246,7 +246,7 @@ public class UnmappingFilterVisitor implements
 		Expression left = expression.getExpression1();
 		Expression right = expression.getExpression2();
 
-		UnmappingFilterVisitor2 helper = copy();
+		UnmappingFilterVisitor helper = copy();
 		helper.visit(left);
 		left = (Expression) helper.unrolledExpressions.get(0);
 
@@ -505,7 +505,7 @@ public class UnmappingFilterVisitor implements
 
 		for (Iterator it = expressions.iterator(); it.hasNext();) {
 			Expression mappingExpression = (Expression) it.next();
-			UnmappingFilterVisitor2 helper = copy();
+			UnmappingFilterVisitor helper = copy();
 			helper.visit(mappingExpression);
 			List list = helper.unrolledExpressions;
 			Expression unrolledExpression = (Expression) list.get(0);
