@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.data.Transaction;
-import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 
 /**
@@ -55,20 +54,27 @@ public abstract class ContentEntry {
         this.state.put( Transaction.AUTO_COMMIT, autoState );
     }
     
-    final TypeName getName() {
+    public final TypeName getName() {
         return typeName;
     }
     
-    final String getTypeName(){
+    public final String getTypeName(){
         return typeName.getLocalPart();
     }
+    
+    /**
+     * @return Back pointer to the datastore.
+     */
+    public ContentDataStore getDataStore() {
+		return dataStore;
+	}
     
     public String toString() {
         return getTypeName() + " ContentEntry";
     }
 
     /** Grab the per transaction state */
-    ContentState getState( Transaction transaction ){
+    public final ContentState getState( Transaction transaction ){
         if( state.containsKey( transaction )){
             return (ContentState) state.get( transaction );
         }
@@ -80,4 +86,6 @@ public abstract class ContentEntry {
             return copy;
         }
     }    
+    
+    
 }
