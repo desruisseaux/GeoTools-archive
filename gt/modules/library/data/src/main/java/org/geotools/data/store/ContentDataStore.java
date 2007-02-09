@@ -18,6 +18,7 @@ package org.geotools.data.store;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
@@ -33,6 +34,7 @@ import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
@@ -54,8 +56,7 @@ import org.opengis.filter.sort.SortBy;
  * <p>
  * A subclass has the following responsibility / operatunities:
  * <ul>
- * <li>Provide an implementation of "Content" teaching the
- *     ContentDataStore 
+ * <li>Provide an implementation of "Content" teaching the ContentDataStore
  * <li>Additional methods as needs or interest dictate
  * </ul>
  * This class is locked down to the maximum extent possible; learning from our
@@ -64,105 +65,168 @@ import org.opengis.filter.sort.SortBy;
  * @author Jody Garnett, Refractions Research Inc.
  */
 public class ContentDataStore implements DataStore {
-     /**
-      * Map<TypeName,ContentEntry> one for each kind of content served up.
-      */
-     final Map entries;
-     
-     final protected Content content;
+	
+	/**
+	 * Map<TypeName,ContentEntry> one for each kind of content served up.
+	 */
+	final Map entries;
 
-     public ContentDataStore( Content content ){
-         this.content = content;
-         this.entries = new HashMap();
-     }
+	/**
+	 * The driver for the content the data store provides
+	 */
+	final protected Content content;
 
-    public void createSchema(FeatureType featureType) throws IOException {
-        throw new UnsupportedOperationException("Not yet");
-    }
+	/**
+	 * Factory used to create feature types
+	 */
+	protected SimpleTypeFactory typeFactory;
+	
+	/**
+	 * Application namespace uri of the datastore
+	 */
+	protected String namespaceURI;
+	
+	public ContentDataStore(Content content) {
+		this.content = content;
+		this.entries = new HashMap();
+	}
+	
+	public void setTypeFactory(SimpleTypeFactory typeFactory) {
+		this.typeFactory = typeFactory;
+	}
+	
+	public SimpleTypeFactory getTypeFactory() {
+		return typeFactory;
+	}
+	
+	public void setNamespaceURI(String namespaceURI) {
+		this.namespaceURI = namespaceURI;
+	}
+	
+	public String getNamespaceURI() {
+		return namespaceURI;
+	}
+	
+	//
+	// Start of DataStore API
+	//
+	
+	public String[] getTypeNames() throws IOException {
+		List typeNames = content.getTypeNames();
+		String[] names = new String[ typeNames.size() ];
+		
+		for ( int i = 0; i < typeNames.size(); i++ ) {
+			TypeName typeName = (TypeName) typeNames.get( i );
+			names[ i ] = typeName.getLocalPart();
+		}
+		
+		return names;
+	}
 
-    /** Used to strongly type typeName as soon as possible */
-    final private TypeName name( String typeName ){
-        for( Iterator i = entries.keySet().iterator(); i.hasNext(); ){
-            TypeName name = (TypeName) i.next();
-            if( name.getLocalPart().equals( typeName )) return name;
-        }
-        return null;
-    }
-    
-    final private FeatureCollection query( Query query, Transaction transaction ) throws IOException{
-//        TypeName typeName = name( query.getTypeName() );
-//        ContentEntry entry = (ContentEntry) entries.get( typeName );
-//        ContentState state = entry.getState( transaction );
-        
-          FeatureSource source = getFeatureSource( query.getTypeName() );
-          if( source instanceof FeatureStore){
-              ((FeatureStore)source).setTransaction( transaction );
-          }
-          FeatureCollection collection = source.getFeatures( query.getFilter() );
+	public void createSchema(FeatureType featureType) throws IOException {
+		throw new UnsupportedOperationException("Not yet");
+	}
+	
+	public FeatureType getSchema(String typeName) throws IOException {
+		ContentEntry entry = entry( name( typeName ) );
+		return entry.getState( Transaction.AUTO_COMMIT ).featureType( typeFactory );
+	}
 
-          if( query.getCoordinateSystemReproject() != null ){
-              // collection = collection.reproject( query.getCoordinateSystemReproject() );
-          }
-          if( query.getCoordinateSystem() != null ){
-              // collection = collection.toCRS( query.getCoordinateSystem() );
-          }
-          if( query.getMaxFeatures() != Integer.MAX_VALUE ){
-              collection = (FeatureCollection)
-                  collection.sort( SortBy.NATURAL_ORDER ).subList( 0, query.getMaxFeatures() );
-          }
-          if( query.getNamespace() != null ){
-              //collection = collection.toNamespace( query.getNamespace() );
-          }
-          if( query.getPropertyNames() != Query.ALL_NAMES ){
-              //collection = collection.reType( query.getPropertyNames() );
-          }
-          return collection;        
-    }
+	/** Used to strongly type typeName as soon as possible */
+	final protected TypeName name(String typeName) {
+		return  new org.geotools.feature.type.TypeName( typeName );
+	}
 
-    public FeatureSource getFeatureSource(String typeName) throws IOException {
-        return null;
-    }
+	/**
+	 * Looks up an entry, creating it if necessary.
+	 */
+	final protected ContentEntry entry(TypeName name) {
+		ContentEntry entry = (ContentEntry) entries.get(name);
+		if (entry == null) {
+			entry = content.entry(this, name);
+			entries.put(name, entry);
+		}
+		return entry;
+	}
 
-    public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction) throws IOException {
-        return null;
-    }
+	final private FeatureCollection query(Query query, Transaction transaction)
+			throws IOException {
+		// TypeName typeName = name( query.getTypeName() );
+		// ContentEntry entry = (ContentEntry) entries.get( typeName );
+		// ContentState state = entry.getState( transaction );
 
-    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction) throws IOException {
-        return null;
-    }
+		FeatureSource source = getFeatureSource(query.getTypeName());
+		if (source instanceof FeatureStore) {
+			((FeatureStore) source).setTransaction(transaction);
+		}
+		FeatureCollection collection = source.getFeatures(query.getFilter());
 
-    public LockingManager getLockingManager() {
-        return null;
-    }
+		if (query.getCoordinateSystemReproject() != null) {
+			// collection = collection.reproject(
+			// query.getCoordinateSystemReproject() );
+		}
+		if (query.getCoordinateSystem() != null) {
+			// collection = collection.toCRS( query.getCoordinateSystem() );
+		}
+		if (query.getMaxFeatures() != Integer.MAX_VALUE) {
+			collection = (FeatureCollection) collection.sort(
+					SortBy.NATURAL_ORDER).subList(0, query.getMaxFeatures());
+		}
+		if (query.getNamespace() != null) {
+			// collection = collection.toNamespace( query.getNamespace() );
+		}
+		if (query.getPropertyNames() != Query.ALL_NAMES) {
+			// collection = collection.reType( query.getPropertyNames() );
+		}
+		return collection;
+	}
 
-    public FeatureType getSchema(String typeName) throws IOException {
-        return null;
-    }
+	public FeatureSource getFeatureSource(String typeName) throws IOException {
+		return null;
+	}
 
-    public String[] getTypeNames() throws IOException {
-        return null;
-    }
+	public FeatureWriter getFeatureWriter(String typeName, Filter filter,
+			Transaction transaction) throws IOException {
+		return null;
+	}
 
-    public FeatureSource getView(Query query) throws IOException, SchemaException {
-        return null;
-    }
+	public FeatureWriter getFeatureWriterAppend(String typeName,
+			Transaction transaction) throws IOException {
+		return null;
+	}
 
-    public void updateSchema(String typeName, FeatureType featureType) throws IOException {        
-    }
+	public LockingManager getLockingManager() {
+		return null;
+	}
 
-    //
-    // low level operations
-    //
-    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
-        FeatureCollection collection = query( query, transaction );
-        
-        return null; // new DelegateFeatureReader( collection.getSchema(), collection.features() );
-    }
+	
+	
+	public FeatureSource getView(Query query) throws IOException,
+			SchemaException {
+		return null;
+	}
 
-    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction) throws IOException {
-        //FeatureCollection collection = query( query, transaction );
+	public void updateSchema(String typeName, FeatureType featureType)
+			throws IOException {
+	}
 
-        return null; // new DelegateFeatureWriter( collection.getSchema(), collection.features() );
-    }
+	//
+	// low level operations
+	//
+	public FeatureReader getFeatureReader(Query query, Transaction transaction)
+			throws IOException {
+		FeatureCollection collection = query(query, transaction);
+
+		return null; // new DelegateFeatureReader( collection.getSchema(),
+						// collection.features() );
+	}
+
+	public FeatureWriter getFeatureWriter(String typeName,
+			Transaction transaction) throws IOException {
+		// FeatureCollection collection = query( query, transaction );
+
+		return null; // new DelegateFeatureWriter( collection.getSchema(),
+						// collection.features() );
+	}
 
 }
