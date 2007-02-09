@@ -71,11 +71,11 @@ public class MockPooledConnection implements PooledConnection {
     /*
      * Uncomment the code below for compiling with J2SE 1.6
      */
-//    public void addStatementEventListener(javax.sql.StatementEventListener listener) {
-//        
-//    }
-//
-//    public void removeStatementEventListener(javax.sql.StatementEventListener listener) {
-//        
-//    }
+    public void addStatementEventListener(javax.sql.StatementEventListener listener) {
+        
+    }
+
+    public void removeStatementEventListener(javax.sql.StatementEventListener listener) {
+        
+    }
 }
