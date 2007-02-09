@@ -1,5 +1,6 @@
 package org.geotools.data.complex;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -8,21 +9,22 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.DataUtilities;
-import org.geotools.data.FeatureSource;
+import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.memory.MemoryDataAccess;
-import org.geotools.feature.impl.AttributeFactoryImpl;
-import org.geotools.feature.schema.NodeImpl;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FunctionExpression;
-import org.opengis.feature.AttributeFactory;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.iso.simple.SimpleFeatureFactoryImpl;
+import org.geotools.feature.iso.simple.SimpleTypeBuilder;
+import org.geotools.feature.iso.simple.SimpleTypeFactoryImpl;
 import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
-import org.opengis.feature.schema.AttributeDescriptor;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.TypeName;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
 
 public class FeatureTypeMappingTest extends TestCase {
 	public static final Logger LOGGER = Logger
@@ -47,58 +49,52 @@ public class FeatureTypeMappingTest extends TestCase {
 	 */
 	public void testFidMapping() throws Exception {
 
-		final FeatureSource wsSource = simpleStore
-				.getFeatureSource(TestData.WATERSAMPLE_TYPENAME);
-		final FeatureType sourceType = wsSource.getSchema();
+		final FeatureSource2 wsSource = (FeatureSource2) simpleStore
+				.access(TestData.WATERSAMPLE_TYPENAME);
+
+		final FeatureType sourceType = (FeatureType) wsSource.describe();
+
 		final FeatureType targetType = TestData.createComplexWaterSampleType();
-		final AttributeDescriptor targetNode = new NodeImpl(targetType);
+		final TypeName targetName = targetType.getName();
+
 		final Expression fidMappingExpression;
-		FilterFactory ff = FilterFactory.createFilterFactory();
+		FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
-		Expression prefix = ff.createLiteralExpression("_");
-		Expression ph = ff.createAttributeExpression(sourceType, "ph");
-		Expression dot = ff.createLiteralExpression(".");
-		Expression temp = ff.createAttributeExpression(sourceType, "temp");
+		Expression prefix = ff.literal("_");
+		Expression ph = ff.property("ph");
+		Expression dot = ff.literal(".");
+		Expression temp = ff.property("temp");
 
-		FunctionExpression concat1 = ff.createFunctionExpression("strConcat");
-		concat1.setArgs(new Expression[] { prefix, ph });
+		Function concat1 = ff.function("strConcat", prefix, ph);
 
-		FunctionExpression concat2 = ff.createFunctionExpression("strConcat");
-		concat2.setArgs(new Expression[] { dot, temp });
+		Function concat2 = ff.function("strConcat", dot, temp);
 
-		FunctionExpression concat3 = ff.createFunctionExpression("strConcat");
-		concat3.setArgs(new Expression[] { concat1, concat2 });
+		Function concat3 = ff.function("strConcat", concat1, concat2);
 
 		fidMappingExpression = concat3;
 
-		List mappings = TestData.createMappingsColumnsAndValues(this.simpleStore);
+		List mappings = TestData
+				.createMappingsColumnsAndValues(this.simpleStore);
 
-		Map/*<String, Expression>*/idExpressions = new HashMap/*<String, Expression>*/();
-		idExpressions.put(targetNode.getName().getLocalPart(), fidMappingExpression);
+		Map/* <String, Expression> */idExpressions = new HashMap();
+		idExpressions.put(targetName.getLocalPart(), fidMappingExpression);
 		FeatureTypeMapping mapper = new FeatureTypeMapping(wsSource,
-				targetNode, mappings, idExpressions);
+				targetName, mappings, idExpressions);
 
-		FeatureCollection sourceFeatures = wsSource.getFeatures();
-		for (Iterator it = sourceFeatures.features(); it.hasNext();) {
+		Collection sourceFeatures = wsSource.content();
+		for (Iterator it = sourceFeatures.iterator(); it.hasNext();) {
 			SimpleFeature sourceFeature = (SimpleFeature) it.next();
-			/*
-			Feature mappedFeature = (Feature) mapper.map(sourceFeature);
-
-			String expectedID = "_" + sourceFeature.get("ph") + "."
-					+ sourceFeature.get("temp");
-
-			assertEquals(expectedID, mappedFeature.getID());
-			*/
+			// TODO
 		}
 	}
 
 	public void testMappingColumnsAndValues() throws Exception {
-		final FeatureSource wsSource = simpleStore
-				.getFeatureSource(TestData.WATERSAMPLE_TYPENAME);
-		final FeatureType sourceType = wsSource.getSchema();
+		final FeatureSource2 wsSource = (FeatureSource2) simpleStore
+				.access(TestData.WATERSAMPLE_TYPENAME);
+		final FeatureType sourceType = (FeatureType) wsSource.describe();
 		final FeatureType targetType = TestData.createComplexWaterSampleType();
-		final AttributeDescriptor targetNode = new NodeImpl(targetType);
-		
+		// final AttributeDescriptor targetNode = new NodeImpl(targetType);
+
 		/*
 		 * "ph" ---> sample/measurement[1]/parameter watersample/ph --->
 		 * sample/measurement[1]/value "temp" --->
@@ -108,85 +104,39 @@ public class FeatureTypeMappingTest extends TestCase {
 		 * sample/measurement[3]/value
 		 */
 
-		List mappings = TestData.createMappingsColumnsAndValues(this.simpleStore);
-		FeatureTypeMapping mapper = new FeatureTypeMapping(wsSource,
-				targetNode, mappings, null);
+		List mappings = TestData
+				.createMappingsColumnsAndValues(this.simpleStore);
 
-		FeatureCollection sourceFeatures = wsSource.getFeatures();
+		FeatureTypeMapping mapper = new FeatureTypeMapping(wsSource, targetType
+				.getName(), mappings, null);
 
-		Iterator it = sourceFeatures.features();
-		/**commented because mapping occurs only in MappingFeatureReader now.
-		while (it.hasNext()) {
-			SimpleFeature sourceFeature = (SimpleFeature) it.next();
+		Collection sourceFeatures = wsSource.content();
 
-			ComplexAttribute mappedObject = mapper.map(sourceFeature);
-			assertNotNull(mappedObject);
-			assertTrue(mappedObject instanceof Feature);
-			Feature mappedFeature = (Feature) mappedObject;
-
-			assertEquals(sourceFeature.getID(), mappedFeature.getID());
-
-			Object measurements = XPath
-					.get(mappedFeature, "sample/measurement");
-			assertTrue(measurements instanceof List);
-			assertEquals(3, ((List) measurements).size());
-
-			Attribute att;
-			Object expectedValue, obtainedValue;
-
-			att = (Attribute) XPath.get(mappedFeature,
-					"sample/measurement[1]/parameter");
-			expectedValue = "ph";
-
-			obtainedValue = att.get();
-			assertEquals(expectedValue, obtainedValue);
-
-			att = (Attribute) XPath.get(mappedFeature,
-					"sample/measurement[1]/value");
-
-			assertEquals(
-					Double.valueOf(sourceFeature.get("ph").toString()),
-					att.get()
-				);
-
-			att = (Attribute) XPath.get(mappedFeature,
-					"sample/measurement[2]/parameter");
-			assertEquals("temp", att.get());
-			att = (Attribute) XPath.get(mappedFeature,
-					"sample/measurement[2]/value");
-			assertEquals(Double.valueOf(sourceFeature.get("temp")
-					.toString()), att.get());
-
-			att = (Attribute) XPath.get(mappedFeature,
-					"sample/measurement[3]/parameter");
-			assertEquals("turbidity", att.get());
-			att = (Attribute) XPath.get(mappedFeature,
-					"sample/measurement[3]/value");
-			assertEquals(Double.valueOf(sourceFeature.get("turbidity")
-					.toString()), att.get());
-		}
-		*/
+		Iterator it = sourceFeatures.iterator();
+		// TODO: test something!
 	}
-	
-	
-	public void testMappingGroupByStation()throws Exception{
-		MemoryDataAccess dataStore = TestData.createDenormalizedWaterQualityResults();
-		FeatureTypeMapping mapper = TestData.createMappingsGroupByStation(dataStore);
+
+	public void testMappingGroupByStation() throws Exception {
+
+		MemoryDataAccess dataStore = TestData
+				.createDenormalizedWaterQualityResults();
+		FeatureTypeMapping mapper = TestData
+				.createMappingsGroupByStation(dataStore);
 		assertNotNull(mapper);
-		
-		FeatureSource simpleSource = dataStore.getFeatureSource(TestData.WATERSAMPLE_TYPENAME);
+
+		FeatureSource2 simpleSource = (FeatureSource2) dataStore
+				.access(TestData.WATERSAMPLE_TYPENAME);
 		assertNotNull(simpleSource);
-		
-		FeatureCollection sourceFeatures = simpleSource.getFeatures();
-		Iterator sourceIterator = sourceFeatures.features();
+
+		Collection sourceFeatures = simpleSource.content();
+		Iterator sourceIterator = sourceFeatures.iterator();
 		assertNotNull(sourceIterator);
-		
+
 		Feature sourceFeature = (Feature) sourceIterator.next();
 		assertNotNull(sourceFeature);
 		/*
-		Feature mapped = mapper.map(sourceFeature);
-		assertNotNull(mapped);
-		*/
+		 * Feature mapped = mapper.map(sourceFeature); assertNotNull(mapped);
+		 */
 	}
 
 	/**
@@ -213,24 +163,32 @@ public class FeatureTypeMappingTest extends TestCase {
 	public static MemoryDataAccess createWaterSampleTestFeatures()
 			throws Exception {
 		MemoryDataAccess dataStore = new MemoryDataAccess();
-		String typeString = "watersampleid:String,ph:int,temp:int,turbidity:float";
-		SimpleFeatureType type = (SimpleFeatureType) DataUtilities.createType(
-				TestData.WATERSAMPLE_TYPENAME, typeString);
-		AttributeDescriptor attributeDescriptor = new NodeImpl(type);
-		dataStore.createSchema(type);
+		SimpleTypeFactory tf = new SimpleTypeFactoryImpl();
+		SimpleTypeBuilder tb = new SimpleTypeBuilder(tf);
+
+		tb.setName(TestData.WATERSAMPLE_TYPENAME.getLocalPart());
+		tb.addAttribute("watersampleid", String.class);
+		tb.addAttribute("ph", Integer.class);
+		tb.addAttribute("temp", Integer.class);
+		tb.addAttribute("turbidity", Float.class);
+
+		SimpleFeatureType type = tb.feature();
+
+		dataStore.createSchemaInternal(type);
 
 		final int NUM_FEATURES = 10;
-		AttributeFactory af = new AttributeFactoryImpl();
+		SimpleFeatureFactory af = new SimpleFeatureFactoryImpl();
 
 		for (int i = 0; i < NUM_FEATURES; i++) {
-			SimpleFeature f = af.createSimpleFeature(attributeDescriptor, 
-					type.getName().getLocalPart() + "." + i
-			);
+			String fid = type.getName().getLocalPart() + "." + i;
+			SimpleFeature f = af.createSimpleFeature(type, fid, null);
+			
 			f.set("watersampleid", "watersample." + i);
 			f.set("ph", new Integer(i));
 			f.set("temp", new Integer(10 + i));
 			f.set("turbidity", new Float(i));
-			dataStore.addFeature(f);
+			
+			dataStore.addFeatureInternal(f);
 		}
 
 		return dataStore;

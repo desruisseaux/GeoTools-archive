@@ -2,6 +2,7 @@ package org.geotools.data.complex;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -11,31 +12,27 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-import org.geotools.data.DefaultQuery;
-import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
+import org.geotools.data.Source;
 import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
 import org.geotools.data.complex.config.ComplexDataStoreDTO;
 import org.geotools.data.complex.config.XMLConfigDigester;
+import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.memory.MemoryDataAccess;
-import org.geotools.feature.Descriptors;
-import org.geotools.feature.XPath;
-import org.geotools.feature.schema.NodeImpl;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterType;
-import org.geotools.util.AttributeName;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
-import org.opengis.feature.FeatureCollection;
-import org.opengis.feature.schema.AttributeDescriptor;
-import org.opengis.feature.schema.Descriptor;
-import org.opengis.feature.schema.OrderedDescriptor;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.TypeName;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
@@ -45,7 +42,8 @@ public class ComplexDataStoreTest extends TestCase {
 	private final static Logger LOGGER = Logger
 			.getLogger(ComplexDataStoreTest.class.getPackage().getName());
 
-	AttributeDescriptor targetDescriptor;
+	TypeName targetName;
+
 	FeatureType targetType;
 
 	private ComplexDataStore dataStore;
@@ -57,13 +55,14 @@ public class ComplexDataStoreTest extends TestCase {
 		MemoryDataAccess ds = FeatureTypeMappingTest
 				.createWaterSampleTestFeatures();
 		targetType = TestData.createComplexWaterSampleType();
-		targetDescriptor = new NodeImpl(targetType);
-		
+		targetName = targetType.getName();
+
 		List mappings = TestData.createMappingsColumnsAndValues(ds);
 
-		FeatureSource source = ds
-				.getFeatureSource(TestData.WATERSAMPLE_TYPENAME);
-		mapping = new FeatureTypeMapping(source, targetDescriptor, mappings, null);
+		TypeName sourceName = TestData.WATERSAMPLE_TYPENAME;
+		FeatureSource2 source = (FeatureSource2) ds.access(sourceName);
+
+		mapping = new FeatureTypeMapping(source, targetName, mappings, null);
 
 		dataStore = new ComplexDataStore(Collections.singleton(mapping));
 
@@ -81,34 +80,50 @@ public class ComplexDataStoreTest extends TestCase {
 		String[] typeNames = dataStore.getTypeNames();
 		assertNotNull(typeNames);
 		assertEquals(1, typeNames.length);
-		assertEquals(name(targetType), typeNames[0]);
+		assertEquals(targetName.getLocalPart(), typeNames[0]);
+
+		// DataAccess interface:
+		List names = dataStore.getNames();
+		assertNotNull(names);
+		assertEquals(1, names.size());
+		assertEquals(targetName, names.get(0));
 	}
 
 	/*
 	 * Test method for
 	 * 'org.geotools.data.complex.ComplexDataStore.getSchema(String)'
 	 */
-	public void testGetSchema() throws IOException {
-		FeatureType schema = dataStore.getSchema(name(targetType));
+	public void testDescribeType() throws IOException {
+		FeatureType schema = (FeatureType) dataStore.describe(targetName);
 		assertNotNull(schema);
 		assertEquals(targetType, schema);
 	}
 
 	public void testGetBounds() throws IOException {
+		final String namespaceUri = "http://online.socialchange.net.au";
+		final String localName = "RoadSegmentType";
+		final TypeName typeName = new org.geotools.feature.type.TypeName(
+				namespaceUri, localName);
+
 		URL configUrl = getClass().getResource("test-data/roadsegments.xml");
-		
+
 		ComplexDataStoreDTO config = new XMLConfigDigester().parse(configUrl);
-		
-		Set/*<FeatureTypeMapping>*/ mappings = ComplexDataStoreConfigurator.buildMappings(config);
-		
+
+		Set/* <FeatureTypeMapping> */mappings = ComplexDataStoreConfigurator
+				.buildMappings(config);
+
 		dataStore = new ComplexDataStore(mappings);
-		FeatureSource source = dataStore.getFeatureSource("RoadSegmentType");
-		FeatureType mappedType = source.getSchema();
+		FeatureSource2 source = (FeatureSource2) dataStore.access(typeName);
+
+		FeatureType mappedType = (FeatureType) source.describe();
 		assertNotNull(mappedType.getDefaultGeometry());
 
-		FeatureTypeMapping mapping = (FeatureTypeMapping) mappings.iterator().next();
+		FeatureTypeMapping mapping = (FeatureTypeMapping) mappings.iterator()
+				.next();
+
 		FeatureSource mappedSource = mapping.getSource();
 		Envelope originalBounds = mappedSource.getBounds(Query.ALL);
+
 		assertNotNull("mapped type bounds are not being fetched",
 				originalBounds);
 		FeatureSource fs = dataStore.getFeatureSource("RoadSegmentType");
@@ -122,22 +137,52 @@ public class ComplexDataStoreTest extends TestCase {
 	 * 'org.geotools.data.complex.ComplexDataStore.getFeatureReader(String)'
 	 */
 	public void testGetFeatureReader() throws IOException {
-		FeatureReader reader = dataStore.getFeatureReader(
-			name(targetType), Query.ALL);
+		Source access = dataStore.access(targetName);
+		assertEquals(targetType, access.describe());
+
+		Collection reader = access.content();
 		assertNotNull(reader);
-		assertEquals(targetType, reader.getFeatureType());
-		assertTrue(reader.hasNext());
-		Feature complexFeature = reader.next();
+
+		Iterator features = reader.iterator();
+		assertTrue(features.hasNext());
+
+		Feature complexFeature = (Feature) features.next();
 		assertNotNull(complexFeature);
 		assertEquals(targetType, complexFeature.getType());
 
-		assertNotNull(XPath.get(complexFeature, "measurement[1]"));
-		assertNotNull(XPath.get(complexFeature, "measurement[1]/parameter"));
-		assertNotNull(XPath.get(complexFeature, "measurement[1]/value"));
-		assertNotNull(XPath.get(complexFeature, "measurement[2]/parameter"));
-		assertNotNull(XPath.get(complexFeature, "measurement[2]/value"));
-		assertNotNull(XPath.get(complexFeature, "measurement[3]/parameter"));
-		assertNotNull(XPath.get(complexFeature, "measurement[3]/value"));
+		org.opengis.filter.FilterFactory ff = CommonFactoryFinder
+				.getFilterFactory(null);
+		PropertyName expr;
+		Object value;
+
+		expr = ff.property("measurement[1]");
+		value = expr.evaluate(complexFeature);
+		assertNotNull(value);
+
+		expr = ff.property("measurement[1]/parameter");
+		value = expr.evaluate(complexFeature);
+		assertNotNull(value);
+
+		expr = ff.property("measurement[1]/value");
+		value = expr.evaluate(complexFeature);
+		assertNotNull(value);
+
+		expr = ff.property("measurement[2]/parameter");
+		value = expr.evaluate(complexFeature);
+		assertNotNull(value);
+
+		expr = ff.property("measurement[2]/value");
+		value = expr.evaluate(complexFeature);
+		assertNotNull(value);
+
+		expr = ff.property("measurement[3]/parameter");
+		value = expr.evaluate(complexFeature);
+		assertNotNull(value);
+
+		expr = ff.property("measurement[3]/value");
+		value = expr.evaluate(complexFeature);
+		assertNotNull(value);
+
 	}
 
 	/*
@@ -145,9 +190,9 @@ public class ComplexDataStoreTest extends TestCase {
 	 * 'org.geotools.data.AbstractDataStore.getFeatureSource(String)'
 	 */
 	public void testGetFeatureSource() throws IOException {
-		FeatureSource complexSource = dataStore.getFeatureSource(
-			name(targetType));
+		Source complexSource = dataStore.access(targetName);
 		assertNotNull(complexSource);
+		assertEquals(targetType, complexSource.describe());
 	}
 
 	/*
@@ -156,48 +201,38 @@ public class ComplexDataStoreTest extends TestCase {
 	 * Transaction)'
 	 */
 	public void testGetFeatureReaderQuery() throws Exception {
-		FilterFactory ff = FilterFactory.createFilterFactory();
-		CompareFilter ph = ff.createCompareFilter(FilterType.COMPARE_EQUALS);
-		ph.addLeftValue(ff.createAttributeExpression(targetType,
-				"sample/measurement[1]/parameter"));
-		ph.addRightValue(ff.createLiteralExpression("ph"));
+		FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
-		CompareFilter phValue = ff
-				.createCompareFilter(FilterType.COMPARE_LESS_THAN_EQUAL);
-		phValue.addLeftValue(ff.createAttributeExpression(targetType,
-				"sample/measurement[1]/value"));
-		phValue.addRightValue(ff.createLiteralExpression(new Integer(3)));
+		PropertyName property = ff.property("sample/measurement[1]/parameter");
+		Literal literal = ff.literal("ph");
+		Filter filterParameter = ff.equals(property, literal);
 
-		Filter filter = ph.and(phValue);
+		property = ff.property("sample/measurement[1]/value");
+		literal = ff.literal(new Integer(3));
+		Filter filterValue = ff.equals(property, literal);
 
-		Query query = new DefaultQuery(name(targetType), filter);
-		FeatureSource complexSource = dataStore.getFeatureSource(name(targetType));
-		FeatureCollection features = complexSource.getFeatures(query);
-		Iterator reader = features.features();
+		Filter filter = ff.and(filterParameter, filterValue);
+
+		Source complexSource = dataStore.access(targetName);
+		Collection features = complexSource.content(filter);
+
+		Iterator reader = features.iterator();
 
 		int count = 0;
 		int expectedCount = 4;
-		CompareFilter badFilter = ff
-				.createCompareFilter(FilterType.COMPARE_GREATER_THAN);
-		badFilter.addLeftValue(ff.createAttributeExpression(targetType,
-				"sample/measurement[1]/value"));
-		badFilter.addRightValue(ff.createLiteralExpression(new Integer(3)));
+
+		Filter badFilter = ff.greater(ff
+				.property("sample/measurement[1]/value"), ff
+				.literal(new Integer(3)));
 
 		while (reader.hasNext()) {
 			Feature f = (Feature) reader.next();
 			assertNotNull(f);
-			assertTrue(filter.contains(f));
-			assertFalse(badFilter.contains(f));
+			assertTrue(filter.evaluate(f));
+			assertFalse(badFilter.evaluate(f));
 			count++;
 		}
 		assertEquals(expectedCount, count);
-
-		/*
-		 * UnmappingFilterVisitor visitor = new UnmappingFilterVisitor(mapping);
-		 * visitor.visit(filter);
-		 * 
-		 * Filter unrolled = visitor.getUnrolledFilter();
-		 */
 	}
 
 	public void testGroupByFeatureReader() throws Exception {
@@ -212,17 +247,19 @@ public class ComplexDataStoreTest extends TestCase {
 		FeatureTypeMapping mapper = TestData
 				.createMappingsGroupByStation(dataStore);
 
-		targetDescriptor = mapper.getTargetFeature();
-		targetType = (FeatureType)targetDescriptor.getType();
+		targetName = mapper.getTargetFeature();
 
-		Set/*<FeatureTypeMapping>*/ mappings = Collections.singleton(mapper);
+		Set/* <FeatureTypeMapping> */mappings = Collections.singleton(mapper);
 
 		ComplexDataStore complexDataStore = new ComplexDataStore(mappings);
 
-		FeatureSource complexSource = complexDataStore
-				.getFeatureSource(name(targetType));
+		Source complexSource = complexDataStore.access(targetName);
 		assertNotNull(complexSource);
-		FeatureCollection complexFeatures = complexSource.getFeatures();
+
+		targetType = (FeatureType) complexSource.describe();
+		assertNotNull(targetType);
+
+		Collection complexFeatures = complexSource.content();
 		assertNotNull(complexFeatures);
 
 		final int EXPECTED_FEATURE_COUNT = 10;// as results from applying the
@@ -230,7 +267,9 @@ public class ComplexDataStoreTest extends TestCase {
 		// FeatureSource
 
 		int featureCount = 0;
-		Iterator it = complexFeatures.features();
+		Iterator it = complexFeatures.iterator();
+		TypeName measurementName = new org.geotools.feature.type.TypeName(
+				"measurement");
 		while (it.hasNext()) {
 
 			Feature currFeature = (Feature) it.next();
@@ -240,20 +279,22 @@ public class ComplexDataStoreTest extends TestCase {
 			LOGGER.info(currFeature.toString());
 
 			// currFeature must have as many "measurement" complex attribute
-			// instances as
-			// the current iteration number
+			// instances as the current iteration number
 			// This check relies on MemoryDataStore returning Features in the
-			// same order they
-			// was inserted
+			// same order they was inserted
+
 			int expectedMeasurementInstances = featureCount;
-			List/*<Attribute>*/ measurements = currFeature
-					.getAttributes(new AttributeName("measurement"));
+
+			List/* <Attribute> */measurements = currFeature
+					.get(measurementName);
+
 			assertNotNull(measurements);
+
 			try {
 				for (Iterator itr = measurements.iterator(); itr.hasNext();) {
 					Attribute attribute = (Attribute) itr.next();
-					assertNotNull("expected not null id: " + attribute.getID(),
-							attribute.getID());
+					String measurementId = attribute.getID();
+					assertNotNull("expected not null id", measurementId);
 				}
 				assertEquals(expectedMeasurementInstances, measurements.size());
 			} catch (AssertionFailedError e) {
@@ -275,42 +316,44 @@ public class ComplexDataStoreTest extends TestCase {
 	public void testGroupByFeatureReaderRespectsAttributeOrder()
 			throws Exception {
 
-		LOGGER.info("DATA TEST: testGroupByFeatureReaderRespectsAttributeOrder");
+		LOGGER
+				.info("DATA TEST: testGroupByFeatureReaderRespectsAttributeOrder");
 
 		// dataStore with denormalized wq_ir_results type
-		MemoryDataAccess dataStore = TestData
-				.createDenormalizedWaterQualityResults();
+		MemoryDataAccess dataStore;
+		dataStore = TestData.createDenormalizedWaterQualityResults();
 		// mapping definitions from simple wq_ir_results type to complex wq_plus
 		// type
-		FeatureTypeMapping mapper = TestData.createMappingsGroupByStation(dataStore);
+		FeatureTypeMapping mapper;
+		mapper = TestData.createMappingsGroupByStation(dataStore);
 
-		targetDescriptor = mapper.getTargetFeature();
-		targetType = (FeatureType)targetDescriptor.getType();
+		targetName = mapper.getTargetFeature();
 
-		Set/*<FeatureTypeMapping>*/ mappings = Collections.singleton(mapper);
+		Set/* <FeatureTypeMapping> */mappings = Collections.singleton(mapper);
 
 		ComplexDataStore complexDataStore = new ComplexDataStore(mappings);
-
-		FeatureSource complexSource = complexDataStore
-				.getFeatureSource(name(targetType));
+		Source complexSource = complexDataStore.access(targetName);
 		assertNotNull(complexSource);
-		FeatureCollection complexFeatures = complexSource.getFeatures();
+
+		targetType = (FeatureType) complexSource.describe();
+
+		Collection complexFeatures = complexSource.content();
 		assertNotNull(complexFeatures);
 
-		Iterator it = complexFeatures.features();
+		Iterator it = complexFeatures.iterator();
 		Feature currFeature = (Feature) it.next();
-		List/*<? extends Descriptor>*/ sequence = ((OrderedDescriptor) targetType
-				.getDescriptor()).sequence();
-		List/*<Attribute>*/ atts = currFeature.getAttributes();
+
+		Collection/* <? extends StructuralDescriptor> */sequence = targetType
+				.getProperties();
+
+		List/* <Attribute> */atts = (List) currFeature.get();
 		int idx = 0;
 		for (Iterator itr = sequence.iterator(); itr.hasNext();) {
-			Descriptor d = (Descriptor) itr.next();
-			AttributeDescriptor node = (AttributeDescriptor) d;
+			AttributeDescriptor node = (AttributeDescriptor) itr.next();
 			AttributeType attType = node.getType();
 			Attribute attribute = (Attribute) atts.get(idx);
-			String msg = "Expected " + attType.getName()
-					+ " at index " + idx + " but got "
-					+ attribute.getType().getName();
+			String msg = "Expected " + attType.getName() + " at index " + idx
+					+ " but got " + attribute.getType().getName();
 			assertEquals(msg, attType, attribute.getType());
 			idx++;
 		}
@@ -324,40 +367,61 @@ public class ComplexDataStoreTest extends TestCase {
 	 * @throws IOException
 	 */
 	public void testWithConfig() throws Exception {
-		URL configUrl = getClass().getResource("test-data/roadsegments.xml");
-		
+		final String nsUri = "http://online.socialchange.net.au";
+		final String localName = "RoadSegmentType";
+		final TypeName typeName = new org.geotools.feature.type.TypeName(nsUri,
+				localName);
+
+		final URL configUrl = getClass().getResource(
+				"test-data/roadsegments.xml");
+
 		ComplexDataStoreDTO config = new XMLConfigDigester().parse(configUrl);
-		
-		Set/*<FeatureTypeMapping>*/ mappings = ComplexDataStoreConfigurator.buildMappings(config); 
-		
+
+		Set/* <FeatureTypeMapping> */mappings = ComplexDataStoreConfigurator
+				.buildMappings(config);
+
 		dataStore = new ComplexDataStore(mappings);
-		FeatureSource source = dataStore.getFeatureSource("RoadSegmentType");
+		Source source = dataStore.access(typeName);
+
+		FeatureType type = (FeatureType) source.describe();
 
 		AttributeDescriptor node;
-
-		FeatureType type = source.getSchema();
-		Descriptor scheme = type.getDescriptor();
-
-
-		node = Descriptors.node(scheme, "the_geom");
+		node = (AttributeDescriptor) Types.descriptor(type, Types.typeName(
+				nsUri, "the_geom"));
 		assertNotNull(node);
-		assertEquals("LineStringPropertyType", node.getType().getName().getLocalPart());
+		assertEquals("LineStringPropertyType", node.getType().getName()
+				.getLocalPart());
 
 		assertNotNull(type.getDefaultGeometry());
-		assertEquals(node.getType(), type.getDefaultGeometry());;
-		
-		assertNotNull(type.type("name"));
-		assertNotNull(type.type("fromToNodes"));
+		assertEquals(node.getType(), type.getDefaultGeometry());
 
-		ComplexType fromToNodes = (ComplexType) type.type("fromToNodes");
-		assertFalse(fromToNodes.isNillable().booleanValue());
+		assertNotNull(Types.descriptor(type, Types.typeName(nsUri, "name")));
+
+		TypeName ftNodeName = Types.typeName(nsUri, "fromToNodes");
+		assertNotNull(Types.descriptor(type, ftNodeName));
+
+		AttributeDescriptor descriptor = (AttributeDescriptor) Types
+				.descriptor(type, ftNodeName);
+
+		ComplexType fromToNodes = (ComplexType) descriptor.getType();
+
+		assertFalse(descriptor.isNillable());
 		assertTrue(fromToNodes.isIdentified());
-		//assertEquals(2, fromToNodes.getDescriptor());
-		assertNotNull(fromToNodes.type("fromNode"));
-		assertEquals(Point.class, fromToNodes.type("fromNode").getBinding());
-		assertEquals(Point.class, fromToNodes.type("toNode").getBinding());
 
-		Iterator features = source.getFeatures().features();
+		TypeName fromNodeName = Types.typeName(nsUri, "fromNode");
+		AttributeDescriptor fromNode = (AttributeDescriptor) Types.descriptor(
+				fromToNodes, fromNodeName);
+		assertNotNull(fromNode);
+
+		TypeName toNodeName = Types.typeName(nsUri, "toNode");
+		AttributeDescriptor toNode = (AttributeDescriptor) Types.descriptor(
+				fromToNodes, toNodeName);
+		assertNotNull(fromNode);
+
+		assertEquals(Point.class, fromNode.getType().getBinding());
+		assertEquals(Point.class, toNode.getType().getBinding());
+
+		Iterator features = source.content().iterator();
 		int count = 0;
 		final int expectedCount = 5;
 		try {
@@ -370,9 +434,5 @@ public class ComplexDataStoreTest extends TestCase {
 			throw e;
 		}
 		assertEquals("feature count", expectedCount, count);
-	}
-	
-	protected String name(FeatureType type) {
-		return type.getName().getLocalPart();
 	}
 }
