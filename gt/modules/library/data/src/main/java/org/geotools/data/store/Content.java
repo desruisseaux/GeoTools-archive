@@ -23,7 +23,6 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureList;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
 
 /**
  * Class is used to provide data access for ContentDataStore.
