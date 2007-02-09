@@ -44,6 +44,7 @@ public abstract class FunctionExpressionImpl
      */
     protected FunctionExpressionImpl(String name) {
         this.name = name;
+        params = new ArrayList();
     }
 
      /**
