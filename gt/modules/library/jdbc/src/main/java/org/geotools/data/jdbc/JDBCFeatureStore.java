@@ -363,7 +363,18 @@ public class JDBCFeatureStore extends JDBCFeatureSource implements FeatureStore 
                 newFeature = (SimpleFeature)writer.next();
 
                 try {
-                    newFeature.setAttributes(feature.getAttributes(null));
+                	//JD: we may have a case that the source feature type does not 
+                	//match exactly the target feature type, so build attributes
+                	// based oin target
+                    //newFeature.setAttributes(feature.getAttributes(null));
+                	Object[] attributes = new Object[ newFeature.getNumberOfAttributes() ];
+                	for ( int i = 0; i < attributes.length; i++) {
+                		AttributeType type = 
+                			newFeature.getFeatureType().getAttributeType( i );
+                		attributes[ i ] = feature.getAttribute( type.getName() );
+                	}
+                	newFeature.setAttributes( attributes );
+                	
                 } catch (IllegalAttributeException writeProblem) {
                     throw new DataSourceException("Could not create "
                         + typeName + " out of provided feature: "
