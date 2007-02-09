@@ -17,12 +17,10 @@ package org.geotools.data.store;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.geotools.data.DataStore;
-import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
@@ -34,9 +32,11 @@ import org.geotools.data.collection.DelegateFeatureReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+
 import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.sort.SortBy;
 
 /**
@@ -80,7 +80,10 @@ public class ContentDataStore implements DataStore {
 	 * Factory used to create feature types
 	 */
 	protected SimpleTypeFactory typeFactory;
-	
+	/**
+	 * Factory used to create filters
+	 */
+	protected FilterFactory filterFactory;
 	/**
 	 * Application namespace uri of the datastore
 	 */
@@ -128,25 +131,55 @@ public class ContentDataStore implements DataStore {
 	}
 	
 	public FeatureType getSchema(String typeName) throws IOException {
-		ContentEntry entry = entry( name( typeName ) );
+		
+		TypeName name = name( typeName );
+		ContentEntry entry = null;
+		
+		//do we already know about entry
+		if ( !entries.containsKey( name ) ) {
+			//is this type available?
+			List typeNames = content.getTypeNames();
+			if ( typeNames.contains( name ) ) {
+				//yes, create an entry for it
+				synchronized ( this ) {
+					if ( !entries.containsKey( name ) ) {
+						entry = content.entry( this, name );
+						entries.put( name, entry );
+					}
+				}
+				
+				entry = (ContentEntry) entries.get( name );
+			}
+		}
+	
+		if ( entry == null ) {
+			throw new IOException( "Schema '" + typeName + "' does not exist." );
+		}	
+			
 		return entry.getState( Transaction.AUTO_COMMIT ).featureType( typeFactory );
 	}
 
+	public FeatureReader getFeatureReader(Query query, Transaction transaction)
+		throws IOException {
+		FeatureCollection collection = query(query, transaction);
+		return new DelegateFeatureReader( collection.getSchema(), collection.features() );
+	}
+
+	
 	/** Used to strongly type typeName as soon as possible */
 	final protected TypeName name(String typeName) {
 		return  new org.geotools.feature.type.TypeName( typeName );
 	}
 
 	/**
-	 * Looks up an entry, creating it if necessary.
+	 * Looks up an entry.
+	 * 
+	 * @param The name of the entry.
+	 * 
+	 * @return The entry, or <code>null</code> if it does not exist.
 	 */
 	final protected ContentEntry entry(TypeName name) {
-		ContentEntry entry = (ContentEntry) entries.get(name);
-		if (entry == null) {
-			entry = content.entry(this, name);
-			entries.put(name, entry);
-		}
-		return entry;
+		return (ContentEntry) entries.get(name);
 	}
 
 	final private FeatureCollection query(Query query, Transaction transaction)
@@ -213,14 +246,6 @@ public class ContentDataStore implements DataStore {
 	//
 	// low level operations
 	//
-	public FeatureReader getFeatureReader(Query query, Transaction transaction)
-			throws IOException {
-		FeatureCollection collection = query(query, transaction);
-
-		return null; // new DelegateFeatureReader( collection.getSchema(),
-						// collection.features() );
-	}
-
 	public FeatureWriter getFeatureWriter(String typeName,
 			Transaction transaction) throws IOException {
 		// FeatureCollection collection = query( query, transaction );
