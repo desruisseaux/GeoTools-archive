@@ -48,10 +48,11 @@ public class H2FeatureCollectionAll implements FeatureCollection {
 		// TODO Auto-generated method stub
 
 	}
-
-	public void close(FeatureIterator close) {
+	
+	public void removeListener(CollectionListener listener)
+		throws NullPointerException {
 		// TODO Auto-generated method stub
-
+	
 	}
 
 	public FeatureIterator features() {
@@ -59,6 +60,12 @@ public class H2FeatureCollectionAll implements FeatureCollection {
 		return null;
 	}
 
+	public void close(FeatureIterator close) {
+		// TODO Auto-generated method stub
+
+	}
+
+	
 	public Iterator iterator() {
 		// TODO Auto-generated method stub
 		return null;
@@ -80,11 +87,7 @@ public class H2FeatureCollectionAll implements FeatureCollection {
 		return null;
 	}
 
-	public void removeListener(CollectionListener listener)
-			throws NullPointerException {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 	public FeatureList sort(SortBy order) {
 		// TODO Auto-generated method stub

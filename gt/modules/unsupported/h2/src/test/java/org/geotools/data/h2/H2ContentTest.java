@@ -1,11 +1,10 @@
 package org.geotools.data.h2;
 
-import java.sql.ResultSet;
-import java.util.Iterator;
+import java.util.List;
 
 import org.geotools.feature.type.TypeName;
 
-public class H2ContentTest extends H2MockTestSupport {
+public class H2ContentTest extends H2TestSupport {
 
 	H2Content content;
 	
@@ -16,20 +15,11 @@ public class H2ContentTest extends H2MockTestSupport {
 	}
 	
 	public void testGetTypeNames() throws Exception {
-		Iterator typeNames = content.getTypeNames().iterator();
-		assertTrue( typeNames.hasNext() );
+		List typeNames = content.getTypeNames();
+		assertEquals( 1, typeNames.size() );
 		
-		ResultSet tables = createTableMetaDataResultSet();
-		
-		while( tables.next() ) {
-			assertTrue( typeNames.hasNext() );
-			TypeName typeName = (TypeName) typeNames.next();
-			
-			String tableName =  tables.getString( "TABLE_NAME" );
-			assertEquals( tableName, typeName.getLocalPart() );
-		}
-		
-		assertFalse( typeNames.hasNext() );
+		TypeName typeName = (TypeName) typeNames.get( 0 );
+		assertEquals( "featureType1", typeName.getLocalPart() );
 	}
 	
 	

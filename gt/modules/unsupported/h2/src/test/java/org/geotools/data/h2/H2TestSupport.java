@@ -131,6 +131,7 @@ public class H2TestSupport extends TestCase {
 		
 		//stop the server
 		server.stop();
+		Thread.sleep( 100 );
 		
 		//kill the files
 		String dir = System.getProperty( "user.dir" );

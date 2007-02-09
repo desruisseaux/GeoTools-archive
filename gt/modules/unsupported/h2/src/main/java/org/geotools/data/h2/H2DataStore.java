@@ -3,6 +3,8 @@ package org.geotools.data.h2;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.sql.ConnectionPoolDataSource;
@@ -76,21 +78,29 @@ public class H2DataStore extends ContentDataStore {
 		H2SQLBuilder sqlBuilder = sqlBuilder( state );
 		String sql = sqlBuilder.create();
 		
-		Connection conn;
+		//execute the sql
+		Connection conn = null;
 		try {
 			conn = connection();
+			
+			Statement st = conn.createStatement();
+			st.execute( sql );
+			
+			st.close();
 		} 
 		catch (SQLException e) {
-		
-		}
-		try {
-			
+			throw (IOException) new IOException().initCause( e );
 		}
 		finally {
-			conn.close();
+			try {
+				if ( conn != null ) {
+					conn.close();
+				}
+			} 
+			catch (SQLException e) {
+				LOGGER.log( Level.WARNING, "Error closing connection", e );
+			}
 		}
-		
-		
 	}
 	
 	protected H2SQLBuilder sqlBuilder( H2ContentState state ) {

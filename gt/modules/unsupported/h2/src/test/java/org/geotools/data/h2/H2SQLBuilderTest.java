@@ -6,7 +6,7 @@ import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.type.TypeName;
 import org.opengis.filter.FilterFactory2;
 
-public class H2SQLBuilderTest extends H2MockTestSupport {
+public class H2SQLBuilderTest extends H2TestSupport {
 
 	/**
 	 * Factory for creating filters
@@ -35,8 +35,8 @@ public class H2SQLBuilderTest extends H2MockTestSupport {
 	public void testCreate() throws Exception {
 		String sql = encoder.create();
 		assertEquals( 
-			"CREATE TABLE \"schema\".\"featureType1\" (" + 
-				" \"bool\" bool, \"double\" double, \"int\" int, \"string\" varchar " +
+			"CREATE TABLE \"geotools\".\"featureType1\" (" + 
+				" \"intProperty\" INTEGER, \"doubleProperty\" DOUBLE, \"stringProperty\" VARCHAR_IGNORECASE " +
 			");",  sql );
 	}
 	
