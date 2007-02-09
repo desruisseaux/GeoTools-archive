@@ -17,11 +17,13 @@ package org.geotools.feature.type;
 
 import org.geotools.feature.DefaultAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.geometry.jts.JTS;
 import org.opengis.filter.Filter;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -100,6 +102,11 @@ public class GeometricAttributeType extends DefaultAttributeType implements org.
 
         if (value instanceof Geometry) {
             return value;
+        }
+        
+        if ( value instanceof Envelope ) {
+        	//convert enevelope to polygon
+        	return JTS.toGeometry( (Envelope) value );
         }
 
 	if (value instanceof String) {
