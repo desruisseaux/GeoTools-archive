@@ -92,7 +92,8 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Extended by: Mauricio Pazos - Axios Engineering
  * @author Extended by: Gabriel Roldan - Axios Engineering
  * @version $Id$
- * @source $URL$
+ * @source $URL:
+ *         http://gtsvn.refractions.net/geotools/trunk/gt/modules/unsupported/cql/src/main/java/org/geotools/text/filter/FilterBuilder.java $
  */
 public class FilterBuilder {
 
@@ -108,13 +109,13 @@ public class FilterBuilder {
      * @return a {@link Filter} equivalent to the constraint specified in
      *         <code>input</code>.
      */
-    public static org.opengis.filter.Filter parse(FilterFactory filterFactory, String input)
-            throws ParseException {
+    public static org.opengis.filter.Filter parse(FilterFactory filterFactory,
+            String input) throws ParseException {
 
-        if(filterFactory == null){
-            filterFactory = CommonFactoryFinder.getFilterFactory((Hints)null);
+        if (filterFactory == null) {
+            filterFactory = CommonFactoryFinder.getFilterFactory((Hints) null);
         }
-        
+
         CQLCompiler c = new CQLCompiler(input, filterFactory);
         try {
             c.CompilationUnit();
@@ -124,7 +125,8 @@ public class FilterBuilder {
         if (c.exception != null)
             throw c.exception;
 
-        Filter builtFilter = c.getResult();
+        Object result = c.getResult();
+        Filter builtFilter = (Filter) result;
         return builtFilter;
     }
 
@@ -140,6 +142,52 @@ public class FilterBuilder {
     public static org.opengis.filter.Filter parse(String input)
             throws ParseException {
         return parse(null, input);
+    }
+
+    /**
+     * Parses the input string in OGC CQL format into an Expression, using the
+     * provided FilterFactory.
+     * 
+     * @param filterFactory
+     *            the {@link FilterFactory} to use for the creation of the
+     *            Expression.
+     * @param input
+     *            a string containing a OGC CQL expression.
+     * @return a {@link Filter} equivalent to the constraint specified in
+     *         <code>input</code>.
+     */
+    public static org.opengis.filter.expression.Expression parseExpression(
+            FilterFactory filterFactory, String input) throws ParseException {
+
+        if (filterFactory == null) {
+            filterFactory = CommonFactoryFinder.getFilterFactory((Hints) null);
+        }
+
+        CQLCompiler c = new CQLCompiler(input, filterFactory);
+        try {
+            c.ExpressionCompilationUnit();
+        } catch (TokenMgrError tme) {
+            throw new FilterBuilderException(tme.getMessage(), c.getToken(0));
+        }
+        if (c.exception != null)
+            throw c.exception;
+
+        Expression builtFilter = (Expression) c.getResult();
+        return builtFilter;
+    }
+
+    /**
+     * Parses the input string in OGC CQL format into an Expression, using the
+     * systems default FilterFactory implementation.
+     * 
+     * @param input
+     *            a string containing an OGC CQL expression.
+     * @return a {@link Expression} equivalent to the one specified in
+     *         <code>input</code>.
+     */
+    public static org.opengis.filter.expression.Expression parseExpression(
+            String input) throws ParseException {
+        return parseExpression(null, input);
     }
 
     /**
@@ -188,9 +236,13 @@ public class FilterBuilder {
             this.resultStack = BuildResultStack.getInstance();
         }
 
-        public Filter getResult() {
+        /**
+         * @return either an Expression or a Filter, depending on what
+         * the product of the compilation unit was
+         */
+        public Object getResult() {
             Result item = resultStack.peek();
-            Filter result = (org.opengis.filter.Filter) item.getBuilt();
+            Object result = item.getBuilt();
             return result;
         }
 
@@ -292,8 +344,8 @@ public class FilterBuilder {
                 org.opengis.filter.expression.Expression expr = resultStack
                         .popExpression();
 
-                PropertyIsLike f = filterFactory.like(expr,
-                        pattern.toString(), WC_MULTI, WC_SINGLE, ESCAPE);
+                PropertyIsLike f = filterFactory.like(expr, pattern.toString(),
+                        WC_MULTI, WC_SINGLE, ESCAPE);
 
                 return f;
 
@@ -342,8 +394,8 @@ public class FilterBuilder {
                 org.opengis.filter.expression.Expression expr = resultStack
                         .popExpression();
 
-                PropertyIsBetween filter = filterFactory.between(expr, inf,
-                        sup);
+                PropertyIsBetween filter = filterFactory
+                        .between(expr, inf, sup);
 
                 return filter;
 
@@ -568,8 +620,8 @@ public class FilterBuilder {
             }
             attribute.append(arrayIdentifiers.get(i));
 
-            PropertyName property = filterFactory.property(attribute
-                    .toString());
+            PropertyName property = filterFactory
+                    .property(attribute.toString());
 
             return property;
         }
@@ -702,8 +754,9 @@ public class FilterBuilder {
                 break;
 
             case JJTROUTINEINVOCATION_GEOOP_WITHIN_NODE:
-                //TODO: remove cast once http://jira.codehaus.org/browse/GEO-92 and
-                //http://jira.codehaus.org/browse/GEOT-1028 are fixed.
+                // TODO: remove cast once http://jira.codehaus.org/browse/GEO-92
+                // and
+                // http://jira.codehaus.org/browse/GEOT-1028 are fixed.
                 FilterFactoryImpl ffi = (FilterFactoryImpl) ff;
                 filter = ffi.within(property, geom);
                 break;
@@ -816,8 +869,8 @@ public class FilterBuilder {
             Function function = filterFactory.function("PropertyExists", args);
             Literal literalTrue = filterFactory.literal(Boolean.TRUE);
 
-            PropertyIsEqualTo propExistsFilter = filterFactory.equals(
-                    function, literalTrue);
+            PropertyIsEqualTo propExistsFilter = filterFactory.equals(function,
+                    literalTrue);
 
             return propExistsFilter;
         }
@@ -1048,9 +1101,9 @@ public class FilterBuilder {
             org.opengis.filter.expression.Expression property = resultStack
                     .popExpression();
 
-            org.opengis.filter.Filter filter = filterFactory.and(
-                    filterFactory.lessOrEqual(begin, property), filterFactory
-                            .lessOrEqual(property, end));
+            org.opengis.filter.Filter filter = filterFactory.and(filterFactory
+                    .lessOrEqual(begin, property), filterFactory.lessOrEqual(
+                    property, end));
             return filter;
         }
 
@@ -1104,8 +1157,8 @@ public class FilterBuilder {
             org.opengis.filter.expression.Expression property = resultStack
                     .popExpression();
 
-            PropertyIsGreaterThan filter = filterFactory.greater(property,
-                    date);
+            PropertyIsGreaterThan filter = filterFactory
+                    .greater(property, date);
 
             return filter;
 
@@ -1275,9 +1328,9 @@ public class FilterBuilder {
          * <p>
          * 
          * <pre>
-         *        Then OGC require MULTIPOINT((1 2), (3 4)) 
-         *        but vividsolunion works without point &quot;(&quot; ans &quot;)&quot; 
-         *        MULTIPOINT(1 2, 3 4)
+         *         Then OGC require MULTIPOINT((1 2), (3 4)) 
+         *         but vividsolunion works without point &quot;(&quot; ans &quot;)&quot; 
+         *         MULTIPOINT(1 2, 3 4)
          * </pre>
          * 
          * <p>
