@@ -87,17 +87,17 @@ public abstract class MapProjection extends AbstractMathTransform
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
+
     /**
      * Difference allowed in iterative computations.
      */
     private static final double ITERATION_TOLERANCE = 1E-10;
-    
+
     /**
      * Maximum number of iterations for iterative computations.
      */
     private static final int MAXIMUM_ITERATIONS = 15;
-    
+
     /**
      * Ellipsoid excentricity, equals to <code>sqrt({@link #excentricitySquared})</code>.
      * Value 0 means that the ellipsoid is spherical.
@@ -106,7 +106,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * @see #isSpherical
      */
     protected final double excentricity;
-    
+
     /**
      * The square of excentricity: e² = (a²-b²)/a² where
      * <var>e</var> is the {@linkplain #excentricity excentricity},
@@ -130,7 +130,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * @see #semiMinor
      */
     protected final boolean isSpherical;
-    
+
     /**
      * Length of semi-major axis, in metres. This is named '<var>a</var>' or '<var>R</var>'
      * (Radius in spherical cases) in Snyder.
@@ -139,7 +139,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * @see #semiMinor
      */
     protected final double semiMajor;
-    
+
     /**
      * Length of semi-minor axis, in metres. This is named '<var>b</var>' in Snyder.
      *
@@ -147,7 +147,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * @see #semiMajor
      */
     protected final double semiMinor;
-    
+
     /**
      * Central longitude in <u>radians</u>. Default value is 0, the Greenwich meridian.
      * This is called '<var>lambda0</var>' in Snyder.
@@ -156,7 +156,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * because some classes need to modify it at construction time.
      */
     protected double centralMeridian;
-    
+
     /**
      * Latitude of origin in <u>radians</u>. Default value is 0, the equator.
      * This is called '<var>phi0</var>' in Snyder.
@@ -165,7 +165,7 @@ public abstract class MapProjection extends AbstractMathTransform
      * because some classes need to modify it at construction time.
      */
     protected double latitudeOfOrigin;
-    
+
     /**
      * The scale factor. Default value is 1. Named '<var>k</var>' in Snyder.
      *
@@ -173,17 +173,17 @@ public abstract class MapProjection extends AbstractMathTransform
      * because some classes need to modify it at construction time.
      */
     protected double scaleFactor;
-    
+
     /**
      * False easting, in metres. Default value is 0.
      */
     protected final double falseEasting;
-    
+
     /**
      * False northing, in metres. Default value is 0.
      */
     protected final double falseNorthing;
-    
+
     /**
      * Global scale factor. Default value {@code globalScale} is equal
      * to {@link #semiMajor}&times;{@link #scaleFactor}.
@@ -192,12 +192,12 @@ public abstract class MapProjection extends AbstractMathTransform
      * because some classes need to modify it at construction time.
      */
     protected double globalScale;
-    
+
     /**
      * The inverse of this map projection. Will be created only when needed.
      */
     private transient MathTransform inverse;
-    
+
     /**
      * Constructs a new map projection from the suplied parameters.
      *
@@ -314,6 +314,36 @@ public abstract class MapProjection extends AbstractMathTransform
     }
 
     /**
+     * Ensures that this projection has equals semi-major and semi-minor axis. This method is
+     * invoked by constructors of classes implementing only spherical formulas.
+     */
+    final void ensureSpherical() throws IllegalArgumentException {
+        if (!isSpherical) {
+            throw new IllegalArgumentException(Errors.format(ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
+        }
+    }
+
+    /**
+     * Ensures that the absolute value of a latitude is equals to the specified value, up to
+     * the tolerance value. The expected value is usually either {@code 0} or {@code PI/2}
+     * (the equator or a pole).
+     *
+     * @param  y Latitude to check, in radians.
+     * @param  expected The expected value, in radians.
+     * @throws IllegalArgumentException if the latitude is not the expected one.
+     */
+    static void ensureLatitudeEquals(final ParameterDescriptor name, double y, double expected)
+            throws IllegalArgumentException
+    {
+        if (!(Math.abs(Math.abs(y) - expected) < EPSILON)) {
+            y = Math.toDegrees(y);
+            final String n = name.getName().getCode();
+            throw new InvalidParameterValueException(Errors.format(ErrorKeys.ILLEGAL_ARGUMENT_$2,
+                    n, new Latitude(y)), n, y);
+        }
+    }
+
+    /**
      * Ensures that the latitude is within allowed limits (&plusmn;&pi;/2).
      * This method is useful to check the validity of projection parameters,
      * like {@link #latitudeOfOrigin}.
@@ -334,7 +364,7 @@ public abstract class MapProjection extends AbstractMathTransform
         throw new InvalidParameterValueException(Errors.format(ErrorKeys.LATITUDE_OUT_OF_RANGE_$1,
                                                  new Latitude(y)), name.getName().getCode(), y);
     }
-    
+
     /**
      * Ensures that the longitue is within allowed limits (&plusmn;&pi;).
      * This method is used to check the validity of projection parameters,
@@ -427,31 +457,31 @@ public abstract class MapProjection extends AbstractMathTransform
         set(expected, AbstractProvider.FALSE_NORTHING,     values, falseNorthing   );
         return values;
     }
-    
+
     /**
      * Returns the dimension of input points.
      */
     public final int getSourceDimensions() {
         return 2;
     }
-    
+
     /**
      * Returns the dimension of output points.
      */
     public final int getTargetDimensions() {
         return 2;
     }
-    
-    
-    
-    
+
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
     ////////                          TRANSFORMATION METHODS                          ////////
     ////////             Includes an inner class for inverse projections.             ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * Returns the orthodromic distance between the two specified points using a spherical
      * approximation. This is used for assertions only.
@@ -465,7 +495,7 @@ public abstract class MapProjection extends AbstractMathTransform
         if (rho<-1) {assert rho >= -(1+EPSILON) : rho; rho=-1;}
         return Math.acos(rho) * semiMajor;
     }
-    
+
     /**
      * Check point for private use by {@link #checkReciprocal}. This class is necessary in order
      * to avoid never-ending loop in {@code assert} statements (when an {@code assert}
@@ -477,7 +507,7 @@ public abstract class MapProjection extends AbstractMathTransform
             super(point.getX(), point.getY());
         }
     }
-    
+
     /**
      * Check if the transform of {@code point} is close enough to {@code target}.
      * "Close enough" means that the two points are separated by a distance shorter than
@@ -563,7 +593,7 @@ public abstract class MapProjection extends AbstractMathTransform
                                          final Point2D expected, final double tolerance)
     {
         compare("latitude", expected.getY(), latitude, tolerance);
-        if (Math.abs(Math.PI/2 - latitude) > EPSILON) {
+        if (Math.abs(Math.PI/2 - Math.abs(latitude)) > EPSILON) {
             compare("longitude", expected.getX(), longitude, tolerance);
         }
         return tolerance < Double.POSITIVE_INFINITY;
@@ -595,7 +625,7 @@ public abstract class MapProjection extends AbstractMathTransform
                       new Double(expected), new Double(actual)));
         }
     }
-    
+
     /**
      * Transforms the specified coordinate and stores the result in {@code ptDst}.
      * This method returns longitude as <var>x</var> values in the range {@code [-PI..PI]}
@@ -636,7 +666,7 @@ public abstract class MapProjection extends AbstractMathTransform
      */
     protected abstract Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException;
-    
+
     /**
      * Transforms the specified coordinate and stores the result in {@code ptDst}.
      * This method is guaranteed to be invoked with values of <var>x</var> in the range
@@ -675,7 +705,7 @@ public abstract class MapProjection extends AbstractMathTransform
      */
     protected abstract Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException;
-    
+
     /**
      * Transforms the specified {@code ptSrc} and stores the result in {@code ptDst}.
      * <p>
@@ -725,7 +755,7 @@ public abstract class MapProjection extends AbstractMathTransform
         assert checkReciprocal(ptDst, (ptSrc!=ptDst) ? ptSrc : new Point2D.Double(x,y), true);
         return ptDst;
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values. Ordinates must be
      * (<var>longitude</var>,<var>latitude</var>) pairs in decimal degrees.
@@ -776,7 +806,7 @@ public abstract class MapProjection extends AbstractMathTransform
             throw firstException;
         }
     }
-    
+
     /**
      * Transforms a list of coordinate point ordinal values. Ordinates must be
      * (<var>longitude</var>,<var>latitude</var>) pairs in decimal degrees.
@@ -822,7 +852,7 @@ public abstract class MapProjection extends AbstractMathTransform
             throw firstException;
         }
     }
-    
+
     /**
      * Inverse of a map projection.  Will be created by {@link MapProjection#inverse()} only when
      * first required. Implementation of {@code transform(...)} methods are mostly identical
@@ -991,7 +1021,7 @@ public abstract class MapProjection extends AbstractMathTransform
             }
         }
     }
-    
+
     /**
      * Returns the inverse of this map projection.
      */
@@ -1025,16 +1055,16 @@ public abstract class MapProjection extends AbstractMathTransform
         // Be less strict when the point is near an edge.
         return (Math.abs(longitude) > 179) || (Math.abs(latitude) > 89) ? 1E-1 : EPSILON;
     }
-    
-    
-    
-    
+
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
     ////////      IMPLEMENTATION OF Object AND MathTransform2D STANDARD METHODS       ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * Returns a hash value for this map projection.
      */
@@ -1045,7 +1075,7 @@ public abstract class MapProjection extends AbstractMathTransform
         code = code*37 + Double.doubleToLongBits(latitudeOfOrigin);
         return (int) code ^ (int) (code >>> 32);
     }
-    
+
     /**
      * Compares the specified object with this map projection for equality.
      */
@@ -1072,16 +1102,16 @@ public abstract class MapProjection extends AbstractMathTransform
     static boolean equals(final double value1, final double value2) {
         return Double.doubleToLongBits(value1) == Double.doubleToLongBits(value2);
     }
-    
-    
-    
-    
+
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
     ////////                           FORMULAS FROM SNYDER                           ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * Iteratively solve equation (7-9) from Snyder.
      */
@@ -1098,7 +1128,7 @@ public abstract class MapProjection extends AbstractMathTransform
         }
         throw new ProjectionException(Errors.format(ErrorKeys.NO_CONVERGENCE));
     }
-    
+
     /**
      * Compute function <code>f(s,c,e²) = c/sqrt(1 - s²&times;e²)</code> needed for the true scale
      * latitude (Snyder 14-15), where <var>s</var> and <var>c</var> are the sine and cosine of
@@ -1108,7 +1138,7 @@ public abstract class MapProjection extends AbstractMathTransform
     final double msfn(final double s, final double c) {
         return c / Math.sqrt(1.0 - (s*s) * excentricitySquared);
     }
-    
+
     /**
      * Compute function (15-9) and (9-13) from Snyder.
      * Equivalent to negative of function (7-7).
@@ -1121,16 +1151,16 @@ public abstract class MapProjection extends AbstractMathTransform
         return Math.tan(0.5 * ((Math.PI/2) - phi)) /
                Math.pow((1-sinphi)/(1+sinphi), 0.5*excentricity);
     }
-    
-    
-    
-    
+
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
     ////////                                 PROVIDER                                 ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
-    
+
     /**
      * The base provider for {@link MapProjection}s.
      *

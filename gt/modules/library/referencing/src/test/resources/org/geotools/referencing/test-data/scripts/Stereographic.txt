@@ -56,81 +56,81 @@ set _Stereo13_ = PROJCS["Oblique Stereographic",     GEOGCS["WGS84",  DATUM["WGS
 set _Stereo14_ = PROJCS["Oblique Stereographic",     GEOGCS["WGS84",  DATUM["WGS84",  SPHEROID["WGS84",  6378137.0, 298.257223563]], PRIMEM["Greenwich", 0.0], UNIT["degree",0.017453292519943295], AXIS["Longitude",EAST], AXIS["Latitude",NORTH]], PROJECTION["Stereographic"],            PARAMETER["central_meridian",   64.0], PARAMETER["latitude_of_origin", -32.0], PARAMETER["scale_factor", 1.00],                                         PARAMETER["false_easting",       0.0       ], PARAMETER["false_northing",      0.0], UNIT["metre",         1.0],               AXIS["x",EAST], AXIS["y",NORTH]]
 
 ////////////////////////////////////////////
-//Spherical North
+// Spherical North
 
 source crs = _sphere_
 target crs = _Stereo1_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-569039.6270,        4702290.0974)
+target pt = (-569039.6270, 4702290.0974)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (-4001482.1176,       -3645739.640)
+target pt = (-4001482.1176, -3645739.640)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (23459842.7218,        4680642.8947)
+target pt = (23459842.7218, 4680642.8947)
 
-source pt = (-47.95,  -15.75)
-target pt = (-16670888.6766,        2328106.9805)
+source pt = (-47.95, -15.75)
+target pt = (-16670888.6766, 2328106.9805)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (6536715.3141,         -30423.4742)
+target pt = (6536715.3141, -30423.4742)
 
 source pt = (18.45, -33.9166666666)
-target pt = (-12517120.9473,      -20386130.6194)
+target pt = (-12517120.9473, -20386130.6194)
 
 
 ////////////////////////////////////////////
-//Spherical South
+// Spherical South
 
 source crs = _sphere_
 target crs = _Stereo2_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-13447315.1416,       32029133.6112)
+target pt = (-13447315.1416, 32029133.6112)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (29301227.6488,       -5908074.5888)
+target pt = (29301227.6488, -5908074.5888)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (-6427015.6000,       -1677847.5077)
+target pt = (-6427015.6000, -1677847.5077)
 
-source pt = (-47.95,  -15.75)
-target pt = (7606887.4054,        6431688.8876)
+source pt = (-47.95, -15.75)
+target pt = (7606887.4054, 6431688.8876)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (-21451003.9982,      -12018802.8096)
+target pt = (-21451003.9982, -12018802.8096)
 
 source pt = (18.45, -33.9166666666)
-target pt = (5968293.0902,       -2733236.3811)
+target pt = (5968293.0902, -2733236.3811)
 
 
 ////////////////////////////////////////////
-//Spherical Equitorial
+// Spherical Equitorial
 
 source crs = _sphere_
 target crs = _Stereo3_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-10975901.6974,       17425146.9141)
+target pt = (-10975901.6974, 17425146.9141)
 
 source pt = (2.33656753, 43.96499314)
-target pt = ( -713822.4244,        5162871.3803)
+target pt = ( -713822.4244, 5162871.3803)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (18761641.7965,      -20169201.7279)
+target pt = (18761641.7965, -20169201.7279)
 
-source pt = (-47.95,  -15.75)
-target pt = (-6880387.3644,       -2289409.5189)
+source pt = (-47.95, -15.75)
+target pt = (-6880387.3644, -2289409.5189)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (16554295.1489,       15458696.4976)
+target pt = (16554295.1489, 15458696.4976)
 
 source pt = (18.45, -33.9166666666)
-target pt = (853342.6017,       -3904711.5139)
+target pt = (853342.6017, -3904711.5139)
 
 
 source crs = _sphere2_
@@ -138,48 +138,48 @@ target crs = _Stereo4_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (18313312.9974,       23071108.5406)
+target pt = (18313312.9974, 23071108.5406)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (-2679048.8043,      102188221.1560)
+target pt = (-2679048.8043, 102188221.1560)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (-7899377.2908,      -13350238.6363)
+target pt = (-7899377.2908, -13350238.6363)
 
-source pt = (-47.95,  -15.75)
-target pt = (84776405.1579,      -31575568.6281)
+source pt = (-47.95, -15.75)
+target pt = (84776405.1579, -31575568.6281)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (-11758008.0552,       14886510.7664)
+target pt = (-11758008.0552, 14886510.7664)
 
 source pt = (18.45, -33.9166666666)
-target pt = (-49376756.6233,     -108392290.3667)
+target pt = (-49376756.6233, -108392290.3667)
 
 
 ////////////////////////////////////////////
-//Spherical Oblique
+// Spherical Oblique
 
 source crs = _sphere_
 target crs = _Stereo5_
 test tolerance = (1e-2, 1e-2)
 
 //source pt = (-123.1, 49.2166666666)
-//target pt = (5111518.3838,        3519921.2597)
+//target pt = (5111518.3838, 3519921.2597)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (-4626083.2478,        7709778.2077)
+target pt = (-4626083.2478, 7709778.2077)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (2239865.7214,      -13571053.7552)
+target pt = (2239865.7214, -13571053.7552)
 
-source pt = (-47.95,  -15.75)
-target pt = (5882861.1803,       30483752.1708)
+source pt = (-47.95, -15.75)
+target pt = (5882861.1803, 30483752.1708)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (-25202.8272,       -2745174.2686)
+target pt = (-25202.8272, -2745174.2686)
 
 source pt = (18.45, -33.9166666666)
-target pt = (-30070247.8619,        4126498.8667)
+target pt = (-30070247.8619, 4126498.8667)
 
 
 source crs = _sphere_
@@ -187,48 +187,48 @@ target crs = _Stereo6_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-536335.5224,       14976051.8319)
+target pt = (-536335.5224, 14976051.8319)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (35106533.5793,        8734803.7398)
+target pt = (35106533.5793, 8734803.7398)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (-7344290.0367,       -3049012.9721)
+target pt = (-7344290.0367, -3049012.9721)
 
-source pt = (-47.95,  -15.75)
-target pt = (8341703.4925,         480514.1948)
+source pt = (-47.95, -15.75)
+target pt = (8341703.4925, 480514.1948)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (-22133987.2972,        7312269.0941)
+target pt = (-22133987.2972, 7312269.0941)
 
 source pt = (18.45, -33.9166666666)
-target pt = (6820762.1489,      -10340013.7044)
+target pt = (6820762.1489, -10340013.7044)
 
 
 ////////////////////////////////////////////
-//Ellipse North
+// Ellipse North
 
 source crs = _WGS84_
 target crs = _Stereo7_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-//target pt = (4734112.9430,        -256390.3922)
+target pt = (4734112.9430, -256390.3922)
 
 source pt = (2.33656753, 43.96499314)
-//target pt = (-2897000.2339,        4576132.3583)
+target pt = (-2897000.2339, 4576132.3583)
 
 source pt = (151.283333333, -33.916666666)
-//target pt = (531572.7533,      -23728661.1588)
+target pt = (531572.7533, -23728661.1588)
 
-source pt = (-47.95,  -15.75)
-//target pt = (5156818.7159,       15918309.4169)
+source pt = (-47.95, -15.75)
+target pt = (5156818.7159, 15918309.4169)
 
 source pt = (139.733333333, 35.6833333333)
-//target pt = (-1164785.0278,       -6430662.1897)
+target pt = (-1164785.0278, -6430662.1897)
 
 source pt = (18.45, -33.9166666666)
-//target pt = (-17762444.1908,       15742538.1165)
+target pt = (-17762444.1908, 15742538.1165)
 
 
 source crs = _WGS84_
@@ -236,48 +236,48 @@ target crs = _Stereo8_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-3942631.5543,       -2649338.4561)
+target pt = (-3942631.5543, -2649338.4561)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (5077292.5287,       -1914846.7289)
+target pt = (5077292.5287, -1914846.7289)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (-14732828.3540,       18666157.2113)
+target pt = (-14732828.3540, 18666157.2113)
 
-source pt = (-47.95,  -15.75)
-target pt = ( 5471869.9971,      -15846527.7746)
+source pt = (-47.95, -15.75)
+target pt = ( 5471869.9971, -15846527.7746)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (-2945434.4200,        5847866.4702)
+target pt = (-2945434.4200, 5847866.4702)
 
 source pt = (18.45, -33.9166666666)
-target pt = (23704915.6430,       -1886433.3285)
+target pt = (23704915.6430, -1886433.3285)
 
 
 ////////////////////////////////////////
-//Elliptical South
+// Elliptical South
 
 source crs = _WGS84_
 target crs = _Stereo9_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-//target pt = (26745521.5872,      19503169.7905)
+target pt = (26745521.5872, 19503169.7905)
 
 source pt = (2.33656753, 43.96499314)
-//target pt = (335506.9066,      -28973967.1999)
+target pt = (335506.9066, -28973967.1999)
 
 source pt = (151.283333333, -33.916666666)
-//target pt = (-3476092.5649,        5624613.2248)
+target pt = (-3476092.5649, 5624613.2248)
 
 source pt = (-47.95,  -15.75)
-//target pt = (7283623.7845,       -5908693.9040)
+target pt = (7283623.7845, -5908693.9040)
 
 source pt = (139.733333333, 35.6833333333)
-//target pt = (-16458682.7200,       17485900.3222)
+target pt = (-16458682.7200, 17485900.3222)
 
 source pt = (18.45, -33.9166666666)
-//target pt = (-1761438.3929,       -6373133.3138)
+target pt = (-1761438.3929, -6373133.3138)
 
 
 source crs = _WGS84_
@@ -285,48 +285,48 @@ target crs = _Stereo10_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-19468934.7924,      -27908063.5417)
+target pt = (-19468934.7924, -27908063.5417)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (-10023169.8500,       28050023.6648)
+target pt = (-10023169.8500, 28050023.6648)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (5261171.9431,       -4303664.2698)
+target pt = (5261171.9431, -4303664.2698)
 
 source pt = (-47.95,  -15.75)
-target pt = (-9057118.4307,        3305475.2442)
+target pt = (-9057118.4307, 3305475.2442)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (21849835.1170,      -11487640.3953)
+target pt = (21849835.1170, -11487640.3953)
 
 source pt = (18.45, -33.9166666666)
-target pt = (-420877.4389,        6784122.5330)
+target pt = (-420877.4389, 6784122.5330)
 
 
 ////////////////////////////////////////
-//Elliptical Equitorial
+// Elliptical Equitorial
 
 source crs = _WGS84_
 target crs = _Stereo11_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-381517.7735,      27967467.8233)
+target pt = (-381517.7735, 27967467.8233)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (-5196633.8476,        6180449.7189)
+target pt = (-5196633.8476, 6180449.7189)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (11438665.7948,       -7672420.6307)
+target pt = (11438665.7948, -7672420.6307)
 
 source pt = (-47.95,  -15.75)
-target pt = (-15525059.5040,       -4481382.3081)
+target pt = (-15525059.5040, -4481382.3081)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (9480395.8620,        6803267.4579)
+target pt = (9480395.8620, 6803267.4579)
 
 source pt = (18.45, -33.9166666666)
-target pt = (-3896229.3187,       -4269843.2094)
+target pt = (-3896229.3187, -4269843.2094)
 
 
 source crs = _WGS84_
@@ -334,48 +334,48 @@ target crs = _Stereo12_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-9764791.6464,       12867824.7061)
+target pt = (-9764791.6464, 12867824.7061)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (538591.9946,        4675248.9850)
+target pt = (538591.9946, 4675248.9850)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (16501209.0722,      -26357916.0339)
+target pt = (16501209.0722, -26357916.0339)
 
-source pt = (-47.95,  -15.75)
-target pt = (-4581578.1738,       -1849327.3326)
+source pt = (-47.95, -15.75)
+target pt = (-4581578.1738, -1849327.3326)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (16269126.0087,       19618474.4606)
+target pt = (16269126.0087, 19618474.4606)
 
 source pt = (18.45, -33.9166666666)
-target pt = (2084362.8747,       -3645505.7204)
+target pt = (2084362.8747, -3645505.7204)
 
 
 ////////////////////////////////////////
-//Elliptical Oblique
+// Elliptical Oblique
 
 source crs = _WGS84_
 target crs = _Stereo13_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (-4407434.5194,        2082811.7883)
+target pt = (-4407434.5194, 2082811.7883)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (4298278.4273,         955057.5666)
+target pt = (4298278.4273, 955057.5666)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (-47167588.1622,       29071179.3031)
+target pt = (-47167588.1622, 29071179.3031)
 
 source pt = (-47.95,  -15.75)
-target pt = (1067938.1787,       -8233254.2708)
+target pt = (1067938.1787, -8233254.2708)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (-2739234.3871,       12928389.0428)
+target pt = (-2739234.3871, 12928389.0428)
 
 source pt = (18.45, -33.9166666666)
-target pt = (13968985.4665,       -9367398.2205)
+target pt = (13968985.4665, -9367398.2205)
 
 
 source crs = _WGS84_
@@ -383,22 +383,22 @@ target crs = _Stereo14_
 test tolerance = (1e-2, 1e-2)
 
 source pt = (-123.1, 49.2166666666)
-target pt = (21084353.9245,       77613853.8593)
+target pt = (21084353.9245, 77613853.8593)
 
 source pt = (2.33656753, 43.96499314)
-target pt = (-8743580.0850,       10572818.2134)
+target pt = (-8743580.0850, 10572818.2134)
 
 source pt = (151.283333333, -33.916666666)
-target pt = (7981081.4514,       -4334411.3396)
+target pt = (7981081.4514, -4334411.3396)
 
 source pt = (-47.95,  -15.75)
-target pt = (-13608055.3148,       -6384283.3272)
+target pt = (-13608055.3148, -6384283.3272)
 
 source pt = (139.733333333, 35.6833333333)
-target pt = (11635190.0266,        8836389.2762)
+target pt = (11635190.0266, 8836389.2762)
 
 source pt = (18.45, -33.9166666666)
-target pt = (-4231988.1148,       -1174790.7406)
+target pt = (-4231988.1148, -1174790.7406)
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -430,7 +430,7 @@ set _DStereo11_= PROJCS["Oblique Stereographic EPSG", GEOGCS["NAD27",DATUM["Nort
 set _DStereo12_= PROJCS["Oblique Stereographic EPSG", GEOGCS["NAD27",DATUM["North_American_Datum_1927",SPHEROID["Clarke 1866",6378206.4,294.978698213901,AUTHORITY["EPSG","7008"]],TOWGS84[-3,142,183,0,0,0,0],AUTHORITY["EPSG","6267"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["DMSH",0.0174532925199433,AUTHORITY["EPSG","9108"]],AXIS["Longitude",EAST], AXIS["Latitude",NORTH],AUTHORITY["EPSG","4267"]], PROJECTION["Oblique_Stereographic"], PARAMETER["semi_major", 6378206.4], PARAMETER["semi_minor", 6356583.8], PARAMETER["central_meridian", -63.0], PARAMETER["latitude_of_origin", 47.25], PARAMETER["scale_factor", 0.999912], PARAMETER["false_easting", 700000.0], PARAMETER["false_northing", 400000.0], UNIT["metre",1.0], AXIS["x",EAST], AXIS["y",NORTH]]
 
 ////////////////////////////////////////
-//Elliptical Oblique
+// Elliptical Oblique
 source crs = _WGS84_
 target crs = _DStereo1_
 test tolerance = (1e-2, 1e-2)
@@ -473,7 +473,7 @@ target pt = (27866150.44815110, 9702053.86856459)
 
 //error (replaced with libproj output)
 source pt = (151.283333333, -33.9166666666)
-target pt = (-7466458.20136069,       -4150816.18942717)
+target pt = (-7466458.20136069, -4150816.18942717)
 //target pt = (-7460003.39378955, -4124311.05369635)  //arcGIS output
 
 source pt = (-47.95, -15.75)
@@ -495,7 +495,7 @@ target pt = (3.9914448559467E-10, -4464514.77931394)
 
 
 ////////////////////////////////////////
-//Elliptical Equitorial
+// Elliptical Equatorial
 
 source crs = _WGS84_
 target crs = _DStereo3_
@@ -721,7 +721,7 @@ target pt = (-45, -90)
 
 
 ////////////////////////////////////////
-//Spherical Oblique
+// Spherical Oblique
 
 source crs = _sphere3_
 target crs = _DStereo8_

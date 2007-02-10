@@ -34,7 +34,7 @@ import org.geotools.resources.i18n.Vocabulary;
 /**
  * Mercator Cylindrical 1SP Projection.
  *
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on RemoteSensing.org</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"Mercator 1SP" on RemoteSensing.org</A>
  * 
  * @since 2.2
  * @source $URL$
@@ -92,16 +92,26 @@ public class Mercator1SP extends Mercator {
     }
 
 
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider} for a
-     * {@linkplain Mercator1SP Mercator 1SP} projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a {@linkplain Mercator1SP Mercator 1SP} projection (EPSG code 9804).
      *
-     * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html">"mercator_1sp" on RemoteSensing.org</A>
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.2
      * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
         /**

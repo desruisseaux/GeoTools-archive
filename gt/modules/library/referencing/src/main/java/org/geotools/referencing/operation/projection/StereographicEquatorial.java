@@ -25,11 +25,11 @@ package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-import java.util.Collection;
 
 // OpenGIS dependencies
-import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 
 // Geotools dependencies
 import org.geotools.resources.i18n.Errors;
@@ -39,7 +39,7 @@ import org.geotools.resources.i18n.ErrorKeys;
 /**
  * The USGS equatorial case of the {@linkplain Stereographic stereographic} projection.
  * This is a special case of oblique stereographic projection for 
- * {@link #latitudeOfOrigin} == 0.0.
+ * {@linkplain #latitudeOfOrigin latitude of origin} == 0.0.
  *
  * @since 2.1
  * @source $URL$
@@ -59,22 +59,33 @@ public class StereographicEquatorial extends StereographicOblique {
      * This is <strong>not</strong> equal to the {@link #scaleFactor}.
      */
     static final double k0 = 2;
-    
+
+    /**
+     * Constructs an equatorial stereographic projection (EPSG equations).
+     *
+     * @param  parameters The group of parameter values.
+     * @throws ParameterNotFoundException if a required parameter was not found.
+     *
+     * @since 2.4
+     */
+    protected StereographicEquatorial(final ParameterValueGroup parameters)
+            throws ParameterNotFoundException 
+    {
+        this(parameters, Stereographic.Provider.PARAMETERS);
+    }
+
     /**
      * Constructs an equatorial stereographic projection (USGS equations).
      *
      * @param  parameters The group of parameter values.
-     * @param  expected The expected parameter descriptors.
-     * @param  stereoType The type of stereographic projection (used for 
-     *         creating wkt).
+     * @param  descriptor The expected parameter descriptor.
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
-    StereographicEquatorial(final ParameterValueGroup parameters, final Collection expected,
-                            final short stereoType) 
+    StereographicEquatorial(final ParameterValueGroup parameters,
+                            final ParameterDescriptorGroup descriptor) 
             throws ParameterNotFoundException
     {
-        super(parameters, expected, stereoType);
-        this.stereoType = stereoType;
+        super(parameters, descriptor);
         assert super.k0 == k0 : super.k0;
         latitudeOfOrigin = 0.0;
     }
@@ -92,7 +103,7 @@ public class StereographicEquatorial extends StereographicOblique {
         
         final double chi = 2.0 * Math.atan(ssfn(y, Math.sin(y))) - (Math.PI/2);
         final double cosChi = Math.cos(chi);
-        final double A = k0 / (1.0 + cosChi*Math.cos(x));    //typo in (12-29)
+        final double A = k0 / (1.0 + cosChi*Math.cos(x));    // typo in (12-29)
         x = A * cosChi*Math.sin(x);
         y = A * Math.sin(chi);
 
@@ -118,17 +129,14 @@ public class StereographicEquatorial extends StereographicOblique {
          * Constructs a spherical equatorial stereographic projection (USGS equations).
          *
          * @param  parameters The group of parameter values.
-         * @param  expected The expected parameter descriptors.
-         * @param stereoType The type of stereographic projection (used for 
-         *        creating wkt).
+         * @param  descriptor The expected parameter descriptor.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        protected Spherical(final ParameterValueGroup parameters, final Collection expected,
-                            final short stereoType) 
+        Spherical(final ParameterValueGroup parameters, final ParameterDescriptorGroup descriptor)
                 throws ParameterNotFoundException
         {
-            super(parameters, expected, stereoType);
-            assert isSpherical;
+            super(parameters, descriptor);
+            ensureSpherical();
         }
 
         /**
@@ -148,7 +156,7 @@ public class StereographicEquatorial extends StereographicOblique {
                 throw new ProjectionException(Errors.format(
                           ErrorKeys.VALUE_TEND_TOWARD_INFINITY));
             }
-            f = k0/f;                     // (21-14)
+            f = k0 / f;                   // (21-14)
             x = f * coslat * Math.sin(x); // (21-2)
             y = f * Math.sin(y);          // (21-13)
 
@@ -175,7 +183,7 @@ public class StereographicEquatorial extends StereographicOblique {
                 y = 0.0;                     // latitudeOfOrigin
                 x = 0.0;
             } else {
-                final double c = 2.0 * Math.atan(rho/k0);
+                final double c = 2.0 * Math.atan(rho / k0);
                 final double cosc = Math.cos(c);
                 final double sinc = Math.sin(c);
                 y = Math.asin(y * sinc/rho); // (20-14)  with phi1=0

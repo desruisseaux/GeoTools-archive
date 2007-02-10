@@ -592,13 +592,14 @@ public class ObliqueMercator extends MapProjection {
     //////////////////////////////////////////////////////////////////////////////////////////
     
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for an {@link ObliqueMercator} projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for an {@linkplain ObliqueMercator Oblique Mercator} projection (EPSG code 9815).
      *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.1
      * @version $Id$
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
         /**
@@ -722,13 +723,15 @@ public class ObliqueMercator extends MapProjection {
     }
     
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a Hotine {@link ObliqueMercator} projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a Hotine {@linkplain ObliqueMercator Oblique Mercator} projection (EPSG
+     * code 9812).
      *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.1
      * @version $Id$
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class Provider_Hotine extends Provider {
         /**
@@ -781,14 +784,15 @@ public class ObliqueMercator extends MapProjection {
     }
    
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a {@link ObliqueMercator} projection, specified with
-     * two points on the central line (instead of a central point and azimuth).
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a {@linkplain ObliqueMercator Oblique Mercator} projection, specified
+     * with two points on the central line (instead of a central point and azimuth).
      *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.1
      * @version $Id$
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider_TwoPoint extends Provider {
         /**
@@ -897,14 +901,15 @@ public class ObliqueMercator extends MapProjection {
 
 
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a Hotine {@link ObliqueMercator} projection, specified with
-     * two points on the central line (instead of a central point and azimuth).
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a Hotine {@linkplain ObliqueMercator Oblique Mercator} projection,
+     * specified with two points on the central line (instead of a central point and azimuth).
      *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.1
      * @version $Id$
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class Provider_Hotine_TwoPoint extends Provider_TwoPoint {
     	/**

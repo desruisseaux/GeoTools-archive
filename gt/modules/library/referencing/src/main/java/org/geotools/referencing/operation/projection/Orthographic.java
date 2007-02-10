@@ -21,9 +21,6 @@
  */
 package org.geotools.referencing.operation.projection;
 
-// J2SE dependencies and extensions
-import java.util.Collection;
-
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -75,28 +72,29 @@ public abstract class Orthographic extends MapProjection {
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
+
     /**
      * Creates a transform from the specified group of parameter values.
      *
      * @param  parameters The group of parameter values.
-     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a required parameter was not found.
+     *
+     * @since 2.4
      */
-    Orthographic(final ParameterValueGroup parameters, final Collection expected) 
+    protected Orthographic(final ParameterValueGroup parameters) 
             throws ParameterNotFoundException
     {
-        //Fetch parameters 
-        super(parameters, expected);
+        // Fetch parameters 
+        super(parameters);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public ParameterDescriptorGroup getParameterDescriptors() {
         return Provider.PARAMETERS;
     }
-    
+
     /**
      * Compares the specified object with this map projection for equality.
      */
@@ -108,26 +106,27 @@ public abstract class Orthographic extends MapProjection {
         // Relevant parameters are already compared in MapProjection
         return super.equals(object);
     }
-    
-    
-    
-    
+
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
-    ////////                                 PROVIDER                                 ////////
+    ////////                                 PROVIDERS                                ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a {@link Orthographic} projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a {@linkplain Orthographic Orthographic} projection.
      *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.1
      * @version $Id$
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static final class Provider extends AbstractProvider {
         /**
@@ -145,7 +144,7 @@ public abstract class Orthographic extends MapProjection {
                 SCALE_FACTOR,     
                 FALSE_EASTING,    FALSE_NORTHING
             });
-            
+
         /**
          * Constructs a new provider. 
          */
@@ -159,7 +158,7 @@ public abstract class Orthographic extends MapProjection {
         protected Class getOperationType() {
             return PlanarProjection.class;
         }
-        
+
         /**
          * Creates a transform from the specified group of parameter values.
          *
@@ -172,19 +171,18 @@ public abstract class Orthographic extends MapProjection {
         {
             // Values here are in radians (the standard units for the map projection package)
             final double latitudeOfOrigin = Math.abs(doubleValue(LATITUDE_OF_ORIGIN, parameters));
-            final Collection descriptors = PARAMETERS.descriptors();
             if (isSpherical(parameters)) {
                 // Polar case.
                 if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
-                    return new OrthographicPolar(parameters, descriptors);
+                    return new OrthographicPolar(parameters);
                 }
                 // Equatorial case.
                 else if (latitudeOfOrigin < EPSILON) {
-                    return new OrthographicEquatorial(parameters, descriptors);
+                    return new OrthographicEquatorial(parameters);
                 }
                 // Generic (oblique) case.
                 else {
-                    return new OrthographicOblique(parameters, descriptors);
+                    return new OrthographicOblique(parameters);
                 }
             } else {
                 throw new FactoryException(Errors.format(ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));

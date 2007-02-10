@@ -60,15 +60,28 @@ public class LambertConformal1SP extends LambertConformal {
         return Provider.PARAMETERS;
     }
 
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a {@linkplain LambertConformal1SP Lambert Conformal 1SP} projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a {@linkplain LambertConformal1SP Lambert Conformal 1SP} projection (EPSG
+     * code 9801).
      *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.2
      * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {       
         /**

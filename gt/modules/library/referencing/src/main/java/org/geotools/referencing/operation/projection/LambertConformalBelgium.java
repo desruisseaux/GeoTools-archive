@@ -63,14 +63,26 @@ public class LambertConformalBelgium extends LambertConformal {
     }
 
 
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider} for a
-     * {@linkplain LambertConformalBelgium Lambert Conformal 2SP Belgium} Belgium projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a {@linkplain LambertConformalBelgium Lambert Conformal 2SP Belgium}
+     * projection (EPSG code 9803).
      *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.2
      * @version $Id$
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
      public static final class Provider extends AbstractProvider {
         /**

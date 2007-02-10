@@ -86,9 +86,9 @@ import org.geotools.resources.i18n.Errors;
  *
  * <strong>References:</strong><ul>
  *   <li> Proj-4.4.6 available at <A HREF="http://www.remotesensing.org/proj">www.remotesensing.org/proj</A><br>
- *        Relevent files are: PJ_tmerc.c, pj_mlfn.c, pj_fwd.c and pj_inv.c </li>
+ *        Relevent files are: {@code PJ_tmerc.c}, {@code pj_mlfn.c}, {@code pj_fwd.c} and {@code pj_inv.c}.</li>
  *   <li> John P. Snyder (Map Projections - A Working Manual,
- *        U.S. Geological Survey Professional Paper 1395, 1987)</li>
+ *        U.S. Geological Survey Professional Paper 1395, 1987).</li>
  *   <li> "Coordinate Conversions and Transformations including Formulas",
  *        EPSG Guidence Note Number 7, Version 19.</li>
  * </ul>
@@ -323,7 +323,7 @@ public class TransverseMercator extends MapProjection {
                 throws ParameterNotFoundException
         {
             super(parameters);
-            assert isSpherical;
+            ensureSpherical();
         }
         
         /**
@@ -436,9 +436,9 @@ public class TransverseMercator extends MapProjection {
      * Determines phi to {@link #ITERATION_TOLERANCE} radians, about
      * 1e-6 seconds.
      * 
-     * @param arg meridian distance to calulate latitude for.
+     * @param  arg meridian distance to calulate latitude for.
      * @return the latitude of the meridian distance.
-     * @throws ProjectionException if the itteration does not converge.
+     * @throws ProjectionException if the iteration does not converge.
      */
     private final double inv_mlfn(double arg) throws ProjectionException {
         double s, t, phi, k = 1.0/(1.0 - excentricitySquared);
@@ -581,21 +581,22 @@ public class TransverseMercator extends MapProjection {
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
-    ////////                                 PROVIDER                                 ////////
+    ////////                                 PROVIDERS                                ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for a {@link TransverseMercator} projection.
-     *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a {@linkplain TransverseMercator Transverse Mercator} projection (EPSG code
+     * 9807).
      *
      * @since 2.1
      * @version $Id$
      * @author Martin Desruisseaux
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
         /**
@@ -665,11 +666,12 @@ public class TransverseMercator extends MapProjection {
     }
 
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider} for a South Orientated
-     * {@link TransverseMercator} projection (EPSG code 9808). Note that at the contrary of what
-     * this class name suggest, the projected coordinates are still increasing toward North. This
-     * is because all {@link MapProjection}s must complies with standard axis orientations. The
-     * real axis flip is performed by the CRS framework outside this package.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a South Orientated {@linkplain TransverseMercator Transverse Mercator}
+     * projection (EPSG code 9808). Note that at the contrary of what this class name suggest,
+     * the projected coordinates are still increasing toward North. This is because all
+     * {@linkplain MapProjection map projections} in Geotools must complies with standard axis
+     * orientations. The real axis flip is performed by the CRS framework outside this package.
      * See "<cite>Axis units and orientation</cite>" in
      * {@linkplain org.geotools.referencing.operation.projection package description} for details.
      * <p>
@@ -699,6 +701,8 @@ public class TransverseMercator extends MapProjection {
      * @since 2.2
      * @version $Id$
      * @author Martin Desruisseaux
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider_SouthOrientated extends Provider {
         /**

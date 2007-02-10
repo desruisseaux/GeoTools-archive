@@ -102,7 +102,7 @@ public class AlbersEqualArea extends MapProjection {
     private final double n, c, rho0;
 
     /**
-     * An error condition indicating itteration will not converge for the 
+     * An error condition indicating iteration will not converge for the 
      * inverse ellipse. See Snyder (14-20)
      */
     private final double ec;
@@ -272,7 +272,7 @@ public class AlbersEqualArea extends MapProjection {
     /**
      * Iteratively solves equation (3-16) from Snyder.
      *
-     * @param qs arcsin(q/2), used in the first step of itteration
+     * @param qs arcsin(q/2), used in the first step of iteration
      * @return the latitude
      */
     private double phi1(final double qs) throws ProjectionException {
@@ -347,19 +347,19 @@ public class AlbersEqualArea extends MapProjection {
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
-    ////////                                 PROVIDER                                 ////////
+    ////////                                 PROVIDERS                                ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for an {@linkplain AlbersEqualArea Albers Equal Area} projection.
-     *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for an {@linkplain AlbersEqualArea Albers Equal Area} projection (EPSG code 9822).
      *
      * @version $Id$
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
         /**

@@ -88,17 +88,17 @@ import org.geotools.resources.i18n.Errors;
  *  </ul>
  * </p>
  *
- * @since 2.4
- * @version $Id$
- * @source $URL$
- * @author Jan Jezek
- * @author Martin Desruisseaux
- *
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/krovak.html">Krovak on
  *      RemoteSensing.org </A>
  * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/guid7.html">Krovak on "Coordinate
  *      Conversions and Transformations including Formulas"</A>
  * @see <A HREF="http://www.posc.org/Epicentre.2_2/DataModel/ExamplesofUsage/eu_cs34e2.html">Krovak on POSC</A>
+ *
+ * @since 2.4
+ * @version $Id$
+ * @source $URL$
+ * @author Jan Jezek
+ * @author Martin Desruisseaux
  */
 public class Krovak extends MapProjection {
     /**
@@ -274,16 +274,18 @@ public class Krovak extends MapProjection {
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
-    ////////                                 PROVIDER                                 ////////
+    ////////                                 PROVIDERS                                ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for an {@link Krovak krovak} projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for an {@linkplain Krovak Krovak} projection (EPSG code 9819).
      *
-     * @author jezekjan
+     * @since 2.4
+     * @version $Id$
+     * @author Jan Jezek
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */

@@ -187,7 +187,7 @@ public abstract class Mercator extends MapProjection {
                 throws ParameterNotFoundException
         {
             super(parameters);
-            assert isSpherical;
+            ensureSpherical();
         }
 
         /**

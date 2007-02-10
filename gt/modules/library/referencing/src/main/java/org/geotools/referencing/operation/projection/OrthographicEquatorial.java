@@ -23,7 +23,6 @@ package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-import java.util.Collection;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
@@ -52,20 +51,22 @@ public class OrthographicEquatorial extends OrthographicOblique {
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
+
     /**
      * Constructs an equatorial orthographic projection.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
+     *
+     * @since 2.4
      */
-    OrthographicEquatorial(final ParameterValueGroup parameters, final Collection expected) 
+    protected OrthographicEquatorial(final ParameterValueGroup parameters) 
             throws ParameterNotFoundException
     {
-        super(parameters, expected);
-        assert (latitudeOfOrigin < EPSILON) : latitudeOfOrigin;
+        super(parameters);
+        ensureLatitudeEquals(Provider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, 0);
         latitudeOfOrigin = 0.0;
+        ensureSpherical();
     }
 
     /**
@@ -79,8 +80,8 @@ public class OrthographicEquatorial extends OrthographicOblique {
         // Compute using oblique formulas, for comparaison later.
         assert (ptDst = super.transformNormalized(x, y, ptDst)) != null;
 
-        double cosphi = Math.cos(y);
-        double coslam = Math.cos(x);
+        final double cosphi = Math.cos(y);
+        final double coslam = Math.cos(x);
 
         if (cosphi * coslam < -EPSILON) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
@@ -116,7 +117,7 @@ public class OrthographicEquatorial extends OrthographicOblique {
             sinc = 1.0;
         }
 
-        double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
+        final double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
         if (rho <= EPSILON) {
             y = latitudeOfOrigin;
             x = 0.0;
@@ -125,17 +126,17 @@ public class OrthographicEquatorial extends OrthographicOblique {
             x *= sinc;
             y = cosc * rho;
 
-            //begin sinchk
+            // begin sinchk
             if (Math.abs(phi) >= 1.0) {
                 phi = (phi < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
             }
             else {
                 phi = Math.asin(phi);
             }
-            //end sinchk
+            // end sinchk
 
             if (y == 0.0) {
-                if(x == 0.0) {
+                if (x == 0.0) {
                     x = 0.0;
                 } else {
                     x = (x < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;

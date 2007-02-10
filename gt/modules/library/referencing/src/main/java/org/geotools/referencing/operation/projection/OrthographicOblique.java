@@ -23,7 +23,6 @@ package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-import java.util.Collection;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
@@ -48,33 +47,34 @@ public class OrthographicOblique extends Orthographic {
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
+
     /**
      * The sine of the {@link #latitudeOfOrigin}.
      */
     private final double sinphi0; 
-    
+
     /**
      * The cosine of the {@link #latitudeOfOrigin}.
      */
     private final double cosphi0;
-    
+
     /**
      * Constructs an oblique orthographic projection.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
+     *
+     * @since 2.4
      */
-    OrthographicOblique(final ParameterValueGroup parameters, final Collection expected) 
+    protected OrthographicOblique(final ParameterValueGroup parameters) 
             throws ParameterNotFoundException
     {
-        super(parameters, expected);
+        super(parameters);
         sinphi0 = Math.sin(latitudeOfOrigin);
         cosphi0 = Math.cos(latitudeOfOrigin);
-        assert isSpherical;
+        ensureSpherical();
     }
-    
+
     /**
      * Transforms the specified (<var>&lambda;</var>,<var>&phi;</var>) coordinates
      * (units in radians) and stores the result in {@code ptDst} (linear distance
@@ -83,24 +83,24 @@ public class OrthographicOblique extends Orthographic {
     protected Point2D transformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException
     {
-        double cosphi = Math.cos(y);
-        double coslam = Math.cos(x);
-        double sinphi = Math.sin(y);
-        
+        final double cosphi = Math.cos(y);
+        final double coslam = Math.cos(x);
+        final double sinphi = Math.sin(y);
+
         if (sinphi0*sinphi + cosphi0*cosphi*coslam < - EPSILON) {
             throw new ProjectionException(Errors.format(ErrorKeys.POINT_OUTSIDE_HEMISPHERE));
         }
-        
+
         y = cosphi0 * sinphi - sinphi0 * cosphi * coslam;      
         x = cosphi * Math.sin(x);
-        
+
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;
         }
         return new Point2D.Double(x,y);
     }
-    
+
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
      * and stores the result in {@code ptDst}.
@@ -116,8 +116,8 @@ public class OrthographicOblique extends Orthographic {
             }
             sinc = 1.0;
         }
-        
-        double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
+
+        final double cosc = Math.sqrt(1.0 - sinc * sinc); /* in this range OK */
         if (rho <= EPSILON) {
             y = latitudeOfOrigin;
             x = 0.0;
@@ -125,18 +125,18 @@ public class OrthographicOblique extends Orthographic {
             double phi = (cosc * sinphi0) + (y * sinc * cosphi0 / rho);
             y = (cosc - sinphi0 * phi) * rho;       //rather clever; equivalent to part of (20-15)
             x *= sinc * cosphi0;
-            
-            //begin sinchk
+
+            // begin sinchk
             if (Math.abs(phi) >= 1.0) {
                 phi = (phi < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
             }
             else {
                 phi = Math.asin(phi);
             }
-            //end sinchk
-            
+            // end sinchk
+
             if (y == 0.0) {
-                if(x == 0.0) {
+                if (x == 0.0) {
                     x = 0.0;
                 } else {
                     x = (x < 0.0) ? -Math.PI/2.0 : Math.PI/2.0;
@@ -146,7 +146,7 @@ public class OrthographicOblique extends Orthographic {
             }
             y = phi;
         }
-        
+
         if (ptDst != null) {
             ptDst.setLocation(x,y);
             return ptDst;

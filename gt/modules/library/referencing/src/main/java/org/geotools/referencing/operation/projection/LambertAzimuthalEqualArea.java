@@ -55,15 +55,15 @@ import org.geotools.resources.XMath;
  *        U.S. Geological Survey Professional Paper 1395)</li>
  * </ul>
  *
+ * @see <A HREF="http://mathworld.wolfram.com/LambertAzimuthalEqual-AreaProjection.html">Lambert Azimuthal Equal-Area Projection on MathWorld</A>
+ * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_azimuthal_equal_area.html">"Lambert_Azimuthal_Equal_Area" on RemoteSensing.org</A>
+ *
  * @since 2.4
  * @version $Id$
  * @source $URL$
  * @author Gerald Evenden
  * @author Beate Stollberg
  * @author Martin Desruisseaux
- *
- * @see <A HREF="http://mathworld.wolfram.com/LambertAzimuthalEqual-AreaProjection.html">Lambert Azimuthal Equal-Area Projection on MathWorld</A>
- * @see <A HREF="http://www.remotesensing.org/geotiff/proj_list/lambert_azimuthal_equal_area.html">"Lambert_Azimuthal_Equal_Area" on RemoteSensing.org</A>
  */
 public class LambertAzimuthalEqualArea extends MapProjection {
     /** Maximum difference allowed when comparing real numbers. */
@@ -342,7 +342,7 @@ public class LambertAzimuthalEqualArea extends MapProjection {
                 throws ParameterNotFoundException
         {
             super(parameters);
-            assert isSpherical;
+            ensureSpherical();
         }
 
         /**
@@ -510,18 +510,18 @@ public class LambertAzimuthalEqualArea extends MapProjection {
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     ////////                                                                          ////////
-    ////////                                 PROVIDER                                 ////////
+    ////////                                 PROVIDERS                                ////////
     ////////                                                                          ////////
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider}
-     * for an {@linkplain LambertAzimuthalEqualArea Lambert Equal Area} projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for an {@linkplain LambertAzimuthalEqualArea Lambert Equal Area} projection
+     * (EPSG code 9820).
      *
      * @since 2.4
      * @version $Id$
-     * @source $URL$
      * @author Beate Stollberg
      *
      * @see org.geotools.referencing.operation.DefaultMathTransformFactory

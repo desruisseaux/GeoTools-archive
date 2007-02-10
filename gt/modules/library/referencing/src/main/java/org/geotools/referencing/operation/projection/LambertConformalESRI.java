@@ -62,14 +62,25 @@ public class LambertConformalESRI extends LambertConformal {
     }
 
 
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider} for a
-     * {@linkplain LambertConformal2SP Lambert Conformal ESRI} projection.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a {@linkplain LambertConformal2SP Lambert Conformal ESRI} projection.
      *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
-     *
+     * @since 2.2
      * @version $Id$
      * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
      public static final class Provider extends AbstractProvider {
         /**

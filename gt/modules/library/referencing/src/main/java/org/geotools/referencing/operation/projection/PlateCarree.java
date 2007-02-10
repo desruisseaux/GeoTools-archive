@@ -63,16 +63,27 @@ public class PlateCarree extends EquidistantCylindrical {
         return Provider.PARAMETERS;
     }
 
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider} for an
-     * {@linkplain org.geotools.referencing.operation.projection.PlateCarree Plate Carree}
-     * projection.
-     *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for an {@linkplain org.geotools.referencing.operation.projection.PlateCarree
+     * Plate Carree} projection.
      *
      * @since 2.2
      * @version $Id$
      * @author John Grange
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
         /**

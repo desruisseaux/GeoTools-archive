@@ -23,7 +23,6 @@ package org.geotools.referencing.operation.projection;
 
 // J2SE dependencies and extensions
 import java.awt.geom.Point2D;
-import java.util.Collection;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterNotFoundException;
@@ -48,7 +47,7 @@ public class OrthographicPolar extends Orthographic {
      * Maximum difference allowed when comparing real numbers.
      */
     private static final double EPSILON = 1E-6;
-    
+
     /**
      * {@code true} if this projection is for the north pole, or {@code false}
      * if it is for the south pole.
@@ -59,17 +58,18 @@ public class OrthographicPolar extends Orthographic {
      * Constructs a polar orthographic projection.
      *
      * @param  parameters The parameter values in standard units.
-     * @param  expected The expected parameter descriptors.
      * @throws ParameterNotFoundException if a mandatory parameter is missing.
+     *
+     * @since 2.4
      */
-    OrthographicPolar(final ParameterValueGroup parameters, final Collection expected) 
+    protected OrthographicPolar(final ParameterValueGroup parameters) 
             throws ParameterNotFoundException
     {
-        super(parameters, expected);
-        assert (Math.abs(Math.abs(latitudeOfOrigin) - Math.PI/2) < EPSILON) : latitudeOfOrigin;
+        super(parameters);
+        ensureLatitudeEquals(Provider.LATITUDE_OF_ORIGIN, latitudeOfOrigin, Math.PI/2);
         northPole = (latitudeOfOrigin > 0);
         latitudeOfOrigin = (northPole) ? Math.PI/2.0 : -Math.PI/2.0;
-        assert isSpherical;
+        ensureSpherical();
     }
 
     /**
@@ -120,9 +120,9 @@ public class OrthographicPolar extends Orthographic {
             double phi;
             if (northPole) {
                 y = -y;
-                phi = Math.acos(sinc);   //equivalent to asin(cos(c)) over the range [0:1]
+                phi = Math.acos(sinc);   // equivalent to asin(cos(c)) over the range [0:1]
             } else {
-                phi = - Math.acos(sinc);
+                phi = -Math.acos(sinc);
             }
             x = Math.atan2(x, y);
             y = phi;

@@ -171,16 +171,27 @@ public class EquidistantCylindrical extends MapProjection {
         return false;
     } 
 
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider} for an
-     * {@linkplain org.geotools.referencing.operation.projection.EquidistantCylindrical
-     * Equidistant Cylindrical} projection.
-     *
-     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for an {@linkplain EquidistantCylindrical Equidistant Cylindrical} projection
+     * (EPSG code 9823).
      *
      * @since 2.2
      * @version $Id$
      * @author John Grange
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
         /**

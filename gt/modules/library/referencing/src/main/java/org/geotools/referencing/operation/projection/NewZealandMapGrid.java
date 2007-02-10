@@ -252,13 +252,26 @@ public class NewZealandMapGrid extends MapProjection {
         return new Point2D.Double(theta.imag, dphi);
     }
 
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     /**
-     * The {@link org.geotools.referencing.operation.MathTransformProvider} for
-     * {@linkplain NewZealandMapGrid New Zealand Map Grid}.
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for {@linkplain NewZealandMapGrid New Zealand Map Grid} (EPSG code 27200).
      *
      * @since 2.2
      * @version $Id$
      * @author Justin Deoliveira
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
      */
     public static class Provider extends AbstractProvider {
         /**
