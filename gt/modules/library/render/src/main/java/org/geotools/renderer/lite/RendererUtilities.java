@@ -64,12 +64,18 @@ public final class RendererUtilities {
 	private final static DefaultGeographicCRS GeogCRS = DefaultGeographicCRS.WGS84;;
 
     /**
-     * Helber class for building affine transforms.
+     * Helber class for building affine transforms. We use one instance per thread,
+     * in order to avoid the need for {@code synchronized} statements.
      */
-    private static final GridToEnvelopeMapper gridToEnvelopeMapper = new GridToEnvelopeMapper();
-    static {
-        gridToEnvelopeMapper.setGridType(PixelInCell.CELL_CORNER);
-    }
+    private static final ThreadLocal/*<GridToEnvelopeMapper>*/ gridToEnvelopeMappers =
+            new ThreadLocal/*<GridToEnvelopeMapper>*/() {
+                //@Override
+                protected Object/*<GridToEnvelopeMapper>*/ initialValue() {
+                    final GridToEnvelopeMapper mapper = new GridToEnvelopeMapper();
+                    mapper.setGridType(PixelInCell.CELL_CORNER);
+                    return mapper;
+                }
+    };
 
 	/**
 	 * Utilities classes should not be instantiated.
@@ -135,12 +141,11 @@ public final class RendererUtilities {
 		// Get the transform
 		//
 		// //
+            final GridToEnvelopeMapper m = (GridToEnvelopeMapper) gridToEnvelopeMappers.get();
 		try {
-            synchronized (gridToEnvelopeMapper) {
-                gridToEnvelopeMapper.setGridRange(new GeneralGridRange(paintArea));
-                gridToEnvelopeMapper.setEnvelope(genvelope);
-                return gridToEnvelopeMapper.createAffineTransform().createInverse();
-            }
+            m.setGridRange(new GeneralGridRange(paintArea));
+            m.setEnvelope(genvelope);
+            return m.createAffineTransform().createInverse();
 		} catch (MismatchedDimensionException e) {
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return null;
@@ -657,14 +662,13 @@ public final class RendererUtilities {
 			//			
 			// with this method I can build a world to grid transform
 			// without adding half of a pixel translations. The cost
-            // is synchronization. The benefit is reusing the last
+            // is a hashtable lookup. The benefit is reusing the last
             // transform (instead of creating a new one) if the grid
             // and envelope are the same one than during last invocation.
-            synchronized (gridToEnvelopeMapper) {
-                gridToEnvelopeMapper.setGridRange(new GeneralGridRange(paintArea));
-                gridToEnvelopeMapper.setEnvelope(newEnvelope);
-            	return (AffineTransform) (gridToEnvelopeMapper.createTransform().inverse());
-            }
+            final GridToEnvelopeMapper m = (GridToEnvelopeMapper) gridToEnvelopeMappers.get();
+            m.setGridRange(new GeneralGridRange(paintArea));
+            m.setEnvelope(newEnvelope);
+            return (AffineTransform) (m.createTransform().inverse());
 
 		} catch (IndexOutOfBoundsException e) {
 			return null;
