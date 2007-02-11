@@ -139,7 +139,7 @@ public class AttributeExpressionImpl extends DefaultExpression
       */
     public Object evaluate(Feature feature) {
     	PropertyAccessor accessor =
-    		new PropertyAccessors().findPropertyAccessor( feature, attPath, null, null );
+    		PropertyAccessors.findPropertyAccessor( feature, attPath, null, null );
     	if ( accessor == null ) {
     		//JD:not throwing exception to remain backwards compatabile, just returnign null
     		return null;
@@ -159,7 +159,7 @@ public class AttributeExpressionImpl extends DefaultExpression
      */
    public Object evaluate(Object obj) {
         PropertyAccessor accessor =
-                new PropertyAccessors().findPropertyAccessor( obj, attPath, null, null );
+                PropertyAccessors.findPropertyAccessor( obj, attPath, null, null );
 
         if ( accessor == null ) {
                 return null; //JD:not throwing exception to remain backwards compatabile, just returnign null                
@@ -169,7 +169,7 @@ public class AttributeExpressionImpl extends DefaultExpression
    
    public Object evaluate(Object obj, Class target) {
        PropertyAccessor accessor =
-               new PropertyAccessors().findPropertyAccessor( obj, attPath, target, null );
+               PropertyAccessors.findPropertyAccessor( obj, attPath, target, null );
 
        if ( accessor == null ) {
                return null; //JD:not throwing exception to remain backwards compatabile, just returnign null                
