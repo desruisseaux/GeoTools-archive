@@ -1426,7 +1426,7 @@ public class SLDStyleFactory {
          * @see java.lang.Object#hashCode()
          */
         public int hashCode() {
-            return ((((17 + symbolizer.hashCode()) * 37) + doubleHash(minScale)) * 37)
+            return ((((17 + System.identityHashCode(symbolizer)) * 37) + doubleHash(minScale)) * 37)
             + doubleHash(maxScale);
         }
 
@@ -1441,13 +1441,11 @@ public class SLDStyleFactory {
         if(exp == null){
             return fallback;
         }
-        try{
-            // TODO: change to this! return exp.evaluate(f,Float.class);
-            return Float.parseFloat(exp.evaluate(f).toString());
+        Float fo = (Float) exp.evaluate( f, Float.class );
+        if( fo != null ){
+            return fo.floatValue();
         }
-        catch(NumberFormatException nfe){
-            return fallback;
-        }
+        return fallback;  
     }
 
     private double evalToDouble(Expression exp, Object f, double fallback){

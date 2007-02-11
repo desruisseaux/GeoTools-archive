@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -152,8 +153,7 @@ public final class StreamingRenderer implements GTRenderer {
      */
     public static final String SCALE_OGC = "OGC";
     
-	// value
-	public HashMap symbolizerAssociationHT = new HashMap(); // associate a
+	public IdentityHashMap symbolizerAssociationHT = new IdentityHashMap(); // associate a value
 
 	/** Tolerance used to compare doubles for equality */
 	private static final double TOLERANCE = 1e-6;
@@ -1623,7 +1623,7 @@ public final class StreamingRenderer implements GTRenderer {
         final Collection result;
         final CoordinateReferenceSystem sourceCrs;
         final NumberRange scaleRange = new NumberRange(scaleDenominator,scaleDenominator);
-        symbolizerAssociationHT = new HashMap();// TODO use clear? MT issues?
+        symbolizerAssociationHT = new IdentityHashMap();// TODO use clear? MT issues?
         final ArrayList lfts ;
         
         if ( featureSource != null ) {
