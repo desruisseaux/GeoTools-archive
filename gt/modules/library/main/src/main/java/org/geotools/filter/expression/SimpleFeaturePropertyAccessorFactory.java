@@ -1,5 +1,7 @@
 package org.geotools.filter.expression;
 
+import java.util.regex.Pattern;
+
 import org.geotools.factory.Hints;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -30,6 +32,8 @@ public class SimpleFeaturePropertyAccessorFactory implements
     static PropertyAccessor ATTRIBUTE_ACCESS = new SimpleFeaturePropertyAccessor();
     static PropertyAccessor DEFAULT_GEOMETRY_ACCESS = new DefaultGeometrySimpleFeaturePropertyAccessor();
     static PropertyAccessor FID_ACCESS = new FidSimpleFeaturePropertyAccessor();
+    static Pattern idPattern = Pattern.compile("@(\\w+:)?id");
+    static Pattern propertyPattern = Pattern.compile("(\\w+:)?(\\w+)");
 
     public PropertyAccessor createPropertyAccessor(Class type, String xpath,
             Class target, Hints hints) {
@@ -44,11 +48,11 @@ public class SimpleFeaturePropertyAccessorFactory implements
             return DEFAULT_GEOMETRY_ACCESS;
 
         //check for fid access
-        if (xpath.matches("@(\\w+:)?id"))
+        if (idPattern.matcher(xpath).matches())
             return FID_ACCESS;
 
         //check for simple property acess
-        if (xpath.matches("(\\w+:)?(\\w+)") ) {
+        if (propertyPattern.matcher(xpath).matches()) {
         	return ATTRIBUTE_ACCESS;	
         }
         
