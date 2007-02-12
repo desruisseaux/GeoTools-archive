@@ -239,8 +239,7 @@ public class FidFilterImpl extends AbstractFilterImpl implements FidFilter {
 		final Set fids = fids();
 		final String attPath = "@id";
 		
-		PropertyAccessors accessors = new PropertyAccessors();
-		PropertyAccessor accessor = accessors.findPropertyAccessor(feature, attPath, null, null);
+		PropertyAccessor accessor = PropertyAccessors.findPropertyAccessor(feature, attPath, null, null);
 
 		if (accessor == null) {
 			return false;
