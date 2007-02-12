@@ -26,7 +26,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.collection.AbstractFeatureCollection;
-import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.CRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -97,14 +97,7 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         this.schema = getSchema();
         
         CoordinateReferenceSystem originalCs = results.getSchema().getDefaultGeometry().getCoordinateSystem();
-        
-        if (destinationCS.equals(originalCs)) {                       
-            //this.transform = null; // identity?
-            this.transform = FactoryFinder.getCoordinateOperationFactory(null).createOperation(originalCs,destinationCS).getMathTransform();
-        }
-        else {
-            this.transform = FactoryFinder.getCoordinateOperationFactory(null).createOperation(originalCs,destinationCS).getMathTransform();            
-        }
+        this.transform = CRS.findMathTransform(originalCs,destinationCS, true);            
     }
 
     private static FeatureCollection origionalCollection( FeatureCollection results ){
