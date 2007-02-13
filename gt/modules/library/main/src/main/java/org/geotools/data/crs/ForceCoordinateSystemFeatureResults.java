@@ -70,6 +70,7 @@ public class ForceCoordinateSystemFeatureResults extends AbstractFeatureCollecti
     public ForceCoordinateSystemFeatureResults(FeatureCollection results,            
         CoordinateReferenceSystem forcedCS, boolean forceOnlyMissing) throws IOException, SchemaException {
         super( forceType( origionalType( results ), forcedCS, forceOnlyMissing ) );
+        this.results = results;
     }
     
     private static FeatureType origionalType( FeatureCollection results ){
