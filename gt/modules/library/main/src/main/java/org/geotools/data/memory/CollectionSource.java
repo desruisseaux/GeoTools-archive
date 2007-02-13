@@ -9,6 +9,7 @@ import java.util.List;
 import org.geotools.catalog.GeoResourceInfo;
 import org.geotools.data.Source;
 import org.geotools.data.Transaction;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
@@ -60,7 +61,7 @@ public class CollectionSource implements Source {
         return null;
     }
 
-    public TypeName getName() {
+    public Name getName() {
         return new org.geotools.feature.type.TypeName("localhost/memory");
     }
 

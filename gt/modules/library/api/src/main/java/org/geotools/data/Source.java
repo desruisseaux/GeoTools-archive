@@ -16,6 +16,7 @@
 package org.geotools.data;
 
 import java.util.Collection;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
@@ -98,7 +99,7 @@ public interface Source /*<Content,Description>*/ {
     /**
      * Description of content in an appropriate format.
      * <ul>
-     *   <li>FeatureType: when serving up features</li>
+     *   <li>AttributeDescriptor: when serving up features</li>
      *   <li>Class: when providing access to a java domain model</li>
      *   <li>URL: of XSD document when working with XML document</li>
      *   <li>etc...</li>
@@ -109,11 +110,11 @@ public interface Source /*<Content,Description>*/ {
     Object /*Description*/ describe();
 
     /**
-     * Names of the type this data source provides.
+     * Names of the content this data source provides.
      *
      * @return The type name
      */
-    TypeName getName();
+    Name getName();
 
     /**
      * Provides a transaction for commit/rollback control of this <code>Source</code>.

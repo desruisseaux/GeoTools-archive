@@ -34,7 +34,7 @@ public class TypeName extends Name implements org.opengis.feature.type.TypeName 
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof TypeName) {
+        if (obj instanceof Name) {
             return super.equals(obj);
         }
 

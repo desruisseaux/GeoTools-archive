@@ -16,6 +16,7 @@
 package org.geotools.data;
 
 import java.util.List;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 import org.geotools.catalog.ServiceInfo;
 
@@ -56,14 +57,14 @@ public interface DataAccess /*<Content,Description>*/ {
     /**
      * Names for the content we are providing access to.
      *
-     * @return List<TypeName>, may be emtpy, but never null
+     * @return List<Name>, may be emtpy, but never null
      */
-    List /*<TypeName>*/ getNames();
+    List /*<Name>*/ getNames();
 
     /**
      * Description of content in an appropriate format.
      * <ul>
-     *   <li>FeatureType: when serving up features</li>
+     *   <li>AttributeDescriptor: when serving up features</li>
      *   <li>Class: when providing access to a java domain model</li>
      *   <li>URL: of XSD document when working with XML document</li>
      *   <li>etc...</li>
@@ -76,14 +77,14 @@ public interface DataAccess /*<Content,Description>*/ {
      * @param typeName
      * @return FeatureType, ResultSetMetaData, Class, whatever?
      */
-    Object /*Description*/ describe(TypeName typeName);
+    Object /*Description*/ describe(Name typeName);
 
     /**
      * Provides access to the data source for the given type name.
      *
      * @return Data source, null if typeName is not available
      */
-    Source access(TypeName typeName);
+    Source access(Name typeName);
 
     /**
      * Clean up any and all data connections.
