@@ -78,13 +78,21 @@ public class AttributePropertyHandlerTest extends TestCase {
 
         JXPathContext context = JXPathContext.newContext(f);
 
-        Attribute id = (Attribute) context.getValue("id");
-        assertNotNull(id);
-        assertEquals(new Integer(1), id.get());
+        // Attribute id = (Attribute) context.getValue("id");
+        // assertNotNull(id);
+        // assertEquals(new Integer(1), id.get());
 
-        Attribute name = (Attribute) context.getValue("name");
+        Object id = context.getValue("id");
+        assertNotNull(id);
+        assertEquals(new Integer(1), id);
+
+//        Attribute name = (Attribute) context.getValue("name");
+//        assertNotNull(name);
+//        assertEquals("foo", name.get());
+
+        Object name = context.getValue("name");
         assertNotNull(name);
-        assertEquals("foo", name.get());
+        assertEquals("foo", name);
     }
 
     public void testNonSimpleFeature() {
@@ -107,18 +115,29 @@ public class AttributePropertyHandlerTest extends TestCase {
 
         JXPathContext context = JXPathContext.newContext(cf);
 
-        Attribute xid = (Attribute) context.getValue("xid");
+//        Attribute xid = (Attribute) context.getValue("xid");
+//        assertNotNull(xid);
+//        assertEquals(new Double(1), xid.get());
+
+        Object xid = context.getValue("xid");
         assertNotNull(xid);
-        assertEquals(new Double(1), xid.get());
+        assertEquals(new Double(1), xid);
 
-        Attribute id = (Attribute) context.getValue("feature/id");
+//        Attribute id = (Attribute) context.getValue("feature/id");
+//        assertNotNull(id);
+//        assertEquals(new Integer(1), id.get());
+
+        Object id = context.getValue("feature/id");
         assertNotNull(id);
-        assertEquals(new Integer(1), id.get());
+        assertEquals(new Integer(1), id);
 
-        Attribute name = (Attribute) context.getValue("feature/name");
+//        Attribute name = (Attribute) context.getValue("feature/name");
+//        assertNotNull(name);
+//        assertEquals("foo", name.get());
+
+        Object name = context.getValue("feature/name");
         assertNotNull(name);
-        assertEquals("foo", name.get());
-
+        assertEquals("foo", name);
     }
 
 }

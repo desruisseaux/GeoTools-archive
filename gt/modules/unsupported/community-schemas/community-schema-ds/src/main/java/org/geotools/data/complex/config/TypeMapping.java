@@ -14,7 +14,6 @@ public class TypeMapping implements Serializable{
 	private String sourceTypeName;
 	private String targetElementName;
 	private List groupbyAttributeNames = Collections.EMPTY_LIST;
-	private List fidMappings = Collections.EMPTY_LIST;
 	private List attributeMappings = Collections.EMPTY_LIST;
 		
 	public TypeMapping(){
@@ -28,16 +27,6 @@ public class TypeMapping implements Serializable{
 		this.attributeMappings = new CheckedArrayList(AttributeMapping.class);
 		if(attributeMappings != null)
 			this.attributeMappings.addAll(attributeMappings);
-	}
-	
-	public List getFidMappings() {
-		return new ArrayList(fidMappings);
-	}
-	
-	public void setFidMappings(List fidMappings) {
-		this.fidMappings = new CheckedArrayList(AttributeMapping.class);
-		if(fidMappings != null)
-			this.fidMappings.addAll(fidMappings);
 	}
 	
 	public List getGroupbyAttributeNames() {
@@ -82,7 +71,6 @@ public class TypeMapping implements Serializable{
 		.append(",\n sourceTypeName=").append(sourceTypeName)
 		.append(",\n targetElementName=").append(targetElementName)
 		.append(",\n groupbyAttributeNames=").append(groupbyAttributeNames)
-		.append(",\n fidMappings=").append(fidMappings)
 		.append(",\n attributeMappings=").append(attributeMappings)
 		.append("]");
 		return sb.toString();

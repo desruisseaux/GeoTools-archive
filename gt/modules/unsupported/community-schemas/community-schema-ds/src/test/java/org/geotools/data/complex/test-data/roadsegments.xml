@@ -13,7 +13,7 @@
         <Parameter>
           <name>directory</name>
           <!-- path can be relative to working dir -->
-          <value>test/org/geotools/data/complex/test-data</value>
+          <value>src/test/java/org/geotools/data/complex/test-data</value>
         </Parameter>
       </parameters>
     </DataStore>
@@ -29,26 +29,18 @@
       <sourceType>RoadSegments</sourceType>
       <targetElement>sco:RoadSegment</targetElement>
       <groupBy/>
-      <fidMappings>
-        <FidMapping>
-          <targetAttribute>RoadSegment</targetAttribute>
-          <sourceExpression>
-            <OCQL>getId()</OCQL>
-          </sourceExpression>
-        </FidMapping>
-        <FidMapping>
-          <targetAttribute>RoadSegment/fromToNodes</targetAttribute>
-          <sourceExpression>
-            <OCQL>FID</OCQL>
-          </sourceExpression>
-        </FidMapping>
-      </fidMappings>
       <attributeMappings>
         <AttributeMapping>
+          <targetAttribute>RoadSegment</targetAttribute>
+          <idExpression>
+            <OCQL>getId()</OCQL>
+          </idExpression>
+        </AttributeMapping>
+        <AttributeMapping>
           <targetAttribute>RoadSegment/fromToNodes</targetAttribute>
-          <sourceExpression>
-            <OCQL>null</OCQL>
-          </sourceExpression>
+          <idExpression>
+            <OCQL>FID</OCQL>
+          </idExpression>
         </AttributeMapping>
         <AttributeMapping>
           <targetAttribute>RoadSegment/fromToNodes/fromNode</targetAttribute>

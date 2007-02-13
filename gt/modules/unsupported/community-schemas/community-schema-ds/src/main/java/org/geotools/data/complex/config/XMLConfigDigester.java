@@ -163,24 +163,6 @@ public class XMLConfigDigester {
 		digester.addCallMethod(groupBy + "/GroupByAttribute", "add", 1);
 		digester.addCallParam(groupBy + "/GroupByAttribute", 0);
 		digester.addSetNext(groupBy, "setGroupbyAttributeNames", "java.util.List");
-
-		//create fid mappings
-		final String fidMappings = typeMapping + "/fidMappings";
-		digester.addObjectCreate(fidMappings, CONFIG_NS_URI, ArrayList.class);
-
-		final String fidMap = fidMappings + "/FidMapping";
-		digester.addObjectCreate(fidMap, CONFIG_NS_URI, AttributeMapping.class);
-		digester.addCallMethod(fidMap + "/targetAttribute", "setTargetAttributePath", 1);
-		digester.addCallParam(fidMap + "/targetAttribute", 0);
-		digester.addCallMethod(fidMap + "/sourceExpression/OCQL", "setSourceExpression", 1);
-		digester.addCallParam(fidMap + "/sourceExpression/OCQL", 0);
-
-		//add the AttributeMapping to the list
-		digester.addSetNext(fidMap, "add");
-
-		//set fid mappings on the TypeMapping
-		digester.addSetNext(fidMappings, "setFidMappings");
-
 		
 		//create attribute mappings
 		final String attMappings = typeMapping + "/attributeMappings";

@@ -219,8 +219,8 @@ public class Types {
     }
 
     /**
-     * Returns the first descriptor matching the given name within the given
-     * type.
+     * Returns the first descriptor matching the given local name within the
+     * given type.
      * 
      * @param type
      *            The type, non null.
@@ -230,7 +230,12 @@ public class Types {
      * @return The first descriptor, or null if no match.
      */
     public static PropertyDescriptor descriptor(ComplexType type, String name) {
-        return descriptor(type, new org.geotools.feature.Name(name));
+        List match = descriptors(type, name);
+
+        if (match.isEmpty())
+            return null;
+
+        return (PropertyDescriptor) match.get(0);
     }
 
     /**
@@ -273,8 +278,8 @@ public class Types {
     }
 
     /**
-     * Returns the set of descriptors matching the given name within the given
-     * type.
+     * Returns the set of descriptors matching the given local name within the
+     * given type.
      * 
      * @param type
      *            The type, non null.
@@ -286,8 +291,20 @@ public class Types {
      */
     public static List/* <PropertyDescriptor> */descriptors(ComplexType type,
             String name) {
+        if (name == null)
+            return Collections.EMPTY_LIST;
 
-        return descriptors(type, new org.geotools.feature.Name(name));
+        List match = new ArrayList();
+
+        for (Iterator itr = type.getProperties().iterator(); itr.hasNext();) {
+            PropertyDescriptor descriptor = (PropertyDescriptor) itr.next();
+            String localPart = descriptor.getName().getLocalPart();
+            if (name.equals(localPart)) {
+                match.add(descriptor);
+            }
+        }
+
+        return match;
     }
 
     /**

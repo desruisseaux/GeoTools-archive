@@ -29,6 +29,14 @@ import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
 import org.geotools.data.complex.config.ComplexDataStoreDTO;
 import org.geotools.data.complex.config.XMLConfigDigester;
 
+/**
+ * DataStoreFactory for ComplexDataStore.
+ * 
+ * NOTE: currently this one is not registered through the geotools datastore plugin mechanism. Instead, we're
+ * directly using DataAccessFactory
+ * 
+ * @author Gabriel Roldan, Axios Engineering
+ */
 public class ComplexDataStoreFactory implements DataStoreFactorySpi {
 
 	public static final Param DBTYPE = new Param("dbtype", String.class, "Fixed value 'complex'", true, "complex");

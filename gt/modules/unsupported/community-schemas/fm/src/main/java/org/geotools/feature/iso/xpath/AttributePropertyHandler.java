@@ -50,15 +50,38 @@ public class AttributePropertyHandler implements DynamicPropertyHandler {
 
 	public Object getProperty(Object o, String propName) {
 		Object value = null;
+        
+        //the Filter spec says the xpath expresion may or may not
+        //start with the Feature name. If it does, it is the self
+        //location path
+        Attribute att = (Attribute)o;
+        AttributeDescriptor descriptor = att.getDescriptor();
+        String attName;
+        if(descriptor == null){
+            attName = att.getType().getName().getLocalPart();
+        }else{
+            attName = descriptor.getName().getLocalPart();
+        }
+        if(propName.equals(attName) || propName.startsWith(attName + "/")){
+            return o;
+        }
+        
 		if (o instanceof ComplexAttribute) {
 			ComplexAttribute attribute = (ComplexAttribute) o;
 			Name name = Types.attributeName(propName);
-			
-			List found = attribute.get(name);
-			
+            List found;
+            try{
+                found = attribute.get(name);
+            }catch(NullPointerException e){
+                e.printStackTrace();
+                throw e;
+            }
 			value = found.size() == 0 ? 
 					null : (found.size() == 1? found.get(0) : found);
 
+            //FIXME HACK: this is due to the Filter subsystem not dealing with
+            //PropertyHandler returning attribute, hence can't, for example, compare
+            //an Attribute with a Literal
 			if(value instanceof Attribute && !(value instanceof ComplexAttribute)){
 				value = ((Attribute)value).get();
 			}

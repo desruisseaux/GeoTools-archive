@@ -17,6 +17,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
@@ -29,9 +30,9 @@ public class MemorySource implements FeatureSource2 {
 
 	private Collection content;
 
-	private FeatureAccess dataStore;
+	private MemoryDataAccess dataStore;
 
-	public MemorySource(FeatureAccess dataStore, FeatureType type,
+	public MemorySource(MemoryDataAccess dataStore, FeatureType type,
 			Collection collection) {
 		this.dataStore = dataStore;
 		this.type = type;
@@ -51,7 +52,7 @@ public class MemorySource implements FeatureSource2 {
 	}
 
 	public Object describe() {
-		return type;
+		return dataStore.describe(type.getName());
 	}
 
 	public void dispose() {
@@ -65,7 +66,7 @@ public class MemorySource implements FeatureSource2 {
 		throw new UnsupportedOperationException();
 	}
 
-	public TypeName getName() {
+	public Name getName() {
 		return type.getName();
 	}
 

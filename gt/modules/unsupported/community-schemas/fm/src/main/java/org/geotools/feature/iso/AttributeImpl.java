@@ -42,7 +42,6 @@ public class AttributeImpl implements Attribute {
         // throw new UnsupportedOperationException(type.getName()
         // + " is abstract");
         // }
-
         TYPE = type;
         ID = id;
         set(content);
@@ -168,5 +167,19 @@ public class AttributeImpl implements Attribute {
 
     public Object operation(Name arg0, List arg1) {
         throw new UnsupportedOperationException("operation not supported yet");
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Attribute[");
+        sb.append(DESCRIPTOR == null ? "" : DESCRIPTOR.getName()
+                        .getLocalPart());
+        sb.append(":");
+        sb.append(TYPE.getName().getLocalPart());
+        sb.append(":@");
+        sb.append(ID == null? "" : ID);
+        sb.append(":");
+        sb.append(content);
+        sb.append("]");
+        return sb.toString();
     }
 }

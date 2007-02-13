@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.AttributeImpl;
+import org.geotools.feature.iso.attribute.GeometricAttribute;
 import org.geotools.feature.iso.attribute.TextualAttribute;
 import org.geotools.feature.iso.type.AttributeDescriptorImpl;
 import org.opengis.feature.Attribute;
@@ -24,6 +25,8 @@ import org.opengis.feature.simple.TextAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.TypeName;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Construct specific types for SimpleFeatures.
@@ -51,8 +54,14 @@ public class SimpleFeatureFactoryImpl extends AttributeFactoryImpl implements
 		int index = 0;
 		for( Iterator i=type.getProperties().iterator(); i.hasNext(); index++ ){
 			AttributeDescriptor descriptor = (AttributeDescriptor) i.next();
+            Class binding = descriptor.getType().getBinding();
 			Object value = index < values.length ? values[ index ] : null;
-			Attribute attribute = new AttributeImpl( value, descriptor, null ); 
+            Attribute attribute;
+            if(Geometry.class.isAssignableFrom(binding)){
+                attribute = new GeometricAttribute(value, descriptor, null, null);
+            }else{
+                attribute = new AttributeImpl( value, descriptor, null );
+            }
 			attributes.add( attribute );
 		}
 		return attributes;		

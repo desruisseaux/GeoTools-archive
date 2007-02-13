@@ -19,67 +19,77 @@ package org.geotools.data.complex;
 import java.util.Collections;
 import java.util.Map;
 
-import org.geotools.filter.Expression;
 import org.geotools.resources.Utilities;
 import org.opengis.feature.type.AttributeType;
-
+import org.opengis.filter.expression.Expression;
 
 /**
  * DOCUMENT ME!
- *
+ * 
  * @author Gabriel Roldan, Axios Engineering
  * @version $Id$
-  */
+ */
 public class AttributeMapping {
-    /** DOCUMENT ME!  */
+
+    /** Expression to set the Attribute's ID from, or {@linkplain Expression#NIL} */
+    private Expression identifierExpression;
+
+    /** DOCUMENT ME! */
     private Expression sourceExpression;
 
-    /** DOCUMENT ME!  */
+    /** DOCUMENT ME! */
     private String targetXPath;
-    
-    
+
     private boolean isMultiValued;
 
     /**
-     * If present, represents our way to deal polymorphic attribute
-     * instances, so this node should be of a subtype of the one
-     * referenced by {@link  #targetXPath}
+     * If present, represents our way to deal polymorphic attribute instances,
+     * so this node should be of a subtype of the one referenced by
+     * {@link  #targetXPath}
      */
     AttributeType targetNodeInstance;
-    
-    
-    private Map /*<AttributeName,Expression>*/ clientProperties;
-    
+
+    private Map /* <AttributeName,Expression> */clientProperties;
+
     /**
      * Creates a new AttributeMapping object.
-     *
-     * @param sourceExpression DOCUMENT ME!
-     * @param targetXPath DOCUMENT ME!
+     * 
+     * @param sourceExpression
+     *            DOCUMENT ME!
+     * @param targetXPath
+     *            DOCUMENT ME!
      */
-    public AttributeMapping(Expression sourceExpression, String targetXPath) {
-    	this(sourceExpression, targetXPath, null, false, null);
+    public AttributeMapping(Expression idExpression,
+            Expression sourceExpression, String targetXPath) {
+        this(idExpression, sourceExpression, targetXPath, null, false, null);
     }
 
-    public AttributeMapping(Expression sourceExpression, String targetXPath,
-    		AttributeType targetNodeInstance, boolean isMultiValued, Map clientProperties) {
-        this.sourceExpression = sourceExpression;
+    public AttributeMapping(Expression idExpression,
+            Expression sourceExpression, String targetXPath,
+            AttributeType targetNodeInstance, boolean isMultiValued,
+            Map clientProperties) {
+
+        this.identifierExpression = idExpression == null ? Expression.NIL
+                : idExpression;
+        this.sourceExpression = sourceExpression == null ? Expression.NIL
+                : sourceExpression;
         this.isMultiValued = isMultiValued;
-        if(this.sourceExpression == null){
-        	this.sourceExpression = FeatureTypeMapping.NULL_EXPRESSION;
+        if (this.sourceExpression == null) {
+            this.sourceExpression = Expression.NIL;
         }
         this.targetXPath = targetXPath;
         this.targetNodeInstance = targetNodeInstance;
-        this.clientProperties = clientProperties == null? Collections.EMPTY_MAP : clientProperties;
+        this.clientProperties = clientProperties == null ? Collections.EMPTY_MAP
+                : clientProperties;
     }
-    
-    
-    public boolean isMultiValued(){
-    	return isMultiValued;
+
+    public boolean isMultiValued() {
+        return isMultiValued;
     }
-    
+
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public Expression getSourceExpression() {
@@ -88,22 +98,23 @@ public class AttributeMapping {
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public String getTargetXPath() {
         return targetXPath;
     }
-    
-    public AttributeType getTargetNodeInstance(){
-    	return targetNodeInstance;
+
+    public AttributeType getTargetNodeInstance() {
+        return targetNodeInstance;
     }
 
     /**
      * DOCUMENT ME!
-     *
-     * @param o DOCUMENT ME!
-     *
+     * 
+     * @param o
+     *            DOCUMENT ME!
+     * 
      * @return DOCUMENT ME!
      */
     public boolean equals(Object o) {
@@ -117,41 +128,52 @@ public class AttributeMapping {
 
         AttributeMapping other = (AttributeMapping) o;
 
-        return Utilities.equals(sourceExpression, other.sourceExpression)
-        && Utilities.equals(targetXPath, other.targetXPath) 
-        && Utilities.equals(targetNodeInstance, other.targetNodeInstance);
+        return Utilities.equals(identifierExpression,
+                other.identifierExpression)
+                && Utilities.equals(sourceExpression, other.sourceExpression)
+                && Utilities.equals(targetXPath, other.targetXPath)
+                && Utilities.equals(targetNodeInstance,
+                        other.targetNodeInstance);
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public int hashCode() {
-        return 37 * (((sourceExpression == null) ? 17
-                                                 : sourceExpression.hashCode())
-        ^ targetXPath.hashCode()) * (targetNodeInstance == null? 1 : targetNodeInstance.hashCode());
+        return (37 * identifierExpression.hashCode() + 37 * sourceExpression
+                .hashCode())
+                ^ targetXPath.hashCode();
     }
 
     /**
      * DOCUMENT ME!
-     *
+     * 
      * @return DOCUMENT ME!
      */
     public String toString() {
         StringBuffer sb = new StringBuffer("AttributeMapping[");
-        sb.append("sourceExpression='").append(sourceExpression)
-          .append("', targetXPath='").append(targetXPath);
-        if(targetNodeInstance != null){
-        	sb.append(", target instance type=")
-        	.append(targetNodeInstance);
+        sb.append("sourceExpression='").append(sourceExpression).append(
+                "', targetXPath='").append(targetXPath);
+        if (targetNodeInstance != null) {
+            sb.append(", target instance type=").append(targetNodeInstance);
         }
         sb.append("']");
 
         return sb.toString();
     }
 
-	public Map getClientProperties() {
-		return clientProperties == null? Collections.EMPTY_MAP : clientProperties;
-	}
+    public Map getClientProperties() {
+        return clientProperties == null ? Collections.EMPTY_MAP
+                : clientProperties;
+    }
+
+    public Expression getIdentifierExpression() {
+        return identifierExpression;
+    }
+
+    public void setIdentifierExpression(Expression identifierExpression) {
+        this.identifierExpression = identifierExpression;
+    }
 }

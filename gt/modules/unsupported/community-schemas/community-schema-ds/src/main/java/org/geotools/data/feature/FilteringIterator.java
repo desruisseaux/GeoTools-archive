@@ -1,6 +1,7 @@
 package org.geotools.data.feature;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.opengis.filter.Filter;
 
@@ -58,6 +59,9 @@ public class FilteringIterator implements Iterator {
 	}
 
 	public Object next() {
+		if(!hasNext()){
+			throw new NoSuchElementException("There are no more elements");
+		}
 		Object f = next;
 		next = null;
 		return f;

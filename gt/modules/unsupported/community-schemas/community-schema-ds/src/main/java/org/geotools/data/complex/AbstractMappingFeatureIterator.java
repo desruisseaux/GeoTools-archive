@@ -18,18 +18,23 @@
 package org.geotools.data.complex;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
+import java.util.logging.Logger;
 
-import org.geotools.data.DataUtilities;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
-import org.geotools.feature.impl.AttributeFactoryImpl;
-import org.geotools.filter.Expression;
-import org.opengis.feature.AttributeFactory;
+import org.geotools.data.Source;
+import org.geotools.data.feature.FeatureSource2;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.opengis.feature.ComplexAttribute;
-import org.opengis.feature.FeatureCollection;
-import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.FeatureFactory;
+import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 
 /**
  * Base class for mapping iterator strategies.
@@ -48,93 +53,143 @@ import org.opengis.feature.type.FeatureType;
  * 
  * @author Gabriel Roldan, Axios Engineering
  */
-abstract class AbstractMappingFeatureIterator implements Iterator/*<Feature>*/ {
+abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */{
 
-	/**
-	 * The mappings for the source and target schemas
-	 */
-	protected FeatureTypeMapping mapping;
+    private static final Logger LOGGER = Logger
+            .getLogger(AbstractMappingFeatureIterator.class.getPackage()
+                    .getName());
 
-	/**
-	 * Factory used to create the target feature and attributes
-	 */
-	protected AttributeFactory attf;
+    /**
+     * The mappings for the source and target schemas
+     */
+    protected FeatureTypeMapping mapping;
 
-	protected FeatureCollection features;
-	protected Iterator sourceFeatures;
+    /**
+     * Expression to evaluate the feature id
+     */
+    protected Expression featureFidMapping;
 
-	/**
-	 * 
-	 * @param mapping
-	 *            place holder for the target type, the surrogate FeatureSource
-	 *            and the mappings between them.
-	 * @param query
-	 *            the query over the target feature type, that is to be unpacked
-	 *            to its equivalent over the surrogate feature type.
-	 * @throws IOException
-	 */
-	public AbstractMappingFeatureIterator(FeatureTypeMapping mapping,
-			Query query) throws IOException {
-		this.mapping = mapping;
-		this.attf = new AttributeFactoryImpl();
+    /**
+     * Factory used to create the target feature and attributes
+     */
+    protected FeatureFactory attf;
 
-		Query unrolledQuery = getUnrolledQuery(query);
-		FeatureSource mappedSource = mapping.getSource();
-		
-		features = mappedSource.getFeatures(unrolledQuery);
-		this.sourceFeatures = features.features();		
-	}
-	
-	/**
-	 * Subclasses must override to provide a query appropiate to
-	 * its underlying feature source.
-	 * 
-	 * @param query the original query against the output schema
-	 * @return a query appropiate to be executed over the underlying
-	 * feature source.
-	 */
-	protected abstract Query getUnrolledQuery(Query query);
+    protected Collection features;
 
-	/**
-	 * Shall not be called, just throws an UnsupportedOperationException
-	 */
-	public void remove() {
-		throw new UnsupportedOperationException();
-	}
+    protected Iterator sourceFeatures;
 
-	/**
-	 * Closes the underlying FeatureIterator
-	 */
-	public void close() {
-		features.close(this.sourceFeatures);
-	}
+    protected ComplexDataStore store;
 
-	/**
-	 * Based on the set of xpath expression/id extracting expression, finds the
-	 * ID for the attribute <code>attributeXPath</code> from the source
-	 * complex attribute.
-	 * 
-	 * @param attributeXPath
-	 *            the location path of the attribute to be created, for which to
-	 *            obtain the id by evaluating the corresponding
-	 *            <code>org.geotools.filter.Expression</code> from
-	 *            <code>sourceInstance</code>.
-	 * @param sourceInstance
-	 *            a complex attribute which is the source of the mapping.
-	 * @return the ID to be applied to a new attribute instance addressed by
-	 *         <code>attributeXPath</code>, or <code>null</code> if there
-	 *         is no an id mapping for that attribute.
-	 */
-	protected String extractIdForAttribute(String attributeXPath,
-			ComplexAttribute sourceInstance) {
-		Map/*<String, Expression>*/ idExpressions = mapping.getIdMappings();
-		Expression idExpression = (Expression) idExpressions.get(attributeXPath);
-		if (idExpression == null) {
-			idExpression = FeatureTypeMapping.NULL_EXPRESSION;
-		}
-		Object value = idExpression.getValue(sourceInstance);
-		return value == null ? null : value.toString();
-	}
+    protected Source featureSource;
 
-	
+    /**
+     * 
+     * @param store
+     * @param mapping
+     *            place holder for the target type, the surrogate FeatureSource
+     *            and the mappings between them.
+     * @param query
+     *            the query over the target feature type, that is to be unpacked
+     *            to its equivalent over the surrogate feature type.
+     * @throws IOException
+     */
+    public AbstractMappingFeatureIterator(ComplexDataStore store,
+            FeatureTypeMapping mapping, Query query) throws IOException {
+        this.store = store;
+        this.attf = new AttributeFactoryImpl();
+        Name name = mapping.getTargetFeature().getName();
+        this.featureSource = store.access(name);
+
+        List attMappingsWithoutRootFeature = new ArrayList();
+        List attributeMappings = mapping.getAttributeMappings();
+
+        for (Iterator it = attributeMappings.iterator(); it.hasNext();) {
+            AttributeMapping attMapping = (AttributeMapping) it.next();
+            if (name.getLocalPart().equals(attMapping.getTargetXPath())) {
+                featureFidMapping = attMapping.getIdentifierExpression();
+            } else {
+                attMappingsWithoutRootFeature.add(attMapping);
+            }
+        }
+
+        this.mapping = new FeatureTypeMapping(mapping.getSource(), mapping
+                .getTargetFeature(), attMappingsWithoutRootFeature);
+        this.mapping.setGroupByAttNames(mapping.getGroupByAttNames());
+
+        if (featureFidMapping == null
+                || Expression.NIL.equals(featureFidMapping)) {
+            FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+            featureFidMapping = ff.property("@id");
+        }
+
+        Query unrolledQuery = getUnrolledQuery(query);
+        Filter filter = unrolledQuery.getFilter();
+
+        FeatureSource2 mappedSource = mapping.getSource();
+
+        features = mappedSource.content(filter);
+
+        this.sourceFeatures = features.iterator();
+    }
+
+    /**
+     * Subclasses must override to provide a query appropiate to its underlying
+     * feature source.
+     * 
+     * @param query
+     *            the original query against the output schema
+     * @return a query appropiate to be executed over the underlying feature
+     *         source.
+     */
+    protected abstract Query getUnrolledQuery(Query query);
+
+    /**
+     * Shall not be called, just throws an UnsupportedOperationException
+     */
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Closes the underlying FeatureIterator
+     */
+    public void close() {
+        LOGGER.info("remember to propagate close()!!!");
+        // features.close(this.sourceFeatures);
+    }
+
+    /**
+     * Based on the set of xpath expression/id extracting expression, finds the
+     * ID for the attribute <code>attributeXPath</code> from the source
+     * complex attribute.
+     * 
+     * @param attributeXPath
+     *            the location path of the attribute to be created, for which to
+     *            obtain the id by evaluating the corresponding
+     *            <code>org.geotools.filter.Expression</code> from
+     *            <code>sourceInstance</code>.
+     * @param sourceInstance
+     *            a complex attribute which is the source of the mapping.
+     * @return the ID to be applied to a new attribute instance addressed by
+     *         <code>attributeXPath</code>, or <code>null</code> if there
+     *         is no an id mapping for that attribute.
+     */
+    protected String extractIdForAttribute(AttributeMapping attMapping,
+            ComplexAttribute sourceInstance) {
+
+        Expression idExpression = attMapping.getIdentifierExpression();
+        if (idExpression == null) {
+            idExpression = Expression.NIL;
+        }
+        String value = (String) idExpression.evaluate(sourceInstance,
+                String.class);
+        return value;
+    }
+
+    protected String extractIdForFeature(ComplexAttribute sourceInstance) {
+        String fid = (String) featureFidMapping.evaluate(sourceInstance,
+                String.class);
+        return fid;
+    }
+
 }

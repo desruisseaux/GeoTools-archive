@@ -24,10 +24,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.geotools.catalog.ServiceInfo;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
@@ -35,306 +37,379 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
+import org.geotools.data.Source;
+import org.geotools.data.complex.filter.FilterAttributeExtractor;
 import org.geotools.data.complex.filter.UnmappingFilterVisitor;
-import org.geotools.feature.FeatureType;
-import org.geotools.feature.XPath;
-import org.geotools.filter.Expression;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterAttributeExtractor;
-import org.opengis.feature.schema.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
+import org.geotools.data.complex.filter.XPath;
+import org.geotools.data.feature.FeatureAccess;
+import org.geotools.factory.CommonFactoryFinder;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.PropertyName;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class ComplexDataStore extends AbstractDataStore {
+public class ComplexDataStore extends AbstractDataStore implements
+        FeatureAccess {
 
-	private static final boolean IS_WRITABLE = false;
+    private static final boolean IS_WRITABLE = false;
 
-	private Map/* <String, FeatureTypeMapping> */mappings = Collections.EMPTY_MAP;
+    private Map/* <String, FeatureTypeMapping> */mappings = Collections.EMPTY_MAP;
 
-	/**
-	 * 
-	 * @param mappings
-	 *            a Set containing a {@linkplain FeatureTypeMapping} for each
-	 *            FeatureType this DataStore is going to hold.
-	 */
-	public ComplexDataStore(Set/*<FeatureTypeMapping>*/ mappings) {
-		super(IS_WRITABLE);
-		FeatureTypeMapping mapping;
-		this.mappings = new HashMap();
-		for (Iterator it = mappings.iterator(); it.hasNext();) {
-			mapping = (FeatureTypeMapping) it.next();
-			AttributeDescriptor mappedElement = mapping.getTargetFeature();
-			org.opengis.feature.type.FeatureType mappedType;
-			mappedType = (org.opengis.feature.type.FeatureType)mappedElement.getType();
-			String typeName = mappedType.getName().getLocalPart();
-			this.mappings.put(typeName, mapping);
-		}
-	}
+    private FilterFactory filterFac = CommonFactoryFinder
+            .getFilterFactory(null);
 
-	/**
-	 * Returns the set of target type names this DataStore holds, where the term
-	 * 'target type name' refers to the name of one of the types this datastore
-	 * produces by mapping another ones through the definitions stored in its
-	 * {@linkplain FeatureTypeMapping}s
-	 */
-	public String[] getTypeNames() throws IOException {
-		String[] typeNames = new String[mappings.size()];
-		this.mappings.keySet().toArray(typeNames);
-		return typeNames;
-	}
-
-	/**
-	 * Finds the target FeatureType named <code>typeName</code> in this
-	 * ComplexDatastore's internal list of FeatureType mappings and returns it.
-	 */
-	public FeatureType getSchema(String typeName) throws IOException {
-		FeatureTypeMapping mapping = getMapping(typeName);
-		return (FeatureType) mapping.getTargetFeature().getType();
-	}
-
-	/**
-	 * Returns the mapping suite for the given target type name.
-	 * 
-	 * @param typeName
-	 * @return
-	 * @throws IOException
-	 */
-	private FeatureTypeMapping getMapping(String typeName) throws IOException {
-		FeatureTypeMapping mapping = (FeatureTypeMapping) this.mappings
-				.get(typeName);
-		if (mapping == null) {
-			StringBuffer availables = new StringBuffer("[");
-			for(Iterator it = mappings.keySet().iterator(); it.hasNext();){
-				availables.append(it.next());
-				availables.append(it.hasNext()? ", " : "");
-			}
-			availables.append("]");
-			throw new DataSourceException(typeName + " not found " + availables);
-		}
-		return mapping;
-	}
-
-	/**
-	 * GR: this method is called from inside getFeatureReader(Query ,Transaction )
-	 * to allow subclasses return an optimized FeatureReader wich supports the
-	 * filter and attributes truncation specified in <code>query</code>
-	 * <p>
-	 * A subclass that supports the creation of such an optimized FeatureReader
-	 * shold override this method. Otherwise, it just returns
-	 * <code>getFeatureReader(typeName)</code>
-	 * <p>
-	 */
-	protected FeatureReader getFeatureReader(String typeName, Query query)
-			throws IOException {
-		FeatureTypeMapping mapping = getMapping(typeName);
-		MappingFeatureReader reader = new MappingFeatureReader(mapping, query);
-		return reader;
-	}
-
-	/**
-	 * 
-	 * @param typeName
-	 */
-	protected FeatureReader getFeatureReader(String typeName)
-			throws IOException {
-
-		throw new UnsupportedOperationException(
-				"Not needed since we support getFeatureReader(String, Query)");
-	}
-
-	/**
-	 * Computes the bounds of the features for the specified feature type that
-	 * satisfy the query provided that there is a fast way to get that result.
-	 * <p>
-	 * Will return null if there is not fast way to compute the bounds. Since
-	 * it's based on some kind of header/cached information, it's not guaranteed
-	 * to be real bound of the features
-	 * </p>
-	 * 
-	 * @param query
-	 * @return the bounds, or null if too expensive
-	 * @throws SchemaNotFoundException
-	 * @throws IOException
-	 */
-	protected Envelope getBounds(Query query) throws IOException {
-		String typeName = query.getTypeName();
-		FeatureTypeMapping mapping = getMapping(typeName);
-		Query unmappedQuery = unrollQuery(query, mapping);
-		FeatureSource mappedSource = mapping.getSource();
-
-		Envelope bounds = mappedSource.getBounds(unmappedQuery);
-		return bounds;
-	}
-
-	/**
-	 * Gets the number of the features that would be returned by this query for
-	 * the specified feature type.
-	 * <p>
-	 * If getBounds(Query) returns <code>-1</code> due to expense consider
-	 * using <code>getFeatures(Query).getCount()</code> as a an alternative.
-	 * </p>
-	 * 
-	 * @param query
-	 *            Contains the Filter and MaxFeatures to find the bounds for.
-	 * @return The number of Features provided by the Query or <code>-1</code>
-	 *         if count is too expensive to calculate or any errors or occur.
-	 * @throws IOException
-	 * 
-	 * @throws IOException
-	 *             if there are errors getting the count
-	 */
-	protected int getCount(Query query) throws IOException {
-		String typeName = query.getTypeName();
-		
-		FeatureTypeMapping mapping = getMapping(typeName);
-		
-		Query unmappedQuery = unrollQuery(query, mapping);
-		
-		FeatureSource mappedSource = mapping.getSource();
-		
-		//@todo: limit results if its a grouping mapping
-		((DefaultQuery)unmappedQuery).setMaxFeatures(query.getMaxFeatures());
-		
-		int count = mappedSource.getCount(unmappedQuery);
-		return count;
-	}
-	
-	/**
-	 * Returns <code>Filter.NONE</code>, as the whole filter is unrolled and
-	 * passed back to the underlying DataStore to be treated.
+    /**
      * 
-     * @return <code>Filter.NONE</code>
+     * @param mappings
+     *            a Set containing a {@linkplain FeatureTypeMapping} for each
+     *            FeatureType this DataStore is going to hold.
      */
-    protected Filter getUnsupportedFilter(String typeName, Filter filter){
-      return Filter.NONE;
-    }	
+    public ComplexDataStore(Set/* <FeatureTypeMapping> */mappings) {
+        super(IS_WRITABLE);
+        FeatureTypeMapping mapping;
+        this.mappings = new HashMap();
+        for (Iterator it = mappings.iterator(); it.hasNext();) {
+            mapping = (FeatureTypeMapping) it.next();
+            Name mappedElement = mapping.getTargetFeature().getName();
+            FeatureType mappedType;
+            this.mappings.put(mappedElement.getLocalPart(), mapping);
+        }
+    }
 
-	/**
-	 * Creates a <code>org.geotools.data.Query</code> that operates over the
-	 * surrogate DataStore, by unrolling the
-	 * <code>org.geotools.filter.Filter</code> contained in the passed
-	 * <code>query</code>, and replacing the list of required attributes by
-	 * the ones of the mapped FeatureType.
-	 * 
-	 * @param query
-	 * @param mapping
-	 * @return
-	 */
-	public static Query unrollQuery(Query query, FeatureTypeMapping mapping) {
-		Query unrolledQuery = Query.ALL;
-		FeatureSource source = mapping.getSource();
+    /**
+     * Returns the set of target type names this DataStore holds, where the term
+     * 'target type name' refers to the name of one of the types this datastore
+     * produces by mapping another ones through the definitions stored in its
+     * {@linkplain FeatureTypeMapping}s
+     */
+    public String[] getTypeNames() throws IOException {
+        String[] typeNames = new String[mappings.size()];
+        this.mappings.keySet().toArray(typeNames);
+        return typeNames;
+    }
 
-		if (!Query.ALL.equals(query)) {
-			Filter complexFilter = query.getFilter();
-			FeatureType sourceType = source.getSchema();
-			Filter unrolledFilter = unrollFilter(complexFilter, mapping);
-			List propNames = getSurrogatePropertyNames(
-					query.getPropertyNames(), mapping);
-			
-			DefaultQuery newQuery = new DefaultQuery();
-			
-			String name = sourceType.getName().getLocalPart();
-			newQuery.setTypeName(name);
-			newQuery.setFilter(unrolledFilter);
-			newQuery.setPropertyNames(propNames);
-			newQuery.setCoordinateSystem(query.getCoordinateSystem());
-			newQuery.setCoordinateSystemReproject(query.getCoordinateSystemReproject());
-			newQuery.setHandle(query.getHandle());
-			newQuery.setMaxFeatures(query.getMaxFeatures());
+    /**
+     * Finds the target FeatureType named <code>typeName</code> in this
+     * ComplexDatastore's internal list of FeatureType mappings and returns it.
+     */
+    public org.geotools.feature.FeatureType getSchema(String typeName)
+            throws IOException {
+        throw new UnsupportedOperationException(
+                "Use access(typeName).describe()");
+        /*
+         * FeatureTypeMapping mapping = getMapping(typeName); return
+         * (FeatureType) mapping.getTargetFeature().getType();
+         */
+    }
 
-			unrolledQuery = newQuery;
-		}
-		return unrolledQuery;
-	}
+    /**
+     * Returns the mapping suite for the given target type name.
+     * 
+     * @param typeName
+     * @return
+     * @throws IOException
+     */
+    private FeatureTypeMapping getMapping(String typeName) throws IOException {
+        FeatureTypeMapping mapping = (FeatureTypeMapping) this.mappings
+                .get(typeName);
+        if (mapping == null) {
+            StringBuffer availables = new StringBuffer("[");
+            for (Iterator it = mappings.keySet().iterator(); it.hasNext();) {
+                availables.append(it.next());
+                availables.append(it.hasNext() ? ", " : "");
+            }
+            availables.append("]");
+            throw new DataSourceException(typeName + " not found " + availables);
+        }
+        return mapping;
+    }
 
-	/**
-	 * 
-	 * @param mappingProperties
-	 * @param mapping
-	 * @return <code>null</code> if all surrogate attributes shall be queried,
-	 *         else the list of needed surrogate attributes to satisfy the
-	 *         mapping of prorperties in <code>mappingProperties</code>
-	 */
-	public static List getSurrogatePropertyNames(String[] mappingProperties,
-			FeatureTypeMapping mapping) {
-		List propNames = null;
+    /**
+     * GR: this method is called from inside getFeatureReader(Query ,Transaction )
+     * to allow subclasses return an optimized FeatureReader wich supports the
+     * filter and attributes truncation specified in <code>query</code>
+     * <p>
+     * A subclass that supports the creation of such an optimized FeatureReader
+     * shold override this method. Otherwise, it just returns
+     * <code>getFeatureReader(typeName)</code>
+     * <p>
+     */
+    protected FeatureReader getFeatureReader(String typeName, Query query)
+            throws IOException {
+        throw new UnsupportedOperationException("Use access(typeName)");
+        /*
+         * FeatureTypeMapping mapping = getMapping(typeName);
+         * MappingFeatureReader reader = new MappingFeatureReader(mapping,
+         * query); return reader;
+         */
+    }
 
-		final org.opengis.feature.type.FeatureType mappedType = mapping.getSource().getSchema();
-		final AttributeDescriptor target = mapping.getTargetFeature();
-		final org.opengis.feature.type.FeatureType targetType = (org.opengis.feature.type.FeatureType)target.getType();
+    /**
+     * 
+     * @param typeName
+     */
+    protected FeatureReader getFeatureReader(String typeName)
+            throws IOException {
 
-		if (mappingProperties != null && mappingProperties.length > 0) {
-			Set requestedSurrogateProperties = new HashSet();
-			FilterAttributeExtractor extractor = new FilterAttributeExtractor();
+        throw new UnsupportedOperationException(
+                "Not needed since we support getFeatureReader(String, Query)");
+    }
 
-			// add all surrogate atts needed to recreate target schema ids
-			Set/*<Expression>*/ idExpressions = new HashSet(mapping.getIdMappings().values());
-			for (Iterator itr = idExpressions.iterator(); itr.hasNext();) {
-				Expression e = (Expression) itr.next();
-				extractor.visit(e);
-				Set exprAtts = extractor.getAttributeNameSet();
-				LOGGER.fine("adding atts needed for ids: " + exprAtts);
-				requestedSurrogateProperties.addAll(exprAtts);
-				extractor.clear();
-			}
+    /**
+     * Computes the bounds of the features for the specified feature type that
+     * satisfy the query provided that there is a fast way to get that result.
+     * <p>
+     * Will return null if there is not fast way to compute the bounds. Since
+     * it's based on some kind of header/cached information, it's not guaranteed
+     * to be real bound of the features
+     * </p>
+     * 
+     * @param query
+     * @return the bounds, or null if too expensive
+     * @throws SchemaNotFoundException
+     * @throws IOException
+     */
+    protected Envelope getBounds(Query query) throws IOException {
+        String typeName = query.getTypeName();
+        FeatureTypeMapping mapping = getMapping(typeName);
+        Query unmappedQuery = unrollQuery(query, mapping);
+        FeatureSource mappedSource = mapping.getSource();
 
-			// add all surrogate attributes involved in mapping of the requested
-			// target schema attributes
-			List attMappings = mapping.getAttributeMappings();
-			List/*<String>*/ requestedProperties = Arrays.asList(mappingProperties);
+        Envelope bounds = mappedSource.getBounds(unmappedQuery);
+        return bounds;
+    }
 
-			for (Iterator itr = requestedProperties.iterator(); itr.hasNext();) {
-				String requestedPropertyXPath = (String) itr.next();
-				List/*<XPath.Step>*/ requestedPropertySteps = XPath.steps(targetType, requestedPropertyXPath);
+    /**
+     * Gets the number of the features that would be returned by this query for
+     * the specified feature type.
+     * <p>
+     * If getBounds(Query) returns <code>-1</code> due to expense consider
+     * using <code>getFeatures(Query).getCount()</code> as a an alternative.
+     * </p>
+     * 
+     * @param query
+     *            Contains the Filter and MaxFeatures to find the bounds for.
+     * @return The number of Features provided by the Query or <code>-1</code>
+     *         if count is too expensive to calculate or any errors or occur.
+     * @throws IOException
+     * 
+     * @throws IOException
+     *             if there are errors getting the count
+     */
+    protected int getCount(Query query) throws IOException {
+        String typeName = query.getTypeName();
 
-				for (Iterator aitr = attMappings.iterator(); aitr.hasNext();) {
-					final AttributeMapping entry = (AttributeMapping) aitr.next();
-					final String mappedPropertyXPath = entry.getTargetXPath();
-					final Expression sourceExpression = entry.getSourceExpression();
-					
-					List/*<XPath.Step>*/ targetSteps = XPath.steps(targetType, mappedPropertyXPath);
+        FeatureTypeMapping mapping = getMapping(typeName);
 
-					//i.e.: requested "measurement", found mapping of "measurement/result".
-					//"result" must be included to create "measurement" 
-					if (targetSteps.containsAll(requestedPropertySteps)) {
-						extractor.visit(sourceExpression);
-						Set/*<String>*/ exprAtts = extractor.getAttributeNameSet();
-						extractor.clear();
+        Query unmappedQuery = unrollQuery(query, mapping);
 
-						for(Iterator eitr = exprAtts.iterator(); eitr.hasNext();){
-							String mappedAtt = (String) eitr.next();
-							AttributeDescriptor mappedAttribute = (AttributeDescriptor)XPath.get(mappedType, mappedAtt);
-							
-							if(mappedAttribute != null){
-								requestedSurrogateProperties.add(mappedAtt);
-							}else{
-								LOGGER.info("mapped type does not contains property " + mappedAtt);
-							}
-						}
-						LOGGER.fine("adding atts needed for : " + exprAtts);
-					}
-				}
-			}
-			propNames = new ArrayList(requestedSurrogateProperties);
-		}
-		return propNames;
-	}
+        FeatureSource mappedSource = mapping.getSource();
 
-	/**
-	 * Takes a filter that operates against a {@linkplain FeatureTypeMapping}'s
-	 * target FeatureType, and unrolls it creating a new Filter that operates
-	 * against the mapping's source FeatureType.
-	 * 
-	 * @param complexFilter
-	 * @return TODO: implement filter unrolling
-	 */
-	public static Filter unrollFilter(Filter complexFilter,
-			FeatureTypeMapping mapping) {
-		UnmappingFilterVisitor visitor = new UnmappingFilterVisitor(mapping);
-		complexFilter.accept(visitor);
-		//visitor.visit(complexFilter);
-		Filter unrolledFilter = visitor.getUnrolledFilter();
-		return unrolledFilter;
-	}
+        // @todo: limit results if its a grouping mapping
+        ((DefaultQuery) unmappedQuery).setMaxFeatures(query.getMaxFeatures());
+
+        int count = mappedSource.getCount(unmappedQuery);
+        return count;
+    }
+
+    /**
+     * Returns <code>Filter.INCLUDE</code>, as the whole filter is unrolled
+     * and passed back to the underlying DataStore to be treated.
+     * 
+     * @return <code>Filter.INLCUDE</code>
+     */
+    protected Filter getUnsupportedFilter(String typeName, Filter filter) {
+        return Filter.INCLUDE;
+    }
+
+    /**
+     * Creates a <code>org.geotools.data.Query</code> that operates over the
+     * surrogate DataStore, by unrolling the
+     * <code>org.geotools.filter.Filter</code> contained in the passed
+     * <code>query</code>, and replacing the list of required attributes by
+     * the ones of the mapped FeatureType.
+     * 
+     * @param query
+     * @param mapping
+     * @return
+     */
+    public Query unrollQuery(Query query, FeatureTypeMapping mapping) {
+        Query unrolledQuery = Query.ALL;
+        Source source = mapping.getSource();
+
+        if (!Query.ALL.equals(query)) {
+            Filter complexFilter = query.getFilter();
+            AttributeDescriptor descriptor = (AttributeDescriptor) source
+                    .describe();
+            FeatureType sourceType = (FeatureType) descriptor.getType();
+
+            Filter unrolledFilter = unrollFilter(complexFilter, mapping);
+
+            List propNames = getSurrogatePropertyNames(
+                    query.getPropertyNames(), mapping);
+
+            DefaultQuery newQuery = new DefaultQuery();
+
+            String name = descriptor.getName().getLocalPart();
+            newQuery.setTypeName(name);
+            newQuery.setFilter(unrolledFilter);
+            newQuery.setPropertyNames(propNames);
+            newQuery.setCoordinateSystem(query.getCoordinateSystem());
+            newQuery.setCoordinateSystemReproject(query
+                    .getCoordinateSystemReproject());
+            newQuery.setHandle(query.getHandle());
+            newQuery.setMaxFeatures(query.getMaxFeatures());
+
+            unrolledQuery = newQuery;
+        }
+        return unrolledQuery;
+    }
+
+    /**
+     * 
+     * @param mappingProperties
+     * @param mapping
+     * @return <code>null</code> if all surrogate attributes shall be queried,
+     *         else the list of needed surrogate attributes to satisfy the
+     *         mapping of prorperties in <code>mappingProperties</code>
+     */
+    public List getSurrogatePropertyNames(String[] mappingProperties,
+            FeatureTypeMapping mapping) {
+        List propNames = null;
+
+        final FeatureType mappedType;
+
+        final AttributeDescriptor targetDescriptor = mapping.getTargetFeature();
+        final Name targetName = targetDescriptor.getName();
+        mappedType = (FeatureType) targetDescriptor.getType();
+
+        Source target = this.access(targetName);
+        final FeatureType targetType = (FeatureType) targetDescriptor.getType();
+
+        if (mappingProperties != null && mappingProperties.length > 0) {
+            Set requestedSurrogateProperties = new HashSet();
+
+            // add all surrogate attributes involved in mapping of the requested
+            // target schema attributes
+            List attMappings = mapping.getAttributeMappings();
+            List/* <String> */requestedProperties = Arrays
+                    .asList(mappingProperties);
+
+            for (Iterator itr = requestedProperties.iterator(); itr.hasNext();) {
+                String requestedPropertyXPath = (String) itr.next();
+                List/* <XPath.Step> */requestedPropertySteps;
+                requestedPropertySteps = XPath.steps(targetName,
+                        requestedPropertyXPath);
+
+                for (Iterator aitr = attMappings.iterator(); aitr.hasNext();) {
+                    final AttributeMapping entry = (AttributeMapping) aitr
+                            .next();
+                    final String mappedPropertyXPath = entry.getTargetXPath();
+                    final Expression sourceExpression = entry
+                            .getSourceExpression();
+                    final Expression idExpression = entry
+                            .getIdentifierExpression();
+
+                    List/* <XPath.Step> */targetSteps;
+                    targetSteps = XPath.steps(targetName, mappedPropertyXPath);
+
+                    // i.e.: requested "measurement", found mapping of
+                    // "measurement/result".
+                    // "result" must be included to create "measurement"
+                    if (targetSteps.containsAll(requestedPropertySteps)) {
+                        FilterAttributeExtractor extractor = new FilterAttributeExtractor();
+                        sourceExpression.accept(extractor, null);
+                        idExpression.accept(extractor, null);
+                        
+                        Set exprAtts = extractor.getAttributeNameSet();
+
+                        for (Iterator eitr = exprAtts.iterator(); eitr
+                                .hasNext();) {
+                            String mappedAtt = (String) eitr.next();
+                            PropertyName propExpr = filterFac
+                                    .property(mappedAtt);
+                            Object object = propExpr.evaluate(mappedType);
+                            AttributeDescriptor mappedAttribute = (AttributeDescriptor) object;
+
+                            if (mappedAttribute != null) {
+                                requestedSurrogateProperties.add(mappedAtt);
+                            } else {
+                                LOGGER
+                                        .info("mapped type does not contains property "
+                                                + mappedAtt);
+                            }
+                        }
+                        LOGGER.fine("adding atts needed for : " + exprAtts);
+                    }
+                }
+            }
+            propNames = new ArrayList(requestedSurrogateProperties);
+        }
+        return propNames;
+    }
+
+    /**
+     * Takes a filter that operates against a {@linkplain FeatureTypeMapping}'s
+     * target FeatureType, and unrolls it creating a new Filter that operates
+     * against the mapping's source FeatureType.
+     * 
+     * @param complexFilter
+     * @return TODO: implement filter unrolling
+     */
+    public static Filter unrollFilter(Filter complexFilter,
+            FeatureTypeMapping mapping) {
+        UnmappingFilterVisitor visitor = new UnmappingFilterVisitor(mapping);
+        complexFilter.accept(visitor, null);
+        // visitor.visit(complexFilter);
+        Filter unrolledFilter = visitor.getUnrolledFilter();
+        return unrolledFilter;
+    }
+
+    // //// FeatureAccess implementation /////
+
+    public Source access(Name typeName) {
+        FeatureTypeMapping mapping;
+        try {
+            mapping = getMapping(typeName.getLocalPart());
+        } catch (IOException e) {
+            throw (RuntimeException) new RuntimeException().initCause(e);
+        }
+        MappingFeatureSource reader = new MappingFeatureSource(this, mapping);
+        return reader;
+    }
+
+    public Object describe(Name typeName) {
+        FeatureTypeMapping mapping;
+        try {
+            mapping = getMapping(typeName.getLocalPart());
+        } catch (IOException e) {
+            throw (RuntimeException) new RuntimeException().initCause(e);
+        }
+        AttributeDescriptor targetFeature = mapping.getTargetFeature();
+        return targetFeature;
+    }
+
+    public void dispose() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public ServiceInfo getInfo() {
+        throw new UnsupportedOperationException();
+    }
+
+    public List getNames() {
+        List names = new LinkedList();
+        for (Iterator it = mappings.values().iterator(); it.hasNext();) {
+            FeatureTypeMapping mapping = (FeatureTypeMapping) it.next();
+            Name name = mapping.getTargetFeature().getName();
+            names.add(name);
+        }
+        return names;
+    }
 }

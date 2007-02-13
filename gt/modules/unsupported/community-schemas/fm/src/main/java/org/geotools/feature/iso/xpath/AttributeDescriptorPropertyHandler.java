@@ -13,7 +13,7 @@ import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 
 /**
- * JXPath property handler that works on Attribute
+ * JXPath property handler that works on AttributeDescriptor/type
  * 
  * @author Gabriel Roldan
  */

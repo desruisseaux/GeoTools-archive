@@ -50,6 +50,39 @@
 	<!-- ==================================================== -->
 	<dependencies>
 		<dependency>
+			<groupId>commons-digester</groupId>
+			<artifactId>commons-digester</artifactId>
+			<version>1.7</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-collections</groupId>
+					<artifactId>commons-collections</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-beanutils</groupId>
+					<artifactId>commons-beanutils</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<!-- override transitive dependency from commons-digester 1.7
+			which depends on commons-collections 2.1, since gt2-xml (SchemaIndexImpl)
+			depends on commons-collections 3.1 -->
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<!-- override transitive dependency from commons-digester 1.7
+			which depends on commons-collections 2.1, since gt2-xml (SchemaIndexImpl)
+			depends on commons-collections 3.1 -->
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.7.0</version>
+		</dependency>
+
+
+		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt2-fm</artifactId>
 			<version>2.4-SNAPSHOT</version>
@@ -58,6 +91,23 @@
 			<groupId>org.geotools</groupId>
 			<artifactId>gt2-data</artifactId>
 			<version>2.4-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt2-cql</artifactId>
+			<version>2.4-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt2-xml-gml3</artifactId>
+			<version>2.4-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.geotools.demo</groupId>
+			<artifactId>gt2-demo-property</artifactId>
+			<version>2.4-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

@@ -112,7 +112,7 @@ public class AttributeBuilder {
                 Property property = (Property) itr.next();
                 if (property instanceof Attribute) {
                     Attribute att = (Attribute) property;
-                    add( att.get() , att.name() );
+                    add(att.getID(), att.get() , att.name() );
                 }
                 else if (property instanceof Association) {
                     Association assoc = (Association) property;
@@ -217,8 +217,8 @@ public class AttributeBuilder {
      *  The value of the attribute.
      * 
      */
-    public void add(Object value, String name) {
-        add(null, value, name);
+    public Attribute add(Object value, String name) {
+        return add(null, value, name);
     }
     
     /**
@@ -256,8 +256,8 @@ public class AttributeBuilder {
      * @param namespaceURI
      *  The namespace of the attribute.
      */
-    public void add(Object value, String name, String namespaceURI) {
-        add(null, value, name, namespaceURI);
+    public Attribute add(Object value, String name, String namespaceURI) {
+        return add(null, value, name, namespaceURI);
     }
     
     /**
@@ -292,8 +292,8 @@ public class AttributeBuilder {
      *  The value of the attribute.
      * 
      */
-    public void add(Object value, Name name) {
-        add(null, value, name);
+    public Attribute add(Object value, Name name) {
+        return add(null, value, name);
     }
     
     /**
@@ -337,8 +337,8 @@ public class AttributeBuilder {
      * @param value
      *  The value of the attribute.
      */
-    public void add(String id, Object value, String name) {
-        add(id, value, name, namespace);
+    public Attribute add(String id, Object value, String name) {
+        return add(id, value, name, namespace);
     }
     
     /**
@@ -358,8 +358,8 @@ public class AttributeBuilder {
      * @param namespaceURI
      *  The namespace of the attribute.
      */
-    public void add(String id, Object value, String name, String namespaceURI) {
-        add(id,value,Types.attributeName(namespaceURI,name));
+    public Attribute add(String id, Object value, String name, String namespaceURI) {
+        return add(id,value,Types.attributeName(namespaceURI,name));
     }
     
     /**
@@ -378,10 +378,11 @@ public class AttributeBuilder {
      *  The value of the attribute.
      * 
      */
-    public void add(String id, Object value, Name name) {
+    public Attribute add(String id, Object value, Name name) {
         AttributeDescriptor descriptor = attributeDescriptor(name);
         Attribute attribute = create(value,null,descriptor,id);
         properties().add(attribute);
+        return attribute;
     }
     
     /**
@@ -413,7 +414,6 @@ public class AttributeBuilder {
     }
     
     protected AttributeDescriptor attributeDescriptor(Name name) {
-    	System.out.println(name);
         PropertyDescriptor descriptor = Types.descriptor((ComplexType)type,name);
         
         if (descriptor == null) {
