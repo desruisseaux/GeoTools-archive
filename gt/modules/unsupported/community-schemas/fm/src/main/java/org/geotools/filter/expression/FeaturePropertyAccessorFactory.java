@@ -1,7 +1,5 @@
 package org.geotools.filter.expression;
 
-import java.util.List;
-
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.geotools.factory.Hints;
@@ -18,7 +16,6 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.type.PropertyType;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -166,14 +163,13 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
             // support any implementation. Reason being that JXPath works
             // over concrete classes and hence we cannot set it up over the
             // interface
-            JXPathIntrospector.registerDynamicClass(AttributePropertyHandler.AttributeWrapper.class,
+            JXPathIntrospector.registerDynamicClass(FeatureImpl.class,
                     AttributePropertyHandler.class);
-            /*
             JXPathIntrospector.registerDynamicClass(SimpleFeatureImpl.class,
                     AttributePropertyHandler.class);
             JXPathIntrospector.registerDynamicClass(ComplexAttributeImpl.class,
                     AttributePropertyHandler.class);
-            */
+
             JXPathIntrospector.registerDynamicClass(AttributeDescriptorImpl.class,
                     AttributeDescriptorPropertyHandler.class);
             JXPathIntrospector.registerDynamicClass(FeatureTypeImpl.class,
@@ -191,21 +187,11 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         public Object get(Object object, String xpath, Class target) {
             // xpath = stripPrefix(xpath);
 
-            if(object instanceof Attribute){
-                object = new AttributePropertyHandler.AttributeWrapper((Attribute) object);
-            }
             JXPathContext context = JXPathContext.newContext(object);
             context.setLenient(true);
 
             Object value = context.getValue(xpath);
 
-            if (value != null) {
-                if (object instanceof Feature) {
-                    assert value instanceof Attribute || value instanceof List;
-                } else {
-                    assert value instanceof PropertyType;
-                }
-            }
             return value;
         }
 

@@ -22,22 +22,6 @@ import org.opengis.feature.type.Name;
  * @author Justin Deoliveira
  */
 public class AttributePropertyHandler implements DynamicPropertyHandler {
-    /**
-     * A lightweight wrapper for an Attribute (complex, feature, etc) in order
-     * to let JXPath play well with any Attribute implementation. Reason is that
-     * only concrete classes can be registered in JXPathIntrospector, no
-     * interfaces.
-     * 
-     * @author Gabriel Roldan, Axios Engineering
-     * 
-     */
-    public static class AttributeWrapper {
-        public Attribute attribute;
-
-        public AttributeWrapper(Attribute attribute) {
-            this.attribute = attribute;
-        }
-    }
 
     public String[] getPropertyNames(Object o) {
         Attribute att = (Attribute) o;
@@ -66,9 +50,6 @@ public class AttributePropertyHandler implements DynamicPropertyHandler {
     public Object getProperty(Object o, String propName) {
         Object value = null;
 
-        if (o instanceof AttributeWrapper) {
-            o = ((AttributeWrapper) o).attribute;
-        } 
         Attribute att = (Attribute)o;
         
         // the Filter spec says the xpath expresion may or may not
