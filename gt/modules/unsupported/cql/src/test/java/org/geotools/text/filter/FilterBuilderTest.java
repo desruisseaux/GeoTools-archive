@@ -16,14 +16,19 @@
 
 package org.geotools.text.filter;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.FilterFactoryImpl;
+import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.IncludeFilter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Add;
@@ -58,8 +63,7 @@ import org.opengis.filter.spatial.Within;
 public class FilterBuilderTest extends TestCase {
 
     public static junit.framework.Test suite() {
-        junit.framework.TestSuite suite = new junit.framework.TestSuite(
-                FilterBuilderTest.class);
+        junit.framework.TestSuite suite = new junit.framework.TestSuite(FilterBuilderTest.class);
 
         return suite;
     }
@@ -96,13 +100,60 @@ public class FilterBuilderTest extends TestCase {
 
     }
 
+    public void testBoolean() throws ParseException {
+        Filter filter = FilterBuilder.parse("attr = true");
+        assertNotNull(filter);
+        assertTrue(filter instanceof PropertyIsEqualTo);
+        PropertyIsEqualTo f = (PropertyIsEqualTo) filter;
+        assertEquals("attr", ((PropertyName) f.getExpression1()).getPropertyName());
+        assertEquals(Boolean.TRUE, ((Literal) f.getExpression2()).getValue());
+    }
+
+    /**
+     * An INCLUDE token is parsed as {@link Filter#INCLUDE}
+     * 
+     * @throws ParseException
+     */
+    public void testIncludeFilter() throws ParseException {
+        Filter filter = FilterBuilder.parse("INCLUDE");
+        assertNotNull(filter);
+        assertTrue(Filter.INCLUDE.equals(filter));
+
+        filter = FilterBuilder.parse("INCLUDE and a < 1");
+        assertNotNull(filter);
+        assertTrue(filter instanceof PropertyIsLessThan);
+
+        filter = FilterBuilder.parse("INCLUDE or a < 1");
+        assertNotNull(filter);
+        assertTrue(Filter.INCLUDE.equals(filter));
+    }
+
+    /**
+     * An EXCLUDE token is parsed as {@link Filter#EXCLUDE}
+     * 
+     * @throws ParseException
+     */
+    public void testExcludeFilter() throws ParseException {
+        Filter filter = FilterBuilder.parse("EXCLUDE");
+        assertNotNull(filter);
+        assertTrue(Filter.EXCLUDE.equals(filter));
+
+        filter = FilterBuilder.parse("EXCLUDE and a < 1");
+        assertNotNull(filter);
+        assertTrue(Filter.EXCLUDE.equals(filter));
+
+        filter = FilterBuilder.parse("EXCLUDE or a < 1");
+        assertNotNull(filter);
+        assertTrue(filter instanceof PropertyIsLessThan);
+    }
+
     /**
      * Test Comparation Predicate
      * <p>
      * 
      * <pre>
-     *    &lt;comparison predicate &gt; ::= 
-     *  	       &lt;attribute name &gt;  &lt;comp op &gt;  &lt;literal &gt;
+     *                             &lt;comparison predicate &gt; ::= 
+     *                           	       &lt;attribute name &gt;  &lt;comp op &gt;  &lt;literal &gt;
      * </pre>
      * 
      * </p>
@@ -144,8 +195,7 @@ public class FilterBuilderTest extends TestCase {
         final String propExpected = "gmd:aa:bb/gmd:cc/gmd:dd";
         actual = FilterBuilder.parse(prop + " < 100");
 
-        assertTrue("PropertyIsLessThan filter was expected",
-                actual instanceof PropertyIsLessThan);
+        assertTrue("PropertyIsLessThan filter was expected", actual instanceof PropertyIsLessThan);
 
         PropertyIsLessThan lessFilter = (PropertyIsLessThan) actual;
         Expression property = lessFilter.getExpression1();
@@ -158,14 +208,13 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *     &lt;comparison predicate &gt; ::= 
-     *    	    &lt;attrsibute name &gt;  &lt;comp op &gt;  &lt;literal &gt;
+     *                              &lt;comparison predicate &gt; ::= 
+     *                             	    &lt;attrsibute name &gt;  &lt;comp op &gt;  &lt;literal &gt;
      * </pre>
      * 
      * </p>
      */
-    public void testComparationPredicateWithSimpleExpressions()
-            throws Exception {
+    public void testComparationPredicateWithSimpleExpressions() throws Exception {
 
         Filter expected;
         Filter actual;
@@ -206,9 +255,9 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;existence_predicate &gt; ::= 
-     *   	  &lt;attribute_name &gt; EXISTS
-     *   |  &lt;attribute_name &gt; DOES-NOT-EXIST
+     *                             &lt;existence_predicate &gt; ::= 
+     *                            	  &lt;attribute_name &gt; EXISTS
+     *                            |  &lt;attribute_name &gt; DOES-NOT-EXIST
      * </pre>
      * 
      * </p>
@@ -223,13 +272,11 @@ public class FilterBuilderTest extends TestCase {
         // <attribute_name> DOES-NOT-EXIST
         // -------------------------------------------------------------
 
-        resultFilter = FilterBuilder
-                .parse(FilterSample.ATTRIBUTE_NAME_DOES_NOT_EXIST);
+        resultFilter = FilterBuilder.parse(FilterSample.ATTRIBUTE_NAME_DOES_NOT_EXIST);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.ATTRIBUTE_NAME_DOES_NOT_EXIST);
+        expected = FilterSample.getSample(FilterSample.ATTRIBUTE_NAME_DOES_NOT_EXIST);
 
         assertEquals(expected, resultFilter);
 
@@ -248,8 +295,10 @@ public class FilterBuilderTest extends TestCase {
 
         assertEquals(expected, eqToResultFilter);
 
-        assertNotNull("implementation of function was expected",
-                eqToResultFilter.getExpression1()); // TODO this function must
+        assertNotNull("implementation of function was expected", eqToResultFilter.getExpression1()); // TODO
+        // this
+        // function
+        // must
         // be implemented in
         // Geotools
 
@@ -260,7 +309,7 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;null predicate &gt; ::=  &lt;attribute name &gt; IS [ NOT ] NULL
+     *                             &lt;null predicate &gt; ::=  &lt;attribute name &gt; IS [ NOT ] NULL
      * </pre>
      * 
      * </p>
@@ -277,8 +326,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        assertEquals("PropertyIsNull filter was expected", resultFilter,
-                expected);
+        assertEquals("PropertyIsNull filter was expected", resultFilter, expected);
 
         // -------------------------------------------------------------
         // ATTR1 IS NOT NULL
@@ -288,8 +336,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        assertEquals("Not PropertyIsNull filter was expected", resultFilter,
-                expected);
+        assertEquals("Not PropertyIsNull filter was expected", resultFilter, expected);
 
     }
 
@@ -318,19 +365,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;temporal predicate  &gt;::= 
-     *      &lt;attribute_name &gt; &lt;b&gt;BEFORE&lt;/b&gt;  &lt;date-time expression &gt; [*]
-     *   |  &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; DURING  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
-     *   
-     *    &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;[*]
-     *   
-     *    &lt;period &gt; ::= 
-     *      &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *   |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt; [*]	
-     *   |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt; [*]
+     *                             &lt;temporal predicate  &gt;::= 
+     *                               &lt;attribute_name &gt; &lt;b&gt;BEFORE&lt;/b&gt;  &lt;date-time expression &gt; [*]
+     *                            |  &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
+     *                            
+     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;[*]
+     *                            
+     *                             &lt;period &gt; ::= 
+     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt; [*]	
+     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt; [*]
      * </pre>
      * 
      * </p>
@@ -351,13 +398,11 @@ public class FilterBuilderTest extends TestCase {
         assertEquals("less filter ", expected, resultFilter);
 
         // ATTR1 BEFORE 2006-11-31T01:30:00Z/2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder
-                .parse(FilterSample.FILTER_BEFORE_PERIOD_BETWEEN_DATES);
+        resultFilter = FilterBuilder.parse(FilterSample.FILTER_BEFORE_PERIOD_BETWEEN_DATES);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_BEFORE_PERIOD_BETWEEN_DATES);
+        expected = FilterSample.getSample(FilterSample.FILTER_BEFORE_PERIOD_BETWEEN_DATES);
 
         assertEquals("less than first date of period ", expected, resultFilter);
 
@@ -367,8 +412,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_DAYS);
+        expected = FilterSample.getSample(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_DAYS);
 
         assertEquals("less than first date of period ", expected, resultFilter);
 
@@ -378,8 +422,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_YEARS);
+        expected = FilterSample.getSample(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_YEARS);
 
         assertEquals("less than first date of period ", expected, resultFilter);
 
@@ -389,27 +432,24 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_MONTHS);
+        expected = FilterSample.getSample(FilterSample.FILTER_BEFORE_PERIOD_DATE_AND_MONTHS);
 
         assertEquals("less than first date of period ", expected, resultFilter);
 
         // ATTR1 BEFORE P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_BEFORE_PERIOD_YMD_HMS_DATE);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_BEFORE_PERIOD_YMD_HMS_DATE);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_BEFORE_PERIOD_YMD_HMS_DATE);
+        expected = FilterSample.getSample(FilterSample.FILTER_BEFORE_PERIOD_YMD_HMS_DATE);
 
         assertEquals("greater filter", expected, resultFilter);
 
         // test compound attribute gmd:aa:bb.gmd:cc.gmd:dd
         final String prop = "gmd:aa:bb.gmd:cc.gmd:dd";
         final String propExpected = "gmd:aa:bb/gmd:cc/gmd:dd";
-        resultFilter = FilterBuilder.parse(prop
-                + " BEFORE P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z ");
+        resultFilter = FilterBuilder
+                .parse(prop + " BEFORE P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z ");
 
         assertTrue("PropertyIsLessThan filter was expected",
                 resultFilter instanceof PropertyIsLessThan);
@@ -426,19 +466,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;temporal predicate  &gt;::= 
-     *      &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
-     *   | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;[*]&lt;/b&gt;
-     *   |  &lt;attribute_name &gt; DURING  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
-     *   
-     *    &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
-     *   
-     *    &lt;period &gt; ::= 
-     *      &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *   |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
-     *   |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                             &lt;temporal predicate  &gt;::= 
+     *                               &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
+     *                            | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;[*]&lt;/b&gt;
+     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
+     *                            
+     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
+     *                            
+     *                             &lt;period &gt; ::= 
+     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
+     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
      * </pre>
      * 
      * </p>
@@ -459,8 +499,7 @@ public class FilterBuilderTest extends TestCase {
         expected = FilterSample
                 .getSample(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_BETWEEN_DATES);
 
-        assertEquals("less than or equal the last date of period ", expected,
-                resultFilter);
+        assertEquals("less than or equal the last date of period ", expected, resultFilter);
 
         // ATTR1 BEFORE OR DURING P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z
         resultFilter = (Filter) FilterBuilder
@@ -468,8 +507,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_YMD_HMS_DATE);
+        expected = FilterSample.getSample(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_YMD_HMS_DATE);
 
         assertEquals(" filter", expected, resultFilter);
 
@@ -479,8 +517,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_DATE_YMD_HMS);
+        expected = FilterSample.getSample(FilterSample.FILTER_BEFORE_OR_DURING_PERIOD_DATE_YMD_HMS);
 
         assertEquals(" filter", expected, resultFilter);
 
@@ -491,19 +528,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;temporal predicate  &gt;::= 
-     *      &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
-     *   | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;&lt;/b&gt;
-     *   |  &lt;attribute_name &gt; DURING  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;[*]
-     *   |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
-     *   
-     *    &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
-     *   
-     *    &lt;period &gt; ::= 
-     *      &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *   |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
-     *   |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                             &lt;temporal predicate  &gt;::= 
+     *                               &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
+     *                            | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;&lt;/b&gt;
+     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;[*]
+     *                            |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
+     *                            
+     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
+     *                            
+     *                             &lt;period &gt; ::= 
+     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
+     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
      * </pre>
      * 
      * </p>
@@ -521,11 +558,9 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_BETWEEN_DATES);
+        expected = FilterSample.getSample(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_BETWEEN_DATES);
 
-        assertEquals("greater than or equal the first date of period ",
-                expected, resultFilter);
+        assertEquals("greater than or equal the first date of period ", expected, resultFilter);
 
         // ATTR1 DURING OR AFTER P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z
         resultFilter = (Filter) FilterBuilder
@@ -533,8 +568,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_YMD_HMS_DATE);
+        expected = FilterSample.getSample(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_YMD_HMS_DATE);
 
         assertEquals(
                 "greater than or equal the first date (is calculated subtract period to last date) of period",
@@ -546,11 +580,9 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_DATE_YMD_HMS);
+        expected = FilterSample.getSample(FilterSample.FILTER_DURING_OR_AFTER_PERIOD_DATE_YMD_HMS);
 
-        assertEquals("greater than or equal the first date", expected,
-                resultFilter);
+        assertEquals("greater than or equal the first date", expected, resultFilter);
 
     }
 
@@ -559,19 +591,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;temporal predicate  &gt;::= 
-     *      &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
-     *   | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;&lt;/b&gt;
-     *   |  &lt;attribute_name &gt; DURING  &lt;period &gt;[*]
-     *   |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
-     *   
-     *    &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
-     *   
-     *    &lt;period &gt; ::= 
-     *      &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *   |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
-     *   |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                             &lt;temporal predicate  &gt;::= 
+     *                               &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
+     *                            | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;&lt;/b&gt;
+     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;[*]
+     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
+     *                            
+     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
+     *                            
+     *                             &lt;period &gt; ::= 
+     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
+     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
      * </pre>
      * 
      * </p>
@@ -582,35 +614,29 @@ public class FilterBuilderTest extends TestCase {
         Filter expected;
 
         // ATTR1 DURING 2006-11-30T01:30:00Z/2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder
-                .parse(FilterSample.FILTER_DURING_PERIOD_BETWEEN_DATES);
+        resultFilter = FilterBuilder.parse(FilterSample.FILTER_DURING_PERIOD_BETWEEN_DATES);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_DURING_PERIOD_BETWEEN_DATES);
+        expected = FilterSample.getSample(FilterSample.FILTER_DURING_PERIOD_BETWEEN_DATES);
 
         assertEquals("greater filter ", expected, resultFilter);
 
         // ATTR1 DURING 2006-11-30T01:30:00Z/P10Y10M10DT5H5M5S
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_DURING_PERIOD_DATE_YMD_HMS);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_DURING_PERIOD_DATE_YMD_HMS);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_DURING_PERIOD_DATE_YMD_HMS);
+        expected = FilterSample.getSample(FilterSample.FILTER_DURING_PERIOD_DATE_YMD_HMS);
 
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 DURING P10Y10M10DT5H5M5S/2006-11-30T01:30:00Z
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_DURING_PERIOD_YMD_HMS_DATE);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_DURING_PERIOD_YMD_HMS_DATE);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_DURING_PERIOD_YMD_HMS_DATE);
+        expected = FilterSample.getSample(FilterSample.FILTER_DURING_PERIOD_YMD_HMS_DATE);
 
         assertEquals("greater filter", expected, resultFilter);
 
@@ -621,19 +647,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;temporal predicate  &gt;::= 
-     *      &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
-     *   |  &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; DURING  &lt;period &gt;
-     *   |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
-     *   | &lt;B&gt;  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;[*]&lt;/B&gt;     
-     *   
-     *    &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
-     *   
-     *    &lt;period &gt; ::= 
-     *      &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *   |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;  [*]
-     *   |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;  [*]
+     *                             &lt;temporal predicate  &gt;::= 
+     *                               &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
+     *                            |  &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;
+     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
+     *                            | &lt;B&gt;  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;[*]&lt;/B&gt;     
+     *                            
+     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
+     *                            
+     *                             &lt;period &gt; ::= 
+     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;  [*]
+     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;  [*]
      * </pre>
      * 
      * </p>
@@ -647,8 +673,7 @@ public class FilterBuilderTest extends TestCase {
         // <attribute_name> AFTER <date-time expression>
         // -------------------------------------------------------------
         //
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_DATE);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_DATE);
 
         assertNotNull("Filter expected", resultFilter);
 
@@ -660,46 +685,38 @@ public class FilterBuilderTest extends TestCase {
         // <attribute_name> AFTER <period>
         // -------------------------------------------------------------
         // ATTR1 BEFORE 2006-11-31T01:30:00Z/2006-12-31T01:30:00Z
-        resultFilter = FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_PERIOD_BETWEEN_DATES);
+        resultFilter = FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_BETWEEN_DATES);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_BETWEEN_DATES);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_BETWEEN_DATES);
 
         assertEquals("greater filter ", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10D
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_PERIOD_DATE_DAYS);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_DAYS);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_DAYS);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_DAYS);
 
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10M
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_PERIOD_DATE_MONTH);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_MONTH);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_MONTH);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_MONTH);
 
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10Y
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS);
 
         assertEquals("greater filter", expected, resultFilter);
 
@@ -709,52 +726,43 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS_MONTH);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_YEARS_MONTH);
 
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/T5H
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_PERIOD_DATE_HOURS);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_HOURS);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_HOURS);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_HOURS);
 
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/T5M
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_PERIOD_DATE_MINUTES);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_MINUTES);
 
         assertNotNull("FilSter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_MINUTES);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_MINUTES);
 
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/T5S
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_PERIOD_DATE_SECONDS);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_SECONDS);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_SECONDS);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_SECONDS);
 
         assertEquals("greater filter", expected, resultFilter);
 
         // ATTR1 AFTER 2006-11-30T01:30:00Z/P10Y10M10DT5H5M5S
-        resultFilter = (Filter) FilterBuilder
-                .parse(FilterSample.FILTER_AFTER_PERIOD_DATE_YMD_HMS);
+        resultFilter = (Filter) FilterBuilder.parse(FilterSample.FILTER_AFTER_PERIOD_DATE_YMD_HMS);
 
         assertNotNull("Filter expected", resultFilter);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_YMD_HMS);
+        expected = FilterSample.getSample(FilterSample.FILTER_AFTER_PERIOD_DATE_YMD_HMS);
 
         assertEquals("greater filter", expected, resultFilter);
 
@@ -765,18 +773,18 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;text predicate &gt; ::= 
-     *         &lt;attribute name &gt; [ NOT ] LIKE  &lt;character pattern &gt; 
-     *   
-     *   For example:
-     *   
-     *   attribute like '%contains_this%'
-     *   attribute like 'begins_with_this%'
-     *   attribute like '%ends_with_this'
-     *   attribute like 'd_ve' will match 'dave' or 'dove'
-     *   attribute not like '%will_not_contain_this%'
-     *   attribute not like 'will_not_begin_with_this%'
-     *   attribute not like '%will_not_end_with_this'
+     *                             &lt;text predicate &gt; ::= 
+     *                                  &lt;attribute name &gt; [ NOT ] LIKE  &lt;character pattern &gt; 
+     *                            
+     *                            For example:
+     *                            
+     *                            attribute like '%contains_this%'
+     *                            attribute like 'begins_with_this%'
+     *                            attribute like '%ends_with_this'
+     *                            attribute like 'd_ve' will match 'dave' or 'dove'
+     *                            attribute not like '%will_not_contain_this%'
+     *                            attribute not like 'will_not_begin_with_this%'
+     *                            attribute not like '%will_not_end_with_this'
      * </pre>
      * 
      * </p>
@@ -811,10 +819,10 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *   This cql clause is an extension for convenience.
-     *   
-     *    &lt;between predicate &gt; ::= 
-     *         &lt;attribute name &gt; [ NOT ] BETWEEN  &lt;literal&amp; #62; AND  &lt; literal  &gt; 
+     *                            This cql clause is an extension for convenience.
+     *                            
+     *                             &lt;between predicate &gt; ::= 
+     *                                  &lt;attribute name &gt; [ NOT ] BETWEEN  &lt;literal&amp; #62; AND  &lt; literal  &gt; 
      * </pre>
      * 
      * </p>
@@ -863,16 +871,16 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;attribute name &gt; ::= 
-     *             &lt;simple attribute name &gt; 
-     *        |    &lt;compound attribute name &gt;
-     *        
-     *    &lt;simple attribute name &gt; ::=  &lt;identifier &gt;
-     *    &lt;compound attribute name &gt; ::=  &lt;identifier &gt; &lt;period &gt; [{ &lt;identifier &gt; &lt;period &gt;}...] &lt;simple attribute name &gt;     
-     *   
-     *    &lt;identifier &gt; ::=  &lt;identifier start [ {  &lt;colon &gt; |  &lt;identifier part &gt; }... ]
-     *    &lt;identifier start &gt; ::=  &lt;simple Latin letter &gt;
-     *    &lt;identifier part &gt; ::=  &lt;simple Latin letter &gt; |  &lt;digit &gt;
+     *                             &lt;attribute name &gt; ::= 
+     *                                      &lt;simple attribute name &gt; 
+     *                                 |    &lt;compound attribute name &gt;
+     *                                 
+     *                             &lt;simple attribute name &gt; ::=  &lt;identifier &gt;
+     *                             &lt;compound attribute name &gt; ::=  &lt;identifier &gt; &lt;period &gt; [{ &lt;identifier &gt; &lt;period &gt;}...] &lt;simple attribute name &gt;     
+     *                            
+     *                             &lt;identifier &gt; ::=  &lt;identifier start [ {  &lt;colon &gt; |  &lt;identifier part &gt; }... ]
+     *                             &lt;identifier start &gt; ::=  &lt;simple Latin letter &gt;
+     *                             &lt;identifier part &gt; ::=  &lt;simple Latin letter &gt; |  &lt;digit &gt;
      * </pre>
      * 
      * </p>
@@ -899,8 +907,7 @@ public class FilterBuilderTest extends TestCase {
 
             String expected = attSample.replace('.', '/');
 
-            result = (PropertyIsLike) FilterBuilder.parse(attSample
-                    + " LIKE 'abc%'");
+            result = (PropertyIsLike) FilterBuilder.parse(attSample + " LIKE 'abc%'");
 
             attResult = (PropertyName) result.getExpression();
 
@@ -917,13 +924,13 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;boolean value expression &gt; ::= 
-     *         &lt;boolean term &gt;
-     *    |    &lt;boolean value expression &gt; OR  &lt;boolean term &gt;
-     *    
-     *    &lt;boolean term &gt; ::= 
-     *         &lt;boolean factor &gt;
-     *   |     &lt;boolean term &gt; AND  &lt;boolean factor&gt;
+     *                             &lt;boolean value expression &gt; ::= 
+     *                                  &lt;boolean term &gt;
+     *                             |    &lt;boolean value expression &gt; OR  &lt;boolean term &gt;
+     *                             
+     *                             &lt;boolean term &gt; ::= 
+     *                                  &lt;boolean factor &gt;
+     *                            |     &lt;boolean term &gt; AND  &lt;boolean factor&gt;
      * </pre>
      * 
      * </p>
@@ -958,19 +965,16 @@ public class FilterBuilderTest extends TestCase {
 
         expected = FilterSample.getSample(FilterSample.FILTER_OR_AND);
 
-        assertEquals("(ATTR1 < 10 AND ATTR2 < 2 OR ATTR3 > 10) was expected",
-                expected, result);
+        assertEquals("(ATTR1 < 10 AND ATTR2 < 2 OR ATTR3 > 10) was expected", expected, result);
 
         // ATTR3 < 4 AND (ATT1 > 10 OR ATT2 < 2)
         result = FilterBuilder.parse(FilterSample.FILTER_OR_AND_PARENTHESIS);
 
         assertNotNull("filter expected", result);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_OR_AND_PARENTHESIS);
+        expected = FilterSample.getSample(FilterSample.FILTER_OR_AND_PARENTHESIS);
 
-        assertEquals("ATTR3 < 4 AND (ATT1 > 10 OR ATT2 < 2) was expected",
-                expected, result);
+        assertEquals("ATTR3 < 4 AND (ATT1 > 10 OR ATT2 < 2) was expected", expected, result);
 
         // ATTR3 < 4 AND (NOT( ATTR1 < 10 AND ATTR2 < 2))
         result = FilterBuilder.parse(FilterSample.FILTER_AND_NOT_AND);
@@ -979,21 +983,17 @@ public class FilterBuilderTest extends TestCase {
 
         expected = FilterSample.getSample(FilterSample.FILTER_AND_NOT_AND);
 
-        assertEquals(
-                "ATTR3 < 4 AND (NOT( ATTR1 < 10 AND ATTR2 < 2)) was expected",
-                expected, result);
+        assertEquals("ATTR3 < 4 AND (NOT( ATTR1 < 10 AND ATTR2 < 2)) was expected", expected,
+                result);
 
         // "ATTR1 < 1 AND (NOT (ATTR2 < 2)) AND ATTR3 < 3"
         result = FilterBuilder.parse(FilterSample.FILTER_AND_NOT_COMPARASION);
 
         assertNotNull("filter expected", result);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_AND_NOT_COMPARASION);
+        expected = FilterSample.getSample(FilterSample.FILTER_AND_NOT_COMPARASION);
 
-        assertEquals(
-                "ATTR1 < 4 AND (NOT (ATTR2 < 4)) AND ATTR3 < 4 was expected",
-                expected, result);
+        assertEquals("ATTR1 < 4 AND (NOT (ATTR2 < 4)) AND ATTR3 < 4 was expected", expected, result);
 
     }
 
@@ -1002,13 +1002,13 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *   
-     *    &lt;unary expression &gt; ::= 
-     *             &lt;Literal &gt;
-     *        |    &lt;Function &gt;
-     *        |    &lt;Attribute &gt;
-     *        |   ( &lt;Expression &gt;)
-     *        |   [ &lt;Expression &gt;]
+     *                            
+     *                             &lt;unary expression &gt; ::= 
+     *                                      &lt;Literal &gt;
+     *                                 |    &lt;Function &gt;
+     *                                 |    &lt;Attribute &gt;
+     *                                 |   ( &lt;Expression &gt;)
+     *                                 |   [ &lt;Expression &gt;]
      * </pre>
      * 
      * </p>
@@ -1023,8 +1023,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertNotNull("filter expected", result);
 
-        expected = FilterSample
-                .getSample(FilterSample.FILTER_WITH_FUNCTION_ABS);
+        expected = FilterSample.getSample(FilterSample.FILTER_WITH_FUNCTION_ABS);
 
         // TODO BUG in Geotools method equals in Functions
         /*
@@ -1039,25 +1038,25 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;routine invocation &gt; ::= 
-     *           &lt;geoop name &gt; &lt;georoutine argument list &gt;[*]
-     *        |  &lt;relgeoop name &gt; &lt;relgeoop argument list &gt;
-     *        |  &lt;routine name &gt; &lt;argument list &gt;
-     *        
-     *    &lt;geoop name &gt; ::= 
-     *        EQUAL | DISJOINT | INTERSECT | TOUCH | CROSS | [*]
-     *        WITHIN | CONTAINS |OVERLAP | RELATE [*]
-     *   
-     *   That rule is extended with bbox for convenience.
-     *  
-     *    &lt;bbox argument list &gt;::= 
-     *    &quot;(&quot;  &lt;attribute &gt; &quot;,&quot; &lt;min X &gt; &quot;,&quot; &lt;min Y &gt; &quot;,&quot; &lt;max X &gt; &quot;,&quot; &lt;max Y &gt;[&quot;,&quot;  &lt;srs &gt;] &quot;)&quot;
-     *   
-     *    &lt;min X &gt; ::=  &lt;signed numerical literal &gt; 
-     *    &lt;min Y &gt; ::=  &lt;signed numerical literal &gt; 
-     *    &lt;max X &gt; ::=  &lt;signed numerical literal &gt; 
-     *    &lt;max Y &gt; ::=  &lt;signed numerical literal &gt;
-     *    &lt;srs &gt; ::=  
+     *                             &lt;routine invocation &gt; ::= 
+     *                                    &lt;geoop name &gt; &lt;georoutine argument list &gt;[*]
+     *                                 |  &lt;relgeoop name &gt; &lt;relgeoop argument list &gt;
+     *                                 |  &lt;routine name &gt; &lt;argument list &gt;
+     *                                 
+     *                             &lt;geoop name &gt; ::= 
+     *                                 EQUAL | DISJOINT | INTERSECT | TOUCH | CROSS | [*]
+     *                                 WITHIN | CONTAINS |OVERLAP | RELATE [*]
+     *                            
+     *                            That rule is extended with bbox for convenience.
+     *                           
+     *                             &lt;bbox argument list &gt;::= 
+     *                             &quot;(&quot;  &lt;attribute &gt; &quot;,&quot; &lt;min X &gt; &quot;,&quot; &lt;min Y &gt; &quot;,&quot; &lt;max X &gt; &quot;,&quot; &lt;max Y &gt;[&quot;,&quot;  &lt;srs &gt;] &quot;)&quot;
+     *                            
+     *                             &lt;min X &gt; ::=  &lt;signed numerical literal &gt; 
+     *                             &lt;min Y &gt; ::=  &lt;signed numerical literal &gt; 
+     *                             &lt;max X &gt; ::=  &lt;signed numerical literal &gt; 
+     *                             &lt;max Y &gt; ::=  &lt;signed numerical literal &gt;
+     *                             &lt;srs &gt; ::=  
      * </pre>
      * 
      * </p>
@@ -1074,8 +1073,7 @@ public class FilterBuilderTest extends TestCase {
 
         resultFilter = FilterBuilder.parse("INTERSECT(ATTR1, POINT(1 2))");
 
-        assertTrue("Intersects was expected",
-                resultFilter instanceof Intersects);
+        assertTrue("Intersects was expected", resultFilter instanceof Intersects);
 
         resultFilter = FilterBuilder.parse("TOUCH(ATTR1, POINT(1 2))");
 
@@ -1098,8 +1096,7 @@ public class FilterBuilderTest extends TestCase {
 
         assertTrue("BBox was expected", resultFilter instanceof BBOX);
 
-        resultFilter = FilterBuilder
-                .parse("BBOX(ATTR1, 10,20,30,40, 'EPSG:4326')");
+        resultFilter = FilterBuilder.parse("BBOX(ATTR1, 10,20,30,40, 'EPSG:4326')");
 
         assertTrue("BBox was expected", resultFilter instanceof BBOX);
 
@@ -1120,13 +1117,13 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;routine invocation &gt; ::= 
-     *           &lt;geoop name &gt; &lt;georoutine argument list &gt;
-     *        |  &lt;relgeoop name &gt; &lt;relgeoop argument list &gt; [*]
-     *        |  &lt;routine name &gt; &lt;argument list &gt;
-     *        
-     *    &lt;relgeoop name &gt; ::= 
-     *        DWITHIN | BEYON [*]
+     *                             &lt;routine invocation &gt; ::= 
+     *                                    &lt;geoop name &gt; &lt;georoutine argument list &gt;
+     *                                 |  &lt;relgeoop name &gt; &lt;relgeoop argument list &gt; [*]
+     *                                 |  &lt;routine name &gt; &lt;argument list &gt;
+     *                                 
+     *                             &lt;relgeoop name &gt; ::= 
+     *                                 DWITHIN | BEYON [*]
      * </pre>
      * 
      * </p>
@@ -1135,16 +1132,14 @@ public class FilterBuilderTest extends TestCase {
 
         Filter resultFilter;
 
-        resultFilter = FilterBuilder
-                .parse("DWITHIN(ATTR1, POINT(1 2), 10, kilometers)");
+        resultFilter = FilterBuilder.parse("DWITHIN(ATTR1, POINT(1 2), 10, kilometers)");
 
         assertTrue(resultFilter instanceof DistanceBufferOperator);
 
         // test compound attribute gmd:aa:bb.gmd:cc.gmd:dd
         final String prop = "gmd:aa:bb.gmd:cc.gmd:dd";
         final String propExpected = "gmd:aa:bb/gmd:cc/gmd:dd";
-        resultFilter = FilterBuilder.parse("DWITHIN(" + prop
-                + ", POINT(1 2), 10, kilometers) ");
+        resultFilter = FilterBuilder.parse("DWITHIN(" + prop + ", POINT(1 2), 10, kilometers) ");
 
         assertTrue("DistanceBufferOperator filter was expected",
                 resultFilter instanceof DistanceBufferOperator);
@@ -1162,15 +1157,15 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *    &lt;geometry literal &gt; := 
-     *           &lt;Point Tagged Text &gt; 
-     *        |  &lt;LineString Tagged Text &gt;
-     *        |  &lt;Polygon Tagged Text &gt;
-     *        |  &lt;MultiPoint Tagged Text &gt;
-     *        |  &lt;MultiLineString Tagged Text &gt;
-     *        |  &lt;MultiPolygon Tagged Text &gt;
-     *        |  &lt;GeometryCollection Tagged Text &gt;
-     *        |  &lt;Envelope Tagged Text &gt;     
+     *                             &lt;geometry literal &gt; := 
+     *                                    &lt;Point Tagged Text &gt; 
+     *                                 |  &lt;LineString Tagged Text &gt;
+     *                                 |  &lt;Polygon Tagged Text &gt;
+     *                                 |  &lt;MultiPoint Tagged Text &gt;
+     *                                 |  &lt;MultiLineString Tagged Text &gt;
+     *                                 |  &lt;MultiPolygon Tagged Text &gt;
+     *                                 |  &lt;GeometryCollection Tagged Text &gt;
+     *                                 |  &lt;Envelope Tagged Text &gt;     
      * </pre>
      * 
      * </p>
@@ -1181,8 +1176,7 @@ public class FilterBuilderTest extends TestCase {
         Literal geom;
 
         // Point
-        result = (BinarySpatialOperator) FilterBuilder
-                .parse("CROSS(ATTR1, POINT(1 2))");
+        result = (BinarySpatialOperator) FilterBuilder.parse("CROSS(ATTR1, POINT(1 2))");
 
         geom = (Literal) result.getExpression2();
 
@@ -1265,8 +1259,7 @@ public class FilterBuilderTest extends TestCase {
 
         } catch (ParseException e) {
 
-            String error = FilterBuilder.getFormattedErrorMessage(e,
-                    filterError);
+            String error = FilterBuilder.getFormattedErrorMessage(e, filterError);
             assertFalse("".equals(error));
             // LOGGER.info( error);
         }
@@ -1278,19 +1271,98 @@ public class FilterBuilderTest extends TestCase {
         Expression expression = FilterBuilder.parseExpression("attName");
         assertNotNull(expression);
         assertTrue(expression instanceof PropertyName);
-        assertEquals("attName", ((PropertyName)expression).getPropertyName());
-        
-        
+        assertEquals("attName", ((PropertyName) expression).getPropertyName());
+
         expression = FilterBuilder.parseExpression("a + b + x.y.z");
         assertNotNull(expression);
         assertTrue(expression instanceof Add);
-        
+
         Add add = (Add) expression;
         Expression e1 = add.getExpression1();
         Expression e2 = add.getExpression2();
-        
+
         assertTrue(e1 instanceof Add);
         assertTrue(e2 instanceof PropertyName);
-        assertEquals("x/y/z", ((PropertyName)e2).getPropertyName());
+        assertEquals("x/y/z", ((PropertyName) e2).getPropertyName());
+    }
+
+    public void testParseFilterListSingleFilter() throws ParseException {
+        String valueWithDelimiter = "text" + FilterBuilder.DELIMITER + "with"
+                + FilterBuilder.DELIMITER + "delimiter";
+        final String singleFilterStr = "attr3 = '" + valueWithDelimiter + "'";
+        List filters = FilterBuilder.parseFilterList(null, singleFilterStr);
+        assertNotNull(filters);
+        assertEquals(1, filters.size());
+        assertTrue(filters.get(0) instanceof PropertyIsEqualTo);
+        PropertyIsEqualTo filter = (PropertyIsEqualTo) filters.get(0);
+        assertEquals("attr3", ((PropertyName) filter.getExpression1()).getPropertyName());
+        assertEquals(valueWithDelimiter, ((Literal) filter.getExpression2()).getValue());
+    }
+
+    public void testParseFilterListWithDelimiter() throws ParseException {
+        String valueWithDelimiter = "text" + FilterBuilder.DELIMITER + "with"
+                + FilterBuilder.DELIMITER + "delimiter";
+
+        // if delimiter is '|':
+        // "attr1 > 5|attr2 between 1 and 7|attr3 = 'text|with|delimiter'"
+        final String filterListStr = "attr1 > 5" + FilterBuilder.DELIMITER
+                + "attr2 between 1 and 7" + FilterBuilder.DELIMITER + "attr3 = '"
+                + valueWithDelimiter + "'";
+        List filters = FilterBuilder.parseFilterList(null, filterListStr);
+        assertNotNull(filters);
+        assertEquals(3, filters.size());
+        assertTrue(filters.get(0) instanceof PropertyIsGreaterThan);
+        assertTrue(filters.get(1) instanceof PropertyIsBetween);
+        assertTrue(filters.get(2) instanceof PropertyIsEqualTo);
+
+        PropertyIsGreaterThan gt = (PropertyIsGreaterThan) filters.get(0);
+        assertEquals("attr1", ((PropertyName) gt.getExpression1()).getPropertyName());
+        assertEquals(new Integer(5), ((Literal) gt.getExpression2()).getValue());
+
+        PropertyIsBetween btw = (PropertyIsBetween) filters.get(1);
+        assertEquals("attr2", ((PropertyName) btw.getExpression()).getPropertyName());
+        assertEquals(new Integer(1), ((Literal) btw.getLowerBoundary()).getValue());
+        assertEquals(new Integer(7), ((Literal) btw.getUpperBoundary()).getValue());
+
+        PropertyIsEqualTo equals = (PropertyIsEqualTo) filters.get(2);
+        assertEquals("attr3", ((PropertyName) equals.getExpression1()).getPropertyName());
+        assertEquals(valueWithDelimiter, ((Literal) equals.getExpression2()).getValue());
+    }
+
+    /**
+     * An empty filter int the constraints list shall be parsed as
+     * {@link Filter#INCLUDE}
+     * 
+     * @throws ParseException
+     */
+    public void testParseFilterListWithEmptyFilter() throws ParseException {
+        String valueWithDelimiter = "text" + FilterBuilder.DELIMITER + "with"
+                + FilterBuilder.DELIMITER + "delimiter";
+
+        // if delimiter is |, "attr1 > 5|INCLUDE|attr3 = 'text|with|delimiter'"
+        String filterListStr = "attr1 > 5" + FilterBuilder.DELIMITER + "INCLUDE"
+                + FilterBuilder.DELIMITER + " attr3 = '" + valueWithDelimiter + "'";
+        List filters = FilterBuilder.parseFilterList(null, filterListStr);
+        assertNotNull(filters);
+        assertEquals(3, filters.size());
+        assertTrue(filters.get(0) instanceof PropertyIsGreaterThan);
+        assertTrue(filters.get(1) instanceof IncludeFilter);
+        assertTrue(filters.get(2) instanceof PropertyIsEqualTo);
+
+        PropertyIsGreaterThan gt = (PropertyIsGreaterThan) filters.get(0);
+        assertEquals("attr1", ((PropertyName) gt.getExpression1()).getPropertyName());
+        assertEquals(new Integer(5), ((Literal) gt.getExpression2()).getValue());
+
+        PropertyIsEqualTo equals = (PropertyIsEqualTo) filters.get(2);
+        assertEquals("attr3", ((PropertyName) equals.getExpression1()).getPropertyName());
+        assertEquals(valueWithDelimiter, ((Literal) equals.getExpression2()).getValue());
+
+        filterListStr = "EXCLUDE" + FilterBuilder.DELIMITER + "INCLUDE" + FilterBuilder.DELIMITER
+                + "attr3 = '" + valueWithDelimiter + "'";
+
+        filters = FilterBuilder.parseFilterList(null, filterListStr);
+        assertTrue(filters.get(0) instanceof ExcludeFilter);
+        assertTrue(filters.get(1) instanceof IncludeFilter);
+        assertTrue(filters.get(2) instanceof PropertyIsEqualTo);
     }
 }

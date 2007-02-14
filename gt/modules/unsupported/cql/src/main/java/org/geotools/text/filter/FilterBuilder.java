@@ -23,18 +23,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.filter.FilterFactoryImpl;
 import org.geotools.filter.FilterTransformer;
 import org.geotools.filter.IllegalFilterException;
-import org.geotools.text.filter.CQLParser;
-import org.geotools.text.filter.CQLParserTreeConstants;
-import org.geotools.text.filter.Node;
-import org.geotools.text.filter.ParseException;
-import org.geotools.text.filter.Token;
-import org.geotools.text.filter.TokenMgrError;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.Filter;
@@ -97,6 +92,8 @@ import com.vividsolutions.jts.io.WKTReader;
  */
 public class FilterBuilder {
 
+    public static final String DELIMITER = "|";
+
     /**
      * Parses the input string in OGC CQL format into a Filter, using the
      * provided FilterFactory.
@@ -109,8 +106,8 @@ public class FilterBuilder {
      * @return a {@link Filter} equivalent to the constraint specified in
      *         <code>input</code>.
      */
-    public static org.opengis.filter.Filter parse(FilterFactory filterFactory,
-            String input) throws ParseException {
+    public static org.opengis.filter.Filter parse(FilterFactory filterFactory, String input)
+            throws ParseException {
 
         if (filterFactory == null) {
             filterFactory = CommonFactoryFinder.getFilterFactory((Hints) null);
@@ -130,6 +127,26 @@ public class FilterBuilder {
         return builtFilter;
     }
 
+    public static List parseFilterList(FilterFactory filterFactory, String input)
+            throws ParseException {
+
+        if (filterFactory == null) {
+            filterFactory = CommonFactoryFinder.getFilterFactory((Hints) null);
+        }
+
+        CQLCompiler c = new CQLCompiler(input, filterFactory);
+        try {
+            c.MultipleCompilationUnit();
+        } catch (TokenMgrError tme) {
+            throw new FilterBuilderException(tme.getMessage() + ": " + input, c.getToken(0));
+        }
+        if (c.exception != null)
+            throw c.exception;
+
+        List results = c.getResults();
+        return results;
+    }
+
     /**
      * Parses the input string in OGC CQL format into a Filter, using the
      * systems default FilterFactory implementation.
@@ -139,8 +156,7 @@ public class FilterBuilder {
      * @return a {@link Filter} equivalent to the constraint specified in
      *         <code>input</code>.
      */
-    public static org.opengis.filter.Filter parse(String input)
-            throws ParseException {
+    public static org.opengis.filter.Filter parse(String input) throws ParseException {
         return parse(null, input);
     }
 
@@ -185,8 +201,8 @@ public class FilterBuilder {
      * @return a {@link Expression} equivalent to the one specified in
      *         <code>input</code>.
      */
-    public static org.opengis.filter.expression.Expression parseExpression(
-            String input) throws ParseException {
+    public static org.opengis.filter.expression.Expression parseExpression(String input)
+            throws ParseException {
         return parseExpression(null, input);
     }
 
@@ -194,8 +210,7 @@ public class FilterBuilder {
      * Returns a formatted error string, showing the original input, along with
      * a pointer to the location of the error and the error message itself.
      */
-    public static String getFormattedErrorMessage(ParseException pe,
-            String input) {
+    public static String getFormattedErrorMessage(ParseException pe, String input) {
 
         StringBuffer sb = new StringBuffer(input);
         sb.append('\n');
@@ -211,8 +226,7 @@ public class FilterBuilder {
         return sb.toString();
     }
 
-    private static class CQLCompiler extends CQLParser implements
-            CQLParserTreeConstants {
+    private static class CQLCompiler extends CQLParser implements CQLParserTreeConstants {
 
         private static final String ATTRIBUTE_PATH_SEPARATOR = "/";
 
@@ -237,13 +251,34 @@ public class FilterBuilder {
         }
 
         /**
-         * @return either an Expression or a Filter, depending on what
-         * the product of the compilation unit was
+         * @return either an Expression or a Filter, depending on what the
+         *         product of the compilation unit was
+         * @throws FilterBuilderException
          */
-        public Object getResult() {
+        public Object getResult() throws FilterBuilderException {
             Result item = resultStack.peek();
             Object result = item.getBuilt();
             return result;
+        }
+
+        /**
+         * Returns the list of Filters built as the result of calling
+         * {@link #MultipleCompilationUnit()}
+         * 
+         * @return
+         * @throws FilterBuilderException
+         *             if a ClassCastException occurs while casting a built item
+         *             to a Filter.
+         */
+        public List getResults() throws FilterBuilderException {
+            int size = resultStack.size();
+            List results = new ArrayList(size);
+            for (int i = 0; i < size; i++) {
+                Result item = resultStack.popResult();
+                Object result = item.getBuilt();
+                results.add(0, result);
+            }
+            return results;
         }
 
         public void jjtreeOpenNodeScope(Node n) {
@@ -262,13 +297,11 @@ public class FilterBuilder {
             }
         }
 
-        private org.opengis.filter.expression.BinaryExpression buildBinaryExpression(
-                int nodeType) throws FilterBuilderException {
+        private org.opengis.filter.expression.BinaryExpression buildBinaryExpression(int nodeType)
+                throws FilterBuilderException {
 
-            org.opengis.filter.expression.Expression right = resultStack
-                    .popExpression();
-            org.opengis.filter.expression.Expression left = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression right = resultStack.popExpression();
+            org.opengis.filter.expression.Expression left = resultStack.popExpression();
 
             org.opengis.filter.expression.BinaryExpression expr = null;
             switch (nodeType) {
@@ -303,32 +336,50 @@ public class FilterBuilder {
                 case JJTBOOLEAN_AND_NODE:
                     right = resultStack.popFilter();
                     left = resultStack.popFilter();
-
-                    logicFilter = filterFactory.and(left, right);
+                    if (Filter.INCLUDE.equals(right)) {
+                        logicFilter = left;
+                    } else if (Filter.INCLUDE.equals(left)) {
+                        logicFilter = right;
+                    } else if (Filter.EXCLUDE.equals(right) || Filter.EXCLUDE.equals(left)) {
+                        logicFilter = Filter.EXCLUDE;
+                    } else {
+                        logicFilter = filterFactory.and(left, right);
+                    }
                     break;
 
                 case JJTBOOLEAN_OR_NODE:
                     right = resultStack.popFilter();
                     left = resultStack.popFilter();
-                    logicFilter = filterFactory.or(left, right);
+                    if (Filter.INCLUDE.equals(right) || Filter.INCLUDE.equals(left)) {
+                        logicFilter = Filter.INCLUDE;
+                    } else if (Filter.EXCLUDE.equals(left)) {
+                        logicFilter = right;
+                    } else if (Filter.EXCLUDE.equals(right)) {
+                        logicFilter = left;
+                    } else {
+                        logicFilter = filterFactory.or(left, right);
+                    }
                     break;
 
                 case JJTBOOLEAN_NOT_NODE:
-
                     right = resultStack.popFilter();
-                    logicFilter = filterFactory.not(right);
+                    if (Filter.INCLUDE.equals(right)) {
+                        logicFilter = Filter.EXCLUDE;
+                    } else if (Filter.EXCLUDE.equals(right)) {
+                        logicFilter = Filter.INCLUDE;
+                    } else {
+                        logicFilter = filterFactory.not(right);
+                    }
                     break;
 
                 default:
                     throw new FilterBuilderException(
-                            "Expression not supported. And, Or, Not is required",
-                            getToken(0));
+                            "Expression not supported. And, Or, Not is required", getToken(0));
                 }
 
                 return logicFilter;
             } catch (IllegalFilterException ife) {
-                throw new FilterBuilderException(
-                        "Exception building LogicFilter", getToken(0), ife);
+                throw new FilterBuilderException("Exception building LogicFilter", getToken(0), ife);
             }
         }
 
@@ -339,19 +390,16 @@ public class FilterBuilder {
             final String ESCAPE = "\\";
 
             try {
-                org.opengis.filter.expression.Expression pattern = resultStack
-                        .popExpression();
-                org.opengis.filter.expression.Expression expr = resultStack
-                        .popExpression();
+                org.opengis.filter.expression.Expression pattern = resultStack.popExpression();
+                org.opengis.filter.expression.Expression expr = resultStack.popExpression();
 
-                PropertyIsLike f = filterFactory.like(expr, pattern.toString(),
-                        WC_MULTI, WC_SINGLE, ESCAPE);
+                PropertyIsLike f = filterFactory.like(expr, pattern.toString(), WC_MULTI,
+                        WC_SINGLE, ESCAPE);
 
                 return f;
 
             } catch (IllegalFilterException ife) {
-                throw new FilterBuilderException(
-                        "Exception building LikeFilter", getToken(0), ife);
+                throw new FilterBuilderException("Exception building LikeFilter", getToken(0), ife);
             }
         }
 
@@ -361,20 +409,18 @@ public class FilterBuilder {
          * @return PropertyIsNull
          * @throws FilterBuilderException
          */
-        private PropertyIsNull buildPropertyIsNull()
-                throws FilterBuilderException {
+        private PropertyIsNull buildPropertyIsNull() throws FilterBuilderException {
 
             try {
-                org.opengis.filter.expression.Expression property = resultStack
-                        .popExpression();
+                org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
                 PropertyIsNull filter = filterFactory.isNull(property);
 
                 return filter;
 
             } catch (FilterBuilderException e) {
-                throw new FilterBuilderException(
-                        "Exception building Null Predicate", getToken(0), e);
+                throw new FilterBuilderException("Exception building Null Predicate", getToken(0),
+                        e);
             }
 
         }
@@ -387,21 +433,17 @@ public class FilterBuilder {
          */
         private PropertyIsBetween buildBetween() throws FilterBuilderException {
             try {
-                org.opengis.filter.expression.Expression sup = resultStack
-                        .popExpression();
-                org.opengis.filter.expression.Expression inf = resultStack
-                        .popExpression();
-                org.opengis.filter.expression.Expression expr = resultStack
-                        .popExpression();
+                org.opengis.filter.expression.Expression sup = resultStack.popExpression();
+                org.opengis.filter.expression.Expression inf = resultStack.popExpression();
+                org.opengis.filter.expression.Expression expr = resultStack.popExpression();
 
-                PropertyIsBetween filter = filterFactory
-                        .between(expr, inf, sup);
+                PropertyIsBetween filter = filterFactory.between(expr, inf, sup);
 
                 return filter;
 
             } catch (IllegalFilterException ife) {
-                throw new FilterBuilderException(
-                        "Exception building CompareFilter", getToken(0), ife);
+                throw new FilterBuilderException("Exception building CompareFilter", getToken(0),
+                        ife);
             }
         }
 
@@ -421,12 +463,10 @@ public class FilterBuilder {
             // note, these should never throw because the parser grammar
             // constrains input before we ever reach here!
             case JJTINTEGERNODE:
-                return filterFactory.literal(Integer
-                        .parseInt(getToken(0).image));
+                return filterFactory.literal(Integer.parseInt(getToken(0).image));
 
             case JJTFLOATINGNODE:
-                return filterFactory.literal(Double
-                        .parseDouble(getToken(0).image));
+                return filterFactory.literal(Double.parseDouble(getToken(0).image));
 
             case JJTSTRINGNODE:
                 return filterFactory.literal(n.getToken().image);
@@ -476,14 +516,14 @@ public class FilterBuilder {
                 // ----------------------------------------
                 // Compare predicate actions
                 // ----------------------------------------
-            case JJTCOMPARATIONPREDICATE_EQ_NODE:
-            case JJTCOMPARATIONPREDICATE_GT_NODE:
-            case JJTCOMPARATIONPREDICATE_LT_NODE:
-            case JJTCOMPARATIONPREDICATE_GTE_NODE:
-            case JJTCOMPARATIONPREDICATE_LTE_NODE:
+            case JJTCOMPARISSONPREDICATE_EQ_NODE:
+            case JJTCOMPARISSONPREDICATE_GT_NODE:
+            case JJTCOMPARISSONPREDICATE_LT_NODE:
+            case JJTCOMPARISSONPREDICATE_GTE_NODE:
+            case JJTCOMPARISSONPREDICATE_LTE_NODE:
                 return buildBinaryComparasionOperator(n.getType());
-            case JJTCOMPARATIONPREDICATE_NOT_EQUAL_NODE:
-                Filter eq = buildBinaryComparasionOperator(JJTCOMPARATIONPREDICATE_EQ_NODE);
+            case JJTCOMPARISSONPREDICATE_NOT_EQUAL_NODE:
+                Filter eq = buildBinaryComparasionOperator(JJTCOMPARISSONPREDICATE_EQ_NODE);
                 Not notFilter = filterFactory.not(eq);
                 return notFilter;
 
@@ -582,19 +622,20 @@ public class FilterBuilder {
                 return buildGeometry(n.getToken());
             case JJTENVELOPETAGGEDTEXT_NODE:
                 return buildEnvelop(n.getToken());
-
-                // Unsupported (for now) TODO revisar!!
+            case JJTINCLUDE_NODE:
+                return Filter.INCLUDE;
+            case JJTEXCLUDE_NODE:
+                return Filter.EXCLUDE;
             case JJTTRUENODE:
+                return filterFactory.literal(Boolean.TRUE);
             case JJTFALSENODE:
-                throw new FilterBuilderException("Unsupported syntax",
-                        getToken(0));
+                return filterFactory.literal(Boolean.FALSE);
             }
 
             return null;
         }
 
-        private PropertyName buildCompoundAttribute()
-                throws FilterBuilderException {
+        private PropertyName buildCompoundAttribute() throws FilterBuilderException {
 
             ArrayList arrayIdentifiers = new ArrayList();
 
@@ -620,8 +661,7 @@ public class FilterBuilder {
             }
             attribute.append(arrayIdentifiers.get(i));
 
-            PropertyName property = filterFactory
-                    .property(attribute.toString());
+            PropertyName property = filterFactory.property(attribute.toString());
 
             return property;
         }
@@ -636,8 +676,7 @@ public class FilterBuilder {
                 while (resultStack.size() > 0) {
 
                     Result r = resultStack.peek();
-                    if (!((r.getNodeType() == JJTIDENTIFIER_START_NODE) || (r
-                            .getNodeType() == JJTIDENTIFIER_PART_NODE))) {
+                    if (!((r.getNodeType() == JJTIDENTIFIER_START_NODE) || (r.getNodeType() == JJTIDENTIFIER_PART_NODE))) {
                         break;
                     }
                     String part = resultStack.popIdentifierPart();
@@ -661,8 +700,7 @@ public class FilterBuilder {
 
             } catch (FilterBuilderException e) {
 
-                throw new FilterBuilderException("Fail builing identifier: "
-                        + e.getMessage());
+                throw new FilterBuilderException("Fail builing identifier: " + e.getMessage());
             }
         }
 
@@ -679,8 +717,7 @@ public class FilterBuilder {
             return part;
         }
 
-        private PropertyName buildSimpleAttribute()
-                throws FilterBuilderException {
+        private PropertyName buildSimpleAttribute() throws FilterBuilderException {
 
             // Only retrieve the identifier built before
             String identifier = resultStack.popIdentifier();
@@ -706,8 +743,7 @@ public class FilterBuilder {
                 tolerance = resultStack.popLiteral();
                 return tolerance;
             } catch (NumberFormatException e) {
-                throw new FilterBuilderException("Unsupported number format",
-                        token);
+                throw new FilterBuilderException("Unsupported number format", token);
             }
         }
 
@@ -719,13 +755,12 @@ public class FilterBuilder {
          * @return Filter (must be BinarySpatialOperator) // FIXME see equals
          * @throws FilterBuilderException
          */
-        private BinarySpatialOperator buildBinarySpatialOperator(
-                final int nodeType) throws FilterBuilderException {
+        private BinarySpatialOperator buildBinarySpatialOperator(final int nodeType)
+                throws FilterBuilderException {
 
             Literal geom = resultStack.popLiteral();
 
-            org.opengis.filter.expression.Expression property = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
             FilterFactory2 ff = (FilterFactory2) filterFactory;// TODO
             // expecting
@@ -769,8 +804,7 @@ public class FilterBuilder {
                 break;
 
             default:
-                throw new FilterBuilderException(
-                        "Binary spatial operator unexpected");
+                throw new FilterBuilderException("Binary spatial operator unexpected");
             }
 
             return filter;
@@ -794,14 +828,14 @@ public class FilterBuilder {
 
                 // CRS.decode(srs); FIXME bug in geotools
 
-                org.opengis.filter.spatial.BBOX bbox = filterFactory.bbox(
-                        strProperty, minX, minY, maxX, maxY, srs);
+                org.opengis.filter.spatial.BBOX bbox = filterFactory.bbox(strProperty, minX, minY,
+                        maxX, maxY, srs);
                 return bbox;
 
             } catch (Exception e) {
 
-                throw new FilterBuilderException("Fails building BBOX filter ("
-                        + e.getMessage() + ")");
+                throw new FilterBuilderException("Fails building BBOX filter (" + e.getMessage()
+                        + ")");
             }
 
         }
@@ -813,18 +847,16 @@ public class FilterBuilder {
          * @return DistanceBufferOperator dwithin and beyond filters
          * @throws FilterBuilderException
          */
-        private DistanceBufferOperator buildDistanceBufferOperator(
-                final int nodeType) throws FilterBuilderException {
+        private DistanceBufferOperator buildDistanceBufferOperator(final int nodeType)
+                throws FilterBuilderException {
 
             String unit = resultStack.popStringValue();
 
             double tolerance = resultStack.popDoubleValue();
 
-            org.opengis.filter.expression.Expression geom = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression geom = resultStack.popExpression();
 
-            org.opengis.filter.expression.Expression property = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
             FilterFactory2 ff = (FilterFactory2) filterFactory;// TODO
             // expecting
@@ -845,8 +877,7 @@ public class FilterBuilder {
                 break;
 
             default:
-                throw new FilterBuilderException(
-                        "Binary spatial operator unexpected");
+                throw new FilterBuilderException("Binary spatial operator unexpected");
             }
 
             return filter;
@@ -858,8 +889,7 @@ public class FilterBuilder {
          * @return PropertyIsEqualTo
          * @throws FilterBuilderException
          */
-        private PropertyIsEqualTo buildPropertyExists()
-                throws FilterBuilderException {
+        private PropertyIsEqualTo buildPropertyExists() throws FilterBuilderException {
 
             PropertyName property = resultStack.popPropertyName();
 
@@ -869,8 +899,7 @@ public class FilterBuilder {
             Function function = filterFactory.function("PropertyExists", args);
             Literal literalTrue = filterFactory.literal(Boolean.TRUE);
 
-            PropertyIsEqualTo propExistsFilter = filterFactory.equals(function,
-                    literalTrue);
+            PropertyIsEqualTo propExistsFilter = filterFactory.equals(function, literalTrue);
 
             return propExistsFilter;
         }
@@ -890,8 +919,7 @@ public class FilterBuilder {
                 break;
             default:
                 throw new FilterBuilderException(
-                        "unexpeted date time expression in temporal predicate.",
-                        node.getToken());
+                        "unexpeted date time expression in temporal predicate.", node.getToken());
             }
             return filter;
         }
@@ -911,8 +939,7 @@ public class FilterBuilder {
                 break;
             default:
                 throw new FilterBuilderException(
-                        "unexpeted date time expression in temporal predicate.",
-                        node.getToken());
+                        "unexpeted date time expression in temporal predicate.", node.getToken());
             }
             return filter;
         }
@@ -937,8 +964,7 @@ public class FilterBuilder {
                 return literalDate;
 
             } catch (java.text.ParseException e) {
-                throw new FilterBuilderException(
-                        "Unsupported date time format", token);
+                throw new FilterBuilderException("Unsupported date time format", token);
             }
         }
 
@@ -949,14 +975,11 @@ public class FilterBuilder {
          * 
          * @throws FilterBuilderException
          */
-        private PeriodNode buildPeriodBetweenDates()
-                throws FilterBuilderException {
+        private PeriodNode buildPeriodBetweenDates() throws FilterBuilderException {
 
-            org.opengis.filter.expression.Literal end = resultStack
-                    .popLiteral();
+            org.opengis.filter.expression.Literal end = resultStack.popLiteral();
 
-            org.opengis.filter.expression.Literal begin = resultStack
-                    .popLiteral();
+            org.opengis.filter.expression.Literal begin = resultStack.popLiteral();
 
             PeriodNode period = PeriodNode.createPeriodDateAndDate(begin, end);
 
@@ -969,15 +992,14 @@ public class FilterBuilder {
          * @return PeriodNode
          * @throws FilterBuilderException
          */
-        private PeriodNode buildPeriodDurationAndDate()
-                throws FilterBuilderException {
+        private PeriodNode buildPeriodDurationAndDate() throws FilterBuilderException {
 
             Literal date = resultStack.popLiteral();
 
             Literal duration = resultStack.popLiteral();
 
-            PeriodNode period = PeriodNode.createPeriodDurationAndDate(
-                    duration, date, filterFactory);
+            PeriodNode period = PeriodNode.createPeriodDurationAndDate(duration, date,
+                    filterFactory);
 
             return period;
         }
@@ -988,15 +1010,14 @@ public class FilterBuilder {
          * @return PeriodNode
          * @throws FilterBuilderException
          */
-        private PeriodNode buildPeriodDateAndDuration()
-                throws FilterBuilderException {
+        private PeriodNode buildPeriodDateAndDuration() throws FilterBuilderException {
 
             Literal duration = resultStack.popLiteral();
 
             Literal date = resultStack.popLiteral();
 
-            PeriodNode period = PeriodNode.createPeriodDateAndDuration(date,
-                    duration, filterFactory);
+            PeriodNode period = PeriodNode.createPeriodDateAndDuration(date, duration,
+                    filterFactory);
 
             return period;
         }
@@ -1010,8 +1031,7 @@ public class FilterBuilder {
 
             Token token = getToken(0);
             String duration = token.image;
-            org.opengis.filter.expression.Literal literalDuration = filterFactory
-                    .literal(duration);
+            org.opengis.filter.expression.Literal literalDuration = filterFactory.literal(duration);
 
             return literalDuration;
 
@@ -1034,7 +1054,7 @@ public class FilterBuilder {
 
             switch (node.getNodeType()) {
             case JJTDATETIME_NODE:
-                filter = buildBinaryComparasionOperator(JJTCOMPARATIONPREDICATE_LT_NODE);
+                filter = buildBinaryComparasionOperator(JJTCOMPARISSONPREDICATE_LT_NODE);
                 break;
             case JJTPERIOD_BETWEEN_DATES_NODE:
             case JJTPERIOD_WITH_DATE_DURATION_NODE:
@@ -1044,8 +1064,7 @@ public class FilterBuilder {
 
             default:
                 throw new FilterBuilderException(
-                        "unexpeted date time expression in temporal predicate.",
-                        node.getToken());
+                        "unexpeted date time expression in temporal predicate.", node.getToken());
             }
             return filter;
         }
@@ -1057,8 +1076,7 @@ public class FilterBuilder {
          * @throws FilterBuilderException
          * @throws FilterBuilderException
          */
-        private Object buildTemporalPredicateDuring()
-                throws FilterBuilderException {
+        private Object buildTemporalPredicateDuring() throws FilterBuilderException {
 
             org.opengis.filter.Filter filter = null;
 
@@ -1073,8 +1091,7 @@ public class FilterBuilder {
                 break;
             default:
                 throw new FilterBuilderException(
-                        "unexpeted period expression in temporal predicate.",
-                        node.getToken());
+                        "unexpeted period expression in temporal predicate.", node.getToken());
             }
             return filter;
         }
@@ -1087,8 +1104,7 @@ public class FilterBuilder {
          * 
          * @throws FilterBuilderException
          */
-        private org.opengis.filter.Filter buildPropertyBetweenDates()
-                throws FilterBuilderException {
+        private org.opengis.filter.Filter buildPropertyBetweenDates() throws FilterBuilderException {
 
             // retrieve date and duration of expression
             Result node = resultStack.popResult();
@@ -1098,12 +1114,10 @@ public class FilterBuilder {
             org.opengis.filter.expression.Literal end = period.getEnding();
 
             // create and filter firstDate<= property <= lastDate
-            org.opengis.filter.expression.Expression property = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
-            org.opengis.filter.Filter filter = filterFactory.and(filterFactory
-                    .lessOrEqual(begin, property), filterFactory.lessOrEqual(
-                    property, end));
+            org.opengis.filter.Filter filter = filterFactory.and(filterFactory.lessOrEqual(begin,
+                    property), filterFactory.lessOrEqual(property, end));
             return filter;
         }
 
@@ -1123,7 +1137,7 @@ public class FilterBuilder {
 
             switch (node.getNodeType()) {
             case JJTDATETIME_NODE:
-                filter = buildBinaryComparasionOperator(JJTCOMPARATIONPREDICATE_GT_NODE);
+                filter = buildBinaryComparasionOperator(JJTCOMPARISSONPREDICATE_GT_NODE);
                 break;
             case JJTPERIOD_BETWEEN_DATES_NODE:
             case JJTPERIOD_WITH_DURATION_DATE_NODE:
@@ -1133,8 +1147,7 @@ public class FilterBuilder {
 
             default:
                 throw new FilterBuilderException(
-                        "unexpeted date time expression in temporal predicate.",
-                        node.getToken());
+                        "unexpeted date time expression in temporal predicate.", node.getToken());
             }
             return filter;
         }
@@ -1146,19 +1159,16 @@ public class FilterBuilder {
          * 
          * @throws FilterBuilderException
          */
-        private PropertyIsGreaterThan buildPropertyIsGTLastDate()
-                throws FilterBuilderException {
+        private PropertyIsGreaterThan buildPropertyIsGTLastDate() throws FilterBuilderException {
 
             Result node = resultStack.popResult();
             PeriodNode period = (PeriodNode) node.getBuilt();
 
             org.opengis.filter.expression.Literal date = period.getEnding();
 
-            org.opengis.filter.expression.Expression property = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
-            PropertyIsGreaterThan filter = filterFactory
-                    .greater(property, date);
+            PropertyIsGreaterThan filter = filterFactory.greater(property, date);
 
             return filter;
 
@@ -1181,22 +1191,19 @@ public class FilterBuilder {
             org.opengis.filter.expression.Expression property = (org.opengis.filter.expression.Expression) resultStack
                     .popExpression();
 
-            PropertyIsGreaterThanOrEqualTo filter = filterFactory
-                    .greaterOrEqual(property, begin);
+            PropertyIsGreaterThanOrEqualTo filter = filterFactory.greaterOrEqual(property, begin);
 
             return filter;
 
         }
 
-        private PropertyIsLessThan buildPropertyIsLTFirsDate()
-                throws FilterBuilderException {
+        private PropertyIsLessThan buildPropertyIsLTFirsDate() throws FilterBuilderException {
 
             PeriodNode period = resultStack.popPeriod();
 
             org.opengis.filter.expression.Literal date = period.getBeginning();
 
-            org.opengis.filter.expression.Expression property = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
             PropertyIsLessThan filter = filterFactory.less(property, date);
 
@@ -1211,11 +1218,9 @@ public class FilterBuilder {
 
             org.opengis.filter.expression.Literal date = period.getEnding();
 
-            org.opengis.filter.expression.Expression property = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression property = resultStack.popExpression();
 
-            PropertyIsLessThanOrEqualTo filter = filterFactory.lessOrEqual(
-                    property, date);
+            PropertyIsLessThanOrEqualTo filter = filterFactory.lessOrEqual(property, date);
 
             return filter;
         }
@@ -1228,24 +1233,22 @@ public class FilterBuilder {
          * @return BinaryComparisonOperator
          * @throws FilterBuilderException
          */
-        private BinaryComparisonOperator buildBinaryComparasionOperator(
-                int filterType) throws FilterBuilderException {
+        private BinaryComparisonOperator buildBinaryComparasionOperator(int filterType)
+                throws FilterBuilderException {
 
-            org.opengis.filter.expression.Expression right = resultStack
-                    .popExpression();
-            org.opengis.filter.expression.Expression left = resultStack
-                    .popExpression();
+            org.opengis.filter.expression.Expression right = resultStack.popExpression();
+            org.opengis.filter.expression.Expression left = resultStack.popExpression();
 
             switch (filterType) {
-            case JJTCOMPARATIONPREDICATE_EQ_NODE:
+            case JJTCOMPARISSONPREDICATE_EQ_NODE:
                 return filterFactory.equals(left, right);
-            case JJTCOMPARATIONPREDICATE_GT_NODE:
+            case JJTCOMPARISSONPREDICATE_GT_NODE:
                 return filterFactory.greater(left, right);
-            case JJTCOMPARATIONPREDICATE_LT_NODE:
+            case JJTCOMPARISSONPREDICATE_LT_NODE:
                 return filterFactory.less(left, right);
-            case JJTCOMPARATIONPREDICATE_GTE_NODE:
+            case JJTCOMPARISSONPREDICATE_GTE_NODE:
                 return filterFactory.greaterOrEqual(left, right);
-            case JJTCOMPARATIONPREDICATE_LTE_NODE:
+            case JJTCOMPARISSONPREDICATE_LTE_NODE:
                 return filterFactory.lessOrEqual(left, right);
             default:
                 throw new FilterBuilderException("unexpeted filter type.");
@@ -1260,8 +1263,7 @@ public class FilterBuilder {
          * @param left
          * @return buildBinaryComparasionOperator
          */
-        private BinaryComparisonOperator buildBinaryComparasion(
-                final int filterType,
+        private BinaryComparisonOperator buildBinaryComparasion(final int filterType,
                 final org.opengis.filter.expression.Expression right,
                 final org.opengis.filter.expression.Expression left) {
 
@@ -1281,8 +1283,7 @@ public class FilterBuilder {
             }
         }
 
-        private Literal buildGeometry(final Token geometry)
-                throws FilterBuilderException {
+        private Literal buildGeometry(final Token geometry) throws FilterBuilderException {
             try {
                 String wktGeom = scanExpression(geometry);
 
@@ -1299,8 +1300,7 @@ public class FilterBuilder {
                 throw new FilterBuilderException(e.getMessage(), geometry);
 
             } catch (Exception e) {
-                throw new FilterBuilderException("Error building WKT Geometry",
-                        geometry, e);
+                throw new FilterBuilderException("Error building WKT Geometry", geometry, e);
             }
         }
 
@@ -1317,8 +1317,7 @@ public class FilterBuilder {
             while (end.next != null) {
                 end = end.next;
             }
-            String wktGeom = input.substring(initialTocken.beginColumn - 1,
-                    end.endColumn);
+            String wktGeom = input.substring(initialTocken.beginColumn - 1, end.endColumn);
             return wktGeom;
         }
 
@@ -1328,9 +1327,9 @@ public class FilterBuilder {
          * <p>
          * 
          * <pre>
-         *         Then OGC require MULTIPOINT((1 2), (3 4)) 
-         *         but vividsolunion works without point &quot;(&quot; ans &quot;)&quot; 
-         *         MULTIPOINT(1 2, 3 4)
+         *                Then OGC require MULTIPOINT((1 2), (3 4)) 
+         *                but vividsolunion works without point &quot;(&quot; ans &quot;)&quot; 
+         *                MULTIPOINT(1 2, 3 4)
          * </pre>
          * 
          * <p>
@@ -1349,14 +1348,13 @@ public class FilterBuilder {
             int cur = -1;
             if ((cur = source.indexOf(MULTIPOINT_TYPE)) != -1) {
                 // extract "(" and ")" from points in arguments
-                String argument = source.substring(cur
-                        + MULTIPOINT_TYPE.length() + 1, source.length() - 1);
+                String argument = source.substring(cur + MULTIPOINT_TYPE.length() + 1, source
+                        .length() - 1);
 
                 argument = argument.replace('(', ' ');
                 argument = argument.replace(')', ' ');
 
-                transformed.append(MULTIPOINT_TYPE).append("(")
-                        .append(argument).append(")");
+                transformed.append(MULTIPOINT_TYPE).append("(").append(argument).append(")");
                 return transformed.toString();
 
             } else {
@@ -1407,9 +1405,9 @@ public class FilterBuilder {
 
             GeometryFactory gf = new GeometryFactory();
 
-            Coordinate[] coords = { new Coordinate(minX, minY),
-                    new Coordinate(minX, maxY), new Coordinate(maxX, maxY),
-                    new Coordinate(maxX, minY), new Coordinate(minX, minY) };
+            Coordinate[] coords = { new Coordinate(minX, minY), new Coordinate(minX, maxY),
+                    new Coordinate(maxX, maxY), new Coordinate(maxX, minY),
+                    new Coordinate(minX, minY) };
             LinearRing shell = gf.createLinearRing(coords);
             Polygon bbox = gf.createPolygon(shell, null);
             bbox.setUserData(DefaultGeographicCRS.WGS84);
@@ -1564,8 +1562,7 @@ public class FilterBuilder {
                 t.transform(b, System.out);
                 System.out.println();
             } catch (ParseException pe) {
-                System.out.println(FilterBuilder.getFormattedErrorMessage(pe,
-                        line));
+                System.out.println(FilterBuilder.getFormattedErrorMessage(pe, line));
             }
         }
     }
