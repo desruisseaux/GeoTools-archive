@@ -92,6 +92,12 @@ import com.vividsolutions.jts.io.WKTReader;
  */
 public class FilterBuilder {
 
+    /**
+     * Delimiter characted used for
+     * {@link #parseFilterList(FilterFactory, String)} to distinguish between
+     * the different filters in a list (for example:
+     * <code>att > 1| att2 < 3</code>
+     */
     public static final String DELIMITER = "|";
 
     /**
@@ -1327,9 +1333,9 @@ public class FilterBuilder {
          * <p>
          * 
          * <pre>
-         *                Then OGC require MULTIPOINT((1 2), (3 4)) 
-         *                but vividsolunion works without point &quot;(&quot; ans &quot;)&quot; 
-         *                MULTIPOINT(1 2, 3 4)
+         *                 Then OGC require MULTIPOINT((1 2), (3 4)) 
+         *                 but vividsolunion works without point &quot;(&quot; ans &quot;)&quot; 
+         *                 MULTIPOINT(1 2, 3 4)
          * </pre>
          * 
          * <p>
