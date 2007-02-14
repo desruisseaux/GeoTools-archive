@@ -38,6 +38,7 @@ import org.opengis.referencing.datum.DatumAuthorityFactory;
 import org.opengis.util.InternationalString;
 
 // Geotools dependencies
+import org.geotools.factory.Hints;
 import org.geotools.referencing.wkt.Symbols;
 import org.geotools.referencing.NamedIdentifier;
 import org.geotools.util.DerivedSet;
@@ -144,6 +145,9 @@ public class PropertyAuthorityFactory extends DirectAuthorityFactory
             throws IOException
     {
         super(factories, MINIMUM_PRIORITY + 10);
+        // The following hint has no effect on this class behaviour,
+        // but tells to the user what this factory do about axis order.
+        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
         ensureNonNull("authorities", authorities);
         if (authorities.length == 0) {
             throw new IllegalArgumentException(Errors.format(ErrorKeys.EMPTY_ARRAY));

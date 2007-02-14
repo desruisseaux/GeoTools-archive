@@ -122,9 +122,28 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         hints = new Hints(hints);
         hints.keySet().removeAll(this.hints.keySet());
         if (!hints.isEmpty()) {
+            noForce(hints);
             authorityFactory = FactoryFinder.getCoordinateOperationAuthorityFactory(
                     DEFAULT_AUTHORITY, hints);
         }
+    }
+
+    /**
+     * Makes sure that every {@code FORCE_*} hints are set to false. We do that because we want
+     * {@link CoordinateOperationAuthorityFactory#createFromCoordinateReferenceSystemCodes} to
+     * returns coordinate operations straight from the EPSG database; we don't want an instance
+     * like {@link org.geotools.referencing.factory.OrderedAxisAuthorityFactory}. Axis swapping
+     * are performed by {@link #createFromDatabase} in this class <strong>after</strong> we invoked
+     * {@link CoordinateOperationAuthorityFactory#createFromCoordinateReferenceSystemCodes}. An
+     * {@code OrderedAxisAuthorityFactory} instance in this class would be in the way and cause
+     * an infinite recursivity.
+     *
+     * @see http://jira.codehaus.org/browse/GEOT-1161
+     */
+    private static void noForce(final Hints hints) {
+        hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
+        hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
     }
 
     /**
@@ -143,8 +162,10 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
              * construction time, which explain why it is correct to use {@link FactoryFinder}
              * with null hints here.
              */
+            final Hints hints = new Hints(null);
+            noForce(hints);
             authorityFactory = FactoryFinder
-                    .getCoordinateOperationAuthorityFactory(DEFAULT_AUTHORITY, null);
+                    .getCoordinateOperationAuthorityFactory(DEFAULT_AUTHORITY, hints);
         }
         return authorityFactory;
     }
@@ -176,7 +197,7 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         /*
          * Safety check against recursivity: returns null if the given source and target CRS
          * are already under examination by a previous call to this method. Note: there is no
-         * need to synchronize since the Set is thread-local.
+         * need to synchronize since the Boolean is thread-local.
          */
         if (Boolean.TRUE.equals(processing.get())) {
             return null;
@@ -194,8 +215,8 @@ public class AuthorityBackedFactory extends DefaultCoordinateOperationFactory
         if (targetID == null) {
             return null;
         }
-        final String sourceCode = sourceID.getCode();
-        final String targetCode = targetID.getCode();
+        final String sourceCode = sourceID.getCode().trim();
+        final String targetCode = targetID.getCode().trim();
         if (sourceCode.equals(targetCode)) {
             /*
              * NOTE: This check is mandatory because this method may be invoked in some situations
