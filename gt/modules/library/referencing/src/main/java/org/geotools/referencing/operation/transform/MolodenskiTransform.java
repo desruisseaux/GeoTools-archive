@@ -667,7 +667,7 @@ public class MolodenskiTransform extends AbstractMathTransform implements Serial
         /**
          * Returns the operation type.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Transformation.class;
         }
         

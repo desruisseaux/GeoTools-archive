@@ -364,7 +364,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
         /**
          * Returns the operation type.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Conversion.class;
         }
         
@@ -375,7 +375,7 @@ public class ExponentialTransform1D extends AbstractMathTransform
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup values)
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
             return create(doubleValue(BASE,  values),

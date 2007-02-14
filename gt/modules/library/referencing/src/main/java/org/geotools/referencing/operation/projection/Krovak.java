@@ -373,7 +373,7 @@ public class Krovak extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return ConicProjection.class;
         }
 

@@ -108,7 +108,7 @@ public class LambertConformalESRI extends LambertConformal {
         /**
          * Returns the operation type for this map projection.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return ConicProjection.class;
         }
 

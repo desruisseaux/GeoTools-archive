@@ -21,7 +21,6 @@ package org.geotools.referencing.factory;
 
 // J2SE dependencies
 import java.util.Set;
-import java.util.Iterator;
 import java.util.Collections;
 import javax.units.Unit;
 
@@ -32,12 +31,14 @@ import org.opengis.referencing.crs.*;
 import org.opengis.referencing.datum.*;
 import org.opengis.referencing.operation.*;
 import org.opengis.util.InternationalString;
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.util.GenericName;
 
 // Geotools dependencies
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -747,6 +748,103 @@ public abstract class AbstractAuthorityFactory extends ReferencingFactory
             throws FactoryException
     {
         return Collections.EMPTY_SET;
+    }
+
+    /**
+     * Looks up an object from this authority factory which is
+     * {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata equals, ignoring metadata},
+     * to the specified object. The default implementation tries to instantiate some
+     * {@linkplain IdentifiedObject identified objects} from this factory in the
+     * following order:
+     * <p>
+     * <ul>
+     *   <li>If the specified object contains {@linkplain IdentifiedObject#getIdentifiers
+     *       identifiers} associated to the same authority than this factory, then those
+     *       identifiers are used for {@linkplain #createObject creating objects} to be
+     *       tested.</li>
+     *   <li>If this authority factory can create objects from their {@linkplain
+     *       IdentifiedObject#getName name} in addition of identifiers, then the name and
+     *       {@linkplain IdentifiedObject#getAlias aliases} are used for creating objects
+     *       to be tested.</li>
+     *   <li>If {@code fullScan} is {@code true}, then full {@linkplain #getAuthorityCodes
+     *       set of authority codes} are used for creating objects to be tested.</li>
+     * </ul>
+     * <p>
+     * The first of the above created objects which is equals to the specified object in the
+     * sense of {@link org.geotools.referencing.CRS#equalsIgnoreMetadata equalsIgnoreMetadata}
+     * is returned. The main purpose of this method is to get a fully identified object from
+     * an incomplete one, e.g. from an object without identifier or "{@code AUTHORITY[...]}"
+     * element in <cite>Well Known Text</cite> terminology.
+     * <p>
+     * The authority code can be obtained from the identified object using the following code:
+     *
+     * <blockquote><pre>
+     * IdentifiedObject object = factory.find(...);
+     * Identifier id = AbstractIdentifiedObject.getIdentifier(object, factory.getAuthority());
+     * String code = (id != null) ? id.getCode() : null;
+     * </pre></blockquote>
+     *
+     * @param  object The object looked up.
+     * @param  fullScan If {@code true}, an exhaustive full scan against all registered object
+     *         will be performed (may be slow). Otherwise only a fast lookup based on embedded
+     *         identifiers and names will be performed.
+     * @return The identified object, or {@code null} if not found.
+     * @throws FactoryException if an error occured while creating an object.
+     *
+     * @since 2.4
+     */
+    public IdentifiedObject find(final IdentifiedObject object, final boolean fullScan)
+            throws FactoryException
+    {
+        final AuthorityFactoryProxy proxy = AuthorityFactoryProxy.getInstance(
+                AuthorityFactoryProxy.getType(object.getClass()), this);
+        /*
+         * First check if one of the identifiers can be used to spot directly an
+         * identified object (and check it's actually equal to one in the factory).
+         */
+        IdentifiedObject candidate = proxy.createFromIdentifiers(object);
+        if (candidate != null) {
+            return candidate;
+        }
+        /*
+         * We are unable to find the object from its identifiers. Try a quick name lookup.
+         * Some implementations like the one backed by the EPSG database are capable to find
+         * an object from its name.
+         */
+        candidate = proxy.createFromNames(object);
+        if (candidate != null) {
+            return candidate;
+        }
+        /*
+         * Here we exhausted the quick paths. Bail out if the user does not want a full scan.
+         */
+        return fullScan ? proxy.createEquivalent(object) : null;
+    }
+
+    /**
+     * Returns a set of authority codes that <strong>may</strong> identify the same object than
+     * the specified one. The returned set must contains the code of every objects that are
+     * {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata equals, ignoring metadata},
+     * to the specified one. However the set is not required to contains only the codes of those
+     * objects; it may conservatively contains the code for more objects if an exact search is too
+     * expensive.
+     * <p>
+     * This method is invoked by the default {@link #find find} method implementation. The caller
+     * may iterates through every returned codes, instantiate the objects and compare them with
+     * the specified one in order to determine which codes are really applicable.
+     * <p>
+     * If this method has no code candidates to suggest, then it should return {@code null}
+     * (which is not the same than an {@linkplain Collections#EMPTY_SET empty set}).
+     * The default implementation always returns {@code null}.
+     *
+     * @param  object The object looked up.
+     * @return A set of code candidates, or {@code null} if this method is not implemented.
+     * @throws FactoryException if an error occured while fetching the set of candidates.
+     *
+     * @since 2.4
+     */
+    protected Set/*<String>*/ getCodeCandidates(IdentifiedObject object) throws FactoryException {
+        return null;
     }
 
     /**

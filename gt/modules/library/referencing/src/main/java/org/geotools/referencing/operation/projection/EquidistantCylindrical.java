@@ -221,7 +221,7 @@ public class EquidistantCylindrical extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return CylindricalProjection.class;
         }
 
@@ -232,7 +232,7 @@ public class EquidistantCylindrical extends MapProjection {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException, FactoryException
         {
             if (isSpherical(parameters)) {

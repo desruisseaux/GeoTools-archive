@@ -104,11 +104,46 @@ public class DefaultConversion extends DefaultOperation implements Conversion {
      *                  to positions in the {@linkplain #getTargetCRS target CRS}.
      *
      * @see DefaultOperation#create
+     *
+     * @deprecated Replaced by {@link #create(Conversion, CoordinateReferenceSystem,
+     *             CoordinateReferenceSystem, MathTransform, Class)}.
      */
     public static Conversion create(final Conversion               definition,
                                     final CoordinateReferenceSystem sourceCRS,
                                     final CoordinateReferenceSystem targetCRS,
                                     final MathTransform             transform)
+    {
+        return create(definition, sourceCRS, targetCRS, transform, null);
+    }
+
+    /**
+     * Returns a conversion from the specified {@linkplain DefiningConversion defining conversion}.
+     * The new conversion will be a more specific type like a {@linkplain PlanarProjection planar},
+     * {@linkplain CylindricalProjection cylindrical} or {@linkplain ConicProjection conic
+     * projection}. This type is inferred from the {@code conversion} argument when possible.
+     * However the inferred type is not always the most accurate one, so an optional
+     * {@code typeHint} argument may be specified in order to get a more specific subclass.
+     * This later argument is just a hint: it may be {@code null} and will be ignored if it
+     * conflict with the automatically inferred type.
+     *
+     * @param definition The defining conversion.
+     * @param sourceCRS  The source CRS.
+     * @param targetCRS  The target CRS.
+     * @param transform  Transform from positions in the {@linkplain #getSourceCRS source CRS}
+     *                   to positions in the {@linkplain #getTargetCRS target CRS}.
+     * @param typeHint   One of <code>{@linkplain PlanarProjection}.class</code>,
+     *                   <code>{@linkplain CylindricalProjection}.class</code> or
+     *                   <code>{@linkplain ConicProjection}.class</code>, or {@code null}.
+     *
+     * @see DefaultOperation#create
+     *
+     * @since 2.4
+     */
+    public static Conversion create(final Conversion               definition,
+                                    final CoordinateReferenceSystem sourceCRS,
+                                    final CoordinateReferenceSystem targetCRS,
+                                    final MathTransform             transform,
+                                    final Class/*<? extends Conversion>*/ typeHint)
     {
         Class type = getType(definition);
         final OperationMethod method = definition.getMethod();
@@ -119,6 +154,9 @@ public class DefaultConversion extends DefaultOperation implements Conversion {
                     type = candidate;
                 }
             }
+        }
+        if (typeHint != null && type.isAssignableFrom(typeHint)) {
+            type = typeHint;
         }
         if (ConicProjection.class.isAssignableFrom(type)) {
             return new DefaultConicProjection(definition, sourceCRS, targetCRS, transform);

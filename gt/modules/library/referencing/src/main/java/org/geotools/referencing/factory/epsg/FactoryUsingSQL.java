@@ -63,6 +63,7 @@ import org.geotools.metadata.iso.quality.QuantitativeResultImpl;
 import org.geotools.metadata.iso.quality.AbsoluteExternalPositionalAccuracyImpl;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DirectAuthorityFactory;
 import org.geotools.referencing.factory.FactoryGroup;
@@ -72,8 +73,7 @@ import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.referencing.operation.DefaultConcatenatedOperation;
 import org.geotools.referencing.operation.DefaultOperationMethod;
-import org.geotools.referencing.operation.DefaultTransformation;
-import org.geotools.referencing.operation.DefaultConversion;
+import org.geotools.referencing.operation.DefaultOperation;
 import org.geotools.referencing.operation.DefiningConversion;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
@@ -399,7 +399,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     private final Set safetyGuard = new HashSet();
 
     /**
-     * The buffered authority factory, or {@code null} if none. This field is set
+     * The buffered authority factory, or {@code this} if none. This field is set
      * to a different value by {@link DefaultFactory} only, which will point toward a
      * buffered factory wrapping this {@code FactoryUsingSQL} for efficienty.
      */
@@ -758,6 +758,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * Note that this method includes a call to {@link #trimAuthority}, so there is no need to
      * call it before or after this method.
      *
+     * @param  type       The type of object to create.
      * @param  code       The code to check.
      * @param  table      The table where the code should appears.
      * @param  codeColumn The column name for the code.
@@ -765,15 +766,16 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * @return The numerical identifier (i.e. the table primary key value).
      * @throws SQLException if an error occured while reading the database.
      */
-    private String toPrimaryKey(final String code,
+    private String toPrimaryKey(final Class  type,
+                                final String code,
                                 final String table,
                                 final String codeColumn,
                                 final String nameColumn)
             throws SQLException, FactoryException
     {
         assert Thread.holdsLock(this);
-        final String epsg = trimAuthority(code);
-        if (!isPrimaryKey(epsg)) {
+        String identifier = trimAuthority(code);
+        if (!isPrimaryKey(identifier)) {
             /*
              * The character is not the numerical code. Search the value in the database.
              * If a prepared statement is already available, reuse it providing that it was
@@ -795,18 +797,18 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                 statement = connection.prepareStatement(adaptSQL(query));
                 statements.put(KEY, statement);
             }
-            statement.setString(1, epsg);
-            String identifier = null;
+            statement.setString(1, identifier);
+            identifier = null;
             final ResultSet result = statement.executeQuery();
             while (result.next()) {
                 identifier = (String) ensureSingleton(result.getString(1), identifier, code);
             }
             result.close();
-            if (identifier != null) {
-                return identifier;
+            if (identifier == null) {
+                throw noSuchAuthorityCode(type, code);
             }
         }
-        return epsg;
+        return identifier;
     }
 
     /**
@@ -1054,7 +1056,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         ensureNonNull("code", code);
         Unit returnValue = null;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(Unit.class, code,
                     "[Unit of Measure]", "UOM_CODE", "UNIT_OF_MEAS_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("Unit", "SELECT UOM_CODE,"
@@ -1111,7 +1113,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         ensureNonNull("code", code);
         Ellipsoid returnValue = null;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(Ellipsoid.class, code,
                     "[Ellipsoid]", "ELLIPSOID_CODE", "ELLIPSOID_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("Ellipsoid", "SELECT ELLIPSOID_CODE,"
@@ -1192,7 +1194,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         ensureNonNull("code", code);
         PrimeMeridian returnValue = null;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(PrimeMeridian.class, code,
                     "[Prime Meridian]", "PRIME_MERIDIAN_CODE", "PRIME_MERIDIAN_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("PrimeMeridian", "SELECT PRIME_MERIDIAN_CODE,"
@@ -1241,7 +1243,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         ensureNonNull("code", code);
         Extent returnValue = null;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(Extent.class, code,
                     "[Area]", "AREA_CODE", "AREA_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("Area", "SELECT AREA_OF_USE,"
@@ -1432,7 +1434,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         ensureNonNull("code", code);
         Datum returnValue = null;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(Datum.class, code,
                     "[Datum]", "DATUM_CODE", "DATUM_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("Datum", "SELECT DATUM_CODE,"
@@ -1681,7 +1683,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         CoordinateSystem returnValue = null;
         final PreparedStatement stmt;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(CoordinateSystem.class, code,
                     "[Coordinate System]", "COORD_SYS_CODE", "COORD_SYS_NAME");
             stmt = prepareStatement("CoordinateSystem", "SELECT COORD_SYS_CODE,"
                                                       +       " COORD_SYS_NAME,"
@@ -1765,8 +1767,8 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * and {@link #createFromCoordinateReferenceSystemCodes}
      */
     private String toPrimaryKeyCRS(final String code) throws SQLException, FactoryException {
-        return toPrimaryKey(code, "[Coordinate Reference System]",
-                                  "COORD_REF_SYS_CODE", "COORD_REF_SYS_NAME");
+        return toPrimaryKey(CoordinateReferenceSystem.class, code,
+                "[Coordinate Reference System]", "COORD_REF_SYS_CODE", "COORD_REF_SYS_NAME");
     }
 
     /**
@@ -1971,7 +1973,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         ParameterDescriptor returnValue = null;
         final PreparedStatement stmt;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(ParameterDescriptor.class, code,
                     "[Coordinate_Operation Parameter]", "PARAMETER_CODE", "PARAMETER_NAME");
             stmt = prepareStatement("ParameterDescriptor", // Must be singular form.
                                         "SELECT PARAMETER_CODE,"
@@ -2165,7 +2167,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         OperationMethod returnValue = null;
         final PreparedStatement stmt;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(OperationMethod.class, code,
                     "[Coordinate_Operation Method]", "COORD_OP_METHOD_CODE", "COORD_OP_METHOD_NAME");
             stmt = prepareStatement("OperationMethod", "SELECT COORD_OP_METHOD_CODE,"
                                                      +       " COORD_OP_METHOD_NAME,"
@@ -2322,7 +2324,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         ensureNonNull("code", code);
         CoordinateOperation returnValue = null;
         try {
-            final String primaryKey = toPrimaryKey(code,
+            final String primaryKey = toPrimaryKey(CoordinateOperation.class, code,
                     "[Coordinate_Operation]", "COORD_OP_CODE", "COORD_OP_NAME");
             final PreparedStatement stmt;
             stmt = prepareStatement("CoordinateOperation", "SELECT COORD_OP_CODE,"
@@ -2539,19 +2541,20 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                      * At this stage, the parameters are ready for use. Creates the math transform
                      * and wraps it in the final operation (a Conversion or a Transformation).
                      */
-                    final MathTransform mt;
-                    mt = factories.createBaseToDerived(sourceCRS, parameters,
-                                                       targetCRS.getCoordinateSystem(), null);
+                    final Class expected;
                     if (isTransformation) {
-                        // TODO: uses GeoAPI factory method once available.
-                        operation = new DefaultTransformation(properties, sourceCRS, targetCRS, mt, method);
+                        expected = Transformation.class;
                     } else if (isConversion) {
-                        // TODO: uses GeoAPI factory method once available.
-                        operation = new DefaultConversion(properties, sourceCRS, targetCRS, mt, method);
+                        expected = Conversion.class;
                     } else {
                         result.close();
                         throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
                     }
+                    final MathTransform mt = factories.createBaseToDerived(sourceCRS, parameters,
+                            targetCRS.getCoordinateSystem(), null);
+                    // TODO: uses GeoAPI factory method once available.
+                    operation = DefaultOperation.create(properties, sourceCRS, targetCRS,
+                                                        mt, method, expected);
                 }
                 returnValue = (CoordinateOperation) ensureSingleton(operation, returnValue, code);
                 if (result == null) {
@@ -2702,6 +2705,61 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
         }
         while (--maxIterations != 0);
         LOGGER.finer("Possible recursivity in supersessions.");
+    }
+
+    /**
+     * Returns a set of authority codes that <strong>may</strong> identify the same object
+     * than the specified one. This implementation tries to get a smaller set than what
+     * {@link #getAuthorityCodes} would produce.
+     *
+     * @since 2.4
+     */
+    protected Set getCodeCandidates(final IdentifiedObject object) throws FactoryException {
+        String select = "COORD_REF_SYS_CODE";
+        String from   = "[Coordinate Reference System]";
+        String where, code;
+        if (object instanceof Ellipsoid) {
+            select = "ELLIPSOID_CODE";
+            from   = "[Ellipsoid]";
+            where  = "SEMI_MAJOR_AXIS";
+            code   = Double.toString(((Ellipsoid) object).getSemiMajorAxis());
+        } else {
+            IdentifiedObject dependency;
+            if (object instanceof GeneralDerivedCRS) {
+                dependency = ((GeneralDerivedCRS) object).getBaseCRS();
+                where      = "SOURCE_GEOGCRS_CODE";
+            } else if (object instanceof SingleCRS) {
+                dependency = ((SingleCRS) object).getDatum();
+                where      = "DATUM_CODE";
+            } else if (object instanceof GeodeticDatum) {
+                dependency = ((GeodeticDatum) object).getEllipsoid();
+                select     = "DATUM_CODE";
+                from       = "[Datum]";
+                where      = "ELLIPSOID_CODE";
+            } else {
+                return super.getCodeCandidates(object);
+            }
+            dependency = buffered.find(dependency, true);
+            Identifier id = AbstractIdentifiedObject.getIdentifier(dependency, getAuthority());
+            if (id == null || (code = id.getCode()) == null) {
+                return super.getCodeCandidates(object);
+            }
+        }
+        String sql = "SELECT " + select + " FROM " + from + " WHERE " + where + "='" + code + '\'';
+        sql = adaptSQL(sql);
+        final Set/*<String>*/ result = new LinkedHashSet();
+        try {
+            final Statement s = connection.createStatement();
+            final ResultSet r = s.executeQuery(sql);
+            while (r.next()) {
+                result.add(r.getString(1));
+            }
+            r.close();
+            s.close();
+        } catch (SQLException exception) {
+            throw databaseFailure(Identifier.class, code, exception);
+        }
+        return result;
     }
 
     /**

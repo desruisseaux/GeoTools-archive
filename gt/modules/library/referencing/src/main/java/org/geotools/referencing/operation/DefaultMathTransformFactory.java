@@ -46,6 +46,7 @@ import org.opengis.referencing.operation.Projection;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.factory.Hints;
 import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.AbstractIdentifiedObject;
@@ -59,7 +60,6 @@ import org.geotools.resources.Arguments;
 import org.geotools.resources.LazySet;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
-import org.geotools.util.DerivedSet;
 import org.geotools.util.WeakHashSet;
 
 
@@ -105,6 +105,12 @@ import org.geotools.util.WeakHashSet;
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Parameters
  */
 public class DefaultMathTransformFactory extends ReferencingFactory implements MathTransformFactory {
+    /**
+     * The hints to provide to math transform providers. Null for now, but may be non-null
+     * in some future version.
+     */
+    private static final Hints HINTS = null;
+
     /**
      * The object to use for parsing <cite>Well-Known Text</cite> (WKT) strings.
      * Will be created only when first needed.
@@ -172,51 +178,37 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * @see #createParameterizedTransform
      */
     public Set/*<OperationMethod>*/ getAvailableMethods(final Class type) {
-        Set methods = new LazySet(registry.getServiceProviders(MathTransformProvider.class));
-        if (type != null) {
-            methods = new FilteredSet(methods, type);
-        }
-        return methods;
+        return new LazySet(registry.getServiceProviders(MathTransformProvider.class,
+                new MethodFilter(type), HINTS));
     }
 
     /**
-     * A set of available projections backed by the set of available operations.
+     * A filter for the set of available operations.
      */
-    private static final class FilteredSet extends DerivedSet {
+    private static final class MethodFilter implements FactoryRegistry.Filter {
         /**
          * The expected type ({@code Projection.class}) for projections).
          */
         private final Class type;
 
         /**
-         * Constructs a set of projection methods from the specified set of math operations methods.
+         * Constructs a filter for the set of math operations methods.
          */
-        public FilteredSet(final Set methods, final Class type) {
-            super(methods);
+        public MethodFilter(final Class type) {
             this.type = type;
         }
  
         /**
-         * Returns the generic math transform method as a projection method,
-         * or {@code null} if the specified method is not an operation
-         * method of the expected type. Returning null will force the filtered
-         * set to skip it.
+         * Returns {@code true} if the specified element should be included.
          */
-        protected Object baseToDerived(final Object element) {
+        public boolean filter(final Object element) {
             if (element instanceof MathTransformProvider) {
                 final Class t = ((MathTransformProvider) element).getOperationType();
                 if (!type.isAssignableFrom(t)) {
-                    return null;
+                    return false;
                 }
             }
-            return element;
-        }
-
-        /**
-         * Returns the projection method as a generic math transform method.
-         */
-        protected Object derivedToBase(final Object element) {
-            return element;
+            return true;
         }
     }
 
@@ -256,7 +248,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         if (provider!=null && provider.nameMatches(method)) {
             return provider;
         }
-        final Iterator providers = registry.getServiceProviders(MathTransformProvider.class);        
+        final Iterator providers = registry.getServiceProviders(MathTransformProvider.class, null, HINTS);
         while (providers.hasNext()) {
             provider = (MathTransformProvider) providers.next();            
             if (provider.nameMatches(method)) {

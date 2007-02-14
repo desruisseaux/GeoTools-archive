@@ -479,6 +479,7 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
             final AbstractCoordinateOperation that = (AbstractCoordinateOperation) object;
             if (equals(this.sourceCRS, that.sourceCRS, compareMetadata) &&
                 Utilities.equals(this.transform, that.transform))
+                // See comment in DefaultOperation.equals(...) about why we compare MathTransform.
             {
                 if (compareMetadata) {
                     if (!Utilities.equals(this.validArea,          that.validArea) ||

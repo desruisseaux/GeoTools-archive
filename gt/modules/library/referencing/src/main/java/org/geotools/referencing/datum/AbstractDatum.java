@@ -249,8 +249,8 @@ public class AbstractDatum extends AbstractIdentifiedObject implements Datum {
                  * asked for metadata comparaison, because in such case the names
                  * have already been compared by the subclass.
                  */
-                return nameMatches(object. getName().getCode()) ||
-                       nameMatches(object, getName().getCode());
+                return nameMatches(object.getName().getCode()) ||
+                       object.nameMatches(getName().getCode());
             }
             final AbstractDatum that = (AbstractDatum) object;
             return this.realizationEpoch == that.realizationEpoch &&

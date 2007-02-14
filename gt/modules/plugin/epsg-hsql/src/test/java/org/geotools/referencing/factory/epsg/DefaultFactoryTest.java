@@ -38,6 +38,7 @@ import org.opengis.metadata.Identifier;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.crs.CompoundCRS;
@@ -63,6 +64,8 @@ import org.geotools.TestData;
 import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.AbstractIdentifiedObject;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
@@ -334,6 +337,17 @@ public class DefaultFactoryTest extends TestCase {
         final IdentifiedObject cs = factory.createCoordinateSystem(
                 "Ellipsoidal 2D CS. Axes: latitude, longitude. Orientations: north, east.  UoM: DMS");
         assertEquals("6411", getIdentifier(cs));
+        /*
+         * Tests with a unknown name. The exception should be NoSuchAuthorityCodeException
+         * (some previous version wrongly threw a SQLException when using HSQL database).
+         */
+        try {
+            factory.createGeographicCRS("WGS84");
+            fail();
+        } catch (NoSuchAuthorityCodeException e) {
+            // This is the expected exception.
+            assertEquals("WGS84", e.getAuthorityCode());
+        }
     }
 
     /**
@@ -531,12 +545,7 @@ public class DefaultFactoryTest extends TestCase {
         final CoordinateOperation projection = crs.getConversionFromBase();
         assertEquals("32210", getIdentifier(crs));
         assertEquals("16010", getIdentifier(projection));
-        /*
-         * TODO: Current EPSG factory implementation creates Conversion object, not Projection,
-         *       because the OperationMethod declared is not one of the build-in ones: it doesn't
-         *       have a 'getOperationType()' method. We need to find a fix at some later stage.
-         */
-//      assertTrue(projection instanceof Projection);
+        assertTrue   (projection instanceof Projection);
         assertNotNull(projection.getSourceCRS());
         assertNotNull(projection.getTargetCRS());
         assertNotNull(projection.getMathTransform());
@@ -697,5 +706,52 @@ public class DefaultFactoryTest extends TestCase {
             System.out.print("Maximal accuracy value (meters):    "); System.out.println(max);
             System.out.print("Average accuracy value (meters):    "); System.out.println(sum / valid);
         }
+    }
+
+    /**
+     * Tests {@link DefaultFactory#find} method.
+     */
+    public void testFind() throws FactoryException {
+        assertNull(factory.find(DefaultGeographicCRS.WGS84, true));
+        String wkt;
+        wkt = "GEOGCS[\"WGS 84\",\n"                                    +
+              "  DATUM[\"World Geodetic System 1984\",\n"               +
+              "    SPHEROID[\"WGS 84\", 6378137.0, 298.257223563]],\n"  +
+              "  PRIMEM[\"Greenwich\", 0.0],\n"                         +
+              "  UNIT[\"degree\", 0.017453292519943295],\n"             +
+              "  AXIS[\"Geodetic latitude\", NORTH],\n"                 +
+              "  AXIS[\"Geodetic longitude\", EAST]]";
+        CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
+        assertNull(factory.find(crs, false)); // Work because there is more than one object called "WGS 84".
+        IdentifiedObject find = factory.find(crs, true);
+        assertTrue(CRS.equalsIgnoreMetadata(crs, find));
+        assertEquals("4326", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
+        /*
+         * The PROJCS below intentionnaly use a name different from the one found in the
+         * EPSG database, in order to force a full scan (otherwise the EPSG database would
+         * find it by name, but we want to test the scan).
+         */
+        wkt = "PROJCS[\"Beijing 1954\",\n"                                 +
+              "   GEOGCS[\"Beijing 1954\",\n"                              +
+              "     DATUM[\"Beijing 1954\",\n"                             +
+              "       SPHEROID[\"Krassowsky 1940\", 6378245.0, 298.3]],\n" +
+              "     PRIMEM[\"Greenwich\", 0.0],\n"                         +
+              "     UNIT[\"degree\", 0.017453292519943295],\n"             +
+              "     AXIS[\"Geodetic latitude\", NORTH],\n"                 +
+              "     AXIS[\"Geodetic longitude\", EAST]],\n"                +
+              "   PROJECTION[\"Transverse Mercator\"],\n"                  +
+              "   PARAMETER[\"central_meridian\", 135.0],\n"               +
+              "   PARAMETER[\"latitude_of_origin\", 0.0],\n"               +
+              "   PARAMETER[\"scale_factor\", 1.0],\n"                     +
+              "   PARAMETER[\"false_easting\", 500000.0],\n"               +
+              "   PARAMETER[\"false_northing\", 0.0],\n"                   +
+              "   UNIT[\"m\", 1.0],\n"                                     +
+              "   AXIS[\"Northing\", NORTH],\n"                            +
+              "   AXIS[\"Easting\", EAST]]";
+        crs = CRS.parseWKT(wkt);
+        assertNull(factory.find(crs, false));
+        find = factory.find(crs, true);
+        assertTrue(CRS.equalsIgnoreMetadata(crs, find));
+        assertEquals("2442", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
     }
 }

@@ -16,6 +16,9 @@
  */
 package org.geotools.referencing;
 
+// J2SE dependencies
+import java.util.Set;
+
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -65,6 +68,25 @@ public class CrsTest extends TestCase {
     }
 
     /**
+     * Tests the {@link CRS#getSupportedAuthorities} method.
+     */
+    public void testSupportedAuthorities() {
+        final Set withoutAlias = CRS.getSupportedAuthorities(false);
+        assertTrue (withoutAlias.contains("CRS"));
+        assertTrue (withoutAlias.contains("AUTO2"));
+        assertTrue (withoutAlias.contains("urn:ogc:def"));
+        assertTrue (withoutAlias.contains("http://www.opengis.net"));
+        assertFalse(withoutAlias.contains("AUTO"));
+        assertFalse(withoutAlias.contains("urn:x-ogc:def"));
+
+        final Set withAlias = CRS.getSupportedAuthorities(true);
+        assertTrue (withAlias.containsAll(withoutAlias));
+        assertFalse(withoutAlias.containsAll(withAlias));
+        assertTrue (withAlias.contains("AUTO"));
+        assertTrue (withAlias.contains("urn:x-ogc:def"));
+    }
+
+    /**
      * Tests the transformations of an envelope.
      */
     public void testEnvelopeTransformation() throws FactoryException, TransformException {
@@ -97,6 +119,6 @@ public class CrsTest extends TestCase {
         oldEnvelope.setCoordinateReferenceSystem(WGS84);
 
         assertTrue(oldEnvelope.contains(firstEnvelope, true));
-        assertTrue(oldEnvelope.equals  (firstEnvelope, 0.02));
+        assertTrue(oldEnvelope.equals  (firstEnvelope, 0.02, true));
     }
 }

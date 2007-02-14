@@ -72,6 +72,24 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
     private static final long serialVersionUID = -175151161496419854L;
 
     /**
+     * Key for the <code>{@value}</code> property to be given to the constructor. The value should
+     * be one of <code>{@linkplain org.opengis.referencing.operation.PlanarProjection}.class</code>,
+     * <code>{@linkplain org.opengis.referencing.operation.CylindricalProjection}.class</code> or
+     * <code>{@linkplain org.opengis.referencing.operation.ConicProjection}.class</code>.
+     * <p>
+     * This is a Geotools specific property used as a hint for creating a {@linkplain Projection
+     * projection} of proper type from a {@linkplain DefiningConversion defining conversion}. In
+     * many cases, this hint is not needed since Geotools is often capable to infer it. This hint is
+     * used mostly by advanced factories like the {@linkplain org.geotools.referencing.factory.epsg
+     * EPSG backed} one.
+     *
+     * @see DefaultConversion#create
+     *
+     * @since 2.4
+     */
+    public static final String CONVERSION_TYPE_KEY = "conversionType";
+
+    /**
      * A lock for avoiding never-ending recursivity in the {@code equals} method. This field
      * contains a {@code boolean} flag set to {@code true} when a comparaison is in progress.
      * This lock is necessary because {@code AbstractDerivedCRS} objects contain a
@@ -141,11 +159,13 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
         this.baseCRS = base;
         checkDimensions(base, baseToDerived, derivedCS);
         DefaultOperationMethod.checkDimensions(conversionFromBase.getMethod(), baseToDerived);
+        final Class typeHint = (Class) properties.get(CONVERSION_TYPE_KEY); // May be null.
         this.conversionFromBase = DefaultConversion.create(
             /* definition */ conversionFromBase,
             /* sourceCRS  */ base,
             /* targetCRS  */ this,
-            /* transform  */ baseToDerived);
+            /* transform  */ baseToDerived,
+            /* typeHints  */ typeHint);
     }
 
     /**

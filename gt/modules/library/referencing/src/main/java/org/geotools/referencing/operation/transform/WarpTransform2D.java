@@ -612,7 +612,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
         /**
          * Returns the operation type.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Transformation.class;
         }
 
@@ -623,7 +623,7 @@ public class WarpTransform2D extends AbstractMathTransform implements MathTransf
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup values)
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
             final int      degree   =        intValue(DEGREE,   values);

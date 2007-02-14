@@ -28,12 +28,14 @@ import junit.framework.TestSuite;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.resources.Arguments;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.referencing.factory.AbstractAuthorityFactory;
 
 
 /**
@@ -127,5 +129,28 @@ public class CRSTest extends TestCase {
         assertSame(crs, factory.createGeographicCRS("CRS:CRS83"));
         assertNotSame(crs, factory.createGeographicCRS("CRS:84"));
         assertFalse(CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, crs));
+    }
+
+    /**
+     * Tests the {@link AbstractAuthorityFactory#find} method.
+     */
+    public void testFind() throws FactoryException {
+        final AbstractAuthorityFactory factory = (AbstractAuthorityFactory) this.factory;
+        GeographicCRS crs = factory.createGeographicCRS("CRS:84");
+        assertSame   (crs, factory.find(crs, false));
+        assertSame   (crs, factory.find(crs, true ));
+        assertNotSame(crs, DefaultGeographicCRS.WGS84);
+        assertSame   (crs, factory.find(DefaultGeographicCRS.WGS84, true ));
+        assertNull   (     factory.find(DefaultGeographicCRS.WGS84, false));
+
+        String wkt = "GEOGCS[\"WGS 84\",\n" +
+                     "  DATUM[\"WGS84\",\n" +
+                     "    SPHEROID[\"WGS 84\", 6378137.0, 298.257223563]],\n" +
+                     "  PRIMEM[\"Greenwich\", 0.0],\n" +
+                     "  UNIT[\"degree\", 0.017453292519943295]]";
+        CoordinateReferenceSystem search = CRS.parseWKT(wkt);
+        assertFalse(crs.equals(search));
+        assertNull (factory.find(search, false));
+        assertSame (crs, factory.find(search, true));
     }
 }

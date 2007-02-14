@@ -408,7 +408,7 @@ public final class EarthGravitationalModel extends VerticalTransform {
         /**
          * Returns the operation type for this transform.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Transformation.class;
         }
 

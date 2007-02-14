@@ -1326,7 +1326,7 @@ public abstract class MapProjection extends AbstractMathTransform
         /**
          * Returns the operation type for this map projection.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Projection.class;
         }
 

@@ -241,7 +241,35 @@ public class DefaultOperation extends DefaultSingleOperation implements Operatio
     public boolean equals(final AbstractIdentifiedObject object, final boolean compareMetadata) {
         if (super.equals(object, compareMetadata)) {
             final DefaultOperation that = (DefaultOperation) object;
-            return equals(this.method, that.method, compareMetadata);
+            if (compareMetadata) {
+                return equals(this.method, that.method, compareMetadata);
+            }
+            /*
+             * We consider the operation method as metadata. We could argue that OperationMethod's
+             * 'sourceDimensions' and 'targetDimensions' are not metadata, but their values should
+             * be identical to the 'sourceCRS' and 'targetCRS' dimensions,  already checked by the
+             * superclass. We could also argue that 'OperationMethod.parameters' are not metadata,
+             * but their values should have been taken in account for the MathTransform creation,
+             * which was compared by the superclass.
+             *
+             * Comparing the MathTransforms instead of parameters avoid the problem of implicit
+             * parameters.  For example in a ProjectedCRS, the "semiMajor" and "semiMinor" axis
+             * lengths are sometime provided as explicit parameters, and sometime inferred from
+             * the geodetic datum.  The two cases would be different set of parameters from the
+             * OperationMethod's point of view, but still result in the creation of identical
+             * MathTransform.
+             *
+             * An other rational for treating OperationMethod as metadata is that Geotools
+             * MathTransformProvider extends DefaultOperationMethod. Consequently there is
+             * a wide range of subclasses, which make the comparaisons more difficult. For
+             * example Mercator1SP.Provider and Mercator2SP.Provider are two different ways
+             * to describe the same projection. The SQL-backed EPSG factory uses yet an
+             * other implementation.
+             *
+             * As a safety, we still compare the name. But I'm not completly sure that it is
+             * necessary.
+             */
+            return nameMatches(this.method, that.method);
         }
         return false;
     }

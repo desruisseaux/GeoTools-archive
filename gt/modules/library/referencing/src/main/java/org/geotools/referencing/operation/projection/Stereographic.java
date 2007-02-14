@@ -271,7 +271,7 @@ public abstract class Stereographic extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return PlanarProjection.class;
         }
 
@@ -282,7 +282,7 @@ public abstract class Stereographic extends MapProjection {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
             // Values here are in radians (the standard units for the map projection package)

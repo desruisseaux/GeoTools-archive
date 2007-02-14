@@ -109,7 +109,7 @@ public class PlateCarree extends EquidistantCylindrical {
         /**
          * Returns the operation type for this map projection.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return CylindricalProjection.class;
         }
 

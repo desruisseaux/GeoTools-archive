@@ -703,7 +703,7 @@ public class ObliqueMercator extends MapProjection {
         /**
          * Returns the operation type for this map projection.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return CylindricalProjection.class;
         }
 
@@ -714,7 +714,7 @@ public class ObliqueMercator extends MapProjection {
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
@@ -762,20 +762,13 @@ public class ObliqueMercator extends MapProjection {
         }
 
         /**
-         * Returns the operation type for this map projection.
-         */
-        protected Class getOperationType() {
-            return CylindricalProjection.class;
-        }
-
-        /**
          * Creates a transform from the specified group of parameter values.
          *
          * @param  parameters The group of parameter values.
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
@@ -878,20 +871,13 @@ public class ObliqueMercator extends MapProjection {
         }
 
         /**
-         * Returns the operation type for this map projection.
-         */
-        protected Class getOperationType() {
-            return CylindricalProjection.class;
-        }
-
-        /**
          * Creates a transform from the specified group of parameter values.
          *
          * @param  parameters The group of parameter values.
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();
@@ -935,20 +921,13 @@ public class ObliqueMercator extends MapProjection {
         }
 
         /**
-         * Returns the operation type for this map projection.
-         */
-        protected Class getOperationType() {
-            return CylindricalProjection.class;
-        }
-
-        /**
          * Creates a transform from the specified group of parameter values.
          *
          * @param  parameters The group of parameter values.
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup parameters)
+        protected MathTransform createMathTransform(final ParameterValueGroup parameters)
                 throws ParameterNotFoundException
         {
             final Collection descriptors = PARAMETERS.descriptors();

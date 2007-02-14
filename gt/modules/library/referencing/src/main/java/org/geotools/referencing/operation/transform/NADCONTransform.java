@@ -986,7 +986,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
         /**
          * Returns the operation type.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Transformation.class;
         }
 
@@ -1002,7 +1002,7 @@ public class NADCONTransform extends AbstractMathTransform implements MathTransf
          *         math transform.
          */
         protected MathTransform createMathTransform(final ParameterValueGroup values)
-            throws ParameterNotFoundException, FactoryException
+                throws ParameterNotFoundException, FactoryException
         {
             return new NADCONTransform(
                 stringValue(LAT_DIFF_FILE,  values),

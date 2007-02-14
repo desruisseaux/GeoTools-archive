@@ -41,6 +41,7 @@ import org.geotools.referencing.factory.BufferedAuthorityFactory;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Andrea Aime
  */
 final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements CRSAuthorityFactory {
     /**
@@ -98,21 +99,23 @@ final class DefaultAuthorityFactory extends BufferedAuthorityFactory implements 
     	}
         return result;
     }
-    
+
     /**
      * Implementation of {@link CRS#getSupportedAuthorities}. Provided here in order to reduce the
      * amount of class loading when using {@link CRS} for other purpose than CRS decoding.
      */
-    static Set/*<String>*/ getSupportedAuthorities() {
-        Set authorityFactories = FactoryFinder.getCRSAuthorityFactories(null);
-        if(authorityFactories.size() == 0)
-            return Collections.EMPTY_SET;
-        Set result = new LinkedHashSet();
+    static Set/*<String>*/ getSupportedAuthorities(final boolean returnAliases) {
+        final Set authorityFactories = FactoryFinder.getCRSAuthorityFactories(null);
+        final Set result = new LinkedHashSet();
         for (final Iterator i = authorityFactories.iterator(); i.hasNext();) {
             final CRSAuthorityFactory factory = (CRSAuthorityFactory) i.next();
-            Collection identifiers = factory.getAuthority().getIdentifiers();
-            if(identifiers.size() > 0)
-                result.add((String) identifiers.iterator().next());
+            final Collection identifiers = factory.getAuthority().getIdentifiers();
+            for (final Iterator j = identifiers.iterator(); j.hasNext();) {
+                result.add(j.next());
+                if (!returnAliases) {
+                    break;
+                }
+            }
         }
         return result;
     }

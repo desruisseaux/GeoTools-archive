@@ -570,7 +570,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         /**
          * Returns the operation type.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Conversion.class;
         }
 
@@ -652,7 +652,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
         /**
          * Returns the operation type.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Conversion.class;
         }
         
@@ -663,7 +663,7 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup values)
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException
         {
             final double offset = doubleValue(OFFSET, values);

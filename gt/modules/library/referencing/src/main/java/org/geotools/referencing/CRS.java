@@ -16,27 +16,18 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Map;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 
-import org.geotools.factory.Factory;
-import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.factory.FactoryRegistryException;
-import org.geotools.factory.Hints;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.resources.Utilities;
+// OpenGIS dependencies
+import org.opengis.metadata.Identifier;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.BoundingPolygon;
 import org.opengis.metadata.extent.GeographicExtent;
@@ -55,22 +46,24 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
-
 // Geotools dependencies
 import org.geotools.factory.Hints;
-import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.factory.FactoryRegistryException;
+import org.geotools.factory.Factory;
 import org.geotools.factory.FactoryNotFoundException;
-import org.geotools.referencing.crs.DefaultGeographicCRS;            // For javadoc
-import org.geotools.util.UnsupportedImplementationException;
+import org.geotools.factory.FactoryRegistryException;
+import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.resources.geometry.XRectangle2D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.Utilities;
 import org.geotools.util.Version;
 import org.geotools.util.Logging;
+import org.geotools.util.UnsupportedImplementationException;
+
 
 /**
  * Simple utility class for making use of the {@linkplain CoordinateReferenceSystem
@@ -89,6 +82,7 @@ import org.geotools.util.Logging;
  * @version $Id$
  * @author Jody Garnett (Refractions Research)
  * @author Martin Desruisseaux
+ * @author Andrea Aime
  *
  * @tutorial http://docs.codehaus.org/display/GEOTOOLS/Coordinate+Transformation+Services+for+Geotools+2.1
  */
@@ -237,16 +231,19 @@ public final class CRS {
     public static Set/*<String>*/ getSupportedCodes(final String authority) {
         return DefaultAuthorityFactory.getSupportedCodes(authority);
     }
-    
+
     /**
      * Returns the set of the authority identifiers supported by registered authority factories.
-     * @param returnAliases If true, the set will contain all identifiers for each authority, 
-     *        if false, only the first one
+     * This method search only for {@linkplain CRSAuthorityFactory CRS authority factories}.
+     *
+     * @param  returnAliases If {@code true}, the set will contain all identifiers for each
+     *         authority. If {@code false}, only the first one
      * @return The set of supported authorities. May be empty, but never null.
+     *
      * @since 2.3.1
      */
-    public static Set/*<String>*/ getSupportedAuthorities(boolean returnAliases) {
-        return DefaultAuthorityFactory.getSupportedAuthorities();
+    public static Set/*<String>*/ getSupportedAuthorities(final boolean returnAliases) {
+        return DefaultAuthorityFactory.getSupportedAuthorities(returnAliases);
     }
 
     /**
@@ -627,52 +624,63 @@ public final class CRS {
 
     
     /**
-     * Looks up an identifier for the specified coordinate reference system 
-     * @param ref the coordinate reference system looked up
+     * Looks up an identifier for the specified coordinate reference system.
+     * 
+     * 
+     * @param crs the coordinate reference system looked up.
      * @param authorities the authority that we should look up the identifier into. 
-     *        If null the search will to be performed against all authorities
-     * @param fullScan if true, an exhaustive full scan against all registered CRS will be performed,
-     *        otherwise only a fast lookup based on embedded identifiers and names will be performed
-     * @return the identifier, or null if not found
+     *         If {@code null} the search will to be performed against all authorities.
+     * @param fullScan if {@code true}, an exhaustive full scan against all registered CRS
+     *         will be performed (may be slow). Otherwise only a fast lookup based on embedded
+     *         identifiers and names will be performed.
+     * @return The identifier, or {@code null} if not found.
+     *
      * @since 2.3.1
      */
-    public static String lookupIdentifier(final CoordinateReferenceSystem ref, Set authorities, final boolean fullScan) {
+    public static String lookupIdentifier(final CoordinateReferenceSystem crs,
+                                          Set/*<String>*/ authorities,
+                                          final boolean fullScan)
+    {
         // gather the authorities we're considering
-        if(authorities == null)
+        if (authorities == null) {
             authorities = getSupportedAuthorities(false);
-        
+        }
         // first check if one of the identifiers can be used to spot directly
         // a CRS (and check it's actually equal to one in the db)
-        for (Iterator it = ref.getIdentifiers().iterator(); it.hasNext();) {
-            NamedIdentifier id = (NamedIdentifier) it.next();
+        for (Iterator it = crs.getIdentifiers().iterator(); it.hasNext();) {
+            final Identifier id = (Identifier) it.next();
+            final CoordinateReferenceSystem candidate;
             try {
-                CoordinateReferenceSystem crs = CRS.decode(id.toString());
-                if(equalsIgnoreMetadata(crs, ref)) {
-                    String identifier = getSRSFromCRS(crs, authorities);
-                    if(identifier != null) 
-                        return identifier;
-                }
-            } catch (Exception e) {
+                candidate = CRS.decode(id.toString());
+            } catch (FactoryException e) {
                 // the identifier was not recognized, no problem, let's go on
+                continue;
+            }
+            if (equalsIgnoreMetadata(candidate, crs)) {
+                String identifier = getSRSFromCRS(candidate, authorities);
+                if (identifier != null) {
+                    return identifier;
+                }
             }
         }
         
         // try a quick name lookup
         try {
-            CoordinateReferenceSystem crs = CRS.decode(ref.getName().toString());
-            if(equalsIgnoreMetadata(crs, ref)) {
-                String identifier = getSRSFromCRS(crs, authorities);
-                if(identifier != null) 
+            CoordinateReferenceSystem candidate = CRS.decode(crs.getName().toString());
+            if (equalsIgnoreMetadata(candidate, crs)) {
+                String identifier = getSRSFromCRS(candidate, authorities);
+                if (identifier != null) {
                     return identifier;
+                }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             // the name was not recognized, no problem, let's go on
         }
         
         // here we exhausted the quick paths, bail out if the user does not want a full scan
-        if(!fullScan)
+        if (!fullScan) {
             return null;
-        
+        }
         // a direct lookup did not work, let's try a full scan of known CRS then
         // TODO: implement a smarter method in the actual EPSG authorities, which may
         // well be this same loop if they do have no other search capabilities
@@ -682,24 +690,22 @@ public final class CRS {
             for (Iterator itCodes = codes.iterator(); itCodes.hasNext();) {
                 String code = (String) itCodes.next();
                 try {
-                    final CoordinateReferenceSystem crs;
+                    final CoordinateReferenceSystem candidate;
                     if(code.indexOf(":") == -1)
-                        crs = CRS.decode(authority + ":" + code, true);
+                        candidate = CRS.decode(authority + ":" + code, true);
                     else
-                        crs = CRS.decode(code, true);
-                    if (CRS.equalsIgnoreMetadata(crs, ref)) {
-                        return getSRSFromCRS(crs, Collections.singleton(authority));
+                        candidate = CRS.decode(code, true);
+                    if (CRS.equalsIgnoreMetadata(candidate, crs)) {
+                        return getSRSFromCRS(candidate, Collections.singleton(authority));
                     }
                 } catch (Exception e) {
                     // some CRS cannot be decoded properly
                 }
             }
         }
-        
         return null;
-    } 
-    
-    
+    }
+
     /**
      * Scans the identifiers list looking for an EPSG id
      * @param crs
@@ -917,7 +923,4 @@ public final class CRS {
         }
         return XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
     }
-
-    
-    
 }

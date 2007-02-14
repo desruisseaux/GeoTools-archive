@@ -40,9 +40,11 @@ import org.geotools.factory.FactoryRegistry;
 import org.geotools.parameter.Parameters;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
-import org.geotools.referencing.operation.DefiningConversion;  // For javadoc
+import org.geotools.referencing.operation.DefiningConversion;
+import org.geotools.referencing.operation.MathTransformProvider;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.referencing.operation.matrix.MatrixFactory;
+import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.cs.AbstractCS;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -475,16 +477,42 @@ public final class FactoryGroup extends ReferencingFactory {
      * @todo Current implementation creates directly a Geotools implementation, because there
      *       is not yet a suitable method in GeoAPI interfaces.
      */
-    public ProjectedCRS createProjectedCRS(final Map           properties,
+    public ProjectedCRS createProjectedCRS(      Map           properties,
                                            final GeographicCRS baseCRS,
                                            final Conversion    conversionFromBase,
                                            final CartesianCS   derivedCS)
             throws FactoryException
     {
-        final MathTransform mt;
-        mt = createBaseToDerived(baseCRS, conversionFromBase.getParameterValues(), derivedCS, null);
-        return new org.geotools.referencing.crs.DefaultProjectedCRS(
-                    properties, conversionFromBase, baseCRS, mt, derivedCS);
+        List methods = null;
+        OperationMethod method = conversionFromBase.getMethod();
+        if (!(method instanceof MathTransformProvider)) {
+            /*
+             * Our Geotools implementation of DefaultProjectedCRS may not be able to detect
+             * the conversion type (PlanarProjection, CylindricalProjection, etc.)  because
+             * we rely on the Geotools-specific MathTransformProvider for that. We will try
+             * to help it with the optional "conversionType" hint,  providing that the user
+             * do not already provides this hint.
+             */
+            if (!properties.containsKey(DefaultProjectedCRS.CONVERSION_TYPE_KEY)) {
+                methods = new ArrayList(1);
+            }
+        }
+        final ParameterValueGroup parameters = conversionFromBase.getParameterValues();
+        final MathTransform mt = createBaseToDerived(baseCRS, parameters, derivedCS, methods);
+        if (methods!=null && !methods.isEmpty()) {
+            /*
+             * We asked for more informations about the operation method (see previous comment)
+             * and we got some. Try to extract the conversion type from those additional infos
+             * and put it in a copy of the property map.
+             */
+            method = (OperationMethod) methods.get(0);
+            if (method instanceof MathTransformProvider) {
+                properties = new HashMap(properties);
+                properties.put(DefaultProjectedCRS.CONVERSION_TYPE_KEY,
+                        ((MathTransformProvider) method).getOperationType());
+            }
+        }
+        return new DefaultProjectedCRS(properties, conversionFromBase, baseCRS, mt, derivedCS);
     }
 
     /**

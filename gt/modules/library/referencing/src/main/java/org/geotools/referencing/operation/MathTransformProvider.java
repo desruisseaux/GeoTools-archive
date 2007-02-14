@@ -141,7 +141,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
      * Subclass should overrides this methods and returns the appropriate
      * OpenGIS interface type (<strong>not</strong> the implementation type).
      */
-    protected Class getOperationType() {
+    public Class getOperationType() {
         return Operation.class;
     }
 

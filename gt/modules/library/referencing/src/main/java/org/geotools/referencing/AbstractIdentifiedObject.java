@@ -582,6 +582,9 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
      * Implementation of {@link #getIdentifier(Citation)}.
      */
     private static Identifier getIdentifier0(final IdentifiedObject info, final Citation authority) {
+        if (info == null) {
+            return null;
+        }
         for (final Iterator it=info.getIdentifiers().iterator(); it.hasNext();) {
             final Identifier identifier = (Identifier) it.next();
             if (authority == null) {
@@ -728,6 +731,20 @@ NEXT_KEY: for (final Iterator it=properties.entrySet().iterator(); it.hasNext();
         } else {
             return nameMatches(object, object.getAlias(), name);
         }
+    }
+
+    /**
+     * Returns {@code true} if the {@linkplain #getName() primary name} of an object matches
+     * the primary name of one {@linkplain #getAlias alias} of the other object.
+     *
+     * @param o1 The first object to compare by name.
+     * @param o2 The second object to compare by name.
+     *
+     * @since 2.4
+     */
+    public static boolean nameMatches(final IdentifiedObject o1, final IdentifiedObject o2) {
+        return nameMatches(o1, o2.getName().getCode()) ||
+               nameMatches(o2, o1.getName().getCode());
     }
 
     /**

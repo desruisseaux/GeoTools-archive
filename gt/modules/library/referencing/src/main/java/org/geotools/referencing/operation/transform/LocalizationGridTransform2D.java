@@ -779,7 +779,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
         /**
          * Returns the operation type.
          */
-        protected Class getOperationType() {
+        public Class getOperationType() {
             return Transformation.class;
         }
 
@@ -790,7 +790,7 @@ final class LocalizationGridTransform2D extends AbstractMathTransform
          * @return The created math transform.
          * @throws ParameterNotFoundException if a required parameter was not found.
          */
-        public MathTransform createMathTransform(final ParameterValueGroup values)
+        protected MathTransform createMathTransform(final ParameterValueGroup values)
                 throws ParameterNotFoundException, FactoryException
         {
             throw new FactoryException("Not yet implemented");

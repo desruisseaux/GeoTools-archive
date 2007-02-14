@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.WeakHashMap;
 import java.util.LinkedHashMap;
 import java.util.logging.LogRecord;
 import java.util.logging.Level;
@@ -102,6 +103,12 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
      * weak references.
      */
     private final int maxStrongReferences;
+
+    /**
+     * The pool of objects identified by {@link #find}.
+     */
+    private final Map/*<IdentifiedObject,IdentifiedObject>*/ findPool =
+            Collections.synchronizedMap(new WeakHashMap());
 
     /**
      * Constructs an instance wrapping the specified factory with a default number
@@ -957,6 +964,50 @@ public class BufferedAuthorityFactory extends AbstractAuthorityFactory {
         public String toString() {
             return source + " \u21E8 " + target;
         }
+    }
+
+    /**
+     * Looks up an object from this authority factory which is
+     * {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata equals, ignoring metadata},
+     * to the specified object. The default implementation performs the same lookup than the
+     * {@linkplain AbstractAuthorityFactory#find super-class} and caches the result.
+     *
+     * @since 2.4
+     */
+    //@Override
+    public IdentifiedObject find(final IdentifiedObject object, final boolean fullScan)
+            throws FactoryException
+    {
+        /*
+         * Do not synchronize on 'this'. This method may take a while to execute and we don't
+         * want to block other threads. The synchronizations in the 'create' methods and in
+         * the 'findPool' map should be suffisient.
+         */
+        IdentifiedObject candidate = (IdentifiedObject) findPool.get(object);
+        if (candidate == null) {
+            candidate = super.find(object, fullScan);
+            if (candidate != null) {
+                findPool.put(object, candidate);
+            }
+        }
+        return candidate;
+    }
+
+    /**
+     * Returns a set of authority codes that <strong>may</strong> identify the same object than
+     * the specified one. The default implementation delegates to the underlying authority factory.
+     *
+     * @since 2.4
+     */
+    //@Override
+    protected Set/*<String>*/ getCodeCandidates(final IdentifiedObject object)
+            throws FactoryException
+    {
+        final AbstractAuthorityFactory factory;
+        synchronized (this) {
+            factory = getBackingStore();
+        }
+        return factory.getCodeCandidates(object);
     }
 
     /**
