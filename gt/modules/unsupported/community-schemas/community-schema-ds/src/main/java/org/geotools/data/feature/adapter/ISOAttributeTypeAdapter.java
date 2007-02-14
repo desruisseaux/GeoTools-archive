@@ -48,10 +48,18 @@ public class ISOAttributeTypeAdapter implements AttributeType {
     }
 
     public Set getRestrictions() {
+        /*
         Filter restriction = adaptee.getRestriction();
         Set restrictions = restriction == null ? Collections.EMPTY_SET
                 : Collections.singleton(restriction);
         return restrictions;
+        */
+        //TODO: REVISIT: the types reused from GMLSchema, which are created
+        //with the old DefaultAttributeTypeFactory contains _always_ a length
+        //restriction with Integer.MAX_VALUE. This causes a lot of problems
+        //when evaluating the restriction, for example, over a GeometryType.
+        //This happens when AttributeBuilder.build() creates the attribu
+        return Collections.EMPTY_SET;
     }
 
     public AttributeType getSuper() {

@@ -9,18 +9,16 @@ import java.util.List;
 
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.feature.iso.AttributeBuilder;
-import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.AttributeImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -34,12 +32,15 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
 
     private SimpleFeatureType featureType;
 
-    public ISOFeatureAdapter(org.geotools.feature.Feature feature,
-            SimpleFeatureType ftype) {
+    private SimpleFeatureFactory attributeFactory;
+
+    public ISOFeatureAdapter(org.geotools.feature.Feature feature, SimpleFeatureType ftype,
+            SimpleFeatureFactory attributeFactory) {
         if (adaptee instanceof GTFeaureAdapter) {
             throw new IllegalArgumentException(
                     "No need to adapt GTFeaureAdapter, use getAdaptee() instead");
         }
+        this.attributeFactory = attributeFactory;
         this.adaptee = feature;
         this.featureType = ftype;
     }
@@ -49,33 +50,21 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public BoundingBox getBounds() {
-        ReferencedEnvelope env = new ReferencedEnvelope(
-                (CoordinateReferenceSystem) null);
+        ReferencedEnvelope env = new ReferencedEnvelope((CoordinateReferenceSystem) null);
         env.init(adaptee.getBounds());
         return env;
     }
 
     public CoordinateReferenceSystem getCRS() {
-        GeometryAttributeType defaultGeometry = adaptee.getFeatureType()
-                .getDefaultGeometry();
-        return defaultGeometry == null ? null : defaultGeometry
-                .getCoordinateSystem();
+        GeometryAttributeType defaultGeometry = adaptee.getFeatureType().getDefaultGeometry();
+        return defaultGeometry == null ? null : defaultGeometry.getCoordinateSystem();
     }
 
     public GeometryAttribute getDefaultGeometry() {
         AttributeDescriptor defaultGeometry = featureType.getDefaultGeometry();
-
-        GeometryType type = (GeometryType) defaultGeometry.getType();
-
-        AttributeFactoryImpl attributeFactory = new AttributeFactoryImpl();
-        AttributeBuilder builder = new AttributeBuilder(attributeFactory);
-
-        builder.setType(type);
         Geometry geom = adaptee.getDefaultGeometry();
-        builder.add(geom, type.getName());
-
-        Attribute attribute = builder.build();
-
+        Attribute attribute;
+        attribute = attributeFactory.createAttribute(geom, defaultGeometry, null);
         return (GeometryAttribute) attribute;
     }
 
@@ -128,7 +117,18 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public Object get() {
-        throw new UnsupportedOperationException("not implemented yet");
+        Collection properties = featureType.getProperties();
+        Object[] values = this.adaptee.getAttributes((Object[]) null);
+        List attributes = new ArrayList(properties.size());
+        AttributeDescriptor descriptor;
+        int i = 0;
+        for (Iterator it = properties.iterator(); it.hasNext(); i++) {
+            descriptor = (AttributeDescriptor) it.next();
+            Object value = values[i];
+            Attribute att = attributeFactory.createAttribute(value, descriptor, null);
+            attributes.add(att);
+        }
+        return attributes;
     }
 
     public List get(Name name) {
@@ -137,11 +137,17 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public AttributeDescriptor getDescriptor() {
-        throw new UnsupportedOperationException("not implemented yet");
+        return null;
     }
 
-    public void set(Object arg0) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("not implemented yet");
+    public void set(Object atts) throws IllegalArgumentException {
+        Collection attributes = (Collection) atts;
+        int i = 0;
+        Attribute att;
+        for (Iterator it = attributes.iterator(); it.hasNext(); i++) {
+            att = (Attribute) it.next();
+            set(i, att.get());
+        }
     }
 
     public AttributeType getType() {
@@ -149,7 +155,7 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public boolean nillable() {
-        return false;
+        return true;
     }
 
     public Object operation(Name name, List parameters) {
@@ -157,7 +163,7 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public PropertyDescriptor descriptor() {
-        throw new UnsupportedOperationException("not implemented yet");
+        return null;
     }
 
     public Name name() {
@@ -165,8 +171,7 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public Object defaultGeometry() {
-        // TODO Auto-generated method stub
-        return null;
+        return adaptee.getDefaultGeometry();
     }
 
     public void defaultGeometry(Object geometry) {
@@ -209,8 +214,7 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
      * TODO implement as a data view
      */
     public List types() {
-        org.geotools.feature.AttributeType[] types = adaptee.getFeatureType()
-                .getAttributeTypes();
+        org.geotools.feature.AttributeType[] types = adaptee.getFeatureType().getAttributeTypes();
         return Arrays.asList(types);
     }
 

@@ -30,7 +30,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.FINER);
+        Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.INFO);
         factory = new ComplexDataStoreFactory();
         params = new HashMap();
         params.put("dbtype", "complex");

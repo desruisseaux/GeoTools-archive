@@ -21,11 +21,15 @@ import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.iso.simple.SimpleTypeBuilder;
 import org.geotools.feature.iso.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.iso.type.TypeFactoryImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeocentricCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
@@ -44,14 +48,15 @@ import org.opengis.filter.FilterFactory;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
+import org.opengis.spatialschema.geometry.BoundingBox;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 
 public class ComplexDataStoreTest extends TestCase {
 
-    private final static Logger LOGGER = Logger
-            .getLogger(ComplexDataStoreTest.class.getPackage().getName());
+    private final static Logger LOGGER = Logger.getLogger(ComplexDataStoreTest.class.getPackage()
+            .getName());
 
     Name targetName;
 
@@ -66,8 +71,8 @@ public class ComplexDataStoreTest extends TestCase {
         MemoryDataAccess ds = createWaterSampleTestFeatures();
         targetType = TestData.createComplexWaterSampleType();
         TypeFactory tf = new TypeFactoryImpl();
-        AttributeDescriptor targetFeature = tf.createAttributeDescriptor(
-                targetType, targetType.getName(), 0, Integer.MAX_VALUE, true);
+        AttributeDescriptor targetFeature = tf.createAttributeDescriptor(targetType, targetType
+                .getName(), 0, Integer.MAX_VALUE, true);
         targetName = targetFeature.getName();
         List mappings = TestData.createMappingsColumnsAndValues(ds);
 
@@ -106,24 +111,21 @@ public class ComplexDataStoreTest extends TestCase {
      * 'org.geotools.data.complex.ComplexDataStore.getSchema(String)'
      */
     public void testDescribeType() throws IOException {
-        AttributeDescriptor descriptor = (AttributeDescriptor) dataStore
-                .describe(targetName);
+        AttributeDescriptor descriptor = (AttributeDescriptor) dataStore.describe(targetName);
         assertNotNull(descriptor);
         assertEquals(targetType, descriptor.getType());
     }
 
     public void testGetBounds() throws IOException {
         final String namespaceUri = "http://online.socialchange.net.au";
-        final String localName = "RoadSegmentType";
-        final TypeName typeName = new org.geotools.feature.type.TypeName(
-                namespaceUri, localName);
+        final String localName = "RoadSegment";
+        final Name typeName = new org.geotools.feature.Name(namespaceUri, localName);
 
         URL configUrl = getClass().getResource("test-data/roadsegments.xml");
 
         ComplexDataStoreDTO config = new XMLConfigDigester().parse(configUrl);
 
-        Set/* <FeatureTypeMapping> */mappings = ComplexDataStoreConfigurator
-                .buildMappings(config);
+        Set/* <FeatureTypeMapping> */mappings = ComplexDataStoreConfigurator.buildMappings(config);
 
         dataStore = new ComplexDataStore(mappings);
         FeatureSource2 source = (FeatureSource2) dataStore.access(typeName);
@@ -132,18 +134,26 @@ public class ComplexDataStoreTest extends TestCase {
         FeatureType mappedType = (FeatureType) describe.getType();
         assertNotNull(mappedType.getDefaultGeometry());
 
-        FeatureTypeMapping mapping = (FeatureTypeMapping) mappings.iterator()
-                .next();
+        FeatureTypeMapping mapping = (FeatureTypeMapping) mappings.iterator().next();
 
-        FeatureSource mappedSource = mapping.getSource();
-        Envelope originalBounds = mappedSource.getBounds(Query.ALL);
+        FeatureSource2 mappedSource = mapping.getSource();
+        ReferencedEnvelope expected = getBounds(mappedSource);
+        Envelope actual = getBounds(source);
 
-        assertNotNull("mapped type bounds are not being fetched",
-                originalBounds);
-        FeatureSource fs = dataStore.getFeatureSource("RoadSegmentType");
-        Envelope bounds = fs.getBounds();
-        assertNotNull(bounds);
+        assertEquals(expected, actual);
 
+    }
+
+    private ReferencedEnvelope getBounds(FeatureSource2 source) {
+        ReferencedEnvelope boundingBox = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
+        Collection features = source.content();
+        Iterator iterator = features.iterator();
+        while (iterator.hasNext()) {
+            Feature f = (Feature) iterator.next();
+            BoundingBox bounds = f.getBounds();
+            boundingBox.include(bounds);
+        }
+        return boundingBox;
     }
 
     /*
@@ -166,8 +176,7 @@ public class ComplexDataStoreTest extends TestCase {
         assertNotNull(complexFeature);
         assertEquals(targetType, complexFeature.getType());
 
-        org.opengis.filter.FilterFactory ff = CommonFactoryFinder
-                .getFilterFactory(null);
+        org.opengis.filter.FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
         PropertyName expr;
         Object value;
 
@@ -236,16 +245,14 @@ public class ComplexDataStoreTest extends TestCase {
 
         Iterator reader = features.iterator();
 
-        PropertyIsEqualTo equivalentSourceFilter = ff.equals(ff.property("ph"),
-                ff.literal(new Integer(3)));
-        Collection collection = mapping.getSource().content(
-                equivalentSourceFilter);
+        PropertyIsEqualTo equivalentSourceFilter = ff.equals(ff.property("ph"), ff
+                .literal(new Integer(3)));
+        Collection collection = mapping.getSource().content(equivalentSourceFilter);
 
         int count = 0;
         int expectedCount = collection.size();
 
-        Filter badFilter = ff.greater(ff
-                .property("sample/measurement[1]/value"), ff
+        Filter badFilter = ff.greater(ff.property("sample/measurement[1]/value"), ff
                 .literal(new Integer(3)));
 
         while (reader.hasNext()) {
@@ -259,25 +266,25 @@ public class ComplexDataStoreTest extends TestCase {
     }
 
     public void testGroupByFeatureReader() throws Exception {
-        
+
         LOGGER.info("DATA TEST: testGroupByFeatureReader");
 
         // dataStore with denormalized wq_ir_results type
         MemoryDataAccess dataStore = TestData.createDenormalizedWaterQualityResults();
         // mapping definitions from simple wq_ir_results type to complex wq_plus
         // type
-        FeatureTypeMapping mapper = TestData
-                .createMappingsGroupByStation(dataStore);
+        FeatureTypeMapping mapper = TestData.createMappingsGroupByStation(dataStore);
 
-//        for(Iterator it = mapper.getSource().content().iterator(); it.hasNext();){
-//            SimpleFeature f = (SimpleFeature) it.next();
-//            for(int i =  0; i < f.getNumberOfAttributes(); i++){
-//                Object o = f.get(i);
-//                System.out.print(o + ",\t");
-//            }
-//            System.out.println("");
-//        }
-        
+        // for(Iterator it = mapper.getSource().content().iterator();
+        // it.hasNext();){
+        // SimpleFeature f = (SimpleFeature) it.next();
+        // for(int i = 0; i < f.getNumberOfAttributes(); i++){
+        // Object o = f.get(i);
+        // System.out.print(o + ",\t");
+        // }
+        // System.out.println("");
+        // }
+
         targetName = mapper.getTargetFeature().getName();
 
         Set/* <FeatureTypeMapping> */mappings = Collections.singleton(mapper);
@@ -316,8 +323,7 @@ public class ComplexDataStoreTest extends TestCase {
 
             int expectedMeasurementInstances = featureCount;
 
-            List/* <Attribute> */measurements = currFeature
-                    .get(measurementName);
+            List/* <Attribute> */measurements = currFeature.get(measurementName);
 
             assertNotNull(measurements);
 
@@ -344,11 +350,9 @@ public class ComplexDataStoreTest extends TestCase {
      * 
      * @throws Exception
      */
-    public void testGroupByFeatureReaderRespectsAttributeOrder()
-            throws Exception {
+    public void testGroupByFeatureReaderRespectsAttributeOrder() throws Exception {
 
-        LOGGER
-                .info("DATA TEST: testGroupByFeatureReaderRespectsAttributeOrder");
+        LOGGER.info("DATA TEST: testGroupByFeatureReaderRespectsAttributeOrder");
 
         // dataStore with denormalized wq_ir_results type
         MemoryDataAccess dataStore;
@@ -374,8 +378,7 @@ public class ComplexDataStoreTest extends TestCase {
         Iterator it = complexFeatures.iterator();
         Feature currFeature = (Feature) it.next();
 
-        Collection/* <? extends StructuralDescriptor> */sequence = targetType
-                .getProperties();
+        Collection/* <? extends StructuralDescriptor> */sequence = targetType.getProperties();
 
         List/* <Attribute> */atts = (List) currFeature.get();
         int idx = 0;
@@ -383,8 +386,8 @@ public class ComplexDataStoreTest extends TestCase {
             AttributeDescriptor node = (AttributeDescriptor) itr.next();
             AttributeType attType = node.getType();
             Attribute attribute = (Attribute) atts.get(idx);
-            String msg = "Expected " + attType.getName() + " at index " + idx
-                    + " but got " + attribute.getType().getName();
+            String msg = "Expected " + attType.getName() + " at index " + idx + " but got "
+                    + attribute.getType().getName();
             assertEquals(msg, attType, attribute.getType());
             idx++;
         }
@@ -399,17 +402,14 @@ public class ComplexDataStoreTest extends TestCase {
      */
     public void testWithConfig() throws Exception {
         final String nsUri = "http://online.socialchange.net.au";
-        final String localName = "RoadSegmentType";
-        final TypeName typeName = new org.geotools.feature.type.TypeName(nsUri,
-                localName);
+        final String localName = "RoadSegment";
+        final TypeName typeName = new org.geotools.feature.type.TypeName(nsUri, localName);
 
-        final URL configUrl = getClass().getResource(
-                "test-data/roadsegments.xml");
+        final URL configUrl = getClass().getResource("test-data/roadsegments.xml");
 
         ComplexDataStoreDTO config = new XMLConfigDigester().parse(configUrl);
 
-        Set/* <FeatureTypeMapping> */mappings = ComplexDataStoreConfigurator
-                .buildMappings(config);
+        Set/* <FeatureTypeMapping> */mappings = ComplexDataStoreConfigurator.buildMappings(config);
 
         dataStore = new ComplexDataStore(mappings);
         Source source = dataStore.access(typeName);
@@ -418,11 +418,9 @@ public class ComplexDataStoreTest extends TestCase {
         FeatureType type = (FeatureType) sdesc.getType();
 
         AttributeDescriptor node;
-        node = (AttributeDescriptor) Types.descriptor(type, Types.typeName(
-                nsUri, "the_geom"));
+        node = (AttributeDescriptor) Types.descriptor(type, Types.typeName(nsUri, "the_geom"));
         assertNotNull(node);
-        assertEquals("LineStringPropertyType", node.getType().getName()
-                .getLocalPart());
+        assertEquals("LineStringPropertyType", node.getType().getName().getLocalPart());
 
         assertNotNull(type.getDefaultGeometry());
         assertEquals(node.getType(), type.getDefaultGeometry());
@@ -432,8 +430,7 @@ public class ComplexDataStoreTest extends TestCase {
         TypeName ftNodeName = Types.typeName(nsUri, "fromToNodes");
         assertNotNull(Types.descriptor(type, ftNodeName));
 
-        AttributeDescriptor descriptor = (AttributeDescriptor) Types
-                .descriptor(type, ftNodeName);
+        AttributeDescriptor descriptor = (AttributeDescriptor) Types.descriptor(type, ftNodeName);
 
         ComplexType fromToNodes = (ComplexType) descriptor.getType();
 
@@ -441,13 +438,13 @@ public class ComplexDataStoreTest extends TestCase {
         assertTrue(fromToNodes.isIdentified());
 
         TypeName fromNodeName = Types.typeName(nsUri, "fromNode");
-        AttributeDescriptor fromNode = (AttributeDescriptor) Types.descriptor(
-                fromToNodes, fromNodeName);
+        AttributeDescriptor fromNode = (AttributeDescriptor) Types.descriptor(fromToNodes,
+                fromNodeName);
         assertNotNull(fromNode);
 
         TypeName toNodeName = Types.typeName(nsUri, "toNode");
-        AttributeDescriptor toNode = (AttributeDescriptor) Types.descriptor(
-                fromToNodes, toNodeName);
+        AttributeDescriptor toNode = (AttributeDescriptor) Types
+                .descriptor(fromToNodes, toNodeName);
         assertNotNull(fromNode);
 
         assertEquals(Point.class, fromNode.getType().getBinding());
@@ -467,7 +464,7 @@ public class ComplexDataStoreTest extends TestCase {
         }
         assertEquals("feature count", expectedCount, count);
     }
-    
+
     /**
      * Creates a MemoryDataStore contaning a simple FeatureType with test data
      * for the "Multiple columns could be mapped to a multi-value property"
@@ -489,8 +486,7 @@ public class ComplexDataStoreTest extends TestCase {
      * </table>
      * </p>
      */
-    public static MemoryDataAccess createWaterSampleTestFeatures()
-            throws Exception {
+    public static MemoryDataAccess createWaterSampleTestFeatures() throws Exception {
         MemoryDataAccess dataStore = new MemoryDataAccess();
         SimpleTypeFactory tf = new SimpleTypeFactoryImpl();
         SimpleTypeBuilder tb = new SimpleTypeBuilder(tf);

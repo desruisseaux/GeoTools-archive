@@ -48,14 +48,13 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
 
     static PropertyAccessor FID_ACCESS = new FidFeaturePropertyAccessor();
 
-    public PropertyAccessor createPropertyAccessor(Class type, String xpath,
-            Class target, Hints hints) {
+    public PropertyAccessor createPropertyAccessor(Class type, String xpath, Class target,
+            Hints hints) {
 
         if (xpath == null)
             return null;
 
-        if (!Feature.class.isAssignableFrom(type)
-                && !FeatureType.class.isAssignableFrom(type)
+        if (!Feature.class.isAssignableFrom(type) && !FeatureType.class.isAssignableFrom(type)
                 && !AttributeDescriptor.class.isAssignableFrom(type))
             return null; // we only work with simple feature
 
@@ -116,8 +115,7 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         }
     }
 
-    static class DefaultGeometryFeaturePropertyAccessor implements
-            PropertyAccessor {
+    static class DefaultGeometryFeaturePropertyAccessor implements PropertyAccessor {
 
         public boolean canHandle(Object object, String xpath, Class target) {
             if (!"".equals(xpath))
@@ -153,8 +151,7 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
                     geom = f.getDefaultGeometry();
                     geom.set(value);
                 } else {
-                    throw new IllegalArgumentException(
-                            "Argument is not a geometry: " + value);
+                    throw new IllegalArgumentException("Argument is not a geometry: " + value);
                 }
             }
             if (object instanceof FeatureType) {
@@ -169,15 +166,15 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
             // support any implementation. Reason being that JXPath works
             // over concrete classes and hence we cannot set it up over the
             // interface
-            JXPathIntrospector.registerDynamicClass(FeatureImpl.class,
+            JXPathIntrospector.registerDynamicClass(AttributePropertyHandler.AttributeWrapper.class,
                     AttributePropertyHandler.class);
+            /*
             JXPathIntrospector.registerDynamicClass(SimpleFeatureImpl.class,
                     AttributePropertyHandler.class);
             JXPathIntrospector.registerDynamicClass(ComplexAttributeImpl.class,
                     AttributePropertyHandler.class);
-
-            JXPathIntrospector.registerDynamicClass(
-                    AttributeDescriptorImpl.class,
+            */
+            JXPathIntrospector.registerDynamicClass(AttributeDescriptorImpl.class,
                     AttributeDescriptorPropertyHandler.class);
             JXPathIntrospector.registerDynamicClass(FeatureTypeImpl.class,
                     AttributeDescriptorPropertyHandler.class);
@@ -194,6 +191,9 @@ public class FeaturePropertyAccessorFactory implements PropertyAccessorFactory {
         public Object get(Object object, String xpath, Class target) {
             // xpath = stripPrefix(xpath);
 
+            if(object instanceof Attribute){
+                object = new AttributePropertyHandler.AttributeWrapper((Attribute) object);
+            }
             JXPathContext context = JXPathContext.newContext(object);
             context.setLenient(true);
 

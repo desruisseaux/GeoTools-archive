@@ -11,7 +11,9 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.feature.FeatureAccess;
+import org.geotools.feature.iso.simple.SimpleFeatureFactoryImpl;
 import org.geotools.util.SimpleInternationalString;
+import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.util.InternationalString;
 
 /**
@@ -46,7 +48,8 @@ public class FeatureAccessFactoryAdapter implements DataAccessFactory {
 
     public DataAccess createAccess(Object params) throws IOException {
         DataStore dataStore = DataStoreFinder.getDataStore((Map) params);
-        FeatureAccessAdapter adapter = new FeatureAccessAdapter(dataStore);
+        SimpleFeatureFactory attributeFactory = new SimpleFeatureFactoryImpl();
+        FeatureAccessAdapter adapter = new FeatureAccessAdapter(dataStore, attributeFactory);
         return adapter;
     }
 

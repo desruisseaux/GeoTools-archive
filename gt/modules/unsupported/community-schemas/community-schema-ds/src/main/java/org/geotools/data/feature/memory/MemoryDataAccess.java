@@ -40,11 +40,13 @@ import org.geotools.data.feature.adapter.GTFeaureAdapter;
 import org.geotools.data.feature.adapter.ISOFeatureAdapter;
 import org.geotools.data.feature.adapter.ISOFeatureTypeAdapter;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.iso.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.iso.type.TypeFactoryImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
@@ -83,6 +85,8 @@ public class MemoryDataAccess extends AbstractDataStore implements
     /** Schema holds FeatureType by typeName */
     protected Map schema = new HashMap();
 
+    private SimpleFeatureFactory attributeFactory = new SimpleFeatureFactoryImpl();
+
     public MemoryDataAccess() {
         super(true);
     }
@@ -116,7 +120,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
                     isoType = new ISOFeatureTypeAdapter(feature
                             .getFeatureType());
                 }
-                Feature isoFeature = new ISOFeatureAdapter(feature, isoType);
+                Feature isoFeature = new ISOFeatureAdapter(feature, isoType, attributeFactory);
                 addFeatureInternal(isoFeature);
             }
         } finally {
@@ -181,7 +185,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
                     features[0].getFeatureType());
             for (int i = 0; i < features.length; i++) {
                 org.geotools.feature.Feature feature = features[i];
-                Feature isoFeature = new ISOFeatureAdapter(feature, isoType);
+                Feature isoFeature = new ISOFeatureAdapter(feature, isoType, attributeFactory);
                 addFeatureInternal(isoFeature);
             }
         }
@@ -204,7 +208,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
      */
     public void addFeature(org.geotools.feature.Feature feature) {
         synchronized (memory) {
-            Feature f = new ISOFeatureAdapter(feature, null);
+            Feature f = new ISOFeatureAdapter(feature, null, attributeFactory);
             addFeatureInternal(f);
         }
     }

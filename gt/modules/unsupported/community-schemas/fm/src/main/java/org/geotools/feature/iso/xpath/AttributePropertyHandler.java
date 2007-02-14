@@ -22,95 +22,117 @@ import org.opengis.feature.type.Name;
  * @author Justin Deoliveira
  */
 public class AttributePropertyHandler implements DynamicPropertyHandler {
+    /**
+     * A lightweight wrapper for an Attribute (complex, feature, etc) in order
+     * to let JXPath play well with any Attribute implementation. Reason is that
+     * only concrete classes can be registered in JXPathIntrospector, no
+     * interfaces.
+     * 
+     * @author Gabriel Roldan, Axios Engineering
+     * 
+     */
+    public static class AttributeWrapper {
+        public Attribute attribute;
 
-	
-	public String[] getPropertyNames(Object o) {
-		Attribute att = (Attribute) o;
-		
-		//we only work on complex attributes
-		if (att instanceof ComplexAttribute) {
-			
-			ComplexType type = (ComplexType) att.getType();
-			Collection attributes = type.attributes(); 
-			
-			String[] propNames = new String[attributes.size()];
-			int i = 0;
-			for (Iterator itr = attributes.iterator(); itr.hasNext(); i++) {
-				AttributeDescriptor descriptor = (AttributeDescriptor) itr.next();
-				
-				//JD: this ignores namespaces
-				propNames[i] = descriptor.getName().getLocalPart();
-			}
-			
-			return propNames;
-		}
-		
-		return null;
-	}
+        public AttributeWrapper(Attribute attribute) {
+            this.attribute = attribute;
+        }
+    }
 
-	public Object getProperty(Object o, String propName) {
-		Object value = null;
-        
-        //the Filter spec says the xpath expresion may or may not
-        //start with the Feature name. If it does, it is the self
-        //location path
+    public String[] getPropertyNames(Object o) {
+        Attribute att = (Attribute) o;
+
+        // we only work on complex attributes
+        if (att instanceof ComplexAttribute) {
+
+            ComplexType type = (ComplexType) att.getType();
+            Collection attributes = type.attributes();
+
+            String[] propNames = new String[attributes.size()];
+            int i = 0;
+            for (Iterator itr = attributes.iterator(); itr.hasNext(); i++) {
+                AttributeDescriptor descriptor = (AttributeDescriptor) itr.next();
+
+                // JD: this ignores namespaces
+                propNames[i] = descriptor.getName().getLocalPart();
+            }
+
+            return propNames;
+        }
+
+        return null;
+    }
+
+    public Object getProperty(Object o, String propName) {
+        Object value = null;
+
+        if (o instanceof AttributeWrapper) {
+            o = ((AttributeWrapper) o).attribute;
+        } 
         Attribute att = (Attribute)o;
+        
+        // the Filter spec says the xpath expresion may or may not
+        // start with the Feature name. If it does, it is the self
+        // location path
         AttributeDescriptor descriptor = att.getDescriptor();
         String attName;
-        if(descriptor == null){
+        if (descriptor == null) {
             attName = att.getType().getName().getLocalPart();
-        }else{
+        } else {
             attName = descriptor.getName().getLocalPart();
         }
-        if(propName.equals(attName) || propName.startsWith(attName + "/")){
+        if (propName.equals(attName) || propName.startsWith(attName + "/")) {
             return o;
         }
-        
-		if (o instanceof ComplexAttribute) {
-			ComplexAttribute attribute = (ComplexAttribute) o;
-			Name name = Types.attributeName(propName);
+
+        if (o instanceof ComplexAttribute) {
+            ComplexAttribute attribute = (ComplexAttribute) o;
+            Name name = Types.attributeName(propName);
             List found;
-            try{
+            try {
                 found = attribute.get(name);
-            }catch(NullPointerException e){
+            } catch (NullPointerException e) {
                 e.printStackTrace();
                 throw e;
             }
-			value = found.size() == 0 ? 
-					null : (found.size() == 1? found.get(0) : found);
+            value = found.size() == 0 ? null : (found.size() == 1 ? found.get(0) : found);
 
-            //FIXME HACK: this is due to the Filter subsystem not dealing with
-            //PropertyHandler returning attribute, hence can't, for example, compare
-            //an Attribute with a Literal
-			if(value instanceof Attribute && !(value instanceof ComplexAttribute)){
-				value = ((Attribute)value).get();
-			}
-		}
-		return value;
-	}
+            // FIXME HACK: this is due to the Filter subsystem not dealing with
+            // PropertyHandler returning attribute, hence can't, for example,
+            // compare
+            // an Attribute with a Literal
+            if (value instanceof Attribute && !(value instanceof ComplexAttribute)) {
+                value = ((Attribute) value).get();
+            }
+        }
+        return value;
+    }
 
-	public void setProperty(Object att, String name, Object value) {
-//		Attribute attribute = (Attribute)att;
-//		if (att instanceof ComplexAttribute) {
-//			
-//		}
-//		else {
-//			//just set the value
-//			
-//		}
-//		
-//		if(!(attribute instanceof ComplexAttribute)){
-//			if(!propertyName.equals(attribute.getType().getName().getLocalPart())){
-//				throw new IllegalArgumentException("only self reference to type allowed for simple attributes");
-//			}
-//			attribute.set(value);
-//		}else{
-//			ComplexAttribute complex = (ComplexAttribute)attribute;
-//			List/*<Attribute>*/atts = complex.get(new org.geotools.util.AttributeName(propertyName));
-//			if(atts.size() == 0){
-//				throw new IllegalArgumentException("No attributes of type " + propertyName + " found");
-//			}
-//			((Attribute)atts.get(0)).set(value);
-//		}
-	}
+    public void setProperty(Object att, String name, Object value) {
+        // Attribute attribute = (Attribute)att;
+        // if (att instanceof ComplexAttribute) {
+        //			
+        // }
+        // else {
+        // //just set the value
+        //			
+        // }
+        //		
+        // if(!(attribute instanceof ComplexAttribute)){
+        // if(!propertyName.equals(attribute.getType().getName().getLocalPart())){
+        // throw new IllegalArgumentException("only self reference to type
+        // allowed for simple attributes");
+        // }
+        // attribute.set(value);
+        // }else{
+        // ComplexAttribute complex = (ComplexAttribute)attribute;
+        // List/*<Attribute>*/atts = complex.get(new
+        // org.geotools.util.AttributeName(propertyName));
+        // if(atts.size() == 0){
+        // throw new IllegalArgumentException("No attributes of type " +
+        // propertyName + " found");
+        // }
+        // ((Attribute)atts.get(0)).set(value);
+        // }
+    }
 }

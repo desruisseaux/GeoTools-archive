@@ -14,6 +14,7 @@ import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.iso.type.TypeFactoryImpl;
+import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
@@ -34,11 +35,14 @@ public class FeatureSource2Adapter implements FeatureSource2 {
 
     private SimpleFeatureType isoFeatureType;
 
+    private SimpleFeatureFactory attributeFactory;
+    
     public FeatureSource2Adapter(FeatureAccessAdapter dataStore,
-            FeatureSource featureSource) {
+            FeatureSource featureSource, SimpleFeatureFactory attributeFactory) {
         this.dataStore = dataStore;
         this.source = featureSource;
-
+        this.attributeFactory = attributeFactory;
+        
         isoFeatureType = new ISOFeatureTypeAdapter(source.getSchema());
         TypeFactory tf = new TypeFactoryImpl();
         descriptor = tf.createAttributeDescriptor(isoFeatureType,
@@ -103,7 +107,7 @@ public class FeatureSource2Adapter implements FeatureSource2 {
             throw (RuntimeException) new RuntimeException().initCause(e);
         }
         Collection isoFeatures = new FeatureCollectionAdapter(isoFeatureType,
-                features);
+                features, attributeFactory);
         return isoFeatures;
     }
 

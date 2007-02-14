@@ -18,6 +18,7 @@ import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.TypeName;
@@ -27,10 +28,13 @@ public class FeatureAccessAdapter implements FeatureAccess {
 
     private DataStore store;
 
-    public FeatureAccessAdapter(DataStore dataStore) {
+    private SimpleFeatureFactory attributeFactory;
+
+    public FeatureAccessAdapter(DataStore dataStore, SimpleFeatureFactory attributeFactory) {
         if (dataStore == null) {
             throw new NullPointerException("dataStore");
         }
+        this.attributeFactory = attributeFactory;
         this.store = dataStore;
     }
 
@@ -92,7 +96,7 @@ public class FeatureAccessAdapter implements FeatureAccess {
             try {
                 String localPart = typeName.getLocalPart();
                 FeatureSource featureSource = store.getFeatureSource(localPart);
-                source = new FeatureSource2Adapter(this, featureSource);
+                source = new FeatureSource2Adapter(this, featureSource, attributeFactory);
             } catch (IOException e) {
                 throw (RuntimeException) new RuntimeException().initCause(e);
             }
