@@ -291,6 +291,12 @@ public class CreationTest extends TestCase {
 
         datum = factory.createGeodeticDatum(Collections.singletonMap("name", "Dummy"), ellipsoid, meridian);
         assertTrue("Non existing datum should have no alias.", datum.getAlias().isEmpty());
+
+        datum = factory.createGeodeticDatum(Collections.singletonMap("name", "WGS 84"), ellipsoid, meridian);
+        assertTrue (AbstractIdentifiedObject.nameMatches(datum, "WGS 84"));
+        assertTrue (AbstractIdentifiedObject.nameMatches(datum, "WGS_1984"));
+        assertTrue (AbstractIdentifiedObject.nameMatches(datum, "World Geodetic System 1984"));
+        assertFalse(AbstractIdentifiedObject.nameMatches(datum, "WGS 72"));
     }
 
     /**

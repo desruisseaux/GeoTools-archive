@@ -6,7 +6,7 @@
 # (C) 2005-2006, GeoTools Project Managment Committee (PMC)
 #
 
-EPSG;OGR;ESRI;Oracle
+EPSG;OGR;ESRI;Oracle;OGC
 #-----------------------------------------------------------------------
 Abidjan 1987;Abidjan_1987;D_Abidjan_1987;
 Accra;Accra;D_Accra;
@@ -314,7 +314,7 @@ Voirol 1879;Voirol_1879;;
 Voirol 1879 (Paris);Voirol_1879_Paris;;
 WGS 72 Transit Broadcast Ephemeris;WGS_72_Transit_Broadcast_Ephemeris;D_WGS_1972_BE;
 World Geodetic System 1972;World_Geodetic_System_1972;D_WGS_1972;WGS 72
-World Geodetic System 1984;World_Geodetic_System_1984;D_WGS_1984;WGS 84
+World Geodetic System 1984;World_Geodetic_System_1984;D_WGS_1984;WGS 84;WGS84;WGS_84;WGS 1984;WGS_1984
 Xian 1980;Xian_1980;D_Xian_1980;
 Yacare;Yacare;D_Yacare;Yacare
 Yemen National Geodetic Network 1996;Yemen_National_Geodetic_Network_1996;D_Yemen_NGN_1996;
