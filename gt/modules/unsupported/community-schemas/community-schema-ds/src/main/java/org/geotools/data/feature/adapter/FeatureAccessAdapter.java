@@ -98,7 +98,8 @@ public class FeatureAccessAdapter implements FeatureAccess {
                 FeatureSource featureSource = store.getFeatureSource(localPart);
                 source = new FeatureSource2Adapter(this, featureSource, attributeFactory);
             } catch (IOException e) {
-                throw (RuntimeException) new RuntimeException().initCause(e);
+                e.printStackTrace();
+                throw (RuntimeException) new RuntimeException(e.getMessage()).initCause(e);
             }
         }
         return source;

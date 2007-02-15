@@ -66,16 +66,16 @@
 		</dependency>
 		<dependency>
 			<!-- override transitive dependency from commons-digester 1.7
-			which depends on commons-collections 2.1, since gt2-xml (SchemaIndexImpl)
-			depends on commons-collections 3.1 -->
+				which depends on commons-collections 2.1, since gt2-xml (SchemaIndexImpl)
+				depends on commons-collections 3.1 -->
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
 			<version>3.1</version>
 		</dependency>
 		<dependency>
 			<!-- override transitive dependency from commons-digester 1.7
-			which depends on commons-collections 2.1, since gt2-xml (SchemaIndexImpl)
-			depends on commons-collections 3.1 -->
+				which depends on commons-collections 2.1, since gt2-xml (SchemaIndexImpl)
+				depends on commons-collections 3.1 -->
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.7.0</version>
@@ -115,5 +115,14 @@
 	<!-- ==================================================== -->
 	<!--     Compilation (including non-standard plugins)     -->
 	<!-- ==================================================== -->
-
+	<build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+		</testResources>
+	</build>
 </project>

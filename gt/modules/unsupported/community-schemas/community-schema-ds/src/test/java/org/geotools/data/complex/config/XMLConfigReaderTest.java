@@ -23,7 +23,7 @@ public class XMLConfigReaderTest extends TestCase {
 	 * Test method for 'org.geotools.data.complex.config.XMLConfigReader.parse(URL)'
 	 */
 	public void testParseURL() throws Exception{
-        Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.INFO);
+        Logging.GEOTOOLS.forceMonolineConsoleOutput(Level.WARNING);
 		XMLConfigDigester reader = new XMLConfigDigester();
 		URL url = XMLConfigDigester.class.getResource("../test-data/roadsegments.xml");
 		ComplexDataStoreDTO config = reader.parse(url);

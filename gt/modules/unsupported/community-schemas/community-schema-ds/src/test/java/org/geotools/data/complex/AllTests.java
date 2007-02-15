@@ -8,7 +8,6 @@ import org.geotools.data.complex.config.XMLConfigReaderTest;
 import org.geotools.data.complex.filter.UnmappingFilterVisitorTest;
 import org.geotools.data.feature.memory.MemoryDataAccessTest;
 import org.geotools.filter.IDFunctionExpressionTest;
-import org.geotools.gml.producer.GML3FeatureTransformerTest;
 
 public class AllTests {
 
@@ -22,7 +21,6 @@ public class AllTests {
 		suite.addTestSuite(IDFunctionExpressionTest.class);
 		suite.addTestSuite(EmfAppSchemaReaderTest.class);
 		suite.addTestSuite(XMLConfigReaderTest.class);
-		suite.addTestSuite(GML3FeatureTransformerTest.class);
 		
 		//$JUnit-END$
 		return suite;

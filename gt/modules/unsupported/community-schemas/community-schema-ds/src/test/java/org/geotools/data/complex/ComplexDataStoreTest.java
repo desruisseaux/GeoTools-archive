@@ -350,50 +350,56 @@ public class ComplexDataStoreTest extends TestCase {
      * 
      * @throws Exception
      */
-    public void testGroupByFeatureReaderRespectsAttributeOrder() throws Exception {
-
-        LOGGER.info("DATA TEST: testGroupByFeatureReaderRespectsAttributeOrder");
-
-        // dataStore with denormalized wq_ir_results type
-        MemoryDataAccess dataStore;
-        dataStore = TestData.createDenormalizedWaterQualityResults();
-        // mapping definitions from simple wq_ir_results type to complex wq_plus
-        // type
-        FeatureTypeMapping mapper;
-        mapper = TestData.createMappingsGroupByStation(dataStore);
-
-        AttributeDescriptor targetFeature = mapper.getTargetFeature();
-        targetType = (FeatureType) targetFeature.getType();
-        targetName = targetFeature.getName();
-
-        Set/* <FeatureTypeMapping> */mappings = Collections.singleton(mapper);
-
-        ComplexDataStore complexDataStore = new ComplexDataStore(mappings);
-        Source complexSource = complexDataStore.access(targetName);
-        assertNotNull(complexSource);
-
-        Collection complexFeatures = complexSource.content();
-        assertNotNull(complexFeatures);
-
-        Iterator it = complexFeatures.iterator();
-        Feature currFeature = (Feature) it.next();
-
-        Collection/* <? extends StructuralDescriptor> */sequence = targetType.getProperties();
-
-        List/* <Attribute> */atts = (List) currFeature.get();
-        int idx = 0;
-        for (Iterator itr = sequence.iterator(); itr.hasNext();) {
-            AttributeDescriptor node = (AttributeDescriptor) itr.next();
-            AttributeType attType = node.getType();
-            Attribute attribute = (Attribute) atts.get(idx);
-            String msg = "Expected " + attType.getName() + " at index " + idx + " but got "
-                    + attribute.getType().getName();
-            assertEquals(msg, attType, attribute.getType());
-            idx++;
-        }
-        LOGGER.info(currFeature.toString());
-    }
-
+    // Commented out since it is no longer needed for the featuresource to
+    // produce
+    // content in the schema specified order. That has to be handled at encoding
+    // time with a schema assisted encoder
+    // public void testGroupByFeatureReaderRespectsAttributeOrder() throws
+    // Exception {
+    //
+    // LOGGER.info("DATA TEST: testGroupByFeatureReaderRespectsAttributeOrder");
+    //
+    // // dataStore with denormalized wq_ir_results type
+    // MemoryDataAccess dataStore;
+    // dataStore = TestData.createDenormalizedWaterQualityResults();
+    // // mapping definitions from simple wq_ir_results type to complex wq_plus
+    // // type
+    // FeatureTypeMapping mapper;
+    // mapper = TestData.createMappingsGroupByStation(dataStore);
+    //
+    // AttributeDescriptor targetFeature = mapper.getTargetFeature();
+    // targetType = (FeatureType) targetFeature.getType();
+    // targetName = targetFeature.getName();
+    //
+    // Set/* <FeatureTypeMapping> */mappings = Collections.singleton(mapper);
+    //
+    // ComplexDataStore complexDataStore = new ComplexDataStore(mappings);
+    // Source complexSource = complexDataStore.access(targetName);
+    // assertNotNull(complexSource);
+    //
+    // Collection complexFeatures = complexSource.content();
+    // assertNotNull(complexFeatures);
+    //
+    // Iterator it = complexFeatures.iterator();
+    // Feature currFeature = (Feature) it.next();
+    //
+    // Collection/* <? extends StructuralDescriptor> */sequence =
+    // targetType.getProperties();
+    //
+    // List/* <Attribute> */atts = (List) currFeature.get();
+    // int idx = 0;
+    // for (Iterator itr = sequence.iterator(); itr.hasNext();) {
+    // AttributeDescriptor node = (AttributeDescriptor) itr.next();
+    // AttributeType attType = node.getType();
+    // Attribute attribute = (Attribute) atts.get(idx);
+    // String msg = "Expected " + attType.getName() + " at index " + idx + " but
+    // got "
+    // + attribute.getType().getName();
+    // assertEquals(msg, attType, attribute.getType());
+    // idx++;
+    // }
+    // LOGGER.info(currFeature.toString());
+    // }
     /**
      * Loads config from an xml config file which uses a property datastore as
      * source of features.
@@ -418,12 +424,13 @@ public class ComplexDataStoreTest extends TestCase {
         FeatureType type = (FeatureType) sdesc.getType();
 
         AttributeDescriptor node;
-        node = (AttributeDescriptor) Types.descriptor(type, Types.typeName(nsUri, "the_geom"));
+        node = (AttributeDescriptor) Types.descriptor(type, new org.geotools.feature.Name(nsUri,
+                "the_geom"));
         assertNotNull(node);
         assertEquals("LineStringPropertyType", node.getType().getName().getLocalPart());
 
         assertNotNull(type.getDefaultGeometry());
-        assertEquals(node.getType(), type.getDefaultGeometry());
+        assertEquals(node.getType(), type.getDefaultGeometry().getType());
 
         assertNotNull(Types.descriptor(type, Types.typeName(nsUri, "name")));
 

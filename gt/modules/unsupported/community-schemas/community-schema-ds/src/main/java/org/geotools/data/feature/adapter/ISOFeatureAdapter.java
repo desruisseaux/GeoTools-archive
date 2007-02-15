@@ -7,9 +7,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.jxpath.JXPathIntrospector;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.iso.AttributeImpl;
+import org.geotools.feature.iso.xpath.AttributePropertyHandler;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
@@ -28,6 +30,11 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class ISOFeatureAdapter implements Feature, SimpleFeature {
 
+    static{
+        JXPathIntrospector.registerDynamicClass(ISOFeatureAdapter.class,
+                AttributePropertyHandler.class);
+    }
+    
     private org.geotools.feature.Feature adaptee;
 
     private SimpleFeatureType featureType;

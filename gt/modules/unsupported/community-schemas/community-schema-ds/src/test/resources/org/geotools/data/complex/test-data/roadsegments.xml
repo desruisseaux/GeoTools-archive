@@ -13,7 +13,7 @@
         <Parameter>
           <name>directory</name>
           <!-- path can be relative to working dir -->
-          <value>src/test/java/org/geotools/data/complex/test-data</value>
+          <value>src/test/resources/org/geotools/data/complex/test-data</value>
         </Parameter>
       </parameters>
     </DataStore>
