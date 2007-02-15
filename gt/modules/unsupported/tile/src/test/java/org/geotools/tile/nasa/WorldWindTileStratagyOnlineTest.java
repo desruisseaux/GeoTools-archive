@@ -39,8 +39,6 @@ import org.geotools.tile.cache.TileRange;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-import sun.rmi.runtime.GetThreadPoolAction;
-
 public class WorldWindTileStratagyOnlineTest extends TestCase {
     WorldWindTileStratagy ww;
     private URL url;
