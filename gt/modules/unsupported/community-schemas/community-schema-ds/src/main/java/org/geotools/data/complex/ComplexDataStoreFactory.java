@@ -50,7 +50,7 @@ public class ComplexDataStoreFactory implements DataStoreFactorySpi {
 		Set/*<FeatureTypeMapping>*/ mappings;
 		ComplexDataStore dataStore;
 
-		URL configFileUrl = (URL)URL.lookUp(params);
+		URL configFileUrl = (URL)ComplexDataStoreFactory.URL.lookUp(params);
 		XMLConfigDigester configReader = new XMLConfigDigester();
 		ComplexDataStoreDTO config = configReader.parse(configFileUrl);
 		mappings = ComplexDataStoreConfigurator.buildMappings(config);
@@ -73,13 +73,13 @@ public class ComplexDataStoreFactory implements DataStoreFactorySpi {
 	}
 
 	public Param[] getParametersInfo() {
-		return new Param[]{DBTYPE, URL};
+		return new Param[]{ComplexDataStoreFactory.DBTYPE, ComplexDataStoreFactory.URL};
 	}
 
 	public boolean canProcess(Map params) {
 		try {
-			Object dbType = DBTYPE.lookUp(params);
-			Object configUrl = URL.lookUp(params);
+			Object dbType = ComplexDataStoreFactory.DBTYPE.lookUp(params);
+			Object configUrl = ComplexDataStoreFactory.URL.lookUp(params);
 			return "complex".equals(dbType) && configUrl != null;
 		} catch (Exception e) {
 			//e.printStackTrace();

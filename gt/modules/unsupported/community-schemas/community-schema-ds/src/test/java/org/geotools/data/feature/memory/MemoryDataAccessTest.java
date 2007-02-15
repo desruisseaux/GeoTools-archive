@@ -1,7 +1,6 @@
 package org.geotools.data.feature.memory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -125,6 +124,7 @@ public class MemoryDataAccessTest extends TestCase {
         int count = 0;
         for (Iterator reader = features.iterator(); reader.hasNext();) {
             Feature object = (Feature) reader.next();
+            assertNotNull(object);
             count++;
         }
         assertEquals(NUM_FEATURES, count);
@@ -240,7 +240,7 @@ public class MemoryDataAccessTest extends TestCase {
 
             AttributeBuilder mbuilder = new AttributeBuilder(attf);
 
-            Collection measurements = new ArrayList();
+            //Collection measurements = new ArrayList();
 
             for (int mcount = 0; mcount < i; mcount++) {
                 mbuilder.setType(mtype);

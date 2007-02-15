@@ -21,7 +21,6 @@ import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 
 public class FeatureAccessAdapter implements FeatureAccess {
@@ -148,13 +147,13 @@ public class FeatureAccessAdapter implements FeatureAccess {
         List names = new ArrayList(len);
         try {
             for (int i = 0; i < i; i++) {
-                String typeName = typeNames[i];
+                String featureName = typeNames[i];
                 FeatureType schema;
-                schema = getSchema(typeName);
+                schema = getSchema(featureName);
                 URI namespace = schema.getNamespace();
                 String nsUri = namespace == null ? null : namespace.toString();
-
-                TypeName name = new org.geotools.feature.type.TypeName(nsUri, typeName);
+                Name name = new org.geotools.feature.Name(nsUri, featureName);
+                names.add(name);
             }
         } catch (IOException e) {
             throw (RuntimeException) new RuntimeException().initCause(e);

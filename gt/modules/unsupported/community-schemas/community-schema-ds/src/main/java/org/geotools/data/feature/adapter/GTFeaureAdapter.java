@@ -116,7 +116,6 @@ public class GTFeaureAdapter implements org.geotools.feature.SimpleFeature {
 
         Collection atts = adaptee.attributes();
 
-        Object[] values = new Object[atts.size()];
         int current = 0;
         for (Iterator it = atts.iterator(); it.hasNext();) {
             Attribute att = (Attribute) it.next();

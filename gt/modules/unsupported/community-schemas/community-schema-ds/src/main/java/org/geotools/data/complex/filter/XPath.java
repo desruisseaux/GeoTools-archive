@@ -121,7 +121,7 @@ public class XPath {
 
     public static List/* <Step> */steps(String xpathExpression)
             throws IllegalArgumentException {
-        return steps(null, xpathExpression);
+        return XPath.steps(null, xpathExpression);
     }
 
     /**
@@ -171,14 +171,14 @@ public class XPath {
 
         int startIndex = 0;
         if (rootName != null && rootName.getLocalPart().equals(partialSteps[0])) {
-            LOGGER.finer("ignoring type name, since its redundant");
+            XPath.LOGGER.finer("ignoring type name, since its redundant");
             startIndex = 1;
         }
 
         for (int i = startIndex; i < partialSteps.length; i++) {
             String step = partialSteps[i];
             if (step.indexOf('[') != -1) {
-                LOGGER.finer("removing index from step " + step);
+                XPath.LOGGER.finer("removing index from step " + step);
                 int start = step.indexOf('[');
                 int end = step.indexOf(']');
                 String stepName = step.substring(0, start);
@@ -232,8 +232,8 @@ public class XPath {
      */
     public Attribute set2(final Attribute att, final String xpath,
             Object value, String id, AttributeType targetNodeType) {
-        if (LOGGER.isLoggable(Level.CONFIG)) {
-            LOGGER.entering("XPath", "set", new Object[] { att, xpath, value,
+        if (XPath.LOGGER.isLoggable(Level.CONFIG)) {
+            XPath.LOGGER.entering("XPath", "set", new Object[] { att, xpath, value,
                     id, targetNodeType });
         }
 
@@ -262,7 +262,7 @@ public class XPath {
 
             Attribute parentAtt = null;
             if (parents instanceof Collection) {
-                LOGGER
+                XPath.LOGGER
                         .fine("warn, we're assuming parent is the first in the list?!");
                 // REVISIT: might parents be empty?
                 parentAtt = (Attribute) ((Collection) parents).iterator()
@@ -343,8 +343,8 @@ public class XPath {
 
     public Attribute set(final Attribute att, final String xpath, Object value,
             String id, AttributeType targetNodeType) {
-        if (LOGGER.isLoggable(Level.CONFIG)) {
-            LOGGER.entering("XPath", "set", new Object[] { att, xpath, value,
+        if (XPath.LOGGER.isLoggable(Level.CONFIG)) {
+            XPath.LOGGER.entering("XPath", "set", new Object[] { att, xpath, value,
                     id, targetNodeType });
         }
 
@@ -435,8 +435,9 @@ public class XPath {
             final AttributeDescriptor featureType) {
         PropertyName attExp = FF.property(attrXPath);
         Object type = attExp.evaluate(featureType);
-        if (type == null)
+        if (type == null) {
             throw new IllegalArgumentException("path not found: " + attrXPath);
+        }
 
         AttributeDescriptor node = (AttributeDescriptor) type;
         return node.getType() instanceof ComplexType;

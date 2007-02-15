@@ -48,7 +48,7 @@ public class FilteringIterator implements Iterator {
 		}
 
 		while (delegate.hasNext()) {
-			Object peek = (Object) delegate.next();
+			Object peek = delegate.next();
 			if (filter.evaluate(peek)) {
 				next = peek;
 				break;

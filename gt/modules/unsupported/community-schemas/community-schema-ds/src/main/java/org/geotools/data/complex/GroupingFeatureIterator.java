@@ -40,7 +40,6 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.expression.Expression;
 
 /**
@@ -215,7 +214,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         if (!requestedAtts.containsAll(this.groupByAttributeNames)) {
             List remaining = new ArrayList(groupByAttributeNames);
             remaining.removeAll(requestedAtts);
-            LOGGER.fine("Adding missing grouping atts: " + remaining);
+            GroupingFeatureIterator.LOGGER.fine("Adding missing grouping atts: " + remaining);
 
             List queryAtts = new ArrayList(remaining);
             queryAtts.addAll(requestedAtts);
@@ -240,7 +239,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
         }
 
         if (!exists) {
-            LOGGER.finest("no more features, produced " + featureCounter);
+            GroupingFeatureIterator.LOGGER.finest("no more features, produced " + featureCounter);
         }
         return exists;
     }
@@ -281,7 +280,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
 
         // create the target feature and iterate in the source for set its
         // values.
-        final Feature targetFeature = attf.createFeature(null, targetNode, fid);
+        final Feature targetFeature = GroupingFeatureIterator.attf.createFeature(null, targetNode, fid);
 
         final Feature featureForGroupingAtts = this.curSrcFeature;
 
@@ -528,7 +527,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
                 groupingMappings.add(attMapping);
             } else {
                 sourceAttNames.removeAll(groupByAttributeNames);
-                LOGGER.fine("attributes of multivalued property: "
+                GroupingFeatureIterator.LOGGER.fine("attributes of multivalued property: "
                         + sourceAttNames);
                 nonGroupingMappings.add(attMapping);
             }
@@ -567,7 +566,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
                 }
                 int parentStepCount = parentSteps.size();
                 if (equalCount == parentStepCount) {
-                    LOGGER.fine("scheduling " + targetXPath
+                    GroupingFeatureIterator.LOGGER.fine("scheduling " + targetXPath
                             + " as property of multivalued attribute "
                             + multivalued);
                     multivaluedAttributePaths.put(targetXPath, parentSteps);
@@ -590,8 +589,9 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
             final AttributeDescriptor targetFeatureNode) {
 
         if (xpathAttributeBuilder.isComplexType(xpathAttrDefinition,
-                targetFeatureNode))
+                targetFeatureNode)) {
             return false;
+        }
 
         // if leaf then check if its parent attribute is complex
         List stepList = XPath.steps(targetFeatureNode.getName(),

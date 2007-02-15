@@ -10,7 +10,6 @@ import org.geotools.data.DataStore;
 import org.geotools.data.FeatureListener;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.FilteringCollection;
 import org.geotools.feature.FeatureCollection;
@@ -18,7 +17,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
-import org.opengis.feature.type.TypeName;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
 
@@ -99,7 +97,6 @@ public class MemorySource implements FeatureSource2 {
 
 	public int getCount(Query query) throws IOException {
 		Collection collection = content(query.getFilter());
-		Feature f;
 		int count = 0;
 		for (Iterator it = collection.iterator(); it.hasNext();) {
 			it.next();

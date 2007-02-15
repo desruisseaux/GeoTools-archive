@@ -12,8 +12,6 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Query;
 import org.geotools.data.Source;
 import org.geotools.data.complex.config.ComplexDataStoreConfigurator;
 import org.geotools.data.complex.config.ComplexDataStoreDTO;
@@ -21,14 +19,12 @@ import org.geotools.data.complex.config.XMLConfigDigester;
 import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.memory.MemoryDataAccess;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.iso.Types;
 import org.geotools.feature.iso.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.iso.simple.SimpleTypeBuilder;
 import org.geotools.feature.iso.simple.SimpleTypeFactoryImpl;
 import org.geotools.feature.iso.type.TypeFactoryImpl;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.Attribute;
 import org.opengis.feature.Feature;
@@ -37,7 +33,6 @@ import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleTypeFactory;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
@@ -463,6 +458,7 @@ public class ComplexDataStoreTest extends TestCase {
         try {
             while (features.hasNext()) {
                 Feature f = (Feature) features.next();
+                LOGGER.finest(String.valueOf(f));
                 ++count;
             }
         } catch (Exception e) {

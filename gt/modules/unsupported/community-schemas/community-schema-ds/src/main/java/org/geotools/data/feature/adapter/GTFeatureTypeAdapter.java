@@ -71,7 +71,7 @@ public class GTFeatureTypeAdapter implements FeatureType {
     }
 
     public FeatureType[] getAncestors() {
-        org.opengis.feature.type.AttributeType parent = type.getSuper();
+        //org.opengis.feature.type.AttributeType parent = type.getSuper();
         throw new UnsupportedOperationException("not implemented yet");
     }
 

@@ -154,7 +154,7 @@ abstract class AbstractMappingFeatureIterator implements Iterator/* <Feature> */
      * Closes the underlying FeatureIterator
      */
     public void close() {
-        LOGGER.info("remember to propagate close()!!!");
+        AbstractMappingFeatureIterator.LOGGER.info("remember to propagate close()!!!");
         // features.close(this.sourceFeatures);
     }
 

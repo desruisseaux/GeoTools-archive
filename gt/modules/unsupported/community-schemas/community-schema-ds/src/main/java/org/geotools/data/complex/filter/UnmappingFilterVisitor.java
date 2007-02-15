@@ -240,7 +240,7 @@ public class UnmappingFilterVisitor implements
     }
 
     public Expression[] visitBinaryExpression(BinaryExpression expression) {
-        LOGGER.finest(expression.toString());
+        UnmappingFilterVisitor.LOGGER.finest(expression.toString());
 
         Expression left = expression.getExpression1();
         Expression right = expression.getExpression2();
@@ -266,7 +266,7 @@ public class UnmappingFilterVisitor implements
 
     public Object visit(And filter, Object arg1) {
         List list = visitBinaryLogicOp(filter);
-        this.unrolled = ff.and(list);
+        this.unrolled = UnmappingFilterVisitor.ff.and(list);
         return this.unrolled;
     }
 
@@ -303,41 +303,41 @@ public class UnmappingFilterVisitor implements
         if (fidExpression instanceof Function) {
             Function fe = (Function) fidExpression;
             if ("getID".equalsIgnoreCase(fe.getName())) {
-                LOGGER.finest("Fid mapping points to same ID as source");
+                UnmappingFilterVisitor.LOGGER.finest("Fid mapping points to same ID as source");
                 this.unrolled = filter;
                 return unrolled;
             }
         }
 
-        LOGGER.finest("fid mapping expression is " + fidExpression);
+        UnmappingFilterVisitor.LOGGER.finest("fid mapping expression is " + fidExpression);
         try {
             for (Iterator it = fids.iterator(); it.hasNext();) {
                 Identifier fid = (Identifier) it.next();
-                Filter comparison = ff.equals(fidExpression, ff.literal(fid
+                Filter comparison = UnmappingFilterVisitor.ff.equals(fidExpression, UnmappingFilterVisitor.ff.literal(fid
                         .toString()));
-                LOGGER.finest("Adding unmapped fid filter " + comparison);
-                unrolled = unrolled == null ? comparison : ff.or(unrolled,
+                UnmappingFilterVisitor.LOGGER.finest("Adding unmapped fid filter " + comparison);
+                unrolled = unrolled == null ? comparison : UnmappingFilterVisitor.ff.or(unrolled,
                         comparison);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "unrolling " + filter, e);
+            UnmappingFilterVisitor.LOGGER.log(Level.SEVERE, "unrolling " + filter, e);
             throw new RuntimeException(e.getMessage());
         }
 
-        LOGGER.finer("unrolled fid filter is " + unrolled);
+        UnmappingFilterVisitor.LOGGER.finer("unrolled fid filter is " + unrolled);
         this.unrolled = unrolled;
         return unrolled;
     }
 
     public Object visit(Not filter, Object arg1) {
         filter.getFilter().accept(this, null);
-        this.unrolled = ff.not(this.unrolled);
+        this.unrolled = UnmappingFilterVisitor.ff.not(this.unrolled);
         return unrolled;
     }
 
     public Object visit(Or filter, Object arg1) {
         List list = visitBinaryLogicOp(filter);
-        this.unrolled = ff.or(list);
+        this.unrolled = UnmappingFilterVisitor.ff.or(list);
         return unrolled;
     }
 
@@ -355,7 +355,7 @@ public class UnmappingFilterVisitor implements
         lower = (Expression) this.unrolledExpressions.get(1);
         upper = (Expression) this.unrolledExpressions.get(2);
 
-        PropertyIsBetween newFilter = ff.between(expression, lower, upper);
+        PropertyIsBetween newFilter = UnmappingFilterVisitor.ff.between(expression, lower, upper);
 
         this.unrolled = newFilter;
         return newFilter;
@@ -363,38 +363,38 @@ public class UnmappingFilterVisitor implements
 
     public Object visit(PropertyIsEqualTo filter, Object arg1) {
         Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = ff.equals(expressions[0], expressions[1]);
+        unrolled = UnmappingFilterVisitor.ff.equals(expressions[0], expressions[1]);
         return unrolled;
     }
 
     public Object visit(PropertyIsNotEqualTo filter, Object arg1) {
         Expression[] expressions = visitBinaryComparisonOperator(filter);
         boolean matchingCase = filter.isMatchingCase();
-        unrolled = ff.notEqual(expressions[0], expressions[1], matchingCase);
+        unrolled = UnmappingFilterVisitor.ff.notEqual(expressions[0], expressions[1], matchingCase);
         return unrolled;
     }
 
     public Object visit(PropertyIsGreaterThan filter, Object arg1) {
         Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = ff.greater(expressions[0], expressions[1]);
+        unrolled = UnmappingFilterVisitor.ff.greater(expressions[0], expressions[1]);
         return unrolled;
     }
 
     public Object visit(PropertyIsGreaterThanOrEqualTo filter, Object arg1) {
         Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = ff.greaterOrEqual(expressions[0], expressions[1]);
+        unrolled = UnmappingFilterVisitor.ff.greaterOrEqual(expressions[0], expressions[1]);
         return unrolled;
     }
 
     public Object visit(PropertyIsLessThan filter, Object arg1) {
         Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = ff.less(expressions[0], expressions[1]);
+        unrolled = UnmappingFilterVisitor.ff.less(expressions[0], expressions[1]);
         return unrolled;
     }
 
     public Object visit(PropertyIsLessThanOrEqualTo filter, Object arg1) {
         Expression[] expressions = visitBinaryComparisonOperator(filter);
-        unrolled = ff.lessOrEqual(expressions[0], expressions[1]);
+        unrolled = UnmappingFilterVisitor.ff.lessOrEqual(expressions[0], expressions[1]);
         return unrolled;
     }
 
@@ -407,7 +407,7 @@ public class UnmappingFilterVisitor implements
         String single = filter.getSingleChar();
         String escape = filter.getEscape();
 
-        PropertyIsLike newFilter = ff.like(newValue, filter.getLiteral(),
+        PropertyIsLike newFilter = UnmappingFilterVisitor.ff.like(newValue, filter.getLiteral(),
                 wildcard, single, escape);
         this.unrolled = newFilter;
         return newFilter;
@@ -419,17 +419,17 @@ public class UnmappingFilterVisitor implements
 
         Expression newCheckValue = (Expression) this.unrolledExpressions.get(0);
 
-        this.unrolled = ff.isNull(newCheckValue);
+        this.unrolled = UnmappingFilterVisitor.ff.isNull(newCheckValue);
         return unrolled;
     }
 
     public Object visit(BBOX filter, Object arg1) {
         String propertyName = filter.getPropertyName();
-        Expression name = ff.property(propertyName);
+        Expression name = UnmappingFilterVisitor.ff.property(propertyName);
         name.accept(this, null);
         name = (Expression) this.unrolledExpressions.get(0);
 
-        unrolled = ff.bbox(name, filter.getMinX(), filter.getMinY(), filter
+        unrolled = UnmappingFilterVisitor.ff.bbox(name, filter.getMinX(), filter.getMinY(), filter
                 .getMaxX(), filter.getMaxY(), filter.getSRS());
         return unrolled;
     }
@@ -437,63 +437,63 @@ public class UnmappingFilterVisitor implements
     public Object visit(Beyond filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
 
-        unrolled = ff.beyond(exps[0], exps[1], filter.getDistance(), filter
+        unrolled = UnmappingFilterVisitor.ff.beyond(exps[0], exps[1], filter.getDistance(), filter
                 .getDistanceUnits());
         return unrolled;
     }
 
     public Object visit(Contains filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.contains(exps[0], exps[1]);
+        unrolled = UnmappingFilterVisitor.ff.contains(exps[0], exps[1]);
         return unrolled;
     }
 
     public Object visit(Crosses filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.crosses(exps[0], exps[1]);
+        unrolled = UnmappingFilterVisitor.ff.crosses(exps[0], exps[1]);
         return unrolled;
     }
 
     public Object visit(Disjoint filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.disjoint(exps[0], exps[1]);
+        unrolled = UnmappingFilterVisitor.ff.disjoint(exps[0], exps[1]);
         return unrolled;
     }
 
     public Object visit(DWithin filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.dwithin(exps[0], exps[1], filter.getDistance(), filter
+        unrolled = UnmappingFilterVisitor.ff.dwithin(exps[0], exps[1], filter.getDistance(), filter
                 .getDistanceUnits());
         return unrolled;
     }
 
     public Object visit(Equals filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.equal(exps[0], exps[1]);
+        unrolled = UnmappingFilterVisitor.ff.equal(exps[0], exps[1]);
         return unrolled;
     }
 
     public Object visit(Intersects filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.intersects(exps[0], exps[1]);
+        unrolled = UnmappingFilterVisitor.ff.intersects(exps[0], exps[1]);
         return unrolled;
     }
 
     public Object visit(Overlaps filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.overlaps(exps[0], exps[1]);
+        unrolled = UnmappingFilterVisitor.ff.overlaps(exps[0], exps[1]);
         return unrolled;
     }
 
     public Object visit(Touches filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.touches(exps[0], exps[1]);
+        unrolled = UnmappingFilterVisitor.ff.touches(exps[0], exps[1]);
         return unrolled;
     }
 
     public Object visit(Within filter, Object arg1) {
         Expression[] exps = visitBinarySpatialOp(filter);
-        unrolled = ff.within(exps[0], exps[1]);
+        unrolled = UnmappingFilterVisitor.ff.within(exps[0], exps[1]);
         return unrolled;
     }
 
@@ -508,14 +508,14 @@ public class UnmappingFilterVisitor implements
 
     public Object visit(Add expr, Object arg1) {
         Expression[] expressions = visitBinaryExpression(expr);
-        Expression add = ff.add(expressions[0], expressions[1]);
+        Expression add = UnmappingFilterVisitor.ff.add(expressions[0], expressions[1]);
         unrolledExpressions.add(add);
         return unrolledExpressions;
     }
 
     public Object visit(Divide expr, Object arg1) {
         Expression[] expressions = visitBinaryExpression(expr);
-        Expression divide = ff.divide(expressions[0], expressions[1]);
+        Expression divide = UnmappingFilterVisitor.ff.divide(expressions[0], expressions[1]);
         unrolledExpressions.add(divide);
         return unrolledExpressions;
     }
@@ -536,7 +536,7 @@ public class UnmappingFilterVisitor implements
         Expression[] unmapped = new Expression[arguments.size()];
         unmapped = (Expression[]) arguments.toArray(unmapped);
 
-        Function unmappedFunction = ff.function(expr.getName(), unmapped);
+        Function unmappedFunction = UnmappingFilterVisitor.ff.function(expr.getName(), unmapped);
 
         this.unrolledExpressions.add(unmappedFunction);
 
@@ -550,7 +550,7 @@ public class UnmappingFilterVisitor implements
 
     public Object visit(Multiply expr, Object arg1) {
         Expression[] expressions = visitBinaryExpression(expr);
-        Expression multiply = ff.multiply(expressions[0], expressions[1]);
+        Expression multiply = UnmappingFilterVisitor.ff.multiply(expressions[0], expressions[1]);
         unrolledExpressions.add(multiply);
         return unrolledExpressions;
     }
@@ -575,7 +575,7 @@ public class UnmappingFilterVisitor implements
 
     public Object visit(Subtract expr, Object arg1) {
         Expression[] expressions = visitBinaryExpression(expr);
-        Expression subtract = ff.subtract(expressions[0], expressions[1]);
+        Expression subtract = UnmappingFilterVisitor.ff.subtract(expressions[0], expressions[1]);
         unrolledExpressions.add(subtract);
         return unrolledExpressions;
     }

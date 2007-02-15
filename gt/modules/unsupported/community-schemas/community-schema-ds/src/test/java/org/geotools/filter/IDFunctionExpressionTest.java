@@ -3,7 +3,6 @@ package org.geotools.filter;
 import junit.framework.TestCase;
 
 import org.geotools.data.ComplexTestData;
-import org.geotools.data.DataTestCase;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.iso.AttributeBuilder;
 import org.geotools.feature.iso.AttributeFactoryImpl;

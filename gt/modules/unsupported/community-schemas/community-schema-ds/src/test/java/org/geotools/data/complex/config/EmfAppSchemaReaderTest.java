@@ -12,6 +12,7 @@ import org.geotools.feature.Name;
 import org.geotools.feature.iso.Types;
 import org.geotools.feature.type.TypeName;
 import org.geotools.gml3.bindings.GML;
+import org.geotools.test.TestData;
 import org.geotools.xs.bindings.XS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -44,7 +45,7 @@ public class EmfAppSchemaReaderTest extends TestCase {
 
     public void testParseSimpleFeatureType() throws Exception {
         String res = "simpleFeature.xsd";
-        URL resource = getClass().getResource(res);
+        URL resource = TestData.getResource(this, res);
 
         schemaLoader.parse(resource);
 
@@ -107,7 +108,7 @@ public class EmfAppSchemaReaderTest extends TestCase {
 
     public void testComplexFeatureType() throws Exception {
         String res = "complexFeature.xsd";
-        URL resource = getClass().getResource(res);
+        URL resource = TestData.getResource(this, res);
         schemaLoader.parse(resource);
 
         Map registry = schemaLoader.getTypeRegistry();

@@ -230,7 +230,7 @@ public class ComplexDataStoreConfigurator {
                 expression = FilterBuilder.parseExpression(sourceExpr);
             } catch (Exception e) {
                 String msg = "parsing expression " + sourceExpr;
-                LOGGER.log(Level.SEVERE, msg, e);
+                ComplexDataStoreConfigurator.LOGGER.log(Level.SEVERE, msg, e);
                 throw new DataSourceException(msg + ": " + e.getMessage(), e);
             }
         }
@@ -272,10 +272,10 @@ public class ComplexDataStoreConfigurator {
                     + dto);
         }
 
-        LOGGER.fine("asking datastore " + sourceDataStore + " for source type " + typeName);
+        ComplexDataStoreConfigurator.LOGGER.fine("asking datastore " + sourceDataStore + " for source type " + typeName);
         TypeName name = deglose(typeName);
         FeatureSource2 fSource = (FeatureSource2) sourceDataStore.access(name);
-        LOGGER.fine("found feature source for " + typeName);
+        ComplexDataStoreConfigurator.LOGGER.fine("found feature source for " + typeName);
         return fSource;
     }
 
@@ -293,7 +293,7 @@ public class ComplexDataStoreConfigurator {
      * @throws IOException
      */
     private void parseGmlSchemas() throws IOException {
-        LOGGER.finer("about to parse target schemas");
+        ComplexDataStoreConfigurator.LOGGER.finer("about to parse target schemas");
 
         final URL baseUrl;
         if (config.getBaseSchemasUrl() == null) {
@@ -310,7 +310,7 @@ public class ComplexDataStoreConfigurator {
         for (Iterator it = schemaFiles.iterator(); it.hasNext();) {
             String schemaLocation = (String) it.next();
             final URL schemaUrl = guessSchemaUrl(baseUrl, schemaLocation);
-            LOGGER.fine("parsing schema " + schemaUrl.toExternalForm());
+            ComplexDataStoreConfigurator.LOGGER.fine("parsing schema " + schemaUrl.toExternalForm());
 
             schemaParser.parse(schemaUrl);
         }
@@ -322,15 +322,15 @@ public class ComplexDataStoreConfigurator {
             throws MalformedURLException {
         final URL schemaUrl;
         if (schemaLocation.startsWith("file:") || schemaLocation.startsWith("http:")) {
-            LOGGER.fine("using schema location as absolute path: " + schemaLocation);
+            ComplexDataStoreConfigurator.LOGGER.fine("using schema location as absolute path: " + schemaLocation);
             schemaUrl = new URL(schemaLocation);
         } else {
             if (baseUrl == null) {
                 schemaUrl = new URL(schemaLocation);
-                LOGGER.warning("base url not provided, may be unable to locate" + schemaLocation
+                ComplexDataStoreConfigurator.LOGGER.warning("base url not provided, may be unable to locate" + schemaLocation
                         + ". Path resolved to: " + schemaUrl.toExternalForm());
             } else {
-                LOGGER.fine("using schema location " + schemaLocation + " as relative to "
+                ComplexDataStoreConfigurator.LOGGER.fine("using schema location " + schemaLocation + " as relative to "
                         + baseUrl);
                 schemaUrl = new URL(baseUrl, schemaLocation);
             }
@@ -349,7 +349,7 @@ public class ComplexDataStoreConfigurator {
      *             DOCUMENT ME!
      */
     private Map/* <String, FeatureAccess> */aquireSourceDatastores() throws IOException {
-        LOGGER.entering(getClass().getName(), "aquireSourceDatastores");
+        ComplexDataStoreConfigurator.LOGGER.entering(getClass().getName(), "aquireSourceDatastores");
 
         final Map datastores = new HashMap();
         final List dsParams = config.getSourceDataStores();
@@ -361,7 +361,7 @@ public class ComplexDataStoreConfigurator {
 
             Map datastoreParams = dsconfig.getParams();
 
-            LOGGER.fine("looking for datastore " + id);
+            ComplexDataStoreConfigurator.LOGGER.fine("looking for datastore " + id);
 
             DataAccess dataStore = DataAccessFinder.createAccess((Object) datastoreParams);
 
@@ -370,9 +370,7 @@ public class ComplexDataStoreConfigurator {
                         + datastoreParams);
             }
 
-            FeatureAccess featureAccess = (FeatureAccess) dataStore;
-
-            LOGGER.fine("got datastore " + dataStore);
+            ComplexDataStoreConfigurator.LOGGER.fine("got datastore " + dataStore);
             datastores.put(id, dataStore);
         }
 
@@ -392,8 +390,9 @@ public class ComplexDataStoreConfigurator {
     private TypeName deglose(String prefixedName) throws IllegalArgumentException {
         TypeName name = null;
 
-        if (prefixedName == null)
+        if (prefixedName == null) {
             return null;
+        }
 
         int prefixIdx = prefixedName.indexOf(':');
         if (prefixIdx == -1) {

@@ -5,7 +5,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 
 import junit.framework.TestCase;
@@ -34,9 +33,11 @@ public class ComplexDataStoreFactoryTest extends TestCase {
         factory = new ComplexDataStoreFactory();
         params = new HashMap();
         params.put("dbtype", "complex");
-        params.put("config", getClass().getResource("test-data/roadsegments.xml"));
-        Properties env = System.getProperties();
-        // env.save(System.out, "");
+        URL resource = org.geotools.test.TestData.getResource(this, "roadsegments.xml");
+        if (resource == null) {
+            fail("Can't find resouce test-data/roadsegments.xml");
+        }
+        params.put("config", resource);
     }
 
     protected void tearDown() throws Exception {

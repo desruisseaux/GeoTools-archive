@@ -240,10 +240,6 @@ public class TestData {
         final FeatureSource2 wsSource = (FeatureSource2) simpleStore
                 .access(typeName);
 
-        AttributeDescriptor descriptor = (AttributeDescriptor) wsSource
-                .describe();
-        final FeatureType sourceType = (FeatureType) descriptor.getType();
-
         List mappings = new LinkedList();
         Expression id;
         Expression source;
@@ -401,7 +397,6 @@ public class TestData {
 
         builder.setName(TestData.WATERSAMPLE_TYPENAME.getLocalPart());
 
-        String typeString = "determinand_description:string,results_value:float,location:Point";
         builder.addAttribute("station_no", String.class);
         builder.addAttribute("sitename", String.class);
         builder.addAttribute("anzlic_no", String.class);
@@ -414,7 +409,6 @@ public class TestData {
 
         SimpleFeatureType type = builder.feature();
 
-        AttributeDescriptor node = null;// new NodeImpl(type);
         dataStore.createSchemaInternal(type);
 
         final int NUM_STATIONS = 10;

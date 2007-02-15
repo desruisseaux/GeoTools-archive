@@ -109,6 +109,12 @@
 			<version>2.4-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt2-sample-data</artifactId>
+			<version>2.4-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 
@@ -121,6 +127,8 @@
 				<directory>src/test/resources</directory>
 				<includes>
 					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+					<include>**/*.xsd</include>
 				</includes>
 			</testResource>
 		</testResources>

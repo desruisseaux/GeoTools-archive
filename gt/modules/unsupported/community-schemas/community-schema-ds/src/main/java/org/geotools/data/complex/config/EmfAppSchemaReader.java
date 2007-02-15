@@ -13,14 +13,12 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.eclipse.xsd.XSDAnnotation;
 import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDAttributeUse;
 import org.eclipse.xsd.XSDAttributeUseCategory;
 import org.eclipse.xsd.XSDComplexTypeDefinition;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.eclipse.xsd.XSDSchema;
-import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.data.feature.adapter.ISOAttributeTypeAdapter;
 import org.geotools.data.feature.adapter.ISOFeatureTypeAdapter;
@@ -85,22 +83,22 @@ public class EmfAppSchemaReader {
     }
 
     public void parse(URL location) throws IOException {
-        if (FOUNDATION_TYPES.isEmpty()) {
+        if (EmfAppSchemaReader.FOUNDATION_TYPES.isEmpty()) {
             createFoundationTypes();
         }
-        registry.putAll(FOUNDATION_TYPES);
+        registry.putAll(EmfAppSchemaReader.FOUNDATION_TYPES);
 
         String appSchemaUri = location.toExternalForm();
-        LOGGER.info("Parsing application schema to emf:" + appSchemaUri);
+        EmfAppSchemaReader.LOGGER.info("Parsing application schema to emf:" + appSchemaUri);
         XSDSchema xsdSchema = Schemas.parse(appSchemaUri);
 
-        LOGGER.info("Importing application schema " + appSchemaUri);
+        EmfAppSchemaReader.LOGGER.info("Importing application schema " + appSchemaUri);
         importSchema(xsdSchema);
     }
 
     private void createFoundationTypes() {
-        synchronized (FOUNDATION_TYPES) {
-            if (!FOUNDATION_TYPES.isEmpty()) {
+        synchronized (EmfAppSchemaReader.FOUNDATION_TYPES) {
+            if (!EmfAppSchemaReader.FOUNDATION_TYPES.isEmpty()) {
                 return;
             }
             Schema schema;
@@ -116,33 +114,33 @@ public class EmfAppSchemaReader {
             schema = new GMLSchema();
             importSchema(schema);
 
-            LOGGER.info("Creating GMLConfiguration to get the prebuilt gml schemas from");
+            EmfAppSchemaReader.LOGGER.info("Creating GMLConfiguration to get the prebuilt gml schemas from");
             GMLConfiguration configuration = new GMLConfiguration();
-            LOGGER.info("Aquiring prebuilt gml schema an its dependencies");
+            EmfAppSchemaReader.LOGGER.info("Aquiring prebuilt gml schema an its dependencies");
             SchemaIndex index = Schemas.findSchemas(configuration);
             XSDSchema[] schemas = index.getSchemas();
 
-            LOGGER.info("Importing GML schema and dependencies");
+            EmfAppSchemaReader.LOGGER.info("Importing GML schema and dependencies");
             for (int i = 0; i < schemas.length; i++) {
                 XSDSchema xsdSchema = schemas[i];
                 importSchema(xsdSchema);
             }
 
-            FOUNDATION_TYPES.putAll(registry);
+            EmfAppSchemaReader.FOUNDATION_TYPES.putAll(registry);
             registry.clear();
         }
     }
 
     private void importSchema(XSDSchema xsdSchema) {
         String targetNamespace = xsdSchema.getTargetNamespace();
-        LOGGER.fine("Importing schema " + targetNamespace);
+        EmfAppSchemaReader.LOGGER.fine("Importing schema " + targetNamespace);
 
         List typeDefinitions = xsdSchema.getTypeDefinitions();
-        LOGGER.finer("Importing " + targetNamespace + " type definitions");
+        EmfAppSchemaReader.LOGGER.finer("Importing " + targetNamespace + " type definitions");
         importXsdTypeDefinitions(typeDefinitions);
 
         List elementDeclarations = xsdSchema.getElementDeclarations();
-        LOGGER.finer("Importing " + targetNamespace + " element definitions");
+        EmfAppSchemaReader.LOGGER.finer("Importing " + targetNamespace + " element definitions");
         importElementDeclarations(elementDeclarations);
     }
 
@@ -150,9 +148,9 @@ public class EmfAppSchemaReader {
         XSDElementDeclaration elemDecl;
         for (Iterator it = elementDeclarations.iterator(); it.hasNext();) {
             elemDecl = (XSDElementDeclaration) it.next();
-            LOGGER.finest("Creating attribute descriptor for " + elemDecl.getQName());
+            EmfAppSchemaReader.LOGGER.finest("Creating attribute descriptor for " + elemDecl.getQName());
             AttributeDescriptor descriptor = createAttributeDescriptor(null, elemDecl);
-            LOGGER.finest("Registering attribute descriptor " + descriptor.getName());
+            EmfAppSchemaReader.LOGGER.finest("Registering attribute descriptor " + descriptor.getName());
             register(descriptor);
         }
     }
@@ -190,7 +188,7 @@ public class EmfAppSchemaReader {
         AttributeDescriptor descriptor = typeFactory.createAttributeDescriptor(type, elemName,
                 minOccurs, maxOccurs, nillable);
 
-        descriptor.putUserData(EMF_USERDATA_KEY, elemDecl);
+        descriptor.putUserData(EmfAppSchemaReader.EMF_USERDATA_KEY, elemDecl);
 
         return descriptor;
     }
@@ -277,9 +275,6 @@ public class EmfAppSchemaReader {
             attType = createType(assignedName, schema, typeDefinition, superType);
 
         } else {
-            XSDSimpleTypeDefinition simpleType = typeDefinition.getSimpleType();
-            XSDAnnotation derivationAnnotation = simpleType.getDerivationAnnotation();
-
             Class binding = String.class;
             boolean isIdentifiable = false;
             boolean isAbstract = false;
@@ -289,7 +284,7 @@ public class EmfAppSchemaReader {
                     isAbstract, restrictions, superType, description);
         }
 
-        attType.putUserData(EMF_USERDATA_KEY, typeDefinition);
+        attType.putUserData(EmfAppSchemaReader.EMF_USERDATA_KEY, typeDefinition);
         return attType;
     }
 
@@ -310,7 +305,6 @@ public class EmfAppSchemaReader {
         if (isFeatureType) {
             if (isSimpleContent) {
                 SimpleTypeFactory fac = new SimpleTypeFactoryImpl();
-                List types = new ArrayList(schema);
                 // let the factory decide
                 CoordinateReferenceSystem crs = null;
                 // let the factory decide
@@ -431,16 +425,16 @@ public class EmfAppSchemaReader {
             String name = typeDef.getName();
             attType = getType(targetNamespace, name);
             if (attType == null) {
-                LOGGER.finest("Creating attribute type " + typeDef.getQName());
+                EmfAppSchemaReader.LOGGER.finest("Creating attribute type " + typeDef.getQName());
                 attType = createType(typeDef);
-                LOGGER.finest("Registering attribute type " + attType.getName());
+                EmfAppSchemaReader.LOGGER.finest("Registering attribute type " + attType.getName());
                 register(attType);
             } else {
-                LOGGER.finer("Ignoring type " + typeDef.getQName()
+                EmfAppSchemaReader.LOGGER.finer("Ignoring type " + typeDef.getQName()
                         + " as it already exists in the registry");
             }
         }
-        LOGGER.finer("--- type definitions imported successfully ---");
+        EmfAppSchemaReader.LOGGER.finer("--- type definitions imported successfully ---");
     }
 
     private void importSchema(Schema schema) {
@@ -449,10 +443,10 @@ public class EmfAppSchemaReader {
             Name key = (Name) entry.getKey();
             Object value = entry.getValue();
             if (registry.containsKey(key)) {
-                LOGGER.finer("Ignoring " + key + " as it already exists. type "
+                EmfAppSchemaReader.LOGGER.finer("Ignoring " + key + " as it already exists. type "
                         + value.getClass().getName());
             } else {
-                LOGGER.finer("Importing " + key + " of type " + value.getClass().getName());
+                EmfAppSchemaReader.LOGGER.finer("Importing " + key + " of type " + value.getClass().getName());
                 if (value instanceof AttributeType) {
                     AttributeType type = (AttributeType) value;
                     register(type);
@@ -473,7 +467,7 @@ public class EmfAppSchemaReader {
                 }
             }
         }
-        LOGGER.fine("Schema " + schema.namespace().getURI() + " imported successfully");
+        EmfAppSchemaReader.LOGGER.fine("Schema " + schema.namespace().getURI() + " imported successfully");
     }
 
     public static EmfAppSchemaReader newInstance() {

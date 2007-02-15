@@ -53,10 +53,11 @@ public class AsMultiGeometryFunctionExpression extends FunctionExpressionImpl {
                 }
 
                 return wrap((Geometry) value);
-            } else
+            } else {
                 throw new IllegalArgumentException(
                         "function argument did not evaluate to "
                                 + Geometry.class);
+            }
         }
 
         return null;

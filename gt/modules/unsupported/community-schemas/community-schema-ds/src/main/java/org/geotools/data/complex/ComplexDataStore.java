@@ -70,13 +70,12 @@ public class ComplexDataStore extends AbstractDataStore implements
      *            FeatureType this DataStore is going to hold.
      */
     public ComplexDataStore(Set/* <FeatureTypeMapping> */mappings) {
-        super(IS_WRITABLE);
+        super(ComplexDataStore.IS_WRITABLE);
         FeatureTypeMapping mapping;
         this.mappings = new HashMap();
         for (Iterator it = mappings.iterator(); it.hasNext();) {
             mapping = (FeatureTypeMapping) it.next();
             Name mappedElement = mapping.getTargetFeature().getName();
-            FeatureType mappedType;
             this.mappings.put(mappedElement.getLocalPart(), mapping);
         }
     }
@@ -246,9 +245,8 @@ public class ComplexDataStore extends AbstractDataStore implements
             Filter complexFilter = query.getFilter();
             AttributeDescriptor descriptor = (AttributeDescriptor) source
                     .describe();
-            FeatureType sourceType = (FeatureType) descriptor.getType();
 
-            Filter unrolledFilter = unrollFilter(complexFilter, mapping);
+            Filter unrolledFilter = ComplexDataStore.unrollFilter(complexFilter, mapping);
 
             List propNames = getSurrogatePropertyNames(
                     query.getPropertyNames(), mapping);
@@ -287,9 +285,6 @@ public class ComplexDataStore extends AbstractDataStore implements
         final AttributeDescriptor targetDescriptor = mapping.getTargetFeature();
         final Name targetName = targetDescriptor.getName();
         mappedType = (FeatureType) targetDescriptor.getType();
-
-        Source target = this.access(targetName);
-        final FeatureType targetType = (FeatureType) targetDescriptor.getType();
 
         if (mappingProperties != null && mappingProperties.length > 0) {
             Set requestedSurrogateProperties = new HashSet();
@@ -339,12 +334,12 @@ public class ComplexDataStore extends AbstractDataStore implements
                             if (mappedAttribute != null) {
                                 requestedSurrogateProperties.add(mappedAtt);
                             } else {
-                                LOGGER
+                                AbstractDataStore.LOGGER
                                         .info("mapped type does not contains property "
                                                 + mappedAtt);
                             }
                         }
-                        LOGGER.fine("adding atts needed for : " + exprAtts);
+                        AbstractDataStore.LOGGER.fine("adding atts needed for : " + exprAtts);
                     }
                 }
             }

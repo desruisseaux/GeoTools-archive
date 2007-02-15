@@ -25,8 +25,9 @@ public class TypeMapping implements Serializable{
 	}
 	public void setAttributeMappings(List attributeMappings) {
 		this.attributeMappings = new CheckedArrayList(AttributeMapping.class);
-		if(attributeMappings != null)
-			this.attributeMappings.addAll(attributeMappings);
+		if(attributeMappings != null) {
+            this.attributeMappings.addAll(attributeMappings);
+        }
 	}
 	
 	public List getGroupbyAttributeNames() {

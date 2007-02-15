@@ -42,8 +42,6 @@ public class XMLConfigDigester {
     /** Namespace URI for the ComplexDataStore configuration files */
     private static final String CONFIG_NS_URI = "http://www.geotools.org/complex";
 
-    /** Namespace URI for the OGC Filter Expressions */
-    private static final String OGC_NS_URI = "http://www.opengis.net/ogc";
 
     /**
      * Creates a new XMLConfigReader object.
@@ -92,17 +90,17 @@ public class XMLConfigDigester {
                 + dataStoreConfigUrl);
         }
 
-        LOGGER.fine("parsing complex datastore config: "
+        XMLConfigDigester.LOGGER.fine("parsing complex datastore config: "
             + dataStoreConfigUrl.toExternalForm());
 
         Digester digester = new Digester();
-        LOGGER.fine("digester created");
+        XMLConfigDigester.LOGGER.fine("digester created");
         //URL schema = getClass()
         //		.getResource("../test-data/ComplexDataStore.xsd");
         //digester.setSchema(schema.toExternalForm());
         digester.setValidating(false);
         digester.setNamespaceAware(true);
-        digester.setRuleNamespaceURI(CONFIG_NS_URI);
+        digester.setRuleNamespaceURI(XMLConfigDigester.CONFIG_NS_URI);
 
         // digester.setRuleNamespaceURI(OGC_NS_URI);
         ComplexDataStoreDTO configDto = new ComplexDataStoreDTO();
@@ -121,7 +119,7 @@ public class XMLConfigDigester {
 
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.log(Level.SEVERE, "setting digester properties: ", e);
+            XMLConfigDigester.LOGGER.log(Level.SEVERE, "setting digester properties: ", e);
             throw new IOException("Error setting digester properties: "
                 + e.getMessage());
         }
@@ -130,7 +128,7 @@ public class XMLConfigDigester {
             digester.parse(configStream);
         } catch (SAXException e) {
             e.printStackTrace();
-            LOGGER.log(Level.SEVERE, "parsing " + dataStoreConfigUrl, e);
+            XMLConfigDigester.LOGGER.log(Level.SEVERE, "parsing " + dataStoreConfigUrl, e);
 
             IOException ioe = new IOException(
                     "Can't parse complex datastore config. ");
@@ -145,11 +143,11 @@ public class XMLConfigDigester {
 
 	private void setTypeMappingsRules(Digester digester) {
 		final String mappings = "ComplexDataStore/typeMappings";
-		digester.addObjectCreate(mappings, CONFIG_NS_URI, HashSet.class);
+		digester.addObjectCreate(mappings, XMLConfigDigester.CONFIG_NS_URI, HashSet.class);
 
 		final String typeMapping = mappings + "/FeatureTypeMapping";
 
-		digester.addObjectCreate(typeMapping, CONFIG_NS_URI, TypeMapping.class);
+		digester.addObjectCreate(typeMapping, XMLConfigDigester.CONFIG_NS_URI, TypeMapping.class);
 		digester.addCallMethod(typeMapping + "/sourceDataStore", "setSourceDataStore", 1);
 		digester.addCallParam(typeMapping + "/sourceDataStore", 0);
 		digester.addCallMethod(typeMapping + "/sourceType", "setSourceTypeName", 1);
@@ -159,17 +157,17 @@ public class XMLConfigDigester {
 
 		//add grouping source attribute names
 		final String groupBy = typeMapping + "/groupBy";
-		digester.addObjectCreate(groupBy, CONFIG_NS_URI, ArrayList.class);
+		digester.addObjectCreate(groupBy, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);
 		digester.addCallMethod(groupBy + "/GroupByAttribute", "add", 1);
 		digester.addCallParam(groupBy + "/GroupByAttribute", 0);
 		digester.addSetNext(groupBy, "setGroupbyAttributeNames", "java.util.List");
 		
 		//create attribute mappings
 		final String attMappings = typeMapping + "/attributeMappings";
-		digester.addObjectCreate(attMappings, CONFIG_NS_URI, ArrayList.class);
+		digester.addObjectCreate(attMappings, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);
 
 		final String attMap = attMappings + "/AttributeMapping";
-		digester.addObjectCreate(attMap, CONFIG_NS_URI, AttributeMapping.class);
+		digester.addObjectCreate(attMap, XMLConfigDigester.CONFIG_NS_URI, AttributeMapping.class);
 
 		digester.addCallMethod(attMap + "/isMultiple", "setMultiple", 1);
 		digester.addCallParam(attMap + "/isMultiple", 0);
@@ -203,7 +201,7 @@ public class XMLConfigDigester {
 
 	private void setTargetSchemaUriRules(Digester digester) {
 		final String targetSchemas =   "ComplexDataStore/targetTypes";
-		digester.addObjectCreate(targetSchemas, CONFIG_NS_URI, ArrayList.class);
+		digester.addObjectCreate(targetSchemas, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);
 		
 		final String schema = targetSchemas + "/FeatureType/schemaUri";
 		digester.addCallMethod(schema, "add", 1);
@@ -214,14 +212,14 @@ public class XMLConfigDigester {
 
 	private void setSourceDataStoresRules(Digester digester) {
 		final String dataStores = "ComplexDataStore/sourceDataStores";
-		digester.addObjectCreate(dataStores, CONFIG_NS_URI, ArrayList.class);
+		digester.addObjectCreate(dataStores, XMLConfigDigester.CONFIG_NS_URI, ArrayList.class);
 
 		//create a SourceDataStore for each DataStore tag
-		digester.addObjectCreate(dataStores + "/DataStore", CONFIG_NS_URI, SourceDataStore.class);
+		digester.addObjectCreate(dataStores + "/DataStore", XMLConfigDigester.CONFIG_NS_URI, SourceDataStore.class);
 		digester.addCallMethod(dataStores + "/DataStore/id", "setId", 1);
 		digester.addCallParam(dataStores + "/DataStore/id", 0);
 		
-		digester.addObjectCreate(dataStores + "/DataStore/parameters", CONFIG_NS_URI, HashMap.class);
+		digester.addObjectCreate(dataStores + "/DataStore/parameters", XMLConfigDigester.CONFIG_NS_URI, HashMap.class);
 		digester.addCallMethod(dataStores + "/DataStore/parameters/Parameter", "put", 2);
 		digester.addCallParam(dataStores + "/DataStore/parameters/Parameter/name", 0);
 		digester.addCallParam(dataStores + "/DataStore/parameters/Parameter/value", 1);
@@ -236,7 +234,7 @@ public class XMLConfigDigester {
 
 	private void setNamespacesRules(Digester digester) {
 		final String ns = "ComplexDataStore/namespaces";
-		digester.addObjectCreate(ns, CONFIG_NS_URI, HashMap.class);
+		digester.addObjectCreate(ns, XMLConfigDigester.CONFIG_NS_URI, HashMap.class);
 		digester.addCallMethod(ns + "/Namespace", "put", 2);
 		digester.addCallParam(ns + "/Namespace/prefix", 0);
 		digester.addCallParam(ns + "/Namespace/uri", 1);

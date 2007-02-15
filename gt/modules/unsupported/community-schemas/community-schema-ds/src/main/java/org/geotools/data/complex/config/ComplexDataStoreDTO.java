@@ -16,9 +16,6 @@
  */
 package org.geotools.data.complex.config;
 
-import org.geotools.util.CheckedArrayList;
-import org.geotools.util.CheckedHashMap;
-import org.geotools.util.CheckedHashSet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +24,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.geotools.util.CheckedArrayList;
+import org.geotools.util.CheckedHashMap;
+import org.geotools.util.CheckedHashSet;
 
 
 /**
