@@ -2551,7 +2551,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                         throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1, type));
                     }
                     final MathTransform mt = factories.createBaseToDerived(sourceCRS, parameters,
-                            targetCRS.getCoordinateSystem(), null);
+                            targetCRS.getCoordinateSystem());
                     // TODO: uses GeoAPI factory method once available.
                     operation = DefaultOperation.create(properties, sourceCRS, targetCRS,
                                                         mt, method, expected);

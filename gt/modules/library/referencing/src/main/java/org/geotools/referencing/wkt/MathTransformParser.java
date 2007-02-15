@@ -40,7 +40,6 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefaultMathTransformFactory;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
-import org.geotools.util.Singleton;
 
 
 /**
@@ -68,10 +67,11 @@ public class MathTransformParser extends AbstractParser {
     private String classification;
 
     /**
-     * The method for the last math transform passed.
+     * The method for the last math transform passed, or {@code null} if none.
+     *
      * @see #getOperationMethod
      */
-    private final Singleton method = new Singleton();
+    private OperationMethod lastMethod;
     
     /**
      * Constructs a parser using the default set of symbols.
@@ -140,7 +140,7 @@ public class MathTransformParser extends AbstractParser {
     final MathTransform parseMathTransform(final Element element, final boolean required)
             throws ParseException
     {
-        method.clear();
+        lastMethod = null;
         classification = null;
         final Object key = element.peek();
         if (key instanceof Element) {
@@ -201,15 +201,16 @@ public class MathTransformParser extends AbstractParser {
          * method used. Otherwise, we will use the ordinary method and will performs a slower
          * search for the operation method later if the user ask for it.
          */
+        final MathTransform transform;
         try {
-            if (mtFactory instanceof DefaultMathTransformFactory) {
-                return ((DefaultMathTransformFactory) mtFactory)
-                       .createParameterizedTransform(parameters, method);
-            }
-            return mtFactory.createParameterizedTransform(parameters);
+            transform = mtFactory.createParameterizedTransform(parameters);
         } catch (FactoryException exception) {
             throw element.parseFailed(exception, null);
         }
+        if (mtFactory instanceof DefaultMathTransformFactory) {
+            lastMethod = ((DefaultMathTransformFactory) mtFactory).getLastUsedMethod();
+        }
+        return transform;
     }    
     
     /**
@@ -293,24 +294,22 @@ public class MathTransformParser extends AbstractParser {
         /*
          * Information available if the math transform used was a Geotools implementation.
          */
-        if (!method.isEmpty()) {
-            return (OperationMethod) method.get();
-        }
-        /*
-         * Not a Geotools implementation. Unfortunatly, there is no obvious way to get this
-         * information using GeoAPI interfaces at this time. Performs a slower and less robust
-         * check.
-         */
-        if (classification != null) {
-            for (final Iterator it=mtFactory.getAvailableMethods(CoordinateOperation.class).iterator();
-                                   it.hasNext();)
-            {
-                final OperationMethod method = (OperationMethod) it.next();
-                if (AbstractIdentifiedObject.nameMatches(method, classification)) {
-                    return method;
+        if (lastMethod == null) {
+            /*
+             * Not a Geotools implementation. Unfortunatly, there is no obvious way to get this
+             * information using GeoAPI interfaces at this time. Performs a slower and less robust
+             * check.
+             */
+            if (classification != null) {
+                for (final Iterator it=mtFactory.getAvailableMethods(CoordinateOperation.class).iterator(); it.hasNext();) {
+                    final OperationMethod method = (OperationMethod) it.next();
+                    if (AbstractIdentifiedObject.nameMatches(method, classification)) {
+                        lastMethod = method;
+                        break;
+                    }
                 }
             }
         }
-        return null;
+        return lastMethod;
     }
 }

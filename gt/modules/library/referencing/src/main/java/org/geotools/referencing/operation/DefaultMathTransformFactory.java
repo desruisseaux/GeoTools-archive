@@ -121,7 +121,12 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      * The last value returned by {@link #getProvider}. Stored as an
      * optimization since the same provider is often asked many times.
      */
-    private transient MathTransformProvider last;
+    private transient MathTransformProvider lastProvider;
+
+    /**
+     * The operation method for the last transform created.
+     */
+    private final ThreadLocal/*<OperationMethod>*/ lastMethod = new ThreadLocal();
 
     /**
      * A pool of math transform. This pool is used in order to
@@ -213,6 +218,19 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     }
 
     /**
+     * Returns the operation method used for the latest call to
+     * {@link #createParameterizedTransform createParameterizedTransform}
+     * in the currently running thread. Returns {@code null} if not applicable.
+     *
+     * @see #createParameterizedTransform
+     *
+     * @since 2.4
+     */
+    public OperationMethod getLastUsedMethod() {
+        return (OperationMethod) lastMethod.get();
+    }
+
+    /**
      * Returns the operation method for the specified name.
      *
      * @param  name The case insensitive {@linkplain Identifier#getCode identifier code}
@@ -244,7 +262,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     private MathTransformProvider getProvider(final String method)
             throws NoSuchIdentifierException
     {
-        MathTransformProvider provider = last; // Avoid synchronization
+        MathTransformProvider provider = lastProvider; // Avoid synchronization
         if (provider!=null && provider.nameMatches(method)) {
             return provider;
         }
@@ -252,7 +270,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         while (providers.hasNext()) {
             provider = (MathTransformProvider) providers.next();            
             if (provider.nameMatches(method)) {
-                return last = provider;
+                return lastProvider = provider;
             }
         }
         throw new NoSuchIdentifierException(Errors.format(
@@ -304,31 +322,12 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      *
      * @see #getDefaultParameters
      * @see #getAvailableMethods
+     * @see #getLastUsedMethod
      */
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
             throws NoSuchIdentifierException, FactoryException
     {
-        return createParameterizedTransform(parameters, null);
-    }
-
-    /**
-     * Creates a transform from a group of parameters and add the method used to a list.
-     * This variant of {@code createParameterizedTransform(...)} provides a way for
-     * the client to keep trace of any {@linkplain OperationMethod operation method}
-     * used by this factory. 
-     *
-     * @param  parameters The parameter values.
-     * @param  methods A collection where to add the operation method that apply to the transform,
-     *                 or {@code null} if none.
-     * @return The parameterized transform.
-     * @throws NoSuchIdentifierException if there is no transform registered for the method.
-     * @throws FactoryException if the object creation failed. This exception is thrown
-     *         if some required parameter has not been supplied, or has illegal value.
-     */
-    public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
-                                                      Collection          methods)
-            throws NoSuchIdentifierException, FactoryException
-    {
+//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
         final String classification = parameters.getDescriptor().getName().getCode();
         final MathTransformProvider provider = getProvider(classification);
         OperationMethod method = provider;
@@ -349,10 +348,37 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
             method    = delegate.method;
             transform = delegate.transform;
         }
+        transform = (MathTransform) pool.canonicalize(transform);
+        lastMethod.set(method);
+        return transform;
+    }
+
+    /**
+     * Creates a transform from a group of parameters and add the method used to a list.
+     * This variant of {@code createParameterizedTransform(...)} provides a way for
+     * the client to keep trace of any {@linkplain OperationMethod operation method}
+     * used by this factory. 
+     *
+     * @param  parameters The parameter values.
+     * @param  methods A collection where to add the operation method that apply to the transform,
+     *                 or {@code null} if none.
+     * @return The parameterized transform.
+     * @throws NoSuchIdentifierException if there is no transform registered for the method.
+     * @throws FactoryException if the object creation failed. This exception is thrown
+     *         if some required parameter has not been supplied, or has illegal value.
+     *
+     * @deprecated Replaced by {@link #createParameterizedTransform(ParameterValueGroup)}
+     *             followed by a call to {@link #getLastUsedMethod}.
+     */
+    public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
+                                                      Collection          methods)
+            throws NoSuchIdentifierException, FactoryException
+    {
+        MathTransform transform = createParameterizedTransform(parameters);
         if (methods != null) {
-            methods.add(method);
+            methods.add(lastMethod.get());
         }
-        return (MathTransform) pool.canonicalize(transform);
+        return transform;
     }
 
     /**
@@ -372,6 +398,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     public MathTransform createAffineTransform(final Matrix matrix)
             throws FactoryException
     {
+//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
         return (MathTransform) pool.canonicalize(ProjectiveTransform.create(matrix));
     }
     
@@ -394,6 +421,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
                                                      final MathTransform transform2)
             throws FactoryException
     {
+//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
         MathTransform tr;
         try {
             tr = ConcatenatedTransform.create(transform1, transform2);
@@ -427,6 +455,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
                                                     final int numTrailingOrdinates)
             throws FactoryException
     {
+//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
         MathTransform tr;
         try {
             tr = PassThroughTransform.create(firstAffectedOrdinate,

@@ -51,7 +51,6 @@ import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.XArray;
-import org.geotools.util.Singleton;
 
 
 /**
@@ -100,6 +99,13 @@ public final class FactoryGroup extends ReferencingFactory {
     // The Datum, CS, CRS and MathTransform factories above are standalone, while the Geotools
     // implementation of CoordinateOperationFactory has complex dependencies with all of those,
     // and even with authority factories.
+
+    /**
+     * The operation method for the last CRS created, or {@code null} if none. This field
+     * may be the operation name as a {@link String} rather than a {@link OperationMethod}
+     * if the math transform was not created by a Geotools implementation of factory.
+     */
+    private final ThreadLocal/*<Object>*/ lastMethod = new ThreadLocal();
 
     /**
      * Constructs an instance using the specified factories. If any factory is null,
@@ -300,8 +306,11 @@ public final class FactoryGroup extends ReferencingFactory {
     }
 
     /**
-     * Returns the operation method for the specified name. This method scans all operations
-     * registered in the {@linkplain #getMathTransformFactory current math transform factory}.
+     * Returns the operation method for the specified name.
+     * If the {@linkplain #getMathTransformFactory underlying math transform factory} is the
+     * {@linkplain DefaultMathTransformFactory Geotools implementation}, then this method just
+     * delegates the call to it. Otherwise this method scans all operations registered in the
+     * math transform factory until a match is found.
      *
      * @param  name The case insensitive {@linkplain Identifier#getCode identifier code}
      *         of the operation method to search for (e.g. {@code "Transverse_Mercator"}).
@@ -334,8 +343,80 @@ public final class FactoryGroup extends ReferencingFactory {
     }
 
     /**
+     * Returns the operation method for the last call to a {@code create} method in the currently
+     * running thread. This method may be invoked after any of the following methods:
+     * <p>
+     * <ul>
+     *   <li>{@link #createParameterizedTransform}</li>
+     *   <li>{@link #createBaseToDerived}</li>
+     * </ul>
+     *
+     * @return The operation method for the last call to a {@code create} method, or
+     *         {@code null} if none.
+     *
+     * @see DefaultMathTransformFactory#getLastUsedMethod
+     *
+     * @since 2.4
+     */
+    public OperationMethod getLastUsedMethod() {
+        final Object candidate = lastMethod.get();
+        if (candidate instanceof OperationMethod) {
+            return (OperationMethod) candidate;
+        }
+        if (candidate instanceof String) {
+            /*
+             * The last math transform was not created by a Geotools implementation
+             * of the factory. Scans all methods until a match is found.
+             */
+            final MathTransformFactory mtFactory = getMathTransformFactory();
+            final Set operations = mtFactory.getAvailableMethods(Operation.class);
+            final String classification = (String) candidate;
+            for (final Iterator it=operations.iterator(); it.hasNext();) {
+                final OperationMethod method = (OperationMethod) it.next();
+                if (AbstractIdentifiedObject.nameMatches(method.getParameters(), classification)) {
+                    lastMethod.set(method);
+                    return method;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates a transform from a group of parameters. This method delegates the work to the
+     * {@linkplain #getMathTransformFactory underlying math transform factory} and keep trace
+     * of the {@linkplain OperationMethod operation method} used. The later can be obtained
+     * by a call to {@link #getLastUsedMethod}.
+     *
+     * @param  parameters The parameter values.
+     * @return The parameterized transform.
+     * @throws NoSuchIdentifierException if there is no transform registered for the method.
+     * @throws FactoryException if the object creation failed. This exception is thrown
+     *         if some required parameter has not been supplied, or has illegal value.
+     *
+     * @see MathTransformFactory#createParameterizedTransform
+     *
+     * @since 2.4
+     */
+    public MathTransform createParameterizedTransform(ParameterValueGroup parameters)
+            throws NoSuchIdentifierException, FactoryException
+    {
+//        lastMethod.remove(); // TODO: uncomment when we will be allowed to target J2SE 1.5.
+        final MathTransformFactory mtFactory = getMathTransformFactory();
+        final MathTransform transform = mtFactory.createParameterizedTransform(parameters);
+        if (mtFactory instanceof DefaultMathTransformFactory) {
+            // Special processing for Geotools implementation.
+            lastMethod.set(((DefaultMathTransformFactory) mtFactory).getLastUsedMethod());
+        } else {
+            // Not a geotools implementation. Will try to guess the method later.
+            lastMethod.set(parameters.getDescriptor().getName().getCode());
+        }
+        return transform;
+    }
+
+    /**
      * Creates a transform from a group of parameters and add the method used to a list.
-     * This variant of {@code createParameterizedTransform(...)} provide a way for
+     * This variant of {@code createParameterizedTransform(...)} provides a way for
      * the client to keep trace of any {@linkplain OperationMethod operation method}
      * used by this factory. 
      *
@@ -347,58 +428,42 @@ public final class FactoryGroup extends ReferencingFactory {
      * @throws FactoryException if the object creation failed. This exception is thrown
      *         if some required parameter has not been supplied, or has illegal value.
      *
-     * @see MathTransformFactory#createParameterizedTransform
+     * @deprecated Replaced by {@link #createParameterizedTransform(ParameterValueGroup)}
+     *             followed by a call to {@link #getLastUsedMethod}.
      */
     public MathTransform createParameterizedTransform(ParameterValueGroup parameters,
                                                       Collection          methods)
             throws NoSuchIdentifierException, FactoryException
     {
-        final MathTransformFactory mtFactory = getMathTransformFactory();
-        if (methods == null) {
-            return mtFactory.createParameterizedTransform(parameters);
-        }
-        final MathTransform transform;
-        if (mtFactory instanceof DefaultMathTransformFactory) {
-            // Special processing for Geotools implementation.
-            transform = ((DefaultMathTransformFactory) mtFactory)
-                        .createParameterizedTransform(parameters, methods);
-        } else {
-            // Not a geotools implementation. Try to guess the method.
-            transform = mtFactory.createParameterizedTransform(parameters);
-            final Set operations = mtFactory.getAvailableMethods(Operation.class);
-            final String classification = parameters.getDescriptor().getName().getCode();
-            for (final Iterator it=operations.iterator(); it.hasNext();) {
-                final OperationMethod method = (OperationMethod) it.next();
-                if (AbstractIdentifiedObject.nameMatches(method.getParameters(), classification)) {
-                    methods.add(method);
-                    break;
-                }
-            }
+        final MathTransform transform = createParameterizedTransform(parameters);
+        if (methods != null) {
+            methods.add(getLastUsedMethod());
         }
         return transform;
     }
 
     /**
      * Creates a {@linkplain #createParameterizedTransform parameterized transform} from a base
-     * CRS to a derived CS. If the <code>"semi_major"</code> and <code>"semi_minor"</code>
-     * parameters are not explicitly specified, they will be inferred from the
-     * {@linkplain Ellipsoid ellipsoid} and added to {@code parameters}.
-     * In addition, this method performs axis switch as needed. 
+     * CRS to a derived CS. If the {@code "semi_major"} and {@code "semi_minor"} parameters are
+     * not explicitly specified, they will be inferred from the {@linkplain Ellipsoid ellipsoid}
+     * and added to {@code parameters}. In addition, this method performs axis switch as needed.
+     * <p>
+     * The {@linkplain OperationMethod operation method} used can be obtained by a call to
+     * {@link #getLastUsedMethod}.
      *
      * @param  baseCRS The source coordinate reference system.
      * @param  parameters The parameter values for the transform.
      * @param  derivedCS the target coordinate system.
-     * @param  methods A collection where to add the operation method that apply to the transform,
-     *                 or {@code null} if none.
      * @return The parameterized transform.
      * @throws NoSuchIdentifierException if there is no transform registered for the method.
      * @throws FactoryException if the object creation failed. This exception is thrown
      *         if some required parameter has not been supplied, or has illegal value.
+     *
+     * @since 2.4
      */
     public MathTransform createBaseToDerived(final CoordinateReferenceSystem baseCRS,
                                              final ParameterValueGroup       parameters,
-                                             final CoordinateSystem          derivedCS,
-                                             final Collection                methods)
+                                             final CoordinateSystem          derivedCS)
             throws NoSuchIdentifierException, FactoryException
     {
         /*
@@ -438,8 +503,11 @@ public final class FactoryGroup extends ReferencingFactory {
          */
         MathTransformFactory  mtFactory = getMathTransformFactory();
         MathTransform step1 = mtFactory.createAffineTransform(swap1);
-        MathTransform step2 = createParameterizedTransform(parameters, methods);
         MathTransform step3 = mtFactory.createAffineTransform(swap3);
+        MathTransform step2 = createParameterizedTransform(parameters);
+        // IMPORTANT: From this point, 'createParameterizedTransform' should not be invoked
+        //            anymore, directly or indirectly, in order to preserve the 'lastMethod'
+        //            value. It will be checked by the last assert before return.
         /*
          * If the target coordinate system has a height, instructs the projection to pass
          * the height unchanged from the base CRS to the target CRS. After this block, the
@@ -461,8 +529,44 @@ public final class FactoryGroup extends ReferencingFactory {
             step1 = mtFactory.createConcatenatedTransform(
                     mtFactory.createAffineTransform(drop), step1);
         }
-        return mtFactory.createConcatenatedTransform(
-               mtFactory.createConcatenatedTransform(step1, step2), step3);
+        final MathTransform transform =
+                mtFactory.createConcatenatedTransform(
+                mtFactory.createConcatenatedTransform(step1, step2), step3);
+        assert AbstractIdentifiedObject.nameMatches(parameters.getDescriptor(), getLastUsedMethod());
+        return transform;
+    }
+
+    /**
+     * Creates a {@linkplain #createParameterizedTransform parameterized transform} from a base
+     * CRS to a derived CS. If the <code>"semi_major"</code> and <code>"semi_minor"</code>
+     * parameters are not explicitly specified, they will be inferred from the
+     * {@linkplain Ellipsoid ellipsoid} and added to {@code parameters}.
+     * In addition, this method performs axis switch as needed. 
+     *
+     * @param  baseCRS The source coordinate reference system.
+     * @param  parameters The parameter values for the transform.
+     * @param  derivedCS the target coordinate system.
+     * @param  methods A collection where to add the operation method that apply to the transform,
+     *                 or {@code null} if none.
+     * @return The parameterized transform.
+     * @throws NoSuchIdentifierException if there is no transform registered for the method.
+     * @throws FactoryException if the object creation failed. This exception is thrown
+     *         if some required parameter has not been supplied, or has illegal value.
+     *
+     * @deprecated Replaced by {@link #createBaseToDerived}
+     *             followed by a call to {@link #getLastUsedMethod}.
+     */
+    public MathTransform createBaseToDerived(final CoordinateReferenceSystem baseCRS,
+                                             final ParameterValueGroup       parameters,
+                                             final CoordinateSystem          derivedCS,
+                                             final Collection                methods)
+            throws NoSuchIdentifierException, FactoryException
+    {
+        final MathTransform transform = createBaseToDerived(baseCRS, parameters, derivedCS);
+        if (methods != null) {
+            methods.add(getLastUsedMethod());
+        }
+        return transform;
     }
 
     /**
@@ -483,7 +587,8 @@ public final class FactoryGroup extends ReferencingFactory {
                                            final CartesianCS   derivedCS)
             throws FactoryException
     {
-        List methods = null;
+        final ParameterValueGroup parameters = conversionFromBase.getParameterValues();
+        final MathTransform mt = createBaseToDerived(baseCRS, parameters, derivedCS);
         OperationMethod method = conversionFromBase.getMethod();
         if (!(method instanceof MathTransformProvider)) {
             /*
@@ -494,22 +599,12 @@ public final class FactoryGroup extends ReferencingFactory {
              * do not already provides this hint.
              */
             if (!properties.containsKey(DefaultProjectedCRS.CONVERSION_TYPE_KEY)) {
-                methods = new ArrayList(1);
-            }
-        }
-        final ParameterValueGroup parameters = conversionFromBase.getParameterValues();
-        final MathTransform mt = createBaseToDerived(baseCRS, parameters, derivedCS, methods);
-        if (methods!=null && !methods.isEmpty()) {
-            /*
-             * We asked for more informations about the operation method (see previous comment)
-             * and we got some. Try to extract the conversion type from those additional infos
-             * and put it in a copy of the property map.
-             */
-            method = (OperationMethod) methods.get(0);
-            if (method instanceof MathTransformProvider) {
-                properties = new HashMap(properties);
-                properties.put(DefaultProjectedCRS.CONVERSION_TYPE_KEY,
-                        ((MathTransformProvider) method).getOperationType());
+                method = getLastUsedMethod();
+                if (method instanceof MathTransformProvider) {
+                    properties = new HashMap(properties);
+                    properties.put(DefaultProjectedCRS.CONVERSION_TYPE_KEY,
+                            ((MathTransformProvider) method).getOperationType());
+                }
             }
         }
         return new DefaultProjectedCRS(properties, conversionFromBase, baseCRS, mt, derivedCS);
@@ -535,10 +630,9 @@ public final class FactoryGroup extends ReferencingFactory {
                                            CartesianCS          derivedCS)
             throws FactoryException
     {
-        final Singleton methods = (method==null) ? new Singleton() : null;
-        final MathTransform mt = createBaseToDerived(baseCRS, parameters, derivedCS, methods);
+        final MathTransform mt = createBaseToDerived(baseCRS, parameters, derivedCS);
         if (method == null) {
-            method = (OperationMethod) methods.get();
+            method = getLastUsedMethod();
         }
         return getCRSFactory().createProjectedCRS(properties, method, baseCRS, mt, derivedCS);
     }

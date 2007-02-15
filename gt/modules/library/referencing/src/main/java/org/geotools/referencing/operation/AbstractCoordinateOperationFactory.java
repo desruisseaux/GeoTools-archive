@@ -66,7 +66,6 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.util.Singleton;
 import org.geotools.util.WeakHashSet;
 
 
@@ -374,12 +373,12 @@ public abstract class AbstractCoordinateOperationFactory extends ReferencingFact
                                   final ParameterValueGroup       parameters)
             throws FactoryException
     {
-        final MathTransform transform;
-        final Singleton method = new Singleton();
-        final Map   properties = getProperties(name);
-        transform = getFactoryGroup().createParameterizedTransform(parameters, method);
+        final Map          properties = getProperties(name);
+        final FactoryGroup  factories = getFactoryGroup();
+        final MathTransform transform = factories.createParameterizedTransform(parameters);
+        final OperationMethod  method = factories.getLastUsedMethod();
         return createFromMathTransform(properties, sourceCRS, targetCRS, transform,
-                                       (OperationMethod) method.get(), Operation.class);
+                                       method, Operation.class);
     }
 
     /**
