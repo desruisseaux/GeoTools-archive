@@ -285,7 +285,8 @@ public final class JTS {
         }
         TransformException firstError = null;
         boolean startPointTransformed = false;
-        for (int i=0; i<src.length; i+=sourceDim) {
+        final int length=src.length;
+        for (int i=0; i<length; i+=sourceDim) {
             try {
                 transform.transform(src, i, dest, i, 1);
                 if (!startPointTransformed) {
