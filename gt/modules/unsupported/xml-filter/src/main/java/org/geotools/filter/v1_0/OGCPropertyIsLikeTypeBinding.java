@@ -92,6 +92,11 @@ public class OGCPropertyIsLikeTypeBinding extends AbstractComplexBinding {
         String single = (String) node.getAttributeValue("singleChar");
         String escape = (String) node.getAttributeValue("escape");
 
+        if (escape == null) {
+            //1.1 uses "escapeChar", suppot that too
+            escape = (String) node.getAttributeValue("escapeChar");
+        }
+
         return factory.like(name, literal.toString(), wildcard, single, escape);
     }
 
@@ -115,7 +120,7 @@ public class OGCPropertyIsLikeTypeBinding extends AbstractComplexBinding {
             return isLike.getSingleChar();
         }
 
-        if ("escape".equals(name.getLocalPart())) {
+        if ("escape".equals(name.getLocalPart()) || "escapeChar".equals(name.getLocalPart())) {
             return isLike.getEscape();
         }
 
