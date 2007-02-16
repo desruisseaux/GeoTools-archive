@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ColorUtilities;
 import org.geotools.resources.image.ComponentColorModelJAI;
-import org.geotools.util.WeakValueHashMap;
+import org.geotools.util.SoftValueHashMap;
 
 
 /**
@@ -54,7 +54,7 @@ final class ColorModelFactory {
      * peuvent être construits à partir des couleurs qui ont été définies dans les différentes
      * catégories du tableau {@link #categories}.
      */
-    private static final Map colors = new WeakValueHashMap();
+    private static final Map colors = new SoftValueHashMap();
 
     /**
      * The list of categories for the construction of a single instance of a {@link ColorModel}.
