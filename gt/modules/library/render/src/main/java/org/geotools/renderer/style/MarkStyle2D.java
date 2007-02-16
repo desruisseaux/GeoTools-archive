@@ -19,7 +19,7 @@ package org.geotools.renderer.style;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 
-import org.geotools.renderer.lite.TransformedShape;
+import org.geotools.geometry.jts.TransformedShape;
 import org.geotools.resources.Utilities;
 
 
