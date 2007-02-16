@@ -18,6 +18,10 @@ public class NamespaceSupportWrapper implements NamespaceContext {
 		this.namespaceSupport = namesaceSupport;
 	}
 	
+	public NamespaceSupport getNamespaceSupport() {
+		return namespaceSupport;
+	}
+	
 	public String getNamespaceURI(String prefix) {
         return namespaceSupport.getURI(prefix);
     }
