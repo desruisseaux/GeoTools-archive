@@ -32,9 +32,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.collection.CollectionDataStore;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
@@ -1707,142 +1705,7 @@ public class DataUtilities {
             }
         }
     }
-	/**
-	 * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
-	 * (temporary).
-	 * 
-	 * @param gridCoverage
-	 *            the grid coverage
-	 * 
-	 * @return a feature with the grid coverage envelope as the geometry and the
-	 *         grid coverage itself in the "grid" attribute
-	 * @throws TransformException
-	 * @throws SchemaException
-	 * @throws FactoryConfigurationError
-	 * @throws IllegalAttributeException
-	 */
-	public final static FeatureCollection wrapGc(GridCoverage gridCoverage)
-			throws TransformException, FactoryConfigurationError,
-			SchemaException, IllegalAttributeException {
-
-		// create surrounding polygon
-		final PrecisionModel pm = new PrecisionModel();
-		final GeometryFactory gf = new GeometryFactory(pm, 0);
-		final Rectangle2D rect = ((GridCoverage2D) gridCoverage)
-				.getEnvelope2D();
-		final CoordinateReferenceSystem
-
-		sourceCrs = CRSUtilities.getCRS2D(((GridCoverage2D) gridCoverage)
-				.getCoordinateReferenceSystem());
-
-		// final boolean lonFirst = !GridGeometry2D.swapXY(sourceCrs
-		// .getCoordinateSystem());
-		final Coordinate[] coord = new Coordinate[5];
-		// if (lonFirst) {
-		coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
-		coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
-		coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
-		coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
-		coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
-		// } else {
-		// coord[0] = new Coordinate(rect.getMinY(), rect.getMinX());
-		// coord[1] = new Coordinate(rect.getMaxY(), rect.getMinX());
-		// coord[2] = new Coordinate(rect.getMaxY(), rect.getMaxX());
-		// coord[3] = new Coordinate(rect.getMinY(), rect.getMaxX());
-		// coord[4] = new Coordinate(rect.getMinY(), rect.getMinX());
-		// }
-		final LinearRing ring = gf.createLinearRing(coord);
-		final Polygon bounds = new Polygon(ring, null, gf);
-
-		// create the feature type
-		final GeometricAttributeType geom = new GeometricAttributeType("geom",
-				Polygon.class, true, 1, 1, null, sourceCrs, null);
-		final AttributeType grid = AttributeTypeFactory.newAttributeType(
-				"grid", GridCoverage.class);
-
-		final AttributeType[] attTypes = { geom, grid };
-		// Fix the schema name
-		final String typeName = "GridCoverage";
-		final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
-				.newFeatureType(attTypes, typeName);
-
-		// create the feature
-		Feature feature = schema.create(new Object[] { bounds, gridCoverage });
-
-		final FeatureCollection collection = FeatureCollections.newCollection();
-		collection.add(feature);
-
-		return collection;
-	}
-
-	/**
-	 * Wraps a grid coverage into a Feature. Code lifted from ArcGridDataSource
-	 * (temporary).
-	 * 
-	 * @param gridCoverageReader
-	 *            the grid coverage 
-	 * 
-	 * @return a feature with the grid coverage envelope as the geometry and the
-	 *         grid coverage itself in the "grid" attribute
-	 * @throws TransformException
-	 * @throws SchemaException
-	 * @throws FactoryConfigurationError
-	 * @throws IllegalAttributeException
-	 */
-	public final static FeatureCollection wrapGcReader(
-			AbstractGridCoverage2DReader gridCoverageReader)
-			throws TransformException, FactoryConfigurationError,
-			SchemaException, IllegalAttributeException {
-
-		// create surrounding polygon
-		final PrecisionModel pm = new PrecisionModel();
-		final GeometryFactory gf = new GeometryFactory(pm, 0);
-		final Rectangle2D rect = gridCoverageReader.getOriginalEnvelope()
-				.toRectangle2D();
-		final CoordinateReferenceSystem sourceCrs = CRSUtilities
-				.getCRS2D(gridCoverageReader.getCrs());
-
-		// TODO hack to be removed
-		// final boolean lonFirst = !GridGeometry2D.swapXY(sourceCrs
-		// .getCoordinateSystem());
-		final Coordinate[] coord = new Coordinate[5];
-		// if (lonFirst) {
-		coord[0] = new Coordinate(rect.getMinX(), rect.getMinY());
-		coord[1] = new Coordinate(rect.getMaxX(), rect.getMinY());
-		coord[2] = new Coordinate(rect.getMaxX(), rect.getMaxY());
-		coord[3] = new Coordinate(rect.getMinX(), rect.getMaxY());
-		coord[4] = new Coordinate(rect.getMinX(), rect.getMinY());
-		// } else {
-		// coord[0] = new Coordinate(rect.getMinY(), rect.getMinX());
-		// coord[1] = new Coordinate(rect.getMaxY(), rect.getMinX());
-		// coord[2] = new Coordinate(rect.getMaxY(), rect.getMaxX());
-		// coord[3] = new Coordinate(rect.getMinY(), rect.getMaxX());
-		// coord[4] = new Coordinate(rect.getMinY(), rect.getMinX());
-		// }
-		final LinearRing ring = gf.createLinearRing(coord);
-		final Polygon bounds = new Polygon(ring, null, gf);
-
-		// create the feature type
-		final GeometricAttributeType geom = new GeometricAttributeType("geom",
-				Polygon.class, true, 1, 1, null, sourceCrs, null);
-		final AttributeType grid = AttributeTypeFactory.newAttributeType(
-				"grid", AbstractGridCoverage2DReader.class);
-
-		final AttributeType[] attTypes = { geom, grid };
-		// Fix the schema name
-		final String typeName = "GridCoverageReader";
-		final DefaultFeatureType schema = (DefaultFeatureType) FeatureTypeBuilder
-				.newFeatureType(attTypes, typeName);
-
-		// create the feature
-		Feature feature = schema.create(new Object[] { bounds,
-				gridCoverageReader });
-
-		final FeatureCollection collection = FeatureCollections.newCollection();
-		collection.add(feature);
-
-		return collection;
-	}
+	
 	
 	/**
 	 * Manually calculates the bounds of a feature collection.

@@ -16,6 +16,7 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,7 +24,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.factory.FactoryFinder;
+import org.geotools.factory.FactoryCreator;
+import org.geotools.factory.FactoryRegistry;
 
 
 /**
@@ -53,6 +55,13 @@ public final class DataStoreFinder {
 	/** The logger for the filter module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data");
     
+	/**
+	 * The service registry for this manager. Will be initialized only when
+	 * first needed.
+	 */
+	private static FactoryRegistry registry;
+    
+	//Singleton pattern
     private DataStoreFinder() {
     }
 
@@ -71,11 +80,11 @@ public final class DataStoreFinder {
      * @throws IOException If a suitable loader can be found, but it can not be
      *         attached to the specified resource without errors.
      */
-    public static DataStore getDataStore(Map params) throws IOException {
+    public static synchronized DataStore getDataStore(Map params) throws IOException {
         Iterator ps = getAvailableDataStores();
-
+        DataStoreFactorySpi fac;
         while (ps.hasNext()) {
-            DataStoreFactorySpi fac = (DataStoreFactorySpi) ps.next();
+        	fac = (DataStoreFactorySpi) ps.next();
 
             try {
                 if (fac.canProcess(params)) {
@@ -87,9 +96,9 @@ public final class DataStoreFinder {
                 // Protect against DataStores that don't carefully
                 // code canProcess
                 
-                continue;
             }
         }
+
         return null;
     }
 
@@ -101,12 +110,12 @@ public final class DataStoreFinder {
      * @return An iterator over all discovered datastores which have registered
      *         factories, and whose available method returns true.
      */
-    public static Iterator getAvailableDataStores() {
-        Set availableDS = new HashSet();
-        Iterator it = FactoryFinder.factories(DataStoreFactorySpi.class);
-
+    public static synchronized Iterator getAvailableDataStores() {
+        Set availableDS = new HashSet(5);
+        Iterator it = getServiceRegistry().getServiceProviders(DataStoreFactorySpi.class);
+        DataStoreFactorySpi dsFactory;
         while (it.hasNext()) {
-            DataStoreFactorySpi dsFactory = (DataStoreFactorySpi) it.next();
+        	dsFactory = (DataStoreFactorySpi) it.next();
 
             if (dsFactory.isAvailable()) {
                 availableDS.add(dsFactory);
@@ -115,4 +124,33 @@ public final class DataStoreFinder {
 
         return availableDS.iterator();
     }
+    
+	/**
+	 * Returns the service registry. The registry will be created the first time
+	 * this method is invoked.
+	 */
+	private static FactoryRegistry getServiceRegistry() {
+		assert Thread.holdsLock(DataStoreFinder.class);
+		if (registry == null) {
+			registry = new FactoryCreator(Arrays
+					.asList(new Class[] { DataStoreFactorySpi.class }));
+		}
+		return registry;
+	}
+	
+	/**
+	 * Scans for factory plug-ins on the application class path. This method is
+	 * needed because the application class path can theoretically change, or
+	 * additional plug-ins may become available. Rather than re-scanning the
+	 * classpath on every invocation of the API, the class path is scanned
+	 * automatically only on the first invocation. Clients can call this method
+	 * to prompt a re-scan. Thus this method need only be invoked by
+	 * sophisticated applications which dynamically make new plug-ins available
+	 * at runtime.
+	 */
+	public static synchronized void scanForPlugins() {
+		
+		getServiceRegistry().scanForPlugins();
+		
+	}
 }
