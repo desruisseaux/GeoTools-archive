@@ -84,18 +84,6 @@ public final class GeoTiffException extends IOException {
 	private GeoKeyEntry[] geoKeys = null;
 
 	/**
-	 * Creates a new instance of <code>GeoTiffException</code> without detail
-	 * message.
-	 * 
-	 * @param metadata
-	 *            The metadata from the GeoTIFFWritingUtilities image causing
-	 *            the error.
-	 */
-	public GeoTiffException(GeoTiffIIOMetadataDecoder metadata) {
-		this(metadata, "");
-	}
-
-	/**
 	 * Constructs an instance of <code>GeoTiffException</code> with the
 	 * specified detail message.
 	 * 
@@ -105,9 +93,11 @@ public final class GeoTiffException extends IOException {
 	 * @param msg
 	 *            the detail message.
 	 */
-	public GeoTiffException(GeoTiffIIOMetadataDecoder metadata, String msg) {
+	public GeoTiffException(GeoTiffIIOMetadataDecoder metadata, String msg,
+			Throwable t) {
 		super(msg);
 		this.metadata = metadata;
+		this.initCause(t);
 
 		int numGeoKeys = metadata.getNumGeoKeys();
 
@@ -207,10 +197,13 @@ public final class GeoTiffException extends IOException {
 					+ metadata.getGeoKey(geoKeys[i].getKeyID()));
 		}
 
-		String msg = text.toString();
+		// print out the localized message
+		Throwable t = getCause();
+		if (t != null)
+			t.printStackTrace(message);
 
+		// close and return
 		message.close();
-
-		return msg;
+		return text.toString();
 	}
 }

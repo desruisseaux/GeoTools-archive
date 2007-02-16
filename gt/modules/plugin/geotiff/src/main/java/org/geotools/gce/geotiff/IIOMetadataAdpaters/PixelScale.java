@@ -24,11 +24,11 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters;
  * Quoting the geotiff spec:
  * 
  * <pre>
- *       ModelPixelScaleTag:
- *       Tag = 33550
- *       Type = DOUBLE (IEEE Double precision)
- *       N = 3
- *       Owner: SoftDesk
+ *          ModelPixelScaleTag:
+ *          Tag = 33550
+ *          Type = DOUBLE (IEEE Double precision)
+ *          N = 3
+ *          Owner: SoftDesk
  * </pre>
  * 
  * This tag may be used to specify the size of raster pixel spacing in the model
@@ -36,7 +36,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters;
  * coordinate system without rotation, and consists of the following 3 values:
  * 
  * <pre>
- *    ModelPixelScaleTag = (ScaleX, ScaleY, ScaleZ)
+ *       ModelPixelScaleTag = (ScaleX, ScaleY, ScaleZ)
  * </pre>
  * 
  * where ScaleX and ScaleY give the horizontal and vertical spacing of raster
@@ -98,6 +98,26 @@ public final class PixelScale {
 
 	public double[] getValues() {
 		return new double[] { scaleX, scaleY, scaleZ };
+	}
+
+	public boolean isSet() {
+		return isComponentSet(scaleX) && isComponentSet(scaleY);
+	}
+
+	public boolean isSetExtended() {
+		return isComponentSet(scaleX) && isComponentSet(scaleY)
+				&& isComponentSet(scaleZ);
+	}
+
+	/**
+	 * Tells me if a component of this {@link PixelScale} is set.
+	 * 
+	 * @param scale
+	 * @return
+	 */
+	protected boolean isComponentSet(double scale) {
+		return !Double.isInfinite(scale) && !Double.isNaN(scale)
+				&& Math.abs(scale) > 1E-6;
 	}
 
 }

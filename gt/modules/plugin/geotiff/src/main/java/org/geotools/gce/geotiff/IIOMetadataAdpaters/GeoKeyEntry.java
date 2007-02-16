@@ -14,11 +14,12 @@
  *    Lesser General Public License for more details.
  */
 package org.geotools.gce.geotiff.IIOMetadataAdpaters;
+
 /**
- * This class is a holder for a GeoKey record containing four short values. The
- * values are a GeoKey ID, the TIFFTag number of the location of this data, the
- * count of values for this GeoKey, and the offset (or value if the location is
- * 0).
+ * This class is a holder for a GeoKey record containing four short values as
+ * specified in the GeoTiff spec. The values are a GeoKey ID, the TIFFTag number
+ * of the location of this data, the count of values for this GeoKey, and the
+ * offset (or value if the location is 0).
  * 
  * <p>
  * If the Tiff Tag location is 0, then the value is a Short and is contained in
@@ -30,7 +31,8 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters;
  * @author Simone Giannecchini
  * @author Mike Nidel
  */
-public final  class GeoKeyEntry {
+public final class GeoKeyEntry {
+	/** ID of this key. */
 	private int myKeyID;
 
 	private int myTiffTagLocation;
@@ -39,6 +41,16 @@ public final  class GeoKeyEntry {
 
 	private int myValueOffset;
 
+	/**
+	 * Constructor of a {@link GeoKeyEntry}.
+	 * 
+	 * @param keyID
+	 *            the id of this {@link GeoKeyEntry}.
+	 * @param tagLoc
+	 *            the location of this tag.
+	 * @param count
+	 * @param offset
+	 */
 	public GeoKeyEntry(int keyID, int tagLoc, int count, int offset) {
 		myKeyID = keyID;
 		myTiffTagLocation = tagLoc;
@@ -79,6 +91,6 @@ public final  class GeoKeyEntry {
 	}
 
 	public int[] getValues() {
-		return new int[] { myKeyID, myTiffTagLocation, myCount, myValueOffset };
+		return new int[] { myKeyID, myTiffTagLocation, myValueOffset, myCount };
 	}
-} // end of class GeoKeyEntry
+} 

@@ -20,19 +20,19 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters;
  * Quoting the geotiff spec:
  * 
  * <pre>
- *     ModelTiepointTag:
- *     Tag = 33922 (8482.H) 
- *     Type = DOUBLE (IEEE Double precision)
- *     N = 6*K,  K = number of tiepoints
- *     Alias: GeoreferenceTag
- *     Owner: Intergraph
+ *      ModelTiepointTag:
+ *      Tag = 33922 (8482.H) 
+ *      Type = DOUBLE (IEEE Double precision)
+ *      N = 6*K,  K = number of tiepoints
+ *      Alias: GeoreferenceTag
+ *      Owner: Intergraph
  * </pre>
  * 
  * This tag stores raster->model tiepoint pairs in the order
  * 
  * 
  * <pre>
- *  ModelTiepointTag = (...,I,J,K, X,Y,Z...),
+ *   ModelTiepointTag = (...,I,J,K, X,Y,Z...),
  * </pre>
  * 
  * where (I,J,K) is the point at location (I,J) in raster space with pixel-value
@@ -75,7 +75,7 @@ package org.geotools.gce.geotiff.IIOMetadataAdpaters;
  * @since 2.3
  */
 public final class TiePoint {
-	private double[] values;
+	private double[] values = null;
 
 	public TiePoint(double i, double j, double k, double x, double y, double z) {
 		values = new double[6];
@@ -101,4 +101,9 @@ public final class TiePoint {
 	public double[] getData() {
 		return values;
 	}
+	
+	public boolean isSet(){
+		return values!=null;
+	}
+
 }

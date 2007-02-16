@@ -34,7 +34,6 @@
 package org.geotools.gce.geotiff;
 
 // JAI ImageIO Tools dependencies
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -52,28 +51,26 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
-import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.gce.geotiff.crs_adapters.GeoTiffMetadata2CRSAdapter;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
-import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.image.ImageUtilities;
-import org.opengis.coverage.MetadataNameNotFoundException;
+import org.geotools.resources.CRSUtilities;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -81,10 +78,9 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import com.sun.media.imageioimpl.plugins.tiff.TIFFImageReaderSpi;
 
 /**
- * <CODE>GeoTiffReader</CODE> is responsible for exposing the data and the
- * Georeferencing metadata available to the Geotools library. This reader is
- * heavily based on the capabilities provided by the ImageIO tools and JAI
- * libraries.
+ * this class is responsible for exposing the data and the Georeferencing
+ * metadata available to the Geotools library. This reader is heavily based on
+ * the capabilities provided by the ImageIO tools and JAI libraries.
  * 
  * 
  * @author Bryce Nordgren, USDA Forest Service
@@ -113,7 +109,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	 * 
 	 * @param input
 	 *            the GeoTiff file
-	 * 
 	 * @throws DataSourceException
 	 */
 	public GeoTiffReader(Object input) throws DataSourceException {
@@ -145,6 +140,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			uHints.remove(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER);
 			this.hints.add(uHints);
 		}
+		coverageName = "geotiff_coverage";
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -152,6 +148,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		if (input == null) {
+
 			final IOException ex = new IOException(
 					"GeoTiffReader:No source set to read this coverage.");
 			throw new DataSourceException(ex);
@@ -178,7 +175,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 							"UTF-8"));
 			}
 
-			boolean closeMe = true;
+			closeMe = true;
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// Get a stream in order to read from it for getting the basic
@@ -228,6 +225,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
+	 * 
 	 * @param hints
 	 * @throws IOException
 	 * @throws FactoryException
@@ -253,7 +251,6 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// //
 		reader.setInput(inStream);
 		final IIOMetadata iioMetadata = reader.getImageMetadata(0);
-
 		metadata = new GeoTiffIIOMetadataDecoder(iioMetadata);
 		gtcs = (GeoTiffMetadata2CRSAdapter) GeoTiffMetadata2CRSAdapter
 				.get(hints);
@@ -263,8 +260,15 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// get the CRS INFO
 		//
 		// //
-		// get the coordinate reference system for this coverage
-		crs = gtcs.createCoordinateSystem(metadata);
+		final Object tempCRS = this.hints
+				.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+		if (tempCRS != null) {
+			this.crs = (CoordinateReferenceSystem) tempCRS;
+			LOGGER.log(Level.WARNING, new StringBuffer(
+					"Using forced coordinate reference system ").append(
+					crs.toWKT()).toString());
+		} else
+			crs = gtcs.createCoordinateSystem(metadata);
 
 		// //
 		//
@@ -281,7 +285,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		final AffineTransform tempTransform = new AffineTransform(
 				(AffineTransform) raster2Model);
 		tempTransform.translate(-0.5, -0.5);
-		originalEnvelope = CRS.transform(ProjectiveTransform
+		originalEnvelope = CRSUtilities.transform(ProjectiveTransform
 				.create(tempTransform), new GeneralEnvelope(actualDim));
 		originalEnvelope.setCoordinateReferenceSystem(crs);
 
@@ -311,61 +315,10 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * TODO use me in a me better way
+	 * @see org.opengis.coverage.grid.GridCoverageReader#getFormat()
 	 */
-	public void dispose() {
-		try {
-			if (inStream != null)
-				inStream.close();
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
-		}
-
-	}
-
-	/**
-	 * No subnames. Always returns null.
-	 * 
-	 * @return null
-	 */
-	public String getCurrentSubname() {
-		return null;
-	}
-
 	public Format getFormat() {
 		return new GeoTiffFormat();
-	}
-
-	public String[] getMetadataNames() throws IOException {
-		throw new UnsupportedOperationException(
-				"GeoTIFF reader doesn't support metadata manipulation yet");
-	}
-
-	public String getMetadataValue(String name) throws IOException,
-			MetadataNameNotFoundException {
-		throw new UnsupportedOperationException(
-				"GeoTIFF reader doesn't support metadata manipulation yet");
-	}
-
-	/**
-	 * Returns true if another image remains to be read. This module currently
-	 * only supports one image per TIFF file, so the first read will make this
-	 * method return false.
-	 * 
-	 * @return true if another grid coverage remains to be read.
-	 */
-	public boolean hasMoreGridCoverages() {
-		throw new UnsupportedOperationException(
-				"GeoTIFF reader doesn't support hasMoreGridCoverages");
-	}
-
-	/**
-	 * Always returns null. No subnames.
-	 * 
-	 * @return null
-	 */
-	public String[] listSubNames() {
-		return null;
 	}
 
 	/**
@@ -430,21 +383,21 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 				.createImageInputStream(source);
 		reader.setInput(inStream);
 		final Hints newHints = (Hints) hints.clone();
-		inStream.mark();
-		if (!reader.isImageTiled(imageChoice.intValue())) {
-			final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
-					reader.getWidth(imageChoice.intValue()), reader
-							.getHeight(imageChoice.intValue())));
-			final ImageLayout layout = new ImageLayout();
-			layout.setTileGridXOffset(0);
-			layout.setTileGridYOffset(0);
-			layout.setTileHeight(tileSize.height);
-			layout.setTileWidth(tileSize.width);
-			newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
-		}
-		inStream.reset();
+//		if (!reader.isImageTiled(imageChoice.intValue())) {
+//			final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
+//					reader.getWidth(imageChoice.intValue()), reader
+//							.getHeight(imageChoice.intValue())));
+//			final ImageLayout layout = new ImageLayout();
+//			layout.setTileGridXOffset(0);
+//			layout.setTileGridYOffset(0);
+//			layout.setTileHeight(tileSize.height);
+//			layout.setTileWidth(tileSize.width);
+//			newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
+//		}
+		inStream.close();
+		reader.reset();
 		final ParameterBlock pbjRead = new ParameterBlock();
-		pbjRead.add(inStream);
+		pbjRead.add(ImageIO.createImageInputStream(source));
 		pbjRead.add(imageChoice);
 		pbjRead.add(Boolean.FALSE);
 		pbjRead.add(Boolean.FALSE);
@@ -460,23 +413,11 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		// get the raster -> model transformation and
-		// create the coverage
-		return createImageCoverage(JAI.create("ImageRead", pbjRead,
-				(RenderingHints) newHints));
+		//		 create the coverage
+		 return createImageCoverage(JAI.create("ImageRead", pbjRead,
+		 (RenderingHints) newHints));
 
-	}
 
-	/**
-	 * There are no guts to this function. Only single-image TIFF files are
-	 * supported.
-	 * 
-	 * @throws UnsupportedOperationException
-	 *             always
-	 */
-	public void skip() {
-		// add support for multi image TIFF files later.
-		throw new UnsupportedOperationException(
-				"No support for multi-image TIFF.");
 	}
 
 	/**

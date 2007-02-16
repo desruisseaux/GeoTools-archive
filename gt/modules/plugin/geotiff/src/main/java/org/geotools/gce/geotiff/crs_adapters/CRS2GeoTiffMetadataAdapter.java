@@ -248,7 +248,8 @@ public final class CRS2GeoTiffMetadataAdapter {
 		default:
 			throw new GeoTiffException(
 					null,
-					"The supplied grid coverage uses an unsupported crs! You are allowed to use only projected and geographic coordinate reference systems");
+					"The supplied grid coverage uses an unsupported crs! You are allowed to use only projected and geographic coordinate reference systems",
+					null);
 		}
 		return metadata;
 

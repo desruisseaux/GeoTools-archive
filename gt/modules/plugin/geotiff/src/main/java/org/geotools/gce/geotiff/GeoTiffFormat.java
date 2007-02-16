@@ -47,8 +47,9 @@ import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.GeoTiffIIOMetadataDecoder;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -98,6 +99,12 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 						mInfo,
 						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
 
+		// writing parameters
+		writeParameters = new ParameterGroup(
+				new DefaultParameterDescriptorGroup(
+						mInfo,
+						new GeneralParameterDescriptor[] { AbstractGridFormat.GEOTOOLS_WRITE_PARAMS }));
+
 	}
 
 	/**
@@ -118,7 +125,11 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 		// if (o instanceof CatalogEntry) {
 		// o = ((CatalogEntry) o).resource();
 		// }
-
+		if (o == null) {
+			return false;
+		}
+		ImageReader reader = null;
+		ImageInputStream inputStream = null;
 		try {
 			if (o instanceof URL) {
 				// /////////////////////////////////////////////////////////////
@@ -144,16 +155,19 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 
 			}
 			// get a stream
-			final ImageInputStream inputStream = ImageIO
-					.createImageInputStream(o);
+			inputStream = (ImageInputStream) ((o instanceof ImageInputStream) ? o
+					: ImageIO.createImageInputStream(o));
 			if (inputStream == null) {
-				if (LOGGER.isLoggable(Level.WARNING))
-					LOGGER.warning("Unable to get an ImageInputStream");
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.fine("Unable to get an ImageInputStream");
 				return false;
 			}
 
 			// get a reader
-			final ImageReader reader = spi.createReaderInstance();
+			inputStream.mark();
+			if (!spi.canDecodeInput(inputStream))
+				return false;
+			reader = spi.createReaderInstance();
 			reader.setInput(inputStream);
 			final IIOMetadata metadata = reader.getImageMetadata(0);
 			try {
@@ -164,13 +178,21 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 					return false;
 				}
 			} catch (UnsupportedOperationException e) {
-				if (LOGGER.isLoggable(Level.WARNING))
-					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 				return false;
+			} finally {
+				if (reader != null) {
+					reader.dispose();
+				}
+				if (inputStream != null) {
+					inputStream.close();
+				}
 			}
+
 		} catch (IOException e) {
-			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 			return false;
 		}
 		return true;
@@ -235,6 +257,7 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 		}
 
 	}
+
 	/**
 	 * Retrieves a {@link GeoTiffWriter} or <code>null</code> if the provided
 	 * <code>destination</code> is suitable.
@@ -249,15 +272,16 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 	 * 
 	 * @return a GeoTiffReader object initialized to the specified File.
 	 */
-	public GridCoverageWriter getWriter(Object destination,Hints hints) {
+	public GridCoverageWriter getWriter(Object destination, Hints hints) {
 		try {
-			return new GeoTiffWriter(destination,hints);
+			return new GeoTiffWriter(destination, hints);
 		} catch (IOException e) {
 			if (LOGGER.isLoggable(Level.WARNING))
 				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return null;
 		}
 	}
+
 	/**
 	 * Retrieves a {@link GeoTiffWriter} or <code>null</code> if the provided
 	 * <code>destination</code> is suitable.
@@ -278,4 +302,15 @@ public final class GeoTiffFormat extends AbstractGridFormat implements Format {
 			return null;
 		}
 	}
+
+	/**
+	 * Returns an instance of {@link GeoTiffWriteParams} for controlling an
+	 * hypothetic writing process.
+	 * 
+	 * @return an instance of {@link GeoTiffWriteParams}.
+	 */
+	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
+		return new GeoTiffWriteParams();
+	}
+
 }

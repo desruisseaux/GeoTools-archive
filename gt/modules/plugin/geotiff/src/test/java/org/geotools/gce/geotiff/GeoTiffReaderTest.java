@@ -24,9 +24,10 @@ import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.IIOMetadataDumper;
 import org.geotools.factory.Hints;
-import org.geotools.test.TestData;
+import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
@@ -41,7 +42,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * General Public License for more details.
  */
 /**
- * Testing {@link GeoTiffReader} as well as {@link MetadataDumper}.
+ * Testing {@link GeoTiffReader} as well as {@link IIOMetadataDumper}.
  * 
  * @author Simone Giannecchini
  * @source $URL:
@@ -82,7 +83,7 @@ public class GeoTiffReaderTest extends TestCase {
 		StringBuffer buffer;
 		GridCoverage2D coverage;
 		GridCoverageReader reader;
-		// MetadataDumper metadataDumper;
+		IIOMetadataDumper iIOMetadataDumper;
 		for (int i = 0; i < numFiles; i++) {
 			buffer = new StringBuffer();
 			final String path = files[i].getAbsolutePath().toLowerCase();
@@ -90,11 +91,18 @@ public class GeoTiffReaderTest extends TestCase {
 				continue;
 
 			buffer.append(files[i].getAbsolutePath()).append("\n");
-			if (format.accepts(files[i])) {
+			Object o;
+			if (i % 2 == 0)
+				// testing file
+				o = files[i];
+			else
+				// testing url
+				o = files[i].toURL();
+			if (format.accepts(o)) {
 				buffer.append("ACCEPTED").append("\n");
 
 				// getting a reader
-				reader = new GeoTiffReader(files[i], new Hints(
+				reader = new GeoTiffReader(o, new Hints(
 						Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE));
 
 				if (reader != null) {
@@ -102,18 +110,20 @@ public class GeoTiffReaderTest extends TestCase {
 					// reading the coverage
 					coverage = (GridCoverage2D) reader.read(null);
 
-					// Crs
-					if (TestData.isInteractiveTest())
+					// Crs and envelope
+					if (TestData.isInteractiveTest()) {
 						buffer.append("CRS: ").append(
-							coverage.getCoordinateReferenceSystem2D().toWKT())
-							.append("\n");
-
+								coverage.getCoordinateReferenceSystem2D()
+										.toWKT()).append("\n");
+						buffer.append("Envelope: ").append(
+								coverage.getEnvelope().toString()).append("\n");
+					}
 					// display metadata
-					// metadataDumper = new MetadataDumper(
-					// ((GeoTiffReader) reader).getMetadata()
-					// .getRootNode());
-					// buffer.append("TIFF metadata: ").append(
-					//							metadataDumper.getMetadata()).append("\n");
+					iIOMetadataDumper = new IIOMetadataDumper(
+							((GeoTiffReader) reader).getMetadata()
+									.getRootNode());
+					buffer.append("TIFF metadata: ").append(
+							iIOMetadataDumper.getMetadata()).append("\n");
 					// showing it
 					if (TestData.isInteractiveTest())
 						coverage.show();
@@ -124,7 +134,9 @@ public class GeoTiffReaderTest extends TestCase {
 
 			} else
 				buffer.append("NOT ACCEPTED").append("\n");
-			LOGGER.info(buffer.toString());
+			if (TestData.isInteractiveTest())
+				LOGGER.info(buffer.toString());
+
 		}
 
 	}

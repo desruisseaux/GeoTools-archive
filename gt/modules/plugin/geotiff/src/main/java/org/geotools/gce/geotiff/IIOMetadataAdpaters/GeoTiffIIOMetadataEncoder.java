@@ -15,6 +15,8 @@
  */
 package org.geotools.gce.geotiff.IIOMetadataAdpaters;
 
+import java.awt.geom.AffineTransform;
+
 import org.geotools.gce.geotiff.IIOMetadataAdpaters.utils.GeoTiffConstants;
 import org.geotools.util.KeySortedList;
 import org.jdom.Element;
@@ -74,8 +76,7 @@ public final class GeoTiffIIOMetadataEncoder {
 		modelTiePoints = new TiePoint[GeoTiffConstants.ARRAY_ELEM_INCREMENT];
 		modelPixelScale = new PixelScale();
 		modelTransformation = new double[16];
-		setModelPixelScale(1.0, 1.0);
-		addGeoKeyEntry(geoTIFFVersion, keyRevisionMajor, keyRevisionMinor, 0);
+		addGeoKeyEntry(geoTIFFVersion, keyRevisionMajor, 1, keyRevisionMinor);
 	}
 
 	public static boolean isTiffUShort(final int value) {
@@ -121,6 +122,9 @@ public final class GeoTiffIIOMetadataEncoder {
 	}
 
 	public void setModelPixelScale(double x, double y, double z) {
+		if (isModelTransformationSet())
+			throw new IllegalStateException(
+					"ModelTransformationTag already set. It is not possible to set the ModelPixelScale.");
 		modelPixelScale.setScaleX(x);
 		modelPixelScale.setScaleY(y);
 		modelPixelScale.setScaleZ(z);
@@ -144,6 +148,9 @@ public final class GeoTiffIIOMetadataEncoder {
 
 	public void setModelTiePoint(double i, double j, double k, double x,
 			double y, double z) {
+		if (isModelTransformationSet())
+			throw new IllegalStateException(
+					"ModelTransformationTag already set. It is not possible to set the ModelTiePoint.");
 		if (getNumModelTiePoints() > 0) {
 			getModelTiePointAt(0).set(i, j, k, x, y, z);
 		} else {
@@ -285,7 +292,7 @@ public final class GeoTiffIIOMetadataEncoder {
 
 		final int numKeyEntries = numGeoTiffEntries;
 		geoTiffEntries.add(new Integer(keyID), new GeoKeyEntry(keyID, tag,
-				count, offset));
+				offset, count));
 		getGeoKeyEntryAt(0).setCount(numKeyEntries);
 		numGeoTiffEntries++;
 	}
@@ -430,15 +437,13 @@ public final class GeoTiffIIOMetadataEncoder {
 				BaselineTIFFTagSet.class.getName() + ","
 						+ GeoTIFFTagSet.class.getName());
 
-		if (isModelPixelScaleSet()) {
+		if (modelPixelScale.isSet()) {
 			ifd.addContent(createModelPixelScaleElement());
 		}
 
-		if (hasModelTiePoints()) {
+		if (isModelTiePointsSet()) {
 			ifd.addContent(createModelTiePointsElement());
-		}
-
-		if (isModelTransformationSet()) {
+		} else if (isModelTransformationSet()) {
 			ifd.addContent(createModelTransformationElement());
 		}
 
@@ -457,25 +462,7 @@ public final class GeoTiffIIOMetadataEncoder {
 		return ifd;
 	}
 
-	/**
-	 * Did we set the pixel scales for this set of metadata?
-	 * 
-	 * <p>
-	 * If one of the scales is not a simple number the answer is false.
-	 * 
-	 * @return true if we set them, false otherwise.
-	 */
-	private boolean isModelPixelScaleSet() {
-		final double xScale = modelPixelScale.getScaleX();
-		final double yScale = modelPixelScale.getScaleY();
-		if (Double.isInfinite(xScale) || Double.isNaN(xScale)
-				|| Double.isInfinite(yScale) || Double.isNaN(yScale))
-			return false;
-
-		return true;
-	}
-
-	private boolean hasModelTiePoints() {
+	private boolean isModelTiePointsSet() {
 		return numModelTiePoints > 0;
 	}
 
@@ -490,15 +477,65 @@ public final class GeoTiffIIOMetadataEncoder {
 		return false;
 	}
 
+	public void setModelTransformation(final AffineTransform rasterToModel) {
+		if (modelPixelScale!=null&&modelPixelScale.isSet())
+			throw new IllegalStateException(
+					"ModelPixelScaleTag already set. It is not possible to set the ModelTransformation.");
+		if (isModelTiePointsSet())
+			throw new IllegalStateException(
+					"ModelTiePointsTag already set. It is not possible to set the ModelTransformation.");
+
+		// //
+		//
+		// See pag 28 of the spec for an explanation
+		//
+		// //
+		// a
+		modelTransformation[0] = rasterToModel.getScaleX();
+		// b
+		modelTransformation[1] = rasterToModel.getShearX();
+		// c
+		modelTransformation[2] = 0;
+		// d
+		modelTransformation[3] = rasterToModel.getTranslateX();
+		// e
+		modelTransformation[4] = rasterToModel.getShearY();
+		// f
+		modelTransformation[5] = rasterToModel.getScaleY();
+		// g
+		modelTransformation[6] = 0;
+		// h
+		modelTransformation[7] = rasterToModel.getTranslateY();
+		// i
+		modelTransformation[8] = 0;
+		// j
+		modelTransformation[9] = 0;
+		// k
+		modelTransformation[10] = 0;
+		// l
+		modelTransformation[11] = 0;
+		// m
+		modelTransformation[12] = 0;
+		// n
+		modelTransformation[13] = 0;
+		// o
+		modelTransformation[14] = 0;
+		// p
+		modelTransformation[15] = 1;
+
+	}
+
 	private Element createGeoKeyDirectoryElement() {
 		Element field = createFieldElement(getGeoKeyDirectoryTag());
 		Element data = new Element(GeoTiffConstants.GEOTIFF_SHORTS_TAG);
 		field.addContent(data);
-
+		int[] values;
+		int lenght;
+		Element GeoKeyRecord;
+		;
 		for (int i = 0; i < numGeoTiffEntries; i++) {
-			final int[] values = getGeoKeyEntryAt(i).getValues();
-			final int lenght = values.length;
-			Element GeoKeyRecord;
+			values = getGeoKeyEntryAt(i).getValues();
+			lenght = values.length;
 			for (int j = 0; j < lenght; j++) {
 				GeoKeyRecord = createShortElement(values[j]);
 				data.addContent(GeoKeyRecord);
