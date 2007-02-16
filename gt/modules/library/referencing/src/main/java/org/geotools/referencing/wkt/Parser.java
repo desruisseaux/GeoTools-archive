@@ -132,6 +132,13 @@ public class Parser extends MathTransformParser {
     private static final CoordinateSystemAxis[] NO_AXIS = new CoordinateSystemAxis[0];
 
     /**
+     * {@code true} in order to allows the non-standard Oracle syntax. Oracle put the Bursa-Wolf
+     * parameters straight into the {@code DATUM} elements, without enclosing them in a
+     * {@code TOWGS84} element.
+     */
+    private static final boolean ALLOW_ORACLE_SYNTAX = true;
+
+    /**
      * The mapping between WKT element name and the object class to be created.
      * Will be created by {@link #getClassOf} only when first needed.
      */
@@ -520,7 +527,7 @@ public class Parser extends MathTransformParser {
      * @throws ParseException if the "TOWGS84" can't be parsed.
      */
     private static BursaWolfParameters parseToWGS84(final Element parent)
-        throws ParseException 
+            throws ParseException 
     {          
         final Element element = parent.pullOptionalElement("TOWGS84");
         if (element == null) {
@@ -662,6 +669,16 @@ public class Parser extends MathTransformParser {
         Ellipsoid         ellipsoid = parseSpheroid(element);
         BursaWolfParameters toWGS84 = parseToWGS84(element); // Optional; may be null.
         Map              properties = parseAuthority(element, name);
+        if (ALLOW_ORACLE_SYNTAX && (toWGS84 == null) && (element.peek() instanceof Number)) {
+            toWGS84     = new BursaWolfParameters(DefaultGeodeticDatum.WGS84);
+            toWGS84.dx  = element.pullDouble("dx");
+            toWGS84.dy  = element.pullDouble("dy");
+            toWGS84.dz  = element.pullDouble("dz");
+            toWGS84.ex  = element.pullDouble("ex");
+            toWGS84.ey  = element.pullDouble("ey");
+            toWGS84.ez  = element.pullDouble("ez");
+            toWGS84.ppm = element.pullDouble("ppm");
+        }
         element.close();
         if (toWGS84 != null) {
             if (!(properties instanceof HashMap)) {

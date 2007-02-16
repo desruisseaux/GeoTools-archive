@@ -31,6 +31,7 @@ import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // Geotools dependencies
 import org.geotools.referencing.crs.DefaultProjectedCRS;
@@ -225,6 +226,37 @@ public class WKTParserTest extends TestCase {
                "  UNIT[\"Decimal_Second\", 4.84813681109536e-06],\n"                    +
                "  AUTHORITY[\"EPSG\", \"100001\"]]";
         parser.parseObject(wkt1);
+    }
+
+    /**
+     * Tests the Oracle variant of WKT.
+     */
+    public void testOracleWKT() throws ParseException {
+        final String wkt =
+                "PROJCS[\"Datum 73 / Modified Portuguese Grid\"," +
+                 " GEOGCS [ \"Datum 73\"," +
+                   " DATUM[\"Datum 73 (EPSG ID 6274)\"," +
+                     " SPHEROID [\"International 1924 (EPSG ID 7022)\", 6378388, 297]," +
+                     " -231, 102.6, 29.8, .6149999999999993660366746131394108039579," +
+                     " -.1979999999999997958947342656936639661522," +
+                      " .8809999999999990918346509498793836069706, .99999821]," +
+                   " PRIMEM [ \"Greenwich\", 0.000000 ]," +
+                   " UNIT [\"Decimal Degree\", 0.01745329251994328]]," +
+                 " PROJECTION[\"Transverse_Mercator\"]," +
+//               " PROJECTION[\"Modified Portuguese Grid (EPSG OP 19974)\"]," +
+// TODO: The real projection is "Modified Portugues", but it is not yet implemented in Geotools.
+                 " PARAMETER[\"Latitude_Of_Origin\", 39.66666666666666666666666666666666666667]," +
+                 " PARAMETER[\"Central_Meridian\", -8.13190611111111111111111111111111111111]," +
+                 " PARAMETER[\"Scale_Factor\", 1]," +
+                 " PARAMETER [\"False_Easting\", 180.598]," +
+                 " PARAMETER[\"False_Northing\", -86.99]," +
+                 " UNIT [\"Meter\", 1]]";
+        final Parser parser = new Parser();
+        CoordinateReferenceSystem crs1 = parser.parseCoordinateReferenceSystem(wkt);
+        final String check = parser.format(crs1);
+        assertTrue(check.indexOf("TOWGS84[-231") >= 0);
+        CoordinateReferenceSystem crs2 = parser.parseCoordinateReferenceSystem(check);
+        assertEquals(crs1, crs2);
     }
 
     /**
