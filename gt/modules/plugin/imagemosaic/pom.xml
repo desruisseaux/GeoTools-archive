@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- =======================================================================    
-        Maven Project Configuration File                                        
-                                                                                
-        The Geotools Project                                                    
-            http://www.geotools.org/                                            
-                                                                                
-        Version: $Id$              
+<!-- =======================================================================
+        Maven Project Configuration File
+
+        The Geotools Project
+            http://www.geotools.org/
+
+        Version: $Id$
      ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+  <project xmlns="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                                http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +18,7 @@
     <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -28,16 +28,16 @@
   <packaging>jar</packaging>
   <name>imagemosaic datasource module</name>
   <url>http://maven.geotools.fr/reports/modules/plugin/imagemosaic/</url>
-  
+
   <scm>
     <connection>
       scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/imagemosaic/
     </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/imagemosaic/</url>
   </scm>
-  
+
   <description>
-    Datasource created to read a mosaic of georeferenced images or geotiff 
+    Datasource created to read a mosaic of georeferenced images or geotiff
     (and in future also JPEG2K).
   </description>
 
@@ -119,7 +119,7 @@
     <groupId>org.geotools</groupId>
     <artifactId>gt2-shapefile</artifactId>
     <version>${project.version}</version>
-  </dependency>  
+  </dependency>
   <dependency>
     <groupId>org.geotools</groupId>
     <artifactId>gt2-sample-data</artifactId>

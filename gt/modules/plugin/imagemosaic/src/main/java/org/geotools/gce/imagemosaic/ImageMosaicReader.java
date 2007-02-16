@@ -19,13 +19,16 @@
 package org.geotools.gce.imagemosaic;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.IndexColorModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -46,24 +49,21 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
-import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.TileCache;
 import javax.media.jai.operator.MosaicDescriptor;
+import javax.media.jai.operator.PatternDescriptor;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
@@ -74,7 +74,8 @@ import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
-import org.opengis.coverage.MetadataNameNotFoundException;
+import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -121,9 +122,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.imagemosaic");
 
-	/** Cachin neares neighbohr interpolator (immutable) */
-	private final static Interpolation nnInterpolation = new InterpolationNearest();
-
 	/**
 	 * The source {@link URL} pointing to the index shapefile for this
 	 * {@link ImageMosaicReader}.
@@ -145,9 +143,13 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	/** {@link FeatureSource} for the shape index. */
 	private final FeatureSource featureSource;
 
-	/** Hints for {@link JAI} to not use {@link TileCache}. */
-	private final static RenderingHints NO_CACHE = new RenderingHints(
-			JAI.KEY_TILE_CACHE, null);
+	/**
+	 * This {@link BufferedImage} is cached in memory since it is used whenever
+	 * I need to build up a fake mosaic.
+	 */
+	private final BufferedImage unavailableImage;
+
+	private boolean expandMe;
 
 	/**
 	 * Max number of tiles that this plugin will load.
@@ -156,7 +158,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * instead of getting stuck ith opening thousands of files I give you back a
 	 * fake coverage.
 	 */
-	public static final int MAX_TILES = 300;
+	public static final int MAX_TILES = 1000000;
 
 	/**
 	 * COnstructor.
@@ -227,6 +229,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		} else
 			throw new IllegalArgumentException(
 					"This plugin accepts only File, URL and String pointing to a file");
+
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Load tiles informations, especially the bounds, which will be
@@ -261,19 +264,28 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// get the crs if able to
 		//
 		// //
-		final CoordinateReferenceSystem tempcrs = featureSource.getSchema()
-				.getDefaultGeometry().getCoordinateSystem();
-		if (tempcrs == null) {
-			// use the default crs
-			crs = AbstractGridFormat.getDefaultCRS();
-			LOGGER
-					.log(
-							Level.WARNING,
-							new StringBuffer(
-									"Unable to find a CRS for this coverage, using a default one: ")
-									.append(crs.toWKT()).toString());
-		} else
-			crs = tempcrs;
+		final Object tempCRS = this.hints
+				.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+		if (tempCRS != null) {
+			this.crs = (CoordinateReferenceSystem) tempCRS;
+			LOGGER.log(Level.WARNING, new StringBuffer(
+					"Using forced coordinate reference system ").append(
+					crs.toWKT()).toString());
+		} else {
+			final CoordinateReferenceSystem tempcrs = featureSource.getSchema()
+					.getDefaultGeometry().getCoordinateSystem();
+			if (tempcrs == null) {
+				// use the default crs
+				crs = AbstractGridFormat.getDefaultCRS();
+				LOGGER
+						.log(
+								Level.WARNING,
+								new StringBuffer(
+										"Unable to find a CRS for this coverage, using a default one: ")
+										.append(crs.toWKT()).toString());
+			} else
+				crs = tempcrs;
+		}
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -281,6 +293,23 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		//
 		// /////////////////////////////////////////////////////////////////////
 		// property file
+		loadProperties();
+
+		// load the unavailaible pattern
+		unavailableImage = ImageIO
+				.read(this.getClass().getResource("unav.png"));
+	}
+
+	/**
+	 * Loads the properties file that contains useful information about this
+	 * coverage.
+	 * 
+	 * @throws UnsupportedEncodingException
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	private void loadProperties() throws UnsupportedEncodingException,
+			IOException, FileNotFoundException {
 		String temp = URLDecoder.decode(sourceURL.getFile(), "UTF8");
 		final int index = temp.lastIndexOf(".");
 		if (index != -1)
@@ -329,6 +358,16 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// name
 		coverageName = properties.getProperty("Name");
 
+		// need a color expansion?
+		// this is a newly added property we have to be ready to the case where
+		// we do not find it.
+		try {
+			expandMe = properties.getProperty("ExpandToRGB").equalsIgnoreCase(
+					"true");
+		} catch (Exception e) {
+			expandMe = false;
+		}
+
 		// original gridrange (estimated)
 		originalGridRange = new GeneralGridRange(
 				new Rectangle((int) Math.round(originalEnvelope.getLength(0)
@@ -363,52 +402,6 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataNames()
-	 */
-	public String[] getMetadataNames() throws IOException {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataValue(java.lang.String)
-	 */
-	public String getMetadataValue(String arg0) throws IOException,
-			MetadataNameNotFoundException {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#listSubNames()
-	 */
-	public String[] listSubNames() throws IOException {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getCurrentSubname()
-	 */
-	public String getCurrentSubname() throws IOException {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
-	 */
-	public boolean hasMoreGridCoverages() throws IOException {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
 	 */
 	public GridCoverage read(GeneralParameterValue[] params) throws IOException {
@@ -424,17 +417,16 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// Checking params
 		//
 		// /////////////////////////////////////////////////////////////////////
-		double alphaThreshold = ((Double) ImageMosaicFormat.ALPHA_THRESHOLD
+		Color inputTransparentColor = (Color) ImageMosaicFormat.INPUT_TRANSPARENT_COLOR
+				.getDefaultValue();
+		Color outputTransparentColor = (Color) ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR
+				.getDefaultValue();
+		double inputImageThreshold = ((Double) ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE
 				.getDefaultValue()).doubleValue();
-		boolean alpha = ((Boolean) ImageMosaicFormat.FINAL_ALPHA
-				.getDefaultValue()).booleanValue();
-		boolean singleImageROI = ((Boolean) ImageMosaicFormat.INPUT_IMAGE_ROI
-				.getDefaultValue()).booleanValue();
-		int singleImageROIThreshold = ((Integer) ImageMosaicFormat.INPUT_IMAGE_ROI_THRESHOLD
-				.getDefaultValue()).intValue();
 		Parameter param = null;
 		GeneralEnvelope requestedEnvelope = null;
 		Rectangle dim = null;
+		boolean blend = false;
 		if (params != null) {
 			final int length = params.length;
 			for (int i = 0; i < length; i++) {
@@ -447,55 +439,81 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 					requestedEnvelope = (GeneralEnvelope) gg.getEnvelope();
 					dim = gg.getGridRange2D().getBounds();
 				} else if (param.getDescriptor().getName().getCode().equals(
-						ImageMosaicFormat.ALPHA_THRESHOLD.getName().toString())) {
-					alphaThreshold = ((Double) param.getValue()).doubleValue();
-				} else if (param.getDescriptor().getName().getCode().equals(
-						ImageMosaicFormat.FINAL_ALPHA.getName().toString())) {
-					alpha = ((Boolean) param.getValue()).booleanValue();
-				} else if (param.getDescriptor().getName().getCode().equals(
-						ImageMosaicFormat.INPUT_IMAGE_ROI.getName().toString())) {
-					singleImageROI = ((Boolean) param.getValue())
-							.booleanValue();
-				} else if (param.getDescriptor().getName().getCode().equals(
-						ImageMosaicFormat.INPUT_IMAGE_ROI_THRESHOLD.getName()
+						ImageMosaicFormat.INPUT_TRANSPARENT_COLOR.getName()
 								.toString())) {
-					singleImageROIThreshold = ((Integer) param.getValue())
-							.intValue();
+					inputTransparentColor = (Color) param.getValue();
+
+				} else if (param.getDescriptor().getName().getCode().equals(
+						ImageMosaicFormat.INPUT_IMAGE_THRESHOLD_VALUE.getName()
+								.toString())) {
+					inputImageThreshold = ((Double) param.getValue())
+							.doubleValue();
+
+				} else if (param.getDescriptor().getName().getCode().equals(
+						ImageMosaicFormat.FADING.getName().toString())) {
+					blend = ((Boolean) param.getValue()).booleanValue();
+
+				} else if (param.getDescriptor().getName().getCode().equals(
+						ImageMosaicFormat.OUTPUT_TRANSPARENT_COLOR.getName()
+								.toString())) {
+					outputTransparentColor = (Color) param.getValue();
+
 				}
 			}
 		}
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Loading tiles
+		// Loading tiles trying to optimize as much as possible
 		//
 		// /////////////////////////////////////////////////////////////////////
-		return loadTiles(requestedEnvelope, alpha, alphaThreshold,
-				singleImageROI, singleImageROIThreshold, dim);
+		return loadTiles(requestedEnvelope, inputTransparentColor,
+				outputTransparentColor, inputImageThreshold, dim, blend);
 	}
 
 	/**
-	 * Loading the tiles which overlap with the requested envelope.
+	 * Loading the tiles which overlap with the requested envelope with control
+	 * over the <code>inputImageThresholdValue</code>, the fading effect
+	 * between different images, abd the <code>transparentColor</code> for the
+	 * input images.
 	 * 
-	 * @param envelope
-	 * @param alphaThreshold
-	 * @param alpha
-	 * @param singleImageROIThreshold
-	 * @param singleImageROI
-	 * @param dim
-	 * @return
+	 * @param requestedOriginalEnvelope
+	 *            bounds the tiles that we will load. Tile outside ths
+	 *            {@link GeneralEnvelope} won't even be considered.
+	 * 
+	 * 
+	 * @param transparentColor
+	 *            should be used to control transparency on input images.
+	 * @param outputTransparentColor
+	 * @param inputImageThresholdValue
+	 *            should be used to create ROIs on the input images
+	 * @param pixelDimension
+	 *            is the dimension in pixels of the requested coverage.
+	 * @param fading
+	 *            tells to ask for {@link MosaicDescriptor#MOSAIC_TYPE_BLEND}
+	 *            instead of the classic
+	 *            {@link MosaicDescriptor#MOSAIC_TYPE_OVERLAY}.
+	 * @return a {@link GridCoverage2D} matching as close as possible the
+	 *         requested {@link GeneralEnvelope} and <code>pixelDimension</code>,
+	 *         or null in case nothing existed in the requested area.
 	 * @throws IOException
 	 */
-	private GridCoverage loadTiles(GeneralEnvelope requestedEnvelope,
-			boolean alpha, double alphaThreshold, boolean singleImageROI,
-			int singleImageROIThreshold, Rectangle dim) throws IOException {
+	private GridCoverage loadTiles(GeneralEnvelope requestedOriginalEnvelope,
+			Color transparentColor, Color outputTransparentColor,
+			double inputImageThresholdValue, Rectangle pixelDimension,
+			boolean fading) throws IOException {
 
 		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine(new StringBuffer(
-					"Creating mosaic to comply with envelope ").append(
-					requestedEnvelope != null ? requestedEnvelope.toString()
-							: null).append(" crs ").append(crs.toWKT()).append(
-					" dim ").append(dim == null ? " null" : dim.toString())
-					.toString());
+			LOGGER
+					.fine(new StringBuffer(
+							"Creating mosaic to comply with envelope ")
+							.append(
+									requestedOriginalEnvelope != null ? requestedOriginalEnvelope
+											.toString()
+											: null).append(" crs ").append(
+									crs.toWKT()).append(" dim ").append(
+									pixelDimension == null ? " null"
+											: pixelDimension.toString())
+							.toString());
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Check if we have something to load by intersecting the requested
@@ -506,27 +524,31 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		// intersecting anything.
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (requestedEnvelope != null) {
-			if (!CRS.equalsIgnoreMetadata(requestedEnvelope
+		GeneralEnvelope intersectionEnvelope = null;
+		if (requestedOriginalEnvelope != null) {
+			if (!CRS.equalsIgnoreMetadata(requestedOriginalEnvelope
 					.getCoordinateReferenceSystem(), this.crs)) {
 				try {
-					// transforming the envelope back to the data set crs
+					// transforming the envelope back to the dataset crs in
+					// order to interact with the original envelope for this
+					// mosaic.
 					final MathTransform transform = operationFactory
 							.createOperation(
-									requestedEnvelope
+									requestedOriginalEnvelope
 											.getCoordinateReferenceSystem(),
 									crs).getMathTransform();
 					if (!transform.isIdentity()) {
-						requestedEnvelope = CRS.transform(transform,
-								requestedEnvelope);
-						requestedEnvelope
+						requestedOriginalEnvelope = CRSUtilities.transform(
+								transform, requestedOriginalEnvelope);
+						requestedOriginalEnvelope
 								.setCoordinateReferenceSystem(this.crs);
 
 						if (LOGGER.isLoggable(Level.FINE))
 							LOGGER.fine(new StringBuffer(
 									"Reprojected envelope ").append(
-									requestedEnvelope.toString()).append(
-									" crs ").append(crs.toWKT()).toString());
+									requestedOriginalEnvelope.toString())
+									.append(" crs ").append(crs.toWKT())
+									.toString());
 					}
 				} catch (TransformException e) {
 					throw new DataSourceException(
@@ -536,52 +558,71 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 							"Unable to create a coverage for this source", e);
 				}
 			}
-			if (!requestedEnvelope.intersects(this.originalEnvelope, true))
+			if (!requestedOriginalEnvelope.intersects(this.originalEnvelope,
+					true)) {
+				if (LOGGER.isLoggable(Level.WARNING))
+					LOGGER
+							.warning("The requested envelope does not intersect the envelope of this mosaic, we will return a null coverage.");
 				return null;
-
+			}
+			intersectionEnvelope = new GeneralEnvelope(
+					requestedOriginalEnvelope);
 			// intersect the requested area with the bounds of this layer
-			requestedEnvelope.intersect(originalEnvelope);
+			intersectionEnvelope.intersect(originalEnvelope);
 
 		} else {
-			requestedEnvelope = new GeneralEnvelope(originalEnvelope);
+			requestedOriginalEnvelope = new GeneralEnvelope(originalEnvelope);
+			intersectionEnvelope = requestedOriginalEnvelope;
 
 		}
-		requestedEnvelope.setCoordinateReferenceSystem(this.crs);
+		requestedOriginalEnvelope.setCoordinateReferenceSystem(this.crs);
+		intersectionEnvelope.setCoordinateReferenceSystem(this.crs);
 		// ok we got something to return, let's load records from the index
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Prepare the filter for loading th needed layers
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final ReferencedEnvelope requestedJTSEnvelope = new ReferencedEnvelope(
-				requestedEnvelope, crs);
+		final ReferencedEnvelope intersectionJTSEnvelope = new ReferencedEnvelope(
+				intersectionEnvelope, crs);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Load feaures from the index
+		// In case there are no features under the requested bbox which is legal
+		// in case the mosaic is not a real sqare, we return a fake mosaic.
 		//
 		// /////////////////////////////////////////////////////////////////////
-
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("loading tile for envelope "
-					+ requestedJTSEnvelope.toString());
-		final List features = getFeaturesFromIndex(requestedJTSEnvelope);
+					+ intersectionJTSEnvelope.toString());
+		final List features = getFeaturesFromIndex(intersectionJTSEnvelope);
 		if (features == null) {
-			return null;
+			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
 		}
 		// do we have any feature to load
 		final Iterator it = features.iterator();
 		if (!it.hasNext())
-			return null;
+			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
 		final int size = features.size();
-		if (size > MAX_TILES)
-			return fakeMosaic(requestedEnvelope, size);
+		if (size > MAX_TILES) {
+			LOGGER
+					.warning(new StringBuffer("We can load at most ")
+							.append(MAX_TILES)
+							.append(" tiles while there were requested ")
+							.append(features)
+							.append(
+									"\nI am going to print out a fake coverage, sorry about it!")
+							.toString());
+			return fakeMosaic(requestedOriginalEnvelope, pixelDimension);
+		}
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine("We have " + size + " tiles to load");
 		try {
-			return loadRequestedTiles(requestedEnvelope, alpha, alphaThreshold,
-					requestedJTSEnvelope, features, it, singleImageROI,
-					singleImageROIThreshold, dim);
+			return loadRequestedTiles(requestedOriginalEnvelope,
+					intersectionEnvelope, transparentColor,
+					outputTransparentColor, intersectionJTSEnvelope, features,
+					it, inputImageThresholdValue, pixelDimension, size, fading);
 		} catch (DataSourceException e) {
 			LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
 		} catch (TransformException e) {
@@ -591,59 +632,65 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 	}
 
+	/**
+	 * Builds up a fake mosaic that consists of a transparent image with a red
+	 * cross.
+	 * 
+	 * <p>
+	 * The purpose of the fake mosaic
+	 * 
+	 * @param requestedEnvelope
+	 *            is the envelope requested by the user.
+	 * @param dim
+	 *            indicates the requested dimension for this
+	 *            {@link GridCoverage2D} in terms of pixels.
+	 * @param features
+	 *            is the number of features touching the requsted envelope.
+	 * @return a {@link GridCoverage2D}.
+	 */
 	private GridCoverage fakeMosaic(GeneralEnvelope requestedEnvelope,
-			int features) {
-		LOGGER.warning(new StringBuffer("We can load at most ").append(
-				MAX_TILES).append(" tiles while there were requested ").append(
-				features).append(
-				"\nI am going to print out a fake coverage, sorry about it!")
-				.toString());
-		Rectangle dim = new Rectangle(800, 600);
-		final BufferedImage image = new BufferedImage(dim.width, dim.height,
-				BufferedImage.TYPE_4BYTE_ABGR);
-		final Graphics2D g2D = (Graphics2D) image.getGraphics();
-		g2D.setColor(Color.red);
-		g2D.draw3DRect(0, 0, dim.width - 1, dim.height - 1, true);
-		g2D.drawLine(0, 0, dim.width, dim.height);
-		g2D.drawLine(0, dim.height, dim.width, 0);
-		g2D.dispose();
-		return coverageFactory.create(coverageName, image, requestedEnvelope);
+			Rectangle dim) {
+
+		return coverageFactory.create(coverageName, PatternDescriptor.create(
+				unavailableImage, new Integer(dim.width), new Integer(
+						dim.height), ImageUtilities.NOCACHE_HINT),
+				requestedEnvelope);
 
 	}
 
 	/**
-	 * This method loads the tiles which overlap the requested envelope using
-	 * the provided values for alpha and input ROI.
+	 * This method loads the tiles which overlap the requested
+	 * {@link GeneralEnvelope} using the provided values for alpha and input
+	 * ROI.
 	 * 
-	 * @param requestedEnvelope
-	 * @param alpha
-	 * @param alphaThreshold
+	 * @param requestedOriginalEnvelope
+	 * @param intersectionEnvelope
+	 * @param transparentColor
+	 * @param outputTransparentColor
 	 * @param requestedJTSEnvelope
 	 * @param features
 	 * @param it
-	 * @param singleImageROI
-	 * @param singleImageROIThreshold
+	 * @param inputImageThresholdValue
 	 * @param dim
+	 * @param numImages
+	 * @param blend
 	 * @return
 	 * @throws DataSourceException
 	 * @throws TransformException
-	 * @throws IOException
-	 * @throws FileNotFoundException
-	 * @throws IllegalArgumentException
-	 * @throws FactoryRegistryException
 	 */
-	private GridCoverage loadRequestedTiles(GeneralEnvelope requestedEnvelope,
-			boolean alpha, double alphaThreshold,
-			final Envelope requestedJTSEnvelope, final List features,
-			final Iterator it, boolean singleImageROI,
-			int singleImageROIThreshold, Rectangle dim)
-			throws DataSourceException, TransformException {
+	private GridCoverage loadRequestedTiles(
+			GeneralEnvelope requestedOriginalEnvelope,
+			GeneralEnvelope intersectionEnvelope, Color transparentColor,
+			Color outputTransparentColor, final Envelope requestedJTSEnvelope,
+			final List features, final Iterator it,
+			double inputImageThresholdValue, Rectangle dim, int numImages,
+			boolean blend) throws DataSourceException, TransformException {
 
 		try {
 			// if we get here we have something to load
 			// /////////////////////////////////////////////////////////////////////
 			//
-			// prepare the mosaic params
+			// prepare the params for executing a mosaic operation.
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final ParameterBlockJAI pbjMosaic = new ParameterBlockJAI("Mosaic");
@@ -652,13 +699,15 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 
 			// /////////////////////////////////////////////////////////////////////
 			//
-			// compute the requested resolution
+			// compute the requested resolution given the requested envelope and
+			// dimension.
 			//
 			// /////////////////////////////////////////////////////////////////////
 			final ImageReadParam readP = new ImageReadParam();
 			final Integer imageChoice;
 			if (dim != null)
-				imageChoice = setReadParams(readP, requestedEnvelope, dim);
+				imageChoice = setReadParams(readP, requestedOriginalEnvelope,
+						dim);
 			else
 				imageChoice = new Integer(0);
 			if (LOGGER.isLoggable(Level.FINE))
@@ -670,25 +719,48 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// Resolution.
+			//
 			// I am implicitly assuming that all the images have the same
 			// resolution. In principle this is not required but in practice
-			// having
-			// different resolution would surely bring to having small
-			// displacements
-			// in the final mosaic which we do not wnat to happen.
+			// having different resolution would surely bring to having small
+			// displacements in the final mosaic which we do not wnat to happen.
+			//
 			// /////////////////////////////////////////////////////////////////////
 			final double[] res;
 			if (imageChoice.intValue() == 0) {
 				res = new double[highestRes.length];
 				res[0] = highestRes[0];
 				res[1] = highestRes[1];
-			} else
-				res = overViewResolutions[imageChoice.intValue() - 1];
+			} else {
+				final double temp[] = overViewResolutions[imageChoice
+						.intValue() - 1];
+				res = new double[temp.length];
+				res[0] = temp[0];
+				res[1] = temp[1];
+
+			}
 			// adjusting the resolution for the source subsampling
 			res[0] *= readP.getSourceXSubsampling();
 			res[1] *= readP.getSourceYSubsampling();
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// Envelope of the loaded dataset and upper left corner of this
+			// envelope.
+			//
+			// Ths envelope corresponds to the union of the envelopes of all the
+			// tiles that intersect the area that was request by the user. It is
+			// crucial to understand that this geographic area can be, and it
+			// usually is, bigger then the requested one. This involves doing a
+			// crop operation at the end of the mosaic creation.
+			//
+			// /////////////////////////////////////////////////////////////////////
+			final Envelope loadedDataSetBound = getLoadedDataSetBoud(features);
+			final Point2D ULC = new Point2D.Double(
+					loadedDataSetBound.getMinX(), loadedDataSetBound.getMaxY());
 
 			// /////////////////////////////////////////////////////////////////////
+			//
+			// CORE LOOP
 			//
 			// Loop over the single features and load the images which
 			// intersect the requested envelope. Once all of them have been
@@ -701,53 +773,44 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			Feature feature;
 			String location;
 			Envelope bound;
-			Envelope loadedDataSetBound = new Envelope();
-			RenderedOp loadedImage;
+			PlanarImage loadedImage;
 			File imageFile;
-			final int numImages = features.size();
 			final ROI[] rois = new ROI[numImages];
 			final PlanarImage[] alphaChannels = new PlanarImage[numImages];
 			final Area finalLayout = new Area();
-			// /////////////////////////////////////////////////////////////////////
-			//
-			// envelope of the loaded dataset
-			//
-			// /////////////////////////////////////////////////////////////////////
-			final Point2D ULC = getULC(new Envelope(requestedJTSEnvelope
-					.getMinX(), requestedJTSEnvelope.getMaxY(),
-					requestedJTSEnvelope.getMinX(), requestedJTSEnvelope
-							.getMaxY()));
 
 			// reusable parameters
 			boolean alphaIn = false;
+			boolean doTransparentColor = false;
+			boolean doInputImageThreshold = false;
 			int[] alphaIndex = null;
 			int i = 0;
 			Boolean readMetadata = Boolean.FALSE;
 			Boolean readThumbnails = Boolean.FALSE;
 			Boolean verifyInput = Boolean.FALSE;
+			ParameterBlock pbjImageRead;
+			ColorModel model;
 
 			do {
 				// /////////////////////////////////////////////////////////////////////
 				//
-				// get location and envelope of the image to load.
+				// Get location and envelope of the image to load.
 				//
 				// /////////////////////////////////////////////////////////////////////
 				feature = (Feature) it.next();
 				location = (String) feature.getAttribute("location");
 				bound = feature.getBounds();
-				loadedDataSetBound.expandToInclude(bound);
 
 				// /////////////////////////////////////////////////////////////////////
 				//
-				// load a tile from disk as requested.
+				// lLad a tile from disk as requested.
 				//
 				// /////////////////////////////////////////////////////////////////////
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("About to read image number " + i);
 				imageFile = new File(new StringBuffer(parentLocation).append(
 						File.separatorChar).append(location).toString());
-
-				ParameterBlock pbjImageRead = new ParameterBlock();
+				pbjImageRead = new ParameterBlock();
 				pbjImageRead.add(ImageIO.createImageInputStream(imageFile));
 				pbjImageRead.add(imageChoice);
 				pbjImageRead.add(readMetadata);
@@ -757,31 +820,99 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				pbjImageRead.add(null);
 				pbjImageRead.add(readP);
 				pbjImageRead.add(null);
-				loadedImage = JAI.create("ImageRead", pbjImageRead, null);
+				loadedImage = JAI.create("ImageRead", pbjImageRead);
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("Just read image number " + i);
 
 				// /////////////////////////////////////////////////////////////
 				//
-				// Input alpha management.
+				// Input alpha, ROI and transparent color management.
 				//
+				// Once I get the first image Ican acquire all the information I
+				// need in order to decide which actions to while and after
+				// loading the images.
 				//
-				//
+				// Specifically, I have to check if the loaded image have
+				// transparency, because if we do a ROI and/or we have a
+				// transparent color to set we have to remove it.
 				//
 				// /////////////////////////////////////////////////////////////
 				if (i == 0) {
-
-					final ColorModel model = loadedImage.getColorModel();
+					// //
+					//
+					// We check here if the images have an alpha channel or some
+					// other sort of transparency. In case we have transparency
+					// I also save the index of the transparent channel.
+					//
+					// //
+					model = loadedImage.getColorModel();
 					alphaIn = model.hasAlpha();
 					if (alphaIn)
-					// XXX good for RGBA but what about ARGB and others???
-					{
 						alphaIndex = new int[] { model.getNumComponents() - 1 };
 
-						// we do not need final alpha since the initial images
-						// have alpha channel therefore they background for the
-						// mosaic will be transparent by default.
-						alpha = false;
+					// //
+					//
+					// ROI has to be computed depending on the value of the
+					// input threshold and on the data type of the images.
+					//
+					// If I request a threshod of 0 on a byte image, I can skip
+					// doing the ROI!
+					//
+					// //
+					doInputImageThreshold = checkIfThresholdIsNeeded(
+							loadedImage, inputImageThresholdValue);
+
+					// //
+					//
+					// Checking if we have to do something against the final
+					// transparent color.
+					//
+					// If we have a valid transparent color we have to remove
+					// the input alpha information.
+					//
+					// However a possible optimization is to check for index
+					// color model images with transparency where the
+					// transparent color is the same requested here and no ROIs
+					// requested.
+					//
+					// //
+					if (transparentColor != null) {
+						// paranoiac check on the provided transparent color
+						transparentColor = new Color(transparentColor.getRed(),
+								transparentColor.getGreen(), transparentColor
+										.getBlue());
+						doTransparentColor = true;
+						//
+						// If the images use an IndexColorModel Bitamsk where
+						// the transparent color is the same that was requested,
+						// the optimization is to avoid removing the alpha
+						// information just to readd it at the end. We can
+						// simply go with what we have from the input.
+						//
+						// However, we have to take into account that no action
+						// has to be take if a ROI is requested on the input
+						// images since that would imply doing an RGB
+						// conversion.
+						//
+						//
+						if (model instanceof IndexColorModel
+								&& alphaIn
+								&& model.getTransparency() == Transparency.BITMASK) {
+							final IndexColorModel icm = (IndexColorModel) model;
+							final int transparentPixel = icm
+									.getTransparentPixel();
+							if (transparentPixel != -1) {
+								final int oldTransparentColor = icm
+										.getRGB(transparentPixel);
+								if (oldTransparentColor == transparentColor
+										.getRGB()) {
+									doTransparentColor = false;
+								}
+
+							}
+
+						}
+
 					}
 
 				}
@@ -794,37 +925,164 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("Adding to mosaic image number " + i);
 				addToMosaic(pbjMosaic, bound, ULC, res, loadedImage,
-						singleImageROI, rois, i, singleImageROIThreshold,
-						alphaIn, alphaIndex, alphaChannels, finalLayout,
-						imageFile);
+						doInputImageThreshold, rois, i,
+						inputImageThresholdValue, alphaIn, alphaIndex,
+						alphaChannels, finalLayout, imageFile,
+						doTransparentColor, transparentColor);
 
 				i++;
 			} while (i < numImages);
 
 			// /////////////////////////////////////////////////////////////////////
 			//
-			// create the mosaic image
-			// 
+			// Prepare the last parameters for the mosaic.
+			//
+			// First of all we set the input threshold accordingly to the input
+			// image data type. I find the default value (which is 0) very bad
+			// for data type other than byte and ushort. With float and double
+			// it can cut off a large par of fthe dynamic.
+			//
+			// Second step is the the management of the input threshold that is
+			// converted into a roi because the way we want to manage such
+			// threshold is by applying it on the intensitiy of the input image.
+			// Note that this ROI has to be mutually exclusive with the alpha
+			// management due to the rules of the JAI Mosaic Operation which
+			// ignore the ROIs in case an alpha information is provided for the
+			// input images.
+			//
+			// Third step is the management of the alpha information which can
+			// be the result of a masking operation upong the request for a
+			// transparent color or the result of input images with internal
+			// transparency.
+			//
+			// Fourth step is the blending for having nice Fading effect at
+			// overlapping regions.ù
+			//
 			// /////////////////////////////////////////////////////////////////////
-			if (!alphaIn && singleImageROI) {
-				pbjMosaic.setParameter("sourceThreshold",
-						new double[][] { { 0 } });
+			double th = getThreshold(loadedImage.getSampleModel().getDataType());
+			pbjMosaic
+					.setParameter("sourceThreshold", new double[][] { { th } });
+			if (doInputImageThreshold) {
+				// //
+				//
+				// Set the ROI parameter in case it was requested by setting a
+				// threshold.
+				// 
+				// //
 				pbjMosaic.setParameter("sourceROI", rois);
 
-			} else if (alphaIn) {
-				pbjMosaic.setParameter("mosaicType",
-						MosaicDescriptor.MOSAIC_TYPE_BLEND);
+			} else if (alphaIn || doTransparentColor) {
+				// //
+				//
+				// In case the input images have transparency information this
+				// way we can handle it.
+				//
+				// //
 				pbjMosaic.setParameter("sourceAlpha", alphaChannels);
 
 			}
+			// //
+			//
+			// It might important to set the mosaic tpe to blend otherwise
+			// sometimes strange results jump in.
+			// 
+			// //
+			if (blend) {
+				pbjMosaic.setParameter("mosaicType",
+						MosaicDescriptor.MOSAIC_TYPE_BLEND);
 
-			// prepare the final mosaic
-			return prepareMosaic(location, requestedEnvelope,
-					requestedJTSEnvelope, res, loadedDataSetBound, pbjMosaic,
-					alpha, alphaThreshold, finalLayout);
+			}
+
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// Create the mosaic image by doing a crop if necessary and also
+			// managing the transparent color if applicablw. Be aware that
+			// management of the transparent color involves removing
+			// transparency information from the input images.
+			// 
+			// /////////////////////////////////////////////////////////////////////
+			return prepareMosaic(location, requestedOriginalEnvelope,
+					intersectionEnvelope, res, loadedDataSetBound, pbjMosaic,
+					finalLayout, outputTransparentColor);
 		} catch (IOException e) {
 			throw new DataSourceException("Unable to create this mosaic", e);
 		}
+	}
+
+	/**
+	 * ROI has to be computed depending on the value of the input threshold and
+	 * on the data type of the images.
+	 * 
+	 * If I request a threshod of 0 on a byte image, I can skip doing the ROI!
+	 * 
+	 * @param loadedImage
+	 *            to check before applying a threshold.
+	 * @param thresholdValue
+	 *            is the value that is suggested to be used for the threshold.
+	 * @return true in case the threshold is to be performed, false otherwise.
+	 */
+	private boolean checkIfThresholdIsNeeded(PlanarImage loadedImage,
+			double thresholdValue) {
+		if (Double.isNaN(thresholdValue) || Double.isInfinite(thresholdValue))
+			return false;
+		switch (loadedImage.getSampleModel().getDataType()) {
+		case DataBuffer.TYPE_BYTE:
+			int bTh = (int) thresholdValue;
+			if (bTh <= 0 || bTh >= 255)
+				return false;
+		case DataBuffer.TYPE_USHORT:
+			int usTh = (int) thresholdValue;
+			if (usTh <= 0 || usTh >= 65535)
+				return false;
+		case DataBuffer.TYPE_SHORT:
+			int sTh = (int) thresholdValue;
+			if (sTh <= Short.MIN_VALUE || sTh >= Short.MAX_VALUE)
+				return false;
+		case DataBuffer.TYPE_INT:
+			int iTh = (int) thresholdValue;
+			if (iTh <= Integer.MIN_VALUE || iTh >= Integer.MAX_VALUE)
+				return false;
+		case DataBuffer.TYPE_FLOAT:
+			float fTh = (float) thresholdValue;
+			if (fTh <= -Float.MAX_VALUE || fTh >= Float.MAX_VALUE
+					|| Float.isInfinite(fTh) || Float.isNaN(fTh))
+				return false;
+		case DataBuffer.TYPE_DOUBLE:
+			double dTh = (double) thresholdValue;
+			if (dTh <= -Double.MAX_VALUE || dTh >= Double.MAX_VALUE
+					|| Double.isInfinite(dTh) || Double.isNaN(dTh))
+				return false;
+
+		}
+		return true;
+	}
+
+	/**
+	 * Returns a suitable threshold depending on the {@link DataBuffer} type.
+	 * 
+	 * <p>
+	 * Remember that the threshold works with >=.
+	 * 
+	 * @param dataType
+	 *            to create a low threshold for.
+	 * @return a minimum threshold value suitable for this data type.
+	 */
+	private double getThreshold(int dataType) {
+		switch (dataType) {
+		case DataBuffer.TYPE_BYTE:
+		case DataBuffer.TYPE_USHORT:
+			// XXX change to zero when bug fixed
+			return 1.0;
+		case DataBuffer.TYPE_INT:
+			return Integer.MIN_VALUE;
+		case DataBuffer.TYPE_SHORT:
+			return Short.MIN_VALUE;
+		case DataBuffer.TYPE_DOUBLE:
+			return -Double.MAX_VALUE;
+		case DataBuffer.TYPE_FLOAT:
+			return -Float.MAX_VALUE;
+		}
+		return 0;
 	}
 
 	/**
@@ -836,20 +1094,19 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 *         envelope.
 	 * @throws IOException
 	 */
-	private Point2D getULC(Envelope envelope) throws IOException {
+	private Envelope getLoadedDataSetBoud(List features) throws IOException {
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Load feaures and evaluate envelope
 		//
 		// /////////////////////////////////////////////////////////////////////
-		List features = getFeaturesFromIndex(envelope);
 		final Envelope loadedULC = new Envelope();
 		Iterator it = features.iterator();
 		while (it.hasNext()) {
 			loadedULC.expandToInclude(((Feature) it.next())
 					.getDefaultGeometry().getEnvelopeInternal());
 		}
-		return new Point2D.Double(loadedULC.getMinX(), loadedULC.getMaxY());
+		return loadedULC;
 
 	}
 
@@ -874,7 +1131,7 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 			if (o != null) {
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("Index does not need to be created...");
-				;
+
 			} else {
 				if (LOGGER.isLoggable(Level.FINE))
 					LOGGER.fine("Index needa to be recreated...");
@@ -896,12 +1153,15 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * 
 	 * @param envelope
 	 * @param requestedEnvelope
+	 * @param intersectionEnvelope
 	 * @param res
-	 * @param loadedTilesBound
+	 * @param loadedTilesEnvelope
 	 * @param pbjMosaic
-	 * @param alphaThreshold
+	 * @param transparentColor
 	 * @param doAlpha
+	 * @param doTransparentColor
 	 * @param finalLayout
+	 * @param outputTransparentColor
 	 * @param singleImageROI
 	 * @return A {@link GridCoverage}, wewll actually a {@link GridCoverage2D}.
 	 * @throws IllegalArgumentException
@@ -909,57 +1169,72 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @throws DataSourceException
 	 */
 	private GridCoverage prepareMosaic(String location,
-			GeneralEnvelope requestedEnvelope,
-			final Envelope requestedJTSEnvelope, double[] res,
-			Envelope loadedTilesBound, ParameterBlockJAI pbjMosaic,
-			boolean doAlpha, double alphaThreshold, Area finalLayout)
+			GeneralEnvelope requestedOriginalEnvelope,
+			GeneralEnvelope intersectionEnvelope, double[] res,
+			final Envelope loadedTilesEnvelope, ParameterBlockJAI pbjMosaic,
+			Area finalLayout, Color outputTransparentColor)
 			throws DataSourceException {
-
-		RenderedOp imageBeforeAlpha;
+		GeneralEnvelope finalenvelope = null;
+		PlanarImage preparationImage;
+		Rectangle loadedTilePixelsBound = finalLayout.getBounds();
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(new StringBuffer("Loaded bbox ").append(
-					loadedTilesBound.toString()).append(
+					loadedTilesEnvelope.toString()).append(
 					" while requested bbox ").append(
-					requestedJTSEnvelope.toString()).toString());
-		if (!requestedJTSEnvelope.equals(loadedTilesBound)) {
+					requestedOriginalEnvelope.toString()).toString());
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Check if we need to do a crop on the loaded tiles or not. Keep into
+		// account that most part of the time the loaded tiles will be go
+		// beyoind the requested area, hence there is a need for cropping them
+		// while mosaicking them.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final GeneralEnvelope loadedTilesBoundEnv = new GeneralEnvelope(
+				new double[] { loadedTilesEnvelope.getMinX(),
+						loadedTilesEnvelope.getMinY() }, new double[] {
+						loadedTilesEnvelope.getMaxX(),
+						loadedTilesEnvelope.getMaxY() });
+		loadedTilesBoundEnv.setCoordinateReferenceSystem(crs);
+		final double loadedTilesEnvelopeDim0 = loadedTilesBoundEnv.getLength(0);
+		final double loadedTilesEnvelopeDim1 = loadedTilesBoundEnv.getLength(1);
+		if (!intersectionEnvelope.equals(loadedTilesBoundEnv, Math
+				.min((loadedTilesEnvelopeDim0 / loadedTilePixelsBound
+						.getWidth()) / 2.0,
+						(loadedTilesEnvelopeDim1 / loadedTilePixelsBound
+								.getHeight()) / 2.0), false)) {
+
 			// /////////////////////////////////////////////////////////////////////
 			//
 			// CROP the mosaic image to the requested BBOX
 			//
 			// /////////////////////////////////////////////////////////////////////
-			final GeneralEnvelope intersection = new GeneralEnvelope(
-					new double[] { requestedJTSEnvelope.getMinX(),
-							requestedJTSEnvelope.getMinY() }, new double[] {
-							requestedJTSEnvelope.getMaxX(),
-							requestedJTSEnvelope.getMaxY() });
-			intersection.setCoordinateReferenceSystem(crs);
-
-			final GeneralEnvelope loadedTilesBoundEnv = new GeneralEnvelope(
-					new double[] { loadedTilesBound.getMinX(),
-							loadedTilesBound.getMinY() }, new double[] {
-							loadedTilesBound.getMaxX(),
-							loadedTilesBound.getMaxY() });
-			loadedTilesBoundEnv.setCoordinateReferenceSystem(crs);
-
 			// intersect them
-			intersection.intersects(loadedTilesBoundEnv, true);
+			final GeneralEnvelope intersection = new GeneralEnvelope(
+					intersectionEnvelope);
+			intersection.intersect(loadedTilesBoundEnv);
 
 			// get the transform for going from world to grid
-            final GridToEnvelopeMapper gridToEnvelopeMapper = new GridToEnvelopeMapper(
-                    new GeneralGridRange(finalLayout.getBounds()), loadedTilesBoundEnv);
-            gridToEnvelopeMapper.setGridType(PixelInCell.CELL_CORNER);
 			try {
-				final MathTransform transform = gridToEnvelopeMapper.createTransform().inverse();
+				final GridToEnvelopeMapper gridToEnvelopeMapper = new GridToEnvelopeMapper(
+						new GeneralGridRange(loadedTilePixelsBound),
+						loadedTilesBoundEnv);
+				gridToEnvelopeMapper.setGridType(PixelInCell.CELL_CORNER);
+				final MathTransform transform = gridToEnvelopeMapper
+						.createTransform().inverse();
 				final GeneralGridRange finalRange = new GeneralGridRange(
-						CRS.transform(transform, intersection));
+						CRSUtilities.transform(transform, intersection));
 				// CROP
 				finalLayout.intersect(new Area(finalRange.toRectangle()));
 				Rectangle tempRect = finalLayout.getBounds();
 
-				imageBeforeAlpha = JAI.create("Mosaic", pbjMosaic,
+				preparationImage = JAI.create("Mosaic", pbjMosaic,
 						new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
 								new ImageLayout(tempRect.x, tempRect.y,
 										tempRect.width, tempRect.height)));
+
+				finalenvelope = intersection;
 
 			} catch (MismatchedDimensionException e) {
 				throw new DataSourceException(
@@ -972,73 +1247,55 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 						"Problem when creating this mosaic.", e);
 			}
 
-		} else
-			imageBeforeAlpha = JAI.create("Mosaic", pbjMosaic, null);
+		} else {
+			preparationImage = JAI.create("Mosaic", pbjMosaic);
+			finalenvelope = new GeneralEnvelope(intersectionEnvelope);
+		}
 		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(new StringBuffer("Mosaic created ").toString());
-		// ///////////////////////////////////////////////////////////////////
-		//
-		// TRANSLATE in order to have minx and minY equal o zero.
-		// It is not required but it could simply things a lot in successive
-		// steps.
+
 		//
 		// ///////////////////////////////////////////////////////////////////
-		if (imageBeforeAlpha.getMinX() != 0 || imageBeforeAlpha.getMinY() != 0) {
-			// TRANSLATE in order to have minx and minY equal o zero
-			final ParameterBlock pbjTranslate = new ParameterBlock();
-			pbjTranslate.addSource(imageBeforeAlpha).add(
-					new Float(-imageBeforeAlpha.getMinX())).add(
-					new Float(-imageBeforeAlpha.getMinY()))
-					.add(nnInterpolation);
-			imageBeforeAlpha = JAI.create("Translate", pbjTranslate, NO_CACHE);
-
-		}
-
-		// /////////////////////////////////////////////////////////////////////
 		//
 		// FINAL ALPHA
 		//
-		// /////////////////////////////////////////////////////////////////////
-		if (doAlpha) {
+		//
+		// ///////////////////////////////////////////////////////////////////
+		if (outputTransparentColor != null) {
 			if (LOGGER.isLoggable(Level.FINE))
 				LOGGER.fine(new StringBuffer("Support for alpha").toString());
-			// /////////////////////////////////////////////////////////////////////
+			//
+			// ///////////////////////////////////////////////////////////////////
 			//
 			// If requested I can perform the ROI operation on the prepared ROI
 			// image for building up the alpha band
 			//
-			// /////////////////////////////////////////////////////////////////////
+			//
+			// ///////////////////////////////////////////////////////////////////
+			ImageWorker w = new ImageWorker(preparationImage);
+			if (preparationImage.getColorModel() instanceof IndexColorModel) {
+				preparationImage = w.maskIndexColorModelByte(
+						outputTransparentColor).getPlanarImage();
+			} else
+				preparationImage = w.maskComponentColorModelByte(
+						outputTransparentColor).getPlanarImage();
 
-			ImageWorker w = new ImageWorker(imageBeforeAlpha);
-			w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
-			w.intensity();
-			w.binarize(alphaThreshold);
-			w.forceComponentColorModel();
-			w.retainFirstBand();
-			final PlanarImage alpha = w.getPlanarImage();
-
-			final ParameterBlock pbjMultiplyConst = new ParameterBlock();
-			pbjMultiplyConst.addSource(alpha).add(new double[] { 255 });
-			final RenderedOp multipliedImage = JAI.create("MultiplyConst",
-					pbjMultiplyConst, NO_CACHE);
-
-			// /////////////////////////////////////////////////////////////////////
+			// ///////////////////////////////////////////////////////////////////
 			//
 			// create the coverage
 			//
-			// /////////////////////////////////////////////////////////////////////
-			final ParameterBlock pbjBandMerge = new ParameterBlock();
-			pbjBandMerge.addSource(imageBeforeAlpha).addSource(multipliedImage);
-			return coverageFactory.create(coverageName, JAI.create("BandMerge",
-					pbjBandMerge, NO_CACHE), requestedEnvelope);
+			//
+			// ///////////////////////////////////////////////////////////////////
+			return coverageFactory.create(coverageName, preparationImage,
+					finalenvelope);
 		}
-		// /////////////////////////////////////////////////////////////////////
-		//
+		// ///////////////////////////////////////////////////////////////////
+		//		
 		// create the coverage
-		//
-		// /////////////////////////////////////////////////////////////////////
-		return coverageFactory.create(coverageName, imageBeforeAlpha,
-				requestedEnvelope);
+		//		
+		// ///////////////////////////////////////////////////////////////////
+		return coverageFactory.create(coverageName, preparationImage,
+				finalenvelope);
 
 	}
 
@@ -1052,43 +1309,159 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 	 * @param bound
 	 *            Lon-Lat bounds of the loaded image
 	 * @param ulc
-	 *            Lon-Lat bounds of the loaded dataset
 	 * @param res
 	 * @param loadedImage
-	 * @param singleImageROI
+	 * @param removeAlpha
 	 * @param rois
 	 * @param i
-	 * @param singleImageROIThreshold
+	 * @param inputImageThresholdValue
 	 * @param alphaChannels
 	 * @param alphaIndex
 	 * @param alphaIn
 	 * @param finalLayout
 	 * @param imageFile
+	 * @param transparentColor
+	 * @param doTransparentColor
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
 	private void addToMosaic(ParameterBlockJAI pbjMosaic, Envelope bound,
-			Point2D ulc, double[] res, RenderedOp loadedImage,
-			boolean singleImageROI, ROI[] rois, int i,
-			int singleImageROIThreshold, boolean alphaIn, int[] alphaIndex,
-			PlanarImage[] alphaChannels, Area finalLayout, File imageFile) {
+			Point2D ulc, double[] res, PlanarImage loadedImage,
+			boolean doInputImageThreshold, ROI[] rois, int i,
+			double inputImageThresholdValue, boolean alphaIn, int[] alphaIndex,
+			PlanarImage[] alphaChannels, Area finalLayout, File imageFile,
+			boolean doTransparentColor, Color transparentColor) {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Computing TRANSLATION AND SCALING FACTORS
+		//
+		// Using the spatial resolution we compute the translation factors for
+		// positioning the actual image correctly in final mosaic.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		PlanarImage readyToMosaicImage = scaleAndTranslate(bound, ulc, res,
+				loadedImage);
+
+		// ///////////////////////////////////////////////////////////////////
+		//
+		// INDEX COLOR MODEL EXPANSION
+		//
+		// Take into account the need for an expansions of the original color
+		// model.
+		//
+		// If the original color model is an index color model an expansion
+		// might be requested in case the differemt palettes are not all the
+		// same. In this case the mosaic operator from JAI would provide wrong
+		// results since it would take the first palette and use that one for
+		// all the other images.
+		//
+		// There is a special case to take into account here. In case the input
+		// images use an IndexColorModel t might happen that the transparent
+		// color is present in some of them while it is not present in some
+		// others. This case is the case where for sure a color expansion is
+		// needed. However we have to take into account that during the masking
+		// phase the images where the requested transparent color was present
+		// willl have 4 bands, the other 3. If we want the mosaic to work we
+		// have to add na extra band to the latter type of images for providing
+		// alpha information to them.
+		//
+		//
+		// ///////////////////////////////////////////////////////////////////
+		if (expandMe
+				&& readyToMosaicImage.getColorModel() instanceof IndexColorModel) {
+			readyToMosaicImage = new ImageWorker(readyToMosaicImage)
+					.forceComponentColorModel().getPlanarImage();
+		}
+
+		// ///////////////////////////////////////////////////////////////////
+		//
+		// TRANSPARENT COLOR MANAGEMENT
+		//
+		//
+		// ///////////////////////////////////////////////////////////////////
+		if (doTransparentColor) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine(new StringBuffer(
+						"Support for alpha on input image number " + i)
+						.toString());
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// If requested I can perform the ROI operation on the prepared ROI
+			// image for building up the alpha band
+			//
+			// /////////////////////////////////////////////////////////////////////
+			ImageWorker w = new ImageWorker(readyToMosaicImage);
+			if (readyToMosaicImage.getColorModel() instanceof IndexColorModel) {
+				readyToMosaicImage = w
+						.maskIndexColorModelByte(transparentColor)
+						.getPlanarImage();
+			} else
+				readyToMosaicImage = w.maskComponentColorModelByte(
+						transparentColor).getPlanarImage();
+			alphaIndex = new int[] { readyToMosaicImage.getColorModel()
+					.getNumComponents() - 1 };
+
+		}
+		// ///////////////////////////////////////////////////////////////////
+		//
+		// ROI
+		//
+		// ///////////////////////////////////////////////////////////////////
+		if (doInputImageThreshold) {
+			ImageWorker w = new ImageWorker(readyToMosaicImage);
+			w.tileCacheEnabled(false).intensity().binarize(
+					inputImageThresholdValue);
+			rois[i] = w.getImageAsROI();
+
+		} else if (alphaIn || doTransparentColor) {
+			ImageWorker w = new ImageWorker(readyToMosaicImage);
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// ALPHA in INPUT
+			//
+			// I have to select the alpha band and provide it to the final
+			// mosaic operator. I have to force going to ComponentColorModel in
+			// case the image is indexed.
+			//
+			// /////////////////////////////////////////////////////////////////////
+			if (readyToMosaicImage.getColorModel() instanceof IndexColorModel) {
+				alphaChannels[i] = w.forceComponentColorModel()
+						.retainLastBand().getPlanarImage();
+			}
+
+			else
+				alphaChannels[i] = w.retainBands(alphaIndex).getPlanarImage();
+
+		}
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Translation.
-		// Using the spatial resolution we compute the translation factors for
-		// positioning the actual image correctly in final mosaic.
+		// ADD TO MOSAIC
+		//
 		// /////////////////////////////////////////////////////////////////////
-		// evaluate trans
-		double resX = (bound.getMaxX() - bound.getMinX())
-				/ loadedImage.getWidth();
-		double resY = (bound.getMaxY() - bound.getMinY())
-				/ loadedImage.getHeight();
+		pbjMosaic.addSource(readyToMosaicImage);
+		finalLayout.add(new Area(readyToMosaicImage.getBounds()));
+
+	}
+
+	/**
+	 * Computing TRANSLATION AND SCALING FACTORS
+	 * 
+	 * Using the spatial resolution we compute the translation factors for
+	 * positioning the actual image correctly in final mosaic.
+	 * 
+	 * @param bound
+	 * @param ulc
+	 * @param res
+	 * @param image
+	 * @return
+	 */
+	private PlanarImage scaleAndTranslate(Envelope bound, Point2D ulc,
+			double[] res, PlanarImage image) {
+		// evaluate translation and scaling factors.
+		double resX = (bound.getMaxX() - bound.getMinX()) / image.getWidth();
+		double resY = (bound.getMaxY() - bound.getMinY()) / image.getHeight();
 		double scaleX = 1.0, scaleY = 1.0;
-		// int xTrans = (int) Math.round((bound.getMinX() - ulc.getX()) /
-		// res[0]);
-		// int yTrans = (int) Math.round((ulc.getY() - bound.getMaxY()) /
-		// res[1]);
 		double xTrans = 0.0, yTrans = 0.0;
 		if (Math.abs((resX - res[0]) / resX) > EPS
 				|| Math.abs(resY - res[1]) > EPS) {
@@ -1098,69 +1471,53 @@ public final class ImageMosaicReader extends AbstractGridCoverage2DReader
 		}
 		xTrans = (bound.getMinX() - ulc.getX()) / res[0];
 		yTrans = (ulc.getY() - bound.getMaxY()) / res[1];
-
-		// if (LOGGER.isLoggable(Level.FINE))
-		// LOGGER.fine(new StringBuffer("Adding to mosaic image ").append(
-		// imageFile.getAbsolutePath()).append(" as number ")
-		// .append(i).append(" with translations factors ").append(
-		// xTrans).append(" ").append(yTrans).toString());
 		//
-		// final ParameterBlock pbjTranslate = new ParameterBlock();
-		// // translation
-		// pbjTranslate.addSource(loadedImage).add(new Float(xTrans)).add(
-		// new Float(yTrans)).add(nnInterpolation);
-		// final RenderedOp readyToMosaicImage = JAI.create("Translate",
-		// pbjTranslate, NO_CACHE);
-		// pbjMosaic.addSource(readyToMosaicImage);
-		// finalLayout.add(new Area(readyToMosaicImage.getBounds()));
-
-		final ParameterBlock pbjScaleTranslate = new ParameterBlock();
-		// translation
-		pbjScaleTranslate.addSource(loadedImage).add(new Float(scaleX)).add(
-				new Float(scaleY)).add(new Float(xTrans))
-				.add(new Float(yTrans)).add(nnInterpolation);
-		final RenderedOp readyToMosaicImage = JAI.create("Scale",
-				pbjScaleTranslate, NO_CACHE);
-		pbjMosaic.addSource(readyToMosaicImage);
-		finalLayout.add(new Area(readyToMosaicImage.getBounds()));
-
-		// /////////////////////////////////////////////////////////////////////
+		// Optimising scale and translate.
 		//
-		// roi
-		// It is ignored in case I have input alpha
+		// In case the scale factors are very close to 1 we have two
+		// optimizarions: if fthe translation factors are close to zero we do
+		// thing, otherwise if thery are integers we do a simple translate.
 		//
-		// /////////////////////////////////////////////////////////////////////
-		if (!alphaIn && singleImageROI) {
-			ImageWorker w = new ImageWorker(readyToMosaicImage);
-			w.setRenderingHint(JAI.KEY_TILE_CACHE, null);
-			w.intensity();
-			w.binarize(singleImageROIThreshold);
-			rois[i] = w.getImageAsROI();
-		} else if (alphaIn) {
-			final ParameterBlock pbjBandSelect = new ParameterBlock();
+		// In the general case when wew have translation and scaling we do a
+		// warp affine which is the most precise operation we can perform.
+		//
+		// //
+		final ParameterBlock pbjAffine = new ParameterBlock();
+		if (Math.abs(xTrans - (int) xTrans) < Math.pow(10, -3)
+				&& Math.abs(yTrans - (int) yTrans) < Math.pow(10, -3)
+				&& Math.abs(scaleX - 1) < Math.pow(10, -6)
+				&& Math.abs(scaleY - 1) < Math.pow(10, -6)) {
+
+			// return the original image
+			if (Math.abs(xTrans) < Math.pow(10, -3)
+					&& Math.abs(yTrans) < Math.pow(10, -3)) {
+				return image;
+
+			}
+
 			// translation
-			pbjBandSelect.addSource(readyToMosaicImage).add(alphaIndex);
-			alphaChannels[i] = JAI
-					.create("BandSelect", pbjBandSelect, NO_CACHE);
+			pbjAffine.addSource(image).add(new Float(xTrans)).add(
+					new Float(yTrans)).add(
+					ImageUtilities.NN_INTERPOLATION_HINT
+							.get(JAI.KEY_INTERPOLATION));
+			// avoid doing the color expansion now since it might not be needed
+			return JAI.create("Translate", pbjAffine,
+					ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
+
 		}
-
-	} /*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.opengis.coverage.grid.GridCoverageReader#skip()
-		 */
-
-	public void skip() throws IOException {
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#dispose()
-	 */
-	public void dispose() throws IOException {
+		// translation and scaling
+		pbjAffine.addSource(image).add(
+				new AffineTransform(scaleX, 0, 0, scaleY, xTrans, yTrans))
+				.add(
+						ImageUtilities.NN_INTERPOLATION_HINT
+								.get(JAI.KEY_INTERPOLATION));
+		// avoid doing the color expansion now since it might not be needed
+		final RenderingHints hints = (RenderingHints) ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL
+				.clone();
+		// adding the capability to do a border extension which is great when
+		// doing
+		hints.add(ImageUtilities.EXTEND_BORDER_BY_COPYING);
+		return JAI.create("Affine", pbjAffine, hints);
 
 	}
-
 }

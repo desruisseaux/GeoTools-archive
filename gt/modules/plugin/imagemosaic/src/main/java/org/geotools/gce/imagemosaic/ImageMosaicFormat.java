@@ -18,18 +18,23 @@
  */
 package org.geotools.gce.imagemosaic;
 
+import java.awt.Color;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureType;
@@ -50,7 +55,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * <li>tiff+tfw+prj</li>
  * <li>jpeg+tfw+prj</li>
  * <li>png+tfw+prj</li>
- * <li>geotif</li>
+ * <li>geotiff</li>
  * </ol>
  * This does not mean that you throw there a couple of images and it will do the
  * trick no matter how these images are. Requirements are:
@@ -58,7 +63,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * <ul>
  * <li>(almost) equal spatial resolution</li>
  * <li>same number of bands</li>
- * <li>same data type on all bands</li>
+ * <li>same data type</li>
  * <li>same projection</li>
  * </ul>
  * 
@@ -83,11 +88,11 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * specifying the treshold to use.</li>
  * 
  * 
- * <li>INPUT_IMAGE_ROI = new DefaultParameterDescriptor( "InputImageROI",
- * Boolean.class, null, Boolean.FALSE)--- INPUT_IMAGE_ROI_THRESHOLD = new
+ * <li>INPUT_IMAGE_THRESHOLD = new DefaultParameterDescriptor( "InputImageROI",
+ * Boolean.class, null, Boolean.FALSE)--- INPUT_IMAGE_THRESHOLD_VALUE = new
  * DefaultParameterDescriptor( "InputImageROIThreshold", Integer.class, null,
  * new Integer(1));--- These two can be used to control the application of ROIs
- * on the input images based on tresholding vlues. Basically using the threshold
+ * on the input images based on tresholding values. Basically using the threshold
  * you can ask the mosaic plugin to load or not certain pixels of the original
  * images.</li>
  * 
@@ -102,21 +107,21 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.imagemosaic");
 
-	/** Control the transparency of the output image. */
-	public static final DefaultParameterDescriptor FINAL_ALPHA = new DefaultParameterDescriptor(
-			"FinalAlpha", Boolean.class, null, Boolean.FALSE);
+	/** Control the type of the final mosaic. */
+	public static final DefaultParameterDescriptor FADING = new DefaultParameterDescriptor(
+			"Fading", Boolean.class, null,Boolean.FALSE);
+	
+	/** Control the transparency of the input coverages. */
+	public static final DefaultParameterDescriptor INPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor(
+			"InputTransparentColor", Color.class, null,null);
+	
+	/** Control the transparency of the output coverage. */
+	public static final DefaultParameterDescriptor OUTPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor(
+			"OutputTransparentColor", Color.class, null,null);
 
-	/** Control the transparency of the output image. */
-	public static final DefaultParameterDescriptor ALPHA_THRESHOLD = new DefaultParameterDescriptor(
-			"AlphaThreshold", Double.class, null, new Double(1));
-
-	/** Control the thresholding on the input images */
-	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI = new DefaultParameterDescriptor(
-			"InputImageROI", Boolean.class, null, Boolean.FALSE);
-
-	/** Control the thresholding on the input images */
-	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI_THRESHOLD = new DefaultParameterDescriptor(
-			"InputImageROIThreshold", Integer.class, null, new Integer(1));
+	/** Control the thresholding on the input coverage */
+	public static final DefaultParameterDescriptor INPUT_IMAGE_THRESHOLD_VALUE = new DefaultParameterDescriptor(
+			"InputImageThresholdValue", Double.class, null, new Double(Double.NaN));
 
 	/**
 	 * Creates an instance and sets the metadata.
@@ -142,8 +147,8 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 		readParameters = new ParameterGroup(
 				new DefaultParameterDescriptorGroup(mInfo,
 						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D,
-								FINAL_ALPHA, ALPHA_THRESHOLD, INPUT_IMAGE_ROI,
-								INPUT_IMAGE_ROI_THRESHOLD }));
+						INPUT_TRANSPARENT_COLOR,
+								INPUT_IMAGE_THRESHOLD_VALUE,OUTPUT_TRANSPARENT_COLOR }));
 
 		// reading parameters
 		writeParameters = null;
@@ -194,14 +199,14 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 
 						}
 					} catch (MalformedURLException e) {
-						if (LOGGER.isLoggable(Level.WARNING))
-							LOGGER.log(Level.WARNING, e.getLocalizedMessage(),
+						if (LOGGER.isLoggable(Level.FINE))
+							LOGGER.log(Level.FINE, e.getLocalizedMessage(),
 									e);
 						return false;
 
 					} catch (UnsupportedEncodingException e) {
-						if (LOGGER.isLoggable(Level.WARNING))
-							LOGGER.log(Level.WARNING, e.getLocalizedMessage(),
+						if (LOGGER.isLoggable(Level.FINE))
+							LOGGER.log(Level.FINE, e.getLocalizedMessage(),
 									e);
 						return false;
 
@@ -227,11 +232,53 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 			// looking for the location attribute
 			if (schema.getAttributeType("location") == null)
 				return false;
+			
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// Now look for the properties file and try to parse relevant fields
+			//
+			// /////////////////////////////////////////////////////////////////////
+			String temp = URLDecoder.decode(sourceURL.getFile(), "UTF8");
+			final int index = temp.lastIndexOf(".");
+			if (index != -1)
+				temp = temp.substring(0, index);
+			final File propertiesFile = new File(new StringBuffer(temp).append(
+					".properties").toString());
+			assert propertiesFile.exists() && propertiesFile.isFile();
+			final Properties properties = new Properties();
+			properties.load(new BufferedInputStream(new FileInputStream(
+					propertiesFile)));
 
+			// load the envelope
+			final String envelope = properties.getProperty("Envelope2D");
+			String[] pairs = envelope.split(" ");
+			final double cornersV[][] = new double[2][2];
+			String pair[];
+			for (int i = 0; i < 2; i++) {
+				pair = pairs[i].split(",");
+				cornersV[i][0] = Double.parseDouble(pair[0]);
+				cornersV[i][1] = Double.parseDouble(pair[1]);
+			}
+
+
+			// resolutions levels
+			Integer.parseInt(properties.getProperty("LevelsNum"));
+			final String levels = properties.getProperty("Levels");
+			pairs = levels.split(" ");
+			pair = pairs[0].split(",");
+			Double.parseDouble(pair[0]);
+			Double.parseDouble(pair[1]);
+			properties.getProperty("Name");
+			try {
+				properties.getProperty("ExpandToRGB").equalsIgnoreCase(
+						"true");
+			} catch (Exception e) {
+
+			}
 			return true;
 		} catch (IOException e) {
-			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 			return false;
 
 		}
@@ -254,6 +301,15 @@ public final class ImageMosaicFormat extends AbstractGridFormat implements
 				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return null;
 		}
+	}
+
+	/**
+	 * Throw an exception since this plugin is readonly.
+	 * 
+	 * @return nothing.
+	 */
+	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
+		throw new UnsupportedOperationException("Unsupported method.");
 	}
 
 }

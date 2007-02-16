@@ -28,7 +28,6 @@ import org.geotools.feature.FeatureIterator;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 /**
@@ -52,9 +51,6 @@ public final class MemorySpatialIndex {
 
 	/** The {@link STRtree} index. */
 	private final STRtree index;
-
-	/** Internally used {@link PrecisionModel}. */
-	private final static PrecisionModel pm = new PrecisionModel();
 
 	/**
 	 * Constructs a {@link MemorySpatialIndex} out of a

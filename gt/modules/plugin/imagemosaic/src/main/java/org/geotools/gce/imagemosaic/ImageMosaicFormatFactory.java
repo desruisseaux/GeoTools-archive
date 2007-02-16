@@ -21,7 +21,7 @@ package org.geotools.gce.imagemosaic;
 import java.util.Collections;
 import java.util.Map;
 
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 
 /**
