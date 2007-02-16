@@ -64,7 +64,6 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.coverage.grid.FilteredSubsampleTest.suite());
         suite.addTest(org.geotools.coverage.grid.SubsampleAverageTest .suite());
         suite.addTest(org.geotools.coverage.grid.OperationsTest       .suite());
-        suite.addTest(org.geotools.coverage.io.MetadataBuilderTest    .suite());
         return suite;
     }
 }

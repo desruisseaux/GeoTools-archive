@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
@@ -50,11 +51,13 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverageFactory;
+import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.resources.Utilities;
-import org.geotools.test.TestData;
+import org.geotools.resources.TestData;
 import org.geotools.util.NumberRange;
 
+import com.sun.media.jai.codecimpl.util.RasterFactory;
 
 /**
  * Tests the {@link GridCoverage2D} implementation. This class can also be used
@@ -320,11 +323,12 @@ public class GridCoverageTest extends TestCase {
      * @throws IOException if an I/O operation was needed and failed.
      */
     public static GridCoverage2D getExample( final int number) throws IOException {
+        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
         final String                   path;
-        final String                   unit;
         final Category[]         categories;
         final CoordinateReferenceSystem crs;
         final Rectangle2D            bounds;
+        final GridSampleDimension[] bands;
         switch (number) {
             default: {
                 throw new IllegalArgumentException(String.valueOf(number));
@@ -344,6 +348,9 @@ public class GridCoverageTest extends TestCase {
                 };
                 // 41°S - 5°N ; 35°E - 80°E  (450 x 460 pixels)
                 bounds = new Rectangle2D.Double(35, -41, 45, 46);
+                bands = new GridSampleDimension[] {
+                        new GridSampleDimension("Measure", categories, null)
+                    };
                 break;
             }
             case 1: {
@@ -357,16 +364,72 @@ public class GridCoverageTest extends TestCase {
                 };
                 // 34°N - 45°N ; 07°W - 12°E  (1200 x 700 pixels)
                 bounds = new Rectangle2D.Double(-7, 34, 19, 11);
+                bands = new GridSampleDimension[] {
+                        new GridSampleDimension("Measure", categories, null).geophysics(false)
+                    };
+                
                 break;
             }
+            case 2:{
+            	////
+            	//
+            	// 	WORLD DEM
+            	//
+            	////
+            	path="world_dem.gif";
+                bounds = new Rectangle2D.Double(-180,-90, 360, 180);
+                crs  = DefaultGeographicCRS.WGS84;
+                bands=null;
+                break;
+            }
+            case 3:{
+            	////
+            	//
+            	// 	WORLD BATHY
+            	//
+            	////
+            	path="BATHY.gif";
+                bounds = new Rectangle2D.Double(-180,-90, 360, 180);
+                crs  = DefaultGeographicCRS.WGS84;
+                bands=null;
+                break;
+            }
+            
+            case 4:{
+            	////
+            	//
+            	// 	A float covearage
+            	//
+            	////
+            	 /*
+                 * Set the pixel values.  Because we use only one tile with one band, the code below
+                 * is pretty similar to the code we would have if we were just setting the values in
+                 * a matrix.
+                 */
+                final int width  = 500;
+                final int height = 500;
+                WritableRaster raster = RasterFactory.createBandedRaster(DataBuffer.TYPE_FLOAT,
+                                                                         width, height, 1, null);
+                for (int y=0; y<height; y++) {
+                    for (int x=0; x<width; x++) {
+                        raster.setSample(x, y, 0, x+y);
+                    }
+                }
+                /*
+                 * Set some metadata (the CRS, the geographic envelope, etc.) and display the image.
+                 * The display may be slow, since the translation from floating-point values to some
+                 * color (or grayscale) is performed on the fly everytime the image is rendered.
+                 */
+                Color[] colors = new Color[] {Color.BLUE, Color.CYAN, Color.WHITE, Color.YELLOW, Color.RED};
+                return factory.create("My colored coverage", raster, new Envelope2D(DefaultGeographicCRS.WGS84,35, -41, 35+45, -41+46),
+                                    null, null, null, new Color[][] {colors}, null);
+                
+            }
         }
-        final GridSampleDimension[] bands = new GridSampleDimension[] {
-            new GridSampleDimension("Measure", categories, null)
-        };
+
         final GeneralEnvelope    envelope = new GeneralEnvelope(bounds);
         final RenderedImage         image = ImageIO.read(TestData.getResource(GridCoverageTest.class, path));
         final String             filename = new File(path).getName();
-        final GridCoverageFactory factory = FactoryFinder.getGridCoverageFactory(null);
         envelope.setCoordinateReferenceSystem(crs);
         return (GridCoverage2D) factory.create(filename, image, envelope, bands, null, null);
     }

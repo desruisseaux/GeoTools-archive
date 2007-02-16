@@ -16,24 +16,28 @@
 package org.geotools.coverage.grid;
 
 // J2SE and JAI dependencies
+import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
+import java.io.IOException;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.BorderExtenderCopy;
 import javax.media.jai.Interpolation;
-import javax.media.jai.RenderedOp;
+import javax.media.jai.InterpolationBilinear;
+import javax.media.jai.InterpolationNearest;
+
 
 // JUnit dependencies
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
 import org.geotools.coverage.processing.AbstractProcessor;
+import org.geotools.coverage.processing.DefaultProcessor;
 
 // Geotools dependencies
 import org.geotools.coverage.processing.Operations;
-
+import org.geotools.factory.Hints;
 
 /**
  * Tests the crop operation.
@@ -52,10 +56,13 @@ public class ScaleTest extends GridCoverageTest {
      */
     private static boolean SHOW;
 
-    /**
-     * The source grid coverage.
-     */
-    private GridCoverage2D coverage;
+	private GridCoverage2D originallyIndexedCoverage;
+
+	private GridCoverage2D indexedCoverage;
+
+	private GridCoverage2D indexedCoverageWithTransparency;
+
+	private GridCoverage2D floatCoverage;
 
     /**
      * Creates a test suite for the given name.
@@ -84,53 +91,158 @@ public class ScaleTest extends GridCoverageTest {
      * Set up common objects used for all tests.
      */
     protected void setUp() throws Exception {
-        super.setUp();
-        coverage = getExample(0);
+		super.setUp();
+		originallyIndexedCoverage = getExample(0);
+		indexedCoverage = getExample(2);
+		indexedCoverageWithTransparency = getExample(3);
+		floatCoverage=getExample(4);
     }
 
-    /**
-     * Tests the "Scale" operation.
-     */
-    public void testScale() {
-        final AbstractProcessor processor = AbstractProcessor.getInstance();
-        GridCoverage2D source = coverage.geophysics(true);
-        final ParameterValueGroup param = processor.getOperation("Scale").getParameters();
-        param.parameter("Source").setValue(source);
-        param.parameter("xScale").setValue(new Float(0.5));
-        param.parameter("yScale").setValue(new Float(0.5));
-        param.parameter("xTrans").setValue(new Float(0));
-        param.parameter("yTrans").setValue(new Float(0));
-        param.parameter("Interpolation").setValue(
-                Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
-        param.parameter("BorderExtender").setValue(
-                BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
-        GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
-        assertNotNull(scaled.getRenderedImage().getData());
-        final RenderedImage image = scaled.getRenderedImage();
-        scaled = scaled.geophysics(false);
-        String operation = null;
-        if (image instanceof RenderedOp) {
-            operation = ((RenderedOp) image).getOperationName();
-            AbstractProcessor.LOGGER.fine("Applied \"" + operation + "\" JAI operation.");
-        }
-        if (SHOW) {
-            Viewer.show(coverage,coverage.getName().toString());
-            Viewer.show(scaled,scaled.getName().toString());
-        } else {
-            // Force computation
-            assertNotNull(coverage.getRenderedImage().getData());
-            assertNotNull(scaled.getRenderedImage().getData());
-        }
+	/**
+	 * Tests the "Scale" operation.
+	 * 
+	 * @throws IOException
+	 */
 
-        final GridCoverage2D scaledGridCoverage = (GridCoverage2D) Operations.DEFAULT
-                .scale(source, 10, 10, 0.0, 0.0, 
-                        Interpolation.getInstance(Interpolation.INTERP_BILINEAR),
-                        BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        if (SHOW) {
-            Viewer.show(scaledGridCoverage,scaledGridCoverage.getName().toString());
-        } else {
-            // Force computation
-            assertNotNull(scaledGridCoverage.getRenderedImage().getData());
-        }
-    }
+	public void testScale() throws IOException {
+		///////////////////////////////////////////////////////////////////////
+		//
+		// Nearest neighbor interpolation and non-geo view 
+		//
+		///////////////////////////////////////////////////////////////////////
+		scale(originallyIndexedCoverage.geophysics(false), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		scale(indexedCoverage.geophysics(false), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		scale(indexedCoverageWithTransparency.geophysics(false), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+
+		///////////////////////////////////////////////////////////////////////
+		//
+		// Nearest neighbor interpolation and geo view 
+		//
+		///////////////////////////////////////////////////////////////////////
+		scale(originallyIndexedCoverage.geophysics(true), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		scale(indexedCoverage.geophysics(true), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		scale(indexedCoverageWithTransparency.geophysics(true), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		
+		///////////////////////////////////////////////////////////////////////
+		//
+		// Bilinear interpolation and non-geo view 
+		//
+		///////////////////////////////////////////////////////////////////////
+		scale(originallyIndexedCoverage.geophysics(false), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		scale(indexedCoverage.geophysics(false), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		scale(indexedCoverageWithTransparency.geophysics(false), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+
+		///////////////////////////////////////////////////////////////////////
+		//
+		// Bilinear interpolation and geo view 
+		//
+		///////////////////////////////////////////////////////////////////////
+		scale(originallyIndexedCoverage.geophysics(true), new InterpolationBilinear(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		scale(indexedCoverage.geophysics(true), new InterpolationBilinear(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		scale(indexedCoverageWithTransparency.geophysics(true), new InterpolationBilinear(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		
+		///////////////////////////////////////////////////////////////////////
+		//
+		// Bilinear interpolation and non-geo view for a float coverage
+		//
+		///////////////////////////////////////////////////////////////////////
+		// on this one the subsample average should NOT go back to the
+		// geophysiscs view before being applied
+		scale(floatCoverage.geophysics(false), new InterpolationBilinear(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+		
+		
+		///////////////////////////////////////////////////////////////////////
+		//
+		// Nearest neighbor  interpolation and non-geo view for a float coverage
+		//
+		///////////////////////////////////////////////////////////////////////
+		// on this one the subsample average should NOT go back to the
+		// geophysiscs
+		// view before being applied
+		scale(floatCoverage.geophysics(false), new InterpolationNearest(),
+				new RenderingHints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,
+						Boolean.FALSE));
+
+	}
+
+	public void scale(GridCoverage2D coverage, Interpolation interp) {
+		scale(coverage, interp, null);
+	}
+
+	public void scale(GridCoverage2D coverage, Interpolation interp,
+			RenderingHints hints) {
+		// caching initial properties
+		RenderedImage originalImage = coverage.getRenderedImage();
+		final int w = originalImage.getWidth();
+		final int h = originalImage.getHeight();
+
+		// creating a default processor
+		final DefaultProcessor processor = new DefaultProcessor(hints);
+		// getting parameters for doing a scale
+		final ParameterValueGroup param = processor.getOperation("Scale")
+				.getParameters();
+		param.parameter("Source").setValue(coverage);
+		param.parameter("xScale").setValue(new Float(0.5));
+		param.parameter("yScale").setValue(new Float(0.5));
+		param.parameter("xTrans").setValue(new Float(0));
+		param.parameter("yTrans").setValue(new Float(0));
+		param.parameter("Interpolation").setValue(interp);
+		param.parameter("BorderExtender").setValue(
+				BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
+		// doing a first scale
+		GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
+		RenderedImage scaledImage = scaled.getRenderedImage();
+		assertTrue(scaledImage.getWidth() == w / 2.0f);
+		assertTrue(scaledImage.getHeight() == h / 2.0f);
+
+		if (SHOW) {
+			Viewer.show(coverage, coverage.getName().toString());
+			Viewer.show(scaled, scaled.getName().toString());
+		} else {
+			// Force computation
+			assertNotNull(coverage.getRenderedImage().getData());
+			assertNotNull(scaledImage.getData());
+		}
+
+		// doing another scale using the Default processor
+		scaled = (GridCoverage2D) Operations.DEFAULT.scale(scaled, 3, 3, 0.0,
+				0.0, interp, BorderExtender
+						.createInstance(BorderExtender.BORDER_COPY));
+		scaledImage = scaled.getRenderedImage();
+		assertTrue(scaledImage.getWidth() == 3 * w / 2.0f);
+		assertTrue(scaledImage.getHeight() == 3 * h / 2.0f);
+
+		if (SHOW) {
+			Viewer.show(scaled, scaled.getName().toString());
+		} else {
+			// Force computation
+			assertNotNull(scaledImage.getData());
+		}
+	}
 }

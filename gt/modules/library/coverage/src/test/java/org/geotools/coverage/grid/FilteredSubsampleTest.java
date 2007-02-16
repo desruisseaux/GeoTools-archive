@@ -16,10 +16,14 @@
 package org.geotools.coverage.grid;
 
 // J2SE and JAI dependencies
+import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
+import java.io.IOException;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.BorderExtenderCopy;
 import javax.media.jai.Interpolation;
+import javax.media.jai.InterpolationBilinear;
+import javax.media.jai.InterpolationNearest;
 import javax.media.jai.RenderedOp;
 
 // JUnit dependencies
@@ -32,9 +36,11 @@ import org.opengis.parameter.ParameterValueGroup;
 
 // Geotools dependencies
 import org.geotools.coverage.processing.AbstractProcessor;
+import org.geotools.coverage.processing.DefaultProcessor;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.coverage.processing.operation.FilteredSubsample;
-
+import org.geotools.factory.Hints;
+import org.geotools.resources.image.CoverageUtilities;
 
 /**
  * Tests the "filtered subsample" operation.
@@ -53,10 +59,11 @@ public class FilteredSubsampleTest extends GridCoverageTest {
      */
     private static boolean SHOW;
 
-    /**
-     * The source grid coverage.
-     */
-    private GridCoverage2D coverage;
+	private GridCoverage2D originallyIndexedCoverage;
+
+	private GridCoverage2D indexedCoverage;
+
+	private GridCoverage2D indexedCoverageWithTransparency;
 
     /**
      * Creates a test suite for the given name.
@@ -81,59 +88,163 @@ public class FilteredSubsampleTest extends GridCoverageTest {
         junit.textui.TestRunner.run(FilteredSubsampleTest.class);
     }
 
-    /**
-     * Set up common objects used for all tests.
-     */
-    protected void setUp() throws Exception {
-        super.setUp();
-        coverage = getExample(0);
-    }
+	/**
+	 * Set up common objects used for all tests.
+	 */
+	protected void setUp() throws Exception {
+		super.setUp();
+		originallyIndexedCoverage = getExample(0);
+		indexedCoverage = getExample(2);
+		indexedCoverageWithTransparency = getExample(3);
+	}
 
-    /**
-     * Tests the "FilteredSubsamble" operation.
-     */
-    public void testFilteredSubsample() {
-        final AbstractProcessor processor = AbstractProcessor.getInstance();
-        GridCoverage2D source = coverage.geophysics(true);
-        final ParameterValueGroup param = processor.getOperation(
-                "FilteredSubsample").getParameters();
-        param.parameter("Source").setValue(source);
-        param.parameter("scaleX").setValue(new Integer(2));
-        param.parameter("scaleY").setValue(new Integer(2));
-        param.parameter("qsFilterArray").setValue(
-                FilteredSubsample.qsFilter.getDefaultValue());
-        param.parameter("Interpolation").setValue(
-                Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
-        param.parameter("BorderExtender").setValue(
-                BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
-        GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
-        assertNotNull(scaled.getRenderedImage().getData());
-        final RenderedImage image = scaled.getRenderedImage();
-        scaled = scaled.geophysics(false);
-        String operation = null;
-        if (image instanceof RenderedOp) {
-            operation = ((RenderedOp) image).getOperationName();
-            AbstractProcessor.LOGGER.fine("Applied \"" + operation + "\" JAI operation.");
-        }
-        if (SHOW) {
-            Viewer.show(coverage,coverage.getName().toString());
-            Viewer.show(scaled,scaled.getName().toString());
-        } else {
-            // Force computation
-            assertNotNull(coverage.getRenderedImage().getData());
-            assertNotNull(scaled.getRenderedImage().getData());
-        }
+	/**
+	 * Tests the "Scale" operation.
+	 * @throws IOException 
+	 */
 
-        final GridCoverage2D scaledGridCoverage = (GridCoverage2D) Operations.DEFAULT
-                .filteredSubsample(source, 3, 3, new float[] {0.5F, 1.0F/3.0F, 0.0F, -1.0F/12.0F },
-                        Interpolation.getInstance(Interpolation.INTERP_NEAREST),
-                        BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+	public void testSubsampleAverage() throws IOException {
+		// on this one the Subsample average should do an RGB expansion
+		filteredSubsample(indexedCoverage.geophysics(true),
+				new InterpolationNearest(),
+				(float[]) FilteredSubsample.qsFilter.getDefaultValue());
+		// on this one the Subsample average should do an RGB expansion
+		// preserving alpha
+		filteredSubsample(indexedCoverageWithTransparency.geophysics(true),
+				new InterpolationNearest(),
+				(float[]) FilteredSubsample.qsFilter.getDefaultValue());
+		// on this one the subsample average should go back to the geophysiscs
+		// view before being applied
+		filteredSubsample(originallyIndexedCoverage.geophysics(false),
+				new InterpolationNearest(),
+				(float[]) FilteredSubsample.qsFilter.getDefaultValue());
 
-        if (SHOW) {
-            Viewer.show(scaledGridCoverage,scaledGridCoverage.getName().toString());
-        } else {
-            // Force computation
-            assertNotNull(scaledGridCoverage.getRenderedImage().getData());
-        }
-    }
+		// on this one the Subsample average should do an RGB expansion
+		filteredSubsample(indexedCoverage.geophysics(true),
+				new InterpolationBilinear(),
+				(float[]) FilteredSubsample.qsFilter.getDefaultValue());
+		// on this one the Subsample average should do an RGB expansion
+		// preserving alpha
+		filteredSubsample(indexedCoverageWithTransparency.geophysics(true),
+				new InterpolationBilinear(),
+				(float[]) FilteredSubsample.qsFilter.getDefaultValue());
+		// on this one the subsample average should go back to the geophysiscs
+		// view before being applied
+		filteredSubsample(originallyIndexedCoverage.geophysics(false),
+				new InterpolationBilinear(),
+				(float[]) FilteredSubsample.qsFilter.getDefaultValue());
+
+		// on this one the Subsample average should do an RGB expansion
+		filteredSubsample(indexedCoverage.geophysics(true),
+				new InterpolationNearest(), new float[] { 0.5F, 1.0F / 3.0F,
+						0.0F, -1.0F / 12.0F });
+		// on this one the Subsample average should do an RGB expansion
+		// preserving alpha
+		filteredSubsample(indexedCoverageWithTransparency.geophysics(true),
+				new InterpolationNearest(), new float[] { 0.5F, 1.0F / 3.0F,
+						0.0F, -1.0F / 12.0F });
+		// on this one the subsample average should go back to the geophysiscs
+		// view before being applied
+		filteredSubsample(originallyIndexedCoverage.geophysics(false),
+				new InterpolationNearest(), new float[] { 0.5F, 1.0F / 3.0F,
+						0.0F, -1.0F / 12.0F });
+
+		// on this one the Subsample average should do an RGB expansion
+		filteredSubsample(indexedCoverage.geophysics(true),
+				new InterpolationBilinear(), new float[] { 0.5F, 1.0F / 3.0F,
+						0.0F, -1.0F / 12.0F });
+		// on this one the Subsample average should do an RGB expansion
+		// preserving alpha
+		filteredSubsample(indexedCoverageWithTransparency.geophysics(true),
+				new InterpolationBilinear(), new float[] { 0.5F, 1.0F / 3.0F,
+						0.0F, -1.0F / 12.0F });
+		// on this one the subsample average should go back to the geophysiscs
+		// view before being applied
+		filteredSubsample(originallyIndexedCoverage.geophysics(false),
+				new InterpolationBilinear(), new float[] { 0.5F, 1.0F / 3.0F,
+						0.0F, -1.0F / 12.0F });
+
+		// on this one the subsample average should go back to the
+		// geophysiscs
+		// view before being applied
+		filteredSubsample(getExample(4).geophysics(false),
+				new InterpolationBilinear(),
+				(float[]) FilteredSubsample.qsFilter.getDefaultValue(),
+				new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW, Boolean.FALSE));
+	}
+
+	public void filteredSubsample(GridCoverage2D coverage,
+			Interpolation interp, float[] filter) {
+		filteredSubsample(coverage, interp, filter, null);
+	}
+
+	/**
+	 * Tests the "FilteredSubsamble" operation.
+	 * 
+	 * @param nearest,float[]
+	 *            filter
+	 */
+	public void filteredSubsample(GridCoverage2D coverage,
+			Interpolation interp, float[] filter, Hints hints) {
+		// caching initial properties
+		RenderedImage originalImage = coverage.getRenderedImage();
+		boolean isIndexed = originalImage.getColorModel() instanceof IndexColorModel;
+		int w = originalImage.getWidth();
+		int h = originalImage.getHeight();
+
+		// creating a default processor
+		final DefaultProcessor processor = new DefaultProcessor(hints);
+		// getting parameters for the FilteredSubsample operation
+		final ParameterValueGroup param = processor.getOperation(
+				"FilteredSubsample").getParameters();
+		param.parameter("Source").setValue(coverage);
+		param.parameter("scaleX").setValue(new Integer(2));
+		param.parameter("scaleY").setValue(new Integer(2));
+		param.parameter("qsFilterArray").setValue(filter);
+		param.parameter("Interpolation").setValue(interp);
+		param.parameter("BorderExtender").setValue(
+				BorderExtenderCopy.createInstance(BorderExtender.BORDER_COPY));
+		// scale a first time by 2
+		GridCoverage2D scaled = (GridCoverage2D) processor.doOperation(param);
+		RenderedImage scaledImage = scaled.getRenderedImage();
+		assertTrue(scaledImage.getWidth() ==  Math.round(w / 2.0f));
+		assertTrue(scaledImage.getHeight() == Math.round( h / 2.0f));
+		assertTrue(!isIndexed
+				|| (interp instanceof InterpolationNearest)
+				|| !(scaledImage.getColorModel() instanceof IndexColorModel)
+				|| CoverageUtilities.prepareSourcesForGCOperation(coverage,
+						interp, false, null) == 2);
+		isIndexed = scaledImage.getColorModel() instanceof IndexColorModel;
+		w=scaledImage.getWidth();
+		h=scaledImage.getHeight();
+
+		if (SHOW) {
+			Viewer.show(coverage, coverage.getName().toString());
+			Viewer.show(scaled, scaled.getName().toString());
+		} else {
+			// Force computation
+			assertNotNull(coverage.getRenderedImage().getData());
+			assertNotNull(scaled.getRenderedImage().getData());
+		}
+
+		// scale a second time by 3
+		scaled = (GridCoverage2D) Operations.DEFAULT.filteredSubsample(scaled,
+				3, 3, filter, interp, BorderExtender
+						.createInstance(BorderExtender.BORDER_COPY));
+		scaledImage = scaled.getRenderedImage();
+		assertTrue(scaledImage.getWidth() == Math.round(w / 3.0f));
+		assertTrue(scaledImage.getHeight() == Math.round(h / 3.0f));
+		assertTrue(!isIndexed
+				|| (interp instanceof InterpolationNearest)
+				|| !(scaledImage.getColorModel() instanceof IndexColorModel)
+				|| CoverageUtilities.prepareSourcesForGCOperation(coverage,
+						interp, false, null) == 2);
+
+		if (SHOW) {
+			Viewer.show(scaled, scaled.getName().toString());
+		} else {
+			// Force computation
+			assertNotNull(scaledImage.getData());
+		}
+	}
 }
