@@ -100,12 +100,12 @@ import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.XArray;
+import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
 import org.geotools.resources.image.ImageUtilities;
-import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.util.NumberRange;
 
 
