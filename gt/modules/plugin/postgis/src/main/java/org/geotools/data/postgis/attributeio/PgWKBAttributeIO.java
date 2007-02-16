@@ -23,7 +23,7 @@ import java.sql.Types;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.jdbc.attributeio.AttributeIO;
-import org.geotools.util.LiteCoordinateSequenceFactory;
+import org.geotools.geometry.jts.LiteCoordinateSequenceFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
