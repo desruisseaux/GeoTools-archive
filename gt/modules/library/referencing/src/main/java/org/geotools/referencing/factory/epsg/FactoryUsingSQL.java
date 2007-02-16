@@ -420,9 +420,11 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      */
     public FactoryUsingSQL(final Hints hints, final Connection connection) {
         super(hints, MAXIMUM_PRIORITY-20);
-        // The following hint has no effect on this class behaviour,
-        // but tells to the user what this factory do about axis order.
+        // The following hints have no effect on this class behaviour,
+        // but tell to the user what this factory do about axis order.
         this.hints.put(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.FALSE);
+        this.hints.put(Hints.FORCE_STANDARD_AXIS_DIRECTIONS,   Boolean.FALSE);
+        this.hints.put(Hints.FORCE_STANDARD_AXIS_UNITS,        Boolean.FALSE);
         this.connection = connection;
         ensureNonNull("connection", connection);
     }

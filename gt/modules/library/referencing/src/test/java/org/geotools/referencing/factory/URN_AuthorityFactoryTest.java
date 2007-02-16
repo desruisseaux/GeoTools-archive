@@ -24,7 +24,7 @@ import junit.framework.TestSuite;
 // OpenGIS dependencies
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 
@@ -90,9 +90,9 @@ public class URN_AuthorityFactoryTest extends TestCase {
         try {
             crs = factory.createGeographicCRS("CRS:84");
             fail();
-        } catch (NoSuchIdentifierException exception) {
+        } catch (NoSuchAuthorityCodeException exception) {
             // This is the expected exception.
-            assertEquals("CRS:84", exception.getIdentifierCode());
+            assertEquals("CRS:84", exception.getAuthorityCode());
         }
         crs =           factory.createGeographicCRS("urn:ogc:def:crs:CRS:WMS1.3:84");
         assertSame(crs, factory.createGeographicCRS("urn:ogc:def:crs:CRS:1.3:84"));

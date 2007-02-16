@@ -563,33 +563,14 @@ public class DefaultFactory extends DeferredAuthorityFactory
 
     /**
      * Constructs an object from the EPSG database and print its WKT (Well Know Text) to
-     * the standard output. This method can be invoked from the command line. For example:
+     * the {@linkplain System#out standard output stream}.
      *
-     * <blockquote><pre>
-     * java org.geotools.referencing.factory.epsg.DefaultFactory 4181
-     * </pre></blockquote>
-     *
-     * Should print:
-     *
-     * <blockquote><pre>
-     * GEOGCS["Luxembourg 1930", DATUM["Luxembourg 1930", <FONT face="Arial">etc...</FONT>
-     * </pre></blockquote>
-     *
-     * The following optional arguments are supported:
-     *
-     * <blockquote>
-     *   <strong>{@code -encoding} <var>charset</var></strong><br>
-     *       Sets the console encoding for this application output. This value has
-     *       no impact on the data exchanged with the EPSG database.
-     *
-     *   <strong>{@code -transform}</strong><br>
-     *       Output the math transforms between every pairs of CRS.
-     * </blockquote>
-     *
-     * @param args A list of EPSG code to display.
-     *             An arbitrary number of codes can be specified on the command line.
+     * @deprecated Replaced in a more generic way by {@link org.geotools.referencing.CRS#main}
+     *             with a {@code "-authority=EPSG"} optional argument.
      */
-    public static void main(final String[] args) {
-        Console.main(args);
+    public static void main(String[] args) {
+        args = (String[]) org.geotools.resources.XArray.insert(args, 0, 1);
+        args[0] = "-authority=EPSG";
+        org.geotools.referencing.CRS.main(args);
     }
 }

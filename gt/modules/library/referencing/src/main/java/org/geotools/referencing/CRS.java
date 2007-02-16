@@ -923,4 +923,68 @@ public final class CRS {
         }
         return XRectangle2D.createFromExtremums(xmin, ymin, xmax, ymax);
     }
+
+    /**
+     * Instantiates CRS objects and prints them as <cite>Well Known Text</cite> to the
+     * {@linkplain System#out standard output stream}. This method can be invoked from
+     * the command line in order to test the {@linkplain #getAuthorityFactory authority
+     * factory} content for some specific CRS. In addition, this method can also prints
+     * the {@linkplain MathTransform math transform} between a pair of CRS.
+     * <p>
+     * <b>Usage:</b> {@code java org.geotools.referencing.CRS [options] [codes]}<br>
+     * <b>Options:</b>
+     *
+     * <blockquote>
+     *   <p><b>{@code -help}</b><br>
+     *       Prints help message and exits.</p>
+     *
+     *   <p><b>{@code -authority}=<var>name</var></b><br>
+     *       Uses the specified authority factory, for example {@code "EPSG"}.
+     *       If this option is not specified, then the default is all factories.</p>
+     *
+     *   <p><b>{@code -list}</b><br>
+     *       Lists available authority codes and exits.</p>
+     *
+     *   <p><b>{@code -bursawolfs}</b><br>
+     *       Lists the Bursa-Wolf parameters after the WKT. Many CRS define more than one set
+     *       of Bursa-Wolf parameters. The standard <cite>Well Known Text</cite> format prints
+     *       only what Geotools believe is the main one. This option cause the display of
+     *       other Bursa-Wolf parameters as well.</p>
+     *
+     *   <p><b>{@code -operations}</b><br>
+     *       Prints all available coordinate operations between pairs of CRS.</p>
+     *
+     *   <p><b>{@code -transform}</b><br>
+     *       Prints the preferred math transforms between pairs of CRS.</p>
+     *
+     *   <p><b>{@code -encoding}=<var>charset</var></b><br>
+     *       Sets the console encoding for this application output. This value has no impact
+     *       on data, but may improves the output quality. This is not needed on Linux terminal
+     *       using UTF-8 encoding. Windows users may need to set this encoding to the value
+     *       returned by the {@code chcp} command line. This parameter need to be specified
+     *       only once.</p>
+     * </blockquote>
+     *
+     * <strong>Examples</strong>
+     * <blockquote><pre>
+     * java org.geotools.referencing.factory.CRS EPSG:4181
+     * </pre></blockquote>
+     *
+     * Should print:
+     *
+     * <blockquote><pre>
+     * GEOGCS["Luxembourg 1930", DATUM["Luxembourg 1930", <FONT face="Arial">etc...</FONT>
+     * </pre></blockquote>
+     *
+     * <strong>WARNING</strong> This method is still under development as of Geotools 2.4.
+     * The option switchs are likely to change.
+     *
+     * @param args Options and list of object codes to display.
+     *             An arbitrary number of codes can be specified.
+     *
+     * @since 2.4
+     */
+    public static void main(final String[] args) {
+        Command.execute(args);
+    }
 }

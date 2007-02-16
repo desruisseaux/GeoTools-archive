@@ -141,6 +141,11 @@ public final class VocabularyKeys {
     public static final int CLOSE = 14;
 
     /**
+     * Code
+     */
+    public static final int CODE = 239;
+
+    /**
      * Colors
      */
     public static final int COLORS = 15;

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -139,7 +140,7 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      * Constructs a geodetic datum from a set of properties. The properties map is given
      * unchanged to the {@linkplain AbstractDatum#AbstractDatum(Map) super-class constructor}.
      * Additionally, the following properties are understood by this construtor:
-     * <br><br>
+     * <p>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>
@@ -178,10 +179,12 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
                 if (bursaWolf.length == 0) {
                     bursaWolf = null;
                 } else {
-                    bursaWolf = (BursaWolfParameters[]) bursaWolf.clone();
+                    final Set s = new LinkedHashSet();
                     for (int i=0; i<bursaWolf.length; i++) {
-                        bursaWolf[i] = (BursaWolfParameters) bursaWolf[i].clone();
+                        s.add((BursaWolfParameters) bursaWolf[i].clone());
                     }
+                    bursaWolf = (BursaWolfParameters[])
+                            s.toArray(new BursaWolfParameters[s.size()]);
                 }
             }
         }
@@ -200,6 +203,19 @@ public class DefaultGeodeticDatum extends AbstractDatum implements GeodeticDatum
      */
     public PrimeMeridian getPrimeMeridian() {
         return primeMeridian;
+    }
+
+    /**
+     * Returns all Bursa Wolf parameters specified in the {@code properties} map at
+     * construction time.
+     *
+     * @since 2.4
+     */
+    public BursaWolfParameters[] getBursaWolfParameters() {
+        if (bursaWolf != null) {
+            return (BursaWolfParameters[]) bursaWolf.clone();
+        }
+        return new BursaWolfParameters[0];
     }
 
     /**

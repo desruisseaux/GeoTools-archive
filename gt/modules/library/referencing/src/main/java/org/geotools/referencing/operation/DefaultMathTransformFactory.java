@@ -522,7 +522,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
     }
 
     /**
-     * Dump to the standard output stream a list of available operation method.
+     * Dump to the standard output stream a list of available operation methods.
      * This method can be invoked from the command line. It provides a mean to
      * verify which transforms were found in the classpath. The syntax is:
      * <BR>

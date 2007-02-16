@@ -88,7 +88,7 @@ public class AbstractReferenceSystem extends AbstractIdentifiedObject implements
      * The properties given in argument follow the same rules than for the
      * {@linkplain AbstractIdentifiedObject#AbstractIdentifiedObject(Map) super-class constructor}.
      * Additionally, the following properties are understood by this construtor:
-     * <br><br>
+     * <p>
      * <table border='1'>
      *   <tr bgcolor="#CCCCFF" class="TableHeadingColor">
      *     <th nowrap>Property name</th>

@@ -724,7 +724,8 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @throws IllegalArgumentException if the specified {@code type} is invalid.
      * @throws FactoryException if no suitable factory were found.
      */
-    final AuthorityFactory getAuthorityFactory(final String code, final Class type)
+    AuthorityFactory getAuthorityFactory(final Class/*<T extends AuthorityFactory>*/ type,
+                                         final String code)
             throws FactoryException
     {
         if (CRSAuthorityFactory.class.equals(type)) {

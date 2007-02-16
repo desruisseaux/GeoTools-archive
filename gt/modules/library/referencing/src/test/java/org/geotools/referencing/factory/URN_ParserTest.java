@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
-import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 
 /**
@@ -67,7 +67,7 @@ public class URN_ParserTest extends TestCase {
     /**
      * Parses a valid URN.
      */
-    public void testParse() throws NoSuchIdentifierException {
+    public void testParse() throws NoSuchAuthorityCodeException {
         final URN_Parser parser = new URN_Parser("urn:ogc:def:CRS:EPSG:6.11.2:4326");
         assertEquals("crs",       parser.type.name);
         assertEquals("EPSG",      parser.authority);
@@ -79,7 +79,7 @@ public class URN_ParserTest extends TestCase {
     /**
      * Parses a valid URN without version.
      */
-    public void testParseWithoutVersion() throws NoSuchIdentifierException {
+    public void testParseWithoutVersion() throws NoSuchAuthorityCodeException {
         final URN_Parser parser = new URN_Parser("urn:ogc:def:CRS:EPSG:4326");
         assertEquals("crs",       parser.type.name);
         assertEquals("EPSG",      parser.authority);
@@ -96,9 +96,9 @@ public class URN_ParserTest extends TestCase {
         try {
             new URN_Parser(urn);
             fail();
-        } catch (NoSuchIdentifierException e) {
+        } catch (NoSuchAuthorityCodeException e) {
             // This is the expected exception.
-            assertEquals(urn, e.getIdentifierCode());
+            assertEquals(urn, e.getAuthorityCode());
         }
     }
 
@@ -110,9 +110,9 @@ public class URN_ParserTest extends TestCase {
         try {
             new URN_Parser(urn);
             fail();
-        } catch (NoSuchIdentifierException e) {
+        } catch (NoSuchAuthorityCodeException e) {
             // This is the expected exception.
-            assertEquals("dummy", e.getIdentifierCode());
+            assertEquals("dummy", e.getAuthorityCode());
         }
     }
 }

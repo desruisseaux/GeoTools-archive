@@ -33,19 +33,9 @@ import org.geotools.referencing.factory.FactoryGroup;
  * table and field names in the Data Description Language (DDL) scripts provided by
  * EPSG to create the schema for the database. Subclasses can changes this default
  * behavior by modifying the {@link #map}.
- * <br><br>
- * In order to register this ANSI version as the default EPSG factory backed by a PostgreSQL
- * database (for example), invokes the following <u>only once</u> from the command line. The
- * change will by system-wide.
- *
- * <blockquote><code>
- * java org.geotools.referencing.factory.epsg.DefaultFactory
- * -datasource=org.postgresql.jdbc2.optional.SimpleDataSource
- * </code></blockquote>
- * 
- * <br><br> 
+ * <p>
  * <strong>References:</strong><ul>
- *   <li>EPSG geodecy parameters database readme at 
+ *   <li>EPSG geodecy parameters database readme at
  *       <A HREF="http://www.ihsenergy.com/epsg/geodetic2.html">www.epsg.org</A>
  *   </li>
  * </ul>

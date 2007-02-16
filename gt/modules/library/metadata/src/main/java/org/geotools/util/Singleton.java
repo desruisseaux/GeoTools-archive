@@ -29,6 +29,9 @@ import java.util.NoSuchElementException;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Not used anymore in the Geotools code base. If needed, use a small
+ *             {@link java.util.ArrayList} instead.
  */
 public class Singleton extends AbstractSet {
     /**

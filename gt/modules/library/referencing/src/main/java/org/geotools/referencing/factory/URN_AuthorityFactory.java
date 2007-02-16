@@ -25,7 +25,7 @@ import java.util.TreeMap;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.cs.CSAuthorityFactory;
@@ -116,9 +116,9 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      *
      * @param  code The URN to parse.
      * @return parser The parser.
-     * @throws NoSuchIdentifierException if the URN syntax is invalid.
+     * @throws NoSuchAuthorityCodeException if the URN syntax is invalid.
      */
-    private URN_Parser getParser(final String code) throws NoSuchIdentifierException {
+    private URN_Parser getParser(final String code) throws NoSuchAuthorityCodeException {
         /*
          * Take a local copy of the field in order to protect against changes.
          * This avoid the need for synchronization (URN_Parsers are immutable,
@@ -142,7 +142,7 @@ public class URN_AuthorityFactory extends AuthorityFactoryAdapter implements CRS
      */
     protected AuthorityFactory getAuthorityFactory(final String code) throws FactoryException {
         if (code != null) {
-            return getAuthorityFactory(code, getParser(code).type.type);
+            return getAuthorityFactory(getParser(code).type.type, code);
         } else {
             return super.getAuthorityFactory(code);
         }

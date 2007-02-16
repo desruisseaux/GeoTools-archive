@@ -25,7 +25,7 @@ import java.util.logging.LogRecord;
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.AuthorityFactory;
-import org.opengis.referencing.NoSuchIdentifierException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.cs.CSAuthorityFactory;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.datum.DatumAuthorityFactory;
@@ -97,13 +97,13 @@ final class URN_Parser {
      * Parses the specified URN.
      *
      * @param urn The URN to parse.
-     * @throws NoSuchIdentifierException if the URN syntax is invalid.
+     * @throws NoSuchAuthorityCodeException if the URN syntax is invalid.
      *
      * @todo Implementation should be replaced by some mechanism using {@code GenericName}
      *       (at least the call to {@code String.regionMatches}) otherwise this method will
      *       fails if there is spaces around the separator.
      */
-    public URN_Parser(final String urn) throws NoSuchIdentifierException {
+    public URN_Parser(final String urn) throws NoSuchAuthorityCodeException {
         this.urn = urn;
         final String code = urn.trim();
         String type = urn; // To be really assigned later.
@@ -130,8 +130,8 @@ final class URN_Parser {
                 }
             }
         }
-        throw new NoSuchIdentifierException(
-                Errors.format(ErrorKeys.ILLEGAL_IDENTIFIER_$1, type), type);
+        throw new NoSuchAuthorityCodeException(
+                Errors.format(ErrorKeys.ILLEGAL_IDENTIFIER_$1, type), "urn:ogc:def", type);
     }
 
     /**

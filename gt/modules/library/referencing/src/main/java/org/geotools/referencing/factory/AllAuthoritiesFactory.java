@@ -88,11 +88,22 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
      * consistent with the types expected by the {@link #getAuthorityFactory(Class, String)}
      * method.
      */
-    private static final Class[] AUTHORIZED_TYPES = new Class[] {
+    private static final Class[] FACTORY_TYPES = new Class[] {
         CRSAuthorityFactory.class,
         DatumAuthorityFactory.class,
         CSAuthorityFactory.class,
         CoordinateOperationAuthorityFactory.class
+    };
+
+    /**
+     * The types created by {@link #FACTORY_TYPES}. For each type {@code OBJECT_TYPES[i]},
+     * the factory to be used must be {@code FACTORY_TYPES[i]}.
+     */
+    private static final Class[] OBJECT_TYPES = new Class[] {
+        CoordinateReferenceSystem.class,
+        Datum.class,
+        CoordinateSystem.class,
+        CoordinateOperation.class
     };
 
     /**
@@ -197,7 +208,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
          */
         int authorityCount = 0;
         final Citation[] authorities = new Citation[factories.size()];
-        final List[] factoriesByType = new List[authorities.length * AUTHORIZED_TYPES.length];
+        final List[] factoriesByType = new List[authorities.length * FACTORY_TYPES.length];
         final Map/*<AuthorityFactory,Integer>*/ positions = new IdentityHashMap();
         for (final Iterator it=factories.iterator(); it.hasNext();) {
             final AuthorityFactory factory = (AuthorityFactory) it.next();
@@ -233,9 +244,9 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
              * does, then the factory is added to the list of factories for this (authority,type)
              * pair. Otherwise it is silently ignored.
              */
-            authorityBase *= AUTHORIZED_TYPES.length;
-            for (int i=0; i<AUTHORIZED_TYPES.length; i++) {
-                final Class type = AUTHORIZED_TYPES[i];
+            authorityBase *= FACTORY_TYPES.length;
+            for (int i=0; i<FACTORY_TYPES.length; i++) {
+                final Class type = FACTORY_TYPES[i];
                 if (type.isInstance(factory)) {
                     List forType = factoriesByType[authorityBase + i];
                     if (forType == null) {
@@ -257,7 +268,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
                 AuthorityFactory factory = (AuthorityFactory) forType.get(0);
                 Integer position = (Integer) positions.get(factory);
                 if (forType.size() != 1) {
-                    final Class type = AUTHORIZED_TYPES[i % AUTHORIZED_TYPES.length];
+                    final Class type = FACTORY_TYPES[i % FACTORY_TYPES.length];
                     factory = FallbackAuthorityFactory.create(type, forType);
                     if (position.intValue() < 0) {
                         position = new Integer(~position.intValue());
@@ -385,6 +396,16 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     }
 
     /**
+     * Returns a description of the underlying backing store, or {@code null} if unknow.
+     *
+     * @throws FactoryException if a failure occured while fetching the engine description.
+     */
+    public String getBackingStoreDescription() throws FactoryException {
+        // We have no authority code, so we can't pick a particular factory.
+        return null;
+    }
+
+    /**
      * Searchs for a factory of the given type. This method first search in user-supplied
      * factories. If no user factory is found, then this method request for a factory using
      * {@link FactoryFinder}. The authority name is inferred from the specified code.
@@ -394,8 +415,9 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
      * @return The factory.
      * @throws NoSuchAuthorityCodeException if no suitable factory were found.
      */
-    private AuthorityFactory getAuthorityFactory(final Class/*<T extends AuthorityFactory>*/ type,
-                                                 final String code)
+    //@Override
+    final AuthorityFactory getAuthorityFactory(final Class/*<T extends AuthorityFactory>*/ type,
+                                               final String code)
             throws NoSuchAuthorityCodeException
     {
         ensureNonNull("code", code);
@@ -485,10 +507,6 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
     /**
      * Returns a generic object authority factory for the specified {@code "AUTHORITY:NUMBER"}
      * code.
-     * <p>
-     * <b>Note:</b> this method is defined for safety, but should not be used since
-     * most methods that may invoke it in {@link AuthorityFactoryAdapter} are overridden
-     * in {@code AllAuthoritiesFactory}.
      *
      * @param  code The code to parse.
      * @return The authority factory.
@@ -610,27 +628,54 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
                  * factory has not already been done in a previous iteration (some implementation
                  * apply to more than one factory).
                  */
-                for (int i=0; i<AUTHORIZED_TYPES.length; i++) {
+scanForType:    for (int i=0; i<FACTORY_TYPES.length; i++) {
+                    if (!OBJECT_TYPES[i].isAssignableFrom(type)) {
+                        continue;
+                    }
+                    final Class factoryType = FACTORY_TYPES[i];
                     final AuthorityFactory factory;
                     try {
-                        factory = getAuthorityFactory(AUTHORIZED_TYPES[i], dummyCode);
+                        factory = getAuthorityFactory(factoryType, dummyCode);
                     } catch (NoSuchAuthorityCodeException e) {
                         continue;
                     }
-                    if (done.add(factory)) {
-                        for (final Iterator it2=factory.getAuthorityCodes(type).iterator(); it2.hasNext();) {
-                            String candidate = ((String) it2.next()).trim();
-                            if (candidate.length() < codeBase ||
-                                Character.isLetterOrDigit (candidate.charAt(codeBase-1)) ||
-                               !authority.equalsIgnoreCase(candidate.substring(0, codeBase-1)))
-                            {
-                                // Prepend the authority code if it was not already presents.
-                                code.setLength(codeBase);
-                                code.append(candidate);
-                                candidate = code.toString();
-                            }
-                            codes.add(candidate);
+                    if (!done.add(factory)) {
+                        continue;
+                    }
+                    AuthorityFactory wrapped = factory;
+                    while (wrapped instanceof AuthorityFactoryAdapter) {
+                        final AuthorityFactoryAdapter adapter = (AuthorityFactoryAdapter) wrapped;
+                        try {
+                            wrapped = adapter.getAuthorityFactory(factoryType, dummyCode);
+                        } catch (NoSuchAuthorityCodeException exception) {
+                            /*
+                             * The factory doesn't understand our dummy code. It happen with
+                             * URN_AuthorityFactory, which expect the type ("CRS", etc.) in the URN.
+                             */
+                            continue scanForType;
                         }
+                        if (!done.add(wrapped)) {
+                            /*
+                             * Avoid the factories that are wrapper around an other factory already
+                             * done. If we don't do that, we will duplicate the whole set of EPSG
+                             * identifiers (more than 3000 codes) for OrderedAuthorityFactory,
+                             * HTTP_AuthorityFactory, URN_AuthorityFactory, etc.
+                             */
+                            continue scanForType;
+                        }
+                    }
+                    for (final Iterator it2=factory.getAuthorityCodes(type).iterator(); it2.hasNext();) {
+                        String candidate = ((String) it2.next()).trim();
+                        if (candidate.length() < codeBase ||
+                            Character.isLetterOrDigit (candidate.charAt(codeBase-1)) ||
+                           !authority.equalsIgnoreCase(candidate.substring(0, codeBase-1)))
+                        {
+                            // Prepend the authority code if it was not already presents.
+                            code.setLength(codeBase);
+                            code.append(candidate);
+                            candidate = code.toString();
+                        }
+                        codes.add(candidate);
                     }
                 }
             }
@@ -653,7 +698,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
         final Set/*<AuthorityFactory>*/ done = new HashSet();
         done.add(this); // Safety for avoiding recursive calls.
         FactoryException failure = null;
-        for (int type=0; type<AUTHORIZED_TYPES.length; type++) {
+        for (int type=0; type<FACTORY_TYPES.length; type++) {
             /*
              * Try all factories, starting with the CRS factory because it is the only one most
              * users care about. If the CRS factory doesn't know about the specified object, then
@@ -661,7 +706,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
              */
             final AuthorityFactory factory;
             try {
-                factory = getAuthorityFactory(AUTHORIZED_TYPES[type], code);
+                factory = getAuthorityFactory(FACTORY_TYPES[type], code);
             } catch (NoSuchAuthorityCodeException exception) {
                 if (failure == null) {
                     failure = exception;
@@ -701,7 +746,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
         final Set/*<AuthorityFactory>*/ done = new HashSet();
         done.add(this); // Safety for avoiding recursive calls.
         FactoryException failure = null;
-        for (int type=0; type<AUTHORIZED_TYPES.length; type++) {
+        for (int type=0; type<FACTORY_TYPES.length; type++) {
             /*
              * Try all factories, starting with the CRS factory because it is the only one most
              * users care about. If the CRS factory doesn't know about the specified object, then
@@ -709,7 +754,7 @@ public class AllAuthoritiesFactory extends AuthorityFactoryAdapter implements CR
              */
             final AuthorityFactory factory;
             try {
-                factory = getAuthorityFactory(AUTHORIZED_TYPES[type], code);
+                factory = getAuthorityFactory(FACTORY_TYPES[type], code);
             } catch (NoSuchAuthorityCodeException exception) {
                 if (failure == null) {
                     failure = exception;
