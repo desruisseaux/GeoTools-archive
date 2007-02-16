@@ -58,9 +58,9 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
@@ -69,7 +69,6 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.util.NumberRange;
-import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
@@ -127,12 +126,16 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	/** Projection file. */
 	private URL prjURL;
 
+	/** The header for this GTOPO30 file. */
 	private final GT30Header header;
 
+	/** The file holding the statistics for this GTOPO30 file. */
 	private final GT30Stats stats;
 
+	/** The {@link URL} that points to the file to use. */
 	private URL urlToUse;
 
+	/** URL of the header file. */
 	private final URL demHeaderURL;
 
 	/**
@@ -293,38 +296,6 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 	}
 
 	/**
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataNames()
-	 */
-	public String[] getMetadataNames() {
-		throw new UnsupportedOperationException(
-				"GTopo30 reader doesn't support metadata manipulation yet");
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataValue(java.lang.String)
-	 */
-	public String getMetadataValue(final String name)
-			throws MetadataNameNotFoundException {
-		throw new UnsupportedOperationException(
-				"GTopo30 reader doesn't support metadata manipulation yet: "
-						+ name);
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageReader#listSubNames()
-	 */
-	public String[] listSubNames() {
-		return null;
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getCurrentSubname()
-	 */
-	public String getCurrentSubname() {
-		return null;
-	}
-
-	/**
 	 * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
 	 */
 	public org.opengis.coverage.grid.GridCoverage read(
@@ -368,26 +339,6 @@ public final class GTopo30Reader extends AbstractGridCoverage2DReader implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		return getGridCoverage(requestedEnvelope, dim);
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageReader#dispose()
-	 */
-	public void dispose() {
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
-	 */
-	public boolean hasMoreGridCoverages() {
-		return false;
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageReader#skip()
-	 */
-	public void skip() {
-		// nothing to do here a gtopo30 as just one band one coverage
 	}
 
 	/**

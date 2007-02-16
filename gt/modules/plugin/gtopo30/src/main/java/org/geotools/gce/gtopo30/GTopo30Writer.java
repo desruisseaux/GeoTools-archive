@@ -21,6 +21,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,18 +36,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileCacheImageOutputStream;
-import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import javax.imageio.stream.ImageOutputStreamImpl;
 import javax.media.jai.Histogram;
 import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
+import javax.media.jai.InterpolationBilinear;
 import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 import javax.media.jai.PlanarImage;
@@ -57,31 +56,34 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.processing.Operations;
+import org.geotools.coverage.grid.io.AbstractGridCoverageWriter;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.coverage.processing.operation.Resample;
 import org.geotools.coverage.processing.operation.SelectSampleDimension;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
 import org.geotools.factory.Hints;
+import org.geotools.parameter.Parameter;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.util.NumberRange;
-import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
 import com.sun.media.jai.operator.ImageWriteDescriptor;
 
 /**
- * Class useful for writing GTopo30 file format from a GridCoverage2D.
+ * Class used for encoding a {@link GridCoverage2D} into a GTOPO30 file.
  * 
- * @author jeichar
+ * 
  * @author Simone Giannecchini
+ * @author jeichar
  * @author mkraemer
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/gtopo30/src/org/geotools/gce/gtopo30/GTopo30Writer.java $
@@ -101,17 +103,20 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	/** Cached factory for a {@link SelectSampleDimension} operation. */
 	private final static SelectSampleDimension sdFactory = new SelectSampleDimension();
 
+
+
+
+
 	/** Cached factory for {@link Resample} operation. */
 	private final static Resample resampleFactory = new Resample();
 
-	/** Standard width for the GIF image. */
+	/**
+	 * Standard width for the GIF image.
+	 */
 	private final static int GIF_WIDTH = 640;
 
 	/** Standard height for the GIF image. */
 	private final static int GIF_HEIGHT = 480;
-
-	/** Destination for this writer. */
-	private Object destination;
 
 	/**
 	 * Creates a {@link GTopo30Writer}.
@@ -204,12 +209,6 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 					destination = null;
 				}
 			}
-
-		} else if (dest instanceof ZipOutputStream) {
-			this.destination = (ZipOutputStream) dest;
-			((ZipOutputStream) destination).setMethod(ZipOutputStream.DEFLATED);
-			((ZipOutputStream) destination).setLevel(Deflater.BEST_COMPRESSION);
-
 		} else if (dest instanceof ImageOutputStream) {
 			this.destination = dest;
 		} else {
@@ -223,9 +222,9 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		// managing hints
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (super.hints == null) {
+		if (super.hints == null)
+		{
 			this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-			this.hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
 		}
 		if (hints != null) {
 
@@ -241,145 +240,183 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	}
 
 	/**
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#getDestination()
-	 */
-	public Object getDestination() {
-		return destination;
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#getMetadataNames()
-	 */
-	public String[] getMetadataNames() {
-		return null;
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#setMetadataValue(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public void setMetadataValue(final String name, final String value)
-			throws MetadataNameNotFoundException {
-		if ((name != null) && (value != null)) {
-			// unreferenced parameter: name
-			// unreferenced parameter: value
-		}
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#setCurrentSubname(java.lang.String)
-	 */
-	public void setCurrentSubname(final String name) {
-		if (name != null) {
-			// unreferenced parameter: name
-		}
-	}
-
-	/**
 	 * @see org.opengis.coverage.grid.GridCoverageWriter#write(org.opengis.coverage.grid.GridCoverage,
 	 *      org.opengis.parameter.GeneralParameterValue[])
 	 */
 	public void write(final GridCoverage coverage,
-			final GeneralParameterValue[] parameters)
+			final GeneralParameterValue[] params)
 			throws java.lang.IllegalArgumentException, java.io.IOException {
-		final GridCoverage2D gc2D = (GridCoverage2D) coverage;
 
-		if (parameters != null) {
-			// unreferenced parameter: parameters
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Checking input params
+		//
+		// /////////////////////////////////////////////////////////////////////
+		if (coverage == null)
+			throw new NullPointerException(
+					"The provided source coverage is null");
+		// the source GridCoverage2D
+		GridCoverage2D gc2D = (GridCoverage2D) coverage;
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Checking writing params
+		//
+		// /////////////////////////////////////////////////////////////////////
+		GeoToolsWriteParams gtParams = null;
+		if (params != null) {
+
+			if (params != null) {
+				Parameter param;
+				final int length = params.length;
+				for (int i = 0; i < length; i++) {
+					param = (Parameter) params[i];
+					if (param.getDescriptor().getName().getCode().equals(
+							AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName()
+									.toString())) {
+						gtParams = (GeoToolsWriteParams) param.getValue();
+					}
+				}
+			}
 		}
+		if (gtParams == null)
+			gtParams = new GTopo30WriteParams();
+		// compression
+		final boolean compressed = gtParams.getCompressionMode() == ImageWriteParam.MODE_EXPLICIT;
+		// write band
+		int[] writeBands = gtParams.getSourceBands();
+		int writeBand = CoverageUtilities.getVisibleBand(gc2D
+				.getRenderedImage());
+		if ((writeBands == null || writeBands.length == 0 || writeBands.length > 1)
+				&& (writeBand < 0 || writeBand > gc2D.getNumSampleDimensions()))
+			throw new IllegalArgumentException(
+					"You need to supply a valid index for deciding which band to write.");
+		if (!((writeBands == null || writeBands.length == 0 || writeBands.length > 1)))
+			writeBand = writeBands[0];
 
 		// destination file name
 		String fileName = gc2D.getName().toString();
 
-		// destination
-		Object dest = this.destination;
+		// destination XXX HAS to be a dir
+		if (compressed) {
+			destination = new ZipOutputStream(new BufferedOutputStream(
+					new FileOutputStream(new File((File) destination,
+							new StringBuffer(fileName).append(".zip")
+									.toString()))));
+		}
 
-		/**
-		 * TODO At this place a format operation on the GridCoverage2D should be
-		 * performed since the internal rendered image should of data type
-		 * short. Moreover we should substitute NaN values with -9999.
-		 */
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// STEP 1
+		//
+		// We might need to do a band select in order to cope with the GTOPO30
+		// limitation.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final ParameterValueGroup pvg = sdFactory.getParameters();
+		pvg.parameter("Source").setValue(gc2D);
+		pvg.parameter("SampleDimensions").setValue(new int[]{writeBand});
+		pvg.parameter("VisibleSampleDimension").setValue(writeBand);
+		gc2D = (GridCoverage2D) sdFactory.doOperation(pvg, hints);
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// STEP 2
+		//
+		// We might need to reformat the selected band for this coverage in
+		// order to cope with the GTOPO30 limitation.
+		//
+		// /////////////////////////////////////////////////////////////////////
 		final PlanarImage reFormattedData2Short = reFormatCoverageImage(gc2D,
 				DataBuffer.TYPE_SHORT);
 
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// STEP 2
+		//
+		// Start with writing things out.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		// //
+		//
 		// write DEM
-		if (this.destination instanceof File) {
-			fileName = ((File) this.destination).getAbsolutePath() + "/"
-					+ fileName;
-			dest = new File(fileName + ".DEM");
-		}
+		//
+		// //
+		this.writeDEM(reFormattedData2Short, fileName, destination);
 
-		this.writeDEM(reFormattedData2Short, fileName, dest);
+		// //
+		//
 		// write statistics
-		if (this.destination instanceof File) {
-			dest = new File(fileName + ".STX");
-		}
-
-		this.writeStats(reFormattedData2Short, dest, gc2D);
+		//
+		// //
+		this.writeStats(reFormattedData2Short, fileName, destination, gc2D);
 		// we won't use this image anymore let's release the resources.
 
+		// //
+		//
 		// write world file
-		if (this.destination instanceof File) {
-			dest = new File(fileName + ".DMW");
-		}
+		//
+		// //
+		this.writeWorldFile(gc2D, fileName, destination);
 
-		this.writeWorldFile(gc2D, dest);
-
+		// //
+		//
 		// write projection
-		if (this.destination instanceof File) {
-			dest = new File(fileName + ".PRJ");
-		}
+		//
+		// //
+		this.writePRJ(gc2D, fileName, destination);
 
-		this.writePRJ(gc2D, dest);
-
+		// //
+		//
 		// write HDR
-		if (this.destination instanceof File) {
-			dest = new File(fileName + ".HDR");
-		}
+		//
+		// //
+		this.writeHDR(gc2D, fileName, destination);
 
-		this.writeHDR(gc2D, dest);
-
+		// //
+		//
 		// write gif
-		if (this.destination instanceof File) {
-			dest = new File(fileName + ".GIF");
-		}
+		//
+		// //
+		this.writeGIF(gc2D, fileName, destination);
 
-		this.writeGIF(gc2D, dest);
-
+		// //
+		//
 		// write src
-		if (this.destination instanceof File) {
-			dest = new File(fileName + ".SRC");
-		}
+		//
+		// //
+		this.writeSRC(gc2D, fileName, destination);
 
-		this.writeSRC(gc2D, dest);
+		if (compressed) {
+
+			((ZipOutputStream) destination).close();
+		}
 	}
 
 	/**
-	 * DOCUMENT ME!
+	 * Reformats the input single banded planar image to having
+	 * {@link DataBuffer#TYPE_SHORT} sample type as requested by the GTOPO30
+	 * format.
 	 * 
 	 * @param gc2D
-	 * @param dataType
-	 *            DOCUMENT ME!
+	 *            source {@link GridCoverage2D} from which to take the input
+	 *            {@link PlanarImage}.
 	 * 
-	 * @return
+	 * @return the reformated {@link PlanarImage}.
 	 */
 	private PlanarImage reFormatCoverageImage(final GridCoverage2D gc2D,
-			final int dataType) {
+			int writeBand) {
 		// internal image
 		PlanarImage image = (PlanarImage) gc2D.getRenderedImage();
-
 		// sample dimension type
 		final int origDataType = image.getSampleModel().getDataType();
-
 		// short?
-		if (dataType == origDataType) {
+		if (DataBuffer.TYPE_SHORT == origDataType) {
 			return image;
 		}
 
-		//
-		final int visibleBand = CoverageUtilities.getVisibleBand(gc2D);
 		final GridSampleDimension visibleSD = ((GridSampleDimension) gc2D
-				.getSampleDimension(visibleBand)).geophysics(true);
+				.getSampleDimension(0)).geophysics(true);
 
 		// getting categories
 		final List oldCategories = visibleSD.getCategories();
@@ -403,21 +440,12 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 
 		// new no data category
 		final double oldNoData = candidateRange.getMinimum();
-
 		final ParameterBlockJAI pbjM = new ParameterBlockJAI(
 				"org.geotools.gce.gtopo30.NoDataReplacer");
 		pbjM.addSource(image);
 		pbjM.setParameter("oldNoData", oldNoData);
 		image = JAI.create("org.geotools.gce.gtopo30.NoDataReplacer", pbjM,
-				null);
-
-		// //format
-		// final ParameterBlockJAI pbjF= new ParameterBlockJAI("Format");
-		// pbjF.addSource(image);
-		// pbjF.setParameter("dataType",DataBuffer.TYPE_SHORT);
-		//		
-		// image=JAI.create("Format",pbjF,new
-		// RenderingHints(JAI.KEY_IMAGE_LAYOUT,new ImageLayout(image)));
+				hints);
 		return image;
 	}
 
@@ -432,8 +460,8 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	 * @throws IOException
 	 *             If the file could not be written
 	 */
-	private void writeHDR(final GridCoverage2D gc, final Object file)
-			throws IOException {
+	private void writeHDR(final GridCoverage2D gc, final String name,
+			final Object dest) throws IOException {
 
 		// final GeneralEnvelope envelope = (GeneralEnvelope) gc.getEnvelope();
 		final double noData = -9999.0;
@@ -444,12 +472,11 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 			// specified
 			final CoordinateReferenceSystem crs = CRSUtilities.getCRS2D(gc
 					.getCoordinateReferenceSystem());
-			/*
-			 * Note from Martin: I suggest to replace all the above lines by the
-			 * commented code below. The change need to be tested in order to
-			 * make sure that I didn't made a mistake in the mathematic. Note
-			 * that 'lonFirst' totally vanish.
-			 */
+/*
+ * Note from Martin: I suggest to replace all the above lines by the commented code below.
+ * The change need to be tested in order to make sure that I didn't made a mistake in the
+ * mathematic. Note that 'lonFirst' totally vanish.
+ */
 			final AffineTransform gridToWorld = (AffineTransform) gc
 					.getGridGeometry().getGridToCoordinateSystem();
 			boolean lonFirst = (XAffineTransform.getSwapXY(gridToWorld) != -1);
@@ -464,18 +491,17 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 					: gridToWorld.getTranslateY();
 			final double yUpperLeft = lonFirst ? gridToWorld.getTranslateY()
 					: gridToWorld.getTranslateX();
-			/*
-			 * final AffineTransform worldToGrid = (AffineTransform) gc
-			 * .getGridGeometry().getGridToCoordinateSystem().inverse();
-			 * 
-			 * final double geospatialDx = 1 /
-			 * XAffineTransform.getScaleX0(worldToGrid); final double
-			 * geospatialDy = 1 / XAffineTransform.getScaleY0(worldToGrid);
-			 *  // getting corner coordinates of the left upper corner final
-			 * double xUpperLeft = -worldToGrid.getTranslateX() * geospatialDx;
-			 * final double yUpperLeft = -worldToGrid.getTranslateY() *
-			 * geospatialDy;
-			 */
+/*
+			final AffineTransform worldToGrid = (AffineTransform) gc
+					.getGridGeometry().getGridToCoordinateSystem().inverse();
+
+			final double geospatialDx = 1 / XAffineTransform.getScaleX0(worldToGrid);
+			final double geospatialDy = 1 / XAffineTransform.getScaleY0(worldToGrid);
+
+			// getting corner coordinates of the left upper corner
+			final double xUpperLeft = -worldToGrid.getTranslateX() * geospatialDx;
+			final double yUpperLeft = -worldToGrid.getTranslateY() * geospatialDy;
+*/
 
 			// calculating the physical resolution over x and y.
 			final int geometryWidth = gc.getGridGeometry().getGridRange()
@@ -483,9 +509,12 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 			final int geometryHeight = gc.getGridGeometry().getGridRange()
 					.getLength(1);
 
-			if (file instanceof File) {
-				final PrintWriter out = new PrintWriter(new FileOutputStream(
-						(File) file));
+			if (dest instanceof File) {
+
+				final PrintWriter out = new PrintWriter(
+						new BufferedOutputStream(new FileOutputStream(new File(
+								(File) dest, new StringBuffer(name).append(
+										".HDR").toString()))));
 
 				// output header and assign header fields
 				out.print("BYTEORDER");
@@ -546,7 +575,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 				out.flush();
 				out.close();
 			} else {
-				final ZipOutputStream outZ = (ZipOutputStream) file;
+				final ZipOutputStream outZ = (ZipOutputStream) dest;
 				final ZipEntry e = new ZipEntry(gc.getName().toString()
 						+ ".HDR");
 				outZ.putNextEntry(e);
@@ -626,7 +655,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 
 				outZ.closeEntry();
 
-				((ZipOutputStream) file).closeEntry();
+				((ZipOutputStream) dest).closeEntry();
 			}
 		} catch (TransformException e) {
 			final IOException ioe = new IOException(
@@ -643,13 +672,14 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	 *            The GridCoverage to write
 	 * @param file
 	 *            The destination object (can be a File or ZipOutputStream)
+	 * @param dest
 	 * 
 	 * @throws FileNotFoundException
 	 *             If the destination file could not be found
 	 * @throws IOException
 	 *             If the file could not be written
 	 */
-	private void writeSRC(GridCoverage2D gc, final Object file)
+	private void writeSRC(GridCoverage2D gc, final String name, Object dest)
 			throws FileNotFoundException, IOException {
 
 		// /////////////////////////////////////////////////////////////////////
@@ -662,16 +692,17 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		//
 		// /////////////////////////////////////////////////////////////////////
 		gc = gc.geophysics(false);
-		ImageOutputStreamImpl out = null;
+		ImageOutputStream out = null;
 
-		if (file instanceof File) {
-			out = new FileImageOutputStream((File) file);
+		if (dest instanceof File) {
+			out = ImageIO.createImageOutputStream(new File((File) dest,
+					new StringBuffer(name).append(".SRC").toString()));
 		} else {
-			final ZipOutputStream outZ = (ZipOutputStream) file;
+			final ZipOutputStream outZ = (ZipOutputStream) dest;
 			final ZipEntry e = new ZipEntry(gc.getName().toString() + ".SRC");
 			outZ.putNextEntry(e);
 
-			out = new FileCacheImageOutputStream(outZ, null);
+			out = ImageIO.createImageOutputStream(outZ);
 		}
 
 		// setting byte order
@@ -701,8 +732,8 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		if (o instanceof ImageWriter)
 			((ImageWriter) o).dispose();
 
-		if (!(file instanceof File)) {
-			((ZipOutputStream) file).closeEntry();
+		if (!(dest instanceof File)) {
+			((ZipOutputStream) dest).closeEntry();
 		}
 		out.flush();
 		out.close();
@@ -716,23 +747,25 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	 *            The GridCoverage to write
 	 * @param file
 	 *            The destination object (can be a File or ZipOutputStream)
+	 * @param dest
 	 * 
 	 * @throws IOException
 	 *             If the file could not be written
 	 */
-	private void writeGIF(final GridCoverage2D gc, final Object file)
-			throws IOException {
-		ImageOutputStreamImpl out = null;
+	private void writeGIF(final GridCoverage2D gc, final String name,
+			Object dest) throws IOException {
+		ImageOutputStream out = null;
 
-		if (file instanceof File) {
+		if (dest instanceof File) {
 			// writing gif image
-			out = new FileImageOutputStream((File) file);
+			out = ImageIO.createImageOutputStream(new File((File) dest,
+					new StringBuffer(name).append(".GIF").toString()));
 		} else {
-			final ZipOutputStream outZ = (ZipOutputStream) file;
+			final ZipOutputStream outZ = (ZipOutputStream) dest;
 			final ZipEntry e = new ZipEntry(gc.getName().toString() + ".GIF");
 			outZ.putNextEntry(e);
 
-			out = new FileCacheImageOutputStream(outZ, null);
+			out = ImageIO.createImageOutputStream(outZ);
 		}
 
 		// rescaling to a smaller resolution in order to save space on storage
@@ -752,11 +785,11 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 		JAI.create("ImageWrite", pbj, new RenderingHints(JAI.KEY_TILE_CACHE,
 				null));
 
-		if (file instanceof File) {
+		if (dest instanceof File) {
 			out.close();
 		} else {
 			out.flush();
-			((ZipOutputStream) file).closeEntry();
+			((ZipOutputStream) dest).closeEntry();
 		}
 
 		// disposing the old unused coverages
@@ -769,9 +802,9 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	 * gtopo30 set of files.
 	 * 
 	 * @param gc
-	 *            Supplied coverage.
+	 *            the original {@link GridCoverage2D}.
 	 * 
-	 * @return rescaled coverage.
+	 * @return the rescaled {@link GridCoverage2D}.
 	 */
 	private GridCoverage2D rescaleCoverage(GridCoverage2D gc) {
 		final RenderedImage image = gc.getRenderedImage();
@@ -790,9 +823,12 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 				gc.getEnvelope());
 
 		// resample this coverage
-		return (GridCoverage2D) Operations.DEFAULT.resample(gc, gc
-				.getCoordinateReferenceSystem(), newGridGeometry, Interpolation
-				.getInstance(Interpolation.INTERP_NEAREST));
+		final ParameterValueGroup pvg= resampleFactory.getParameters();
+		pvg.parameter("Source").setValue(gc);
+		pvg.parameter("GridGeometry").setValue(newGridGeometry);
+		pvg.parameter("InterpolationType").setValue(new InterpolationBilinear());
+		return (GridCoverage2D) resampleFactory.doOperation(pvg, hints);
+
 	}
 
 	/**
@@ -802,22 +838,24 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	 *            The GridCoverage to write
 	 * @param file
 	 *            The destination object (can be a File or ZipOutputStream)
+	 * @param dest
 	 * 
 	 * @throws IOException
 	 *             If the file could not be written
 	 */
-	private void writePRJ(final GridCoverage2D gc, Object file)
+	private void writePRJ(final GridCoverage2D gc, String name, Object dest)
 			throws IOException {
-		if (file instanceof File) {
+		if (dest instanceof File) {
 			// create the file
 			final BufferedWriter fileWriter = new BufferedWriter(
-					new FileWriter((File) file));
+					new FileWriter(new File((File) dest, new StringBuffer(name)
+							.append(".PRJ").toString())));
 
 			// write information on crs
 			fileWriter.write(gc.getCoordinateReferenceSystem().toWKT());
 			fileWriter.close();
 		} else {
-			final ZipOutputStream out = (ZipOutputStream) file;
+			final ZipOutputStream out = (ZipOutputStream) dest;
 			final ZipEntry e = new ZipEntry(new StringBuffer(gc.getName()
 					.toString()).append(".PRJ").toString());
 			out.putNextEntry(e);
@@ -839,10 +877,9 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	 * @throws IOException
 	 *             If the file could not be written
 	 */
-	private void writeStats(final PlanarImage image, final Object file,
+	private void writeStats(final PlanarImage image, String name, Object dest,
 			final GridCoverage2D gc) throws IOException {
 		ParameterBlock pb = new ParameterBlock();
-
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// we need to evaluate stats first using jai
@@ -878,31 +915,32 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 
 		// /////////////////////////////////////////////////////////////////////
 		//
-		// Write things our
+		// Write things
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (file instanceof File) {
+		if (dest instanceof File) {
 			// files destinations
-			if (!((File) file).exists()) {
-				((File) file).createNewFile();
+			// write statistics
+			if (dest instanceof File) {
+				dest = new File((File) dest, new StringBuffer(name).append(
+						".STX").toString());
 			}
-
 			// writing world file
-			final PrintWriter out = new PrintWriter(new FileOutputStream(
-					((File) file)));
-			out.print(1);
-			out.print(" ");
-			out.print((int) Min[0]);
-			out.print(" ");
-			out.print((int) Max[0]);
-			out.print(" ");
-			out.print(hist.getMean()[0]);
-			out.print(" ");
-			out.print(hist.getStandardDeviation()[0]);
-			out.close();
+			final PrintWriter p = new PrintWriter(new FileOutputStream(
+					((File) dest)));
+			p.print(1);
+			p.print(" ");
+			p.print((int) Min[0]);
+			p.print(" ");
+			p.print((int) Max[0]);
+			p.print(" ");
+			p.print(hist.getMean()[0]);
+			p.print(" ");
+			p.print(hist.getStandardDeviation()[0]);
+			p.close();
 		} else {
-			final ZipOutputStream outZ = (ZipOutputStream) file;
-			final ZipEntry e = new ZipEntry(gc.getName().toString() + ".STX");
+			final ZipOutputStream outZ = (ZipOutputStream) dest;
+			final ZipEntry e = new ZipEntry(name + ".STX");
 			outZ.putNextEntry(e);
 
 			// writing world file
@@ -916,7 +954,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 			outZ.write(" ".getBytes());
 			outZ.write(new Double(hist.getStandardDeviation()[0]).toString()
 					.getBytes());
-			((ZipOutputStream) file).closeEntry();
+			((ZipOutputStream) dest).closeEntry();
 		}
 
 		histogramImage.dispose();
@@ -934,8 +972,8 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	 * @throws IOException
 	 *             if the file could not be written
 	 */
-	private void writeWorldFile(final GridCoverage2D gc, Object worldFile)
-			throws IOException {
+	private void writeWorldFile(final GridCoverage2D gc, String name,
+			Object dest) throws IOException {
 		// final RenderedImage image = (PlanarImage) gc.getRenderedImage();
 
 		/**
@@ -976,15 +1014,13 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 					: gridToWorld.getTranslateY();
 			final double yLoc = lonFirst ? gridToWorld.getTranslateY()
 					: gridToWorld.getTranslateX();
-			if (worldFile instanceof File) {
-				// files destinations
-				if (!((File) worldFile).exists()) {
-					((File) worldFile).createNewFile();
-				}
+			if (dest instanceof File) {
 
+				dest = new File((File) dest, new StringBuffer(name).append(
+						".DMW").toString());
 				// writing world file
 				final PrintWriter out = new PrintWriter(new FileOutputStream(
-						(File) worldFile));
+						(File) dest));
 				out.println(xPixelSize);
 				out.println(rotation1);
 				out.println(rotation2);
@@ -993,7 +1029,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 				out.println(yLoc);
 				out.close();
 			} else {
-				final ZipOutputStream outZ = (ZipOutputStream) worldFile;
+				final ZipOutputStream outZ = (ZipOutputStream) dest;
 				final ZipEntry e = new ZipEntry(gc.getName().toString()
 						+ ".DMW");
 				outZ.putNextEntry(e);
@@ -1013,7 +1049,7 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 				outZ.write("\n".getBytes());
 				outZ.write(Double.toString(yLoc).toString().getBytes());
 				outZ.write("\n".getBytes());
-				((ZipOutputStream) worldFile).closeEntry();
+				((ZipOutputStream) dest).closeEntry();
 			}
 		} catch (TransformException e) {
 			final IOException ioe = new IOException(
@@ -1039,17 +1075,22 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 	 * @throws IOException
 	 *             If the file could not be written
 	 */
-	private void writeDEM(PlanarImage image, final String name,
-			final Object dest) throws FileNotFoundException, IOException {
-		ImageOutputStreamImpl out;
+	private void writeDEM(PlanarImage image, final String name, Object dest)
+			throws FileNotFoundException, IOException {
+		ImageOutputStream out;
 
 		if (dest instanceof File) {
-			out = new FileImageOutputStream((File) dest);
+			// write statistics
+			if (dest instanceof File) {
+				dest = new File((File) dest, new StringBuffer(name).append(
+						".DEM").toString());
+			}
+			out = ImageIO.createImageOutputStream((File) dest);
 		} else {
 			final ZipOutputStream outZ = (ZipOutputStream) dest;
 			final ZipEntry e = new ZipEntry(name + ".DEM");
 			outZ.putNextEntry(e);
-			out = new FileCacheImageOutputStream(outZ, null);
+			out = ImageIO.createImageOutputStream(outZ);
 		}
 
 		out.setByteOrder(java.nio.ByteOrder.BIG_ENDIAN);
@@ -1103,13 +1144,9 @@ final public class GTopo30Writer extends AbstractGridCoverageWriter implements
 
 		final RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
 				layout);
+		// avoid caching this image
 
 		return JAI.create("format", pbj, hints);
 	}
 
-	/**
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#dispose()
-	 */
-	public void dispose() {
-	}
 }

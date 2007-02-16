@@ -24,8 +24,9 @@ import javax.media.jai.RecyclingTileFactory;
 import javax.media.jai.TileCache;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.test.TestData;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.resources.TestData;
+import org.geotools.resources.image.CoverageUtilities;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 
@@ -91,6 +92,7 @@ public class GT30ReaderWriterTest extends GT30TestBase {
 
 			// get a grid coverage
 			gc = ((GridCoverage2D) reader.read(null));
+			assertTrue(CoverageUtilities.hasRenderingCategories(gc));
 			if(TestData.isInteractiveTest())
 				gc.show();
 

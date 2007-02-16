@@ -17,25 +17,25 @@
 package org.geotools.gce.gtopo30;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URL;
-import java.util.zip.ZipOutputStream;
 
 import javax.media.jai.JAI;
 import javax.media.jai.TileCache;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.test.TestData;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.resources.TestData;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Purpose of this method is testing the ability of this plugin to write the
  * complete set of files for the GTOPO30 format in a single zip package.
  * 
  * @author Simone Giannecchini
- * @source $URL$
+ * @source $URL:
  */
 public class GT30ZipWriterTest extends GT30TestBase {
 	/**
@@ -59,8 +59,16 @@ public class GT30ZipWriterTest extends GT30TestBase {
 
 		final TileCache defaultInstance = JAI.getDefaultInstance()
 				.getTileCache();
-		defaultInstance.setMemoryCapacity(1024 * 1024 * 128);
+		defaultInstance.setMemoryCapacity(1024 * 1024 * 64);
 		defaultInstance.setMemoryThreshold(1.0f);
+
+		final GTopo30WriteParams wp = new GTopo30WriteParams();
+		wp.setCompressionMode(GTopo30WriteParams.MODE_EXPLICIT);
+		wp.setCompressionType("ZIP");
+		ParameterValueGroup params = format.getWriteParameters();
+		params.parameter(
+				AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString())
+				.setValue(wp);
 
 		if (format.accepts(statURL)) {
 			// get a reader
@@ -69,21 +77,21 @@ public class GT30ZipWriterTest extends GT30TestBase {
 			// get a grid coverage
 			final GridCoverage2D gc = ((GridCoverage2D) reader.read(null));
 
-			final File zipFile = TestData.temp(this,"test.zip");
-			final ZipOutputStream out = new ZipOutputStream(
-					new FileOutputStream(zipFile));
+			// preparing to write it down
+			File testDir = TestData.file(this, "");
+			newDir = new File(testDir.getAbsolutePath() + "/newDir");
+			newDir.mkdir();
 
-			final GridCoverageWriter writer = format.getWriter(out);
-			writer.write(gc, null);
-			out.flush();
-			out.close();
+
+			final GridCoverageWriter writer = format.getWriter(newDir);
+			writer.write(gc, (GeneralParameterValue[]) params.values().toArray(
+					new GeneralParameterValue[1]));
+		
 			gc.dispose();
 		}
 	}
 
 	public static final void main(String[] args) throws Exception {
 		junit.textui.TestRunner.run((GT30ZipWriterTest.class));
-	} /*
-		 * @see TestCase#setUp()
-		 */
+	}
 }

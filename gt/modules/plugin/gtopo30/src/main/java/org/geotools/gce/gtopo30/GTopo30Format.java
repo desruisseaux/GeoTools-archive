@@ -30,8 +30,9 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -72,7 +73,10 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
 
 		// reading parameters
-		writeParameters = null;
+		writeParameters = new ParameterGroup(
+				new DefaultParameterDescriptorGroup(
+						mInfo,
+						new GeneralParameterDescriptor[] { GEOTOOLS_WRITE_PARAMS }));
 	}
 
 	/**
@@ -117,6 +121,7 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 	 *            The destination object
 	 * 
 	 * @return a GridCoverageWriter object
+	 * @throws DataSourceException
 	 */
 	public GridCoverageWriter getWriter(final Object destination, Hints hints) {
 		try {
@@ -202,6 +207,16 @@ public final class GTopo30Format extends AbstractGridFormat implements Format {
 			return null;
 		}
 
+	}
+
+	/**
+	 * Always returns null since for the moment there are no
+	 * {@link GeoToolsWriteParams} availaible for this format.
+	 * 
+	 * @return always null.
+	 */
+	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
+		return null;
 	}
 
 }

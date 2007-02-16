@@ -13,9 +13,10 @@ import javax.media.jai.TileCache;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.test.TestData;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.resources.TestData;
+import org.geotools.resources.image.CoverageUtilities;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -92,6 +93,7 @@ public class GT30DecimationTest extends GT30TestBase {
 									.getOriginalEnvelope()));
 			gc = ((GridCoverage2D) reader.read((GeneralParameterValue[]) params
 					.values().toArray(new GeneralParameterValue[1])));
+			assertTrue(CoverageUtilities.hasRenderingCategories(gc));
 			if(TestData.isInteractiveTest())
 			{
 //				 logging some info
