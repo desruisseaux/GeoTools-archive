@@ -48,6 +48,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  */
 public class AffineTransform2D extends AffineTransform implements Matrix {
     /**

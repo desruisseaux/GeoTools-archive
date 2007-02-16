@@ -35,6 +35,7 @@ import org.opengis.referencing.operation.Matrix;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  */
 public interface XMatrix extends Matrix {
     /**
@@ -80,4 +81,28 @@ public interface XMatrix extends Matrix {
      * transform.
      */
     void multiply(Matrix matrix);
+    /**
+     * Returns the number of rows in this matrix, which is always {@value #SIZE}
+     * in this implementation.
+     * @since 2.4
+     */
+    public int getNumRow();
+
+    /**
+     * Returns the number of colmuns in this matrix, which is always {@value #SIZE}
+     * in this implementation.
+     * @since 2.4
+     */
+    public int getNumCol();
+    
+    /**
+     * Returns the element at the specified index.
+     */
+    public double getElement(final int row, final int col) ;
+    
+    /**
+     * Set the element at the specified index.
+     * @since 2.4
+     */
+    public void setElement(final int row, final int col, final double value);
 }

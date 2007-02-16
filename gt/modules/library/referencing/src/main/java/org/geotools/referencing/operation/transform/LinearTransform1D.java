@@ -174,7 +174,20 @@ public class LinearTransform1D extends AbstractMathTransform
      * Tests whether this transform does not move any points.
      */
     public boolean isIdentity() {
-        return offset==0 && scale==1;
+       return isIdentity(0);
+    }
+    
+    /**
+     * Tests whether this transform does not move any points.
+     * 
+     * <p>
+     * It uses the provided <code>tolerance</code> before perfoming 
+     * the check.
+     * @snce 2.3.1
+     */
+    public boolean isIdentity(double tolerance) {
+    	tolerance=Math.abs(tolerance);
+        return Math.abs(offset)<=tolerance&& Math.abs(scale-1)<=tolerance;
     }
     
     /**

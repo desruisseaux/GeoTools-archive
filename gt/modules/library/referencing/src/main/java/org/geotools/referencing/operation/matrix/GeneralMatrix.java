@@ -65,6 +65,11 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
     private static final long serialVersionUID = 8447482612423035360L;
     
     /**
+     * Defaul tolerance value for floating point comparisons.
+     */
+    public static final double EPS = 1E-6;
+    
+    /**
      * Constructs a square identity matrix of size {@code size}&nbsp;&times;&nbsp;{@code size}.
      */
     public GeneralMatrix(final int size) {
@@ -403,7 +408,34 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         assert isAffine() : this;
         return true;
     }
-
+    /**
+     * Returns {@code true} if this matrix is an identity matrix using the provided tolerance.
+     * @since 2.3.1
+     */
+    public final boolean isIdentity(double tolerance) {
+    	return isIdentity(this, tolerance);
+    }
+    /**
+     * Returns {@code true} if this matrix is an identity matrix using the provided tolerance.
+     * @since 2.3.1
+     */
+    public final static boolean isIdentity(final XMatrix matrix,double tolerance) {
+    	tolerance=Math.abs(tolerance);
+        final int numRow = matrix.getNumRow();
+        final int numCol = matrix.getNumCol();
+        if (numRow != numCol) {
+            return false;
+        }
+        for (int j=0; j<numRow; j++) {
+            for (int i=0; i<numCol; i++) {
+                if (Math.abs(matrix.getElement(j,i)- (i==j ? 1 : 0))>tolerance) {
+                    return false;
+                }
+            }
+        }
+        assert matrix.isAffine() : matrix;
+        return true;
+    }
     /**
      * {@inheritDoc}
      */

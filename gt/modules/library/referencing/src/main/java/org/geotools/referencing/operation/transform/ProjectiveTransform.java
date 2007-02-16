@@ -448,6 +448,25 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
     }
     
     /**
+     * Tests whether this transform does not move any points by employing the provided tolerance.
+     * @since 2.4
+     */
+    public boolean isIdentity(double tolerance) {
+    	tolerance=Math.abs(tolerance);
+        if (numRow != numCol) {
+            return false;
+        }
+        int index=0;
+        for (int j=0; j<numRow; j++) {
+            for (int i=0; i<numCol; i++) {
+                if (Math.abs(elt[index++] -(i==j ? 1 : 0))>tolerance) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    /**
      * Creates the inverse transform of this object.
      */
     public MathTransform inverse() throws NoninvertibleTransformException {

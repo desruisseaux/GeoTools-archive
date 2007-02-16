@@ -132,6 +132,15 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     public boolean isIdentity() {
         return false;
     }
+    
+    /**
+     * Tests whether this transform does not move any points, by using
+     * the provided <code>tolerance</code> value.
+     * The default implementation always returns {@code false}.
+     */
+    public boolean isIdentity(double tolerance) {
+        return false;
+    }
 
     /**
      * Constructs an error message for the {@link MismatchedDimensionException}.

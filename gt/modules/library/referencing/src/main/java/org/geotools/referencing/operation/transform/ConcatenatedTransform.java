@@ -34,6 +34,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
@@ -405,15 +406,46 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     /**
      * Tests whether this transform does not move any points.
      * Default implementation check if the two transforms are
-     * identity. This a way too conservative aproach, but it
-     * it doesn't hurt since ConcatenatedTransform should not
-     * have been created if it were to result in an identity
-     * transform (this case should have been detected earlier).
+     * identity. 
      */
     public final boolean isIdentity() {
         return transform1.isIdentity() && transform2.isIdentity();
     }
     
+    /**
+	 * Tests whether this transform does not move any points by using the
+	 * provided <code>tolerance</code>.
+	 * @since 2.4
+	 */
+	public final boolean isIdentity(double tolerance) {
+		boolean t1Res = false, t2Res = false;
+		//analyzing transformation 1
+		if (transform1 instanceof AbstractMathTransform)
+			t1Res = ((AbstractMathTransform) transform1).isIdentity(tolerance);
+		else if (transform1 instanceof AffineTransform)
+			t1Res = XAffineTransform.isIdentity((AffineTransform) transform1,
+					tolerance);
+		else if (transform1 instanceof LinearTransform1D)
+			t1Res = ((LinearTransform1D) transform1).isIdentity(tolerance);
+		else if (transform1 instanceof ProjectiveTransform)
+			t1Res = ((ProjectiveTransform) transform1).isIdentity(tolerance);
+		else
+			t1Res = transform1.isIdentity();
+		
+		//analizing transformation 2
+		if (transform2 instanceof AbstractMathTransform)
+			t1Res = ((AbstractMathTransform) transform2).isIdentity(tolerance);
+		else if (transform2 instanceof AffineTransform)
+			t1Res = XAffineTransform.isIdentity((AffineTransform) transform2,
+					tolerance);
+		else if (transform2 instanceof LinearTransform1D)
+			t1Res = ((LinearTransform1D) transform2).isIdentity(tolerance);
+		else if (transform2 instanceof ProjectiveTransform)
+			t1Res = ((ProjectiveTransform) transform2).isIdentity(tolerance);
+		else
+			t1Res = transform2.isIdentity();
+		return t1Res && t2Res;
+	}
     /**
      * Returns a hash value for this transform.
      */
