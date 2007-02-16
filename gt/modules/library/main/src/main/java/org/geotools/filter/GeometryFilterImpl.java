@@ -17,11 +17,8 @@ package org.geotools.filter;
 
 import java.util.logging.Logger;
 
-import org.geotools.coverage.processing.operation.Exp;
 import org.geotools.feature.Feature;
-import org.opengis.filter.FilterVisitor;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 
