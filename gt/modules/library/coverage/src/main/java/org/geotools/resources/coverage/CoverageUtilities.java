@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.resources.image;
+package org.geotools.resources.coverage;
 
 // J2SE and JAI dependencies
 import java.awt.RenderingHints;
@@ -68,11 +68,11 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * rigorous; must of them should be seen as temporary implementations.
  *
  * @since 2.2
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/modules/library/coverage/src/main/java/org/geotools/resources/image/CoverageUtilities.java $
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Simone Giannecchini
- * @deprecated moved to org.geotools.resources.coverage package.
+ * -deprecated moved to org.geotools.resources.coverage package.-
  */
 public final class CoverageUtilities {
 	/** Controlling datum shift process. */
@@ -350,7 +350,7 @@ public final class CoverageUtilities {
 	 * @throws FactoryConfigurationError
 	 * @throws IllegalAttributeException
 	 */
-	public final static FeatureCollection wrapGc(GridCoverage gridCoverage)
+	public static FeatureCollection wrapGc(GridCoverage gridCoverage)
 			throws TransformException, FactoryConfigurationError,
 			SchemaException, IllegalAttributeException {
 
@@ -410,7 +410,7 @@ public final class CoverageUtilities {
 	 * @throws FactoryConfigurationError
 	 * @throws IllegalAttributeException
 	 */
-	public final static FeatureCollection wrapGcReader(
+	public static FeatureCollection wrapGcReader(
 			AbstractGridCoverage2DReader gridCoverageReader)
 			throws TransformException, FactoryConfigurationError,
 			SchemaException, IllegalAttributeException {
