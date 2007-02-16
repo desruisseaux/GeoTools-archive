@@ -19,6 +19,7 @@ package org.geotools.map;
 
 import java.util.Collection;
 
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureEvent;
@@ -26,13 +27,13 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Source;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.data.memory.CollectionSource;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.map.event.MapLayerEvent;
+import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.styling.Style;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.referencing.operation.TransformException;
@@ -176,7 +177,7 @@ public class DefaultMapLayer implements MapLayer {
 	 */
 	public DefaultMapLayer(GridCoverage coverage, Style style) throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
 
-		this(DataUtilities.wrapGc(coverage), style, "");
+		this(CoverageUtilities.wrapGc(coverage), style, "");
 
 	}
 
@@ -196,7 +197,7 @@ public class DefaultMapLayer implements MapLayer {
 	public DefaultMapLayer(AbstractGridCoverage2DReader reader, Style style, String title)
 			throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
 
-		this(DataUtilities.wrapGcReader(reader), style, title);
+		this(CoverageUtilities.wrapGcReader(reader), style, title);
 
 	}
 
@@ -219,7 +220,7 @@ public class DefaultMapLayer implements MapLayer {
 	         SchemaException, 
 	         IllegalAttributeException {
 
-		this(DataUtilities.wrapGcReader(reader), style, "");
+		this(CoverageUtilities.wrapGcReader(reader), style, "");
 
 	}
 
@@ -238,7 +239,7 @@ public class DefaultMapLayer implements MapLayer {
 	public DefaultMapLayer(GridCoverage coverage, Style style, String title)
 			throws TransformException, FactoryConfigurationError, SchemaException, IllegalAttributeException {
 
-		this(DataUtilities.wrapGc(coverage), style, title);
+		this(CoverageUtilities.wrapGc(coverage), style, title);
 
 	}
 	/**

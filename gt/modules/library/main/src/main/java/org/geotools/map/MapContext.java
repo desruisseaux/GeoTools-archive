@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Source;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.event.MapBoundsEvent;
