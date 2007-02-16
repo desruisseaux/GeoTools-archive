@@ -23,7 +23,6 @@ import java.awt.image.renderable.ParameterBlock;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
-import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 

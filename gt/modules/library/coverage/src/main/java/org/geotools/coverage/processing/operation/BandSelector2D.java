@@ -23,20 +23,16 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
-// JAI dependencies
+import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
-import javax.media.jai.ImageLayout;
 
-// OpenGIS dependencies
-import org.opengis.parameter.ParameterValueGroup;
-
-// Geotools dependencies
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.OperationJAI;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.image.ColorUtilities;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**

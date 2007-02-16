@@ -31,7 +31,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.OperationJAI;
 import org.geotools.factory.Hints;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.grid.GridCoverage;

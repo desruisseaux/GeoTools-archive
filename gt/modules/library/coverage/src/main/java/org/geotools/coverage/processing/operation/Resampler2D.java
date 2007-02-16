@@ -25,30 +25,17 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-// JAI dependencies
-import javax.media.jai.JAI;
-import javax.media.jai.Warp;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.PlanarImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.Warp;
 
-// OpenGIS dependencies
-import org.opengis.coverage.grid.GridRange;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.MathTransform2D;
-import org.opengis.referencing.operation.MathTransformFactory;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.spatialschema.geometry.Envelope;
-
-// Geotools dependencies
 import org.geotools.coverage.GridSampleDimension;
+import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
-import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.processing.AbstractProcessor;
 import org.geotools.coverage.processing.CannotReprojectException;
 import org.geotools.factory.Hints;
@@ -58,17 +45,24 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.DimensionFilter;
-import org.geotools.referencing.operation.transform.WarpTransform2D;
 import org.geotools.referencing.operation.transform.IdentityTransform;
+import org.geotools.referencing.operation.transform.WarpTransform2D;
 import org.geotools.resources.XArray;
-import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.Logging;
 import org.geotools.resources.i18n.LoggingKeys;
-import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.resources.image.ImageUtilities;
-import org.geotools.resources.CRSUtilities;
-import org.geotools.util.NumberRange;
+import org.opengis.coverage.grid.GridRange;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.CoordinateOperationFactory;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.MathTransformFactory;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.Envelope;
 
 
 /**

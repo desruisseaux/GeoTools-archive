@@ -43,6 +43,7 @@ import org.opengis.referencing.datum.GeodeticDatum;
 import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.crs.DefaultDerivedCRS;
 import org.geotools.referencing.crs.DefaultProjectedCRS;
@@ -250,12 +251,22 @@ public final class ResampleTest extends GridCoverageTest {
      */
     public void testStereographic() {
         assertEquals("Warp", projectTo(coverage,getProjectedCRS(coverage), null));
-        assertEquals("Warp", projectTo(indexedCoverage,getProjectedCRS(indexedCoverage), null));
-        assertEquals("Warp", projectTo(indexedCoverageWithTransparency,getProjectedCRS(indexedCoverageWithTransparency), null));
-        assertEquals("Warp", projectTo(floatCoverage,getProjectedCRS(floatCoverage), 
-        		null, new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,Boolean.FALSE),false));
-    }
+    }	
+    
+    /**
+     * Tests the "Resample" operation with a stereographic coordinate system.
+     * @throws FactoryException 
+     */
+    public void testsNad83() throws FactoryException {
+    	 final CoordinateReferenceSystem crs = CRS.parseWKT("GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0, AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST],AUTHORITY[\"EPSG\",\"4269\"]]");
 
+    	 
+        assertEquals("Warp", projectTo(indexedCoverage,crs, null));
+        assertEquals("Warp", projectTo(indexedCoverageWithTransparency,crs, null));
+        assertEquals("Warp", projectTo(floatCoverage,crs, 
+        		null, new Hints(Hints.REPLACE_NON_GEOPHYSICS_VIEW,Boolean.FALSE),false));
+    }	
+     
     /**
      * Tests the "Resample" operation with an "Affine" transform.
      */
