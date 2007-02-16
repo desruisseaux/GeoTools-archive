@@ -34,6 +34,8 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.geometry.jts.GeomCollectionIterator;
+import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.renderer.style.GraphicStyle2D;
 import org.geotools.renderer.style.LineStyle2D;
 import org.geotools.renderer.style.MarkStyle2D;

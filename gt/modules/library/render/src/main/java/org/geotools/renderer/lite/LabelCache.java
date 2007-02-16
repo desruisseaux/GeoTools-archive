@@ -21,7 +21,7 @@ import java.awt.Rectangle;
 import javax.media.jai.util.Range;
 
 import org.geotools.feature.Feature;
-import org.geotools.renderer.style.TextStyle2D;
+import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.styling.TextSymbolizer;
 
 /**

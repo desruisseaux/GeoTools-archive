@@ -18,6 +18,7 @@ package org.geotools.renderer.lite;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.renderer.style.TextStyle2D;
 
 import com.vividsolutions.jts.geom.Geometry;
