@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ===========================================================================
+         Project configuration file for the Geotools 2 project
+         http://www.geotools.org/
+
+         Version: $Id$
+     =========================================================================== -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.geotools</groupId>
+    <artifactId>gt2-plugin</artifactId>
+    <version>2.4-SNAPSHOT</version>
+  </parent>
+
+
+  <!-- ==================================================== -->
+  <!--     Module description                               -->
+  <!-- ==================================================== -->
+  <groupId>org.geotools</groupId>
+  <artifactId>imageio-simplegrids</artifactId>
+  <packaging>jar</packaging>
+  <name>Image IO for "Simple" images are usually raw grids </name>
+  <url>http://modules.geotools.org/imageio/raw</url>
+  <scm>
+    <connection>scm:svn:http://svn.geotools.org/geotools/trunk/spike/imageio/simplegrids</connection>
+    <url>http://svn.geotools.org/geotools/trunk/spike/imageio/simplegrids/</url>
+  </scm>
+  <description>
+    Image IO for simple raw grids.
+  </description>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Developers and contributors                      -->
+  <!-- ==================================================== -->
+  <developers>
+    <developer>
+      <name>Martin Desruisseaux</name>
+      <email>martin.desruisseaux@geomatys.fr</email>
+      <organization>GeoMatys</organization>
+      <roles>
+        <role>Module Maintainer</role>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Simone Giannecchini</name>
+      <id>simboss</id>
+	<email>simboss1@gmail.com</email>
+      <organization>GeoSolutions</organization>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+
+
+  <!-- ==================================================== -->
+  <!--     Dependencies                                     -->
+  <!-- ==================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-main</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+</project>
