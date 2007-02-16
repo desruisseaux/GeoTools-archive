@@ -385,6 +385,9 @@ public class Encoder {
 							if ( binding == null ) 
 								continue;
 							
+							if ( binding.getType() == null ) 
+								continue;
+							
 							//match up the type
 							if ( binding.getType().isAssignableFrom( entry.object.getClass() ) ) {
 								//we have a match, store as an (element,binding) tuple
