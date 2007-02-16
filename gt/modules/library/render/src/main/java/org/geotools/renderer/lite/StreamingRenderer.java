@@ -36,20 +36,26 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.media.jai.Interpolation;
+import javax.media.jai.InterpolationBicubic;
+import javax.media.jai.InterpolationBilinear;
+import javax.media.jai.InterpolationNearest;
+import javax.media.jai.JAI;
 import javax.media.jai.util.Range;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Source;
 import org.geotools.data.collection.ResourceCollection;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
@@ -57,17 +63,18 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.Decimator;
 import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.LiteShape2;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContext;
 import org.geotools.map.MapLayer;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
 import org.geotools.renderer.GTRenderer;
@@ -85,7 +92,9 @@ import org.geotools.styling.StyleAttributeExtractor;
 import org.geotools.styling.Symbolizer;
 import org.geotools.styling.TextSymbolizer;
 import org.geotools.util.NumberRange;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.parameter.GeneralParameterValue;
@@ -165,8 +174,12 @@ public final class StreamingRenderer implements GTRenderer {
 	int error = 0;
 
 	/** Filter factory for creating bounding box filters */
-	private final FilterFactory filterFactory = FilterFactoryFinder
-			.createFilterFactory();
+	private final static FilterFactory filterFactory = CommonFactoryFinder.getFilterFactory(null);
+	
+	private final static PropertyName gridPropertyName= filterFactory.property("grid");
+	
+	private final static PropertyName paramsPropertyName= filterFactory.property("params");
+	
 
 	private final static CoordinateOperationFactory operationFactory = new BufferedCoordinateOperationFactory(
 			new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE));
@@ -735,9 +748,19 @@ public final class StreamingRenderer implements GTRenderer {
 		}
 	}
 
+	/**
+	 * Extends the provided {@link Envelope} in order to add the number of pixels
+	 * specified by <code>buffer</code> in every direction.
+	 * 
+	 * @param envelope to extend.
+	 * @param worldToScreen by means  of which doing the extension.
+	 * @param buffer to use for the extension.
+	 * @return an extende version of the provided {@link Envelope}.
+	 */
     private Envelope expandEnvelope(Envelope envelope, AffineTransform worldToScreen, int buffer) {
-        double bufferX =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleX());
-        double bufferY =  Math.abs(buffer * 1.0 /  worldToScreen.getScaleY());
+    	assert buffer>0;
+        double bufferX =  Math.abs(buffer * 1.0 /  XAffineTransform.getScaleX0(worldToScreen));
+        double bufferY =  Math.abs(buffer * 1.0 /  XAffineTransform.getScaleY0(worldToScreen));
         return new Envelope(envelope.getMinX() - bufferX, 
                 envelope.getMaxX() + bufferX, envelope.getMinY() - bufferY, 
                 envelope.getMaxY() + bufferY);
@@ -1140,10 +1163,15 @@ public final class StreamingRenderer implements GTRenderer {
 	private boolean isMemoryPreloadingEnabled() {
 		if (rendererHints == null)
 			return memoryPreloadingEnabledDEFAULT;
-		Boolean result = (Boolean) rendererHints.get("memoryPreloadingEnabled");
+		Object result = null;
+		try{
+			result =  rendererHints.get("memoryPreloadingEnabled");
+		}catch (ClassCastException e) {
+			
+		}
 		if (result == null)
 			return memoryPreloadingEnabledDEFAULT;
-		return result.booleanValue();
+		return ((Boolean)result).booleanValue();
 	}
     
     /**
@@ -1253,7 +1281,9 @@ public final class StreamingRenderer implements GTRenderer {
 			// default geometry is used. So, we no longer add EVERY geometry
 			// column to the query!!
 
-			if ((attTypes[i].getName().equalsIgnoreCase("grid"))
+			if ((attName.equalsIgnoreCase("grid"))
+					&& !atts.contains(attName)||
+					(attName.equalsIgnoreCase("params"))
 					&& !atts.contains(attName)) {
 				atts.add(attName);
 				if (LOGGER.isLoggable(Level.FINE))
@@ -1788,7 +1818,6 @@ public final class StreamingRenderer implements GTRenderer {
 			//
 			// /////////////////////////////////////////////////////////////////
 			if (symbolizers[m] instanceof RasterSymbolizer) {
-
 				renderRaster(graphics, drawMe,
 						(RasterSymbolizer) symbolizers[m], destinationCrs,
 						scaleRange);
@@ -1904,22 +1933,23 @@ public final class StreamingRenderer implements GTRenderer {
 	 * 
 	 * @param graphics
 	 *            DOCUMENT ME!
-	 * @param feature
+	 * @param drawMe
 	 *            the feature that contains the GridCoverage. The grid coverage
 	 *            must be contained in the "grid" attribute
 	 * @param symbolizer
 	 *            The raster symbolizer
 	 * @param scaleRange
+	 * @param world2Grid 
 	 * @task make it follow the symbolizer
 	 */
-	private void renderRaster(Graphics2D graphics, Object feature,
+	private void renderRaster(Graphics2D graphics, Object drawMe,
 			RasterSymbolizer symbolizer,
 			CoordinateReferenceSystem destinationCRS, Range scaleRange) {
-		if (LOGGER.isLoggable(Level.FINE)){
-            Object grid = filterFactory.property("grid").evaluate( feature );
+		final Object grid = gridPropertyName.evaluate( drawMe);
+		if (LOGGER.isLoggable(Level.FINE))
 			LOGGER.fine(new StringBuffer("rendering Raster for feature ")
-					.append(feature.toString()).append(" - ").append(grid).toString());
-        }
+					.append(drawMe.toString()).append(" - ").append(
+							grid).toString());
 
 		try {
 			// /////////////////////////////////////////////////////////////////
@@ -1929,30 +1959,85 @@ public final class StreamingRenderer implements GTRenderer {
 			// rely on the gridocerage renderer itself.
 			//
 			// /////////////////////////////////////////////////////////////////
-		    
-			final Object grid = filterFactory.property("grid").evaluate( feature );
-
+//			METABUFFER SUPPORT			
+//			final GeneralEnvelope metaBufferedEnvelope=handleTileBordersArtifacts(mapExtent,java2dHints,this.worldToScreenTransform);
 			final GridCoverageRenderer gcr = new GridCoverageRenderer(
 					destinationCRS, mapExtent, screenSize, java2dHints);
 
 			// //
 			// It is a grid coverage
 			// //
-			if (grid instanceof GridCoverage2D){
-            	gcr.paint(graphics, (GridCoverage2D) grid, symbolizer);
-            }
+			if (grid instanceof GridCoverage)
+//				METABUFFER SUPPORT				
+//				gcr.paint(graphics, (GridCoverage2D) grid, symbolizer, metaBufferedEnvelope);
+				gcr.paint(graphics, (GridCoverage2D) grid, symbolizer);
 			else if (grid instanceof AbstractGridCoverage2DReader) {
 				// //
-				// It is an AbstractGridCoverage2DReader
+				// It is an AbstractGridCoverage2DReader, let's use parameters
+				// if we have any supplied by a user.
 				// //
+				// first I created the correct ReadGeometry
 				final Parameter readGG = new Parameter(
 						AbstractGridFormat.READ_GRIDGEOMETRY2D);
+//	METABUFFER SUPPORT
+//				readGG.setValue(new GridGeometry2D(new GeneralGridRange(
+//						screenSize), metaBufferedEnvelope));
 				readGG.setValue(new GridGeometry2D(new GeneralGridRange(
-						screenSize), new GeneralEnvelope(mapExtent)));
-                
-				AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) grid;                
-				GridCoverage2D coverage = (GridCoverage2D) reader
-						.read(new GeneralParameterValue[] { readGG });
+						screenSize), mapExtent));
+				final AbstractGridCoverage2DReader reader = (AbstractGridCoverage2DReader) grid;
+				// then I try to get read parameters associated with this
+				// coverage if there are any.
+				final Object params =gridPropertyName.evaluate( drawMe);
+				final GridCoverage2D coverage;
+				if (params != null) {
+					// //
+					//
+					// Getting parameters to control how to read this coverage.
+					// Remember to check to actually have them before forwarding
+					// them to the reader.
+					//
+					// //
+					GeneralParameterValue[] readParams = (GeneralParameterValue[]) params;
+					final int length = readParams.length;
+					if (length > 0) {
+						// we have a valid number of parameters, let's check if
+						// also have a READ_GRIDGEOMETRY2D. In such case we just
+						// override it with the one we just build for this
+						// request.
+						final String name = AbstractGridFormat.READ_GRIDGEOMETRY2D
+								.getName().toString();
+						int i = 0;
+						for (; i < length; i++)
+							if (readParams[i].getDescriptor().getName()
+									.toString().equalsIgnoreCase(name))
+								break;
+						// did we find anything?
+						if (i < length) {
+							//we found another READ_GRIDGEOMETRY2D, let's override it.
+							((Parameter) readParams[i]).setValue(readGG);
+							coverage = (GridCoverage2D) reader
+							.read(readParams);
+						} else {
+							// add the correct read geometry to the supplied
+							// params since we did not find anything
+							GeneralParameterValue[] readParams2 = new GeneralParameterValue[length + 1];
+							System.arraycopy(readParams, 0, readParams2, 0,
+									length);
+							readParams2[length] = readGG;
+							coverage = (GridCoverage2D) reader
+									.read(readParams2);
+						}
+					} else
+						// we have no parameters hence we just use the read grid
+						// geometry to get a coverage
+						coverage = (GridCoverage2D) reader
+								.read(new GeneralParameterValue[] { readGG });
+				} else {
+					coverage = (GridCoverage2D) reader
+							.read(new GeneralParameterValue[] { readGG });
+				}
+//				METABUFFER SUPPORT
+//				gcr.paint(graphics, coverage, symbolizer,metaBufferedEnvelope);
 				gcr.paint(graphics, coverage, symbolizer);
 			}
 			if (LOGGER.isLoggable(Level.FINE))
@@ -1974,6 +2059,79 @@ public final class StreamingRenderer implements GTRenderer {
 			LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			fireErrorEvent(e);
 		}
+
+	}
+
+	/**
+	 * This method captures a first attempt to handle in a coherent way the problem of having artifacts at the 
+	 * borders of drown tiles when using Tiling Clients like OpenLayers with higher order interpolation.
+	 * 
+	 * @param mapExtent to draw on.
+	 * @param java2dHints to control the drawing process.
+	 * @param worldToScreen transformation that maps onto the screen.
+	 * @return a {@link GeneralEnvelope} that might be expanded in order to avoid
+	 * 		   artifacts at the borders
+	 */
+	private GeneralEnvelope handleTileBordersArtifacts(
+			ReferencedEnvelope mapExtent, RenderingHints java2dHints,
+			AffineTransform worldToScreen) {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Check if interpolation is required.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		if (!java2dHints.containsKey(JAI.KEY_INTERPOLATION)) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("Unable to find interpolation for this request.");
+			return new GeneralEnvelope(mapExtent);
+		}
+		final Interpolation interp = (Interpolation) java2dHints
+				.get(JAI.KEY_INTERPOLATION);
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Ok, we have an interpolation, let's decide if we have to extend the
+		// requested area accordingly.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		int buffer = 0;
+		if (interp instanceof InterpolationNearest) {
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("Interpolation Nearest no need for extending.");
+			return new GeneralEnvelope(mapExtent);
+
+		}
+		if (interp instanceof InterpolationBilinear)
+		{
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("Interpolation Bilinear  extending.by 1 pixel at least");
+			buffer = 10;
+		}
+		else if (interp instanceof InterpolationBicubic)
+		{
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.fine("Interpolation Bicubic  extending.by 2 pixel at least");
+			buffer = 30;
+		}
+		if (buffer <= 0) {
+			return new GeneralEnvelope(mapExtent);
+		}
+		
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Doing the extension
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final Envelope tempEnv =expandEnvelope(mapExtent, worldToScreen, buffer);
+		final GeneralEnvelope newEnv = new GeneralEnvelope(
+				new double[] { tempEnv.getMinX(),
+						tempEnv.getMinY() , }, new double[] {
+						tempEnv.getMaxX() ,
+						tempEnv.getMaxY()  });
+		newEnv.setCoordinateReferenceSystem(mapExtent
+				.getCoordinateReferenceSystem());
+		return newEnv;
+
 	}
 
 	/**
