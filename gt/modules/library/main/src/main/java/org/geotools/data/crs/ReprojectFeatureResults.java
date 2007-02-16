@@ -68,7 +68,6 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class ReprojectFeatureResults extends AbstractFeatureCollection {
     FeatureCollection results;
-    FeatureType schema;
     MathTransform transform;
 
     /**
@@ -94,7 +93,6 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         super( forceType( origionalType( results ), destinationCS ) );
                         
         this.results = origionalCollection( results );        
-        this.schema = getSchema();
         
         CoordinateReferenceSystem originalCs = results.getSchema().getDefaultGeometry().getCoordinateSystem();
         this.transform = CRS.findMathTransform(originalCs,destinationCS, true);            
@@ -137,13 +135,6 @@ public class ReprojectFeatureResults extends AbstractFeatureCollection {
         else {
             return FeatureTypes.transform(startingType, forcedCS);
         }
-    }
-    
-    /**
-     * @see org.geotools.data.FeatureResults#getSchema()
-     */
-    public FeatureType getSchema(){
-        return schema;
     }
     
     protected Iterator openIterator() {
