@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,17 +20,19 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-import org.geotools.data.coverage.grid.GridFormatFinder;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFinder;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 /**
- * DOCUMENT ME!
+ * Class for testing availaibility of arcgrid format factory
  * 
+ * @author Simone Giannecchini
  * @author ian
  * @source $URL$
  */
 public class ServiceTest extends TestCase {
-	final String TEST_FILE = "ArcGrid.asc";
 
 	public ServiceTest(java.lang.String testName) {
 		super(testName);
@@ -40,12 +42,14 @@ public class ServiceTest extends TestCase {
 		junit.textui.TestRunner.run(ServiceTest.class);
 	}
 
-	public void testIsAvailable() {
+	public void testIsAvailable() throws NoSuchAuthorityCodeException,
+			FactoryException {
+		GridFormatFinder.scanForPlugins();
 		Iterator list = GridFormatFinder.getAvailableFormats().iterator();
 		boolean found = false;
-
+		GridFormatFactorySpi fac = null;
 		while (list.hasNext()) {
-			GridFormatFactorySpi fac = (GridFormatFactorySpi) list.next();
+			fac = (GridFormatFactorySpi) list.next();
 
 			if (fac instanceof ArcGridFormatFactory) {
 				found = true;
@@ -55,5 +59,7 @@ public class ServiceTest extends TestCase {
 		}
 
 		assertTrue("ArcGridFormatFactory not registered", found);
+		assertTrue("ArcGridFormatFactory not available", fac.isAvailable());
+		assertNotNull(new ArcGridFormatFactory().createFormat());
 	}
 }

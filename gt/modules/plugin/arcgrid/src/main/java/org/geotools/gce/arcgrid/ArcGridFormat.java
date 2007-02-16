@@ -1,7 +1,7 @@
 /*
  *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,15 +16,16 @@
  */
 package org.geotools.gce.arcgrid;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.net.URL;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.geotools.data.coverage.grid.AbstractGridFormat;
-import org.geotools.data.coverage.grid.stream.IOExchange;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
+import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
+import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageReaderSpi;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
 import org.geotools.parameter.ParameterGroup;
@@ -32,32 +33,36 @@ import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
- * A simple implementation of the Arc Grid Format.
+ * An implementation a {@link Format} for the ASCII grid ESRI and GRASS format.
  * 
- * @author jeichar
+ * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
- * @source $URL$
  */
-public class ArcGridFormat extends AbstractGridFormat implements Format {
+public final class ArcGridFormat extends AbstractGridFormat implements Format {
+	/**
+	 * Logger.
+	 * 
+	 */
+	private final static Logger LOGGER = Logger
+			.getLogger("org.geotools.gce.arcgrid");
 
-	/** Indicates whether the arcgrid data is compressed with GZIP */
-	public static final DefaultParameterDescriptor COMPRESS = new DefaultParameterDescriptor(
-			"Compressed",
-			"Indicates whether the arcgrid data is compressed with GZIP",
-			Boolean.FALSE, true);
-
-	/** Indicates whether the arcgrid is in GRASS format */
+	/** Indicates whether the arcgrid data is in GRASS format */
 	public static final DefaultParameterDescriptor GRASS = new DefaultParameterDescriptor(
-			"GRASS", "Indicates whether arcgrid is in GRASS format",
+			"GRASS", "Indicates whether the arcgrid data is in GRASS format",
 			Boolean.FALSE, true);
+	
+
+	/** Caching the {@link AsciiGridsImageReaderSpi} factory. */
+	private final AsciiGridsImageReaderSpi spi = new AsciiGridsImageReaderSpi();
 
 	/**
 	 * Creates an instance and sets the metadata.
 	 */
 	public ArcGridFormat() {
+		if (LOGGER.isLoggable(Level.FINE))
+			LOGGER.fine("Creating a new ArcGriFormat.");
 		setInfo();
 	}
 
@@ -74,15 +79,17 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 		info.put("version", "1.0");
 		mInfo = info;
 
-		// reading parameters
-		readParameters = new ParameterGroup(
-				new DefaultParameterDescriptorGroup(mInfo,
-						new GeneralParameterDescriptor[] { GRASS, COMPRESS }));
-
-		// reading parameters
+		// writing parameters
 		writeParameters = new ParameterGroup(
 				new DefaultParameterDescriptorGroup(mInfo,
-						new GeneralParameterDescriptor[] { GRASS, COMPRESS }));
+						new GeneralParameterDescriptor[] { GRASS,
+								GEOTOOLS_WRITE_PARAMS }));
+
+		// reading parameters
+		readParameters = new ParameterGroup(
+				new DefaultParameterDescriptorGroup(
+						mInfo,
+						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D }));
 	}
 
 	/**
@@ -90,7 +97,7 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	 *      source)
 	 */
 	public GridCoverageReader getReader(Object source) {
-		return new ArcGridReader(source);
+		return getReader(source, null);
 	}
 
 	/**
@@ -98,7 +105,27 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	 *      destination)
 	 */
 	public GridCoverageWriter getWriter(Object destination) {
-		return new ArcGridWriter(destination);
+		try {
+			return new ArcGridWriter(destination);
+		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		}
+	}
+
+	/**
+	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#createWriter(java.lang.Object
+	 *      destination,Hints hints)
+	 */
+	public GridCoverageWriter getWriter(Object destination, Hints hints) {
+		try {
+			return new ArcGridWriter(destination, hints);
+		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -106,125 +133,38 @@ public class ArcGridFormat extends AbstractGridFormat implements Format {
 	 *      input)
 	 */
 	public boolean accepts(Object input) {
-		boolean compress = false;
-		Reader fakeReader = null;
-		IOExchange mExchange = IOExchange.getIOExchange();
-
-		if (!(input instanceof String || input instanceof File || input instanceof URL))
-			return false;
-		// trying to check the header
 		try {
-			fakeReader = mExchange.getGZIPReader(input);
-			// it is compressed
-			compress = true;
+			return spi.canDecodeInput(input);
 		} catch (IOException e) {
-			// if I get here I hope it is not compressed
-			compress = false;
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
+			return false;
 		}
+	}
 
-		// GRASS, arcgrid or not acceptable?
-		for (int i = 0; i < 3; i++) {
-			try {
-				if (i < 2 && fakeReader == null) {
-					if (compress) {
-						fakeReader = mExchange.getGZIPReader(input);
-					} else {
-						fakeReader = mExchange.getReader(input);
-					}
-				}
-
-				switch (i) {
-				case 0: // reading an arcgrid ascii grid
-
-					ArcGridRaster acgRaster = new ArcGridRaster(fakeReader,
-							compress);
-
-					// trying to parse the header
-					acgRaster.parseHeader();
-					fakeReader = null;
-
-					// ok it is an arcgrid ascii grid (well, it should be!)
-					this.readParameters.parameter("Compressed").setValue(
-							compress);
-					this.readParameters.parameter("GRASS").setValue(false);
-					return true;
-
-				case 1:
-
-					GRASSArcGridRaster gAscgRaster = new GRASSArcGridRaster(
-							fakeReader, compress);
-
-					// trying to parse the header
-					gAscgRaster.parseHeader();
-					fakeReader = null;
-
-					// ok it is an arcgrid ascii grid (well, it should be!)
-					this.readParameters.parameter("Compressed").setValue(
-							compress);
-					this.readParameters.parameter("GRASS").setValue(true);
-					return true;
-
-				default:
-					return false;
-				}
-			} catch (IOException e) {
-				fakeReader = null;
-			}
+	/**
+	 * @see org.geotools.data.coverage.grid.AbstractGridFormat#getReader(Object,
+	 *      Hints)
+	 */
+	public GridCoverageReader getReader(Object source, Hints hints) {
+		try {
+			return new ArcGridReader(source, hints);
+		} catch (DataSourceException e) {
+			if (LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			return null;
 		}
-
-		return false;
 	}
 
 	/**
-	 * @see org.opengis.coverage.grid.Format#getName()
+	 * Retrieves the default instance for the {@link ArcGridFormat} of the
+	 * {@link GeoToolsWriteParams} to control the writing process.
+	 * 
+	 * @return a default instance for the {@link ArcGridFormat} of the
+	 *         {@link GeoToolsWriteParams} to control the writing process.
 	 */
-	public String getName() {
-		return (String) this.mInfo.get("name");
-	}
+	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
 
-	/**
-	 * @see org.opengis.coverage.grid.Format#getDescription()
-	 */
-	public String getDescription() {
-		return (String) this.mInfo.get("description");
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.Format#getVendor()
-	 */
-	public String getVendor() {
-		return (String) this.mInfo.get("vendor");
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.Format#getDocURL()
-	 */
-	public String getDocURL() {
-		return (String) this.mInfo.get("docURL");
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.Format#getVersion()
-	 */
-	public String getVersion() {
-		return (String) this.mInfo.get("version");
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.Format#getReadParameters()
-	 */
-	public ParameterValueGroup getReadParameters() {
-		return readParameters;
-	}
-
-	/**
-	 * @see org.opengis.coverage.grid.Format#getWriteParameters()
-	 */
-	public ParameterValueGroup getWriteParameters() {
-		return writeParameters;
-	}
-
-	public GridCoverageReader getReader(Object arg0, Hints arg1) {
-		return null;
+		return new ArcGridWriteParams();
 	}
 }

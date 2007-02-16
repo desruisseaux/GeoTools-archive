@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- =======================================================================    
-        Maven Project Configuration File                                        
-                                                                                
-        The Geotools Project                                                    
-            http://www.geotools.org/                                            
-                                                                                
-        Version: $Id$              
+<!-- =======================================================================
+        Maven Project Configuration File
+
+        The Geotools Project
+            http://www.geotools.org/
+
+        Version: $Id$
      ======================================================================= -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" 
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+  <project xmlns="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                                http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +18,7 @@
     <artifactId>gt2-plugin</artifactId>
     <version>2.4-SNAPSHOT</version>
   </parent>
-  
+
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
@@ -28,14 +28,14 @@
   <packaging>jar</packaging>
   <name>ArcGrid datasource module</name>
   <url>http://maven.geotools.fr/reports/modules/plugin/arcgrid/</url>
-  
+
   <scm>
     <connection>
       scm:svn:http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcgrid/
     </connection>
     <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/arcgrid/</url>
   </scm>
-  
+
   <description>
     Datasource created to read ArcGrid raster format. Currently Serving
     as a prototype for the GridCoverageExchange API.
@@ -55,29 +55,12 @@
   <!-- =========================================================== -->
   <developers>
     <developer>
-      <name>Christiaan ten Klooster</name>
-      <id>ckl</id>
-      <email>ckl@dacelo.nl</email>
-      <organization>Dacelo</organization>
-      <roles>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
-      <name>Andrea Aime</name>
-      <id>aaime</id>
-      <email>aaime@users.sourceforge.net</email>
-      <organization>University of Modena and Reggio Emilia</organization>
-      <roles>
-        <role>Module Maintainer</role>
-        <role>Java Developer</role>
-      </roles>
-    </developer>
-    <developer>
       <name>Simone Giannecchini</name>
       <id>simboss</id>
       <email>simboss1@gmail.com</email>
+      <organization>GeoSolutions</organization>
       <roles>
+        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
@@ -93,10 +76,20 @@
       <artifactId>gt2-main</artifactId>
       <version>${project.version}</version>
     </dependency>
+        <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-coverage</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt2-image</artifactId>
+      <artifactId>gt2-epsg-hsql</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>it.geosolutions.imageioext</groupId>
+      <artifactId>imageioext-asciigrid</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
@@ -104,6 +97,7 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- because main and sample-data depend on referencing we need a tie breaker -->
   </dependencies>
 
 
