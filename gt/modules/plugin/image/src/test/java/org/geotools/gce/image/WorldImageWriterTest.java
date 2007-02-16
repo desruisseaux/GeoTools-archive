@@ -39,7 +39,8 @@ import org.opengis.referencing.operation.TransformException;
  * 
  * @author Simone Giannecchini
  * @author rgould
- * @source $URL$
+ * @source $URL:
+ *         http://svn.geotools.org/geotools/trunk/gt/modules/plugin/image/src/test/java/org/geotools/gce/image/WorldImageWriterTest.java $
  */
 public class WorldImageWriterTest extends WorldImageBaseTestCase {
 	private final static String[] supportedFormat = new String[] { "tiff",
@@ -151,7 +152,7 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 		GeneralParameterValue[] gpv = { params
 				.parameter(WorldImageFormat.FORMAT.getName().toString()) };
 		// writing
-		wiWriter.write(coverage, gpv );
+		wiWriter.write(coverage, gpv);
 
 		// reading again
 		assertTrue(tempFile.exists());
@@ -159,7 +160,7 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 		coverage = (GridCoverage2D) wiReader.read(null);
 
 		// displaying the coverage
-		if(TestData.isInteractiveTest())
+		if (TestData.isInteractiveTest())
 			coverage.show();
 		else
 			coverage.getRenderedImage().getData();

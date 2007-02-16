@@ -4,8 +4,8 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-import org.geotools.data.coverage.grid.GridFormatFinder;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFinder;
 
 public class ServiceTest extends TestCase {
 
@@ -26,9 +26,9 @@ public class ServiceTest extends TestCase {
 	public void testIsAvailable() {
 		Iterator list = GridFormatFinder.getAvailableFormats().iterator();
 		boolean found = false;
-
+		GridFormatFactorySpi fac;
 		while (list.hasNext()) {
-			GridFormatFactorySpi fac = (GridFormatFactorySpi) list.next();
+			fac = (GridFormatFactorySpi) list.next();
 
 			if (fac instanceof WorldImageFormatFactory) {
 				found = true;

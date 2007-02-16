@@ -23,8 +23,9 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -157,8 +158,8 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 						query = java.net.URLDecoder.decode(url.getQuery()
 								.intern(), "UTF-8");
 					} catch (UnsupportedEncodingException e) {
-						if (LOGGER.isLoggable(Level.WARNING))
-							LOGGER.log(Level.WARNING, e.getLocalizedMessage(),
+						if (LOGGER.isLoggable(Level.FINE))
+							LOGGER.log(Level.FINE, e.getLocalizedMessage(),
 									e);
 						return false;
 					}
@@ -286,5 +287,14 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
 			return null;
 		}
+	}
+	/**
+	 * Always returns null since for the moment there are no
+	 * {@link GeoToolsWriteParams} availaible for this format.
+	 * 
+	 * @return always null.
+	 */
+	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
+		return null;
 	}
 }

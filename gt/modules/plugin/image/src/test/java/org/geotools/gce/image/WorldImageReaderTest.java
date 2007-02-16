@@ -119,9 +119,10 @@ public class WorldImageReaderTest extends WorldImageBaseTestCase {
 		assertNotNull(coverage.getEnvelope());
 
 		// log some information
-		logger.info(coverage.getCoordinateReferenceSystem().toWKT());
-		logger.info(coverage.getEnvelope().toString());
-
+		if(TestData.isInteractiveTest()){
+			logger.info(coverage.getCoordinateReferenceSystem().toWKT());
+			logger.info(coverage.getEnvelope().toString());
+		}
 		// show it, but only if tests are interactive
 		if(TestData.isInteractiveTest())
 			coverage.show();

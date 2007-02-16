@@ -45,25 +45,24 @@ import javax.media.jai.PlanarImage;
 
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
 import org.geotools.data.WorldFileReader;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.image.ImageUtilities;
-import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
@@ -82,10 +81,8 @@ import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 public final class WorldImageReader extends AbstractGridCoverage2DReader
 		implements GridCoverageReader {
 
-	private Logger LOGGER = Logger.getLogger(WorldImageReader.class.toString());
-
-	/** Number of coverages left */
-	private boolean gridLeft = false;
+	/** Logger. */
+	private Logger LOGGER = Logger.getLogger("org.geotools.gce.image");
 
 	private boolean wmsRequest;
 
@@ -128,7 +125,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// Checking input
 		//
 		// /////////////////////////////////////////////////////////////////////
-		coverageName = "image_coverage";
 		if (input == null) {
 
 			final IOException ex = new IOException(
@@ -138,6 +134,9 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			throw new DataSourceException(ex);
 		}
 		this.source = input;
+		if (hints != null)
+			this.hints.add(hints);
+		coverageName = "image_coverage";
 		try {
 			boolean closeMe = true;
 
@@ -209,8 +208,17 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			// CRS
 			//
 			// /////////////////////////////////////////////////////////////////////
-			if (!wmsRequest)
-				readCRS();
+			if (!wmsRequest) {
+				final Object tempCRS = this.hints
+						.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+				if (tempCRS != null) {
+					this.crs = (CoordinateReferenceSystem) tempCRS;
+					LOGGER.log(Level.WARNING, new StringBuffer(
+							"Using forced coordinate reference system ")
+							.append(crs.toWKT()).toString());
+				} else
+					readCRS();
+			}
 
 			// /////////////////////////////////////////////////////////////////////
 			//
@@ -322,73 +330,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 	}
 
 	/**
-	 * Metadata is not suported. Returns null.
-	 * 
-	 * @return DOCUMENT ME!
-	 * 
-	 * @throws IOException
-	 *             DOCUMENT ME!
-	 */
-	public String[] getMetadataNames() throws IOException {
-		return null;
-	}
-
-	/**
-	 * Metadata is not supported. Returns null.
-	 * 
-	 * @param name
-	 *            DOCUMENT ME!
-	 * 
-	 * @return DOCUMENT ME!
-	 * 
-	 * @throws IOException
-	 *             DOCUMENT ME!
-	 * @throws MetadataNameNotFoundException
-	 *             DOCUMENT ME!
-	 */
-	public String getMetadataValue(String name) throws IOException,
-			MetadataNameNotFoundException {
-		return null;
-	}
-
-	/**
-	 * WorldImage GridCoverages are not named. Returns null.
-	 * 
-	 * @return DOCUMENT ME!
-	 * 
-	 * @throws IOException
-	 *             DOCUMENT ME!
-	 */
-	public String[] listSubNames() throws IOException {
-		return null;
-	}
-
-	/**
-	 * WorldImage GridCoverages are not named. Returns null.
-	 * 
-	 * @return DOCUMENT ME!
-	 * 
-	 * @throws IOException
-	 *             DOCUMENT ME!
-	 */
-	public String getCurrentSubname() throws IOException {
-		return null;
-	}
-
-	/**
-	 * Returns true until read has been called, as World Image files only
-	 * support one GridCoverage.
-	 * 
-	 * @return DOCUMENT ME!
-	 * 
-	 * @throws IOException
-	 *             DOCUMENT ME!
-	 */
-	public boolean hasMoreGridCoverages() throws IOException {
-		return gridLeft;
-	}
-
-	/**
 	 * Reads an image from a source stream. Loads an image from a source stream,
 	 * then loads the values from the world file and constructs a new
 	 * GridCoverage from this information. When reading from a remote stream we
@@ -464,23 +405,26 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 				.createImageInputStream(source);
 		
 		final Hints newHints = (Hints) hints.clone();
-		inStream.mark();
-		if (!wmsRequest){ 
+		if (!wmsRequest) {
 			reader.setInput(inStream);
-			if(!reader.isImageTiled(imageChoice.intValue())) {
-			final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
-					reader.getWidth(imageChoice.intValue()), reader
-							.getHeight(imageChoice.intValue())));
-			final ImageLayout layout = new ImageLayout();
-			layout.setTileGridXOffset(0);
-			layout.setTileGridYOffset(0);
-			layout.setTileHeight(tileSize.height);
-			layout.setTileWidth(tileSize.width);
-			newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
-		}}
-		inStream.reset();
+			if (!reader.isImageTiled(imageChoice.intValue())) {
+				final Dimension tileSize = ImageUtilities
+						.toTileSize(new Dimension(reader.getWidth(imageChoice
+								.intValue()), reader.getHeight(imageChoice
+								.intValue())));
+				final ImageLayout layout = new ImageLayout();
+				layout.setTileGridXOffset(0);
+				layout.setTileGridYOffset(0);
+				layout.setTileHeight(tileSize.height);
+				layout.setTileWidth(tileSize.width);
+				newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
+			}
+		}
+		inStream.close();
 		final ParameterBlock pbjRead = new ParameterBlock();
-		pbjRead.add(inStream);
+		pbjRead.add(wmsRequest ? ImageIO
+				.createImageInputStream(((URL) source).openStream()) : ImageIO
+				.createImageInputStream(source));
 		pbjRead.add(imageChoice);
 		pbjRead.add(Boolean.FALSE);
 		pbjRead.add(Boolean.FALSE);
@@ -488,7 +432,7 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		pbjRead.add(null);
 		pbjRead.add(null);
 		pbjRead.add(readP);
-		pbjRead.add(reader);
+		pbjRead.add(readerSPI.createReaderInstance());
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -558,24 +502,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 						this.coverageName = kvp[1].replaceAll(",", "_");
 					}
 				}
-				// // adjust envelope
-				// if
-				// (CRSUtilities.getCRS2D(crs).getCoordinateSystem().getAxis(0)
-				// .getDirection().absolute().equals(AxisDirection.NORTH)) {
-				// final GeneralEnvelope tempEnvelope = new GeneralEnvelope(
-				// new double[] {
-				// originalEnvelope.getLowerCorner()
-				// .getOrdinate(1),
-				// originalEnvelope.getLowerCorner()
-				// .getOrdinate(0) }, new double[] {
-				// originalEnvelope.getUpperCorner()
-				// .getOrdinate(1),
-				// originalEnvelope.getUpperCorner()
-				// .getOrdinate(0) });
-				// originalEnvelope = new GeneralEnvelope(tempEnvelope);
-				// originalEnvelope.setCoordinateReferenceSystem(crs);
-				//
-				// }
 
 			} catch (IOException e) {
 				// TODO how to handle this?
@@ -788,24 +714,6 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		originalEnvelope = new GeneralEnvelope(new double[] { xMin, yMin },
 				new double[] { xMax, yMax });
 		originalEnvelope.setCoordinateReferenceSystem(crs);
-	}
-
-	/**
-	 * Not supported, does nothing.
-	 * 
-	 * @throws IOException
-	 *             DOCUMENT ME!
-	 */
-	public void skip() throws IOException {
-	}
-
-	/**
-	 * Cleans up the Reader (currently does nothing)
-	 * 
-	 * @throws IOException
-	 *             DOCUMENT ME!
-	 */
-	public void dispose() throws IOException {
 	}
 
 }

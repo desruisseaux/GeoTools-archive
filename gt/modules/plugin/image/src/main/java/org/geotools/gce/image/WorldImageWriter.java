@@ -16,6 +16,7 @@
  */
 package org.geotools.gce.image;
 
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
@@ -36,13 +37,12 @@ import javax.media.jai.JAI;
 import javax.media.jai.ParameterBlockJAI;
 
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.data.coverage.grid.AbstractGridCoverageWriter;
+import org.geotools.coverage.grid.io.AbstractGridCoverageWriter;
 import org.geotools.factory.Hints;
 import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.CRSUtilities;
-import org.opengis.coverage.MetadataNameNotFoundException;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
@@ -63,12 +63,10 @@ import org.opengis.referencing.operation.TransformException;
  * @source $URL:
  *         http://svn.geotools.org/geotools/trunk/gt/plugin/image/src/org/geotools/gce/image/WorldImageWriter.java $
  */
-public final class WorldImageWriter extends AbstractGridCoverageWriter implements GridCoverageWriter {
+public final class WorldImageWriter extends AbstractGridCoverageWriter
+		implements GridCoverageWriter {
 	/** format for this writer */
 	private Format format = new WorldImageFormat();
-
-	/** Destination to write to */
-	private Object destination;
 
 	/**
 	 * Format chosen for this writer.
@@ -85,8 +83,9 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 	 * @param destination
 	 */
 	public WorldImageWriter(Object destination) {
-		this(destination,null);
+		this(destination, null);
 	}
+
 	/**
 	 * Destination must be a File. The directory it resides in must already
 	 * exist. It must point to where the raster image is to be located. The
@@ -94,7 +93,7 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 	 * 
 	 * @param destination
 	 */
-	public WorldImageWriter(Object destination,Hints hints) {
+	public WorldImageWriter(Object destination, Hints hints) {
 		this.destination = destination;
 
 		// convert everything into a file when possible
@@ -109,21 +108,26 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 			else
 				throw new RuntimeException(
 						"WorldImageWriter::write:It is not possible writing to an URL!");
-		} /*else if (!(destination instanceof ImageOutputStream)
-				&& !(destination instanceof File))
-			throw new RuntimeException(
-					"WorldImageWriter::write:It is not possible writing to an URL!");*/
+		} /*
+			 * else if (!(destination instanceof ImageOutputStream) &&
+			 * !(destination instanceof File)) throw new RuntimeException(
+			 * "WorldImageWriter::write:It is not possible writing to an URL!");
+			 */
+
 		// //
 		//
 		// managing hints
 		//
 		// //
 		if (hints != null) {
-			if (super.hints == null)
-				this.hints = new Hints(null);
-			hints.add(hints);
+			if (this.hints == null) {
+				this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+				this.hints.add(new RenderingHints(JAI.KEY_TILE_CACHE, null));
+			}
+			this.hints.add(hints);
 		}
 	}
+
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -131,42 +135,6 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 	 */
 	public Format getFormat() {
 		return format;
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#getDestination()
-	 */
-	public Object getDestination() {
-		return destination;
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#getMetadataNames()
-	 */
-	public String[] getMetadataNames() {
-		return null;
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#setMetadataValue(java.lang.String,
-	 *      java.lang.String)
-	 */
-	public void setMetadataValue(String name, String value) throws IOException,
-			MetadataNameNotFoundException {
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageWriter#setCurrentSubname(java.lang.String)
-	 */
-	public void setCurrentSubname(String name) throws IOException {
 	}
 
 	/**
@@ -190,7 +158,6 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 	public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
 			throws IllegalArgumentException, IOException {
 		final GridCoverage2D gc = (GridCoverage2D) coverage;
-		final ImageOutputStream outstream;
 		// checking parameters
 		// if provided we have to use them
 		// specifically this is one of the way we can provide an output format
@@ -234,12 +201,12 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 		// Encoding of the original coverage
 		//
 		// ////////////////////////////////////////////////////////////////////
-		outstream = (destination instanceof ImageOutputStream) ? (ImageOutputStream) destination
+		outStream = (destination instanceof ImageOutputStream) ? (ImageOutputStream) destination
 				: ImageIO.createImageOutputStream(destination);
-		if (outstream == null)
+		if (outStream == null)
 			throw new IOException(
 					"WorldImageWriter::write:No image output stream avalaible for the provided destination");
-		this.encode(gc, outstream);
+		this.encode(gc, outStream);
 
 	}
 
@@ -338,15 +305,6 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 	}
 
 	/**
-	 * Cleans up the writer. Currently does nothing.
-	 * 
-	 * @throws IOException
-	 *             DOCUMENT ME!
-	 */
-	public void dispose() throws IOException {
-	}
-
-	/**
 	 * Encode the given coverage to the requsted output format.
 	 * 
 	 * @param sourceCoverage
@@ -427,7 +385,7 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 			 * that.
 			 */
 			if (image.getColorModel() instanceof ComponentColorModel) {
-				worker.forceIndexColorModelForGIF(false);
+				worker.forceIndexColorModelForGIF(true);
 				image = worker.getRenderedImage();
 			} else
 			/**
@@ -436,7 +394,7 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter implement
 			 * informations. we have only one full transparent color.
 			 */
 			if (image.getColorModel() instanceof IndexColorModel) {
-				worker.forceIndexColorModelForGIF(false);
+				worker.forceIndexColorModelForGIF(true);
 				image = worker.getRenderedImage();
 			}
 		}
