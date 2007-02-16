@@ -15,7 +15,9 @@
  */
 package org.geotools.coverage.processing.operation;
 
+import java.awt.geom.AffineTransform;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.CannotCropException;
 import org.geotools.coverage.processing.Operation2D;
 import org.geotools.factory.Hints;
@@ -23,6 +25,7 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.CRS;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
@@ -31,6 +34,7 @@ import org.opengis.coverage.processing.OperationNotFoundException;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.Envelope;
 
@@ -67,6 +71,19 @@ public class Crop extends Operation2D {
 			null, // Maximal value
 			null, // Unit of measure
 			false); // Parameter is optional
+	
+	/**
+	 * The parameter descriptor for the sample dimension indices.
+	 */
+	public static final ParameterDescriptor CONSERVE_ENVELOPE = new DefaultParameterDescriptor(
+			Citations.GEOTOOLS, "ConserveEnvelope", Boolean.class, // Value
+			// class
+			new Boolean[]{Boolean.TRUE,Boolean.FALSE}, // Array of valid values
+			Boolean.FALSE, // Default value
+			null, // Minimal value
+			null, // Maximal value
+			null, // Unit of measure
+			true); // Parameter is optional
 
 	/**
 	 * 
@@ -75,7 +92,7 @@ public class Crop extends Operation2D {
 	public Crop() {
 		super(new DefaultParameterDescriptorGroup(Citations.GEOTOOLS,
 				"CoverageCrop", new ParameterDescriptor[] { SOURCE_0,
-						CROP_ENVELOPE }));
+						CROP_ENVELOPE,CONSERVE_ENVELOPE }));
 
 	}
 
@@ -85,25 +102,38 @@ public class Crop extends Operation2D {
 		// Checking input parameteres
 		//
 		// ///////////////////////////////////////////////////////////////////
-        final ParameterValue sourceParameter = parameters.parameter("Source");
-		if (sourceParameter == null	|| !(sourceParameter.getValue() instanceof GridCoverage2D)) {
-			throw new CannotCropException(Errors.format(ErrorKeys.NULL_PARAMETER_$2,
-					"Source", GridCoverage2D.class.toString()));
-        }
-        final ParameterValue envelopeParameter = parameters.parameter("Envelope");
-		if (envelopeParameter == null || !(envelopeParameter.getValue() instanceof Envelope))
-			throw new CannotCropException(Errors.format(ErrorKeys.NULL_PARAMETER_$2,
-					"Envelope", GeneralEnvelope.class.toString()));
+		final ParameterValue sourceParameter = parameters.parameter("Source");
+		if (sourceParameter == null
+				|| !(sourceParameter.getValue() instanceof GridCoverage2D)) {
+			throw new CannotCropException(Errors.format(
+					ErrorKeys.NULL_PARAMETER_$2, "Source", GridCoverage2D.class
+							.toString()));
+		}
+		final ParameterValue envelopeParameter = parameters
+				.parameter("Envelope");
+		if (envelopeParameter == null
+				|| !(envelopeParameter.getValue() instanceof Envelope))
+			throw new CannotCropException(Errors.format(
+					ErrorKeys.NULL_PARAMETER_$2, "Envelope",
+					GeneralEnvelope.class.toString()));
+		final ParameterValue conserveEnvelopeParameter = parameters
+		.parameter("ConserveEnvelope");
+		if (conserveEnvelopeParameter == null
+				|| !(conserveEnvelopeParameter.getValue() instanceof Boolean))
+			throw new CannotCropException(Errors.format(
+					ErrorKeys.NULL_PARAMETER_$2, "ConserveEnvelope",
+					Double.class.toString()));
 
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Initialization
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final GridCoverage2D source = (GridCoverage2D) sourceParameter.getValue();
+		final GridCoverage2D source = (GridCoverage2D) sourceParameter
+				.getValue();
 		final Envelope sourceEnvelope = source.getEnvelope();
 		Envelope destinationEnvelope = (Envelope) envelopeParameter.getValue();
-        CoordinateReferenceSystem sourceCRS, destinationCRS;
+		CoordinateReferenceSystem sourceCRS, destinationCRS;
         sourceCRS = sourceEnvelope.getCoordinateReferenceSystem();
         destinationCRS = destinationEnvelope.getCoordinateReferenceSystem();
 		if (destinationCRS == null) {
@@ -137,8 +167,9 @@ public class Crop extends Operation2D {
 		if (intersectionEnvelope.isEmpty())
 			return null;
 		// do we need to do something
-		if (!intersectionEnvelope.equals(sourceEnvelope)) {// TODO @task make
-			// me parametric
+		if (!intersectionEnvelope.equals(sourceEnvelope, XAffineTransform
+				.getScale((AffineTransform)((GridGeometry2D) source.getGridGeometry())
+						.getGridToCRS2D()) / 2.0)) {
 			envelopeParameter.setValue(intersectionEnvelope.clone());
 			return CroppedCoverage2D
 					.create(parameters,
@@ -146,6 +177,6 @@ public class Crop extends Operation2D {
 									: new Hints(hints));
 		} else {
 			return source;
-        }
+		}
 	}
 }

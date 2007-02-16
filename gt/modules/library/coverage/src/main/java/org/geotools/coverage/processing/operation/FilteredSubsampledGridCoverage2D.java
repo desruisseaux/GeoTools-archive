@@ -17,16 +17,20 @@ package org.geotools.coverage.processing.operation;
 
 // J2SE dependencies
 import java.awt.RenderingHints;
+import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
 // JAI dependencies
+import javax.media.jai.ImageLayout;
 import javax.media.jai.Interpolation;
+import javax.media.jai.InterpolationNearest;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
 // OpenGIS dependencies
 import org.opengis.coverage.Coverage;
+import org.geotools.coverage.GridSampleDimension;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -36,6 +40,13 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.processing.OperationJAI;
 import org.geotools.factory.Hints;
+import org.geotools.image.ImageWorker;
+import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.image.ImageUtilities;
+import org.opengis.coverage.Coverage;
+import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -56,64 +67,164 @@ final class FilteredSubsampledGridCoverage2D extends GridCoverage2D {
      *       should <strong>always</strong> be performed on {@link MathTransform}, never on
      *       a grid range - envelope pair when the math transform is available.
      */
-    private FilteredSubsampledGridCoverage2D(PlanarImage image, GridCoverage2D sourceCoverage) {
-        super(sourceCoverage.getName(),
-              image,
-              new GridGeometry2D(new GeneralGridRange(image), sourceCoverage.getEnvelope()),
-              sourceCoverage.getSampleDimensions(),
-              new GridCoverage[] { sourceCoverage }, sourceCoverage.getProperties());
-    }
+	FilteredSubsampledGridCoverage2D(PlanarImage image,
+			GridCoverage2D sourceCoverage, int actionTaken) {
+		super(sourceCoverage.getName(), image, new GridGeometry2D(
+				new GeneralGridRange(image), sourceCoverage.getEnvelope()),
+				(GridSampleDimension[]) (actionTaken==1 ? null : sourceCoverage
+						.getSampleDimensions().clone()),
+				new GridCoverage[] { sourceCoverage }, sourceCoverage
+						.getProperties());
+	}
 
     /**
      * Creates a filtered subsampled image from the specified parameters.
      */
-    static Coverage create(final ParameterValueGroup parameters, final Hints hints) {
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Getting the input parameters
-        //
-        // /////////////////////////////////////////////////////////////////////
-        final Integer scaleX   = (Integer) parameters.parameter("scaleX").getValue();
-        final Integer scaleY   = (Integer) parameters.parameter("scaleY").getValue();
-        final float qsFilter[] = (float[]) parameters.parameter("qsFilterArray").getValue();
-        final Interpolation interpolation = (Interpolation) parameters
-                .parameter("Interpolation").getValue();
+	static Coverage create(final ParameterValueGroup parameters,
+			final Hints hints) {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Getting the input parameters
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final Integer scaleX = (Integer) parameters.parameter("scaleX")
+				.getValue();
+		final Integer scaleY = (Integer) parameters.parameter("scaleY")
+				.getValue();
+		final float qsFilter[] = (float[]) parameters
+				.parameter("qsFilterArray").getValue();
+		Interpolation interpolation = (Interpolation) parameters.parameter(
+				"Interpolation").getValue();
+		
+		
 
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // Getting the source coverage
-        //
-        // /////////////////////////////////////////////////////////////////////
-        final GridCoverage2D sourceCoverage = (GridCoverage2D) parameters
-                .parameter("Source").getValue();
-        final RenderedImage sourceImage = sourceCoverage.getRenderedImage();
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Getting the source coverage
+		//
+		// /////////////////////////////////////////////////////////////////////
+		GridCoverage2D sourceCoverage = (GridCoverage2D) parameters.parameter(
+				"Source").getValue();
+		RenderedImage sourceImage = sourceCoverage.getRenderedImage();
+		
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Do we need to explode the Palette to RGB(A)?
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final boolean isFilterPassEverything = qsFilter.length == 1
+				&& qsFilter[0] == 1;
+		int actionTaken = CoverageUtilities.prepareSourcesForGCOperation(
+				sourceCoverage, interpolation,!isFilterPassEverything,hints);
+		switch (actionTaken) {
+		case 2:
+			// in this case we need to go back the geophysics view of the
+			// source coverage
+			sourceCoverage = sourceCoverage.geophysics(true);
+			sourceImage = PlanarImage.wrapRenderedImage(sourceCoverage
+					.getRenderedImage());
 
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // preparing the parameters for the scale operation
-        //
-        // /////////////////////////////////////////////////////////////////////
-        final ParameterBlock pbjFilteredSubsample = new ParameterBlock();
-        pbjFilteredSubsample.addSource(sourceImage);
-        pbjFilteredSubsample.add(scaleX).add(scaleY).add(qsFilter)
-                .add(interpolation).add(sourceImage);
+			break;
+		case 3:
+			sourceCoverage = sourceCoverage.geophysics(false);
+			sourceImage = sourceCoverage.getRenderedImage();
+			break;
+		}
 
-        // /////////////////////////////////////////////////////////////////////
-        //
-        // preparing the new gridgeometry
-        //
-        // /////////////////////////////////////////////////////////////////////
-        hints.add(new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                parameters.parameter("BorderExtender").getValue()));
-        hints.add(new RenderingHints(JAI.KEY_INTERPOLATION, interpolation));
-        final JAI processor = OperationJAI.getJAI(hints);
-        if (!processor.equals(JAI.getDefaultInstance()))
-            return new FilteredSubsampledGridCoverage2D(processor.createNS(
-                    "FilteredSubsample", pbjFilteredSubsample, hints),
-                    sourceCoverage);
-        // no supplied processor
-        return new FilteredSubsampledGridCoverage2D(JAI.create(
-                "FilteredSubsample", pbjFilteredSubsample, hints),
-                sourceCoverage);
-    }
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Managing Hints for output coverage's layout purposes
+		//
+		// /////////////////////////////////////////////////////////////////////
+		RenderingHints targetHints = ImageUtilities
+			.getRenderingHints(sourceImage);
+		if (targetHints == null) {
+			targetHints = new RenderingHints(hints);
+		} else if (hints != null) {
+			targetHints.add(hints);
+		}		
+		ImageLayout layout = (ImageLayout) targetHints
+				.get(JAI.KEY_IMAGE_LAYOUT);
+		if (layout != null) {
+			layout = (ImageLayout) layout.clone();
+		} else {
+			layout = new ImageLayout(sourceImage);
+			layout.unsetTileLayout();
+			// At this point, only the color model and sample model are left
+			// valids.
+		}
+		if ((layout.getValidMask() & (ImageLayout.TILE_WIDTH_MASK
+				| ImageLayout.TILE_HEIGHT_MASK
+				| ImageLayout.TILE_GRID_X_OFFSET_MASK | ImageLayout.TILE_GRID_Y_OFFSET_MASK)) == 0) {
+			layout.setTileGridXOffset(layout.getMinX(sourceImage));
+			layout.setTileGridYOffset(layout.getMinY(sourceImage));
+			final int width = layout.getWidth(sourceImage);
+			final int height = layout.getHeight(sourceImage);
+			if (layout.getTileWidth(sourceImage) > width)
+				layout.setTileWidth(width);
+			if (layout.getTileHeight(sourceImage) > height)
+				layout.setTileHeight(height);
+		}
+		targetHints.put(JAI.KEY_IMAGE_LAYOUT, layout);
+		// it is crucial to correctly manage the Hints to control the
+		// replacement of IndexColorModel. It is worth to point out that setting
+		// the JAI.KEY_REPLACE_INDEX_COLOR_MODEL hint to true is not enough to
+		// force the operators to do an expansion.
+		// If we explicitly provide an ImageLayout built with the source image
+		// where the CM and the SM are valid. those will be employed overriding
+		// a the possibility to expand the color model.
+		if (actionTaken != 1)
+			targetHints.add(ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
+		else {
+			targetHints.add(ImageUtilities.REPLACE_INDEX_COLOR_MODEL);
+			layout.unsetValid(ImageLayout.COLOR_MODEL_MASK);
+			layout.unsetValid(ImageLayout.SAMPLE_MODEL_MASK);
+		}
+
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// preparing the parameters for the scale operation
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final ParameterBlock pbjFilteredSubsample = new ParameterBlock();
+		pbjFilteredSubsample.addSource(sourceImage);
+		pbjFilteredSubsample.add(scaleX).add(scaleY).add(qsFilter).add(
+				interpolation).add(sourceImage);
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// preparing the new gridgeometry
+		//
+		// /////////////////////////////////////////////////////////////////////
+		targetHints.add(new RenderingHints(JAI.KEY_BORDER_EXTENDER, parameters
+				.parameter("BorderExtender").getValue()));
+		targetHints
+				.add(new RenderingHints(JAI.KEY_INTERPOLATION, interpolation));
+		final JAI processor = OperationJAI.getJAI(targetHints);
+		
+		
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Preparing the resulting coverage
+		//
+		// /////////////////////////////////////////////////////////////////////
+		GridCoverage2D result;
+		if (!processor.equals(JAI.getDefaultInstance()))
+			result= new FilteredSubsampledGridCoverage2D(processor.createNS(
+					"FilteredSubsample", pbjFilteredSubsample, targetHints),
+					sourceCoverage, actionTaken);
+		// no supplied processor
+		else
+			result= new FilteredSubsampledGridCoverage2D(JAI.create(
+				"FilteredSubsample", pbjFilteredSubsample, targetHints),
+				sourceCoverage, actionTaken);
+		//now let's see what we need to do in order to clean things up
+		if(actionTaken==2)
+			return result.geophysics(false);
+		if(actionTaken==3)
+			return result.geophysics(true);
+		return result;
+	}
 }

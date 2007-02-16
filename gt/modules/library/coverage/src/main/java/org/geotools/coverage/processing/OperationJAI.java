@@ -67,10 +67,10 @@ import org.geotools.image.jai.Registry;
 import org.geotools.resources.XArray;
 import org.geotools.resources.Utilities;
 import org.geotools.resources.CRSUtilities;
+import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.image.ImageUtilities;
-import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.util.AbstractInternationalString;
 import org.geotools.util.NumberRange;
 
