@@ -23,9 +23,8 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
-import org.geotools.data.coverage.grid.GridFormatFinder;
-import org.geotools.gce.imagepyramid.ImagePyramidFormatFactory;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFinder;
 
 /**
  * @author Simone Giannecchini

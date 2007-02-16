@@ -39,16 +39,17 @@ import javax.imageio.ImageReadParam;
 import org.geotools.coverage.grid.GeneralGridRange;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
-import org.geotools.data.coverage.grid.AbstractGridCoverage2DReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.factory.Hints;
 import org.geotools.gce.imagemosaic.ImageMosaicReader;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
+import org.geotools.resources.CRSUtilities;
 import org.geotools.util.SoftValueHashMap;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
@@ -96,18 +97,18 @@ import org.opengis.referencing.operation.TransformException;
  * file with this structure:
  * 
  * <pre>
- *          #
- *          #Mon Aug 21 22:23:27 CEST 2006
- *          #name of the coverage
- *          Name=ikonos
- *          #different resolution levels available
- *          Levels=1.2218682749859724E-5,9.220132503102996E-6 2.4428817977683634E-5,1.844026500620314E-5 4.8840552865873626E-5,3.686350299024973E-5 9.781791400307775E-5,7.372700598049946E-5 1.956358280061555E-4,1.4786360643866836E-4 3.901787184256844E-4,2.9572721287731037E-4
- *          #where all the levels reside
- *          LevelsDirs=0 2 4 8 16 32
- *          #number of levels availaible
- *          LevelsNum=5
- *          #envelope for this pyramid
- *          Envelope2D=13.398228477973406,43.591366397808976 13.537912459169803,43.67121274528585
+ *           #
+ *           #Mon Aug 21 22:23:27 CEST 2006
+ *           #name of the coverage
+ *           Name=ikonos
+ *           #different resolution levels available
+ *           Levels=1.2218682749859724E-5,9.220132503102996E-6 2.4428817977683634E-5,1.844026500620314E-5 4.8840552865873626E-5,3.686350299024973E-5 9.781791400307775E-5,7.372700598049946E-5 1.956358280061555E-4,1.4786360643866836E-4 3.901787184256844E-4,2.9572721287731037E-4
+ *           #where all the levels reside
+ *           LevelsDirs=0 2 4 8 16 32
+ *           #number of levels availaible
+ *           LevelsNum=6
+ *           #envelope for this pyramid
+ *           Envelope2D=13.398228477973406,43.591366397808976 13.537912459169803,43.67121274528585
  * </pre>
  * 
  * @author Simone Giannecchini
@@ -221,20 +222,28 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		} catch (FactoryException e) {
 			throw new DataSourceException(e);
 		}
-		final CoordinateReferenceSystem tempcrs = crsReader
-				.getCoodinateSystem();
-		if (tempcrs == null) {
-			// use the default crs
-			crs = AbstractGridFormat.getDefaultCRS();
-			LOGGER
-					.log(
-							Level.WARNING,
-							new StringBuffer(
-									"Unable to find a CRS for this coverage, using a default one: ")
-									.append(crs.toWKT()).toString());
-		} else
-			crs = tempcrs;
-
+		final Object tempCRS = hints
+				.get(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM);
+		if (tempCRS != null) {
+			this.crs = (CoordinateReferenceSystem) tempCRS;
+			LOGGER.log(Level.WARNING, new StringBuffer(
+					"Using forced coordinate reference system ").append(
+					crs.toWKT()).toString());
+		} else {
+			final CoordinateReferenceSystem tempcrs = crsReader
+					.getCoodinateSystem();
+			if (tempcrs == null) {
+				// use the default crs
+				crs = AbstractGridFormat.getDefaultCRS();
+				LOGGER
+						.log(
+								Level.WARNING,
+								new StringBuffer(
+										"Unable to find a CRS for this coverage, using a default one: ")
+										.append(crs.toWKT()).toString());
+			} else
+				crs = tempcrs;
+		}
 		//
 		// ///////////////////////////////////////////////////////////////////
 		//
@@ -334,56 +343,6 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataNames()
-	 */
-	public String[] getMetadataNames() throws IOException {
-		throw new UnsupportedOperationException(
-				"Method currently unsupported by this plugin.");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getMetadataValue(java.lang.String)
-	 */
-	public String getMetadataValue(String arg0) throws IOException {
-		throw new UnsupportedOperationException(
-				"Method currently unsupported by this plugin.");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#listSubNames()
-	 */
-	public String[] listSubNames() throws IOException {
-		throw new UnsupportedOperationException(
-				"Method currently unsupported by this plugin.");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#getCurrentSubname()
-	 */
-	public String getCurrentSubname() throws IOException {
-		throw new UnsupportedOperationException(
-				"Method currently unsupported by this plugin.");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#hasMoreGridCoverages()
-	 */
-	public boolean hasMoreGridCoverages() throws IOException {
-		throw new UnsupportedOperationException(
-				"Method currently unsupported by this plugin.");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageReader#read(org.opengis.parameter.GeneralParameterValue[])
 	 */
 	public GridCoverage read(GeneralParameterValue[] params) throws IOException {
@@ -452,7 +411,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 					.getCoordinateReferenceSystem(), this.crs)) {
 				try {
 					// transforming the envelope back to the data set crs
-					requestedEnvelope = CRS.transform(operationFactory
+					requestedEnvelope = CRSUtilities.transform(operationFactory
 							.createOperation(
 									requestedEnvelope
 											.getCoordinateReferenceSystem(),
@@ -526,6 +485,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 			imageChoice = new Integer(0);
 		// /////////////////////////////////////////////////////////////////////
 		//
+		// Check to have the needed reader in memory
 		// 
 		// /////////////////////////////////////////////////////////////////////
 		ImageMosaicReader reader = null;
@@ -551,7 +511,7 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 		// /////////////////////////////////////////////////////////////////////
 		//
 		// Abusing of the created ImageMosaicreader for getting a
-		// gridcoverage3d.
+		// gridcoverage2d.
 		//
 		// /////////////////////////////////////////////////////////////////////
 		return reader.read(params);
@@ -560,19 +520,10 @@ public final class ImagePyramidReader extends AbstractGridCoverage2DReader
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.opengis.coverage.grid.GridCoverageReader#skip()
-	 */
-
-	public void skip() throws IOException {
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.opengis.coverage.grid.GridCoverageReader#dispose()
 	 */
-	public void dispose() throws IOException {
+	public void dispose()  {
+		super.dispose();
 		readers.clear();
 
 	}

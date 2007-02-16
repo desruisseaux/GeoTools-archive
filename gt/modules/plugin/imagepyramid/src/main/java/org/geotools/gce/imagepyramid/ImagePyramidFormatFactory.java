@@ -21,7 +21,7 @@ package org.geotools.gce.imagepyramid;
 import java.util.Collections;
 import java.util.Map;
 
-import org.geotools.data.coverage.grid.GridFormatFactorySpi;
+import org.geotools.coverage.grid.io.GridFormatFactorySpi;
 import org.opengis.coverage.grid.Format;
 
 /**
@@ -65,7 +65,7 @@ public final class ImagePyramidFormatFactory implements GridFormatFactorySpi {
 	 * Returns the implementation hints. The default implementation returns en
 	 * empty map.
 	 * 
-	 * @return An empty map.
+	 * @return an empty map.
 	 */
 	public Map getImplementationHints() {
 		return Collections.EMPTY_MAP;

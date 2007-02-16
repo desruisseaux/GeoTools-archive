@@ -18,6 +18,7 @@
  */
 package org.geotools.gce.imagepyramid;
 
+import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,9 +32,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.coverage.grid.io.AbstractGridFormat;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.PrjFileReader;
-import org.geotools.data.coverage.grid.AbstractGridFormat;
 import org.geotools.factory.Hints;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.parameter.DefaultParameterDescriptorGroup;
@@ -57,22 +59,23 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 	private final static Logger LOGGER = Logger
 			.getLogger("org.geotools.gce.imagepyramid");
 
-	/** Control the transparency of the output image. */
-	public static final DefaultParameterDescriptor FINAL_ALPHA = new DefaultParameterDescriptor(
-			"FinalAlpha", Boolean.class, null, Boolean.FALSE);
+	
+	/** Control the transparency of the output coverage. */
+	public static final DefaultParameterDescriptor OUTPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor(
+			"OutputTransparentColor", Color.class, null,null);
+	
+	/** Control the type of the final mosaic. */
+	public static final DefaultParameterDescriptor FADING = new DefaultParameterDescriptor(
+			"Fading", Boolean.class, null, Boolean.FALSE);
 
-	/** Control the transparency of the output image. */
-	public static final DefaultParameterDescriptor ALPHA_THRESHOLD = new DefaultParameterDescriptor(
-			"AlphaThreshold", Double.class, null, new Double(1));
+	/** Control the transparency of the output coverage. */
+	public static final DefaultParameterDescriptor INPUT_TRANSPARENT_COLOR = new DefaultParameterDescriptor(
+			"InputTransparentColor", Color.class, null, null);
 
-	/** Control the thresholding on the input images */
-	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI = new DefaultParameterDescriptor(
-			"InputImageROI", Boolean.class, null, Boolean.FALSE);
-
-	/** Control the thresholding on the input images */
-	public static final DefaultParameterDescriptor INPUT_IMAGE_ROI_THRESHOLD = new DefaultParameterDescriptor(
-			"InputImageROIThreshold", Integer.class, null, new Integer(1));
-
+	/** Control the thresholding on the input coverage */
+	public static final DefaultParameterDescriptor INPUT_IMAGE_THRESHOLD_VALUE = new DefaultParameterDescriptor(
+			"InputImageThresholdValue", Double.class, null, new Double(
+					Double.NaN));
 
 	/**
 	 * Creates an instance and sets the metadata.
@@ -98,8 +101,8 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 		readParameters = new ParameterGroup(
 				new DefaultParameterDescriptorGroup(mInfo,
 						new GeneralParameterDescriptor[] { READ_GRIDGEOMETRY2D,
-								FINAL_ALPHA, ALPHA_THRESHOLD, INPUT_IMAGE_ROI,
-								INPUT_IMAGE_ROI_THRESHOLD }));
+						INPUT_TRANSPARENT_COLOR,
+								INPUT_IMAGE_THRESHOLD_VALUE ,OUTPUT_TRANSPARENT_COLOR}));
 
 		// reading parameters
 		writeParameters = null;
@@ -179,18 +182,17 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 						new StringBuffer(fileName).append(".prj").toString(),
 						"r").getChannel());
 			} catch (FactoryException e) {
-				if (LOGGER.isLoggable(Level.WARNING))
-					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 				throw new DataSourceException(e);
 			}
-			CoordinateReferenceSystem tempcrs = crsReader
-					.getCoodinateSystem();
+			CoordinateReferenceSystem tempcrs = crsReader.getCoodinateSystem();
 			if (tempcrs == null) {
 				// use the default crs
 				tempcrs = AbstractGridFormat.getDefaultCRS();
 				LOGGER
 						.log(
-								Level.WARNING,
+								Level.FINE,
 								new StringBuffer(
 										"Unable to find a CRS for this coverage, using a default one: ")
 										.append(tempcrs.toWKT()).toString());
@@ -204,11 +206,16 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 			// ///////////////////////////////////////////////////////////////////
 			// property file
 			final Properties properties = new Properties();
-			properties.load(new BufferedInputStream(new FileInputStream(
-					sourceFile)));
+			try {
+				properties.load(new BufferedInputStream(new FileInputStream(
+						sourceFile)));
+			} catch (Exception e) {
+				return false;
+			}
 
 			// load the envelope
 			final String envelope = properties.getProperty("Envelope2D");
+			if (envelope == null) return false;
 			String[] pairs = envelope.split(" ");
 			final double cornersV[][] = new double[2][2];
 			String pair[];
@@ -243,13 +250,13 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 
 			return true;
 		} catch (IOException e) {
-			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 			return false;
 
 		} catch (NumberFormatException e) {
-			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+			if (LOGGER.isLoggable(Level.FINE))
+				LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 			return false;
 		}
 
@@ -285,6 +292,15 @@ public final class ImagePyramidFormat extends AbstractGridFormat implements
 								.append(e.getLocalizedMessage()).toString());
 			return null;
 		}
+	}
+
+	/**
+	 * Throw an exception since this plugin is readonly.
+	 * 
+	 * @return nothing.
+	 */
+	public GeoToolsWriteParams getDefaultImageIOWriteParameters() {
+		throw new UnsupportedOperationException("Unsupported method.");
 	}
 
 }
