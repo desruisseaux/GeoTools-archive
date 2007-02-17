@@ -444,28 +444,38 @@ public class ProjectiveTransform extends AbstractMathTransform implements Linear
                 }
             }
         }
+        assert isIdentity(0);
         return true;
     }
-    
+
     /**
-     * Tests whether this transform does not move any points by employing the provided tolerance.
+     * Tests whether this transform does not move any points by using the provided tolerance.
+     * This method work in the same way than
+     * {@link org.geotools.referencing.operation.matrix.XMatrix#isIdentity(double)}.
+     *
      * @since 2.4
      */
     public boolean isIdentity(double tolerance) {
-    	tolerance=Math.abs(tolerance);
+        tolerance = Math.abs(tolerance);
         if (numRow != numCol) {
             return false;
         }
         int index=0;
         for (int j=0; j<numRow; j++) {
             for (int i=0; i<numCol; i++) {
-                if (Math.abs(elt[index++] -(i==j ? 1 : 0))>tolerance) {
+                double e = elt[index++];
+                if (i == j) {
+                    e--;
+                }
+                // Uses '!' in order to catch NaN values.
+                if (!(Math.abs(e) <= tolerance)) {
                     return false;
                 }
             }
         }
         return true;
     }
+
     /**
      * Creates the inverse transform of this object.
      */

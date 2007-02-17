@@ -135,27 +135,25 @@ public class MathTransformProxy implements MathTransform, Serializable {
     }
 
     /**
-	 * Tests whether this transform does not move any points by using the
-	 * provided <code>tolerance</code>.
-	 * @since 2.4
-	 */
-	public final boolean isIdentity(double tolerance) {
-		//analyzing transformation 1
-		if (transform instanceof AbstractMathTransform)
-			return ((AbstractMathTransform) transform).isIdentity(tolerance);
-		else if (transform instanceof AffineTransform)
-			return XAffineTransform.isIdentity((AffineTransform) transform,
-					tolerance);
-		else if (transform instanceof LinearTransform1D)
-			return((LinearTransform1D) transform).isIdentity(tolerance);
-		else if (transform instanceof ProjectiveTransform)
-			return((ProjectiveTransform) transform).isIdentity(tolerance);
-		else
-			return transform.isIdentity();
+     * Tests whether this transform does not move any points, by using the provided
+     * {@code tolerance} value.
+     *
+     * @since 2.3.1
+     *
+     * @deprecated Doesn't seem to be used anywhere in the Geotools code base (this method
+     *             do not override anything).
+     */
+    // Removes [X]AffineTransform imports if we remove this method.
+    public boolean isIdentity(double tolerance) {
+        if (transform instanceof AbstractMathTransform) {
+            return ((AbstractMathTransform) transform).isIdentity(tolerance);
+        } else if (transform instanceof AffineTransform) {
+            return XAffineTransform.isIdentity((AffineTransform) transform, tolerance);
+        } else {
+            return transform.isIdentity();
+        }
+    }
 
-		
-
-	}
     /**
      * Returns a <cite>Well Known Text</cite> (WKT) for this transform.
      */

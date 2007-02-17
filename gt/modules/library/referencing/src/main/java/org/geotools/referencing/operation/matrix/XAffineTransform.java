@@ -41,101 +41,19 @@ import org.geotools.resources.XMath;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  */
 public abstract class XAffineTransform extends AffineTransform {
-	/**
-	 * Redefines {@link #isIdentity()} default behaviour from {@link AffineTransform}
-	 * in order to keep into account roundings errors.
-	 * 
-	 * <p>
-	 * For example if we have the following affine transnform 
-	 * 
-	 * 1.0000000000000000001	0						0	
-	 * 0						0.999999999999999999999	0
-	 * 0						0						1
-	 * 
-	 * I would say that is pretty hard to state that is not the identity.
-	 * 
-	 * <P>
-	 * Keep in mind that the original check is pretty simple, see below here:
-	 * 
-	 *   return (state == APPLY_IDENTITY || (getType() == TYPE_IDENTITY));
-	 *   
-	 *   
-	 *  @param tr {@link AffineTransform} to be checked for identity.
-	 *  @param tolerance to use when checking for identity.
-	 *  return <code>true</code> id this tranformation is *close* enough to the
-	 *  		indentity, <code>false</code> otherwise.
-	 *  @since 2.3.1
-	 */
-    public final static boolean isIdentity(final AffineTransform tr,double tolerance) {
-    	tolerance=Math.abs(tolerance);
-    	boolean isIdentity=tr.isIdentity();
-    	if(!isIdentity){
-    		//get scale 
-			final double scale=getScale(tr);
-			if(Math.abs(scale-1)>tolerance)
-				return false;
-			//rotation
-			final double rotation =XAffineTransform.getRotation(tr);
-			if(Math.abs(rotation)>tolerance)
-				return false;
-			//translations
-			final double transX=tr.getTranslateX();
-			if(Math.abs(transX)>tolerance)
-				return false;
-			final double transY=tr.getTranslateY();
-			if(Math.abs(transY)>tolerance)
-				return false;
-			//shear
-			final double shearX=tr.getShearX();
-			if(Math.abs(shearX)>tolerance)
-				return false;
-			final double shearY=tr.getShearY();
-			if(Math.abs(shearY)>tolerance)
-				return false;
-			
-			//scale NOT SURE WE NEED THIS
-			final double scaleX=tr.getScaleX();
-			if(Math.abs(scaleX-1)>tolerance)
-				return false;
-			final double scaleY=tr.getScaleY();
-			if(Math.abs(scaleY-1)>tolerance)
-				return false;
-			return true;
-    		
-    		
-    		////
-    		//
-    		// Proposed replacement less performace though
-    		//
-    		////
-//			final AffineTransform clonedTransformation=(AffineTransform) tr.clone();
-//			XAffineTransform.round(clonedTransformation, tolerance);
-//			if(clonedTransformation.isIdentity())
-//				return true;
-    	}
-		return isIdentity;
-	}
     /**
-     * Check whether or not this {@link XAffineTransform} is te identity by
-     * using the provided <code>tolerance</code>.
-     * 
-     * 
-     * @param tolerance to use for this check.
-     * @return true if the check succeeds, faflse otherwise.
-     * @since 2.3.1
-     */
-    public boolean isIdentity(double tolerance) {
-    	return isIdentity(this, tolerance);
-    }
-	/**
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 5215291166450556451L;
 
     /**
      * Tolerance value for floating point comparisons.
+     *
+     * @deprecated To be removed after we removed the deprecated {@link #round(AffineTransform)}
+     *             method (replaced by {@link #round(AffineTransform,double)}).
      */
     public static final double EPS = 1E-6;
 
@@ -277,6 +195,55 @@ public abstract class XAffineTransform extends AffineTransform {
     }
 
     /**
+     * Check whether or not this {@code XAffineTransform} is the identity by
+     * using the provided {@code tolerance}.
+     * 
+     * @param tolerance The tolerance to use for this check.
+     * @return {@code true} if the transform is identity, {@code false} otherwise.
+     *
+     * @since 2.3.1
+     */
+    public boolean isIdentity(double tolerance) {
+    	return isIdentity(this, tolerance);
+    }
+
+    /**
+     * Returns {@code true} if the specified affine transform is an identity transform up to the
+     * specified tolerance. This method is equivalent to computing the difference between this
+     * matrix and an identity matrix (as created by {@link AffineTransform#AffineTransform()
+     * new AffineTransform()}) and returning {@code true} if and only if all differences are
+     * smaller than or equal to {@code tolerance}.
+     * <p>
+     * This method is used for working around rounding error in affine transforms resulting
+     * from a computation, as in the example below:
+     *
+     * <blockquote><pre>
+     * [ 1.0000000000000000001  0.0                      0.0 ]
+     * [ 0.0                    0.999999999999999999999	 0.0 ]
+     * [ 0.0                    0.0                      1.0 ]
+     * </pre></blockquote>
+     *   
+     * @param tr The affine transform to be checked for identity.
+     * @param tolerance The tolerance value to use when checking for identity.
+     * return {@code true} if this tranformation is close enough to the
+     *        identity, {@code false} otherwise.
+     *
+     * @since 2.3.1
+     */
+    public static boolean isIdentity(final AffineTransform tr, double tolerance) {
+        if (tr.isIdentity()) {
+            return true;
+        }
+        tolerance = Math.abs(tolerance);
+        return Math.abs(tr.getScaleX() - 1) <= tolerance &&
+               Math.abs(tr.getScaleY() - 1) <= tolerance &&
+               Math.abs(tr.getShearX())     <= tolerance &&
+               Math.abs(tr.getShearY())     <= tolerance &&
+               Math.abs(tr.getTranslateX()) <= tolerance &&
+               Math.abs(tr.getTranslateY()) <= tolerance;
+    }
+
+    /**
      * Returns a rectangle which entirely contains the direct
      * transform of {@code bounds}. This operation is equivalent to:
      *
@@ -292,7 +259,7 @@ public abstract class XAffineTransform extends AffineTransform {
      *
      * @return The direct transform of the {@code bounds} rectangle.
      */
-    public final static Rectangle2D transform(final AffineTransform transform,
+    public static Rectangle2D transform(final AffineTransform transform,
                                         final Rectangle2D     bounds,
                                         final Rectangle2D     dest)
     {
@@ -335,7 +302,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * @return The inverse transform of the {@code bounds} rectangle.
      * @throws NoninvertibleTransformException if the affine transform can't be inverted.
      */
-    public final static Rectangle2D inverseTransform(final AffineTransform transform,
+    public static Rectangle2D inverseTransform(final AffineTransform transform,
                                                final Rectangle2D     bounds,
                                                final Rectangle2D     dest)
             throws NoninvertibleTransformException
@@ -373,7 +340,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * @return The inverse transform of the {@code source} point.
      * @throws NoninvertibleTransformException if the affine transform can't be inverted.
      */
-    public final static Point2D inverseDeltaTransform(final AffineTransform transform,
+    public static Point2D inverseDeltaTransform(final AffineTransform transform,
                                                 final Point2D         source,
                                                 final Point2D         dest)
             throws NoninvertibleTransformException
@@ -405,7 +372,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * preserved, {@code -1} if the transform seems to swap axis to the (<var>y</var>,
      * <var>x</var>) axis order, or {@code 0} if this method can not make a decision.
      */
-    public final static int getSwapXY(final AffineTransform tr) {
+    public static int getSwapXY(final AffineTransform tr) {
         final int flip = getFlip(tr);
         if (flip != 0) {
             final double scaleX = getScaleX0(tr);
@@ -430,7 +397,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * @return An estimation of the rotation angle in radians, or {@link Double#NaN NaN}
      *         if the angle can not be estimated.
      */
-    public final static double getRotation(final AffineTransform tr) {
+    public static double getRotation(final AffineTransform tr) {
         final int flip = getFlip(tr);
         if (flip != 0) {
             final double scaleX = getScaleX0(tr);
@@ -469,7 +436,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * boolean flipped = (tr.{@linkplain #getType() getType()} & {@linkplain #TYPE_FLIP}) != 0;
      * </code></blockquote>
      */
-    public final static int getFlip(final AffineTransform tr) {
+    public static int getFlip(final AffineTransform tr) {
         final int scaleX = XMath.sgn(tr.getScaleX());
         final int scaleY = XMath.sgn(tr.getScaleY());
         final int shearX = XMath.sgn(tr.getShearX());
@@ -484,7 +451,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * effect of eventual flip and rotation. This factor is calculated by
      * <IMG src="{@docRoot}/org/geotools/display/canvas/doc-files/scaleX0.png">.
      */
-    public final static double getScaleX0(final AffineTransform tr) {
+    public static double getScaleX0(final AffineTransform tr) {
         return XMath.hypot(tr.getScaleX(), tr.getShearX());
     }
 
@@ -493,7 +460,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * effect of eventual flip and rotation. This factor is calculated by
      * <IMG src="{@docRoot}/org/geotools/display/canvas/doc-files/scaleY0.png">.
      */
-    public final  static double getScaleY0(final AffineTransform tr) {
+    public static double getScaleY0(final AffineTransform tr) {
         return XMath.hypot(tr.getScaleY(), tr.getShearY());
     }
 
@@ -503,7 +470,7 @@ public abstract class XAffineTransform extends AffineTransform {
      * The way to compute such a "global" scale is somewhat arbitrary and may change
      * in a future version.
      */
-    public final static double getScale(final AffineTransform tr) {
+    public static double getScale(final AffineTransform tr) {
         return 0.5 * (getScaleX0(tr) + getScaleY0(tr));
     }
 
@@ -519,8 +486,9 @@ public abstract class XAffineTransform extends AffineTransform {
      * @return   Affine transform of a zoom which leaves the
      *          (<var>x</var>,<var>y</var>) coordinate unchanged.
      */
-    public final  static AffineTransform getScaleInstance(final double sx, final double sy,
-                                                   final double  x, final double  y) {
+    public static AffineTransform getScaleInstance(final double sx, final double sy,
+                                                   final double  x, final double  y)
+    {
         return new AffineTransform(sx, 0, 0, sy, (1-sx)*x, (1-sy)*y);
     }
 
@@ -530,33 +498,40 @@ public abstract class XAffineTransform extends AffineTransform {
      * nearest whole numbers. This rounding up is useful, for example, for
      * speeding up image displays.  Above all, it is efficient when we know that
      * a matrix has a chance of being close to the similarity matrix.
-     * 
      * <p>
      * It is crucial to note that this method uses a default rounding threshold 
-     * whose value is hedl by the field {@link #EPS} which is {@value #EPS}.
+     * whose value is held by the field {@link #EPS} which is {@value #EPS}.
+     *
+     * @deprecated Use {@link #round(AffineTransform, double)} instead.
      */
-    public final static void round(final AffineTransform tr) {
-      round(tr,EPS);
+    public static void round(final AffineTransform tr) {
+        round(tr, EPS);
     }
-    
+
     /**
      * Checks whether the matrix coefficients are close to whole numbers.
      * If this is the case, these coefficients will be rounded up to the
      * nearest whole numbers. This rounding up is useful, for example, for
      * speeding up image displays.  Above all, it is efficient when we know that
      * a matrix has a chance of being close to the similarity matrix.
+     *
+     * @param tr The matrix to round. Rounding will be applied in place.
+     * @param tolerance The maximal departure from integers in order to allow rounding.
+     *        It is typically a small number like {@code 1E-6}.
+     *
+     * @since 2.3.1
      */
-    public final static void round(final AffineTransform tr,final double CUSTOM_EPS) {
+    public static void round(final AffineTransform tr, final double tolerance) {
         double r;
         final double m00, m01, m10, m11;
-        if (Math.abs((m00 = Math.rint(r = tr.getScaleX())) - r) <= CUSTOM_EPS &&
-            Math.abs((m01 = Math.rint(r = tr.getShearX())) - r) <= CUSTOM_EPS &&
-            Math.abs((m11 = Math.rint(r = tr.getScaleY())) - r) <= CUSTOM_EPS &&
-            Math.abs((m10 = Math.rint(r = tr.getShearY())) - r) <= CUSTOM_EPS)
+        if (Math.abs((m00 = Math.rint(r = tr.getScaleX())) - r) <= tolerance &&
+            Math.abs((m01 = Math.rint(r = tr.getShearX())) - r) <= tolerance &&
+            Math.abs((m11 = Math.rint(r = tr.getScaleY())) - r) <= tolerance &&
+            Math.abs((m10 = Math.rint(r = tr.getShearY())) - r) <= tolerance)
         {
             if ((m00!=0 || m01!=0) && (m10!=0 || m11!=0)) {
-                double m02=Math.rint(r=tr.getTranslateX()); if (!(Math.abs(m02-r)<=CUSTOM_EPS)) m02=r;
-                double m12=Math.rint(r=tr.getTranslateY()); if (!(Math.abs(m12-r)<=CUSTOM_EPS)) m12=r;
+                double m02=Math.rint(r=tr.getTranslateX()); if (!(Math.abs(m02-r)<=tolerance)) m02=r;
+                double m12=Math.rint(r=tr.getTranslateY()); if (!(Math.abs(m12-r)<=tolerance)) m12=r;
                 tr.setTransform(m00, m10, m01, m11, m02, m12);
             }
         }

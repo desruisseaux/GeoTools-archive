@@ -101,7 +101,7 @@ public class Matrix4 extends Matrix4d implements XMatrix {
     }
 
     /**
-     * Returns {@code true} if this matrix is an identity matrix.
+     * {@inheritDoc}
      */
     public final boolean isIdentity() {
         for (int j=0; j<SIZE; j++) {
@@ -112,6 +112,13 @@ public class Matrix4 extends Matrix4d implements XMatrix {
             }
         }
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean isIdentity(double tolerance) {
+    	return GeneralMatrix.isIdentity(this, tolerance);
     }
 
     /**

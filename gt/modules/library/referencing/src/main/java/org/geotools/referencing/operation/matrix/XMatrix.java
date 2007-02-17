@@ -39,6 +39,26 @@ import org.opengis.referencing.operation.Matrix;
  */
 public interface XMatrix extends Matrix {
     /**
+     * Returns the number of rows in this matrix.
+     */
+    int getNumRow();
+
+    /**
+     * Returns the number of colmuns in this matrix.
+     */
+    int getNumCol();
+    
+    /**
+     * Returns the element at the specified index.
+     */
+    double getElement(int row, int col);
+    
+    /**
+     * Set the element at the specified index.
+     */
+    void setElement(int row, int col, double value);
+
+    /**
      * Sets all the values in this matrix to zero.
      */
     void setZero();
@@ -47,6 +67,21 @@ public interface XMatrix extends Matrix {
      * Sets this matrix to the identity matrix.
      */
     void setIdentity();
+
+    /**
+     * Returns {@code true} if this matrix is an identity matrix.
+     */
+    boolean isIdentity();
+
+    /**
+     * Returns {@code true} if this matrix is an identity matrix using the provided tolerance.
+     * This method is equivalent to computing the difference between this matrix and an identity
+     * matrix of identical size, and returning {@code true} if and only if all differences are
+     * smaller than or equal to {@code tolerance}.
+     *
+     * @since 2.4
+     */
+    boolean isIdentity(double tolerance);
 
     /**
      * Returns {@code true} if this matrix is an affine transform.
@@ -81,28 +116,4 @@ public interface XMatrix extends Matrix {
      * transform.
      */
     void multiply(Matrix matrix);
-    /**
-     * Returns the number of rows in this matrix, which is always {@value #SIZE}
-     * in this implementation.
-     * @since 2.4
-     */
-    public int getNumRow();
-
-    /**
-     * Returns the number of colmuns in this matrix, which is always {@value #SIZE}
-     * in this implementation.
-     * @since 2.4
-     */
-    public int getNumCol();
-    
-    /**
-     * Returns the element at the specified index.
-     */
-    public double getElement(final int row, final int col) ;
-    
-    /**
-     * Set the element at the specified index.
-     * @since 2.4
-     */
-    public void setElement(final int row, final int col, final double value);
 }

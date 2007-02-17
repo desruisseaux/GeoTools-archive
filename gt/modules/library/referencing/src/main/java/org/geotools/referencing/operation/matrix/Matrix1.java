@@ -89,7 +89,7 @@ public class Matrix1 implements XMatrix, Serializable {
     }
 
     /**
-     * Returns the element at the specified index.
+     * {@inheritDoc}
      */
     public final double getElement(final int row, final int col) {
         if (row==0 && col==0) {
@@ -100,7 +100,7 @@ public class Matrix1 implements XMatrix, Serializable {
     }
 
     /**
-     * Set the element at the specified index.
+     * {@inheritDoc}
      */
     public final void setElement(final int row, final int col, final double value) {
         if (row==0 && col==0) {
@@ -125,10 +125,17 @@ public class Matrix1 implements XMatrix, Serializable {
     }
 
     /**
-     * Returns {@code true} if this matrix is an identity matrix.
+     * {@inheritDoc}
      */
     public final boolean isIdentity() {
-        return m00==1;
+        return m00 == 1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean isIdentity(double tolerance) {
+    	return Math.abs(m00 - 1) <= Math.abs(tolerance);
     }
 
     /**

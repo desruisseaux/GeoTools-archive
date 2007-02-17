@@ -411,41 +411,38 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
     public final boolean isIdentity() {
         return transform1.isIdentity() && transform2.isIdentity();
     }
-    
+
     /**
-	 * Tests whether this transform does not move any points by using the
-	 * provided <code>tolerance</code>.
-	 * @since 2.4
-	 */
-	public final boolean isIdentity(double tolerance) {
-		boolean t1Res = false, t2Res = false;
-		//analyzing transformation 1
-		if (transform1 instanceof AbstractMathTransform)
-			t1Res = ((AbstractMathTransform) transform1).isIdentity(tolerance);
-		else if (transform1 instanceof AffineTransform)
-			t1Res = XAffineTransform.isIdentity((AffineTransform) transform1,
-					tolerance);
-		else if (transform1 instanceof LinearTransform1D)
-			t1Res = ((LinearTransform1D) transform1).isIdentity(tolerance);
-		else if (transform1 instanceof ProjectiveTransform)
-			t1Res = ((ProjectiveTransform) transform1).isIdentity(tolerance);
-		else
-			t1Res = transform1.isIdentity();
-		
-		//analizing transformation 2
-		if (transform2 instanceof AbstractMathTransform)
-			t1Res = ((AbstractMathTransform) transform2).isIdentity(tolerance);
-		else if (transform2 instanceof AffineTransform)
-			t1Res = XAffineTransform.isIdentity((AffineTransform) transform2,
-					tolerance);
-		else if (transform2 instanceof LinearTransform1D)
-			t1Res = ((LinearTransform1D) transform2).isIdentity(tolerance);
-		else if (transform2 instanceof ProjectiveTransform)
-			t1Res = ((ProjectiveTransform) transform2).isIdentity(tolerance);
-		else
-			t1Res = transform2.isIdentity();
-		return t1Res && t2Res;
-	}
+     * Tests whether this transform does not move any points by using the
+     * provided <code>tolerance</code>.
+     *
+     * @since 2.4
+     *
+     * @deprecated This method should be defined in {@code LinearTransform} interface instead.
+     */
+    public final boolean isIdentity(double tolerance) {
+        boolean identity;
+        // Analyzing transformation 1
+        if (transform1 instanceof AbstractMathTransform)
+            identity = ((AbstractMathTransform) transform1).isIdentity(tolerance);
+        else if (transform1 instanceof AffineTransform)
+            identity = XAffineTransform.isIdentity((AffineTransform) transform1, tolerance);
+        else
+            identity = transform1.isIdentity();
+        if (!identity) {
+            return false;
+        }
+
+        // Analizing transformation 2
+        if (transform2 instanceof AbstractMathTransform)
+            identity = ((AbstractMathTransform) transform2).isIdentity(tolerance);
+        else if (transform2 instanceof AffineTransform)
+            identity = XAffineTransform.isIdentity((AffineTransform) transform2, tolerance);
+        else
+            identity = transform2.isIdentity();
+        return identity;
+    }
+
     /**
      * Returns a hash value for this transform.
      */

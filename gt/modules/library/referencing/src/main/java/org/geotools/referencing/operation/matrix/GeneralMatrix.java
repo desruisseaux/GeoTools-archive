@@ -50,6 +50,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ * @author Simone Giannecchini
  *
  * @see javax.vecmath.GMatrix
  * @see java.awt.geom.AffineTransform
@@ -66,6 +67,10 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
     
     /**
      * Defaul tolerance value for floating point comparisons.
+     *
+     * @since 2.4
+     *
+     * @deprecated Doesn't seem to be used...
      */
     public static final double EPS = 1E-6;
     
@@ -406,21 +411,29 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
             }
         }
         assert isAffine() : this;
+        assert isIdentity(0) : this;
         return true;
     }
+    
     /**
-     * Returns {@code true} if this matrix is an identity matrix using the provided tolerance.
+     * {@inheritDoc}
+     *
      * @since 2.3.1
      */
     public final boolean isIdentity(double tolerance) {
     	return isIdentity(this, tolerance);
     }
+    
     /**
-     * Returns {@code true} if this matrix is an identity matrix using the provided tolerance.
+     * Returns {@code true} if the matrix is an identity matrix using the provided tolerance.
+     *
      * @since 2.3.1
+     *
+     * @deprecated Replaced by {@link XMatrix#isIdentity(double)}.
      */
-    public final static boolean isIdentity(final XMatrix matrix,double tolerance) {
-    	tolerance=Math.abs(tolerance);
+    // Do not delete; make package-privated and undeprecated in Geotools 2.5
+    public static boolean isIdentity(final Matrix matrix, double tolerance) {
+    	tolerance = Math.abs(tolerance);
         final int numRow = matrix.getNumRow();
         final int numCol = matrix.getNumCol();
         if (numRow != numCol) {
@@ -428,14 +441,19 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         }
         for (int j=0; j<numRow; j++) {
             for (int i=0; i<numCol; i++) {
-                if (Math.abs(matrix.getElement(j,i)- (i==j ? 1 : 0))>tolerance) {
+                double e = matrix.getElement(j,i);
+                if (i == j) {
+                    e--;
+                }
+                if (!(Math.abs(e) <= tolerance)) {  // Uses '!' in order to catch NaN values.
                     return false;
                 }
             }
         }
-        assert matrix.isAffine() : matrix;
+        // Note: we can't assert matrix.isAffine().
         return true;
     }
+    
     /**
      * {@inheritDoc}
      */

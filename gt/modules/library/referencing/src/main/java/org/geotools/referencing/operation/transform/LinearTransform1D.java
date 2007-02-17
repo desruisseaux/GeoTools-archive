@@ -178,16 +178,15 @@ public class LinearTransform1D extends AbstractMathTransform
     }
     
     /**
-     * Tests whether this transform does not move any points.
-     * 
-     * <p>
-     * It uses the provided <code>tolerance</code> before perfoming 
-     * the check.
-     * @snce 2.3.1
+     * Tests whether this transform does not move any points by using the provided tolerance.
+     * This method work in the same way than
+     * {@link org.geotools.referencing.operation.matrix.XMatrix#isIdentity(double)}.
+     *
+     * @since 2.3.1
      */
     public boolean isIdentity(double tolerance) {
-    	tolerance=Math.abs(tolerance);
-        return Math.abs(offset)<=tolerance&& Math.abs(scale-1)<=tolerance;
+        tolerance = Math.abs(tolerance);
+        return Math.abs(offset) <= tolerance && Math.abs(scale-1) <= tolerance;
     }
     
     /**

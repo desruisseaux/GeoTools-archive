@@ -132,14 +132,24 @@ public abstract class AbstractMathTransform extends Formattable implements MathT
     public boolean isIdentity() {
         return false;
     }
-    
+
     /**
-     * Tests whether this transform does not move any points, by using
-     * the provided <code>tolerance</code> value.
-     * The default implementation always returns {@code false}.
+     * Tests whether this transform does not move any points, by using the provided
+     * {@code tolerance} value. The signification of <cite>tolerance value</cite> is
+     * implementation dependent, but a typical usage is to forward this parameter to
+     * {@link org.geotools.referencing.operation.matrix.XMatrix#isIdentity(double)}.
+     * <p>
+     * Implementations may ignore the tolerance value if it is not applicable. The
+     * default implementation ignores the value and always returns {@link #isIdentity()}.
+     *
+     * @deprecated The meaning of "tolerance value" is very hard to define in this class.
+     *             This is probably not the appropriate place where to define such method.
+     *             Consider moving to {@link LinearTransform} instead.
+     *
+     * @since 2.3.1
      */
     public boolean isIdentity(double tolerance) {
-        return false;
+        return isIdentity();
     }
 
     /**

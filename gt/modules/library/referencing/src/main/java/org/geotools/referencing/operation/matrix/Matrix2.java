@@ -105,7 +105,7 @@ public class Matrix2 implements XMatrix, Serializable {
     }
 
     /**
-     * Returns the element at the specified index.
+     * {@inheritDoc}
      */
     public final double getElement(final int row, final int col) {
         switch (row) {
@@ -128,7 +128,7 @@ public class Matrix2 implements XMatrix, Serializable {
     }
 
     /**
-     * Set the element at the specified index.
+     * {@inheritDoc}
      */
     public final void setElement(final int row, final int col, final double value) {
         switch (row) {
@@ -167,10 +167,17 @@ public class Matrix2 implements XMatrix, Serializable {
     }
 
     /**
-     * Returns {@code true} if this matrix is an identity matrix.
+     * {@inheritDoc}
      */
     public final boolean isIdentity() {
         return m01==0 && m10==0 && m00==1 && m11==1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public final boolean isIdentity(double tolerance) {
+    	return GeneralMatrix.isIdentity(this, tolerance);
     }
 
     /**
