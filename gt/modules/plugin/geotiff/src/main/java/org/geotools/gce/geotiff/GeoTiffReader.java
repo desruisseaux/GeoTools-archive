@@ -376,10 +376,10 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		// IMAGE READ OPERATION
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final ImageReader reader = readerSPI.createReaderInstance();
-		final ImageInputStream inStream = ImageIO
-				.createImageInputStream(source);
-		reader.setInput(inStream);
+//		final ImageReader reader = readerSPI.createReaderInstance();
+//		final ImageInputStream inStream = ImageIO
+//				.createImageInputStream(source);
+//		reader.setInput(inStream);
 		final Hints newHints = (Hints) hints.clone();
 //		if (!reader.isImageTiled(imageChoice.intValue())) {
 //			final Dimension tileSize = ImageUtilities.toTileSize(new Dimension(
@@ -392,8 +392,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 //			layout.setTileWidth(tileSize.width);
 //			newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
 //		}
-		inStream.close();
-		reader.reset();
+//		inStream.close();
+//		reader.reset();
 		final ParameterBlock pbjRead = new ParameterBlock();
 		pbjRead.add(ImageIO.createImageInputStream(source));
 		pbjRead.add(imageChoice);
@@ -403,7 +403,7 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 		pbjRead.add(null);
 		pbjRead.add(null);
 		pbjRead.add(readP);
-		pbjRead.add(reader);
+		pbjRead.add( readerSPI.createReaderInstance());
 
 		// /////////////////////////////////////////////////////////////////////
 		//
