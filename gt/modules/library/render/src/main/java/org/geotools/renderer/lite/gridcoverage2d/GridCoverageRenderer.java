@@ -17,6 +17,7 @@ package org.geotools.renderer.lite.gridcoverage2d;
 
 // J2SE dependencies
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -25,6 +26,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.awt.image.renderable.RenderableImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -57,6 +59,7 @@ import org.geotools.resources.image.CoverageUtilities;
 import org.geotools.resources.image.ImageUtilities;
 import org.geotools.styling.RasterSymbolizer;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.filter.expression.Literal;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -339,8 +342,10 @@ public final class GridCoverageRenderer {
 			//
 			// //
 			// create a new envelope
-			croppedDestinationEnvelope = new GeneralEnvelope(destinationEnvelope);
-
+			croppedDestinationEnvelope = new GeneralEnvelope(
+					destinationEnvelope);
+			croppedDestinationEnvelope
+					.setCoordinateReferenceSystem(destinationCRS);
 
 			//
 			// transform the source coverage envelope to the destination
@@ -708,6 +713,9 @@ public final class GridCoverageRenderer {
 		RenderingHints oldHints = graphics.getRenderingHints();
 		graphics.setRenderingHints(this.hints);
 		try {
+			// //
+			// Drawing the Image
+			// //
 			graphics.drawRenderedImage(finalImage, clonedFinalWorldToGrid);
 		} catch (Throwable t) {
 			try {
@@ -761,6 +769,18 @@ public final class GridCoverageRenderer {
 				LOGGER.log(Level.WARNING, t1.getLocalizedMessage(), t1);
 			}
 		}
+		
+		// //
+		// Opacity
+		// //
+		float opacity = ((Double) ((Literal) symbolizer.getOpacity())
+				.getValue()).floatValue();
+
+		graphics.setComposite( AlphaComposite.getInstance( AlphaComposite.DST_IN ) );
+		Color c = new Color(0.0f, 0.0f, 0.0f, opacity);
+		graphics.setColor(c);
+		graphics.fillRect(0, 0, this.destinationSize.width, this.destinationSize.height);
+		
 		// ///////////////////////////////////////////////////////////////////
 		//
 		// Restore old composite

@@ -1051,7 +1051,7 @@ public class SLDParser {
 			if (childName.equalsIgnoreCase("Opacity")) {
 				try {
 					symbol.setOpacity((Expression) ExpressionBuilder
-							.parse(child.getNodeValue()));
+							.parse(child.getFirstChild().getNodeValue()));
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
