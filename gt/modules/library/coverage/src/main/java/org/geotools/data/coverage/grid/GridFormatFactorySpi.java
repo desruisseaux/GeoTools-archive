@@ -52,7 +52,9 @@ import org.opengis.coverage.grid.Format;
  * </p>
  *
  * @author Jody Garnett, Refractions Research
- * @source $URL: http://svn.geotools.org/geotools/branches/2.3.x/module/main/src/org/geotools/data/coverage/grid/GridFormatFactorySpi.java $
+ * @deprecated use
+ *             {@link org.geotools.coverage.grid.io.GridFormatFactorySpi}
+ *             instead.
  */
 public interface GridFormatFactorySpi extends Factory, OptionalFactory {
     /**

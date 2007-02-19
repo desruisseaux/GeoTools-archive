@@ -55,8 +55,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * 
  * @author jeichar
  * @author Simone Giannecchini
- * @source $URL:
- *         http://svn.geotools.org/geotools/branches/2.3.x/module/main/src/org/geotools/data/coverage/grid/AbstractGridFormat.java $
+ * @deprecated use
+ *             {@link org.geotools.coverage.grid.io.AbstractGridFormat}
+ *             instead.
  */
 public abstract class AbstractGridFormat implements Format {
 
@@ -211,9 +212,7 @@ public abstract class AbstractGridFormat implements Format {
 	 *            The input object to test for suitablilty.
 	 * @return True if this format can read this object, False otherwise.
 	 */
-	public abstract boolean accepts(Object input) ;
-
-
+	public abstract boolean accepts(Object input);
 
 	/**
 	 * @see org.geotools.data.coverage.grid.Format#equals(org.geotools.data.coverage.grid.Format)

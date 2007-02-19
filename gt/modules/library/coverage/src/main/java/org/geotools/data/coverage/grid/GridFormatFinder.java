@@ -53,8 +53,9 @@ import org.opengis.coverage.grid.GridCoverage;
  * </p>
  * 
  * @author Simone Giannecchini
- * @source $URL:
- *         http://svn.geotools.org/geotools/trunk/branches/2.3.x/main/src/org/geotools/data/coverage/grid/GridFormatFinder.java $
+ * @deprecated use
+ *             {@link org.geotools.coverage.grid.io.GridFormatFinder}
+ *             instead.
  */
 public final class GridFormatFinder {
 	/**
