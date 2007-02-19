@@ -20,8 +20,8 @@ import java.util.Map;
 import javax.imageio.ImageWriteParam;
 
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.factory.Hints;
-import org.geotools.image.imageio.GeoToolsWriteParams;
 import org.geotools.parameter.DefaultParameterDescriptor;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;

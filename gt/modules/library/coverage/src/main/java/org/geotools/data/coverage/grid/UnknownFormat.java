@@ -17,8 +17,8 @@ package org.geotools.data.coverage.grid;
 
 import java.util.HashMap;
 
+import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.factory.Hints;
-import org.geotools.image.imageio.GeoToolsWriteParams;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
