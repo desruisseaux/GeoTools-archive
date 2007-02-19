@@ -34,7 +34,6 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.matrix.XMatrix;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
@@ -410,37 +409,6 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      */
     public final boolean isIdentity() {
         return transform1.isIdentity() && transform2.isIdentity();
-    }
-
-    /**
-     * Tests whether this transform does not move any points by using the
-     * provided <code>tolerance</code>.
-     *
-     * @since 2.4
-     *
-     * @deprecated This method should be defined in {@code LinearTransform} interface instead.
-     */
-    public final boolean isIdentity(double tolerance) {
-        boolean identity;
-        // Analyzing transformation 1
-        if (transform1 instanceof AbstractMathTransform)
-            identity = ((AbstractMathTransform) transform1).isIdentity(tolerance);
-        else if (transform1 instanceof AffineTransform)
-            identity = XAffineTransform.isIdentity((AffineTransform) transform1, tolerance);
-        else
-            identity = transform1.isIdentity();
-        if (!identity) {
-            return false;
-        }
-
-        // Analizing transformation 2
-        if (transform2 instanceof AbstractMathTransform)
-            identity = ((AbstractMathTransform) transform2).isIdentity(tolerance);
-        else if (transform2 instanceof AffineTransform)
-            identity = XAffineTransform.isIdentity((AffineTransform) transform2, tolerance);
-        else
-            identity = transform2.isIdentity();
-        return identity;
     }
 
     /**

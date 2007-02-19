@@ -426,13 +426,8 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
     
     /**
      * Returns {@code true} if the matrix is an identity matrix using the provided tolerance.
-     *
-     * @since 2.3.1
-     *
-     * @deprecated Replaced by {@link XMatrix#isIdentity(double)}.
      */
-    // Do not delete; make package-privated and undeprecated in Geotools 2.5
-    public static boolean isIdentity(final Matrix matrix, double tolerance) {
+    static boolean isIdentity(final Matrix matrix, double tolerance) {
     	tolerance = Math.abs(tolerance);
         final int numRow = matrix.getNumRow();
         final int numCol = matrix.getNumCol();

@@ -97,8 +97,17 @@ public class IdentityTransform extends AbstractMathTransform
     
     /**
      * Tests whether this transform does not move any points.
+     * This implementation always returns {@code true}.
      */
     public boolean isIdentity() {
+        return true;
+    }
+    
+    /**
+     * Tests whether this transform does not move any points.
+     * This implementation always returns {@code true}.
+     */
+    public boolean isIdentity(double tolerance) {
         return true;
     }
     

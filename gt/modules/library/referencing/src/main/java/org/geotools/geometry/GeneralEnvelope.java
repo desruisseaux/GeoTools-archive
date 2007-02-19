@@ -1019,13 +1019,13 @@ public class GeneralEnvelope implements Envelope, Cloneable, Serializable {
         }
         assert equalsIgnoreMetadata(crs, envelope.getCoordinateReferenceSystem()) : envelope;
         for (int i=0; i<dimension; i++) {
-        	double epsilon;
-        	if(relativeToLength){
-	            epsilon = Math.max(getLength(i), envelope.getLength(i));
-	            epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;
-        	}
-        	else
-        		epsilon=eps;
+            double epsilon;
+            if (relativeToLength) {
+                epsilon = Math.max(getLength(i), envelope.getLength(i));
+                epsilon = (epsilon>0 && epsilon<Double.POSITIVE_INFINITY) ? epsilon*eps : eps;
+            } else {
+                epsilon = eps;
+            }
             // Comparaison below uses '!' in order to catch NaN values.
             if (!(Math.abs(getMinimum(i) - envelope.getMinimum(i)) <= epsilon &&
                   Math.abs(getMaximum(i) - envelope.getMaximum(i)) <= epsilon))

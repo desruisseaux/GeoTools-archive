@@ -23,6 +23,9 @@ package org.geotools.referencing.operation;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.Matrix;
 
+// Geotools dependencies
+import org.geotools.referencing.operation.matrix.XMatrix; // For javadoc
+
 
 /**
  * Interface for linear {@link MathTransform}s.  A linear transform can be express as an affine
@@ -40,5 +43,18 @@ public interface LinearTransform extends MathTransform {
     /**
      * Returns this transform as an affine transform matrix.
      */
-    public abstract Matrix getMatrix();
+    Matrix getMatrix();
+
+    /**
+     * Tests whether this transform does not move any points, by using the provided
+     * {@code tolerance} value. The signification of <cite>tolerance value</cite> is
+     * the same than in the following pseudo-code:
+     *
+     * <blockquote><pre>
+     * {@linkplain #getMatrix()}.{@linkplain XMatrix#isIdentity(double) isIdentity}(tolerance);
+     * </pre></blockquote>
+     *
+     * @since 2.4
+     */
+    boolean isIdentity(double tolerance);
 }

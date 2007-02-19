@@ -21,7 +21,6 @@
 package org.geotools.referencing.operation.transform;
 
 // J2SE dependencies
-import java.awt.geom.AffineTransform;
 import java.io.Serializable;
 
 // OpenGIS dependencies
@@ -33,7 +32,6 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
-import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.resources.Utilities;
 
 
@@ -132,26 +130,6 @@ public class MathTransformProxy implements MathTransform, Serializable {
      */
     public boolean isIdentity() {
         return transform.isIdentity();
-    }
-
-    /**
-     * Tests whether this transform does not move any points, by using the provided
-     * {@code tolerance} value.
-     *
-     * @since 2.3.1
-     *
-     * @deprecated Doesn't seem to be used anywhere in the Geotools code base (this method
-     *             do not override anything).
-     */
-    // Removes [X]AffineTransform imports if we remove this method.
-    public boolean isIdentity(double tolerance) {
-        if (transform instanceof AbstractMathTransform) {
-            return ((AbstractMathTransform) transform).isIdentity(tolerance);
-        } else if (transform instanceof AffineTransform) {
-            return XAffineTransform.isIdentity((AffineTransform) transform, tolerance);
-        } else {
-            return transform.isIdentity();
-        }
     }
 
     /**
