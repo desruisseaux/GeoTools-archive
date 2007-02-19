@@ -142,9 +142,9 @@ public class GeoTiffWriterTest extends TestCase {
 		// /////////////////////////////////////////////////////////////////////
 		final GeoTiffFormat format = new GeoTiffFormat();
 		final GeoTiffWriteParams wp = new GeoTiffWriteParams();
-		wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
-		wp.setCompressionType("LZW");
-		wp.setCompressionQuality(0.75F);
+//		wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
+//		wp.setCompressionType("ZLib");
+//		wp.setCompressionQuality(0.75F);
 		wp.setTilingMode(GeoToolsWriteParams.MODE_EXPLICIT);
 		wp.setTiling(256, 256);
 		final ParameterValueGroup params = format.getWriteParameters();
@@ -233,7 +233,7 @@ public class GeoTiffWriterTest extends TestCase {
 					targetEnv = (GeneralEnvelope) gc.getEnvelope();
 					assertTrue(
 							"Source and Target coordinate reference systems do not match",
-							CRS.findMathTransform(targetCRS, sourceCRS, true)
+							CRS.equalsIgnoreMetadata(targetCRS, sourceCRS)||CRS.findMathTransform(targetCRS, sourceCRS, true)
 									.isIdentity());
 					assertTrue("Source and Target envelopes do not match",
 							checkEnvelopes(sourceEnv,targetEnv,gc));

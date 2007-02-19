@@ -344,10 +344,8 @@ public final class GeoTiffReader extends AbstractGridCoverage2DReader implements
 			//
 			// /////////////////////////////////////////////////////////////////////
 			if (params != null) {
-				Parameter param;
-				final int length = params.length;
-				for (int i = 0; i < length; i++) {
-					param = (Parameter) params[i];
+				for (int i = 0; i < params.length; i++) {
+					final Parameter param = (Parameter) params[i];
 					if (param.getDescriptor().getName().getCode().equals(
 							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 									.toString())) {

@@ -179,7 +179,7 @@ public final class GeoTiffMetadata2CRSAdapter {
 	/** CS Factory for creating {@link CoordinateSystem} objects. */
 	private final CSFactory csFactory;
 
-	/**EPSG factories for various purposes.*/
+	/** EPSG factories for various purposes. */
 	private final AllAuthoritiesFactory allAuthoritiesFactory;
 
 	/**
@@ -191,9 +191,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 */
 	public GeoTiffMetadata2CRSAdapter(Hints hints) {
 
-		final Hints tempHints = hints != null ?new Hints(  hints)
-				: new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER,
-						Boolean.TRUE);
+		final Hints tempHints = hints != null ? new Hints(hints) : new Hints(
+				Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
 
 		this.hints = (Hints) tempHints.clone();
 		allAuthoritiesFactory = new AllAuthoritiesFactory(this.hints);
@@ -803,7 +802,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 						throw io;
 					}
 				} else {
-					pm = this.allAuthoritiesFactory.createPrimeMeridian(pmCode);
+					pm = this.allAuthoritiesFactory.createPrimeMeridian("EPSG:"
+							+ pmCode);
 				}
 			} else {
 				pm = this.allAuthoritiesFactory
@@ -917,6 +917,12 @@ public final class GeoTiffMetadata2CRSAdapter {
 	 */
 	private Ellipsoid createEllipsoid(final Unit unit,
 			final GeoTiffIIOMetadataDecoder metadata) throws GeoTiffException {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Getting the ellipsoid key in order to understand if we are working
+		// against a common ellipsoid or a user defined one.
+		//
+		// /////////////////////////////////////////////////////////////////////
 		// ellipsoid key
 		final String ellipsoidKey = metadata
 				.getGeoKey(GeoTiffGCSCodes.GeogEllipsoidGeoKey);
@@ -924,6 +930,11 @@ public final class GeoTiffMetadata2CRSAdapter {
 		// is the ellipsoid user defined?
 		if (ellipsoidKey
 				.equalsIgnoreCase(GeoTiffConstants.GTUserDefinedGeoKey_String)) {
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// USER DEFINED ELLIPSOID
+			//
+			// /////////////////////////////////////////////////////////////////////
 			String nameEllipsoid = metadata
 					.getGeoKey(GeoTiffGCSCodes.GeogCitationGeoKey);
 			if (nameEllipsoid == null)
@@ -931,29 +942,45 @@ public final class GeoTiffMetadata2CRSAdapter {
 			// is it the default for WGS84?
 			if (nameEllipsoid.trim().equalsIgnoreCase("WGS84"))
 				return DefaultEllipsoid.WGS84;
+
+			// //
+			//
+			// It is worth to point out that I ALWAYS use the inverse flattening
+			// along with the semi-major axis to builde the Flattened Sphere.
+			// This
+			// has to be done in order to comply with the opposite process of
+			// goin from CRS to metadata where this coupls is always used.
+			//
+			// //
 			// getting temporary parameters
 			temp = metadata.getGeoKey(GeoTiffGCSCodes.GeogSemiMajorAxisGeoKey);
-			double semiMajorAxis = (temp != null ? Double.parseDouble(temp)
-					: Double.NaN);
+			final double semiMajorAxis = (temp != null ? Double
+					.parseDouble(temp) : Double.NaN);
 			temp = metadata.getGeoKey(GeoTiffGCSCodes.GeogInvFlatteningGeoKey);
+			final double inverseFlattening;
 			if (temp != null) {
-				double inverseFlattening = (temp != null ? Double
-						.parseDouble(temp) : Double.NaN);
-				// look for the ellypsoid first then build the datum
-				return DefaultEllipsoid.createFlattenedSphere(nameEllipsoid,
-						semiMajorAxis, inverseFlattening, unit);
+				inverseFlattening = (temp != null ? Double.parseDouble(temp)
+						: Double.NaN);
 			} else {
 				temp = metadata
 						.getGeoKey(GeoTiffGCSCodes.GeogSemiMinorAxisGeoKey);
-				double semiMinorAxis = (temp != null ? Double.parseDouble(temp)
-						: Double.NaN);
-				// look for the ellypsoid first then build the datum
-				return DefaultEllipsoid.createEllipsoid(nameEllipsoid,
-						semiMajorAxis, semiMinorAxis, unit);
+				final double semiMinorAxis = (temp != null ? Double
+						.parseDouble(temp) : Double.NaN);
+				inverseFlattening = semiMajorAxis
+						/ (semiMajorAxis - semiMinorAxis);
+
 			}
+			// look for the Ellipsoid first then build the datum
+			return DefaultEllipsoid.createFlattenedSphere(nameEllipsoid,
+					semiMajorAxis, inverseFlattening, unit);
 		}
 
 		try {
+			// /////////////////////////////////////////////////////////////////////
+			//
+			// EPSG STANDARD ELLIPSOID
+			//
+			// /////////////////////////////////////////////////////////////////////
 			return this.allAuthoritiesFactory.createEllipsoid(new StringBuffer(
 					"EPSG:").append(ellipsoidKey).toString());
 		} catch (FactoryException fe) {
