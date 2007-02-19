@@ -550,8 +550,8 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     }
 
     /**
-     * Implementation of {@link #getAuthorityCodes0} as a private method, for protecting
-     * {@link #getDescriptionText} for user method overriding.
+     * Implementation of {@link #getAuthorityCodes} as a private method, for protecting
+     * {@link #getDescriptionText} from user overriding of {@link #getAuthorityCodes}.
      */
     private synchronized Set/*<String>*/ getAuthorityCodes0(final Class type) throws FactoryException {
         Reference reference;

@@ -17,18 +17,24 @@
 package org.geotools.referencing;
 
 // J2SE dependencies
+import java.util.Locale;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.text.NumberFormat;
 
 // OpenGIS dependencies
 import org.opengis.util.InternationalString;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.datum.Datum;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperation;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
@@ -47,7 +53,6 @@ import org.geotools.resources.CRSUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
 
-
 /**
  * Implementation of the {@link CRS#main} method. Exists as a separated class in order
  * to reduce the class loading for applications that don't want to run this main method.
@@ -61,6 +66,11 @@ final class Command {
      * The hints for the factory to fetch. Null for now, but may be different in a future version.
      */
     private static final Hints HINTS = null;
+
+    /**
+     * {@code true} if colors are enabled.
+     */
+    private static boolean colors = false;
 
     /**
      * The authority factory.
@@ -88,36 +98,38 @@ final class Command {
      * Prints usage.
      */
     private static void help(final PrintWriter out) {
+        out.println("Display informations about CRS identified by authority codes.");
         out.println("Usage: java org.geotools.referencing.CRS [options] [codes]");
         out.println("Options:");
-        out.println(" -help          : Prints this message.");
         out.println(" -authority=ARG : Uses the specified authority factory (default to all).");
-        out.println(" -list          : List all available CRS codes with their description.");
-        out.println(" -bursawolfs    : List Bursa-Wolf parameters for the specified CRS.");
-        out.println(" -operations    : Prints all available coordinate operations between pairs of CRS.");
-        out.println(" -transform     : Prints the preferred math transform between pairs of CRS.");
-        out.println();
-        out.println("Examples:");
-        out.println("  java org.geotools.referencing.CRS EPSG:4326 EPSG:4181");
-        out.println("  java org.geotools.referencing.CRS -authority=EPSG 4326 4181");
+        out.println(" -bursawolfs    : Lists Bursa-Wolf parameters for the specified CRS.");
+        out.println(" -codes         : Lists all available CRS codes with their description.");
+        out.println(" -factories     : Lists all availables CRS authority factories.");
+        out.println(" -help          : Prints this message.");
+        out.println(" -locale=ARG    : Formats texts in the specified locale.");
+        out.println(" -operations    : Prints all available coordinate operations between a pair of CRS.");
+        out.println(" -transform     : Prints the preferred math transform between a pair of CRS.");
     }
 
     /**
-     * Prints the backing store description, if any.
+     * Prints all objects as WKT. This is the default behavior when no option is specified.
      */
-    private void description(final PrintWriter out) throws FactoryException {
-        if (factory instanceof AbstractAuthorityFactory) {
-            String description = ((AbstractAuthorityFactory) factory).getBackingStoreDescription();
-            if (description != null) {
-                out.println(description);
+    private void list(final PrintWriter out, final String[] args) throws FactoryException {
+        char[] separator = null;
+        for (int i=0; i<args.length; i++) {
+            if (separator == null) {
+                separator = getSeparator();
+            } else {
+                out.println(separator);
             }
+            out.println(factory.createObject(args[i]));
         }
     }
 
     /**
      * Lists all authority codes.
      */
-    private void list(final PrintWriter out) throws FactoryException, IOException {
+    private void codes(final PrintWriter out) throws FactoryException {
         final Set codes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         final TableWriter table = new TableWriter(out);
         table.writeHorizontalSeparator();
@@ -140,7 +152,136 @@ final class Command {
             table.nextLine();
         }
         table.writeHorizontalSeparator();
-        table.flush();
+        try {
+            table.flush();
+        } catch (IOException e) {
+            // Should never happen, since we are backed by PrintWriter
+            throw new AssertionError(e);
+        }
+    }
+
+    /**
+     * Lists all CRS authority factories.
+     */
+    private static void factories(final PrintWriter out) {
+        final Set/*<Citation>*/ done = new HashSet();
+        final TableWriter   table = new TableWriter(out, " \u2502 ");
+        final TableWriter   notes = new TableWriter(out, " ");
+        int noteCount = 0;
+        notes.setMultiLinesCells(true);
+        table.setMultiLinesCells(true);
+        table.writeHorizontalSeparator();
+        table.write(Vocabulary.format(VocabularyKeys.AUTHORITY));
+        table.nextColumn();
+        table.write(Vocabulary.format(VocabularyKeys.DESCRIPTION));
+        table.nextColumn();
+        table.write(Vocabulary.format(VocabularyKeys.NOTE));
+        table.writeHorizontalSeparator();
+        for (final Iterator it=FactoryFinder.getCRSAuthorityFactories(null).iterator(); it.hasNext();) {
+            AuthorityFactory factory = (AuthorityFactory) it.next();
+            final Citation authority = factory.getAuthority();
+            final Iterator identifiers = authority.getIdentifiers().iterator();
+            if (!identifiers.hasNext()) {
+                // No identifier. Scan next authorities.
+                continue;
+            }
+            if (!done.add(authority)) {
+                // Already done. Scans next authorities.
+                continue;
+            }
+            table.write((String) identifiers.next());
+            table.nextColumn();
+            table.write(authority.getTitle().toString().trim());
+            if (factory instanceof AbstractAuthorityFactory) {
+                String description;
+                try {
+                    description = ((AbstractAuthorityFactory) factory).getBackingStoreDescription();
+                } catch (FactoryException e) {
+                    description = e.getLocalizedMessage();
+                }
+                if (description != null) {
+                    final String n = String.valueOf(++noteCount);
+                    table.nextColumn();
+                    table.write('('); table.write(n); table.write(')');
+                    notes.write('('); notes.write(n); notes.write(')');
+                    notes.nextColumn();
+                    notes.write(description.trim());
+                    notes.nextLine();
+                }
+            }
+            table.nextLine();
+        }
+        table.writeHorizontalSeparator();
+        try {
+            table.flush();
+            notes.flush();
+        } catch (IOException e) {
+            // Should never happen, since we are backed by PrintWriter.
+            throw new AssertionError(e);
+        }
+    }
+
+    /**
+     * Prints the bursa-wolfs parameters for the specified CRS.
+     */
+    private void bursaWolfs(final PrintWriter out, final String[] args) throws FactoryException {
+        final NumberFormat nf = NumberFormat.getNumberInstance();
+        nf.setMinimumFractionDigits(3);
+        nf.setMaximumFractionDigits(3);
+        final TableWriter table = new TableWriter(out);
+        table.writeHorizontalSeparator();
+        final String[] titles = {
+            Vocabulary.format(VocabularyKeys.TARGET),
+            "dx", "dy", "dz", "ex", "ey", "ez", "ppm"
+        };
+        for (int i=0; i<titles.length; i++) {
+            table.write(titles[i]);
+            table.nextColumn();
+            table.setAlignment(TableWriter.ALIGN_CENTER);
+        }
+        table.writeHorizontalSeparator();
+        for (int i=0; i<args.length; i++) {
+            IdentifiedObject object = factory.createObject(args[i]);
+            if (object instanceof CoordinateReferenceSystem) {
+                object = CRSUtilities.getDatum((CoordinateReferenceSystem) object);
+            }
+            if (object instanceof DefaultGeodeticDatum) {
+                final BursaWolfParameters[] params =
+                        ((DefaultGeodeticDatum) object).getBursaWolfParameters();
+                for (int j=0; j<params.length; j++) {
+                    final BursaWolfParameters p = params[j];
+                    final boolean useColors = colors &&
+                            CRS.equalsIgnoreMetadata(DefaultGeodeticDatum.WGS84, p.targetDatum);
+                    table.setAlignment(TableWriter.ALIGN_LEFT);
+                    table.write(p.targetDatum.getName().getCode());
+                    table.nextColumn();
+                    table.setAlignment(TableWriter.ALIGN_RIGHT);
+                    double v;
+                    for (int k=0; k<7; k++) {
+                        switch (k) {
+                            case 0: v = p.dx;  break;
+                            case 1: v = p.dy;  break;
+                            case 2: v = p.dz;  break;
+                            case 3: v = p.ex;  break;
+                            case 4: v = p.ey;  break;
+                            case 5: v = p.ez;  break;
+                            case 6: v = p.ppm; break;
+                            default: throw new AssertionError(k);
+                        }
+                        table.write(nf.format(v));
+                        table.nextColumn();
+                    }
+                    table.nextLine();
+                }
+                table.writeHorizontalSeparator();
+            }
+        }
+        try {
+            table.flush();
+        } catch (IOException e) {
+            // Should never happen, since we are backed by PrintWriter
+            throw new AssertionError(e);
+        }
     }
 
     /**
@@ -150,11 +291,11 @@ final class Command {
         if (!(factory instanceof CoordinateOperationAuthorityFactory)) {
             return;
         }
-        char[] separator = null;
         final CoordinateOperationAuthorityFactory factory =
                 (CoordinateOperationAuthorityFactory) this.factory;
+        char[] separator = null;
         for (int i=0; i<args.length; i++) {
-            for (int j=1; j<args.length; j++) {
+            for (int j=i+1; j<args.length; j++) {
                 final Set/*<CoordinateOperation>*/ op;
                 op = factory.createFromCoordinateReferenceSystemCodes(args[i], args[j]);
                 for (final Iterator it=op.iterator(); it.hasNext();) {
@@ -166,6 +307,38 @@ final class Command {
                     }
                     out.println(operation);
                 }
+            }
+        }
+    }
+
+    /**
+     * Prints the math transforms between every pairs of the specified authority code.
+     */
+    private void transform(final PrintWriter out, final String[] args) throws FactoryException {
+        if (!(factory instanceof CRSAuthorityFactory)) {
+            return;
+        }
+        final CRSAuthorityFactory factory = (CRSAuthorityFactory) this.factory;
+        final CoordinateOperationFactory opFactory =
+                FactoryFinder.getCoordinateOperationFactory(HINTS);
+        char[] separator = null;
+        for (int i=0; i<args.length; i++) {
+            final CoordinateReferenceSystem crs1 = factory.createCoordinateReferenceSystem(args[i]);
+            for (int j=i+1; j<args.length; j++) {
+                final CoordinateReferenceSystem crs2 = factory.createCoordinateReferenceSystem(args[j]);
+                final CoordinateOperation op;
+                try {
+                    op = opFactory.createOperation(crs1, crs2);
+                } catch (OperationNotFoundException exception) {
+                    out.println(exception.getLocalizedMessage());
+                    continue;
+                }
+                if (separator == null) {
+                    separator = getSeparator();
+                } else {
+                    out.println(separator);
+                }
+                out.println(op.getMathTransform());
             }
         }
     }
@@ -184,111 +357,46 @@ final class Command {
      */
     public static void execute(String[] args) {
         final Arguments arguments = new Arguments(args);
-        final String    authority = arguments.getOptionalString("-authority");
-        final boolean  bursawolfs = arguments.getFlag          ("-bursawolfs");
-        final boolean     printMT = arguments.getFlag          ("-transform");
-        final boolean  operations = arguments.getFlag          ("-operations");
-        final boolean     listCRS = arguments.getFlag          ("-list");
-        final boolean        help = arguments.getFlag          ("-help");
-        args = arguments.getRemainingArguments(Integer.MAX_VALUE);
         final PrintWriter out = arguments.out;
-        if (help) {
+        Locale.setDefault(arguments.locale);
+        colors = arguments.getFlag("-colors");
+        if (arguments.getFlag("-help")) {
+            args = arguments.getRemainingArguments(0);
             help(out);
             return;
         }
-        final char[] separator = getSeparator();
-        /*
-         * Constructs and prints each object. In the process, keep all coordinate reference systems.
-         * They will be used later for printing math transforms. This is usefull in order to check
-         * if the EPSG database provides enough information that Geotools know about for creating
-         * the coordinate operation.
-         */
-        int count = 0;
-        final CoordinateReferenceSystem[] crs = new CoordinateReferenceSystem[args.length];
+        if (arguments.getFlag("-factories")) {
+            args = arguments.getRemainingArguments(0);
+            factories(out);
+            return;
+        }
+        final String authority = arguments.getOptionalString("-authority");
+        final Command command = new Command(authority);
         try {
-            Command command = null;
-            if (listCRS) {
-                command = new Command(authority);
-                command.list(out);
-                return;
-            }
-            if (operations) {
-                command = new Command(authority);
+            if (arguments.getFlag("-codes")) {
+                args = arguments.getRemainingArguments(0);
+                command.codes(out);
+            } else if (arguments.getFlag("-bursawolfs")) {
+                args = arguments.getRemainingArguments(Integer.MAX_VALUE);
+                command.bursaWolfs(out, args);
+            } else if (arguments.getFlag("-operations")) {
+                args = arguments.getRemainingArguments(2);
                 command.operations(out, args);
-                return;
+            } else if (arguments.getFlag("-transform")) {
+                args = arguments.getRemainingArguments(2);
+                command.transform(out, args);
+            } else {
+                args = arguments.getRemainingArguments(Integer.MAX_VALUE);
+                command.list(out, args);
             }
-            try {
-                for (int i=0; i<args.length; i++) {
-                    if (command == null) {
-                        command = new Command(authority);
-                        command.description(out);
-                    } else {
-                        out.println(separator);
-                    }
-                    final Object object = command.factory.createObject(args[i]);
-                    out.println(object);
-                    if (object instanceof CoordinateReferenceSystem) {
-                        final CoordinateReferenceSystem ref = (CoordinateReferenceSystem) object;
-                        crs[count++] = ref;
-                        if (bursawolfs) {
-                            final Datum datum = CRSUtilities.getDatum(ref);
-                            if (datum instanceof DefaultGeodeticDatum) {
-                                out.println("  Bursa-Wolf parameters:");
-                                final IndentedLineWriter w = new IndentedLineWriter(out);
-                                w.setIndentation(4);
-                                final BursaWolfParameters[] params =
-                                        ((DefaultGeodeticDatum) datum).getBursaWolfParameters();
-                                for (int j=0; j<params.length; j++) {
-                                    w.write(params[j].toString());
-                                    w.write(System.getProperty("line.separator", "\n"));
-                                }
-                                w.flush();
-                            }
-                        }
-                    }
-                }
-                /*
-                 * If the user asked for math transforms, prints them now. We will try all possible
-                 * combinaisons. If an operation is not found (usually because not yet implemented
-                 * in Geotools), prints the message on a single line (not the whole stack trace) and
-                 * continue. Other kinds of error will stop the process.
-                 */
-                if (printMT) {
-                    final CoordinateOperationFactory opFactory =
-                            FactoryFinder.getCoordinateOperationFactory(HINTS);
-                    for (int i=0; i<count; i++) {
-                        for (int j=i+1; j<count; j++) {
-                            out.println(separator);
-                            final CoordinateOperation op;
-                            try {
-                                op = opFactory.createOperation(crs[i], crs[j]);
-                            } catch (OperationNotFoundException exception) {
-                                out.println(exception.getLocalizedMessage());
-                                continue;
-                            }
-                            out.println(op);
-                            out.println("  Transform: ");
-                            final IndentedLineWriter w = new IndentedLineWriter(out);
-                            w.setIndentation(4);
-                            w.write(op.getMathTransform().toString());
-                            w.flush();
-                        }
-                    }
-                }
-            } finally {
-                /*
-                 * It is possible to dispose the factory right after CRS creation and before math
-                 * transform creation.  However, it is better to dispose after math transforms in
-                 * order to avoid opening and closing the database connection twice (the operation
-                 * factory too may uses this factory).
-                 */
-                command.dispose();
-            }
+            out.flush();
+            command.dispose();
+        } catch (FactoryException exception) {
+            out.flush();
+            arguments.err.println(exception.getLocalizedMessage());
         } catch (Exception exception) {
             out.flush();
             exception.printStackTrace(arguments.err);
-            return;
         }
-        out.flush();
     }
 }

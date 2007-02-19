@@ -763,6 +763,11 @@ public final class VocabularyKeys {
     public static final int NORTHING = 113;
 
     /**
+     * Note
+     */
+    public static final int NOTE = 240;
+
+    /**
      * {0} (no details)
      */
     public static final int NO_DETAILS_$1 = 114;
@@ -1046,6 +1051,11 @@ public final class VocabularyKeys {
      * System
      */
     public static final int SYSTEM = 160;
+
+    /**
+     * Target
+     */
+    public static final int TARGET = 241;
 
     /**
      * Target CRS

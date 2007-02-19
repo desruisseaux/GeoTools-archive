@@ -184,7 +184,7 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
      */
     public Set/*<OperationMethod>*/ getAvailableMethods(final Class type) {
         return new LazySet(registry.getServiceProviders(MathTransformProvider.class,
-                new MethodFilter(type), HINTS));
+                (type!=null) ? new MethodFilter(type) : null, HINTS));
     }
 
     /**
@@ -204,12 +204,13 @@ public class DefaultMathTransformFactory extends ReferencingFactory implements M
         }
  
         /**
-         * Returns {@code true} if the specified element should be included.
+         * Returns {@code true} if the specified element should be included. If the type is
+         * unknown, conservatively returns {@code true}.
          */
         public boolean filter(final Object element) {
             if (element instanceof MathTransformProvider) {
                 final Class t = ((MathTransformProvider) element).getOperationType();
-                if (!type.isAssignableFrom(t)) {
+                if (t!=null && !type.isAssignableFrom(t)) {
                     return false;
                 }
             }

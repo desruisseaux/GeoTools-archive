@@ -925,62 +925,93 @@ public final class CRS {
     }
 
     /**
-     * Instantiates CRS objects and prints them as <cite>Well Known Text</cite> to the
-     * {@linkplain System#out standard output stream}. This method can be invoked from
-     * the command line in order to test the {@linkplain #getAuthorityFactory authority
-     * factory} content for some specific CRS. In addition, this method can also prints
-     * the {@linkplain MathTransform math transform} between a pair of CRS.
+     * Prints to the {@linkplain System#out standard output stream} some information about
+     * {@linkplain CoordinateReferenceSystem coordinate reference systems} specified by their
+     * authority codes. This method can be invoked from the command line in order to test the
+     * {@linkplain #getAuthorityFactory authority factory} content for some specific CRS.
+     * <p>
+     * By default, this method prints all enumerated objects as <cite>Well Known Text</cite>.
+     * However this method can prints different kind of information if an option such as
+     * {@code -factories}, {@code -codes} or {@code -bursawolfs} is provided.
      * <p>
      * <b>Usage:</b> {@code java org.geotools.referencing.CRS [options] [codes]}<br>
      * <b>Options:</b>
      *
      * <blockquote>
-     *   <p><b>{@code -help}</b><br>
-     *       Prints help message and exits.</p>
-     *
      *   <p><b>{@code -authority}=<var>name</var></b><br>
-     *       Uses the specified authority factory, for example {@code "EPSG"}.
-     *       If this option is not specified, then the default is all factories.</p>
+     *       Uses the specified authority factory, for example {@code "EPSG"}. The authority
+     *       name can be any of the authorities listed by the {@code -factories} option. If
+     *       this option is not specified, then the default is all factories.</p>
      *
-     *   <p><b>{@code -list}</b><br>
-     *       Lists available authority codes and exits.</p>
+     *   <p><b>{@code -bursawolfs} <var>codes</var></b><br>
+     *       Lists the Bursa-Wolf parameters for the specified CRS ou datum objects. For some
+     *       transformations, there is more than one set of Bursa-Wolf parameters available.
+     *       The standard <cite>Well Known Text</cite> format prints only what look like the
+     *       "main" one. This option display all Bursa-Wolf parameters in a table for a given
+     *       object.</p>
      *
-     *   <p><b>{@code -bursawolfs}</b><br>
-     *       Lists the Bursa-Wolf parameters after the WKT. Many CRS define more than one set
-     *       of Bursa-Wolf parameters. The standard <cite>Well Known Text</cite> format prints
-     *       only what Geotools believe is the main one. This option cause the display of
-     *       other Bursa-Wolf parameters as well.</p>
-     *
-     *   <p><b>{@code -operations}</b><br>
-     *       Prints all available coordinate operations between pairs of CRS.</p>
-     *
-     *   <p><b>{@code -transform}</b><br>
-     *       Prints the preferred math transforms between pairs of CRS.</p>
+     *   <p><b>{@code -codes}</b><br>
+     *       Lists all available authority codes. Use the {@code -authority} option if the
+     *       list should be restricted to a single authority.</p>
      *
      *   <p><b>{@code -encoding}=<var>charset</var></b><br>
      *       Sets the console encoding for this application output. This value has no impact
-     *       on data, but may improves the output quality. This is not needed on Linux terminal
-     *       using UTF-8 encoding. Windows users may need to set this encoding to the value
-     *       returned by the {@code chcp} command line. This parameter need to be specified
-     *       only once.</p>
+     *       on data, but may improve the output quality. This is not needed on Linux terminal
+     *       using UTF-8 encoding (tip: the <cite>terminus font</cite> gives good results).
+     *       Windows users may need to set this encoding to the value returned by the
+     *       {@code chcp} command line. This parameter need to be specified only once.</p>
+     *
+     *   <p><b>{@code -factories}</b><br>
+     *       Lists all availables CRS authority factories.</p>
+     *
+     *   <p><b>{@code -help}</b><br>
+     *       Prints the list of options.</p>
+     *
+     *   <p><b>{@code -locale}=<var>name</var></b><br>
+     *       Formats texts in the specified {@linkplain java.util.Locale locale}.</p>
+     *
+     *   <p><b>{@code -operations} <var>sourceCRS</var> <var>targetCRS</var></b><br>
+     *       Prints all available coordinate operations between a pair of CRS. This option
+     *       prints only the operations explicitly defined in a database like EPSG. There
+     *       is sometime many such operations, and sometime none (in which case this option
+     *       prints nothing - it doesn't try to find an operation by itself).</p>
+     *
+     *   <p><b>{@code -transform} <var>sourceCRS</var> <var>targetCRS</var></b><br>
+     *       Prints the preferred math transform between a pair of CRS. At the difference of
+     *       the {@code "-operations"} option, this option pick up only one operation (usually
+     *       the most accurate one), inferring it if none were explicitly specified in the
+     *       database.</p>
      * </blockquote>
      *
-     * <strong>Examples</strong>
-     * <blockquote><pre>
-     * java org.geotools.referencing.factory.CRS EPSG:4181
-     * </pre></blockquote>
+     * <strong>Examples</strong> (assuming that {@code "CRS"} is a shortcut for 
+     * {@code "java org.geotools.referencing.CRS"}):
      *
-     * Should print:
+     * <blockquote>
+     *   <p><b>{@code CRS EPSG:4181 EPSG:4326 CRS:84 AUTO:42001,30,0}</b><br>
+     *       Prints the "Luxembourg 1930" CRS, the "WGS 84" CRS (from EPSG database),
+     *       the ""WGS84" CRS (from the <cite>Web Map Service</cite> specification) and a UTM
+     *       projection in WKT format.</p>
      *
-     * <blockquote><pre>
-     * GEOGCS["Luxembourg 1930", DATUM["Luxembourg 1930", <FONT face="Arial">etc...</FONT>
-     * </pre></blockquote>
+     *   <p><b>{@code CRS -authority=EPSG 4181 4326}</b><br>
+     *       Prints the "Luxembourg 1930" and "WGS 84" CRS, looking only in the EPSG
+     *       database (so there is no need to prefix the codes with {@code "EPSG"}).</p>
      *
-     * <strong>WARNING</strong> This method is still under development as of Geotools 2.4.
-     * The option switchs are likely to change.
+     *   <p><b>{@code CRS -bursawolfs EPSG:4230}</b><br>
+     *       Prints three set of Bursa-Wolf parameters for a CRS based on
+     *       "European Datum 1950".</p>
+     *
+     *   <p><b>{@code CRS -authority=EPSG -operations 4230 4326}</b><br>
+     *       Prints all operations declared in the EPSG database from "ED50" to "WGS 84"
+     *       geographic CRS. Note that for this particular pair of CRS, there is close
+     *       to 40 operations declared in the EPSG database. This method prints only the
+     *       ones that Geotools can handle.</p>
+     *
+     *   <p><b>{@code CRS -transform EPSG:4230 EPSG:4326}</b><br>
+     *       Prints the math transform that Geotools would use by default for coordinate
+     *       transformation from "ED50" to "WGS 84".</p>
+     * </blockquote>
      *
      * @param args Options and list of object codes to display.
-     *             An arbitrary number of codes can be specified.
      *
      * @since 2.4
      */
