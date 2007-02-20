@@ -954,6 +954,12 @@ public final class CRS {
      *       Lists all available authority codes. Use the {@code -authority} option if the
      *       list should be restricted to a single authority.</p>
      *
+     *   <p><b>{@code -colors}</b><br>
+     *       Enable syntax coloring on <A HREF="http://en.wikipedia.org/wiki/ANSI_escape_code">ANSI
+     *       X3.64</A> compatible (aka ECMA-48 and ISO/IEC 6429) terminal. This option tries to
+     *       highlight most of the elements relevant to the {@link #equalsIgnoreMetadata
+     *       equalsIgnoreMetadata} method, as well as authority codes.</p>
+     *
      *   <p><b>{@code -encoding}=<var>charset</var></b><br>
      *       Sets the console encoding for this application output. This value has no impact
      *       on data, but may improve the output quality. This is not needed on Linux terminal
@@ -995,6 +1001,10 @@ public final class CRS {
      *   <p><b>{@code CRS -authority=EPSG 4181 4326}</b><br>
      *       Prints the "Luxembourg 1930" and "WGS 84" CRS, looking only in the EPSG
      *       database (so there is no need to prefix the codes with {@code "EPSG"}).</p>
+     *
+     *   <p><b>{@code CRS -colors EPSG:7411}</b><br>
+     *       Prints the "NTF (Paris) / Lambert zone II + NGF Lallemand" CRS with syntax
+     *       coloring enabled.</p>
      *
      *   <p><b>{@code CRS -bursawolfs EPSG:4230}</b><br>
      *       Prints three set of Bursa-Wolf parameters for a CRS based on

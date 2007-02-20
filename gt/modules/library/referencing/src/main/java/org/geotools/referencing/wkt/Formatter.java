@@ -40,8 +40,10 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.OperationMethod;
 import org.opengis.util.CodeList;
 import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
@@ -50,6 +52,7 @@ import org.opengis.util.InternationalString;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.resources.Arguments;
 import org.geotools.resources.Utilities;
+import org.geotools.resources.X364;
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
@@ -83,14 +86,40 @@ public class Formatter {
     };
 
     /**
+     * ANSI X3.64 codes for syntax coloring. Used only if syntax coloring
+     * has been explicitly enabled.
+     */
+    private static final String
+            AUTHORITY_COLOR = X364.RED,
+            NUMBER_COLOR    = X364.YELLOW,  // Floating point numbers only, not integers.
+            INTEGER_COLOR   = X364.YELLOW,
+            UNIT_COLOR      = X364.YELLOW,
+            AXIS_COLOR      = X364.CYAN,
+            CODELIST_COLOR  = X364.CYAN,
+            PARAMETER_COLOR = X364.GREEN,
+            METHOD_COLOR    = X364.GREEN,
+            DATUM_COLOR     = X364.GREEN;
+
+    /**
      * The symbols to use for this formatter.
      */
     private final Symbols symbols;
 
     /**
      * The preferred authority for object or parameter names.
+     *
+     * @see AbstractParser#getAuthority
+     * @see AbstractParser#setAuthority
      */
     Citation authority = Citations.OGC;
+
+    /**
+     * Whatever we allow syntax coloring on ANSI X3.64 compatible terminal.
+     *
+     * @see AbstractParser#isColorEnabled
+     * @see AbstractParser#setColorEnabled
+     */
+    boolean colors = false;
 
     /**
      * The unit for formatting measures, or {@code null} for the "natural" unit of each WKT
@@ -203,6 +232,46 @@ public class Formatter {
     }
 
     /**
+     * Set the colors using the specified ANSI escape. The color is ignored
+     * unless syntax coloring has been explicitly enabled. The {@code color}
+     * should be a constant from {@link X364}.
+     */
+    private void setColor(final String color) {
+        if (colors) {
+            buffer.append(color);
+        }
+    }
+
+    /**
+     * Reset the colors to the default. This method do nothing
+     * unless syntax coloring has been explicitly enabled.
+     */
+    private void resetColor() {
+        if (colors) {
+            buffer.append(X364.DEFAULT);
+        }
+    }
+
+    /**
+     * Returns the color to uses for the name of the specified object.
+     */
+    private static String getNameColor(final IdentifiedObject object) {
+        if (object instanceof Datum) {
+            return DATUM_COLOR;
+        }
+        if (object instanceof OperationMethod) {
+            return METHOD_COLOR;
+        }
+        if (object instanceof CoordinateSystemAxis) {
+            return AXIS_COLOR;
+        }
+        // Note: we can't test for MathTransform here, since it is not an IdentifiedObject.
+        //       If we want to provide a color for the MathTransform name, we would need to
+        //       do that in 'append(String)' method, but the later is for general string...
+        return null;
+    }
+
+    /**
      * Add a separator to the buffer, if needed.
      *
      * @param newLine if {@code true}, add a line separator too.
@@ -251,9 +320,16 @@ public class Formatter {
         final IdentifiedObject info = (formattable instanceof IdentifiedObject)
                                     ? (IdentifiedObject) formattable : null;
         if (info != null) {
+            final String c = getNameColor(info);
+            if (c != null) {
+                setColor(c);
+            }
             buffer.append(symbols.quote);
             buffer.append(getName(info));
             buffer.append(symbols.quote);
+            if (c != null) {
+                resetColor();
+            }
         }
         /*
          * Formats the part after the object name, then insert the WKT element name
@@ -306,16 +382,20 @@ public class Formatter {
                     appendSeparator(lineChanged);
                     buffer.append("AUTHORITY");
                     buffer.append(symbols.open);
+                    setColor(AUTHORITY_COLOR);
                     buffer.append(symbols.quote);
                     buffer.append(title);
+                    buffer.append(symbols.quote);
+                    resetColor();
                     final String code = identifier.getCode();
                     if (code != null) {
-                        buffer.append(symbols.quote);
                         buffer.append(symbols.separator);
+                        setColor(AUTHORITY_COLOR);
                         buffer.append(symbols.quote);
                         buffer.append(code);
+                        buffer.append(symbols.quote);
+                        resetColor();
                     }
-                    buffer.append(symbols.quote);
                     buffer.append(symbols.close);
                 }
             }
@@ -357,7 +437,9 @@ public class Formatter {
     public void append(final CodeList code) {
         if (code != null) {
             appendSeparator(false);
+            setColor(CODELIST_COLOR);
             buffer.append(code.name());
+            resetColor();
         }
     }
 
@@ -388,9 +470,11 @@ public class Formatter {
             appendSeparator(true);
             buffer.append("PARAMETER");
             buffer.append(symbols.open);
+            setColor(PARAMETER_COLOR);
             buffer.append(symbols.quote);
             buffer.append(getName(descriptor));
             buffer.append(symbols.quote);
+            resetColor();
             buffer.append(symbols.separator);
             buffer.append(symbols.space);
             if (unit != null) {
@@ -464,6 +548,7 @@ public class Formatter {
             appendSeparator(lineChanged);
             buffer.append("UNIT");
             buffer.append(symbols.open);
+            setColor(UNIT_COLOR);
             buffer.append(symbols.quote);
             if (NonSI.DEGREE_ANGLE.equals(unit)) {
                 buffer.append("degree");
@@ -471,6 +556,7 @@ public class Formatter {
                 unitFormat.format(unit, buffer, dummy);
             }
             buffer.append(symbols.quote);
+            resetColor();
             Unit base = null;
             if (SI.METER.isCompatible(unit)) {
                 base = SI.METER;
@@ -517,17 +603,21 @@ public class Formatter {
      * Format an integer number.
      */
     private void format(final int number) {
+        setColor(INTEGER_COLOR);
         final int fraction = numberFormat.getMinimumFractionDigits();
         numberFormat.setMinimumFractionDigits(0);
         numberFormat.format(number, buffer, dummy);
         numberFormat.setMinimumFractionDigits(fraction);
+        resetColor();
     }
 
     /**
      * Format a floating point number.
      */
     private void format(final double number) {
+        setColor(NUMBER_COLOR);
         numberFormat.format(number, buffer, dummy);
+        resetColor();
     }
 
     /**

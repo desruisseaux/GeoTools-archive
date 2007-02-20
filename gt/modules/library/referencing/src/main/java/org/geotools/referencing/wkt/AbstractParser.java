@@ -123,6 +123,28 @@ public abstract class AbstractParser extends Format {
     }
 
     /**
+     * Returns {@code true} if syntax coloring is enabled.
+     * By default, syntax coloring is disabled.
+     *
+     * @since 2.4
+     */
+    public boolean isColorEnabled() {
+        return getFormatter().colors;
+    }
+
+    /**
+     * Enables or disables syntax coloring on ANSI X3.64 (aka ECMA-48 and ISO/IEC 6429) compatible
+     * terminal. This apply only when formatting text. By default, syntax coloring is disabled.
+     * When enabled, {@link #format(Object)} tries to highlight most of the elements compared by
+     * {@link org.geotools.referencing.CRS#equalsIgnoreMetadata}, as well as authority codes.
+     *
+     * @since 2.4
+     */
+    public void setColorEnabled(final boolean colors) {
+        getFormatter().colors = colors;
+    }
+
+    /**
      * Parses a <cite>Well Know Text</cite> (WKT).
      *
      * @param  text The text to be parsed.

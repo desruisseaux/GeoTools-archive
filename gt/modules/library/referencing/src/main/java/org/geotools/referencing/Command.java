@@ -45,6 +45,7 @@ import org.opengis.referencing.operation.CoordinateOperationAuthorityFactory;
 import org.geotools.factory.Hints;
 import org.geotools.io.TableWriter;
 import org.geotools.io.IndentedLineWriter;
+import org.geotools.referencing.wkt.Parser;
 import org.geotools.referencing.datum.BursaWolfParameters;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
@@ -68,14 +69,14 @@ final class Command {
     private static final Hints HINTS = null;
 
     /**
-     * {@code true} if colors are enabled.
-     */
-    private static boolean colors = false;
-
-    /**
      * The authority factory.
      */
     private final AuthorityFactory factory;
+
+    /**
+     * The object to use for formatting objects.
+     */
+    private final Parser formatter;
 
     /**
      * Creates an instance of the specified authority.
@@ -83,6 +84,7 @@ final class Command {
     private Command(final String authority) {
         factory = (authority == null) ? CRS.getAuthorityFactory(false) :
                 FactoryFinder.getCRSAuthorityFactory(authority, HINTS);
+        formatter = new Parser();
     }
 
     /**
@@ -104,6 +106,7 @@ final class Command {
         out.println(" -authority=ARG : Uses the specified authority factory (default to all).");
         out.println(" -bursawolfs    : Lists Bursa-Wolf parameters for the specified CRS.");
         out.println(" -codes         : Lists all available CRS codes with their description.");
+        out.println(" -colors        : Enable syntax coloring on ANSI X3.64 compatible terminal.");
         out.println(" -factories     : Lists all availables CRS authority factories.");
         out.println(" -help          : Prints this message.");
         out.println(" -locale=ARG    : Formats texts in the specified locale.");
@@ -122,7 +125,7 @@ final class Command {
             } else {
                 out.println(separator);
             }
-            out.println(factory.createObject(args[i]));
+            out.println(formatter.format(factory.createObject(args[i])));
         }
     }
 
@@ -250,8 +253,6 @@ final class Command {
                         ((DefaultGeodeticDatum) object).getBursaWolfParameters();
                 for (int j=0; j<params.length; j++) {
                     final BursaWolfParameters p = params[j];
-                    final boolean useColors = colors &&
-                            CRS.equalsIgnoreMetadata(DefaultGeodeticDatum.WGS84, p.targetDatum);
                     table.setAlignment(TableWriter.ALIGN_LEFT);
                     table.write(p.targetDatum.getName().getCode());
                     table.nextColumn();
@@ -305,7 +306,7 @@ final class Command {
                     } else {
                         out.println(separator);
                     }
-                    out.println(operation);
+                    out.println(formatter.format(operation));
                 }
             }
         }
@@ -338,7 +339,7 @@ final class Command {
                 } else {
                     out.println(separator);
                 }
-                out.println(op.getMathTransform());
+                out.println(formatter.format(op.getMathTransform()));
             }
         }
     }
@@ -359,7 +360,6 @@ final class Command {
         final Arguments arguments = new Arguments(args);
         final PrintWriter out = arguments.out;
         Locale.setDefault(arguments.locale);
-        colors = arguments.getFlag("-colors");
         if (arguments.getFlag("-help")) {
             args = arguments.getRemainingArguments(0);
             help(out);
@@ -372,6 +372,7 @@ final class Command {
         }
         final String authority = arguments.getOptionalString("-authority");
         final Command command = new Command(authority);
+        command.formatter.setColorEnabled(arguments.getFlag("-colors"));
         try {
             if (arguments.getFlag("-codes")) {
                 args = arguments.getRemainingArguments(0);
