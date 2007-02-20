@@ -51,6 +51,7 @@ import org.geotools.coverage.processing.operation.Scale;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.builder.GridToEnvelopeMapper;
 import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.renderer.lite.StreamingRenderer;
@@ -254,8 +255,7 @@ public final class GridCoverageRenderer {
 		// this prevents users from overriding leninet hint
 		this.hints.add(CoverageUtilities.LENIENT_HINT);
 		this.hints.add(ImageUtilities.DONT_REPLACE_INDEX_COLOR_MODEL);
-		if (!this.hints.containsKey(JAI.KEY_BORDER_EXTENDER))
-			this.hints.add(ImageUtilities.EXTEND_BORDER_BY_COPYING);
+
 	}
 
 	/**
@@ -350,7 +350,7 @@ public final class GridCoverageRenderer {
 			//
 			// transform the source coverage envelope to the destination
 			// coordinate reference system for cropping the destination envelope
-			final GeneralEnvelope transformedSourceCoverageEnvelope = CRSUtilities
+			final GeneralEnvelope transformedSourceCoverageEnvelope = CRS
 					.transform(sourceCRSToDestinationCRSTransformation,
 							sourceCoverageEnvelope);
 			transformedSourceCoverageEnvelope
@@ -377,7 +377,7 @@ public final class GridCoverageRenderer {
 		// to be used for getting the crop area to crop the source coverage
 		//
 		// //
-		final GeneralEnvelope destinationEnvelopeInSourceGCCRS = doReprojection ? CRSUtilities
+		final GeneralEnvelope destinationEnvelopeInSourceGCCRS = doReprojection ? CRS
 				.transform(destinationCRSToSourceCRSTransformation,
 						destinationEnvelope)
 				: new GeneralEnvelope(destinationEnvelope);
@@ -552,7 +552,7 @@ public final class GridCoverageRenderer {
 							.getRenderedImage(), "tiff", new File(debugDir,
 							"scaled.tiff"));
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+
 					e.printStackTrace();
 				}
 			}
@@ -576,7 +576,7 @@ public final class GridCoverageRenderer {
 								.getRenderedImage(), "tiff", new File(debugDir,
 								"reprojected.tiff"));
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
+	
 						e.printStackTrace();
 					}
 				}
@@ -609,7 +609,7 @@ public final class GridCoverageRenderer {
 							.getRenderedImage(), "tiff", new File(
 							"c:/reprojected.tiff"));
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+
 					e.printStackTrace();
 				}
 			}
@@ -632,7 +632,7 @@ public final class GridCoverageRenderer {
 							.getRenderedImage(), "tiff", new File(debugDir,
 							"scaleup.tiff"));
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+
 					e.printStackTrace();
 				}
 			}
@@ -724,7 +724,7 @@ public final class GridCoverageRenderer {
 						ImageIO.write(finalImage, "tiff", new File(debugDir,
 								"final0.tiff"));
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
+	
 						e.printStackTrace();
 					}
 				}
@@ -755,8 +755,8 @@ public final class GridCoverageRenderer {
 						ImageIO.write(buf, "tiff", new File(debugDir,
 								"final1.tiff"));
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+	
+						
 					}
 				}
 
@@ -832,7 +832,7 @@ public final class GridCoverageRenderer {
 			CoordinateReferenceSystem crs, final Interpolation interpolation,
 			final GeneralEnvelope destinationEnvelope) {
 		// paranoiac check
-		assert CRSUtilities.equalsIgnoreMetadata(destinationEnvelope
+		assert CRS.equalsIgnoreMetadata(destinationEnvelope
 				.getCoordinateReferenceSystem(), crs);
 
 		final ParameterValueGroup param = (ParameterValueGroup) resampleParams
@@ -879,7 +879,8 @@ public final class GridCoverageRenderer {
 				param.parameter("qsFilterArray").setValue(
 						new float[] { 0.5F, 1.0F / 3.0F, 0.0F, -1.0F / 12.0F });
 			param.parameter("Interpolation").setValue(interpolation);
-			param.parameter("BorderExtender").setValue(be);
+			if(!(interpolation instanceof InterpolationNearest))
+				param.parameter("BorderExtender").setValue(be);
 			preScaledGridCoverage = (GridCoverage2D) filteredSubsampleFactory
 					.doOperation(param, hints);
 

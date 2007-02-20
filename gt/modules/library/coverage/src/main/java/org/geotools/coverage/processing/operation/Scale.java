@@ -130,7 +130,7 @@ public class Scale extends Operation2D {
 			// class
 			// (mandatory)
 			null, // Array of valid values
-			BorderExtenderCopy.createInstance(BorderExtenderCopy.BORDER_ZERO), // Default
+			null, // Default
 			// value
 			null, // Minimal value
 			null, // Maximal value

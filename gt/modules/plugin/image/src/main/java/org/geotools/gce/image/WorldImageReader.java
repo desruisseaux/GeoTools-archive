@@ -363,10 +363,8 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			//
 			// /////////////////////////////////////////////////////////////////////
 			if (params != null) {
-				Parameter param;
-				final int length = params.length;
-				for (int i = 0; i < length; i++) {
-					param = (Parameter) params[i];
+				for (int i = 0; i < params.length; i++) {
+					final Parameter param = (Parameter) params[i];
 					if (param.getDescriptor().getName().getCode().equals(
 							AbstractGridFormat.READ_GRIDGEOMETRY2D.getName()
 									.toString())) {
@@ -399,28 +397,28 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 		// Reading the source layer
 		//
 		// /////////////////////////////////////////////////////////////////////
-		final ImageReader reader = readerSPI.createReaderInstance();
-		final ImageInputStream inStream = wmsRequest ? ImageIO
-				.createImageInputStream(((URL) source).openStream()) : ImageIO
-				.createImageInputStream(source);
-		
+//		final ImageReader reader = readerSPI.createReaderInstance();
+//		final ImageInputStream inStream = wmsRequest ? ImageIO
+//				.createImageInputStream(((URL) source).openStream()) : ImageIO
+//				.createImageInputStream(source);
+//		
 		final Hints newHints = (Hints) hints.clone();
-		if (!wmsRequest) {
-			reader.setInput(inStream);
-			if (!reader.isImageTiled(imageChoice.intValue())) {
-				final Dimension tileSize = ImageUtilities
-						.toTileSize(new Dimension(reader.getWidth(imageChoice
-								.intValue()), reader.getHeight(imageChoice
-								.intValue())));
-				final ImageLayout layout = new ImageLayout();
-				layout.setTileGridXOffset(0);
-				layout.setTileGridYOffset(0);
-				layout.setTileHeight(tileSize.height);
-				layout.setTileWidth(tileSize.width);
-				newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
-			}
-		}
-		inStream.close();
+//		if (!wmsRequest) {
+//			reader.setInput(inStream);
+//			if (!reader.isImageTiled(imageChoice.intValue())) {
+//				final Dimension tileSize = ImageUtilities
+//						.toTileSize(new Dimension(reader.getWidth(imageChoice
+//								.intValue()), reader.getHeight(imageChoice
+//								.intValue())));
+//				final ImageLayout layout = new ImageLayout();
+//				layout.setTileGridXOffset(0);
+//				layout.setTileGridYOffset(0);
+//				layout.setTileHeight(tileSize.height);
+//				layout.setTileWidth(tileSize.width);
+//				newHints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, layout));
+//			}
+//		}
+//		inStream.close();
 		final ParameterBlock pbjRead = new ParameterBlock();
 		pbjRead.add(wmsRequest ? ImageIO
 				.createImageInputStream(((URL) source).openStream()) : ImageIO
