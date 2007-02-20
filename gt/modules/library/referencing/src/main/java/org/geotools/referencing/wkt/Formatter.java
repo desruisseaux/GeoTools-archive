@@ -90,7 +90,6 @@ public class Formatter {
      * has been explicitly enabled.
      */
     private static final String
-            AUTHORITY_COLOR = X364.RED,
             NUMBER_COLOR    = X364.YELLOW,  // Floating point numbers only, not integers.
             INTEGER_COLOR   = X364.YELLOW,
             UNIT_COLOR      = X364.YELLOW,
@@ -382,19 +381,15 @@ public class Formatter {
                     appendSeparator(lineChanged);
                     buffer.append("AUTHORITY");
                     buffer.append(symbols.open);
-                    setColor(AUTHORITY_COLOR);
                     buffer.append(symbols.quote);
                     buffer.append(title);
                     buffer.append(symbols.quote);
-                    resetColor();
                     final String code = identifier.getCode();
                     if (code != null) {
                         buffer.append(symbols.separator);
-                        setColor(AUTHORITY_COLOR);
                         buffer.append(symbols.quote);
                         buffer.append(code);
                         buffer.append(symbols.quote);
-                        resetColor();
                     }
                     buffer.append(symbols.close);
                 }

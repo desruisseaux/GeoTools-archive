@@ -958,7 +958,7 @@ public final class CRS {
      *       Enable syntax coloring on <A HREF="http://en.wikipedia.org/wiki/ANSI_escape_code">ANSI
      *       X3.64</A> compatible (aka ECMA-48 and ISO/IEC 6429) terminal. This option tries to
      *       highlight most of the elements relevant to the {@link #equalsIgnoreMetadata
-     *       equalsIgnoreMetadata} method, as well as authority codes.</p>
+     *       equalsIgnoreMetadata} method.</p>
      *
      *   <p><b>{@code -encoding}=<var>charset</var></b><br>
      *       Sets the console encoding for this application output. This value has no impact

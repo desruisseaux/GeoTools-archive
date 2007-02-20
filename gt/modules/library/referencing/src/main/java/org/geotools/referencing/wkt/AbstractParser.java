@@ -136,7 +136,7 @@ public abstract class AbstractParser extends Format {
      * Enables or disables syntax coloring on ANSI X3.64 (aka ECMA-48 and ISO/IEC 6429) compatible
      * terminal. This apply only when formatting text. By default, syntax coloring is disabled.
      * When enabled, {@link #format(Object)} tries to highlight most of the elements compared by
-     * {@link org.geotools.referencing.CRS#equalsIgnoreMetadata}, as well as authority codes.
+     * {@link org.geotools.referencing.CRS#equalsIgnoreMetadata}.
      *
      * @since 2.4
      */
