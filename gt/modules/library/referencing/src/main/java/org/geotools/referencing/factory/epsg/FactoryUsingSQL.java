@@ -1720,7 +1720,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     switch (dimension) {
                         case 3: cs=factory.createSphericalCS(properties, axis[0], axis[1], axis[2]); break;
                     }
-                } else if (type.equals("gravity-related")) {
+                } else if (type.equals("vertical") || type.equals("gravity-related")) {
                     switch (dimension) {
                         case 1: cs=factory.createVerticalCS(properties, axis[0]); break;
                     }
@@ -2713,6 +2713,9 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * Returns a set of authority codes that <strong>may</strong> identify the same object
      * than the specified one. This implementation tries to get a smaller set than what
      * {@link #getAuthorityCodes} would produce.
+     * <p>
+     * <b>Implementation note:</b> Since this method may be invoked indirectly by
+     * {@link LongitudeFirstFactory}, it must be insensitive to axis order.
      *
      * @since 2.4
      */
