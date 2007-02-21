@@ -81,7 +81,7 @@ public class FactoryOnHSQL extends DefaultFactory {
      *
      * @since 2.4
      */
-    public static final Version VERSION = new Version("6.8.0");
+    public static final Version VERSION = new Version("6.12.0");
 
     /**
      * The key for fetching the database directory from {@linkplain System#getProperty(String)

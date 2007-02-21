@@ -11,15 +11,15 @@
      copy of EPSG scripts.
 
      There is one change that this script doesn't performs. Column creation
-     in the form "columnName type UNIQUE" must move the "unique" keyword at
-     the end of table creation in the form "UNIQUE (columnName)". This change
-     need to be done by hand in the "HSQL/EPSG_Tables.sql" file.
+     in the form "columnName UNIQUE" must move the "unique" keyword at the
+     end of table creation in the form "UNIQUE (columnName)". This change
+     needs to be done by hand in the "EPSG_Tables.sql" file.
 
      The SQL scripts must be executed in the following order:
 
-         HSQL/EPSG_Tables.sql
-         HSQL/EPSG_Data.sql
-         HSQL/EPSG_FKeys.sql
+         EPSG_Tables.sql
+         EPSG_Data.sql
+         EPSG_FKeys.sql
 
      Author:  Martin Desruisseaux
      Version: $Id$
@@ -27,17 +27,16 @@
 
 <project name="Creates HSQL scripts" default="create">
   <target name="create">
-    <mkdir dir="HSQL"/>
-    <copy file="EPSG_v68a.mdb_Tables_PostgreSQL.sql" tofile="HSQL/EPSG_Tables.sql"/>
-    <copy file="EPSG_v68a.mdb_FKeys_PostgreSQL.sql"  tofile="HSQL/EPSG_FKeys.sql" />
-    <copy file="EPSG_v68a.mdb_Data_PostgreSQL.sql"   tofile="HSQL/EPSG_Data.sql"  />
+    <copy file="EPSG_v6_12.mdb_Tables_PostgreSQL.sql" tofile="EPSG_Tables.sql"/>
+    <copy file="EPSG_v6_12.mdb_FKeys_PostgreSQL.sql"  tofile="EPSG_FKeys.sql" />
+    <copy file="EPSG_v6_12.mdb_Data_PostgreSQL.sql"   tofile="EPSG_Data.sql"  />
 
-    <replace file="HSQL/EPSG_Tables.sql">
+    <replace file="EPSG_Tables.sql">
       <replacefilter token="CREATE TABLE" value="CREATE CACHED TABLE"/>
       <replacefilter token="TEXT"         value="VARCHAR"            />
     </replace>
 
-    <replaceregexp file="HSQL/EPSG_Data.sql" byline="true">
+    <replaceregexp file="EPSG_Data.sql" byline="true">
       <regexp pattern="'(\d{4})/(\d{2})/(\d{2})',\s*"/>
       <substitution expression="'\1-\2-\3',"/>
     </replaceregexp>

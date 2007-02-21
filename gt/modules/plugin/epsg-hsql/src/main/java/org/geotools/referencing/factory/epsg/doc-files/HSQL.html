@@ -24,19 +24,40 @@
 <BLOCKQUOTE><PRE>COMMIT;
 SHUTDOWN;</PRE></BLOCKQUOTE></LI>
 
+      <LI><P>There is one change that the above Ant script doesn't performs. Column creation in
+      the form "<CODE>columnName UNIQUE</CODE>" must move the "<CODE>UNIQUE</CODE>" keyword at
+      the end of table creation in the form "<CODE>UNIQUE (columnName)</CODE>". This change needs
+      to be done by hand in the "<CODE>EPSG_Tables.sql</CODE>" file. Example:</P>
+      <BLOCKQUOTE><TABLE BORDER="1">
+        <TR>
+          <TH>Before</TH>
+          <TH>After</TH>
+        </TR><TR VALIGN="TOP">
+          <TD><PRE>CREATE CACHED TABLE epsg_change (
+change_id     DOUBLE PRECISION NOT NULL UNIQUE,
+report_date   DATE NOT NULL,
+action        VARCHAR);</PRE></TD>
+          <TD><PRE>CREATE CACHED TABLE epsg_change (
+change_id     DOUBLE PRECISION NOT NULL,
+report_date   DATE NOT NULL,
+action        VARCHAR,
+UNIQUE(CHANGE_ID) );</PRE>
+          </TD>
+        </TR>
+      </TABLE></BLOCKQUOTE></LI>
+
       <LI><P>Creates the database using the following commands:</P>
-<BLOCKQUOTE><PRE>java org.hsqldb.util.SqlTool --autoCommit EPSG-admin HSQL/EPSG_Tables.sql
-java org.hsqldb.util.SqlTool --autoCommit EPSG-admin HSQL/EPSG_Data.sql
-java org.hsqldb.util.SqlTool --autoCommit EPSG-admin HSQL/EPSG_FKeys.sql</PRE></BLOCKQUOTE></LI>
+<BLOCKQUOTE><PRE>java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_Tables.sql
+java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_Data.sql
+java org.hsqldb.util.SqlTool --autoCommit EPSG-admin EPSG_FKeys.sql
+java org.hsqldb.util.SqlTool --autoCommit EPSG-admin dump.sql</PRE></BLOCKQUOTE>
 
-      <LI><P>Launch the following application:</P></LI>
-<BLOCKQUOTE><PRE>java org.hsqldb.util.DatabaseManagerSwing</PRE></BLOCKQUOTE></LI>
-
-      <P>Make sure the database is okay, and invoke the following commands:</P>
+      <P>where "<CODE>dump.sql</CODE>" is a small file containing the following
+      instructions:</P>
 <BLOCKQUOTE><PRE>SCRIPT 'EPSG.sql';
 SHUTDOWN COMPACT;</PRE></BLOCKQUOTE></LI>
 
-      <LI><P>Quit the application. Edit the <CODE>EPSG.sql</CODE> script as below:</P>
+      <LI><P>Edit the <CODE>EPSG.sql</CODE> script as below:</P>
       <UL>
         <LI>Remove the <CODE>SET DELAY 60</CODE> statement; 60 is already the default.</LI>
 

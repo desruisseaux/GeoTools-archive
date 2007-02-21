@@ -68,6 +68,7 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
+import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.Arguments;
 
@@ -727,7 +728,7 @@ public class DefaultFactoryTest extends TestCase {
         assertTrue(CRS.equalsIgnoreMetadata(crs, find));
         assertEquals("4326", AbstractIdentifiedObject.getIdentifier(find, factory.getAuthority()).getCode());
         /*
-         * The PROJCS below intentionnaly use a name different from the one found in the
+         * The PROJCS below intentionnaly uses a name different from the one found in the
          * EPSG database, in order to force a full scan (otherwise the EPSG database would
          * find it by name, but we want to test the scan).
          */
