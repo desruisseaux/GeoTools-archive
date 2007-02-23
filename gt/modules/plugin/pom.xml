@@ -42,6 +42,28 @@
         <module>epsg-access</module>      
       </modules>
     </profile>
+    <profile>
+      <id>Java 6 Experimental</id>
+      <activation>
+        <jdk>1.6</jdk>
+      </activation>
+      <modules>
+         <!--module>arcgrid</module-->
+         <module>epsg-hsql</module>
+         <module>epsg-postgresql</module>
+         <module>epsg-wkt</module>
+         <module>geotiff</module>
+         <module>gtopo30</module>
+         <module>image</module>
+         <module>imagemosaic</module>
+         <module>imagepyramid</module>
+         <module>postgis</module>
+         <module>referencing3D</module>
+         <module>shapefile</module>
+         <module>wfs</module>
+         <module>wms</module>
+      </modules>
+    </profile>
   </profiles>
 
   <!-- =========================================================== -->
@@ -71,11 +93,10 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
-  
+
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
-  <!-- =========================================================== -->
+  <!-- =========================================================== --> 
   <modules>
     <module>arcgrid</module>
     <module>epsg-hsql</module>
@@ -92,6 +113,5 @@
     <module>wfs</module>
     <module>wms</module>
   </modules>
-
 
 </project>
