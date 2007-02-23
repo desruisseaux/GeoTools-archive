@@ -49,16 +49,16 @@ public class PolygonImpl extends SurfacePatchImpl implements Polygon {
     public com.vividsolutions.jts.geom.Geometry calculateJTSPeer() {
         SurfaceBoundary boundary = getBoundary();
         Ring exterior = boundary.getExterior();
-        Ring [] interiors = boundary.getInteriors();
+        List interiors = boundary.getInteriors();
         com.vividsolutions.jts.geom.Geometry g = ((JTSGeometry) exterior).getJTSGeometry();
-        int numHoles = (interiors != null) ? interiors.length : 0;
+        int numHoles = (interiors != null) ? interiors.size() : 0;
         com.vividsolutions.jts.geom.LinearRing jtsExterior =
             JTSUtils.GEOMETRY_FACTORY.createLinearRing(g.getCoordinates());
         com.vividsolutions.jts.geom.LinearRing [] jtsInterior =
             new com.vividsolutions.jts.geom.LinearRing[numHoles];
         for (int i=0; i<numHoles; i++) {
             com.vividsolutions.jts.geom.Geometry g2 =
-                ((JTSGeometry) interiors[i]).getJTSGeometry();
+                ((JTSGeometry) interiors.get(i)).getJTSGeometry();
             jtsInterior[i] = JTSUtils.GEOMETRY_FACTORY.createLinearRing(g2.getCoordinates());
         }
         com.vividsolutions.jts.geom.Polygon result =

@@ -28,6 +28,7 @@ import org.geotools.data.DefaultFeatureResults;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.MaxFeatureReader;
 import org.geotools.data.Query;
+import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.data.jdbc.SQLBuilder;
 import org.geotools.feature.visitor.AverageVisitor;
@@ -59,9 +60,8 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
     protected JDBCFeatureSource featureSource;
     public boolean isOptimized = false;
 
-    public JDBCFeatureCollection(JDBCFeatureSource source, Query query) {
+    public JDBCFeatureCollection(JDBCFeatureSource source, Query query) throws IOException {
         super(source, query);
-        featureSource = source;
     }
 
     OracleDataStore getDataStore() {
@@ -76,18 +76,17 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
      * @throws IOException DOCUMENT ME!
      */
     public FeatureReader reader() throws IOException {
-        int maxFeatures = query.getMaxFeatures();
         FeatureReader reader = getDataStore().getFeatureReader(query,
                 getTransaction());
 
-        //TODO: implement Query.UNLIMITED_FEATURES or something
-        //to that effect, instead of constraining ourselves to 
-        //integer max as we do now.  
-        if (maxFeatures == Integer.MAX_VALUE) {
-            return reader;
-        } else {
-            return new MaxFeatureReader(reader, maxFeatures);
+        int maxFeatures = query.getMaxFeatures();
+        if (maxFeatures != Integer.MAX_VALUE) {
+            reader = new MaxFeatureReader(reader, maxFeatures);
+        }        
+        if( transform != null ){
+            reader = new ReprojectFeatureReader( reader, schema, transform );
         }
+        return reader;
     }
 
     /**

@@ -73,7 +73,7 @@ public class PointGridImpl implements PointGrid {
      * @throws IndexOutOfBoundsException if an index is out of bounds.
      */
     public DirectPosition get(int row, int column) throws IndexOutOfBoundsException {
-        return pointGrid[row].get(column);
+        return getInternal( row, column );
     }
     
     /**
@@ -100,14 +100,29 @@ public class PointGridImpl implements PointGrid {
      * @throws IndexOutOfBoundsException if an index is out of bounds.
      */
     public DirectPosition get(int row, int column, DirectPosition dest) throws IndexOutOfBoundsException {
-        DirectPosition target = (DirectPosition)pointGrid[row].get(column).clone();
-        if (dest == null || !dest.getCoordinateReferenceSystem().equals(target.getCoordinateReferenceSystem())) 
-            return target;
+        DirectPosition target = (DirectPosition) getInternal( row, column ).clone();
         
+        if (dest == null || !dest.getCoordinateReferenceSystem().equals(target.getCoordinateReferenceSystem())){ 
+            return target;
+        }
         for (int i = 0; i < target.getDimension(); i++) {
             dest.setOrdinate(i, target.getOrdinate(i));
         }
         return dest;
+    }
+    /**
+     * Used to replace removed PointArray.get( column ) method.
+     * <p>
+     * Please note all example code uses getTarget( row, col ).clone()
+     * when returning a direct position to client code.
+     * </p>
+     * @param row
+     * @param column
+     * @return DirectPosition 
+     */
+     DirectPosition getInternal( int row, int column ){
+        PointArray pointArray = pointGrid[row];
+        return (DirectPosition) pointArray.positions().get( column ); 
     }
 
     /**
@@ -124,7 +139,8 @@ public class PointGridImpl implements PointGrid {
      */
     public void set(int row, int column, DirectPosition position) throws IndexOutOfBoundsException,
                                                                          UnsupportedOperationException {
-        DirectPosition target = (DirectPosition)pointGrid[row].get(column).clone();
+        DirectPosition target = (DirectPosition) getInternal( row, column).clone();
+        
         if (position.getCoordinateReferenceSystem().equals(target.getCoordinateReferenceSystem())) {
             for (int i = 0; i < position.getDimension(); i++) {
                 target.setOrdinate(i, position.getOrdinate(i));

@@ -31,6 +31,7 @@ import org.opengis.spatialschema.geometry.geometry.ArcByBulge;
 import org.opengis.spatialschema.geometry.geometry.ArcString;
 import org.opengis.spatialschema.geometry.geometry.ArcStringByBulge;
 import org.opengis.spatialschema.geometry.geometry.BSplineCurve;
+import org.opengis.spatialschema.geometry.geometry.BSplineSurface;
 import org.opengis.spatialschema.geometry.geometry.Geodesic;
 import org.opengis.spatialschema.geometry.geometry.GeodesicString;
 import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
@@ -80,7 +81,6 @@ public class GeometryFactoryImpl implements GeometryFactory {
     //*************************************************************************
     //  implement the GeometryFactory interface
     //*************************************************************************
-    
     /**
      * @inheritDoc
      * @see org.opengis.spatialschema.geometry.geometry.GeometryFactory#getCoordinateReferenceSystem()
@@ -89,6 +89,10 @@ public class GeometryFactoryImpl implements GeometryFactory {
         return crs;
     }
     
+
+    public Position createPosition( DirectPosition point ) {
+        return new DirectPositionImpl( point );
+    }
     public DirectPosition createDirectPosition() {
         return new DirectPositionImpl(crs);
     }
@@ -291,4 +295,10 @@ public class GeometryFactoryImpl implements GeometryFactory {
         result.getPatches().addAll(polygons);
         return result;
     }
+
+    public BSplineSurface createBSplineSurface( List arg0, int[] arg1, List[] arg2, KnotType arg3 ) throws MismatchedReferenceSystemException, MismatchedDimensionException {
+        throw new UnsupportedOperationException(
+            "This is the JTS Wrapper Factory which only supports implementations that align with the Simple Feature for SQL Specification.");
+    }
+
 }

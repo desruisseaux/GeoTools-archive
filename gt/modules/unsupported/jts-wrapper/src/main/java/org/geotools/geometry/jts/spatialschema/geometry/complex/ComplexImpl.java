@@ -16,6 +16,7 @@ import org.geotools.geometry.jts.JTSUtils;
 import com.vividsolutions.jts.geom.Geometry;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -61,7 +62,7 @@ public class ComplexImpl extends GeometryImpl implements Complex {
 
     private List elements;
 
-    private Set setViewOfElements;
+    protected Set setViewOfElements;
 
     private Set subComplexes;
 
@@ -135,7 +136,7 @@ public class ComplexImpl extends GeometryImpl implements Complex {
      * no attempt to keep the set of subComplexes up to date when this set is
      * modified, so modify with caution.
      */
-    public final Set/*<Primitive>*/ getElements() {
+    public final Collection/*<Primitive>*/ getElements() {
         return setViewOfElements;
     }
 

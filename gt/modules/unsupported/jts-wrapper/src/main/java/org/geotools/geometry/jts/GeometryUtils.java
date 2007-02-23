@@ -674,10 +674,10 @@ public final class GeometryUtils {
     
     public static DirectPosition[][] getInteriorDirectPositions(final Polygon polygon) {
         final SurfaceBoundary surfaceBoundary = polygon.getBoundary();
-        final Ring[] interiorRings = surfaceBoundary.getInteriors();
-        final DirectPosition[][] returnable = new DirectPosition[interiorRings.length][];
-        for (int i = 0; i < interiorRings.length; i++) {
-            returnable[i] = getDirectPositions(interiorRings[i]);
+        final List interiorRings = surfaceBoundary.getInteriors();
+        final DirectPosition[][] returnable = new DirectPosition[interiorRings.size()][];
+        for (int i = 0; i < interiorRings.size(); i++) {
+            returnable[i] = getDirectPositions((Ring)interiorRings.get(i));
         }
         return returnable;
     }

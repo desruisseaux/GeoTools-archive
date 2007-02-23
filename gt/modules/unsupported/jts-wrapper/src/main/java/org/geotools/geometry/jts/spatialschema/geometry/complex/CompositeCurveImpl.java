@@ -11,6 +11,7 @@ package org.geotools.geometry.jts.spatialschema.geometry.complex;
 
 // J2SE direct dependencies
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -127,8 +128,8 @@ public class CompositeCurveImpl extends CompositeImpl implements CompositeCurve 
         return null;
     }
 
-    public final Set/*<Primitive>*/ getContainedPrimitives() {
-        return getElements();
+    public final Set getContainedPrimitives() {
+        return setViewOfElements;
     }
 
     /**

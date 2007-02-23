@@ -146,4 +146,8 @@ public class EnvelopeImpl implements Envelope {
         final Envelope that = (Envelope) obj;
         return GeometryUtils.equals(this, that);
     }
+
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return getUpperCorner().getCoordinateReferenceSystem();
+    }
 }
