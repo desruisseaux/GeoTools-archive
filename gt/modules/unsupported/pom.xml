@@ -47,90 +47,10 @@
 
   <profiles>
      <profile>
+       <id>Java 1.4</id>
        <activation>
-           <jdk>1.5</jdk>
+           <jdk>1.4</jdk>
        </activation>
-      <!-- ================================================= -->
-      <!--     Modules included for Java 5 build             -->
-      <!-- ================================================== -->
-      <modules>
-         <!-- commented out until the 2 bugs in geotools that prevents the
-              tests to pass are fixed -->
-    <!--<module>cql</module> -->
-        <module>arcsde</module>
-        <module>db2</module>
-        <module>directory</module>
-        <module>epsg-extension</module>
-        <module>geomedia</module>
-    <!--<module>geometryless</module> -->
-        <module>gml</module>
-        <module>gml3</module>
-        <module>go</module>
-    <!--<module>hsql</module>-->
-    <!--<module>h2</module>-->
-        <module>mif</module>
-        <module>mysql</module>
-        <module>oracle-spatial</module>
-        <module>tiger</module>
-        <module>tile</module>
-        <module>vpf</module>
-        <module>xml-sld</module>
-        <module>xml-xsd</module>
-        <module>xml-gml2</module>
-        <module>xml-gml3</module>
-        <module>xml-filter</module>
-        <module>mappane</module>
-        <module>coveragetools</module>
-
-        <!-- NEW for Java 5-->
-       <module>geometry</module>
-   <!--<module>jpox</module>-->
-       </modules>
-     </profile>
-
-     <!-- ================================================== -->
-     <!--     Modules included for Java 6 build              -->
-     <!-- ================================================== -->
-     <profile>
-       <activation>
-           <jdk>1.6</jdk>
-       </activation>
-       <modules>
-         <!-- commented out until the 2 bugs in geotools that prevents the
-              tests to pass are fixed -->
-    <!--<module>cql</module> -->
-        <module>arcsde</module>
-        <module>db2</module>
-        <module>directory</module>
-        <module>epsg-extension</module>
-        <module>geomedia</module>
-    <!--<module>geometryless</module> -->
-        <module>gml</module>
-        <module>gml3</module>
-        <module>go</module>
-    <!--<module>hsql</module>-->
-    <!--<module>h2</module>-->
-        <module>mif</module>
-        <module>mysql</module>
-        <module>oracle-spatial</module>
-        <module>tiger</module>
-        <module>tile</module>
-        <module>vpf</module>
-        <module>xml-sld</module>
-        <module>xml-xsd</module>
-        <module>xml-gml2</module>
-        <module>xml-gml3</module>
-        <module>xml-filter</module>
-        <module>mappane</module>
-        <module>coveragetools</module>
-
-        <!-- NEW for Java 5-->
-       <module>geometry</module>
-   <!--<module>jpox</module>-->
-       </modules>
-     </profile>
-  </profiles>
-
   <!-- =========================================================== -->
   <!--     Modules included in the Java 1.4 build                  -->
   <!-- =========================================================== -->
@@ -161,4 +81,90 @@
     <module>mappane</module>
     <module>coveragetools</module>
   </modules>
+
+  </profile>
+     <profile>
+       <id>Java 5 Experimental</id>
+       <activation>
+           <jdk>1.5</jdk>
+       </activation>
+      <!-- ================================================= -->
+      <!--     Modules included for Java 5 build             -->
+      <!-- ================================================== -->
+      <modules>
+         <!-- commented out until the 2 bugs in geotools that prevents the
+              tests to pass are fixed -->
+    <!--<module>cql</module> -->
+        <module>arcsde</module>
+        <module>db2</module>
+        <module>directory</module>
+        <module>epsg-extension</module>
+        <module>geomedia</module>
+        <module>geometry</module>
+    <!--<module>geometryless</module> -->
+        <module>gml</module>
+        <module>gml3</module>
+        <module>go</module>
+    <!--<module>hsql</module>-->
+    <!--<module>h2</module>-->
+        <module>jts-wrapper</module>
+    <!--<module>jpox</module>-->
+        <module>mif</module>
+        <module>mysql</module>
+        <module>oracle-spatial</module>
+        <module>tiger</module>
+        <module>tile</module>
+        <module>vpf</module>
+        <module>xml-sld</module>
+        <module>xml-xsd</module>
+        <module>xml-gml2</module>
+        <module>xml-gml3</module>
+        <module>xml-filter</module>
+        <module>mappane</module>
+        <module>coveragetools</module>
+       </modules>
+     </profile>
+
+     <!-- ================================================== -->
+     <!--     Modules included for Java 6 build              -->
+     <!-- ================================================== -->
+     <profile>
+       <id>Java 6 Experimental</id>
+       <activation>
+           <jdk>1.6</jdk>
+       </activation>
+       <modules>
+         <!-- commented out until the 2 bugs in geotools that prevents the
+              tests to pass are fixed -->
+    <!--<module>cql</module> -->
+        <module>arcsde</module>
+        <module>db2</module>
+        <module>directory</module>
+        <module>epsg-extension</module>
+        <module>geomedia</module>
+        <module>geometry</module>
+    <!--<module>geometryless</module> -->
+        <module>gml</module>
+        <module>gml3</module>
+        <module>go</module>
+    <!--<module>hsql</module>-->
+    <!--<module>h2</module>-->
+        <module>jts-wrapper</module>
+   <!--<module>jpox</module>-->
+        <module>mif</module>
+        <module>mysql</module>
+        <module>oracle-spatial</module>
+        <module>tiger</module>
+        <module>tile</module>
+        <module>vpf</module>
+        <module>xml-sld</module>
+        <module>xml-xsd</module>
+        <module>xml-gml2</module>
+        <module>xml-gml3</module>
+        <module>xml-filter</module>
+        <module>mappane</module>
+        <module>coveragetools</module>
+       </modules>
+     </profile>
+  </profiles>
 </project>
