@@ -78,8 +78,8 @@ public abstract class Mercator extends MapProjection {
     private static final double EPSILON = 1E-6;
     
     /**
-     * Standard Parallel used for the {@code Mercator_2SP} case.
-     * Set to {@link Double#NaN} for the {@code Mercator_1SP} case.
+     * Standard Parallel used for the {@link Mercator2SP} case.
+     * Set to {@link Double#NaN} for the {@link Mercator1SP} case.
      */
     protected final double standardParallel;
 

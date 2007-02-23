@@ -294,6 +294,28 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
     }
 
     /**
+     * Delegates the work to an appropriate {@code replace} method for the given object.
+     */
+    private IdentifiedObject replaceObject(final IdentifiedObject object) throws FactoryException {
+        if (object instanceof CoordinateReferenceSystem) {
+            return replace((CoordinateReferenceSystem) object);
+        }
+        if (object instanceof CoordinateSystem) {
+            return replace((CoordinateSystem) object);
+        }
+        if (object instanceof CoordinateSystemAxis) {
+            return replace((CoordinateSystemAxis) object);
+        }
+        if (object instanceof Datum) {
+            return replace((Datum) object);
+        }
+        if (object instanceof CoordinateOperation) {
+            return replace((CoordinateOperation) object);
+        }
+        return object;
+    }
+
+    /**
      * Returns one of the underlying factories as an instance of the Geotools implementation.
      * If there is none of them, then returns {@code null} or throws an exception if {@code caller}
      * is not null.
@@ -362,15 +384,7 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
      * @see #createUnit
      */
     public IdentifiedObject createObject(final String code) throws FactoryException {
-        IdentifiedObject object = getAuthorityFactory(code).createObject(toBackingFactoryCode(code));
-        if (object instanceof Datum) {
-            object = replace((Datum) object);
-        } else if (object instanceof CoordinateSystem) {
-            object = replace((CoordinateSystem) object);
-        } else if (object instanceof CoordinateReferenceSystem) {
-            object = replace((CoordinateReferenceSystem) object);
-        }
-        return object;
+        return replaceObject(getAuthorityFactory(code).createObject(toBackingFactoryCode(code)));
     }
 
     /**
@@ -682,6 +696,27 @@ public class AuthorityFactoryAdapter extends AbstractAuthorityFactory implements
         }
         return factory.createFromCoordinateReferenceSystemCodes(
                 toBackingFactoryCode(sourceCode), toBackingFactoryCode(targetCode));
+    }
+
+    /**
+     * Looks up an object from this authority factory which is
+     * {@linkplain org.geotools.referencing.CRS#equalsIgnoreMetadata equals, ignoring metadata},
+     * to the specified object. The default implementation delegates to the
+     * {@linkplain #getAuthorityFactory(String) generic authority factory}, if possible.
+     *
+     * @since 2.4
+     */
+    //@Override
+    public IdentifiedObject find(IdentifiedObject object, final boolean fullScan)
+            throws FactoryException
+    {
+        final AbstractAuthorityFactory factory = getGeotoolsFactory(null, null);
+        if (factory != null) {
+            object = factory.find(object, fullScan);
+        } else {
+            object = super.find(object, fullScan);
+        }
+        return replaceObject(object);
     }
 
     /**

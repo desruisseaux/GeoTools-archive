@@ -129,7 +129,7 @@ public class Krovak extends MapProjection {
     private final double sinAzim, cosAzim, n, tanS2, alfa, hae, k1, ka, ro0, rop;
 
     /**
-     * Useful constant - 45ï¿½ in radians.
+     * Useful constant - 45° in radians.
      */
     private static final double s45 = 0.785398163397448;
 

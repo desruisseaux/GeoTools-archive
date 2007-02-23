@@ -35,6 +35,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.parameter.ParameterWriter;
 import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.resources.Arguments;
 
 
@@ -285,6 +286,52 @@ public class MathTransformTest extends TestCase {
         doTransform(new DirectPosition2D(-123.1, 49.2166666666),
                     new DirectPosition2D(2663494.1734, 2152319.9230), transform);
         
+    }
+
+    /**
+     * Some tests for the Oblique Mercator Projection.
+     */
+    public void testObliqueMercator() throws FactoryException, TransformException {
+        if (VERBOSE) {
+            printParameters("Oblique Mercator");
+        }
+        MathTransform transform;
+        ParameterValueGroup params;
+
+        params = mtFactory.getDefaultParameters("Oblique Mercator");
+        setObliqueMercatorParameter(params);
+        transform = mtFactory.createParameterizedTransform(params);
+        assertEquals(transform.getClass(), ObliqueMercator.class);
+        assertEquals(transform, new ObliqueMercator(params));
+        ParameterDescriptorGroup descriptor = ((MapProjection) transform).getParameterDescriptors();
+        assertTrue (AbstractIdentifiedObject.nameMatches(descriptor, "Oblique Mercator"));
+        assertFalse(AbstractIdentifiedObject.nameMatches(descriptor, "Hotine Oblique Mercator"));
+        final MathTransform standard = transform;
+
+        params = mtFactory.getDefaultParameters("Hotine Oblique Mercator");
+        setObliqueMercatorParameter(params);
+        transform = mtFactory.createParameterizedTransform(params);
+        assertEquals(transform.getClass(), HotineObliqueMercator.class);
+        assertEquals(transform, new HotineObliqueMercator(params));
+        descriptor = ((MapProjection) transform).getParameterDescriptors();
+        assertFalse(AbstractIdentifiedObject.nameMatches(descriptor, "Oblique Mercator"));
+        assertTrue (AbstractIdentifiedObject.nameMatches(descriptor, "Hotine Oblique Mercator"));
+        assertFalse(transform.equals(standard));
+    }
+
+    /**
+     * For {@link #testObliqueMercator} internal use only.
+     */
+    private static void setObliqueMercatorParameter(ParameterValueGroup params) {
+        params.parameter("semi_major")          .setValue(6377397.155);
+        params.parameter("semi_minor")          .setValue(6356078.963);
+        params.parameter("longitude_of_center") .setValue(7.439583333333333);
+        params.parameter("latitude_of_center")  .setValue(46.952405555555565);
+        params.parameter("azimuth")             .setValue(90.0);
+        params.parameter("scale_factor")        .setValue(1.0);
+        params.parameter("false_easting")       .setValue(600000.0);
+        params.parameter("false_northing")      .setValue(200000.0);
+        params.parameter("rectified_grid_angle").setValue(90.0);
     }
     
     /**

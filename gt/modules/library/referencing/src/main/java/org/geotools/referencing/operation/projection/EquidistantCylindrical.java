@@ -68,10 +68,10 @@ public class EquidistantCylindrical extends MapProjection {
     private final double cosStandardParallel;
 
     /**
-     * standard_parallel_1 parameter, used in getParameterValues(). 
-     * Set to {@link Double#NaN} for the {@code Plate_Carree} case.
+     * {@linkplain Provider#STANDARD_PARALLEL Standard parallel} parameter.
+     * Set to {@link Double#NaN} for the {@link PlateCarree} case.
      */
-    private final double standardParallel;
+    protected final double standardParallel;
 
     /**
      * Constructs a new map projection from the supplied parameters.

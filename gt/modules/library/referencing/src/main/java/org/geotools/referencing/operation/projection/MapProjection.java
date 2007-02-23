@@ -1279,6 +1279,7 @@ public abstract class MapProjection extends AbstractMathTransform
                 new NamedIdentifier[] {
                     new NamedIdentifier(Citations.OGC,     "scale_factor"),
                     new NamedIdentifier(Citations.EPSG,    "Scale factor at natural origin"),
+                    new NamedIdentifier(Citations.EPSG,    "Scale factor on initial line"),
                     new NamedIdentifier(Citations.GEOTIFF, "ScaleAtNatOrigin"),
                     new NamedIdentifier(Citations.GEOTIFF, "ScaleAtCenter")
                 },

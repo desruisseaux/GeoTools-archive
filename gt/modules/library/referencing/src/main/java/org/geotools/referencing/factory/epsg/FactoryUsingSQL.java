@@ -232,7 +232,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                       "COORD_SYS_NAME",
                       "COORD_SYS_TYPE",
          new Class[]  { CartesianCS.class, EllipsoidalCS.class, SphericalCS.class, VerticalCS.class},
-         new String[] {"Cartesian",       "ellipsoidal",       "spherical",       "gravity-related"}),
+         new String[] {"Cartesian",       "ellipsoidal",       "spherical",       "vertical"}),
 
         new TableInfo(CoordinateSystemAxis.class,
                       "[Coordinate Axis] AS CA INNER JOIN [Coordinate Axis Name] AS CAN"+
