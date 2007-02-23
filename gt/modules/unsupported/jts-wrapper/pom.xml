@@ -11,8 +11,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.geotools</groupId>
-    <artifactId>gt2-module</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <artifactId>gt2-unsupported</artifactId>
+    <version>2.4-SNAPSHOT</version>
   </parent>
 
 
@@ -20,7 +20,7 @@
   <!--     Module description                               -->
   <!-- ==================================================== -->
   <groupId>org.geotools</groupId>
-  <artifactId>gt2-jtsGeometry</artifactId>
+  <artifactId>gt2-jts-wrapper</artifactId>
   <packaging>jar</packaging>
   <name>ISO 19107 implementation using JTS</name>
   <url>http://maven.geotools.fr/reports/jtsGeometry/</url>
