@@ -1493,7 +1493,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     properties = new HashMap(properties); // Protect from changes
                     final Ellipsoid         ellipsoid = buffered.createEllipsoid    (getString(result,  9, code));
                     final PrimeMeridian      meridian = buffered.createPrimeMeridian(getString(result, 10, code));
-                    final BursaWolfParameters[] param = createBursaWolfParameters(code, result);
+                    final BursaWolfParameters[] param = createBursaWolfParameters(primaryKey, result);
                     if (param != null) {
                         result = null; // Already closed by createBursaWolfParameters
                         properties.put(DefaultGeodeticDatum.BURSA_WOLF_KEY, param);

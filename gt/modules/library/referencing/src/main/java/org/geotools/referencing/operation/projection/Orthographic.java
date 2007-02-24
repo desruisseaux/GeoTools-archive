@@ -174,15 +174,15 @@ public abstract class Orthographic extends MapProjection {
             if (isSpherical(parameters)) {
                 // Polar case.
                 if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
-                    return new OrthographicPolar(parameters);
+                    return new PolarOrthographic(parameters);
                 }
                 // Equatorial case.
                 else if (latitudeOfOrigin < EPSILON) {
-                    return new OrthographicEquatorial(parameters);
+                    return new EquatorialOrthographic(parameters);
                 }
                 // Generic (oblique) case.
                 else {
-                    return new OrthographicOblique(parameters);
+                    return new ObliqueOrthographic(parameters);
                 }
             } else {
                 throw new FactoryException(Errors.format(ErrorKeys.ELLIPTICAL_NOT_SUPPORTED));
