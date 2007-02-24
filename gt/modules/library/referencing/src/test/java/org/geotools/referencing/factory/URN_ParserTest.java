@@ -32,7 +32,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class URN_ParserTest extends TestCase {
+public final class URN_ParserTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

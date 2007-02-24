@@ -17,6 +17,7 @@
 package org.geotools.util;
 
 // J2SE dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.Test;
@@ -33,7 +34,7 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class MonolineFormatterTest extends TestCase {
+public final class MonolineFormatterTest extends TestCase {
     /**
      * Returns the test suite.
      */
@@ -63,7 +64,7 @@ public class MonolineFormatterTest extends TestCase {
     protected void setUp() throws Exception {
         runFromJUnit = true;
         super.setUp();
-        MonolineFormatter.init("org.geotools");
+        Logging.GEOTOOLS.forceMonolineConsoleOutput();
     }
 
     /**
@@ -103,10 +104,10 @@ public class MonolineFormatterTest extends TestCase {
     public static void main(final String[] args) {
         final Arguments arguments = new Arguments(args);
         if (arguments.getFlag("-init")) {
-            MonolineFormatter.init("org.geotools");
+            Logging.GEOTOOLS.forceMonolineConsoleOutput();
         }
         if (arguments.getFlag("-geotools")) {
-            MonolineFormatter.initGeotools();
+            MonolineFormatter.init("org.geotools", (Level) null);
         }
         arguments.getRemainingArguments(0);
         new MonolineFormatterTest(null).testInitialization();

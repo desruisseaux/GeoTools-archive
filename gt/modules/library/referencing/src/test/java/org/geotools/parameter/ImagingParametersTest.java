@@ -51,7 +51,7 @@ import org.geotools.metadata.iso.citation.Citations;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ImagingParametersTest extends TestCase {
+public final class ImagingParametersTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

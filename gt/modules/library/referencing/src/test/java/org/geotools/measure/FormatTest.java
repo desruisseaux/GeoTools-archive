@@ -51,7 +51,7 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class FormatTest extends TestCase {
+public final class FormatTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

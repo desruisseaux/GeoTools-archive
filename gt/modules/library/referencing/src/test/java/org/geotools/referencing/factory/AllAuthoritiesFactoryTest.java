@@ -43,7 +43,7 @@ import org.geotools.referencing.FactoryFinder;
  * @source $URL$
  * @version $Id$
  */
-public class AllAuthoritiesFactoryTest extends TestCase {
+public final class AllAuthoritiesFactoryTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

@@ -51,7 +51,7 @@ import org.geotools.resources.XMath;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeocentricTransformTest extends TestTransform {
+public final class GeocentricTransformTest extends TestTransform {
     /**
      * Runs the tests with the textual test runner.
      */

@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class XAffineTransformTest extends TestCase {
+public final class XAffineTransformTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

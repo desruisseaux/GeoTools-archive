@@ -38,7 +38,7 @@ import org.opengis.util.GenericName;
  * @source $URL$
  * @version $Id$
  */
-public class InternationalStringTest extends TestCase {
+public final class InternationalStringTest extends TestCase {
     /**
      * Run the suit from the command line.
      */

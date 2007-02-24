@@ -49,7 +49,7 @@ import org.geotools.referencing.operation.transform.AffineTransform2D;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class WarpTransformTest extends TestCase {
+public final class WarpTransformTest extends TestCase {
     /**
      * Width and height of a pseudo-image source image.
      */

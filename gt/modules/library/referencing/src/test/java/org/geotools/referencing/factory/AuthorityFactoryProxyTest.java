@@ -42,7 +42,7 @@ import org.geotools.referencing.FactoryFinder;
  * @source $URL$
  * @version $Id$
  */
-public class AuthorityFactoryProxyTest extends TestCase {
+public final class AuthorityFactoryProxyTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

@@ -43,7 +43,7 @@ import org.geotools.geometry.GeneralDirectPosition;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class GeocentricTranslationTest extends TestCase {
+public final class GeocentricTranslationTest extends TestCase {
     /**
      * Runs the tests with the textual test runner.
      */

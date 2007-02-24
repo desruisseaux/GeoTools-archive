@@ -273,6 +273,8 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
                                 scaleX *= scale;
                                 scaleY *= scale;
                             } else if (nameMatches(descriptor, "semi_major")) {
+                                // TODO: this is wrong since we are not ensuring that the
+                                // semi_major/semi_minor ratio is the same in source and target.
                                 scaleX *= (targetValue / sourceValue);
                             } else if (nameMatches(descriptor, "semi_minor")) {
                                 scaleY *= (targetValue / sourceValue);

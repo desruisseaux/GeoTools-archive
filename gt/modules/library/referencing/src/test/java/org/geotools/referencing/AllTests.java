@@ -70,30 +70,32 @@ public class AllTests extends TestCase {
     public static Test suite() {
         final TestSuite suite = new TestSuite("org.geotools.referencing");
         addTest(suite, "org.geotools.metadata.AllTests");
-        suite.addTest(org.geotools.measure                         .FormatTest               .suite());
-        suite.addTest(org.geotools.parameter                       .ParametersTest           .suite());
-        suite.addTest(org.geotools.parameter                       .ImagingParametersTest    .suite());
-        suite.addTest(org.geotools.referencing                     .BasicTest                .suite());
-        suite.addTest(org.geotools.referencing                     .CreationTest             .suite());
-        suite.addTest(org.geotools.referencing                     .WKTParserTest            .suite());
-        suite.addTest(org.geotools.referencing                     .GeodeticCalculatorTest   .suite());
-        suite.addTest(org.geotools.referencing.operation           .BasicTest                .suite());
-        suite.addTest(org.geotools.referencing.operation           .Transform3DTest          .suite());
-        suite.addTest(org.geotools.referencing.operation           .TransformationTest       .suite());
-        suite.addTest(org.geotools.referencing.operation.matrix    .XAffineTransformTest     .suite());
-        suite.addTest(org.geotools.referencing.operation.transform .MathTransformTest        .suite());
-        suite.addTest(org.geotools.referencing.operation.transform .GeocentricTransformTest  .suite());
-        suite.addTest(org.geotools.referencing.operation.transform .GeocentricTranslationTest.suite());
-        suite.addTest(org.geotools.referencing.operation.transform .PassthroughTransformTest .suite());
-        suite.addTest(org.geotools.referencing.operation.transform .LocalizationGridTest     .suite());
-        suite.addTest(org.geotools.referencing.operation.transform .WarpTransformTest        .suite());
-        suite.addTest(org.geotools.referencing.operation.projection.MathTransformTest        .suite());
-        suite.addTest(org.geotools.referencing.operation.projection.NewZealandMapGridTest    .suite());
-        suite.addTest(org.geotools.referencing                     .ScriptTest               .suite());
-        suite.addTest(org.geotools.referencing                     .CrsTest                  .suite());
-        suite.addTest(org.geotools.referencing.factory             .URN_ParserTest           .suite());
-        suite.addTest(org.geotools.referencing.factory.wms         .AUTOTest                 .suite());
-        suite.addTest(org.geotools.referencing.factory.wms         .CRSTest                  .suite());
+        suite.addTest(org.geotools.measure                         .FormatTest                    .suite());
+        suite.addTest(org.geotools.parameter                       .ParametersTest                .suite());
+        suite.addTest(org.geotools.parameter                       .ImagingParametersTest         .suite());
+        suite.addTest(org.geotools.referencing                     .IdentifiedObjectTest          .suite());
+        suite.addTest(org.geotools.referencing                     .PredefinedObjectsTest         .suite());
+        suite.addTest(org.geotools.referencing                     .FactoriesTest                 .suite());
+        suite.addTest(org.geotools.referencing                     .GeodeticCalculatorTest        .suite());
+        suite.addTest(org.geotools.referencing.wkt                 .ParserTest                    .suite());
+        suite.addTest(org.geotools.referencing.operation           .LinearConversionTest          .suite());
+        suite.addTest(org.geotools.referencing.operation           .Transform3DTest               .suite());
+        suite.addTest(org.geotools.referencing.operation           .CoordinateOperationFactoryTest.suite());
+        suite.addTest(org.geotools.referencing.operation.matrix    .XAffineTransformTest          .suite());
+        suite.addTest(org.geotools.referencing.operation.transform .MathTransformTest             .suite());
+        suite.addTest(org.geotools.referencing.operation.transform .GeocentricTransformTest       .suite());
+        suite.addTest(org.geotools.referencing.operation.transform .GeocentricTranslationTest     .suite());
+        suite.addTest(org.geotools.referencing.operation.transform .PassthroughTransformTest      .suite());
+        suite.addTest(org.geotools.referencing.operation.transform .LocalizationGridTest          .suite());
+        suite.addTest(org.geotools.referencing.operation.transform .WarpTransformTest             .suite());
+        suite.addTest(org.geotools.referencing.operation.projection.DirectCreationTest            .suite());
+        suite.addTest(org.geotools.referencing.operation.projection.NewZealandMapGridTest         .suite());
+        suite.addTest(org.geotools.referencing.operation.projection.SouthOrientedTest             .suite());
+        suite.addTest(org.geotools.referencing.factory.wms         .AUTOTest                      .suite());
+        suite.addTest(org.geotools.referencing.factory.wms         .CRSTest                       .suite());
+        suite.addTest(org.geotools.referencing.factory             .URN_ParserTest                .suite());
+        suite.addTest(org.geotools.referencing                     .CrsTest                       .suite());
+        suite.addTest(org.geotools.referencing                     .ScriptTest                    .suite());
         /*
          * If the EPSG authority factory on HSQL is available in the class path, add its tests.
          * It is never the case when the referencing module is build by Maven  (the EPSG tests

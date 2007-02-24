@@ -65,7 +65,7 @@ import org.geotools.referencing.wkt.Formatter;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ParametersTest extends TestCase {
+public final class ParametersTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

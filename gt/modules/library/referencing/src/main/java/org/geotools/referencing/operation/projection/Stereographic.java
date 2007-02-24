@@ -187,8 +187,8 @@ public abstract class Stereographic extends MapProjection {
     public boolean equals(final Object object) {
         /*
          * Implementation note: usually, we define this method in the last subclass, which may
-         * compare every fields.   However, all fields in subclasses like StereographicOblique
-         * are fully determined by the parameters like "latitude_of_origin", which are already
+         * compare every fields.  However, all fields in subclasses like StereographicUSGS are
+         * fully determined by the parameters like "latitude_of_origin", which are already
          * compared by super.equals(object). Comparing those derived fields would be redundant.
          */
         if (object == this) {
@@ -215,11 +215,11 @@ public abstract class Stereographic extends MapProjection {
 
     /**
      * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
-     * provider} for a stereographic projection of any kind. The equations used are the one from
-     * EPSG.
+     * provider} for a {@linkplain Stereographic Stereographic} projections using USGS equations.
+     * This is <strong>not</strong> the provider for EPSG 9809. For the later, use
+     * {@link ObliqueStereographic.Provider} instead.
      *
      * @since 2.4
-     * @source $URL$
      * @version $Id$
      * @author Rueben Schulz
      *
@@ -236,12 +236,8 @@ public abstract class Stereographic extends MapProjection {
          * The parameters group.
          */
         static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
-                new NamedIdentifier(Citations.OGC,      "Oblique_Stereographic"),
-                new NamedIdentifier(Citations.EPSG,     "Oblique Stereographic"),
-                new NamedIdentifier(Citations.EPSG,     "Roussilhe"),
-                new NamedIdentifier(Citations.EPSG,     "9809"),
-                new NamedIdentifier(Citations.GEOTIFF,  "CT_ObliqueStereographic"),
-                new NamedIdentifier(Citations.ESRI,     "Double_Stereographic"),
+                new NamedIdentifier(Citations.ESRI,     "Stereographic"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_Stereographic"),
                 new NamedIdentifier(Citations.GEOTOOLS, NAME)
             }, new ParameterDescriptor[] {
                 SEMI_MAJOR,          SEMI_MINOR,
@@ -292,32 +288,36 @@ public abstract class Stereographic extends MapProjection {
             // Polar case.
             if (Math.abs(latitudeOfOrigin - Math.PI/2) < EPSILON) {
                 if (isSpherical) {
-                    return new StereographicPolar.Spherical(parameters, descriptor, null);
+                    return new PolarStereographic.Spherical(parameters, descriptor, null);
+                } else {
+                    return new PolarStereographic(parameters, descriptor, null);
                 }
-                return new StereographicPolar(parameters, descriptor, null);
-            }
+            } else
             // Equatorial case.
             if (latitudeOfOrigin < EPSILON) {
                 if (isSpherical) {
-                    return new StereographicEquatorial.Spherical(parameters, descriptor);
+                    return new EquatorialStereographic.Spherical(parameters, descriptor);
+                } else {
+//                    return new EquatorialStereographic(parameters, descriptor);
+                    return createMathTransform(parameters, descriptor);
                 }
-                // Otherwise fallback on the generic (oblique) case below.
-            }
+            } else
             // Generic (oblique) case.
             if (isSpherical) {
-                return new StereographicOblique.Spherical(parameters, descriptor);
+                return new StereographicUSGS.Spherical(parameters, descriptor);
+            } else {
+                return createMathTransform(parameters, descriptor);
             }
-            return createMathTransform(parameters, descriptor);
         }
 
         /**
-         * Creates the general case. To be overriden by the USGS case only.
+         * Creates the general case. To be overriden by the EPSG case only.
          */
         MathTransform createMathTransform(final ParameterValueGroup parameters,
                                           final ParameterDescriptorGroup descriptor)
                 throws ParameterNotFoundException
         {
-            return new StereographicDouble(parameters, descriptor);
+            return new StereographicUSGS(parameters, descriptor);
         }
     }
 }

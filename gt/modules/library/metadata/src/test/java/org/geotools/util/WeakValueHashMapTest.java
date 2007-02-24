@@ -36,7 +36,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class WeakValueHashMapTest extends TestCase {
+public final class WeakValueHashMapTest extends TestCase {
     /**
      * The size of the test sets to be created.
      */

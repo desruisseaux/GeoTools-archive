@@ -51,7 +51,7 @@ import org.geotools.referencing.factory.FactoryGroup;
  * @author Justin Couch
  * @author Martin Desruisseaux
  */
-public class Transform3DTest extends TestCase {
+public final class Transform3DTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

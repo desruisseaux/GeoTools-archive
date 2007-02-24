@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class XMathTest extends TestCase {
+public final class XMathTest extends TestCase {
     /**
      * Run the test from the command line.
      */

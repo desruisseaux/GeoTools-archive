@@ -42,7 +42,7 @@ import org.geotools.referencing.FactoryFinder;
  * @author Jody Garnett
  * @author Martin Desruisseaux
  */
-public class AUTOTest extends TestCase {
+public final class AUTOTest extends TestCase {
     /**
      * The factory to test.
      */

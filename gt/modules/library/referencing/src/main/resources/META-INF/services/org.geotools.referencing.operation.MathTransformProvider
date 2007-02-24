@@ -29,10 +29,10 @@ org.geotools.referencing.operation.projection.LambertConformalESRI$Provider
 org.geotools.referencing.operation.projection.LambertAzimuthalEqualArea$Provider
 org.geotools.referencing.operation.projection.Orthographic$Provider
 org.geotools.referencing.operation.projection.Stereographic$Provider
-org.geotools.referencing.operation.projection.StereographicOblique$Provider
-org.geotools.referencing.operation.projection.StereographicPolar$ProviderA
-org.geotools.referencing.operation.projection.StereographicPolar$ProviderB
-org.geotools.referencing.operation.projection.StereographicPolar$ProviderNorth
-org.geotools.referencing.operation.projection.StereographicPolar$ProviderSouth
+org.geotools.referencing.operation.projection.ObliqueStereographic$Provider
+org.geotools.referencing.operation.projection.PolarStereographic$ProviderA
+org.geotools.referencing.operation.projection.PolarStereographic$ProviderB
+org.geotools.referencing.operation.projection.PolarStereographic$ProviderNorth
+org.geotools.referencing.operation.projection.PolarStereographic$ProviderSouth
 org.geotools.referencing.operation.projection.NewZealandMapGrid$Provider
 org.geotools.referencing.operation.projection.Krovak$Provider

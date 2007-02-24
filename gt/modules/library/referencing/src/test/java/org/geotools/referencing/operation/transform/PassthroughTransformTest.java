@@ -49,7 +49,7 @@ import org.geotools.referencing.operation.matrix.GeneralMatrix;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class PassthroughTransformTest extends TestTransform {
+public final class PassthroughTransformTest extends TestTransform {
     /**
      * Runs the tests with the textual test runner.
      */

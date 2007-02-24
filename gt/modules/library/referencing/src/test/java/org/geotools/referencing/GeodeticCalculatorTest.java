@@ -48,7 +48,7 @@ import org.geotools.referencing.datum.DefaultGeodeticDatum;
  * @source $URL$
  * @version $Id$
  */
-public class GeodeticCalculatorTest extends TestCase {
+public final class GeodeticCalculatorTest extends TestCase {
     /**
      * Run the test from the command line.
      */

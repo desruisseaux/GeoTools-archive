@@ -31,7 +31,7 @@ import org.opengis.referencing.operation.TransformException;
  * @version $Id$
  * @author Justin Deoliveira
  */
-public class NewZealandMapGridTest extends TestCase {
+public final class NewZealandMapGridTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

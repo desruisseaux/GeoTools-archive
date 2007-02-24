@@ -44,7 +44,7 @@ import org.geotools.referencing.wkt.Parser;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CrsTest extends TestCase {
+public final class CrsTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

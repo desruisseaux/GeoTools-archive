@@ -34,7 +34,7 @@ import org.geotools.resources.LazySet;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class FactoryRegistryTest extends TestCase {
+public final class FactoryRegistryTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

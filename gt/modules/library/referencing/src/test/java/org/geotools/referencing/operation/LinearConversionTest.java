@@ -50,7 +50,7 @@ import org.geotools.referencing.operation.matrix.Matrix2;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class BasicTest extends TestCase {
+public final class LinearConversionTest extends TestCase {
     /**
      * Run the suite from the command line.
      */
@@ -63,13 +63,13 @@ public class BasicTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(BasicTest.class);
+        return new TestSuite(LinearConversionTest.class);
     }
 
     /**
      * Constructs a test case.
      */
-    public BasicTest(String testName) {
+    public LinearConversionTest(String testName) {
         super(testName);
     }
 

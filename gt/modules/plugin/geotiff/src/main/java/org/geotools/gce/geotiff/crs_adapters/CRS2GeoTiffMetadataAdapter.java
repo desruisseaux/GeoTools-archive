@@ -45,7 +45,7 @@ import org.geotools.referencing.operation.projection.Mercator;
 import org.geotools.referencing.operation.projection.ObliqueMercator;
 import org.geotools.referencing.operation.projection.Orthographic;
 import org.geotools.referencing.operation.projection.Stereographic;
-import org.geotools.referencing.operation.projection.StereographicPolar;
+import org.geotools.referencing.operation.projection.PolarStereographic;
 import org.geotools.referencing.operation.projection.TransverseMercator;
 import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.resources.CRSUtilities;
@@ -615,7 +615,7 @@ public final class CRS2GeoTiffMetadataAdapter {
 		// polar_stereographic
 		//
 		// /////////////////////////////////////////////////////////////////////
-		if (projTransf instanceof StereographicPolar
+		if (projTransf instanceof PolarStereographic
 				&& name.equalsIgnoreCase("polar_stereographic")) {
 			// key 3075
 			metadata

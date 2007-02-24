@@ -50,15 +50,15 @@ import org.geotools.referencing.operation.matrix.XMatrix;
 
 
 /**
- * Tests the {@link ConcatenatedTransform} classes. Actually, there is many
- * {@link ConcatenatedTransform}, each optimized for special cases. This
- * test tries to test a wide range of subclasses.
+ * Tests various classes of {@link MathTransform}, including {@link ConcatenatedTransform}.
+ * Actually, there is many {@link ConcatenatedTransform}, each optimized for special cases.
+ * This test tries to test a wide range of subclasses.
  *
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class MathTransformTest extends TestCase {
+public final class MathTransformTest extends TestCase {
     /**
      * Runs the tests with the textual test runner.
      */
@@ -105,7 +105,7 @@ public class MathTransformTest extends TestCase {
     }
 
     /**
-     * Tests a transformation on a <code>DirectPosition</code> object.
+     * Tests a transformation on a {@link DirectPosition} object.
      */
     public void testDirectPositionTransform() throws FactoryException, TransformException {
         CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null).createFromWKT(

@@ -70,12 +70,13 @@ import org.geotools.resources.Arguments;
 
 
 /**
- * Tests the creation of {@link CoordinateReferenceSystem} objects and dependencies.
+ * Tests the creation of {@link CoordinateReferenceSystem} objects and dependencies through
+ * factories (not authority factories).
  *
  * @source $URL$
  * @version $Id$
  */
-public class CreationTest extends TestCase {
+public final class FactoriesTest extends TestCase {
     /**
      * The output stream. Will be overwriten by the {@link #main}
      * if the test is run from the command line.
@@ -86,13 +87,13 @@ public class CreationTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(CreationTest.class);
+        return new TestSuite(FactoriesTest.class);
     }
 
     /**
-     * Creates a new instance of <code>CreationTest</code>
+     * Creates a new instance of <code>FactoriesTest</code>
      */
-    public CreationTest(final String name) {
+    public FactoriesTest(final String name) {
         super(name);
     }
 
@@ -309,7 +310,7 @@ public class CreationTest extends TestCase {
         final Arguments arguments = new Arguments(args);
         if (arguments.getFlag("-verbose")) try {
             out = arguments.out;
-            final CreationTest test = new CreationTest(null);
+            final FactoriesTest test = new FactoriesTest(null);
             test.testCreation();
             test.testMapProjections();
         } catch (FactoryException exception) {

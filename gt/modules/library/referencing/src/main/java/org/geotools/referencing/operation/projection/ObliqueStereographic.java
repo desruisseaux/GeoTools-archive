@@ -29,13 +29,18 @@ import java.awt.geom.Point2D;
 
 // OpenGIS dependencies
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.operation.MathTransform;
 
 // Geotools dependencies
 import org.geotools.resources.XMath;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.referencing.NamedIdentifier;
+import org.geotools.metadata.iso.citation.Citations;
 
 
 /**
@@ -72,7 +77,7 @@ import org.geotools.resources.i18n.ErrorKeys;
  * @version $Id$
  * @author Rueben Schulz
  */
-public class StereographicDouble extends StereographicOblique {
+public class ObliqueStereographic extends StereographicUSGS {
     /*
      * The tolerance used for the inverse iteration. This is smaller
      * than the tolerance in the {@code StereographicOblique} superclass.
@@ -105,10 +110,10 @@ public class StereographicDouble extends StereographicOblique {
      * @param  parameters The group of parameter values.
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
-    protected StereographicDouble(final ParameterValueGroup parameters)
+    protected ObliqueStereographic(final ParameterValueGroup parameters)
             throws ParameterNotFoundException 
     {
-        this(parameters, Stereographic.Provider.PARAMETERS);
+        this(parameters, Provider.PARAMETERS);
     }
 
     /**
@@ -118,8 +123,8 @@ public class StereographicDouble extends StereographicOblique {
      * @param  descriptor The expected parameter descriptor.
      * @throws ParameterNotFoundException if a required parameter was not found.
      */
-    StereographicDouble(final ParameterValueGroup parameters,
-                        final ParameterDescriptorGroup descriptor)
+    ObliqueStereographic(final ParameterValueGroup parameters,
+                         final ParameterDescriptorGroup descriptor)
             throws ParameterNotFoundException 
     {
         super(parameters, descriptor);
@@ -227,5 +232,66 @@ public class StereographicDouble extends StereographicOblique {
      */
     private static double srat(double esinp, double exp) {
         return Math.pow((1.0 - esinp) / (1.0 + esinp), exp);
+    }
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    ////////                                                                          ////////
+    ////////                                 PROVIDERS                                ////////
+    ////////                                                                          ////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The {@linkplain org.geotools.referencing.operation.MathTransformProvider math transform
+     * provider} for a stereographic projection of any kind. The equations used are the one from
+     * EPSG.
+     *
+     * @since 2.4
+     * @source $URL$
+     * @version $Id$
+     * @author Rueben Schulz
+     *
+     * @see org.geotools.referencing.operation.DefaultMathTransformFactory
+     */
+    public static final class Provider extends Stereographic.Provider {
+        /**
+         * The parameters group.
+         */
+        static final ParameterDescriptorGroup PARAMETERS = createDescriptorGroup(new NamedIdentifier[] {
+                new NamedIdentifier(Citations.OGC,      "Oblique_Stereographic"),
+                new NamedIdentifier(Citations.EPSG,     "Oblique Stereographic"),
+                new NamedIdentifier(Citations.EPSG,     "Roussilhe"),
+                new NamedIdentifier(Citations.EPSG,     "9809"),
+                new NamedIdentifier(Citations.GEOTIFF,  "CT_ObliqueStereographic"),
+                new NamedIdentifier(Citations.ESRI,     "Double_Stereographic"),
+                new NamedIdentifier(Citations.GEOTOOLS, NAME)
+            }, new ParameterDescriptor[] {
+                SEMI_MAJOR,          SEMI_MINOR,
+                CENTRAL_MERIDIAN,    LATITUDE_OF_ORIGIN,
+                SCALE_FACTOR,
+                FALSE_EASTING,       FALSE_NORTHING
+            });
+
+        /**
+         * Constructs a new provider. 
+         */
+        public Provider() {
+            super(PARAMETERS);
+        }
+
+        /**
+         * Creates the general case.
+         */
+        //@Override
+        MathTransform createMathTransform(final ParameterValueGroup parameters,
+                                          final ParameterDescriptorGroup descriptor)
+                throws ParameterNotFoundException
+        {
+            return new ObliqueStereographic(parameters, descriptor);
+        }
     }
 }

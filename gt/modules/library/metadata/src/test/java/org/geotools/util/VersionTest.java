@@ -29,7 +29,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class VersionTest extends TestCase {
+public final class VersionTest extends TestCase {
     /**
      * Run the suit from the command line.
      */

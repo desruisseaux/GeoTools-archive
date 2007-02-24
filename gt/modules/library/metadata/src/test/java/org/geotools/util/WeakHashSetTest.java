@@ -34,7 +34,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class WeakHashSetTest extends TestCase {
+public final class WeakHashSetTest extends TestCase {
     /**
      * Run the suit from the command line.
      */

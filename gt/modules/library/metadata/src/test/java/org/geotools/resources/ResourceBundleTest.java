@@ -35,7 +35,7 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class ResourceBundleTest extends TestCase {
+public final class ResourceBundleTest extends TestCase {
     /**
      * Run the test from the command line.
      */

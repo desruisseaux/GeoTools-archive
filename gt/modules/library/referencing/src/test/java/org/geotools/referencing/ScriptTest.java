@@ -41,7 +41,7 @@ import org.geotools.test.TestData;
  * Each script contains a list of source and target coordinates reference systems (in WKT),
  * source coordinate points and expected coordinate points after the transformation from
  * source CRS to target CRS.
- *
+ * <p>
  * This is probably the most important test case for the whole CRS module.
  *
  * @source $URL$
@@ -50,7 +50,7 @@ import org.geotools.test.TestData;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public class ScriptTest extends TestCase {
+public final class ScriptTest extends TestCase {
     /**
      * Run all tests from the command line.
      */

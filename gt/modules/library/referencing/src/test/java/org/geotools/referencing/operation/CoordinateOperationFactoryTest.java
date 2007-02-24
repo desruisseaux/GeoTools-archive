@@ -47,7 +47,7 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
 
 
 /**
- * Test transformation factory.
+ * Test the default coordinate operation factory.
  * <p>
  * <strong>NOTE:</strong> Some tests are disabled in the particular case when the
  * {@link CoordinateOperationFactory} is actually an {@link AuthorityBackedFactory}
@@ -65,11 +65,11 @@ import org.geotools.metadata.iso.quality.PositionalAccuracyImpl;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class TransformationTest extends TestTransform {
+public final class CoordinateOperationFactoryTest extends TestTransform {
     /**
      * Constructs a test case with the given name.
      */
-    public TransformationTest(final String name) {
+    public CoordinateOperationFactoryTest(final String name) {
         super(name);
     }
     
@@ -78,7 +78,7 @@ public class TransformationTest extends TestTransform {
      * the <code>testXXX()</code> methods - from the JUnit FAQ.
      */
     public static Test suite() {
-        return new TestSuite(TransformationTest.class);
+        return new TestSuite(CoordinateOperationFactoryTest.class);
     }
     
     /**

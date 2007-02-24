@@ -32,7 +32,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class UtilitiesTest extends TestCase {
+public final class UtilitiesTest extends TestCase {
     /**
      * Run the test from the command line.
      */

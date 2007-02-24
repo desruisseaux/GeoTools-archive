@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Andrea Aime
  */
-public class RangeSetTest extends TestCase {
+public final class RangeSetTest extends TestCase {
     /**
      * Run the suit from the command line.
      */

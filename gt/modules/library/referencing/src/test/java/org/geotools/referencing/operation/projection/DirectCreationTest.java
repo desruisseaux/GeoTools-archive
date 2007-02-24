@@ -51,7 +51,7 @@ import org.geotools.resources.Arguments;
  * @version $Id$
  * @author Rueben Schulz
  */
-public class MathTransformTest extends TestCase {
+public final class DirectCreationTest extends TestCase {
     /**
      * Set to {@code true} for printing some informations to standard output while
      * performing tests. Consider this field as constants after the application launch.
@@ -70,7 +70,7 @@ public class MathTransformTest extends TestCase {
     /**
      * Constructs a test with the given name.
      */
-    public MathTransformTest(final String name) {
+    public DirectCreationTest(final String name) {
         super(name);
     }
     
@@ -79,7 +79,7 @@ public class MathTransformTest extends TestCase {
      * the {@code testXXX()} methods - from the JUnit FAQ.
      */
     public static Test suite() {
-        return new TestSuite(MathTransformTest.class);
+        return new TestSuite(DirectCreationTest.class);
     }
     
     /**

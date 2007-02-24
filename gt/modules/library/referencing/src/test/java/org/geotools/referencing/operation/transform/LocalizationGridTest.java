@@ -36,7 +36,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public class LocalizationGridTest extends TestCase {
+public final class LocalizationGridTest extends TestCase {
     /**
      * Random number generator for this test.
      */

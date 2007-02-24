@@ -45,7 +45,7 @@ import org.geotools.referencing.factory.AbstractAuthorityFactory;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class CRSTest extends TestCase {
+public final class CRSTest extends TestCase {
     /**
      * The factory to test.
      */

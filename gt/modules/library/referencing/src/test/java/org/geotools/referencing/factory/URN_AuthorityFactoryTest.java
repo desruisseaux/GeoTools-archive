@@ -41,7 +41,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class URN_AuthorityFactoryTest extends TestCase {
+public final class URN_AuthorityFactoryTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

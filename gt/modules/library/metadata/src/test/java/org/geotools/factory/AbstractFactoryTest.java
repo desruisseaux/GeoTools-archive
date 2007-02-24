@@ -29,7 +29,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class AbstractFactoryTest extends TestCase {
+public final class AbstractFactoryTest extends TestCase {
     /**
      * Run the suite from the command line.
      */

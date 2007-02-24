@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing;
+package org.geotools.referencing.wkt;
 
 // J2SE dependencies
 import java.io.BufferedReader;
@@ -38,6 +38,7 @@ import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.wkt.AbstractParser;
 import org.geotools.referencing.wkt.MathTransformParser;
 import org.geotools.referencing.wkt.Parser;
+import org.geotools.referencing.TestScript;
 import org.geotools.test.TestData;
 
 
@@ -50,7 +51,7 @@ import org.geotools.test.TestData;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public class WKTParserTest extends TestCase {
+public final class ParserTest extends TestCase {
     /**
      * Run the suite from the command line.
      */
@@ -63,13 +64,13 @@ public class WKTParserTest extends TestCase {
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(WKTParserTest.class);
+        return new TestSuite(ParserTest.class);
     }
     
     /**
      * Constructs a test case with the given name.
      */
-    public WKTParserTest(final String name) {
+    public ParserTest(final String name) {
         super(name);
     }
 
@@ -281,7 +282,7 @@ public class WKTParserTest extends TestCase {
     private void testParsing(final AbstractParser parser, final String filename)
             throws IOException, ParseException
     {
-        final BufferedReader reader = TestData.openReader(this, filename);
+        final BufferedReader reader = TestData.openReader(TestScript.class, filename);
         if (reader == null) {
             throw new FileNotFoundException(filename);
         }

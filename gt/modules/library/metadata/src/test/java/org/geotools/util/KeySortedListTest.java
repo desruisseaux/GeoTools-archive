@@ -35,7 +35,7 @@ import junit.framework.TestSuite;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class KeySortedListTest extends TestCase {
+public final class KeySortedListTest extends TestCase {
     /**
      * Run the suit from the command line.
      */
