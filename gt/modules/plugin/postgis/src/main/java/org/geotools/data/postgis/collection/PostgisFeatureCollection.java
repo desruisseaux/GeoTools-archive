@@ -15,6 +15,8 @@
  */
 package org.geotools.data.postgis.collection;
 
+import java.io.IOException;
+
 import org.geotools.data.Query;
 import org.geotools.data.jdbc.JDBCFeatureCollection;
 import org.geotools.data.jdbc.JDBCFeatureSource;
@@ -31,7 +33,7 @@ import org.geotools.data.jdbc.JDBCFeatureSource;
  */
 public class PostgisFeatureCollection extends JDBCFeatureCollection  {
 
-	public PostgisFeatureCollection(JDBCFeatureSource arg0, Query arg1) {
+	public PostgisFeatureCollection(JDBCFeatureSource arg0, Query arg1) throws IOException  {
 		super(arg0, arg1);
 	}
 	

@@ -96,7 +96,8 @@ public class FidQueryTest extends FIDTestCase {
 		assertEquals(1, newFids.size());
 		this.assertFidsMatch();
 		FilterFactory fac = FilterFactoryFinder.createFilterFactory();
-		DefaultQuery query = new DefaultQuery(TYPE_NAME);
+                
+		DefaultQuery query = new DefaultQuery( schema.getTypeName() );
 		String fid = (String) newFids.iterator().next();
 		query.setFilter(fac.createFidFilter(fid));
 		FeatureIterator features = featureStore.getFeatures(query)
@@ -203,7 +204,8 @@ public class FidQueryTest extends FIDTestCase {
 	private void assertFidsMatch() throws IOException {
 		//long start = System.currentTimeMillis();
 		FilterFactory fac = FilterFactoryFinder.createFilterFactory();
-		DefaultQuery query = new DefaultQuery(TYPE_NAME);
+        
+		DefaultQuery query = new DefaultQuery( featureStore.getSchema().getTypeName());
 
 		int i=0;
 		

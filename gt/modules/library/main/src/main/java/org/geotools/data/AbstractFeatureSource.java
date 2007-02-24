@@ -17,10 +17,19 @@ package org.geotools.data;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
+import org.geotools.data.crs.ForceCoordinateSystemFeatureResults;
+import org.geotools.data.crs.ReprojectFeatureResults;
+import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.SchemaException;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.OperationNotFoundException;
+import org.opengis.referencing.operation.TransformException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -89,7 +98,41 @@ public abstract class AbstractFeatureSource implements FeatureSource {
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
     public FeatureCollection getFeatures(Query query) throws IOException {
-        return new DefaultFeatureResults(this, query);
+        FeatureType schema = getSchema();        
+        String typeName = schema.getTypeName();
+        
+        if( query.getTypeName() == null ){ // typeName unspecified we will "any" use a default
+            DefaultQuery defaultQuery = new DefaultQuery(query);
+            defaultQuery.setTypeName( typeName );
+        }
+        else if ( !typeName.equals( query.getTypeName() ) ){
+            return new EmptyFeatureCollection( schema );
+        }
+        
+        FeatureCollection collection = new DefaultFeatureResults(this, query);
+        if( collection.getDefaultGeometry() == null ){
+            return collection; // no geometry no reprojection needed
+        }
+        
+        if( false ){ // we need to have our CRS forced
+            if ( query.getCoordinateSystem() != null ){
+                try {
+                    collection = new ForceCoordinateSystemFeatureResults(collection, query.getCoordinateSystem() );
+                } catch (SchemaException e) {
+                    throw new IOException( "Could not force CRS "+query.getCoordinateSystem() ); 
+                }
+            }
+        }
+        if( false ){ // we need our data reprojected
+            if ( query.getCoordinateSystemReproject() != null){
+                try {
+                    collection = new ReprojectFeatureResults(collection, query.getCoordinateSystemReproject() );
+                } catch (Exception e) {
+                    throw new IOException( "Could not reproject to "+query.getCoordinateSystemReproject() );
+                }
+            }            
+        }
+        return collection;
     }
     
     /**

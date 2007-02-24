@@ -1,10 +1,11 @@
 MODULE MAIN
 ===========
-Module Maintainer:
+Module Maintainer: Jody Garnett
 - feature
 - filter & expression - Corey
 - styling - Corey
 IP Review:
+- Martin, Feb 1st, 2006
 - Jody Garnett, July 24th, 2006
 - TODO: test directory
 
@@ -16,10 +17,6 @@ obvious things like feature, filter, style,....).
 Much of the origional code comes from the dawn of time - say 1996 but was only punted together
 under a GeoTools PMC (C) in 2002 as part of a merge of the existing GeoTools project with the
 work of Martin.
-
-This module is the "white whale" bottleneck with the most contributions and problems, currently
-it lists James as the module maintainer, but in practice it is a burden and thus falls on the
-PMC for maintence.
 
 IP:
 - LICENSE.txt updated
@@ -380,6 +377,12 @@ Origional traditional XML transformer code from GeoTools 2.0.
 IP:
 - updated header
 
+org.geotools.util
+-----------------
+IP:
+- TODO: require LGPL copyright header
+- javadocs needed w/ "@since 2.4"
+ 
 org.geotools.xml.xLink
 ----------------------
 Utility class for XDO based xml parsing added for GeoTools 2.1.

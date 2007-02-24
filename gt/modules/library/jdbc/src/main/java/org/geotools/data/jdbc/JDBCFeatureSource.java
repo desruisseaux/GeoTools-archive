@@ -172,12 +172,9 @@ public class JDBCFeatureSource implements FeatureSource {
     public FeatureCollection getFeatures(Query request) throws IOException {
         String typeName = featureType.getTypeName();
 
-        if ((request.getTypeName() != null)
-                && !typeName.equals(request.getTypeName())) {
-            throw new IOException("Cannot query " + typeName + " with:"
-                + request);
+        if ((request.getTypeName() != null) && !typeName.equals(request.getTypeName())) {
+            throw new IOException("Cannot query " + typeName + " with:" + request);
         }
-
         if (request.getTypeName() == null) {
             request = new DefaultQuery(request);
             ((DefaultQuery) request).setTypeName(featureType.getTypeName());

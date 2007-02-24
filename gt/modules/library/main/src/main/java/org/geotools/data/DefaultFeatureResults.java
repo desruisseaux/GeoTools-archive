@@ -16,7 +16,10 @@
 package org.geotools.data;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.geotools.data.crs.ReprojectFeatureReader;
 import org.geotools.data.store.DataFeatureCollection;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
@@ -24,6 +27,11 @@ import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.geometry.jts.GeometryCoordinateSequenceTransformer;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -40,7 +48,9 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  */
 public class DefaultFeatureResults extends DataFeatureCollection {
-    
+    /** Shared package logger */
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.data");
+
     /** Query used to define this subset of features from the feature source */
     protected Query query;
     
@@ -52,6 +62,9 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      */
     protected FeatureSource featureSource;
 
+    protected FeatureType schema;
+    protected MathTransform transform;
+    
     /**
      * FeatureResults query against featureSource.
      * <p>
@@ -66,18 +79,62 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * @param source
      * @param query
      */
-    public DefaultFeatureResults(FeatureSource source, Query query) {
-        this.featureSource = source;
-        String typeName = source.getSchema().getTypeName();
-
+    public DefaultFeatureResults(FeatureSource source, Query query) throws IOException {
+        this.featureSource = source;        
+        FeatureType origionalType = source.getSchema();
+        
+        String typeName = origionalType.getTypeName();        
         if( typeName.equals( query.getTypeName() ) ){
             this.query = query;
         }
         else {
+            // jg: this should be an error, we are deliberatly gobbling a mistake
+            // option 1: remove Query.getTypeName
+            // option 2: throw a warning
+            // option 3: restore exception code
             this.query = new DefaultQuery(query);
             ((DefaultQuery) this.query).setTypeName(typeName);
-            ((DefaultQuery) this.query).setCoordinateSystem(query.getCoordinateSystem());
-            ((DefaultQuery) this.query).setCoordinateSystemReproject(query.getCoordinateSystemReproject());
+            //((DefaultQuery) this.query).setCoordinateSystem(query.getCoordinateSystem());
+            //((DefaultQuery) this.query).setCoordinateSystemReproject(query.getCoordinateSystemReproject());
+        }
+        CoordinateReferenceSystem cs = null;        
+        if (query.getCoordinateSystemReproject() != null) {
+            cs = query.getCoordinateSystemReproject();
+        } else if (query.getCoordinateSystem() != null) {
+            cs = query.getCoordinateSystem();
+        }
+        try {
+            if( cs == null ){
+                if (query.retrieveAllProperties()) { // we can use the origionalType as is                
+                    schema = featureSource.getSchema();
+                } else { 
+                    schema = DataUtilities.createSubType(featureSource.getSchema(), query.getPropertyNames());                    
+                } 
+            }
+            else {
+                // we need to change the projection of the origional type
+                schema = DataUtilities.createSubType(origionalType, query.getPropertyNames(), cs, query.getTypeName(), null);
+            }
+        }
+        catch (SchemaException e) {
+            // we were unable to create the schema requested!
+            //throw new DataSourceException("Could not create schema", e);
+            LOGGER.log( Level.WARNING, "Could not change projection to "+cs, e );
+            schema = null; // client will notice something is amiss when getSchema() return null
+        }
+        if( origionalType.getDefaultGeometry() == null ){
+            return; // no transform needed
+        }
+        CoordinateReferenceSystem origionalCRS = origionalType.getDefaultGeometry().getCoordinateSystem();
+        if( query.getCoordinateSystem() != null ){
+            origionalCRS = query.getCoordinateSystem();
+        }
+        if( cs != null && cs != origionalCRS ){
+            try {
+                transform = CRS.findMathTransform( origionalCRS, cs, true);
+            } catch (FactoryException noTransform) {
+                throw (IOException) new IOException("Could not reproject data to "+cs).initCause( noTransform );
+            }
         }
     }
 
@@ -100,17 +157,7 @@ public class DefaultFeatureResults extends DataFeatureCollection {
      * @throws DataSourceException DOCUMENT ME!
      */
     public FeatureType getSchema() {
-        if (query.retrieveAllProperties()) {
-            return featureSource.getSchema();
-        } else {
-            try {
-                return DataUtilities.createSubType(featureSource.getSchema(),
-                    query.getPropertyNames());
-            } catch (SchemaException e) {
-                return featureSource.getSchema();
-                //throw new DataSourceException("Could not create schema", e);
-            }
-        }
+        return schema;        
     }
 
     /**
@@ -139,16 +186,16 @@ public class DefaultFeatureResults extends DataFeatureCollection {
     public FeatureReader reader() throws IOException {
         FeatureReader reader = featureSource.getDataStore().getFeatureReader(query,
                 getTransaction());
+        
         int maxFeatures = query.getMaxFeatures();
-
-        if (maxFeatures == Integer.MAX_VALUE) {
-            return reader;
-        } else {
-            return new MaxFeatureReader(reader, maxFeatures);
+        if (maxFeatures != Integer.MAX_VALUE) {
+            reader = new MaxFeatureReader(reader, maxFeatures);
+        }        
+        if( transform != null ){
+            reader = new ReprojectFeatureReader( reader, schema, transform );
         }
-
-
-    }
+        return reader;
+    }   
 
     /**
      * Returns the bounding box of this FeatureResults

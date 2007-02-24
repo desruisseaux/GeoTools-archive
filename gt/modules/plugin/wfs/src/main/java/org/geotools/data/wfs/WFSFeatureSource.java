@@ -25,6 +25,7 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.Filter;
@@ -104,7 +105,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures()
      */
-    public FeatureCollection getFeatures(){
+    public FeatureCollection getFeatures() throws IOException {
         return getFeatures(new DefaultQuery(getSchema().getTypeName(), Filter.INCLUDE));
     }
 
@@ -112,7 +113,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.filter.Filter)
      */
-    public FeatureCollection getFeatures(Filter filter){
+    public FeatureCollection getFeatures(Filter filter) throws IOException {
         return getFeatures(new DefaultQuery(getSchema().getTypeName(), filter));
     }
 
@@ -120,8 +121,21 @@ public class WFSFeatureSource extends AbstractFeatureSource {
      * 
      * @see org.geotools.data.FeatureSource#getFeatures(org.geotools.data.Query)
      */
-    public FeatureCollection getFeatures(Query query) {
-        return new DefaultFeatureResults(this, query);
+    public FeatureCollection getFeatures(Query query) throws IOException  {
+        FeatureType schema = getSchema();        
+        String typeName = schema.getTypeName();
+        
+        if( query.getTypeName() == null ){ // typeName unspecified we will "any" use a default
+            DefaultQuery defaultQuery = new DefaultQuery(query);
+            defaultQuery.setTypeName( typeName );
+        }
+        
+        if( !typeName.equals( query.getTypeName() ) ){
+            return new EmptyFeatureCollection( schema );
+        }
+        else {
+            return new DefaultFeatureResults(this, query);    
+        }
     }
 
     /**
@@ -145,7 +159,7 @@ public class WFSFeatureSource extends AbstractFeatureSource {
          * @param fs
          * @param query
          */
-        public WFSFeatureResults(WFSFeatureSource fs, Query query) {
+        public WFSFeatureResults(WFSFeatureSource fs, Query query) throws IOException {
         	super(fs, query);
             this.query = query;
             this.fs = fs;
