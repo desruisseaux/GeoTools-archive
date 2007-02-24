@@ -77,7 +77,7 @@ public final class GeometryUtils {
             CoordinateReferenceSystem crs = null;
             try {
                 crs = org.geotools.referencing.CRS.decode("EPSG:4326");
-            } catch (NoSuchAuthorityCodeException nsace){
+            } catch (Exception nsace){
                 getLog().warn("could not get crs for EPSG:4326");
             }
             
@@ -420,7 +420,7 @@ public final class GeometryUtils {
 	GeographicCRS wgs84crs = null;
         try {
                 wgs84crs = (GeographicCRS) CRS.decode("EPSG:4327");
-        } catch (NoSuchAuthorityCodeException nsace){
+        } catch (Exception nsace){
                 getLog().warn("could not get crs for EPSG:4327");
         }
     	
@@ -443,7 +443,7 @@ public final class GeometryUtils {
         //same equality issues as above
         DirectPosition dp2 = BasicFactories.getDefault().getGeometryFactory(wgs84crs).createDirectPosition();
         try{
-            MathTransform transform = CRS.transform(crs, wgs84crs);
+            MathTransform transform = CRS.findMathTransform(crs, wgs84crs);
             transform.transform(dp, dp2);
         } catch (FactoryException fe) {
         	getLog().warn("Could not create CoordinateOperation to convert DirectPosition CRS "
