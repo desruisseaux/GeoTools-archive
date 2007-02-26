@@ -441,14 +441,6 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
         }
         formatter.setAngularUnit(angularUnit);
         formatter.setLinearUnit(linearUnit);
-        return getTypeWKT();
-    }
-    
-    /**
-     * Returns the name of the WKT element type, which is {@code "PROJCS"}.
-     */
-    //@Override
-    final String getTypeWKT() {
         return "PROJCS";
     }
 }

@@ -171,7 +171,7 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
      * Known Text</cite> (WKT)</A> element.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name, which is "GEOCCS"
+     * @return The name of the WKT element type, which is {@code "GEOCCS"}.
      */
     protected String formatWKT(final Formatter formatter) {
         final Unit unit = getUnit();
@@ -185,14 +185,6 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
         if (unit == null) {
             formatter.setInvalidWKT(GeocentricCRS.class);
         }
-        return getTypeWKT();
-    }
-    
-    /**
-     * Returns the name of the WKT element type, which is {@code "GEOCCS"}.
-     */
-    //@Override
-    final String getTypeWKT() {
         return "GEOCCS";
     }
 }

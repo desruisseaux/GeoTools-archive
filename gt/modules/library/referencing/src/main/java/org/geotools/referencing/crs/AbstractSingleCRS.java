@@ -174,22 +174,11 @@ public class AbstractSingleCRS extends AbstractCRS implements SingleCRS {
     }
     
     /**
-     * Formats the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element. The default implementation writes the following
-     * elements:
-     * <ul>
-     *   <li>The {@linkplain #datum datum}.</li>
-     *   <li>The unit if all axis use the same unit. Otherwise the unit is omitted and
-     *       the WKT format is {@linkplain Formatter#isInvalidWKT flagged as invalid}.</li>
-     *   <li>All {@linkplain #coordinateSystem coordinate system}'s axis.</li>
-     * </ul>
-     *
-     * @param  formatter The formatter to use.
-     * @return The name of the WKT element type (e.g. {@code "GEOGCS"}).
+     * {@inheritDoc}
      */
-    protected String formatWKT(final Formatter formatter) {
+    //@Override
+    final void formatDefaultWKT(final Formatter formatter) {
         formatter.append(datum);
-        return super.formatWKT(formatter);
+        super.formatDefaultWKT(formatter);
     }
 }

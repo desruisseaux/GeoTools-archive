@@ -210,7 +210,7 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
      * Known Text</cite> (WKT)</A> element.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name, which is "GEOGCS"
+     * @return The name of the WKT element type, which is {@code "GEOGCS"}.
      */
     protected String formatWKT(final Formatter formatter) {
         final Unit oldUnit = formatter.getAngularUnit();
@@ -227,14 +227,6 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
             formatter.setInvalidWKT(GeographicCRS.class);
         }
         formatter.setAngularUnit(oldUnit);
-        return getTypeWKT();
-    }
-    
-    /**
-     * Returns the name of the WKT element type, which is {@code "GEOGCS"}.
-     */
-    //@Override
-    final String getTypeWKT() {
         return "GEOGCS";
     }
 }

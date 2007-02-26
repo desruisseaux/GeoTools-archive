@@ -355,15 +355,6 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
         }
         formatter.append(inverse);
         formatter.append(baseCRS);
-        return getTypeWKT();
-    }
-    
-    /**
-     * Returns the name of the WKT element type, which is {@code "FITTED_CS"} by default.
-     * {@link DefaultProjectedCRS} will use a different name.
-     */
-    //@Override
-    String getTypeWKT() {
         return "FITTED_CS";
     }
 }

@@ -214,10 +214,15 @@ public class DefaultEngineeringCRS extends AbstractSingleCRS implements Engineer
     }
     
     /**
-     * Returns the name of the WKT element type, which is {@code "LOCAL_CS"}.
+     * Format the inner part of a
+     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
+     * Known Text</cite> (WKT)</A> element.
+     *
+     * @param  formatter The formatter to use.
+     * @return The name of the WKT element type, which is {@code "LOCAL_CS"}.
      */
-    //@Override
-    final String getTypeWKT() {
+    protected String formatWKT(final Formatter formatter) {
+        formatDefaultWKT(formatter);
         return "LOCAL_CS";
     }
 }

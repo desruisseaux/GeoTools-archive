@@ -265,14 +265,6 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
         for (final Iterator it=crs.iterator(); it.hasNext();) {
             formatter.append((CoordinateReferenceSystem) it.next());
         }
-        return getTypeWKT();
-    }
-    
-    /**
-     * Returns the name of the WKT element type, which is {@code "COMPD_CS"}.
-     */
-    //@Override
-    final String getTypeWKT() {
         return "COMPD_CS";
     }
 }

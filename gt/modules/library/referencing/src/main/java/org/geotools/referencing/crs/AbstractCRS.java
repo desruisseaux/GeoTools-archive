@@ -184,6 +184,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      * Known Text</cite> (WKT)</A> element. The default implementation writes the following
      * elements:
      * <ul>
+     *   <li>The {@linkplain #datum datum}, if any.</li>
      *   <li>The unit if all axis use the same unit. Otherwise the unit is omitted and
      *       the WKT format is {@linkplain Formatter#isInvalidWKT flagged as invalid}.</li>
      *   <li>All {@linkplain #coordinateSystem coordinate system}'s axis.</li>
@@ -193,6 +194,16 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      * @return The name of the WKT element type (e.g. {@code "GEOGCS"}).
      */
     protected String formatWKT(final Formatter formatter) {
+        formatDefaultWKT(formatter);
+        // Will declares the WKT as invalid.
+        return super.formatWKT(formatter);
+    }
+
+    /**
+     * Default implementation of {@link #formatWKT}. For {@link DefaultEngineeringCRS}
+     * and {@link DefaultVerticalCRS} use only.
+     */
+    void formatDefaultWKT(final Formatter formatter) {
         final Unit unit = getUnit();
         formatter.append(unit);
         final int dimension = coordinateSystem.getDimension();
@@ -202,25 +213,5 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
         if (unit == null) {
             formatter.setInvalidWKT(CoordinateReferenceSystem.class);
         }
-        final String type = getTypeWKT();
-        if (type != null) {
-            return type;
-        }
-        // Will declares the WKT as invalid.
-        return super.formatWKT(formatter);
-    }
-    
-    /**
-     * Returns the name of the element type (for example {@code "GEOGCS"}), or {@code null}
-     * if the WKT specification doesn't have a type name for the kind of CRS to be formatted.
-     * In the later case, {@link #formatWKT} will uses a synthetic name and flags the WKT
-     * string as invalid.
-     * <p>
-     * This method is package-private because not really needed even for users outside this
-     * package. It is just a trick for reducing code duplication in {@code formatWKT} methods
-     * inside this package.
-     */
-    String getTypeWKT() {
-        return null;
     }
 }
