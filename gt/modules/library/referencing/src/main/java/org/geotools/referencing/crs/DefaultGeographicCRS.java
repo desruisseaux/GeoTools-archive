@@ -217,16 +217,24 @@ public class DefaultGeographicCRS extends AbstractSingleCRS implements Geographi
         final Unit unit = getAngularUnit(coordinateSystem);
         formatter.setAngularUnit(unit);
         formatter.append(datum);
-        formatter.append(((GeodeticDatum)datum).getPrimeMeridian());
+        formatter.append(((GeodeticDatum) datum).getPrimeMeridian());
         formatter.append(unit);
         final int dimension = coordinateSystem.getDimension();
         for (int i=0; i<dimension; i++) {
             formatter.append(coordinateSystem.getAxis(i));
         }
         if (!unit.equals(getUnit())) {
-            formatter.setInvalidWKT();
+            formatter.setInvalidWKT(GeographicCRS.class);
         }
         formatter.setAngularUnit(oldUnit);
+        return getTypeWKT();
+    }
+    
+    /**
+     * Returns the name of the WKT element type, which is {@code "GEOGCS"}.
+     */
+    //@Override
+    final String getTypeWKT() {
         return "GEOGCS";
     }
 }

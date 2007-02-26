@@ -126,6 +126,13 @@ final class Command {
                 out.println(separator);
             }
             out.println(formatter.format(factory.createObject(args[i])));
+            final String warning = formatter.getWarning();
+            if (warning != null) {
+                out.println();
+                out.print(Vocabulary.format(VocabularyKeys.WARNING));
+                out.print(": ");
+                out.println(warning);
+            }
         }
     }
 

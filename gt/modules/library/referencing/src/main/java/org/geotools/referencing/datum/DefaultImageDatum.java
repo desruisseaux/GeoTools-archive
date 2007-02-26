@@ -147,7 +147,7 @@ public class DefaultImageDatum extends AbstractDatum implements ImageDatum {
     protected String formatWKT(final Formatter formatter) {
         super.formatWKT(formatter);
         formatter.append(pixelInCell);
-        formatter.setInvalidWKT();
+        formatter.setInvalidWKT(ImageDatum.class);
         return "IMAGE_DATUM";
     }
 }

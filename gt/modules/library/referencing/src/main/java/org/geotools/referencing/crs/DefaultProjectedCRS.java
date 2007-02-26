@@ -407,7 +407,7 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
      * Known Text</cite> (WKT)</A> element.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name, which is "PROJCS"
+     * @return The name of the WKT element type, which is {@code "PROJCS"}.
      */
     protected String formatWKT(final Formatter formatter) {
         final Unit unit = getUnit();
@@ -437,10 +437,18 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
             formatter.append(coordinateSystem.getAxis(i));
         }
         if (unit == null) {
-            formatter.setInvalidWKT();
+            formatter.setInvalidWKT(ProjectedCRS.class);
         }
         formatter.setAngularUnit(angularUnit);
         formatter.setLinearUnit(linearUnit);
+        return getTypeWKT();
+    }
+    
+    /**
+     * Returns the name of the WKT element type, which is {@code "PROJCS"}.
+     */
+    //@Override
+    final String getTypeWKT() {
         return "PROJCS";
     }
 }

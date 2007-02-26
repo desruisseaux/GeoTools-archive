@@ -259,12 +259,20 @@ public class DefaultCompoundCRS extends AbstractCRS implements CompoundCRS {
      * Known Text</cite> (WKT)</A> element.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name, which is "COMPD_CS"
+     * @return The name of the WKT element type, which is {@code "COMPD_CS"}.
      */
     protected String formatWKT(final Formatter formatter) {
         for (final Iterator it=crs.iterator(); it.hasNext();) {
             formatter.append((CoordinateReferenceSystem) it.next());
         }
+        return getTypeWKT();
+    }
+    
+    /**
+     * Returns the name of the WKT element type, which is {@code "COMPD_CS"}.
+     */
+    //@Override
+    final String getTypeWKT() {
         return "COMPD_CS";
     }
 }

@@ -181,7 +181,10 @@ public class Formattable {
                     formatter.append(this);
                 }
                 if (strict && formatter.isInvalidWKT()) {
-                    throw new UnformattableObjectException(Errors.format(ErrorKeys.INVALID_WKT_FORMAT));
+                    final Class unformattable = formatter.getUnformattableClass();
+                    throw new UnformattableObjectException(Errors.format(
+                            ErrorKeys.INVALID_WKT_FORMAT_$1,
+                            Utilities.getShortName(unformattable)), unformattable);
                 }
                 return formatter.toString();
             } finally {
@@ -205,18 +208,20 @@ public class Formattable {
      * &nbsp;           (insertion point)
      * </pre>
      *
-     * The default implementation declare that this object produces an invalid WKT.
-     * Subclasses must override this method for proper WKT formatting.
+     * The default implementation declares that this object produces an invalid WKT.
+     * Subclasses must override this method for proper WKT formatting and should
+     * <strong>not</strong> invoke {@code super.formatWKT(formatter)} if they can
+     * use a valid WKT syntax.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name (e.g. "GEOGCS").
+     * @return The name of the WKT element type (e.g. {@code "GEOGCS"}).
      *
      * @see #toWKT
      * @see #toString
      */
     protected String formatWKT(final Formatter formatter) {
-        formatter.setInvalidWKT();
         Class type = getClass();
+        formatter.setInvalidWKT(type);
         Class[] interfaces = type.getInterfaces();
         for (int i=0; i<interfaces.length; i++) {
             final Class candidate = interfaces[i];

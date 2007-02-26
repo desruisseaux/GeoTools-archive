@@ -29,14 +29,51 @@ package org.geotools.referencing.wkt;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @see Formatter#setInvalidWKT
  */
 public class UnformattableObjectException extends UnsupportedOperationException {
+    /**
+     * The type of the object that can't be formatted.
+     */
+    private final Class unformattable;
+
     /**
      * Constructs an exception with the specified detail message.
      *
      * @param message The detail message.
+     *
+     * @deprecated Replaced by {@link #UnformattableObjectException(String, Class)}.
      */
     public UnformattableObjectException(final String message) {
+        this(message, Object.class);
+    }
+
+    /**
+     * Constructs an exception with the specified detail message.
+     *
+     * @param message The detail message.
+     * @param unformattable The type of the object that can't be formatted.
+     *
+     * @since 2.4
+     */
+    public UnformattableObjectException(final String message, final Class unformattable) {
         super(message);
+        this.unformattable = unformattable;
+    }
+
+    /**
+     * Returns the type of the object that can't be formatted. This is often an OpenGIS
+     * interface rather than the implementation class. For example if a engineering CRS
+     * uses different unit for each axis, then this method may return
+     * <code>{@linkplain org.opengis.referencing.crs.CoordinateReferenceSystem}.class</code>.
+     * It doesn't mean that no CRS can be formatted; only that a particular instance of it
+     * can't. Other possible classes are {@link org.opengis.referencing.datum.ImageDatum},
+     * {@link org.opengis.referencing.crs.ProjectedCRS}, <cite>etc</cite>.
+     *
+     * @since 2.4
+     */
+    public Class getUnformattableClass() {
+        return unformattable;
     }
 }

@@ -39,4 +39,8 @@ public final class X364 {
     /** Magenta foreground.       */ public  static final String MAGENTA = ESCAPE + "35m";
     /** Cyan foreground.          */ public  static final String CYAN    = ESCAPE + "36m";
     /** Default foreground.       */ public  static final String DEFAULT = ESCAPE + "39m";
+
+    /** Red background.     */ public  static final String BACKGROUND_RED     = ESCAPE + "41m";
+    /** Default background. */ public  static final String BACKGROUND_DEFAULT = ESCAPE + "49m";
+    
 }

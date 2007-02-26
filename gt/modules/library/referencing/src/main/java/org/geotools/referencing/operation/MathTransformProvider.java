@@ -532,7 +532,7 @@ public abstract class MathTransformProvider extends DefaultOperationMethod {
         if (Projection.class.isAssignableFrom(type)) {
             return super.formatWKT(formatter);
         }
-        formatter.setInvalidWKT();
+        formatter.setInvalidWKT(OperationMethod.class);
         return "OperationMethod";
     }
 

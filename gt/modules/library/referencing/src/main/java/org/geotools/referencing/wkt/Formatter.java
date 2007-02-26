@@ -97,7 +97,8 @@ public class Formatter {
             CODELIST_COLOR  = X364.CYAN,
             PARAMETER_COLOR = X364.GREEN,
             METHOD_COLOR    = X364.GREEN,
-            DATUM_COLOR     = X364.GREEN;
+            DATUM_COLOR     = X364.GREEN,
+            ERROR_COLOR     = X364.BACKGROUND_RED;
 
     /**
      * The symbols to use for this formatter.
@@ -175,9 +176,17 @@ public class Formatter {
     private boolean lineChanged;
 
     /**
-     * {@code true} if the WKT is invalid.
+     * {@code true} if the WKT is invalid. Similar to {@link #unformattable}, except that
+     * this field is reset to {@code false} after the invalid part has been processed by
+     * {@link #append(Formattable)}. This field is for internal use only.
      */
     private boolean invalidWKT;
+
+    /**
+     * Non-null if the WKT is invalid. If non-null, then this field contains the interface class
+     * of the problematic part (e.g. {@link org.opengis.referencing.crs.EngineeringCRS}).
+     */
+    private Class/*<?>*/ unformattable;
 
     /**
      * Creates a new instance of the formatter with the default symbols.
@@ -314,7 +323,7 @@ public class Formatter {
          *           ["NAD27 / Idaho Central"
          */
         appendSeparator(true);
-        final int base = buffer.length();
+        int base = buffer.length();
         buffer.append(symbols.open);
         final IdentifiedObject info = (formattable instanceof IdentifiedObject)
                                     ? (IdentifiedObject) formattable : null;
@@ -342,6 +351,11 @@ public class Formatter {
         indent(+1);
         lineChanged = false;
         String keyword = formattable.formatWKT(this);
+        if (colors && invalidWKT) {
+            invalidWKT = false;
+            buffer.insert(base, ERROR_COLOR + X364.BACKGROUND_DEFAULT);
+            base += ERROR_COLOR.length();
+        }
         buffer.insert(base, keyword);
         /*
          * Formats the AUTHORITY[<name>,<code>] entity, if there is one. The entity
@@ -779,7 +793,18 @@ public class Formatter {
      * exception if this flag is set.
      */
     public boolean isInvalidWKT() {
-        return invalidWKT || buffer.length()==0;
+        return unformattable != null || (buffer!=null && buffer.length() == 0);
+        /*
+         * Note: we really use a "and" condition (not an other "or") for the buffer test because
+         *       the buffer is reset to 'null' by AbstractParser after a successfull formatting.
+         */
+    }
+
+    /**
+     * Returns the class declared by the last call to {@link #setInvalidWKT}.
+     */
+    final Class getUnformattableClass() {
+        return unformattable;
     }
 
     /**
@@ -790,9 +815,26 @@ public class Formatter {
      * method is invoked when an {@linkplain org.geotools.referencing.crs.DefaultEngineeringCRS
      * engineering CRS} uses different unit for each axis, An application can tests
      * {@link #isInvalidWKT} later for checking WKT validity.
+     *
+     * @param unformattable The type of the component that can't be formatted,
+     *        for example {@link org.opengis.referencing.crs.EngineeringCRS}.
+     *
+     * @see UnformattableObjectException#getUnformattableClass
+     *
+     * @since 2.4
+     */
+    public void setInvalidWKT(final Class unformattable) {
+        this.unformattable = unformattable;
+        invalidWKT = true;
+    }
+
+    /**
+     * Set a flag marking the current WKT as not strictly compliant to the WKT specification.
+     *
+     * @deprecated Replaced by {@link #setInvalidWKT(Class)}.
      */
     public void setInvalidWKT() {
-        invalidWKT = true;
+        setInvalidWKT(IdentifiedObject.class);
     }
 
     /**
@@ -812,11 +854,12 @@ public class Formatter {
         if (buffer != null) {
             buffer.setLength(0);
         }
-        linearUnit  = null;
-        angularUnit = null;
-        lineChanged = false;
-        invalidWKT  = false;
-        margin      = 0;
+        linearUnit    = null;
+        angularUnit   = null;
+        unformattable = null;
+        invalidWKT    = false;
+        lineChanged   = false;
+        margin        = 0;
     }
 
     /**

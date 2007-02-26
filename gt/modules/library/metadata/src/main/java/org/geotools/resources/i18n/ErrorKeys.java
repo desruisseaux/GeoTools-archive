@@ -446,9 +446,9 @@ public final class ErrorKeys {
     public static final int INSUFFICIENT_POINTS_$2 = 198;
 
     /**
-     * Invalid WKT format.
+     * This "{0}" object is too complex for WKT syntax.
      */
-    public static final int INVALID_WKT_FORMAT = 159;
+    public static final int INVALID_WKT_FORMAT_$1 = 159;
 
     /**
      * Error in "{0}":

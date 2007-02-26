@@ -1190,6 +1190,6 @@ class CategoryList extends AbstractList implements MathTransform1D, Comparator, 
      * @todo Not yet implemented.
      */
     public String toWKT() throws UnsupportedOperationException {
-        throw new UnformattableObjectException("Not yet implemented.");
+        throw new UnformattableObjectException("Not yet implemented.", getClass());
     }
 }

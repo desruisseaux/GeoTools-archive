@@ -125,15 +125,10 @@ public class DefaultVerticalCRS extends AbstractSingleCRS implements VerticalCRS
     }
     
     /**
-     * Format the inner part of a
-     * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element.
-     *
-     * @param  formatter The formatter to use.
-     * @return The WKT element name, which is "VERT_CS"
+     * Returns the name of the WKT element type, which is {@code "VERT_CS"}.
      */
-    protected String formatWKT(final Formatter formatter) {
-        super.formatWKT(formatter);
+    //@Override
+    final String getTypeWKT() {
         return "VERT_CS";
     }
 }

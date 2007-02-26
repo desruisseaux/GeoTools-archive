@@ -341,18 +341,29 @@ public class AbstractDerivedCRS extends AbstractSingleCRS implements GeneralDeri
      * Known Text</cite> (WKT)</A> element.
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name, which is "FITTED_CS"
+     * @return The name of the WKT element type, which is {@code "FITTED_CS"}.
      */
     protected String formatWKT(final Formatter formatter) {
+        MathTransform inverse = conversionFromBase.getMathTransform();
         try {
-            formatter.append(conversionFromBase.getMathTransform().inverse());
-            formatter.append(baseCRS);
-            return "FITTED_CS";
+            inverse = inverse.inverse();
         } catch (NoninvertibleTransformException exception) {
-            // TODO: provide a more accurate error message.
+            // TODO: provide a more accurate error message. Use J2SE 1.5 constructor.
             IllegalStateException e = new IllegalStateException(exception.getLocalizedMessage());
             e.initCause(exception);
             throw e;
         }
+        formatter.append(inverse);
+        formatter.append(baseCRS);
+        return getTypeWKT();
+    }
+    
+    /**
+     * Returns the name of the WKT element type, which is {@code "FITTED_CS"} by default.
+     * {@link DefaultProjectedCRS} will use a different name.
+     */
+    //@Override
+    String getTypeWKT() {
+        return "FITTED_CS";
     }
 }

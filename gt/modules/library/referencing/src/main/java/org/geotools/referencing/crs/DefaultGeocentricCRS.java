@@ -176,15 +176,23 @@ public class DefaultGeocentricCRS extends AbstractSingleCRS implements Geocentri
     protected String formatWKT(final Formatter formatter) {
         final Unit unit = getUnit();
         formatter.append(datum);
-        formatter.append(((GeodeticDatum)datum).getPrimeMeridian());
+        formatter.append(((GeodeticDatum) datum).getPrimeMeridian());
         formatter.append(unit);
         final int dimension = coordinateSystem.getDimension();
         for (int i=0; i<dimension; i++) {
             formatter.append(coordinateSystem.getAxis(i));
         }
         if (unit == null) {
-            formatter.setInvalidWKT();
+            formatter.setInvalidWKT(GeocentricCRS.class);
         }
+        return getTypeWKT();
+    }
+    
+    /**
+     * Returns the name of the WKT element type, which is {@code "GEOCCS"}.
+     */
+    //@Override
+    final String getTypeWKT() {
         return "GEOCCS";
     }
 }

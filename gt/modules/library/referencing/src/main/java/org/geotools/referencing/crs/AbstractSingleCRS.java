@@ -174,9 +174,10 @@ public class AbstractSingleCRS extends AbstractCRS implements SingleCRS {
     }
     
     /**
-     * Format the inner part of a
+     * Formats the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element. The default implementation write the following elements:
+     * Known Text</cite> (WKT)</A> element. The default implementation writes the following
+     * elements:
      * <ul>
      *   <li>The {@linkplain #datum datum}.</li>
      *   <li>The unit if all axis use the same unit. Otherwise the unit is omitted and
@@ -185,7 +186,7 @@ public class AbstractSingleCRS extends AbstractCRS implements SingleCRS {
      * </ul>
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name.
+     * @return The name of the WKT element type (e.g. {@code "GEOGCS"}).
      */
     protected String formatWKT(final Formatter formatter) {
         formatter.append(datum);

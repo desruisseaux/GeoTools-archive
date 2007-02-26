@@ -247,6 +247,8 @@ public abstract class AbstractParser extends Format {
     /**
      * Format the specified object as a Well Know Text.
      * Formatting will uses the same set of symbols than the one used for parsing.
+     *
+     * @see #getWarning
      */
     public StringBuffer format(final Object        object,
                                final StringBuffer  toAppendTo,
@@ -254,6 +256,7 @@ public abstract class AbstractParser extends Format {
     {
         final Formatter formatter = getFormatter();
         try {
+            formatter.clear();
             formatter.buffer = toAppendTo;
             formatter.bufferBase = toAppendTo.length();
             if (object instanceof MathTransform) {
@@ -269,7 +272,6 @@ public abstract class AbstractParser extends Format {
             return toAppendTo;
         } finally {
             formatter.buffer = null;
-            formatter.clear();
         }
     }     
 
@@ -313,6 +315,21 @@ public abstract class AbstractParser extends Format {
     }
 
     /**
+     * If a warning occured during the last WKT {@linkplain #format formatting},
+     * returns the warning. Otherwise returns {@code null}. The warning is cleared
+     * every time a new object is formatted.
+     *
+     * @since 2.4
+     */
+    public String getWarning() {
+        if (formatter != null && formatter.isInvalidWKT()) {
+            return Errors.format(ErrorKeys.INVALID_WKT_FORMAT_$1,
+                    Utilities.getShortName(formatter.getUnformattableClass()));
+        }
+        return null;
+    }
+
+    /**
      * Report a failure while parsing the specified line.
      *
      * @param err  The stream where to report the failure.
@@ -324,8 +341,8 @@ public abstract class AbstractParser extends Format {
         line = line.replace('\r', ' ').replace('\n', ' ');
         final int WINDOW_WIDTH    = 80; // Arbitrary value.
         int           stop        = line.length();
-        int           base        = errorOffset-WINDOW_WIDTH/2;
-        final int     baseMax     = stop-WINDOW_WIDTH;
+        int           base        = errorOffset - WINDOW_WIDTH/2;
+        final int     baseMax     = stop - WINDOW_WIDTH;
         final boolean hasTrailing = (Math.max(base,0) < baseMax);
         if (!hasTrailing) {
             base = baseMax;
@@ -333,7 +350,7 @@ public abstract class AbstractParser extends Format {
         if (base < 0) {
             base = 0;
         }
-        stop = Math.min(stop, base+WINDOW_WIDTH);
+        stop = Math.min(stop, base + WINDOW_WIDTH);
         if (hasTrailing) {
             stop -= 3;
         }
@@ -348,7 +365,7 @@ public abstract class AbstractParser extends Format {
         } else {
             err.println();
         }
-        err.print(Utilities.spaces(errorOffset-base));
+        err.print(Utilities.spaces(errorOffset - base));
         err.println('^');
     }
 }

@@ -163,7 +163,7 @@ public abstract class AbstractParameterDescriptor extends AbstractIdentifiedObje
      * @return The WKT element name, which is "PARAMETER"
      */
     protected String formatWKT(final Formatter formatter) {
-        formatter.setInvalidWKT();
+        formatter.setInvalidWKT(GeneralParameterDescriptor.class);
         return "PARAMETER";
     }
 }

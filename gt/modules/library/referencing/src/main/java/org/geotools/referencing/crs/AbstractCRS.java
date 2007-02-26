@@ -179,9 +179,10 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
     }
     
     /**
-     * Format the inner part of a
+     * Formats the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well
-     * Known Text</cite> (WKT)</A> element. The default implementation write the following elements:
+     * Known Text</cite> (WKT)</A> element. The default implementation writes the following
+     * elements:
      * <ul>
      *   <li>The unit if all axis use the same unit. Otherwise the unit is omitted and
      *       the WKT format is {@linkplain Formatter#isInvalidWKT flagged as invalid}.</li>
@@ -189,7 +190,7 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
      * </ul>
      *
      * @param  formatter The formatter to use.
-     * @return The WKT element name.
+     * @return The name of the WKT element type (e.g. {@code "GEOGCS"}).
      */
     protected String formatWKT(final Formatter formatter) {
         final Unit unit = getUnit();
@@ -199,8 +200,27 @@ public abstract class AbstractCRS extends AbstractReferenceSystem implements Coo
             formatter.append(coordinateSystem.getAxis(i));
         }
         if (unit == null) {
-            formatter.setInvalidWKT();
+            formatter.setInvalidWKT(CoordinateReferenceSystem.class);
         }
+        final String type = getTypeWKT();
+        if (type != null) {
+            return type;
+        }
+        // Will declares the WKT as invalid.
         return super.formatWKT(formatter);
+    }
+    
+    /**
+     * Returns the name of the element type (for example {@code "GEOGCS"}), or {@code null}
+     * if the WKT specification doesn't have a type name for the kind of CRS to be formatted.
+     * In the later case, {@link #formatWKT} will uses a synthetic name and flags the WKT
+     * string as invalid.
+     * <p>
+     * This method is package-private because not really needed even for users outside this
+     * package. It is just a trick for reducing code duplication in {@code formatWKT} methods
+     * inside this package.
+     */
+    String getTypeWKT() {
+        return null;
     }
 }

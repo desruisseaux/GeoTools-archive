@@ -58,6 +58,11 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 5772066656987558634L;
+
+    /**
+     * Small number for floating point comparaisons.
+     */
+    private static final double EPSILON = 1E-10;
     
     /**
      * The first math transform.
@@ -174,6 +179,9 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
                     final GeneralMatrix m = new GeneralMatrix(numRow, numCol);
                     m.mul(toGMatrix(matrix2), toGMatrix(matrix1));
                     matrix = m;
+                }
+                if (matrix.isIdentity(EPSILON)) {
+                    matrix.setIdentity();
                 }
                 // May not be really affine, but work anyway...
                 // This call will detect and optimize the special

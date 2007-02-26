@@ -510,7 +510,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
         for (int i=0; i<axis.length; i++) {
             formatter.append(axis[i]);
         }
-        formatter.setInvalidWKT();
+        formatter.setInvalidWKT(CoordinateSystem.class);
         return super.formatWKT(formatter);
     }
 }
