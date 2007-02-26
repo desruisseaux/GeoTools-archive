@@ -35,6 +35,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 // Geotools dependencies
 import org.geotools.geometry.GeneralDirectPosition;
 import org.geotools.referencing.operation.matrix.XMatrix;
+import org.geotools.referencing.operation.matrix.Matrix3;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.referencing.operation.LinearTransform;
 import org.geotools.referencing.wkt.Formatter;
@@ -102,7 +103,7 @@ public class ConcatenatedTransform extends AbstractMathTransform implements Seri
             return toXMatrix(((LinearTransform) transform).getMatrix());
         }
         if (transform instanceof AffineTransform) {
-            return new GeneralMatrix((AffineTransform) transform);
+            return new Matrix3((AffineTransform) transform);
         }
         return null;
     }

@@ -626,7 +626,8 @@ public class ObliqueMercator extends MapProjection {
         }
         if (super.equals(object)) {
             final ObliqueMercator that = (ObliqueMercator) object;
-            return equals(this.latitudeOfCentre   , that.latitudeOfCentre   ) &&
+            return this.twoPoint == that.twoPoint &&
+                   equals(this.latitudeOfCentre   , that.latitudeOfCentre   ) &&
                    equals(this.longitudeOfCentre  , that.longitudeOfCentre  ) &&
                    equals(this.azimuth            , that.azimuth            ) &&
                    equals(this.rectifiedGridAngle , that.rectifiedGridAngle ) &&
@@ -634,7 +635,10 @@ public class ObliqueMercator extends MapProjection {
                    equals(this.longitudeOf1stPoint, that.longitudeOf1stPoint) &&
                    equals(this.latitudeOf2ndPoint , that.latitudeOf2ndPoint ) &&
                    equals(this.longitudeOf2ndPoint, that.longitudeOf2ndPoint) &&
-                          this.twoPoint         == that.twoPoint;
+                   equals(this.u_c,                 that.u_c);
+            // Note: "u_c" is a derived parameter, so in theory we don't need to compare it.
+            //        However we still compare it as a safety, because it takes a different
+            //        value in the "hotine" case.
         }
         return false;
     }

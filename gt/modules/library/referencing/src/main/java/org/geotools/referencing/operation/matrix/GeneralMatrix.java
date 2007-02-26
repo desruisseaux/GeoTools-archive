@@ -571,13 +571,15 @@ public class GeneralMatrix extends GMatrix implements XMatrix {
         final String lineSeparator = System.getProperty("line.separator", "\n");
         final FieldPosition  dummy = new FieldPosition(0);
         final NumberFormat  format = NumberFormat.getNumberInstance();
+        format.setGroupingUsed(false);
         format.setMinimumFractionDigits(6);
         format.setMaximumFractionDigits(6);
         for (int j=0; j<numRow; j++) {
             for (int i=0; i<numCol; i++) {
                 final int position = buffer.length();
                 buffer = format.format(matrix.getElement(j,i), buffer, dummy);
-                buffer.insert(position, Utilities.spaces(columnWidth-(buffer.length()-position)));
+                final int spaces = Math.max(columnWidth - (buffer.length() - position), 1);
+                buffer.insert(position, Utilities.spaces(spaces));
             }
             buffer.append(lineSeparator);
         }

@@ -183,7 +183,7 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      * </UL>
      * <P>
      * Then the conversion between two projected CRS can sometime be represented as a linear
-     * conversion. For example if only false easting/northing differ, than the coordinate conversion
+     * conversion. For example if only false easting/northing differ, then the coordinate conversion
      * is simply a translation. If no linear conversion has been found between the two CRS, then
      * this method returns {@code null}.
      *
@@ -193,6 +193,9 @@ public class DefaultProjectedCRS extends AbstractDerivedCRS implements Projected
      *         equal. This is usually a small number like {@code 1E-10}.
      * @return The conversion from {@code sourceCRS} to {@code targetCRS} as an
      *         affine transform, or {@code null} if no linear transform has been found.
+     *
+     * @deprecated This method was for {@code DefaultCoordinateOperationFactory} internal
+     *             use only, and contains some shortcomming. Avoid direct use.
      */
     public static Matrix createLinearConversion(final ProjectedCRS sourceCRS,
                                                 final ProjectedCRS targetCRS,
@@ -273,8 +276,6 @@ search: for (final Iterator it=targetParams.iterator(); it.hasNext();) {
                                 scaleX *= scale;
                                 scaleY *= scale;
                             } else if (nameMatches(descriptor, "semi_major")) {
-                                // TODO: this is wrong since we are not ensuring that the
-                                // semi_major/semi_minor ratio is the same in source and target.
                                 scaleX *= (targetValue / sourceValue);
                             } else if (nameMatches(descriptor, "semi_minor")) {
                                 scaleY *= (targetValue / sourceValue);

@@ -58,6 +58,12 @@ public final class LoggingKeys {
     public static final int APPLIED_RESAMPLE_$11 = 3;
 
     /**
+     * Converted "{0}" from "{1}" to "{2}" units. We assume that this is the expected units for
+     * computation purpose.
+     */
+    public static final int APPLIED_UNIT_CONVERSION_$3 = 47;
+
+    /**
      * Failed to bind a "{0}" entry.
      */
     public static final int CANT_BIND_DATASOURCE_$1 = 24;

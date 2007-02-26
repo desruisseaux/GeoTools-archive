@@ -119,6 +119,8 @@ public final class SouthOrientedTest extends TestCase {
         assertFalse(matrix.isIdentity());
         assertEquals("West direction should be unchanged. ",      +1, matrix.getElement(0,0), EPS);
         assertEquals("North-South direction should be reverted.", -1, matrix.getElement(1,1), EPS);
+        assertEquals("No easting expected.",                       0, matrix.getElement(0,2), EPS);
+        assertEquals("No northing expected.",                      0, matrix.getElement(1,2), EPS);
 
         /*
          * Tests "Transverse Mercator South Oriented"
@@ -127,13 +129,27 @@ public final class SouthOrientedTest extends TestCase {
         assertEquals(AxisDirection.WEST,  south.getCoordinateSystem().getAxis(0).getDirection());
         assertEquals(AxisDirection.SOUTH, south.getCoordinateSystem().getAxis(1).getDirection());
         transform = CRS.findMathTransform(north, south);
-if (true) return; // TODO: Does not yet work below this point.
         assertTrue(transform instanceof LinearTransform);
         matrix = ((LinearTransform) transform).getMatrix();
         assertDiagonal(matrix);
         assertFalse(matrix.isIdentity());
         assertEquals("West direction should be unchanged. ",      +1, matrix.getElement(0,0), EPS);
         assertEquals("North-South direction should be reverted.", -1, matrix.getElement(1,1), EPS);
+        assertEquals("No easting expected.",                       0, matrix.getElement(0,2), EPS);
+        assertEquals("No northing expected.",                      0, matrix.getElement(1,2), EPS);
+
+        /*
+         * Tries with a different northing.
+         */
+        north = parseTransverseMercator(false, false, 3000);
+        transform = CRS.findMathTransform(north, south);
+        assertTrue(transform instanceof LinearTransform);
+        matrix = ((LinearTransform) transform).getMatrix();
+        assertFalse(matrix.isIdentity());
+        assertEquals("West direction should be unchanged. ",      +1, matrix.getElement(0,0), EPS);
+        assertEquals("North-South direction should be reverted.", -1, matrix.getElement(1,1), EPS);
+        assertEquals("No easting expected.",                       0, matrix.getElement(0,2), EPS);
+        assertEquals("Northing expected.",                      2000, matrix.getElement(1,2), EPS);
     }
 
     /**

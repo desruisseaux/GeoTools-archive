@@ -42,7 +42,6 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultCompoundCRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.geotools.referencing.crs.DefaultProjectedCRS;
 import org.geotools.referencing.cs.DefaultCartesianCS;
 import org.geotools.referencing.cs.DefaultEllipsoidalCS;
 import org.geotools.referencing.datum.BursaWolfParameters;
@@ -606,8 +605,6 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
      * <BR>
      * <UL>
      *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SCALE_FACTOR   scale_factor}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SEMI_MAJOR     semi_major}</LI>
-     *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#SEMI_MINOR     semi_minor}</LI>
      *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_EASTING  false_easting}</LI>
      *   <LI>{@link org.geotools.referencing.operation.projection.MapProjection.AbstractProvider#FALSE_NORTHING false_northing}</LI>
      * </UL>
@@ -628,7 +625,7 @@ public class DefaultCoordinateOperationFactory extends AbstractCoordinateOperati
     private static Matrix createLinearConversion(final ProjectedCRS sourceCRS,
                                                  final ProjectedCRS targetCRS)
     {
-        return DefaultProjectedCRS.createLinearConversion(sourceCRS, targetCRS, 1E-10);
+        return ProjectionAnalyzer.createLinearConversion(sourceCRS, targetCRS, 1E-10);
     }
 
 
