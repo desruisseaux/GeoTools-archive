@@ -1,0 +1,133 @@
+/*
+ *    GeoTools - OpenSource mapping toolkit
+ *    http://geotools.org
+ *    (C) 2002-2006, GeoTools Project Managment Committee (PMC)
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.geotools.data.property;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import junit.framework.TestCase;
+
+import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultQuery;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureReader;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.Query;
+import org.geotools.data.Transaction;
+import org.geotools.feature.AttributeType;
+import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.IllegalAttributeException;
+import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.referencing.CRS;
+
+/**
+ * Test non functionality of PropertyDataStore.
+ * 
+ * @author Jody Garnett, Refractions Research Inc.
+ * @source $URL: http://svn.geotools.org/geotools/trunk/gt/demo/property/src/test/java/org/geotools/data/property/PropertyDataStoreTest.java $
+ */
+public class PropertyDataStore2Test extends TestCase {
+    PropertyDataStore store;
+    /**
+     * Constructor for SimpleDataStoreTest.
+     * @param arg0
+     */
+    public PropertyDataStore2Test(String arg0) {
+        super(arg0);
+    }
+    protected void setUp() throws Exception {
+        File dir = new File(".", "propertyTestData" );
+        dir.mkdir();
+               
+        File file = new File( dir ,"road.properties");
+        if( file.exists()){
+            file.delete();
+        }        
+        BufferedWriter writer = new BufferedWriter( new FileWriter( file ) );
+        writer.write("_=id:Integer,*geom:Geometry,name:String"); writer.newLine();
+        writer.write("fid1=1|LINESTRING(0 0,10 10)|jody"); writer.newLine();
+        writer.write("fid2=2|LINESTRING(20 20,30 30)|brent"); writer.newLine();
+        writer.write("fid3=3|LINESTRING(5 0, 5 10)|dave"); writer.newLine();
+        writer.write("fid4=4|LINESTRING(0 5, 5 0, 10 5, 5 10, 0 5)|justin");
+        writer.close();
+        store = new PropertyDataStore( dir );
+        super.setUp();
+    }
+    protected void tearDown() throws Exception {
+        File dir = new File( "propertyTestData" );
+        File list[]=dir.listFiles();
+        for( int i=0; i<list.length;i++){
+            list[i].delete();
+        }
+        dir.delete();
+        super.tearDown();                
+    }
+
+ 
+    public void testSimple() throws Exception {
+        FeatureSource road = store.getFeatureSource( "road" );
+        FeatureCollection features = road.getFeatures();
+        
+        assertEquals( 1, features.getFeatureType().getAttributeCount() );
+        assertEquals( 4, features.size() );
+    }
+    public void testQuery() throws Exception {
+        FeatureSource road = store.getFeatureSource( "road" );
+                
+        DefaultQuery query = new DefaultQuery( "road", Filter.INCLUDE,
+                new String[]{ "name" } );
+        
+        FeatureCollection features = road.getFeatures( query );
+        assertEquals( 1, features.getFeatureType().getAttributeCount() );
+    }
+    
+    public void testQueryReproject() throws Exception {
+        CoordinateReferenceSystem world = CRS.decode("EPSG:4326"); // world lon/lat
+        CoordinateReferenceSystem local = CRS.decode("EPSG:3005"); // british columbia
+        
+        
+        FeatureSource road = store.getFeatureSource( "road" );
+        FeatureType origionalType = road.getSchema();
+        
+        DefaultQuery query = new DefaultQuery( "road", Filter.INCLUDE,
+                new String[]{ "geom", "name" } );
+        
+        query.setCoordinateSystem( local ); // FROM
+        query.setCoordinateSystemReproject( world ); // TO
+                
+        FeatureCollection features = road.getFeatures( query );
+        FeatureType resultType = features.getSchema();
+        
+        
+        assertNotNull( resultType );
+        assertNotSame( resultType, origionalType );
+        
+        GeometryAttributeType resultGeometryType = resultType.getDefaultGeometry();
+        assertEquals( world, resultGeometryType.getCoordinateSystem() );
+    }
+}
