@@ -65,7 +65,7 @@ public class PostgisAuthorityFactoryOnlineTest extends TestCase {
             String message = sqle.getMessage();
 
             throw new DataSourceException(message, sqle);
-        }finally {
+        } finally {
             JDBCUtils.close(dbConnection, Transaction.AUTO_COMMIT, null);
         }
     }

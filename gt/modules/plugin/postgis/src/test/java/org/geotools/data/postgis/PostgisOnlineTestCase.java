@@ -34,6 +34,11 @@ public abstract class PostgisOnlineTestCase extends OnlineTestCase {
     protected abstract String getFixtureId();
 
     protected void connect() throws Exception {
+        Map params = getParams();
+        dataStore = new PostgisDataStoreFactory().createDataStore(params);
+    }
+    
+    public Map getParams() {
         Map params = new HashMap();
 
         params.put(PostgisDataStoreFactory.DBTYPE.key, "postgis");
@@ -59,8 +64,9 @@ public abstract class PostgisOnlineTestCase extends OnlineTestCase {
                     .getProperty("looseBbox"));
         }
 
-        dataStore = new PostgisDataStoreFactory().createDataStore(params);
+        return params;
     }
+
 
     protected void disconnect() throws Exception {
         dataStore = null;

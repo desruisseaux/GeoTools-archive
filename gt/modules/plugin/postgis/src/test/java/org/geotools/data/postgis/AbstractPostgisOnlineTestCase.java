@@ -3,19 +3,13 @@ package org.geotools.data.postgis;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.postgis.PostgisTests.Fixture;
 
 /**
  * Sets up various dummy tables/sequences, for extension.
  * 
  * @author Cory Horner, Refractions Research
  */
-public class AbstractPostgisOnlineTestCase extends TestCase {
+public class AbstractPostgisOnlineTestCase extends PostgisOnlineTestCase {
     
     protected PostgisDataStore ds;
     
@@ -32,15 +26,9 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
     /** simple table with int4 primary key, sequence as default value, WITHOUT OIDS, and space in name */
     final protected String table6 = "tmp_pgtest 6";
     
-    Fixture fixture;
-    
-    protected void setUp() throws Exception {
-        super.setUp();
-        //connect
-        fixture = PostgisTests.newFixture("fixture.properties");
-        Map params = PostgisTests.getParams(fixture);
-        ds = (PostgisDataStore) DataStoreFinder.getDataStore(params);
-        
+    protected void connect() throws Exception {
+        super.connect();
+        ds = (PostgisDataStore) dataStore;
         //create dummy tables
         Statement st = getConnection().createStatement();
         dropTables(st);
@@ -49,18 +37,18 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
         setupGeometryColumns(st);
         st.close();
     }
-    
-    public Connection getConnection() throws Exception {
-        return ds.getConnectionPool().getConnection();
-    }
-    
-    protected void tearDown() throws Exception {
+
+    protected void disconnect() throws Exception {
         Statement st = getConnection().createStatement();
         purgeGeometryColumns(st);
         dropTables(st);
         st.close();
         //ds.getConnectionPool().close(); //is this killing our other tests?
-        super.tearDown();
+        super.disconnect();
+    }
+    
+    public Connection getConnection() throws Exception {
+        return ds.getConnectionPool().getConnection();
     }
     
     protected void setupGeometryColumns(Statement st) throws Exception {
@@ -179,5 +167,9 @@ public class AbstractPostgisOnlineTestCase extends TestCase {
             sql = "DROP SEQUENCE \"" + sequenceName + "\"";
             st.execute(sql);
         }
+    }
+
+    protected String getFixtureId() {
+        return "postgis.typical";
     }
 }
