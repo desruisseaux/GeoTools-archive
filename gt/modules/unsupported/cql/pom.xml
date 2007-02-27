@@ -112,7 +112,7 @@
         <version>2.4-SNAPSHOT</version>
         <configuration>
           <!-- Where to search for .jjt files -->
-          <sourceDirectory>${basedir}/src</sourceDirectory>
+          <sourceDirectory>${basedir}/src/main/resources</sourceDirectory>
           <!-- Where to search for Node.java -->
           <nodeDirectory>
             ${basedir}/modified-src
