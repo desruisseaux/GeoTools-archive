@@ -93,7 +93,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @source $URL:
  *         http://gtsvn.refractions.net/geotools/trunk/gt/modules/unsupported/cql/src/main/java/org/geotools/text/filter/FilterBuilder.java $
  */
-public class FilterBuilder {
+class FilterBuilder {
 
     /**
      * Delimiter characted used for
