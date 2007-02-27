@@ -22,6 +22,8 @@ import junit.framework.TestCase;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.factory.CommonFactoryFinder;
 
 /**
  * Test Params used by PostgisDataStoreFactory.
@@ -32,8 +34,8 @@ import org.geotools.data.DataStore;
  * @version $Id$
  */
 public class VersiondPostgisDataStoreFactoryOnlineTest extends TestCase {
-    static VersionedPostgisDatastoreFactory factory
-        = new VersionedPostgisDatastoreFactory();
+    static VersionedPostgisDataStoreFactory factory
+        = new VersionedPostgisDataStoreFactory();
     
     Map remote;
     Map local;
@@ -78,4 +80,10 @@ public class VersiondPostgisDataStoreFactoryOnlineTest extends TestCase {
         	assertTrue( expected.getMessage().startsWith("Connection failed:"));
         }               
     }    
+    
+    public void testLookup() throws Exception {
+        DataStore ds = DataStoreFinder.getDataStore(remote);
+        assertNotNull(ds);
+        assertTrue(ds instanceof VersionedPostgisDataStore);
+    }
 }
