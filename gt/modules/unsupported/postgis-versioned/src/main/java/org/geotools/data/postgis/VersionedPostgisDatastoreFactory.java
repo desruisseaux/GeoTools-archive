@@ -80,11 +80,7 @@ public class VersionedPostgisDatastoreFactory extends AbstractDataStoreFactory {
         if (!super.canProcess(params)) {
             return false; // was not in agreement with getParametersInfo
         }
-        if (!(((String) params.get("dbtype")).equalsIgnoreCase("postgis"))) {
-            return (false);
-        } else {
-            return (true);
-        }
+        return ((String) params.get("dbtype")).equalsIgnoreCase("postgis-versioned");
     }
 
     /**
