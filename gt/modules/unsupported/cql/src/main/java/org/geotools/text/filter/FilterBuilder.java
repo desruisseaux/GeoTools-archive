@@ -22,7 +22,10 @@ import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.factory.CommonFactoryFinder;
@@ -493,9 +496,17 @@ public class FilterBuilder {
 
             case JJTCOMPOUND_ATTRIBUTE_NODE:
                 return buildCompoundAttribute();
+                
+                // ----------------------------------------
+                // function
+                // ----------------------------------------
             case JJTFUNCTION_NODE:
                 return buildFunction(n);
-
+            case JJTFUNCTIONNAME_NODE: 
+                return n; // used as mark of function name in stack
+            case JJTFUNCTIONARG_NODE:
+                return n; // used as mark of args in stack
+                
                 // Math Nodes
             case JJTADDNODE:
             case JJTSUBTRACTNODE:
@@ -1422,132 +1433,50 @@ public class FilterBuilder {
             return literal;
         }
 
+        /**
+         * Builds a function expression 
+         *
+         * @param n function node
+         * @return Function
+         * @throws FilterBuilderException
+         */
         private Function buildFunction(Node n) throws FilterBuilderException {
 
-            // TODO expecting implementation of Expr.function(...)
+            //FIXME FilterFactoryImpl cast must be precluded
             FilterFactoryImpl ff = (FilterFactoryImpl) filterFactory;
 
-            Token token = n.getToken();
-            String functionName = token.image;
-
-            int nArgs = n.jjtGetNumChildren();
-
-            Expression[] args = new Expression[nArgs];
-            for (int i = 0; i < nArgs; i++) {
-                args[i] = (Expression) resultStack.popExpression();
+            String functionName = null; //token.image;
+            
+            // extracts the arguments from stack. Each argument in the stack 
+            // is preceded by an argument node. Finally extracts the function name
+            List argList = new LinkedList();
+            while(!resultStack.empty()){
+                   
+                Result node = resultStack.peek(); 
+                if(node.getNodeType() == JJTFUNCTIONNAME_NODE){
+                    // gets the function's name
+                    Result funcNameNode = resultStack.popResult();
+                    functionName = funcNameNode.getToken().image;
+                    break; 
+                }
+                // ejects the argument node
+                resultStack.popResult(); 
+                    
+                // extracts the argument value
+                Expression arg = resultStack.popExpression();
+                argList.add(arg); 
+                
             }
+            // Puts the argument in correct order 
+            Collections.reverse(argList);
+            Expression []args = (Expression[]) argList.toArray(new Expression[argList.size()]);
+            
             Function function = ff.function(functionName, args);
             if (function == null) {
                 throw new FilterBuilderException("function not found: ", token);
             }
 
             return function;
-
-            // FIXME arreglarla revisar box en CQL
-            // String function = n.getToken().image;
-            // if ("box".equalsIgnoreCase(function)) {
-            // if (n.jjtGetNumChildren() != 4) {
-            // throw new FilterBuilderException(
-            // "Bounding Box filter requires 4 arguments",
-            // getToken(0));
-            // }
-            //                
-            // double d4 = doubleValue();
-            // double d3 = doubleValue();
-            // double d2 = doubleValue();
-            // double d1 = doubleValue();
-            // try {
-            // return factory.createBBoxExpression(new Envelope(d1, d2,
-            // d3, d4));
-            // } catch (IllegalFilterException ife) {
-            // throw new FilterBuilderException(
-            // "Exception building BBoxExpression", getToken(0),
-            // ife);
-            // }
-            // } else if ("id".equalsIgnoreCase(function)) {
-            // if (n.jjtGetNumChildren() != 1) {
-            // throw new FilterBuilderException(
-            // "Feature ID filter requires 1 argument",
-            // getToken(0));
-            // }
-            // return factory.createFidFilter(stringValue());
-            // } else if ("between".equalsIgnoreCase(function)) {
-            // if (n.jjtGetNumChildren() != 3) {
-            // throw new FilterBuilderException(
-            // "Between filter requires 3 arguments", getToken(0));
-            // }
-            // Expression two = popExpression();
-            // Expression att = popExpression();
-            // Expression one = popExpression();
-            // try {
-            // BetweenFilter b = factory.createBetweenFilter();
-            // b.addLeftValue(one);
-            // b.addMiddleValue(att);
-            // b.addRightValue(two);
-            // return b;
-            // } catch (IllegalFilterException ife) {
-            // throw new FilterBuilderException(
-            // "Exception building BetweenFilter", getToken(0),
-            // ife);
-            // }
-            //                
-            // } else if ("like".equalsIgnoreCase(function)) {
-            // if (n.jjtGetNumChildren() != 2) {
-            // throw new FilterBuilderException(
-            // "Like filter requires at least two arguments",
-            // getToken(0));
-            // }
-            // LikeFilter f = factory.createLikeFilter();
-            // f.setPattern(stringValue(), "*", ".?", "//");
-            // try {
-            // f.setValue(popExpression());
-            // } catch (IllegalFilterException ife) {
-            // throw new FilterBuilderException(
-            // "Exception building LikeFilter", getToken(0), ife);
-            // }
-            // return f;
-            // } else if ("null".equalsIgnoreCase(function)
-            // || "isNull".equalsIgnoreCase(function)) {
-            // NullFilter nf = factory.createNullFilter();
-            // Expression e = popExpression();
-            //                
-            // try {
-            // if (e instanceof LiteralExpression) {
-            // e = factory
-            // .createAttributeExpression(((LiteralExpression) e)
-            // .getValue(null).toString());
-            // }
-            // nf.nullCheckValue(e);
-            // } catch (IllegalFilterException ife) {
-            // throw new FilterBuilderException(
-            // "Exception building NullFilter", getToken(0), ife);
-            // }
-            // return nf;
-            // }
-            //            
-            // short geometryFilterType = lookupGeometryFilter(function);
-            // if (geometryFilterType >= 0)
-            // return buildGeometryFilter(geometryFilterType);
-            //            
-            // FunctionExpression func = factory
-            // .createFunctionExpression(function);
-            // if (func == null)
-            // throw new FilterBuilderException("Could not build function : "
-            // + function, getToken(0));
-            //            
-            // int nArgs = func.getArgCount();
-            // if (n.jjtGetNumChildren() != nArgs) {
-            // throw new FilterBuilderException(function + " function requires "
-            // + nArgs + " arguments", getToken(0));
-            // }
-            //            
-            // Expression[] args = new Expression[func.getArgCount()];
-            // for (int i = 0; i < args.length; i++) {
-            // args[i] = popExpression();
-            // }
-            //            
-            // func.setArgs(args);
-            // return func;
 
         }
 

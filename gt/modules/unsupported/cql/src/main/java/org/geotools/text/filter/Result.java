@@ -18,7 +18,8 @@ package org.geotools.text.filter;
 import org.geotools.text.filter.Token;
 
 /**
- *
+ * Maintains the result of building process. 
+ * 
  * @since 2.4
  * @author Mauricio Pazos - Axios Engineering
  * @author Gabriel Roldan - Axios Engineering
@@ -29,9 +30,9 @@ final class Result {
 
     private int nodeType = 0;
 
-    private Object built;
+    private Object built = null;
 
-    private Token token;
+    private Token token = null;
 
     Result(Object built, Token token, int nodeType) {
 
@@ -40,6 +41,12 @@ final class Result {
         this.nodeType = nodeType;
     }
 
+    public String toString(){
+        assert this.token != null;
+        
+        return "Result [TOKEN("+ this.token.toString()+");"+ "BUILT("+ built +"); NODE_TYPE("+ new Integer(nodeType)+") ]"; 
+        
+    }
     public final Object getBuilt() {
         return this.built;
     }

@@ -33,6 +33,7 @@ import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.Add;
 import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BBOX;
@@ -57,7 +58,6 @@ import org.opengis.filter.spatial.Within;
  * </p>
  * 
  * @author Created by: James
- * 
  * @author Extended by: Mauricio Pazos - Axios Engineering
  */
 public class FilterBuilderTest extends TestCase {
@@ -68,7 +68,7 @@ public class FilterBuilderTest extends TestCase {
         return suite;
     }
 
-    public FilterBuilderTest(String testName) {
+    public FilterBuilderTest( String testName ) {
         super(testName);
     }
 
@@ -78,9 +78,9 @@ public class FilterBuilderTest extends TestCase {
      * @throws ParseException
      */
     public void testUsesProvidedFilterFactory() throws ParseException {
-        final boolean[] called = { false };
-        FilterFactory ff = new FilterFactoryImpl() {
-            public PropertyName property(String propName) {
+        final boolean[] called = {false};
+        FilterFactory ff = new FilterFactoryImpl(){
+            public PropertyName property( String propName ) {
                 called[0] = true;
                 return super.property(propName);
             }
@@ -90,7 +90,7 @@ public class FilterBuilderTest extends TestCase {
         assertTrue("Provided FilterFactory was not called", called[0]);
     }
 
-    private void testEqualsExpressions(String inputExpression) throws Exception {
+    private void testEqualsExpressions( String inputExpression ) throws Exception {
 
         Filter expected = FilterSample.getSample(inputExpression);
         Filter actual = FilterBuilder.parse(inputExpression);
@@ -152,12 +152,11 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;comparison predicate &gt; ::= 
-     *                           	       &lt;attribute name &gt;  &lt;comp op &gt;  &lt;literal &gt;
+     *                               &lt;comparison predicate &gt; ::= 
+     *                             	       &lt;attribute name &gt;  &lt;comp op &gt;  &lt;literal &gt;
      * </pre>
      * 
      * </p>
-     * 
      */
     public void testComparationPredicate() throws Exception {
 
@@ -208,8 +207,8 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                              &lt;comparison predicate &gt; ::= 
-     *                             	    &lt;attrsibute name &gt;  &lt;comp op &gt;  &lt;literal &gt;
+     *                                &lt;comparison predicate &gt; ::= 
+     *                               	    &lt;attrsibute name &gt;  &lt;comp op &gt;  &lt;literal &gt;
      * </pre>
      * 
      * </p>
@@ -229,8 +228,7 @@ public class FilterBuilderTest extends TestCase {
     }
 
     /**
-     * Test of getFormattedErrorMessage method, of class
-     * org.geotools.filter.ExpressionBuilder.
+     * Test of getFormattedErrorMessage method, of class org.geotools.filter.ExpressionBuilder.
      */
     public void testGetFormattedErrorMessage() {
         final String exp = "12 / ] + 4";
@@ -248,16 +246,15 @@ public class FilterBuilderTest extends TestCase {
     /**
      * Test Existnce Predicate.
      * <p>
-     * EXIST: evaluates as true for all record instances where the
-     * attribute_name is a member of the record schema. DOES-NOT-EXIST: opposite
-     * to EXISTS
+     * EXIST: evaluates as true for all record instances where the attribute_name is a member of the
+     * record schema. DOES-NOT-EXIST: opposite to EXISTS
      * </p>
      * <p>
      * 
      * <pre>
-     *                             &lt;existence_predicate &gt; ::= 
-     *                            	  &lt;attribute_name &gt; EXISTS
-     *                            |  &lt;attribute_name &gt; DOES-NOT-EXIST
+     *                               &lt;existence_predicate &gt; ::= 
+     *                              	  &lt;attribute_name &gt; EXISTS
+     *                              |  &lt;attribute_name &gt; DOES-NOT-EXIST
      * </pre>
      * 
      * </p>
@@ -309,7 +306,7 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;null predicate &gt; ::=  &lt;attribute name &gt; IS [ NOT ] NULL
+     *                               &lt;null predicate &gt; ::=  &lt;attribute name &gt; IS [ NOT ] NULL
      * </pre>
      * 
      * </p>
@@ -365,19 +362,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;temporal predicate  &gt;::= 
-     *                               &lt;attribute_name &gt; &lt;b&gt;BEFORE&lt;/b&gt;  &lt;date-time expression &gt; [*]
-     *                            |  &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
-     *                            
-     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;[*]
-     *                            
-     *                             &lt;period &gt; ::= 
-     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt; [*]	
-     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt; [*]
+     *                               &lt;temporal predicate  &gt;::= 
+     *                                 &lt;attribute_name &gt; &lt;b&gt;BEFORE&lt;/b&gt;  &lt;date-time expression &gt; [*]
+     *                              |  &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; DURING  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
+     *                              
+     *                               &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;[*]
+     *                              
+     *                               &lt;period &gt; ::= 
+     *                                 &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                              |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt; [*]	
+     *                              |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt; [*]
      * </pre>
      * 
      * </p>
@@ -466,19 +463,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;temporal predicate  &gt;::= 
-     *                               &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
-     *                            | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;[*]&lt;/b&gt;
-     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
-     *                            
-     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
-     *                            
-     *                             &lt;period &gt; ::= 
-     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
-     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                               &lt;temporal predicate  &gt;::= 
+     *                                 &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
+     *                              | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;[*]&lt;/b&gt;
+     *                              |  &lt;attribute_name &gt; DURING  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
+     *                              
+     *                               &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
+     *                              
+     *                               &lt;period &gt; ::= 
+     *                                 &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                              |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
+     *                              |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
      * </pre>
      * 
      * </p>
@@ -528,19 +525,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;temporal predicate  &gt;::= 
-     *                               &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
-     *                            | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;&lt;/b&gt;
-     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;[*]
-     *                            |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
-     *                            
-     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
-     *                            
-     *                             &lt;period &gt; ::= 
-     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
-     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                               &lt;temporal predicate  &gt;::= 
+     *                                 &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
+     *                              | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;&lt;/b&gt;
+     *                              |  &lt;attribute_name &gt; DURING  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;[*]
+     *                              |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
+     *                              
+     *                               &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
+     *                              
+     *                               &lt;period &gt; ::= 
+     *                                 &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                              |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
+     *                              |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
      * </pre>
      * 
      * </p>
@@ -591,19 +588,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;temporal predicate  &gt;::= 
-     *                               &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
-     *                            | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;&lt;/b&gt;
-     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;[*]
-     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
-     *                            
-     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
-     *                            
-     *                             &lt;period &gt; ::= 
-     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
-     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                               &lt;temporal predicate  &gt;::= 
+     *                                 &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
+     *                              | &lt;b&gt; &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;&lt;/b&gt;
+     *                              |  &lt;attribute_name &gt; DURING  &lt;period &gt;[*]
+     *                              |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;     
+     *                              
+     *                               &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
+     *                              
+     *                               &lt;period &gt; ::= 
+     *                                 &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                              |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;[*]
+     *                              |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;[*]
      * </pre>
      * 
      * </p>
@@ -647,19 +644,19 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;temporal predicate  &gt;::= 
-     *                               &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
-     *                            |  &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; DURING  &lt;period &gt;
-     *                            |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
-     *                            | &lt;B&gt;  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;[*]&lt;/B&gt;     
-     *                            
-     *                             &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
-     *                            
-     *                             &lt;period &gt; ::= 
-     *                               &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
-     *                            |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;  [*]
-     *                            |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;  [*]
+     *                               &lt;temporal predicate  &gt;::= 
+     *                                 &lt;attribute_name &gt; BEFORE  &lt;date-time expression &gt;
+     *                              |  &lt;attribute_name &gt; BEFORE OR DURING  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; DURING  &lt;period &gt;
+     *                              |  &lt;attribute_name &gt; DURING OR AFTER  &lt;period &gt;
+     *                              | &lt;B&gt;  &lt;attribute_name &gt; AFTER  &lt;date-time expression &gt;[*]&lt;/B&gt;     
+     *                              
+     *                               &lt;date-time expression &gt; ::=  &lt;date-time &gt; |  &lt;period &gt;
+     *                              
+     *                               &lt;period &gt; ::= 
+     *                                 &lt;date-time &gt; &quot;/&quot;  &lt;date-time &gt;[*]
+     *                              |  &lt;date-time &gt; &quot;/&quot;  &lt;duration &gt;  [*]
+     *                              |  &lt;duration &gt; &quot;/&quot;  &lt;date-time &gt;  [*]
      * </pre>
      * 
      * </p>
@@ -773,18 +770,18 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;text predicate &gt; ::= 
-     *                                  &lt;attribute name &gt; [ NOT ] LIKE  &lt;character pattern &gt; 
-     *                            
-     *                            For example:
-     *                            
-     *                            attribute like '%contains_this%'
-     *                            attribute like 'begins_with_this%'
-     *                            attribute like '%ends_with_this'
-     *                            attribute like 'd_ve' will match 'dave' or 'dove'
-     *                            attribute not like '%will_not_contain_this%'
-     *                            attribute not like 'will_not_begin_with_this%'
-     *                            attribute not like '%will_not_end_with_this'
+     *                               &lt;text predicate &gt; ::= 
+     *                                    &lt;attribute name &gt; [ NOT ] LIKE  &lt;character pattern &gt; 
+     *                              
+     *                              For example:
+     *                              
+     *                              attribute like '%contains_this%'
+     *                              attribute like 'begins_with_this%'
+     *                              attribute like '%ends_with_this'
+     *                              attribute like 'd_ve' will match 'dave' or 'dove'
+     *                              attribute not like '%will_not_contain_this%'
+     *                              attribute not like 'will_not_begin_with_this%'
+     *                              attribute not like '%will_not_end_with_this'
      * </pre>
      * 
      * </p>
@@ -819,10 +816,10 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                            This cql clause is an extension for convenience.
-     *                            
-     *                             &lt;between predicate &gt; ::= 
-     *                                  &lt;attribute name &gt; [ NOT ] BETWEEN  &lt;literal&amp; #62; AND  &lt; literal  &gt; 
+     *                              This cql clause is an extension for convenience.
+     *                              
+     *                               &lt;between predicate &gt; ::= 
+     *                                    &lt;attribute name &gt; [ NOT ] BETWEEN  &lt;literal&amp; #62; AND  &lt; literal  &gt; 
      * </pre>
      * 
      * </p>
@@ -867,20 +864,19 @@ public class FilterBuilderTest extends TestCase {
 
     /**
      * Test Attribute
-     * 
      * <p>
      * 
      * <pre>
-     *                             &lt;attribute name &gt; ::= 
-     *                                      &lt;simple attribute name &gt; 
-     *                                 |    &lt;compound attribute name &gt;
-     *                                 
-     *                             &lt;simple attribute name &gt; ::=  &lt;identifier &gt;
-     *                             &lt;compound attribute name &gt; ::=  &lt;identifier &gt; &lt;period &gt; [{ &lt;identifier &gt; &lt;period &gt;}...] &lt;simple attribute name &gt;     
-     *                            
-     *                             &lt;identifier &gt; ::=  &lt;identifier start [ {  &lt;colon &gt; |  &lt;identifier part &gt; }... ]
-     *                             &lt;identifier start &gt; ::=  &lt;simple Latin letter &gt;
-     *                             &lt;identifier part &gt; ::=  &lt;simple Latin letter &gt; |  &lt;digit &gt;
+     *                               &lt;attribute name &gt; ::= 
+     *                                        &lt;simple attribute name &gt; 
+     *                                   |    &lt;compound attribute name &gt;
+     *                                   
+     *                               &lt;simple attribute name &gt; ::=  &lt;identifier &gt;
+     *                               &lt;compound attribute name &gt; ::=  &lt;identifier &gt; &lt;period &gt; [{ &lt;identifier &gt; &lt;period &gt;}...] &lt;simple attribute name &gt;     
+     *                              
+     *                               &lt;identifier &gt; ::=  &lt;identifier start [ {  &lt;colon &gt; |  &lt;identifier part &gt; }... ]
+     *                               &lt;identifier start &gt; ::=  &lt;simple Latin letter &gt;
+     *                               &lt;identifier part &gt; ::=  &lt;simple Latin letter &gt; |  &lt;digit &gt;
      * </pre>
      * 
      * </p>
@@ -899,7 +895,7 @@ public class FilterBuilderTest extends TestCase {
 
     }
 
-    private void testAttribute(final String attSample) {
+    private void testAttribute( final String attSample ) {
 
         PropertyIsLike result;
         PropertyName attResult = null;
@@ -924,13 +920,13 @@ public class FilterBuilderTest extends TestCase {
      * <p>
      * 
      * <pre>
-     *                             &lt;boolean value expression &gt; ::= 
-     *                                  &lt;boolean term &gt;
-     *                             |    &lt;boolean value expression &gt; OR  &lt;boolean term &gt;
-     *                             
-     *                             &lt;boolean term &gt; ::= 
-     *                                  &lt;boolean factor &gt;
-     *                            |     &lt;boolean term &gt; AND  &lt;boolean factor&gt;
+     *                               &lt;boolean value expression &gt; ::= 
+     *                                    &lt;boolean term &gt;
+     *                               |    &lt;boolean value expression &gt; OR  &lt;boolean term &gt;
+     *                               
+     *                               &lt;boolean term &gt; ::= 
+     *                                    &lt;boolean factor &gt;
+     *                              |     &lt;boolean term &gt; AND  &lt;boolean factor&gt;
      * </pre>
      * 
      * </p>
@@ -998,21 +994,21 @@ public class FilterBuilderTest extends TestCase {
     }
 
     /**
-     * Test for Function Unary Expressions .
+     * Test for Function Unary Expressions with funcions in CQL.
      * <p>
      * 
      * <pre>
-     *                            
-     *                             &lt;unary expression &gt; ::= 
-     *                                      &lt;Literal &gt;
-     *                                 |    &lt;Function &gt;
-     *                                 |    &lt;Attribute &gt;
-     *                                 |   ( &lt;Expression &gt;)
-     *                                 |   [ &lt;Expression &gt;]
+     *                              
+     *  &lt;unary expression &gt; ::= 
+     *         &lt;Literal &gt;
+     *   |     &lt;Function &gt; [*]
+     *   |     &lt;Attribute &gt;
+     *   |   ( &lt;Expression &gt;)
+     *   |   [ &lt;Expression &gt;]
      * </pre>
      * 
      * </p>
-     * TODO require more test }
+     * TODO requires more test
      */
     public void testUnaryExpressionFunction() throws Exception {
 
@@ -1024,45 +1020,68 @@ public class FilterBuilderTest extends TestCase {
         assertNotNull("filter expected", result);
 
         expected = FilterSample.getSample(FilterSample.FILTER_WITH_FUNCTION_ABS);
+        
+//      TODO BUG in Geotools method equals in Functions
+//      assertEquals( "fails due to a BUG in Geotools method equals in Functions", expected,result);
+        
+        // Key: GEOT-1167 type: BUG
+        result = FilterBuilder.parse(FilterSample.FILTER__WITH_FUNCTION_STR_CONCAT);
 
-        // TODO BUG in Geotools method equals in Functions
-        /*
-         * assertEquals( "fails due to a BUG in Geotools method equals in
-         * Functions", expected, result);
-         */
+        assertNotNull("filter expected", result);
+
+        expected = FilterSample.getSample(FilterSample.FILTER_WITH_FUNCTION_ABS);
+//      TODO BUG in Geotools method equals in Functions
+//        assertEquals( "fails due to a BUG in Geotools method equals in Functions", expected, result);
+        
+        
+        // test for improvement Key:  GEOT-1168
+        String cqlExpression = "A = strConcat(B, 'testParam')";
+        Filter filter = FilterBuilder.parse(cqlExpression);
+        
+        assertTrue(filter instanceof PropertyIsEqualTo);
+        Expression expression = ((PropertyIsEqualTo) filter).getExpression2();
+        assertNotNull(expression);
+        assertTrue(expression instanceof Function);
+        Function function = (Function) expression;
+        assertEquals(2, function.getParameters().size());
+        Expression arg1 = (Expression) function.getParameters().get(0);
+        Expression arg2 = (Expression) function.getParameters().get(1);
+        assertTrue(arg1 instanceof PropertyName);
+        assertTrue(arg2 instanceof Literal);
+
+        assertEquals("B", ((PropertyName) arg1).getPropertyName());
+        assertEquals("testParam", ((Literal) arg2).getValue());        
+    
     }
 
     /**
      * Test Geo Operations.
-     * 
      * <p>
      * 
      * <pre>
-     *                             &lt;routine invocation &gt; ::= 
-     *                                    &lt;geoop name &gt; &lt;georoutine argument list &gt;[*]
-     *                                 |  &lt;relgeoop name &gt; &lt;relgeoop argument list &gt;
-     *                                 |  &lt;routine name &gt; &lt;argument list &gt;
-     *                                 
-     *                             &lt;geoop name &gt; ::= 
-     *                                 EQUAL | DISJOINT | INTERSECT | TOUCH | CROSS | [*]
-     *                                 WITHIN | CONTAINS |OVERLAP | RELATE [*]
-     *                            
-     *                            That rule is extended with bbox for convenience.
-     *                           
-     *                             &lt;bbox argument list &gt;::= 
-     *                             &quot;(&quot;  &lt;attribute &gt; &quot;,&quot; &lt;min X &gt; &quot;,&quot; &lt;min Y &gt; &quot;,&quot; &lt;max X &gt; &quot;,&quot; &lt;max Y &gt;[&quot;,&quot;  &lt;srs &gt;] &quot;)&quot;
-     *                            
-     *                             &lt;min X &gt; ::=  &lt;signed numerical literal &gt; 
-     *                             &lt;min Y &gt; ::=  &lt;signed numerical literal &gt; 
-     *                             &lt;max X &gt; ::=  &lt;signed numerical literal &gt; 
-     *                             &lt;max Y &gt; ::=  &lt;signed numerical literal &gt;
-     *                             &lt;srs &gt; ::=  
+     *   &lt;routine invocation &gt; ::= 
+     *           &lt;geoop name &gt; &lt;georoutine argument list &gt;[*]
+     *       |   &lt;relgeoop name &gt; &lt;relgeoop argument list &gt;
+     *       |   &lt;routine name &gt; &lt;argument list &gt;
+     *                                   
+     *   &lt;geoop name &gt; ::= 
+     *           EQUAL | DISJOINT | INTERSECT | TOUCH | CROSS | [*]
+     *           WITHIN | CONTAINS |OVERLAP | RELATE [*]
+     *                              
+     *   That rule is extended with bbox for convenience.
+     *                             
+     *   &lt;bbox argument list &gt;::= 
+     *       &quot;(&quot;  &lt;attribute &gt; &quot;,&quot; &lt;min X &gt; &quot;,&quot; &lt;min Y &gt; &quot;,&quot; &lt;max X &gt; &quot;,&quot; &lt;max Y &gt;[&quot;,&quot;  &lt;srs &gt;] &quot;)&quot;
+     *                              
+     *       &lt;min X &gt; ::=  &lt;signed numerical literal &gt; 
+     *       &lt;min Y &gt; ::=  &lt;signed numerical literal &gt; 
+     *       &lt;max X &gt; ::=  &lt;signed numerical literal &gt; 
+     *       &lt;max Y &gt; ::=  &lt;signed numerical literal &gt;
+     *       &lt;srs &gt; ::=  
      * </pre>
      * 
      * </p>
-     * 
-     * Note: RELATE is not supported (implementation in GeoTools is required)
-     * 
+     * TODO Note: RELATE is not supported (implementation in GeoTools is required)
      */
     public void testRoutineInvocationGeoOp() throws Exception {
         Filter resultFilter;
@@ -1113,17 +1132,16 @@ public class FilterBuilderTest extends TestCase {
 
     /**
      * Test RelGeo Operations [*]
-     * 
      * <p>
      * 
      * <pre>
-     *                             &lt;routine invocation &gt; ::= 
-     *                                    &lt;geoop name &gt; &lt;georoutine argument list &gt;
-     *                                 |  &lt;relgeoop name &gt; &lt;relgeoop argument list &gt; [*]
-     *                                 |  &lt;routine name &gt; &lt;argument list &gt;
-     *                                 
-     *                             &lt;relgeoop name &gt; ::= 
-     *                                 DWITHIN | BEYON [*]
+     *   &lt;routine invocation &gt; ::= 
+     *       &lt;geoop name &gt; &lt;georoutine argument list &gt;
+     *   |   &lt;relgeoop name &gt; &lt;relgeoop argument list &gt; [*]
+     *   |  &lt;routine name &gt; &lt;argument list &gt;
+     *                                            
+     *   &lt;relgeoop name &gt; ::= 
+     *       DWITHIN | BEYON [*]
      * </pre>
      * 
      * </p>
@@ -1152,20 +1170,167 @@ public class FilterBuilderTest extends TestCase {
     }
 
     /**
-     * Tests Geometry Literals
-     * 
+     * Test RelGeo Operations [*]
      * <p>
      * 
      * <pre>
-     *                             &lt;geometry literal &gt; := 
-     *                                    &lt;Point Tagged Text &gt; 
-     *                                 |  &lt;LineString Tagged Text &gt;
-     *                                 |  &lt;Polygon Tagged Text &gt;
-     *                                 |  &lt;MultiPoint Tagged Text &gt;
-     *                                 |  &lt;MultiLineString Tagged Text &gt;
-     *                                 |  &lt;MultiPolygon Tagged Text &gt;
-     *                                 |  &lt;GeometryCollection Tagged Text &gt;
-     *                                 |  &lt;Envelope Tagged Text &gt;     
+     *   &lt;routine invocation &gt; ::= 
+     *       &lt;geoop name &gt; &lt;georoutine argument list &gt;
+     *   |   &lt;relgeoop name &gt; &lt;relgeoop argument list &gt; 
+     *   |   &lt;routine name &gt; &lt;argument list &gt; [*]
+     *   
+     *  &lt;argument list&gt; ::=    [*]
+     *       &lt;left paren&gt; [&lt;positional arguments&gt;] &lt;right paren&gt;
+     *  &lt;positional arguments&gt; ::=
+     *       &lt;argument&gt; [ { &lt;comma&amp;gt &lt;argument&gt; }... ]
+     *            
+     *  &lt;argument&gt;  ::= 
+     *       &lt;literal&gt;  
+     *   |   &lt;attribute name&gt;                                            
+     *                                            
+     * </pre>
+     * 
+     * </p>
+     * @throws Exception 
+     */
+    public void testRoutineInvocationGeneric() throws Exception {
+
+        //TODO not implement it
+        //(Mauricio Comments) This case is not implemented because the filter model has not a 
+        // Routine (Like functions in Expresión). We could develop easily the  parser 
+        // but we can not build a filter for CQL <Routine invocation>. 
+    }
+    
+
+    /**
+     * Test Function Expression
+     * 
+     * Note: this solves the bug GEOT-1167
+     *
+     * @throws Exception
+     */
+    public void testFuncitionExpression() throws Exception {
+        Expression arg1;
+        Expression arg2; 
+        Expression resultExpr;
+
+        final String cqlExpression = "strConcat(A, B)";
+        
+        // simple attribute as argument
+        resultExpr = FilterBuilder.parseExpression(cqlExpression);
+        
+        assertNotNull(resultExpr);
+        assertTrue(resultExpr instanceof Function);
+        Function function1 = (Function) resultExpr;
+        assertEquals(2, function1.getParameters().size());
+
+        arg1 = (Expression) function1.getParameters().get(0);
+        assertTrue(arg1 instanceof PropertyName);
+        assertEquals("A", ((PropertyName) arg1).getPropertyName());
+
+        arg2 = (Expression) function1.getParameters().get(1);
+        assertTrue(arg2 instanceof PropertyName);
+        assertEquals("B", ((PropertyName) arg2).getPropertyName());
+
+        // compound attribute as argument
+        final String arg1Name = "gmd:aa:bb.gmd:cc.gmd:dd";
+        final String arg2Name = "gmd:ee:ff.gmd:gg.gmd:hh";
+        
+        final String cqlExpression2 = "strConcat("+arg1Name+ ", "+ arg2Name + ")";
+        
+        resultExpr = FilterBuilder.parseExpression(cqlExpression2);
+        
+        assertNotNull(resultExpr);
+        assertTrue(resultExpr instanceof Function);
+        Function function = (Function) resultExpr;
+        assertEquals(2, function.getParameters().size());
+
+        arg1 = (Expression) function.getParameters().get(0);
+        assertTrue(arg1 instanceof PropertyName);
+        
+        final String arg1Expected = arg1Name.replace(".", "/");        
+        assertEquals(arg1Expected, ((PropertyName) arg1).getPropertyName());
+
+        arg2 = (Expression) function.getParameters().get(1);
+        assertTrue(arg2 instanceof PropertyName);
+
+        final String arg2Expected = arg2Name.replace(".", "/");        
+        assertEquals(arg2Expected, ((PropertyName) arg2).getPropertyName());
+        
+    }
+
+    /**
+     * This test the following improvement: GEOT-1169
+     * This is an extension the CQL specification.
+     * 
+     * <pre>
+     *   &lt;function&gt; ::= &lt;routine name &gt; &lt;argument list &gt; [*]
+     *                                            
+     *  &lt;argument list&amp;gt ::=    [*]
+     *       &lt;left paren&gt; [&lt;positional arguments&gt;] &lt;right paren&gt;
+     *  &lt;positional arguments&gt; ::=
+     *       &lt;argument&gt; [ { &lt;comma&amp;gt &lt;argument&gt; }... ]
+     *            
+     *  &lt;argument&gt;  ::= 
+     *       &lt;literal&gt;  
+     *   |   &lt;attribute name&gt;                                            
+     *   |   &lt;function&gt;           [*]                                            
+     *   |   &lt;binary expression&gt;  [*]                            
+     * </pre>
+     * @throws Exception 
+     */
+    public void testFunctionExpressionWithFunctionArgs() throws Exception {
+        // Test 1
+        String cqlExpression = "strConcat(A, abs(B))";
+        Expression expression = FilterBuilder.parseExpression(cqlExpression);
+
+        // Test 2
+        cqlExpression = "strConcat(A, strConcat(B, strConcat(C, \".\")))";
+        expression = FilterBuilder.parseExpression(cqlExpression);
+        assertNotNull(expression);
+        assertTrue(expression instanceof Function);
+        Function function = (Function) expression;
+        assertEquals(2, function.getParameters().size());
+
+        Expression propertyName = (Expression) function.getParameters().get(0);
+        assertTrue(propertyName instanceof PropertyName);
+        assertEquals("A", ((PropertyName) propertyName).getPropertyName());
+
+        Expression arg2 = (Expression) function.getParameters().get(1);
+        assertTrue(arg2 instanceof Function);
+
+        function = (Function) arg2;
+        propertyName = (Expression) function.getParameters().get(0);
+        assertTrue(propertyName instanceof PropertyName);
+        assertEquals("B", ((PropertyName) propertyName).getPropertyName());
+
+        arg2 = (Expression) function.getParameters().get(1);
+        assertTrue(arg2 instanceof Function);
+
+        function = (Function) arg2;
+        propertyName = (Expression) function.getParameters().get(0);
+        assertTrue(propertyName instanceof PropertyName);
+        assertEquals("C", ((PropertyName) propertyName).getPropertyName());
+
+        arg2 = (Expression) function.getParameters().get(1);
+        assertTrue(arg2 instanceof Literal);
+        assertEquals(".", ((Literal) arg2).getValue());
+    }
+
+    /**
+     * Tests Geometry Literals
+     * <p>
+     * 
+     * <pre>
+     *                               &lt;geometry literal &gt; := 
+     *                                      &lt;Point Tagged Text &gt; 
+     *                                   |  &lt;LineString Tagged Text &gt;
+     *                                   |  &lt;Polygon Tagged Text &gt;
+     *                                   |  &lt;MultiPoint Tagged Text &gt;
+     *                                   |  &lt;MultiLineString Tagged Text &gt;
+     *                                   |  &lt;MultiPolygon Tagged Text &gt;
+     *                                   |  &lt;GeometryCollection Tagged Text &gt;
+     *                                   |  &lt;Envelope Tagged Text &gt;     
      * </pre>
      * 
      * </p>
@@ -1330,8 +1495,7 @@ public class FilterBuilderTest extends TestCase {
     }
 
     /**
-     * An empty filter int the constraints list shall be parsed as
-     * {@link Filter#INCLUDE}
+     * An empty filter int the constraints list shall be parsed as {@link Filter#INCLUDE}
      * 
      * @throws ParseException
      */

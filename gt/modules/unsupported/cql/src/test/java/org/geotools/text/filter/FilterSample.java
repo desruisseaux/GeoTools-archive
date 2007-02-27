@@ -335,6 +335,8 @@ public final class FilterSample {
     public static final String         FILTER_AND_NOT_COMPARASION                   = "ATTR1 < 1 AND (NOT (ATTR2 < 2)) AND ATTR3 < 3";
 
     public static final String         FILTER_WITH_FUNCTION_ABS                     = "ATTR1 < abs(10)";
+    
+    public static final String         FILTER__WITH_FUNCTION_STR_CONCAT              = "ATTR1 = strConcat(A, '1')";
 
     public static final String         LIKE_FILTER                                  = "ATTR1 LIKE 'abc%'";
 
@@ -852,23 +854,41 @@ public final class FilterSample {
         try {
             // User defined Function Sample 
             // TODO this uses the deprecate api because the new have errors
+
+            //Function function=  ff.function("abs", args);
             FilterFactoryImpl ff = (FilterFactoryImpl)FACTORY;
             FunctionExpression function=  ff.createFunctionExpression("abs");
 
             org.geotools.filter.Expression[] args = new org.geotools.filter.Expression[1];
             args[0] = (org.geotools.filter.Expression)FACTORY.literal(10);
             function.setArgs(args);
-            //Function function=  ff.function("abs", args);
             
             PropertyIsLessThan lessFilter = FACTORY.less(
-                                FACTORY.property("ATTR1"),
-                                function );
+                                                FACTORY.property("ATTR1"),
+                                                function );
             
             SAMPLES.put(FILTER_WITH_FUNCTION_ABS, lessFilter);
+
+            // builds ATTR1 = strConcat(A, '1')
+            FunctionExpression strConcat=  ff.createFunctionExpression("strConcat");
+
+            org.geotools.filter.Expression[] strConcatArgs = new org.geotools.filter.Expression[2];
+            strConcatArgs[0] = (org.geotools.filter.Expression)FACTORY.property("A");
+            strConcatArgs[1] = (org.geotools.filter.Expression)FACTORY.literal('1');
+            strConcat.setArgs(strConcatArgs);
+            
+            PropertyIsEqualTo eqFilter = FACTORY.equals(
+                                                FACTORY.property("ATTR1"),
+                                                strConcat );
+            
+            SAMPLES.put(FILTER__WITH_FUNCTION_STR_CONCAT, eqFilter);
+            
             
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        
         
         // Like filter
         try {

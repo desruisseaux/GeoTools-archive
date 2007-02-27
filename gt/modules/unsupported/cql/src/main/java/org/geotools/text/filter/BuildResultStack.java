@@ -56,6 +56,9 @@ final class BuildResultStack {
     public Result peek() {
         return (Result) stack.peek();
     }
+    public boolean  empty() {
+        return stack.empty();
+    }
 
     public Result popResult() throws FilterBuilderException {
 
