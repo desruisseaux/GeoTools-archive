@@ -55,7 +55,6 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
     /** The logger for the filter module. */
 //    private static final Logger LOGGER = Logger.getLogger(
 //            "org.geotools.data.jdbc");
-    protected JDBCFeatureSource featureSource;
     public boolean isOptimized = false;
 
     public JDBCFeatureCollection(JDBCFeatureSource source, Query query) throws IOException {
@@ -64,6 +63,10 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
 
     JDBC1DataStore getDataStore() {
         return (JDBC1DataStore) featureSource.getDataStore();
+    }
+    
+    JDBCFeatureSource getFeatureSource() {
+        return (JDBCFeatureSource) featureSource;
     }
 
     /**
@@ -96,7 +99,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
      * @see org.geotools.data.DefaultFeatureResults#getCount()
      */
     public int getCount() throws IOException {
-        int count = featureSource.count(query, getTransaction());
+        int count = getFeatureSource().count(query, getTransaction());
 
         if (count != -1) {
             int maxFeatures = query.getMaxFeatures();
@@ -227,7 +230,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
     }
 
     Connection getConnection() throws IOException {
-        return getDataStore().getConnection(featureSource.getTransaction());
+        return getDataStore().getConnection(getFeatureSource().getTransaction());
     }
 
     Object min(Expression expression) throws IOException {
@@ -274,7 +277,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
         ResultSet results = null;
         Statement statement = null;
         try {
-            conn = jdbc.getConnection(featureSource.getTransaction());
+            conn = jdbc.getConnection(getFeatureSource().getTransaction());
 
             String typeName = getSchema().getTypeName();
             //Filter preFilter = sqlBuilder.getPreQueryFilter(query.getFilter());
@@ -327,7 +330,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
             }
             return list;
         } catch (SQLException sqlException) {
-            JDBCUtils.close(conn, featureSource.getTransaction(), sqlException);
+            JDBCUtils.close(conn, getFeatureSource().getTransaction(), sqlException);
             conn = null;
             throw new DataSourceException("Could not calculate " + aggregate + " with "
                 + query.getHandle(), sqlException);
@@ -342,7 +345,7 @@ public class JDBCFeatureCollection extends DefaultFeatureResults {
         	}
         	catch (SQLException ignore ){        		
         	}
-            JDBCUtils.close(conn, featureSource.getTransaction(), null);
+            JDBCUtils.close(conn, getFeatureSource().getTransaction(), null);
         }
     }
     
