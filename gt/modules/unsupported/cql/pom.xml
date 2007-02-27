@@ -67,6 +67,7 @@
       <email>mauricio.pazos@axios.es</email>
       <organization>Axios Engineering</organization>
       <roles>
+        <role>Module Maintainer</role>
         <role>Java Developer</role>
       </roles>
     </developer>
@@ -76,7 +77,6 @@
       <email>groldan@axios.es</email>
       <roles>
         <role>Java Developer</role>
-        <role>Module Maintainer</role>
       </roles>
     </developer>
   </developers>
