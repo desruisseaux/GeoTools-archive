@@ -199,7 +199,7 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
     }
 
     public String getDisplayName() {
-        return "Postgis";
+        return "Versioning Postgis";
     }
 
     /**
