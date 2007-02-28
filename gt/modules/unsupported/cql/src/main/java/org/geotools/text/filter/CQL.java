@@ -31,19 +31,27 @@ import org.opengis.filter.expression.Expression;
  * 
  * <pre>
  * <code>
- * Expression expr1 = CQL.toExpression("attName");
- * Expression expr2 = CQL.toExpression("attName * 2");
- * Expression expr3 = CQL.toExpression("strConcat(attName, 'suffix')");
+ * Expression expr1 = CQL.toExpression(&quot;attName&quot;);
  * 
- * Filter f1 = CQL.toFilter("ATTR1 < 10 AND ATTR2 < 2 OR ATTR3 > 10" );
- * Filter f2 = CQL.toFilter( "ATTR1 IS NULL" );
- * Filter f3 = CQL.toFilter( "ATTR1 BEFORE 2006-11-30T01:30:00Z" );
- * Filter f4 = CQL.toFilter( "ATTR1 DOES-NOT-EXIST" );
- * Filter f5 = CQL.toFilter( "ATTR1 BETWEEN 10 AND 20" );
- * Filter f6 = CQL.toFilter( "CROSS(ATTR1, LINESTRING(1 2, 10 15))" );
- * Filter f7 = CQL.toFilter( "BBOX(ATTR1, 10,20,30,40)" );
+ * Expression expr2 = CQL.toExpression(&quot;attName * 2&quot;);
  * 
- * List filters = CQL.toFilterList("ATTR1 IS NULL|BBOX(ATTR1, 10,20,30,40)|INCLUDE");
+ * Expression expr3 = CQL.toExpression(&quot;strConcat(attName, 'suffix')&quot;);
+ * 
+ * Filter f1 = CQL.toFilter(&quot;ATTR1 &lt; 10 AND ATTR2 &lt; 2 OR ATTR3 &gt; 10&quot;);
+ * 
+ * Filter f2 = CQL.toFilter(&quot;ATTR1 IS NULL&quot;);
+ * 
+ * Filter f3 = CQL.toFilter(&quot;ATTR1 BEFORE 2006-11-30T01:30:00Z&quot;);
+ * 
+ * Filter f4 = CQL.toFilter(&quot;ATTR1 DOES-NOT-EXIST&quot;);
+ * 
+ * Filter f5 = CQL.toFilter(&quot;ATTR1 BETWEEN 10 AND 20&quot;);
+ * 
+ * Filter f6 = CQL.toFilter(&quot;CROSS(ATTR1, LINESTRING(1 2, 10 15))&quot;);
+ * 
+ * Filter f7 = CQL.toFilter(&quot;BBOX(ATTR1, 10,20,30,40)&quot;);
+ * 
+ * List filters = CQL.toFilterList(&quot;ATTR1 IS NULL|BBOX(ATTR1, 10,20,30,40)|INCLUDE&quot;);
  * </code>
  * </pre>
  * 
@@ -161,4 +169,8 @@ public class CQL {
         return filters;
     }
 
+    public static String getFormattedErrorMessage(ParseException pe, String input) {
+        String formattedErrorMessage = FilterBuilder.getFormattedErrorMessage(pe, input);
+        return formattedErrorMessage;
+    }
 }
