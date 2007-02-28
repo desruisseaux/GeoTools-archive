@@ -256,7 +256,6 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
      * @see org.geotools.data.DataStoreFactorySpi#getParametersInfo()
      */
     public Param[] getParametersInfo() {
-        return new Param[] { DBTYPE, HOST, PORT, SCHEMA, DATABASE, USER, PASSWD, WKBENABLED,
-                LOOSEBBOX, NAMESPACE };
+        return arrayParameters;
     }
 }
