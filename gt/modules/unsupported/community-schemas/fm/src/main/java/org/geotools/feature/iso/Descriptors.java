@@ -369,9 +369,8 @@ public class Descriptors {
 	 * @return
 	 */
 	static public AttributeDescriptor node(ComplexType schema, String name) {
-		return node(schema,new org.geotools.feature.Name(name));
+		//return node(schema,new org.geotools.feature.Name(name));
 		
-		/*
 		for (Iterator itr = list(schema).iterator(); itr.hasNext();) {
 			AttributeDescriptor node = (AttributeDescriptor) itr.next();
 			
@@ -391,7 +390,6 @@ public class Descriptors {
 			
 		}
 		return null;
-		*/
 	}
 
 //	static public List nodes(Attribute schema) {
