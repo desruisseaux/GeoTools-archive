@@ -48,8 +48,7 @@ class MappingFeatureSource implements FeatureSource2 {
 
     private FeatureTypeMapping mappings;
 
-    public MappingFeatureSource(ComplexDataStore store,
-            FeatureTypeMapping mapping) {
+    public MappingFeatureSource(ComplexDataStore store, FeatureTypeMapping mapping) {
         this.store = store;
         this.mappings = mapping;
     }
@@ -113,8 +112,7 @@ class MappingFeatureSource implements FeatureSource2 {
     }
 
     public void removeFeatureListener(FeatureListener listener) {
-        throw new UnsupportedOperationException(
-                "this is a read only feature source");
+        throw new UnsupportedOperationException("this is a read only feature source");
     }
 
     public Collection content() {
@@ -132,15 +130,12 @@ class MappingFeatureSource implements FeatureSource2 {
                 Query query = namedQuery(filter);
                 try {
                     if (0 == mappings.getGroupByAttNames().size()) {
-                        iterator = new DefaultMappingFeatureIterator(store,
-                                mappings, query);
+                        iterator = new DefaultMappingFeatureIterator(store, mappings, query);
                     } else {
-                        iterator = new GroupingFeatureIterator(store, mappings,
-                                query);
+                        iterator = new GroupingFeatureIterator(store, mappings, query);
                     }
                 } catch (IOException e) {
-                    throw (RuntimeException) new RuntimeException()
-                            .initCause(e);
+                    throw (RuntimeException) new RuntimeException().initCause(e);
                 }
                 return iterator;
             }
@@ -148,7 +143,20 @@ class MappingFeatureSource implements FeatureSource2 {
             public int size() {
                 int count;
                 try {
-                    count = store.getCount(namedQuery(Filter.INCLUDE));
+                    if (0 == mappings.getGroupByAttNames().size()) {
+                        count = store.getCount(namedQuery(Filter.INCLUDE));
+                    } else {
+                        GroupingFeatureIterator it = (GroupingFeatureIterator) iterator();
+                        int groupedCount = 0;
+                        while (it.hasNext()) {
+                            //this prvents the full complex feature
+                            //to be created, but just to advance the
+                            //surrogate iterator by group
+                            it.createCurrentGroup();
+                            groupedCount++;
+                        }
+                        count = groupedCount;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     count = -1;

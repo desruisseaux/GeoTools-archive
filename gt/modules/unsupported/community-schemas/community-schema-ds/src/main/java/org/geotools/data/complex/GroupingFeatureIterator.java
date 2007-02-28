@@ -311,7 +311,7 @@ class GroupingFeatureIterator extends AbstractMappingFeatureIterator {
      * @return the set of Features from the source resultset that belongs to the
      *         same group.
      */
-    private List/* <Feature> */createCurrentGroup() {
+    List/* <Feature> */createCurrentGroup() {
         List/* <List<Attribute>> */curGroupingAttrList = extractGroupingAttributes(this.curSrcFeature);
         List/* <Feature> */currentGroup = new LinkedList/* <Feature> */();
         currentGroup.add(this.curSrcFeature);
