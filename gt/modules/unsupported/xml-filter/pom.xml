@@ -137,7 +137,7 @@
         <artifactId>gt2-xmlcodegen</artifactId>
         <configuration>
           <schemaLocation>filter.xsd</schemaLocation>
-					<schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/filter/v1_1/</schemaSourceDirectory>
+  	  <schemaSourceDirectory>${basedir}/src/main/resources/org/geotools/filter/v1_1/</schemaSourceDirectory>
         </configuration>
       </plugin>
 			<plugin>
