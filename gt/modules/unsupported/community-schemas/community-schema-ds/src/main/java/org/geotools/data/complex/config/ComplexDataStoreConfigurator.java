@@ -37,7 +37,9 @@ import org.geotools.data.complex.AttributeMapping;
 import org.geotools.data.complex.FeatureTypeMapping;
 import org.geotools.data.feature.FeatureAccess;
 import org.geotools.data.feature.FeatureSource2;
-import org.geotools.text.filter.FilterBuilder;
+import org.geotools.filter.FilterBuilder;
+import org.geotools.text.filter.CQL;
+import org.geotools.text.filter.ParseException;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.TypeName;
@@ -227,7 +229,12 @@ public class ComplexDataStoreConfigurator {
         Expression expression = Expression.NIL;
         if (sourceExpr != null && sourceExpr.trim().length() > 0) {
             try {
-                expression = FilterBuilder.parseExpression(sourceExpr);
+                expression = CQL.toExpression(sourceExpr);
+            } catch (ParseException e) {
+                String formattedErrorMessage;
+                formattedErrorMessage = CQL.getFormattedErrorMessage(e, sourceExpr);
+                ComplexDataStoreConfigurator.LOGGER.log(Level.SEVERE, formattedErrorMessage, e);
+                throw new DataSourceException("Error parsing expression:\n" + formattedErrorMessage);
             } catch (Exception e) {
                 String msg = "parsing expression " + sourceExpr;
                 ComplexDataStoreConfigurator.LOGGER.log(Level.SEVERE, msg, e);
@@ -272,7 +279,8 @@ public class ComplexDataStoreConfigurator {
                     + dto);
         }
 
-        ComplexDataStoreConfigurator.LOGGER.fine("asking datastore " + sourceDataStore + " for source type " + typeName);
+        ComplexDataStoreConfigurator.LOGGER.fine("asking datastore " + sourceDataStore
+                + " for source type " + typeName);
         TypeName name = deglose(typeName);
         FeatureSource2 fSource = (FeatureSource2) sourceDataStore.access(name);
         ComplexDataStoreConfigurator.LOGGER.fine("found feature source for " + typeName);
@@ -310,7 +318,8 @@ public class ComplexDataStoreConfigurator {
         for (Iterator it = schemaFiles.iterator(); it.hasNext();) {
             String schemaLocation = (String) it.next();
             final URL schemaUrl = guessSchemaUrl(baseUrl, schemaLocation);
-            ComplexDataStoreConfigurator.LOGGER.fine("parsing schema " + schemaUrl.toExternalForm());
+            ComplexDataStoreConfigurator.LOGGER
+                    .fine("parsing schema " + schemaUrl.toExternalForm());
 
             schemaParser.parse(schemaUrl);
         }
@@ -322,16 +331,18 @@ public class ComplexDataStoreConfigurator {
             throws MalformedURLException {
         final URL schemaUrl;
         if (schemaLocation.startsWith("file:") || schemaLocation.startsWith("http:")) {
-            ComplexDataStoreConfigurator.LOGGER.fine("using schema location as absolute path: " + schemaLocation);
+            ComplexDataStoreConfigurator.LOGGER.fine("using schema location as absolute path: "
+                    + schemaLocation);
             schemaUrl = new URL(schemaLocation);
         } else {
             if (baseUrl == null) {
                 schemaUrl = new URL(schemaLocation);
-                ComplexDataStoreConfigurator.LOGGER.warning("base url not provided, may be unable to locate" + schemaLocation
-                        + ". Path resolved to: " + schemaUrl.toExternalForm());
+                ComplexDataStoreConfigurator.LOGGER
+                        .warning("base url not provided, may be unable to locate" + schemaLocation
+                                + ". Path resolved to: " + schemaUrl.toExternalForm());
             } else {
-                ComplexDataStoreConfigurator.LOGGER.fine("using schema location " + schemaLocation + " as relative to "
-                        + baseUrl);
+                ComplexDataStoreConfigurator.LOGGER.fine("using schema location " + schemaLocation
+                        + " as relative to " + baseUrl);
                 schemaUrl = new URL(baseUrl, schemaLocation);
             }
         }
@@ -349,7 +360,8 @@ public class ComplexDataStoreConfigurator {
      *             DOCUMENT ME!
      */
     private Map/* <String, FeatureAccess> */aquireSourceDatastores() throws IOException {
-        ComplexDataStoreConfigurator.LOGGER.entering(getClass().getName(), "aquireSourceDatastores");
+        ComplexDataStoreConfigurator.LOGGER
+                .entering(getClass().getName(), "aquireSourceDatastores");
 
         final Map datastores = new HashMap();
         final List dsParams = config.getSourceDataStores();

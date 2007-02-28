@@ -9,8 +9,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.xsd.XSDAttributeDeclaration;
@@ -114,7 +116,8 @@ public class EmfAppSchemaReader {
             schema = new GMLSchema();
             importSchema(schema);
 
-            EmfAppSchemaReader.LOGGER.info("Creating GMLConfiguration to get the prebuilt gml schemas from");
+            EmfAppSchemaReader.LOGGER
+                    .info("Creating GMLConfiguration to get the prebuilt gml schemas from");
             GMLConfiguration configuration = new GMLConfiguration();
             EmfAppSchemaReader.LOGGER.info("Aquiring prebuilt gml schema an its dependencies");
             SchemaIndex index = Schemas.findSchemas(configuration);
@@ -148,10 +151,16 @@ public class EmfAppSchemaReader {
         XSDElementDeclaration elemDecl;
         for (Iterator it = elementDeclarations.iterator(); it.hasNext();) {
             elemDecl = (XSDElementDeclaration) it.next();
-            EmfAppSchemaReader.LOGGER.finest("Creating attribute descriptor for " + elemDecl.getQName());
-            AttributeDescriptor descriptor = createAttributeDescriptor(null, elemDecl);
-            EmfAppSchemaReader.LOGGER.finest("Registering attribute descriptor " + descriptor.getName());
-            register(descriptor);
+            EmfAppSchemaReader.LOGGER.finest("Creating attribute descriptor for "
+                    + elemDecl.getQName());
+            AttributeDescriptor descriptor;
+            try {
+                descriptor = createAttributeDescriptor(null, elemDecl);
+                LOGGER.finest("Registering attribute descriptor " + descriptor.getName());
+                register(descriptor);
+            } catch (NoSuchElementException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+            }
         }
     }
 
@@ -174,8 +183,17 @@ public class EmfAppSchemaReader {
         String name = elemDecl.getName();
         Name elemName = new org.geotools.feature.Name(targetNamespace, name);
 
-        AttributeType type = getTypeOf(elemDecl);
-
+        AttributeType type;
+        try {
+            type = getTypeOf(elemDecl);
+        } catch (NoSuchElementException e) {
+            String msg = "Type not found for " + elemName + " at type container "
+                    + container.getTargetNamespace() + "#" + container.getName() + " at "
+                    + container.getSchema().getSchemaLocation();
+            NoSuchElementException nse = new NoSuchElementException(msg);
+            nse.initCause(e);
+            throw nse;
+        }
         int minOccurs = container == null ? 0 : Schemas.getMinOccurs(container, elemDecl);
         int maxOccurs = container == null ? Integer.MAX_VALUE : Schemas.getMaxOccurs(container,
                 elemDecl);
@@ -202,7 +220,7 @@ public class EmfAppSchemaReader {
      * @param elemDecl
      * @return
      */
-    private AttributeType getTypeOf(XSDElementDeclaration elemDecl) {
+    private AttributeType getTypeOf2(XSDElementDeclaration elemDecl) {
         boolean registerIfNotExists = false;
         XSDTypeDefinition typeDefinition;
 
@@ -233,6 +251,51 @@ public class EmfAppSchemaReader {
         return type;
     }
 
+    private AttributeType getTypeOf(XSDElementDeclaration elemDecl) {
+        boolean hasToBeRegistered = false;
+        XSDTypeDefinition typeDefinition;
+
+        // TODO REVISIT, I'm not sure this is the way to find out if the
+        // element's type is defined in line (an thus no need to register it
+        // as a global type)
+        typeDefinition = elemDecl.getAnonymousTypeDefinition();
+        if (typeDefinition == null) {
+            hasToBeRegistered = true;
+            typeDefinition = elemDecl.getTypeDefinition();
+        }
+
+        if (typeDefinition == null) {
+            throw new NoSuchElementException("The element declaration "
+                    + elemDecl.getTargetNamespace() + "#" + elemDecl.getName()
+                    + " has a null type definition, can't continue, fix it on the schema");
+        }
+        
+        AttributeType type;
+        if (hasToBeRegistered) {
+            String targetNamespace = typeDefinition.getTargetNamespace();
+            String name = typeDefinition.getName();
+            TypeName typeName = Types.typeName(targetNamespace, name);
+            type = getType(typeName);
+            if (type == null) {
+                if (typeDefinition instanceof XSDComplexTypeDefinition) {
+                    type = new ComplexTypeProxy(typeName, this.registry);
+                } else {
+                    type = new AttributeTypeProxy(typeName, this.registry);
+                }
+
+                /*
+                 * type = createType(typeDefinition); register(type);
+                 */
+            }
+        } else {
+            String name = elemDecl.getName();
+            String targetNamespace = elemDecl.getTargetNamespace();
+            TypeName overrideName = Types.typeName(targetNamespace, name);
+            type = createType(overrideName, typeDefinition);
+        }
+        return type;
+    }
+
     private AttributeType createType(XSDTypeDefinition typeDefinition) {
         String targetNamespace = typeDefinition.getTargetNamespace();
         String name = typeDefinition.getName();
@@ -244,13 +307,17 @@ public class EmfAppSchemaReader {
             final XSDTypeDefinition typeDefinition) {
 
         AttributeType attType;
-
+        
         final XSDTypeDefinition baseType = typeDefinition.getBaseType();
         AttributeType superType = null;
         if (baseType != null) {
             String targetNamespace = baseType.getTargetNamespace();
             String name = baseType.getName();
             superType = getType(targetNamespace, name);
+            if(superType == null){
+                superType = createType(baseType);
+                register(superType);
+            }
         }
 
         if (typeDefinition instanceof XSDComplexTypeDefinition) {
@@ -266,9 +333,11 @@ public class EmfAppSchemaReader {
             AttributeDescriptor descriptor;
             for (Iterator it = children.iterator(); it.hasNext();) {
                 childDecl = (XSDElementDeclaration) it.next();
-                descriptor = createAttributeDescriptor(complexTypeDef, childDecl);
-                if (descriptor != null) {
+                try {
+                    descriptor = createAttributeDescriptor(complexTypeDef, childDecl);
                     schema.add(descriptor);
+                } catch (NoSuchElementException e) {
+                    LOGGER.log(Level.WARNING, e.getMessage());
                 }
             }
 
@@ -384,8 +453,7 @@ public class EmfAppSchemaReader {
      * @param superTypeName
      * @return
      */
-    private boolean isDerivedFrom(final XSDTypeDefinition typeDefinition,
-            final TypeName superTypeName) {
+    private boolean isDerivedFrom(XSDTypeDefinition typeDefinition, final TypeName superTypeName) {
 
         XSDTypeDefinition baseType;
         final String superNS = superTypeName.getNamespaceURI();
@@ -402,6 +470,7 @@ public class EmfAppSchemaReader {
             if (superNS.equals(targetNamespace) && superName.equals(name)) {
                 return true;
             }
+            typeDefinition = baseType;
         }
         return false;
     }
@@ -423,6 +492,7 @@ public class EmfAppSchemaReader {
             typeDef = (XSDTypeDefinition) it.next();
             String targetNamespace = typeDef.getTargetNamespace();
             String name = typeDef.getName();
+
             attType = getType(targetNamespace, name);
             if (attType == null) {
                 EmfAppSchemaReader.LOGGER.finest("Creating attribute type " + typeDef.getQName());
@@ -430,8 +500,8 @@ public class EmfAppSchemaReader {
                 EmfAppSchemaReader.LOGGER.finest("Registering attribute type " + attType.getName());
                 register(attType);
             } else {
-                EmfAppSchemaReader.LOGGER.finer("Ignoring type " + typeDef.getQName()
-                        + " as it already exists in the registry");
+//                EmfAppSchemaReader.LOGGER.finer("Ignoring type " + typeDef.getQName()
+//                        + " as it already exists in the registry");
             }
         }
         EmfAppSchemaReader.LOGGER.finer("--- type definitions imported successfully ---");
@@ -446,7 +516,8 @@ public class EmfAppSchemaReader {
                 EmfAppSchemaReader.LOGGER.finer("Ignoring " + key + " as it already exists. type "
                         + value.getClass().getName());
             } else {
-                EmfAppSchemaReader.LOGGER.finer("Importing " + key + " of type " + value.getClass().getName());
+                EmfAppSchemaReader.LOGGER.finer("Importing " + key + " of type "
+                        + value.getClass().getName());
                 if (value instanceof AttributeType) {
                     AttributeType type = (AttributeType) value;
                     register(type);
@@ -467,7 +538,8 @@ public class EmfAppSchemaReader {
                 }
             }
         }
-        EmfAppSchemaReader.LOGGER.fine("Schema " + schema.namespace().getURI() + " imported successfully");
+        EmfAppSchemaReader.LOGGER.fine("Schema " + schema.namespace().getURI()
+                + " imported successfully");
     }
 
     public static EmfAppSchemaReader newInstance() {

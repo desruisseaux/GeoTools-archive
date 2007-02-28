@@ -178,7 +178,10 @@ public class XMLConfigDigester {
 		digester.addCallMethod(attMap + "/targetAttributeNode", "setTargetAttributeSchemaElement", 1);
 		digester.addCallParam(attMap + "/targetAttributeNode", 0);
 		
-		digester.addCallMethod(attMap + "/sourceExpression/OCQL", "setSourceExpression", 1);
+        digester.addCallMethod(attMap + "/idExpression/OCQL", "setIdentifierExpression", 1);
+        digester.addCallParam(attMap + "/idExpression/OCQL", 0);
+
+        digester.addCallMethod(attMap + "/sourceExpression/OCQL", "setSourceExpression", 1);
 		digester.addCallParam(attMap + "/sourceExpression/OCQL", 0);
 
 		digester.addCallMethod(attMap + "/ClientProperty", "putClientProperty", 2);
