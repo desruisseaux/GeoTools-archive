@@ -65,9 +65,9 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         setUpRailTable();
 
         // make sure versioned metadata is not in the way
-        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TABLESCHANGED, false);
-        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.VERSIONEDTABLES, false);
-        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.CHANGESETS, true);
+        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED, false);
+        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_VERSIONEDTABLES, false);
+        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_CHANGESETS, true);
     }
 
     protected void dataSetUp() throws Exception {

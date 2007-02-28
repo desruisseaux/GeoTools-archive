@@ -355,7 +355,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
      * <p>
      * This is equivalent to gathering the ids of features changed between the two versions and
      * matching the filter, getting a list of revision involving those feaures between fromVersion
-     * and toVersion, and then query {@link VersionedPostgisDataStore#CHANGESETS} against these
+     * and toVersion, and then query {@link VersionedPostgisDataStore#TBL_CHANGESETS} against these
      * revision numbers.
      * 
      * @param fromVersion
@@ -447,7 +447,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // "default"
         // value for them).
         FeatureStore changesets = (FeatureStore) store
-                .getFeatureSource(VersionedPostgisDataStore.CHANGESETS);
+                .getFeatureSource(VersionedPostgisDataStore.TBL_CHANGESETS);
         changesets.setTransaction(getTransaction());
         DefaultQuery sq = new DefaultQuery();
         sq.setFilter(revisionFilter);

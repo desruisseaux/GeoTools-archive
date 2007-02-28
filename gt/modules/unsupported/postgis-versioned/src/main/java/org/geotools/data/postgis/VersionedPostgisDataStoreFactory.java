@@ -18,6 +18,8 @@ package org.geotools.data.postgis;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataSourceException;
@@ -32,6 +34,9 @@ import org.geotools.data.jdbc.ConnectionPool;
  * 
  */
 public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
+    
+    /** The logger for the postgis module. */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
 
     /** Creates PostGIS-specific JDBC driver class. */
     private static final String DRIVER_CLASS = "org.postgresql.Driver";
@@ -65,10 +70,13 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
     public static final Param LOOSEBBOX = new Param("loose bbox", Boolean.class,
             "set to true if the Bounding Box should be 'loose', faster but "
                     + "not as deadly accurate", false, new Boolean(true));
+    
+    public static final Param VERSIONALL = new Param("version enable all", Boolean.class,
+            "set to true if you want all feature types to be version enabled on connection", false, new Boolean(false));
 
     /** Array with all of the params */
     static final Param[] arrayParameters = { DBTYPE, HOST, PORT, DATABASE, USER, PASSWD,
-            WKBENABLED, LOOSEBBOX, NAMESPACE };
+            WKBENABLED, LOOSEBBOX, NAMESPACE, VERSIONALL };
 
     /**
      * Creates a new instance of PostgisDataStoreFactory
@@ -115,6 +123,7 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
         Boolean wkb_enabled = (Boolean) WKBENABLED.lookUp(params);
         Boolean is_loose_bbox = (Boolean) LOOSEBBOX.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
+        Boolean versionAll = (Boolean) VERSIONALL.lookUp(params);
 
         // Try processing params first so we can get real IO
         // error message back to the user
@@ -143,6 +152,19 @@ public class VersionedPostgisDataStoreFactory extends AbstractDataStoreFactory {
 
         if (is_loose_bbox != null) {
             dataStore.setLooseBbox(is_loose_bbox.booleanValue());
+        }
+        
+        if(versionAll != null && versionAll.booleanValue()) {
+            String[] typeNames = dataStore.getTypeNames();
+            for (int i = 0; i < typeNames.length; i++) {
+                if(typeNames[i].equals(VersionedPostgisDataStore.TBL_CHANGESETS))
+                    continue;
+                try {
+                    dataStore.setVersioned(typeNames[i], true, null, null);
+                } catch(IOException e) {
+                    LOGGER.log(Level.SEVERE, "Could not version enable: " + typeNames[i], e);
+                }
+            }
         }
 
         return dataStore;

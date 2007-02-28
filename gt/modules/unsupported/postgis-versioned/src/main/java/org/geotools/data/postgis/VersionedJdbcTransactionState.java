@@ -141,7 +141,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
                         .valueOf(getRevision()))));
 
                 // get a writer for the changeset record we want to update
-                writer = wrapped.getFeatureWriter(VersionedPostgisDataStore.CHANGESETS,
+                writer = wrapped.getFeatureWriter(VersionedPostgisDataStore.TBL_CHANGESETS,
                         (org.geotools.filter.Filter) revisionFilter, transaction);
                 if (!writer.hasNext()) {
                     // who ate my changeset record ?!?
@@ -169,9 +169,9 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
                 st = getConnection().createStatement();
                 for (Iterator it = dirtyTypes.iterator(); it.hasNext();) {
                     String typeName = (String) it.next();
-                    execute(st, "INSERT INTO " + VersionedPostgisDataStore.TABLESCHANGED + " "
+                    execute(st, "INSERT INTO " + VersionedPostgisDataStore.TBL_TABLESCHANGED + " "
                             + "SELECT " + revision + ", id " + "FROM "
-                            + VersionedPostgisDataStore.VERSIONEDTABLES + " WHERE SCHEMA = '"
+                            + VersionedPostgisDataStore.TBL_VERSIONEDTABLES + " WHERE SCHEMA = '"
                             + wrapped.getConfig().getDatabaseSchemaName() + "' " + "AND NAME = '"
                             + typeName + "'");
                 }
@@ -235,7 +235,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
         String author = (String) t.getProperty(VersionedPostgisDataStore.AUTHOR);
         String message = (String) t.getProperty(VersionedPostgisDataStore.MESSAGE);
         try {
-            writer = wrapped.getFeatureWriterAppend(VersionedPostgisDataStore.CHANGESETS, t);
+            writer = wrapped.getFeatureWriterAppend(VersionedPostgisDataStore.TBL_CHANGESETS, t);
             f = writer.next();
             f.setAttribute("author", author);
             f.setAttribute("message", message);

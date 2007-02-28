@@ -45,11 +45,11 @@ public class SupportTableOnlineTest extends AbstractVersionedPostgisDataTestCase
             tables = meta.getTables(null, f.schema, "%", tableType);
             while (tables.next()) {
                 String tableName = tables.getString(3);
-                if (tableName.equals(VersionedPostgisDataStore.CHANGESETS))
+                if (tableName.equals(VersionedPostgisDataStore.TBL_CHANGESETS))
                     changeSets = true;
-                if (tableName.equals(VersionedPostgisDataStore.TABLESCHANGED))
+                if (tableName.equals(VersionedPostgisDataStore.TBL_TABLESCHANGED))
                     tablesChanged = true;
-                if (tableName.equals(VersionedPostgisDataStore.VERSIONEDTABLES))
+                if (tableName.equals(VersionedPostgisDataStore.TBL_VERSIONEDTABLES))
                     versionedTables = true;
             }
             tables.close();
@@ -75,7 +75,7 @@ public class SupportTableOnlineTest extends AbstractVersionedPostgisDataTestCase
         try {
             conn = pool.getConnection();
             st = conn.createStatement();
-            st.execute("CREATE TABLE " + VersionedPostgisDataStore.CHANGESETS
+            st.execute("CREATE TABLE " + VersionedPostgisDataStore.TBL_CHANGESETS
                     + "(ID SERIAL, STUFF VARCHAR(20))");
             try {
                 buildDataStore();
@@ -83,10 +83,10 @@ public class SupportTableOnlineTest extends AbstractVersionedPostgisDataTestCase
             } catch (IOException e) {
                 // ok
             }
-            SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.CHANGESETS, true);
+            SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_CHANGESETS, true);
 
             st.execute("CREATE TABLE "
-                    + VersionedPostgisDataStore.TABLESCHANGED
+                    + VersionedPostgisDataStore.TBL_TABLESCHANGED
                     + "(ID SERIAL, STUFF VARCHAR(20))");
             try {
                 buildDataStore();
@@ -94,10 +94,10 @@ public class SupportTableOnlineTest extends AbstractVersionedPostgisDataTestCase
             } catch (IOException e) {
                 // ok
             }
-            SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TABLESCHANGED, false);
+            SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED, false);
 
             st.execute("CREATE TABLE "
-                    + VersionedPostgisDataStore.VERSIONEDTABLES
+                    + VersionedPostgisDataStore.TBL_VERSIONEDTABLES
                     + "(ID SERIAL, STUFF VARCHAR(20))");
             try {
                 buildDataStore();
@@ -105,7 +105,7 @@ public class SupportTableOnlineTest extends AbstractVersionedPostgisDataTestCase
             } catch (IOException e) {
                 // ok
             }
-            SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.VERSIONEDTABLES, true);
+            SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_VERSIONEDTABLES, true);
         } finally {
             JDBCUtils.close(st);
             JDBCUtils.close(conn, null, null);

@@ -15,7 +15,10 @@
  */
 package org.geotools.data.postgis;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -85,5 +88,12 @@ public class VersiondPostgisDataStoreFactoryOnlineTest extends TestCase {
         DataStore ds = DataStoreFinder.getDataStore(remote);
         assertNotNull(ds);
         assertTrue(ds instanceof VersionedPostgisDataStore);
+    }
+    
+    public void testVersioned() throws Exception {
+        remote.put("version enable all", Boolean.TRUE);
+        VersionedPostgisDataStore ds = (VersionedPostgisDataStore) DataStoreFinder.getDataStore(remote);
+        assertTrue(ds.isVersioned("road"));
+        assertTrue(ds.isVersioned("river"));
     }
 }

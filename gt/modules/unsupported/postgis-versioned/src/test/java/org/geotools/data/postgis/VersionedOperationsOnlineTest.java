@@ -48,10 +48,24 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
     public VersionedOperationsOnlineTest(String name) {
         super(name);
     }
+    
+    public void testTypeNames() throws IOException {
+        VersionedPostgisDataStore ds = getDataStore();
+        List typeNames = Arrays.asList(ds.getTypeNames());
+        assertTrue(typeNames.contains("road"));
+        assertTrue(typeNames.contains("lake"));
+        assertTrue(typeNames.contains("river"));
+        assertTrue(typeNames.contains("rail"));
+        assertTrue(typeNames.contains(VersionedPostgisDataStore.TBL_CHANGESETS));
+        
+        assertFalse(typeNames.contains(VersionedPostgisDataStore.TBL_VERSIONEDTABLES));
+        assertFalse(typeNames.contains(VersionedPostgisDataStore.TBL_TABLESCHANGED));
+    }
+    
 
     public void testChangesetFeatureType() throws IOException {
         VersionedPostgisDataStore ds = getDataStore();
-        ds.getSchema(VersionedPostgisDataStore.CHANGESETS);
+        ds.getSchema(VersionedPostgisDataStore.TBL_CHANGESETS);
     }
 
     public void testVersionEnableDisableFeatureType() throws IOException {
@@ -77,12 +91,12 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
     public void testVersionEnableChangeSets() throws IOException {
         VersionedPostgisDataStore ds = getDataStore();
-        ds.getSchema(VersionedPostgisDataStore.CHANGESETS);
+        ds.getSchema(VersionedPostgisDataStore.TBL_CHANGESETS);
         assertFalse(ds.isVersioned("road"));
 
         // try version, should fail
         try {
-            ds.setVersioned(VersionedPostgisDataStore.CHANGESETS, true, "gimbo",
+            ds.setVersioned(VersionedPostgisDataStore.TBL_CHANGESETS, true, "gimbo",
                     "Initial import of roads");
             fail("It should not be possible to version enable changesets");
         } catch (IOException e) {
@@ -209,7 +223,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         t.commit();
 
         // check we have the rigth changesets in the database
-        DefaultQuery q = new DefaultQuery(VersionedPostgisDataStore.CHANGESETS);
+        DefaultQuery q = new DefaultQuery(VersionedPostgisDataStore.TBL_CHANGESETS);
         t = new DefaultTransaction();
         FeatureReader fr = ds.getFeatureReader(q, t);
         // ... ah, would very much like to sort on revision...

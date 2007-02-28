@@ -96,11 +96,11 @@ public class VersionedPostgisDataStore implements DataStore {
     /** The logger for the postgis module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
 
-    static final String VERSIONEDTABLES = "versioned_tables";
+    static final String TBL_VERSIONEDTABLES = "versioned_tables";
 
-    static final String TABLESCHANGED = "tables_changed";
+    static final String TBL_TABLESCHANGED = "tables_changed";
 
-    static final String CHANGESETS = "changesets";
+    static final String TBL_CHANGESETS = "changesets";
 
     static final String REVISION = "revision";
 
@@ -165,7 +165,10 @@ public class VersionedPostgisDataStore implements DataStore {
     }
 
     public String[] getTypeNames() throws IOException {
-        return wrapped.getTypeNames();
+        List names = new ArrayList(Arrays.asList(wrapped.getTypeNames()));
+        names.remove(TBL_TABLESCHANGED);
+        names.remove(TBL_VERSIONEDTABLES);
+        return (String[]) names.toArray(new String[names.size()]);
     }
 
     public FeatureType getSchema(String typeName) throws IOException {
@@ -338,8 +341,8 @@ public class VersionedPostgisDataStore implements DataStore {
             String message) throws IOException {
         if (typeName == null)
             throw new NullPointerException("TypeName cannot be null");
-        if (typeName.equals(CHANGESETS) && versioned)
-            throw new IOException(CHANGESETS
+        if (typeName.equals(TBL_CHANGESETS) && versioned)
+            throw new IOException(TBL_CHANGESETS
                     + " is exposed as a log facility, and cannot be versioned");
 
         // no change, no action
@@ -380,7 +383,7 @@ public class VersionedPostgisDataStore implements DataStore {
                 st = conn.createStatement();
 
                 rs = executeQuery(st, "SELECT COUNT(*) from "
-                        + sqlb.encodeTableName(VERSIONEDTABLES) + " WHERE SCHEMA = '"
+                        + sqlb.encodeTableName(TBL_VERSIONEDTABLES) + " WHERE SCHEMA = '"
                         + getConfig().getDatabaseSchemaName() + "'" //
                         + " AND NAME='" + typeName + "'" //
                         + " AND VERSIONED = TRUE");
@@ -433,7 +436,7 @@ public class VersionedPostgisDataStore implements DataStore {
             conn = wrapped.getConnectionPool().getConnection();
             st = conn.createStatement();
 
-            rs = st.executeQuery("select max(revision) from " + CHANGESETS);
+            rs = st.executeQuery("select max(revision) from " + TBL_CHANGESETS);
             rs.next();
             return rs.getLong(1);
         } catch (SQLException e) {
@@ -477,8 +480,8 @@ public class VersionedPostgisDataStore implements DataStore {
             conn = wrapped.getConnectionPool().getConnection();
             st = conn.createStatement();
 
-            rs = st.executeQuery("select distinct(name) from " + VERSIONEDTABLES + " where id in "
-                    + "(select versionedtable from " + TABLESCHANGED + " where revision > "
+            rs = st.executeQuery("select distinct(name) from " + TBL_VERSIONEDTABLES + " where id in "
+                    + "(select versionedtable from " + TBL_TABLESCHANGED + " where revision > "
                     + r1.revision + " and revision <= " + r2.revision + ")");
             List result = new ArrayList();
             while (rs.next())
@@ -753,11 +756,11 @@ public class VersionedPostgisDataStore implements DataStore {
             tables = meta.getTables(null, getConfig().getDatabaseSchemaName(), "%", tableType);
             while (tables.next()) {
                 String tableName = tables.getString(3);
-                if (tableName.equals(CHANGESETS))
+                if (tableName.equals(TBL_CHANGESETS))
                     changeSets = true;
-                if (tableName.equals(TABLESCHANGED))
+                if (tableName.equals(TBL_TABLESCHANGED))
                     tablesChanged = true;
-                if (tableName.equals(VERSIONEDTABLES))
+                if (tableName.equals(TBL_VERSIONEDTABLES))
                     versionedTables = true;
 
             }
@@ -773,11 +776,11 @@ public class VersionedPostgisDataStore implements DataStore {
                     String msg = "The versioning tables are not complete, yet some table with the same name is there.\n";
                     msg += "Remove tables (";
                     if (changeSets)
-                        msg += CHANGESETS + " ";
+                        msg += TBL_CHANGESETS + " ";
                     if (tablesChanged)
-                        msg += TABLESCHANGED + " ";
+                        msg += TBL_TABLESCHANGED + " ";
                     if (versionedTables)
-                        msg += VERSIONEDTABLES;
+                        msg += TBL_VERSIONEDTABLES;
                     msg += ") before using again the versioned data store";
                     throw new IOException(msg);
                 }
@@ -789,22 +792,22 @@ public class VersionedPostgisDataStore implements DataStore {
                 // is 63 chars
                 // (http://www.postgresql.org/docs/faqs.FAQ_DEV.html#item2.2,
                 // NAMEDATALEN is 64 but the string is null terminated)
-                execute(st, "CREATE TABLE " + VERSIONEDTABLES + "(ID SERIAL PRIMARY KEY, "
+                execute(st, "CREATE TABLE " + TBL_VERSIONEDTABLES + "(ID SERIAL PRIMARY KEY, "
                         + "SCHEMA VARCHAR(63) NOT NULL, NAME VARCHAR(63) NOT NULL, "
                         + "VERSIONED BOOLEAN NOT NULL)");
-                execute(st, "CREATE TABLE " + CHANGESETS + "(REVISION BIGSERIAL PRIMARY KEY, "
+                execute(st, "CREATE TABLE " + TBL_CHANGESETS + "(REVISION BIGSERIAL PRIMARY KEY, "
                         + "AUTHOR VARCHAR(256), "
                         + "DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " //
                         + "MESSAGE TEXT)");
                 String schema = getConfig().getDatabaseSchemaName();
                 if (schema == null)
                     schema = "public";
-                execute(st, "SELECT ADDGEOMETRYCOLUMN('" + schema + "', '" + CHANGESETS
+                execute(st, "SELECT ADDGEOMETRYCOLUMN('" + schema + "', '" + TBL_CHANGESETS
                         + "', 'BBOX', 4326,  'POLYGON', 2)");
 
-                execute(st, "CREATE TABLE " + TABLESCHANGED
-                        + "(REVISION BIGINT NOT NULL REFERENCES " + CHANGESETS
-                        + ", VERSIONEDTABLE INT NOT NULL REFERENCES " + VERSIONEDTABLES
+                execute(st, "CREATE TABLE " + TBL_TABLESCHANGED
+                        + "(REVISION BIGINT NOT NULL REFERENCES " + TBL_CHANGESETS
+                        + ", VERSIONEDTABLE INT NOT NULL REFERENCES " + TBL_VERSIONEDTABLES
                         + ", PRIMARY KEY (REVISION, VERSIONEDTABLE))");
 
                 // and finally commit table creation (yes, Postgres supports
@@ -844,7 +847,7 @@ public class VersionedPostgisDataStore implements DataStore {
 
         // ensure this does not get a typed fid mapper for changesets
         // we want easy extraction of the generated revision
-        wrapped.setFIDMapper(CHANGESETS, new PostGISAutoIncrementFIDMapper(CHANGESETS, "revision",
+        wrapped.setFIDMapper(TBL_CHANGESETS, new PostGISAutoIncrementFIDMapper(TBL_CHANGESETS, "revision",
                 Types.BIGINT, true));
     }
 
@@ -858,7 +861,7 @@ public class VersionedPostgisDataStore implements DataStore {
             conn = wrapped.getConnectionPool().getConnection();
             st = conn.createStatement();
 
-            rs = executeQuery(st, "SELECT NAME from " + sqlb.encodeTableName(VERSIONEDTABLES)
+            rs = executeQuery(st, "SELECT NAME from " + sqlb.encodeTableName(TBL_VERSIONEDTABLES)
                     + " WHERE SCHEMA = '" + getConfig().getDatabaseSchemaName() + "'" //
                     + " AND VERSIONED ='" + true + "'");
             while (rs.next()) {
@@ -897,7 +900,7 @@ public class VersionedPostgisDataStore implements DataStore {
         if (!checkSupportedMapper(mapper)) {
             if (mapper instanceof TypedFIDMapper)
                 mapper = ((TypedFIDMapper) mapper).getWrappedMapper();
-            throw new IOException("This feature type is associated to "
+            throw new IOException("This feature type (" + typeName + ") is associated to "
                     + "an unsupported fid mapper: " + mapper.getClass() + "\n"
                     + "The supported fid mapper classes are: "
                     + Arrays.asList(SUPPORTED_FID_MAPPERS));
@@ -955,7 +958,7 @@ public class VersionedPostgisDataStore implements DataStore {
                     + pk.name);
 
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName)
-                    + " ADD COLUMN REVISION BIGINT REFERENCES " + CHANGESETS);
+                    + " ADD COLUMN REVISION BIGINT REFERENCES " + TBL_CHANGESETS);
             // TODO: add some runtime check that acts as a foreign key iif
             // the value is not Long.MAX_VALUE
             execute(st, "ALTER TABLE " + sqlb.encodeTableName(typeName)
@@ -977,18 +980,18 @@ public class VersionedPostgisDataStore implements DataStore {
             // mark the table as versioned. First check if we already have
             // records for this table
             // then insert or update
-            rs = executeQuery(st, "SELECT VERSIONED from " + sqlb.encodeTableName(VERSIONEDTABLES)
+            rs = executeQuery(st, "SELECT VERSIONED from " + sqlb.encodeTableName(TBL_VERSIONEDTABLES)
                     + " WHERE SCHEMA = '" + getConfig().getDatabaseSchemaName() + "'" //
                     + " AND NAME='" + typeName + "'");
             if (rs.next()) {
                 // we already have the table listed, it was versioned in the past
-                execute(st, "UPDATE " + sqlb.encodeTableName(VERSIONEDTABLES) //
+                execute(st, "UPDATE " + sqlb.encodeTableName(TBL_VERSIONEDTABLES) //
                         + " SET VERSIONED = TRUE " //
                         + " WHERE SCHEMA = '" + getConfig().getDatabaseSchemaName() + "'" //
                         + " AND NAME='" + typeName + "'");
             } else {
                 // this has never been versioned, insert new records
-                execute(st, "INSERT INTO " + sqlb.encodeTableName(VERSIONEDTABLES)
+                execute(st, "INSERT INTO " + sqlb.encodeTableName(TBL_VERSIONEDTABLES)
                         + " VALUES(default, " + "'" + getConfig().getDatabaseSchemaName() + "','"
                         + typeName + "', TRUE)");
             }
@@ -1093,7 +1096,7 @@ public class VersionedPostgisDataStore implements DataStore {
                     + pk.name + " PRIMARY KEY(" + colList + ")");
 
             // mark the table as versioned
-            execute(st, "UPDATE " + sqlb.encodeTableName(VERSIONEDTABLES)
+            execute(st, "UPDATE " + sqlb.encodeTableName(TBL_VERSIONEDTABLES)
                     + " SET VERSIONED = FALSE WHERE SCHEMA = '"
                     + getConfig().getDatabaseSchemaName() + "' AND NAME = '" + typeName + "'");
 

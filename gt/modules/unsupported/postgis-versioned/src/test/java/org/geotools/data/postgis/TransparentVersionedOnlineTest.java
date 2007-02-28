@@ -30,12 +30,12 @@ public class TransparentVersionedOnlineTest extends
     protected void setupDbTables() throws Exception {
         super.setupDbTables();
         // make sure versioned metadata is not in the way
-        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TABLESCHANGED,
+        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED,
                 false);
-        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.VERSIONEDTABLES,
+        SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_VERSIONEDTABLES,
                 false);
         SqlTestUtils
-                .dropTable(pool, VersionedPostgisDataStore.CHANGESETS, true);
+                .dropTable(pool, VersionedPostgisDataStore.TBL_CHANGESETS, true);
     }
 
     public String getFixtureFile() {
