@@ -35,8 +35,8 @@ import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Source;
 import org.geotools.data.Transaction;
 import org.geotools.data.feature.FeatureAccess;
-import org.geotools.data.feature.adapter.GTFeatureTypeAdapter;
 import org.geotools.data.feature.adapter.GTFeaureAdapter;
+import org.geotools.data.feature.adapter.GTSimpleFeatureTypeAdapter;
 import org.geotools.data.feature.adapter.ISOFeatureAdapter;
 import org.geotools.data.feature.adapter.ISOFeatureTypeAdapter;
 import org.geotools.feature.IllegalAttributeException;
@@ -77,8 +77,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL:
  *         http://gtsvn.refractions.net/geotools/trunk/gt/modules/library/main/src/main/java/org/geotools/data/memory/MemoryDataStore.java $
  */
-public class MemoryDataAccess extends AbstractDataStore implements
-        FeatureAccess {
+public class MemoryDataAccess extends AbstractDataStore implements FeatureAccess {
     /** Memory holds Map of Feature by fid by typeName. */
     protected Map memory = new HashMap();
 
@@ -109,16 +108,14 @@ public class MemoryDataAccess extends AbstractDataStore implements
         addFeatures(features);
     }
 
-    public MemoryDataAccess(FeatureReader reader)
-            throws NoSuchElementException, IOException,
+    public MemoryDataAccess(FeatureReader reader) throws NoSuchElementException, IOException,
             IllegalAttributeException {
         try {
             ISOFeatureTypeAdapter isoType = null;
             while (reader.hasNext()) {
                 org.geotools.feature.Feature feature = reader.next();
                 if (isoType == null) {
-                    isoType = new ISOFeatureTypeAdapter(feature
-                            .getFeatureType());
+                    isoType = new ISOFeatureTypeAdapter(feature.getFeatureType());
                 }
                 Feature isoFeature = new ISOFeatureAdapter(feature, isoType, attributeFactory);
                 addFeatureInternal(isoFeature);
@@ -143,8 +140,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
      */
     public void addFeatures(Collection collection) {
         if ((collection == null) || collection.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Provided FeatureCollection is empty");
+            throw new IllegalArgumentException("Provided FeatureCollection is empty");
         }
 
         synchronized (memory) {
@@ -181,8 +177,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
         }
 
         synchronized (memory) {
-            ISOFeatureTypeAdapter isoType = new ISOFeatureTypeAdapter(
-                    features[0].getFeatureType());
+            ISOFeatureTypeAdapter isoType = new ISOFeatureTypeAdapter(features[0].getFeatureType());
             for (int i = 0; i < features.length; i++) {
                 org.geotools.feature.Feature feature = features[i];
                 Feature isoFeature = new ISOFeatureAdapter(feature, isoType, attributeFactory);
@@ -298,33 +293,29 @@ public class MemoryDataAccess extends AbstractDataStore implements
      * 
      * @see org.geotools.data.AbstractDataStore#getSchema(java.lang.String)
      */
-    public org.geotools.feature.FeatureType getSchema(String typeName)
-            throws IOException {
+    public org.geotools.feature.FeatureType getSchema(String typeName) throws IOException {
         FeatureType isoType = getSchemaInternal(typeName);
         synchronized (memory) {
             if (!(isoType instanceof SimpleFeatureType)) {
-                throw new IllegalArgumentException(
-                        "Do not ask getSchema for non simple types: "
-                                + typeName);
+                throw new IllegalArgumentException("Do not ask getSchema for non simple types: "
+                        + typeName);
             }
             org.geotools.feature.FeatureType gtType;
             if (isoType instanceof ISOFeatureTypeAdapter) {
                 gtType = ((ISOFeatureTypeAdapter) isoType).getAdaptee();
             } else {
-                gtType = new GTFeatureTypeAdapter((SimpleFeatureType) isoType);
+                gtType = new GTSimpleFeatureTypeAdapter((SimpleFeatureType) isoType);
             }
             return gtType;
         }
     }
 
-    public FeatureType getSchemaInternal(String typeName)
-            throws SchemaNotFoundException {
+    public FeatureType getSchemaInternal(String typeName) throws SchemaNotFoundException {
         TypeName name = typeName(typeName);
         return getSchemaInternal(name);
     }
 
-    public FeatureType getSchemaInternal(Name name)
-            throws SchemaNotFoundException {
+    public FeatureType getSchemaInternal(Name name) throws SchemaNotFoundException {
         synchronized (memory) {
             if (schema.containsKey(name)) {
                 FeatureType isoType = (FeatureType) schema.get(name);
@@ -360,8 +351,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
      * 
      * @see org.geotools.data.DataStore#createSchema(org.geotools.feature.FeatureType)
      */
-    public void createSchema(org.geotools.feature.FeatureType featureType)
-            throws IOException {
+    public void createSchema(org.geotools.feature.FeatureType featureType) throws IOException {
 
         SimpleFeatureType isoType = new ISOFeatureTypeAdapter(featureType);
 
@@ -398,8 +388,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
      * 
      * @see org.geotools.data.AbstractDataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureReader getFeatureReader(final String typeName)
-            throws IOException {
+    public FeatureReader getFeatureReader(final String typeName) throws IOException {
         final FeatureType featureType = getSchemaInternal(typeName);
 
         if (!(featureType instanceof SimpleFeatureType)) {
@@ -411,7 +400,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
         if (featureType instanceof ISOFeatureTypeAdapter) {
             gtFType = ((ISOFeatureTypeAdapter) featureType).getAdaptee();
         } else {
-            gtFType = new GTFeatureTypeAdapter((SimpleFeatureType) featureType);
+            gtFType = new GTSimpleFeatureTypeAdapter((SimpleFeatureType) featureType);
         }
 
         return new FeatureReader() {
@@ -448,8 +437,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
 
                     return gtFType.duplicate(gtFeature);
                 } catch (NoSuchElementException end) {
-                    throw new DataSourceException("There are no more Features",
-                            end);
+                    throw new DataSourceException("There are no more Features", end);
                 }
             }
 
@@ -484,8 +472,8 @@ public class MemoryDataAccess extends AbstractDataStore implements
      * 
      * @see org.geotools.data.AbstractDataStore#getFeatureSource(java.lang.String)
      */
-    public FeatureWriter createFeatureWriter(final String typeName,
-            final Transaction transaction) throws IOException {
+    public FeatureWriter createFeatureWriter(final String typeName, final Transaction transaction)
+            throws IOException {
 
         final FeatureType featureType = getSchemaInternal(typeName);
 
@@ -498,7 +486,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
         if (featureType instanceof ISOFeatureTypeAdapter) {
             gtFType = ((ISOFeatureTypeAdapter) featureType).getAdaptee();
         } else {
-            gtFType = new GTFeatureTypeAdapter((SimpleFeatureType) featureType);
+            gtFType = new GTSimpleFeatureTypeAdapter((SimpleFeatureType) featureType);
         }
 
         return new FeatureWriter() {
@@ -521,8 +509,7 @@ public class MemoryDataAccess extends AbstractDataStore implements
                 return gtFType;
             }
 
-            public org.geotools.feature.Feature next() throws IOException,
-                    NoSuchElementException {
+            public org.geotools.feature.Feature next() throws IOException, NoSuchElementException {
                 if (hasNext()) {
                     // existing content
                     live = (SimpleFeature) iterator.next();
@@ -533,11 +520,10 @@ public class MemoryDataAccess extends AbstractDataStore implements
                         gtLive = new GTFeaureAdapter(live, gtFType);
                     }
                     try {
-                        current = (org.geotools.feature.SimpleFeature) gtFType
-                                .duplicate(gtLive);
+                        current = (org.geotools.feature.SimpleFeature) gtFType.duplicate(gtLive);
                     } catch (IllegalAttributeException e) {
-                        throw new DataSourceException("Unable to edit "
-                                + live.getID() + " of " + typeName);
+                        throw new DataSourceException("Unable to edit " + live.getID() + " of "
+                                + typeName);
                     }
                 } else {
                     // new content
@@ -547,9 +533,8 @@ public class MemoryDataAccess extends AbstractDataStore implements
                         current = (org.geotools.feature.SimpleFeature) DataUtilities
                                 .template(gtFType);
                     } catch (IllegalAttributeException e) {
-                        throw new DataSourceException(
-                                "Unable to add additional Features of "
-                                        + typeName);
+                        throw new DataSourceException("Unable to add additional Features of "
+                                + typeName);
                     }
                 }
 
@@ -568,8 +553,8 @@ public class MemoryDataAccess extends AbstractDataStore implements
                 if (live != null) {
                     // remove existing content
                     iterator.remove();
-                    listenerManager.fireFeaturesRemoved(typeName, transaction,
-                            gtLive.getBounds(), true);
+                    listenerManager.fireFeaturesRemoved(typeName, transaction, gtLive.getBounds(),
+                            true);
                     live = null;
                     current = null;
                 } else {
@@ -599,16 +584,14 @@ public class MemoryDataAccess extends AbstractDataStore implements
                         try {
                             gtLive.setAttributes(current.getAttributes(null));
                         } catch (IllegalAttributeException e) {
-                            throw new DataSourceException(
-                                    "Unable to accept modifications to "
-                                            + live.getID() + " on " + typeName);
+                            throw new DataSourceException("Unable to accept modifications to "
+                                    + live.getID() + " on " + typeName);
                         }
 
                         Envelope bounds = new Envelope();
                         bounds.expandToInclude(gtLive.getBounds());
                         bounds.expandToInclude(current.getBounds());
-                        listenerManager.fireFeaturesChanged(typeName,
-                                transaction, bounds, true);
+                        listenerManager.fireFeaturesChanged(typeName, transaction, bounds, true);
                         live = null;
                         current = null;
                     }
@@ -616,8 +599,8 @@ public class MemoryDataAccess extends AbstractDataStore implements
                     // add new content
                     //
                     contents.put(current.getID(), current);
-                    listenerManager.fireFeaturesAdded(typeName, transaction,
-                            current.getBounds(), true);
+                    listenerManager.fireFeaturesAdded(typeName, transaction, current.getBounds(),
+                            true);
                     current = null;
                 }
             }
@@ -726,8 +709,8 @@ public class MemoryDataAccess extends AbstractDataStore implements
             throw new NoSuchElementException(e.getMessage());
         }
         TypeFactory tf = new TypeFactoryImpl();
-        AttributeDescriptor descriptor = tf.createAttributeDescriptor(ftype,
-                ftype.getName(), 0, Integer.MAX_VALUE, true);
+        AttributeDescriptor descriptor = tf.createAttributeDescriptor(ftype, ftype.getName(), 0,
+                Integer.MAX_VALUE, true);
         return descriptor;
     }
 

@@ -16,11 +16,11 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 
-public class GTFeatureTypeAdapter implements FeatureType {
+public class GTSimpleFeatureTypeAdapter implements FeatureType {
 
     private SimpleFeatureType type;
 
-    public GTFeatureTypeAdapter(SimpleFeatureType type) {
+    public GTSimpleFeatureTypeAdapter(SimpleFeatureType type) {
         if(type instanceof ISOFeatureTypeAdapter){
             throw new IllegalArgumentException("No need to adapt ISOFEatureTypeAdapter, use getAdaptee() instead");
         }

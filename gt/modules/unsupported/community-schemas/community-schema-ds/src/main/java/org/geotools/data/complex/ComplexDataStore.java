@@ -20,6 +20,7 @@ package org.geotools.data.complex;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,8 +43,15 @@ import org.geotools.data.complex.filter.FilterAttributeExtractor;
 import org.geotools.data.complex.filter.UnmappingFilterVisitor;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.feature.FeatureAccess;
+import org.geotools.data.feature.adapter.GTComlexFeatureTypeAdapter;
+import org.geotools.data.feature.adapter.GTSimpleFeatureTypeAdapter;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.DefaultFeatureType;
+import org.geotools.feature.GeometryAttributeType;
+import org.geotools.feature.SchemaException;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -98,12 +106,12 @@ public class ComplexDataStore extends AbstractDataStore implements
      */
     public org.geotools.feature.FeatureType getSchema(String typeName)
             throws IOException {
-        throw new UnsupportedOperationException(
-                "Use access(typeName).describe()");
-        /*
-         * FeatureTypeMapping mapping = getMapping(typeName); return
-         * (FeatureType) mapping.getTargetFeature().getType();
-         */
+        FeatureTypeMapping mapping = getMapping(typeName);
+        AttributeDescriptor targetFeature = mapping.getTargetFeature();
+        
+        org.geotools.feature.FeatureType gtType;
+        gtType = new GTComlexFeatureTypeAdapter(targetFeature);
+        return gtType;
     }
 
     /**
@@ -391,7 +399,6 @@ public class ComplexDataStore extends AbstractDataStore implements
 
     public void dispose() {
         // TODO Auto-generated method stub
-
     }
 
     public ServiceInfo getInfo() {

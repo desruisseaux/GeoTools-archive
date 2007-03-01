@@ -37,7 +37,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
         if (resource == null) {
             fail("Can't find resouce test-data/roadsegments.xml");
         }
-        params.put("config", resource);
+        params.put("url", resource);
     }
 
     protected void tearDown() throws Exception {
@@ -65,7 +65,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
         } catch (IOException e) {
             // OK
         }
-        badParams.put("config", "file://_inexistentConfigFile123456.xml");
+        badParams.put("url", "file://_inexistentConfigFile123456.xml");
         try {
             factory.createDataStore(badParams);
             fail("allowed bad params");
@@ -153,13 +153,13 @@ public class ComplexDataStoreFactoryTest extends TestCase {
         Map params = new HashMap();
         assertFalse(factory.canProcess(params));
         params.put("dbtype", "arcsde");
-        params.put("config", "http://somesite.net/config.xml");
+        params.put("url", "http://somesite.net/config.xml");
         assertFalse(factory.canProcess(params));
-        params.remove("config");
+        params.remove("url");
         params.put("dbtype", "complex");
         assertFalse(factory.canProcess(params));
 
-        params.put("config", "http://somesite.net/config.xml");
+        params.put("url", "http://somesite.net/config.xml");
         assertTrue(factory.canProcess(params));
     }
 

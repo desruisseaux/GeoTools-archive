@@ -40,7 +40,7 @@ import org.geotools.data.complex.config.XMLConfigDigester;
 public class ComplexDataStoreFactory implements DataStoreFactorySpi {
 
 	public static final Param DBTYPE = new Param("dbtype", String.class, "Fixed value 'complex'", true, "complex");
-	public static final Param URL = new Param("config", URL.class, "URL to a complex datastore XML configuration file", true);
+	public static final Param URL = new Param("url", URL.class, "URL to a complex datastore XML configuration file", true);
 	
 	public ComplexDataStoreFactory() {
 		// no-op
