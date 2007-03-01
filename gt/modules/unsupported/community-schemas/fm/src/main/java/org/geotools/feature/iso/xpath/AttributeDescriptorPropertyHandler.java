@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
-import org.geotools.feature.iso.Descriptors;
+import org.geotools.feature.iso.Types;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.ComplexType;
@@ -51,7 +51,8 @@ public class AttributeDescriptorPropertyHandler implements DynamicPropertyHandle
 					+ propName + " of a non complex type: " + node.getType());
 		}
 		ComplexType complex = (ComplexType) node.getType();
-		value = Descriptors.node(complex, propName);
+        value = (AttributeDescriptor) Types.descriptor(complex, propName);
+		//value = Descriptors.node(complex, propName);
 		return value;
 	}
 
