@@ -27,6 +27,7 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.feature.FeatureType;
+import org.opengis.filter.Filter;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -75,7 +76,7 @@ public class PropertyFeatureSource extends AbstractFeatureLocking {
     }
     
     public int getCount(Query query) {
-        if( query == Query.ALL && getTransaction() == Transaction.AUTO_COMMIT ){
+        if( Query.ALL == query || Filter.INCLUDE == query.getFilter() && getTransaction() == Transaction.AUTO_COMMIT ){
             File file = new File( store.directory, typeName+".properties" );            
             if( cacheCount != -1 && file.lastModified() == cacheTimestamp){
                 return cacheCount;
