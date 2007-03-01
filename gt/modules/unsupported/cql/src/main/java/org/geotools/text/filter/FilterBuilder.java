@@ -92,8 +92,9 @@ import com.vividsolutions.jts.io.WKTReader;
  * @version $Id$
  * @source $URL:
  *         http://gtsvn.refractions.net/geotools/trunk/gt/modules/unsupported/cql/src/main/java/org/geotools/text/filter/FilterBuilder.java $
+ * @deprecated use the {@link CQL} utility class instead, this one is going to be set to package visibility
  */
-class FilterBuilder {
+public class FilterBuilder {
 
     /**
      * Delimiter characted used for
