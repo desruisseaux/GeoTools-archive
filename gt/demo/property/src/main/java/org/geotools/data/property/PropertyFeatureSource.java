@@ -76,7 +76,7 @@ public class PropertyFeatureSource extends AbstractFeatureLocking {
     }
     
     public int getCount(Query query) {
-        if( Query.ALL == query || Filter.INCLUDE == query.getFilter() && getTransaction() == Transaction.AUTO_COMMIT ){
+        if( Filter.INCLUDE == query.getFilter() && getTransaction() == Transaction.AUTO_COMMIT ){
             File file = new File( store.directory, typeName+".properties" );            
             if( cacheCount != -1 && file.lastModified() == cacheTimestamp){
                 return cacheCount;
