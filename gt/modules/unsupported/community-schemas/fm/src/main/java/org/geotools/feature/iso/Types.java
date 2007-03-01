@@ -304,6 +304,11 @@ public class Types {
             }
         }
 
+        AttributeType superType = type.getSuper();
+        if(superType instanceof ComplexType){
+            List superDescriptors = descriptors((ComplexType)superType, name);
+            match.addAll(superDescriptors);
+        }
         return match;
     }
 
@@ -331,7 +336,12 @@ public class Types {
                 match.add(descriptor);
             }
         }
-
+        
+        AttributeType superType = type.getSuper();
+        if(superType instanceof ComplexType){
+            List superDescriptors = descriptors((ComplexType)superType, name);
+            match.addAll(superDescriptors);
+        }
         return match;
     }
 

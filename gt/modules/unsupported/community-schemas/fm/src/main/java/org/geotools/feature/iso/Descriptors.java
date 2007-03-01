@@ -389,6 +389,10 @@ public class Descriptors {
 			}
 			
 		}
+        AttributeType superType  = schema.getSuper();
+        if(superType instanceof ComplexType){
+            return node((ComplexType)superType, name);
+        }
 		return null;
 	}
 
