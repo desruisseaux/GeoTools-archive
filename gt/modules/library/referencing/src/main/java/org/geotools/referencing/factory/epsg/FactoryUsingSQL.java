@@ -1604,8 +1604,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     } else if (orientation.equalsIgnoreCase("Geocentre > north pole")) {
                         direction = AxisDirection.NORTH;
                     } else {
-                        throw new FactoryException(Errors.format(ErrorKeys.UNKNOW_TYPE_$1,
-                                                                 orientation), exception);
+                        throw new FactoryException(exception.getLocalizedMessage(), exception);
                     }
                 }
                 final AxisName an = getAxisName(nameCode);
@@ -2510,7 +2509,11 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     } finally {
                         safetyGuard.remove(epsg);
                     }
-                    return new DefaultConcatenatedOperation(properties, operations);
+                    try {
+                        return new DefaultConcatenatedOperation(properties, operations);
+                    } catch (IllegalArgumentException exception) {
+                        throw new FactoryException(exception);
+                    }
                 } else {
                     /*
                      * Needs to create a math transform. A special processing is performed for
