@@ -692,9 +692,9 @@ public final class CRS {
                 try {
                     final CoordinateReferenceSystem candidate;
                     if(code.indexOf(":") == -1)
-                        candidate = CRS.decode(authority + ":" + code, true);
+                        candidate = CRS.decode(authority + ":" + code);
                     else
-                        candidate = CRS.decode(code, true);
+                        candidate = CRS.decode(code);
                     if (CRS.equalsIgnoreMetadata(candidate, crs)) {
                         return getSRSFromCRS(candidate, Collections.singleton(authority));
                     }
