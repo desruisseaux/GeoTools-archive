@@ -130,7 +130,7 @@ public class Scale extends Operation2D {
 			// class
 			// (mandatory)
 			null, // Array of valid values
-			null, // Default
+			javax.media.jai.BorderExtender.createInstance(javax.media.jai.BorderExtender.BORDER_ZERO), // Default
 			// value
 			null, // Minimal value
 			null, // Maximal value

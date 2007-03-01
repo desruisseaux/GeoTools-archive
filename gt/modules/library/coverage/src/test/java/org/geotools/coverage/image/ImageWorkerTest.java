@@ -187,15 +187,15 @@ public class ImageWorkerTest extends TestCase {
 		// /////////////////////////////////////////////////////////////////////
 		final File outFile = TestData.temp(this, "temp.jpeg");
 //		worker.writeJPEG(outFile, "JPEG-LS", 0.75f, true);
-
-		// read it back
-		final ImageWorker worker2 = new ImageWorker(ImageIO.read(outFile));
-
-		// re visualize it
-		if (TestData.isInteractiveTest()) {
-			visualize(worker2.getRenderedImage(), "Native JPEG LS");
-		} else
-			worker.getPlanarImage().getAsBufferedImage();
+//
+//		// read it back
+//		final ImageWorker worker2 = new ImageWorker(ImageIO.read(outFile));
+//
+//		// re visualize it
+//		if (TestData.isInteractiveTest()) {
+//			visualize(worker2.getRenderedImage(), "Native JPEG LS");
+//		} else
+//			worker.getPlanarImage().getAsBufferedImage();
 
 		// /////////////////////////////////////////////////////////////////////
 		// native JPEG compression
@@ -204,7 +204,7 @@ public class ImageWorkerTest extends TestCase {
 		worker.writeJPEG(outFile, "JPEG", 0.75f, true);
 
 		// read it back
-		worker2.setImage(ImageIO.read(outFile));
+		final ImageWorker worker2 = new ImageWorker(ImageIO.read(outFile));
 
 		// re visualize it
 		if (TestData.isInteractiveTest()) {
