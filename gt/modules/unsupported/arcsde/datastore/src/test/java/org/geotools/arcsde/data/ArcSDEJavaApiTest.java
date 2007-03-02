@@ -14,11 +14,14 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 
 import junit.framework.TestCase;
 
@@ -576,11 +579,11 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 *             DOCUMENT ME!
 	 * @throws IOException
 	 *             DOCUMENT ME!
-	 * @throws UnavailableConnectionException
+	 * @throws UnavailableArcSDEConnectionException
 	 *             DOCUMENT ME!
 	 */
 	public void testCreateBaseTable() throws SeException, IOException,
-			UnavailableConnectionException {
+			UnavailableArcSDEConnectionException {
 		SeLayer layer = new SeLayer(conn);
 		SeTable table = null;
 
@@ -693,11 +696,11 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 *             DOCUMENT ME!
 	 * @throws IOException
 	 *             DOCUMENT ME!
-	 * @throws UnavailableConnectionException
+	 * @throws UnavailableArcSDEConnectionException
 	 *             DOCUMENT ME!
 	 */
 	public void testCreateNonStandardSchema() throws SeException, IOException,
-			UnavailableConnectionException {
+			UnavailableArcSDEConnectionException {
 		SeLayer layer = new SeLayer(conn);
 		SeTable table = null;
 

@@ -13,7 +13,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
+
+import org.geotools.arcsde.pool.ArcSDEConnectionPoolTest;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

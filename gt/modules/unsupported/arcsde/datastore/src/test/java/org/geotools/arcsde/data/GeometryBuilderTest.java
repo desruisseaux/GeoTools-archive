@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+import org.geotools.arcsde.data.ArcSDEGeometryBuilder;
 import org.geotools.data.DataSourceException;
 
 import com.esri.sde.sdk.client.SDEPoint;
@@ -61,7 +62,7 @@ public class GeometryBuilderTest extends TestCase {
                                                                      .getName());
 
     /** DOCUMENT ME! */
-    private GeometryBuilder geometryBuilder = null;
+    private ArcSDEGeometryBuilder geometryBuilder = null;
 
     /** DOCUMENT ME! */
     private WKTReader wktReader;
@@ -247,13 +248,13 @@ public class GeometryBuilderTest extends TestCase {
      */
     public void testConstructShapeEmpty() throws Exception {
         Geometry[] testEmptys = new Geometry[6];
-        testEmptys[0] = GeometryBuilder.builderFor(Point.class).getEmpty();
-        testEmptys[1] = GeometryBuilder.builderFor(MultiPoint.class).getEmpty();
-        testEmptys[2] = GeometryBuilder.builderFor(LineString.class).getEmpty();
-        testEmptys[3] = GeometryBuilder.builderFor(MultiLineString.class)
+        testEmptys[0] = ArcSDEGeometryBuilder.builderFor(Point.class).getEmpty();
+        testEmptys[1] = ArcSDEGeometryBuilder.builderFor(MultiPoint.class).getEmpty();
+        testEmptys[2] = ArcSDEGeometryBuilder.builderFor(LineString.class).getEmpty();
+        testEmptys[3] = ArcSDEGeometryBuilder.builderFor(MultiLineString.class)
                                        .getEmpty();
-        testEmptys[4] = GeometryBuilder.builderFor(Polygon.class).getEmpty();
-        testEmptys[5] = GeometryBuilder.builderFor(MultiPolygon.class).getEmpty();
+        testEmptys[4] = ArcSDEGeometryBuilder.builderFor(Polygon.class).getEmpty();
+        testEmptys[5] = ArcSDEGeometryBuilder.builderFor(MultiPolygon.class).getEmpty();
         testBuildSeShapes(testEmptys);
     }
 
@@ -274,7 +275,7 @@ public class GeometryBuilderTest extends TestCase {
 
     /**
      * tests the building of SeShape objects from JTS Geometries. To do that,
-     * recieves a Geometry object, then creates a GeometryBuilder for it's
+     * recieves a Geometry object, then creates a ArcSDEGeometryBuilder for it's
      * geometry type and ask it to construct an equivalent SeShape. With this
      * SeShape, checks that it's number of points is equal to the number of
      * points in <code>geometry</code>, and then creates an equivalent
@@ -290,7 +291,7 @@ public class GeometryBuilderTest extends TestCase {
         LOGGER.finer("testConstructShape: testing " + geometry);
 
         Class geometryClass = geometry.getClass();
-        GeometryBuilder builder = GeometryBuilder.builderFor(geometryClass);
+        ArcSDEGeometryBuilder builder = ArcSDEGeometryBuilder.builderFor(geometryClass);
 
         SeCoordinateReference cr = TestData.getGenericCoordRef();
         if (LOGGER.isLoggable(Level.FINE)) {
@@ -343,7 +344,7 @@ public class GeometryBuilderTest extends TestCase {
      * To do so, first parses the WKT geometries from the properties file
      * pointed by <code>"test-data/" + testDataSource</code>, then creates
      * their corresponding <code>SeShape</code> objects and finally used
-     * GeometryBuilder to build the JTS geometries back, which are tested for
+     * ArcSDEGeometryBuilder to build the JTS geometries back, which are tested for
      * equality against the original ones.
      * </p>
      *
@@ -358,7 +359,7 @@ public class GeometryBuilderTest extends TestCase {
         LOGGER.fine("---- testBuildGeometries: testing " + testDataResource
             + " ----");
 
-        this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
+        this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
         LOGGER.fine("created " + this.geometryBuilder.getClass().getName());
 
         Geometry[] expectedGeometries = loadTestData(testDataResource);
@@ -491,7 +492,7 @@ public class GeometryBuilderTest extends TestCase {
         try {
             LOGGER.fine("loading test data test-data/" + resource);
 
-            InputStream in = org.geotools.test.TestData.openStream(this, resource);
+            InputStream in = org.geotools.test.TestData.openStream(null, resource);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
             while ((line = reader.readLine()) != null) {
@@ -518,13 +519,13 @@ public class GeometryBuilderTest extends TestCase {
     }
 
     /**
-     * given a geometry class, tests that GeometryBuilder.defaultValueFor that
+     * given a geometry class, tests that ArcSDEGeometryBuilder.defaultValueFor that
      * class returns an empty geometry of the same geometry class
      *
      * @param geometryClass DOCUMENT ME!
      */
     private void testGetDefaultValue(Class geometryClass) {
-        Geometry geom = GeometryBuilder.defaultValueFor(geometryClass);
+        Geometry geom = ArcSDEGeometryBuilder.defaultValueFor(geometryClass);
         assertNotNull(geom);
         assertTrue(geom.isEmpty());
         assertTrue(geometryClass.isAssignableFrom(geom.getClass()));

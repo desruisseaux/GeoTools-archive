@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +24,12 @@ import java.util.Calendar;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.data.ArcSDEDataStore;
+import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
@@ -94,6 +100,9 @@ public class TestData {
 
     /** DOCUMENT ME! */
     private ArcSDEDataStore dataStore = null;
+    
+    /** the configuration keyword to use when creating layers and tables */
+    private String configKeyword;
 
     /**
      * Creates a new TestData object.
@@ -113,7 +122,7 @@ public class TestData {
         this.conProps = new Properties();
 
         String propsFile = "testparams.properties";
-        InputStream in = org.geotools.test.TestData.openStream(this, propsFile);
+        InputStream in = org.geotools.test.TestData.openStream(null, propsFile);
         // The line above should never returns null. It should thow a
         // FileNotFoundException instead if the resource is not available.
 
@@ -124,6 +133,7 @@ public class TestData {
         this.line_table = this.conProps.getProperty("line_table");
         this.polygon_table = this.conProps.getProperty("polygon_table");
         this.temp_table = this.conProps.getProperty("temp_table");
+        this.configKeyword = this.conProps.getProperty("configKeyword");
 
         if (this.point_table == null) {
             throw new IOException("point_table not defined in " + propsFile);
@@ -150,7 +160,7 @@ public class TestData {
     		deleteTempTable();
     	}
         if(cleanPool){
-	        ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
+	        ArcSDEConnectionPoolFactory pfac = ArcSDEConnectionPoolFactory.getInstance();
 	        pfac.clear();
         }
         this.dataStore = null;
@@ -166,8 +176,8 @@ public class TestData {
      */
     public ArcSDEDataStore getDataStore() throws IOException {
         if (this.dataStore == null) {
-            ConnectionPoolFactory pfac = ConnectionPoolFactory.getInstance();
-            ConnectionConfig config = new ConnectionConfig(this.conProps);
+            ArcSDEConnectionPoolFactory pfac = ArcSDEConnectionPoolFactory.getInstance();
+            ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(this.conProps);
             ArcSDEConnectionPool pool = pfac.createPool(config);
             this.dataStore = new ArcSDEDataStore(pool);
         }
@@ -228,6 +238,11 @@ public class TestData {
     public String getTemp_table() {
         return this.temp_table;
     }
+    
+    
+    public String getConfigKeyword() {
+        return this.configKeyword;
+    }
 
     /**
      * DOCUMENT ME!
@@ -279,7 +294,7 @@ public class TestData {
      * @param pool DOCUMENT ME!
      */
     public void deleteTempTable(ArcSDEConnectionPool pool) {
-        PooledConnection conn = null;
+        ArcSDEPooledConnection conn = null;
 
         try {
             conn = pool.getConnection();
@@ -302,16 +317,16 @@ public class TestData {
      *
      * @throws SeException for any error
      * @throws IOException DOCUMENT ME!
-     * @throws UnavailableConnectionException DOCUMENT ME!
+     * @throws UnavailableArcSDEConnectionException DOCUMENT ME!
      */
-    public void createTemptTable(boolean insertTestData)
-        throws SeException, IOException, UnavailableConnectionException {
+    public void createTempTable(boolean insertTestData)
+        throws SeException, IOException, UnavailableArcSDEConnectionException {
         ArcSDEConnectionPool connPool = getDataStore()
             .getConnectionPool();
 
         deleteTempTable(connPool);
 
-        PooledConnection conn = connPool.getConnection();
+        ArcSDEPooledConnection conn = connPool.getConnection();
 
         try {
             SeColumnDefinition[] coldefs;
@@ -325,7 +340,7 @@ public class TestData {
             SeTable table = new SeTable(conn, tableName);
             layer.setTableName(tableName);
 
-            coldefs = createBaseTable(conn, table, layer);
+            coldefs = createBaseTable(conn, table, layer, configKeyword);
 
             if (insertTestData) {
                 insertData(layer, conn, coldefs);
@@ -343,8 +358,10 @@ public class TestData {
      *
      */
     private static SeColumnDefinition[] createBaseTable(SeConnection conn,
-        SeTable table, SeLayer layer) throws SeException {
+        SeTable table, SeLayer layer, String configKeyword) throws SeException {
         SeColumnDefinition[] colDefs = new SeColumnDefinition[6];
+        
+        if (configKeyword == null) configKeyword = "DEFAULTS";
 
         /*
          *   Define the columns and their attributes for the table to be created.
@@ -370,7 +387,7 @@ public class TestData {
          *   Create the table using the DBMS default configuration keyword.
          *   Valid keywords are defined in the dbtune table.
          */
-        table.create(colDefs, "DEFAULTS");
+        table.create(colDefs, configKeyword);
 
         /*
          *   Define the attributes of the spatial column
@@ -400,6 +417,8 @@ public class TestData {
         SeExtent ext = coordref.getXYEnvelope();
         layer.setExtent(ext);
         layer.setCoordRef(coordref);
+        
+        layer.setCreationKeyword(configKeyword);
 
         /*
          *   Spatially enable the new table...
