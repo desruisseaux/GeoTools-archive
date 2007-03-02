@@ -40,4 +40,5 @@ public class SeLayer {
 	public String getShapeAttributeName(int i) { return null; }
 	public void setGridSizes(double a, double b, double c){}
 	public void delete()throws SeException{}
+    public void setCreationKeyword(String s) {}
 }
