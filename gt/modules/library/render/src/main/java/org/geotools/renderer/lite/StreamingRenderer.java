@@ -1187,20 +1187,14 @@ public final class StreamingRenderer implements GTRenderer {
     private int findRenderingBuffer(LiteFeatureTypeStyle[] styles) {
         final MetaBufferEstimator rbe = new MetaBufferEstimator();
 
-        LiteFeatureTypeStyle lfts;
-        Rule[] rules;
-        int rulesLength;
-        final int length = styles.length;
-        for (int t = 0; t < length; t++) {
-            lfts = styles[t];
-            rules = lfts.elseRules;
-            rulesLength = rules.length;
-            for (int j = 0; j < rulesLength; j++) {
+        for (int t = 0; t < styles.length; t++) {
+            final LiteFeatureTypeStyle lfts = styles[t];
+            Rule[] rules = lfts.elseRules;
+            for (int j = 0; j < rules.length; j++) {
                 rbe.visit(rules[j]);
             }
             rules = lfts.ruleList;
-            rulesLength = rules.length;
-            for (int j = 0; j < rulesLength; j++) {
+            for (int j = 0; j <  rules.length; j++) {
                 rbe.visit(rules[j]);
             }
         }
@@ -2283,11 +2277,16 @@ public final class StreamingRenderer implements GTRenderer {
 	private boolean isOptimizedDataLoadingEnabled() {
 		if (rendererHints == null)
 			return optimizedDataLoadingEnabledDEFAULT;
-		Boolean result = (Boolean) rendererHints
-				.get("optimizedDataLoadingEnabled");
+		Object result = null;
+		try{
+			result=rendererHints
+					.get("optimizedDataLoadingEnabled");
+		}catch (ClassCastException e) {
+			
+		}
 		if (result == null)
 			return optimizedDataLoadingEnabledDEFAULT;
-		return result.booleanValue();
+		return ((Boolean)result).booleanValue();
 	}
     
     /**
