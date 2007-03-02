@@ -211,6 +211,16 @@ class ArcSDEDataStore extends AbstractDataStore {
 
         return schema;
     }
+    
+    /**
+     * Pass-through to the createSchema method with a config keyword.
+     * This method calls createSchema(schema, "DEFAULTS");
+     * 
+     */
+    public void createSchema(FeatureType schema)
+        throws IOException, IllegalArgumentException {
+            createSchema(schema, "DEFAULTS");
+    }
 
     /**
      * Creates the given featuretype in the underlying ArcSDE database.
@@ -254,7 +264,7 @@ class ArcSDEDataStore extends AbstractDataStore {
      *         creating the feature type at the ArcSDE instance (e.g. a table
      *         with that name already exists).
      */
-    public void createSchema(FeatureType featureType)
+    public void createSchema(FeatureType featureType, String configKeyword)
         throws IOException, IllegalArgumentException {
         if (featureType == null) {
             throw new NullPointerException(
@@ -304,6 +314,8 @@ class ArcSDEDataStore extends AbstractDataStore {
 
             layer = new SeLayer(connection);
             layer.setTableName(qualifiedName);
+            if (configKeyword != null) layer.setCreationKeyword(configKeyword);
+            else layer.setCreationKeyword("DEFAULTS");
 
             final String HACK_COL_NAME = "gt_workaround_col_";
             table = createSeTable(connection, qualifiedName, HACK_COL_NAME);
