@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.pool;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,13 +30,13 @@ import org.geotools.data.DataSourceException;
  * @source $URL$
  * @version $Id$
  */
-class ConnectionPoolFactory {
+public class ArcSDEConnectionPoolFactory {
 	/** DOCUMENT ME! */
-	private static Logger LOGGER = Logger.getLogger(ConnectionPoolFactory.class
+	private static Logger LOGGER = Logger.getLogger(ArcSDEConnectionPoolFactory.class
 			.getPackage().getName());
 
 	/** DOCUMENT ME! */
-	private static final ConnectionPoolFactory singleton =  new ConnectionPoolFactory();
+	private static final ArcSDEConnectionPoolFactory singleton =  new ArcSDEConnectionPoolFactory();
 
 	/** DOCUMENT ME! */
 	private final Map currentPools = new HashMap();
@@ -44,7 +44,7 @@ class ConnectionPoolFactory {
 	/**
 	 * Creates a new SdeConnectionPoolFactory object.
 	 */
-	private ConnectionPoolFactory() {
+	private ArcSDEConnectionPoolFactory() {
 		// intentionally blank
 	}
 
@@ -53,7 +53,7 @@ class ConnectionPoolFactory {
 	 * 
 	 * @return DOCUMENT ME!
 	 */
-	public synchronized static ConnectionPoolFactory getInstance() {
+	public synchronized static ArcSDEConnectionPoolFactory getInstance() {
 		return singleton;
 	}
 
@@ -68,7 +68,7 @@ class ConnectionPoolFactory {
 	 * @throws DataSourceException
 	 *             DOCUMENT ME!
 	 */
-	public synchronized ArcSDEConnectionPool createPool(ConnectionConfig config)
+	public synchronized ArcSDEConnectionPool createPool(ArcSDEConnectionConfig config)
 			throws DataSourceException {
 		ArcSDEConnectionPool pool = (ArcSDEConnectionPool) this.currentPools
 				.get(config);

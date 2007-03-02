@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,9 +86,9 @@ import com.vividsolutions.jts.geom.Polygon;
  * @source $URL$
  * @version $Id$
  */
-public abstract class GeometryBuilder {
+public abstract class ArcSDEGeometryBuilder {
 	/** DOCUMENT ME! */
-	private static final Logger LOGGER = Logger.getLogger(GeometryBuilder.class
+	private static final Logger LOGGER = Logger.getLogger(ArcSDEGeometryBuilder.class
 			.getPackage().getName());
 
 	/** specialized geometry builders classes by it's geometry type */
@@ -127,13 +127,13 @@ public abstract class GeometryBuilder {
 	/**
 	 * Private empty constructor to obligate using this class as factory.
 	 */
-	private GeometryBuilder() {
+	private ArcSDEGeometryBuilder() {
 		// intentionally blank
 	}
 
 	/**
 	 * Takes an ArcSDE's <code>SeShape</code> and builds a JTS Geometry. The
-	 * geometry type constructed depends on this <code>GeometryBuilder</code>
+	 * geometry type constructed depends on this <code>ArcSDEGeometryBuilder</code>
 	 * specialized subclass
 	 * 
 	 * @param shape
@@ -175,18 +175,18 @@ public abstract class GeometryBuilder {
 	 * @return the <code>SeShape</code> representation of passed
 	 *         <code>Geometry</code>
 	 * 
-	 * @throws GeometryBuildingException
+	 * @throws ArcSDEGeometryBuildingException
 	 *             DOCUMENT ME!
 	 */
 	public SeShape constructShape(Geometry geometry, SeCoordinateReference seSrs)
-			throws GeometryBuildingException {
+			throws ArcSDEGeometryBuildingException {
 		SeShape shape = null;
 
 		try {
 			shape = new SeShape(seSrs);
 		} catch (SeException ex) {
 			LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-			throw new GeometryBuildingException(ex.getSeError().getErrDesc()
+			throw new ArcSDEGeometryBuildingException(ex.getSeError().getErrDesc()
 					+ ": " + geometry, ex);
 		}
 
@@ -242,14 +242,14 @@ public abstract class GeometryBuilder {
 		} catch (SeException e) {
 			LOGGER.warning(e.getSeError().getErrDesc() + ":\nGEOM=" + geometry
 					+ "\nShape=" + shape + "\nCRS: " + seSrs);
-			throw new GeometryBuildingException(e.getSeError().getErrDesc(), e);
+			throw new ArcSDEGeometryBuildingException(e.getSeError().getErrDesc(), e);
 		}
 
 		return shape;
 	}
 
 	/**
-	 * utility method that <code>GeometryBuilder</code> subclasses use to
+	 * utility method that <code>ArcSDEGeometryBuilder</code> subclasses use to
 	 * obtain the three dimensional array of double's that forms the body of the
 	 * <code>SeShape</code> structure.
 	 * 
@@ -342,7 +342,7 @@ public abstract class GeometryBuilder {
 
 	/**
 	 * Builds a JTS Geometry who't type is given by the
-	 * <code>GeometryBuilder</code> subclass instance specialization that
+	 * <code>ArcSDEGeometryBuilder</code> subclass instance specialization that
 	 * implements it
 	 * 
 	 * @param coords
@@ -359,7 +359,7 @@ public abstract class GeometryBuilder {
 
 	/**
 	 * returns an empty JTS geometry who's type is given by the
-	 * <code>GeometryBuilder</code> subclass instance specialization that
+	 * <code>ArcSDEGeometryBuilder</code> subclass instance specialization that
 	 * implements it.
 	 * 
 	 * <p>
@@ -426,7 +426,7 @@ public abstract class GeometryBuilder {
 	}
 
 	/**
-	 * Factory method that returns an instance of <code>GeometryBuilder</code>
+	 * Factory method that returns an instance of <code>ArcSDEGeometryBuilder</code>
 	 * specialized in contructing JTS geometries of the JTS Geometry class
 	 * passed as argument. Note that <code>jtsGeometryClass</code> must be one
 	 * of the supported concrete JTS Geometry classes.
@@ -440,9 +440,9 @@ public abstract class GeometryBuilder {
 	 *             <code>com.vividsolutions.jts.geom.MultiPoint.class</code>
 	 *             i.e.)
 	 */
-	public static GeometryBuilder builderFor(Class jtsGeometryClass)
+	public static ArcSDEGeometryBuilder builderFor(Class jtsGeometryClass)
 			throws IllegalArgumentException {
-		GeometryBuilder builder = (GeometryBuilder) builders
+		ArcSDEGeometryBuilder builder = (ArcSDEGeometryBuilder) builders
 				.get(jtsGeometryClass);
 
 		if (builder == null) {
@@ -476,15 +476,15 @@ public abstract class GeometryBuilder {
 	}
 
 	/**
-	 * <code>GeometryBuilder</code> which can create any type of JTS geometry
+	 * <code>ArcSDEGeometryBuilder</code> which can create any type of JTS geometry
 	 * from <code>SeShape</code>'s and viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
 	 * @version $Id$
 	 */
-	private static class GenericGeometryBuilder extends GeometryBuilder {
+	private static class GenericGeometryBuilder extends ArcSDEGeometryBuilder {
 		/** singleton for generic geometry building */
-		private static final GeometryBuilder instance = new GenericGeometryBuilder();
+		private static final ArcSDEGeometryBuilder instance = new GenericGeometryBuilder();
 
 		/**
 		 * Returns an instance of this geometry builder. Currently implemented
@@ -492,7 +492,7 @@ public abstract class GeometryBuilder {
 		 * 
 		 * @return the <code>GenericGeometryBuilder</code> singleton.
 		 */
-		public static GeometryBuilder getInstance() {
+		public static ArcSDEGeometryBuilder getInstance() {
 			return instance;
 		}
 
@@ -522,7 +522,7 @@ public abstract class GeometryBuilder {
 				DataSourceException {
 			int seShapeType = shape.getType();
 			Class realGeomClass = ArcSDEAdapter.getGeometryType(seShapeType);
-			GeometryBuilder realBuilder = builderFor(realGeomClass);
+			ArcSDEGeometryBuilder realBuilder = builderFor(realGeomClass);
 
 			return realBuilder.construct(shape);
 		}
@@ -549,18 +549,18 @@ public abstract class GeometryBuilder {
 	}
 
 	/**
-	 * <code>GeometryBuilder</code> specialized in creating JTS
+	 * <code>ArcSDEGeometryBuilder</code> specialized in creating JTS
 	 * <code>Point</code> s from <code>SeShape</code> points and viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
 	 * @version $Id$
 	 */
-	private static class PointBuilder extends GeometryBuilder {
+	private static class PointBuilder extends ArcSDEGeometryBuilder {
 		/** the empty point singleton */
 		private static Geometry EMPTY;
 
 		/** singleton for point building */
-		private static final GeometryBuilder instance = new PointBuilder();
+		private static final ArcSDEGeometryBuilder instance = new PointBuilder();
 
 		/**
 		 * Returns an instance of this geometry builder for Point geometries.
@@ -569,7 +569,7 @@ public abstract class GeometryBuilder {
 		 * 
 		 * @return the <code>PointBuilder</code> singleton.
 		 */
-		public static GeometryBuilder getInstance() {
+		public static ArcSDEGeometryBuilder getInstance() {
 			return instance;
 		}
 
@@ -605,19 +605,19 @@ public abstract class GeometryBuilder {
 	}
 
 	/**
-	 * <code>GeometryBuilder</code> specialized in creating JTS
+	 * <code>ArcSDEGeometryBuilder</code> specialized in creating JTS
 	 * <code>MultiPoint</code> s from <code>SeShape</code> multipoints and
 	 * viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
 	 * @version $Id$
 	 */
-	private static class MultiPointBuilder extends GeometryBuilder {
+	private static class MultiPointBuilder extends ArcSDEGeometryBuilder {
 		/** the empty multipoint singleton */
 		private static Geometry EMPTY;
 
 		/** singleton for multipoint building */
-		private static final GeometryBuilder instance = new MultiPointBuilder();
+		private static final ArcSDEGeometryBuilder instance = new MultiPointBuilder();
 
 		/**
 		 * Returns an instance of this geometry builder for MultiPoint
@@ -626,7 +626,7 @@ public abstract class GeometryBuilder {
 		 * 
 		 * @return the <code>MultiPointBuilder</code> singleton.
 		 */
-		public static GeometryBuilder getInstance() {
+		public static ArcSDEGeometryBuilder getInstance() {
 			return instance;
 		}
 
@@ -671,14 +671,14 @@ public abstract class GeometryBuilder {
 	}
 
 	/**
-	 * <code>GeometryBuilder</code> specialized in creating JTS
+	 * <code>ArcSDEGeometryBuilder</code> specialized in creating JTS
 	 * <code>LineString</code> s from <code>SeShape</code> linestring and
 	 * viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
 	 * @version $Id$
 	 */
-	private static class LineStringBuilder extends GeometryBuilder {
+	private static class LineStringBuilder extends ArcSDEGeometryBuilder {
 		/** the empty linestring singleton */
 		private static Geometry EMPTY;
 
@@ -690,7 +690,7 @@ public abstract class GeometryBuilder {
 		private static int[] partOffsets = { 0 };
 
 		/** singleton for linestring building */
-		private static final GeometryBuilder instance = new LineStringBuilder();
+		private static final ArcSDEGeometryBuilder instance = new LineStringBuilder();
 
 		/**
 		 * Returns an instance of this geometry builder for LineString
@@ -699,7 +699,7 @@ public abstract class GeometryBuilder {
 		 * 
 		 * @return the <code>LineStringBuilder</code> singleton.
 		 */
-		public static GeometryBuilder getInstance() {
+		public static ArcSDEGeometryBuilder getInstance() {
 			return instance;
 		}
 
@@ -747,7 +747,7 @@ public abstract class GeometryBuilder {
 	}
 
 	/**
-	 * <code>GeometryBuilder</code> specialized in creating JTS
+	 * <code>ArcSDEGeometryBuilder</code> specialized in creating JTS
 	 * <code>MultiLineString</code> s from <code>SeShape</code>
 	 * multilinestrings and viceversa
 	 * 
@@ -759,7 +759,7 @@ public abstract class GeometryBuilder {
 		private static Geometry EMPTY;
 
 		/** singleton for multilinestring building */
-		private static final GeometryBuilder instance = new MultiLineStringBuilder();
+		private static final ArcSDEGeometryBuilder instance = new MultiLineStringBuilder();
 
 		/**
 		 * Returns an instance of this geometry builder for MultiLineString
@@ -768,7 +768,7 @@ public abstract class GeometryBuilder {
 		 * 
 		 * @return the <code>MultiLineStringBuilder</code> singleton.
 		 */
-		public static GeometryBuilder getInstance() {
+		public static ArcSDEGeometryBuilder getInstance() {
 			return instance;
 		}
 
@@ -816,19 +816,19 @@ public abstract class GeometryBuilder {
 	}
 
 	/**
-	 * <code>GeometryBuilder</code> specialized in creating JTS
+	 * <code>ArcSDEGeometryBuilder</code> specialized in creating JTS
 	 * <code>Polygon</code> s from <code>SeShape</code> polygon and
 	 * viceversa
 	 * 
 	 * @author Gabriel Roldan, Axios Engineering
 	 * @version $Id$
 	 */
-	private static class PolygonBuilder extends GeometryBuilder {
+	private static class PolygonBuilder extends ArcSDEGeometryBuilder {
 		/** the empty polygon singleton */
 		private static Geometry EMPTY;
 
 		/** singleton for polygon building */
-		private static final GeometryBuilder instance = new PolygonBuilder();
+		private static final ArcSDEGeometryBuilder instance = new PolygonBuilder();
 
 		/**
 		 * Returns an instance of this geometry builder for Polygon geometries.
@@ -837,7 +837,7 @@ public abstract class GeometryBuilder {
 		 * 
 		 * @return the <code>PolygonBuilder</code> singleton.
 		 */
-		public static GeometryBuilder getInstance() {
+		public static ArcSDEGeometryBuilder getInstance() {
 			return instance;
 		}
 
@@ -903,7 +903,7 @@ public abstract class GeometryBuilder {
 	}
 
 	/**
-	 * <code>GeometryBuilder</code> specialized in creating JTS
+	 * <code>ArcSDEGeometryBuilder</code> specialized in creating JTS
 	 * <code>MultiPolygon</code> s from <code>SeShape</code> multipolygons
 	 * and viceversa
 	 * 
@@ -915,7 +915,7 @@ public abstract class GeometryBuilder {
 		private static Geometry EMPTY;
 
 		/** singleton for multipolygon building */
-		private static final GeometryBuilder instance = new MultiPolygonBuilder();
+		private static final ArcSDEGeometryBuilder instance = new MultiPolygonBuilder();
 
 		/**
 		 * Returns an instance of this geometry builder for MultiPolygon
@@ -924,7 +924,7 @@ public abstract class GeometryBuilder {
 		 * 
 		 * @return the <code>PointBuilder</code> singleton.
 		 */
-		public static GeometryBuilder getInstance() {
+		public static ArcSDEGeometryBuilder getInstance() {
 			return instance;
 		}
 

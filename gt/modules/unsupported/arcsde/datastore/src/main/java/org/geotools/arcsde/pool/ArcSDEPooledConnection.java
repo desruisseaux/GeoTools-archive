@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.pool;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,15 +33,15 @@ import com.esri.sde.sdk.client.SeException;
  * @since 2.3.x
  *
  */
-class PooledConnection extends SeConnection {
+public class ArcSDEPooledConnection extends SeConnection {
 
-	private static final Logger LOGGER = Logger.getLogger(PooledConnection.class.getPackage().getName());
+	private static final Logger LOGGER = Logger.getLogger(ArcSDEPooledConnection.class.getPackage().getName());
 	
 	private ObjectPool pool;
 	
-	private ConnectionConfig config;
+	private ArcSDEConnectionConfig config;
 	
-	public PooledConnection(ObjectPool pool, ConnectionConfig config) throws SeException {
+	public ArcSDEPooledConnection(ObjectPool pool, ArcSDEConnectionConfig config) throws SeException {
 		super(	config.getServerName(),
 				config.getPortNumber().intValue(),
 				config.getDatabaseName(),

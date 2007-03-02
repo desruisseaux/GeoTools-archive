@@ -13,7 +13,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
- */package org.geotools.data.arcsde;
+ */package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -65,7 +65,7 @@ class ArcSDEAttributeReader implements AttributeReader {
 	 * the builder for the geometry type of the schema's default geometry, or
 	 * null if the geometry attribute is not included in the schema
 	 */
-	private GeometryBuilder geometryBuilder;
+	private ArcSDEGeometryBuilder geometryBuilder;
 
 	/**
 	 * holds the "&lt;DATABASE_NAME&gt;.&lt;USER_NAME&gt;." string and is used
@@ -124,7 +124,7 @@ class ArcSDEAttributeReader implements AttributeReader {
 
 		if (geomType != null) {
 			Class geometryClass = geomType.getType();
-			this.geometryBuilder = GeometryBuilder.builderFor(geometryClass);
+			this.geometryBuilder = ArcSDEGeometryBuilder.builderFor(geometryClass);
 		}
 	}
 	

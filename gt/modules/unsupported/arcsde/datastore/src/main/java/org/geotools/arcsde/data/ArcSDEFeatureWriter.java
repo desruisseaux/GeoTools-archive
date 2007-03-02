@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureWriter;
 import org.geotools.feature.AttributeType;
@@ -217,7 +219,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			this.notInserted = false;
 		} else {
 			Feature feature = (Feature) this.features.get(this.currentIndex);
-			PooledConnection connection = null;
+			ArcSDEPooledConnection connection = null;
 
 			try {
 				connection = getConnection();
@@ -252,7 +254,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			throw new IOException("No feature to be written.");
 		}
 
-		PooledConnection connection = null;
+		ArcSDEPooledConnection connection = null;
 
 		try {
 			Feature feature = (Feature) this.features.get(this.currentIndex);
@@ -373,6 +375,13 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 			ArrayList indexes = new ArrayList();
 
 			for (int i = 0; i < attributeTypes.length; i++) {
+                if (attributeTypes[i].getName().equals(this.layer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID))) {
+                    //this is an attribute added to the featuretype
+                    //solely to support FIDs.  It isn't an actual attribute
+                    //on the underlying SDE table, and as such it can't
+                    //be written to.  Skip it!
+                    continue;
+                }
 				// We need to exclude read only types from the set of "mutable"
 				// column names. See the ArcSDE documentation for the
 				// explanation
@@ -457,7 +466,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 		}else if(colType == SeColumnDefinition.TYPE_SHAPE) {
 			if (value != null) {
 				try {
-					GeometryBuilder geometryBuilder = GeometryBuilder
+					ArcSDEGeometryBuilder geometryBuilder = ArcSDEGeometryBuilder
 							.builderFor(value.getClass());
 					SeCoordinateReference coordRef = this.layer.getCoordRef();
 					Geometry geom = (Geometry) value;
@@ -483,11 +492,11 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * 
 	 * @throws DataSourceException
 	 *             DOCUMENT ME!
-	 * @throws UnavailableConnectionException
+	 * @throws UnavailableArcSDEConnectionException
 	 *             DOCUMENT ME!
 	 */
-	private synchronized PooledConnection getConnection()
-			throws DataSourceException, UnavailableConnectionException {
+	private synchronized ArcSDEPooledConnection getConnection()
+			throws DataSourceException, UnavailableArcSDEConnectionException {
 		if (this.transactionState != null) {
 			return this.transactionState.getConnection();
 		}
@@ -500,7 +509,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * 
 	 * @param connection
 	 */
-	private synchronized void releaseConnection(PooledConnection connection) {
+	private synchronized void releaseConnection(ArcSDEPooledConnection connection) {
 		if (this.transactionState != null) {
 			// NO-OP, the transactionState object will release the connection
 			// after it commits or rollsback the operations.

@@ -14,13 +14,16 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
-import java.util.Map;
 import java.util.Collections;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.pool.ArcSDEConnectionConfig;
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEConnectionPoolFactory;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
 
@@ -83,7 +86,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     }
     
     /** factory of connection pools to different SDE databases */
-    private static final ConnectionPoolFactory poolFactory = ConnectionPoolFactory
+    private static final ArcSDEConnectionPoolFactory poolFactory = ArcSDEConnectionPoolFactory
             .getInstance();
     
     /**
@@ -139,7 +142,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
      */
     public DataStore createDataStore(Map params) throws java.io.IOException {
         ArcSDEDataStore sdeDStore = null;
-        ConnectionConfig config = new ConnectionConfig(params);
+        ArcSDEConnectionConfig config = new ArcSDEConnectionConfig(params);
         ArcSDEConnectionPool connPool = poolFactory.createPool(config);
         sdeDStore = new ArcSDEDataStore(connPool, config.getNamespaceUri());
         
@@ -159,9 +162,9 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
     // public DataSourceMetadataEnity createMetadata( Map params )
     // throws IOException {
     //
-    // ConnectionConfig config;
+    // ArcSDEConnectionConfig config;
     // try {
-    // config = new ConnectionConfig(params);
+    // config = new ArcSDEConnectionConfig(params);
     // } catch (NullPointerException ex) {
     // throw new IOException( "Cannot use provided params to connect" );
     // } catch (IllegalArgumentException ex) {
@@ -195,7 +198,7 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
         boolean canProcess = true;
         
         try {
-            new ConnectionConfig(params);
+            new ArcSDEConnectionConfig(params);
         } catch (NullPointerException ex) {
             canProcess = false;
         } catch (IllegalArgumentException ex) {

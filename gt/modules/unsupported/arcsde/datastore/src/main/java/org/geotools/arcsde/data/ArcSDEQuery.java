@@ -14,13 +14,19 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.filter.GeometryEncoderException;
+import org.geotools.arcsde.filter.GeometryEncoderSDE;
+import org.geotools.arcsde.filter.SQLEncoderSDE;
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
@@ -28,10 +34,7 @@ import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
 import org.opengis.filter.Filter;
-import org.geotools.filter.GeometryEncoderException;
-import org.geotools.filter.GeometryEncoderSDE;
 import org.geotools.filter.SQLEncoderException;
-import org.geotools.filter.SQLEncoderSDE;
 import org.geotools.filter.SQLUnpacker;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
@@ -78,7 +81,7 @@ class ArcSDEQuery {
      * NOTE: this member is package visible only for unit test pourposes
      * </p>
      */
-    PooledConnection connection = null;
+    ArcSDEPooledConnection connection = null;
 
     /**
      * The exact feature type this query is about to request from the arcsde
@@ -295,7 +298,7 @@ class ArcSDEQuery {
      */
     private SeQuery getSeQuery() throws SeException, IOException {
         if (this.query == null) {
-            PooledConnection conn = getConnection();
+            ArcSDEPooledConnection conn = getConnection();
             try {
 				String[] propsToQuery = getPropertiesToFetch();
 				this.query = createSeQueryForFetch(conn, propsToQuery);
@@ -321,7 +324,7 @@ class ArcSDEQuery {
      * fetch results.  They cannot be used for other operations, such as
      * calculating layer extents, or result count.
      * <p> 
-     * Difference with {@link #createSeQueryForFetch(PooledConnection, String[])}
+     * Difference with {@link #createSeQueryForFetch(ArcSDEPooledConnection, String[])}
      * is tha this function tells <code>SeQuery.setSpatialConstraints</code> to 
      * NOT return geometry based bitmasks, which are needed for calculating the
      * query extent and result count, but not for fetching SeRows.
@@ -337,7 +340,7 @@ class ArcSDEQuery {
      *         SeQuery or setting it the spatial constraints.
      * @throws DataSourceException DOCUMENT ME!
      */
-    private SeQuery createSeQueryForFetch(PooledConnection connection,
+    private SeQuery createSeQueryForFetch(ArcSDEPooledConnection connection,
         String[] propertyNames)
         throws SeException, DataSourceException {
         if (LOGGER.isLoggable(Level.FINE)) {
@@ -368,7 +371,7 @@ class ArcSDEQuery {
      * calculating layer extents and result counts.  These queries cannot
      * be executed or used to fetch results.
      * <p> 
-     * Difference with {@link #createSeQueryForFetch(PooledConnection, String[])}
+     * Difference with {@link #createSeQueryForFetch(ArcSDEPooledConnection, String[])}
      * is tha this function tells <code>SeQuery.setSpatialConstraints</code> to 
      * return geometry based bitmasks, which are needed for calculating the
      * query extent and result count, but not for fetching SeRows.
@@ -385,7 +388,7 @@ class ArcSDEQuery {
      *         SeQuery or setting it the spatial constraints.
      * @throws DataSourceException DOCUMENT ME!
      */
-    private SeQuery createSeQueryForQueryInfo(PooledConnection connection,
+    private SeQuery createSeQueryForQueryInfo(ArcSDEPooledConnection connection,
         String[] propertyNames)
         throws SeException, DataSourceException {
         if (LOGGER.isLoggable(Level.FINE)) {
@@ -553,7 +556,7 @@ class ArcSDEQuery {
 
             envelope = new Envelope(extent.getMinX(), extent.getMaxX(),
                     extent.getMinY(), extent.getMaxY());
-            LOGGER.info("got extent: " + extent + ", built envelope: "
+            LOGGER.fine("got extent: " + extent + ", built envelope: "
                 + envelope);
         } catch (SeException ex) {
             // //////////////////////
@@ -597,14 +600,14 @@ class ArcSDEQuery {
      *
      * @throws DataSourceException DOCUMENT ME!
      */
-    private PooledConnection getConnection() throws DataSourceException {
+    private ArcSDEPooledConnection getConnection() throws DataSourceException {
         if (this.connection == null) {
             try {
             	if(this.connectionPool == null){
             		throw new IllegalStateException("query is closed");
             	}
                 this.connection = this.connectionPool.getConnection();
-            } catch (UnavailableConnectionException e) {
+            } catch (UnavailableArcSDEConnectionException e) {
                 throw new DataSourceException("Can't obtain a connection: "
                     + e.getMessage(), e);
             }

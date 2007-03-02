@@ -14,13 +14,13 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.filter;
+package org.geotools.arcsde.filter;
 
 /**
  * Indicates a client class has attempted to encode a filter not supported by
  * the GeometryEncoderSDE being used.
  *
- * @author Gabriel Roldán
+ * @author Gabriel Roldï¿½n
  * @source $URL$
  * @version $Id$
  */

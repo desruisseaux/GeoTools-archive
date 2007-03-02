@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.AbstractDataStore;
 import org.geotools.data.AttributeReader;
 import org.geotools.data.DataSourceException;
@@ -40,7 +43,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.Filter;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
@@ -173,7 +176,7 @@ class ArcSDEDataStore extends AbstractDataStore {
 
         // connection used to retrieve the user name if a non qualified type
         // name was passed in
-        PooledConnection conn = null;
+        ArcSDEPooledConnection conn = null;
 
         // check if it is not qualified and prepend it with "instance.user."
         if (typeName.indexOf('.') == -1) {
@@ -186,7 +189,7 @@ class ArcSDEDataStore extends AbstractDataStore {
                 LOGGER.info("full qualified name is " + typeName);
             } catch (DataSourceException e) {
                 throw e;
-            } catch (UnavailableConnectionException e) {
+            } catch (UnavailableArcSDEConnectionException e) {
                 throw new DataSourceException("A non qualified type name ("
                     + typeName
                     + ") was passed and a connection to retrieve the user name "
@@ -271,7 +274,7 @@ class ArcSDEDataStore extends AbstractDataStore {
         }
 
         // Create a new SeTable/SeLayer with the specified attributes....
-        PooledConnection connection = null;
+        ArcSDEPooledConnection connection = null;
         SeTable table = null;
         SeLayer layer = null;
 
@@ -353,7 +356,7 @@ class ArcSDEDataStore extends AbstractDataStore {
         } catch (DataSourceException dse) {
             LOGGER.log(Level.WARNING, dse.getMessage(), dse);
             throw dse;
-        } catch (UnavailableConnectionException uce) {
+        } catch (UnavailableArcSDEConnectionException uce) {
             LOGGER.log(Level.WARNING, uce.getMessage(), uce);
             throw new DataSourceException(uce.getMessage(), uce);
         } finally {
@@ -374,7 +377,7 @@ class ArcSDEDataStore extends AbstractDataStore {
      *
      * @throws SeException
      */
-    private SeTable createSeTable(PooledConnection connection,
+    private SeTable createSeTable(ArcSDEPooledConnection connection,
         String qualifiedName, String hackColName) throws SeException {
         SeTable table;
         final SeColumnDefinition[] tmpCol = {
@@ -642,11 +645,11 @@ class ArcSDEDataStore extends AbstractDataStore {
      */
     protected FeatureWriter getFeatureWriter(String typeName)
         throws IOException {
-    	PooledConnection conn;
+    	ArcSDEPooledConnection conn;
     	SeLayer layer;
     	try {
 			conn = connectionPool.getConnection();
-    	}catch(UnavailableConnectionException e){
+    	}catch(UnavailableArcSDEConnectionException e){
     		throw new DataSourceException(e);
     	}
     	try{
@@ -688,7 +691,7 @@ class ArcSDEDataStore extends AbstractDataStore {
      * @throws IOException DOCUMENT ME!
      */
     public FeatureWriter getFeatureWriter(String typeName, Filter filter,
-        Transaction transaction) throws IOException {
+            Transaction transaction) throws IOException {
     	
         FeatureType featureType = getSchema(typeName);
         AttributeType[] attributes = featureType.getAttributeTypes();
@@ -818,10 +821,10 @@ class ArcSDEDataStore extends AbstractDataStore {
      * @throws IOException if there are errors getting the count
      */
     protected int getCount(Query query) throws IOException {
-        LOGGER.info("getCount");
+        LOGGER.fine("getCount");
 
         int count = ArcSDEQuery.calculateResultCount(this, query);
-        LOGGER.info("count: " + count);
+        LOGGER.fine("count: " + count);
 
         return count;
     }
@@ -843,10 +846,10 @@ class ArcSDEDataStore extends AbstractDataStore {
      * @throws IOException
      */
     protected Envelope getBounds(Query query) throws IOException {
-        LOGGER.info("getBounds");
+        LOGGER.fine("getBounds");
         
         Envelope ev;
-        if (query.getFilter() == null || query.getFilter().equals(Filter.NONE)) {
+        if (query == null || query.getFilter().equals(Filter.EXCLUDE)) {
         	LOGGER.fine("getting bounds of entire layer.  Using optimized SDE call.");
         	// we're really asking for a bounds of the WHOLE layer,
         	// let's just ask SDE metadata for that, rather than doing an expensive query
@@ -858,7 +861,7 @@ class ArcSDEDataStore extends AbstractDataStore {
         	ev = ArcSDEQuery.calculateQueryExtent(this, query);
         }
         
-        LOGGER.info("bounds: " + ev);
+        LOGGER.fine("bounds: " + ev);
 
         return ev;
     }

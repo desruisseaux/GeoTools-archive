@@ -14,36 +14,29 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.pool;
 
 /**
- * Exception that can be thrown if an error occurs while creating a
- * <code>Geometryy</code> from a <code>SeShape</code> or viceversa
+ * Exception thrown when a free SDE connection can't be obtained after the
+ * calling thread was waiting an available connection for
+ * <code>SdeConnectionPool instance's getMaxWaitTime()</code> milliseconds
  * 
- * @author Gabriel Rold?n
+ * @author Gabriel Roldan
  * @source $URL$
  * @version $Id$
  */
-public class GeometryBuildingException extends Exception {
+public class UnavailableArcSDEConnectionException extends Exception {
 	/**
-	 * Creates a new GeometryBuildingException object.
+	 * Creates a new UnavailableArcSDEConnectionException object.
 	 * 
-	 * @param msg
+	 * @param usedConnections
+	 *            DOCUMENT ME!
+	 * @param config
 	 *            DOCUMENT ME!
 	 */
-	public GeometryBuildingException(String msg) {
-		this(msg, null);
-	}
-
-	/**
-	 * Creates a new GeometryBuildingException object.
-	 * 
-	 * @param msg
-	 *            DOCUMENT ME!
-	 * @param cause
-	 *            DOCUMENT ME!
-	 */
-	public GeometryBuildingException(String msg, Throwable cause) {
-		super(msg, cause);
+	public UnavailableArcSDEConnectionException(int usedConnections,
+			ArcSDEConnectionConfig config) {
+		super("The maximun of " + usedConnections + " to " + config.toString()
+				+ " has been reached");
 	}
 }

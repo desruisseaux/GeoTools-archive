@@ -14,12 +14,13 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.data.Transaction;
 
 import com.esri.sde.sdk.client.SeConnection;
@@ -37,7 +38,7 @@ class ArcTransactionState implements Transaction.State {
 	private static final Logger LOGGER = Logger
 			.getLogger(ArcTransactionState.class.getPackage().getName());
 
-	private PooledConnection connection;
+	private ArcSDEPooledConnection connection;
 
 	private ArcSDEDataStore dataStore;
 
@@ -112,7 +113,7 @@ class ArcTransactionState implements Transaction.State {
 	 * 
 	 * @return DOCUMENT ME!
 	 */
-	PooledConnection getConnection() {
+	ArcSDEPooledConnection getConnection() {
 		return connection;
 	}
 }

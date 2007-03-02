@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,6 +24,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.pool.ArcSDEConnectionPool;
+import org.geotools.arcsde.pool.ArcSDEPooledConnection;
+import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
@@ -34,8 +37,8 @@ import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
-import org.opengis.filter.Filter;
 import org.geotools.referencing.FactoryFinder;
+import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -288,7 +291,7 @@ public class ArcSDEAdapter {
 		SeColumnDefinition[] seColumns = null;
 		String rowIdColumnName = null;
 		String shapeFIDColumnname = null;
-		PooledConnection conn = null;
+		ArcSDEPooledConnection conn = null;
 		try {
 			seColumns = table.describe();
 			conn = connPool.getConnection();
@@ -298,7 +301,7 @@ public class ArcSDEAdapter {
 				LOGGER.warning("Figured Row-ID Column named '" + rowIdColumnName + "' for table " + table.getQualifiedName());
 			} else {
 				shapeFIDColumnname = sdeLayer.getShapeAttributeName(SeLayer.SE_SHAPE_ATTRIBUTE_FID);
-				LOGGER.warning("No Row-ID Column registered on table '" + table.getQualifiedName() + "', using SE_SAHPE_ATTRIBUTE_FID value '" + shapeFIDColumnname + "'");
+				LOGGER.warning("No Row-ID Column registered on table '" + table.getQualifiedName() + "', using SE_SHAPE_ATTRIBUTE_FID value '" + shapeFIDColumnname + "'");
 			}
 		} catch (SeException ex) {
 			LOGGER.log(Level.WARNING, ex.getSeError().getErrDesc(), ex);
@@ -307,7 +310,7 @@ public class ArcSDEAdapter {
 			}
 			throw new DataSourceException("Error obtaining table schema from "
 					+ table.getQualifiedName());
-		} catch (UnavailableConnectionException uce) {
+		} catch (UnavailableArcSDEConnectionException uce) {
 			LOGGER.log(Level.SEVERE, "Unable to get connection while attempting to determine SDE RowID Column for table " + table.getName());
 			throw new DataSourceException("Error obtaining table schema from "
 					+ table.getQualifiedName());
@@ -347,7 +350,7 @@ public class ArcSDEAdapter {
 				int seShapeType = sdeLayer.getShapeTypes();
 				typeClass = getGeometryType(seShapeType);
 				isNilable = (seShapeType & SeLayer.SE_NIL_TYPE_MASK) == SeLayer.SE_NIL_TYPE_MASK;
-				defValue = GeometryBuilder.defaultValueFor(typeClass);
+				defValue = ArcSDEGeometryBuilder.defaultValueFor(typeClass);
 				attribute = new GeometricAttributeType(seColumns[i]
 						.getName(), typeClass, isNilable,1,1,defValue, crs,Filter.INCLUDE);
 			} else if (sdeType.intValue() == SeColumnDefinition.TYPE_RASTER) {

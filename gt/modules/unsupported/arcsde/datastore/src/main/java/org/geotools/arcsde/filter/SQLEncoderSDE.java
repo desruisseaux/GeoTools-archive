@@ -14,13 +14,19 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.filter;
+package org.geotools.arcsde.filter;
 
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotools.data.arcsde.ArcSDEAdapter;
+import org.geotools.arcsde.data.ArcSDEAdapter;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.FidFilter;
+import org.geotools.filter.Filter;
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.SQLEncoder;
+import org.geotools.filter.SQLEncoderException;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;

@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.data.arcsde;
+package org.geotools.arcsde.pool;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,12 +33,12 @@ import java.util.logging.Logger;
  * @source $URL$
  * @version $Id$
  */
-public class ConnectionConfig {
+public class ArcSDEConnectionConfig {
 	/**
 	 * Shared package's logger
 	 */
 	private static final Logger LOGGER = Logger
-			.getLogger(ConnectionConfig.class.getPackage().getName());
+			.getLogger(ArcSDEConnectionConfig.class.getPackage().getName());
 
 	/**
 	 * message of the exception thrown if a mandatory parameter is not supplied
@@ -129,7 +129,7 @@ public class ConnectionConfig {
 	 *             if at least one mandatory parameter is present but has no a
 	 *             "valid" value.
 	 */
-	public ConnectionConfig(Map params) throws NullPointerException,
+	public ArcSDEConnectionConfig(Map params) throws NullPointerException,
 			IllegalArgumentException {
 		init(params);
 	}
@@ -152,7 +152,7 @@ public class ConnectionConfig {
 	 * @throws NullPointerException
 	 * @throws IllegalArgumentException
 	 */
-	public ConnectionConfig(String dbType, String serverName,
+	public ArcSDEConnectionConfig(String dbType, String serverName,
 			String portNumber, String databaseName, String userName,
 			String userPassword) throws NullPointerException,
 			IllegalArgumentException {
@@ -422,7 +422,7 @@ public class ConnectionConfig {
 	}
 
 	/**
-	 * checks for equality over another <code>ConnectionConfig</code>, taking
+	 * checks for equality over another <code>ArcSDEConnectionConfig</code>, taking
 	 * in count the values of database name, user name, and port number.
 	 * 
 	 * @param o
@@ -435,11 +435,11 @@ public class ConnectionConfig {
 			return true;
 		}
 
-		if (!(o instanceof ConnectionConfig)) {
+		if (!(o instanceof ArcSDEConnectionConfig)) {
 			return false;
 		}
 
-		ConnectionConfig config = (ConnectionConfig) o;
+		ArcSDEConnectionConfig config = (ArcSDEConnectionConfig) o;
 
 		return config.getServerName().equals(getServerName())
 				&& config.getPortNumber().equals(getPortNumber())
@@ -481,7 +481,7 @@ public class ConnectionConfig {
 	public String toString() {
 		StringBuffer sb = new StringBuffer(getClass().getName() + "[");
 		sb.append("dbtype=");
-		sb.append(ConnectionConfig.DBTYPE_PARAM_VALUE);
+		sb.append(ArcSDEConnectionConfig.DBTYPE_PARAM_VALUE);
 		sb.append(", server=");
 		sb.append(this.serverName);
 		sb.append(", port=");

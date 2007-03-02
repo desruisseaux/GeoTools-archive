@@ -14,15 +14,30 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.filter;
+package org.geotools.arcsde.filter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.geotools.arcsde.data.ArcSDEGeometryBuilder;
+import org.geotools.arcsde.data.ArcSDEGeometryBuildingException;
 import org.geotools.data.DataSourceException;
-import org.geotools.data.arcsde.GeometryBuilder;
-import org.geotools.data.arcsde.GeometryBuildingException;
+import org.geotools.filter.AttributeExpression;
+import org.geotools.filter.BetweenFilter;
+import org.geotools.filter.CompareFilter;
+import org.geotools.filter.Expression;
+import org.geotools.filter.FidFilter;
+import org.geotools.filter.FilterCapabilities;
+import org.geotools.filter.FilterType;
+import org.geotools.filter.Filters;
+import org.geotools.filter.FunctionExpression;
+import org.geotools.filter.GeometryFilter;
+import org.geotools.filter.LikeFilter;
+import org.geotools.filter.LiteralExpression;
+import org.geotools.filter.LogicFilter;
+import org.geotools.filter.MathExpression;
+import org.geotools.filter.NullFilter;
 import org.opengis.filter.Filter;
 
 import com.esri.sde.sdk.client.SeException;
@@ -239,7 +254,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      */
     private void addSpatialFilter(GeometryFilter filter, int sdeMethod,
         boolean truth)
-        throws SeException, DataSourceException, GeometryBuildingException {
+        throws SeException, DataSourceException, ArcSDEGeometryBuildingException {
 
         AttributeExpression attExpr;
         LiteralExpression geomExpr;
@@ -266,7 +281,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
 
         // To prevent errors in ArcSDE, we first trim the user's Filter
         // geometry to the extents of our layer.
-        GeometryBuilder gb = GeometryBuilder.builderFor(Polygon.class);
+        ArcSDEGeometryBuilder gb = ArcSDEGeometryBuilder.builderFor(Polygon.class);
         SeExtent seExtent = this.sdeLayer.getExtent();
         SeShape extent = new SeShape(this.sdeLayer.getCoordRef());
         extent.generateRectangle(seExtent);
@@ -288,7 +303,7 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
         if (geom.getClass() == GeometryCollection.class) {
             filterShape = new SeShape(this.sdeLayer.getCoordRef());
         } else {
-            gb = GeometryBuilder.builderFor(geom.getClass());
+            gb = ArcSDEGeometryBuilder.builderFor(geom.getClass());
             filterShape = gb.constructShape(geom, this.sdeLayer.getCoordRef());
         }
         // Add the filter to our list
