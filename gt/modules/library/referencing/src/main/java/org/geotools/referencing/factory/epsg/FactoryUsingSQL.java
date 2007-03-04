@@ -1604,7 +1604,7 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     } else if (orientation.equalsIgnoreCase("Geocentre > north pole")) {
                         direction = AxisDirection.NORTH;
                     } else {
-                        throw new FactoryException(exception.getLocalizedMessage(), exception);
+                        throw new FactoryException(exception);
                     }
                 }
                 final AxisName an = getAxisName(nameCode);
@@ -2512,6 +2512,8 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
                     try {
                         return new DefaultConcatenatedOperation(properties, operations);
                     } catch (IllegalArgumentException exception) {
+                        // May happen if there is less than 2 operations to concatenate.
+                        // It happen for some deprecated CRS like 8658 for example.
                         throw new FactoryException(exception);
                     }
                 } else {

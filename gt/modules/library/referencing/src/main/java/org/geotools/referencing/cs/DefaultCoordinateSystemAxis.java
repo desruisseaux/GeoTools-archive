@@ -75,6 +75,12 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     private static final long serialVersionUID = -7883614853277827689L;
 
     /**
+     * Number of directions from "North", "North-North-East", "North-East", etc.
+     * This is verified by {@code DefaultCoordinateSystemAxisTest.testCompass}.
+     */
+    static final int COMPASS_DIRECTION_COUNT = 16;
+
+    /**
      * Default axis info for longitudes.
      *
      * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
@@ -762,32 +768,32 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * Returns an axis direction constants from its name.
      *
      * @param  direction The direction name (e.g. "north", "east", etc.).
-     * @return The axis direction for the given name/.
+     * @return The axis direction for the given name.
      * @throws NoSuchElementException if the given name is not a know axis direction.
      */
-    public static AxisDirection getDirection(final String direction) throws NoSuchElementException {
-        final String search = direction.trim();
-        final AxisDirection[] values = AxisDirection.values();
-        for (int i=0; i<values.length; i++) {
-            final AxisDirection candidate = values[i];
-            final String name = candidate.name();
-            if (search.equalsIgnoreCase(name)) {
-                return candidate;
-            }
+    public static AxisDirection getDirection(String direction) throws NoSuchElementException {
+        direction = direction.trim();
+        AxisDirection candidate = DirectionAlongMeridian.findDirection(direction);
+        if (candidate != null) {
+            return candidate;
+        }
+        /*
+         * Some EPSG direction names are of the form "South along 180 deg". We check that the
+         * direction before "along" is valid and create a new axis direction if it is. We can
+         * not just replace "South along 180 deg" by "South" because the same CRS may use two
+         * of those directions. For example EPSG:32661 has the following axis direction:
+         *
+         * South along 180 deg
+         * South along 90 deg East
+         */
+        final DirectionAlongMeridian meridian = DirectionAlongMeridian.parse(direction);
+        if (meridian != null) {
+            candidate = meridian.getAxisDirection();
+            assert candidate == DirectionAlongMeridian.findDirection(meridian.toString());
+            return candidate;
         }
         throw new NoSuchElementException(
                 Errors.format(ErrorKeys.UNKNOW_AXIS_DIRECTION_$1, direction));
-    }
-
-    /**
-     * The abbreviation used for this coordinate system axes. This abbreviation is also
-     * used to identify the ordinates in coordinate tuple. Examples are "<var>X</var>"
-     * and "<var>Y</var>".
-     *
-     * @return The coordinate system axis abbreviation.
-     */
-    public String getAbbreviation() {
-        return abbreviation;
     }
 
     /**
@@ -809,6 +815,17 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public AxisDirection getDirection() {
         return direction;
+    }
+
+    /**
+     * The abbreviation used for this coordinate system axes. This abbreviation is also
+     * used to identify the ordinates in coordinate tuple. Examples are "<var>X</var>"
+     * and "<var>Y</var>".
+     *
+     * @return The coordinate system axis abbreviation.
+     */
+    public String getAbbreviation() {
+        return abbreviation;
     }
 
     /**
@@ -862,6 +879,65 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     final CoordinateSystemAxis getOpposite() {
         return opposite;
+    }
+
+    /**
+     * Returns the arithmetic (counterclockwise) angle from the first direction to the second
+     * direction, in decimal <strong>degrees</strong>. This method returns a value between
+     * -180° and +180°, or {@link Double#NaN NaN} if no angle can be computed.
+     * <p>
+     * A positive angle denotes a right-handed system, while a negative angle denotes
+     * a left-handed system. Example:
+     * <p>
+     * <ul>
+     *   <li>The angle from {@linkplain AxisDirection#EAST EAST} to
+     *       {@linkplain AxisDirection#NORTH NORTH} is 90°</li>
+     *   <li>The angle from {@linkplain AxisDirection#SOUTH SOUTH} to
+     *       {@linkplain AxisDirection#WEST WEST} is -90°</li>
+     *   <li>The angle from "<cite>North along 90 deg East</cite>" to
+     *       "<cite>North along 0 deg</cite>" is 90°.</li>
+     * </ul>
+     *
+     * @since 2.4
+     */
+    public static double getAngle(final AxisDirection source, final AxisDirection target) {
+        /*
+         * Tests for NORTH, SOUTH, EAST, EAST-NORTH-EAST, etc. directions.
+         */
+        final int base = AxisDirection.NORTH.ordinal();
+        final int i = source.ordinal() - base;
+        if (i >= 0 && i < COMPASS_DIRECTION_COUNT) {
+            int delta = target.ordinal() - base;
+            if (delta >= 0 && delta < COMPASS_DIRECTION_COUNT) {
+                delta = i - delta;
+                if (delta < -COMPASS_DIRECTION_COUNT/2) {
+                    delta += COMPASS_DIRECTION_COUNT;
+                } else if (delta > COMPASS_DIRECTION_COUNT/2) {
+                    delta -= COMPASS_DIRECTION_COUNT;
+                }
+                return delta * (360.0 / COMPASS_DIRECTION_COUNT);
+            }
+        }
+        /*
+         * Tests for "South along 90 deg East", etc. directions.
+         */
+        final DirectionAlongMeridian src = DirectionAlongMeridian.parse(source);
+        if (src != null) {
+            final DirectionAlongMeridian tgt = DirectionAlongMeridian.parse(target);
+            if (tgt != null) {
+                return src.getAngle(tgt);
+            }
+        }
+        return Double.NaN;
+    }
+
+    /**
+     * Returns {@code true} if the specified directions are perpendicular.
+     *
+     * @since 2.4
+     */
+    public static boolean perpendicular(final AxisDirection first, final AxisDirection second) {
+        return Math.abs(Math.abs(getAngle(first, second)) - 90) <= DirectionAlongMeridian.EPS;
     }
 
     /**

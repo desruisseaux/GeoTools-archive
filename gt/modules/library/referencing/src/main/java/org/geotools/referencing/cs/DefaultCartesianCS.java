@@ -25,12 +25,15 @@ import javax.units.Converter;
 import javax.units.Unit;
 
 // OpenGIS dependencies
+import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CartesianCS;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 
 // Geotools dependencies
 import org.geotools.measure.Measure;
+import org.geotools.resources.i18n.Errors;
+import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.VocabularyKeys;
 
 
@@ -155,6 +158,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
      */
     public DefaultCartesianCS(final CartesianCS cs) {
         super(cs);
+        ensurePerpendicularAxis();
     }
 
     /**
@@ -169,6 +173,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
                               final CoordinateSystemAxis axis1)
     {
         super(name, axis0, axis1);
+        ensurePerpendicularAxis();
     }
 
     /**
@@ -185,6 +190,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
                               final CoordinateSystemAxis axis2)
     {
         super(name, axis0, axis1, axis2);
+        ensurePerpendicularAxis();
     }
 
     /**
@@ -201,6 +207,7 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
                               final CoordinateSystemAxis axis1)
     {
         super(properties, axis0, axis1);
+        ensurePerpendicularAxis();
     }
 
     /**
@@ -219,6 +226,25 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
                               final CoordinateSystemAxis axis2)
     {
         super(properties, axis0, axis1, axis2);
+        ensurePerpendicularAxis();
+    }
+
+    /**
+     * Ensures that all axis are perpendicular.
+     */
+    private void ensurePerpendicularAxis() throws IllegalArgumentException {
+        final int dimension = getDimension();
+        for (int i=0; i<dimension; i++) {
+            final AxisDirection axis0 = getAxis(i).getDirection();
+            for (int j=i; ++j<dimension;) {
+                final AxisDirection axis1 = getAxis(j).getDirection();
+                final double angle = DefaultCoordinateSystemAxis.getAngle(axis0, axis1);
+                if (Math.abs(Math.abs(angle) - 90) > DirectionAlongMeridian.EPS) {
+                    throw new IllegalArgumentException(Errors.format(
+                            ErrorKeys.NON_PERPENDICULAR_AXIS_$2, axis0.name(), axis1.name()));
+                }
+            }
+        }
     }
 
     /**

@@ -607,6 +607,11 @@ public final class ErrorKeys {
     public static final int NON_LINEAR_UNIT_CONVERSION_$2 = 150;
 
     /**
+     * Axis directions {0} and {1} are not perpendicular.
+     */
+    public static final int NON_PERPENDICULAR_AXIS_$2 = 59;
+
+    /**
      * "{0}" is not a scale unit.
      */
     public static final int NON_SCALE_UNIT_$1 = 176;
