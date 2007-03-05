@@ -39,6 +39,7 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.identity.FeatureId;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -186,6 +187,34 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         f = fr.next();
         assertEquals("road.rd1", f.getID());
         assertEquals("r1 rev 2", f.getAttribute("name"));
+        assertFalse(fr.hasNext());
+    }
+    
+    public void testFidFilter() throws IOException, NoSuchElementException, IllegalAttributeException {
+        VersionedPostgisDataStore ds = getDataStore();
+        
+        // check querying with fids out of the expected format does not break the datastore
+        Filter f = ff.id(new HashSet(Arrays.asList(new FeatureId[] {ff.featureId("road.rd1"), ff.featureId("strangeId")})));
+        Query q = new DefaultQuery("road", f);
+        FeatureReader fr = ds.getFeatureReader(q, Transaction.AUTO_COMMIT);
+        assertTrue(fr.hasNext());
+        fr.next();
+        assertFalse(fr.hasNext());
+        fr.close();
+        
+        // check querying with fids out of the expected format does not break the datastore
+        // this one should turn the filter into a Filter.EXCLUDE thing
+        f = ff.id(new HashSet(Arrays.asList(new FeatureId[] {ff.featureId("xyz:?strangeId")})));
+        q = new DefaultQuery("road", f);
+        fr = ds.getFeatureReader(q, Transaction.AUTO_COMMIT);
+        assertFalse(fr.hasNext());
+        
+        // check querying with fids out of the expected format does not break the datastore
+        // this one was putting the filter splitter in dismay
+        f = ff.id(new HashSet(Arrays.asList(new FeatureId[] {ff.featureId("xyz:?strangeId")})));
+        f = ff.and(f, ff.bbox("geom", -100, -100, 100, 100, null));
+        q = new DefaultQuery("road", f);
+        fr = ds.getFeatureReader(q, Transaction.AUTO_COMMIT);
         assertFalse(fr.hasNext());
     }
 
