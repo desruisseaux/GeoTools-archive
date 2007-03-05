@@ -42,6 +42,7 @@ import org.geotools.data.FeatureListenerManager;
 import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
@@ -306,8 +307,13 @@ public class VersionedPostgisDataStore implements DataStore {
         if (isVersioned(typeName))
             return new VersionedPostgisFeatureStore(getSchema(typeName), this);
 
-        return new WrappingPostgisFeatureLocking((FeatureLocking) wrapped
-                .getFeatureSource(typeName), this);
+        FeatureSource source = wrapped.getFeatureSource(typeName);
+        if(source instanceof FeatureLocking)
+            return new WrappingPostgisFeatureLocking((FeatureLocking) source, this);
+        else if(source instanceof FeatureStore)
+            return new WrappingPostgisFeatureStore((FeatureStore) source, this);
+        else 
+            return new WrappingPostgisFeatureSource((FeatureSource) source, this);
     }
 
     public FeatureSource getView(Query query) throws IOException, SchemaException {

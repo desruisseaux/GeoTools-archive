@@ -26,6 +26,7 @@ import java.util.Set;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
@@ -57,6 +58,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertTrue(typeNames.contains("lake"));
         assertTrue(typeNames.contains("river"));
         assertTrue(typeNames.contains("rail"));
+        assertTrue(typeNames.contains("nopk"));
         assertTrue(typeNames.contains(VersionedPostgisDataStore.TBL_CHANGESETS));
         
         assertFalse(typeNames.contains(VersionedPostgisDataStore.TBL_VERSIONEDTABLES));
@@ -314,9 +316,9 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
     public void testAppendFeatures() throws IOException, IllegalAttributeException {
         VersionedPostgisDataStore ds = getDataStore();
 
-        // version enable road and lakes
+        // version enable road and river
         ds.setVersioned("road", true, "gimbo", "version enabling roads");
-        ds.setVersioned("river", true, "gimbo", "version enabling lakes");
+        ds.setVersioned("river", true, "gimbo", "version enabling river");
 
         // create a transaction and append some features to both feature types
         Transaction t = createTransaction("mambo", "Today I feel like adding fetures, yeah");
@@ -329,7 +331,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         fw.write();
         String rd4id = f.getID();
         fw.close();
-        // ... new lake
+        // ... new river
         fw = ds.getFeatureWriterAppend("river", t);
         f = fw.next();
         f.setAttribute(0, new Integer(4));
@@ -584,6 +586,13 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         for (int i = 0; i < riverFeatures.length; i++) {
             assertTrue(fc.contains(riverFeatures[i]));
         }
+    }
+    
+    public void testVolatilePk() throws IOException, IllegalAttributeException {
+        VersionedPostgisDataStore ds = getDataStore();
+
+        assertTrue(ds.getFeatureSource("river") instanceof FeatureLocking);
+        assertFalse(ds.getFeatureSource("nopk") instanceof FeatureLocking);
     }
     
     public void testFeatureStoreUnversioned() throws IOException, IllegalAttributeException {

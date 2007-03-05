@@ -63,6 +63,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         setUpRiverTable();
         setUpRoadTable();
         setUpRailTable();
+        setUpNoPrimaryKeyTable();
 
         // make sure versioned metadata is not in the way
         SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED, false);
@@ -231,6 +232,35 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
                 s.execute(ql);
             }
+        } finally {
+            conn.close();
+        }
+    }
+    
+    protected void setUpNoPrimaryKeyTable() throws Exception {
+        Connection conn = pool.getConnection();
+        conn.setAutoCommit(true);
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','nopk','geom')");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("DROP TABLE " + f.schema + ".nopk");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+
+            // postgis = new PostgisDataSource(connection, FEATURE_TABLE);
+            s.execute("CREATE TABLE " + f.schema + ".nopk ( id int ) WITHOUT OIDS");
+            s.execute("SELECT AddGeometryColumn('" + f.schema
+                    + "', 'nopk', 'geom', 0, 'POLYGON', 2);");
+            s.execute("ALTER TABLE " + f.schema + ".nopk add name varchar;");
         } finally {
             conn.close();
         }
