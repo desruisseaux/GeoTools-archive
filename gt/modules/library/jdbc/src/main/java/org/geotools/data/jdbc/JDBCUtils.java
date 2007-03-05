@@ -122,7 +122,7 @@ public class JDBCUtils {
             return;
         }
     
-        if (transaction != Transaction.AUTO_COMMIT) {
+        if (transaction != null && transaction != Transaction.AUTO_COMMIT) {
             // we should not close Transaction connections
             // they will do this themselves when they are finished
             // with the connection.
