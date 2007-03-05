@@ -15,10 +15,7 @@
  */
 package org.geotools.data.postgis;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
@@ -26,7 +23,6 @@ import junit.framework.TestCase;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.factory.CommonFactoryFinder;
 
 /**
  * Test Params used by PostgisDataStoreFactory.
