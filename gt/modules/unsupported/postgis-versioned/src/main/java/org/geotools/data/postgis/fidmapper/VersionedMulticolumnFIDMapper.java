@@ -51,7 +51,7 @@ class VersionedMulticolumnFIDMapper extends MultiColumnFIDMapper implements Vers
         // check we can parse this
         if (!FID.startsWith(tableName + "."))
             throw new DataSourceException("The FID is invalid, should start with '" + tableName
-                    + ".'");
+                    + "', it's " + FID + " instead");
 
         // leverage superclass parsing, then throw away the last element
         Object[] values = getPKAttributes(FID.substring(tableName.length() + 1) + "&0");
