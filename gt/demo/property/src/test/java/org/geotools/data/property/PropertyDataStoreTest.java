@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -33,14 +34,15 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 
 /**
  * Test functioning of PropertyDataStore.
@@ -50,6 +52,9 @@ import org.geotools.filter.FilterFactoryFinder;
  */
 public class PropertyDataStoreTest extends TestCase {
     PropertyDataStore store;
+    
+    static FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
+
     /**
      * Constructor for SimpleDataStoreTest.
      * @param arg0
@@ -123,10 +128,10 @@ public class PropertyDataStoreTest extends TestCase {
         }
         assertEquals( 4, count );
         
-        Filter filter;
+        Filter selectFid1;
         
-        filter = FilterFactoryFinder.createFilterFactory().createFidFilter("fid1");
-        reader = store.getFeatureReader( new DefaultQuery("road", filter ), Transaction.AUTO_COMMIT );
+        selectFid1 = ff.id( Collections.singleton( ff.featureId("fid1") ) );
+        reader = store.getFeatureReader( new DefaultQuery("road", selectFid1 ), Transaction.AUTO_COMMIT );
         assertEquals( 1, count( reader ) );
         
         Transaction transaction = new DefaultTransaction();
@@ -346,47 +351,52 @@ public class PropertyDataStoreTest extends TestCase {
         }
     }
 
-    public void testTransaction() throws Exception {
-        Transaction t1 = new DefaultTransaction();
-        Transaction t2 = new DefaultTransaction();
-    
-        FeatureType type = store.getSchema( "road" );
-        FeatureStore road = (FeatureStore) store.getFeatureSource("road");
-        FeatureStore road1 = (FeatureStore) store.getFeatureSource("road");
-        FeatureStore road2 = (FeatureStore) store.getFeatureSource("road");
-    
-        road1.setTransaction( t1 );
-        road2.setTransaction( t2 );
+    public void testTransactionIndependence() throws Exception {
+        FeatureType ROAD = store.getSchema( "road" );
+        Feature chrisFeature =
+            ROAD.create( new Object[]{ new Integer(5), "chris"}, "fid5" );
+        
+        FeatureStore roadAuto = (FeatureStore) store.getFeatureSource("road");
+        
+        FeatureStore roadFromClient1 = (FeatureStore) store.getFeatureSource("road");
+        Transaction transaction1 = new DefaultTransaction("Transaction Used by Client 1");
+        roadFromClient1.setTransaction( transaction1 );
+        
+        FeatureStore roadFromClient2 = (FeatureStore) store.getFeatureSource("road");
+        Transaction transaction2 = new DefaultTransaction("Transaction Used by Client 2");
+        roadFromClient2.setTransaction( transaction2 );
 
-        Filter filter1 = FilterFactoryFinder.createFilterFactory().createFidFilter("fid1");
-        Filter filter2 = FilterFactoryFinder.createFilterFactory().createFidFilter("fid2");        
+        FilterFactory2 ff = (FilterFactory2) CommonFactoryFinder.getFilterFactory(null);
+        Filter selectFid1 = ff.id( Collections.singleton( ff.featureId("fid1") ));
+        Filter selectFid2 = ff.id( Collections.singleton( ff.featureId("fid2") ));        
         
-        Feature feature =
-            type.create( new Object[]{ new Integer(5), "chris"}, "fid5" );
             
-        assertEquals( 4, road.getFeatures().size() );
-        assertEquals( 4, road1.getFeatures().size() );
-        assertEquals( 4, road2.getFeatures().size() );
-                
-        road1.removeFeatures( filter1 ); // road1 removes fid1 on t1
-        assertEquals( 4, road.getFeatures().size() );
-        assertEquals( 3, road1.getFeatures().size() );
-        assertEquals( 4, road2.getFeatures().size() );               
+        // Before we edit everything should be the same
+        assertEquals( "auto before", 4, roadAuto.getFeatures().size() );
+        assertEquals( "client 1 before", 4, roadFromClient1.getFeatures().size() );
+        assertEquals( "client 2 before", 4, roadFromClient2.getFeatures().size() );
+
+        // Remove Feature with Fid1
+        roadFromClient1.removeFeatures( selectFid1 ); // road1 removes fid1 on t1
         
-        road2.addFeatures( DataUtilities.collection( feature )); // road2 adds fid5 on t2
-    
-        assertEquals( 4, road.getFeatures().size() );
-        assertEquals( 3, road1.getFeatures().size() );
-        assertEquals( 5, road2.getFeatures().size() );        
+        assertEquals( "auto after client 1 removes fid1", 4, roadAuto.getFeatures().size() );
+        assertEquals( "client 1 after client 1 removes fid1", 3, roadFromClient1.getFeatures().size() );
+        assertEquals( "client 2 after client 1 removes fid1", 4, roadFromClient2.getFeatures().size() );               
+        
+        
+        roadFromClient2.addFeatures( DataUtilities.collection( chrisFeature )); // road2 adds fid5 on t2    
+        assertEquals( "auto after client 1 removes fid1 and client 2 adds fid5", 4, roadAuto.getFeatures().size() );
+        assertEquals( "client 1 after client 1 removes fid1 and client 2 adds fid5", 3, roadFromClient1.getFeatures().size() );
+        assertEquals( "cleint 2 after client 1 removes fid1 and client 2 adds fid5", 5, roadFromClient2.getFeatures().size() );        
+
+        transaction1.commit();
+        assertEquals( "auto after client 1 commits removal of fid1 (client 2 has added fid5)", 3, roadAuto.getFeatures().size() );
+        assertEquals( "client 1 after commiting removal of fid1 (client 2 has added fid5)", 3, roadFromClient1.getFeatures().size() );
+        assertEquals( "client 2 after client 1 commits removal of fid1 (client 2 has added fid5)", 4, roadFromClient2.getFeatures().size() );                
             
-        t1.commit();
-        assertEquals( 3, road.getFeatures().size() );
-        assertEquals( 3, road1.getFeatures().size() );
-        assertEquals( 4, road2.getFeatures().size() );                
-            
-        t2.commit();
-        assertEquals( 4, road.getFeatures().size() );
-        assertEquals( 4, road1.getFeatures().size() );
-        assertEquals( 4, road2.getFeatures().size() );
+        transaction2.commit();
+        assertEquals( "auto after client 2 commits addition of fid5 (fid1 previously removed)", 4, roadAuto.getFeatures().size() );
+        assertEquals( "client 1 after client 2 commits addition of fid5 (fid1 previously removed)", 4, roadFromClient1.getFeatures().size() );
+        assertEquals( "client 2 after commiting addition of fid5 (fid1 previously removed)", 4, roadFromClient2.getFeatures().size() );
     }
 }
