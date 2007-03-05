@@ -317,8 +317,7 @@ public class VersionedPostgisDataStore implements DataStore {
     }
 
     public FeatureSource getView(Query query) throws IOException, SchemaException {
-        // TODO: implement this!!!
-        return null;
+        throw new UnsupportedOperationException("At the moment getView(Query) is not supported");
     }
 
     /**
@@ -401,7 +400,7 @@ public class VersionedPostgisDataStore implements DataStore {
             } finally {
                 JDBCUtils.close(rs);
                 JDBCUtils.close(st);
-                JDBCUtils.close(conn, null, null);
+                JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
             }
             versionedMap.put(typeName, versioned);
         }
@@ -450,7 +449,7 @@ public class VersionedPostgisDataStore implements DataStore {
         } finally {
             JDBCUtils.close(rs);
             JDBCUtils.close(st);
-            JDBCUtils.close(conn, null, null);
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
         }
     }
 
@@ -499,7 +498,7 @@ public class VersionedPostgisDataStore implements DataStore {
         } finally {
             JDBCUtils.close(rs);
             JDBCUtils.close(st);
-            JDBCUtils.close(conn, null, null);
+            JDBCUtils.close(conn, Transaction.AUTO_COMMIT, null);
         }
     }
 
@@ -776,8 +775,7 @@ public class VersionedPostgisDataStore implements DataStore {
             if (!(changeSets && tablesChanged && versionedTables)) {
 
                 // if we have a partial match, become really angry, someone
-                // messed
-                // up with the schema
+                // messed up with the schema
                 if (changeSets || tablesChanged || versionedTables) {
                     String msg = "The versioning tables are not complete, yet some table with the same name is there.\n";
                     msg += "Remove tables (";

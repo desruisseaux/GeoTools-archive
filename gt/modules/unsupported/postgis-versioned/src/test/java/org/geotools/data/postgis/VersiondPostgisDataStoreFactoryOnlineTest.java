@@ -45,7 +45,7 @@ public class VersiondPostgisDataStoreFactoryOnlineTest extends TestCase {
      */
     protected void setUp() throws Exception {
          
-    	f = PostgisTests.newFixture("fixture.properties");
+    	f = PostgisTests.newFixture("versioned.properties");
 		remote = new HashMap();
         remote.put("dbtype","postgis-versioned");        
         remote.put("charset", "");
