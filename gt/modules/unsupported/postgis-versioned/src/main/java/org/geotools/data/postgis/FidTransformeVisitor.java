@@ -18,6 +18,8 @@ package org.geotools.data.postgis;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.feature.FeatureType;
@@ -39,6 +41,8 @@ import org.geotools.filter.visitor.DuplicatorFilterVisitor;
  * 
  */
 class FidTransformeVisitor extends DuplicatorFilterVisitor {
+    /** The logger for the postgis module. */
+    protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
 
     private VersionedFIDMapper mapper;
 
@@ -52,39 +56,54 @@ class FidTransformeVisitor extends DuplicatorFilterVisitor {
     }
 
     public void visit(FidFilter filter) {
-        try {
-            Set ids = filter.getIDs();
-            if (ids.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "Invalid fid filter provides, has no fids inside");
-            }
-            Filter external = null;
-            for (Iterator it = ids.iterator(); it.hasNext();) {
-                String id = (String) it.next();
-                Object[] attributes = mapper.getUnversionedPKAttributes(id);
-                Filter idf = null;
-                for (int i = 0; i < attributes.length; i++) {
-                    if ("revision".equals(mapper.getColumnName(i)))
-                        continue;
-                    CompareFilter equal = ff.createCompareFilter(Filter.COMPARE_EQUALS);
-                    equal.addLeftValue(ff.createAttributeExpression(mapper.getColumnName(i)));
-                    equal.addRightValue(ff.createLiteralExpression(attributes[i]));
-                    if (idf == null)
-                        idf = equal;
-                    else
-                        idf = idf.and(equal);
-                }
-                if (external == null)
-                    external = idf;
-                else
-                    external = external.or(idf);
-            }
-            pages.push(external);
-        } catch (IOException e) {
-            throw new RuntimeException("An error occurred while de-constructin the fid "
-                    + "into primary key fields in order to build a new filter for "
-                    + "versioned data store", e);
+        Set ids = filter.getIDs();
+        if (ids.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Invalid fid filter provides, has no fids inside");
         }
+        Filter external = null;
+        for (Iterator it = ids.iterator(); it.hasNext();) {
+            String id = (String) it.next();
+            Object[] attributes;
+            try {
+                attributes = mapper.getUnversionedPKAttributes(id);
+            } catch(IOException e) {
+                // assume the fid provided is not in the format the mapper can handle, so
+                // it's not really a real datastore fid but has been provided by the user.
+                // No harm dome, we just need to skip it
+                if(LOGGER.isLoggable(Level.FINE))
+                    LOGGER.fine("Skipping fid " + id + " since it's not in the " +
+                                    "proper format for this datastore" + e.getMessage());
+                continue;
+            }
+            Filter idf = null;
+            for (int i = 0; i < attributes.length; i++) {
+                if ("revision".equals(mapper.getColumnName(i)))
+                    continue;
+                CompareFilter equal = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+                equal.addLeftValue(ff.createAttributeExpression(mapper.getColumnName(i)));
+                equal.addRightValue(ff.createLiteralExpression(attributes[i]));
+                if (idf == null)
+                    idf = equal;
+                else
+                    idf = idf.and(equal);
+            }
+            if (external == null)
+                external = idf;
+            else
+                external = external.or(idf);
+        }
+        // if all the fids are in an improper format, the fid filter is equivalent to
+        // a Filter that excludes everything... Since I cannot use Filter.EXCLUDE (it breaks
+        // the filter splitter with a class cast exception) I'm falling back on the old  
+        // "1 = 0" filter (ugly, but works...)
+        if(external == null) {
+            CompareFilter equal = ff.createCompareFilter(Filter.COMPARE_EQUALS);
+            equal.addLeftValue(ff.createLiteralExpression(0));
+            equal.addRightValue(ff.createLiteralExpression(1));
+            pages.push(equal);
+        } else
+            pages.push(external);
     }
 
 }
