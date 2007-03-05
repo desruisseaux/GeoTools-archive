@@ -609,6 +609,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 				.getGeoKey(GeoTiffPCSCodes.PCSCitationGeoKey);
 		if (projectedCrsName == null)
 			projectedCrsName = "unnamed".intern();
+		else
+			projectedCrsName=cleanName(projectedCrsName);
 
 		// /////////////////////////////////////////////////////////////////////
 		//
@@ -725,6 +727,31 @@ public final class GeoTiffMetadata2CRSAdapter {
 		return factories.createProjectedCRS(Collections.singletonMap("name",
 				projectedCrsName), gcs, projection,
 				DefaultCartesianCS.PROJECTED);
+	}
+
+	/**
+	 * Clean the provided parameters <code>tiffName</code> from strange
+	 * strings like it happens with erdas imageine.
+	 * 
+	 * @param tiffName
+	 *            is the {@link String} to clean up.
+	 * @return a cleaned up {@link String}.
+	 */
+	private final static String cleanName(String tiffName) {
+		// look fofr strange chars
+		// $
+		int index = tiffName.lastIndexOf('$');
+		if (index != -1)
+			tiffName= tiffName.substring(index + 1);
+		// \n
+		index = tiffName.lastIndexOf('\n');
+		if (index != -1)
+			tiffName= tiffName.substring(index + 1);
+		// \r
+		index = tiffName.lastIndexOf('\r');
+		if (index != -1)
+			tiffName= tiffName.substring(index + 1);
+		return tiffName;
 	}
 
 	/**
@@ -1548,6 +1575,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 			origin = metadata
 					.getGeoKey(GeoTiffPCSCodes.ProjNatOriginLongGeoKey);
 		if (origin == null)
+			origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjFalseOriginLongGeoKey);
+		if (origin == null)
 			origin = metadata
 					.getGeoKey(GeoTiffPCSCodes.ProjFalseNorthingGeoKey);
 		if (origin == null)
@@ -1569,6 +1598,8 @@ public final class GeoTiffMetadata2CRSAdapter {
 		String origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjCenterLatGeoKey);
 		if (origin == null)
 			origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjNatOriginLatGeoKey);
+		if (origin == null)
+			origin = metadata.getGeoKey(GeoTiffPCSCodes.ProjFalseOriginLatGeoKey);
 		if (origin == null)
 			return 0.0;
 
