@@ -17,7 +17,6 @@ package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Set;
@@ -41,6 +40,7 @@ import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.factory.FactoryGroup;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
+import org.geotools.referencing.factory.FactoryNotFoundException;
 import org.geotools.referencing.factory.PropertyAuthorityFactory;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.io.TableWriter;
@@ -59,8 +59,14 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * beyong the one defined in the EPSG database. This factory is used as a fallback when a
  * requested code is not found in the EPSG database, or when there is no connection at all
  * to the EPSG database. The additional CRS are defined as <cite>Well Known Text</cite> in
- * a property file (by default the {@value #FILENAME} file).
- *
+ * a property file (by default the {@value #FILENAME} file) which should be located in the package 
+ * org.geotools.referencing.factory.epsg, and whose name should be epsg.properties.<br>
+ * If this file is not found, the factory won't be activated.<br>
+ * This factory can also be used to provide custom extensions or overrides to a main EPSG factory.<br> 
+ * In order to provide a custom extension file, override the {@link #getDefinitionsURL()} method.<br>
+ * In order to make the factory be an override, change the default priority by using the 
+ * two arguments constructor (this factory defaults to {@link DefaultFactory#PRIORITY} - 10, 
+ * so it's used as an extension).
  * @since 2.1
  * @source $URL$
  * @version $Id$
@@ -82,6 +88,11 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * The factories to be given to the backing store.
      */
     private final FactoryGroup factories;
+    
+    /**
+     * Default priority for this factory.
+     */
+    protected static final int DEFAULT_PRIORITY = DefaultFactory.PRIORITY - 10;
 
     /**
      * Constructs an authority factory using the default set of factories.
@@ -97,13 +108,13 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * {@code FACTORY} hints.
      */
     public FactoryUsingWKT(final Hints hints) {
-        this(hints, DefaultFactory.PRIORITY - 10);
+        this(hints, DEFAULT_PRIORITY);
     }
 
     /**
      * Constructs an authority factory using the specified hints and priority.
      */
-    FactoryUsingWKT(final Hints hints, final int priority) {
+    protected FactoryUsingWKT(final Hints hints, final int priority) {
         super(hints, priority);
         factories = FactoryGroup.createInstance(hints);
         // Disposes the cached property file after at least 15 minutes of inactivity.
@@ -150,7 +161,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
         try {
             URL url = getDefinitionsURL();
             if (url == null) {
-                throw new FileNotFoundException(FILENAME);
+                throw new FactoryNotFoundException("Could not locate " + FILENAME);
             }
             final Collection ids = getAuthority().getIdentifiers();
             final String authority = ids.isEmpty() ? "EPSG" : (String) ids.iterator().next();

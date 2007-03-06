@@ -110,16 +110,6 @@ public class FactoryUsingWktTest extends TestCase {
     }
 
     /**
-     * Checks for duplication with EPSG-HSQL.
-     */
-    public void testDuplication() throws FactoryException {
-        final StringWriter buffer = new StringWriter();
-        final PrintWriter  writer = new PrintWriter(buffer);
-        final Set duplicated = factory.reportDuplicatedCodes(writer);
-        assertTrue(buffer.toString(), duplicated.isEmpty());
-    }
-
-    /**
      * Checks for CRS instantiations.
      */
     public void testInstantiation() throws FactoryException {

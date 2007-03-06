@@ -21,7 +21,6 @@ public class VersionedDataStoreStressTest extends
      * @see TestCase#setUp()
      */
     protected void setUp() throws Exception {
-
         f = PostgisTests.newFixture("versioned.properties");
         remote = new HashMap();
         remote.put("dbtype", "postgis-versioned");
