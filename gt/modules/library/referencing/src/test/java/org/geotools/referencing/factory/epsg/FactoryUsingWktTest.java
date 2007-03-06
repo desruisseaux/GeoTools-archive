@@ -16,28 +16,22 @@
 package org.geotools.referencing.factory.epsg;
 
 // Java dependencies
-import java.util.Set;
 import java.util.Collection;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools dependencies
-import org.geotools.factory.Hints;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.NamedIdentifier;
-import org.geotools.metadata.iso.citation.Citations;
-
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.geotools.factory.Hints;
+import org.geotools.metadata.iso.citation.Citations;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.NamedIdentifier;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.ProjectedCRS;
 
 
 /**
@@ -110,16 +104,6 @@ public class FactoryUsingWktTest extends TestCase {
     }
 
     /**
-     * Checks for CRS instantiations.
-     */
-    public void testInstantiation() throws FactoryException {
-        final StringWriter buffer = new StringWriter();
-        final PrintWriter  writer = new PrintWriter(buffer);
-        final Set duplicated = factory.reportInstantiationFailures(writer);
-        assertTrue(buffer.toString(), duplicated.isEmpty());
-    }
-
-    /**
      * Tests the {@code 18001} code.
      */
     public void test18001() throws FactoryException {
@@ -132,4 +116,5 @@ public class FactoryUsingWktTest extends TestCase {
         assertTrue (ids.contains(new NamedIdentifier(Citations.EPSG, "18001")));
         assertFalse(ids.contains(new NamedIdentifier(Citations.ESRI, "18001")));
     }
+    
 }
