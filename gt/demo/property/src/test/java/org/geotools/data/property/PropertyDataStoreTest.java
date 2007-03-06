@@ -201,7 +201,6 @@ public class PropertyDataStoreTest extends TestCase {
         assertTrue( out.exists() );
         writer.close();
         assertTrue( in.exists() );        
-        assertFalse( out.exists() );
         
         assertEquals( 4, count( "road" ) );
     }

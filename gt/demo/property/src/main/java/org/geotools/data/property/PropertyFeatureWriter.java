@@ -16,7 +16,12 @@
 package org.geotools.data.property;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
@@ -154,9 +159,25 @@ public class PropertyFeatureWriter implements FeatureWriter {
         writer.close();
         reader.close();        
         writer = null;
-        reader = null;        
+        reader = null;                  
         read.delete();
-        write.renameTo( read );
+        
+        if (write.exists() && !write.renameTo(read)) {
+            FileChannel out = new FileOutputStream(read).getChannel();
+            FileChannel in = new FileInputStream(write).getChannel();
+            try {
+                long len = in.size();
+                long copied = out.transferFrom(in, 0, in.size());
+                
+                if (len != copied) {
+                    throw new IOException("unable to complete write");
+                }
+            }
+            finally {
+                in.close();
+                out.close();
+            }
+        }
         read = null;
         write = null;        
         store = null;                
