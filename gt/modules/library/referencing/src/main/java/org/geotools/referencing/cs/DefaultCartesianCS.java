@@ -230,6 +230,14 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
     }
 
     /**
+     * For {@link #usingUnit} and {@link PredefinedCS#rightHanded} usage only.
+     */
+    DefaultCartesianCS(final Map properties, final CoordinateSystemAxis[] axis) {
+        super(properties, axis);
+        ensurePerpendicularAxis();
+    }
+
+    /**
      * Ensures that all axis are perpendicular.
      */
     private void ensurePerpendicularAxis() throws IllegalArgumentException {
@@ -293,11 +301,6 @@ public class DefaultCartesianCS extends DefaultAffineCS implements CartesianCS {
         if (axis == null) {
             return this;
         }
-        final Map properties = getProperties(this, null);
-        switch (axis.length) {
-            case 2:  return new DefaultCartesianCS(properties, axis[0], axis[1]);
-            case 3:  return new DefaultCartesianCS(properties, axis[0], axis[1], axis[2]);
-            default: throw new AssertionError(axis.length); // Should never happen.
-        }
+        return new DefaultCartesianCS(getProperties(this, null), axis);
     }
 }

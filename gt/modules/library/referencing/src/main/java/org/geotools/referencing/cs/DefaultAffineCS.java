@@ -131,6 +131,13 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
     }
 
     /**
+     * For {@link #usingUnit} and {@link PredefinedCS#rightHanded} usage only.
+     */
+    DefaultAffineCS(final Map properties, final CoordinateSystemAxis[] axis) {
+        super(properties, axis);
+    }
+
+    /**
      * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts all directions except temporal ones (i.e.
      * {@link AxisDirection#FUTURE FUTURE} and {@link AxisDirection#PAST PAST}).
@@ -148,5 +155,26 @@ public class DefaultAffineCS extends AbstractCS implements AffineCS {
      */
     protected boolean isCompatibleUnit(final AxisDirection direction, final Unit unit) {
         return SI.METER.isCompatible(unit) || Unit.ONE.equals(unit);
+        // Note: this condition is also coded in PredefinedCS.rightHanded(AffineCS).
     }
+
+    // TODO: Uncomment when we will be allowed to compile for J2SE 1.5
+    /*
+     * Returns a new coordinate system with the same properties than the current one except for
+     * axis units.
+     *
+     * @param  unit The unit for the new axis.
+     * @return A coordinate system with axis using the specified units.
+     * @throws IllegalArgumentException If the specified unit is incompatible with the expected one.
+     *
+     * @since 2.5
+     *
+    public DefaultAffineCS usingUnit(final Unit unit) throws IllegalArgumentException {
+        final CoordinateSystemAxis[] axis = axisUsingUnit(unit);
+        if (axis == null) {
+            return this;
+        }
+        return new DefaultAffineCS(getProperties(this, null), axis);
+    }
+     */
 }

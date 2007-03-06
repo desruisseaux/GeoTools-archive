@@ -175,6 +175,13 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
     }
 
     /**
+     * For {@link #usingUnit} usage only.
+     */
+    private DefaultEllipsoidalCS(final Map properties, final CoordinateSystemAxis[] axis) {
+        super(properties, axis);
+    }
+
+    /**
      * Returns {@code true} if the specified axis direction is allowed for this coordinate
      * system. The default implementation accepts only the following directions:
      * {@link AxisDirection#NORTH NORTH}, {@link AxisDirection#SOUTH SOUTH},
@@ -297,6 +304,8 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
      * @return A coordinate system with axis using the specified units.
      * @throws IllegalArgumentException If the specified unit is incompatible with the expected one.
      *
+     * @todo Current implementation can't work for 3D coordinate systems.
+     *
      * @since 2.2
      */
     public DefaultEllipsoidalCS usingUnit(final Unit unit) throws IllegalArgumentException {
@@ -304,11 +313,6 @@ public class DefaultEllipsoidalCS extends AbstractCS implements EllipsoidalCS {
         if (axis == null) {
             return this;
         }
-        final Map properties = getProperties(this, null);
-        switch (axis.length) {
-            case 2:  return new DefaultEllipsoidalCS(properties, axis[0], axis[1]);
-            case 3:  return new DefaultEllipsoidalCS(properties, axis[0], axis[1], axis[2]);
-            default: throw new AssertionError(axis.length); // Should never happen.
-        }
+        return new DefaultEllipsoidalCS(getProperties(this, null), axis);
     }
 }

@@ -447,8 +447,12 @@ public class Formatter {
         if (code != null) {
             appendSeparator(false);
             setColor(CODELIST_COLOR);
-            buffer.append(code.name());
+            final String name = code.name();
+            buffer.append(name);
             resetColor();
+            if (name.indexOf(' ') >= 0) {
+                setInvalidWKT(code.getClass());
+            }
         }
     }
 

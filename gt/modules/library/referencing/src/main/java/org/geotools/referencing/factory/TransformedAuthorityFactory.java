@@ -44,6 +44,7 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.operation.DefiningConversion;
+import org.geotools.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.Utilities;
@@ -75,6 +76,14 @@ import org.geotools.resources.Utilities;
  *       {@code createXXX(...)} methods.
  */
 public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
+    /**
+     * Axis that need to be renamed if their direction changes.
+     */
+    private static final DefaultCoordinateSystemAxis[] RENAMEABLE = {
+        DefaultCoordinateSystemAxis.NORTHING,   DefaultCoordinateSystemAxis.SOUTHING,
+        DefaultCoordinateSystemAxis.EASTING,    DefaultCoordinateSystemAxis.WESTING
+    };
+
     /**
      * The coordinate operation factory. Will be created only when first needed.
      */
@@ -190,9 +199,32 @@ public class TransformedAuthorityFactory extends AuthorityFactoryAdapter {
     protected CoordinateSystemAxis replace(CoordinateSystemAxis axis) throws FactoryException {
         final AxisDirection oldDirection = axis.getDirection();
         final AxisDirection newDirection = replace(oldDirection);
-        final Unit          oldUnits     = axis.getUnit();
+              Unit          oldUnits     = axis.getUnit();
         final Unit          newUnits     = replace(oldUnits);
-        if (!oldDirection.equals(newDirection) || !oldUnits.equals(newUnits)) {
+        boolean directionChanged = !oldDirection.equals(newDirection);
+        if (directionChanged) {
+            /*
+             * Check if the direction change implies an axis renaming.  For example if the axis
+             * name was "Southing" and the direction has been changed from SOUTH to NORTH, then
+             * the axis should be renamed as "Northing".
+             */
+            final String name = axis.getName().getCode();
+            for (int i=0; i<RENAMEABLE.length; i++) {
+                if (RENAMEABLE[i].nameMatches(name)) {
+                    for (i=0; i<RENAMEABLE.length; i++) {
+                        final CoordinateSystemAxis candidate = RENAMEABLE[i];
+                        if (newDirection.equals(candidate.getDirection())) {
+                            axis = candidate;          // The new axis, but may change again later.
+                            oldUnits = axis.getUnit(); // For detecting change relative to new axis.
+                            directionChanged = false;  // The new axis has the requested direction.
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        if (directionChanged || !oldUnits.equals(newUnits)) {
             final FactoryGroup factories = getFactoryGroup(false);
             final CSFactory csFactory = factories.getCSFactory();
             final Map properties = getProperties(axis);

@@ -421,6 +421,11 @@ public final class ErrorKeys {
     public static final int INCOMPATIBLE_UNIT_$1 = 54;
 
     /**
+     * Direction "{1}" is inconsistent with axis "{0}".
+     */
+    public static final int INCONSISTENT_AXIS_ORIENTATION_$2 = 60;
+
+    /**
      * Property "{0}" has a value inconsistent with other properties.
      */
     public static final int INCONSISTENT_PROPERTY_$1 = 55;

@@ -63,13 +63,13 @@ import org.geotools.resources.i18n.Errors;
  */
 public class EquidistantCylindrical extends MapProjection {
     /**
-     * Cosinus of the standard_parallel_1 parameter.
+     * Cosinus of the {@code "standard_parallel_1"} parameter.
      */
     private final double cosStandardParallel;
 
     /**
      * {@linkplain Provider#STANDARD_PARALLEL Standard parallel} parameter.
-     * Set to {@link Double#NaN} for the {@link PlateCarree} case.
+     * Set to 0° for the {@link PlateCarree} case.
      */
     protected final double standardParallel;
 
@@ -92,7 +92,7 @@ public class EquidistantCylindrical extends MapProjection {
             cosStandardParallel = Math.cos(standardParallel);
         } else {
             // standard parallel is the equator (Plate Carree or Equirectangular)
-            standardParallel = Double.NaN;
+            standardParallel = 0;
             cosStandardParallel = 1.0;
         }
         assert latitudeOfOrigin == 0 : latitudeOfOrigin;
@@ -135,7 +135,7 @@ public class EquidistantCylindrical extends MapProjection {
 
     /**
      * Transforms the specified (<var>x</var>,<var>y</var>) coordinates
-     * and stores the result in <code>ptDst</code>.
+     * and stores the result in {@code ptDst}.
      */
     protected Point2D inverseTransformNormalized(double x, double y, final Point2D ptDst)
             throws ProjectionException

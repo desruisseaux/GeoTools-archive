@@ -44,6 +44,7 @@ import org.geotools.resources.i18n.Errors;
 import org.geotools.resources.i18n.ErrorKeys;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
+import org.geotools.util.SimpleInternationalString;
 import org.geotools.util.NameFactory;
 
 
@@ -68,7 +69,9 @@ import org.geotools.util.NameFactory;
  * @see AbstractCS
  * @see Unit
  */
-public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implements CoordinateSystemAxis {
+public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject
+        implements CoordinateSystemAxis
+{
     /**
      * Serial number for interoperability with different versions.
      */
@@ -81,72 +84,16 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
     static final int COMPASS_DIRECTION_COUNT = 16;
 
     /**
-     * Default axis info for longitudes.
-     *
-     * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
-     *
-     * The abbreviation is "&lambda;" (lambda).
-     *
-     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
-     *
-     * @see #GEODETIC_LONGITUDE
-     * @see #SPHERICAL_LONGITUDE
-     * @see #LATITUDE
+     * Number of items in {@link #PREDEFINED}. Should be considered
+     * as a constant after the class initialisation is completed.
      */
-    public static final DefaultCoordinateSystemAxis LONGITUDE = new DefaultCoordinateSystemAxis(
-            VocabularyKeys.LONGITUDE, "\u03BB", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
+    private static int PREDEFINED_COUNT = 0;
 
     /**
-     * Default axis info for latitudes.
-     *
-     * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
-     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
-     *
-     * The abbreviation is "&phi;" (phi).
-     * 
-     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
-     *
-     * @see #GEODETIC_LATITUDE
-     * @see #SPHERICAL_LATITUDE
-     * @see #LONGITUDE
+     * The list of predefined constants declared in this class,
+     * in declaration order. This order matter.
      */
-    public static final DefaultCoordinateSystemAxis LATITUDE = new DefaultCoordinateSystemAxis(
-            VocabularyKeys.LATITUDE, "\u03C6", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
-
-    /**
-     * The default axis for altitude values.
-     *
-     * Increasing ordinates values go {@linkplain AxisDirection#UP up}
-     * and units are {@linkplain SI#METER metres}.
-     *
-     * The abbreviation is lower case "<var>h</var>".
-     * 
-     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
-     *
-     * @see #ELLIPSOIDAL_HEIGHT
-     * @see #GEOCENTRIC_RADIUS
-     * @see #GRAVITY_RELATED_HEIGHT
-     * @see #DEPTH
-     */
-    public static final DefaultCoordinateSystemAxis ALTITUDE = new DefaultCoordinateSystemAxis(
-            VocabularyKeys.ALTITUDE, "h", AxisDirection.UP, SI.METER);
-
-    /**
-     * The default axis for depth.
-     *
-     * Increasing ordinates values go {@linkplain AxisDirection#DOWN down}
-     * and units are {@linkplain SI#METER metres}.
-     *
-     * The ISO 19111 name is "<cite>depth</cite>".
-     *
-     * @see #ALTITUDE
-     * @see #ELLIPSOIDAL_HEIGHT
-     * @see #GEOCENTRIC_RADIUS
-     * @see #GRAVITY_RELATED_HEIGHT
-     */
-    public static final DefaultCoordinateSystemAxis DEPTH = new DefaultCoordinateSystemAxis(
-            VocabularyKeys.DEPTH, "d", AxisDirection.DOWN, SI.METER);
+    private static final DefaultCoordinateSystemAxis[] PREDEFINED = new DefaultCoordinateSystemAxis[26];
 
     /**
      * Default axis info for geodetic longitudes in a
@@ -188,6 +135,40 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
             VocabularyKeys.GEODETIC_LATITUDE, "\u03C6", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
 
     /**
+     * Default axis info for longitudes.
+     *
+     * Increasing ordinates values go {@linkplain AxisDirection#EAST East}
+     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     *
+     * The abbreviation is "&lambda;" (lambda).
+     *
+     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
+     *
+     * @see #GEODETIC_LONGITUDE
+     * @see #SPHERICAL_LONGITUDE
+     * @see #LATITUDE
+     */
+    public static final DefaultCoordinateSystemAxis LONGITUDE = new DefaultCoordinateSystemAxis(
+            VocabularyKeys.LONGITUDE, "\u03BB", AxisDirection.EAST, NonSI.DEGREE_ANGLE);
+
+    /**
+     * Default axis info for latitudes.
+     *
+     * Increasing ordinates values go {@linkplain AxisDirection#NORTH North}
+     * and units are {@linkplain NonSI#DEGREE_ANGLE decimal degrees}.
+     *
+     * The abbreviation is "&phi;" (phi).
+     * 
+     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
+     *
+     * @see #GEODETIC_LATITUDE
+     * @see #SPHERICAL_LATITUDE
+     * @see #LONGITUDE
+     */
+    public static final DefaultCoordinateSystemAxis LATITUDE = new DefaultCoordinateSystemAxis(
+            VocabularyKeys.LATITUDE, "\u03C6", AxisDirection.NORTH, NonSI.DEGREE_ANGLE);
+
+    /**
      * The default axis for height values above the ellipsoid in a
      * {@linkplain org.opengis.referencing.crs.GeographicCRS geographic CRS}.
      *
@@ -224,6 +205,44 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      */
     public static final DefaultCoordinateSystemAxis GRAVITY_RELATED_HEIGHT = new DefaultCoordinateSystemAxis(
             VocabularyKeys.GRAVITY_RELATED_HEIGHT, "h", AxisDirection.UP, SI.METER);
+
+    /**
+     * The default axis for altitude values.
+     *
+     * Increasing ordinates values go {@linkplain AxisDirection#UP up}
+     * and units are {@linkplain SI#METER metres}.
+     *
+     * The abbreviation is lower case "<var>h</var>".
+     * 
+     * This axis is usually part of a {@link #LONGITUDE}, {@link #LATITUDE}, {@link #ALTITUDE} set.
+     *
+     * @see #ELLIPSOIDAL_HEIGHT
+     * @see #GEOCENTRIC_RADIUS
+     * @see #GRAVITY_RELATED_HEIGHT
+     * @see #DEPTH
+     */
+    public static final DefaultCoordinateSystemAxis ALTITUDE = new DefaultCoordinateSystemAxis(
+            VocabularyKeys.ALTITUDE, "h", AxisDirection.UP, SI.METER);
+
+    /**
+     * The default axis for depth.
+     *
+     * Increasing ordinates values go {@linkplain AxisDirection#DOWN down}
+     * and units are {@linkplain SI#METER metres}.
+     *
+     * The ISO 19111 name is "<cite>depth</cite>".
+     *
+     * @see #ALTITUDE
+     * @see #ELLIPSOIDAL_HEIGHT
+     * @see #GEOCENTRIC_RADIUS
+     * @see #GRAVITY_RELATED_HEIGHT
+     */
+    public static final DefaultCoordinateSystemAxis DEPTH = new DefaultCoordinateSystemAxis(
+            VocabularyKeys.DEPTH, "d", AxisDirection.DOWN, SI.METER);
+    static {
+        ALTITUDE.opposite = DEPTH;
+        DEPTH.opposite = ALTITUDE;
+    }
 
     /**
      * Default axis info for radius in a
@@ -307,7 +326,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * @see #COLUMN
      */
     public static final DefaultCoordinateSystemAxis X = new DefaultCoordinateSystemAxis(
-            "x", AxisDirection.EAST, SI.METER);
+            -1, "x", AxisDirection.EAST, SI.METER);
 
     /**
      * Default axis info for <var>y</var> values in a
@@ -327,7 +346,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * @see #ROW
      */
     public static final DefaultCoordinateSystemAxis Y = new DefaultCoordinateSystemAxis(
-            "y", AxisDirection.NORTH, SI.METER);
+            -1, "y", AxisDirection.NORTH, SI.METER);
 
     /**
      * Default axis info for <var>z</var> values in a
@@ -341,7 +360,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * This axis is usually part of a {@link #X}, {@link #Y}, {@link #Z} set.
      */
     public static final DefaultCoordinateSystemAxis Z = new DefaultCoordinateSystemAxis(
-            "z", AxisDirection.UP, SI.METER);
+            -1, "z", AxisDirection.UP, SI.METER);
 
     /**
      * Default axis info for <var>x</var> values in a
@@ -514,7 +533,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * @since 2.2
      */
     public static final DefaultCoordinateSystemAxis DISPLAY_X = new DefaultCoordinateSystemAxis(
-            "x", AxisDirection.DISPLAY_RIGHT, Unit.ONE);
+            -1, "x", AxisDirection.DISPLAY_RIGHT, Unit.ONE);
 
     /**
      * A default axis for <var>y</var> values in a display device. Increasing values go toward
@@ -525,7 +544,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * @since 2.2
      */
     public static final DefaultCoordinateSystemAxis DISPLAY_Y = new DefaultCoordinateSystemAxis(
-            "y", AxisDirection.DISPLAY_DOWN, Unit.ONE);
+            -1, "y", AxisDirection.DISPLAY_DOWN, Unit.ONE);
 
     /**
      * Some names to be treated as equivalent. This is needed because axis names are the primary
@@ -748,6 +767,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
 
     /**
      * Constructs an axis with a name and an abbreviation as a resource bundle key.
+     * To be used for construction of pre-defined constants only.
      *
      * @param name         The resource bundle key for the name.
      * @param abbreviation The {@linkplain #getAbbreviation abbreviation} used for this
@@ -761,7 +781,84 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
                                         final AxisDirection direction,
                                         final Unit          unit)
     {
-        this(Vocabulary.formatInternational(name), abbreviation, direction, unit);
+        this(name>=0 ? Vocabulary.formatInternational(name) :
+                new SimpleInternationalString(abbreviation), abbreviation, direction, unit);
+        PREDEFINED[PREDEFINED_COUNT++] = this;
+    }
+
+    /**
+     * Returns one of the predefined axis for the given name and direction, or {@code null} if
+     * none. This method searchs only in predefined constants like {@link #GEODETIC_LATITUDE},
+     * not in any custom axis instantiated by a public constructor. The name of those constants
+     * match ISO 19111 names or some names commonly found in <cite>Well Known Text</cite> (WKT)
+     * formats.
+     * <p>
+     * This method first checks if the specified name matches the {@linkplain #getAbbreviation
+     * abbreviation} of a predefined axis. The comparaison is case-sensitive (for example the
+     * {@link #GEOCENTRIC_X} abbreviation is uppercase {@code "X"}, while the abbreviation for
+     * the generic {@link #X} axis is lowercase {@code "x"}).
+     * <p>
+     * If the specified name doesn't match any abbreviation, then this method compares the name
+     * against predefined axis {@linkplain #getName name} in a case-insensitive manner. Examples
+     * of valid names are "<cite>Geodetic latitude</cite>" and "<cite>Northing</cite>".
+     * <p>
+     * The direction argument is optional and can be used in order to resolve ambiguity like
+     * {@link #X} and {@link #DISPLAY_X} axis. If this argument is {@code null}, then the first
+     * axis with a matching name or abbreviation will be returned.
+     *
+     * @param  name The axis name or abbreviation.
+     * @param  direction An optional direction, or {@code null}.
+     * @return One of the constants declared in this class, or {@code null}.
+     *
+     * @since 2.4
+     */
+    public static DefaultCoordinateSystemAxis getPredefined(String name, AxisDirection direction) {
+        ensureNonNull("name", name);
+        name = name.trim();
+        DefaultCoordinateSystemAxis found = null;
+        for (int i=0; i<PREDEFINED_COUNT; i++) {
+            final DefaultCoordinateSystemAxis candidate = PREDEFINED[i];
+            if (direction != null && !direction.equals(candidate.getDirection())) {
+                continue;
+            }
+            // Reminder: case matter for abbreviation, so 'equalsIgnoreCase' is not allowed.
+            if (candidate.abbreviation.equals(name)) {
+                return candidate;
+            }
+            if (found == null && candidate.nameMatches(name)) {
+                /*
+                 * We need to perform a special check for Geodetic longitude and latitude.
+                 * Because of the ALIAS map, the "Geodetic latitude" and "Latitude" names
+                 * are considered equivalent, while they are two distinct predefined axis
+                 * constants in Geotools. Because Geodetic longitude & latitude constants
+                 * are declared first, they have precedence.  So we prevent the selection
+                 * of GEODETIC_LATITUDE if the user is likely to ask for LATITUDE.
+                 */
+                if (candidate == GEODETIC_LONGITUDE || candidate == GEODETIC_LATITUDE) {
+                    if (!name.toLowerCase().startsWith("geodetic")) {
+                        continue;
+                    }
+                }
+                found = candidate;
+            }
+        }
+        return found;
+    }
+
+    /**
+     * Returns a predefined axis similar to the specified one except for units.
+     * Returns {@code null} if no predefined axis match.
+     */
+    static DefaultCoordinateSystemAxis getPredefined(final CoordinateSystemAxis axis) {
+        return getPredefined(axis.getName().getCode(), axis.getDirection());
+    }
+
+    /**
+     * Returns the list of all predefined constants.
+     * Currently used for testing purpose only.
+     */
+    static DefaultCoordinateSystemAxis[] values() {
+        return (DefaultCoordinateSystemAxis[]) PREDEFINED.clone();
     }
 
     /**
@@ -772,6 +869,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * @throws NoSuchElementException if the given name is not a know axis direction.
      */
     public static AxisDirection getDirection(String direction) throws NoSuchElementException {
+        ensureNonNull("direction", direction);
         direction = direction.trim();
         AxisDirection candidate = DirectionAlongMeridian.findDirection(direction);
         if (candidate != null) {
@@ -788,7 +886,7 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
          */
         final DirectionAlongMeridian meridian = DirectionAlongMeridian.parse(direction);
         if (meridian != null) {
-            candidate = meridian.getAxisDirection();
+            candidate = meridian.getDirection();
             assert candidate == DirectionAlongMeridian.findDirection(meridian.toString());
             return candidate;
         }
@@ -875,9 +973,9 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
 
     /**
      * Returns an axis with the opposite direction of this one, or {@code null} if unknown.
-     * This method is not yet public because only a few predefined constants have this information.
+     * This method is not public because only a few predefined constants have this information.
      */
-    final CoordinateSystemAxis getOpposite() {
+    final DefaultCoordinateSystemAxis getOpposite() {
         return opposite;
     }
 
@@ -901,26 +999,14 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
      * @since 2.4
      */
     public static double getAngle(final AxisDirection source, final AxisDirection target) {
-        /*
-         * Tests for NORTH, SOUTH, EAST, EAST-NORTH-EAST, etc. directions.
-         */
-        final int base = AxisDirection.NORTH.ordinal();
-        final int i = source.ordinal() - base;
-        if (i >= 0 && i < COMPASS_DIRECTION_COUNT) {
-            int delta = target.ordinal() - base;
-            if (delta >= 0 && delta < COMPASS_DIRECTION_COUNT) {
-                delta = i - delta;
-                if (delta < -COMPASS_DIRECTION_COUNT/2) {
-                    delta += COMPASS_DIRECTION_COUNT;
-                } else if (delta > COMPASS_DIRECTION_COUNT/2) {
-                    delta -= COMPASS_DIRECTION_COUNT;
-                }
-                return delta * (360.0 / COMPASS_DIRECTION_COUNT);
-            }
+        ensureNonNull("source", source);
+        ensureNonNull("target", target);
+        // Tests for NORTH, SOUTH, EAST, EAST-NORTH-EAST, etc. directions.
+        final int compass = getCompassAngle(source, target);
+        if (compass != Integer.MIN_VALUE) {
+            return compass * (360.0 / COMPASS_DIRECTION_COUNT);
         }
-        /*
-         * Tests for "South along 90 deg East", etc. directions.
-         */
+        // Tests for "South along 90 deg East", etc. directions.
         final DirectionAlongMeridian src = DirectionAlongMeridian.parse(source);
         if (src != null) {
             final DirectionAlongMeridian tgt = DirectionAlongMeridian.parse(target);
@@ -929,6 +1015,28 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
             }
         }
         return Double.NaN;
+    }
+
+    /**
+     * Tests for angle on compass only (do not tests angle between direction along meridians).
+     * Returns {@link Integer#MIN_VALUE} if the angle can't be computed.
+     */
+    static int getCompassAngle(final AxisDirection source, final AxisDirection target) {
+        final int base = AxisDirection.NORTH.ordinal();
+        final int src  = source.ordinal() - base;
+        if (src >= 0 && src < COMPASS_DIRECTION_COUNT) {
+            int tgt = target.ordinal() - base;
+            if (tgt >= 0 && tgt < COMPASS_DIRECTION_COUNT) {
+                tgt = src - tgt;
+                if (tgt < -COMPASS_DIRECTION_COUNT/2) {
+                    tgt += COMPASS_DIRECTION_COUNT;
+                } else if (tgt > COMPASS_DIRECTION_COUNT/2) {
+                    tgt -= COMPASS_DIRECTION_COUNT;
+                }
+                return tgt;
+            }
+        }
+        return Integer.MIN_VALUE;
     }
 
     /**
@@ -942,22 +1050,20 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
 
     /**
      * Returns a new axis with the same properties than current axis except for the units.
-     *
-     * @param  unit The unit for the new axis.
+     * 
+     * @param newUnit The unit for the new axis.
      * @return An axis using the specified unit.
      * @throws IllegalArgumentException If the specified unit is incompatible with the expected one.
-     *
-     * @since 2.2
      */
-    final DefaultCoordinateSystemAxis usingUnit(final Unit unit) throws IllegalArgumentException {
-        if (this.unit.equals(unit)) {
+    final DefaultCoordinateSystemAxis usingUnit(final Unit newUnit) throws IllegalArgumentException {
+        if (unit.equals(newUnit)) {
             return this;
         }
-        if (this.unit.isCompatible(unit)) {
+        if (unit.isCompatible(newUnit)) {
             return new DefaultCoordinateSystemAxis(getProperties(this, null),
-                       abbreviation, direction, unit, minimum, maximum, rangeMeaning);
+                       abbreviation, direction, newUnit, minimum, maximum, rangeMeaning);
         }
-        throw new IllegalArgumentException(Errors.format(ErrorKeys.INCOMPATIBLE_UNIT_$1, unit));
+        throw new IllegalArgumentException(Errors.format(ErrorKeys.INCOMPATIBLE_UNIT_$1, newUnit));
     }
 
     /**
@@ -1009,44 +1115,55 @@ public class DefaultCoordinateSystemAxis extends AbstractIdentifiedObject implem
             return true; // Slight optimization.
         }
         if (super.equals(object, compareMetadata)) {
-            final DefaultCoordinateSystemAxis that = (DefaultCoordinateSystemAxis) object;
-            if (compareMetadata) {
-                if (!Utilities.equals(this.abbreviation, that.abbreviation) ||
-                    !Utilities.equals(this.rangeMeaning, that.rangeMeaning) ||
-                    Double.doubleToLongBits(minimum) != Double.doubleToLongBits(that.minimum) ||
-                    Double.doubleToLongBits(maximum) != Double.doubleToLongBits(that.maximum))
-                {
-                    return false;
-                }
-            } else {
-                /*
-                 * Checking the abbreviation is not suffisient. For example the polar angle and the
-                 * spherical latitude have the same abbreviation (theta).  Geotools extensions like
-                 * "Longitude" (in addition of ISO 19111 "Geodetic longitude") bring more potential
-                 * confusion. Furthermore, not all implementors will use the greek letters (even if
-                 * they are part of ISO 19111).    For example most CRS in WKT format use the "Lat"
-                 * abbreviation instead of the greek letter phi. For comparaisons without metadata,
-                 * we ignore the unreliable abbreviation and check the axis name instead. These
-                 * names are constrained by ISO 19111 specification (see class javadoc), so they
-                 * should be reliable enough.
-                 *
-                 * Note: there is no need to execute this block if 'compareMetadata' is true,
-                 *       because in this case a stricter check has already been performed by
-                 *       the 'equals' method in the superclass.
-                 */
-                if (!nameMatches(that.getName().getCode())) {
-                    // The above test checked for special cases ("Lat" / "Lon" aliases, etc.).
-                    // The next line may not, but is tested anyway in case the user overrided
-                    // the 'that.nameMatches(...)' method.
-                    if (!nameMatches(that, getName().getCode())) {
-                        return false;
-                    }
-                }
-            }
-            return Utilities.equals(this.direction, that.direction) &&
-                   Utilities.equals(this.unit,      that.unit);
+            return equals((DefaultCoordinateSystemAxis) object, compareMetadata, true);
         }
         return false;
+    }
+
+    /**
+     * Compares the specified object with this axis for equality, with optional comparaison
+     * of units. Units should always be compared (they are not just metadata), except in the
+     * particular case of {@link AbstractCS#axisColinearWith}, which is used as a first step
+     * toward units conversions through {@link AbstractCS#swapAndScaleAxis}.
+     */
+    final boolean equals(final DefaultCoordinateSystemAxis that,
+                         final boolean compareMetadata, final boolean compareUnit)
+    {
+        if (compareMetadata) {
+            if (!Utilities.equals(this.abbreviation, that.abbreviation) ||
+                !Utilities.equals(this.rangeMeaning, that.rangeMeaning) ||
+                Double.doubleToLongBits(minimum) != Double.doubleToLongBits(that.minimum) ||
+                Double.doubleToLongBits(maximum) != Double.doubleToLongBits(that.maximum))
+            {
+                return false;
+            }
+        } else {
+            /*
+             * Checking the abbreviation is not suffisient. For example the polar angle and the
+             * spherical latitude have the same abbreviation (theta).  Geotools extensions like
+             * "Longitude" (in addition of ISO 19111 "Geodetic longitude") bring more potential
+             * confusion. Furthermore, not all implementors will use the greek letters (even if
+             * they are part of ISO 19111).    For example most CRS in WKT format use the "Lat"
+             * abbreviation instead of the greek letter phi. For comparaisons without metadata,
+             * we ignore the unreliable abbreviation and check the axis name instead. These
+             * names are constrained by ISO 19111 specification (see class javadoc), so they
+             * should be reliable enough.
+             *
+             * Note: there is no need to execute this block if 'compareMetadata' is true,
+             *       because in this case a stricter check has already been performed by
+             *       the 'equals' method in the superclass.
+             */
+            if (!nameMatches(that.getName().getCode())) {
+                // The above test checked for special cases ("Lat" / "Lon" aliases, etc.).
+                // The next line may not, but is tested anyway in case the user overrided
+                // the 'that.nameMatches(...)' method.
+                if (!nameMatches(that, getName().getCode())) {
+                    return false;
+                }
+            }
+        }
+        return Utilities.equals(this.direction, that.direction) &&
+               (!compareUnit || Utilities.equals(this.unit, that.unit));
     }
 
     /**

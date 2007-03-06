@@ -23,6 +23,7 @@ import junit.framework.TestSuite;
 // OpenGIS dependencies
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ProjectedCRS;
 import org.opengis.referencing.operation.Matrix;
 import org.opengis.referencing.operation.MathTransform;
@@ -30,6 +31,7 @@ import org.opengis.referencing.operation.MathTransform;
 // Geotools dependencies
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.LinearTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 
 
 /**
@@ -40,6 +42,11 @@ import org.geotools.referencing.operation.LinearTransform;
  * @author Martin Desruisseaux
  */
 public final class SouthOrientedTest extends TestCase {
+    /**
+     * Small number for matrix element comparaisons.
+     */
+    private static final double EPS = 1E-10;
+
     /**
      * Constructs a test with the given name.
      */
@@ -73,7 +80,7 @@ public final class SouthOrientedTest extends TestCase {
         final String method =
                 methodSouth ? "Transverse Mercator (South Orientated)" : "Transverse Mercator";
         final String axis =
-                axisSouth ? "SOUTH" : "NORTH";
+                axisSouth ? "\"Southing\", SOUTH" : "\"Northing\", NORTH";
         return (ProjectedCRS) CRS.parseWKT(
                 "PROJCS[\"South African Coordinate System zone 25\", " +
                   "GEOGCS[\"Cape\", " +
@@ -94,7 +101,7 @@ public final class SouthOrientedTest extends TestCase {
                   "PARAMETER[\"false_northing\", " + northing + "], " +
                   "UNIT[\"m\", 1.0], " +
                   "AXIS[\"Westing\", WEST], " +
-                  "AXIS[\"Southing\", " + axis + "]]");
+                  "AXIS[" + axis + "]]");
     }
 
     /**
@@ -153,6 +160,38 @@ public final class SouthOrientedTest extends TestCase {
     }
 
     /**
+     * Tests a Krovak projection with (SOUTH,WEST) axis.
+     */
+    public void testKrovak() throws FactoryException {
+        final String geoWKT =
+                "GEOGCS[\"S-JTSK (Ferro)\", " +
+                  "DATUM[\"S_JTSK_Ferro\", " +
+                    "SPHEROID[\"Bessel 1841\", 6377397.155, 299.1528128], " +
+                    "TOWGS84[570.8,85.7,462.8,4.998,1.587,5.261,3.56]], " +
+                  "PRIMEM[\"Greenwich\",0], " +
+                  "UNIT[\"degree\",0.0174532925199433]]";
+        final String prjWKT =
+                "PROJCS[\"S-JTSK(Ferro) / krovak\", " + geoWKT + ", " +
+                  "PROJECTION[\"Krovak\"], " +
+                  "UNIT[\"metre\",1.0], " +
+                  "AXIS[\"y\",WEST], " +
+                  "AXIS[\"x\",SOUTH]]";
+
+        final CoordinateReferenceSystem sourceCRS = CRS.parseWKT(geoWKT);
+        final CoordinateReferenceSystem targetCRS = CRS.parseWKT(prjWKT);
+        final MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS);
+        assertTrue(transform instanceof ConcatenatedTransform);
+        final ConcatenatedTransform ct = (ConcatenatedTransform) transform;
+        assertTrue(ct.transform2 instanceof LinearTransform);
+        final Matrix matrix = ((LinearTransform) ct.transform2).getMatrix();
+        assertDiagonal(matrix);
+        assertEquals("East-West direction should be reverted. ",  -1, matrix.getElement(0,0), EPS);
+        assertEquals("North-South direction should be reverted.", -1, matrix.getElement(1,1), EPS);
+        assertEquals("No easting expected.",                       0, matrix.getElement(0,2), EPS);
+        assertEquals("No northing expected.",                      0, matrix.getElement(1,2), EPS);
+    }
+
+    /**
      * Asserts that the specified matrix is diagonal.
      */
     private static void assertDiagonal(final Matrix matrix) {
@@ -166,9 +205,4 @@ public final class SouthOrientedTest extends TestCase {
             }
         }
     }
-
-    /**
-     * Small number for matrix element comparaisons.
-     */
-    private static final double EPS = 1E-10;
 }

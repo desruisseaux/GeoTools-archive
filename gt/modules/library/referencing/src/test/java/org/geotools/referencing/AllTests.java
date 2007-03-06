@@ -79,6 +79,7 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing                     .GeodeticCalculatorTest         .suite());
         suite.addTest(org.geotools.referencing.cs                  .DirectionAlongMeridianTest     .suite());
         suite.addTest(org.geotools.referencing.cs                  .DefaultCoordinateSystemAxisTest.suite());
+        suite.addTest(org.geotools.referencing.cs                  .ComparableAxisWrapperTest      .suite());
         suite.addTest(org.geotools.referencing.cs                  .AbstractCSTest                 .suite());
         suite.addTest(org.geotools.referencing.cs                  .DefaultCartesianCSTest         .suite());
         suite.addTest(org.geotools.referencing.wkt                 .ParserTest                     .suite());

@@ -16,6 +16,10 @@
  */
 package org.geotools.referencing.cs;
 
+// J2SE dependencies and extensions
+import javax.units.SI;
+import javax.units.Unit;
+
 // JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -24,6 +28,7 @@ import junit.framework.TestSuite;
 // OpenGIS dependencies
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.Matrix;
 
 // Geotools dependencies
@@ -121,5 +126,45 @@ public class AbstractCSTest extends TestCase {
         assertEquals(expected.length, numRow*numCol);
         final Matrix em = new GeneralMatrix(numRow, numCol, expected);
         assertEquals(em, matrix);
+    }
+
+    /**
+     * Tests {@link AbstractCS#axisUsingUnit}.
+     */
+    public void testAxisUsingUnit() {
+        assertNull("Should detect that no axis change is needed",
+                   DefaultCartesianCS.PROJECTED.axisUsingUnit(SI.METER));
+
+        final Unit KILOMETER = SI.KILO(SI.METER);
+        final CoordinateSystemAxis[] axis =
+                DefaultCartesianCS.PROJECTED.axisUsingUnit(KILOMETER);
+        assertNotNull(axis);
+        assertEquals("Expected two-dimensional", 2, axis.length);
+        assertEquals(KILOMETER,           axis[0].getUnit());
+        assertEquals(KILOMETER,           axis[1].getUnit());
+        assertEquals(AxisDirection.EAST,  axis[0].getDirection());
+        assertEquals(AxisDirection.NORTH, axis[1].getDirection());
+        assertEquals("Easting",           axis[0].getName().getCode());
+        assertEquals("Northing",          axis[1].getName().getCode());
+    }
+
+    /**
+     * Tests {@link AbstractCS#standard}.
+     */
+    public void testStandards() {
+        CoordinateSystem cs;
+        cs = DefaultCartesianCS  .GRID;               assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultCartesianCS  .GEOCENTRIC;         assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultCartesianCS  .GENERIC_2D;         assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultCartesianCS  .GENERIC_3D;         assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultCartesianCS  .PROJECTED;          assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultEllipsoidalCS.GEODETIC_2D;        assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultEllipsoidalCS.GEODETIC_3D;        assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultSphericalCS  .GEOCENTRIC;         assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultTimeCS       .DAYS;               assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultVerticalCS   .ELLIPSOIDAL_HEIGHT; assertSame(cs, AbstractCS.standard(cs));
+        cs = DefaultVerticalCS   .GRAVITY_RELATED;
+        assertSame("\"Standard\" vertical axis should be forced to ellipsoidal height.",
+                   DefaultVerticalCS.ELLIPSOIDAL_HEIGHT, AbstractCS.standard(cs));
     }
 }

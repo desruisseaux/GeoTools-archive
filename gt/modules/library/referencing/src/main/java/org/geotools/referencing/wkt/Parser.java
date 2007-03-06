@@ -98,40 +98,6 @@ import org.geotools.resources.i18n.ErrorKeys;
  */
 public class Parser extends MathTransformParser {
     /**
-     * A list of predefined coordinate system axis. Returning a pre-defined constant
-     * help to compare successfully two CS using {@code equalsIgnoreMetadata} method.
-     * Axis appears in preferred order for WKT.
-     */
-    private static final CoordinateSystemAxis[] GEOTOOLS_AXIS = {
-        DefaultCoordinateSystemAxis.LONGITUDE,
-        DefaultCoordinateSystemAxis.LATITUDE,
-        DefaultCoordinateSystemAxis.GEODETIC_LONGITUDE,
-        DefaultCoordinateSystemAxis.GEODETIC_LATITUDE,
-        DefaultCoordinateSystemAxis.EASTING,
-        DefaultCoordinateSystemAxis.WESTING,
-        DefaultCoordinateSystemAxis.NORTHING,
-        DefaultCoordinateSystemAxis.SOUTHING,
-        DefaultCoordinateSystemAxis.X,
-        DefaultCoordinateSystemAxis.Y,
-        DefaultCoordinateSystemAxis.Z,
-        DefaultCoordinateSystemAxis.GEOCENTRIC_X,
-        DefaultCoordinateSystemAxis.GEOCENTRIC_Y,
-        DefaultCoordinateSystemAxis.GEOCENTRIC_Z,
-        DefaultCoordinateSystemAxis.ALTITUDE,
-        DefaultCoordinateSystemAxis.DEPTH,
-        DefaultCoordinateSystemAxis.ELLIPSOIDAL_HEIGHT,
-        DefaultCoordinateSystemAxis.GRAVITY_RELATED_HEIGHT,
-        DefaultCoordinateSystemAxis.SPHERICAL_LONGITUDE,
-        DefaultCoordinateSystemAxis.SPHERICAL_LATITUDE,
-        DefaultCoordinateSystemAxis.GEOCENTRIC_RADIUS
-    };
-
-    /**
-     * A predefined empty axis array.
-     */
-    private static final CoordinateSystemAxis[] NO_AXIS = new CoordinateSystemAxis[0];
-
-    /**
      * {@code true} in order to allows the non-standard Oracle syntax. Oracle put the Bursa-Wolf
      * parameters straight into the {@code DATUM} elements, without enclosing them in a
      * {@code TOWGS84} element.
@@ -170,11 +136,6 @@ public class Parser extends MathTransformParser {
      * The list of {@linkplain AxisDirection axis directions} from their name.
      */
     private final Map directions;
-
-    /**
-     * A set of predefined axis (usually the {@code GEOTOOLS_AXIS} constant array).
-     */
-    private final CoordinateSystemAxis[] predefinedAxis;
     
     /**
      * Constructs a parser using the default set of symbols and factories.
@@ -240,7 +201,6 @@ public class Parser extends MathTransformParser {
         for (int i=0; i<values.length; i++) {
             directions.put(values[i].name().trim().toUpperCase(), values[i]);
         }
-        predefinedAxis = Citations.GEOTOOLS.equals(csFactory.getVendor()) ? GEOTOOLS_AXIS : NO_AXIS;
     }
 
     /**
@@ -458,7 +418,7 @@ public class Parser extends MathTransformParser {
      * built from WKT against a CS built from one of Geotools's constants.
      *
      * @param  properties Name and other properties to give to the new object.
-     *         If null, the abbreviation will be used as the axis name.
+     *         If {@code null}, the abbreviation will be used as the axis name.
      * @param  abbreviation The coordinate axis abbreviation.
      * @param  direction The axis direction.
      * @param  unit The coordinate axis unit.
@@ -470,15 +430,10 @@ public class Parser extends MathTransformParser {
                                       final Unit          unit)
             throws FactoryException
     {
-        for (int i=0; i<predefinedAxis.length; i++) {
-            final CoordinateSystemAxis candidate = predefinedAxis[i];
-            if (direction.equals(candidate.getDirection()) && unit.equals(candidate.getUnit())) {
-                if (abbreviation.equalsIgnoreCase(candidate.getName().getCode()) ||
-                    abbreviation.equals(candidate.getAbbreviation())) // Case matter for abbreviation.
-                {
-                    return candidate;
-                }
-            }
+        final CoordinateSystemAxis candidate =
+                DefaultCoordinateSystemAxis.getPredefined(abbreviation, direction);
+        if (candidate != null && unit.equals(candidate.getUnit())) {
+            return candidate;
         }
         if (properties == null) {
             properties = Collections.singletonMap(IdentifiedObject.NAME_KEY, abbreviation);

@@ -68,8 +68,8 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
 
     /**
      * The direction. Will be created only when first needed.
-     *
-     * @see #getAxisDirection
+     * 
+     * @see #getDirection
      */
     private transient AxisDirection direction;
 
@@ -188,7 +188,7 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
      * Returns the axis direction for this object. If a suitable axis direction already exists,
      * it will be returned. Otherwise a new one is created and returned.
      */
-    public AxisDirection getAxisDirection() {
+    public AxisDirection getDirection() {
         if (direction != null) {
             return direction;
         }
@@ -208,26 +208,6 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
             }
         }
         return direction;
-    }
-
-    /**
-     * Returns the direction in the range 0 to 180°
-     */
-    public DirectionAlongMeridian absolute() {
-        return (meridian < 0) ? new DirectionAlongMeridian(baseDirection, -meridian) : this;
-    }
-
-    /**
-     * Returns the opposite direction.
-     */
-    public DirectionAlongMeridian opposite() {
-        double m = meridian + 180;
-        if (m > 180) {
-            m -= 360;
-        }
-        final DirectionAlongMeridian op = new DirectionAlongMeridian(baseDirection, m);
-        assert Math.abs(Math.abs(getAngle(op)) - 180) <= EPS : op;
-        return op;
     }
 
     /**
@@ -270,8 +250,8 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
     /**
      * Compares this direction with the specified one for order. This method tries to reproduce
      * the ordering used for the majority of coordinate systems in the EPSG database, i.e. the
-     * ordering of a right-handed coordinate system. Examples of ordering that we should get
-     * (extracted from the EPSG database):
+     * ordering of a right-handed coordinate system. Examples of ordered pairs that we should
+     * get (extracted from the EPSG database):
      *
      * <table>
      *   <tr><td>North along 90 deg East,</td>  <td>North along 0 deg</td></tr>
@@ -347,8 +327,8 @@ final class DirectionAlongMeridian implements Comparable, Serializable {
     }
 
     /**
-     * Changes the later to lower case from {@code base+1} to the end of the buffer.
-     * For {@link #toString} internal use only.
+     * Changes the buffer content to lower case from {@code base+1} to
+     * the end of the buffer. For {@link #toString} internal use only.
      */
     private static void toLowerCase(final StringBuffer buffer, final int base) {
         for (int i=buffer.length(); --i>base;) {

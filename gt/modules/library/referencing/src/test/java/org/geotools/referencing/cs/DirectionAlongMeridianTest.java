@@ -98,17 +98,17 @@ public class DirectionAlongMeridianTest extends TestCase {
      * Tests the ordering, which also involve a test of angle measurement.
      */
     public void testOrdering() {
-        compare("North along  90 deg East",   "North along   0 deg");
-        compare("North along  75 deg West",   "North along 165 deg West");
-        compare("South along  90 deg West",   "South along   0 deg");
-        compare("South along 180 deg",        "South along  90 deg West");
-        compare("North along 130 deg West",   "North along 140 deg East");
+        assertOrdered("North along  90 deg East",   "North along   0 deg");
+        assertOrdered("North along  75 deg West",   "North along 165 deg West");
+        assertOrdered("South along  90 deg West",   "South along   0 deg");
+        assertOrdered("South along 180 deg",        "South along  90 deg West");
+        assertOrdered("North along 130 deg West",   "North along 140 deg East");
     }
 
     /**
      * Tests if the following directions have an angle of 90° between each other.
      */
-    private static void compare(final String dir1, final String dir2) {
+    private static void assertOrdered(final String dir1, final String dir2) {
         final DirectionAlongMeridian m1 = DirectionAlongMeridian.parse(dir1);
         final DirectionAlongMeridian m2 = DirectionAlongMeridian.parse(dir2);
         assertEquals(+90, m1.getAngle(m2), EPS);

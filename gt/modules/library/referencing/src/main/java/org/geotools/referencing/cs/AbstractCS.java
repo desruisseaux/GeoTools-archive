@@ -80,7 +80,18 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 6757665252533744744L;
-    
+
+    /**
+     * Base axis to use for checking directions. This is used in order to trap
+     * inconsistency like an axis named "Northing" with South direction.
+     */
+    private static final DefaultCoordinateSystemAxis[] DIRECTION_CHECKS = {
+        DefaultCoordinateSystemAxis.NORTHING,
+        DefaultCoordinateSystemAxis.EASTING,
+        DefaultCoordinateSystemAxis.SOUTHING,
+        DefaultCoordinateSystemAxis.WESTING
+    };
+
     /**
      * The axis for this coordinate system at the specified dimension.
      */
@@ -135,26 +146,32 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
         super(properties);
         ensureNonNull("axis", axis);
         this.axis = (CoordinateSystemAxis[]) axis.clone();
-        /*
-         * Makes sure there is no axis along the same direction
-         * (e.g. two North axis, or an East and a West axis).
-         */
         for (int i=0; i<axis.length; i++) {
             ensureNonNull("axis", axis, i);
-            AxisDirection check = axis[i].getDirection();
-            ensureNonNull("direction", check);
-            if (!isCompatibleDirection(check)) {
+            final AxisDirection direction = axis[i].getDirection();
+            ensureNonNull("direction", direction);
+            /*
+             * Ensures that axis direction and units are compatible with the
+             * coordinate system to be created. For example CartesianCS will
+             * accepts only linear or dimensionless units.
+             */
+            if (!isCompatibleDirection(direction)) {
                 // TOOD: localize name()
                 throw new IllegalArgumentException(Errors.format(
                             ErrorKeys.ILLEGAL_AXIS_ORIENTATION_$2,
-                            check.name(), Utilities.getShortClassName(this)));
+                            direction.name(), Utilities.getShortClassName(this)));
             }
             final Unit unit = axis[i].getUnit();
-            if (!isCompatibleUnit(check, unit)) {
+            ensureNonNull("unit", unit);
+            if (!isCompatibleUnit(direction, unit)) {
                 throw new IllegalArgumentException(Errors.format(
                             ErrorKeys.INCOMPATIBLE_UNIT_$1, unit));
             }
-            check = check.absolute();
+            /*
+             * Ensures there is no axis along the same direction
+             * (e.g. two North axis, or an East and a West axis).
+             */
+            final AxisDirection check = direction.absolute();
             if (!check.equals(AxisDirection.OTHER)) {
                 for (int j=i; --j>=0;) {
                     if (check.equals(axis[j].getDirection().absolute())) {
@@ -164,6 +181,29 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
                         throw new IllegalArgumentException(Errors.format(
                                     ErrorKeys.COLINEAR_AXIS_$2, nameI, nameJ));
                     }
+                }
+            }
+            /*
+             * Checks for some inconsistency in naming and direction. For example if the axis
+             * is named "Northing", then the direction must be North. Exceptions to this rule
+             * are the directions along a meridian from a pole. For example a "Northing" axis
+             * may have a "South along 180 deg" direction.
+             */
+            final String name = axis[i].getName().getCode();
+            for (int j=0; j<DIRECTION_CHECKS.length; j++) {
+                final DefaultCoordinateSystemAxis candidate = DIRECTION_CHECKS[j];
+                if (candidate.nameMatches(name)) {
+                    final AxisDirection expected = candidate.getDirection();
+                    if (!direction.equals(expected)) {
+                        DirectionAlongMeridian m = DirectionAlongMeridian.parse(direction);
+                        if (m == null || m.baseDirection.equals(expected)) {
+                            // Check above is really 'equals(expected)', not '!equals(expected)'.
+                            throw new IllegalArgumentException(Errors.format(
+                                    ErrorKeys.INCONSISTENT_AXIS_ORIENTATION_$2,
+                                    name, direction.name()));
+                        }
+                    }
+                    continue;
                 }
             }
         }
@@ -227,7 +267,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     public CoordinateSystemAxis getAxis(final int dimension) throws IndexOutOfBoundsException {
         return axis[dimension];
     }
-    
+
     /**
      * Returns the axis direction for the specified coordinate system.
      *
@@ -331,19 +371,26 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
     }
 
     /**
-     * Returns a coordinate system with "standard" axis order and units. This method returns one
-     * of the predefined constants with axis in (<var>longitude</var>,<var>latitude</var>) or
-     * (<var>X</var>,<var>Y</var>) order, and units in degree or metres. This method is typically
-     * used together with {@link #swapAndScaleAxis swapAndScaleAxis} for the creation of a
-     * transformation step before some {@linkplain org.opengis.referencing.operation.MathTransform
-     * math transform}. Example:
+     * Returns a coordinate system with "standard" axis order and units.
+     * Most of the time, this method returns one of the predefined constants with axis in
+     * (<var>longitude</var>,<var>latitude</var>) or (<var>X</var>,<var>Y</var>) order,
+     * and units in degrees or metres. In some particular cases like
+     * {@linkplain org.opengis.referencing.cs.CartesianCS Cartesian CS}, this method may
+     * create a new instance on the fly. In every cases this method attempts to return a
+     * <A HREF="http://en.wikipedia.org/wiki/Right_hand_rule">right-handed</A> coordinate
+     * system, but this is not garanteed.
+     * <p>
+     * This method is typically used together with {@link #swapAndScaleAxis swapAndScaleAxis}
+     * for the creation of a transformation step before some
+     * {@linkplain org.opengis.referencing.operation.MathTransform math transform}.
+     * Example:
      *
      * <blockquote><pre>
      * Matrix step1 = swapAndScaleAxis(sourceCS, standard(sourceCS));
      * Matrix step2 = ... some transform operating on standard axis ...
      * Matrix step3 = swapAndScaleAxis(standard(targetCS), targetCS);
      * </pre></blockquote>
-     * <p>
+     *
      * A rational for standard axis order and units is explained in the <cite>Axis units and
      * direction</cite> section in the {@linkplain org.geotools.referencing.operation.projection
      * description of map projection package}.
@@ -397,7 +444,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
         }
         return unit;
     }
-    
+
     /**
      * Convenience method for checking object dimension validity.
      *
@@ -442,26 +489,119 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
      * @return New axis using the specified unit, or {@code null} if current axis fits.
      * @throws IllegalArgumentException If the specified unit is incompatible with the expected one.
      *
-     * @since 2.2
+     * @see DefaultCartesianCS#usingUnit
+     * @see DefaultEllipsoidalCS#usingUnit
      */
     final CoordinateSystemAxis[] axisUsingUnit(final Unit unit) throws IllegalArgumentException {
-        final CoordinateSystemAxis[] newAxis = new CoordinateSystemAxis[axis.length];
-        boolean modified = false;
-        for (int i=0; i<newAxis.length; i++) {
+        CoordinateSystemAxis[] newAxis = null;
+        for (int i=0; i<axis.length; i++) {
             CoordinateSystemAxis a = axis[i];
-            DefaultCoordinateSystemAxis da;
-            if (a instanceof DefaultCoordinateSystemAxis) {
-                da = (DefaultCoordinateSystemAxis) a;
-            } else {
-                a = da = new DefaultCoordinateSystemAxis(a);
+            if (!unit.equals(a.getUnit())) {
+                DefaultCoordinateSystemAxis converted;
+                if (a instanceof DefaultCoordinateSystemAxis) {
+                    converted = (DefaultCoordinateSystemAxis) a;
+                } else {
+                    converted = new DefaultCoordinateSystemAxis(a);
+                    a = converted; // For detecting changes.
+                }
+                converted = converted.usingUnit(unit);
+                if (converted != a) {
+                    if (newAxis == null) {
+                        newAxis = new CoordinateSystemAxis[axis.length];
+                        System.arraycopy(axis, 0, newAxis, 0, i);
+                    }
+                    newAxis[i] = converted;
+                }
             }
-            da = da.usingUnit(unit);
-            if (a != da) {
-                modified = true;
-            }
-            newAxis[i] = da;
         }
-        return modified ? newAxis : null;
+        return newAxis;
+    }
+
+    /**
+     * Returns every axis from the specified coordinate system as instance of
+     * {@link DefaultCoordinateSystemAxis}. This allow usage of some methods
+     * specific to that implementation.
+     */
+    private static DefaultCoordinateSystemAxis[] getDefaultAxis(final CoordinateSystem cs) {
+        final DefaultCoordinateSystemAxis[] axis = new DefaultCoordinateSystemAxis[cs.getDimension()];
+        for (int i=0; i<axis.length; i++) {
+            final CoordinateSystemAxis a = cs.getAxis(i);
+            DefaultCoordinateSystemAxis c = DefaultCoordinateSystemAxis.getPredefined(a);
+            if (c == null) {
+                if (a instanceof DefaultCoordinateSystemAxis) {
+                    c = (DefaultCoordinateSystemAxis) a;
+                } else {
+                    c = new DefaultCoordinateSystemAxis(a);
+                }
+            }
+            axis[i] = c;
+        }
+        return axis;
+    }
+
+    /**
+     * Returns {@code true} if every axis in the specified {@code userCS} are colinear with axis
+     * in this coordinate system. The comparaison is insensitive to axis order and units. What
+     * matter is axis names (because they are fixed by ISO 19111 specification) and directions.
+     * <p>
+     * If this method returns {@code true}, then there is good chances that this CS can be used
+     * together with {@code userCS} as arguments to {@link #swapAndScaleAxis swapAndScaleAxis}.
+     * <p>
+     * This method should not be public because current implementation is not fully consistent
+     * for every pair of CS. It tries to check the opposite direction in addition of the usual
+     * one, but only a few pre-defined axis declare their opposite. This method should be okay
+     * when invoked on pre-defined CS declared in this package. {@link PredefinedCS} uses this
+     * method only that way.
+     */
+    final boolean axisColinearWith(final CoordinateSystem userCS) {
+        if (userCS.getDimension() != getDimension()) {
+            return false;
+        }
+        final DefaultCoordinateSystemAxis[] axis0 = getDefaultAxis(this);
+        final DefaultCoordinateSystemAxis[] axis1 = getDefaultAxis(userCS);
+next:   for (int i=0; i<axis0.length; i++) {
+            final DefaultCoordinateSystemAxis direct   = axis0[i];
+            final DefaultCoordinateSystemAxis opposite = direct.getOpposite();
+            for (int j=0; j<axis1.length; j++) {
+                final DefaultCoordinateSystemAxis candidate = axis1[j];
+                if (candidate != null) {
+                    if (candidate.equals(direct,   false, false) || (opposite != null &&
+                        candidate.equals(opposite, false, false)))
+                    {
+                        axis1[j] = null; // Flags as already compared.
+                        continue next;
+                    }
+                }
+            }
+            return false;
+        }
+        assert directionColinearWith(userCS);
+        return true;
+    }
+
+    /**
+     * Compares directions only, without consideration for the axis name.
+     */
+    final boolean directionColinearWith(final CoordinateSystem userCS) {
+        if (userCS.getDimension() != axis.length) {
+            return false;
+        }
+        final AxisDirection[] checks = new AxisDirection[axis.length];
+        for (int i=0; i<checks.length; i++) {
+            checks[i] = userCS.getAxis(i).getDirection().absolute();
+        }
+next:   for (int i=0; i<axis.length; i++) {
+            final AxisDirection direction = axis[i].getDirection().absolute();
+            for (int j=0; j<checks.length; j++) {
+                final AxisDirection candidate = checks[j];
+                if (candidate != null && candidate.equals(direction)) {
+                    checks[j] = null;  // Flags as already compared.
+                    continue next;
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -482,7 +622,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
         }
         return false;
     }
-    
+
     /**
      * Returns a hash value for this coordinate system.
      *
@@ -496,7 +636,7 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
         }
         return code;
     }
-    
+
     /**
      * Format the inner part of a
      * <A HREF="http://geoapi.sourceforge.net/snapshot/javadoc/org/opengis/referencing/doc-files/WKT.html"><cite>Well

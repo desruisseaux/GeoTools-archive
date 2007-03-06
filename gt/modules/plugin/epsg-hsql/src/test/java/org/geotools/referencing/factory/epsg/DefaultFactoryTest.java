@@ -16,16 +16,11 @@
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies and extensions
-import java.util.Set;
-import java.util.Locale;
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.SQLException;
+import java.awt.geom.AffineTransform;
 import javax.units.Unit;
 
 // JUnit dependencies
@@ -34,29 +29,14 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 // OpenGIS dependencies
+import org.opengis.referencing.*;
+import org.opengis.referencing.cs.*;
+import org.opengis.referencing.crs.*;
+import org.opengis.referencing.datum.*;
+import org.opengis.referencing.operation.*;
 import org.opengis.metadata.Identifier;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.datum.Datum;
-import org.opengis.referencing.datum.GeodeticDatum;
-import org.opengis.referencing.crs.CompoundCRS;
-import org.opengis.referencing.crs.EngineeringCRS;
-import org.opengis.referencing.crs.GeocentricCRS;
-import org.opengis.referencing.crs.GeographicCRS;
-import org.opengis.referencing.crs.ProjectedCRS;
-import org.opengis.referencing.crs.VerticalCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.Operation;
-import org.opengis.referencing.operation.Conversion;
-import org.opengis.referencing.operation.Projection;
-import org.opengis.referencing.operation.Transformation;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.referencing.operation.CoordinateOperation;
-import org.opengis.referencing.operation.CoordinateOperationFactory;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.spatialschema.geometry.Envelope;
 
 // Geotools dependencies
@@ -68,6 +48,8 @@ import org.geotools.referencing.AbstractIdentifiedObject;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.datum.DefaultGeodeticDatum;
 import org.geotools.referencing.operation.AbstractCoordinateOperation;
+import org.geotools.referencing.operation.transform.AbstractMathTransform;
+import org.geotools.referencing.operation.transform.ConcatenatedTransform;
 import org.geotools.referencing.factory.AbstractAuthorityFactory;
 import org.geotools.metadata.iso.extent.GeographicBoundingBoxImpl;
 import org.geotools.resources.Arguments;
@@ -265,6 +247,34 @@ public class DefaultFactoryTest extends TestCase {
 
         assertSame(sourceCRS, factory.createCoordinateReferenceSystem(" EPSG : 4273 "));
         assertSame(targetCRS, factory.createCoordinateReferenceSystem(" EPSG : 4979 "));
+
+        // CRS with "South along 180 deg" and "South along 90 deg East" axis
+        sourceCRS = factory.createCoordinateReferenceSystem("EPSG:32661");
+        targetCRS = factory.createCoordinateReferenceSystem("4326");
+        operation = opf.createOperation(sourceCRS, targetCRS);
+        final MathTransform    transform = operation.getMathTransform();
+        final CoordinateSystem  sourceCS = sourceCRS.getCoordinateSystem();
+        final CoordinateSystemAxis axis0 = sourceCS.getAxis(0);
+        final CoordinateSystemAxis axis1 = sourceCS.getAxis(1);
+        assertEquals("Northing",                axis0.getName().getCode());
+        assertEquals("Easting",                 axis1.getName().getCode());
+        assertEquals("South along 180 deg",     axis0.getDirection().name());
+        assertEquals("South along 90 deg East", axis1.getDirection().name());
+        assertFalse(transform.isIdentity());
+        assertTrue(transform instanceof ConcatenatedTransform);
+        ConcatenatedTransform ct = (ConcatenatedTransform) transform;
+        // An affine transform for swapping axis should be
+        // performed before and after the map projection.
+        final int mask = AffineTransform.TYPE_FLIP              |
+                         AffineTransform.TYPE_QUADRANT_ROTATION |
+                         AffineTransform.TYPE_UNIFORM_SCALE;
+        assertTrue(ct.transform1 instanceof AffineTransform);
+        assertEquals(mask, ((AffineTransform) ct.transform1).getType());
+        assertTrue(ct.transform2 instanceof ConcatenatedTransform);
+        ct = (ConcatenatedTransform) ct.transform2;
+        assertTrue(ct.transform1 instanceof AbstractMathTransform);
+        assertTrue(ct.transform2 instanceof AffineTransform);
+        assertEquals(mask, ((AffineTransform) ct.transform2).getType());
     }
 
     /**

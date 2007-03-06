@@ -16,10 +16,13 @@
  */
 package org.geotools.referencing.cs;
 
-// J2SE dependencies
+// J2SE dependencies and extensions
 import java.util.List;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
+import javax.units.SI;
+import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.referencing.cs.*;
@@ -95,21 +98,30 @@ final class PredefinedCS implements Comparator {
         if (cs instanceof CartesianCS) {
             switch (dimension) {
                 case 2: {
-                    if (sameAxisNames(DefaultCartesianCS.PROJECTED, cs)) {
+                    if (DefaultCartesianCS.PROJECTED.axisColinearWith(cs)) {
                         return DefaultCartesianCS.PROJECTED;
                     }
-                    if (sameAxisNames(DefaultCartesianCS.GRID, cs)) {
+                    if (DefaultCartesianCS.GRID.axisColinearWith(cs)) {
                         return DefaultCartesianCS.GRID;
                     }
-                    return DefaultCartesianCS.GENERIC_2D;
+                    if (DefaultCartesianCS.GENERIC_2D.directionColinearWith(cs)) {
+                        return DefaultCartesianCS.GENERIC_2D;
+                    }
+                    return rightHanded((CartesianCS) cs);
                 }
                 case 3: {
-                    if (sameAxisNames(DefaultCartesianCS.GEOCENTRIC, cs)) {
+                    if (DefaultCartesianCS.GEOCENTRIC.axisColinearWith(cs)) {
                         return DefaultCartesianCS.GEOCENTRIC;
                     }
-                    return DefaultCartesianCS.GENERIC_3D;
+                    if (DefaultCartesianCS.GENERIC_3D.directionColinearWith(cs)) {
+                        return DefaultCartesianCS.GENERIC_3D;
+                    }
+                    return rightHanded((CartesianCS) cs);
                 }
             }
+        }
+        if (cs instanceof AffineCS) {
+            return rightHanded((AffineCS) cs);
         }
         if (cs instanceof EllipsoidalCS) {
             switch (dimension) {
@@ -124,7 +136,9 @@ final class PredefinedCS implements Comparator {
         }
         if (cs instanceof VerticalCS) {
             switch (dimension) {
-                case 1: return DefaultVerticalCS.ELLIPSOIDAL_HEIGHT;
+                case 1: {
+                    return DefaultVerticalCS.ELLIPSOIDAL_HEIGHT;
+                }
             }
         }
         if (cs instanceof TimeCS) {
@@ -150,44 +164,54 @@ final class PredefinedCS implements Comparator {
     }
 
     /**
-     * Checks if all axis in this coordinate system has the same names than axis in the specified
-     * CS. The order, direction and units may be different however. Note that the specified CS may
-     * have more dimensions than this CS.
-     * <p>
-     * We uses the axis names as the criterion for comparaisons because those names are fixed
-     * by the ISO 19111 specification.
+     * Reorder the axis in the specified Affine CS in an attempt to get a right-handed system.
+     * Units are standardized to meters in the process. If no axis change is needed, then this
+     * method returns {@code cs} unchanged.
      */
-    private static boolean sameAxisNames(final CoordinateSystem stdCS, final CoordinateSystem userCS) {
-        final String[] userNames = new String[userCS.getDimension()];
-        for (int i=0; i<userNames.length; i++) {
-            userNames[i] = userCS.getAxis(i).getName().getCode().trim();
-        }
-check:  for (int i=stdCS.getDimension(); --i>=0;) {
-            final CoordinateSystemAxis axis = stdCS.getAxis(i);
-            final String name = axis.getName().getCode().trim();
-            String opposite = null;
-            if (axis instanceof DefaultCoordinateSystemAxis) {
-                final CoordinateSystemAxis op = ((DefaultCoordinateSystemAxis) axis).getOpposite();
-                if (op != null) {
-                    opposite = op.getName().getCode().trim();
-                }
+    private static AffineCS rightHanded(final AffineCS cs) {
+        boolean changed = false;
+        final int dimension = cs.getDimension();
+        final CoordinateSystemAxis[] axis = new CoordinateSystemAxis[dimension];
+        for (int i=0; i<dimension; i++) {
+            /*
+             * Gets the axis and replaces it by one of the predefined constants declared in
+             * DefaultCoordinateSystemAxis, if possible. The predefined constants use ISO 19111
+             * names with metres or degrees units, so it is pretty close to the "standard" axis
+             * we are looking for.
+             */
+            CoordinateSystemAxis axe = axis[i] = cs.getAxis(i);
+            DefaultCoordinateSystemAxis standard = DefaultCoordinateSystemAxis.getPredefined(axe);
+            if (standard != null) {
+                axe = standard;
             }
-            for (int j=userNames.length; --j>=0;) {
-                final String userName = userNames[j];
-                if (userName!=null && (userName.equalsIgnoreCase(name) ||
-                   (opposite!=null && userName.equalsIgnoreCase(opposite))))
-                {
-                    userNames[j] = null; // Do not compare the same axis twice.
-                    continue check;
+            /*
+             * Changes units to meters. Every units in an affine CS should be linear or
+             * dimensionless (the later is used for grid coordinates).  The 'usingUnit'
+             * method will thrown an exception if the unit is incompatible. See
+             * DefaultAffineCS.isCompatibleUnit(Unit).
+             */
+            final Unit unit = axe.getUnit();
+            if (!Unit.ONE.equals(unit) && !SI.METER.equals(unit)) {
+                if (!(axe instanceof DefaultCoordinateSystemAxis)) {
+                    axe = new DefaultCoordinateSystemAxis(axe);
                 }
+                axe = ((DefaultCoordinateSystemAxis) axe).usingUnit(SI.METER);
             }
-            return false; // At least one axis doesn't match.
+            changed |= (axe != axis[i]);
+            axis[i] = axe;
         }
         /*
-         * All axis in this CS match one axis in the specified CS.  Note that some extra axis may
-         * remains in the specified CS; we choose to ignore them. Anyway, it should not happen if
-         * both CS have the same number of dimensions.
+         * Sorts the axis in an attempt to create a right-handed system
+         * and creates a new Coordinate System if at least one axis changed.
          */
-        return true;
+        changed |= ComparableAxisWrapper.sort(axis);
+        if (!changed) {
+            return cs;
+        }
+        final Map properties = DefaultAffineCS.getProperties(cs, null);
+        if (cs instanceof CartesianCS) {
+            return new DefaultCartesianCS(properties, axis);
+        }
+        return new DefaultAffineCS(properties, axis);
     }
 }
