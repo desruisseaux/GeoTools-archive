@@ -24,6 +24,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollectionIteration;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureType;
+import org.geotools.feature.type.DateUtil;
 import org.geotools.gml.producer.GeometryTransformer.GeometryTranslator;
 import org.geotools.xml.transform.TransformerBase;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -33,6 +34,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -639,6 +642,16 @@ public class FeatureTransformer extends TransformerBase {
 
                         if (Geometry.class.isAssignableFrom(value.getClass())) {
                             geometryTranslator.encode((Geometry) value, srsName);
+                        } else if(value instanceof Date) {
+                            String text = null;
+                            if(value instanceof java.sql.Date)
+                                text = DateUtil.serializeSqlDate((java.sql.Date) value);
+                            else if(value instanceof java.sql.Time)
+                                text = DateUtil.serializeSqlTime((java.sql.Time) value);
+                            else
+                                text = DateUtil.serializeDateTime((java.sql.Time) value);
+                            contentHandler.characters(text.toCharArray(), 0,
+                                    text.length());
                         } else {
                             String text = value.toString();
                             contentHandler.characters(text.toCharArray(), 0,

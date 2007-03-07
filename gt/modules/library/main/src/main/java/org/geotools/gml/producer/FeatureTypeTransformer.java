@@ -108,6 +108,21 @@ import com.vividsolutions.jts.geom.Polygon;
  * xs:dateTime
  * </td></tr>
  * <tr><td>
+ * java.sql.Date
+ * </td><td>
+ * xs:date
+ * </td></tr>
+ * <tr><td>
+ * java.sql.Time
+ * </td><td>
+ * xs:time
+ * </td></tr>
+ * <tr><td>
+ * java.sql.Timestamp
+ * </td><td>
+ * xs:dateTime
+ * </td></tr>
+ * <tr><td>
  * java.lang.Boolean
  * </td><td>
  * xs:boolean
@@ -466,7 +481,12 @@ public class FeatureTypeTransformer extends TransformerBase {
             throws SAXException {
             AttributesImpl atts = createStandardAttributes(attribute);
 
-            atts.addAttribute("", "type", "type", "", "xs:dateTime");
+            if(java.sql.Date.class.isAssignableFrom(attribute.getType()))
+                atts.addAttribute("", "type", "type", "", "xs:date");
+            else if(java.sql.Time.class.isAssignableFrom(attribute.getType()))
+                atts.addAttribute("", "type", "type", "", "xs:time");
+            else
+                atts.addAttribute("", "type", "type", "", "xs:dateTime");
 
             contentHandler.startElement(SCHEMA_NS, "element", "xs:element", atts);
 
