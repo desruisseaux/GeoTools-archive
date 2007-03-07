@@ -224,7 +224,7 @@ public class FallbackAuthorityFactory extends AuthorityFactoryAdapter {
                 /*
                  * In the 'switch' statement below, we do not implement all possible combinaisons
                  * of authority factories. Only a few common combinaisons are listed. Other
-                 * combinaisons will fallback on some reasonable default. We may complete later
+                 * combinaisons will fallback on some reasonable default. We may complete the
                  * list later if there is a need for that.
                  */
                 switch (code) {

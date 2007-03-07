@@ -30,6 +30,7 @@ import java.net.URL;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -60,19 +61,22 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * requested code is not found in the EPSG database, or when there is no connection at all
  * to the EPSG database. The additional CRS are defined as <cite>Well Known Text</cite> in
  * a property file (by default the {@value #FILENAME} file) which should be located in the package 
- * org.geotools.referencing.factory.epsg, and whose name should be epsg.properties.<br>
- * If this file is not found, the factory won't be activated.<br>
- * This factory can also be used to provide custom extensions or overrides to a main EPSG factory.<br> 
- * In order to provide a custom extension file, override the {@link #getDefinitionsURL()} method.<br>
+ * {@code org.geotools.referencing.factory.epsg}, and whose name should be {@code epsg.properties}.
+ * If this file is not found, the factory won't be activated.
+ * <p>
+ * This factory can also be used to provide custom extensions or overrides to a main EPSG factory.
+ * In order to provide a custom extension file, override the {@link #getDefinitionsURL()} method.
  * In order to make the factory be an override, change the default priority by using the 
- * two arguments constructor (this factory defaults to {@link DefaultFactory#PRIORITY} - 10, 
+ * two arguments constructor (this factory defaults to {@link DefaultFactory#PRIORITY} - 10,
  * so it's used as an extension).
+ *
  * @since 2.1
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett
  * @author Rueben Schulz
+ * @author Andrea Aime
  */
 public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuthorityFactory {
     /**
@@ -91,6 +95,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
     
     /**
      * Default priority for this factory.
+     *
+     * @since 2.4
      */
     protected static final int DEFAULT_PRIORITY = DefaultFactory.PRIORITY - 10;
 
@@ -154,6 +160,7 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
      * Creates the backing store authority factory.
      *
      * @return The backing store to uses in {@code createXXX(...)} methods.
+     * @throws FactoryNotFoundException if the no {@code epsg.properties} file has been found.
      * @throws FactoryException if the constructor failed to find or read the file.
      *         This exception usually has an {@link IOException} as its cause.
      */
@@ -161,7 +168,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
         try {
             URL url = getDefinitionsURL();
             if (url == null) {
-                throw new FactoryNotFoundException("Could not locate " + FILENAME);
+                throw new FactoryNotFoundException(Errors.format(
+                        ErrorKeys.FILE_DOES_NOT_EXIST_$1, FILENAME));
             }
             final Collection ids = getAuthority().getIdentifiers();
             final String authority = ids.isEmpty() ? "EPSG" : (String) ids.iterator().next();
@@ -210,8 +218,8 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
             throw new AssertionError(e);
         }
         out.println();
-        final Set wktCodes   = this.      getAuthorityCodes(CoordinateReferenceSystem.class);
-        final Set sqlCodes   = sqlFactory.getAuthorityCodes(CoordinateReferenceSystem.class);
+        final Set wktCodes   = this.      getAuthorityCodes(IdentifiedObject.class);
+        final Set sqlCodes   = sqlFactory.getAuthorityCodes(IdentifiedObject.class);
         final Set duplicated = new TreeSet();
         for (final Iterator it=wktCodes.iterator(); it.hasNext();) {
             final String code = ((String) it.next()).trim();

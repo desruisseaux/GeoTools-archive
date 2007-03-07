@@ -323,6 +323,9 @@ public abstract class AbstractParser extends Format {
      */
     public String getWarning() {
         if (formatter != null && formatter.isInvalidWKT()) {
+            if (formatter.warning != null) {
+                return formatter.warning;
+            }
             return Errors.format(ErrorKeys.INVALID_WKT_FORMAT_$1,
                     Utilities.getShortName(formatter.getUnformattableClass()));
         }

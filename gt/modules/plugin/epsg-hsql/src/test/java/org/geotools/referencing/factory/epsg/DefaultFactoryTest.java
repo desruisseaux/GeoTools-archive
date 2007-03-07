@@ -383,6 +383,7 @@ public class DefaultFactoryTest extends TestCase {
         assertTrue(crs.size() > 0); // Must be after the 'assertEquals' above.
 
         final Set geographicCRS = factory.getAuthorityCodes(GeographicCRS.class);
+        assertTrue (geographicCRS instanceof AuthorityCodes);
         assertFalse(geographicCRS.isEmpty());
         assertTrue (geographicCRS.size() > 0);
         assertTrue (geographicCRS.size() < crs.size());
@@ -390,6 +391,7 @@ public class DefaultFactoryTest extends TestCase {
         assertTrue (crs.containsAll(geographicCRS));
 
         final Set projectedCRS = factory.getAuthorityCodes(ProjectedCRS.class);
+        assertTrue (projectedCRS instanceof AuthorityCodes);
         assertFalse(projectedCRS.isEmpty());
         assertTrue (projectedCRS.size() > 0);
         assertTrue (projectedCRS.size() < crs.size());
@@ -399,12 +401,14 @@ public class DefaultFactoryTest extends TestCase {
         // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
 
         final Set datum = factory.getAuthorityCodes(Datum.class);
+        assertTrue (datum instanceof AuthorityCodes);
         assertFalse(datum.isEmpty());
         assertTrue (datum.size() > 0);
 //        assertTrue(Collections.disjoint(datum, crs));
         // TODO: uncomment when we will be allowed to compile for J2SE 1.5.
 
         final Set geodeticDatum = factory.getAuthorityCodes(GeodeticDatum.class);
+        assertTrue (geodeticDatum instanceof AuthorityCodes);
         assertFalse(geodeticDatum.isEmpty());
         assertTrue (geodeticDatum.size() > 0);
         assertFalse(geodeticDatum.containsAll(datum));
@@ -426,6 +430,11 @@ public class DefaultFactoryTest extends TestCase {
         final Set conversions     = factory.getAuthorityCodes(Conversion    .class);
         final Set projections     = factory.getAuthorityCodes(Projection    .class);
         final Set transformations = factory.getAuthorityCodes(Transformation.class);
+
+        assertTrue (operations      instanceof AuthorityCodes);
+        assertTrue (conversions     instanceof AuthorityCodes);
+        assertTrue (projections     instanceof AuthorityCodes);
+        assertTrue (transformations instanceof AuthorityCodes);
 
         assertTrue (conversions    .size() < operations .size());
         assertTrue (projections    .size() < operations .size());
@@ -451,8 +460,17 @@ public class DefaultFactoryTest extends TestCase {
         assertTrue (projections.contains("16001"));
 
         final Set units = factory.getAuthorityCodes(Unit.class);
+        assertTrue (units instanceof AuthorityCodes);
         assertFalse(units.isEmpty());
         assertTrue (units.size() > 0);
+
+        // Tests the fusion of all types
+        final Set all = factory.getAuthorityCodes(IdentifiedObject.class);
+        assertFalse(all instanceof AuthorityCodes); // Usually a HashSet.
+        assertTrue (all.containsAll(crs));
+        assertTrue (all.containsAll(datum));
+        assertTrue (all.containsAll(operations));
+        assertFalse(all.containsAll(units));  // They are not IdentifiedObjects.
     }
 
     /**

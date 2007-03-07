@@ -146,15 +146,14 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         boolean hasWhere = false;
         Class tableType = table.type;
         if (table.typeColumn != null) {
-            // Iterates in reverse order in order to set
-            // 'tableType' to the first occurence found.
-            for (int i=table.subTypes.length; --i>=0;) {
+            for (int i=0; i<table.subTypes.length; i++) {
                 final Class candidate = table.subTypes[i];
                 if (candidate.isAssignableFrom(type)) {
-                    buffer.append(hasWhere ? " OR " : " WHERE (").append(table.typeColumn)
+                    buffer.append(" WHERE (").append(table.typeColumn)
                           .append(" LIKE '").append(table.typeNames[i]).append("%'");
                     hasWhere = true;
                     tableType = candidate;
+                    break;
                 }
             }
             if (hasWhere) {
@@ -166,7 +165,6 @@ final class AuthorityCodes extends AbstractSet implements Serializable {
         final int length = buffer.length();
         buffer.append(" ORDER BY ").append(table.codeColumn);
         sqlAll = factory.adaptSQL(buffer.toString());
-
         buffer.setLength(length);
         buffer.append(hasWhere ? " AND " : " WHERE ").append(table.codeColumn).append(" = ?");
         sqlSingle = factory.adaptSQL(buffer.toString());

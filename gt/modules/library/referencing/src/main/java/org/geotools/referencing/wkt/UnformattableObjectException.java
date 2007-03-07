@@ -17,6 +17,14 @@
  */
 package org.geotools.referencing.wkt;
 
+// J2SE dependencies
+import java.lang.reflect.Modifier;
+
+// Geotools dependencies
+import org.geotools.resources.Utilities;
+import org.geotools.resources.i18n.ErrorKeys;
+import org.geotools.resources.i18n.Errors;
+
 
 /**
  * Thrown by {@link Formattable#toWKT} when an object can't be formatted as WKT.
@@ -46,13 +54,14 @@ public class UnformattableObjectException extends UnsupportedOperationException 
      * @deprecated Replaced by {@link #UnformattableObjectException(String, Class)}.
      */
     public UnformattableObjectException(final String message) {
-        this(message, Object.class);
+        super(message);
+        unformattable = Object.class;
     }
 
     /**
      * Constructs an exception with the specified detail message.
      *
-     * @param message The detail message.
+     * @param message The detail message. If {@code null}, a default message will be created.
      * @param unformattable The type of the object that can't be formatted.
      *
      * @since 2.4
@@ -75,5 +84,25 @@ public class UnformattableObjectException extends UnsupportedOperationException 
      */
     public Class getUnformattableClass() {
         return unformattable;
+    }
+
+    /**
+     * Returns the detail message. A default message is formatted
+     * if none was specified at construction time.
+     */
+    public String getMessage() {
+        String message = super.getMessage();
+        if (message == null) {
+            Class c = unformattable;
+            while (!Modifier.isPublic(c.getModifiers())) {
+                final Class candidate = c.getSuperclass();
+                if (candidate == null) {
+                    break;
+                }
+                c = candidate;
+            }
+            return Errors.format(ErrorKeys.INVALID_WKT_FORMAT_$1, Utilities.getShortName(c));
+        }
+        return message;
     }
 }

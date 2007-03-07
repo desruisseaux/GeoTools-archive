@@ -548,7 +548,11 @@ public class AbstractCoordinateOperation extends AbstractIdentifiedObject
             properties.put(IdentifiedObject.IDENTIFIERS_KEY, formatter.getIdentifier(object));
             formatter.append((IdentifiedObject) new AbstractIdentifiedObject(properties) {
                 protected String formatWKT(final Formatter formatter) {
-                    super.formatWKT(formatter);
+                    /*
+                     * Do not invoke super.formatWKT(formatter), since it doesn't do anything
+                     * more than invoking 'formatter.setInvalidWKT(...)' (we ignore the value
+                     * returned). This method will rather be invoked by the enclosing class.
+                     */
                     return type;
                 }
             });

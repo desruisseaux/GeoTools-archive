@@ -18,20 +18,23 @@ package org.geotools.referencing.factory.epsg;
 // Java dependencies
 import java.util.Collection;
 
+// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+// OpenGIS dependencies
+import org.opengis.metadata.citation.Citation;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.ProjectedCRS;
+
+// Geotools dependencies
 import org.geotools.factory.Hints;
 import org.geotools.metadata.iso.citation.Citations;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.NamedIdentifier;
-import org.opengis.metadata.citation.Citation;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.ProjectedCRS;
 
 
 /**
@@ -57,7 +60,6 @@ public class FactoryUsingWktTest extends TestCase {
 
     /**
      * Run the test from the command line.
-     * Options: {@code -verbose}.
      *
      * @param args the command line arguments.
      */
@@ -106,15 +108,14 @@ public class FactoryUsingWktTest extends TestCase {
     /**
      * Tests the {@code 18001} code.
      */
-    public void test18001() throws FactoryException {
+    public void test42101() throws FactoryException {
         CoordinateReferenceSystem actual, expected;
-        expected = factory.createCoordinateReferenceSystem("18001");
-        actual   = CRS.decode("EPSG:18001");
+        expected = factory.createCoordinateReferenceSystem("42101");
+        actual   = CRS.decode("EPSG:42101");
         assertSame(expected, actual);
         assertTrue(actual instanceof ProjectedCRS);
         Collection ids = actual.getIdentifiers();
-        assertTrue (ids.contains(new NamedIdentifier(Citations.EPSG, "18001")));
-        assertFalse(ids.contains(new NamedIdentifier(Citations.ESRI, "18001")));
-    }
-    
+        assertTrue (ids.contains(new NamedIdentifier(Citations.EPSG, "42101")));
+        assertFalse(ids.contains(new NamedIdentifier(Citations.ESRI, "42101")));
+    }    
 }

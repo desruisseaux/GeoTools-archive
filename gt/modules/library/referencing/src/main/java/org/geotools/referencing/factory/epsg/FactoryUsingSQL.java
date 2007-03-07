@@ -344,14 +344,13 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
     private final Map/*<String,PreparedStatement>*/ statements = new IdentityHashMap();
 
     /**
-     * The set of authority codes for different types. Keys are {@link Class} or
-     * {@link String} objects. This map is used by the {@link #getAuthorityCodes}
-     * method. Note that this factory can't be disposed as long as some cached sets
-     * are in use (i.e. as long as this map is not empty). This is why a weak value
-     * map is mandatory here. The {@link AuthorityCodes#finalize} methods take care
-     * of closing the stamenents used by the sets.
+     * The set of authority codes for different types. This map is used by the
+     * {@link #getAuthorityCodes} method. Note that this factory can't be disposed
+     * as long as some cached sets are in use (i.e. as long as this map is not empty).
+     * This is why a weak value map is mandatory here. The {@link AuthorityCodes#finalize}
+     * methods take care of closing the stamenents used by the sets.
      */
-    private final Map/*<Object,Reference<AuthorityCodes>>*/ authorityCodes = new HashMap();
+    private final Map/*<Class,Reference<AuthorityCodes>>*/ authorityCodes = new HashMap();
 
     /**
      * Cache for axis names. This service is not provided by {@link BufferedAuthorityFactory}
@@ -554,45 +553,72 @@ public class FactoryUsingSQL extends DirectAuthorityFactory
      * {@link #getDescriptionText} from user overriding of {@link #getAuthorityCodes}.
      */
     private synchronized Set/*<String>*/ getAuthorityCodes0(final Class type) throws FactoryException {
-        Reference reference;
-        AuthorityCodes candidate;
         /*
          * If the set were already requested previously for the given type, returns it.
          * Otherwise, a new one will be created (but will not use the database connection yet).
          */
-        reference = (Reference) authorityCodes.get(type);
-        candidate = (reference!=null) ? (AuthorityCodes) reference.get() : null;
+        Reference      reference = (Reference) authorityCodes.get(type);
+        AuthorityCodes candidate = (reference!=null) ? (AuthorityCodes) reference.get() : null;
         if (candidate != null) {
             return candidate;
         }
+        Set result = Collections.EMPTY_SET;
         for (int i=0; i<TABLES_INFO.length; i++) {
             final TableInfo table = TABLES_INFO[i];
-            if (table.type.isAssignableFrom(type)) {
+            /*
+             * We test 'isAssignableFrom' in the two ways, which may seems strange but try
+             * to catch the following use cases:
+             *
+             *  - table.type.isAssignableFrom(type)
+             *    is for the case where a table is for CoordinateReferenceSystem while the user
+             *    type is some subtype like GeographicCRS. The GeographicCRS need to be queried
+             *    into the CoordinateReferenceSystem table. An additional filter will be applied
+             *    inside the AuthorityCodes class implementation.
+             *
+             *  - type.isAssignableFrom(table.type)
+             *    is for the case where the user type is IdentifiedObject or Object, in which
+             *    case we basically want to iterate through every tables.
+             */
+            if (table.type.isAssignableFrom(type) || type.isAssignableFrom(table.type)) {
                 /*
                  * Maybe an instance already existed but was not found above because the user
                  * specified some implementation class instead of an interface class. Before
                  * to return the newly created set, check again in the cached sets using the
-                 * SQL statement as a key instead of the type. Two sets with identical SQL
-                 * statements are actually identical collections even if the user-specified
-                 * type is different.
+                 * type computed by AuthorityCodes itself.
                  */
                 final AuthorityCodes codes;
                 codes = new AuthorityCodes(connection, TABLES_INFO[i], type, this);
-                reference = (Reference) authorityCodes.get(codes.sqlAll);
+                reference = (Reference) authorityCodes.get(codes.type);
                 candidate = (reference!=null) ? (AuthorityCodes) reference.get() : null;
+                final boolean cache;
                 if (candidate == null) {
                     candidate = codes;
-                } else if (reference instanceof SoftReference) {
-                    // No need to update the reference.
-                    return candidate;
+                    cache = true;
+                } else {
+                    // We will reuse the existing 'candidate' instead of the newly created 'codes'.
+                    assert candidate.sqlAll.equals(codes.sqlAll) : codes.type;
+                    cache = !(reference instanceof SoftReference);
                 }
-                reference = new SoftReference(candidate);
-                authorityCodes.put(codes.type,   reference);
-                authorityCodes.put(codes.sqlAll, reference);
-                return candidate;
+                if (cache) {
+                    reference = new SoftReference(candidate);
+                    authorityCodes.put(codes.type, reference);
+                }
+                /*
+                 * We now have the codes for a single type.  Append with the codes of previous
+                 * types, if any. This usually happen only if the user asked for the Object or
+                 * IdentifiedObject type.
+                 */
+                if (result.isEmpty()) {
+                    result = candidate;
+                } else {
+                    if (result instanceof AuthorityCodes) {
+                        result = new LinkedHashSet(result);
+                    }
+                    result.addAll(candidate);
+                }
             }
         }
-        return Collections.EMPTY_SET;
+        return result;
     }
 
     /**

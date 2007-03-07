@@ -364,8 +364,10 @@ public class Parameter extends AbstractParameter implements ParameterValue {
         }
         final String name = getName(descriptor);
         if (value == null) {
+            // This is the kind of exception expected by org.geotools.referencing.wkt.Formatter.
             throw new IllegalStateException(Errors.format(ErrorKeys.MISSING_PARAMETER_$1, name));
         }
+        // Reminder: the following is a specialization of IllegalStateException.
         throw new InvalidParameterTypeException(getClassTypeError(), name);
     }
 

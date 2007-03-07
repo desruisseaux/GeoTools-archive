@@ -182,9 +182,7 @@ public class Formattable {
                 }
                 if (strict && formatter.isInvalidWKT()) {
                     final Class unformattable = formatter.getUnformattableClass();
-                    throw new UnformattableObjectException(Errors.format(
-                            ErrorKeys.INVALID_WKT_FORMAT_$1,
-                            Utilities.getShortName(unformattable)), unformattable);
+                    throw new UnformattableObjectException(formatter.warning, unformattable);
                 }
                 return formatter.toString();
             } finally {

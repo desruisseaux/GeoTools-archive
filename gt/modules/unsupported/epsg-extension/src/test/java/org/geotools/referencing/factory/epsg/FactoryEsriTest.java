@@ -108,15 +108,14 @@ public class FactoryEsriTest extends TestCase {
      * Tests the codes.
      */
     public void testCodes() throws FactoryException {
-        final Set codes = factory.getAuthorityCodes(IdentifiedObject.class);
-        assertEquals(784, codes.size());
+        final Set codes  = factory.getAuthorityCodes(IdentifiedObject.class);
         final Set subset = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
         assertNotNull(codes);
         assertEquals(codes.size(), subset.size());
         assertTrue(codes.containsAll(subset));
         assertFalse(codes.contains("26910"));  // This is an EPSG code.
         // The following number may be adjusted if esri.properties is updated.
-        assertTrue(codes.size() >= 784);
+        assertEquals(779, codes.size());
     }
 
     /**

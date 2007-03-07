@@ -73,7 +73,7 @@ public class FactoryESRI extends FactoryUsingWKT {
      * {@code FACTORY} hints.
      */
     public FactoryESRI(final Hints hints) {
-        super(hints, DefaultFactory.PRIORITY - 15);
+        super(hints, DEFAULT_PRIORITY - 5);
     }
 
     /**

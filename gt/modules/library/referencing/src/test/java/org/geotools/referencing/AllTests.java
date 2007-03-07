@@ -96,6 +96,8 @@ public class AllTests extends TestCase {
         suite.addTest(org.geotools.referencing.operation.projection.DirectCreationTest             .suite());
         suite.addTest(org.geotools.referencing.operation.projection.NewZealandMapGridTest          .suite());
         suite.addTest(org.geotools.referencing.operation.projection.SouthOrientedTest              .suite());
+        suite.addTest(org.geotools.referencing.factory.epsg        .FactoryUsingWktTest            .suite());
+        suite.addTest(org.geotools.referencing.factory.epsg        .FallbackAuthorityFactoryTest   .suite());
         suite.addTest(org.geotools.referencing.factory.wms         .AUTOTest                       .suite());
         suite.addTest(org.geotools.referencing.factory.wms         .CRSTest                        .suite());
         suite.addTest(org.geotools.referencing.factory             .URN_ParserTest                 .suite());

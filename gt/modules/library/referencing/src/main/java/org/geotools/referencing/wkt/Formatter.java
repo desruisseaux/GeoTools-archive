@@ -189,6 +189,11 @@ public class Formatter {
     private Class/*<?>*/ unformattable;
 
     /**
+     * Warning that may be produced during WKT formatting, or {@code null} if none.
+     */
+    String warning;
+
+    /**
      * Creates a new instance of the formatter with the default symbols.
      */
     public Formatter() {
@@ -448,11 +453,16 @@ public class Formatter {
             appendSeparator(false);
             setColor(CODELIST_COLOR);
             final String name = code.name();
+            final boolean needQuotes = (name.indexOf(' ') >= 0);
+            if (needQuotes) {
+                buffer.append(symbols.quote);
+            }
             buffer.append(name);
-            resetColor();
-            if (name.indexOf(' ') >= 0) {
+            if (needQuotes) {
+                buffer.append(symbols.quote);
                 setInvalidWKT(code.getClass());
             }
+            resetColor();
         }
     }
 
@@ -481,7 +491,9 @@ public class Formatter {
                 }
             }
             appendSeparator(true);
+            final int start = buffer.length();
             buffer.append("PARAMETER");
+            final int stop = buffer.length();
             buffer.append(symbols.open);
             setColor(PARAMETER_COLOR);
             buffer.append(symbols.quote);
@@ -491,7 +503,19 @@ public class Formatter {
             buffer.append(symbols.separator);
             buffer.append(symbols.space);
             if (unit != null) {
-                double value = param.doubleValue(unit);
+                double value;
+                try {
+                    value = param.doubleValue(unit);
+                } catch (IllegalStateException exception) {
+                    // May happen if a parameter is mandatory (e.g. "semi-major")
+                    // but no value has been set for this parameter.
+                    if (colors) {
+                        buffer.insert(stop, X364.BACKGROUND_DEFAULT);
+                        buffer.insert(start, ERROR_COLOR);
+                    }
+                    warning = exception.getLocalizedMessage();
+                    value = Double.NaN;
+                }
                 if (!unit.equals(valueUnit)) {
                     value = XMath.fixRoundingError(value, 9);
                 }
@@ -861,6 +885,7 @@ public class Formatter {
         linearUnit    = null;
         angularUnit   = null;
         unformattable = null;
+        warning       = null;
         invalidWKT    = false;
         lineChanged   = false;
         margin        = 0;

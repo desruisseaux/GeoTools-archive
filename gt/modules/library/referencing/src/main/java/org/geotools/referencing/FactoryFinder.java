@@ -141,6 +141,9 @@ public final class FactoryFinder {
      * @param authority The authority factory to add.
      */
     public static synchronized void addAuthorityFactory(final AuthorityFactory authority) {
+        if (registry == null) {
+            scanForPlugins();
+        }
         getServiceRegistry().registerServiceProvider(authority);
         authorityNames = null;
     }

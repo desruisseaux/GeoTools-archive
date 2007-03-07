@@ -196,8 +196,16 @@ public class AbstractCS extends AbstractIdentifiedObject implements CoordinateSy
                     final AxisDirection expected = candidate.getDirection();
                     if (!direction.equals(expected)) {
                         DirectionAlongMeridian m = DirectionAlongMeridian.parse(direction);
-                        if (m == null || m.baseDirection.equals(expected)) {
-                            // Check above is really 'equals(expected)', not '!equals(expected)'.
+                        /*
+                         * Note: for the check below, maybe it would have be nice to use:
+                         *
+                         *     if (m == null || m.baseDirection.equals(expected.opposite())
+                         *
+                         * but the EPSG database contains many axis named "Northing" with
+                         * direction like "South along 180 deg", so it doesn't seem to be
+                         * considered as a contradiction...
+                         */
+                        if (m == null) {
                             throw new IllegalArgumentException(Errors.format(
                                     ErrorKeys.INCONSISTENT_AXIS_ORIENTATION_$2,
                                     name, direction.name()));
