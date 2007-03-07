@@ -649,7 +649,7 @@ public class FeatureTransformer extends TransformerBase {
                             else if(value instanceof java.sql.Time)
                                 text = DateUtil.serializeSqlTime((java.sql.Time) value);
                             else
-                                text = DateUtil.serializeDateTime((java.sql.Time) value);
+                                text = DateUtil.serializeDateTime((Date) value);
                             contentHandler.characters(text.toCharArray(), 0,
                                     text.length());
                         } else {
