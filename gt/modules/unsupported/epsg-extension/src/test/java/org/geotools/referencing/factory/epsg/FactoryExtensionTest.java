@@ -41,24 +41,24 @@ import junit.framework.TestSuite;
 
 
 /**
- * Tests {@link FactoryEPSGExtension}.
+ * Tests {@link FactoryExtension}.
  * 
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Jody Garnett
  */
-public class FactoryEPSGExtensionTest extends TestCase {
+public class FactoryExtensionTest extends TestCase {
     /**
      * The factory to test.
      */
-    private FactoryEPSGExtension factory;
+    private FactoryExtension factory;
 
     /**
      * Returns the test suite.
      */
     public static Test suite() {
-        return new TestSuite(FactoryEPSGExtensionTest.class);
+        return new TestSuite(FactoryExtensionTest.class);
     }
 
     /**
@@ -75,7 +75,7 @@ public class FactoryEPSGExtensionTest extends TestCase {
     /**
      * Creates a test case with the specified name.
      */
-    public FactoryEPSGExtensionTest(final String name) {
+    public FactoryExtensionTest(final String name) {
         super(name);
     }
 
@@ -84,8 +84,8 @@ public class FactoryEPSGExtensionTest extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        factory = (FactoryEPSGExtension) FactoryFinder.getCRSAuthorityFactory("EPSG",
-                new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryEPSGExtension.class));
+        factory = (FactoryExtension) FactoryFinder.getCRSAuthorityFactory("EPSG",
+                new Hints(Hints.CRS_AUTHORITY_FACTORY, FactoryExtension.class));
     }
 
     /**
@@ -97,7 +97,7 @@ public class FactoryEPSGExtensionTest extends TestCase {
         assertEquals("European Petroleum Survey Group", authority.getTitle().toString());
         assertTrue (authority.getIdentifiers().contains("EPSG"));
         assertFalse(authority.getIdentifiers().contains("ESRI"));
-        assertTrue(factory instanceof FactoryEPSGExtension);
+        assertTrue(factory instanceof FactoryExtension);
     }
 
     /**

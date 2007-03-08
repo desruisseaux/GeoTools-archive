@@ -16,6 +16,7 @@
 package org.geotools.referencing.factory.epsg;
 
 // J2SE dependencies
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import java.util.TreeMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Level;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 // OpenGIS dependencies
@@ -60,9 +62,10 @@ import org.geotools.resources.i18n.VocabularyKeys;
  * beyong the one defined in the EPSG database. This factory is used as a fallback when a
  * requested code is not found in the EPSG database, or when there is no connection at all
  * to the EPSG database. The additional CRS are defined as <cite>Well Known Text</cite> in
- * a property file (by default the {@value #FILENAME} file) which should be located in the package 
- * {@code org.geotools.referencing.factory.epsg}, and whose name should be {@code epsg.properties}.
- * If this file is not found, the factory won't be activated.
+ * a property file located by default in the {@code org.geotools.referencing.factory.epsg}
+ * package, and whose name should be {@value #FILENAME}. If no property file is found, the
+ * factory won't be activated. The property file can also be located in a custom directory;
+ * See {@link #getDefinitionsURL()} for more details.
  * <p>
  * This factory can also be used to provide custom extensions or overrides to a main EPSG factory.
  * In order to provide a custom extension file, override the {@link #getDefinitionsURL()} method.
@@ -80,9 +83,28 @@ import org.geotools.resources.i18n.VocabularyKeys;
  */
 public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuthorityFactory {
     /**
-     * The default filename to read. This file will be searched in the
-     * {@code org/geotools/referencing/factory/espg} directory in the
-     * classpath or in a JAR file.
+     * The {@linkplain System#getProperty(String) system property} key for setting the directory
+     * where to search for the {@value #FILENAME} file.
+     *
+     * @since 2.4
+     */
+    public static final String CRS_DIRECTORY_KEY = "org.geotools.referencing.crs-directory";
+
+    /**
+     * The default filename to read. The default {@code FactoryUsingWKT} implementation will
+     * search for the first occurence of this file in the following places:
+     * <p>
+     * <ul>
+     *   <li>In the directory specified by the {@value #CRS_DIRECTORY_KEY} system property.</li>
+     *   <li>In every {@code org/geotools/referencing/factory/espg} directories found on the
+     *       classpath.</li>
+     * </ul>
+     * <p>
+     * The filename part before the extension ({@code "epsg"}) denotes the authority namespace
+     * where to register the content of this file. The user-directory given by the system property
+     * may contains other property files for other authorities, like {@code "esri.properties"},
+     * but those additional authorities are not handled by the default {@code FactoryUsingWKT}
+     * class.
      *
      * @see #getDefinitionsURL
      */
@@ -148,11 +170,33 @@ public class FactoryUsingWKT extends DeferredAuthorityFactory implements CRSAuth
 
     /**
      * Returns the URL to the property file that contains CRS definitions.
-     * The default implementation returns the URL to the {@value #FILENAME} file.
+     * The default implementation performs the following search path:
+     * <ul>
+     *   <li>If a value is set for the {@value #CRS_DIRECTORY_KEY} system property key,
+     *       then the {@value #FILENAME} file will be searched in this directory.</li>
+     *   <li>If no value is set for the above-cited system property, or if no {@value #FILENAME}
+     *       file was found in that directory, then the first {@value #FILENAME} file found in
+     *       any {@code org/geotools/referencing/factory/epsg} directory on the classpath will
+     *       be used.</li>
+     *   <li>If no file was found on the classpath neither, then this factory will be disabled.</li>
+     * </ul>
      *
      * @return The URL, or {@code null} if none.
      */
     protected URL getDefinitionsURL() {
+        try {
+            final String directory = System.getProperty(CRS_DIRECTORY_KEY);
+            if (directory != null) {
+                final File file = new File(directory, FILENAME);
+                if (file.isFile()) {
+                    return file.toURI().toURL();
+                }
+            }
+        } catch (SecurityException exception) {
+            org.geotools.util.Logging.unexpectedException(LOGGER, exception);
+        } catch (MalformedURLException exception) {
+            org.geotools.util.Logging.unexpectedException(LOGGER, exception);
+        }
         return FactoryUsingWKT.class.getResource(FILENAME);
     }
 

@@ -35,7 +35,7 @@ import org.geotools.factory.Hints;
  * @version $Id$
  * @author Andrea Aime
  */
-public class FactoryEPSGExtension extends FactoryUsingWKT {
+public class FactoryExtension extends FactoryUsingWKT {
     /**
      * The default filename to read. This file will be searched in the
      * {@code org/geotools/referencing/factory/espg} directory in the
@@ -43,12 +43,12 @@ public class FactoryEPSGExtension extends FactoryUsingWKT {
      *
      * @see #getDefinitionsURL
      */
-    public static final String FILENAME = "epsg-extension.properties";
+    public static final String FILENAME = "extension.properties";
 
     /**
      * Constructs an authority factory using the default set of factories.
      */
-    public FactoryEPSGExtension() {
+    public FactoryExtension() {
         this(null);
     }
 
@@ -58,7 +58,7 @@ public class FactoryEPSGExtension extends FactoryUsingWKT {
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
      * {@code FACTORY} hints.
      */
-    public FactoryEPSGExtension(final Hints hints) {
+    public FactoryExtension(final Hints hints) {
         super(hints, DEFAULT_PRIORITY - 2);
     }
 
@@ -69,13 +69,13 @@ public class FactoryEPSGExtension extends FactoryUsingWKT {
      * @return The URL, or {@code null} if none.
      */
     protected URL getDefinitionsURL() {
-        return FactoryEPSGExtension.class.getResource(FILENAME);
+        return FactoryExtension.class.getResource(FILENAME);
     }
 
     /**
      * Prints a list of codes that duplicate the ones provided in the {@link DefaultFactory}.
      * The factory tested is the one registered in {@link FactoryFinder}.  By default, this
-     * is this {@code FactoryEPSGExtension} class backed by the {@value #FILENAME} property file.
+     * is this {@code FactoryExtension} class backed by the {@value #FILENAME} property file.
      * This method can be invoked from the command line in order to check the content of the
      * property file. Valid arguments are:
      * <p>
@@ -90,6 +90,6 @@ public class FactoryEPSGExtension extends FactoryUsingWKT {
      * @throws FactoryException if an error occured.
      */
     public static void main(final String[] args) throws FactoryException {
-        main(args, FactoryEPSGExtension.class);
+        main(args, FactoryExtension.class);
     }
 }
