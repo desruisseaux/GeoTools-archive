@@ -369,7 +369,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
     
     /**
      * The datastore used to choke on single point changes because the change bbox would be an invalid
-     * polygon
+     * polygon. Plus the feature collection seems to ignore the version set in the query used to gather it
      * @throws Exception 
      */
     public void testPointChange() throws Exception {
@@ -386,6 +386,33 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         f.setAttribute(1, "NewTreeOnTheBlock");
         fw.write();
         fw.close();
+    }
+    
+    /**
+     * The datastore used to choke on single point changes because the change bbox would be an invalid
+     * polygon. Plus the feature collection seems to ignore the version set in the query used to gather it
+     * @throws Exception 
+     */
+    public void testFeatureSourceBounds() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+
+        // version enable tree
+        ds.setVersioned("tree", true, "gimbo", "versioning trees");
+
+        // now create one feature
+        FeatureWriter fw = ds.getFeatureWriter("tree", Transaction.AUTO_COMMIT);
+        assertTrue(fw.hasNext());
+        Feature f = fw.next();
+        Envelope oldBounds = f.getBounds();
+        f.setAttribute(0, gf.createPoint(new Coordinate(50,50)));
+        fw.write();
+        fw.close();
+        
+        // try to gather an old snapshot and check the bounds are really the old ones
+        DefaultQuery q = new DefaultQuery();
+        q.setVersion("1");
+        Envelope e = ds.getFeatureSource("tree").getBounds(q);
+        assertEquals(oldBounds, e);
     }
 
     public void testDeleteFeatures() throws IOException, NoSuchElementException,

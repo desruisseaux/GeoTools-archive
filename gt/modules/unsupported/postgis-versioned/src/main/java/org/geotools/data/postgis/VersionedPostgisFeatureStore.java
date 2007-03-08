@@ -146,8 +146,9 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
     }
 
     public Envelope getBounds(Query query) throws IOException {
+        RevisionInfo ri = new RevisionInfo(query.getVersion());
         DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query),
-                new RevisionInfo());
+                ri);
         return locking.getBounds(versionedQuery);
     }
 
@@ -226,7 +227,7 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
     public FeatureCollection getFeatures(Query query) throws IOException {
         // feature collection is writable unfortunately, we have to rely on the
         // default behaviour otherwise writes won't be versioned
-        // TODO: builds a versioned feature collection that can do better, if possible at all
+        // TODO: build a versioned feature collection that can do better, if possible at all
         return super.getFeatures(query);
     }
 
