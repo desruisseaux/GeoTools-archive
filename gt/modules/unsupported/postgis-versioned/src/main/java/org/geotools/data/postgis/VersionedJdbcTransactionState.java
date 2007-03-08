@@ -21,8 +21,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataSourceException;
@@ -32,6 +34,7 @@ import org.geotools.data.jdbc.JDBCTransactionState;
 import org.geotools.data.jdbc.JDBCUtils;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
+import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -61,6 +64,8 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
     private ReferencedEnvelope bbox;
 
     private HashSet dirtyTypes;
+    
+    private HashMap dirtyFids;
 
     private WrappedPostgisDataStore wrapped;
 
@@ -80,6 +85,7 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
         this.revision = Long.MIN_VALUE;
         this.bbox = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
         this.dirtyTypes = new HashSet();
+        this.dirtyFids = new HashMap();
     }
 
     /**
@@ -115,6 +121,34 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
     public void expandDirtyBounds(Envelope envelope) {
         bbox.expandToInclude(envelope);
     }
+    
+    /**
+     * Marks a specified FID as dirty. This is used to avoid to do versioned operations
+     * on the same feature multiple times in the same transaction. The first must create 
+     * the new versions, the others should operate against the new record
+     * @param ft
+     * @param fid
+     */
+    public void setFidDirty(String typeName, String fid) {
+        Set fids = (Set) dirtyFids.get(typeName);
+        if(fids == null) {
+            fids = new HashSet();
+            dirtyFids.put(typeName, fids);
+        }
+        fids.add(fid);
+    }
+        
+    /**
+     * Returns true if a specific feature has already been modified during this transaction
+     * @param typeName
+     * @param fid
+     * @return
+     */
+    public boolean isFidDirty(String typeName, String fid) {
+        Set fids = (Set) dirtyFids.get(typeName);
+        if(fids == null) return false;
+        return fids.contains(fid);
+    }
 
     public void setTransaction(Transaction transaction) {
         super.setTransaction(transaction);
@@ -149,6 +183,10 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
                             + "that should have been set in the versioned datastore on "
                             + "versioned jdbc state creation");
                 }
+                
+                // make sure we're not committing an empty, non null, bbox
+                if(!bbox.isNull() && bbox.getHeight() == 0 && bbox.getWidth() == 0)
+                    bbox = expandBBox(bbox);
 
                 // update it
                 f = writer.next();
@@ -189,6 +227,22 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
         super.commit();
         // reset revision, we create a new revision for each new commit
         reset();
+    }
+
+    /** 
+     * Used to expand a single point bbox the very minimum required to make it a polygon
+     * @param bbox
+     */
+    private ReferencedEnvelope expandBBox(ReferencedEnvelope bbox) {
+        // we have to expand both directions using the minimum offset possible,
+        // which we'll compute on the binary presentation of a double
+        double cmax = Math.max(bbox.getMaxX(), bbox.getMaxY());
+        long bits = Double.doubleToLongBits(cmax);
+        // get the minimum offset that will make the biggest coordinate change too
+        double diff = Double.longBitsToDouble(bits++);
+        ReferencedEnvelope result = new ReferencedEnvelope(bbox);
+        result.expandBy(diff);
+        return result;
     }
 
     public boolean isRevisionSet() {
@@ -240,7 +294,13 @@ class VersionedJdbcTransactionState extends JDBCTransactionState {
             f.setAttribute("author", author);
             f.setAttribute("message", message);
             f.setAttribute("date", new Date());
-            f.setDefaultGeometry(toLatLonRectange(bbox));
+            
+            // make sure we're not writing an empty, non null, bbox
+            ReferencedEnvelope currentBox = bbox;
+            if(!bbox.isNull() && bbox.getHeight() == 0 && bbox.getWidth() == 0)
+                currentBox = expandBBox(bbox);
+            
+            f.setDefaultGeometry(toLatLonRectange(currentBox));
             writer.write();
         } catch (IllegalAttributeException e) {
             // if this happens there's a programming error

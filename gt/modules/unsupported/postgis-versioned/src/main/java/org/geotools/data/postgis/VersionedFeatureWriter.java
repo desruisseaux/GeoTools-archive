@@ -195,14 +195,13 @@ class VersionedFeatureWriter implements FeatureWriter {
 
         listenerManager.fireFeaturesRemoved(getFeatureType().getTypeName(), state.getTransaction(),
                 oldFeature.getBounds(), false);
-        expireOldFeature();
+        writeOldFeature(true);
     }
 
-    private void expireOldFeature() throws IOException, DataSourceException {
-        // else, we have to expire the old feature and not write a new revision
-        // of it
+    private void writeOldFeature(boolean expire) throws IOException, DataSourceException {
         try {
-            oldFeature.setAttribute("expired", new Long(state.getRevision()));
+            if(expire)
+                oldFeature.setAttribute("expired", new Long(state.getRevision()));
             updateWriter.write();
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("Error writing expiration tag on old feature. "
@@ -219,7 +218,19 @@ class VersionedFeatureWriter implements FeatureWriter {
     public void write() throws IOException {
         Statement st = null;
         try {
-            // ... copy attributes
+            /*
+             Ok, this is complex. We have to deal with four separate cases:
+             1) the old feature is not there, meaning we're inserting a new feature
+             2) the old feature is there, the new feature is equal to the old one -> no changes, 
+                let's just move on
+             3) the old feature is there, and it's the first time we modify that feature
+                in this transactions, meaning we need to expire the old feature, and 
+                create a new, non expired one
+             4) the old feature is there, but we already modified it during this transaction. This
+                means we have to update the old feature 
+             */ 
+            
+            boolean dirtyFeature = false;
             if (oldFeature != null) {
                 // if there is an old feature, make sure to write a new revision only if the
                 // feauture was modified
@@ -235,62 +246,96 @@ class VersionedFeatureWriter implements FeatureWriter {
                 }
                 if (!dirty)
                     return;
-                // if we have the old feature, just expire it
-                expireOldFeature();
+            
+                // check if the feature is dirty. The live feature has the right external id
+                String typeName = liveFeature.getFeatureType().getTypeName();
+                String fid = liveFeature.getID();
+                dirtyFeature = state.isFidDirty(typeName, fid);
+            }
+            
+            Feature writtenFeature = null;
+            if(dirtyFeature) {
+                // we're updating again a feature we already touched, so we have to move
+                // attributes from the live to the old, and make sure the old is not expired
+                // (we may have deleted and then re-inserted that feature, if FID are the user
+                // assigned kind we can get into troubles with duplicated primary keys)
+                
+                // copy attributes from live to new
+                for (int i = 0; i < liveFeature.getNumberOfAttributes(); i++) {
+                    AttributeType at = liveFeature.getFeatureType().getAttributeType(i);
+                    oldFeature.setAttribute(at.getName(), liveFeature.getAttribute(at.getName()));
+                }
+                
+                // write the old one
+                writeOldFeature(false);
+                
+                writtenFeature = oldFeature;
             } else {
+                // expire if needed
+                if(oldFeature != null)
+                    writeOldFeature(true);
+                
+                // copy attributes from live to new
                 for (int i = 0; i < liveFeature.getNumberOfAttributes(); i++) {
                     AttributeType at = liveFeature.getFeatureType().getAttributeType(i);
                     newFeature.setAttribute(at.getName(), liveFeature.getAttribute(at.getName()));
                 }
-            }
-
-            // set revision and expired,
-            newFeature.setAttribute("expired", NON_EXPIRED);
-            newFeature.setAttribute("revision", new Long(state.getRevision()));
-
-            // ... set FID to the old one
-            // TODO: check this, I'm not sure this is the proper handling
-            String id = null;
-            if (oldFeature != null) {
-                id = liveFeature.getID().substring(featureType.getTypeName().length() + 1) + "&"
-                        + state.getRevision();
-            } else if (!mapper.hasAutoIncrementColumns()) {
-                id = mapper.createID(state.getConnection(), newFeature, null);
-            }
-            // transfer generated id values to the primary key attributes
-            if (id != null) {
-                ((MutableFIDFeature) newFeature).setID(id);
-
-                Object[] pkatts = mapper.getPKAttributes(id);
-                for (int i = 0; i < pkatts.length; i++) {
-                    newFeature.setAttribute(mapper.getColumnName(i), pkatts[i]);
+    
+                //set revision and expired,
+                newFeature.setAttribute("expired", NON_EXPIRED);
+                newFeature.setAttribute("revision", new Long(state.getRevision()));
+    
+                // set FID to the old one
+                // TODO: check this, I'm not sure this is the proper handling
+                String id = null;
+                if (oldFeature != null) {
+                    id = liveFeature.getID().substring(featureType.getTypeName().length() + 1) + "&"
+                            + state.getRevision();
+                } else if (!mapper.hasAutoIncrementColumns()) {
+                    id = mapper.createID(state.getConnection(), newFeature, null);
                 }
+                // transfer generated id values to the primary key attributes
+                if (id != null) {
+                    ((MutableFIDFeature) newFeature).setID(id);
+    
+                    Object[] pkatts = mapper.getPKAttributes(id);
+                    for (int i = 0; i < pkatts.length; i++) {
+                        newFeature.setAttribute(mapper.getColumnName(i), pkatts[i]);
+                    }
+                }
+                
+                // write
+                appendWriter.write();
+                
+                // if the id is auto-generated, gather it from the db
+                if (oldFeature == null && mapper.hasAutoIncrementColumns()) {
+                    st = state.getConnection().createStatement();
+                    id = mapper.createID(state.getConnection(), newFeature, st);
+                }
+
+                // make sure the newly generated id is set into the live
+                // feature, and that it's typed, too
+                ((MutableFIDFeature) newFeature).setID(id);
+                ((MutableFIDFeature) liveFeature).setID(mapper.getUnversionedFid(id));
+                
+                // mark the fid as dirty
+                state.setFidDirty(liveFeature.getFeatureType().getTypeName(), liveFeature.getID());
+                
+                writtenFeature = newFeature;
             }
 
-            // ... write
-            state.expandDirtyBounds(getLatLonFeatureEnvelope(newFeature));
-            appendWriter.write();
+            // update dirty bounds
+            state.expandDirtyBounds(getLatLonFeatureEnvelope(writtenFeature));
 
-            // if the id is auto-generated, gather it from the db
-            if (oldFeature == null && mapper.hasAutoIncrementColumns()) {
-                st = state.getConnection().createStatement();
-                id = mapper.createID(state.getConnection(), newFeature, st);
-            }
-
-            // ... make sure the newly generated id is set into the live
-            // feature, and that it's typed, too
-            ((MutableFIDFeature) newFeature).setID(id);
-            ((MutableFIDFeature) liveFeature).setID(mapper.getUnversionedFid(id));
-
-            // ... and finally notify the user
+            // and finally notify the user
             if (oldFeature != null) {
                 Envelope bounds = oldFeature.getBounds();
-                bounds.expandToInclude(newFeature.getBounds());
+                bounds.expandToInclude(liveFeature.getBounds());
                 listenerManager.fireFeaturesChanged(getFeatureType().getTypeName(), state
                         .getTransaction(), bounds, false);
             } else {
                 listenerManager.fireFeaturesAdded(getFeatureType().getTypeName(), state
-                        .getTransaction(), newFeature.getBounds(), false);
+                        .getTransaction(), liveFeature.getBounds(), false);
             }
         } catch (IllegalAttributeException e) {
             throw new DataSourceException("Error writing expiration tag on old feature. "

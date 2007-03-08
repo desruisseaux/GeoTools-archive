@@ -25,6 +25,7 @@ import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -37,11 +38,14 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
 
     PostgisConnectionFactory pcFactory;
 
-    private FeatureType railType;
+    protected FeatureType railType;
+    protected FeatureType treeType;
 
-    private Feature[] railFeatures;
+    protected Feature[] railFeatures;
+    protected Feature[] treeFeatures;
 
-    private Envelope railBounds;
+    protected Envelope railBounds;
+    protected Envelope treeBounds;
 
     public AbstractVersionedPostgisDataTestCase(String name) {
         super(name);
@@ -50,7 +54,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
     public String getFixtureFile() {
         return "versioned.properties";
     }
-
+    
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -64,6 +68,7 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
         setUpRoadTable();
         setUpRailTable();
         setUpNoPrimaryKeyTable();
+        setUpTreeTable();
 
         // make sure versioned metadata is not in the way
         SqlTestUtils.dropTable(pool, VersionedPostgisDataStore.TBL_TABLESCHANGED, false);
@@ -82,6 +87,18 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
                 "rail.1");
         railBounds = new Envelope();
         railBounds.expandToInclude(railFeatures[0].getBounds());
+        
+        treeType = DataUtilities.createType(getName() +".tree",
+          "geom:Point:nillable,name:String");
+        treeFeatures = new Feature[1];
+        treeFeatures[0] = treeType.create( new Object[]{
+            gf.createPoint(new Coordinate(5,5)),
+            "BigPine"
+        },
+        "tree.tr1"
+        );
+        treeBounds = new Envelope();
+        treeBounds.expandToInclude(treeFeatures[0].getBounds());      
     }
 
     protected VersionedPostgisDataStore getDataStore() throws IOException {
@@ -112,6 +129,47 @@ public class AbstractVersionedPostgisDataTestCase extends DataTestCase {
             pool.close();
         }
         super.tearDown();
+    }
+    
+    protected void setUpTreeTable() throws Exception {
+        Connection conn = pool.getConnection();
+        conn.setAutoCommit(true);
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("SELECT dropgeometrycolumn( '" + f.schema + "','tree','geom')");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+            s.execute("DROP TABLE " + f.schema + ".tree");
+        } catch (Exception ignore) {
+        }
+
+        try {
+            Statement s = conn.createStatement();
+
+            // postgis = new PostgisDataSource(connection, FEATURE_TABLE);
+            s.execute("CREATE TABLE " + f.schema + ".tree ( id serial primary key)");
+            s.execute("SELECT AddGeometryColumn('" + f.schema
+                    + "', 'tree', 'geom', 0, 'POINT', 2);");
+            s.execute("ALTER TABLE " + f.schema + ".tree add name varchar;");
+
+            for (int i = 0; i < treeFeatures.length; i++) {
+                Feature feature = treeFeatures[i];
+
+                // strip out the lake.
+                String ql = "INSERT INTO " + f.schema + ".tree (geom,name) VALUES ("
+                        + "GeometryFromText('"
+                        + ((Geometry) feature.getAttribute("geom")).toText() + "', 0 )," + "'"
+                        + feature.getAttribute("name") + "')";
+
+                s.execute(ql);
+            }
+        } finally {
+            conn.close();
+        }
     }
 
     protected void setUpRoadTable() throws Exception {

@@ -40,8 +40,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 import org.opengis.filter.identity.FeatureId;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataTestCase {
@@ -364,6 +366,27 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertTrue(types.contains("river"));
         assertTrue(types.contains("road"));
     }
+    
+    /**
+     * The datastore used to choke on single point changes because the change bbox would be an invalid
+     * polygon
+     * @throws Exception 
+     */
+    public void testPointChange() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+
+        // version enable tree
+        ds.setVersioned("tree", true, "gimbo", "versioning trees");
+
+        // now create one feature
+        FeatureWriter fw = ds.getFeatureWriterAppend("tree", Transaction.AUTO_COMMIT);
+        assertFalse(fw.hasNext());
+        Feature f = fw.next();
+        f.setAttribute(0, gf.createPoint(new Coordinate(50,50)));
+        f.setAttribute(1, "NewTreeOnTheBlock");
+        fw.write();
+        fw.close();
+    }
 
     public void testDeleteFeatures() throws IOException, NoSuchElementException,
             IllegalAttributeException {
@@ -389,6 +412,95 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         while (fr.hasNext())
             assertFalse(fr.next().getID().equals("road.rd1"));
         fr.close();
+    }
+    
+    /**
+     * Versioned datastore broke if the same feature got updated twice in the same transaction
+     * (since it tried to create a new record at revions x, then expired it, and created another
+     * again at revision x).
+     * @throws Exception 
+     *
+     */
+    public void testDoubleUpdate() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+        
+        // version enable trees
+        ds.setVersioned("tree", true, "udig", "I like to doubly update things in the same transaction :-)");
+        
+        // build a filter to extract just road 1
+        Filter filter = ff.id(Collections.singleton(ff.featureId("tree.1")));
+        
+        // setup a transaction
+        Transaction t = createTransaction("gimbo", "double update");
+        FeatureStore store = (FeatureStore) ds.getFeatureSource("tree");
+        FeatureType treeSchema = ds.getSchema("tree");
+        store.setTransaction(t);
+        assertEquals(1, store.getFeatures(filter).size());
+        store.modifyFeatures(treeSchema.getAttributeType("name"), "update1", filter);
+        store.modifyFeatures(treeSchema.getAttributeType("name"), "update2", filter);
+        t.commit();
+        
+        // make sure the second update is the one that went in
+        FeatureCollection fc = store.getFeatures(filter);
+        FeatureIterator fi = fc.features();
+        assertTrue(fi.hasNext());
+        Feature f = fi.next();
+        assertEquals("update2", f.getAttribute("name"));
+        assertFalse(fi.hasNext());
+        fi.close();
+    }
+    
+    /**
+     * Check insert/delete in the same transaction works
+     * @throws Exception 
+     *
+     */
+    public void testInsertDelete() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+        
+        // version enable trees
+        ds.setVersioned("tree", true, "gimbo", "What do you want, I'm undecided...");
+        
+        // create a new feature
+        Feature tree = treeType.create( new Object[]{gf.createPoint(new Coordinate(7,7)), "SmallPine"  }, "tree.tr2");
+        
+        // setup a transaction
+        Transaction t = createTransaction("gimbo", "double update");
+        FeatureStore store = (FeatureStore) ds.getFeatureSource("tree");
+        store.setTransaction(t);
+        Set ids = store.addFeatures(DataUtilities.collection(tree));
+        Filter filter = ff.id(Collections.singleton(ff.featureId((String) ids.iterator().next())));
+        store.removeFeatures(filter);
+        t.commit();
+        
+        // check it's not there
+        assertEquals(0, store.getFeatures(filter).size());
+    }
+    
+    /**
+     * Same as double update, but for the insert/update case
+     * @throws Exception 
+     *
+     */
+    public void testInsertUpdate() throws Exception {
+        VersionedPostgisDataStore ds = getDataStore();
+        
+        // version enable trees
+        ds.setVersioned("tree", true, "gimbo", "What do you want, I'm undecided...");
+        
+        // create a new feature
+        Feature tree = treeType.create( new Object[]{gf.createPoint(new Coordinate(7,7)), "SmallPine"  }, "tree.tr2");
+        
+        // setup a transaction
+        Transaction t = createTransaction("gimbo", "double update");
+        FeatureType treeSchema = ds.getSchema("tree");
+        FeatureStore store = (FeatureStore) ds.getFeatureSource("tree");
+        store.setTransaction(t);
+        Set ids = store.addFeatures(DataUtilities.collection(tree));
+        Filter filter = ff.id(Collections.singleton(ff.featureId((String) ids.iterator().next())));
+        assertEquals(1, store.getFeatures(filter).size());
+        store.modifyFeatures(treeSchema.getAttributeType("name"), "update1", filter);
+        t.commit();
     }
 
     public void testSerialIdWriting() throws IOException, IllegalArgumentException,

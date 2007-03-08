@@ -39,7 +39,7 @@ public class SqlTestUtils {
             st = conn.createStatement();
             if (geomColumns)
                 st.execute("DELETE FROM GEOMETRY_COLUMNS WHERE F_TABLE_NAME = '" + tableName + "'");
-            st.execute("DROP TABLE " + tableName);
+            st.execute("DROP TABLE " + tableName + " CASCADE");
         } catch (SQLException e) {
             // no problem, the drop may fail
             System.out.println(e.getMessage());
