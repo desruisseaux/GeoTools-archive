@@ -45,7 +45,7 @@
     <license>
       <name>Lesser General Public License (LGPL)</name>
       <!-- url>http://www.gnu.org/copyleft/lesser.txt</url -->
-      <url>http://svn.geotools.org/geotools/trunk/gt/plugin/epsg-hsql/LICENSE.html</url>
+      <url>http://svn.geotools.org/geotools/trunk/gt/modules/plugin/epsg-hsql/LICENSE.html</url>
       <distribution>repo</distribution>
     </license>
     <license>
