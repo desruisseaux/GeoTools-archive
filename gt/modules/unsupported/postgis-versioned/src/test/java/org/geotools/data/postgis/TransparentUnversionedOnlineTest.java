@@ -56,21 +56,4 @@ public class TransparentUnversionedOnlineTest extends PostgisDataStoreAPIOnlineT
     public void testOidFidMapper() throws IOException, IllegalAttributeException {
         // we have to override this one since versioned does not support oid mapper
     }
-    
-//    public FeatureReader reader(String typeName) throws IOException {
-//        FeatureType type = data.getSchema(typeName);
-//
-//        return data.getFeatureReader(new DefaultQuery(typeName, Filter.NONE), transaction);
-//    }
-//
-//    public FeatureWriter writer(String typeName) throws IOException {
-//        return data.getFeatureWriter(typeName, Transaction.AUTO_COMMIT);
-//    }
-//    
-//    private Transaction createTransaction(String author, String message) throws IOException {
-//        Transaction t = new DefaultTransaction();
-//        t.putProperty(VersionedPostgisDataStore.AUTHOR, author);
-//        t.putProperty(VersionedPostgisDataStore.MESSAGE, message);
-//        return t;
-//    }
 }

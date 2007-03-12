@@ -807,7 +807,7 @@ public class VersionedPostgisDataStore implements DataStore {
                 if (schema == null)
                     schema = "public";
                 execute(st, "SELECT ADDGEOMETRYCOLUMN('" + schema + "', '" + TBL_CHANGESETS
-                        + "', 'BBOX', 4326,  'POLYGON', 2)");
+                        + "', 'bbox', 4326,  'POLYGON', 2)");
 
                 execute(st, "CREATE TABLE " + TBL_TABLESCHANGED
                         + "(REVISION BIGINT NOT NULL REFERENCES " + TBL_CHANGESETS
