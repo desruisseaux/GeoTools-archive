@@ -71,8 +71,8 @@ public abstract class AbstractGridCoverageWriter implements GridCoverageWriter {
 				outStream.close();
 
 			} catch (IOException e) {
-				if (LOGGER.isLoggable(Level.WARNING))
-					LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+				if (LOGGER.isLoggable(Level.FINE))
+					LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 
 			}
 		}
