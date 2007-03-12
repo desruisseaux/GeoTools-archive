@@ -80,7 +80,6 @@
      <profile>
        <id>pending</id>
        <modules>
-         <module>cql</module> <!-- until 2 bugs in geotools that prevents the tests to pass are fixed -->
          <module>hsql</module>
          <module>h2</module>
          <module>oracle</module>         
@@ -90,6 +89,7 @@
 
   <modules>
     <module>arcsde</module>
+    <module>cql</module>
     <module>db2</module>
     <module>directory</module>
     <module>epsg-extension</module>

@@ -1248,13 +1248,13 @@ public class FilterBuilderTest extends TestCase {
         arg1 = (Expression) function.getParameters().get(0);
         assertTrue(arg1 instanceof PropertyName);
         
-        final String arg1Expected = arg1Name.replace(".", "/");        
+        final String arg1Expected = arg1Name.replace('.', '/');        
         assertEquals(arg1Expected, ((PropertyName) arg1).getPropertyName());
 
         arg2 = (Expression) function.getParameters().get(1);
         assertTrue(arg2 instanceof PropertyName);
 
-        final String arg2Expected = arg2Name.replace(".", "/");        
+        final String arg2Expected = arg2Name.replace('.', '/');        
         assertEquals(arg2Expected, ((PropertyName) arg2).getPropertyName());
         
     }
