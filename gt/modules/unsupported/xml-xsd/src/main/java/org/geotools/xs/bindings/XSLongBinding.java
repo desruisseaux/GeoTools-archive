@@ -73,7 +73,7 @@ public class XSLongBinding implements SimpleBinding {
      * @generated modifiable
      */
     public Class getType() {
-        return null;
+        return Long.class;
     }
 
     /**
