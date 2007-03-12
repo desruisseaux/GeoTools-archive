@@ -78,14 +78,10 @@ public class FallbackAuthorityFactoryTest extends TestCase {
      * Adds the extra factory to the set of authority factories.
      */
     public void setUp() {
-        if (org.geotools.test.TestData.isBaseJavaPlatform()) {
-            // Disabled in J2SE 1.4 build because of a bug.
-            // TODO: Remove when we will be target J2SE 1.4 or 1.5.
-            return;
-        }
         assertNull(extra);
         extra = new FactoryEPSGExtra();
         FactoryFinder.addAuthorityFactory(extra);
+        FactoryFinder.scanForPlugins();
     }
 
     /**
@@ -118,6 +114,7 @@ public class FallbackAuthorityFactoryTest extends TestCase {
         for (Iterator it = factories.iterator(); it.hasNext();) {
             CRSAuthorityFactory factory = (CRSAuthorityFactory) it.next();
             Class type = factory.getClass();
+            System.out.println(type);
             if (type == FactoryEPSGExtra.class) {
                 foundExtra = true;
             } else if (type == FactoryUsingWKT.class) {
