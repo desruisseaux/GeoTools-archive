@@ -39,7 +39,6 @@ import org.geotools.gui.swing.SelectAction;
 import org.geotools.gui.swing.ZoomInAction;
 import org.geotools.gui.swing.ZoomOutAction;
 import org.geotools.map.DefaultMapContext;
-import org.geotools.map.DefaultMapLayer;
 import org.geotools.map.MapContext;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;

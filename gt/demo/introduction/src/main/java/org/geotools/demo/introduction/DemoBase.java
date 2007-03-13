@@ -202,6 +202,8 @@ public class DemoBase {
     // TODO: move to demoGUI
     CoordinateReferenceSystem projCRS = null;
 
+    /* The URI of the test shapefile. */
+    URI SHAPEFILEURI;
 
     /* DemoGUI class */
     DemoGUI demoGUI;
@@ -213,7 +215,15 @@ public class DemoBase {
     public DemoBase(){
         
         demoData = new DemoData();
-
+        try {
+            //path to our shapefile 
+            String shpPath = getClass().getResource(SHAPEFILENAME).toString();
+            //convert spaces to %20 
+            shpPath = shpPath.replaceAll(" ", "%20");
+            SHAPEFILEURI =  new URI(shpPath);
+        } catch (URISyntaxException uriex) {
+            System.err.println("Unable to create shapefile uri: "+ uriex.getMessage());
+        }
     }
     
     /* These callback methods are called by DemoGUI when the respective buttons 
@@ -413,10 +423,9 @@ public class DemoBase {
         URL shapefileURL = getClass().getResource( shpname );
         Map params = new HashMap();
         params.put( ShapefileDataStoreFactory.URLP.key, shapefileURL );
-        
         //load the services, there should be only one service
-        DefaultServiceFinder finder = new DefaultServiceFinder( demoData.localCatalog );
-        List services = finder.aquire( params );
+        DefaultServiceFinder finder = new DefaultServiceFinder(demoData.localCatalog);
+        List services = finder.aquire(SHAPEFILEURI, params);
         
         //add the service to the catalog
         demoData.localCatalog.add( (Service) services.get( 0 ) );
@@ -529,18 +538,8 @@ public class DemoBase {
     public FeatureSource getAShapefileFeatureSourceFromCatalog(){
 //    public FeatureCollection getFeatureCollectionForShapefile() throws IOException {
         
-        //create the uri to lookup
-        URI uri = null;
-        try {
-            uri =  new URI( getClass().getResource( SHAPEFILENAME ).toString() );
-        } 
-        catch ( URISyntaxException uriex ) {
-            System.err.println( "Unable to create shapefile uri"+ uriex.getMessage() );
-//            throw (IOException) new IOException( "Unable to create shapefile uri").initCause( uriex );
-        }
-        
         //lookup service, should be only one
-        List serviceList = demoData.localCatalog.find( uri, null );
+        List serviceList = demoData.localCatalog.find( SHAPEFILEURI, null );
         Service service = (Service) serviceList.get( 0 );
         
         //shapefiles only contain a single resource
