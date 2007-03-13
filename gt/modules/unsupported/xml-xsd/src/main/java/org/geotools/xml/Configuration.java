@@ -48,7 +48,8 @@ import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
  * <h3>Dependencies</h3>
  * <p>
  * Configurations have dependencies on one another, that result from teh fact that
- * one schema imports another. Each configuration should declare all dependencies in
+ * one schema imports another. Configuration dependencies are transitive. 
+ * Each configuration should declare all dependencies in
  * the constructor using the {@link #addDependency(Configuration)} method.
  * <code>
  * 	<pre>
@@ -173,7 +174,7 @@ import org.picocontainer.defaults.DuplicateComponentKeyRegistrationException;
  * attempts to resolve the location part of the tuple into a schema.
  *
  * The second scenario occurs when the parsing of a schema encounters an
- * <b>import</b> or an <b>include<b> element. These elements have the form:
+ * <b>import</b> or an <b>include</b> element. These elements have the form:
  *
  *  <pre>
  *  <code>
