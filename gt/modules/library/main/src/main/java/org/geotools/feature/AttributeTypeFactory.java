@@ -50,9 +50,10 @@ public abstract class AttributeTypeFactory implements Factory {
     }
 
     /**
-     * Returns a new instance of the current AttributeTypeFactory. If no
-     * implementations are found then DefaultAttributeTypeFactory is returned.
-     *
+     * Returns a new instance of the current AttributeTypeFactory.
+     * <p>
+     * If no implementations are found then DefaultAttributeTypeFactory is returned.
+     * </p>
      * @return A new instance of an AttributeTypeFactory.
      */
     public static AttributeTypeFactory newInstance() {
@@ -68,7 +69,7 @@ public abstract class AttributeTypeFactory implements Factory {
      *
      * @param name The name of the AttributeType to be created.
      * @param clazz The class that objects will validate against.
-     * @param isNillable if nulls are allowed in the new type.
+     * @param isNillable If nulls are allowed (will force min=0)
      *
      * @return A new AttributeType of name, clazz and isNillable.
      */
@@ -76,26 +77,55 @@ public abstract class AttributeTypeFactory implements Factory {
         boolean isNillable,int fieldLength,Object defaultValue) {
         return defaultInstance().createAttributeType(name, clazz, isNillable,fieldLength, defaultValue);
     }
-    /** Creates a new AttributeType with the addition of MetaData.
+    /**
+     * Creates a new AttributeType with the addition of metadata like CRS.
      * <p>
      * Currently MetaData is used to supply the CoordinateSequence
      * when making a GeometryAttributeType.
      * </p>
-     * @param name
-     * @param clazz
-     * @param isNillable
-     * @param fieldLength
-     * @param defaultValue
-     * @param metaData
+     * @param name name of the attribute type to be created
+     * @param clazz Class that objects will validate against
+     * @param isNillable If nulls are allowed (will force min=0)
+     * @param fieldLength A common restriction (this will produce a Filter)
+     * @param defaultValue Initial valid value for new Feature 
+     * @param metaData Additional information (example a CoordinateReferenceSystem for a Geometry)
+     * 
+     * @return Created AttributeType
      */
     public static AttributeType newAttributeType(String name, Class clazz,
         boolean isNillable,int fieldLength,Object defaultValue, Object metaData) {
         return defaultInstance().createAttributeType(name, clazz, isNillable,fieldLength, defaultValue, metaData);
     }
+    /**
+     * Creates a new AttributeType with the addition of metadata like CRS.
+     * 
+     * @param name name of the attribute type to be created
+     * @param clazz Class that objects will validate against
+     * @param isNillable If nulls are allowed (will force min=0)
+     * @param restriction Filter restricting valid content 
+     * @param defaultValue Initial valid value for new Feature
+     * @param metaData Additional information (example a CoordinateReferenceSystem for a Geometry)
+     * 
+     * @return Created AttributeType
+     */
     public static AttributeType newAttributeType(String name, Class clazz,
         boolean isNillable, Filter restriction,Object defaultValue, Object metaData) {
         return defaultInstance().createAttributeType(name, clazz, isNillable, restriction, defaultValue, metaData);
     }
+    
+    /**
+     * Creates a new AttributeType.
+     * 
+     * @param name name of the attribute type to be created
+     * @param clazz Class that objects will validate against
+     * @param isNillable If nulls are allowed (will force min=0)
+     * @param restriction 
+     * @param defaultValue
+     * @param metaData metaData Additional information (example a CoordinateReferenceSystem for a Geometry)
+     * @param min minimum number of occurances for an array class
+     * @param max maximum number of occurances for an array class
+     * @return Created AttributeType
+     */
     public static AttributeType newAttributeType(String name, Class clazz,
         boolean isNillable, Filter restriction,Object defaultValue, Object metaData, int min, int max ) {
         return defaultInstance().createAttributeType(name, clazz, isNillable, restriction, defaultValue, metaData, min, max);
@@ -106,7 +136,7 @@ public abstract class AttributeTypeFactory implements Factory {
      *
      * @param name The name of the AttributeType to be created.
      * @param clazz The class that objects will validate against.
-     * @param isNillable if nulls are allowed in the new type.
+     * @param isNillable If nulls are allowed (will force min=0)
      *
      * @return A new AttributeType of name, clazz and isNillable.
      */
@@ -121,7 +151,7 @@ public abstract class AttributeTypeFactory implements Factory {
      *
      * @param name The name of the AttributeType to be created.
      * @param clazz The class that objects will validate against.
-     * @param isNillable if nulls are allowed in the new type.
+     * @param isNillable If nulls are allowed (will force min=0)
      *
      * @return A new AttributeType of name, clazz and isNillable.
      */
@@ -149,7 +179,7 @@ public abstract class AttributeTypeFactory implements Factory {
      *
      * @param name The name of the AttributeType to be created.
      * @param type the FeatureType that features will validate agist
-     * @param isNillable true iff nulls are allowed.
+     * @param isNillable If nulls are allowed (will force min=0)
      *
      * @return A new AttributeType of name, type, and isNillable.
      */
