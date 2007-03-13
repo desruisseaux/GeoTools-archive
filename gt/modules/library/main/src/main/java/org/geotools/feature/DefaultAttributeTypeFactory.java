@@ -111,17 +111,18 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         Filter f = length( fieldLength, name );
         
         int minOccurs = minOccurs(isNillable);
+        int maxOccurs = 1;
         if (Number.class.isAssignableFrom(clazz)) {
             return new NumericAttributeType(
-                name, clazz, isNillable,1,1,defaultValue,f);
+                name, clazz, isNillable, minOccurs,maxOccurs,defaultValue,f);
         } else if (CharSequence.class.isAssignableFrom(clazz)) {
-            return new TextualAttributeType(name,isNillable,minOccurs,1,defaultValue,f);
+            return new TextualAttributeType(name,isNillable,minOccurs,maxOccurs,defaultValue,f);
         } else if (java.util.Date.class.isAssignableFrom(clazz)) {
-        	return new TemporalAttributeType(name,clazz,isNillable,minOccurs,1,defaultValue,f);
+        	return new TemporalAttributeType(name,clazz,isNillable,minOccurs,maxOccurs,defaultValue,f);
         } else if (Geometry.class.isAssignableFrom( clazz )){
-            return new GeometricAttributeType(name,clazz,isNillable,minOccurs,1, defaultValue,null,f);
+            return new GeometricAttributeType(name,clazz,isNillable,minOccurs,maxOccurs, defaultValue,null,f);
         }        
-        return new DefaultAttributeType(name, clazz, isNillable,minOccurs,1,defaultValue, f);
+        return new DefaultAttributeType(name, clazz, isNillable,minOccurs, maxOccurs,defaultValue, f);
     }
     
     /**
@@ -130,7 +131,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, Filter filter, Object defaultValue, Object metadata) {
 
-    	return createAttributeType( name, clazz, isNillable, filter, defaultValue, metadata, 1, 1);
+    	return createAttributeType( name, clazz, isNillable, filter, defaultValue, metadata, minOccurs( isNillable ), 1);
     }
     protected AttributeType createAttributeType(String name, Class clazz, 
         boolean isNillable, Filter filter, Object defaultValue, Object metadata, int min, int max) {
