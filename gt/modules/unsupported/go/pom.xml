@@ -44,7 +44,7 @@
   <licenses>
     <license>
       <name>Lesser General Public License (LGPL)</name>
-      <url>http://svn.geotools.org/geotools/trunk/gt/ext/go/LICENSE.html</url>
+      <url>http://svn.geotools.org/geotools/trunk/gt/modules/unsupported/go/LICENSE.html</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
