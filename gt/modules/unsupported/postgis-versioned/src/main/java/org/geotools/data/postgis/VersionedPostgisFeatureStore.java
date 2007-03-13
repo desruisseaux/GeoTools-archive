@@ -36,6 +36,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.VersioningFeatureStore;
 import org.geotools.data.postgis.fidmapper.VersionedFIDMapper;
 import org.geotools.data.store.EmptyFeatureCollection;
 import org.geotools.factory.CommonFactoryFinder;
@@ -66,7 +67,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 2.4
  * 
  */
-public class VersionedPostgisFeatureStore extends AbstractFeatureStore implements FeatureStore {
+public class VersionedPostgisFeatureStore extends AbstractFeatureStore implements VersioningFeatureStore {
 
     private VersionedPostgisDataStore store;
 
@@ -132,6 +133,10 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 //                new RevisionInfo());
 //        locking.unLockFeatures(versionedQuery);
 //    }
+    
+    // -----------------------------------------------------------------------------------------------
+    // STANDARD FEATURE STORE METHODS 
+    // -----------------------------------------------------------------------------------------------
 
     public Transaction getTransaction() {
         return locking.getTransaction();
@@ -156,18 +161,6 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         RevisionInfo ri = new RevisionInfo(query.getVersion());
         DefaultQuery versionedQuery = store.buildVersionedQuery(getTypedQuery(query), ri);
         return locking.getCount(versionedQuery);
-    }
-
-    /**
-     * Clones the query and sets the proper type name into it
-     * 
-     * @param query
-     * @return
-     */
-    private Query getTypedQuery(Query query) {
-        DefaultQuery q = new DefaultQuery(query);
-        q.setTypeName(schema.getTypeName());
-        return q;
     }
 
     public DataStore getDataStore() {
@@ -242,17 +235,11 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         // default behaviour otherwise writes won't be versioned
         return super.getFeatures();
     }
+    
+    // ---------------------------------------------------------------------------------------------
+    // VERSIONING EXTENSIONS
+    // ---------------------------------------------------------------------------------------------
 
-    /**
-     * Rolls back features matching the filter to the state they had on the specified version.
-     * <p>
-     * For a feature to be included into the rollback it's sufficient that one of its states between
-     * <code>toVersion</code> and current matches the filter.
-     * 
-     * @param toVersion
-     * @param filter
-     * @throws IOException
-     */
     public void rollback(String toVersion, Filter filter) throws IOException {
         // TODO: build an optimized version of this that can do the same work with a couple
         // of queries assuming the filter is fully encodable
@@ -350,24 +337,6 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
     }
 
-    /**
-     * Returns a log of changes performed between fromVersion and toVersion against the features
-     * matched by the specified filter.
-     * <p>
-     * This is equivalent to gathering the ids of features changed between the two versions and
-     * matching the filter, getting a list of revision involving those feaures between fromVersion
-     * and toVersion, and then query {@link VersionedPostgisDataStore#TBL_CHANGESETS} against these
-     * revision numbers.
-     * 
-     * @param fromVersion
-     *            the start revision
-     * @param toVersion
-     *            the end revision, may be null to imply the latest one
-     * @param filter
-     *            will match features whose log will be reported
-     * @return a feature collection of the logs, sorted on revision, descending
-     * @throws IOException
-     */
     public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter)
             throws IOException {
         RevisionInfo r1 = new RevisionInfo(fromVersion);
@@ -491,6 +460,11 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         return new FeatureDiffReader(fromVersion, toVersion, schema, mapper, createdReader,
                 deletedReader, fvReader, tvReader);
     }
+    
+    // ----------------------------------------------------------------------------------------------
+    // INTERNAL SUPPORT METHODS
+    // ----------------------------------------------------------------------------------------------
+    
 
     /**
      * Returns a feature reader for the specified fids and revision, or null if the fid set is empty
@@ -511,6 +485,18 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Clones the query and sets the proper type name into it
+     * 
+     * @param query
+     * @return
+     */
+    private Query getTypedQuery(Query query) {
+        DefaultQuery q = new DefaultQuery(query);
+        q.setTypeName(schema.getTypeName());
+        return q;
     }
 
 }

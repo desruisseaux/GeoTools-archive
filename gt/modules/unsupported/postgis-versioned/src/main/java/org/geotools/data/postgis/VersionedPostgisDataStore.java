@@ -47,6 +47,8 @@ import org.geotools.data.FeatureWriter;
 import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.VersioningDataStore;
+import org.geotools.data.VersioningFeatureStore;
 import org.geotools.data.jdbc.ConnectionPool;
 import org.geotools.data.jdbc.JDBCDataStoreConfig;
 import org.geotools.data.jdbc.JDBCUtils;
@@ -92,7 +94,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @since 2.4
  * 
  */
-public class VersionedPostgisDataStore implements DataStore {
+public class VersionedPostgisDataStore implements VersioningDataStore {
 
     /** The logger for the postgis module. */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.data.postgis");
