@@ -995,6 +995,7 @@ public class Schemas {
                 }
             }
 
+            LOGGER.warning( "Could not resolve schema location: " + rawSchemaLocationURI + " to physical location." );	
             return null;
         }
     }
