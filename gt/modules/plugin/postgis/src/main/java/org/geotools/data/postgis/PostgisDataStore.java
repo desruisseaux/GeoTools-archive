@@ -943,13 +943,31 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
             final int TABLE_NAME = 3;
             final int COLUMN_NAME = 4;
             final int TYPE_NAME = 6;
+            final int NULLABLE = 11;
             String typeName = metadataRs.getString(TYPE_NAME);
-
+            
             if (typeName.equals("geometry")) {
                 String tableName = metadataRs.getString(TABLE_NAME);
                 String columnName = metadataRs.getString(COLUMN_NAME);
+                
+                // check for nullability
+                int nullCode = metadataRs.getInt( NULLABLE );
+                boolean nillable = true;
+                switch( nullCode ) {
+                    case DatabaseMetaData.columnNoNulls:
+                        nillable = false;
+                        break;
+                        
+                    case DatabaseMetaData.columnNullable:
+                        nillable = true;
+                        break;
+                        
+                    case DatabaseMetaData.columnNullableUnknown:
+                        nillable = true;
+                        break;
+                }
 
-                return getGeometryAttribute(tableName, columnName);
+                return getGeometryAttribute(tableName, columnName, nillable);
             } else {
                 return super.buildAttributeType(metadataRs);
             }
@@ -985,6 +1003,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      *
      * @param tableName The feature table name.
      * @param columnName The geometry column name.
+     * @param nillable 
      *
      * @return Geometric attribute.
      *
@@ -995,7 +1014,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * @task This should probably take a Transaction, so if things mess up then
      *       we can rollback.
      */
-    AttributeType getGeometryAttribute(String tableName, String columnName)
+    AttributeType getGeometryAttribute(String tableName, String columnName, boolean nillable)
         throws IOException {
         Connection dbConnection = null;
         Class type = null;
@@ -1095,8 +1114,8 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         } catch (FactoryException e) {
             crs = null;
         }
-
-        return AttributeTypeFactory.newAttributeType(columnName, type, true, 0, null, crs);
+        
+        return AttributeTypeFactory.newAttributeType(columnName, type, nillable,  0, null, crs);
     }
 
     private PostgisAuthorityFactory getPostgisAuthorityFactory() {

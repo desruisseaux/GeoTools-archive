@@ -353,6 +353,11 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
             assertEquals("attribute " + expectedAttribute.getName(), expectedAttribute,
                     actualAttribute);
         }
+        
+        // make sure the geometry is nillable and has minOccurrs to 0
+        AttributeType dg = actual.getDefaultGeometry();
+        assertTrue(dg.isNillable());
+        assertEquals(0, dg.getMinOccurs());
 
         assertEquals(expected, actual);
     }
@@ -372,6 +377,11 @@ public class PostgisDataStoreAPIOnlineTest extends AbstractPostgisDataTestCase {
             assertEquals("attribute " + expectedAttribute.getName(), expectedAttribute,
                     actualAttribute);
         }
+        
+        // make sure the geometry is nillable and has minOccurrs to 0
+        AttributeType dg = actual.getDefaultGeometry();
+        assertTrue(dg.isNillable());
+        assertEquals(0, dg.getMinOccurs());
 
         assertEquals(expected, actual);
     }

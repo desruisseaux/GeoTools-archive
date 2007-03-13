@@ -81,7 +81,7 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
     protected AttributeType createAttributeType(String name, FeatureType type,
         boolean isNillable) {
             
-        return new FeatureAttributeType(name, type, isNillable,1,1);
+        return new FeatureAttributeType(name, type, isNillable, minOccurs(isNillable) ,1);
     }
     
     protected Filter length(int fieldLength, String attributeXPath){
@@ -110,18 +110,18 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
         boolean isNillable, int fieldLength, Object defaultValue) {
         Filter f = length( fieldLength, name );
         
+        int minOccurs = minOccurs(isNillable);
         if (Number.class.isAssignableFrom(clazz)) {
             return new NumericAttributeType(
                 name, clazz, isNillable,1,1,defaultValue,f);
         } else if (CharSequence.class.isAssignableFrom(clazz)) {
-            return new TextualAttributeType(name,isNillable,1,1,defaultValue,f);
+            return new TextualAttributeType(name,isNillable,minOccurs,1,defaultValue,f);
         } else if (java.util.Date.class.isAssignableFrom(clazz)) {
-            //return new TemporalAttributeType(name,isNillable,1,1,defaultValue,f);
-        	return new TemporalAttributeType(name,clazz,isNillable,1,1,defaultValue,f);
+        	return new TemporalAttributeType(name,clazz,isNillable,minOccurs,1,defaultValue,f);
         } else if (Geometry.class.isAssignableFrom( clazz )){
-            return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue,null,f);
+            return new GeometricAttributeType(name,clazz,isNillable,minOccurs,1, defaultValue,null,f);
         }        
-        return new DefaultAttributeType(name, clazz, isNillable,1,1,defaultValue, f);
+        return new DefaultAttributeType(name, clazz, isNillable,minOccurs,1,defaultValue, f);
     }
     
     /**
@@ -171,8 +171,12 @@ public class DefaultAttributeTypeFactory extends AttributeTypeFactory {
                 // TODO something
             }
             Filter f = cf == null?org.geotools.filter.Filter.ALL:cf;
-            return new GeometricAttributeType(name,clazz,isNillable,1,1, defaultValue, (CoordinateReferenceSystem) metaData,f);
+            return new GeometricAttributeType(name,clazz,isNillable,minOccurs(isNillable),1, defaultValue, (CoordinateReferenceSystem) metaData,f);
         }
         return createAttributeType( name, clazz, isNillable, fieldLength, defaultValue );
+    }
+    
+    private int minOccurs(boolean nillable) {
+        return nillable ? 0 : 1;
     }
 }
