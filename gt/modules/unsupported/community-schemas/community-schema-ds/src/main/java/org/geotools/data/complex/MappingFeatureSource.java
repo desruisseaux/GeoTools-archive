@@ -12,8 +12,10 @@ import org.geotools.data.FeatureListener;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.feature.FeatureSource2;
+import org.geotools.data.feature.adapter.GTFeatureTypeAdapter;
 import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureType;
+import org.opengis.feature.type.AttributeType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
@@ -48,9 +50,13 @@ class MappingFeatureSource implements FeatureSource2 {
 
     private FeatureTypeMapping mappings;
 
+    private org.geotools.feature.FeatureType gtType;
+    
     public MappingFeatureSource(ComplexDataStore store, FeatureTypeMapping mapping) {
         this.store = store;
         this.mappings = mapping;
+        FeatureType type = (FeatureType) mapping.getTargetFeature().getType();
+        gtType = new GTFeatureTypeAdapter(type);
     }
 
     public void addFeatureListener(FeatureListener listener) {
@@ -95,6 +101,11 @@ class MappingFeatureSource implements FeatureSource2 {
         return store;
     }
 
+    public org.geotools.feature.FeatureType getSchema() {
+        return gtType;
+    }
+
+
     public FeatureCollection getFeatures(Query query) throws IOException {
         throw new UnsupportedOperationException();
     }
@@ -104,10 +115,6 @@ class MappingFeatureSource implements FeatureSource2 {
     }
 
     public FeatureCollection getFeatures() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    public FeatureType getSchema() {
         throw new UnsupportedOperationException();
     }
 

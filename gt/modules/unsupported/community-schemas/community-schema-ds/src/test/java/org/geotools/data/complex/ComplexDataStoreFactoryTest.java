@@ -111,7 +111,7 @@ public class ComplexDataStoreFactoryTest extends TestCase {
      * @throws IOException
      */
     public void testFactoryLookup() throws IOException {
-        DataAccess ds = DataAccessFinder.createAccess((Object) params);
+        DataAccess ds = DataAccessFinder.createAccess(params);
         assertNotNull(ds);
         assertTrue(ds instanceof ComplexDataStore);
 

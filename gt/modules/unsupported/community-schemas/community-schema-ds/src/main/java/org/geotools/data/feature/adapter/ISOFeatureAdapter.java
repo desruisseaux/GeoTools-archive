@@ -43,7 +43,7 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
 
     public ISOFeatureAdapter(org.geotools.feature.Feature feature, SimpleFeatureType ftype,
             SimpleFeatureFactory attributeFactory) {
-        if (adaptee instanceof GTFeaureAdapter) {
+        if (adaptee instanceof GTFeatureAdapter) {
             throw new IllegalArgumentException(
                     "No need to adapt GTFeaureAdapter, use getAdaptee() instead");
         }

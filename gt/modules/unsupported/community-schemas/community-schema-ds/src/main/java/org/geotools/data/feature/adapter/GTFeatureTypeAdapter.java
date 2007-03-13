@@ -16,18 +16,18 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 
-public class GTSimpleFeatureTypeAdapter implements FeatureType {
+public class GTFeatureTypeAdapter implements FeatureType {
 
-    private SimpleFeatureType type;
+    private org.opengis.feature.type.FeatureType type;
 
-    public GTSimpleFeatureTypeAdapter(SimpleFeatureType type) {
+    public GTFeatureTypeAdapter(org.opengis.feature.type.FeatureType type) {
         if(type instanceof ISOFeatureTypeAdapter){
             throw new IllegalArgumentException("No need to adapt ISOFEatureTypeAdapter, use getAdaptee() instead");
         }
         this.type = type;
     }
     
-    public SimpleFeatureType getAdaptee(){
+    public org.opengis.feature.type.FeatureType getAdaptee(){
         return type;
     }
 
@@ -46,7 +46,7 @@ public class GTSimpleFeatureTypeAdapter implements FeatureType {
             builder.add(attributes[i], names[i]);
         }
         SimpleFeature feature = (SimpleFeature) builder.build(featureID);
-        return new GTFeaureAdapter(feature, this);
+        return new GTFeatureAdapter(feature, this);
     }
 
     public Feature duplicate(Feature feature) throws IllegalAttributeException {
@@ -76,7 +76,11 @@ public class GTSimpleFeatureTypeAdapter implements FeatureType {
     }
 
     public int getAttributeCount() {
-        return type.getNumberOfAttribtues();
+        if(type instanceof SimpleFeatureType){
+            return ((SimpleFeatureType)type).getNumberOfAttribtues();
+        }else{
+            return type.attributes().size();
+        }
     }
 
     public AttributeType getAttributeType(String xPath) {

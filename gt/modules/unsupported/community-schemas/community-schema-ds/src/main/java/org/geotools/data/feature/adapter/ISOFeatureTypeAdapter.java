@@ -31,7 +31,7 @@ public class ISOFeatureTypeAdapter implements FeatureType, SimpleFeatureType {
     private FeatureType isoType;
 
     public ISOFeatureTypeAdapter(org.geotools.feature.FeatureType featureType) {
-        if (featureType instanceof GTSimpleFeatureTypeAdapter) {
+        if (featureType instanceof GTFeatureTypeAdapter) {
             throw new IllegalArgumentException(
                     "No need to adapt GTFeatureTypeAdapter, use getAdaptee() instead");
         }

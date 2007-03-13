@@ -16,6 +16,8 @@ public class FeatureCollectionAdapter extends AbstractCollection {
     
     private SimpleFeatureFactory attributeFactory;
 	
+    private int maxFeatures = Integer.MAX_VALUE;
+    
     public FeatureCollectionAdapter(SimpleFeatureType isoType, FeatureCollection features, SimpleFeatureFactory attributeFactory) {
 		this.isoType = isoType;
 		this.gtFeatures = features;
@@ -25,11 +27,13 @@ public class FeatureCollectionAdapter extends AbstractCollection {
 		final Iterator gtFeatureIterator = gtFeatures.iterator();
 
 		Iterator isoFeatures = new Iterator() {
+            int featureCount = 0;
 			public boolean hasNext() {
-				return gtFeatureIterator.hasNext();
+				return featureCount <= maxFeatures && gtFeatureIterator.hasNext();
 			}
 
 			public Object next() {
+                featureCount++;
 				Feature gtFeature = (Feature) gtFeatureIterator.next();
 				org.opengis.feature.Feature isoFeature;
 				isoFeature = new ISOFeatureAdapter(gtFeature, isoType, attributeFactory);
@@ -47,4 +51,12 @@ public class FeatureCollectionAdapter extends AbstractCollection {
 	public int size() {
 		return gtFeatures.size();
 	}
+
+    public int getMaxFeatures() {
+        return maxFeatures;
+    }
+
+    public void setMaxFeatures(int maxFeatures) {
+        this.maxFeatures = maxFeatures;
+    }
 }

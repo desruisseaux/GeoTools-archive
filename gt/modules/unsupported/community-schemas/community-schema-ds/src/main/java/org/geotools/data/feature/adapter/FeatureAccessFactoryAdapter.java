@@ -48,6 +48,9 @@ public class FeatureAccessFactoryAdapter implements DataAccessFactory {
 
     public DataAccess createAccess(Object params) throws IOException {
         DataStore dataStore = DataStoreFinder.getDataStore((Map) params);
+        if(dataStore instanceof DataAccess){
+            return (DataAccess)dataStore;
+        }
         SimpleFeatureFactory attributeFactory = new SimpleFeatureFactoryImpl();
         FeatureAccessAdapter adapter = new FeatureAccessAdapter(dataStore, attributeFactory);
         return adapter;

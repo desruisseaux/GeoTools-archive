@@ -20,7 +20,6 @@ package org.geotools.data.complex;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,29 +28,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.geotools.catalog.ServiceInfo;
-import org.geotools.data.AbstractDataStore;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.LockingManager;
 import org.geotools.data.Query;
 import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Source;
+import org.geotools.data.Transaction;
 import org.geotools.data.complex.filter.FilterAttributeExtractor;
 import org.geotools.data.complex.filter.UnmappingFilterVisitor;
 import org.geotools.data.complex.filter.XPath;
 import org.geotools.data.feature.FeatureAccess;
+import org.geotools.data.feature.FeatureSource2;
 import org.geotools.data.feature.adapter.GTComlexFeatureTypeAdapter;
-import org.geotools.data.feature.adapter.GTSimpleFeatureTypeAdapter;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.feature.DefaultFeatureType;
-import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.SchemaException;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
@@ -61,15 +59,16 @@ import org.opengis.filter.expression.PropertyName;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class ComplexDataStore extends AbstractDataStore implements
-        FeatureAccess {
+public class ComplexDataStore /* extends AbstractDataStore */implements FeatureAccess {
 
     private static final boolean IS_WRITABLE = false;
 
+    private static final Logger LOGGER = Logger.getLogger(ComplexDataStore.class.getPackage()
+            .getName());
+
     private Map/* <String, FeatureTypeMapping> */mappings = Collections.EMPTY_MAP;
 
-    private FilterFactory filterFac = CommonFactoryFinder
-            .getFilterFactory(null);
+    private FilterFactory filterFac = CommonFactoryFinder.getFilterFactory(null);
 
     /**
      * 
@@ -78,7 +77,7 @@ public class ComplexDataStore extends AbstractDataStore implements
      *            FeatureType this DataStore is going to hold.
      */
     public ComplexDataStore(Set/* <FeatureTypeMapping> */mappings) {
-        super(ComplexDataStore.IS_WRITABLE);
+        // super(ComplexDataStore.IS_WRITABLE);
         FeatureTypeMapping mapping;
         this.mappings = new HashMap();
         for (Iterator it = mappings.iterator(); it.hasNext();) {
@@ -104,11 +103,10 @@ public class ComplexDataStore extends AbstractDataStore implements
      * Finds the target FeatureType named <code>typeName</code> in this
      * ComplexDatastore's internal list of FeatureType mappings and returns it.
      */
-    public org.geotools.feature.FeatureType getSchema(String typeName)
-            throws IOException {
+    public org.geotools.feature.FeatureType getSchema(String typeName) throws IOException {
         FeatureTypeMapping mapping = getMapping(typeName);
         AttributeDescriptor targetFeature = mapping.getTargetFeature();
-        
+
         org.geotools.feature.FeatureType gtType;
         gtType = new GTComlexFeatureTypeAdapter(targetFeature);
         return gtType;
@@ -122,8 +120,7 @@ public class ComplexDataStore extends AbstractDataStore implements
      * @throws IOException
      */
     private FeatureTypeMapping getMapping(String typeName) throws IOException {
-        FeatureTypeMapping mapping = (FeatureTypeMapping) this.mappings
-                .get(typeName);
+        FeatureTypeMapping mapping = (FeatureTypeMapping) this.mappings.get(typeName);
         if (mapping == null) {
             StringBuffer availables = new StringBuffer("[");
             for (Iterator it = mappings.keySet().iterator(); it.hasNext();) {
@@ -146,8 +143,7 @@ public class ComplexDataStore extends AbstractDataStore implements
      * <code>getFeatureReader(typeName)</code>
      * <p>
      */
-    protected FeatureReader getFeatureReader(String typeName, Query query)
-            throws IOException {
+    protected FeatureReader getFeatureReader(String typeName, Query query) throws IOException {
         throw new UnsupportedOperationException("Use access(typeName)");
         /*
          * FeatureTypeMapping mapping = getMapping(typeName);
@@ -160,8 +156,7 @@ public class ComplexDataStore extends AbstractDataStore implements
      * 
      * @param typeName
      */
-    protected FeatureReader getFeatureReader(String typeName)
-            throws IOException {
+    protected FeatureReader getFeatureReader(String typeName) throws IOException {
 
         throw new UnsupportedOperationException(
                 "Not needed since we support getFeatureReader(String, Query)");
@@ -251,13 +246,11 @@ public class ComplexDataStore extends AbstractDataStore implements
 
         if (!Query.ALL.equals(query)) {
             Filter complexFilter = query.getFilter();
-            AttributeDescriptor descriptor = (AttributeDescriptor) source
-                    .describe();
+            AttributeDescriptor descriptor = (AttributeDescriptor) source.describe();
 
             Filter unrolledFilter = ComplexDataStore.unrollFilter(complexFilter, mapping);
 
-            List propNames = getSurrogatePropertyNames(
-                    query.getPropertyNames(), mapping);
+            List propNames = getSurrogatePropertyNames(query.getPropertyNames(), mapping);
 
             DefaultQuery newQuery = new DefaultQuery();
 
@@ -266,8 +259,7 @@ public class ComplexDataStore extends AbstractDataStore implements
             newQuery.setFilter(unrolledFilter);
             newQuery.setPropertyNames(propNames);
             newQuery.setCoordinateSystem(query.getCoordinateSystem());
-            newQuery.setCoordinateSystemReproject(query
-                    .getCoordinateSystemReproject());
+            newQuery.setCoordinateSystemReproject(query.getCoordinateSystemReproject());
             newQuery.setHandle(query.getHandle());
             newQuery.setMaxFeatures(query.getMaxFeatures());
 
@@ -284,8 +276,7 @@ public class ComplexDataStore extends AbstractDataStore implements
      *         else the list of needed surrogate attributes to satisfy the
      *         mapping of prorperties in <code>mappingProperties</code>
      */
-    public List getSurrogatePropertyNames(String[] mappingProperties,
-            FeatureTypeMapping mapping) {
+    public List getSurrogatePropertyNames(String[] mappingProperties, FeatureTypeMapping mapping) {
         List propNames = null;
 
         final FeatureType mappedType;
@@ -300,23 +291,18 @@ public class ComplexDataStore extends AbstractDataStore implements
             // add all surrogate attributes involved in mapping of the requested
             // target schema attributes
             List attMappings = mapping.getAttributeMappings();
-            List/* <String> */requestedProperties = Arrays
-                    .asList(mappingProperties);
+            List/* <String> */requestedProperties = Arrays.asList(mappingProperties);
 
             for (Iterator itr = requestedProperties.iterator(); itr.hasNext();) {
                 String requestedPropertyXPath = (String) itr.next();
                 List/* <XPath.Step> */requestedPropertySteps;
-                requestedPropertySteps = XPath.steps(targetName,
-                        requestedPropertyXPath);
+                requestedPropertySteps = XPath.steps(targetName, requestedPropertyXPath);
 
                 for (Iterator aitr = attMappings.iterator(); aitr.hasNext();) {
-                    final AttributeMapping entry = (AttributeMapping) aitr
-                            .next();
+                    final AttributeMapping entry = (AttributeMapping) aitr.next();
                     final String mappedPropertyXPath = entry.getTargetXPath();
-                    final Expression sourceExpression = entry
-                            .getSourceExpression();
-                    final Expression idExpression = entry
-                            .getIdentifierExpression();
+                    final Expression sourceExpression = entry.getSourceExpression();
+                    final Expression idExpression = entry.getIdentifierExpression();
 
                     List/* <XPath.Step> */targetSteps;
                     targetSteps = XPath.steps(targetName, mappedPropertyXPath);
@@ -328,26 +314,22 @@ public class ComplexDataStore extends AbstractDataStore implements
                         FilterAttributeExtractor extractor = new FilterAttributeExtractor();
                         sourceExpression.accept(extractor, null);
                         idExpression.accept(extractor, null);
-                        
+
                         Set exprAtts = extractor.getAttributeNameSet();
 
-                        for (Iterator eitr = exprAtts.iterator(); eitr
-                                .hasNext();) {
+                        for (Iterator eitr = exprAtts.iterator(); eitr.hasNext();) {
                             String mappedAtt = (String) eitr.next();
-                            PropertyName propExpr = filterFac
-                                    .property(mappedAtt);
+                            PropertyName propExpr = filterFac.property(mappedAtt);
                             Object object = propExpr.evaluate(mappedType);
                             AttributeDescriptor mappedAttribute = (AttributeDescriptor) object;
 
                             if (mappedAttribute != null) {
                                 requestedSurrogateProperties.add(mappedAtt);
                             } else {
-                                AbstractDataStore.LOGGER
-                                        .info("mapped type does not contains property "
-                                                + mappedAtt);
+                                LOGGER.info("mapped type does not contains property " + mappedAtt);
                             }
                         }
-                        AbstractDataStore.LOGGER.fine("adding atts needed for : " + exprAtts);
+                        LOGGER.fine("adding atts needed for : " + exprAtts);
                     }
                 }
             }
@@ -364,8 +346,7 @@ public class ComplexDataStore extends AbstractDataStore implements
      * @param complexFilter
      * @return TODO: implement filter unrolling
      */
-    public static Filter unrollFilter(Filter complexFilter,
-            FeatureTypeMapping mapping) {
+    public static Filter unrollFilter(Filter complexFilter, FeatureTypeMapping mapping) {
         UnmappingFilterVisitor visitor = new UnmappingFilterVisitor(mapping);
         complexFilter.accept(visitor, null);
         // visitor.visit(complexFilter);
@@ -413,5 +394,49 @@ public class ComplexDataStore extends AbstractDataStore implements
             names.add(name);
         }
         return names;
+    }
+
+    public void createSchema(org.geotools.feature.FeatureType featureType) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public FeatureReader getFeatureReader(Query query, Transaction transaction) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public FeatureSource getFeatureSource(String typeName) throws IOException {
+        FeatureTypeMapping mapping = getMapping(typeName);
+        Name name = mapping.getTargetFeature().getName();
+        FeatureSource2 source = (FeatureSource2) access(name);
+        return source;
+    }
+
+    public FeatureWriter getFeatureWriter(String typeName, Filter filter, Transaction transaction)
+            throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public FeatureWriter getFeatureWriter(String typeName, Transaction transaction)
+            throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public FeatureWriter getFeatureWriterAppend(String typeName, Transaction transaction)
+            throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    public LockingManager getLockingManager() {
+        return null;
+    }
+
+    public FeatureSource getView(Query query) throws IOException, SchemaException {
+        throw new UnsupportedOperationException();
+    }
+
+    public void updateSchema(String typeName, org.geotools.feature.FeatureType featureType)
+            throws IOException {
+        throw new UnsupportedOperationException();
     }
 }

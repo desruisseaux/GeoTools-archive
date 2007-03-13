@@ -35,8 +35,8 @@ import org.geotools.data.SchemaNotFoundException;
 import org.geotools.data.Source;
 import org.geotools.data.Transaction;
 import org.geotools.data.feature.FeatureAccess;
-import org.geotools.data.feature.adapter.GTFeaureAdapter;
-import org.geotools.data.feature.adapter.GTSimpleFeatureTypeAdapter;
+import org.geotools.data.feature.adapter.GTFeatureAdapter;
+import org.geotools.data.feature.adapter.GTFeatureTypeAdapter;
 import org.geotools.data.feature.adapter.ISOFeatureAdapter;
 import org.geotools.data.feature.adapter.ISOFeatureTypeAdapter;
 import org.geotools.feature.IllegalAttributeException;
@@ -304,7 +304,7 @@ public class MemoryDataAccess extends AbstractDataStore implements FeatureAccess
             if (isoType instanceof ISOFeatureTypeAdapter) {
                 gtType = ((ISOFeatureTypeAdapter) isoType).getAdaptee();
             } else {
-                gtType = new GTSimpleFeatureTypeAdapter((SimpleFeatureType) isoType);
+                gtType = new GTFeatureTypeAdapter((SimpleFeatureType) isoType);
             }
             return gtType;
         }
@@ -400,7 +400,7 @@ public class MemoryDataAccess extends AbstractDataStore implements FeatureAccess
         if (featureType instanceof ISOFeatureTypeAdapter) {
             gtFType = ((ISOFeatureTypeAdapter) featureType).getAdaptee();
         } else {
-            gtFType = new GTSimpleFeatureTypeAdapter((SimpleFeatureType) featureType);
+            gtFType = new GTFeatureTypeAdapter((SimpleFeatureType) featureType);
         }
 
         return new FeatureReader() {
@@ -432,7 +432,7 @@ public class MemoryDataAccess extends AbstractDataStore implements FeatureAccess
                         gtFeature = (featureAdapter).getAdaptee();
                     } else {
                         SimpleFeature simpleFeature = (SimpleFeature) obj;
-                        gtFeature = new GTFeaureAdapter(simpleFeature, gtFType);
+                        gtFeature = new GTFeatureAdapter(simpleFeature, gtFType);
                     }
 
                     return gtFType.duplicate(gtFeature);
@@ -486,7 +486,7 @@ public class MemoryDataAccess extends AbstractDataStore implements FeatureAccess
         if (featureType instanceof ISOFeatureTypeAdapter) {
             gtFType = ((ISOFeatureTypeAdapter) featureType).getAdaptee();
         } else {
-            gtFType = new GTSimpleFeatureTypeAdapter((SimpleFeatureType) featureType);
+            gtFType = new GTFeatureTypeAdapter((SimpleFeatureType) featureType);
         }
 
         return new FeatureWriter() {
@@ -517,7 +517,7 @@ public class MemoryDataAccess extends AbstractDataStore implements FeatureAccess
                         gtLive = (org.geotools.feature.SimpleFeature) ((ISOFeatureAdapter) live)
                                 .getAdaptee();
                     } else {
-                        gtLive = new GTFeaureAdapter(live, gtFType);
+                        gtLive = new GTFeatureAdapter(live, gtFType);
                     }
                     try {
                         current = (org.geotools.feature.SimpleFeature) gtFType.duplicate(gtLive);

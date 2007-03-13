@@ -24,14 +24,14 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author Gabriel Roldan, Axios Engineering
  * 
  */
-public class GTFeaureAdapter implements org.geotools.feature.SimpleFeature {
+public class GTFeatureAdapter implements org.geotools.feature.SimpleFeature {
 
     private SimpleFeature adaptee;
 
     private FeatureType gtType;
 
 
-    public GTFeaureAdapter(SimpleFeature adaptee, FeatureType gtType) {
+    public GTFeatureAdapter(SimpleFeature adaptee, FeatureType gtType) {
         if(adaptee instanceof ISOFeatureAdapter){
             throw new IllegalArgumentException("No need to adapt ISOFEatureAdapter, use getAdaptee() instead");
         }
