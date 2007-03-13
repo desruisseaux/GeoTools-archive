@@ -154,6 +154,7 @@ public class DefaultQuery implements Query {
       this.sortBy = query.getSortBy();
       this.coordinateSystem = query.getCoordinateSystem();
       this.coordinateSystemReproject = query.getCoordinateSystemReproject();
+      this.version = query.getVersion();
     }
     // deprecated constructors
     //
