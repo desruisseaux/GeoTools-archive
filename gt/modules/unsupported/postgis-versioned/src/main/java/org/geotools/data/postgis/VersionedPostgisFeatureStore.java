@@ -339,6 +339,8 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
     public FeatureCollection getLog(String fromVersion, String toVersion, Filter filter)
             throws IOException {
+        if(filter == null)
+            filter = Filter.INCLUDE;
         RevisionInfo r1 = new RevisionInfo(fromVersion);
         RevisionInfo r2 = new RevisionInfo(toVersion);
 
@@ -427,6 +429,9 @@ public class VersionedPostgisFeatureStore extends AbstractFeatureStore implement
 
     public FeatureDiffReader getDifferences(String fromVersion, String toVersion, Filter filter)
             throws IOException {
+        if(filter == null)
+            filter = Filter.INCLUDE;
+        
         RevisionInfo r1 = new RevisionInfo(fromVersion);
         RevisionInfo r2 = new RevisionInfo(toVersion);
 
