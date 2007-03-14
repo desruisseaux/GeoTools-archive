@@ -18,6 +18,8 @@ package org.geotools.data.postgis;
 import java.util.Collections;
 import java.util.Map;
 
+import org.geotools.feature.Feature;
+
 /**
  * Represents the difference between two states of the same feature.
  * 
@@ -31,13 +33,14 @@ public class FeatureDiff {
     public static final int MODIFIED = 0;
 
     /**
-     * Feature does not exists in fromVersion, has been created in the meantime (change map contains
-     * all attributes in this case)
+     * Feature does not exists in fromVersion, has been created in the meantime
+     * (change map contains all attributes in this case)
      */
     public static final int CREATED = 1;
 
     /**
-     * Feature existed in fromVersion, but has been deleted (change map is empty)
+     * Feature existed in fromVersion, but has been deleted (change map is
+     * empty)
      */
     public static final int DELETED = 2;
 
@@ -46,7 +49,41 @@ public class FeatureDiff {
     int state;
 
     Map changes;
+    
+    Feature feature;
 
+    /**
+     * Creates a new feature difference for a deleted feature
+     * 
+     * @param ID
+     * @param fromVersion
+     * @param toVersion
+     * @param state
+     * @param changes
+     */
+    FeatureDiff(String ID) {
+        super();
+        this.ID = ID;
+        this.state = DELETED;
+        this.changes = Collections.EMPTY_MAP;
+    }
+    
+    /**
+     * Creates a new feature difference for a modified feature
+     * 
+     * @param ID
+     * @param fromVersion
+     * @param toVersion
+     * @param state
+     * @param changes
+     */
+    FeatureDiff(String ID, Map changes) {
+        super();
+        this.ID = ID;
+        this.state = MODIFIED;
+        this.changes = Collections.unmodifiableMap(changes);
+    }
+    
     /**
      * Creates a new feature difference
      * 
@@ -56,16 +93,17 @@ public class FeatureDiff {
      * @param state
      * @param changes
      */
-    FeatureDiff(String ID, int state, Map changes) {
+    FeatureDiff(Feature feature) {
         super();
-        this.ID = ID;
-        this.state = state;
-        if (state == MODIFIED || state == CREATED)
-            this.changes = Collections.unmodifiableMap(changes);
+        this.ID = feature.getID();
+        this.state = CREATED;
+        this.feature = feature;
+        this.changes = Collections.EMPTY_MAP;
     }
 
     /**
-     * A map of changes, from attribute name to the value at toVersion
+     * Returns a map of changes, from attribute name to the value at toVersion,
+     * if state is {@link #MODIFIED}, an empty map otherwise
      * 
      * @return
      */
@@ -94,6 +132,14 @@ public class FeatureDiff {
      */
     public int getState() {
         return state;
+    }
+    
+    /**
+     * Returns the inserted feature, if the state is {@link #CREATED}, null otherwise
+     * @return
+     */
+    public Feature getFeature() {
+        return feature;
     }
 
 }

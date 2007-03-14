@@ -812,11 +812,11 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         diff = fdr.next();
         assertEquals("river.rv2", diff.getID());
         assertEquals(FeatureDiff.CREATED, diff.getState());
-        assertEquals("rv2 v3", diff.getChanges().get("river"));
-        assertEquals(new Double(3.0), diff.getChanges().get("flow"));
+        assertEquals("rv2 v3", diff.getFeature().getAttribute("river"));
+        assertEquals(new Double(3.0), diff.getFeature().getAttribute("flow"));
         // ... can't compare directly, they have different geometry factories (afaik)
         assertTrue(DataUtilities.attributesEqual(lines(new int[][] { { 200, 200, 120, 120 } }),
-                diff.getChanges().get("geom")));
+                diff.getFeature().getDefaultGeometry()));
         assertFalse(fdr.hasNext());
         fdr.close();
 
@@ -849,7 +849,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         assertTrue(fdr.hasNext());
         diff = fdr.next();
         assertEquals(FeatureDiff.CREATED, diff.getState());
-        assertEquals(fs.getSchema().getAttributeCount(), diff.getChanges().size());
+        assertEquals(fs.getSchema(), diff.getFeature().getFeatureType());
         assertFalse(fdr.hasNext());
         fdr.close();
     }

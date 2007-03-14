@@ -105,19 +105,18 @@ public class FeatureDiffReader {
 
             if (createdReader != null) {
                 // all attributes in the external type become changes
-                Feature f = createdReader.next();
-                Map changes = new HashMap();
+                final Feature f = createdReader.next();
+                final Object[] attributes = new Object[externalFeatureType.getAttributeCount()];
                 for (int i = 0; i < externalFeatureType.getAttributeCount(); i++) {
-                    String attName = externalFeatureType.getAttributeType(i).getName();
-                    changes.put(attName, f.getAttribute(attName));
+                    attributes[i] = f.getAttribute(externalFeatureType.getAttributeType(i).getName());
                 }
                 String id = mapper.getUnversionedFid(f.getID());
-                return new FeatureDiff(id, FeatureDiff.CREATED, changes);
+                return new FeatureDiff(externalFeatureType.create(attributes, id));
             } else if (deletedReader != null) {
                 // no changes, we just need the id
-                Feature f = deletedReader.next();
-                String id = mapper.getUnversionedFid(f.getID());
-                return new FeatureDiff(id, FeatureDiff.DELETED, null);
+                final Feature f = deletedReader.next();
+                final String id = mapper.getUnversionedFid(f.getID());
+                return new FeatureDiff(id);
             } else {
                 FeatureDiff diff = lastDiff;
                 lastDiff = null;
@@ -185,7 +184,7 @@ public class FeatureDiffReader {
                     }
                     if (!changes.isEmpty()) {
                         String id = mapper.getUnversionedFid(from.getID());
-                        lastDiff = new FeatureDiff(id, FeatureDiff.MODIFIED, changes);
+                        lastDiff = new FeatureDiff(id, changes);
                         return true;
                     }
                 }
@@ -221,4 +220,8 @@ public class FeatureDiffReader {
             tvReader = null;
         }
     }
+    
+    protected void finalize() throws Throwable {
+        close();
+    }   
 }
