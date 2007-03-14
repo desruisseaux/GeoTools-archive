@@ -2,16 +2,19 @@ package org.geotools.xml.impl;
 
 import java.util.logging.Logger;
 
+import org.eclipse.xsd.XSDAttributeDeclaration;
 import org.eclipse.xsd.XSDElementDeclaration;
 import org.picocontainer.MutablePicoContainer;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * Utility class to be used by bindings to encode an element.
+ * Utility class to be used by bindings to encode an element or an attribute.
  *
  * 
  * @author Justin Deoliveira, The Open Planning Project
+ * TODO: rename this class, it is not just for element.s
  *
  */
 public class ElementEncoder {
@@ -57,6 +60,16 @@ public class ElementEncoder {
 		bindingWalker.walk( element, executor, context );
 		
 		return executor.getEncodedElement();
+	}
+	
+	public Attr encode( Object value, XSDAttributeDeclaration attribute, Document document ) {
+		
+		AttributeEncodeExecutor executor = 
+			new AttributeEncodeExecutor(value,attribute,document,logger);
+		
+		bindingWalker.walk(attribute,executor,context);
+		
+		return executor.getEncodedAttribute();
 	}
 	
 	public void setContext(MutablePicoContainer context) {

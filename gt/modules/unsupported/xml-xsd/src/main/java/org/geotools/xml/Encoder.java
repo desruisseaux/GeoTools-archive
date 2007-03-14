@@ -630,13 +630,7 @@ public class Encoder {
 			XSDAttributeDeclaration attribute = 
 				(XSDAttributeDeclaration)component;
 			
-			AttributeEncodeExecutor encoder = 
-				new AttributeEncodeExecutor(object,attribute,doc,logger);
-			
-			//bindingWalker.walk(attribute,encoder,bindingLoader.getContainer());
-			bindingWalker.walk(attribute,encoder,context);
-			
-			return encoder.getEncodedAttribute();
+			return encoder.encode( object, attribute, doc );
 		}
 		
 		return null;
