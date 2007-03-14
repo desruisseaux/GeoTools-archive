@@ -85,6 +85,14 @@ public class FeatureDiffReader {
     public String getToVersion() {
         return toVersion;
     }
+    
+    /**
+     * Returns the feature type whose features are diffed with this reader
+     * @return
+     */
+    public FeatureType getSchema() {
+        return externalFeatureType;
+    }
 
     /**
      * Reads the next FeatureDifference

@@ -30,13 +30,13 @@ public class FeatureDiff {
     /**
      * Feature exists in both versions, but has been modified
      */
-    public static final int MODIFIED = 0;
+    public static final int UPDATED = 0;
 
     /**
      * Feature does not exists in fromVersion, has been created in the meantime
      * (change map contains all attributes in this case)
      */
-    public static final int CREATED = 1;
+    public static final int INSERTED = 1;
 
     /**
      * Feature existed in fromVersion, but has been deleted (change map is
@@ -80,7 +80,7 @@ public class FeatureDiff {
     FeatureDiff(String ID, Map changes) {
         super();
         this.ID = ID;
-        this.state = MODIFIED;
+        this.state = UPDATED;
         this.changes = Collections.unmodifiableMap(changes);
     }
     
@@ -96,14 +96,14 @@ public class FeatureDiff {
     FeatureDiff(Feature feature) {
         super();
         this.ID = feature.getID();
-        this.state = CREATED;
+        this.state = INSERTED;
         this.feature = feature;
         this.changes = Collections.EMPTY_MAP;
     }
 
     /**
      * Returns a map of changes, from attribute name to the value at toVersion,
-     * if state is {@link #MODIFIED}, an empty map otherwise
+     * if state is {@link #UPDATED}, an empty map otherwise
      * 
      * @return
      */
@@ -123,8 +123,8 @@ public class FeatureDiff {
     /**
      * The type of difference, either::
      * <ul>
-     * <li>{@link #MODIFIED}</li>
-     * <li>{@link #CREATED}</li>
+     * <li>{@link #UPDATED}</li>
+     * <li>{@link #INSERTED}</li>
      * <li>{@link #DELETED}</li>
      * </ul>
      * 
@@ -135,7 +135,7 @@ public class FeatureDiff {
     }
     
     /**
-     * Returns the inserted feature, if the state is {@link #CREATED}, null otherwise
+     * Returns the inserted feature, if the state is {@link #INSERTED}, null otherwise
      * @return
      */
     public Feature getFeature() {

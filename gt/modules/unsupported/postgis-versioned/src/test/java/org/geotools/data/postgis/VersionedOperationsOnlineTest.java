@@ -793,12 +793,13 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
     public void testDiff() throws IOException, IllegalAttributeException {
         VersionedPostgisDataStore ds = getDataStore();
-        String newId = buildRiverHistory();
+        buildRiverHistory();
         VersionedPostgisFeatureStore fs = (VersionedPostgisFeatureStore) ds
                 .getFeatureSource("river");
 
         // forward, deletion changeset
         FeatureDiffReader fdr = fs.getDifferences("4", "5", Filter.INCLUDE);
+        assertEquals(fs.getSchema(), fdr.getSchema());
         assertTrue(fdr.hasNext());
         FeatureDiff diff = fdr.next();
         assertEquals("river.rv2", diff.getID());
@@ -808,10 +809,11 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // same changeset, but backwards
         fdr = fs.getDifferences("5", "4", Filter.INCLUDE);
+        assertEquals(fs.getSchema(), fdr.getSchema());
         assertTrue(fdr.hasNext());
         diff = fdr.next();
         assertEquals("river.rv2", diff.getID());
-        assertEquals(FeatureDiff.CREATED, diff.getState());
+        assertEquals(FeatureDiff.INSERTED, diff.getState());
         assertEquals("rv2 v3", diff.getFeature().getAttribute("river"));
         assertEquals(new Double(3.0), diff.getFeature().getAttribute("flow"));
         // ... can't compare directly, they have different geometry factories (afaik)
@@ -822,6 +824,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
 
         // forward diff, two modifications on changeset 1-2
         fdr = fs.getDifferences("1", "2", Filter.INCLUDE);
+        assertEquals(fs.getSchema(), fdr.getSchema());
         Set ids = new HashSet(Arrays.asList(new String[] { "river.rv1", "river.rv2" }));
         assertTrue(fdr.hasNext());
         while (fdr.hasNext()) {
@@ -829,7 +832,7 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
             assertTrue("Unexpected id: " + diff.getID(), ids.remove(diff.getID()));
             assertEquals("1", fdr.getFromVersion());
             assertEquals("2", fdr.getToVersion());
-            assertEquals(FeatureDiff.MODIFIED, diff.state);
+            assertEquals(FeatureDiff.UPDATED, diff.state);
             if (diff.getID().equals("river.rv1")) {
                 assertEquals(2, diff.getChanges().size());
                 assertEquals("rv1 v2", diff.getChanges().get("river"));
@@ -846,9 +849,10 @@ public class VersionedOperationsOnlineTest extends AbstractVersionedPostgisDataT
         
         // forward diff on creation
         fdr = fs.getDifferences("3", "4", Filter.INCLUDE);
+        assertEquals(fs.getSchema(), fdr.getSchema());
         assertTrue(fdr.hasNext());
         diff = fdr.next();
-        assertEquals(FeatureDiff.CREATED, diff.getState());
+        assertEquals(FeatureDiff.INSERTED, diff.getState());
         assertEquals(fs.getSchema(), diff.getFeature().getFeatureType());
         assertFalse(fdr.hasNext());
         fdr.close();
