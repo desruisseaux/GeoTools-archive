@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2003-2006, GeoTools Project Managment Committee (PMC)
+ *    (C) 2003-2007, GeoTools Project Managment Committee (PMC)
  *    
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -12,44 +12,120 @@
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
- *
- *
- * Created on October 17, 2003, 1:51 PM
  */
 package org.geotools.styling;
 
+import org.geotools.data.DataStore;
+import org.geotools.data.FeatureSource;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
 import org.geotools.filter.Expression;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.filter.FilterTransformer;
+import org.geotools.gml.producer.FeatureTransformer;
+import org.geotools.referencing.NamedIdentifier;
 import org.geotools.xml.transform.TransformerBase;
+import org.geotools.xml.transform.Translator;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 
 /**
- * Producers SLD to an output stream.
+ * Produces SLD to an output stream.
  *
  * @author Ian Schneider
  * @source $URL$
  */
 public class SLDTransformer extends TransformerBase {
+    /** The logger for this package. */
+    private static final Logger LOGGER = Logger.getLogger("org.geotools.styling");
+
     static final String XLINK_NAMESPACE = "http://www.w3.org/1999/xlink";
 
-    public org.geotools.xml.transform.Translator createTranslator(
-        ContentHandler handler) {
-        return new SLDTranslator(handler);
+    /**
+     * Additional namespace mappings to emit in the start element of the
+     * generated. Each entry has a URI key and an associated prefix string
+     * value.
+     */
+    final private Map uri2prefix;
+    
+    /**
+     * Construct a new instance of <code>SLDTransformer</code> with the
+     * default namespace mappings usually found in a simple Styled Layer
+     * Descriptor element.
+     */
+    public SLDTransformer() {
+        this(null);
+    }
+
+    /**
+     * Construct a new instance of <code>SLDTransformer</code> with the
+     * additional namespace mappings contained in <code>nsBindings</code>.
+     * <p>
+     * The designated collection contains mappings of {@link URI} to associated
+     * prefix (string) to emit in the generated XML element.
+     */
+    public SLDTransformer(Map nsBindings) {
+        super();
+        if (nsBindings == null || nsBindings.isEmpty()) {
+            uri2prefix = new HashMap();
+        } else {
+            uri2prefix = new HashMap(nsBindings.size());
+            int count = 0;
+            for (Iterator it = nsBindings.entrySet().iterator(); it.hasNext();) {
+                Map.Entry e = (Entry) it.next();
+                URI uri = (URI) e.getKey();
+                String prefix = (String) e.getValue();
+                if (uri != null && prefix != null) {
+                    uri2prefix.put(uri, prefix.trim());
+                    count++;
+                }
+            }
+            LOGGER.info("Added [" + count
+                    + "] namespace entries resulting in [" + uri2prefix.size()
+                    + "] distinct entries");
+        }
+    }
+
+    public Translator createTranslator(ContentHandler handler) {
+        Translator result = new SLDTranslator(handler);
+        // add pre-configured namespace mappings
+        if (!uri2prefix.isEmpty()) {
+            for (Iterator it = uri2prefix.entrySet().iterator(); it.hasNext();) {
+                Map.Entry e = (Entry) it.next();
+                URI uri = (URI) e.getKey();
+                if (uri != null) {
+                    String prefix = (String) e.getValue();
+                    // FIXME handle default namespace and possible clash with
+                    // one already known to the namespace-support delegate; i.e.
+                    // the entry with an empty prefix
+                    String uriStr = String.valueOf(uri);
+                    result.getNamespaceSupport().declarePrefix(prefix, uriStr);
+                }
+            }
+        }
+        return result;
     }
 
     /**
      * Currently does nothing.
-     *
-     * @param args DOCUMENT ME!
-     *
-     * @throws Exception DOCUMENT ME!
+     * 
+     * @param args
+     *            DOCUMENT ME!
+     * 
+     * @throws Exception
+     *             DOCUMENT ME!
      */
     public static final void main(String[] args) throws Exception {
         java.net.URL url = new java.io.File(args[0]).toURL();
@@ -478,7 +554,10 @@ public class SLDTransformer extends TransformerBase {
                 element("Name", layer.getName()); //optional
             }
 
-            if (layer.getRemoteOWS() != null) {
+            DataStore inlineFDS = layer.getInlineFeatureDatastore();
+            if (inlineFDS != null) {
+                visitInlineFeatureType(inlineFDS, layer.getInlineFeatureType());
+            } else if (layer.getRemoteOWS() != null) {
                 visit(layer.getRemoteOWS());
             }
 
@@ -503,54 +582,136 @@ public class SLDTransformer extends TransformerBase {
             end("UserLayer");
         }
 
+        private void visitInlineFeatureType(DataStore dataStore,
+                FeatureType featureType) {
+            start("InlineFeature");
+            try {
+                final String ftName = featureType.getTypeName();
+                final FeatureSource fs = dataStore.getFeatureSource(ftName);
+                final FeatureCollection fc = fs.getFeatures();
+                final FeatureTransformer ftrax = new FeatureTransformer();
+                ftrax.setCollectionNamespace(null);
+                ftrax.setCollectionPrefix(null);
+                ftrax.setGmlPrefixing(true);
+                ftrax.setIndentation(2);
+                final CoordinateReferenceSystem crs = featureType
+                        .getDefaultGeometry().getCoordinateSystem();
+                String srsName = null;
+                if (crs == null) {
+                    LOGGER.warning("Null CRS in feature type named [" + ftName
+                            + "]. Ignore CRS");
+                } else {
+                    // assume the first named identifier of this CRS is its
+                    // fully
+                    // qualified code; e.g. authoriy and SRID
+                    Set ids = crs.getIdentifiers();
+                    if (ids == null || ids.isEmpty()) {
+                        LOGGER.warning("Null or empty set of named identifiers "
+                                        + "in CRS ["
+                                        + crs
+                                        + "] of feature type named ["
+                                        + ftName
+                                        + "]. Ignore CRS");
+                    } else {
+                        for (Iterator it = ids.iterator(); it.hasNext();) {
+                            NamedIdentifier id = (NamedIdentifier) ids
+                                    .iterator().next();
+                            if (id != null) {
+                                srsName = String.valueOf(id);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (srsName != null) {
+                    // Some Server implementations using older versions of this
+                    // library barf on a fully qualified CRS name with messages
+                    // like : "couldnt decode SRS - EPSG:EPSG:4326. currently
+                    // only supporting EPSG #"; looks like they only needs the
+                    // SRID. adjust
+                    final int ndx = srsName.indexOf(':');
+                    if (ndx > 0) {
+                        LOGGER.info("Reducing CRS name [" + srsName
+                                + "] to its SRID");
+                        srsName = srsName.substring(ndx + 1).trim();
+                    }
+                    ftrax.setSrsName(srsName);
+                }
+                final String defaultNS = this.getDefaultNamespace();
+                ftrax.getFeatureTypeNamespaces().declareDefaultNamespace("",
+                        defaultNS);
+                final URI nsURI = featureType.getNamespace();
+                if (nsURI == null) {
+                    LOGGER.info("Null namespace URI in feature type named ["
+                            + ftName + "]. Ignore namespace in features");
+                } else {
+                    // find the URI's prefix mapping in this namespace support
+                    // delegate and use it; otherwise ignore it
+                    final String ns = String.valueOf(nsURI);
+                    final String prefix = this.nsSupport.getPrefix(ns);
+                    if (prefix != null)
+                        ftrax.getFeatureTypeNamespaces().declareNamespace(
+                                featureType, prefix, ns);
+                }
+                final Translator t = ftrax
+                        .createTranslator(this.contentHandler);
+                t.encode(fc);
+            } catch (IOException ignored) {
+            }
+            end("InlineFeature");
+        }
+        
         public void visit(RemoteOWS remoteOWS) {
-        	start("RemoteOWS");
-        	element("Service", remoteOWS.getService());
-        	element("OnlineResource", remoteOWS.getOnlineResource());
-        	end("RemoteOWS");
+            start("RemoteOWS");
+            element("Service", remoteOWS.getService());
+            element("OnlineResource", remoteOWS.getOnlineResource());
+            end("RemoteOWS");
         }
 
         public void visit(FeatureTypeConstraint ftc) {
-        	start("FeatureTypeConstraint");
-        	
-        	if (ftc != null) {
-        		element("FeatureTypeName", ftc.getFeatureTypeName());
-        		visit(ftc.getFilter());
+            start("FeatureTypeConstraint");
 
-        		Extent[] extent = ftc.getExtents();
+            if (ftc != null) {
+                element("FeatureTypeName", ftc.getFeatureTypeName());
+                visit(ftc.getFilter());
 
-        		for (int i = 0; i < extent.length; i++) {
-        			visit(extent[i]);
-        		}
-        	}
-            
-        	end("FeatureTypeConstraint");
+                Extent[] extent = ftc.getExtents();
+
+                for (int i = 0; i < extent.length; i++) {
+                    visit(extent[i]);
+                }
+            }
+
+            end("FeatureTypeConstraint");
         }
 
         public void visit(Extent extent) {
-        	start("Extent");
-        	element("Name", extent.getName());
-        	element("Value", extent.getValue());
-        	end("Extent");
-		}
+            start("Extent");
+            element("Name", extent.getName());
+            element("Value", extent.getValue());
+            end("Extent");
+        }
 
 		public void visit(Filter filter) {
 			// TODO: implement this visitor
 		}
 
-		public void visit(Style style) {
-            start("UserStyle");
-            element("Name", style.getName());
-            element("Title", style.getTitle());
-            element("Abstract", style.getAbstract());
-
-            FeatureTypeStyle[] fts = style.getFeatureTypeStyles();
-
-            for (int i = 0; i < fts.length; i++) {
-                visit(fts[i]);
-            }
-
-            end("UserStyle");
+        public void visit(Style style) {
+            if (style instanceof NamedStyle) {
+                start("NamedStyle");
+                element("Name", style.getName());
+                end("NamedStyle");
+            } else {
+                start("UserStyle");
+                element("Name", style.getName());
+                element("Title", style.getTitle());
+                element("Abstract", style.getAbstract());
+                FeatureTypeStyle[] fts = style.getFeatureTypeStyles();
+                for (int i = 0; i < fts.length; i++) {
+                    visit(fts[i]);
+                }
+                end("UserStyle");
+            }        
         }
 
         public void visit(FeatureTypeStyle fts) {
