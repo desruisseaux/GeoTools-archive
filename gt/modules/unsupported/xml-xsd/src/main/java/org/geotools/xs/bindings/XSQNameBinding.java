@@ -82,7 +82,7 @@ public class XSQNameBinding implements SimpleBinding {
      * @generated modifiable
      */
     public int getExecutionMode() {
-        return AFTER;
+        return OVERRIDE;
     }
 
     /**
