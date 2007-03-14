@@ -117,7 +117,10 @@ public class FilterTypeBinding extends AbstractComplexBinding {
 
         //&lt;xsd:element maxOccurs="unbounded" ref="ogc:_Id"/&gt;
         if (OGC._Id.equals(name) && filter instanceof Id) {
-            return filter;
+            //unwrap
+            Id id = (Id) filter;
+
+            return id.getIdentifiers();
         }
 
         return null;
