@@ -328,7 +328,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 			final AffineTransform gridToWorld = (AffineTransform) gc
 					.getGridGeometry().getGridToCoordinateSystem();
 			final double xl = newEnv.getLowerCorner().getOrdinate(0);
-			final double yl = newEnv.getLowerCorner().getOrdinate(0);
+			final double yl = newEnv.getLowerCorner().getOrdinate(1);
 			final double cellsizeX = Math.abs(gridToWorld.getScaleX());
 			final double cellsizeY = Math.abs(gridToWorld.getScaleY());
 
