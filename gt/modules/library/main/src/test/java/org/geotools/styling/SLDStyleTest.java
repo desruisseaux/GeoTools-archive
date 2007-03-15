@@ -33,6 +33,7 @@ import org.geotools.filter.FidFilter;
 import org.opengis.filter.Filter;
 import org.opengis.filter.Id;
 import org.opengis.filter.Not;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.Disjoint;
 import org.geotools.filter.FilterFactory;
 import org.geotools.filter.FilterFactoryFinder;
@@ -130,6 +131,21 @@ public class SLDStyleTest extends TestCase {
         //TODO: convert the buffer/resource to a string and compare
     }
 
+    public void testSLDParserWithWhitespace() throws Exception {
+    	java.net.URL surl = TestData.getResource(this, "whitespace.sld");
+    	 SLDParser stylereader = new SLDParser(sf, surl);
+         StyledLayerDescriptor sld = stylereader.parseSLD();
+         
+         TextSymbolizer ts = (TextSymbolizer) ((NamedLayer)sld.getStyledLayers()[0])
+         	.getStyles()[0].getFeatureTypeStyles()[0].getRules()[0].getSymbolizers()[0];
+         
+         PropertyName property = (PropertyName) ts.getLabel();
+         assertEquals( "testProperty", property.getPropertyName() );
+         
+         Expression color = ts.getFill().getColor();
+         assertEquals( Color.BLACK, SLD.color( color ) );
+    }
+    
     /**
 	 * SLD --> XML --> SLD
 	 * @throws Exception

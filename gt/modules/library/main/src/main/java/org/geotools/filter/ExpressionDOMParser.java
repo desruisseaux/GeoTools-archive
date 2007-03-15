@@ -359,10 +359,11 @@ public final class ExpressionDOMParser {
 
         if (childName.equalsIgnoreCase("PropertyName")) {
             try {
-                //NodeList kids = child.getChildNodes();
+            	//JD: trim whitespace here
+            	String value = child.getFirstChild().getNodeValue();
+            	value = value != null ? value.trim() : value;
                 AttributeExpression attribute = ff
-                    .createAttributeExpression((FeatureType) null,
-                        child.getFirstChild().getNodeValue());
+                    .createAttributeExpression((FeatureType) null, value);
 
                 //                attribute.setAttributePath(child.getFirstChild().getNodeValue());
                 return attribute;

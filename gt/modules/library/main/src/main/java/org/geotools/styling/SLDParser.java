@@ -307,7 +307,7 @@ public class SLDParser {
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory
 				.newInstance();
 		dbf.setNamespaceAware(true);
-
+		
 		try {
 			javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
 			dom = db.parse(source);
@@ -1756,9 +1756,13 @@ public class SLDParser {
 		}
 
 		if (ret == null) {
+			//JD: There are no CssParameters that require leading and trailign 
+			// spaces, so we trim them
+			String value = root.getFirstChild().getNodeValue();
+			value = value != null ? value.trim() : value;
+			
 			Element literal = dom.createElement("literal");
-			Node child = dom
-					.createTextNode(root.getFirstChild().getNodeValue());
+			Node child = dom .createTextNode(value);
 
 			literal.appendChild(child);
 
