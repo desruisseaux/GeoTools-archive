@@ -21,7 +21,7 @@ import java.util.Iterator;
 
 /**
  * Provides iterators over factories of specified categories. Users shall
- * {@linkplain FactoryRegistry#addFactoryIteratorProvider register} an implementation
+ * {@linkplain Factories#addFactoryIteratorProvider register} an implementation
  * of this interface when the default lookup mechanism (namely scanning the content of the
  * <code>META-INF/services/</code><var>category</var> file in every JARs found on the classpath)
  * can not work. Such need may appear in the context of {@linkplain ClassLoader class loaders}

@@ -51,7 +51,7 @@ public final class SeaWater {
 
     /**
      * Conductivity (in mS/cm) of a standard sea water sample.
-     * S is for <cite>Siemmens</cite> (or Mho, its the same...).
+     * S is for <cite>Siemens</cite> (or Mho, its the same...).
      */
     public static final double STANDARD_CONDUCTIVITY=42.914;
 
@@ -203,7 +203,8 @@ public final class SeaWater {
 
         // Compression terms
         final double K_S_T_0 = (polynome(T,EOS80_F) + polynome(T,EOS80_G)*SR)*S + polynome(T,EOS80_Et);
-        final double K_S_T_P = K_S_T_0 + ((EOS80_J*SR+polynome(T,EOS80_I))*S+polynome(T,EOS80_Ht) + (polynome(T,EOS80_Kt)+polynome(T,EOS80_M)*S)*P)*P;
+        final double K_S_T_P = K_S_T_0 + ((EOS80_J*SR + polynome(T,EOS80_I)) * S + polynome(T,EOS80_Ht) +
+                               (polynome(T,EOS80_Kt) + polynome(T,EOS80_M) * S) * P) * P;
         return RHO_S_T_0/( 1.0 - P/K_S_T_P );
     }
 
@@ -232,11 +233,13 @@ public final class SeaWater {
         }
         // Compression terms, DK = K(S,T,P) - K(35,0,P)
         final double K0 = (polynome(T,EOS80_F) + polynome(T,EOS80_G)*SR)*S + polynome(T,EOS80_E);
-        final double DK = K0 + (((EOS80_J*SR+polynome(T,EOS80_I))*S+polynome(T,EOS80_H)) + (polynome(T,EOS80_K) + polynome(T,EOS80_M)*S)*P)*P;
+        final double DK = K0 + (((EOS80_J * SR + polynome(T,EOS80_I)) * S + polynome(T,EOS80_H)) +
+                          (polynome(T,EOS80_K) + polynome(T,EOS80_M) * S) * P) * P;
 
         final double K_35_0_P = polynome(P,EOS80_N);
         final double V_S_T_0  = SVAN_S_T_0 + V_35_0_0;
-        final double SVANS    = SVAN_S_T_0*( 1.0 - P/K_35_0_P ) + V_S_T_0*P*DK/(K_35_0_P*( K_35_0_P + DK ) );
+        final double SVANS    = SVAN_S_T_0 * (1.0 - P/K_35_0_P) + V_S_T_0 * P * DK /
+                                (K_35_0_P * (K_35_0_P + DK));
 
         // Compute density anomaly
         final double V_35_0_P  = V_35_0_0*( 1.0 - P/K_35_0_P );
@@ -268,12 +271,13 @@ public final class SeaWater {
             return SVAN_S_T_0 + V_35_0_0;
         }
         // Compression terms, DK = K(S,T,P) - K(35,0,P)
-        final double K0 = ( polynome(T,EOS80_F) + polynome(T,EOS80_G)*SR )*S + polynome(T,EOS80_E);
-        final double DK = K0 + (((EOS80_J*SR+polynome(T,EOS80_I))*S+polynome(T,EOS80_H)) + (polynome(T,EOS80_K) + polynome(T,EOS80_M)*S)*P)*P;
+        final double K0 = (polynome(T,EOS80_F) + polynome(T,EOS80_G) * SR) * S + polynome(T,EOS80_E);
+        final double DK = K0 + (((EOS80_J * SR + polynome(T,EOS80_I)) * S + polynome(T,EOS80_H)) +
+                          (polynome(T,EOS80_K) + polynome(T,EOS80_M) * S) * P) * P;
 
         final double K_35_0_P = polynome(P,EOS80_N);
         final double V_S_T_0  = SVAN_S_T_0 + V_35_0_0;
-        return (SVAN_S_T_0 + V_35_0_0) * ( 1.0 - P/K_35_0_P ) + V_S_T_0*P*DK/(K_35_0_P*( K_35_0_P + DK ));
+        return (SVAN_S_T_0 + V_35_0_0) * (1.0 - P/K_35_0_P) + V_S_T_0 * P * DK / (K_35_0_P * (K_35_0_P + DK));
     }
 
     /**
@@ -301,12 +305,13 @@ public final class SeaWater {
             return SVAN_S_T_0;
         }
         // Compression terms, DK = K(S,T,P) - K(35,0,P)
-        final double K0 = ( polynome(T,EOS80_F) + polynome(T,EOS80_G)*SR )*S + polynome(T,EOS80_E);
-        final double DK = K0 + (((EOS80_J*SR+polynome(T,EOS80_I))*S+polynome(T,EOS80_H)) + (polynome(T,EOS80_K) + polynome(T,EOS80_M)*S)*P)*P;
+        final double K0 = (polynome(T,EOS80_F) + polynome(T,EOS80_G)*SR)*S + polynome(T,EOS80_E);
+        final double DK = K0 + (((EOS80_J * SR + polynome(T,EOS80_I)) * S + polynome(T,EOS80_H)) +
+                          (polynome(T,EOS80_K) + polynome(T,EOS80_M) * S) * P) * P;
 
         final double K_35_0_P = polynome(P,EOS80_N);
         final double V_S_T_0  = SVAN_S_T_0 + V_35_0_0;
-        return (SVAN_S_T_0*( 1.0 - P/K_35_0_P ) + V_S_T_0*P*DK/(K_35_0_P*( K_35_0_P + DK )));
+        return (SVAN_S_T_0*(1.0 - P/K_35_0_P) + V_S_T_0 * P * DK / (K_35_0_P * (K_35_0_P + DK)));
     }
 
     /**
@@ -328,7 +333,7 @@ public final class SeaWater {
     /**
      * Computes salinity as a function of conductivity, temperature and pressure.
      *
-     * @param C Conductivity in mS/cm (milli-Siemmens by centimeters). Multiply
+     * @param C Conductivity in mS/cm (millisiemens by centimeters). Multiply
      *          par {@link #STANDARD_CONDUCTIVITY} if {@code C} is not a
      *          real conductivity, but instead the ratio between the sample's
      *          conductivity and the standard sample's conductivity.
@@ -341,9 +346,9 @@ public final class SeaWater {
     public static double salinity(double C, final double T, final double P) {
         C /= STANDARD_CONDUCTIVITY;
         if (!(C < 5E-4)) { // use '!' in order to accept NaN
-            final double XR = Math.sqrt(C/(polynome(T,PSS78_C)
-                            * (1.0+polynome(P,PSS78_E)*P/((PSS78_D[1]*T+PSS78_D[0])*T+1.0 + (PSS78_D[3]*T+PSS78_D[2])*C))));
-            final double S  = sal(XR, T-15.0);  // Ne pas mettre de "assert" qui appelerait "cond".
+            final double XR = Math.sqrt(C/(polynome(T,PSS78_C) * (1.0 + polynome(P,PSS78_E) * P / 
+                              ((PSS78_D[1] * T+PSS78_D[0]) * T + 1.0 + (PSS78_D[3] * T + PSS78_D[2]) * C))));
+            final double S  = sal(XR, T-15.0);  // Do not use an 'assert' statement invoking 'cond'.
             if (!(S>=42)) return S; // use '!' to accept NaN
             /*
              * Calcule la salinité pour une eau de conductivité,
@@ -351,7 +356,8 @@ public final class SeaWater {
              * doit être utilisé lorsque l'on s'attend à une salinité
              * entre 42 et 50.
              */
-            return 35*C+C*(C-1)*(polynome(C,PSS78_AR)+T*(polynome(T,PSS78_AT)+C*(PSS78_CR[0] + PSS78_CR[1]*C + PSS78_CR[2]*T)));
+            return 35 * C + C * (C-1) * (polynome(C,PSS78_AR) + T * (polynome(T,PSS78_AT) + C *
+                        (PSS78_CR[0] + PSS78_CR[1] * C + PSS78_CR[2] * T)));
             // TODO: VERIFIER CE QUE DEVIENT LA PRESSION ET IMPLEMENTER L'EQUATION D'ETAT.
         } else {
             return 0; // Zero conductivity trap
@@ -400,9 +406,9 @@ public final class SeaWater {
     public static double specificHeat(final double S, final double T, double P) {
         P /= 10.0;
         final double SR = Math.sqrt(S);
-        return (polynome(T,HEAT_CC) + ( polynome(T,HEAT_BB)*SR + polynome(T,HEAT_AA) )*S +
-            ((( polynome(T,HEAT_C)*P + polynome(T,HEAT_B) )*P + polynome(T,HEAT_A) )*P ) +
-            ((( (HEAT_J*SR+polynome(T,HEAT_H))*S*P + (HEAT_G*SR+polynome(T,HEAT_F))*S )*P +
+        return (polynome(T,HEAT_CC) + (polynome(T,HEAT_BB)*SR + polynome(T,HEAT_AA))*S +
+            (((polynome(T,HEAT_C)*P + polynome(T,HEAT_B) )*P + polynome(T,HEAT_A) )*P) +
+            ((((HEAT_J*SR+polynome(T,HEAT_H))*S*P + (HEAT_G*SR+polynome(T,HEAT_F))*S)*P +
                           (polynome(T,HEAT_E)*SR+polynome(T,HEAT_D))*S )*P));
     }
 
@@ -428,7 +434,7 @@ public final class SeaWater {
     public static double adiabeticTemperatureGradient(double S, final double T, final double P) {
         S -= 35.0;
         return (polynome(T,GRAD_A) + polynome(T,GRAD_B)*S +
-               (polynome(T,GRAD_C) + polynome(T,GRAD_D)*S + polynome(T,GRAD_E)*P )*P);
+               (polynome(T,GRAD_C) + polynome(T,GRAD_D)*S + polynome(T,GRAD_E)*P)*P);
     }
 
     /**
@@ -455,11 +461,11 @@ public final class SeaWater {
      */
     public static double soundVelocity(final double S, final double T, final double P) {
         // S^0 terms
-        final double CW = (( polynome(T,SOUND_C3) *P + polynome(T,SOUND_C2))*P +
-                             polynome(T,SOUND_C1))*P + polynome(T,SOUND_C0);
+        final double CW = ((polynome(T,SOUND_C3) *P + polynome(T,SOUND_C2))*P +
+                            polynome(T,SOUND_C1))*P + polynome(T,SOUND_C0);
         // S^1 terms
-        final double A  = (( polynome(T,SOUND_A3) *P + polynome(T,SOUND_A2))*P +
-                             polynome(T,SOUND_A1))*P + polynome(T,SOUND_A0);
+        final double A  = ((polynome(T,SOUND_A3) *P + polynome(T,SOUND_A2))*P +
+                            polynome(T,SOUND_A1))*P + polynome(T,SOUND_A0);
         // S^3/2 terms
         final double B  = polynome(T,SOUND_B0) + polynome(T,SOUND_B1)*P;
 
@@ -467,7 +473,7 @@ public final class SeaWater {
         final double D  = SOUND_D0 + SOUND_D1*P;
 
         // sound speed return
-        return CW + ( D*S + B*Math.sqrt(S) + A )*S;
+        return CW + (D*S + B*Math.sqrt(S) + A)*S;
     }
 
     /**
@@ -501,9 +507,9 @@ public final class SeaWater {
      * @see #poly_inv(double,double[])
      */
     private static double polynome(final double x, final double c[]) {
-        int n=c.length-1;
+        int n = c.length-1;
         double y = c[n];
-        while (n>0) {
+        while (n > 0) {
             y = y*x + c[--n];
         }
         return y;
@@ -527,9 +533,9 @@ public final class SeaWater {
      * @see #polynome(double,double[])
      */
     private static double polynome_neg(final double x, final double c[]) {
-        int n=c.length-1;
+        int n = c.length-1;
         double y = c[n];
-        while (n>0) {
+        while (n > 0) {
             y = y/x + c[--n];
         }
         return y;

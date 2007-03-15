@@ -210,6 +210,18 @@ public final class Hints extends RenderingHints {
             "org.opengis.referencing.crs.CoordinateReferenceSystem");
 
     /**
+     * The {@linkplain javax.sql.DataSource data source} name to lookup from JNDI when
+     * initializing the {@linkplain org.geotools.referencing.factory.epsg EPSG factory}.
+     * The value should be a {@link String}. If this hint is not provided, then the default
+     * is {@value org.geotools.referencing.factory.epsg.DefaultFactory#DATASOURCE_NAME}.
+     * This hint has no effect if there is no {@linkplain javax.naming.InitialContext
+     * JNDI initial context} setup.
+     *
+     * @since 2.4
+     */
+    public static final Key EPSG_DATA_SOURCE = new Key(String.class);
+
+    /**
      * The preferred datum shift method to use for
      * {@linkplain org.opengis.referencing.operation.CoordinateOperation coordinate operations}.
      * Valid values are {@code "Molodenski"}, {@code "Abridged_Molodenski"} or {@code "Geocentric"}.

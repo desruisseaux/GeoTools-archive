@@ -84,14 +84,16 @@ public class DefaultFactory extends DeferredAuthorityFactory
                    CoordinateOperationAuthorityFactory
 {
     /**
-     * The JDBC {@linkplain DataSource data source} name in JNDI.
+     * The default JDBC {@linkplain DataSource data source} name in JNDI.
+     * This is the name used if no other name were specified through the
+     * {@link Hints#EPSG_DATA_SOURCE EPSG_DATA_SOURCE} hint.
      *
      * @see #createDataSource
      */
     public static final String DATASOURCE_NAME = "jdbc/EPSG";
 
     /**
-     * {@code true} if automatic registration of {@link #DATASOURCE_NAME} is allowed.
+     * {@code true} if automatic registration of {@link #datasourceName} is allowed.
      * Set to {@code false} for now because the registration has not been correctly
      * tested in JEE environment.
      *
@@ -125,6 +127,12 @@ public class DefaultFactory extends DeferredAuthorityFactory
     private transient InitialContext registerInto;
 
     /**
+     * The data source name. If it was not specified by the {@link Hints#EPSG_DATA_SOURCE
+     * EPSG_DATA_SOURCE} hint, then this is the {@value #DATASOURCE_NAME} value.
+     */
+    private String datasourceName;
+
+    /**
      * The data source, or {@code null} if the connection has not yet been etablished.
      */
     private DataSource datasource;
@@ -152,7 +160,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
      * Constructs an authority factory using a set of factories created from the specified hints.
      * This constructor recognizes the {@link Hints#CRS_FACTORY CRS}, {@link Hints#CS_FACTORY CS},
      * {@link Hints#DATUM_FACTORY DATUM} and {@link Hints#MATH_TRANSFORM_FACTORY MATH_TRANSFORM}
-     * {@code FACTORY} hints.
+     * {@code FACTORY} hints, in addition of {@link Hints#EPSG_DATA_SOURCE EPSG_DATA_SOURCE}.
      *
      * @param hints An optional set of hints, or {@code null} if none.
      * @param priority The priority for this factory, as a number between
@@ -163,6 +171,13 @@ public class DefaultFactory extends DeferredAuthorityFactory
      */
     public DefaultFactory(final Hints hints, final int priority) {
         super(hints, priority);
+        if (hints != null) {
+            datasourceName = (String) hints.get(Hints.EPSG_DATA_SOURCE);
+        }
+        if (datasourceName == null) {
+            datasourceName = DATASOURCE_NAME;
+        }
+        this.hints.put(Hints.EPSG_DATA_SOURCE, datasourceName);
         factories = FactoryGroup.createInstance(hints);
         setTimeout(30*60*1000L); // Close the connection after at least 30 minutes of inactivity.
     }
@@ -260,7 +275,8 @@ public class DefaultFactory extends DeferredAuthorityFactory
      * Setup a data source for a connection to the EPSG database. This method is invoked by
      * {@link #getDataSource()} when no data source has been {@linkplain #setDataSource
      * explicitly set}. The default implementation searchs for a {@link DataSource} instance
-     * binded to the <code>{@value #DATASOURCE_NAME}</code> name using <cite>Java Naming and
+     * binded to the {@link Hints#EPSG_DATA_SOURCE} name
+     * (<code>{@value #DATASOURCE_NAME}</code> by default) using <cite>Java Naming and
      * Directory Interfaces</cite> (JNDI). If no data source were found, then this method
      * returns {@code null}.
      * <p>
@@ -284,10 +300,6 @@ public class DefaultFactory extends DeferredAuthorityFactory
      * }
      * </pre></blockquote>
      *
-     * If a JNDI environment is running and no <code>{@value #DATASOURCE_NAME}</code> data source
-     * was previously bound, then the {@code Jdbc3SimpleDataSource} created by the above code will
-     * be automatically binded by {@link DefaultFactory}.
-     *
      * @return The EPSG data source, or {@code null} if none where found.
      * @throws SQLException if an error occured while creating the data source.
      *
@@ -298,7 +310,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
         DataSource     source  = null;
         try {
             context = JNDI.getInitialContext(new Hints(hints));
-            source = (DataSource) context.lookup(DATASOURCE_NAME);
+            source = (DataSource) context.lookup(datasourceName);
         } catch (NoInitialContextException exception) {
             // Fall back on 'return null' below.
         } catch (NameNotFoundException exception) {
@@ -306,7 +318,7 @@ public class DefaultFactory extends DeferredAuthorityFactory
             // Fall back on 'return null' below.
         } catch (NamingException exception) {
             SQLException e = new SQLException(Errors.format(ErrorKeys.CANT_GET_DATASOURCE_$1,
-                                              DATASOURCE_NAME));
+                                              datasourceName));
             e.initCause(exception);
             throw e;
         }
@@ -444,12 +456,12 @@ public class DefaultFactory extends DeferredAuthorityFactory
         LogRecord record;
         if (ALLOW_REGISTRATION && context != null) {
             try {
-                context.bind(DATASOURCE_NAME, source);
+                context.bind(datasourceName, source);
                 record = Logging.format(Level.INFO, LoggingKeys.CREATED_DATASOURCE_ENTRY_$1,
-                                        DATASOURCE_NAME);
+                                        datasourceName);
             } catch (NamingException exception) {
                 record = Logging.format(Level.WARNING, LoggingKeys.CANT_BIND_DATASOURCE_$1,
-                                        DATASOURCE_NAME);
+                                        datasourceName);
                 record.setThrown(exception);
             }
             log(record);

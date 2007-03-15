@@ -46,6 +46,11 @@ import org.geotools.referencing.FactoryFinder;
  */
 public class FallbackAuthorityFactoryTest extends TestCase {
     /**
+     * Set to {@code true} for printing debugging information.
+     */
+    private static final boolean VERBOSE = false;
+
+    /**
      * The extra factory.
      */
     private FactoryEPSGExtra extra;
@@ -114,7 +119,9 @@ public class FallbackAuthorityFactoryTest extends TestCase {
         for (Iterator it = factories.iterator(); it.hasNext();) {
             CRSAuthorityFactory factory = (CRSAuthorityFactory) it.next();
             Class type = factory.getClass();
-            System.out.println(type);
+            if (VERBOSE) {
+                System.out.println(type);
+            }
             if (type == FactoryEPSGExtra.class) {
                 foundExtra = true;
             } else if (type == FactoryUsingWKT.class) {

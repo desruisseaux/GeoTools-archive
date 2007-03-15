@@ -74,12 +74,6 @@ public class FactoryRegistry extends ServiceRegistry {
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
 
     /**
-     * Alternative scanning methods. This is used by {@link #scanForPlugins(Collection,Class)}
-     * in addition of the default lookup mechanism.
-     */
-    private final Collection/*<FactoryIteratorProvider>*/ iteratorProviders = new LinkedHashSet();
-
-    /**
      * Categories under scanning. This is used by {@link #scanForPlugins(Collection,Class)}
      * as a guard against infinite recursivity (i.e. when a factory to be scanned request
      * an other dependency of the same category).
@@ -630,7 +624,7 @@ public class FactoryRegistry extends ServiceRegistry {
             /*
              * First, query the user-provider iterators, if any.
              */
-            for (final Iterator ip=iteratorProviders.iterator(); ip.hasNext();) {
+            for (final Iterator ip=Factories.getIteratorProviders().iterator(); ip.hasNext();) {
                 final Iterator it = ((FactoryIteratorProvider) ip.next()).iterator(category);
                 if (it != null) {
                     newServices |= register(it, category, message);
@@ -833,10 +827,10 @@ public class FactoryRegistry extends ServiceRegistry {
      * frameworks that use the <cite>constructor injection</cite> pattern, like the
      * <a href="http://www.springframework.org/">Spring framework</a>.
      *
-     * @since 2.4
+     * @deprecated Not used since we moved this method to {@link Factories}. We need to find
+     *             a way to get this method invoked automatically as a notification scheme.
      */
-    public void addFactoryIteratorProvider(final FactoryIteratorProvider provider) {
-        iteratorProviders.add(provider);
+    private void addFactoryIteratorProvider(final FactoryIteratorProvider provider) {
         for (final Iterator categories=getCategories(); categories.hasNext();) {
             final Class category = (Class) categories.next();
             if (getServiceProviders(category, false).hasNext()) {
@@ -858,17 +852,6 @@ public class FactoryRegistry extends ServiceRegistry {
                 }
             }
         }
-    }
-
-    /**
-     * Removes a provider that was previously {@linkplain #addFactoryIteratorProvider added}.
-     * Note that factories already obtained from the specified provider will not be
-     * {@linkplain #deregisterServiceProvider deregistered} by this method.
-     *
-     * @since 2.4
-     */
-    public void removeFactoryIteratorProvider(final FactoryIteratorProvider provider) {
-        iteratorProviders.remove(provider);
     }
 
     /**
