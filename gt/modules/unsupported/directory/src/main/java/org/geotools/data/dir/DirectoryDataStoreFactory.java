@@ -34,8 +34,8 @@ import org.geotools.data.DataStoreFactorySpi;
  */
 public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     /** The Directory parameter which should contain some files to read */
-    public static final Param DIRECTORY = new Param("directory", File.class,
-            "Directory containing gml files", true);
+    public static final Param DIRECTORY = new Param("data_directory", File.class,
+            "Directory containing gml files", true); 
 
     /**
      * The suffix parameter to specify the order of creation for new
