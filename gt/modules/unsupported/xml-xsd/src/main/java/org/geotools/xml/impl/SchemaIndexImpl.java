@@ -40,6 +40,8 @@ import org.eclipse.xsd.XSDParticle;
 import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
+import org.eclipse.xsd.util.XSDSchemaBuildingTools;
+import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.SchemaIndex;
 import org.geotools.xml.Schemas;
 
@@ -69,10 +71,16 @@ public class SchemaIndexImpl implements SchemaIndex {
 	HashMap/*<XSDElementDeclaratoin,List>*/ element2attributes = new HashMap();
 	
     public SchemaIndexImpl(XSDSchema[] schemas) {
-        this.schemas = schemas;
-        for ( int i = 0; i < schemas.length; i++ ) {
-        	schemas[i].eAdapters().add( new SchemaAdapter());
+    	this.schemas = new XSDSchema[ schemas.length + 1 ];
+        
+    	//set the schemas passed in
+    	for ( int i = 0; i < schemas.length; i++ ) {
+    		this.schemas[ i ] = schemas[ i ];
+        	this.schemas[i].eAdapters().add( new SchemaAdapter());
         }
+        
+    	//add the schema for xml schema itself
+        this.schemas[schemas.length] = schemas[0].getSchemaForSchema();
     }
 
     public XSDSchema[] getSchemas() {
