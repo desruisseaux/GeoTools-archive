@@ -22,11 +22,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
 
+import org.geotools.TestData;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.geometry.GeneralEnvelope;
-import org.geotools.resources.TestData;
-import org.geotools.resources.image.CoverageUtilities;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.opengis.coverage.grid.GridCoverageReader;
 import org.opengis.coverage.grid.GridCoverageWriter;
 import org.opengis.parameter.GeneralParameterValue;
@@ -62,8 +62,7 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 
 		// create a temporary output file
 		// temporary file to use
-		final File tmpFile;
-		tmpFile = TestData.temp(this, Long.toString(Math
+		File tmpFile = TestData.temp(this, Long.toString(Math
 				.round(100000 * generator.nextDouble()))
 				+ testFile.getName());
 		tmpFile.deleteOnExit();
@@ -72,6 +71,10 @@ public class ArcGridReadWriteTest extends ArcGridBaseTestCase {
 		LOGGER.info(testFile.getName() + " ESRI");
 		writeEsriUnCompressed(testFile, tmpFile);
 
+		tmpFile = TestData.temp(this, Long.toString(Math
+				.round(100000 * generator.nextDouble()))
+				+ testFile.getName());
+		tmpFile.deleteOnExit();
 		// GRASS
 		LOGGER.info(testFile.getName() + " GRASS");
 		writeGrassUnCompressed(testFile, tmpFile);

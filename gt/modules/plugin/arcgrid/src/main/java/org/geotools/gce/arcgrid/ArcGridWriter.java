@@ -16,7 +16,6 @@
  */
 package org.geotools.gce.arcgrid;
 
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 import java.io.BufferedWriter;
@@ -36,7 +35,6 @@ import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
 
 import org.geotools.coverage.Category;
 import org.geotools.coverage.GridSampleDimension;
@@ -56,9 +54,11 @@ import org.geotools.gce.imageio.asciigrid.AsciiGridsImageWriter;
 import org.geotools.gce.imageio.asciigrid.spi.AsciiGridsImageWriterSpi;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
+import org.geotools.referencing.operation.matrix.AffineTransform2D;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
+import org.geotools.resources.coverage.CoverageUtilities;
 import org.geotools.resources.i18n.Vocabulary;
 import org.geotools.resources.i18n.VocabularyKeys;
-import org.geotools.resources.image.CoverageUtilities;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageWriter;
@@ -67,11 +67,14 @@ import org.opengis.parameter.InvalidParameterNameException;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.spatialschema.geometry.Envelope;
 
 /**
  * {@link ArcGridWriter} supports writing of an ArcGrid GridCoverage to a
  * Desination object
+ * 
+ * XXX We cannot write a rotated grid coverage, we have to enforce that!
  * 
  * @author Daniele Romagnoli
  * @author Simone Giannecchini (simboss)
@@ -153,7 +156,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 				File destFile;
 				try {
 					destFile = new File(URLDecoder.decode(dest.getFile(),
-							"UTF8"));
+							"UTF-8"));
 				} catch (UnsupportedEncodingException e) {
 					if (LOGGER.isLoggable(Level.SEVERE))
 						LOGGER.log(Level.SEVERE, e.getLocalizedMessage(), e);
@@ -190,10 +193,8 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 		//
 		// //
 		if (hints != null) {
-			if (this.hints == null)
-			{
-				this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT,Boolean.TRUE);
-				this.hints.add(new RenderingHints(JAI.KEY_TILE_CACHE,null));
+			if (this.hints == null) {
+				this.hints = new Hints(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 			}
 			this.hints.add(hints);
 		}
@@ -233,12 +234,9 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 		// /////////////////////////////////////////////////////////////////////
 		GeoToolsWriteParams gtParams = null;
 		if (parameters != null) {
-			Parameter param;
-			String name;
-			final int length = parameters.length;
-			for (int i = 0; i < length; i++) {
-				param = (Parameter) parameters[i];
-				name = param.getDescriptor().getName().toString();
+			for (int i = 0; i < parameters.length; i++) {
+				Parameter param = (Parameter) parameters[i];
+				String name = param.getDescriptor().getName().toString();
 				if (param.getDescriptor().getName().getCode().equals(
 						AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName()
 								.toString())) {
@@ -248,8 +246,8 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 					grass = param.booleanValue();
 			}
 		}
-		if(gtParams==null)
-			gtParams= new ArcGridWriteParams();
+		if (gtParams == null)
+			gtParams = new ArcGridWriteParams();
 		// write band
 		int[] writeBands = gtParams.getSourceBands();
 		writeBand = CoverageUtilities.getVisibleBand(gc2D.getRenderedImage());
@@ -312,9 +310,7 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 			//
 			// /////////////////////////////////////////////////////////////////
 			if (!grass)
-				gc = reShapeData(gc, oldEnv.getLength(0), // W
-						oldEnv.getLength(1)// H
-				);
+				gc = reShapeData(gc);
 
 			// /////////////////////////////////////////////////////////////////
 			//
@@ -325,8 +321,8 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 			final Envelope newEnv = gc.getEnvelope();
 
 			// trying to prepare the header
-			final AffineTransform gridToWorld = (AffineTransform) gc
-					.getGridGeometry().getGridToCoordinateSystem();
+			final AffineTransform gridToWorld = (AffineTransform) ((GridGeometry2D) gc
+					.getGridGeometry()).getGridToCRS2D();
 			final double xl = newEnv.getLowerCorner().getOrdinate(0);
 			final double yl = newEnv.getLowerCorner().getOrdinate(1);
 			final double cellsizeX = Math.abs(gridToWorld.getScaleX());
@@ -385,28 +381,45 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 	 * 
 	 * @param gc
 	 *            Input coverage.
-	 * @param W
-	 *            Geospatial width of this coverage.
-	 * @param H
-	 *            Geospatial height of this coverage.
 	 * @return A new coverage with square pixels.
 	 */
-	private GridCoverage2D reShapeData(GridCoverage2D gc, double W, double H) {
+	private GridCoverage2D reShapeData(GridCoverage2D gc) {
 
-		// resampling the image if needed
-		final RenderedImage image = gc.getRenderedImage();
-		int Nx = image.getWidth();
-		int Ny = image.getHeight();
-		final double dx = W / Nx;
-		final double dy = H / Ny;
-
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Getting the dx and dy for this coverage and checking if they differ
+		// so much that we need to reshape in order to have square pixels
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final AffineTransform gridToWorld = (AffineTransform) ((GridGeometry2D) gc
+				.getGridGeometry()).getGridToCRS2D();
+		final double dx = XAffineTransform.getScaleX0(gridToWorld);
+		final double dy = XAffineTransform.getScaleY0(gridToWorld);
 		if (Math.abs(dx - dy) <= ArcGridWriter.EPS) {
 			return gc;
 		}
 
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Getting info about the original image in order to create the new
+		// gridgeometry
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final RenderedImage image = gc.getRenderedImage();
+		int Nx = image.getWidth();
+		int Ny = image.getHeight();
 		final double _Nx;
 		final double _Ny;
 
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Getting info about the original evelope n order to create the new
+		// gridgeometry
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final Envelope oldEnv = gc.getEnvelope2D();
+		final double W = oldEnv.getLength(0);
+		final double H = oldEnv.getLength(1);
 		if ((dx - dy) > ArcGridWriter.EPS) {
 			/**
 			 * we have higher resolution on the Y axis we have to increase it on
@@ -432,6 +445,12 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 				0, 0 }, new int[] { Nx, Ny });
 		final GridGeometry2D newGridGeometry = new GridGeometry2D(newGridrange,
 				new GeneralEnvelope(gc.getEnvelope()));
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// Reshaping using the resample operation for having best precision.
+		//
+		// /////////////////////////////////////////////////////////////////////
 		final ParameterValueGroup param = (ParameterValueGroup) reShapeParams
 				.clone();
 		param.parameter("source").setValue(gc);
@@ -511,11 +530,81 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 	 */
 	public void write(GridCoverage coverage, GeneralParameterValue[] parameters)
 			throws IllegalArgumentException, IOException {
+		ensureWeCanWrite(coverage, parameters);
 		if (parameters != null) {
-			setEnvironment(parameters,(GridCoverage2D) coverage);
+			setEnvironment(parameters, (GridCoverage2D) coverage);
 		}
 
 		writeGridCoverage((GridCoverage2D) coverage);
+
+	}
+
+	/**
+	 * Ascii grids have a few limitations.
+	 * 
+	 * <ol>
+	 * <li>The gridcoverage they contain must have a gridToWorld transform
+	 * which is a compositions of scale and translate, no skew, no rotation.</li>
+	 * <li>The PRJ must be lon-lat (this is an assumption form real world).</li>
+	 * </ol>
+	 * 
+	 * @param coverage
+	 *            to check for the possibility to be written b this writer.
+	 * @param parameters
+	 *            to control the writing process.
+	 * @throws IOException
+	 */
+	private static void ensureWeCanWrite(GridCoverage coverage,
+			GeneralParameterValue[] parameters) throws IOException {
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// RULE 1
+		//
+		// Checking the grid to world transform for having only scale and
+		// translate.
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final AffineTransform gridToWorldTransform = new AffineTransform(
+				(AffineTransform) ((GridGeometry2D) coverage
+						.getGridGeometry()).getGridToCRS2D());
+		XAffineTransform.round(gridToWorldTransform, EPS);
+		final int swapXY = XAffineTransform.getSwapXY(gridToWorldTransform);
+		final double rotation = XAffineTransform
+				.getRotation(gridToWorldTransform);
+		if (rotation != 0)
+			throw new IOException(
+					"Impossible to encode this coverage as an ascii grid since its"
+							+ "transformation is not a simple scale and translate");
+		if (swapXY == -1)
+			throw new IOException(
+					"Impossible to encode this coverage as an ascii grid since its"
+							+ "transformation is not a simple scale and translate");
+
+		// /////////////////////////////////////////////////////////////////////
+		//
+		// RULE 2
+		//
+		// Checking the CRS to have flfip only at first axis
+		//
+		// /////////////////////////////////////////////////////////////////////
+		final int flip = XAffineTransform.getFlip(gridToWorldTransform);
+		final CoordinateReferenceSystem crs2D = ((GridCoverage2D) coverage)
+				.getCoordinateReferenceSystem2D();
+		//flip==-1 means there is a flip.
+		if(flip>0)
+			throw new IOException(
+					"Impossible to encode this coverage as an ascii grid since its"
+							+ "coordinate reference system has strange axes orientation");
+		//let's check that its the Y axis that's flipped
+		if(!AxisDirection.NORTH.equals(crs2D.getCoordinateSystem().getAxis(1).getDirection()))
+			throw new IOException(
+					"Impossible to encode this coverage as an ascii grid since its"
+							+ "coordinate reference system has strange axes orientation");
+		if(!AxisDirection.EAST.equals(crs2D.getCoordinateSystem().getAxis(0).getDirection()))
+			throw new IOException(
+					"Impossible to encode this coverage as an ascii grid since its"
+							+ "coordinate reference system has strange axes orientation");
+			
 
 	}
 
@@ -540,11 +629,12 @@ public final class ArcGridWriter extends AbstractGridCoverageWriter implements
 		final Iterator it = categories.iterator();
 		Category candidate;
 		double inNoData = Double.NaN;
-        final String noDataName = Vocabulary.format(VocabularyKeys.NODATA);
+		final String noDataName = Vocabulary.format(VocabularyKeys.NODATA);
 		while (it.hasNext()) {
 			candidate = (Category) it.next();
-            final String name = candidate.getName().toString();
-			if (name.equalsIgnoreCase("No Data") || name.equalsIgnoreCase(noDataName)) {
+			final String name = candidate.getName().toString();
+			if (name.equalsIgnoreCase("No Data")
+					|| name.equalsIgnoreCase(noDataName)) {
 				inNoData = candidate.getRange().getMaximum();
 			}
 		}
