@@ -83,6 +83,7 @@ public abstract class TestCaseSupport extends TestCase {
             sibling(tf, "fix").delete();
             sibling(tf, "qix").delete();
             sibling(tf, "grx").delete();
+            sibling(tf, "prj").delete();
             tf.delete();
             f.remove();
         }
@@ -93,7 +94,7 @@ public abstract class TestCaseSupport extends TestCase {
      * Helper method for {@link #tearDown}.
      */
     private static File sibling(final File f, final String ext) {
-        return new File(sibling(f.getName(), ext));
+    	return new File(f.getParent(), sibling(f.getName(), ext));
     }
 
     /**

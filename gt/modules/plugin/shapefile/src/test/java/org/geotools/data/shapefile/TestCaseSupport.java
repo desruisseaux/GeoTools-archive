@@ -109,7 +109,7 @@ public class TestCaseSupport extends TestCase {
      * Helper method for {@link #tearDown}.
      */
     private static File sibling(final File f, final String ext) {
-        return new File(sibling(f.getName(), ext));
+    	return new File(f.getParent(), sibling(f.getName(), ext));
     }
 
     /**
