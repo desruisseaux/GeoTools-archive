@@ -85,6 +85,7 @@ public class TestCaseSupport extends TestCase {
             dieDieDIE( sibling(targetFile, "shx") );
             dieDieDIE( sibling(targetFile, "qix") );
             dieDieDIE( sibling(targetFile, "fix") );
+            dieDieDIE( sibling(targetFile, "grx") );
             // TODDO: r i tree must die
             dieDieDIE( sibling(targetFile, "prj") );
             dieDieDIE( sibling(targetFile, "shp.xml") );

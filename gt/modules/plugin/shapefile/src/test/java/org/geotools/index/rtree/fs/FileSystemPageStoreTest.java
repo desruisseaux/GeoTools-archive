@@ -44,7 +44,8 @@ public class FileSystemPageStoreTest extends TestCase {
      * Test for void FileSystemPageStore(File)
      */
     public void testFileSystemPageStoreFile() throws Exception {
-        File file = File.createTempFile("geotools2", ".grx");
+        File file = File.createTempFile("geotools2e", ".grx");
+        file.deleteOnExit();
 
         try {
             FileSystemPageStore fps = new FileSystemPageStore(file);
@@ -60,7 +61,8 @@ public class FileSystemPageStoreTest extends TestCase {
      */
     public void testFileSystemPageStoreFileDataDefinition()
         throws Exception {
-        File file = File.createTempFile("geotools2", ".grx");
+        File file = File.createTempFile("geotoolsf2", ".grx");
+        file.deleteOnExit();
         DataDefinition dd = new DataDefinition("US-ASCII");
 
         try {
@@ -81,7 +83,8 @@ public class FileSystemPageStoreTest extends TestCase {
      */
     public void testFileSystemPageStoreFileDataDefinitionintintshort()
         throws Exception {
-        File file = File.createTempFile("geotools2", ".grx");
+        File file = File.createTempFile("geotools2g", ".grx");
+        file.deleteOnExit();
         DataDefinition dd = new DataDefinition("US-ASCII");
         dd.addField(Integer.class);
 

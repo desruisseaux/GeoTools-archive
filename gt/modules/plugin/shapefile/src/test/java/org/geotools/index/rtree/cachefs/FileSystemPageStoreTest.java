@@ -44,13 +44,15 @@ public class FileSystemPageStoreTest extends TestCase {
      * Test for void FileSystemPageStore(File)
      */
     public void testFileSystemPageStoreFile() throws Exception {
-        File file = File.createTempFile("geotools2", ".grx");
+        File file = File.createTempFile("geotools2a", ".grx");
+        file.deleteOnExit();
 
         try {
             FileSystemPageStore fps = new FileSystemPageStore(file);
             fail("Cannot create a FileSystemPageStore without a "
                 + "DataDefinition");
         } catch (TreeException e) {
+            file.delete();
             // Ok, the file must exist
         }
     }
@@ -60,7 +62,8 @@ public class FileSystemPageStoreTest extends TestCase {
      */
     public void testFileSystemPageStoreFileDataDefinition()
         throws Exception {
-        File file = File.createTempFile("geotools2", ".grx");
+        File file = File.createTempFile("geotools2b", ".grx");
+        file.deleteOnExit();
         DataDefinition dd = new DataDefinition("US-ASCII");
 
         try {
@@ -81,7 +84,8 @@ public class FileSystemPageStoreTest extends TestCase {
      */
     public void testFileSystemPageStoreFileDataDefinitionintintshort()
         throws Exception {
-        File file = File.createTempFile("geotools2", ".grx");
+        File file = File.createTempFile("geotools2c", ".grx");
+        file.deleteOnExit();
         DataDefinition dd = new DataDefinition("US-ASCII");
         dd.addField(Integer.class);
 

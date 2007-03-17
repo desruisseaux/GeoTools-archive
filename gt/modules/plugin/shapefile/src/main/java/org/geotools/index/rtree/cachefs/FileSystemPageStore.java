@@ -196,6 +196,8 @@ public class FileSystemPageStore extends PageStore {
                 this.prepareIndex();
             }
         } catch (TreeException e) {
+            // close the channel, or we won't be able to delete the grx file
+            channel.close();
             throw new TreeException(e);
         }
     }

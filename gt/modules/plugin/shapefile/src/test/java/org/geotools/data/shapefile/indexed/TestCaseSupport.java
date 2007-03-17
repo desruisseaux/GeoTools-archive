@@ -78,16 +78,27 @@ public abstract class TestCaseSupport extends TestCase {
         final Iterator f = tmpFiles.iterator();
         while (f.hasNext()) {
             File tf = (File) f.next();
-            sibling(tf, "dbf").delete();
-            sibling(tf, "shx").delete();
-            sibling(tf, "fix").delete();
-            sibling(tf, "qix").delete();
-            sibling(tf, "grx").delete();
-            sibling(tf, "prj").delete();
+            dieDieDIE(sibling(tf, "dbf"));
+            dieDieDIE(sibling(tf, "shx"));
+            dieDieDIE(sibling(tf, "fix"));
+            dieDieDIE(sibling(tf, "qix"));
+            dieDieDIE(sibling(tf, "grx"));
+            dieDieDIE(sibling(tf, "prj"));
             tf.delete();
             f.remove();
         }
         super.tearDown();
+    }
+    
+    private void dieDieDIE( File file ){
+        if( file.exists() ){
+            if( file.delete() ){
+                // dead
+            }
+            else {
+                file.deleteOnExit(); // dead later
+            }
+        }
     }
 
     /**
