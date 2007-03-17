@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import junit.textui.TestRunner;
@@ -52,9 +55,21 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 	/** The format for the image e will write. */
 	private String format;
 
+    private List tempFiles = new ArrayList();
+
 	public WorldImageWriterTest(String name) {
 		super(name);
 	}
+    
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        
+        for (Iterator it = tempFiles.iterator(); it.hasNext();) {
+            File f = (File) it.next();
+            if(!f.delete())
+                f.deleteOnExit();
+        }
+    }
 
 	/**
 	 * This method simply read all the respecting a predefined pattern inside
@@ -134,9 +149,7 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 		// function
 		// temp
 		final StringBuffer buff = new StringBuffer(format).insert(0, ".");
-		final File tempFile = File.createTempFile("temp", buff.toString());
-		tempFile.deleteOnExit();
-		// final File tempFile = TestData.temp(this, "temp.gif");
+		final File tempFile = tempFile(buff);
 
 		// getting a writer
 		final WorldImageWriter wiWriter = new WorldImageWriter(tempFile);
@@ -153,6 +166,7 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 				.parameter(WorldImageFormat.FORMAT.getName().toString()) };
 		// writing
 		wiWriter.write(coverage, gpv);
+        wiWriter.dispose();
 
 		// reading again
 		assertTrue(tempFile.exists());
@@ -164,8 +178,37 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 			coverage.show();
 		else
 			coverage.getRenderedImage().getData();
-
+		wiReader.dispose();
+        coverage.dispose();
 	}
+
+    private File tempFile(final StringBuffer buff) throws IOException {
+        File temp = File.createTempFile("temp", buff.toString());
+        tempFiles.add(temp);
+        tempFiles.add(sibling(temp, WorldImageFormat.getWorldExtension(format).substring(1)));
+        tempFiles.add(sibling(temp, "prj"));
+        return temp;
+    }
+    
+    
+    /**
+     * Helper method for {@link #tearDown}.
+     */
+    private static File sibling(final File f, final String ext) {
+        return new File(f.getParent(), sibling(f.getName(), ext));
+    }
+
+    /**
+     * Helper method for {@link #copyShapefiles}.
+     */
+    private static String sibling(String name, final String ext) {
+        final int s = name.lastIndexOf('.');
+        if (s >= 0) {
+            name = name.substring(0, s);
+        }
+        return name + '.' + ext;
+    }
+    
 
 	/**
 	 * TestRunner for testing inside a java application. It gives us the ability
