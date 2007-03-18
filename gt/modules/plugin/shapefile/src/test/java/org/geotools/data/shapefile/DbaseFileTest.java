@@ -147,6 +147,7 @@ static final String TEST_FILE = "shapes/statepop.dbf";
       assertTrue(o.length == r.getHeader().getNumFields());
     }
     assertEquals("Bad number of records",cnt,20);
+    r.close(); // make sure the channel is closed
     f.delete();
   }
   
