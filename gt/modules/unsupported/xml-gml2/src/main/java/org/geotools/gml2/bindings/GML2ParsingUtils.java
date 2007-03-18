@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -48,6 +49,53 @@ import org.geotools.xml.impl.BindingWalker;
  *
  */
 public class GML2ParsingUtils {
+    /**
+     * Turns a parse node instance into a geotools feature type.
+     * <p>
+     * For each child element and attribute of the node a geotools attribute
+     * type is created. AttributeType#getName() is derived from the name of
+     * the child element / attribute. Attribute#getType() is derived from the
+     * class of the value of the child element / attribute.
+     * </p>
+     * <p>
+     * Attribute types for the mandatory properties of any gml feature type
+     * (description,name,boundedBy) are also created.
+     * </p>
+     * @param node The parse node / tree for the feature.
+     *
+     * @return A geotools feature type
+     */
+    public static FeatureType featureType(Node node) throws Exception {
+        FeatureTypeBuilder ftBuilder = new DefaultFeatureTypeFactory();
+        ftBuilder.setName(node.getComponent().getName());
+        ftBuilder.setNamespace(new URI(node.getComponent().getNamespace()));
+
+        //mandatory gml attributes
+        if (!node.hasChild("description")) {
+            ftBuilder.addType(AttributeTypeFactory.newAttributeType("description", String.class));
+        }
+
+        if (!node.hasChild("name")) {
+            ftBuilder.addType(AttributeTypeFactory.newAttributeType("name", String.class));
+        }
+
+        if (!node.hasChild("boundedBy")) {
+            ftBuilder.addType(AttributeTypeFactory.newAttributeType("boundedBy", Envelope.class));
+        }
+
+        //application schema defined attributes
+        for (Iterator c = node.getChildren().iterator(); c.hasNext();) {
+            Node child = (Node) c.next();
+            String name = child.getComponent().getName();
+            Object valu = child.getValue();
+
+            ftBuilder.addType(AttributeTypeFactory.newAttributeType(name,
+                    (valu != null) ? valu.getClass() : Object.class));
+        }
+
+        return ftBuilder.getFeatureType();
+    }
+
     /**
      * Turns a xml type definition into a geotools feature type.
      *
