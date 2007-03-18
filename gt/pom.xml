@@ -939,7 +939,7 @@
             <exclude>${stress.skip.pattern}</exclude>
           </excludes>
           <forkMode>once</forkMode>
-          <argLine>-Xmx512M -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests}</argLine>
+          <argLine>-Xmx512M -enableassertions -Dorg.geotools.test.extensive=${extensive.tests} -Dorg.geotools.test.interactive=${interactive.tests} -Djava.awt.headless=${java.awt.headless}</argLine>
           <!-- Ignores test failure only if we are generating a       -->
           <!-- report for publication on the web site. See the        -->
           <!-- profiles section at the begining of this pom.xml file. -->
