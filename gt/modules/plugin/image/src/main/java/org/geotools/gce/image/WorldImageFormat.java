@@ -19,7 +19,13 @@ package org.geotools.gce.image;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,6 +55,56 @@ import org.opengis.parameter.ParameterDescriptor;
  */
 public final class WorldImageFormat extends AbstractGridFormat implements
 		Format {
+
+	/** {@link Set} of supported extensions for png world files. */
+	private final static Set PNG_WFILE_EXT;
+
+	/** {@link Set} of supported extensions for tiff world files. */
+	private final static Set TIFF_WFILE_EXT;
+
+	/** {@link Set} of supported extensions for jpeg world files. */
+	private final static Set JPG_WFILE_EXT;
+
+	/** {@link Set} of supported extensions for gif world files. */
+	private final static Set GIF_WFILE_EXT;
+
+	/** {@link Set} of supported extensions for bmp world files. */
+	private final static Set BMP_WFILE_EXT;
+
+	static {
+		// png
+		Set tempSet = new HashSet(2);
+		tempSet.add(".pgw");
+		tempSet.add(".pngw");
+		PNG_WFILE_EXT = Collections.unmodifiableSet(tempSet);
+
+		// jpeg
+		tempSet = new HashSet(3);
+		tempSet.add(".jpw");
+		tempSet.add(".jgw");
+		tempSet.add(".jpgw");
+		tempSet.add(".jpegw");
+		JPG_WFILE_EXT = Collections.unmodifiableSet(tempSet);
+
+		// gif
+		tempSet = new HashSet(2);
+		tempSet.add(".gifw");
+		tempSet.add(".gfw");
+		GIF_WFILE_EXT = Collections.unmodifiableSet(tempSet);
+
+		// png
+		tempSet = new HashSet(2);
+		tempSet.add(".tfw");
+		tempSet.add(".tiffw");
+		TIFF_WFILE_EXT = Collections.unmodifiableSet(tempSet);
+
+		// bmp
+		tempSet = new HashSet(2);
+		tempSet.add(".bmw");
+		tempSet.add(".bmpw");
+		BMP_WFILE_EXT = Collections.unmodifiableSet(tempSet);
+
+	}
 
 	/** Logger. */
 	private final static Logger LOGGER = Logger
@@ -119,7 +175,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	public GridCoverageWriter getWriter(Object destination) {
 		return new WorldImageWriter(destination);
 	}
-	
+
 	/**
 	 * Call the accepts() method before asking for a writer to determine if the
 	 * current object is supported.
@@ -129,8 +185,8 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 * 
 	 * @return a new WorldImageWriter for the destination
 	 */
-	public GridCoverageWriter getWriter(Object destination,Hints hints) {
-		return new WorldImageWriter(destination,hints);
+	public GridCoverageWriter getWriter(Object destination, Hints hints) {
+		return new WorldImageWriter(destination, hints);
 	}
 
 	/**
@@ -159,8 +215,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 								.intern(), "UTF-8");
 					} catch (UnsupportedEncodingException e) {
 						if (LOGGER.isLoggable(Level.FINE))
-							LOGGER.log(Level.FINE, e.getLocalizedMessage(),
-									e);
+							LOGGER.log(Level.FINE, e.getLocalizedMessage(), e);
 						return false;
 					}
 
@@ -198,7 +253,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 			return false;
 		String suffix;
 		String fileName;
-		final StringBuffer buff = new StringBuffer("");
+
 		boolean answer = false;
 		final File parentDir = source.getParentFile();
 		if (parentDir != null) {
@@ -206,9 +261,13 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 			if (dotIndex != -1) {
 				fileName = pathname.substring(0, dotIndex);
 				suffix = pathname.substring(dotIndex + 1, pathname.length());
-				suffix = WorldImageFormat.getWorldExtension(suffix);
-				buff.append(fileName);
-				answer = new File(buff.append(suffix).toString()).exists();
+				final Set suffixes = WorldImageFormat.getWorldExtension(suffix);
+				final Iterator it = suffixes.iterator();
+				StringBuffer buff = new StringBuffer(fileName);
+				do {
+					answer = new File(buff.append((String)it.next()).toString()).exists();
+					buff = new StringBuffer(fileName);
+				} while (!answer && it.hasNext());
 				if (!answer) {
 					buff.setLength(0);
 					buff.append(fileName);
@@ -234,35 +293,34 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 	 * @param fileExtension
 	 *            an image file extension, including the '.'
 	 * 
-	 * @return a corresponding world file extension, including the '.'
+	 * @return a corresponding {@link Set} of world file extensions, including
+	 *         the '.'
 	 */
-	public static String getWorldExtension(String fileExtension) {
+	public static Set getWorldExtension(String fileExtension) {
 		if (fileExtension == null) {
 			return null;
 		}
 
-		if (fileExtension.equals("png")) {
-			return ".pgw";
+		if (fileExtension.equalsIgnoreCase("png")) {
+			return PNG_WFILE_EXT;
 		}
 
 		if (fileExtension.equals("gif")) {
-			return ".gfw";
+			return GIF_WFILE_EXT;
 		}
 
-		if (fileExtension.equals("jpg") || fileExtension.equals("jpeg")) {
-			return ".jgw";
+		if (fileExtension.equalsIgnoreCase("jpg")
+				|| fileExtension.equalsIgnoreCase("jpeg")) {
+			return JPG_WFILE_EXT;
 		}
 
-		if (fileExtension.equals("tif") || fileExtension.equals("tiff")) {
-			return ".tfw";
+		if (fileExtension.equalsIgnoreCase("tif")
+				|| fileExtension.equalsIgnoreCase("tiff")) {
+			return TIFF_WFILE_EXT;
 		}
 
-		if (fileExtension.equals("bmp")) {
-			return ".bfw";
-		}
-
-		if (fileExtension.equals("gif")) {
-			return ".gfw";
+		if (fileExtension.equalsIgnoreCase("bmp")) {
+			return BMP_WFILE_EXT;
 		}
 
 		return null;
@@ -288,6 +346,7 @@ public final class WorldImageFormat extends AbstractGridFormat implements
 			return null;
 		}
 	}
+
 	/**
 	 * Always returns null since for the moment there are no
 	 * {@link GeoToolsWriteParams} availaible for this format.

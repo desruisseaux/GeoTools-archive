@@ -16,7 +16,6 @@
  */
 package org.geotools.gce.image;
 
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -31,6 +30,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +39,6 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
-import javax.media.jai.ImageLayout;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
@@ -55,7 +54,6 @@ import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.parameter.Parameter;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.operation.transform.ProjectiveTransform;
-import org.geotools.resources.image.ImageUtilities;
 import org.opengis.coverage.grid.Format;
 import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.coverage.grid.GridCoverageReader;
@@ -612,8 +610,12 @@ public final class WorldImageReader extends AbstractGridCoverage2DReader
 			raster2Model = reader.getTransform();
 		} else {
 			// looking for another extension
-			file2Parse = new File(new StringBuffer(base).append(
-					WorldImageFormat.getWorldExtension(extension)).toString());
+			final Set ext=WorldImageFormat.getWorldExtension(extension);
+			final Iterator it=ext.iterator();
+			if(!it.hasNext())
+				throw new DataSourceException("Unable to parse extension "+extension);
+			file2Parse = new File(new StringBuffer(base).append((String)it.next()
+					).toString());
 
 			if (file2Parse.exists()) {
 				// parse world file

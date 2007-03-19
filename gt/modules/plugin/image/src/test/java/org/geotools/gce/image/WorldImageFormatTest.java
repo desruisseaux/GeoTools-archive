@@ -38,11 +38,11 @@ public class WorldImageFormatTest extends TestCase {
     }
 
     public void testGetWorldExtension() {
-        assertEquals(WorldImageFormat.getWorldExtension("png"), ".pgw");
-        assertEquals(WorldImageFormat.getWorldExtension("gif"), ".gfw");
-        assertEquals(WorldImageFormat.getWorldExtension("jpg"), ".jgw");
-        assertEquals(WorldImageFormat.getWorldExtension("jpeg"), ".jgw");
-        assertEquals(WorldImageFormat.getWorldExtension("tif"), ".tfw");
-        assertEquals(WorldImageFormat.getWorldExtension("tiff"), ".tfw");
+        assertTrue(WorldImageFormat.getWorldExtension("png").contains(".pgw"));
+        assertTrue(WorldImageFormat.getWorldExtension("gif").contains( ".gfw"));
+        assertTrue(WorldImageFormat.getWorldExtension("jpg").contains( ".jgw"));
+        assertTrue(WorldImageFormat.getWorldExtension("jpeg").contains( ".jgw"));
+        assertTrue(WorldImageFormat.getWorldExtension("tif").contains( ".tfw"));
+        assertTrue(WorldImageFormat.getWorldExtension("tiff").contains( ".tfw"));
     }
 }

@@ -30,6 +30,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -38,6 +40,7 @@ import javax.media.jai.ParameterBlockJAI;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverageWriter;
+import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.image.ImageWorker;
 import org.geotools.parameter.Parameter;
@@ -289,8 +292,13 @@ public final class WorldImageWriter extends AbstractGridCoverageWriter
 		//
 		// ////////////////////////////////////////////////////////////////////
 		final StringBuffer buff = new StringBuffer(baseFile);
-		buff.append(WorldImageFormat.getWorldExtension(format
-				.getWriteParameters().parameter("format").stringValue()));
+//		 looking for another extension
+		final Set ext=WorldImageFormat.getWorldExtension(format
+				.getWriteParameters().parameter("format").stringValue());
+		final Iterator it=ext.iterator();
+		if(!it.hasNext())
+			throw new DataSourceException("Unable to parse extension "+extension);
+		buff.append((String)it.next());
 		final File worldFile = new File(buff.toString());
 		final PrintWriter out = new PrintWriter(new FileOutputStream(worldFile));
 		out.println(xPixelSize);

@@ -146,10 +146,10 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
 		assertNotNull(coverage.getEnvelope());
 
 		// remember to provide a valid name, it wil be mde unique by the helper
-		// function
-		// temp
-		final StringBuffer buff = new StringBuffer(format).insert(0, ".");
-		final File tempFile = tempFile(buff);
+		// function temp
+		final StringBuffer buff = new StringBuffer("temp").append(".").append(format);
+		final File tempFile =TestData.temp(this, buff.toString());
+		tempFile.deleteOnExit();
 
 		// getting a writer
 		final WorldImageWriter wiWriter = new WorldImageWriter(tempFile);
@@ -182,32 +182,6 @@ public class WorldImageWriterTest extends WorldImageBaseTestCase {
         coverage.dispose();
 	}
 
-    private File tempFile(final StringBuffer buff) throws IOException {
-        File temp = File.createTempFile("temp", buff.toString());
-        tempFiles.add(temp);
-        tempFiles.add(sibling(temp, WorldImageFormat.getWorldExtension(format).substring(1)));
-        tempFiles.add(sibling(temp, "prj"));
-        return temp;
-    }
-    
-    
-    /**
-     * Helper method for {@link #tearDown}.
-     */
-    private static File sibling(final File f, final String ext) {
-        return new File(f.getParent(), sibling(f.getName(), ext));
-    }
-
-    /**
-     * Helper method for {@link #copyShapefiles}.
-     */
-    private static String sibling(String name, final String ext) {
-        final int s = name.lastIndexOf('.');
-        if (s >= 0) {
-            name = name.substring(0, s);
-        }
-        return name + '.' + ext;
-    }
     
 
 	/**
