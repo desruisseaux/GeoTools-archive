@@ -31,8 +31,11 @@ import org.opengis.coverage.grid.GridCoverage;
 
 // Geotools dependencies
 import org.geotools.resources.Arguments;
+import org.geotools.test.TestData;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.Operations;
+
+import com.sun.media.imageioimpl.plugins.jpeg2000.MediaLibAccessor;
 
 
 /**
@@ -177,7 +180,8 @@ public final class OperationsTest extends GridCoverageTest {
                      * line, then make sure that "<your_jdk_path>/jre/bin/mlib_jai.dll" (Windows)
                      * or "lib/i386/libmlib_jai.so" (Linux) is presents in your JDK installation.
                      */
-                    assertTrue(Float.isNaN(t));
+                    if(TestData.isMediaLibAvailable())
+                        assertTrue(Float.isNaN(t));
                 } else {
                     assertEquals(s - constants[0], t, 1E-3f);
                 }
@@ -187,7 +191,7 @@ public final class OperationsTest extends GridCoverageTest {
             show(targetCoverage);
         }
     }
-
+    
     /**
      * Tests {@link Operations#nodataFilter}.
      */
