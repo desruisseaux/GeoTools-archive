@@ -10,7 +10,10 @@ import java.util.List;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
+import org.geotools.feature.iso.AttributeFactoryImpl;
 import org.geotools.feature.iso.AttributeImpl;
+import org.geotools.feature.iso.Types;
+import org.geotools.feature.iso.simple.SimpleFeatureFactoryImpl;
 import org.geotools.feature.iso.xpath.AttributePropertyHandler;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.Attribute;
@@ -30,26 +33,37 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class ISOFeatureAdapter implements Feature, SimpleFeature {
 
-    static{
+    static {
         JXPathIntrospector.registerDynamicClass(ISOFeatureAdapter.class,
                 AttributePropertyHandler.class);
     }
-    
+
     private org.geotools.feature.Feature adaptee;
 
     private SimpleFeatureType featureType;
 
     private SimpleFeatureFactory attributeFactory;
 
+    private AttributeDescriptor descriptor;
+
     public ISOFeatureAdapter(org.geotools.feature.Feature feature, SimpleFeatureType ftype,
             SimpleFeatureFactory attributeFactory) {
+        this(feature, ftype, attributeFactory, (AttributeDescriptor) null);
+    }
+
+    public ISOFeatureAdapter(org.geotools.feature.Feature feature, SimpleFeatureType ftype,
+            SimpleFeatureFactory attributeFactory, AttributeDescriptor descriptor) {
         if (adaptee instanceof GTFeatureAdapter) {
             throw new IllegalArgumentException(
                     "No need to adapt GTFeaureAdapter, use getAdaptee() instead");
         }
         this.attributeFactory = attributeFactory;
+        if(attributeFactory == null){
+            this.attributeFactory = new SimpleFeatureFactoryImpl();
+        }
         this.adaptee = feature;
         this.featureType = ftype;
+        this.descriptor = descriptor;
     }
 
     public org.geotools.feature.Feature getAdaptee() {
@@ -139,12 +153,18 @@ public class ISOFeatureAdapter implements Feature, SimpleFeature {
     }
 
     public List get(Name name) {
-        Object object = get(name.getLocalPart());
-        return Collections.singletonList(object);
+        Object value = get(name.getLocalPart());
+        if (value == null) {
+            return Collections.EMPTY_LIST;
+        }
+        AttributeDescriptor attDescriptor;
+        attDescriptor = (AttributeDescriptor) Types.descriptor(featureType, name.getLocalPart());
+        Attribute attribute = attributeFactory.createAttribute(value, attDescriptor, null);
+        return Collections.singletonList(attribute);
     }
 
     public AttributeDescriptor getDescriptor() {
-        return null;
+        return descriptor;
     }
 
     public void set(Object atts) throws IllegalArgumentException {

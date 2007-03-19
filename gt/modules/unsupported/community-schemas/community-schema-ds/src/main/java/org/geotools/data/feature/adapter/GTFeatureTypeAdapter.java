@@ -1,6 +1,7 @@
 package org.geotools.data.feature.adapter;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.server.UID;
 
 import org.geotools.feature.AttributeType;
@@ -14,20 +15,23 @@ import org.geotools.feature.iso.Types;
 import org.opengis.feature.FeatureFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 
 public class GTFeatureTypeAdapter implements FeatureType {
 
     private org.opengis.feature.type.FeatureType type;
 
     public GTFeatureTypeAdapter(org.opengis.feature.type.FeatureType type) {
-        if(type instanceof ISOFeatureTypeAdapter){
-            throw new IllegalArgumentException("No need to adapt ISOFEatureTypeAdapter, use getAdaptee() instead");
+        if (type instanceof ISOFeatureTypeAdapter) {
+            throw new IllegalArgumentException(
+                    "No need to adapt ISOFEatureTypeAdapter, use getAdaptee() instead");
         }
         this.type = type;
     }
-    
-    public org.opengis.feature.type.FeatureType getAdaptee(){
+
+    public org.opengis.feature.type.FeatureType getAdaptee() {
         return type;
     }
 
@@ -35,8 +39,7 @@ public class GTFeatureTypeAdapter implements FeatureType {
         return create(attributes, new UID().toString());
     }
 
-    public Feature create(Object[] attributes, String featureID)
-            throws IllegalAttributeException {
+    public Feature create(Object[] attributes, String featureID) throws IllegalAttributeException {
         FeatureFactory ff = new AttributeFactoryImpl();
         AttributeBuilder builder = new AttributeBuilder(ff);
         builder.setType(this.type);
@@ -71,20 +74,26 @@ public class GTFeatureTypeAdapter implements FeatureType {
     }
 
     public FeatureType[] getAncestors() {
-        //org.opengis.feature.type.AttributeType parent = type.getSuper();
+        // org.opengis.feature.type.AttributeType parent = type.getSuper();
         throw new UnsupportedOperationException("not implemented yet");
     }
 
     public int getAttributeCount() {
-        if(type instanceof SimpleFeatureType){
-            return ((SimpleFeatureType)type).getNumberOfAttribtues();
-        }else{
+        if (type instanceof SimpleFeatureType) {
+            return ((SimpleFeatureType) type).getNumberOfAttribtues();
+        } else {
             return type.attributes().size();
         }
     }
 
     public AttributeType getAttributeType(String xPath) {
-        throw new UnsupportedOperationException("not implemented yet");
+        if (type instanceof SimpleFeatureType) {
+            SimpleFeatureType sf = (SimpleFeatureType) type;
+            AttributeDescriptor descriptor = (AttributeDescriptor) Types.descriptor(sf, xPath);
+            AttributeType gtAtt = new GTAttributeTypeAdapter(descriptor);
+            return gtAtt;
+        }
+        throw new UnsupportedOperationException("not implemented for complex types");
     }
 
     public AttributeType getAttributeType(int position) {
@@ -100,11 +109,15 @@ public class GTFeatureTypeAdapter implements FeatureType {
     }
 
     public URI getNamespace() {
-        throw new UnsupportedOperationException("not implemented yet");
+        try {
+            return new URI(type.getName().getNamespaceURI());
+        } catch (URISyntaxException e) {
+            throw (RuntimeException) new RuntimeException().initCause(e);
+        }
     }
 
     public String getTypeName() {
-        throw new UnsupportedOperationException("not implemented yet");
+        return type.getName().getLocalPart();
     }
 
     public boolean hasAttributeType(String xPath) {

@@ -5,8 +5,13 @@ import java.util.Iterator;
 
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureType;
+import org.geotools.feature.iso.type.AttributeDescriptorImpl;
 import org.opengis.feature.simple.SimpleFeatureFactory;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.TypeName;
 
 public class FeatureCollectionAdapter extends AbstractCollection {
 
@@ -18,10 +23,16 @@ public class FeatureCollectionAdapter extends AbstractCollection {
 	
     private int maxFeatures = Integer.MAX_VALUE;
     
+    private AttributeDescriptor featureDescriptor;
+    
     public FeatureCollectionAdapter(SimpleFeatureType isoType, FeatureCollection features, SimpleFeatureFactory attributeFactory) {
 		this.isoType = isoType;
 		this.gtFeatures = features;
-	}
+		
+        TypeName typeName = isoType.getName();
+        Name name = new org.geotools.feature.Name(typeName.getNamespaceURI(), typeName.getLocalPart());
+        featureDescriptor = new AttributeDescriptorImpl(isoType, name, 0, Integer.MAX_VALUE, true);
+    }
 
 	public Iterator iterator() {
 		final Iterator gtFeatureIterator = gtFeatures.iterator();
@@ -36,7 +47,7 @@ public class FeatureCollectionAdapter extends AbstractCollection {
                 featureCount++;
 				Feature gtFeature = (Feature) gtFeatureIterator.next();
 				org.opengis.feature.Feature isoFeature;
-				isoFeature = new ISOFeatureAdapter(gtFeature, isoType, attributeFactory);
+				isoFeature = new ISOFeatureAdapter(gtFeature, isoType, attributeFactory, featureDescriptor);
 				return isoFeature;
 			}
 
