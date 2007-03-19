@@ -221,7 +221,7 @@ public class FilterTest extends TestCase {
 		assertTrue("broadway".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broadway!")));
 		assertTrue("broadway!".equals(LikeFilterImpl.convertToSQL92('!','*','.',"broadway!!")));
     }
-
+    
     /**
      * Sets up a schema and a test feature.
      *
@@ -356,6 +356,14 @@ public class FilterTest extends TestCase {
         //LOGGER.finer( filter.toString());            
         //LOGGER.finer( "contains feature: " + filter.contains(testFeature));
         assertTrue(!filter.contains(testFeature));
+        
+        // Test we don't match if single character is missing
+        filter.setPattern(new LiteralExpressionImpl("test*a."), "*", ".", "!");
+        assertFalse(filter.contains(testFeature));
+        
+        // Test we do match if the single char is there
+        filter.setPattern(new LiteralExpressionImpl("test*dat."), "*", ".", "!");
+        assertTrue(filter.contains(testFeature));
     }
 
     /**

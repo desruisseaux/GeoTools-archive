@@ -237,7 +237,9 @@ public class LikeFilterImpl extends AbstractFilterImpl implements LikeFilter {
                         LOGGER.finer("escaped ");
                         tmp.append(escapedWildcardSingle);
                     } else {
-                        tmp.append(".?");
+                        // From the OpenGIS filter encoding spec, 
+                        // "the single singleChar character matches exactly one character"
+                        tmp.append(".{1}");
                     }
 
                     i += (wildcardSingle1.length() - 1);
