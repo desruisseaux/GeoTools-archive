@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-
 import org.geotools.factory.Factory;
 
 
@@ -472,34 +471,41 @@ public interface DataStoreFactorySpi extends Factory {
                 return null;
             }
 
-           // if type is an array, tokenize the string and have the reflection
-           // parsing be tried on each element, then build the array as a result
-           if(type.isArray()) {
-        	   StringTokenizer tokenizer = new StringTokenizer(text, " ");
-        	   List result = new ArrayList();
-        	   while(tokenizer.hasMoreTokens()) {
-        		   String token = tokenizer.nextToken();
-        		   Object element;
-        		   try {
-        			   if(type.getComponentType() == String.class)
-        				   element = token;
-        			   else
-        				   element = parse(token);
-        		   } catch (IOException ioException) {
-        			   throw ioException;
-        		   } catch (Throwable throwable) {
-        			   throw new DataSourceException("Problem creating "
-        					   + type.getName() + " from '" + text + "'", throwable);
-        		   }
-        		   result.add(element);
-        	   }
-        	   Object array = Array.newInstance(type.getComponentType(), result.size());
-        	   for (int i = 0; i < result.size(); i++) {
-        		   Array.set(array, i, result.get(i));
-        	   }
-        	   return array;
-            } 
-            
+            // if type is an array, tokenize the string and have the reflection
+            // parsing be tried on each element, then build the array as a result
+            if (type.isArray()) {
+                StringTokenizer tokenizer = new StringTokenizer(text, " ");
+                List result = new ArrayList();
+
+                while (tokenizer.hasMoreTokens()) {
+                    String token = tokenizer.nextToken();
+                    Object element;
+
+                    try {
+                        if (type.getComponentType() == String.class) {
+                            element = token;
+                        } else {
+                            element = parse(token);
+                        }
+                    } catch (IOException ioException) {
+                        throw ioException;
+                    } catch (Throwable throwable) {
+                        throw new DataSourceException("Problem creating " + type.getName()
+                            + " from '" + text + "'", throwable);
+                    }
+
+                    result.add(element);
+                }
+
+                Object array = Array.newInstance(type.getComponentType(), result.size());
+
+                for (int i = 0; i < result.size(); i++) {
+                    Array.set(array, i, result.get(i));
+                }
+
+                return array;
+            }
+
             try {
                 return parse(text);
             } catch (IOException ioException) {
@@ -533,32 +539,31 @@ public interface DataStoreFactorySpi extends Factory {
         public Object parse(String text) throws Throwable {
             Constructor constructor;
 
-			try {
-			    constructor = type.getConstructor(new Class[] { String.class });
-			} catch (SecurityException e) {
-			    //  type( String ) constructor is not public
-			    throw new IOException("Could not create " + type.getName() + " from text");
-			} catch (NoSuchMethodException e) {
-			    // No type( String ) constructor
-			    throw new IOException("Could not create " + type.getName() + " from text");
-			}
+            try {
+                constructor = type.getConstructor(new Class[] { String.class });
+            } catch (SecurityException e) {
+                //  type( String ) constructor is not public
+                throw new IOException("Could not create " + type.getName() + " from text");
+            } catch (NoSuchMethodException e) {
+                // No type( String ) constructor
+                throw new IOException("Could not create " + type.getName() + " from text");
+            }
 
-			try {
-			    return constructor.newInstance(new Object[] { text, });
-			} catch (IllegalArgumentException illegalArgumentException) {
-			    throw new DataSourceException("Could not create " + type.getName() + ": from '"
-			        + text + "'", illegalArgumentException);
-			} catch (InstantiationException instantiaionException) {
-			    throw new DataSourceException("Could not create " + type.getName() + ": from '"
-			        + text + "'", instantiaionException);
-			} catch (IllegalAccessException illegalAccessException) {
-			    throw new DataSourceException("Could not create " + type.getName() + ": from '"
-			        + text + "'", illegalAccessException);
-			} catch (InvocationTargetException targetException) {
-			    throw targetException.getCause();
-			}
-			
-		}
+            try {
+                return constructor.newInstance(new Object[] { text, });
+            } catch (IllegalArgumentException illegalArgumentException) {
+                throw new DataSourceException("Could not create " + type.getName() + ": from '"
+                    + text + "'", illegalArgumentException);
+            } catch (InstantiationException instantiaionException) {
+                throw new DataSourceException("Could not create " + type.getName() + ": from '"
+                    + text + "'", instantiaionException);
+            } catch (IllegalAccessException illegalAccessException) {
+                throw new DataSourceException("Could not create " + type.getName() + ": from '"
+                    + text + "'", illegalAccessException);
+            } catch (InvocationTargetException targetException) {
+                throw targetException.getCause();
+            }
+        }
 
         /**
          * key=Type description
