@@ -173,6 +173,29 @@
     <url>http://jira.codehaus.org/browse/GEOT</url>
   </issueManagement>
 
+  <!-- =========================================================== -->
+  <!--    Continuous Integration                                   -->
+  <!-- =========================================================== -->
+  <ciManagement>
+    <system>continuum</system>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <configuration>
+           <address>geotools-devel@lists.sourceforge.net</address>
+           <sendOnFailure>true</sendOnFailure>
+        </configuration>
+      </notifier>
+      <notifier>
+        <type>irc</type>
+        <configuration>
+           <host>freenode</host>
+           <channel>#geotools</channel>
+        </configuration>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+
   <mailingLists>
     <mailingList>
       <name>geotools-gt2-users</name>
@@ -901,7 +924,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-webdav</artifactId>
-        <version>1.0-beta-1</version>
+        <version>1.0-beta-2</version>
       </extension>
     </extensions>
 
