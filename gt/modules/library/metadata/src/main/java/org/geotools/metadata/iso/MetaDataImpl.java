@@ -72,6 +72,12 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     private Locale language;
 
     /**
+     * Information about an alternatively used localized character
+     * strings for linguistic extensions.
+     */
+    private Collection locales;
+    
+    /**
      * Full name of the character coding standard used for the metadata set.
      */
     private Charset characterSet;
@@ -94,8 +100,13 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     /**
      * Party responsible for the metadata information.
      */
-    private ResponsibleParty contact;
+    private Collection contacts;
 
+    /**
+     * Uniformed Resource Identifier (URI) of the dataset to which the metadata applies.
+     */
+    private String dataSetUri;
+    
     /**
      * Date that the metadata was created, in milliseconds ellapsed since January 1st, 1970.
      * If not defined, then then value is {@link Long#MIN_VALUE}.
@@ -183,10 +194,10 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      *        to which the metadata applies.
      */
     public MetaDataImpl(final ResponsibleParty contact,
-                    final Date             dateStamp,
-                    final Identification   identificationInfo)
+                        final Date             dateStamp,
+                        final Identification   identificationInfo)
     {
-        setContact           (contact);
+        setContacts          (Collections.singleton(contact));
         setDateStamp         (dateStamp);
         setIdentificationInfo(Collections.singleton(identificationInfo));
     }
@@ -281,19 +292,36 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
 
     /**
      * Returns the party responsible for the metadata information.
+     * @deprecated use getContacts
      */
     public ResponsibleParty getContact() {
-        return contact;
+        Collection contacts = getContacts();
+        return (contacts.isEmpty()) ? null : (ResponsibleParty) contacts.toArray()[0];
+    }
+
+    /**
+     * Returns the party responsible for the metadata information.
+     */
+    public Collection getContacts() {
+        return nonNullCollection(contacts, ResponsibleParty.class);
     }
 
     /**
      * Set the party responsible for the metadata information.
+     * @deprecated use setContacts
      */
     public synchronized void setContact(final ResponsibleParty newValue) {
-        checkWritePermission();
-        contact = newValue;
+        setContacts(Collections.singleton(newValue));
     }
 
+    /**
+     * Set the parties responsible for the metadata information.
+     */
+    public synchronized void setContacts(final Collection newValues) {
+        checkWritePermission();
+        contacts = copyCollection(newValues, contacts, ResponsibleParty.class);
+    }
+    
     /**
      * Returns the date that the metadata was created.
      */
@@ -505,6 +533,37 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         checkWritePermission();
         metadataMaintenance = newValue;
     }
+    
+    /**
+     * Provides information about an alternatively used localized character
+     * string for a linguistic extension
+     */
+    public synchronized Collection getLocales() {
+        return nonNullCollection(locales, Locale.class);
+    }
+    
+    /**
+     * Set information about an alternatively used localized character
+     * string for a linguistic extension
+     */
+    public synchronized void setLocales(final Collection newValues) {
+        locales = copyCollection(newValues, locales, Locale.class);
+    }
+    
+    /**
+     * Provides the URI of the dataset to which the metadata applies.
+     */
+    public String getDataSetUri() {
+        return dataSetUri;
+    }
+
+    /**
+     * Sets the URI of the dataset to which the metadata applies.
+     */
+    public void setDataSetUri(final String newValue) {
+        checkWritePermission();
+        dataSetUri = newValue;
+    }
      
     /**
      * Declare this metadata and all its attributes as unmodifiable.
@@ -512,10 +571,11 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     protected void freeze() {
         super.freeze();
         language                  = (Locale)                 unmodifiable(language);
+        locales                   = (Collection)             unmodifiable(locales);
         characterSet              = (Charset)                unmodifiable(characterSet);
         hierarchyLevels           = (Collection)             unmodifiable(hierarchyLevels);
         hierarchyLevelNames       = (Collection)             unmodifiable(hierarchyLevelNames);
-        contact                   = (ResponsibleParty)       unmodifiable(contact);
+        contacts                  = (Collection)             unmodifiable(contacts);
         spatialRepresentationInfo = (Collection)             unmodifiable(spatialRepresentationInfo);
         referenceSystemInfo       = (Collection)             unmodifiable(referenceSystemInfo);
         metadataExtensionInfo     = (Collection)             unmodifiable(metadataExtensionInfo);
@@ -526,7 +586,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         portrayalCatalogueInfo    = (Collection)             unmodifiable(portrayalCatalogueInfo);
         metadataConstraints       = (Collection)             unmodifiable(metadataConstraints);
         applicationSchemaInfo     = (Collection)             unmodifiable(applicationSchemaInfo);
-        metadataMaintenance       = (MaintenanceInformation) unmodifiable(metadataMaintenance);     
+        metadataMaintenance       = (MaintenanceInformation) unmodifiable(metadataMaintenance);
     }
 
     /**
@@ -541,11 +601,13 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
             return               this.dateStamp             ==   that.dateStamp                  &&
                 Utilities.equals(this.fileIdentifier,            that.fileIdentifier           ) &&
                 Utilities.equals(this.language,                  that.language                 ) &&
+                Utilities.equals(this.locales,                   that.locales                  ) &&
+                Utilities.equals(this.dataSetUri,                that.dataSetUri               ) &&
                 Utilities.equals(this.characterSet,              that.characterSet             ) &&
                 Utilities.equals(this.parentIdentifier,          that.parentIdentifier         ) &&
                 Utilities.equals(this.hierarchyLevels,           that.hierarchyLevels          ) &&
                 Utilities.equals(this.hierarchyLevelNames,       that.hierarchyLevelNames      ) &&
-                Utilities.equals(this.contact,                   that.contact                  ) &&
+                Utilities.equals(this.contacts,                  that.contacts                 ) &&
                 Utilities.equals(this.metadataStandardName,      that.metadataStandardName     ) &&
                 Utilities.equals(this.metadataStandardVersion,   that.metadataStandardVersion  ) &&
                 Utilities.equals(this.spatialRepresentationInfo, that.spatialRepresentationInfo) &&
@@ -570,7 +632,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        if (contact            != null) code ^= contact           .hashCode();
+        if (fileIdentifier     != null) code ^= fileIdentifier    .hashCode();
         if (identificationInfo != null) code ^= identificationInfo.hashCode();
         return code;
     }
@@ -582,6 +644,13 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      * @todo Provides a more elaborated implementation.
      */
     public String toString() {
-        return String.valueOf(contact);
-    }        
+        StringBuffer str = new StringBuffer();
+        if (fileIdentifier != null) {
+            str.append(fileIdentifier);
+        }
+        appendCollection(str, "ContentInfo", getContentInfo());
+        appendCollection(str, "Contacts", getContacts());
+        return str.toString();
+    }
+
 }

@@ -303,4 +303,30 @@ public class MetadataEntity implements java.lang.Cloneable, Serializable {
             buffer.append(System.getProperty("line.separator", "\n"));
         }
     }
+    
+    /**
+     * Add the contents of a collection to the provided buffer.
+     * This convenience method is used for {@link #toString) implementations.
+     * Output will be: "label: [1,2,3]"
+     *  
+     * @param buffer     string buffer to add the collection contents to
+     * @param label      label for easy identification 
+     * @param collection source object
+     */
+    protected static void appendCollection(final StringBuffer buffer, String label, Collection collection) {
+        buffer.append(label);
+        buffer.append(": [");
+        if (collection != null && !collection.isEmpty()) {
+            Iterator it = collection.iterator();
+            while (it.hasNext()) {
+                buffer.append(it.next().toString());
+                if (it.hasNext()) {
+                    buffer.append(",");
+                }
+            }
+            it.remove();
+            it = null;
+        }
+        buffer.append("]");
+    }
 }
