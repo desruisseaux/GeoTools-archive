@@ -31,7 +31,9 @@ import org.w3c.dom.NodeList;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.TopologyException;
 
@@ -531,7 +533,25 @@ public final class ExpressionDOMParser {
             return gfac.createPolygon(ring, null);
         }
 
-     
+        //check for geometry properties
+        if (childName.equalsIgnoreCase("gml:polygonmember") || 
+        		childName.equalsIgnoreCase( "gml:pointmember") || 
+        		childName.equalsIgnoreCase( "gml:linestringmember") || 
+        		childName.equalsIgnoreCase( "gml:linearringmember" ) ) {
+        	
+        	for ( int i = 0; i < child.getChildNodes().getLength(); i++ ) {
+        		Node newChild = child.getChildNodes().item( i );
+        		if ( newChild.getNodeType() == Node.ELEMENT_NODE ) {
+        			childName = newChild.getNodeName();
+        			if ( !childName.startsWith("gml:" ) ) {
+        				childName = "gml:" + childName;
+        			}
+        			root = newChild;
+        			child = newChild;
+        			break;
+        		}
+        	}
+        }
         
         if (childName.equalsIgnoreCase("gml:polygon")) {
             LOGGER.finer("polygon");
@@ -602,7 +622,6 @@ public final class ExpressionDOMParser {
             return ring;
         }
         
-
         if (childName.equalsIgnoreCase("gml:linestring")) {
             LOGGER.finer("linestring");
             type = GML_LINESTRING;
@@ -626,20 +645,37 @@ public final class ExpressionDOMParser {
             return point;
         }
 
-        if (childName.toLowerCase().startsWith("gml:multiPolygon")) {
-            LOGGER.finer("MultiPolygon");
-
-            List multi = new ArrayList();
+        if (childName.toLowerCase().startsWith("gml:multipolygon") 
+    		|| childName.toLowerCase().startsWith("gml:multilinestring") 
+    		|| childName.toLowerCase().startsWith("gml:multipoint")) {
+        	
+        	List multi = new ArrayList();
 
             // parse all children thru parseGML
             NodeList kids = child.getChildNodes();
 
             for (int i = 0; i < kids.getLength(); i++) {
-                multi.add(parseGML(kids.item(i)));
+            	if ( kids.item(i).getNodeType() == Node.ELEMENT_NODE ) {
+            		multi.add(parseGML(kids.item(i)));	
+            	}
             }
+            
+            if ( childName.toLowerCase().startsWith("gml:multipolygon") ) {
+            	LOGGER.finer( "MultiPolygon" );
+            	return gfac.createMultiPolygon((Polygon[]) multi.toArray(
+                        new Polygon[0]));
+            }
+            else if ( childName.toLowerCase().startsWith("gml:multilinestring") ) {
+            	LOGGER.finer( "MultiLineString" );
+            	return gfac.createMultiLineString((LineString[]) multi.toArray(
+                        new LineString[0]));
+            }
+            else {
+            	LOGGER.finer( "MultiPoint" );
+            	return gfac.createMultiPoint((Point[])multi.toArray(new Point[0]) );
+            }
+            
 
-            return gfac.createMultiPolygon((Polygon[]) multi.toArray(
-                    new Polygon[0]));
         }
 
         return null;
@@ -736,7 +772,8 @@ public final class ExpressionDOMParser {
                     }
 
                     String outer = grandKid.getNodeValue().trim();
-                    StringTokenizer ost = new StringTokenizer(outer, " ");
+                    //handle newline and tab whitespace along with space
+                    StringTokenizer ost = new StringTokenizer(outer, " \n\t");
 
                     while (ost.hasMoreTokens()) {
                         String internal = ost.nextToken();
