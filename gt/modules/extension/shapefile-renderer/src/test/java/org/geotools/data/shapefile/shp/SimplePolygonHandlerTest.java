@@ -1,17 +1,18 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.shapefile.shp;
 
@@ -26,15 +27,15 @@ import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.shapefile.ShapefileRendererUtil;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
 import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.LabelingTest;
-import org.geotools.renderer.shape.PolygonHandler;
 import org.geotools.renderer.shape.SimpleGeometry;
-import org.geotools.test.TestData;
+import org.geotools.resources.TestData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.MathTransform2D;
@@ -46,27 +47,21 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/test/org/geotools/data/shapefile/shp/PolygonHandlerTest.java $
  */
-public class PolygonHandlerTest extends TestCase {
+public class SimplePolygonHandlerTest extends TestCase {
 
 	public void testRead() throws Exception{
 		URL url=TestData.getResource(LabelingTest.class, "lakes.shp");
 		ShapefileDataStore ds=(ShapefileDataStore) new ShapefileDataStoreFactory().createDataStore(url);
 		
-		Envelope env=ds.getFeatureSource().getBounds();
-//		Envelope env=new Envelope(-180,180,-90,90);
-		CoordinateReferenceSystem crs=ds.getSchema().getDefaultGeometry().getCoordinateSystem();
-//		CoordinateReferenceSystem crs=DefaultGeographicCRS.WGS84;
-		MathTransform2D mt=(MathTransform2D) CRS.findMathTransform(crs, DefaultGeographicCRS.WGS84);
-		
+		ReferencedEnvelope env=(ReferencedEnvelope) ds.getFeatureSource().getBounds();
+//		
+                AffineTransform transform = RendererUtilities.worldToScreenTransform(env, new Rectangle(500,500));
+                MathTransform mt = FactoryFinder.getMathTransformFactory(null).createAffineTransform(new GeneralMatrix(transform));
+                
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-        if (true) {
-            // TODO: The remaining of this test is disabled because the CRS used is way outside
-            //       its area of validity, which cause an AssertionError in projection code.
-            return;
-        }
-		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
+		reader.setHandler(new org.geotools.renderer.shape.shapehandler.simple.PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
 		assertTrue( shape instanceof SimpleGeometry);
@@ -96,7 +91,7 @@ public class PolygonHandlerTest extends TestCase {
 				.createAffineTransform(new GeneralMatrix(at)));
 
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
+		reader.setHandler(new org.geotools.renderer.shape.shapehandler.simple.PolygonHandler(reader.getHeader().getShapeType(), env, mt, false));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
 		assertTrue( shape instanceof SimpleGeometry);

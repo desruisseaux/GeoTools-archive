@@ -1,17 +1,18 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.renderer.shape;
 
@@ -22,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,8 +45,10 @@ import org.geotools.filter.FidFilter;
 import org.geotools.filter.Filter;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.renderer.RenderListener;
 import org.geotools.styling.Style;
+import org.opengis.referencing.operation.MathTransform;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -59,6 +61,10 @@ import com.vividsolutions.jts.geom.Envelope;
  *         http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/test/org/geotools/renderer/shape/ShapeRendererTest.java $
  */
 public class ShapeRendererTest extends TestCase {
+    private static final boolean INTERACTIVE = false;
+
+    private static final MathTransform IDENTITY = IdentityTransform.create(2);
+
     private File shp2;
 
     private File shx2;
@@ -72,7 +78,7 @@ public class ShapeRendererTest extends TestCase {
     private File directory;
 
     protected void setUp() throws Exception {
-        Logger.getLogger("org.geotools.data.shapefile").setLevel(Level.FINE);
+        Logger.getLogger("org.geotools").setLevel(Level.FINE);
         File shp = new File(TestData.url(Rendering2DTest.class, "theme1.shp")
                 .getFile());
         File shx = new File(TestData.url(Rendering2DTest.class, "theme1.shx")
@@ -166,7 +172,7 @@ public class ShapeRendererTest extends TestCase {
         ShapefileReader shpReader = ShapefileRendererUtil
                         .getShpReader(ds, bounds, 
                                 new Rectangle(0,0,(int)bounds.getWidth(), (int)bounds.getHeight()),
-                                null, false);
+                                IDENTITY, false, false);
         Feature feature = renderer.createFeature(type, shpReader.nextRecord(), reader, "id");
         shpReader.close();
         reader.close();
@@ -195,6 +201,7 @@ public class ShapeRendererTest extends TestCase {
         renderer.addRenderListener(listener);
         Envelope env = context.getLayerBounds();
         int boundary = 7;
+        TestUtilites.INTERACTIVE = INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
         TestUtilites.showRender("testTransaction", renderer, 2000, env);
@@ -256,6 +263,7 @@ public class ShapeRendererTest extends TestCase {
         renderer.addRenderListener(listener);
         Envelope env = context.getLayerBounds();
         int boundary = 7;
+        TestUtilites.INTERACTIVE = INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
         TestUtilites.showRender("testTransaction", renderer, 2000, env);
@@ -270,7 +278,7 @@ public class ShapeRendererTest extends TestCase {
         Transaction t = new DefaultTransaction();
         store.setTransaction(t);
         store.modifyFeatures(ds.getSchema().getAttributeType("NAME"), "bleep",
-                Filter.INCLUDE);
+                Filter.NONE);
 
         MapContext context = new DefaultMapContext();
         context.addLayer(store, st);
@@ -290,10 +298,12 @@ public class ShapeRendererTest extends TestCase {
         });
         Envelope env = context.getLayerBounds();
         int boundary = 7;
+        TestUtilites.INTERACTIVE = INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
         TestUtilites.showRender("testTransaction", renderer, 2000, env);
 
         assertEquals(3, listener.count);
     }
+
 }

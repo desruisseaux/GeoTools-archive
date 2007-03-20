@@ -1,17 +1,18 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.shapefile.shp;
 
@@ -32,27 +33,30 @@ import org.geotools.referencing.CRS;
 import org.geotools.referencing.FactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.matrix.GeneralMatrix;
+import org.geotools.referencing.operation.transform.IdentityTransform;
 import org.geotools.renderer.lite.RendererUtilities;
 import org.geotools.renderer.shape.LabelingTest;
-import org.geotools.renderer.shape.MultiLineHandler;
 import org.geotools.renderer.shape.ShapefileRenderer;
-import org.geotools.renderer.shape.SimpleGeometry;
 import org.geotools.renderer.shape.TestUtilites;
-import org.geotools.test.TestData;
+import org.geotools.resources.TestData;
 import org.geotools.styling.Style;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Tests multilinehandler class
  * 
  * @author jeichar
  * @since 2.1.x
- * @source $URL$
+ * @source $URL: http://svn.geotools.org/geotools/branches/2.2.x/ext/shaperenderer/test/org/geotools/data/shapefile/shp/MultiLineHandlerTest.java $
  */
-public class MultiLineHandlerTest extends TestCase {
+public class JTSMultiLineHandlerTest extends TestCase {
+
+	private static final boolean INTERACTIVE = false;
 
 	public void testRead() throws Exception{
 		URL url=TestData.getResource(LabelingTest.class, "streams.shp");
@@ -71,20 +75,26 @@ public class MultiLineHandlerTest extends TestCase {
 		}
 
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, 
+		reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiLineHandler(reader.getHeader().getShapeType(), env, 
                         mt, false, new Rectangle(512,512) ));
 		Object shape=reader.nextRecord().shape();
 		assertNotNull( shape );
-		assertTrue( shape instanceof SimpleGeometry);
+		assertTrue( shape instanceof Geometry);
+                Coordinate[] coords = ((Geometry)shape).getCoordinates();
+                for (int i = 0; i < coords.length; i++) {
+                    Coordinate coordinate = coords[i];
+                    assertNotNull(coordinate);
+                }
+
 		int i=0;
 		while( reader.hasNext() ){
 			i++;
 			shape=reader.nextRecord().shape();
 			assertNotNull( shape );
-			assertTrue( shape instanceof SimpleGeometry);
+			assertTrue( shape instanceof Geometry);
 			if( i==0 ){
-				SimpleGeometry geom=(SimpleGeometry) shape;
-				assertEquals(13, geom.coords[0].length);
+                            Geometry geom=(Geometry) shape;
+				assertEquals(13, geom.getCoordinates().length);
 			}
 		}
 		assertEquals(ds.getFeatureSource().getCount(Query.ALL)-1, i);
@@ -102,18 +112,15 @@ public class MultiLineHandlerTest extends TestCase {
 		mt = FactoryFinder.getMathTransformFactory(null)
 		.createConcatenatedTransform(mt,worldToScreen);
 		ShapefileReader reader=new ShapefileReader(ShapefileRendererUtil.getShpReadChannel(ds), new Lock());
-		reader.setHandler(new MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false,new Rectangle(300,300)));
-		SimpleGeometry shape=(SimpleGeometry) reader.nextRecord().shape();
-		assertEquals( 6, shape.coords[0].length );
+		reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiLineHandler(reader.getHeader().getShapeType(), env, mt, false,new Rectangle(300,300)));
+		Geometry shape=(Geometry) reader.nextRecord().shape();
+		assertEquals( 3, shape.getCoordinates().length );
 		
-		shape=(SimpleGeometry) reader.nextRecord().shape();
-		assertEquals( 4, shape.coords[0].length );
+		shape=(Geometry) reader.nextRecord().shape();
+		assertEquals( 2, shape.getCoordinates().length );
 
-		shape=(SimpleGeometry) reader.nextRecord().shape();
-		assertEquals( 4, shape.coords[0].length);
-//	
-//		assertEquals( shape.coords[0][0], 0, 0.00001 );
-//		assertEquals( shape.coords[0][1], 0, 0.00001 );
+		shape=(Geometry) reader.nextRecord().shape();
+		assertEquals( 2, shape.getCoordinates().length);
 	}
 
 	public void disabledtestFeatureNearBoundry() throws Exception{		
@@ -124,12 +131,14 @@ public class MultiLineHandlerTest extends TestCase {
         map.addLayer(ds.getFeatureSource(), style);
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = new Envelope(-5,6,-1.4,0);
+        TestUtilites.INTERACTIVE=INTERACTIVE;
         TestUtilites.showRender("testLineLabeling", renderer, 2000, env);
 	}
 
 	public void testBBoxIntersectSegment() throws Exception{
-		MultiLineHandler handler=
-                    new MultiLineHandler(ShapeType.ARC, new Envelope(0,10,0,10), null, false, 
+            org.geotools.renderer.shape.shapehandler.jts.MultiLineHandler handler=
+                    new org.geotools.renderer.shape.shapehandler.jts.MultiLineHandler(ShapeType.ARC, new Envelope(0,10,0,10), 
+                            IdentityTransform.create(2), false, 
                             new Rectangle(0,0,10,10));
 		assertTrue("point contained in bbox", handler.bboxIntersectSegment(false, new double[]{1,1}, 2));
 		assertFalse("point outside of bbox",handler.bboxIntersectSegment(false, new double[]{-1,1}, 2));

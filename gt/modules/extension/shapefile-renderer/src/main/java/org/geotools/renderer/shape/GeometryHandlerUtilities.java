@@ -1,17 +1,18 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.renderer.shape;
 
@@ -40,6 +41,7 @@ public class GeometryHandlerUtilities {
      *
      * @param buffer
      *
+     * @return
      */
     public static Envelope readBounds(ByteBuffer buffer) {
         double[] tmpbbox = new double[4];
@@ -57,8 +59,8 @@ public class GeometryHandlerUtilities {
     public static void transform(ShapeType type, MathTransform mt,
         double[] src, double[] dest) throws TransformException {
         boolean startPointTransformed = true;
-        final int length=dest.length;
-        for (int i = 0; i < length; i += 2) {
+
+        for (int i = 0; i < dest.length; i += 2) {
             try {
                 mt.transform(src, i, dest, i, 1);
 
@@ -74,7 +76,7 @@ public class GeometryHandlerUtilities {
                 if (i == 0) {
                     startPointTransformed = false;
                 } else if (startPointTransformed) {
-                    if ((i == (length - 2))
+                    if ((i == (dest.length - 2))
                             && ((type == ShapeType.POLYGON)
                             || (type == ShapeType.POLYGONZ)
                             || (type == ShapeType.POLYGONM))) {
@@ -118,17 +120,6 @@ public class GeometryHandlerUtilities {
         return span;
     }
 
-    /**
-     * <p>
-     * This method is making the implicit assumption that the envelope is lon,lat
-     * 
-     * 
-     * @param env
-     * @param mt
-     * @param hasOpacity
-     * @throws TransformException
-     * @throws NoninvertibleTransformException
-     */
     public static ScreenMap calculateScreenSize(Rectangle screenSize,
         boolean hasOpacity)
         throws TransformException, NoninvertibleTransformException {

@@ -1,17 +1,18 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.renderer.shape;
 
@@ -19,17 +20,18 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Panel;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.net.URL;
 
 import junit.framework.TestCase;
 
+import org.geotools.TestData;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.data.shapefile.indexed.IndexedShapefileDataStoreFactory;
 import org.geotools.feature.Feature;
@@ -38,7 +40,6 @@ import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.renderer.GTRenderer;
 import org.geotools.renderer.RenderListener;
-import org.geotools.TestData;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Fill;
 import org.geotools.styling.LineSymbolizer;
@@ -65,6 +66,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class TestUtilites {
     static final FilterFactory filterFactory =
     	FilterFactoryFinder.createFilterFactory();
+    public static boolean INTERACTIVE = false;
 
     public static IndexedShapefileDataStore getPolygons() throws IOException {
         return TestUtilites.getDataStore("lakes.shp");
@@ -208,7 +210,7 @@ public class TestUtilites {
         TestUtilites.render(renderer, g, new Rectangle(w, h), bounds);
 
         g.dispose();
-        if (!GraphicsEnvironment.isHeadless() && TestData.isInteractiveTest()) {
+        if (!GraphicsEnvironment.isHeadless() && TestUtilites.INTERACTIVE) {
             Frame frame = new Frame(testName);
             frame.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {

@@ -1,33 +1,36 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.renderer.shape;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.test.TestData;
+import org.geotools.resources.TestData;
 import org.geotools.styling.SLDParser;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.geotools.styling.StyleFactoryFinder;
 
-import java.io.IOException;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -41,6 +44,7 @@ import java.io.IOException;
 public class LabelingTest extends TestCase {
     private static final int CENTERX = 160;
     private static final int CENTERY = 40;
+    private static final boolean INTERACTIVE = false;
     private long timout = 1000;
 
     static Style loadStyle(String sldFilename) throws IOException {
@@ -66,6 +70,7 @@ public class LabelingTest extends TestCase {
         ShapefileRenderer renderer = new ShapefileRenderer(map);
         Envelope env = map.getLayerBounds();
         int boundary = 10;
+        TestUtilites.INTERACTIVE = INTERACTIVE;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
         TestUtilites.showRender("testLineLabeling", renderer, timout, env);
@@ -74,7 +79,6 @@ public class LabelingTest extends TestCase {
     public void testPolyLabeling() throws Exception {
         ShapefileDataStore ds = (ShapefileDataStore) TestUtilites.getDataStore(
                 "smallMultiPoly.shp");
-        FeatureSource source = ds.getFeatureSource(ds.getTypeNames()[0]);
 
         Style style = loadStyle("PolyStyle.sld");
         assertNotNull(style);
@@ -87,6 +91,7 @@ public class LabelingTest extends TestCase {
         int boundary = 1;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
+        TestUtilites.INTERACTIVE = INTERACTIVE;
         TestUtilites.showRender("testPolyLabeling", renderer, timout, env);
     }
 
@@ -106,6 +111,7 @@ public class LabelingTest extends TestCase {
         int boundary = 30;
         env = new Envelope(env.getMinX() - boundary, env.getMaxX() + boundary,
                 env.getMinY() - boundary, env.getMaxY() + boundary);
+        TestUtilites.INTERACTIVE = INTERACTIVE;
         TestUtilites.showRender("testPolyLabeling", renderer, timout, env);
     }
 }

@@ -1,59 +1,55 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  *
- *    StylingTest.java JUnit based test Created on April 12, 2002, 1:18 PM
+ */
+/*
+ * StylingTest.java JUnit based test Created on April 12, 2002, 1:18 PM
  */
 package org.geotools.renderer.shape;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.impl.PackedCoordinateSequenceFactory;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-import org.geotools.data.DataStore;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.geotools.filter.IllegalFilterException;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.map.DefaultMapContext;
-import org.geotools.map.MapContext;
-import org.geotools.referencing.FactoryFinder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.geotools.test.TestData;
-import org.geotools.styling.FeatureTypeStyle;
-import org.geotools.styling.Fill;
-import org.geotools.styling.LineSymbolizer;
-import org.geotools.styling.PointSymbolizer;
-import org.geotools.styling.PolygonSymbolizer;
-import org.geotools.styling.Rule;
-import org.geotools.styling.SLDParser;
-import org.geotools.styling.Stroke;
-import org.geotools.styling.Style;
-import org.geotools.styling.StyleFactory;
-import org.geotools.styling.StyleFactoryFinder;
-import org.geotools.styling.StyledLayerDescriptor;
-import org.geotools.styling.Symbolizer;
-import org.geotools.styling.UserLayer;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Logger;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+
+import org.geotools.data.DataStore;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.filter.IllegalFilterException;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.DefaultMapContext;
+import org.geotools.map.MapContext;
+import org.geotools.referencing.FactoryFinder;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.styling.SLDParser;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.geotools.styling.StyleFactoryFinder;
+import org.geotools.styling.StyledLayerDescriptor;
+import org.geotools.styling.UserLayer;
+import org.geotools.test.TestData;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.EngineeringCRS;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -75,7 +71,6 @@ public class Rendering2DTest extends TestCase {
     static final String POINT = "pointfeature";
     static final String RING = "ringfeature";
     static final String COLLECTION = "collfeature";
-    private Object transform;
 
     public Rendering2DTest(java.lang.String testName) {
         super(testName);
@@ -117,13 +112,11 @@ public class Rendering2DTest extends TestCase {
         FeatureSource source = ds.getFeatureSource(ds.getTypeNames()[0]);
         Style style = createTestStyle();
 
-        MapContext map = new DefaultMapContext();
+        MapContext map = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         map.addLayer(source, style);
 
         ShapefileRenderer renderer = new ShapefileRenderer(map);
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(),
-                env.getMaxY());
+        ReferencedEnvelope env = map.getLayerBounds();
         TestUtilites.showRender("testSimpleRender", renderer, 1000, env);
     }
 
@@ -138,9 +131,9 @@ public class Rendering2DTest extends TestCase {
             map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
                .getCoordinateSystem());
 
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20,
-                env.getMinY() - 20, env.getMaxY() + 20);
+        ReferencedEnvelope env = map.getLayerBounds();
+        env = new ReferencedEnvelope(env.getMinX() - 20, env.getMaxX() + 20,
+                env.getMinY() - 20, env.getMaxY() + 20, env.crs());
         map.setAreaOfInterest(env);
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
@@ -157,9 +150,9 @@ public class Rendering2DTest extends TestCase {
             map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
                .getCoordinateSystem());
 
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20,
-                env.getMinY() - 20, env.getMaxY() + 20);
+        ReferencedEnvelope env = map.getLayerBounds();
+        env = new ReferencedEnvelope(env.getMinX() - 20, env.getMaxX() + 20,
+                env.getMinY() - 20, env.getMaxY() + 20, env.crs());
         map.setAreaOfInterest(env);
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
@@ -176,9 +169,9 @@ public class Rendering2DTest extends TestCase {
             map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
                .getCoordinateSystem());
 
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX() - 200000, env.getMaxX() + 200000,
-                env.getMinY() - 200000, env.getMaxY() + 200000);
+        ReferencedEnvelope env = map.getLayerBounds();
+        env = new ReferencedEnvelope(env.getMinX() - 200000, env.getMaxX() + 200000,
+                env.getMinY() - 200000, env.getMaxY() + 200000, env.crs());
         map.setAreaOfInterest(env);
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
@@ -194,11 +187,11 @@ public class Rendering2DTest extends TestCase {
             map.getLayer(0).getFeatureSource().getSchema().getDefaultGeometry()
                .getCoordinateSystem());
 
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX() - env.getWidth(),
+        ReferencedEnvelope env = map.getLayerBounds();
+        env = new ReferencedEnvelope(env.getMinX() - env.getWidth(),
                 env.getMaxX() + env.getWidth(),
                 env.getMinY() - env.getHeight(), env.getMaxY()
-                + env.getHeight());
+                + env.getHeight(), env.crs());
         map.setAreaOfInterest(env);
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
@@ -211,13 +204,13 @@ public class Rendering2DTest extends TestCase {
         FeatureSource source = ds.getFeatureSource(ds.getTypeNames()[0]);
         Style style = createTestStyle();
 
-        MapContext map = new DefaultMapContext();
+        MapContext map = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         map.addLayer(source, style);
 
         ShapefileRenderer renderer = new ShapefileRenderer(map);
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX() - 20, env.getMaxX() + 20,
-                env.getMinY() - 20, env.getMaxY() + 20);
+        ReferencedEnvelope env = map.getLayerBounds();
+        env = new ReferencedEnvelope(env.getMinX() - 20, env.getMaxX() + 20,
+                env.getMinY() - 20, env.getMaxY() + 20, env.crs());
         TestUtilites.showRender("testSimplePointRender", renderer, 1000, env);
     }
 
@@ -225,31 +218,19 @@ public class Rendering2DTest extends TestCase {
         DataStore ds = TestUtilites.getPolygons();
         FeatureSource source = ds.getFeatureSource(ds.getTypeNames()[0]);
         Style style = createTestStyle();
+        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null)
+        .createFromWKT("PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
-        MapContext map = new DefaultMapContext();
+        MapContext map = new DefaultMapContext(crs);
         map.addLayer(source, style);
 
         ShapefileRenderer renderer = new ShapefileRenderer(map);
-        CoordinateReferenceSystem crs = FactoryFinder.getCRSFactory(null)
-                                                     .createFromWKT("PROJCS[\"NAD_1983_UTM_Zone_10N\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",TOWGS84[0,0,0,0,0,0,0],SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-123],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0],UNIT[\"Meter\",1]]");
 
-        MathTransform t = FactoryFinder.getCoordinateOperationFactory(null)
-                                       .createOperation(DefaultGeographicCRS.WGS84,
-                crs).getMathTransform();
 
-        Envelope env = map.getLayerBounds();
+        ReferencedEnvelope bounds = map.getLayerBounds();
 
-        Envelope bounds = JTS.transform(env, t);
-        map.setAreaOfInterest(bounds, crs);
+        TestUtilites.showRender("testReprojection", renderer, 1000, bounds);
 
-        Rectangle rect = new Rectangle(400, 400);
-
-        //        renderer.setOptimizedDataLoadingEnabled(true);
-        env = new Envelope(bounds.getMinX(), bounds.getMaxX(),
-                bounds.getMinY(), bounds.getMaxY());
-        TestUtilites.showRender("testReprojection", renderer, 1000, env);
-
-        // System.in.read();
     }
 
     public void testLineReprojection() throws Exception {
@@ -257,8 +238,9 @@ public class Rendering2DTest extends TestCase {
         System.err.println("starting rendering2DTest");
 
         ShapefileRenderer renderer = createLineRenderer(TestUtilites.getLines());
-        Envelope env = renderer.getContext().getAreaOfInterest();
+        ReferencedEnvelope env = renderer.getContext().getAreaOfInterest();
 
+        //        INTERACTIVE=true;
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
 
@@ -271,19 +253,16 @@ public class Rendering2DTest extends TestCase {
         Style style = TestUtilites.createTestStyle(ds.getSchema().getTypeName(),
                 null);
 
-        MapContext map = new DefaultMapContext();
+        MapContext map = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         map.addLayer(source, style);
 
-        final BufferedImage image = new BufferedImage(400, 400,
-                BufferedImage.TYPE_4BYTE_ABGR);
         ShapefileRenderer renderer = new ShapefileRenderer(map);
-        Envelope env = map.getLayerBounds();
+        ReferencedEnvelope env = map.getLayerBounds();
 
-        Rectangle rect = new Rectangle(400, 400);
 
         //        renderer.setOptimizedDataLoadingEnabled(true);
-        env = new Envelope(env.getMinX() - 1, env.getMaxX() + 1,
-                env.getMinY() - 1, env.getMaxY() + 1);
+        env = new ReferencedEnvelope(env.getMinX() - 1, env.getMaxX() + 1,
+                env.getMinY() - 1, env.getMaxY() + 1, env.crs());
         TestUtilites.showRender("testReprojection", renderer, 1000, env);
 
         // System.in.read();
@@ -295,16 +274,15 @@ public class Rendering2DTest extends TestCase {
 
         ShapefileRenderer renderer = createLineRenderer(TestUtilites
                 .getDataStore("lineNoCRS.shp"));
-        Envelope env = renderer.getContext().getAreaOfInterest();
+        ReferencedEnvelope env = renderer.getContext().getAreaOfInterest();
 
+        //        INTERACTIVE=true;
         TestUtilites.showRender("testSimpleLineRender", renderer, 3000, env);
     }
 
     public void testEnvelopePerformance() throws Exception {
         ShapefileRenderer renderer = createLineRenderer(TestUtilites.getLines());
         MapContext context = renderer.getContext();
-
-        context.setAreaOfInterest(context.getLayerBounds());
 
         TestUtilites.CountingRenderListener l1 = new TestUtilites.CountingRenderListener();
         renderer.addRenderListener(l1);
@@ -318,16 +296,10 @@ public class Rendering2DTest extends TestCase {
         TestUtilites.CountingRenderListener l2 = new TestUtilites.CountingRenderListener();
         renderer.addRenderListener(l2);
 
-        Envelope old = context.getAreaOfInterest();
-        Envelope env = new Envelope(old.getMinX() + (old.getWidth() / 2),
-                old.getMaxX() - (old.getWidth() / 2),
-                old.getMinY() + (old.getHeight() / 2),
-                old.getMaxY() - (old.getHeight() / 2));
-        if (true) {
-            // TODO: The remaining of this test is disabled because the CRS used is way outside
-            //       its area of validity, which cause an AssertionError in projection code.
-            return;
-        }
+        ReferencedEnvelope old = context.getAreaOfInterest();
+        double w = old.getWidth()/4;
+        double h = old.getHeight()/4;
+        ReferencedEnvelope env = new ReferencedEnvelope( old.getCenter(0)-w, old.getCenter(0)+w,old.getCenter(1)-h, old.getCenter(1)+h, old.crs());
         renderer.paint(image.createGraphics(), new Rectangle(300, 300), env);
         assertTrue(l1.count > l2.count);
     }
@@ -337,6 +309,7 @@ public class Rendering2DTest extends TestCase {
      *
      * @param ds DOCUMENT ME!
      *
+     * @return
      *
      * @throws Exception
      */
@@ -345,13 +318,13 @@ public class Rendering2DTest extends TestCase {
         FeatureSource source = ds.getFeatureSource(ds.getTypeNames()[0]);
         Style style = TestUtilites.createTestStyle(null, ds.getTypeNames()[0]);
 
-        MapContext map = new DefaultMapContext();
+        MapContext map = new DefaultMapContext(DefaultGeographicCRS.WGS84);
         map.addLayer(source, style);
 
         ShapefileRenderer renderer = new ShapefileRenderer(map);
-        Envelope env = map.getLayerBounds();
-        env = new Envelope(env.getMinX(), env.getMaxX(), env.getMinY(),
-                env.getMaxY());
+        ReferencedEnvelope env = map.getLayerBounds();
+        if( env.crs()==null )
+            env=new ReferencedEnvelope((Envelope)env, DefaultEngineeringCRS.GENERIC_2D );
         map.setAreaOfInterest(env);
 
         return renderer;

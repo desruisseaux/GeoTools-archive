@@ -1,17 +1,18 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.data.shapefile;
 
@@ -28,10 +29,10 @@ import org.geotools.data.shapefile.indexed.IndexedShapefileDataStore;
 import org.geotools.data.shapefile.indexed.RecordNumberTracker;
 import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.renderer.shape.MultiLineHandler;
-import org.geotools.renderer.shape.MultiPointHandler;
-import org.geotools.renderer.shape.PointHandler;
-import org.geotools.renderer.shape.PolygonHandler;
+import org.geotools.renderer.shape.shapehandler.simple.MultiLineHandler;
+import org.geotools.renderer.shape.shapehandler.simple.MultiPointHandler;
+import org.geotools.renderer.shape.shapehandler.simple.PointHandler;
+import org.geotools.renderer.shape.shapehandler.simple.PolygonHandler;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
@@ -54,30 +55,43 @@ public class ShapefileRendererUtil {
      * @param mt The transform used to transform from data->world coordinates->screen coordinates
      * @param hasOpacity the transform from screen coordinates to world coordinates. Used for
      *        decimation.
+     * @return
      * @throws IOException
      * @throws TransformException
      */
     public static ShapefileReader getShpReader( ShapefileDataStore ds, Envelope bbox, 
-            Rectangle screenSize, MathTransform mt, boolean hasOpacity ) throws IOException, TransformException {
+            Rectangle screenSize, MathTransform mt, boolean hasOpacity, boolean returnJTS ) throws IOException, TransformException {
         ShapefileReader reader = ds.openShapeReader();
         ShapeType type = reader.getHeader().getShapeType();
 
         if ((type == ShapeType.ARC) || (type == ShapeType.ARCM) || (type == ShapeType.ARCZ)) {
-            reader.setHandler(new MultiLineHandler(type, bbox, mt, hasOpacity, screenSize));
+            if( returnJTS )
+                reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiLineHandler(type, bbox, mt, hasOpacity, screenSize));
+            else
+                reader.setHandler(new MultiLineHandler(type, bbox, mt, hasOpacity, screenSize));
         }
 
         if ((type == ShapeType.POLYGON) || (type == ShapeType.POLYGONM)
                 || (type == ShapeType.POLYGONZ)) {
+            if( returnJTS )
+                reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.PolygonHandler(type, bbox, mt, hasOpacity));
+            else
             reader.setHandler(new PolygonHandler(type, bbox, mt, hasOpacity));
         }
 
         if ((type == ShapeType.POINT) || (type == ShapeType.POINTM) || (type == ShapeType.POINTZ)) {
-            reader.setHandler(new PointHandler(type, bbox, screenSize, mt, hasOpacity));
+            if( returnJTS )
+                reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.PointHandler(type, bbox, screenSize, mt, hasOpacity));
+            else
+                reader.setHandler(new PointHandler(type, bbox, screenSize, mt, hasOpacity));
         }
 
         if ((type == ShapeType.MULTIPOINT) || (type == ShapeType.MULTIPOINTM)
                 || (type == ShapeType.MULTIPOINTZ)) {
-            reader.setHandler(new MultiPointHandler(type, bbox, screenSize, mt, hasOpacity));
+            if( returnJTS )
+                reader.setHandler(new org.geotools.renderer.shape.shapehandler.jts.MultiPointHandler(type, bbox, screenSize, mt, hasOpacity));
+            else
+                reader.setHandler(new MultiPointHandler(type, bbox, screenSize, mt, hasOpacity));
         }
 
         return reader;

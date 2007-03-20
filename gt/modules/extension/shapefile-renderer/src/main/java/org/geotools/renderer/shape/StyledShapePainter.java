@@ -1,17 +1,18 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
+ *
  */
 package org.geotools.renderer.shape;
 
@@ -102,11 +103,11 @@ public class StyledShapePainter {
             // get the point onto the shape has to be painted
             float[] coords = new float[2];
             MarkStyle2D ms2d = (MarkStyle2D) style;
-            Shape transformedShape;
+
             while (!(citer.isDone())) {
                 citer.currentSegment(coords);
 
-                 transformedShape = ms2d.getTransformedShape(coords[0],
+                Shape transformedShape = ms2d.getTransformedShape(coords[0],
                         coords[1]);
 
                 if (transformedShape != null) {

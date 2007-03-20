@@ -1,12 +1,12 @@
 /*
- *    GeoTools - OpenSource mapping toolkit
+ *    Geotools2 - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) 2004-2006, Geotools Project Managment Committee (PMC)
+ *    (C) 2002, Geotools Project Managment Committee (PMC)
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 2.1 of the License, or (at your option) any later version.
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
  *    This library is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,8 +15,11 @@
  */
 package org.geotools.renderer.shape;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.awt.Rectangle;
+import java.io.IOException;
+
 import junit.framework.TestCase;
+
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.Lock;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -25,9 +28,11 @@ import org.geotools.data.shapefile.indexed.ShapeFileIndexer;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.map.DefaultMapContext;
 import org.geotools.map.MapContext;
-import org.geotools.test.TestData;
+import org.geotools.referencing.operation.transform.IdentityTransform;
+import org.geotools.resources.TestData;
 import org.geotools.styling.Style;
-import java.io.IOException;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -35,6 +40,7 @@ import java.io.IOException;
  * @source $URL$
  */
 public class IndexedRenderingTest_Disabled extends TestCase {
+    private static final boolean INTERACTIVE = false;
     private Lock lock = new Lock();
 
     protected void tearDown() {
@@ -132,44 +138,12 @@ public class IndexedRenderingTest_Disabled extends TestCase {
 
         IndexInfo.Reader reader = new IndexInfo.Reader(renderer.layerIndexInfo[0],
                 ShapefileRendererUtil.getShpReader(
-                    (ShapefileDataStore) ds.getDataStore(), null, null, null, false),
+                    (ShapefileDataStore) ds.getDataStore(),new Envelope(0,0,100,100),new Rectangle(0,0,100,100), IdentityTransform.create(2), false, false),
                 new Envelope(env.getMinX() + 10, env.getMaxX() - 10,
                     env.getMinY() + 10, env.getMaxY() - 10));
         assertNotNull("Should find records", reader.goodRecs);
+        TestUtilites.INTERACTIVE = INTERACTIVE;
         TestUtilites.showRender("testQuadTree", renderer, 1000, env,
             expectedFeatures);
-    }
-
-    public void testRTree() throws Exception {
-        String file = TestData.file(IndexedRenderingTest_Disabled.class,
-                "lakes.shp").toString();
-        ShapeFileIndexer indexer = new ShapeFileIndexer();
-        indexer.setIdxType(ShapeFileIndexer.RTREE);
-        indexer.setShapeFileName(file);
-        indexer.index(true, lock);
-
-        performRenderTest(IndexInfo.R_TREE,
-            TestUtilites.getDataStore("lakes.shp").getFeatureSource(),
-            TestUtilites.createTestStyle("lakes", null), 100);
-
-        performRenderTest(IndexInfo.R_TREE,
-            TestUtilites.getDataStore("lakes.shp").getFeatureSource(),
-            TestUtilites.createTestStyle("lakes", null),
-            new Envelope(552238.3401249995, 570174.7868350003,
-                5233300.242658593, 5246192.063731406), 93);
-
-        indexer.setShapeFileName(TestData.file(
-                IndexedRenderingTest_Disabled.class, "streams.shp").getPath());
-        indexer.index(true, lock);
-
-        performRenderTest(IndexInfo.R_TREE,
-            TestUtilites.getDataStore("streams.shp").getFeatureSource(),
-            TestUtilites.createTestStyle(null, "streams"), 116);
-
-        performRenderTest(IndexInfo.R_TREE,
-            TestUtilites.getDataStore("streams.shp").getFeatureSource(),
-            TestUtilites.createTestStyle(null, "streams"),
-            new Envelope(552383.9726608695, 569483.1330782612,
-                5233875.318546738, 5246165.340096739), 97);
     }
 }
