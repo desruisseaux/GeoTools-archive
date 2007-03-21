@@ -25,6 +25,7 @@ import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.Geometry;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.Precision;
 import org.opengis.spatialschema.geometry.TransfiniteSet;
 import org.opengis.spatialschema.geometry.complex.Complex;
 import org.opengis.spatialschema.geometry.primitive.Ring;
@@ -73,6 +74,12 @@ public abstract class GeometryImpl
      */
     private JTSGeometry parent;
 
+    
+    /**
+     * Precision model
+     */
+    private Precision precision;
+    
     //*************************************************************************
     //  Constructors
     //*************************************************************************
@@ -105,6 +112,10 @@ public abstract class GeometryImpl
 
     public void setParent(JTSGeometry parent) {
         this.parent = parent;
+    }
+    
+    public Precision getPrecision() {
+        return precision;
     }
 
     /**
