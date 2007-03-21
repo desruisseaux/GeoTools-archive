@@ -973,12 +973,25 @@ public class PostgisFeatureStore extends JDBCFeatureStore {
         Filter filter)
         throws SQLException, SQLEncoderException, IOException, ParseException {
         String typeName = getSchema().getTypeName();
+        
         StringBuffer sql = new StringBuffer();
-
-        //StringBuffer sqlBuffer = new StringBuffer();
-        sql.append("SELECT AsText(force_2d(Envelope(Extent(\"" + geomName + "\")))) ");
-        sqlBuilder.sqlFrom(sql, typeName);
-        sqlBuilder.sqlWhere(sql, filter);
+        sql.append("SELECT AsText(force_2d(Envelope(" );
+        
+        //check if we can apply the estimated_extent optimization
+        boolean useEstimatedExtent = ( filter == null || filter == Filter.INCLUDE ) 
+        	&& ((PostgisDataStore)getDataStore()).isEstimatedExtent();
+        
+        if ( useEstimatedExtent ) {
+        	sql.append("estimated_extent(");	
+        	sql.append("'" + typeName + "','" + geomName + "'))));");
+        }
+        else {
+        	sql.append("Extent(\"" + geomName + "\")))) " );
+        	sqlBuilder.sqlFrom(sql, typeName);
+            sqlBuilder.sqlWhere(sql, filter);
+        }
+        
+      
         LOGGER.fine("SQL: " + sql);
 
         Statement statement = conn.createStatement();

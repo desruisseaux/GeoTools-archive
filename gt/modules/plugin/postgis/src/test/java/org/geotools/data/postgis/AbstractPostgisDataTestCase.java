@@ -78,8 +78,9 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
     protected DataStore newDataStore() throws IOException {
         PostgisDataStore pg = new PostgisDataStore(pool, f.schema, getName(),
-                PostgisDataStore.OPTIMIZE_SAFE);
+                PostgisDataStore.OPTIMIZE_SQL);
         pg.setWKBEnabled(WKB_ENABLED);
+        pg.setEstimatedExtent( true );
         pg.setFIDMapper("road",
             new TypedFIDMapper(new BasicFIDMapper("fid", 255, false), "road"));
         pg.setFIDMapper("river",
@@ -191,6 +192,8 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
                 s.execute(ql);
             }
+            
+            s.execute( "VACUUM ANALYZE " + f.schema + ".road" );
         } finally {
             conn.close();
         }
@@ -232,6 +235,8 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
 
                 s.execute(ql);
             }
+            
+            s.execute( "VACUUM ANALYZE " + f.schema + ".lake" );
         } finally {
             conn.close();
         }
@@ -312,6 +317,8 @@ public class AbstractPostgisDataTestCase extends DataTestCase {
                     + "', 0 )," + "'" + feature.getAttribute("river") + "',"
                     + feature.getAttribute("flow") + ")");
             }
+            
+            s.execute( "VACUUM ANALYZE " + f.schema + ".river" );
         } finally {
             conn.close();
         }

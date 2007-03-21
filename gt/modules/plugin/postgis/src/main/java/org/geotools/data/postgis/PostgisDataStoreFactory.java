@@ -73,14 +73,14 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
             "set to true if the Bounding Box should be 'loose', faster but "
             + "not as deadly accurate", false, new Boolean(true));
 
-
-
-    /** Array with all of the params */
-    static final Param[] arrayParameters = {
-        DBTYPE, HOST, PORT, DATABASE, USER, PASSWD, WKBENABLED, LOOSEBBOX,
-        NAMESPACE
-    };
-
+    public static final Param ESTIMATEDEXTENT = new Param( "esimated extent", Boolean.class,
+    		"set to true if the bounds for a table should be computed using the " + 
+    		"'estimated_extent' function, but beware that this function is less accurate, " +
+    		"and in some cases *far* less accurate if the data within the actual bounds " +
+    		"does not follow a uniform distribution. It also relies on the fact that you have" +
+    		"accurate table stats available. So it is a good idea to 'VACUUM ANALYZE' " +
+    		"the postgis table.", false, new Boolean(false));
+    
     /**
      * Creates a new instance of PostgisDataStoreFactory
      */
@@ -160,6 +160,7 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
         String database = (String) DATABASE.lookUp(params);
         Boolean wkb_enabled = (Boolean) WKBENABLED.lookUp(params);
         Boolean is_loose_bbox = (Boolean) LOOSEBBOX.lookUp(params);
+        Boolean is_estimated_extent = (Boolean) ESTIMATEDEXTENT.lookUp(params);
         String namespace = (String) NAMESPACE.lookUp(params);
         
         // Try processing params first so we can get real IO
@@ -191,6 +192,11 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
             dataStore.setLooseBbox(is_loose_bbox.booleanValue());
         }
         
+        if (is_estimated_extent != null) {
+        	//ensure optimize mode set to OPTIMIZE_SQL
+        	dataStore.setOptimizeMode( PostgisDataStore.OPTIMIZE_SQL );
+        	dataStore.setEstimatedExtent(is_estimated_extent.booleanValue());
+        }
         return dataStore;
     }
     
@@ -281,7 +287,8 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
      */
     public Param[] getParametersInfo() {
         return new Param[] {
-            DBTYPE, HOST, PORT, SCHEMA, DATABASE, USER, PASSWD, WKBENABLED, LOOSEBBOX, NAMESPACE 
+            DBTYPE, HOST, PORT, SCHEMA, DATABASE, USER, PASSWD, WKBENABLED, 
+            LOOSEBBOX, ESTIMATEDEXTENT, NAMESPACE 
         };
     }
 }

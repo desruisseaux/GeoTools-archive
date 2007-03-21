@@ -192,8 +192,11 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
     /** Enables the use of geos operators */
     protected boolean useGeos;
 
-    /** Current optimize mode */
-    public final int OPTIMIZE_MODE;
+    /** 
+     * Current optimize mode 
+     * @deprecated Dot not use this directly, use {@link #getOptimizeMode()}.
+     */
+    public int OPTIMIZE_MODE;
 
     /** If true, WKB format is used instead of WKT */
     protected boolean WKBEnabled = false;
@@ -217,6 +220,14 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
      * geom, leading to greater speed and slightly less accuracy.
      */
     protected boolean looseBbox;
+    
+    /**
+     * set to true if the bounds for a table should be computed using the  
+	 * estimated_extent' function, but beware that this function is less accurate
+	 * and in some cases *far* less accurate if the data within the actual bounds
+	 * does not follow a uniform distribution.
+     */
+    protected boolean estimatedExtent;
     
     /** Flag indicating whether schema support **/
     protected boolean schemaEnabled = true;
@@ -774,7 +785,7 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         encoder.setFeatureType( info.getSchema() );
         encoder.setSRID(srid);
         encoder.setLooseBbox(looseBbox);
-
+       
         PostgisSQLBuilder builder = new PostgisSQLBuilder(encoder,config,info.getSchema());
         initBuilder(builder);
         
@@ -1869,6 +1880,43 @@ public class PostgisDataStore extends JDBCDataStore implements DataStore {
         this.byteaEnabled = byteaEnabled;
     }
 
+    
+    /**
+     * Enables the use of the 'estimated_extent' function for bounds computation.
+     * <p>
+     * Beware that this function is an approximation and is dependent on the 
+     * degree to with the data in the actual bounds follows a uniform distribution.
+     * </p>
+     */
+    public void setEstimatedExtent(boolean estimatedExtent) {
+    	this.estimatedExtent = estimatedExtent;
+    	
+    	//also make sure optimize mode is set properly
+    	if ( estimatedExtent ) {
+    		LOGGER.info( "Setting OPTIMIZE_MODE to 'SQL'" );
+    		setOptimizeMode( OPTIMIZE_SQL );	
+    	}
+    }
+    
+    /**
+     * @see {@link #setEstimatedExtent(boolean)}.
+     */
+    public boolean isEstimatedExtent() {
+    	return estimatedExtent;
+    }
+    
+    /**
+     * Sets the optimization mode for the datastore.
+     * 
+     * @param mode One of {@link #OPTIMIZE_SAFE},{@link #OPTIMIZE_SQL}.
+     */
+    public void setOptimizeMode( int mode ) {
+    	OPTIMIZE_MODE = mode;
+    }
+    public int getOptimizeMode() {
+    	return OPTIMIZE_MODE;
+    }
+    
 	public FeatureType getSchema(String arg0) throws IOException {
 		return super.getSchema(arg0);
 	}
