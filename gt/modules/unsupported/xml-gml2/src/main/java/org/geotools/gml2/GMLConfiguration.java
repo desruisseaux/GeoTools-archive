@@ -47,6 +47,7 @@ public class GMLConfiguration extends Configuration {
 
         //add the parse unknown attributes property, this is mostly for 
         // the "fid" attribute
+        getProperties().add(Parser.Properties.PARSE_UNKNOWN_ELEMENTS);
         getProperties().add(Parser.Properties.PARSE_UNKNOWN_ATTRIBUTES);
     }
 
