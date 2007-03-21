@@ -18,8 +18,8 @@ public class DirectoryDataStoreTest extends TestCase {
         Map params = new HashMap();
         copyShapefiles("shapes/archsites.shp");
         File f = copyShapefiles("shapes/bugsites.shp");
-        params.put("data_directory", f.getParent());
-        params.put("suffix_list", new String[] {"shp"});
+        params.put(DirectoryDataStoreFactory.DIRECTORY.key, f.getParentFile().toURL());
+        params.put(DirectoryDataStoreFactory.CREATE_SUFFIX_ORDER.key, new String[] {"shp"});
         DirectoryDataStore store =  (DirectoryDataStore) factory.createDataStore(params);
         assertTrue(store.getTypeNames().length > 0);
         assertTrue(Arrays.asList(store.getTypeNames()).contains("archsites"));

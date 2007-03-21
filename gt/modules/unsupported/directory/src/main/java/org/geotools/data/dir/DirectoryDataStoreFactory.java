@@ -17,6 +17,7 @@ package org.geotools.data.dir;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
 import java.util.Collections;
 
@@ -34,8 +35,8 @@ import org.geotools.data.DataStoreFactorySpi;
  */
 public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     /** The Directory parameter which should contain some files to read */
-    public static final Param DIRECTORY = new Param("data_directory", File.class,
-            "Directory containing gml files", true); 
+    public static final Param DIRECTORY = new Param("data_directory url", URL.class,
+            "Directory containing geospatial vector files", true); 
 
     /**
      * The suffix parameter to specify the order of creation for new
@@ -44,7 +45,28 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
     public static final Param CREATE_SUFFIX_ORDER = new Param("suffix_list",
             String[].class,
             "space delimited list of prefixes to attempt and create new files for.",
-            true);
+            true) {
+    	
+    	/**
+    	 * Overide text to unwap the array of strings back into a space 
+    	 * limited text string.
+    	 * TODO: (JD) perhaps this should be done by param? I guess we would have to 
+    	 * agree on the delimiter for collection or array based parameters.
+    	 */
+    	public String text(Object value) {
+    		if ( value instanceof String[] ) {
+    			String[] values = (String[]) value;
+    			StringBuffer sb = new StringBuffer();
+    			for ( int i = 0; i < values.length; i++ ) {
+    				sb.append( values[i] + " " );
+    			}
+    			sb.setLength( sb.length() - 1);
+    			return sb.toString();
+    		}
+    		
+    		return super.text( value );
+    	}
+    };
 
     /**
      * @see org.geotools.data.DataStoreFactorySpi#createDataStore(java.util.Map)
@@ -54,7 +76,8 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
             throw new IOException("Invalid parameters for DirectoryDataStore");
         }
 
-        File f = (File) DIRECTORY.lookUp(params);
+        URL url = (URL) DIRECTORY.lookUp(params);
+        File f = new File( url.getFile() );
         String[] strs = (String[]) CREATE_SUFFIX_ORDER.lookUp(params);
 
         if (strs == null) {
@@ -91,7 +114,8 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
             throw new IOException("Invalid parameters for DirectoryDataStore");
         }
 
-        File f = (File) DIRECTORY.lookUp(params);
+        URL url = (URL) DIRECTORY.lookUp(params);
+        File f = new File( url.getFile() );
 
         if (f.exists()) {
             throw new IOException("Invalid parameter " + DIRECTORY.key
@@ -144,10 +168,12 @@ public class DirectoryDataStoreFactory implements DataStoreFactorySpi {
      */
     public boolean canProcess(Map params) {
         try {
-            File f = (File) DIRECTORY.lookUp(params);
+            URL url = (URL) DIRECTORY.lookUp(params);
+        	File f = new File( url.getFile() );
             String[] str = (String[]) CREATE_SUFFIX_ORDER.lookUp(params);
 
-            return ((f != null) && (str != null) && f.isDirectory());
+            //return ((f != null) && (str != null) && f.isDirectory());
+            return (f != null) && (str != null);
         } catch (Exception e) {
             return false;
         }
