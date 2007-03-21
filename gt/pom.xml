@@ -186,13 +186,6 @@
            <sendOnFailure>true</sendOnFailure>
         </configuration>
       </notifier>
-      <notifier>
-        <type>irc</type>
-        <configuration>
-           <host>freenode</host>
-           <channel>#geotools</channel>
-        </configuration>
-      </notifier>
     </notifiers>
   </ciManagement>
 
