@@ -73,7 +73,7 @@ public class PostgisDataStoreFactory extends AbstractDataStoreFactory
             "set to true if the Bounding Box should be 'loose', faster but "
             + "not as deadly accurate", false, new Boolean(true));
 
-    public static final Param ESTIMATEDEXTENT = new Param( "esimated extent", Boolean.class,
+    public static final Param ESTIMATEDEXTENT = new Param( "estimated extent", Boolean.class,
     		"set to true if the bounds for a table should be computed using the " + 
     		"'estimated_extent' function, but beware that this function is less accurate, " +
     		"and in some cases *far* less accurate if the data within the actual bounds " +
