@@ -15,6 +15,7 @@
  */
 package org.geotools.xml;
 
+import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.eclipse.xsd.XSDTypeDefinition;
 
@@ -28,7 +29,7 @@ public interface InstanceComponent {
     /**
      * @return The feature describing the component instance.
      */
-    XSDSchemaContent getDeclaration();
+    XSDNamedComponent getDeclaration();
 
     /**
      * @return The namespace of the element;

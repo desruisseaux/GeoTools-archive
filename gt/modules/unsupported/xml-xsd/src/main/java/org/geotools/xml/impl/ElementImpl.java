@@ -16,6 +16,7 @@
 package org.geotools.xml.impl;
 
 import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.eclipse.xsd.XSDTypeDefinition;
 import org.geotools.xml.AttributeInstance;
@@ -38,8 +39,8 @@ public class ElementImpl extends InstanceComponentImpl
         return declaration.getTypeDefinition();
     }
 
-    public XSDSchemaContent getDeclaration() {
-        return getDeclaration();
+    public XSDNamedComponent getDeclaration() {
+        return getElementDeclaration();
     }
 
     public XSDElementDeclaration getElementDeclaration() {

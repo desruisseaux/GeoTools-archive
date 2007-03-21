@@ -17,6 +17,7 @@ package org.geotools.xml.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -26,6 +27,7 @@ import org.eclipse.xsd.XSDFactory;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
+import org.eclipse.xsd.util.XSDConstants;
 import org.eclipse.xsd.util.XSDUtil;
 import org.geotools.xml.AttributeInstance;
 import org.geotools.xml.Binding;
@@ -83,7 +85,32 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         List atts = new ArrayList();
 
         for (int i = 0; i < attributes.getLength(); i++) {
-            String uri = attributes.getURI(i);
+        	String rawAttQName = attributes.getQName( i );
+        	if ( rawAttQName != null ) {
+        	 	//ignore namespace declarations
+            	if ( rawAttQName.startsWith("xmlns:") ) {
+            		continue;
+            	}
+            	//ignore xsi:schemaLocation
+            	if ( rawAttQName.endsWith( "schemaLocation" ) ) {
+            		String prefix = "";
+            		if ( rawAttQName.indexOf(':') != -1 ) {
+            			prefix = rawAttQName.substring( 0, rawAttQName.indexOf(':') );
+            		}
+            		
+            		String uri = parser.getNamespaceSupport().getURI( prefix );
+            		if ( uri != null && uri.equals( XSDConstants.SCHEMA_INSTANCE_URI_2001 ) ) {
+            			continue;
+            		}
+            	}
+        	}
+//        	String qName = attributes.getQName(i);
+//        	
+//       
+//        	//ignore schema location attribute
+//        	if ( attributes.getQName(i) != null && attributes.getQName(index))
+//            
+        	String uri = attributes.getURI(i);
             String name = attributes.getLocalName(i);
 
             QName attQName = new QName(uri, name);
@@ -195,12 +222,11 @@ public class ElementHandlerImpl extends HandlerImpl implements ElementHandler {
         value = executor.getValue();
 
         if (value == null) {
-            //TODO: instead of crashing, just remove the element from 
+            //TODO: instead of continuuing, just remove the element from 
             // the parent, or figure out if the element is 'optional' and 
             // remove
-            String msg = "Parsing failed for " + element.getName()
-                + ", no value returned from strategy";
-            throw new RuntimeException(msg);
+        	String msg = "Binding for " + element.getName() + " returned null";
+        	parser.getLogger().fine( msg );
         }
         
         //set the value for this node in the parse tree

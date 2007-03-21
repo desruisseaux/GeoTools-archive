@@ -15,6 +15,7 @@
  */
 package org.geotools.xml.impl;
 
+import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.geotools.xml.InstanceComponent;
 
@@ -29,7 +30,7 @@ public abstract class InstanceComponentImpl implements InstanceComponent {
     /** text **/
     StringBuffer text;
 
-    public XSDSchemaContent getDeclaration() {
+    public XSDNamedComponent getDeclaration() {
         // TODO Auto-generated method stub
         return null;
     }

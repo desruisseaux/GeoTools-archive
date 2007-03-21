@@ -153,6 +153,10 @@ public class ParserHandler extends DefaultHandler {
         return logger;
     }
 
+    public NamespaceSupport getNamespaceSupport() {
+    	return namespaces;
+    }
+    
     public void startPrefixMapping(String prefix, String uri)
         throws SAXException {
         namespaces.declarePrefix(prefix, uri);
@@ -198,6 +202,7 @@ public class ParserHandler extends DefaultHandler {
 
     public void startElement(String uri, String localName, String qName,
         Attributes attributes) throws SAXException {
+    	logger.finest( "startElement(" + uri + "," + localName + "," + qName );
         if (schemas == null) {
             //root element, parse the schema
             //TODO: this processing is too loose, do some validation will ya!
@@ -216,7 +221,7 @@ public class ParserHandler extends DefaultHandler {
                     if (name.endsWith("schemaLocation")) {
                         //create an array of alternating namespace, location pairs
                         locations = attributes.getValue(i).split(" +");
-
+                        
                         break;
                     }
                 }

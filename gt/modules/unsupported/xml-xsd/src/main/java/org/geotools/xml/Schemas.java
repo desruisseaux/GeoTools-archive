@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+
 import javax.xml.namespace.QName;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -63,6 +64,8 @@ import org.eclipse.xsd.util.XSDResourceImpl;
 import org.eclipse.xsd.util.XSDSchemaLocationResolver;
 import org.eclipse.xsd.util.XSDSchemaLocator;
 import org.eclipse.xsd.util.XSDUtil;
+
+import org.geotools.resources.Utilities;
 import org.geotools.xml.impl.SchemaIndexImpl;
 import org.geotools.xml.impl.TypeWalker;
 import org.picocontainer.ComponentAdapter;
@@ -386,6 +389,37 @@ public class Schemas {
     	return elements;
     }
 
+    /**
+     * Returns the base type defintion of <code>type</code> named <code>parentTypeName<code>.
+     * <p>
+     * This method will handle the case in which the <code>parentTypeName == type.getTypeName()</code>.
+     * If no such parent type is found this method will return <code>null</code>.
+     * </p>
+     * @param type The type.
+     * @param parentTypeName The name of the base type to return.
+     * 
+     * @return The base type, or null if it could not be found.
+     */
+    public static final XSDTypeDefinition getBaseTypeDefinition( 
+    		XSDTypeDefinition type, final QName parentTypeName ) {
+    	
+    	final List found = new ArrayList();
+    	
+    	 TypeWalker.Visitor visitor = new TypeWalker.Visitor() {
+             public boolean visit(XSDTypeDefinition type) {
+            	 if ( nameMatches( type, parentTypeName ) ) {
+            		 found.add( type );
+            		 return false;
+            	 }
+            	 
+            	 return true;
+             }
+         };
+         new TypeWalker().walk( type, visitor );
+         
+         return found.isEmpty() ? null : (XSDTypeDefinition) found.get( 0 );
+    }
+    
     /**
      * Returns the minimum number of occurences of an element within a complex
      * type.
@@ -777,7 +811,7 @@ public class Schemas {
      * match if one of the following conditions hold.
      *
      * <ul>
-     *         <li>Both strings are null.
+     *  <li>Both strings are null.
      *  <li>Both strings are the empty string.
      *  <li>One string is null, and the other is the empty string.
      *  <li>Both strings are non-null and non-empty and equals() return true.
@@ -787,29 +821,59 @@ public class Schemas {
      * @param qName The qualifined name.
      *
      */
-    private static final boolean nameMatches(XSDNamedComponent component,
+    public static final boolean nameMatches(XSDNamedComponent component,
         QName qName) {
-        //is this the element we are looking for
-        if ((component.getTargetNamespace() == null)
-                || "".equals(component.getTargetNamespace())) {
-            if ((qName.getNamespaceURI() == null)
-                    || "".equals(qName.getNamespaceURI())) {
-                //do a local name match
-                return component.getName().equals(qName.getLocalPart());
-            }
+    	String ns1 = component.getTargetNamespace();
+    	String ns2 = qName.getNamespaceURI();
+    	String n1 = component.getName();
+    	String n2 = qName.getLocalPart();
+    	
+    	ns1 = "".equals( ns1 ) ? null : ns1;
+    	ns2 = "".equals( ns2 ) ? null : ns2;
+    	n1 = "".equals( n1 ) ? null : n1;
+    	n2 = "".equals( n2 ) ? null : n2;
+    	
+    	if ( ns1 == null && ns2 != null ) {
+    		//try the default namespace
+    		if ( component.getSchema() != null ) {
+    			ns1 = component.getSchema().getTargetNamespace();
+    			if ( "".equals( ns1 ) ) {
+    				ns1 = null;
+    			}
+    		}
+    	}
+    	
+    	return Utilities.equals( ns1 , ns2 ) && Utilities.equals( n1 , n2 );
+//    	
+//        //is this the element we are looking for
+//        if ((component.getTargetNamespace() == null)
+//                || "".equals(component.getTargetNamespace())) {
+//            if ((qName.getNamespaceURI() == null)
+//                    || "".equals(qName.getNamespaceURI())) {
+//                //do a local name match
+//            	String n1 = component.getName();
+//            	if ( "".equals( n1 ) ) {
+//            		n1 = null;
+//            	}
+//            	String n2 = qName.getLocalPart();
+//            	if ( "".equals( n2 ) ) {
+//            		n2 = null;
+//            	}
+//                return (n1 == null && n2 == null) || n1.equals( n2 );
+//            }
+//
+//            //assume default namespace
+//            if (component.getSchema().getTargetNamespace()
+//                             .equals(qName.getNamespaceURI())
+//                    && component.getName().equals(qName.getLocalPart())) {
+//                return true;
+//            }
+//        } else if (component.getTargetNamespace().equals(qName.getNamespaceURI())
+//                && component.getName().equals(qName.getLocalPart())) {
+//            return true;
+//        }
 
-            //assume default namespace
-            if (component.getSchema().getTargetNamespace()
-                             .equals(qName.getNamespaceURI())
-                    && component.getName().equals(qName.getLocalPart())) {
-                return true;
-            }
-        } else if (component.getTargetNamespace().equals(qName.getNamespaceURI())
-                && component.getName().equals(qName.getLocalPart())) {
-            return true;
-        }
-
-        return false;
+        
     }
 
     /**

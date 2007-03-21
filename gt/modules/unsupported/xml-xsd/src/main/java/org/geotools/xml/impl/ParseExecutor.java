@@ -31,6 +31,7 @@ import org.eclipse.xsd.XSDFeature;
 import org.eclipse.xsd.XSDLengthFacet;
 import org.eclipse.xsd.XSDMaxLengthFacet;
 import org.eclipse.xsd.XSDMinLengthFacet;
+import org.eclipse.xsd.XSDNamedComponent;
 import org.eclipse.xsd.XSDSchemaContent;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
@@ -41,6 +42,7 @@ import org.geotools.xml.ComplexBinding;
 import org.geotools.xml.ElementInstance;
 import org.geotools.xml.InstanceComponent;
 import org.geotools.xml.Node;
+import org.geotools.xml.Schemas;
 import org.geotools.xml.SimpleBinding;
 import org.geotools.xml.impl.BindingWalker.Visitor;
 import org.geotools.xs.facets.Whitespace;
@@ -50,18 +52,24 @@ import org.picocontainer.MutablePicoContainer;
 public class ParseExecutor implements Visitor {
     private InstanceComponent instance;
     private Node node;
-    private Object value;
     private MutablePicoContainer context;
     private ParserHandler parser;
 
+    /**
+     * initial binding value
+     */
+    private Object value;
+    /**
+     * final parsed result
+     */
+    private Object result;
+    
     public ParseExecutor(InstanceComponent instance, Node node,
         MutablePicoContainer context, ParserHandler parser ) {
         this.instance = instance;
         this.node = node;
         this.context = context;
         this.parser = parser;
-
-        value = parseFacets(instance);
     }
 
     public void visit(Binding binding) {
@@ -76,8 +84,48 @@ public class ParseExecutor implements Visitor {
         
         //execute the binding
         try {
-            Object result = value;
-
+        	if ( result == null ) {
+        		//no result has been produced yet, should we pass the facet 
+        		// parsed text in? only for simple types or complex types with
+        		// mixed content
+        		XSDTypeDefinition type = null;
+        		if ( Schemas.nameMatches( instance.getDeclaration(), binding.getTarget() ) ) {
+        			//instance binding
+        			type = instance.getTypeDefinition();
+        		}
+        		else {
+        			//type binding
+        			type = 
+        				Schemas.getBaseTypeDefinition( instance.getTypeDefinition(), binding.getTarget() );
+        		}
+        		
+        		if ( value == null ) {
+        			//have not preprocessed raw string yet
+        			value = parseFacets( instance );
+        			
+        			//if the type is simple or complex and mixed, use the 
+        			// text as is, other wise trim it, turning to null if the 
+        			// result is empty
+        			if ( type != null && ( type instanceof XSDSimpleTypeDefinition || 
+            				((XSDComplexTypeDefinition)type).isMixed() )) {
+        				result = value;
+        			}
+        			else {
+        				if ( value != null && value instanceof String ) {
+        					value = ((String)value).trim();
+        					if ( "".equals( value ) ) {
+        						result = null;
+        					}
+        					else {
+        						result = value;
+        					}
+        				}
+        			}
+        			
+        		}
+        		
+        	}
+        	
             if (binding instanceof SimpleBinding) {
                 result = ((SimpleBinding) binding).parse(instance, result);
             } else {
@@ -207,8 +255,8 @@ public class ParseExecutor implements Visitor {
 							return itemType;
 						}
 						
-						public XSDSchemaContent getDeclaration() {
-							return (XSDSchemaContent) declaration;
+						public XSDNamedComponent getDeclaration() {
+							return declaration;
 						};
 						
 					};

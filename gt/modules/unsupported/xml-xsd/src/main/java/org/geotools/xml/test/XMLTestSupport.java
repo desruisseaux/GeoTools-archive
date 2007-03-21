@@ -157,8 +157,9 @@ public abstract class XMLTestSupport extends TestCase {
     protected void setUp() throws Exception {
     	DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
    	 	docFactory.setNamespaceAware(true);
-   	 
+   	 	
     	document = docFactory.newDocumentBuilder().newDocument();
+    	
     }
     
     /**
