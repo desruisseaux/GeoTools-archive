@@ -15,68 +15,70 @@
  */
 package org.geotools.filter.visitor;
 
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.FidFilter;
+import java.util.HashSet;
+
 import org.opengis.filter.Filter;
+import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.spatial.BBOX;
 import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LikeFilter;
-import org.geotools.filter.NullFilter;
 import org.geotools.filter.function.FilterFunction_geometryType;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPreProcessFilterSplittingVisitorTests {
 
+    private FilterCapabilities simpleLogicalCaps = new FilterCapabilities();
+    private PostPreProcessFilterSplittingVisitor visitor;
+    
+    public void setUp() throws Exception {
+        super.setUp();
+        simpleLogicalCaps.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
+        simpleLogicalCaps.addAll(FilterCapabilities.LOGICAL_OPENGIS);
+    }
+    
 	public void testVisitBetweenFilter() throws Exception {
-		BetweenFilter filter = filterFactory.createBetweenFilter();
-		filter.addLeftValue(filterFactory.createLiteralExpression(0));
-		filter.addRightValue(filterFactory.createLiteralExpression(4));
-		filter.addMiddleValue(filterFactory.createAttributeExpression(numAtt));
+		PropertyIsBetween filter = ff.between(ff.literal(0), ff.property(numAtt), ff.literal(4));
 		
-		runTest(filter, FilterCapabilities.BETWEEN, numAtt);
+        FilterCapabilities caps = new FilterCapabilities(PropertyIsBetween.class);
+		runTest(filter, caps, numAtt);
 	}
 
 
 	public void testNullTransactionAccessor() throws Exception {
 		accessor=null;
-		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
-		Filter f2 = createEqualsCompareFilter(nameAtt, "david");
-
-		runTest( filterFactory.and( f1,f2 ), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
+		Filter f1 = createPropertyIsEqualToFilter(nameAtt, "david");
+		Filter f2 = createPropertyIsEqualToFilter(nameAtt, "david");
+        
+		runTest( ff.and( f1,f2 ), simpleLogicalCaps, nameAtt);
 	}
 	
 	public void testVisitLogicalANDFilter() throws Exception{
-		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
-		Filter f2 = createEqualsCompareFilter(nameAtt, "david");
+		Filter f1 = createPropertyIsEqualToFilter(nameAtt, "david");
+		Filter f2 = createPropertyIsEqualToFilter(nameAtt, "david");
 
-		runTest( filterFactory.and(f1,f2), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
+		runTest( ff.and(f1,f2), simpleLogicalCaps, nameAtt);
 	}
 	public void testVisitLogicalNOTFilter() throws Exception{
-		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
+		Filter f1 = createPropertyIsEqualToFilter(nameAtt, "david");
 
-		runTest( filterFactory.not( f1 ), (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
+		runTest( ff.not( f1 ), simpleLogicalCaps, nameAtt);
 	}
 
 	public void testVisitLogicalORFilter() throws Exception{
-		Filter f1 = createEqualsCompareFilter(nameAtt, "david");
-		Filter f2 = createEqualsCompareFilter("name", "jose");
+		Filter f1 = createPropertyIsEqualToFilter(nameAtt, "david");
+		Filter f2 = createPropertyIsEqualToFilter("name", "jose");
 
-		Filter orFilter = ((org.geotools.filter.Filter)f1).or(f2);
-		runTest(orFilter, (FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL), nameAtt);
+		Filter orFilter = ff.or(f1, f2);
+		runTest(orFilter, simpleLogicalCaps, nameAtt);
 		
-		filterCapabilitiesMask=new FilterCapabilities();
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
+		visitor=newVisitor(simpleLogicalCaps);
 		
-		visitor=newVisitor();
-		
-		f2=createGeometryFilter(FilterType.GEOMETRY_BBOX);
-		orFilter = filterFactory.or( f1,f2);
-        ((org.geotools.filter.Filter)orFilter).accept(visitor);
+		f2=ff.bbox(geomAtt, 10.0, 20.0, 10.0, 20.0, "");
+		orFilter = ff.or( f1,f2);
+        orFilter.accept(visitor, null);
 		
 		// f1 could be pre-processed but since f2 can't all the processing has to be done on the client side :-(
 		assertEquals(orFilter, visitor.getFilterPost());
@@ -86,23 +88,24 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 
 	
 	public void testVisitCompareFilter() throws Exception{
-		CompareFilter f = createEqualsCompareFilter(nameAtt, "david");
+		Filter f = createPropertyIsEqualToFilter(nameAtt, "david");
 
-		runTest(f, FilterCapabilities.SIMPLE_COMPARISONS, nameAtt);
+		runTest(f, FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS, nameAtt);
 	}
 
 	/**
 	 * an update is in transaction that modifies an  attribute that NOT is referenced in the query
 	 */
 	public void testVisitCompareFilterWithUpdateDifferentAttribute() throws Exception {
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-		CompareFilter f = createEqualsCompareFilter(nameAtt, "david");
+		Filter f = createPropertyIsEqualToFilter(nameAtt, "david");
 
-		CompareFilter updateFilter = createEqualsCompareFilter(nameAtt, "jose");
+		Filter updateFilter = createPropertyIsEqualToFilter(nameAtt, "jose");
 
+        accessor = new TestAccessor();
 		accessor.setUpdate(geomAtt, updateFilter);
 
-		f.accept(visitor);
+        visitor = newVisitor(simpleLogicalCaps);
+		f.accept(visitor, null);
 
 		assertEquals(visitor.getFilterPost().toString(), Filter.INCLUDE, visitor
 				.getFilterPost());
@@ -111,174 +114,161 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 	}
 	
 	public void testVisitLikeFilter() throws Exception {
-		LikeFilter filter = filterFactory.createLikeFilter();
-		filter.setValue(filterFactory.createAttributeExpression(nameAtt));
-		filter.setPattern("j*", "*", "?", "\\");
-		runTest(filter, FilterCapabilities.LIKE, nameAtt);
+		Filter filter = ff.like(ff.property(nameAtt), "j*", "*", "?", "\\");
+        FilterCapabilities likeCaps = new FilterCapabilities(PropertyIsLike.class);
+		runTest(filter, likeCaps, nameAtt);
 	}
 
 	public void testVisitNullFilter() throws Exception {
-		NullFilter filter = filterFactory.createNullFilter();
-		
-		filter.nullCheckValue(filterFactory.createAttributeExpression(nameAtt));
-		runTest(filter, FilterCapabilities.NULL_CHECK, nameAtt);
+		Filter filter = ff.isNull(ff.property(nameAtt));
+        FilterCapabilities nullCaps = new FilterCapabilities(PropertyIsNull.class);
+		runTest(filter, nullCaps, nameAtt);
 	}
 
 	public void testVisitFidFilter() throws Exception {
-		FidFilter filter = filterFactory.createFidFilter("david");
-		filter.accept(visitor);
+        HashSet ids = new HashSet();
+        ids.add(ff.featureId("david"));
+		Filter filter = ff.id(ids);
+        visitor = newVisitor(new FilterCapabilities(Id.class));
+		filter.accept(visitor, null);
 		
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
 	}
 
 	public void testFunctionFilter() throws Exception {
-		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
+		simpleLogicalCaps.addType(BBOX.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
-		CompareFilter filter = createFunctionFilter();
+		Filter filter = createFunctionFilter();
 
-		filter.accept(visitor);
+		filter.accept(visitor, null);
 
 		assertEquals(filter, visitor.getFilterPost());
 		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		
-		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
-		visitor=newVisitor();
+		simpleLogicalCaps.addType(FilterFunction_geometryType.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
-		filter.accept(visitor);
+		filter.accept(visitor, null);
 
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
 	}
 	
 	public void testFunctionANDGeometryFilter() throws Exception{
-		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
+        simpleLogicalCaps.addType(BBOX.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
 		Filter funtionFilter = createFunctionFilter();
-		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		Filter geomFilter= ff.bbox(geomAtt, 10, 20, 10, 20, "");
 		
-		Filter andFilter = filterFactory.and(funtionFilter,geomFilter);
+		Filter andFilter = ff.and(funtionFilter,geomFilter);
 
-        ((org.geotools.filter.Filter)andFilter).accept(visitor);
+        andFilter.accept(visitor, null);
 
-		assertEquals(funtionFilter, visitor.getFilterPost());
-		assertEquals(geomFilter, visitor.getFilterPre());
+		assertEquals(funtionFilter.toString(), visitor.getFilterPost().toString());
+		assertEquals(geomFilter.toString(), visitor.getFilterPre().toString());
 		
-		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
-		visitor=newVisitor();
+		simpleLogicalCaps.addType(FilterFunction_geometryType.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
-        ((org.geotools.filter.Filter)andFilter).accept(visitor);
+        andFilter.accept(visitor, null);
 
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(andFilter, visitor.getFilterPre());
 	}
 
 	public void testFunctionORGeometryFilter() throws Exception{
-		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
+        simpleLogicalCaps.addType(BBOX.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
 		Filter funtionFilter = createFunctionFilter();
-		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
+        Filter geomFilter= ff.bbox(geomAtt, 10, 20, 10, 20, "");
 		
-		Filter orFilter = filterFactory.or(funtionFilter,geomFilter);
+		Filter orFilter = ff.or(funtionFilter,geomFilter);
 
-        ((org.geotools.filter.Filter)orFilter).accept(visitor);
+        orFilter.accept(visitor, null);
 
 		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		assertEquals(orFilter, visitor.getFilterPost());
 		
-		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
-		visitor=newVisitor();
+		simpleLogicalCaps.addType(FilterFunction_geometryType.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
-        ((org.geotools.filter.Filter)orFilter).accept(visitor);
+        orFilter.accept(visitor, null);
 
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(orFilter, visitor.getFilterPre());
 
 	}
 	public void testFunctionNOTFilter() throws Exception {
-		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
+        simpleLogicalCaps.addType(BBOX.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
 		Filter funtionFilter = createFunctionFilter();
 
-		Filter not = filterFactory.not( funtionFilter );
-        ((org.geotools.filter.Filter)not).accept(visitor);
+		Filter not = ff.not( funtionFilter );
+        not.accept(visitor, null);
 
 		assertEquals(not, visitor.getFilterPost());
 		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		
-		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
-		visitor=newVisitor();
+		simpleLogicalCaps.addType(FilterFunction_geometryType.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
-        ((org.geotools.filter.Filter)not).accept(visitor);
+        not.accept(visitor, null);
 
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(not, visitor.getFilterPre());
 	}
 
 	public void testNullParentNullAccessor() throws Exception {
-		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
-		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
+        simpleLogicalCaps.addType(BBOX.class);
+        simpleLogicalCaps.addType(FilterFunction_geometryType.class);
+        visitor=newVisitor(simpleLogicalCaps);
 		
 		Filter funtionFilter = createFunctionFilter();
-		GeometryFilter geomFilter= createGeometryFilter(FilterType.GEOMETRY_BBOX);
+		Filter geomFilter=ff.bbox(geomAtt, 10.0, 20.0, 10.0, 20.0, ""); 
 		
-		Filter orFilter = filterFactory.or( funtionFilter, geomFilter );
+		Filter orFilter = ff.or( funtionFilter, geomFilter );
 		visitor=new PostPreProcessFilterSplittingVisitor(new FilterCapabilities(), null, null);
-		((org.geotools.filter.Filter)orFilter).accept(visitor);
+		orFilter.accept(visitor, null);
 
 		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		assertEquals(orFilter, visitor.getFilterPost());
 
-		visitor=new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, null, null);
+		visitor=new PostPreProcessFilterSplittingVisitor(simpleLogicalCaps, null, null);
 		
-        ((org.geotools.filter.Filter)orFilter).accept(visitor);
+        orFilter.accept(visitor, null);
 
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(orFilter, visitor.getFilterPre());
 	}
 	
 	public void testComplicatedOrFilter() throws Exception {
-		CompareFilter c1=filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c1.addLeftValue(filterFactory.createAttributeExpression("eventstatus"));
-		c1.addRightValue(filterFactory.createLiteralExpression("deleted"));
+		Filter c1=ff.equals(ff.property("eventstatus"), ff.literal("deleted"));
 		
-		CompareFilter c2 = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c2.addLeftValue(filterFactory.createAttributeExpression("eventtype"));
-		c2.addRightValue(filterFactory.createLiteralExpression("road hazard"));
+        Filter c2=ff.equals(ff.property("eventtype"), ff.literal("road hazard"));
 		
-		CompareFilter c3 = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
-		c3.addLeftValue(filterFactory.createAttributeExpression("eventtype"));
-		c3.addRightValue(filterFactory.createLiteralExpression("area warning"));
+        Filter c3=ff.equals(ff.property("eventtype"), ff.literal("area warning"));
 
-		GeometryFilter g = filterFactory.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-		g.addLeftGeometry(filterFactory.createAttributeExpression("geom"));
-		g.addRightGeometry(filterFactory.createBBoxExpression(new Envelope(0,180,0,90)));
+		Filter g = ff.bbox("geom",0,180,0,90,"");
 		
-		Filter f = c2.or(c3);
-		f= filterFactory.and( filterFactory.not( (Filter) c1) ,f);
-		f= filterFactory.and(f,g);
+		Filter f = ff.or(c2, c3);
+		f= ff.and(ff.not(c1), f);
+		f= ff.and(f, g);
 		
-		filterCapabilitiesMask.addType(FilterCapabilities.LOGICAL);
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-		filterCapabilitiesMask.addType(FilterCapabilities.SPATIAL_BBOX);
+        simpleLogicalCaps.addType(BBOX.class);
+        simpleLogicalCaps.addType(FilterFunction_geometryType.class);
 		
-		visitor=new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, null, null);
-        ((org.geotools.filter.Filter)f).accept(visitor);
+		visitor=new PostPreProcessFilterSplittingVisitor(simpleLogicalCaps, null, null);
+        f.accept(visitor, null);
 		
 		assertEquals(f, visitor.getFilterPre());
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		
-		visitor=new PostPreProcessFilterSplittingVisitor( filterCapabilitiesMask, null, new ClientTransactionAccessor(){
+		visitor=new PostPreProcessFilterSplittingVisitor( simpleLogicalCaps, null, new ClientTransactionAccessor(){
 
 			public Filter getDeleteFilter() {
 				return null;
@@ -286,17 +276,22 @@ public class PostPreProcessFilterSplittingVisitorTest extends AbstractPostPrePro
 
 			public Filter getUpdateFilter(String attributePath) {
 				if( attributePath.equals("eventtype") ){
-					return filterFactory.createFidFilter("fid");
+                    HashSet ids = new HashSet();
+                    ids.add(ff.featureId("fid"));
+					return ff.id(ids);
 				}
 				return null;
 			}
 			
 		});
 
-        ((org.geotools.filter.Filter)f).accept(visitor);
+        f.accept(visitor, null);
+        
+        HashSet ids = new HashSet();
+        ids.add(ff.featureId("fid"));
 		
 		assertEquals(f, visitor.getFilterPost());
-		assertEquals( filterFactory.or( f,filterFactory.createFidFilter("fid")), visitor.getFilterPre());
+		assertEquals( ff.or( f,ff.id(ids)), visitor.getFilterPre());
 	}
 	
 }

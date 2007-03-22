@@ -19,6 +19,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.opengis.filter.And;
+import org.opengis.filter.Not;
+import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsNotEqualTo;
+
 
 
 /**
@@ -38,13 +48,11 @@ public class FilterCapabilities {
     /**
      * Mask for Filter.INCLUDE
      */
-    //public static final long NONE = 12345;
     public static final long NONE = 0x01<<30;
 
     /**
      * Mask for Filter.EXCLUDE
      */
-    //public static final long ALL = -12345;
     public static final long ALL = 0x01<<31;
     
     // spatial masks
@@ -144,7 +152,27 @@ public class FilterCapabilities {
 	/**
 	 * Scalar Mask for simple comparison operations
 	 */
-    public static final long SIMPLE_COMPARISONS = COMPARE_EQUALS|COMPARE_GREATER_THAN|COMPARE_GREATER_THAN_EQUAL|COMPARE_LESS_THAN|COMPARE_LESS_THAN_EQUAL|COMPARE_NOT_EQUALS;    
+    public static final long SIMPLE_COMPARISONS = COMPARE_EQUALS|COMPARE_GREATER_THAN|COMPARE_GREATER_THAN_EQUAL|COMPARE_LESS_THAN|COMPARE_LESS_THAN_EQUAL|COMPARE_NOT_EQUALS;
+    
+    public static final FilterCapabilities SIMPLE_COMPARISONS_OPENGIS;
+    
+    public static final FilterCapabilities LOGICAL_OPENGIS;
+    
+    static {
+        SIMPLE_COMPARISONS_OPENGIS = new FilterCapabilities();
+        SIMPLE_COMPARISONS_OPENGIS.addType(PropertyIsEqualTo.class);
+        SIMPLE_COMPARISONS_OPENGIS.addType(PropertyIsGreaterThan.class);
+        SIMPLE_COMPARISONS_OPENGIS.addType(PropertyIsGreaterThanOrEqualTo.class);
+        SIMPLE_COMPARISONS_OPENGIS.addType(PropertyIsLessThanOrEqualTo.class);
+        SIMPLE_COMPARISONS_OPENGIS.addType(PropertyIsLessThan.class);
+        SIMPLE_COMPARISONS_OPENGIS.addType(PropertyIsNotEqualTo.class);
+        
+        LOGICAL_OPENGIS = new FilterCapabilities();
+        LOGICAL_OPENGIS.addType(And.class);
+        LOGICAL_OPENGIS.addType(Not.class);
+        LOGICAL_OPENGIS.addType(Or.class);
+    }
+    
     private long ops = NO_OP;
 
 	private Set functions=new HashSet();
@@ -177,7 +205,9 @@ public class FilterCapabilities {
      * @param type the Class that indicates the new support.
      */
     public void addType( Class type ){
-    	if( FunctionExpression.class.isAssignableFrom(type) ){
+    	if( org.opengis.filter.Filter.class.isAssignableFrom(type)
+                ||
+            org.opengis.filter.expression.Expression.class.isAssignableFrom(type)){
 			addType(FUNCTIONS);
     		functions.add(type);
     	}
@@ -230,6 +260,14 @@ public class FilterCapabilities {
      * @return true if supported, false otherwise.
      */
     public boolean supports(org.opengis.filter.Filter filter) {
+        for (Iterator ifunc = functions.iterator(); ifunc.hasNext();) {
+            if (((Class)ifunc.next()).isAssignableFrom(filter.getClass()))
+                return true;
+        }
+        
+        if (functions.contains(filter.getClass()))
+            return true;
+        
         short filterType = Filters.getFilterType( filter );
 
         return supports(filterType);

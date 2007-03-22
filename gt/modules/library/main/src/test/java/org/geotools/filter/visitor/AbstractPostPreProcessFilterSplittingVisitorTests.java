@@ -15,20 +15,35 @@
  */
 package org.geotools.filter.visitor;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import junit.framework.TestCase;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.SchemaException;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.spatialschema.geometry.Boundary;
+import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.spatialschema.geometry.Precision;
+import org.opengis.spatialschema.geometry.TransfiniteSet;
+import org.opengis.spatialschema.geometry.complex.Complex;
+import org.opengis.spatialschema.geometry.geometry.Position;
+import org.opengis.spatialschema.geometry.primitive.Bearing;
+import org.opengis.spatialschema.geometry.primitive.Point;
 import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
 import org.geotools.filter.function.FilterFunction_geometryType;
 
@@ -58,10 +73,8 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 
 	}
 
-	protected FilterFactory filterFactory = FilterFactoryFinder.createFilterFactory();
+	protected FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 	protected TestAccessor accessor;
-	protected PostPreProcessFilterSplittingVisitor visitor;
-	protected FilterCapabilities filterCapabilitiesMask;
 	protected static final String typeName = "test";
 	protected static final String geomAtt = "geom";
 	protected static final String nameAtt = "name";
@@ -69,29 +82,21 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
     
 	protected void setUp() throws Exception {
 		super.setUp();
-		accessor = new TestAccessor();
-		filterCapabilitiesMask = new FilterCapabilities();
-		visitor=newVisitor();
 	}
 
-	protected PostPreProcessFilterSplittingVisitor newVisitor() throws SchemaException {
-		return new PostPreProcessFilterSplittingVisitor(filterCapabilitiesMask, DataUtilities.createType(typeName,geomAtt+":Point,"+nameAtt+":String," +
-				numAtt+":int"), accessor);
+	protected PostPreProcessFilterSplittingVisitor newVisitor(FilterCapabilities supportedCaps) throws SchemaException {
+		return new PostPreProcessFilterSplittingVisitor(supportedCaps,
+                DataUtilities.createType(typeName,geomAtt+":Point,"+nameAtt+":String," + numAtt+":int"),
+                accessor);
 	} 
 	
-	protected CompareFilter createEqualsCompareFilter(String attr, String value) throws IllegalFilterException {
-		CompareFilter f = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
-    	f.addLeftValue(filterFactory.createAttributeExpression(attr));
-    	f.addRightValue(filterFactory.createLiteralExpression(value));
-		return f;
+	protected PropertyIsEqualTo createPropertyIsEqualToFilter(String attr, String value) throws IllegalFilterException {
+		return ff.equals(ff.property(attr), ff.literal(value));
 	}
 
-	protected GeometryFilter createGeometryFilter(short filterType) throws IllegalFilterException {
-		GeometryFilter filter = filterFactory.createGeometryFilter(filterType);
-		filter.addLeftGeometry(filterFactory.createAttributeExpression(geomAtt));
-		filter.addRightGeometry(filterFactory.createBBoxExpression(new Envelope(10,20,10,20)));
-		return filter;
-	}
+    protected Envelope createTestEnvelope() {
+        return new Envelope(10,20,10,20);
+    }
 	
 	/**
 	 * Runs 3 tests.  1 with out filtercapabilities containing filter type.  1 with filter caps containing filter type
@@ -100,24 +105,22 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 	 * @param filterTypeMask the constant in {@link FilterCapabilities} that is equivalent to the FilterType used in filter
 	 * @param attToEdit the attribute in filter that is queried.  If null then edit test is not ran.
 	 */
-	protected void runTest(Filter filter, long filterTypeMask, String attToEdit) throws SchemaException {
+	protected void runTest(Filter filter, FilterCapabilities supportedCaps, String attToEdit) throws SchemaException {
 		// initialize fields that might be previously modified in current test
-		visitor=newVisitor(); 
-		filterCapabilitiesMask=new FilterCapabilities();
-		if( accessor!=null )
+        PostPreProcessFilterSplittingVisitor visitor=newVisitor(new FilterCapabilities()); 
+		if (accessor!=null )
 		accessor.setUpdate("",null);
 
 		// Testing when FilterCapabilites indicate that filter type is not supported
-		((org.geotools.filter.Filter)filter).accept(visitor);
+		filter.accept(visitor, null);
 
 		assertEquals(filter, visitor.getFilterPost());
 		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		
 		// now filter type is supported
-		filterCapabilitiesMask.addType(filterTypeMask);
-		visitor=newVisitor();
+		visitor=newVisitor(supportedCaps);
 		
-        ((org.geotools.filter.Filter)filter).accept(visitor);
+        filter.accept(visitor, null);
 		
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
@@ -125,31 +128,151 @@ public class AbstractPostPreProcessFilterSplittingVisitorTests extends TestCase 
 		if (attToEdit != null && accessor!=null ) {
 			// Test when the an update exists that affects the attribute of a
 			// feature
-			FidFilter updateFilter = filterFactory.createFidFilter("fid");
+            HashSet idSet = new HashSet();
+            idSet.add(ff.featureId("fid"));
+			Id updateFilter = ff.id(idSet);
 
 			accessor.setUpdate(attToEdit, updateFilter);
 
-			visitor = newVisitor();
+			visitor = newVisitor(supportedCaps);
 
-            ((org.geotools.filter.Filter)filter).accept(visitor);
+            filter.accept(visitor, null);
 
 			assertEquals(filter, visitor.getFilterPost());
-			assertEquals(((org.geotools.filter.Filter)filter).or(updateFilter), visitor.getFilterPre());
+			assertEquals(ff.or(filter, updateFilter), visitor.getFilterPre());
 		}
 	}
 
-	protected CompareFilter createFunctionFilter() throws Exception {
-		FilterFactory factory = FilterFactoryFinder.createFilterFactory();
+	protected PropertyIsEqualTo createFunctionFilter() throws Exception {
+        
 		FilterFunction_geometryType geomTypeExpr = new FilterFunction_geometryType();
-		geomTypeExpr.setArgs(new Expression[] { factory
-				.createAttributeExpression("geom") });
+		geomTypeExpr.setParameters(Arrays.asList(new Expression[] { ff
+				.property("geom") }));
 	
-		CompareFilter filter = factory
-				.createCompareFilter(FilterType.COMPARE_EQUALS);
-		filter.addLeftValue(geomTypeExpr);
-		filter.addRightValue(factory.createLiteralExpression("Polygon"));
+		PropertyIsEqualTo filter = ff.equals(geomTypeExpr, ff.literal("Polygon"));
 		return filter;
 	}
 	
+    class MockGeometryImpl implements Geometry {
+        public boolean contains(DirectPosition arg0) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        public boolean contains(TransfiniteSet arg0) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        public TransfiniteSet difference(TransfiniteSet arg0) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public boolean equals(TransfiniteSet arg0) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        public Boundary getBoundary() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Geometry getBuffer(double arg0) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public DirectPosition getCentroid() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Complex getClosure() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Geometry getConvexHull() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public int getCoordinateDimension() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+        public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public int getDimension(DirectPosition arg0) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+        public double getDistance(Geometry arg0) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+        public org.opengis.spatialschema.geometry.Envelope getEnvelope() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Set getMaximalComplex() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Geometry getMbRegion() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public DirectPosition getRepresentativePoint() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public TransfiniteSet intersection(TransfiniteSet arg0) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public boolean intersects(TransfiniteSet arg0) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        public boolean isCycle() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        public boolean isMutable() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        public boolean isSimple() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        public TransfiniteSet symmetricDifference(TransfiniteSet arg0) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Geometry toImmutable() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Geometry transform(CoordinateReferenceSystem arg0) throws TransformException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Geometry transform(CoordinateReferenceSystem arg0, MathTransform arg1) throws TransformException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public TransfiniteSet union(TransfiniteSet arg0) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public Object clone() throws CloneNotSupportedException {
+            // TODO Auto-generated method stub
+            return super.clone();
+        }
+        public Precision getPrecision() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        public String toString() {
+            return "MOCKGEOM";
+        }
+    }
 
 }

@@ -15,27 +15,22 @@
  */
 package org.geotools.filter.visitor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Logger;
 
-import org.geotools.feature.AttributeType;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureType;
 import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.BetweenFilter;
 import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
 import org.geotools.filter.ExpressionType;
 import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
 import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterType;
-import org.geotools.filter.FilterVisitor;
-import org.geotools.filter.FilterVisitor2;
 import org.geotools.filter.FunctionExpression;
 import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.IllegalFilterException;
@@ -44,9 +39,48 @@ import org.geotools.filter.LiteralExpression;
 import org.geotools.filter.LogicFilter;
 import org.geotools.filter.MathExpression;
 import org.geotools.filter.NullFilter;
-import org.geotools.filter.expression.FilterVisitorExpressionWrapper;
+import org.opengis.filter.And;
+import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Id;
 import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.Not;
+import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Add;
+import org.opengis.filter.expression.BinaryExpression;
+import org.opengis.filter.expression.Divide;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.ExpressionVisitor;
+import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.Multiply;
+import org.opengis.filter.expression.NilExpression;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.expression.Subtract;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -55,22 +89,86 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 /**
  * Determines what queries can be processed server side and which can be processed client side.
  * 
+ * IMPLEMENTATION NOTE:
+ * This class is implemented as a stack processor.  If you're curious how it works, compare it with
+ * the old SQLUnpacker class, which did the same thing using recursion in a more straightforward
+ * way.
+ * 
+ * Here's a non-implementors best-guess at the algorithm:
+ *  Starting at the top of the filter, split each filter into
+ *  its constituent parts.  If the given FilterCapabilities
+ *  support the given operator, then keep checking downwards.
+ *  
+ * The key is in knowing whether or not something "down the tree"
+ *  from you wound up being supported or not.  This is where the
+ *  stacks come in.  Right before handing off to accept() the sub-
+ *  filters, we count how many things are currently on the "can
+ *  be proccessed by the underlying datastore" stack (the preStack)
+ *  and we count how many things are currently on the "need to be post-
+ *  processed" stack.
+ * 
+ * After the accept() call returns, we look again at the preStack.size()
+ *  and postStack.size().  If the postStack has grown, that means that there
+ *  was stuff down in the accept()-ed filter that wasn't supportable.
+ *  Usually this means that our filter isn't supportable, but not always.
+ * 
+ * In some cases a sub-filter being unsupported isn't necessarily bad,
+ *  as we can 'unpack' OR statements into AND statements
+ *  (DeMorgans rule/modus poens) and still
+ *  see if we can handle the other side of the OR.  Same with NOT and
+ *  certain kinds of AND statements.
+ * 
+ * In addition this class supports the case where we're doing an split
+ * in the middle of a client-side transaction.  I.e. imagine doing a
+ * <Transaction> against a WFS-T where you have to filter against
+ * actions that happened previously in the transaction.  That's what
+ * the ClientTransactionAccessor interface does, and this class splits
+ * filters while respecting the information about deletes and updates
+ * that have happened previously in the Transaction.  I can't say with
+ * certainty exactly how the logic for that part of this works, but
+ * the test suite does seem to test it and the tests do pass.
+ * 
+ * 
  * @author dzwiers
+ * @author commented and ported from gt to ogc filters by saul.farber
  * @source $URL$
+ * 
  */
-public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, FilterVisitor2 {
+public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, ExpressionVisitor {
 		private static final Logger logger=Logger.getLogger("org.geotools.filter");
+        
+        /**
+         * The stack holding the bits of the filter that are not processable
+         * by something with the given {@link FilterCapabilities}
+         */
 	    private Stack postStack = new Stack();
+        
+        /**
+         * The stack holding the bits of the filter that <b>are</b> processable
+         * by something with the given {@link FilterCapabilities}
+         */
 	    private Stack preStack = new Stack();
-	    /** 
+	    
+        /** 
 	     * Operates similar to postStack.  When a update is determined to affect an attribute expression the update
 	     * filter is pushed on to the stack, then ored with the filter that contains the expression.
 	     */
 	    private Set changedStack=new HashSet();
+        
+        /**
+         * The given filterCapabilities that we're splitting on.
+         */
 	    private FilterCapabilities fcs = null;
 	    private FeatureType parent = null;
 		private Filter original = null;
+        
+        /**
+         * If we're in the middle of a client-side transaction, this object
+         * will help us figure out what we need to handle from updates/deletes
+         * that we're tracking client-side.
+         */
 		private ClientTransactionAccessor transactionAccessor;
+        private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 	
 	    private PostPreProcessFilterSplittingVisitor() {
 	    	// do nothing
@@ -79,7 +177,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	    /**
 	     * Create a new instance.
 	     * @param fcs The FilterCapabilties that describes what Filters/Expressions the server can process.
-	     * @param parent 
+	     * @param parent The FeatureType that this filter involves.  Why is this needed?
 	     * @param transactionAccessor If the transaction is handled on the client and not the server then different filters
 	     * must be sent to the server.  This class provides a generic way of obtaining the information from the transaction.
 	     */
@@ -94,7 +192,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	     * 
 	     * @return the filter that cannot be sent to the server and must be post-processed on the client by geotools.
 	     */
-	    public org.opengis.filter.Filter getFilterPost() {
+	    public Filter getFilterPost() {
 			if (!changedStack.isEmpty())
 				// Return the original filter to ensure that
 				// correct features are filtered
@@ -106,7 +204,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	        }
 	        
 	        // JE:  Changed to peek because get implies that the value can be retrieved multiple times
-            org.opengis.filter.Filter f = postStack.isEmpty() ? Filter.INCLUDE : (org.opengis.filter.Filter) postStack.peek();
+            Filter f = postStack.isEmpty() ? Filter.INCLUDE : (Filter) postStack.peek();
 	        return f;
 	    }
 		
@@ -115,7 +213,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	     * 
 	     * @return the filter that can be sent to the server for pre-processing.
 	     */
-	    public org.opengis.filter.Filter getFilterPre() {
+	    public Filter getFilterPre() {
+            FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 	        if (preStack.isEmpty()) {
 	            return Filter.INCLUDE;
 	        }
@@ -127,16 +226,16 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 
 	
 	        // JE:  Changed to peek because get implies that the value can be retrieved multiple times
-            org.opengis.filter.Filter f = preStack.isEmpty() ? Filter.INCLUDE : (org.opengis.filter.Filter) preStack.peek();
+            Filter f = preStack.isEmpty() ? Filter.INCLUDE : (Filter) preStack.peek();
 			// deal with deletes here !!!
             if(transactionAccessor != null){
             	if(f != null && f!=Filter.EXCLUDE){
-            		Filter deleteFilter = (org.geotools.filter.Filter) transactionAccessor.getDeleteFilter();
+            		Filter deleteFilter = transactionAccessor.getDeleteFilter();
 	            	if( deleteFilter!=null ){
-                        if( deleteFilter==org.geotools.filter.Filter.ALL )
+                        if (deleteFilter == Filter.EXCLUDE)
                             f=Filter.EXCLUDE;
                         else
-                            f=((Filter)f).and(deleteFilter.not());
+                            f=ff.and(f,ff.not(deleteFilter));
                     }
             	}
             }
@@ -148,191 +247,197 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	        Filter updateFilter=(Filter) iter.next();
 	        while( iter.hasNext() ){
                 Filter next=(Filter) iter.next();
-                if( next==org.geotools.filter.Filter.NONE){
+                if( next == Filter.INCLUDE){
                     updateFilter=next;
                     break;
                 }else{
-                    updateFilter=(Filter) updateFilter.or(next);
+                    updateFilter=(Filter) ff.or(updateFilter,next);
                 }
             }
-            if( updateFilter == org.geotools.filter.Filter.NONE || f==Filter.INCLUDE )
+            if( updateFilter == Filter.INCLUDE || f==Filter.INCLUDE )
                 return Filter.INCLUDE;
-	        return ((Filter)f).or(updateFilter);
+	        return ff.or(f,updateFilter);
 	    }
 
+        /**
+         * @see FilterVisitor#visit(IncludeFilter, Object)
+         * 
+         * @param filter the {@link Filter} to visit
+         */
         public void visit( IncludeFilter filter ) {
             return;
         }
+        
+        /**
+         * @see FilterVisitor#visit(ExcludeFilter, Object)
+         * 
+         * @param filter the {@link Filter} to visit
+         */
         public void visit( ExcludeFilter filter ) {
-            if (fcs.supports(FilterType.ALL)) {
+            if (fcs.supports(Filter.EXCLUDE)) {
                 preStack.push(filter);
             } else {
                 postStack.push(filter);
             }
         }
-	    /**
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)
-	     */
-	    public void visit(Filter filter) {	        
-	        if( original==null )
-	        	original=filter;
-	        if (!postStack.isEmpty()) {
-	        	postStack.push(filter);
-                logger.fine(
-                    		
-                		
-	                "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Filter)"+filter.toString());
-	        } else {
-	            switch (filter.getFilterType()) {
-	            case FilterType.BETWEEN:
-	                visit((BetweenFilter) filter);
 	
-	                break;
-	
-	            case FilterType.COMPARE_EQUALS:
-	            case FilterType.COMPARE_GREATER_THAN:
-	            case FilterType.COMPARE_GREATER_THAN_EQUAL:
-	            case FilterType.COMPARE_LESS_THAN:
-	            case FilterType.COMPARE_LESS_THAN_EQUAL:
-	            case FilterType.COMPARE_NOT_EQUALS:
-	                visit((BetweenFilter) filter);
-	
-	                break;
-	
-	            case FilterType.FID:
-	                visit((BetweenFilter) filter);
-	
-	                break;
-	
-	            case FilterType.GEOMETRY_BBOX:
-	            case FilterType.GEOMETRY_BEYOND:
-	            case FilterType.GEOMETRY_CONTAINS:
-	            case FilterType.GEOMETRY_CROSSES:
-	            case FilterType.GEOMETRY_DISJOINT:
-	            case FilterType.GEOMETRY_DWITHIN:
-	            case FilterType.GEOMETRY_EQUALS:
-	            case FilterType.GEOMETRY_INTERSECTS:
-	            case FilterType.GEOMETRY_OVERLAPS:
-	            case FilterType.GEOMETRY_TOUCHES:
-	            case FilterType.GEOMETRY_WITHIN:
-	                visit((GeometryFilter) filter);
-	
-	                break;
-	
-	            case FilterType.LIKE:
-	                visit((LikeFilter) filter);
-	
-	                break;
-	
-	            case FilterType.LOGIC_AND:
-	            case FilterType.LOGIC_NOT:
-	            case FilterType.LOGIC_OR:
-	                visit((LogicFilter) filter);
-	
-	                break;
-	
-	            case FilterType.NULL:
-	                visit((NullFilter) filter);
-	
-	                break;
-	
-	            default:
-	                postStack.push(filter);
-	                logger.warning(filter.toString()
-                        + " marked for post-processing in PostPreProcessFilterSplittingVisitor");
-                    
-	                break;
-	            }
-	            
-	        }
-	    }
-	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.BetweenFilter)
-	     */
-	    public void visit(BetweenFilter filter) {
+
+        /**
+         * @see FilterVisitor#visit(PropertyIsBetween, Object)
+         * 
+         * NOTE:  This method is extra documented as an example of how
+         * all the other methods are implemented.  If you want to know how this
+         * class works read this method first!
+         * 
+         * @param filter the {@link Filter} to visit
+         */
+	    public Object visit(PropertyIsBetween filter, Object extradata) {
 	        if( original==null )
 	        	original=filter;
 
-	        if (fcs.supports(FilterCapabilities.BETWEEN)) {
-	            int i = postStack.size();
-	            Expression leftValue = filter.getLeftValue();
-	            Expression middleValue = filter.getMiddleValue();
-	            Expression rightValue = filter.getRightValue();
-	            if( leftValue==null 
-	            		|| rightValue==null 
-	            		|| middleValue==null ){
+            // Do we support this filter type at all?
+	        if (fcs.supports(PropertyIsBetween.class)) {
+                //Yes, we do.  Now, can we support the sub-filters?
+	            
+                //first, remember how big the current list of "I can't support these"
+                // filters is.
+                int i = postStack.size();
+                
+	            Expression lowerBound = filter.getLowerBoundary();
+	            Expression expr = filter.getExpression();
+	            Expression upperBound = filter.getUpperBoundary();
+	            if(lowerBound==null || 
+	               upperBound==null ||
+	               expr==null ){
+                    //Well, one of the boundaries is null, so I guess
+                    // we're saying that *no* datastore could support this.
 	            	postStack.push(filter);
-	            	return; 
-	            	
+	            	return null;
 	            }
-				leftValue.accept(this);
+                
+                //Ok, here's the magic.  We know how big our list of "can't support"
+                //filters is.  Now we send off the lowerBound Expression to see if
+                //it can be supported.
+				lowerBound.accept(this, null);
 	
+                //Now we're back, and we check.  Did the postStack get bigger?
 	            if (i < postStack.size()) {
-	            	// post process it
-	            	postStack.pop();
+	            	//Yes, it did.  Well, that means we can't support
+                    //this particular filter.  Let's back out anything that was
+                    //added by the lowerBound.accept() and add ourselves.
+	            	postStack.pop(); //lowerBound.accept()'s bum filter
 	            	postStack.push(filter);
 	
-	                return;
+	                return null;
 	            }
+                
+                //Aha!  The postStack didn't get any bigger, so we're still
+                //all good.  Now try again with the middle expression itself...
 	
-				middleValue.accept(this);
+				expr.accept(this, null);
 	
+                //Did postStack get bigger?
 	            if (i < postStack.size()) {
-	            	// post process it
-	            	preStack.pop(); // left side
-	            	postStack.pop();
+	            	//Yes, it did.  So that means we can't support
+                    //this particular filter.  We need to back out what we've
+                    //done, which is BOTH the lowerbounds filter *and* the
+                    //thing that was added by expr.accept() when it failed.
+	            	preStack.pop(); // lowerBound.accept()'s success
+	            	postStack.pop(); // expr.accept()'s bum filter
 	            	postStack.push(filter);
 	
-	                return;
+	                return null;
 	            }
 	
-				rightValue.accept(this);
+                //Same deal again...
+				upperBound.accept(this, null);
 
 	            if (i < postStack.size()) {
 	            	// post process it
-	            	preStack.pop(); // left side
-	            	preStack.pop(); // middle
-	            	postStack.pop();
+                    postStack.pop(); // upperBound.accept()'s bum filter
+	            	preStack.pop(); // expr.accept()'s success
+                    preStack.pop(); // lowerBound.accept()'s success
 	            	postStack.push(filter);
 	            	
-	            	return;
+	            	return null;
 	            }
 	            
-            	preStack.pop(); // left side
-            	preStack.pop(); // middle
-            	preStack.pop(); // right side
+                //Well, by getting here it means that postStack didn't get
+                //taller, even after accepting all three middle filters.  This
+                //means that this whole filter is totally pre-filterable.
+                
+                //Let's clean up the pre-stack (which got one added to it
+                //for the success at each of the three above .accept() calls)
+                //and add us to the stack.
+                
+                preStack.pop(); // upperBounds.accept()'s success
+            	preStack.pop(); // expr.accept()'s success
+                preStack.pop(); // lowerBounds.accept()'s success
+            	
 	            
+                //finally we add ourselves to the "can be pre-proccessed" filter
+                //stack.  Now when we return we've added exactly one thing to
+                //the preStack...namely, the given filter.
 	            preStack.push(filter);
 	        } else {
+                // No, we don't support this filter.
+                // So we push it onto the postStack, saying
+                // "Hey, here's one more filter that we don't support.
+                // Someone who called us may look at this and say,
+                // "Hmm, I called accept() on this filter and now
+                // the postStack is taller than it was...I guess this
+                // filter wasn't accepted.
             	postStack.push(filter);
 	        }
+            return null;
 	    }
-	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.CompareFilter)
-	     */
-	    public void visit(CompareFilter filter) {
+        
+        
+        
+        public Object visit(PropertyIsEqualTo filter, Object notUsed) {
+            visitBinaryComparisonOperator(filter);
+            return null;
+        }
+        public Object visit(PropertyIsGreaterThan filter, Object notUsed) {
+            visitBinaryComparisonOperator(filter);
+            return null;
+        }
+        public Object visit(PropertyIsGreaterThanOrEqualTo filter, Object notUsed) {
+            visitBinaryComparisonOperator(filter);
+            return null;
+        }
+        public Object visit(PropertyIsLessThan filter, Object notUsed) {
+            visitBinaryComparisonOperator(filter);
+            return null;
+        }
+        public Object visit(PropertyIsLessThanOrEqualTo filter, Object notUsed) {
+            visitBinaryComparisonOperator(filter);
+            return null;
+        }
+        public Object visit(PropertyIsNotEqualTo filter, Object notUsed) {
+            visitBinaryComparisonOperator(filter);
+            return null;
+        }
+        
+	    private void visitBinaryComparisonOperator(BinaryComparisonOperator filter) {
 	        if( original==null )
 	        	original=filter;
 
 	        // supports it as a group -- no need to check the type
-	        if (!fcs.supports(FilterCapabilities.SIMPLE_COMPARISONS) ) {
+	        if (!fcs.supports(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS) ) {
 	            postStack.push(filter);
 	            return;
 	        }
 	
 	        int i = postStack.size();
-	        Expression leftValue = filter.getLeftValue();
-	        Expression rightValue = filter.getRightValue();
+	        Expression leftValue = filter.getExpression1();
+	        Expression rightValue = filter.getExpression2();
 	        if( leftValue==null || rightValue==null ){
 	        	postStack.push(filter);
 	        	return;
 	        }
 
-	        leftValue.accept(this);
+	        leftValue.accept(this, null);
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
@@ -341,7 +446,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	            return;
 	        }
 	
-			rightValue.accept(this);
+			rightValue.accept(this, null);
 	
 	        if (i < postStack.size()) {
 	        	preStack.pop(); // left
@@ -357,177 +462,91 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	        
 	    }
 	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.GeometryFilter)
-	     */
-	    public void visit(GeometryFilter filter) {
+	    
+        public Object visit(BBOX filter, Object notUsed) {
+            if (!fcs.supports(BBOX.class)) {
+                postStack.push(filter);
+            } else {
+                preStack.push(filter);
+            }
+            return null;
+        }
+        
+        public Object visit(Beyond filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(Contains filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(Crosses filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(Disjoint filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(DWithin filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(Equals filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(Intersects filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(Overlaps filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(Touches filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        public Object visit(Within filter, Object notUsed) {
+            visitBinarySpatialOperator(filter);
+            return null;
+        }
+        
+	    private void visitBinarySpatialOperator(BinarySpatialOperator filter) {
 	        if( original==null )
 	        	original=filter;
-
-	        switch (filter.getFilterType()) {
-	        case FilterType.GEOMETRY_BBOX:
-	
-	            if (!fcs.supports( FilterCapabilities.SPATIAL_BBOX) ) {
-	
-	            	// JE:  This is not documented and I can not figure out why if Filter is not supported that there is
-	            	// any reason that the filter should still be sent to server.
-	            	// Only thing I can think of is that BBox is ALWAYS supported but in that case an exception should
-	            	// be thrown instead.
-//	                if (filter.getLeftGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-//	                    LiteralExpression le = (LiteralExpression) filter
-//	                        .getLeftGeometry();
-//	
-//	                    if ((le == null) || (le.getLiteral() == null)
-//	                            || !(le.getLiteral() instanceof Geometry)) {
-//	                    	postStack.push(filter);
-//	
-//	                        return;
-//	                    }
-//	
-//	                } else {
-//	                    if (filter.getRightGeometry().getType() == ExpressionType.LITERAL_GEOMETRY) {
-//	                        LiteralExpression le = (LiteralExpression) filter
-//	                            .getRightGeometry();
-//	
-//	                        if ((le == null) || (le.getLiteral() == null)
-//	                                || !(le.getLiteral() instanceof Geometry)) {
-//	                        	postStack.push(filter);
-//	
-//	                            return;
-//	                        }
-//	                    } else {
-//	                    	postStack.push(filter);
-//	
-//	                        return;
-//	                    }
-//	                }
-	            	
-	            	postStack.push(filter);
-	            	return;
-	            	
-	            }
-	
-            	break;
-	        case FilterType.GEOMETRY_BEYOND:
-	
-	            if (!fcs.supports(FilterCapabilities.SPATIAL_BEYOND) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        case FilterType.GEOMETRY_CONTAINS:
-	
-	            if (!fcs.supports(FilterCapabilities.SPATIAL_CONTAINS) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        case FilterType.GEOMETRY_CROSSES:
-	
-	            if (!fcs.supports( FilterCapabilities.SPATIAL_CROSSES) ) {
-		        	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        case FilterType.GEOMETRY_DISJOINT:
-	
-	            if (!fcs.supports( FilterCapabilities.SPATIAL_DISJOINT) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        case FilterType.GEOMETRY_DWITHIN:
-	
-	            if (!fcs.supports( FilterCapabilities.SPATIAL_DWITHIN) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        case FilterType.GEOMETRY_EQUALS:
-	
-	            if (!fcs.supports( FilterCapabilities.SPATIAL_EQUALS) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	            
-	            // JE: this was missing intentional?  I'm adding it since it make the test work as expected
-	            // see WFSFilterVisitorGeometryTest#testVisitGeometryFilterEquals()
-	            break;
-	        case FilterType.GEOMETRY_INTERSECTS:
-	
-	            if (!fcs.supports( FilterCapabilities.SPATIAL_INTERSECT) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        case FilterType.GEOMETRY_OVERLAPS:
-	
-	            if (!fcs.supports( FilterCapabilities.SPATIAL_OVERLAPS) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        case FilterType.GEOMETRY_TOUCHES:
-	
-	            if (!fcs.supports(FilterCapabilities.SPATIAL_TOUCHES) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        case FilterType.GEOMETRY_WITHIN:
-	
-	            if (!fcs.supports( FilterCapabilities.SPATIAL_WITHIN) ) {
-	            	postStack.push(filter);
-	
-	                return;
-	            }
-	
-	            break;
-	
-	        default:
-	        	postStack.push(filter);
-	
-	            return;
-	        }
+            
+            Class [] spatialOps = new Class[] { Beyond.class,
+                    Contains.class, Crosses.class, Disjoint.class, DWithin.class,
+                    Equals.class, Intersects.class, Overlaps.class, Touches.class,
+                    Within.class };
+            
+            for (int i = 0; i < spatialOps.length; i++) {
+                if (spatialOps[i].isAssignableFrom(filter.getClass())) {
+                    if (!fcs.supports(spatialOps[i])) {
+                        postStack.push(filter);
+                        return;
+                    } else {
+                        //fcs supports this filter, no need to check the rest
+                        break;
+                    }
+                }
+            }
             
             // TODO check against tranasaction ?
 	
 	        int i = postStack.size();
-	        org.opengis.filter.expression.Expression leftGeometry = filter.getExpression1();
-	        //Expression leftGeometry = filter.getLeftGeometry();
-	        org.opengis.filter.expression.Expression rightGeometry = filter.getExpression2();
-	        //Expression rightGeometry = filter.getRightGeometry();
+            
+            Expression leftGeometry, rightGeometry;
+            leftGeometry = ((BinarySpatialOperator)filter).getExpression1();
+            rightGeometry = ((BinarySpatialOperator)filter).getExpression2();
+	        
 	        if( leftGeometry==null || rightGeometry==null ){
 	        	postStack.push(filter);
 	        	return;
 	        }
-			leftGeometry.accept(new FilterVisitorExpressionWrapper( this ), null );
+			leftGeometry.accept(this,null);
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
@@ -536,7 +555,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	            return;
 	        }
 	
-			rightGeometry.accept(new FilterVisitorExpressionWrapper( this ), null);
+            rightGeometry.accept(this,null);
 	
 	        if (i < postStack.size()) {
 	        	preStack.pop(); // left
@@ -550,58 +569,65 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
         	preStack.pop(); // right side
 	        preStack.push(filter);
 	    }
-	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LikeFilter)
-	     */
-	    public void visit(LikeFilter filter) {
+        
+	    public Object visit(PropertyIsLike filter, Object notUsed) {
 	        if( original==null )
 	        	original=filter;
 
-	        if (!fcs.supports( FilterCapabilities.LIKE) ) {
+	        if (!fcs.supports(PropertyIsLike.class) ) {
 	        	postStack.push(filter);
 	
-	            return;
+	            return null;
 	        }
 	
 	        int i = postStack.size();
-	        filter.getValue().accept(this);
+	        filter.getExpression().accept(this, null);
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
 	        	postStack.push(filter);
 	
-	            return;
+	            return null;
 	        }
             
         	preStack.pop(); // value
 	        preStack.push(filter);
+            return null;
 	    }
 	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LogicFilter)
-	     */
-	    public void visit(LogicFilter filter) {
+
+        public Object visit(And filter, Object notUsed) {
+            visitLogicOperator(filter);
+            return null;
+        }
+        public Object visit(Not filter, Object notUsed) {
+            visitLogicOperator(filter);
+            return null;
+        }
+        public Object visit(Or filter, Object notUsed) {
+            visitLogicOperator(filter);
+            return null;
+        }
+        
+	    private void visitLogicOperator(Filter filter) {
 	        if( original==null )
 	        	original=filter;
 
-	        if (!fcs.supports( FilterCapabilities.LOGICAL) ) {
+            
+	        if (!fcs.supports(Not.class)
+                    && !fcs.supports(And.class)
+                    && !fcs.supports(Or.class)) {
 	        	postStack.push(filter);
-	
 	            return;
 	        }
 
             int i = postStack.size();
             int j = preStack.size();
-	        if (filter.getFilterType() == FilterType.LOGIC_NOT) {
-	            // should only have one child
-	            Iterator it = filter.getFilterIterator();
-	
-	            if (it.hasNext()) {
-	                Filter next = (Filter) it.next();
-					(next).accept(this);
+	        if (filter instanceof Not) {
+                
+	            if (((Not)filter).getFilter() != null) {
+	                Filter next = ((Not)filter).getFilter();
+					next.accept(this, null);
 	                
 	                if (i < postStack.size()) {
 	                	// since and can split filter into both pre and post parts
@@ -617,12 +643,12 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	                }
 	            }
 	        } else {
-	            if (filter.getFilterType() == FilterType.LOGIC_OR) {
+	            if (filter instanceof Or) {
 	                Filter orReplacement;
 	
 	                try {
-	                    orReplacement = translateOr(filter);
-	                    orReplacement.accept(this);
+	                    orReplacement = translateOr((Or)filter);
+	                    orReplacement.accept(this, null);
 	                } catch (IllegalFilterException e) {
 	                	popToSize(preStack,j);
 	                	postStack.push(filter);
@@ -638,21 +664,21 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	                preStack.pop();
                 	preStack.push(filter);
 	            } else {
-	                // more than one child
-	                Iterator it = filter.getFilterIterator();
-	
+                    // it's an AND
+                    Iterator it = ((And)filter).getChildren().iterator();
+                    
 	                while (it.hasNext()) {
 	                    Filter next = (Filter) it.next();
-						(next).accept(this);
+						next.accept(this, null);
 	                }
 	
 	                //combine the unsupported and add to the top
 	                if (i < postStack.size()) {
-	                    if (filter.getFilterType() == FilterType.LOGIC_AND) {
+	                    if (filter instanceof And) {
 	                        Filter f = (Filter) postStack.pop();
 	
 	                        while (postStack.size() > i)
-	                            f= (Filter) f.and((Filter) postStack.pop());
+	                            f= ff.and(f, (Filter) postStack.pop());
 	
 	                        postStack.push(f);
 	                        
@@ -660,7 +686,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	                        	f = (Filter)preStack.pop();
 	                        	
 		                        while (preStack.size() > j)
-		                            f=(Filter) f.and((Filter) preStack.pop());
+		                            f=ff.and(f, (Filter) preStack.pop());
 		                        preStack.push(f);
 	                        }
 	                    } else {
@@ -686,22 +712,35 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 			}
 		}
 	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.NullFilter)
-	     */
-	    public void visit(NullFilter filter) {
+        public Object visitNullFilter(Object notUsed) {
+            return null;
+        }
+        
+        public Object visit(IncludeFilter filter, Object notUsed) {
+            return null;
+        }
+        
+        public Object visit(ExcludeFilter filter, Object notUsed) {
+            if (fcs.supports(Filter.EXCLUDE)) {
+                preStack.push(filter);
+            } else {
+                postStack.push(filter);
+            }
+            return null;
+        }
+
+	    public Object visit(PropertyIsNull filter, Object notUsed) {
 	        if( original==null )
 	        	original=filter;
 
-	        if (!fcs.supports( FilterCapabilities.NULL_CHECK) ) {
+	        if (!fcs.supports( PropertyIsNull.class) ) {
 	        	postStack.push(filter);
 	
-	            return;
+	            return null;
 	        }
 	
 	        int i = postStack.size();
-	        filter.getNullCheckValue().accept(this);
+	        ((PropertyIsNull)filter).getExpression().accept(this, null);
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
@@ -710,13 +749,12 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
             
         	preStack.pop(); // null
 	        preStack.push(filter);
+            
+            return null;
 	    }
 	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FidFilter)
-	     */
-	    public void visit(FidFilter filter) {
+
+	    public Object visit(Id filter, Object notUsed) {
 	        if( original==null )
 	        	original=filter;
 
@@ -726,21 +764,17 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	        	postStack.push(filter);
 	        }
 	        preStack.push(filter);
+            return null;
 	    }
-	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.AttributeExpression)
-	     */
-	    public void visit(AttributeExpression expression) {
+        
+	    public Object visit(PropertyName expression, Object notUsed) {
 	    	//JD: use an expression to get at the attribute type intead of accessing directly
-	    	//if (parent != null  && parent.getAttributeType(expression.getAttributePath()) == null) {
 	    	if (parent != null  && expression.evaluate( parent ) == null )  {
 	        	postStack.push(expression);
-	        	return;
+	        	return null;
 	        }
 	        if(transactionAccessor!=null){
-	        	Filter updateFilter= (Filter) transactionAccessor.getUpdateFilter(expression.getAttributePath());
+	        	Filter updateFilter= (Filter) transactionAccessor.getUpdateFilter(expression.getPropertyName());
 	        	if( updateFilter!=null ){
 	        		changedStack.add(updateFilter);
 	        		preStack.push(updateFilter);
@@ -749,48 +783,50 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	        } else{
 	        	preStack.push(expression);
 	        }
+            return null;
 	    }
-
-		/**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
-	     */
-	    public void visit(Expression expression) {
-	    	postStack.push(expression);
-            logger.warning(
-	            "@see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)");
-	    }
-	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.LiteralExpression)
-	     */
-	    public void visit(LiteralExpression expression) {
-	        if (expression.getLiteral() == null) {
+        
+	    public Object visit(Literal expression, Object notUsed) {
+	        if (expression.getValue() == null) {
 	        	postStack.push(expression);
 	        }
 	        preStack.push(expression);
+            return null;
 	    }
-	
-	    /**
-	     * 
-	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.MathExpression)
-	     */
-	    public void visit(MathExpression expression) {
-	        if (!fcs.supports( FilterCapabilities.SIMPLE_ARITHMETIC) ) {
+        
+        
+        public Object visit(Add filter, Object notUsed) {
+            visitMathExpression(filter);
+            return null;
+        }
+        public Object visit(Divide filter, Object notUsed) {
+            visitMathExpression(filter);
+            return null;
+        }
+        public Object visit(Multiply filter, Object notUsed) {
+            visitMathExpression(filter);
+            return null;
+        }
+        public Object visit(Subtract filter, Object notUsed) {
+            visitMathExpression(filter);
+            return null;
+        }
+        
+	    private void visitMathExpression(BinaryExpression expression) {
+	        if (!fcs.supports(Add.class) && !fcs.supports(Subtract.class)
+                    && !fcs.supports(Multiply.class) && !fcs.supports(Divide.class)) {
 	        	postStack.push(expression);
-	
 	            return;
 	        }
 	
 	        int i = postStack.size();
-	        Expression leftValue = expression.getLeftValue();
-	        Expression rightValue = expression.getRightValue();
+	        Expression leftValue = expression.getExpression1();
+	        Expression rightValue = expression.getExpression2();
 	        if( leftValue==null || rightValue==null ){
 	        	postStack.push(expression);
 	        	return;
 	        }
-	        leftValue.accept(this);
+	        leftValue.accept(this, null);
 	
 	        if (i < postStack.size()) {
 	        	postStack.pop();
@@ -799,7 +835,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	            return;
 	        }
 	
-	        rightValue.accept(this);
+	        rightValue.accept(this, null);
 	
 	        if (i < postStack.size()) {
 	        	preStack.pop(); // left
@@ -818,24 +854,22 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	     * 
 	     * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.FunctionExpression)
 	     */
-	    public void visit(FunctionExpression expression) {
-	        if (!fcs.supports( FilterCapabilities.FUNCTIONS) || !fcs.supports(expression.getClass()) ) {
+	    public Object visit(Function expression, Object notUsed) {
+	        if (!fcs.supports(expression.getClass()) ) {
 	        	postStack.push(expression);
-	
-	            return;
+                return null;
 	        }
 	
 	        if (expression.getName() == null) {
 	        	postStack.push(expression);
-	
-	            return;
+	            return null;
 	        }
 
 	        int i = postStack.size();
 	        int j = preStack.size();
 	
-	        for (int k = 0; k < expression.getArgCount(); k++) {
-	            expression.getArgs()[k].accept(this);
+	        for (int k = 0; k < expression.getParameters().size(); k++) {
+	            ((Expression)expression.getParameters().get(i)).accept(this, null);
 	
 	            if (i < postStack.size()) {
 	            	while(j<preStack.size())
@@ -843,23 +877,23 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	            	postStack.pop();
 	                postStack.push(expression);
 	
-	                return;
+	                return null;
 	            }
 	        }
             	while(j<preStack.size())
             		preStack.pop();
 	        preStack.push(expression);
+            return null;
+	    }
+        
+	    public Object visit(NilExpression nilExpression, Object notUsed) {
+            postStack.push(nilExpression);
+	        return null;
 	    }
 	
-	    /**
-	     * 
-	     * @param filter
-	     * @return Or Filter
-	     * @throws IllegalFilterException
-	     */
-	    public Filter translateOr(LogicFilter filter)
+	    private Filter translateOr(Or filter)
 	        throws IllegalFilterException {
-	        if (filter.getFilterType() != FilterType.LOGIC_OR) {
+	        if (!(filter instanceof Or)) {
 	            return filter;
 	        }
 	
@@ -867,35 +901,35 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
 	        // ~(a|b) == (~a + ~b) modus ponens
 	        // ~~(a|b) == ~(~a + ~b) substitution
 	        // a|b == ~(~a + ~b) negative simpilification
-	        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-	        LogicFilter and = ff.createLogicFilter(FilterType.LOGIC_AND);
-	        Iterator i = filter.getFilterIterator();
+	        Iterator i = filter.getChildren().iterator();
+            Filter and = ff.and(new ArrayList());
 	
 	        while (i.hasNext()) {
 	            Filter f = (Filter) i.next();
 	
-	            if (f.getFilterType() == FilterType.LOGIC_NOT) {
+	            if (f instanceof Not) {
 	                // simplify it 
-                    LogicFilter logic = (LogicFilter) f;
-                    Filter next = (Filter) logic.getFilterIterator().next();
-	                and.addFilter((org.opengis.filter.Filter) next );
+                    Not logic = (Not) f;
+                    Filter next = logic.getFilter();
+                    and = ff.and(and, next);
 	            } else {
-	                and.addFilter(f.not());
+	                and = ff.and(and,ff.not(f));
 	            }
 	        }
 	
-	        return (Filter) and.not();
+	        return ff.not(and);
 	    }
 
-    public static class WFSBBoxFilterVisitor implements FilterVisitor{
+    public static class WFSBBoxFilterVisitor implements org.geotools.filter.FilterVisitor {
         Envelope maxbbox;
-        public WFSBBoxFilterVisitor(Envelope fsd){
+        public WFSBBoxFilterVisitor(Envelope fsd) {
             maxbbox = fsd;
-        }public void visit(Filter filter) {
+        }
+        public void visit(org.geotools.filter.Filter filter) {
             if (org.geotools.filter.Filter.NONE == filter) {
                 return;
             }
-                switch (filter.getFilterType()) {
+                switch (((org.geotools.filter.Filter)filter).getFilterType()) {
                 case FilterType.BETWEEN:
                     visit((BetweenFilter) filter);
     
@@ -980,8 +1014,8 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
          */
         public void visit( GeometryFilter filter ) {
             if(filter!=null){
-                Expression leftGeometry = filter.getLeftGeometry();
-				Expression rightGeometry = filter.getRightGeometry();
+                org.geotools.filter.Expression leftGeometry = filter.getLeftGeometry();
+                org.geotools.filter.Expression rightGeometry = filter.getRightGeometry();
 				switch (filter.getFilterType()) {
                 
                             case FilterType.GEOMETRY_BBOX:
@@ -1070,7 +1104,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
             if(filter!=null){
                 Iterator i = filter.getFilterIterator();
                 while(i.hasNext()){
-                    Filter tmp = (Filter)i.next();
+                    org.geotools.filter.Filter tmp = (org.geotools.filter.Filter)i.next();
                     tmp.accept(this);
                 }
             }
@@ -1099,7 +1133,7 @@ public class PostPreProcessFilterSplittingVisitor implements FilterVisitor, Filt
         /*
          * @see org.geotools.filter.FilterVisitor#visit(org.geotools.filter.Expression)
          */
-        public void visit( Expression expression ) {
+        public void visit( org.geotools.filter.Expression expression ) {
             // do nothing
         }
         /*

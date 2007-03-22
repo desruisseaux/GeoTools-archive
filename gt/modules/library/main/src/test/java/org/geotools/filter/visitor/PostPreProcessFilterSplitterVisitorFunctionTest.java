@@ -15,11 +15,12 @@
  */
 package org.geotools.filter.visitor;
 
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
+import java.util.Arrays;
+
 import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.Expression;
 import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterType;
 import org.geotools.filter.function.FilterFunction_geometryType;
 import org.geotools.filter.function.math.FilterFunction_abs;
 
@@ -30,28 +31,33 @@ import org.geotools.filter.function.math.FilterFunction_abs;
  *
  */
 public class PostPreProcessFilterSplitterVisitorFunctionTest extends AbstractPostPreProcessFilterSplittingVisitorTests {
+    
+    PostPreProcessFilterSplittingVisitor visitor;
 
 	public void testSupportAll() throws Exception {
-		CompareFilter filter1 = createFunctionFilter();
-		CompareFilter filter2 = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
-		filter2.addLeftValue(filterFactory.createAttributeExpression("name"));
+        
+		PropertyIsEqualTo filter1 = createFunctionFilter();
 		FilterFunction_abs filterFunction_abs = new FilterFunction_abs();
-		filterFunction_abs.setArgs(new Expression[]{filterFactory.createAttributeExpression("name")});
-		filter2.addRightValue(filterFunction_abs);
+		filterFunction_abs.setParameters(Arrays.asList(new Expression[]{ff.property("name")}));
+        PropertyIsEqualTo filter2 = ff.equals(ff.property("name"), filterFunction_abs);
 		
-		Filter filter=filter1.and(filter2);
+		Filter filter=ff.and(filter1,filter2);
 
-        ((org.geotools.filter.Filter)filter).accept(visitor);
+        visitor = newVisitor(new FilterCapabilities());
+        filter.accept(visitor, null);
 		
 		assertEquals(Filter.INCLUDE, visitor.getFilterPre());
 		assertEquals(filter, visitor.getFilterPost());
+        
+        FilterCapabilities filterCapabilitiesMask = new FilterCapabilities();
 
 		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
 		filterCapabilitiesMask.addType(FilterFunction_abs.class);
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL);
-		visitor=newVisitor();
+		filterCapabilitiesMask.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
+        filterCapabilitiesMask.addAll(FilterCapabilities.LOGICAL_OPENGIS);
+		visitor=newVisitor(filterCapabilitiesMask);
 
-        ((org.geotools.filter.Filter)filter).accept(visitor);
+        filter.accept(visitor, null);
 		
 		assertEquals(Filter.INCLUDE, visitor.getFilterPost());
 		assertEquals(filter, visitor.getFilterPre());
@@ -59,19 +65,20 @@ public class PostPreProcessFilterSplitterVisitorFunctionTest extends AbstractPos
 
 	public void testSupportOnlySome() throws Exception {
 
-		CompareFilter filter1 = createFunctionFilter();
-		CompareFilter filter2 = filterFactory.createCompareFilter(FilterType.COMPARE_EQUALS);
-		filter2.addLeftValue(filterFactory.createAttributeExpression("name"));
-		FilterFunction_abs filterFunction_abs = new FilterFunction_abs();
-		filterFunction_abs.setArgs(new Expression[]{filterFactory.createAttributeExpression("name")});
-		filter2.addRightValue(filterFunction_abs);
-		
-		Filter filter=filter1.and(filter2);
-		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
-		filterCapabilitiesMask.addType(FilterCapabilities.SIMPLE_COMPARISONS|FilterCapabilities.LOGICAL);
-		visitor=newVisitor();
+        PropertyIsEqualTo filter1 = createFunctionFilter();
+        FilterFunction_abs filterFunction_abs = new FilterFunction_abs();
+        filterFunction_abs.setParameters(Arrays.asList(new Expression[]{ff.property("name")}));
+        PropertyIsEqualTo filter2 = ff.equals(ff.property("name"), filterFunction_abs);
+        
+        Filter filter=ff.and(filter1,filter2);
 
-        ((org.geotools.filter.Filter)filter).accept(visitor);
+        FilterCapabilities filterCapabilitiesMask = new FilterCapabilities();
+		filterCapabilitiesMask.addType(FilterFunction_geometryType.class);
+		filterCapabilitiesMask.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
+        filterCapabilitiesMask.addAll(FilterCapabilities.LOGICAL_OPENGIS);
+		visitor=newVisitor(filterCapabilitiesMask);
+
+        filter.accept(visitor, null);
 		
 		assertEquals(filter1, visitor.getFilterPre());
 		assertEquals(filter2, visitor.getFilterPost());
