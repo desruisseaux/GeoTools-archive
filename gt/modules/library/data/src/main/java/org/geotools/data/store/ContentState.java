@@ -71,7 +71,7 @@ public abstract class ContentState {
     final public void put( Object key, Object value ){
         cache.put( key, value );
     }
-    /** Retrive a value from the cache (or null) */
+    /** Retrieve a value from the cache (or null) */
     final public Object get( Object key ){
         return cache.get( key );
     }

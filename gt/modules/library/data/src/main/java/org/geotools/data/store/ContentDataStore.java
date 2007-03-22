@@ -54,7 +54,7 @@ import org.opengis.filter.sort.SortBy;
  * everything from sorting to reprojection and the various retyping operations.
  * </p>
  * <p>
- * A subclass has the following responsibility / operatunities:
+ * A subclass has the following responsibility / opportunities:
  * <ul>
  * <li>Provide an implementation of "Content" teaching the ContentDataStore
  * <li>Additional methods as needs or interest dictate
