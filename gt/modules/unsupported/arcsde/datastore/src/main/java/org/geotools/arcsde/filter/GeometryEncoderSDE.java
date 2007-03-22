@@ -23,22 +23,38 @@ import java.util.logging.Logger;
 import org.geotools.arcsde.data.ArcSDEGeometryBuilder;
 import org.geotools.arcsde.data.ArcSDEGeometryBuildingException;
 import org.geotools.data.DataSourceException;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.BetweenFilter;
-import org.geotools.filter.CompareFilter;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
 import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.Filters;
-import org.geotools.filter.FunctionExpression;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LikeFilter;
-import org.geotools.filter.LiteralExpression;
-import org.geotools.filter.LogicFilter;
-import org.geotools.filter.MathExpression;
-import org.geotools.filter.NullFilter;
+import org.opengis.filter.And;
+import org.opengis.filter.ExcludeFilter;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Id;
+import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.Not;
+import org.opengis.filter.Or;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
@@ -67,7 +83,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author Gabriel Rold?n
  * @source $URL$
  */
-public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
+public class GeometryEncoderSDE implements FilterVisitor {
     /** Standard java logger */
     private static Logger log = Logger.getLogger("org.geotools.filter");
 
@@ -75,14 +91,14 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
     private static FilterCapabilities capabilities = new FilterCapabilities();
 
     static {
-        capabilities.addType(FilterType.GEOMETRY_BBOX);
-        capabilities.addType(FilterType.GEOMETRY_CONTAINS);
-        capabilities.addType(FilterType.GEOMETRY_CROSSES);
-        capabilities.addType(FilterType.GEOMETRY_DISJOINT);
-        capabilities.addType(FilterType.GEOMETRY_EQUALS);
-        capabilities.addType(FilterType.GEOMETRY_INTERSECTS);
-        capabilities.addType(FilterType.GEOMETRY_OVERLAPS);
-        capabilities.addType(FilterType.GEOMETRY_WITHIN);
+        capabilities.addType(BBOX.class);
+        capabilities.addType(Contains.class);
+        capabilities.addType(Crosses.class);
+        capabilities.addType(Disjoint.class);
+        capabilities.addType(Equals.class);
+        capabilities.addType(Intersects.class);
+        capabilities.addType(Overlaps.class);
+        capabilities.addType(Within.class);
     }
 
     /** DOCUMENT ME! */
@@ -161,84 +177,47 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
         	return;
         }
         if (capabilities.fullySupports(filter)) {
-            Filters.accept( filter, this );
+            filter.accept(this, null);
         } else {
-            throw new GeometryEncoderException("Filter type not supported");
+            throw new GeometryEncoderException("Filter type " + filter.getClass() + " not supported");
         }
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     *
-     * @throws RuntimeException DOCUMENT ME!
+     * This is an internal handler so all the logic is in one place.  The actual
+     * methods that call back to this method are the ones specified in the FilterVisitor
+     * interface
      */
-    public void visit(GeometryFilter filter) {
+    private Object visit(BinarySpatialOperator filter, Object extraData) {
         try {
-            switch (filter.getFilterType()) {
-            case FilterType.GEOMETRY_BBOX:
-                addSpatialFilter(filter, SeFilter.METHOD_ENVP, true);
-
-                break;
-
-            case FilterType.GEOMETRY_CONTAINS:
-                addSpatialFilter(filter, SeFilter.METHOD_PC, true);
-
-                break;
-
-            case FilterType.GEOMETRY_CROSSES:
-                addSpatialFilter(filter, SeFilter.METHOD_LCROSS_OR_CP, true);
-
-                break;
-
-            case FilterType.GEOMETRY_DISJOINT:
-                addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, false);
-
-                break;
-
-            case FilterType.GEOMETRY_EQUALS:
-                addSpatialFilter(filter, SeFilter.METHOD_IDENTICAL, true);
-
-                break;
-
-            case FilterType.GEOMETRY_INTERSECTS:
-                addSpatialFilter(filter, SeFilter.METHOD_II_OR_ET, true);
-
-                break;
-
-            case FilterType.GEOMETRY_OVERLAPS:
-                addSpatialFilter(filter, SeFilter.METHOD_II, true);
-                addSpatialFilter(filter, SeFilter.METHOD_PC, false);
-                addSpatialFilter(filter, SeFilter.METHOD_SC, false);
-
-                break;
-
-            case FilterType.GEOMETRY_WITHIN:
-                addSpatialFilter(filter, SeFilter.METHOD_SC, true);
-
-                break;
-
-            default: {
+            if (filter instanceof BBOX) {
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_ENVP, true);
+            } else if (filter instanceof Contains) {
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_PC, true);
+            } else if (filter instanceof Crosses) {
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_LCROSS_OR_CP, true);
+            } else if (filter instanceof Disjoint) {
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_II_OR_ET, false);
+            } else if (filter instanceof Equals) {
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_IDENTICAL, true);
+            } else if (filter instanceof Intersects) {
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_II_OR_ET, true);
+            } else if (filter instanceof Overlaps) {
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_II, true);
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_PC, false);
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_SC, false);
+            } else if (filter instanceof Within) {
+                addSpatialFilter((BinarySpatialOperator)filter, SeFilter.METHOD_SC, true);
+            } else {
                 // This shouldn't happen since we will have pulled out
                 // the unsupported parts before invoking this method
                 String msg = "unsupported filter type";
                 log.warning(msg);
             }
-            }
         } catch (Exception e) {
             throw new RuntimeException("Error building SeFilter", e);
         }
-    }
-
-    /**
-     * This only exists the fulfill the interface - unless There is a way of
-     * determining the FID column in the database...
-     *
-     * @param filter the Fid Filter.
-     */
-    public void visit(FidFilter filter) {
-    	//intentionally blank
+        return extraData;
     }
 
     /**
@@ -252,32 +231,43 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
      * @throws DataSourceException DOCUMENT ME!
      * @throws GeometryBuildingException DOCUMENT ME!
      */
-    private void addSpatialFilter(GeometryFilter filter, int sdeMethod,
+    private void addSpatialFilter(BinarySpatialOperator filter, int sdeMethod,
         boolean truth)
         throws SeException, DataSourceException, ArcSDEGeometryBuildingException {
-
-        AttributeExpression attExpr;
-        LiteralExpression geomExpr;
-        Expression left = filter.getLeftGeometry();
-        Expression right = filter.getRightGeometry();
-        if (left instanceof AttributeExpression &&
-            right instanceof LiteralExpression) {
-            attExpr = (AttributeExpression) left;
-            geomExpr = (LiteralExpression) right;
-        } else if (right instanceof AttributeExpression &&
-                   left instanceof LiteralExpression) {
-            attExpr = (AttributeExpression) right;
-            geomExpr = (LiteralExpression) left;
+        
+        
+        org.opengis.filter.expression.Expression left, right;
+        PropertyName propertyExpr;
+        Literal geomLiteralExpr;
+        
+        left = filter.getExpression1();
+        right = filter.getExpression2();
+        if (left instanceof PropertyName &&
+            right instanceof Literal) {
+            propertyExpr = (PropertyName)left;
+            geomLiteralExpr = (Literal)right;
+        } else if (right instanceof PropertyName &&
+                   left instanceof Literal) {
+            propertyExpr = (PropertyName) right;
+            geomLiteralExpr = (Literal) left;
         } else {
             String err = "SDE currently supports one geometry and one " +
                 "attribute expr.  You gave: " + left + ", " + right;
             throw new DataSourceException(err);
-	}
+        }
    
         // Should probably assert that attExpr's property name is equal to
         // spatialCol...
         String spatialCol = this.sdeLayer.getSpatialColumn();
-        Geometry geom = (Geometry) geomExpr.getLiteral();
+        if (!propertyExpr.getPropertyName().equalsIgnoreCase(spatialCol)) {
+            throw new DataSourceException("When querying against a spatial " +
+                    "column, your property name must match the spatial" +
+                    " column name.You used '" +
+                    propertyExpr.getPropertyName() +
+                    "', but the DB's spatial column name is '" +
+                    spatialCol + "'");
+        }
+        Geometry geom = (Geometry) geomLiteralExpr.getValue();
 
         // To prevent errors in ArcSDE, we first trim the user's Filter
         // geometry to the extents of our layer.
@@ -312,126 +302,89 @@ public class GeometryEncoderSDE implements org.geotools.filter.FilterVisitor {
         this.sdeSpatialFilters.add(shapeFilter);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     */
-    public void visit(org.geotools.filter.Filter filter) {
-    	//intentionally blank
+    
+    // The Spatial Operator methods (these call to the above visit() method
+    public Object visit(BBOX arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     */
-    public void visit(BetweenFilter filter) {
-    	//intentionally blank
+    public Object visit(Beyond arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     */
-    public void visit(CompareFilter filter) {
-//    	intentionally blank
+    public Object visit(Contains arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     */
-    public void visit(LikeFilter filter) {
-//    	intentionally blank
+    public Object visit(Crosses arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     */
-    public void visit(LogicFilter filter) {
-        log.finer("exporting LogicFilter");
-
-        /*
-           filter.getFilterType();
-           String type = (String) logical.get(new Integer(filter.getFilterType()));
-           try {
-               java.util.Iterator list = filter.getFilterIterator();
-               if (filter.getFilterType() == AbstractFilter.LOGIC_NOT) {
-                   out.write(" NOT (");
-                   ((AbstractFilter) list.next()).accept(this);
-                   out.write(")");
-               } else { //AND or OR
-                   out.write("(");
-                   while (list.hasNext()) {
-                       ((AbstractFilter) list.next()).accept(this);
-                       if (list.hasNext()) {
-                           out.write(" " + type + " ");
-                       }
-                   }
-                   out.write(")");
-               }
-           } catch (java.io.IOException ioe) {
-               throw new RuntimeException(IO_ERROR, ioe);
-           }
-         */
+    public Object visit(Disjoint arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param filter DOCUMENT ME!
-     */
-    public void visit(NullFilter filter) {
-//    	intentionally blank
+    public Object visit(DWithin arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param expression DOCUMENT ME!
-     */
-    public void visit(AttributeExpression expression) {
-//    	intentionally blank
+    public Object visit(Equals arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param expression DOCUMENT ME!
-     */
-    public void visit(Expression expression) {
-//    	intentionally blank
+    public Object visit(Intersects arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param expression DOCUMENT ME!
-     */
-    public void visit(LiteralExpression expression) {
-//    	intentionally blank
+    public Object visit(Overlaps arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param expression DOCUMENT ME!
-     */
-    public void visit(MathExpression expression) {
-//    	intentionally blank
+    public Object visit(Within arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param expression DOCUMENT ME!
-     */
-    public void visit(FunctionExpression expression) {
-//    	intentionally blank
+    public Object visit(Touches arg0, Object arg1) {
+        return visit((BinarySpatialOperator)arg0, arg1);
+    }
+    
+    //These are the 'just to implement the interface' methods.
+    public Object visit(Id filter, Object extraData) {
+        return extraData;
+    }
+    public Object visit(And arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(ExcludeFilter arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(IncludeFilter arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(Not arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(Or arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsBetween arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsEqualTo arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsGreaterThan arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsGreaterThanOrEqualTo arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsLessThan arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsLessThanOrEqualTo arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsLike arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsNotEqualTo arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visit(PropertyIsNull arg0, Object arg1) {
+        return arg1;
+    }
+    public Object visitNullFilter(Object arg0) {
+        return arg0;
     }
 }

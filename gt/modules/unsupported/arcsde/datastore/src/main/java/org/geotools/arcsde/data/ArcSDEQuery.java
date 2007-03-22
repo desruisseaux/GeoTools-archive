@@ -30,12 +30,12 @@ import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
+import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.SchemaException;
+import org.geotools.filter.visitor.PostPreProcessFilterSplittingVisitor;
 import org.opengis.filter.Filter;
-import org.geotools.filter.SQLEncoderException;
-import org.geotools.filter.SQLUnpacker;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeException;
@@ -246,7 +246,7 @@ class ArcSDEQuery {
         }
         
         if (!hasFIDColumn) {
-        	LOGGER.info("No FID attribute was contained in your query.  Appending the discovered one to the list of columns to be fetched.");
+        	LOGGER.fine("No FID attribute was contained in your query.  Appending the discovered one to the list of columns to be fetched.");
         	for (int i = 0; i < schema.getAttributeCount(); i++) {
         		AttributeType type = schema.getAttributeType(i);
             	if (type instanceof ArcSDEAttributeType) {
@@ -283,7 +283,7 @@ class ArcSDEQuery {
         throws NoSuchElementException, IOException {
         SeLayer sdeLayer = store.getConnectionPool().getSdeLayer(typeName);
         ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeLayer,
-                filter);
+                filter, store.getSchema(typeName));
 
         return filters;
     }
@@ -908,6 +908,8 @@ class ArcSDEQuery {
          * natively.
          */
         private SeSqlConstruct sdeSqlConstruct;
+        
+        private FeatureType featureType;
 
         /**
          * Creates a new FilterSet object.
@@ -915,9 +917,10 @@ class ArcSDEQuery {
          * @param sdeLayer DOCUMENT ME!
          * @param sourceFilter DOCUMENT ME!
          */
-        public FilterSet(SeLayer sdeLayer, Filter sourceFilter) {
+        public FilterSet(SeLayer sdeLayer, Filter sourceFilter, FeatureType ft) {
             this.sdeLayer = sdeLayer;
             this.sourceFilter = sourceFilter;
+            this.featureType = ft;
             createGeotoolsFilters();
         }
 
@@ -930,27 +933,26 @@ class ArcSDEQuery {
          */
         private void createGeotoolsFilters() {
             /** DOCUMENT ME! */
-            SQLEncoderSDE sqlEncoder = new SQLEncoderSDE(this.sdeLayer);
+            SQLEncoderSDE sqlEncoder = new SQLEncoderSDE(this.sdeLayer, featureType);
+            
+            PostPreProcessFilterSplittingVisitor unpacker = new PostPreProcessFilterSplittingVisitor(sqlEncoder.getCapabilities(), featureType, null);
+            sourceFilter.accept(unpacker, null);
 
-            SQLUnpacker unpacker = new SQLUnpacker(sqlEncoder.getCapabilities());
-
-            unpacker.unPackAND(this.sourceFilter);
-
-            this.sqlFilter = unpacker.getSupported();
+            this.sqlFilter = unpacker.getFilterPre();
             
             if (LOGGER.isLoggable(Level.FINE) && sqlFilter != null)
             	LOGGER.fine("SQL portion of SDE Query: '" + sqlFilter + "'");
 
-            Filter remainingFilter = unpacker.getUnSupported();
+            Filter remainingFilter = unpacker.getFilterPost();
 
-            unpacker = new SQLUnpacker(GeometryEncoderSDE.getCapabilities());
-            unpacker.unPackAND(remainingFilter);
+            unpacker = new PostPreProcessFilterSplittingVisitor(GeometryEncoderSDE.getCapabilities(), featureType, null);
+            remainingFilter.accept(unpacker, null);
 
-            this.geometryFilter = unpacker.getSupported();
+            this.geometryFilter = unpacker.getFilterPre();
             if (LOGGER.isLoggable(Level.FINE) && geometryFilter != null)
             	LOGGER.fine("Spatial-Filter portion of SDE Query: '" + geometryFilter + "'");
             
-            this.unsupportedFilter = unpacker.getUnSupported();
+            this.unsupportedFilter = unpacker.getFilterPost();
             if (LOGGER.isLoggable(Level.FINE) && unsupportedFilter != null)
             	LOGGER.fine("Unsupported (and therefore ignored) portion of SDE Query: '" + unsupportedFilter + "'");
         }
@@ -980,15 +982,16 @@ class ArcSDEQuery {
 
                 if (!Filter.INCLUDE.equals(sqlFilter)) {
                     String whereClause = null;
-                    SQLEncoderSDE sqlEncoder = new SQLEncoderSDE(this.sdeLayer);
+                    SQLEncoderSDE sqlEncoder = new SQLEncoderSDE(this.sdeLayer, featureType);
 
                     try {
-                        whereClause = sqlEncoder.encode(sqlFilter);
-                    } catch (SQLEncoderException sqle) {
+                        whereClause = sqlEncoder.encodeToString(sqlFilter);
+                    } catch (FilterToSQLException sqle) {
                         String message = "Geometry encoder error: "
                             + sqle.getMessage();
                         throw new DataSourceException(message, sqle);
                     }
+                    LOGGER.fine("ArcSDE where clause '" + whereClause + "'");
 
                     this.sdeSqlConstruct.setWhere(whereClause);
                 }

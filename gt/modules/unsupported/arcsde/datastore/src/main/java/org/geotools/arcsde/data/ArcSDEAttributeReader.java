@@ -47,12 +47,7 @@ class ArcSDEAttributeReader implements AttributeReader {
 	/** schema of the features this attribute reader iterates over */
 	private FeatureType schema;
 
-	/** current sde java api row being read */
-
-	// private SeRow currentRow;
-	/** the sde java api shape of the current row */
-
-	// private SeShape currentShape;
+	/** the current values being read */
 	private Object[] currentValues;
 
 	/**
@@ -177,10 +172,6 @@ class ArcSDEAttributeReader implements AttributeReader {
 					this.query.close();
 					this.currentValues = null;
 				} else {
-					// number of attributes as defined in the queried
-					// featuretype
-					int attCount = this.schema.getAttributeCount();
-
 					// actual number of columns returned. Can be 1 more then
 					// attCount. In this case, it means the discovered FID column
 					// wasn't included in the query and was added as the final column.
@@ -209,13 +200,13 @@ class ArcSDEAttributeReader implements AttributeReader {
 							}
 						}
 
-						if (value instanceof SeShape) {
-							SeShape shape = (SeShape) value;
-							value = this.geometryBuilder.construct(shape);
-							this.currentValues[i] = value;
-						} else {
-							this.currentValues[i] = value;
-						}
+                        if (schema.getAttributeType(i) instanceof GeometryAttributeType) {
+                            SeShape shape = (SeShape) value;
+                            value = this.geometryBuilder.construct(shape);
+                            this.currentValues[i] = value;
+                        } else {
+                            this.currentValues[i] = value;
+                        }
 					}
 				}
 			} catch (SeException ex) {

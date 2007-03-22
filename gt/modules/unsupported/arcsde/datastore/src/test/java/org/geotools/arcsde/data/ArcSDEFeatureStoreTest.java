@@ -384,7 +384,7 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         atts[0] = new ArcSDEAttributeType(AttributeTypeFactory.newAttributeType("OBJECTID", Integer.class, false));
         ((ArcSDEAttributeType)atts[0]).setFeatureIDAttribute(true);
         try {
-            atts[1] = new GeometricAttributeType("SHAPE", MultiLineString.class, true, null, CRS.decode("EPSG:4326"), null);
+            atts[1] = new GeometricAttributeType("SHAPE", MultiLineString.class, true, null, null, null);
         } catch (Exception ie) {
             throw new RuntimeException(ie);
         }

@@ -51,6 +51,7 @@ import com.esri.sde.sdk.client.SeCoordinateReference;
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeExtent;
 import com.esri.sde.sdk.client.SeLayer;
+import com.esri.sde.sdk.client.SeRegistration;
 import com.esri.sde.sdk.client.SeTable;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -362,6 +363,17 @@ class ArcSDEDataStore extends AbstractDataStore {
             LOGGER.info("deleting the 'workaround' column...");
             table.dropColumn(HACK_COL_NAME);
             LOGGER.info("Schema correctly created: " + featureType);
+            
+            SeRegistration reg = new SeRegistration(connection, table.getName());
+            String rowIdColumnName = ArcSDEAdapter.getRowIdColumn(featureType);
+            if (rowIdColumnName != null) {
+                LOGGER.fine("setting rowIdColumnName to " + rowIdColumnName + " in table " + reg.getTableName());
+                reg.setRowIdColumnName(rowIdColumnName);
+                reg.setRowIdColumnType(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE);
+                reg.alter();
+                reg = null;
+            }
+            
         } catch (SeException e) {
             LOGGER.log(Level.WARNING, e.getSeError().getErrDesc(), e);
             throw new DataSourceException(e.getMessage(), e);
@@ -394,7 +406,7 @@ class ArcSDEDataStore extends AbstractDataStore {
         SeTable table;
         final SeColumnDefinition[] tmpCol = {
                 new SeColumnDefinition(hackColName,
-                    SeColumnDefinition.TYPE_SMALLINT, 4, 0, true)
+                    SeColumnDefinition.TYPE_STRING, 4, 0, true)
             };
         table = new SeTable(connection, qualifiedName);
 

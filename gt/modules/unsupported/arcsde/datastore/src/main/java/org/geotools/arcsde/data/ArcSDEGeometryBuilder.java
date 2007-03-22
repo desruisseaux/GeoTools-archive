@@ -155,10 +155,13 @@ public abstract class ArcSDEGeometryBuilder {
 	 *             <code>com.vividsolutions.jts.geom.Coordinate[]</code>
 	 *             provided by <code>newGeometry</code>
 	 */
-	public Geometry construct(SeShape shape) throws SeException,
-			DataSourceException {
-		return shape.isNil() ? getEmpty() : newGeometry(shape.getAllCoords());
-	}
+    public Geometry construct(SeShape shape) throws SeException, DataSourceException {
+        if (shape == null || shape.isNil()) {
+            return getEmpty();
+        } else {
+            return newGeometry(shape.getAllCoords());
+        }
+    }
 
 	/**
 	 * Creates the ArcSDE Java API representation of a <code>Geometry</code>

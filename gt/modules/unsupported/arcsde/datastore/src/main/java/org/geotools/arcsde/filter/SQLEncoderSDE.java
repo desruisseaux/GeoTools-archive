@@ -16,17 +16,23 @@
  */
 package org.geotools.arcsde.filter;
 
-import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geotools.arcsde.data.ArcSDEAdapter;
-import org.geotools.filter.AttributeExpression;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
+import org.geotools.data.jdbc.FilterToSQL;
+import org.geotools.data.jdbc.FilterToSQLException;
+import org.geotools.feature.FeatureType;
 import org.geotools.filter.FilterCapabilities;
-import org.geotools.filter.SQLEncoder;
-import org.geotools.filter.SQLEncoderException;
+import org.opengis.filter.ExcludeFilter;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterVisitor;
+import org.opengis.filter.Id;
+import org.opengis.filter.IncludeFilter;
+import org.opengis.filter.PropertyIsBetween;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Expression;
 
 import com.esri.sde.sdk.client.SeException;
 import com.esri.sde.sdk.client.SeLayer;
@@ -50,8 +56,8 @@ import com.esri.sde.sdk.client.SeLayer;
  * @see org.geotools.data.sde.GeometryEncoderSDE
  * @source $URL$
  */
-public class SQLEncoderSDE extends SQLEncoder
-    implements org.geotools.filter.FilterVisitor {
+public class SQLEncoderSDE extends FilterToSQL
+    implements FilterVisitor {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
@@ -67,18 +73,20 @@ public class SQLEncoderSDE extends SQLEncoder
 
     /**
      */
-    public SQLEncoderSDE(SeLayer layer) {
+    public SQLEncoderSDE(SeLayer layer, FeatureType ft) {
         this.sdeLayer = layer;
+        this.featureType = ft;
     }
 
     /**
-     * Overrides the superclass implementation to fully qualify
-     *
-     * @param expression DOCUMENT ME!
-     *
-     * @throws RuntimeException DOCUMENT ME!
+     * Called directly before visiting an appropriate expression, this
+     * method adds the SDE qualified name before the expression's DB
+     * name gets written.
+     * 
+     * So the filter [ MYFIELD = MYVALUE ] gets written as
+     * MYUSER.MYTABLE.MYFIELD = ... instead.
      */
-    public void visit(AttributeExpression expression) throws RuntimeException {
+    private void qualifyExpression(Expression expression) throws RuntimeException {
         try {
         	this.out.write(this.sdeLayer.getQualifiedName());
         	this.out.write('.');
@@ -87,8 +95,6 @@ public class SQLEncoderSDE extends SQLEncoder
         } catch (SeException see) {
             throw new RuntimeException("SDE problems writing attribute exp", see);
         }
-
-        super.visit(expression);
     }
 
     /**
@@ -100,14 +106,14 @@ public class SQLEncoderSDE extends SQLEncoder
     protected FilterCapabilities createFilterCapabilities() {
         FilterCapabilities capabilities = new FilterCapabilities();
 
-        capabilities.addType(FilterCapabilities.LOGICAL);
-        capabilities.addType(FilterCapabilities.SIMPLE_COMPARISONS);
-        capabilities.addType(FilterCapabilities.NULL_CHECK);
-        capabilities.addType(FilterCapabilities.BETWEEN);
-        capabilities.addType(FilterCapabilities.FID);
-        capabilities.addType(FilterCapabilities.NONE);
-        capabilities.addType(FilterCapabilities.ALL);
-        capabilities.addType(FilterCapabilities.LIKE);
+        capabilities.addAll(FilterCapabilities.LOGICAL_OPENGIS);
+        capabilities.addAll(FilterCapabilities.SIMPLE_COMPARISONS_OPENGIS);
+        capabilities.addType(PropertyIsNull.class);
+        capabilities.addType(PropertyIsBetween.class);
+        capabilities.addType(Id.class);
+        capabilities.addType(IncludeFilter.class);
+        capabilities.addType(ExcludeFilter.class);
+        capabilities.addType(PropertyIsLike.class);
 
         return capabilities;
     }
@@ -129,14 +135,13 @@ public class SQLEncoderSDE extends SQLEncoder
      * @param out DOCUMENT ME!
      * @param filter DOCUMENT ME!
      *
-     * @throws SQLEncoderException DOCUMENT ME!
+     * @throws GeoAPIFilterToSQLEncoderException DOCUMENT ME!
      */
-    public void encode(Writer out, Filter filter) throws SQLEncoderException {
+    public void encode(Filter filter) throws FilterToSQLException {
         if (getCapabilities().fullySupports(filter)) {
-            this.out = out;
-            filter.accept(this);
+            filter.accept(this, null);
         } else {
-            throw new SQLEncoderException("Filter type not supported");
+            throw new FilterToSQLException("Filter type not supported");
         }
     }
 
@@ -148,15 +153,18 @@ public class SQLEncoderSDE extends SQLEncoder
      *
      * @throws RuntimeException DOCUMENT ME!
      */
-    public void visit(FidFilter filter) {
-        long[] fids = ArcSDEAdapter.getNumericFids(filter.getFids());
+    public Object visit(Id filter, Object unused) {
+        long[] fids = ArcSDEAdapter.getNumericFids(filter.getIdentifiers());
         int nFids = fids.length;
 
         if (nFids == 0) {
-            return;
+            return unused;
         }
 
-        String fidField = this.sdeLayer.getSpatialColumn();
+        String fidField = ArcSDEAdapter.getRowIdColumn(featureType);
+        if (fidField == null) { 
+            fidField = this.sdeLayer.getSpatialColumn();
+        }
 
         try {
             StringBuffer sb = new StringBuffer();
@@ -176,10 +184,10 @@ public class SQLEncoderSDE extends SQLEncoder
                 LOGGER.finer("added fid filter: " + sb.toString());
             }
 
-            //System.err.println("QUERY: " + sb.toString());
             this.out.write(sb.toString());
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage(), ex);
         }
+        return unused;
     }
 }

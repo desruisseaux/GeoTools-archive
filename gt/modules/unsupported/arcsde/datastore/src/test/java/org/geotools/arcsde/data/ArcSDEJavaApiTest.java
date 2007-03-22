@@ -263,13 +263,12 @@ public class ArcSDEJavaApiTest extends TestCase {
 	 *             DOCUMENT ME!
 	 */
 	public void testGenericSeCoordinateReferenceLimits() throws SeException {
-		SeCoordinateReference crs = this.testData.getGenericCoordRef();
+		SeCoordinateReference crs = TestData.getGenericCoordRef();
 		LOGGER.fine("CRS constraints: " + crs.getXYEnvelope() + ", presision: "
 				+ crs.getXYUnits());
 
 		SDEPoint[] ptArray = new SDEPoint[2];
 		SeShape shape = new SeShape(crs);
-		double[][][] coords;
 		ptArray[0] = new SDEPoint(0.0, 0.0);
 
 		// find the lower limit of separation between coordinates
@@ -662,7 +661,7 @@ public class ArcSDEJavaApiTest extends TestCase {
 			/*
 			 * Define the layer's Coordinate Reference
 			 */
-			SeCoordinateReference coordref = this.testData.getGenericCoordRef();
+			SeCoordinateReference coordref = TestData.getGenericCoordRef();
 			layer.setCoordRef(coordref);
 
 			/*

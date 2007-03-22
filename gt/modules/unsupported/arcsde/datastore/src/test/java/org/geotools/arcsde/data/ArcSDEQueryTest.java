@@ -18,6 +18,7 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.geotools.arcsde.data.ArcSDEDataStore;
@@ -26,11 +27,10 @@ import org.geotools.data.DataStore;
 import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureType;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
 
 import com.esri.sde.sdk.client.SeConnection;
 import com.esri.sde.sdk.client.SeException;
@@ -58,6 +58,8 @@ public class ArcSDEQueryTest extends TestCase {
     private String typeName;
 	
     private Query filteringQuery;
+    
+    private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
     
     private static final int FILTERING_COUNT = 3;
 	/**
@@ -88,11 +90,10 @@ public class ArcSDEQueryTest extends TestCase {
         FeatureReader reader = dstore.getFeatureReader(typeName);
         List fids = new ArrayList();
         for(int i = 0; i < FILTERING_COUNT; i++){
-        	fids.add(reader.next().getID());
+        	fids.add(ff.featureId(reader.next().getID()));
         }
         reader.close();
-        FidFilter filter = FilterFactoryFinder.createFilterFactory().createFidFilter();
-        filter.addAllFids(fids);
+        Id filter = ff.id(new HashSet(fids));
         filteringQuery = new DefaultQuery(typeName, filter);
         this.queryFiltered = ArcSDEQuery.createQuery(dstore, filteringQuery);
     }

@@ -18,6 +18,7 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
@@ -37,6 +38,7 @@ import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
@@ -44,18 +46,14 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.BBoxExpression;
-import org.geotools.filter.Expression;
-import org.geotools.filter.FidFilter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
 import org.geotools.filter.FilterFilter;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
-import org.geotools.filter.LogicFilter;
 import org.geotools.gml.GMLFilterDocument;
 import org.geotools.gml.GMLFilterGeometry;
 import org.opengis.filter.And;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.Id;
+import org.opengis.filter.spatial.BBOX;
 import org.xml.sax.helpers.ParserAdapter;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -81,7 +79,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     private DataStore store;
 
     /** a filter factory for testing */
-    FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+    FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
     /**
      * Creates a new ArcSDEDataStoreTest object.
@@ -131,6 +129,7 @@ public class ArcSDEDataStoreTest extends TestCase {
     public void testFinder() throws IOException {
         DataStore sdeDs = null;
 
+        DataStoreFinder.scanForPlugins();
         sdeDs = DataStoreFinder.getDataStore(this.testData.getConProps());
 
         String failMsg = sdeDs + " is not an ArcSDEDataStore";
@@ -168,22 +167,19 @@ public class ArcSDEDataStoreTest extends TestCase {
             assertEquals("After getBounds()", initialAvailableCount, pool.getAvailableCount());
             assertEquals("After getBounds()", initialPoolSize, pool.getPoolSize());
 
-            final int layerCount = source.getCount(Query.ALL);
+            source.getCount(Query.ALL);
 
             assertEquals("After size()", initialAvailableCount, pool.getAvailableCount());
             assertEquals("After size()", initialPoolSize, pool.getPoolSize());
             
-            FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-            GeometryFilter bbox = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-
-            bbox.addLeftGeometry(ff.createAttributeExpression(schema,
-                    schema.getDefaultGeometry().getName()));
-
-            Envelope bounds = new Envelope(layerBounds.getMinX() + 10,
-                    layerBounds.getMaxX() - 10, layerBounds.getMinY() + 10,
-                    layerBounds.getMaxY() - 10);
-            bbox.addRightGeometry(ff.createBBoxExpression(bounds));
-
+            
+            BBOX bbox = ff.bbox(schema.getDefaultGeometry().getName(),
+                    layerBounds.getMinX() + 10,
+                    layerBounds.getMinY() + 10,
+                    layerBounds.getMaxX() - 10,
+                    layerBounds.getMaxY() - 10,
+                    schema.getDefaultGeometry().getCoordinateSystem().getName().getCode());
+            
             for(int i = 0; i < 20; i++){
             	LOGGER.fine("Running iteration #" + i);
             	
@@ -479,7 +475,6 @@ public class ArcSDEDataStoreTest extends TestCase {
         LOGGER.fine("Geometry filter: " + bboxFilter);
         LOGGER.fine("SQL filter: " + sqlFilter);
 
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
         And mixedFilter = ff.and( sqlFilter, bboxFilter );
         
         LOGGER.fine("Mixed filter: " + mixedFilter);
@@ -586,7 +581,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         List fids = new ArrayList();
 
         while (reader.hasNext()) {
-            fids.add(reader.next().getID());
+            fids.add(ff.featureId(reader.next().getID()));
 
             //skip one
             if (reader.hasNext()) {
@@ -595,9 +590,8 @@ public class ArcSDEDataStoreTest extends TestCase {
         }
 
         reader.close();
-
-        FidFilter filter = FilterFactoryFinder.createFilterFactory().createFidFilter();
-        filter.addAllFids(fids);
+        
+        Id filter = ff.id(new HashSet(fids));
 
         FeatureSource source = ds.getFeatureSource(typeName);
         Query query = new DefaultQuery(typeName, filter);
@@ -609,7 +603,7 @@ public class ArcSDEDataStoreTest extends TestCase {
         while (iterator.hasNext()) {
             String fid = iterator.next().getID();
             assertTrue("a fid not included in query was returned: " + fid,
-                fids.contains(fid));
+                fids.contains(ff.featureId(fid)));
         }
         results.close( iterator );
     }
@@ -920,16 +914,11 @@ public class ArcSDEDataStoreTest extends TestCase {
      * @throws Exception DOCUMENT ME!
      */
     private Filter getBBoxfilter(FeatureSource fs) throws Exception {
-        Envelope env = new Envelope(-60, -40, -55, -20);
-        BBoxExpression bbe = ff.createBBoxExpression(env);
-        org.geotools.filter.GeometryFilter gf = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
         FeatureType schema = fs.getSchema();
-        Expression attExp = ff.createAttributeExpression(schema,
-                schema.getDefaultGeometry().getName());
-        gf.addLeftGeometry(attExp);
-        gf.addRightGeometry(bbe);
-
-        return gf;
+        BBOX bbe = ff.bbox(schema.getDefaultGeometry().getName(),
+                -60, -55, -40, -20,
+                schema.getDefaultGeometry().getCoordinateSystem().getName().getCode());
+        return bbe;
     }
 
     /**

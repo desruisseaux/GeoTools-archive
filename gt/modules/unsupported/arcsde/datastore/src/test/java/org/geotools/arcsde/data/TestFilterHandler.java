@@ -239,8 +239,4 @@ public class TestFilterHandler implements ContentHandler, FilterHandler {
 	public Filter getFilter() {
 		return this.filter;
 	}
-
-    public void filter(org.geotools.filter.Filter arg0) {
-        this.filter = filter;
-    }
 }

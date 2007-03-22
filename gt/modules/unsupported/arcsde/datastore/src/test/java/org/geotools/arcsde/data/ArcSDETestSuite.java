@@ -15,11 +15,11 @@
  */
 package org.geotools.arcsde.data;
 
-import org.geotools.arcsde.pool.ArcSDEConnectionPoolTest;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.geotools.arcsde.pool.ArcSDEConnectionPoolTest;
 
 
 /**

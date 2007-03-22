@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 
 import junit.framework.TestCase;
@@ -32,14 +33,14 @@ import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FilteringFeatureReader;
 import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.geotools.filter.Filter;
-import org.geotools.filter.FilterFactory;
-import org.geotools.filter.FilterFactoryFinder;
-import org.geotools.filter.FilterType;
-import org.geotools.filter.GeometryFilter;
+import org.geotools.geometry.jts.JTSUtils;
+import org.geotools.referencing.CRS;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -68,6 +69,8 @@ public class FilterTest extends TestCase {
         };
 
     private DataStore dataStore;
+    
+    private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
     /**
      * DOCUMENT ME!
@@ -208,16 +211,13 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_DISJOINT);
-        filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
-
         double minx = 106.62;
         double maxx = 106.727;
         double miny = -6.24;
         double maxy = -6.16;
         Polygon p = buildPolygon(minx, miny, maxx, maxy);
-        filter.addRightGeometry(ff.createLiteralExpression(p));
+        
+        Filter filter = ff.disjoint("SHAPE", JTSUtils.jtsToGo1(p, CRS.decode("EPSG:4326")));
 
         runTestWithFilter(ft, filter);
     }
@@ -231,16 +231,13 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_CONTAINS);
-        filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
-
         double minx = 106.6666;
         double maxx = 106.6677;
         double miny = -6.1676;
         double maxy = -6.1672;
         Polygon p = buildPolygon(minx, miny, maxx, maxy);
-        filter.addRightGeometry(ff.createLiteralExpression(p));
+        
+        Filter filter = ff.contains("SHAPE", JTSUtils.jtsToGo1(p, CRS.decode("EPSG:4326"))); 
 
         runTestWithFilter(ft, filter);
     }
@@ -254,17 +251,12 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_BBOX);
-        filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
-
         double minx = 106.6337;
         double maxx = 106.6381;
         double miny = -6.1794;
         double maxy = -6.1727;
-        Polygon p = buildPolygon(minx, miny, maxx, maxy);
-        filter.addRightGeometry(ff.createLiteralExpression(p));
-
+        Filter filter = ff.bbox("SHAPE",minx, miny, maxx, maxy, "EPSG:26986");
+        
         runTestWithFilter(ft, filter);
     }
 
@@ -277,16 +269,12 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_INTERSECTS);
-        filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
-
         double minx = 106.6337;
         double maxx = 106.6381;
         double miny = -6.1794;
         double maxy = -6.1727;
         Polygon p = buildPolygon(minx, miny, maxx, maxy);
-        filter.addRightGeometry(ff.createLiteralExpression(p));
+        Filter filter = ff.intersects("SHAPE", JTSUtils.jtsToGo1(p, CRS.decode("EPSG:4326"))); 
 
         runTestWithFilter(ft, filter);
     }
@@ -300,16 +288,12 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_OVERLAPS);
-        filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
-
         double minx = 106.6337;
         double maxx = 106.6381;
         double miny = -6.1794;
         double maxy = -6.1727;
         Polygon p = buildPolygon(minx, miny, maxx, maxy);
-        filter.addRightGeometry(ff.createLiteralExpression(p));
+        Filter filter = ff.overlaps("SHAPE", JTSUtils.jtsToGo1(p, CRS.decode("EPSG:4326")));
 
         runTestWithFilter(ft, filter);
     }
@@ -323,16 +307,12 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_WITHIN);
-        filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
-
         double minx = 106.6337;
         double maxx = 106.6381;
         double miny = -6.1794;
         double maxy = -6.1727;
         Polygon p = buildPolygon(minx, miny, maxx, maxy);
-        filter.addRightGeometry(ff.createLiteralExpression(p));
+        Filter filter = ff.within("SHAPE", JTSUtils.jtsToGo1(p, CRS.decode("EPSG:4326")));
 
         runTestWithFilter(ft, filter);
     }
@@ -346,16 +326,12 @@ public class FilterTest extends TestCase {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
         // Build the filter
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-        GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_CROSSES);
-        filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
-
         double minx = 106.6337;
         double maxx = 106.6381;
         double miny = -6.1794;
         double maxy = -6.1727;
         LineString ls = buildSegment(minx, miny, maxx, maxy);
-        filter.addRightGeometry(ff.createLiteralExpression(ls));
+        Filter filter = ff.crosses("SHAPE", JTSUtils.jtsToGo1(ls, CRS.decode("EPSG:4326")));
 
         runTestWithFilter(ft, filter);
     }
@@ -368,10 +344,10 @@ public class FilterTest extends TestCase {
     public void testEqualFilter() throws Exception {
         FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
 
-        FilterFactory ff = FilterFactoryFinder.createFilterFactory();
-
         // Get a geometry for equality comparison
-        Filter fidFilter = ff.createFidFilter("SDE.SDE.JAKARTA.101");
+        HashSet fidSet = new HashSet();
+        fidSet.add(ff.featureId("SDE.SDE.JAKARTA.101"));
+        Filter fidFilter = ff.id(fidSet);
         FeatureReader fr = this.dataStore.getFeatureReader(new DefaultQuery(
                     "SDE.SDE.JAKARTA", fidFilter), Transaction.AUTO_COMMIT);
         Feature feature = fr.next();
@@ -380,9 +356,7 @@ public class FilterTest extends TestCase {
         Geometry g = (Geometry) feature.getAttribute("SHAPE");
 
         // Build the filter
-        GeometryFilter filter = ff.createGeometryFilter(FilterType.GEOMETRY_EQUALS);
-        filter.addLeftGeometry(ff.createAttributeExpression(ft, "SHAPE"));
-        filter.addRightGeometry(ff.createLiteralExpression(g));
+        Filter filter = ff.equals("SHAPE", JTSUtils.jtsToGo1(g, CRS.decode("EPSG:4326")));
 
         runTestWithFilter(ft, filter);
     }

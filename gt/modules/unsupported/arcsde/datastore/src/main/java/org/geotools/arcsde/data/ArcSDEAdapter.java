@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,17 +30,18 @@ import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
-import org.geotools.factory.FactoryConfigurationError;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.FeatureType;
-import org.geotools.feature.FeatureTypeFactory;
+import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.GeometryAttributeType;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.type.GeometricAttributeType;
 import org.geotools.referencing.FactoryFinder;
 import org.opengis.filter.Filter;
+import org.opengis.filter.identity.FeatureId;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -163,8 +166,7 @@ public class ArcSDEAdapter {
 			} else if (geometryClass == Polygon.class) {
 				shapeTypes |= SeLayer.SE_AREA_TYPE_MASK;
 			} else if (geometryClass == Geometry.class) {
-				LOGGER
-						.info("Creating SeShape types for all types of geometries.");
+				LOGGER.fine("Creating SeShape types for all types of geometries.");
 				shapeTypes |= (SeLayer.SE_MULTIPART_TYPE_MASK
 						| SeLayer.SE_POINT_TYPE_MASK
 						| SeLayer.SE_LINE_TYPE_MASK | SeLayer.SE_AREA_TYPE_MASK);
@@ -255,13 +257,17 @@ public class ArcSDEAdapter {
 		FeatureType type = null;
 
 		try {
-			type = FeatureTypeFactory.newFeatureType(types, sdeLayer
-					.getQualifiedName(), namespace);
+            AttributeType defaultGeom = null;
+            for (int i = 0; i < types.length; i++) {
+                if (types[i] instanceof GeometryAttributeType) {
+                    defaultGeom = types[i];
+                }
+            }
+            type = FeatureTypeBuilder.newFeatureType(types, sdeLayer
+                    .getQualifiedName(), namespace, false, null, defaultGeom);
 		} catch (SeException ex) {
 			throw new DataSourceException(ex.getMessage(), ex);
 		} catch (SchemaException ex) {
-			throw new DataSourceException(ex.getMessage(), ex);
-		} catch (FactoryConfigurationError ex) {
 			throw new DataSourceException(ex.getMessage(), ex);
 		}
 
@@ -398,11 +404,11 @@ public class ArcSDEAdapter {
 		CoordinateReferenceSystem crs = null;
 		SeCoordinateReference seCRS = sdeLayer.getCoordRef();
 		String WKT = seCRS.getProjectionDescription();
-		LOGGER.info("About to parse CRS for layer " + sdeLayer.getName() + ": "
+		LOGGER.finer("About to parse CRS for layer " + sdeLayer.getName() + ": "
 				+ WKT);
 
 		try {
-			LOGGER.info("Se CRS envelope: " + seCRS.getXYEnvelope());
+			LOGGER.info(sdeLayer.getName() + " has CRS envelope: " + seCRS.getXYEnvelope());
 		} catch (SeException e1) {
 			// intentionally blank
 		}
@@ -427,6 +433,25 @@ public class ArcSDEAdapter {
 
 		return crs;
 	}
+    
+    /**
+     * Gives the row Id column for a given ArcSDE spatial Layer.
+     * 
+     * @param schema - The FeatureType of the layer you're looking to figure the rowid column for
+     * @return A string containing the RowIDColumnName, or null if it can't be determined with this method
+     */
+    public static String getRowIdColumn(FeatureType schema) {
+        String rowIdColumnName = null;
+        AttributeType[] attTypes = schema.getAttributeTypes();
+        for (int i = 0; i < attTypes.length; i++) {
+            if (attTypes[i] instanceof ArcSDEAttributeType  &&  ((ArcSDEAttributeType)attTypes[i]).isFeatureIDAttribute()) {
+                rowIdColumnName = attTypes[i].getName();
+                return rowIdColumnName;
+            }
+        }
+        return rowIdColumnName;
+    }
+
 
 	/**
 	 * Returns the mapping JTS geometry type for the ArcSDE Shape type given by
@@ -520,7 +545,7 @@ public class ArcSDEAdapter {
 									+ isLineString
 									+ ", isPolygon=" + isPolygon);
 				} else {
-					LOGGER.info("safely mapping SeShapeType to abstract Geometry");
+					LOGGER.fine("safely mapping SeShapeType to abstract Geometry");
 				}
 			} else if (isCollection == 1) {
 				if (isPoint == 1) {
@@ -570,10 +595,13 @@ public class ArcSDEAdapter {
 	 *             If the given string is not properly formatted
 	 *             [anystring].[long value]
 	 */
-	public static long getNumericFid(String fid)
+	public static long getNumericFid(Identifier id)
 			throws IllegalArgumentException {
+        if (!(id instanceof FeatureId))
+            throw new IllegalArgumentException("Only FeatureIds are supported when encoding id filters to SDE.  Not " + id.getClass());
+        
+        String fid = ((FeatureId)id).getID();
 		int dotIndex = fid.lastIndexOf('.');
-
 		try {
 			return Long.decode(fid.substring(++dotIndex)).longValue();
 		} catch (Exception ex) {
@@ -593,13 +621,14 @@ public class ArcSDEAdapter {
 	 * @throws IllegalArgumentException
 	 *             DOCUMENT ME!
 	 */
-	public static long[] getNumericFids(String[] stringFids)
+	public static long[] getNumericFids(Set identifiers)
 			throws IllegalArgumentException {
-		int nfids = stringFids.length;
+		int nfids = identifiers.size();
 		long[] fids = new long[nfids];
 
+        Iterator ids = identifiers.iterator();
 		for (int i = 0; i < nfids; i++) {
-			fids[i] = ArcSDEAdapter.getNumericFid(stringFids[i]);
+			fids[i] = ArcSDEAdapter.getNumericFid((Identifier)ids.next());
 		}
 
 		return fids;

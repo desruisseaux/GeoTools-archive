@@ -4,12 +4,12 @@
 		<Or>
 			<PropertyIsEqualTo>
 				<PropertyName>VALUE</PropertyName>
-				<Literal>20S</Literal>
+				<Literal> 20S</Literal>
 			</PropertyIsEqualTo>
 
 			<PropertyIsEqualTo>
 				<PropertyName>VALUE</PropertyName>
-				<Literal>70W</Literal>
+				<Literal> 70W</Literal>
 			</PropertyIsEqualTo>
 		</Or>
 

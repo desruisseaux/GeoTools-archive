@@ -156,7 +156,7 @@ public class ArcSDEConnectionPool {
 
         this.pool = new GenericObjectPool(seConnectionFactory, maxConnections,
                                           exhaustedAction, maxWait);
-        LOGGER.info("Created pool " + pool);
+        LOGGER.fine("Created pool " + pool);
 
         ArcSDEPooledConnection[] preload = new ArcSDEPooledConnection[minConnections];
 

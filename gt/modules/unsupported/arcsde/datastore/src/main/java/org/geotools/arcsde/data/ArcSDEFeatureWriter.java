@@ -28,11 +28,13 @@ import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
 import org.geotools.data.DataSourceException;
 import org.geotools.data.FeatureWriter;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultFeatureType;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
+import org.opengis.filter.FilterFactory;
 
 import com.esri.sde.sdk.client.SeColumnDefinition;
 import com.esri.sde.sdk.client.SeConnection;
@@ -86,12 +88,14 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 
 	// Used to create "pointers" to attributes that are mutable.
 	private Integer[] mutableAttributeIndexes;
-
-	/**
-	 * Holds the name of the spatially enabled column in an ArcSDE SeLayer
-	 * object that is represented by this writer.
-	 */
-	private String spatialColumnName;
+    
+    /**
+     * the 'id' column for this featureType
+     */
+    private String rowIdColumnName;
+    
+    
+    private FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
 
 	/**
 	 * Creates a new ArcSDEFeatureWriter.
@@ -103,7 +107,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 * @param features
 	 */
 	public ArcSDEFeatureWriter(ArcSDEDataStore store,
-			ArcTransactionState state, SeLayer layer, List features) {
+			ArcTransactionState state, SeLayer layer, List features) throws DataSourceException {
 		transactionState = state;
 
 		if (features != null) {
@@ -115,9 +119,18 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 		this.dataStore = store;
 		this.layer = layer;
 
-		// We essentially use this as our primary key column. This seems to
-		// work ok with ArcSDE for the most part...
-		this.spatialColumnName = layer.getSpatialColumn();
+		
+            try {
+                this.rowIdColumnName = ArcSDEAdapter.getRowIdColumn(store.getSchema(layer.getQualifiedName()));
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "", e);
+                throw new DataSourceException(e);
+            } catch (SeException e) {
+                LOGGER.log(Level.SEVERE, "", e);
+                throw new DataSourceException(e);
+            }
+        
+        
 		this.currentIndex = -1;
 	}
 
@@ -132,7 +145,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 	 *            DOCUMENT ME!
 	 */
 	public ArcSDEFeatureWriter(ArcSDEDataStore store,
-			ArcTransactionState state, SeLayer layer) {
+			ArcTransactionState state, SeLayer layer) throws DataSourceException {
 		this(store, state, layer, null);
 	}
 
@@ -226,7 +239,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 
 				SeDelete seDelete = new SeDelete(connection);
 
-				long featureId = ArcSDEAdapter.getNumericFid(feature.getID());
+				long featureId = ArcSDEAdapter.getNumericFid(ff.featureId(feature.getID()));
 				SeObjectId objectID = new SeObjectId(featureId);
 				seDelete.byId(this.layer.getQualifiedName(), objectID);
 				//this.dataStore.fireRemoved(feature);
@@ -291,7 +304,7 @@ class ArcSDEFeatureWriter implements FeatureWriter {
 						feature.getID().lastIndexOf('.') + 1,
 						feature.getID().length());
 				update.toTable(this.layer.getQualifiedName(), cols,
-						this.spatialColumnName + " = " + featureId);
+						this.rowIdColumnName + " = " + featureId);
 				update.setWriteMode(true);
 
 				SeRow row = update.getRowToSet();
