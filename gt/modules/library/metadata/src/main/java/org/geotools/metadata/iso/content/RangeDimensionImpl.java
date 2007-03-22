@@ -20,13 +20,11 @@
 package org.geotools.metadata.iso.content;
 
 // OpenGIS dependencies
-import org.opengis.metadata.content.RangeDimension;
-import org.opengis.util.InternationalString;
-import org.opengis.util.LocalName;
-
-// Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
 import org.geotools.resources.Utilities;
+import org.opengis.metadata.content.RangeDimension;
+import org.opengis.util.InternationalString;
+import org.opengis.util.MemberName;
 
 
 /**
@@ -49,7 +47,7 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
      * Number that uniquely identifies instances of bands of wavelengths on which a sensor
      * operates.
      */
-    private LocalName sequenceIdentifier;
+    private MemberName sequenceIdentifier;
 
     /**
      * Description of the range of a cell measurement value.
@@ -66,7 +64,7 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
      * Returns the number that uniquely identifies instances of bands of wavelengths
      * on which a sensor operates.
      */
-    public LocalName getSequenceIdentifier() {
+    public MemberName getSequenceIdentifier() {
         return sequenceIdentifier;
     }
 
@@ -74,7 +72,7 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
      * Set the number that uniquely identifies instances of bands of wavelengths
      * on which a sensor operates.
      */
-    public synchronized void setSequenceIdentifier(final LocalName newValue) {
+    public synchronized void setSequenceIdentifier(final MemberName newValue) {
         checkWritePermission();
         sequenceIdentifier = newValue;
     }
@@ -99,7 +97,7 @@ public class RangeDimensionImpl extends MetadataEntity implements RangeDimension
      */
     protected void freeze() {
         super.freeze();
-        sequenceIdentifier = (LocalName)           unmodifiable(sequenceIdentifier);
+        sequenceIdentifier = (MemberName)           unmodifiable(sequenceIdentifier);
         descriptor         = (InternationalString) unmodifiable(descriptor);
     }
 

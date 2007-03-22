@@ -20,6 +20,7 @@
 package org.geotools.metadata.iso.identification;
 
 // OpenGIS dependencies
+import org.opengis.metadata.identification.RepresentativeFraction;
 import org.opengis.metadata.identification.Resolution;
 
 // Geotools dependencies
@@ -48,7 +49,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      * Only one of {@linkplain #getEquivalentScale equivalent scale} and
      * {@linkplain #getDistance ground sample distance} may be provided.
      */
-    private double equivalentScale;
+    private RepresentativeFraction equivalentScale;
 
     /**
      * Ground sample distance.
@@ -69,7 +70,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      * Only one of {@linkplain #getEquivalentScale equivalent scale} and
      * {@linkplain #getDistance ground sample distance} may be provided.
      */
-    public double getEquivalentScale()  {
+    public RepresentativeFraction getEquivalentScale()  {
         return equivalentScale;
     }
 
@@ -78,7 +79,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      */
     public synchronized void setEquivalentScale(final double newValue) {
         checkWritePermission();
-        equivalentScale = newValue;
+        equivalentScale = RepresentativeFractionImpl.fromDouble( newValue );
     }
 
     /**
@@ -125,7 +126,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      */
     public synchronized int hashCode() {
         int code = (int)serialVersionUID;
-        code ^= (int)equivalentScale;
+        code ^= (int)equivalentScale.hashCode();
         code ^= (int)distance;
         return code;
     }

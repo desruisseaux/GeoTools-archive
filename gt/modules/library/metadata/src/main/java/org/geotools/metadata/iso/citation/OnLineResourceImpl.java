@@ -176,6 +176,8 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
      */
     private URI linkage;
 
+    private String name;
+
     /**
      * Creates an initially empty on line resource.
      */
@@ -222,6 +224,13 @@ public class OnLineResourceImpl extends MetadataEntity implements OnLineResource
         applicationProfile = newValue;
     }
 
+    /**
+     * Name of the online resource. Returns {@code null} if none.
+     */
+    public String getName() {
+        return name;
+    }
+    
     /**
      * Returns the detailed text description of what the online resource is/does.
      * Returns {@code null} if none.

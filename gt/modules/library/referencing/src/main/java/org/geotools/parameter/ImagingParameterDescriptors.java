@@ -315,7 +315,7 @@ public class ImagingParameterDescriptors extends DefaultParameterDescriptorGroup
             }, '.');
             properties.put(ALIAS_KEY,   alias);
             properties.put(REMARKS_KEY, description);
-            properties.put(Identifier.VERSION_KEY, bundle.getString("Version"));
+            //properties.put(Identifier.VERSION_KEY, bundle.getString("Version"));
             properties.put(Identifier.AUTHORITY_KEY, authority);
         }
         properties.put(NAME_KEY, name);

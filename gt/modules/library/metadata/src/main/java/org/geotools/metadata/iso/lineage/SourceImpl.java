@@ -25,6 +25,7 @@ import java.util.Collection;
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.identification.RepresentativeFraction;
 import org.opengis.metadata.lineage.Source;
 import org.opengis.metadata.lineage.ProcessStep;
 import org.opengis.referencing.ReferenceSystem;
@@ -32,6 +33,7 @@ import org.opengis.util.InternationalString;
 
 // Geotools dependencies
 import org.geotools.metadata.iso.MetadataEntity;
+import org.geotools.metadata.iso.identification.RepresentativeFractionImpl;
 import org.geotools.resources.Utilities;
 
 
@@ -59,7 +61,7 @@ public class SourceImpl extends MetadataEntity implements Source {
     /**
      * Denominator of the representative fraction on a source map.
      */
-    private long scaleDenominator;
+    private RepresentativeFraction scaleDenominator;
 
     /**
      * Spatial reference system used by the source data.
@@ -112,16 +114,16 @@ public class SourceImpl extends MetadataEntity implements Source {
     /**
      * Returns the denominator of the representative fraction on a source map.
      */
-    public synchronized long getScaleDenominator()  {
+    public synchronized RepresentativeFraction getScaleDenominator()  {
         return scaleDenominator;
     }
 
     /**
      * Set the denominator of the representative fraction on a source map.
      */
-    public synchronized void setScaleDenominator(final long newValue)  {
+    public synchronized void setScaleDenominator(final int newValue)  {
         checkWritePermission();
-        scaleDenominator = newValue;
+        scaleDenominator = new RepresentativeFractionImpl( newValue );
     }
 
     /**

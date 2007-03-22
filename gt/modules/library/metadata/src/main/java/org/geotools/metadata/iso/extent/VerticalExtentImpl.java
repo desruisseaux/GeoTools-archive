@@ -24,6 +24,7 @@ import javax.units.Unit;
 
 // OpenGIS dependencies
 import org.opengis.metadata.extent.VerticalExtent;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.datum.VerticalDatum;
 
 // Geotools dependencies
@@ -196,5 +197,10 @@ public class VerticalExtentImpl extends MetadataEntity implements VerticalExtent
      */
     public String toString() {
         return String.valueOf(verticalDatum);
+    }
+
+    // TODO: provide CRS
+    public CoordinateReferenceSystem getVerticalCRS() {
+        return null; // can probably create from verticalData, min/max unit info
     }
 }

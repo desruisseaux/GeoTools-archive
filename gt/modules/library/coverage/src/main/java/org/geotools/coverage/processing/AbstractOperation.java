@@ -99,7 +99,7 @@ public abstract class AbstractOperation implements Operation, Serializable {
      * Returns the version number of the implementation.
      */
     public String getVersion() {
-        return descriptor.getName().getVersion();
+        return null;
     }
 
     /**

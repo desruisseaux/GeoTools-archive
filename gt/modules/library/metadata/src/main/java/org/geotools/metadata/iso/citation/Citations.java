@@ -551,16 +551,19 @@ public final class Citations {
                 return identifierMatches(c2, c1);
             }
         }
-        final Collection types2      = c2.getIdentifierTypes();
-        final Iterator   types1_iter = c1.getIdentifierTypes().iterator();
+        
+        
+        //final Collection types2      = c2.getIdentifierTypes();
+        //final Iterator   types1_iter = c1.getIdentifierTypes().iterator();
         do {
-            /*
-             * If there is no more identifier types to compare, delegates to the
-             * identifierMatches(Citation, String) method (which doesn't take in
-             * account any identifier type, but may inspect titles if c2 doesn't
-             * have any identifier).
-             */
+            
+            // If there is no more identifier types to compare, delegates to the
+            // identifierMatches(Citation, String) method (which doesn't take in
+            // account any identifier type, but may inspect titles if c2 doesn't
+            // have any identifier).
+                          
             final String identifier1 = ((String) ids1_iter.next()).trim();
+            /*
             if (!types1_iter.hasNext() || types2.isEmpty()) {
                 if (identifierMatches(c2, identifier1)) {
                     return true;
@@ -568,29 +571,30 @@ public final class Citations {
                     continue;
                 }
             }
-            /*
-             * Iterates through all identifiers in order to performs the comparaisons.  It would
-             * have been more efficient to use Collection.contains (especially if the collection
-             * is actually a HashSet), but we want the comparaisons to be case-insensitive. We
-             * also want to compare the identifiers only if their types match (except if there
-             * is no type information).
-             */
-            final String   type1       = ((String) types1_iter.next()).trim();
-            final Iterator types2_iter = types2.iterator();
+            */
+            //  Iterates through all identifiers in order to performs the comparaisons.  It would
+            //  have been more efficient to use Collection.contains (especially if the collection
+            //  is actually a HashSet), but we want the comparaisons to be case-insensitive. We
+            //  also want to compare the identifiers only if their types match (except if there
+            //  is no type information).
+             
+            //final String   type1       = ((String) types1_iter.next()).trim();
+            //final Iterator types2_iter = types2.iterator();
             final Iterator ids2_iter   = identifiers2.iterator();
             while (ids2_iter.hasNext()) {
                 final String identifier2 = ((String) ids2_iter.next()).trim();
-                if (types2_iter.hasNext()) {
-                    final String type2 = ((String) types2_iter.next()).trim();
-                    if (!type1.equalsIgnoreCase(type2)) {
-                        continue;
-                    }
-                }
+//                if (types2_iter.hasNext()) {
+//                    final String type2 = ((String) types2_iter.next()).trim();
+//                    if (!type1.equalsIgnoreCase(type2)) {
+//                        continue;
+//                    }
+//                }
                 if (identifier1.equalsIgnoreCase(identifier2)) {
                     return true;
                 }
             }
         } while (ids1_iter.hasNext());
+        
         return false;
     }
 

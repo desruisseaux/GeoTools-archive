@@ -137,7 +137,7 @@ public final class CRSTest extends TestCase {
     public void testFind() throws FactoryException {
         final AbstractAuthorityFactory factory = (AbstractAuthorityFactory) this.factory;
         GeographicCRS crs = factory.createGeographicCRS("CRS:84");
-        assertSame   (crs, factory.find(crs, false));
+        assertSame(crs, factory.find(crs, false));
         assertSame   (crs, factory.find(crs, true ));
         assertNotSame(crs, DefaultGeographicCRS.WGS84);
         assertSame   (crs, factory.find(DefaultGeographicCRS.WGS84, true ));

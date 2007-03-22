@@ -159,7 +159,7 @@ public class CitationImpl extends MetadataEntity implements Citation {
             setEdition                (source.getEdition());
             setEditionDate            (source.getEditionDate());
             setIdentifiers            (source.getIdentifiers());
-            setIdentifierTypes        (source.getIdentifierTypes());
+            //setIdentifierTypes        (source.getIdentifierTypes());
             setCitedResponsibleParties(source.getCitedResponsibleParties());
             setPresentationForm       (source.getPresentationForm());
             setSeries                 (source.getSeries());
