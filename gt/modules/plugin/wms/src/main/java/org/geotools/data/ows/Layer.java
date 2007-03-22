@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
@@ -454,12 +455,12 @@ public class Layer implements Comparable {
                 CoordinateReferenceSystem fromCRS = null;
                 try {
                     fromCRS = CRS.decode(epsg);
-                    MathTransform transform = CRS.findMathTransform(fromCRS, crs, true);
                     
-                    DirectPosition newLower = transform.transform(env.getLowerCorner(),null);
-                    DirectPosition newUpper = transform.transform(env.getUpperCorner(),null);
+                    ReferencedEnvelope oldEnv = new ReferencedEnvelope(env, fromCRS);
+                    ReferencedEnvelope newEnv = oldEnv.transform(crs, true);
                     
-                    env = new GeneralEnvelope(newLower.getCoordinates(), newUpper.getCoordinates());
+                    env = new GeneralEnvelope(new double[] {newEnv.getMinimum(0), newEnv.getMinimum(1)}, 
+                                              new double[] {newEnv.getMaximum(0), newEnv.getMaximum(1)});
                     env.setCoordinateReferenceSystem(crs);
                     
                     //success!!
