@@ -521,9 +521,18 @@ public class ArcSDEConnectionPool {
          *
          * @throws SeException if the connection can't be created
          */
-        public Object makeObject() throws SeException {
-            ArcSDEPooledConnection seConn = new ArcSDEPooledConnection(ArcSDEConnectionPool.this.pool, config);
-            return seConn;
+        public Object makeObject() throws SeException, DataSourceException {
+            NegativeArraySizeException cause = null;
+            for (int i = 0; i < 3; i++) {
+                try {
+                    ArcSDEPooledConnection seConn = new ArcSDEPooledConnection(ArcSDEConnectionPool.this.pool, config);
+                    return seConn;
+                } catch (NegativeArraySizeException nase) {
+                    LOGGER.warning("Strange failed ArcSDE connection error.  Trying again (try " + (i+1) + " of 3)");
+                    cause = nase;
+                }
+            }
+            throw new DataSourceException("Couldn't create ArcSDEPooledConnection because of strange SDE internal exception.  Tried 3 times, giving up.", cause);
         }
 
         /**
