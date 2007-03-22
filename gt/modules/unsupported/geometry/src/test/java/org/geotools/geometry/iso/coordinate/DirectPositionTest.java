@@ -11,18 +11,16 @@ import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
  *
  */
 public class DirectPositionTest extends TestCase {
-	
-	public void testMain() {
-		
-		FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault3D();
-		
-		this._testDP(tGeomFactory.getCoordinateFactory());
-		
-	}	
+	GeometryFactory gf;
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        
+        FeatGeomFactoryImpl tGeomFactory = FeatGeomFactoryImpl.getDefault3D();        
+        gf = tGeomFactory.getCoordinateFactory();
+    }
 
-	private void _testDP(GeometryFactory aCoordFactory) {
-		
-		
+	public void testDirectPosition() {
 		double x1 = 10000.00;
 		double y1 = 10015.50;
 		double z1 = 10031.00;
@@ -32,7 +30,7 @@ public class DirectPositionTest extends TestCase {
 		double resultCoords[];
 		
 		// Creating a DP
-		DirectPosition dp1 = aCoordFactory.createDirectPosition(coords1);
+		DirectPosition dp1 = gf.createDirectPosition(coords1);
 		
 		// getCoordinates()
 		resultCoords = dp1.getCoordinates();

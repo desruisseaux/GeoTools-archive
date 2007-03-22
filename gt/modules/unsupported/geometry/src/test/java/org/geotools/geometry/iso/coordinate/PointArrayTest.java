@@ -6,11 +6,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
-import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
-import org.geotools.geometry.iso.coordinate.PointArrayImpl;
-import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.geometry.PointArray;
+import org.opengis.spatialschema.geometry.geometry.Position;
 
 public class PointArrayTest extends TestCase {
 
@@ -33,7 +31,7 @@ public class PointArrayTest extends TestCase {
 		PositionImpl p4 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{30,  30}));
 		PositionImpl p5 = new PositionImpl(tCoordFactory.createDirectPosition(new double[]{50,  0}));
 
-		List<PositionImpl> posList = new ArrayList<PositionImpl>();
+		List<Position> posList = new ArrayList<Position>();
 		
 		PointArray pa = null;
 		
@@ -55,17 +53,17 @@ public class PointArrayTest extends TestCase {
 		pa = tCoordFactory.createPointArray(posList);
 				
 		// PointArray.length()
-		assertTrue(pa.length() == 5);
+		assertTrue(pa.size() == 5);
 		// PointArray.positions()
-		assertTrue(pa.positions().size() == 5);
+		assertTrue(pa.size() == 5);
 
 		// get-method creates new DP instance
-		DirectPosition dp = pa.get(0, null);
+		DirectPosition dp = pa.getPosition(0, null);
 		System.out.println(dp);
 		assertTrue(dp.getOrdinate(0) == -50);
 		assertTrue(dp.getOrdinate(1) == 0);
 		
-		DirectPosition newDp = pa.get(4, dp);
+		DirectPosition newDp = pa.getPosition(4, dp);
 		System.out.println(dp);
 		assertTrue(dp.getOrdinate(0) == 50);
 		assertTrue(dp.getOrdinate(1) == 0);
@@ -74,13 +72,13 @@ public class PointArrayTest extends TestCase {
 		
 		DirectPosition dp2 = tCoordFactory.createDirectPosition(new double[]{5, 5});
 		pa.set(4, dp2);
-		newDp = pa.get(4, dp);
+		newDp = pa.getPosition(4, dp);
 		System.out.println(dp);
 		assertTrue(dp.getOrdinate(0) == 5);
 		assertTrue(dp.getOrdinate(1) == 5);
 		// Check if the values were copied and not referenced (by modifying the ordinates)
 		dp2.setOrdinate(0, 2);
-		newDp = pa.get(4, dp);
+		newDp = pa.getPosition(4, dp);
 		System.out.println(dp);
 		assertTrue(dp.getOrdinate(0) == 5);
 		

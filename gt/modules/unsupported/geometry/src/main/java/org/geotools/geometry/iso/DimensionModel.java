@@ -86,6 +86,9 @@ public class DimensionModel {
      * @return value based on crs
      */
     public static int toD( CoordinateReferenceSystem crs ){
+        if( crs == null ){
+            return 2; // hack
+        }
         int dimension = crs.getCoordinateSystem().getDimension();
         if( dimension == 2 ){
             return 1;

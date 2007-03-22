@@ -3,6 +3,7 @@ package org.geotools.geometry.iso.primitive;
 import junit.framework.TestCase;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveImpl;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
@@ -62,7 +63,7 @@ public class PrimitiveFactoryTest extends TestCase {
 		da[0] = 999999999.0;
 		da[1] = 100.0;
 		da[2] = -0.00000565;
-		Position pos1 = cf.createPosition(cf.createDirectPosition(da));
+		Position pos1 = new DirectPositionImpl( cf.getCoordinateReferenceSystem(),  da );
 		Point p2 = pf.createPoint(pos1);
 		assertTrue(p2.getPosition().getOrdinate(0) == 999999999.0);
 		assertTrue(p2.getPosition().getOrdinate(1) == 100.0);

@@ -119,6 +119,9 @@ public class WKTReader {
 
 	private StreamTokenizer tokenizer;
 
+    public WKTReader(PrimitiveFactory aPrimitiveFactory, GeometryFactory aCoordinateFactory){
+        this( aPrimitiveFactory, aCoordinateFactory, null );
+    }
 	/**
 	 * Creates a reader that creates objects using the given
 	 * {@link GeometryFactory}.

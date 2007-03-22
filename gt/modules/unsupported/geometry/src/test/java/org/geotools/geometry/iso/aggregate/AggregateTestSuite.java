@@ -6,11 +6,9 @@ import junit.framework.TestSuite;
 public class AggregateTestSuite {
 	
     public static Test suite() {
-
         TestSuite suite = new TestSuite();
 	
         //suite.addTestSuite(CompositeSurfaceTest.class);
-
 
         return suite;
     }
