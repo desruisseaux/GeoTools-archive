@@ -153,7 +153,7 @@ public class DefaultSQLBuilder implements SQLBuilder {
         FilterCapabilities cap = encoder.getCapabilities();
         PostPreProcessFilterSplittingVisitor pfv = new PostPreProcessFilterSplittingVisitor(cap, ft, accessor);
         
-        Filters.accept( filter, pfv );
+        filter.accept(pfv, null);
 
         lastPreFilter = (Filter) pfv.getFilterPre();
         lastPostFilter = (Filter) pfv.getFilterPost();

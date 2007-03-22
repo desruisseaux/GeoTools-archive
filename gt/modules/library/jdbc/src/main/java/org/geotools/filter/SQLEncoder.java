@@ -46,6 +46,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * capabilities.addType block.
  *
  * @author Chris Holmes, TOPP
+ * 
+ * @deprecated Please use org.geotools.data.jdbc.FilterToSQL which uses
+ * opengis filters instead of these geotools filters.
  *
  * @task TODO: Implement LikeFilter encoding, need to figure out escape chars,
  *       the rest of the code should work right.  Once fixed be sure to add

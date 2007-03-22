@@ -13,17 +13,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.filter;
+package org.geotools.data.jdbc;
 
 /**
  * Indicates a client class has attempted to encode a filter not supported by
  * the SQLEncoder being used, or that there were io problems.
  *
- * @deprecated Since you're using OpenGISSFilterToSQLEncoder, use FilterToSQLException as well
  * @author Chris Holmes, TOPP
- * @source $URL$
+ * @source $URL: http://gtsvn.refractions.net/geotools/trunk/gt/modules/library/jdbc/src/main/java/org/geotools/filter/SQLEncoderException.java $
  */
-public class SQLEncoderException extends Exception {
+public class FilterToSQLException extends Exception {
     private static final long serialVersionUID = -2394509611777950167L;
 
     /**
@@ -31,7 +30,7 @@ public class SQLEncoderException extends Exception {
      *
      * @param message Reason for the exception being thrown
      */
-    public SQLEncoderException(String message) {
+    public FilterToSQLException(String message) {
         super(message);
     }
 
@@ -41,7 +40,7 @@ public class SQLEncoderException extends Exception {
      * @param msg A message explaining the exception
      * @param exp the throwable object which caused this exception
      */
-    public SQLEncoderException(String msg, Throwable exp) {
+    public FilterToSQLException(String msg, Throwable exp) {
         super(msg, exp);
     }
 }
