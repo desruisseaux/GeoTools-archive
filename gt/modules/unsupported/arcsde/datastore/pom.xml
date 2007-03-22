@@ -167,7 +167,7 @@
               <!-- You need two things to run these tests successfully
                 1)  The esri ArcSDE jars installed.  The 9.0 jars are freely available
                 so as long as you have #2, you can rely on those ones.  If you have
-                SDE 8.3 or newer jars (9.1, 9.2) you need to inject those into
+                jsde jars other than 9.0 you need to inject them into
                 maven manually and set the sde.version property in the parent pom
                 or on the command line.
                 2)  A properly configured testparams.properties file.  Make
@@ -180,7 +180,7 @@
               -->
               <includes>
                 <include>**/ArcSDETestSuite.java</include>
-                </includes>
+              </includes>
               <excludes>
                 <!-- These tests are currently broken.  Don't enable them -->
                 <exclude>**/*Test.java</exclude>
