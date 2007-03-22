@@ -60,6 +60,7 @@ import org.geotools.referencing.FactoryFinder;
  * @author Martin Desruisseaux
  */
 public class BasicFactories implements CommonFactory {
+    
     /**
      * The default authority name for authority factories.
      */

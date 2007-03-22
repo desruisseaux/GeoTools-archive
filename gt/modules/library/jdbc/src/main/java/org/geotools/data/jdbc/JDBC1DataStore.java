@@ -751,15 +751,18 @@ public abstract class JDBC1DataStore implements DataStore {
 	 */
 	protected FeatureReader createFeatureReader(FeatureType schema,
 			org.opengis.filter.Filter postFilter, QueryData queryData) throws IOException {
-		FeatureReader fReader = getJDBCFeatureReader(queryData);
+        
+        // Thanks Shaun Forbes moving excludes check earlier
+        if (postFilter == Filter.EXCLUDE) {
+            return new EmptyFeatureReader(schema);
+        }
+        
+        FeatureReader fReader = getJDBCFeatureReader(queryData);
 
 		if ((postFilter != null) && (postFilter != Filter.INCLUDE)) {
 			fReader = new FilteringFeatureReader(fReader, postFilter);
 		}
 
-		if (postFilter == Filter.EXCLUDE) {
-			return new EmptyFeatureReader(schema);
-		}
 		
 		return fReader;
 	}

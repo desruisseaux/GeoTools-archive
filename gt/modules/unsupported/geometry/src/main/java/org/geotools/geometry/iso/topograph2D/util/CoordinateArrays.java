@@ -87,6 +87,7 @@ import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.geotools.geometry.iso.topograph2D.CoordinateList;
+import org.opengis.spatialschema.geometry.geometry.Position;
 
 /**
  * Useful utility functions for handling Coordinate arrays
@@ -482,9 +483,9 @@ public class CoordinateArrays {
 	 * @param coordArray
 	 * @return
 	 */
-	public static List<PositionImpl> toPositionList(
+	public static List<Position> toPositionList(
 			CoordinateFactoryImpl coordinateFactory, Coordinate[] coordArray) {
-		List<PositionImpl> rList = new ArrayList<PositionImpl>();
+		List<Position> rList = new ArrayList<Position>();
 		for (int i = 0; i < coordArray.length; i++) {
 			rList.add(coordinateFactory.createPosition(coordArray[i]
 					.getCoordinates()));

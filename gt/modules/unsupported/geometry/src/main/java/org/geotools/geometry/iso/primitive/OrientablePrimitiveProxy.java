@@ -44,6 +44,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.Precision;
 import org.opengis.spatialschema.geometry.TransfiniteSet;
 import org.opengis.spatialschema.geometry.complex.Complex;
 import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
@@ -133,6 +134,9 @@ public class OrientablePrimitiveProxy implements OrientablePrimitive {
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
 		return primitive.getCoordinateReferenceSystem();
 	}
+    public Precision getPrecision() {
+        return primitive.getPrecision();
+    }
 
 	public Geometry getMbRegion() {
 		return primitive.getMbRegion();

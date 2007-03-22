@@ -103,7 +103,10 @@ import org.opengis.spatialschema.geometry.primitive.Surface;
  * <p>
  */
 public class PolygonBuilder {
-
+    final static int X = 0;
+    final static int Y = 1;
+    final static int Z = 2;
+    
 	private FeatGeomFactoryImpl featGeomyFactory;
 
 	private CGAlgorithms cga;
@@ -300,9 +303,9 @@ public class PolygonBuilder {
 		RingImpl testRing = testEr.getRing();
 		org.geotools.geometry.iso.coordinate.EnvelopeImpl env = (EnvelopeImpl) testRing
 				.getEnvelope();
-		Envelope testEnv = new Envelope(env.getLowerCorner().getX(), env
-				.getUpperCorner().getX(), env.getLowerCorner().getY(), env
-				.getUpperCorner().getY());
+		Envelope testEnv = new Envelope(env.getLowerCorner().getOrdinate(X), env
+				.getUpperCorner().getOrdinate(X), env.getLowerCorner().getOrdinate(Y), env
+				.getUpperCorner().getOrdinate(Y));
 		// Take a point on the ring to do the point in ring test
 		DirectPosition dp = testRing.getRepresentativePoint();
 		Coordinate testPt = new Coordinate(dp.getCoordinates());
@@ -314,15 +317,15 @@ public class PolygonBuilder {
 			RingImpl tryRing = tryShell.getRing();
 
 			env = (EnvelopeImpl) tryRing.getEnvelope();
-			Envelope tryEnv = new Envelope(env.getLowerCorner().getX(), env
-					.getUpperCorner().getX(), env.getLowerCorner().getY(), env
-					.getUpperCorner().getY());
+			Envelope tryEnv = new Envelope(env.getLowerCorner().getOrdinate(X), env
+					.getUpperCorner().getOrdinate(X), env.getLowerCorner().getOrdinate(Y), env
+					.getUpperCorner().getOrdinate(Y));
 
 			if (minShell != null) {
 				env = (EnvelopeImpl) minShell.getRing().getEnvelope();
-				minEnv = new Envelope(env.getLowerCorner().getX(), env
-						.getUpperCorner().getX(), env.getLowerCorner().getY(),
-						env.getUpperCorner().getY());
+				minEnv = new Envelope(env.getLowerCorner().getOrdinate(X), env
+						.getUpperCorner().getOrdinate(X), env.getLowerCorner().getOrdinate(Y),
+						env.getUpperCorner().getOrdinate(Y));
 			}
 
 			boolean isContained = false;

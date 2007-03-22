@@ -54,7 +54,6 @@ import org.opengis.spatialschema.geometry.primitive.Curve;
  * memory in cases of large geometries.
  * 
  * @author Sanjay Jena and Prof. Dr. Jackson Roehrig
- *
  */
 public interface CollectionFactory {
 	

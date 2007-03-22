@@ -131,7 +131,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	 */
 	public DirectPositionImpl createDirectPosition() {
 		// Test ok
-		return new DirectPositionImpl(this.geometryFactory);
+		return new DirectPositionImpl( getCoordinateReferenceSystem() );
 	}
 
 	/* (non-Javadoc)
@@ -144,7 +144,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 		if (coord.length != this.getDimension())
 			throw new MismatchedDimensionException();
 		// Create a DirectPosition which references to a COPY of the given double array
-		return new DirectPositionImpl(this.geometryFactory, coord.clone());
+		return new DirectPositionImpl( this.getCoordinateReferenceSystem(), coord );
 	}
 
 	/* (non-Javadoc)
@@ -235,7 +235,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	 * @return DirectPositionImpl
 	 */
 	public DirectPositionImpl createDirectPosition(DirectPosition dp) {
-		return new DirectPositionImpl(this.geometryFactory, dp);
+		return new DirectPositionImpl( dp.getCoordinateReferenceSystem(), dp.getCoordinates() );
 	}
 
 	/**
@@ -285,10 +285,10 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	 * @param positions
 	 * @return PointArrayImpl
 	 */
-	public PointArrayImpl createPointArray(List<? extends Position> positions) {
+	public PointArrayImpl createPointArray(List<Position> positions) {
 		PointArrayImpl pa = null;
 		try {
-			pa = new PointArrayImpl((List<PositionImpl>) positions);
+			pa = new PointArrayImpl( positions );
 		} catch(ClassCastException e) {
 			throw new IllegalArgumentException("List contains Position instances which can not be casted to the local geometry Position classes.");
 		}
@@ -399,7 +399,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 	 * @param startPar
 	 * @return LineString
 	 */
-	public LineStringImpl createLineString(List<? extends Position> positions,
+	public LineStringImpl createLineString(List<Position> positions,
 			double startPar) {
 		return new LineStringImpl(createPointArray(positions), startPar);
 	}

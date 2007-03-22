@@ -96,6 +96,7 @@ import org.opengis.spatialschema.geometry.primitive.Ring;
 import org.opengis.spatialschema.geometry.primitive.Surface;
 import org.opengis.spatialschema.geometry.primitive.SurfaceBoundary;
 import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.spatialschema.geometry.PositionFactory;
 
 /**
  * 
@@ -113,8 +114,8 @@ public class WKTReader {
 	private static final String R_PAREN = ")";
 
 	private PrimitiveFactory primitiveFactory;
-
 	private GeometryFactory coordinateFactory;
+    private PositionFactory positionFactory;
 
 	private StreamTokenizer tokenizer;
 
@@ -126,9 +127,10 @@ public class WKTReader {
 	 *            the factory used to create <code>Geometry</code>s.
 	 */
 	public WKTReader(PrimitiveFactory aPrimitiveFactory,
-			GeometryFactory aCoordinateFactory) {
+			GeometryFactory aCoordinateFactory, PositionFactory aPositionFactory ) {
 		this.primitiveFactory = aPrimitiveFactory;
 		this.coordinateFactory = aCoordinateFactory;
+        this.positionFactory = aPositionFactory;
 	}
 
 	/**
@@ -532,7 +534,7 @@ public class WKTReader {
 		List<Position> points = new ArrayList<Position>();
 		for (int i = 0; i < aCoords.length; i++) {
 			points
-					.add(this.coordinateFactory
+					.add(this.positionFactory
 							.createPosition(this.coordinateFactory
 									.createDirectPosition((aCoords[i]
 											.getCoordinates()))));

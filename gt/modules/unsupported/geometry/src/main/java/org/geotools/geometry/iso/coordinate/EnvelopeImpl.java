@@ -36,39 +36,41 @@
 
 package org.geotools.geometry.iso.coordinate;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
+import org.geotools.geometry.iso.DimensionModel;
+import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.UnsupportedDimensionException;
 import org.geotools.geometry.iso.util.algorithmND.AlgoRectangleND;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.PositionFactory;
+import org.opengis.spatialschema.geometry.geometry.Position;
 
 /**
  * An envlope represents the bounding box of a geometric object.
  * Regardless to the dimension, the envelope can be encoded by two <code>DirectPosition</code>s. 
  */
 public class EnvelopeImpl implements Envelope {
-
+    static final int X = 0;
+    static final int Y = 1;
+    static final int Z = 2;
 	// protected DirectPositionImpl pMin = null; // Lower Corner (Left bottom)
-	private DirectPositionImpl pMin = null; // Lower Corner (Left bottom)
+	private DirectPosition pMin = null; // Lower Corner (Left bottom)
 
 	// protected DirectPositionImpl pMax = null; // Upper Corner (Right top)
-	private DirectPositionImpl pMax = null; // Upper Corner (Right top)
+	private DirectPosition pMax = null; // Upper Corner (Right top)
 
+    /** Used to create Envelope on request */
+    private PositionFactory factory;
+    
 	/**
 	 * Constructor
 	 * 
 	 * @param env
 	 */
 	public EnvelopeImpl(Envelope env) {
-		DirectPositionImpl p0 = (DirectPositionImpl) env.getLowerCorner();
-		DirectPositionImpl p1 = (DirectPositionImpl) env.getUpperCorner();
-		// CoordinateFactoryImpl cf =
-		// p0.getGeometryFactory().getCoordinateFactory();
-		// this.pMin = cf.createDirectPosition(p0);
-		// this.pMax = cf.createDirectPosition(p1);
-		this.pMin = p0.clone();
-		this.pMax = p1.clone();
+        pMin = (DirectPosition) env.getLowerCorner().clone();
+		pMax = (DirectPosition) env.getUpperCorner().clone();
 	}
 
 	/**
@@ -81,14 +83,18 @@ public class EnvelopeImpl implements Envelope {
 		this.setValues(p0, p1);
 	}
 
+    /**
+     * @param p0
+     */
+    public EnvelopeImpl(Position position) {
+        this( position.getPosition() );
+    }
 	/**
 	 * @param p0
 	 */
-	public EnvelopeImpl(DirectPosition p0) {
-		CoordinateFactoryImpl cf = ((DirectPositionImpl) p0)
-				.getGeometryFactory().getCoordinateFactory();
-		this.pMin = cf.createDirectPosition(p0);
-		this.pMax = cf.createDirectPosition(p0);
+	public EnvelopeImpl(DirectPosition position) {
+		this.pMin = (DirectPosition) position.clone();
+		this.pMax = (DirectPosition) position.clone();
 	}
 
 	/*
@@ -172,7 +178,7 @@ public class EnvelopeImpl implements Envelope {
 	 * 
 	 * @see org.opengis.spatialschema.geometry.Envelope#getUpperCorner()
 	 */
-	public DirectPositionImpl getUpperCorner() {
+	public DirectPosition getUpperCorner() {
 		// Return the upper corner of the envelope
 		return this.pMax;
 	}
@@ -182,7 +188,7 @@ public class EnvelopeImpl implements Envelope {
 	 * 
 	 * @see org.opengis.spatialschema.geometry.Envelope#getLowerCorner()
 	 */
-	public DirectPositionImpl getLowerCorner() {
+	public DirectPosition getLowerCorner() {
 		// Return the lower corner of the envelope
 		return this.pMin;
 	}
@@ -194,6 +200,8 @@ public class EnvelopeImpl implements Envelope {
 	public void setValues(DirectPosition p0, DirectPosition p1) {
 		if (p0 == null || p1 == null || p0.getDimension() != p1.getDimension())
 			throw new IllegalArgumentException("Error 1 on setValues"); //$NON-NLS-1$
+        
+        CoordinateReferenceSystem crs = p0.getCoordinateReferenceSystem();
 		double[] min = p0.getCoordinates();
 		double[] max = p1.getCoordinates();
 		// Check wheater all Min values are smaller than max values
@@ -205,18 +213,16 @@ public class EnvelopeImpl implements Envelope {
 			}
 		}
 
-		CoordinateFactoryImpl cf = ((DirectPositionImpl) p0)
-				.getGeometryFactory().getCoordinateFactory();
-		this.pMin = cf.createDirectPosition(min);
-		this.pMax = cf.createDirectPosition(max);
+		this.pMin = new DirectPositionImpl( crs, min);
+		this.pMax = new DirectPositionImpl( crs, max);
 	}
 
 	/**
 	 * @param env
 	 */
 	public void setValues(EnvelopeImpl env) {
-		this.pMin = env.getLowerCorner().clone();
-		this.pMax = env.getUpperCorner().clone();
+		this.pMin = (DirectPosition) env.getLowerCorner().clone();
+		this.pMax = (DirectPosition) env.getUpperCorner().clone();
 	}
 
 	/**
@@ -224,12 +230,14 @@ public class EnvelopeImpl implements Envelope {
 	 * @return EnvelopeImpl
 	 */
 	public static EnvelopeImpl createEnvelope(DirectPositionImpl[] p) {
-		if (p.length == 0)
+		if (p.length == 0){
 			return null;
+        }
 		EnvelopeImpl result = new EnvelopeImpl(p[0]);
 		for (int i = 1; i < p.length; ++i) {
-			if (p[i] != null)
+			if (p[i] != null){
 				result.add(p[i]);
+            }
 		}
 		return result;
 	}
@@ -237,10 +245,13 @@ public class EnvelopeImpl implements Envelope {
 	/**
 	 * @return GeometryFactoryImpl
 	 */
-	public FeatGeomFactoryImpl getGeometryFactory() {
-		return this.pMin.getGeometryFactory();
+	public PositionFactory getPositionFactory() {
+        if (factory == null ){
+            factory = new PositionFactoryImpl( getCoordinateReferenceSystem(), null );            
+        }
+		return factory;
 	}
-
+    
 	/**
 	 * Unions an envelope with an another envelope
 	 * 
@@ -278,8 +289,10 @@ public class EnvelopeImpl implements Envelope {
 	 */
 	public void add(double[] coord) {
 		assert (coord.length == this.getDimension());
+        
 		double[] minCoord = this.pMin.getCoordinates();
 		double[] maxCoord = this.pMax.getCoordinates();
+        
 		for (int i = 0; i < this.getDimension(); ++i) {
 			double ci = coord[i];
 			double cmini = minCoord[i];
@@ -289,12 +302,13 @@ public class EnvelopeImpl implements Envelope {
 			if (!Double.isNaN(ci) && ((ci > cmaxi) || Double.isNaN(cmaxi)))
 				this.pMax.setOrdinate(i, ci);
 		}
+        
 	}
 
 	/**
 	 * @param p
 	 */
-	public void add(DirectPositionImpl p) {
+	public void add(DirectPosition p) {
 		this.add(p.getCoordinates());
 	}
 
@@ -302,8 +316,8 @@ public class EnvelopeImpl implements Envelope {
 	 * @param env
 	 */
 	public void add(EnvelopeImpl env) {
-		this.add(env.getLowerCorner());
-		this.add(env.getUpperCorner());
+		this.add( env.getLowerCorner() );
+		this.add( env.getUpperCorner() );
 	}
 
 // Auskommentiert, da es die scale methode von DP nutzt. diese ist nicht robust.
@@ -358,7 +372,7 @@ public class EnvelopeImpl implements Envelope {
 	 * 
 	 * @return
 	 */
-	public DirectPositionImpl getNECorner() {
+	public DirectPosition getNECorner() {
 		// Test ok
 		return this.getUpperCorner();
 	}
@@ -368,11 +382,11 @@ public class EnvelopeImpl implements Envelope {
 	 * 
 	 * @return
 	 */
-	public DirectPositionImpl getSWCorner() {
+	public DirectPosition getSWCorner() {
 		// Test ok
 		return this.getLowerCorner();
 	}
-	
+
 	/**
 	 * The South East corner of this Envelope
 	 * 2D and 2.5D only!
@@ -382,18 +396,25 @@ public class EnvelopeImpl implements Envelope {
 	 * @return
 	 * @throws UnsupportedDimensionException 
 	 */
-	public DirectPositionImpl getSECorner() throws UnsupportedDimensionException {
+	public DirectPosition getSECorner() throws UnsupportedDimensionException {
 		// Test ok (indirect by Primitive Factory Test)
-		FeatGeomFactoryImpl fact = this.pMin.getGeometryFactory();
-		CoordinateFactoryImpl cf = fact.getCoordinateFactory();
-		
-		DirectPositionImpl rDP = null;
-
-		if (fact.getDimensionModel().is2D()) {
-			rDP = cf.createDirectPosition(new double[]{this.pMax.getX(), this.pMin.getY()});
+        PositionFactory fact = getPositionFactory();  
+        
+		DirectPosition rDP = null;
+        int D = DimensionModel.toD( getCoordinateReferenceSystem() );
+		if ( D == DimensionModel.TWO_DIMENSIONIAL ) {
+			rDP = fact.createDirectPosition(new double[]{
+               this.pMax.getOrdinate(X),
+               this.pMin.getOrdinate(Y)
+            });
 		} else
-		if (fact.getDimensionModel().is2o5D()) {
-			rDP = cf.createDirectPosition(new double[]{this.pMax.getX(), this.pMin.getY(), this.pMin.getZ()});
+            if ( D == DimensionModel.TWOoFIVE_DIMENSIONIAL ) {
+			rDP = fact.createDirectPosition(
+		        new double[]{
+                        this.pMax.getOrdinate(X),
+                        this.pMin.getOrdinate(Y),
+                        this.pMin.getOrdinate(Z)}
+			);
 		} else {
 			throw new UnsupportedDimensionException("3d not supported.");
 		}
@@ -411,16 +432,15 @@ public class EnvelopeImpl implements Envelope {
 	 */
 	public DirectPositionImpl getNWCorner() throws UnsupportedDimensionException {
 		// Test ok (indirect by Primitive Factory Test)
-		FeatGeomFactoryImpl fact = this.pMin.getGeometryFactory();
-		CoordinateFactoryImpl cf = fact.getCoordinateFactory();
 		
 		DirectPositionImpl rDP = null;
-
-		if (fact.getDimensionModel().is2D()) {
-			rDP = cf.createDirectPosition(new double[]{this.pMin.getX(), this.pMax.getY()});
+		CoordinateReferenceSystem crs = getCoordinateReferenceSystem();
+        int D = DimensionModel.toD( crs );
+        if ( D == DimensionModel.TWO_DIMENSIONIAL ) {
+        	rDP = new DirectPositionImpl( crs, new double[]{this.pMin.getOrdinate(X), this.pMax.getOrdinate(Y)});
 		} else
-		if (fact.getDimensionModel().is2o5D()) {
-			rDP = cf.createDirectPosition(new double[]{this.pMin.getX(), this.pMax.getY(), this.pMin.getZ()});
+            if ( D == DimensionModel.TWOoFIVE_DIMENSIONIAL ) {
+			rDP = new DirectPositionImpl( crs, new double[]{this.pMin.getOrdinate(X), this.pMax.getOrdinate(Y), this.pMin.getOrdinate(Z)});
 		} else {
 			throw new UnsupportedDimensionException("3d not supported.");
 		}

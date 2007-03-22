@@ -23,7 +23,7 @@ import java.util.LinkedHashSet;
 /**
  * Utility methods that apply to all {@linkplain FactoryRegistry factory registries}.
  *
- * @since 2.4
+ * @since 2.4 PENDING PROPOSAL
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux

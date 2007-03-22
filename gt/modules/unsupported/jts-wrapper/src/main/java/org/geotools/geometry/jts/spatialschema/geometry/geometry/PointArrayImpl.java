@@ -10,6 +10,7 @@
 package org.geotools.geometry.jts.spatialschema.geometry.geometry;
 
 // J2SE direct dependencies
+import java.util.ArrayList;
 import java.util.List;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -43,12 +44,12 @@ import org.geotools.geometry.jts.JTSUtils;
  * @author <A HREF="http://www.opengis.org">OpenGIS&reg; consortium</A>
  * @version 2.0
  */
-public class PointArrayImpl implements PointArray, JTSGeometry {
+public class PointArrayImpl extends ArrayList implements PointArray, JTSGeometry {
+    private static final long serialVersionUID = -9202900942004287122L;
 
     //*************************************************************************
     //  Fields
-    //*************************************************************************
-    
+    //*************************************************************************    
     private List pointList;
     
     private CoordinateReferenceSystem crs;
@@ -133,7 +134,7 @@ public class PointArrayImpl implements PointArray, JTSGeometry {
      * @revisit Should we specify that changes to the returned point will not be reflected
      *          to this array, or should we left the decision to the implementor?
      */
-    public DirectPosition get(int column) throws IndexOutOfBoundsException {
+    public Object get(int column) throws IndexOutOfBoundsException {
         return (DirectPosition) ((DirectPosition)pointList.get(column)).clone();
     }
 
@@ -150,7 +151,7 @@ public class PointArrayImpl implements PointArray, JTSGeometry {
      *
      * @see #get(int)
      */
-    public DirectPosition get(int column, DirectPosition dest) throws IndexOutOfBoundsException {
+    public DirectPosition getPosition(int column, DirectPosition dest) throws IndexOutOfBoundsException {
         DirectPosition position = (DirectPosition)pointList.get(column);
         if (dest == null) {
             dest = new DirectPositionImpl(position.getCoordinateReferenceSystem());
@@ -160,7 +161,7 @@ public class PointArrayImpl implements PointArray, JTSGeometry {
         }
         return dest;
     }
-
+    
     /**
      * Set the point at the given index.
      *
@@ -174,11 +175,11 @@ public class PointArrayImpl implements PointArray, JTSGeometry {
      *
      * @see List#set
      */
-    public void set(int column, DirectPosition position) throws IndexOutOfBoundsException {
+    public void setPosition(int column, DirectPosition position) throws IndexOutOfBoundsException {
         DirectPosition thisPosition = (DirectPosition)pointList.get(column);
-        
+        DirectPosition otherPosition = position.getPosition();
         for (int i = 0; i < thisPosition.getDimension(); i++) {
-            thisPosition.setOrdinate(i, position.getOrdinate(i));
+            thisPosition.setOrdinate(i, otherPosition.getOrdinate(i));
         }
         if (parent != null) parent.invalidateCachedJTSPeer();
     }
@@ -194,7 +195,7 @@ public class PointArrayImpl implements PointArray, JTSGeometry {
      * @revisit Should we specify that changes to the returned points will not be reflected
      *          into this array, or should we left the decision to the implementor?
      */
-    public DirectPosition[] toArray() {
+    public Object[] toArray() {
         int n = pointList.size();
         DirectPosition [] result = new DirectPosition[n];
         for (int i=0; i<n; i++) {

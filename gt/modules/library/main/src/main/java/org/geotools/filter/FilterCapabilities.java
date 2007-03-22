@@ -270,6 +270,7 @@ public class FilterCapabilities {
 
                 if (!(this.fullySupports(testFilter))) {
                     supports = false;
+                    break;
                 }
             }
         } else {

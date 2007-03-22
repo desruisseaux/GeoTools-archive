@@ -79,7 +79,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.geotools.geometry.iso.topograph2D.Coordinate;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Geometry;
+import org.opengis.spatialschema.geometry.Precision;
+import org.opengis.spatialschema.geometry.PrecisionType;
 
 /**
  * Specifies the precision model of the {@link Coordinate}s in a
@@ -120,64 +123,29 @@ import org.opengis.spatialschema.geometry.Geometry;
  * 
  * @version 1.7.2
  */
-public class PrecisionModel implements Serializable, Comparable {
+public class PrecisionModel implements Serializable, Precision {
 
 	private static final long serialVersionUID = 7777263578777803835L;
-
-
-	/**
-	 * The types of Precision Model which JTS supports.
-	 * <p>
-	 * This class is only for use to support the "enums" for the types of
-	 * precision model.
-	 * <p>
-	 * <i> Note: Type should be declared as private to this class, but JBuilder
-	 * 7 throws a compiler exception when trying to compile with the "private"
-	 * keyword. Package-private is safe enough. </i>
-	 */
-	static class Type implements Serializable {
-		private static final long serialVersionUID = -5528602631731589822L;
-
-		private static Map nameToTypeMap = new HashMap();
-
-		public Type(String name) {
-			this.name = name;
-			nameToTypeMap.put(name, this);
-		}
-
-		private String name;
-
-		public String toString() {
-			return name;
-		}
-
-		/**
-		 * @see http://www.javaworld.com/javaworld/javatips/jw-javatip122.html
-		 */
-		private Object readResolve() {
-			return nameToTypeMap.get(name);
-		}
-	}
 
 	/**
 	 * Fixed Precision indicates that coordinates have a fixed number of decimal
 	 * places. The number of decimal places is determined by the log10 of the
 	 * scale factor.
 	 */
-	public static final Type FIXED = new Type("FIXED");
+	public static final PrecisionType FIXED = PrecisionType.FIXED;
 
 	/**
 	 * Floating precision corresponds to the standard Java double-precision
 	 * floating-point representation, which is based on the IEEE-754 standard
 	 */
-	public static final Type FLOATING = new Type("FLOATING");
+	public static final PrecisionType FLOATING = PrecisionType.DOUBLE;
 
 	/**
 	 * Floating single precision corresponds to the standard Java
 	 * single-precision floating-point representation, which is based on the
 	 * IEEE-754 standard
 	 */
-	public static final Type FLOATING_SINGLE = new Type("FLOATING SINGLE");
+	public static final PrecisionType FLOATING_SINGLE = PrecisionType.FLOAT;
 
 	/**
 	 * The maximum precise value representable in a double. Since IEE754
@@ -189,7 +157,7 @@ public class PrecisionModel implements Serializable, Comparable {
 	/**
 	 * The type of PrecisionModel this represents.
 	 */
-	private Type modelType;
+	private PrecisionType modelType;
 
 	/**
 	 * The scale factor which determines the number of decimal places in fixed
@@ -214,7 +182,7 @@ public class PrecisionModel implements Serializable, Comparable {
 	 * @param modelType
 	 *            the type of the precision model
 	 */
-	public PrecisionModel(Type modelType) {
+	public PrecisionModel(PrecisionType modelType) {
 		this.modelType = modelType;
 		if (modelType == FIXED) {
 			setScale(1.0);
@@ -293,7 +261,7 @@ public class PrecisionModel implements Serializable, Comparable {
 	 * 
 	 * @return the type of this PrecisionModel
 	 */
-	public Type getType() {
+	public PrecisionType getType() {
 		return modelType;
 	}
 
@@ -381,9 +349,7 @@ public class PrecisionModel implements Serializable, Comparable {
 	 *         <code>PrecisionModel</code> is less than, equal to, or greater
 	 *         than the specified <code>PrecisionModel</code>
 	 */
-	public int compareTo(Object o) {
-		PrecisionModel other = (PrecisionModel) o;
-
+	public int compareTo(PrecisionModel other) {		
 		int sigDigits = getMaximumSignificantDigits();
 		int otherSigDigits = other.getMaximumSignificantDigits();
 		return (new Integer(sigDigits)).compareTo(new Integer(otherSigDigits));
@@ -405,4 +371,28 @@ public class PrecisionModel implements Serializable, Comparable {
 		// encountered");
 		// return 0;
 	}
+
+    public int compareTo( Precision arg0 ) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void round( DirectPosition position ) {        
+        if (modelType.isFloating()){ // somekind of optimization
+            return;
+        }
+        double coords[] = position.getCoordinates();
+        position.setOrdinate( 0, makePrecise( coords[0] ));
+        position.setOrdinate( 1, makePrecise( coords[1] ));
+        if( coords.length == 2 ) return;
+        
+        position.setOrdinate( 2, makePrecise( coords[2] ));    
+        if( coords.length == 3 ) return;
+        
+        for( int axis = 3; axis < position.getDimension(); axis++ ){
+            double ordinate = position.getOrdinate( axis );
+            ordinate = makePrecise( ordinate );
+            position.setOrdinate( axis, ordinate );
+        }
+    }
 }

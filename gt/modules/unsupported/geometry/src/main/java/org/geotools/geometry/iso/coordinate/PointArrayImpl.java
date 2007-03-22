@@ -40,6 +40,7 @@ package org.geotools.geometry.iso.coordinate;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
@@ -53,7 +54,6 @@ import org.opengis.spatialschema.geometry.geometry.PointArray;
 import org.opengis.spatialschema.geometry.geometry.Position;
 
 /**
- * 
  * Many of the geometric constructs in this International Standard require the
  * use of reference points which are organized into sequences or grids
  * (sequences of equal length sequences). PointArray::column[1..n] : Position
@@ -66,26 +66,36 @@ import org.opengis.spatialschema.geometry.geometry.Position;
  * @author Jackson Roehrig & Sanjay Jena
  */
 
-public class PointArrayImpl implements PointArray {
-
-	// The list of Positions by which the PointArray is defined
-	private List<PositionImpl> column = null;
-
+public class PointArrayImpl extends ArrayList<Position> implements PointArray {
+    CoordinateReferenceSystem crs;
+    
+    /**
+     * Please add content; according to ISO 19117 an empty PointArray
+     * cannot exist.
+     * @param crs
+     */
+    public PointArrayImpl(CoordinateReferenceSystem crs ) {
+        this.crs = crs;
+    }
+    public PointArrayImpl( DirectPosition p1, DirectPosition p2 ){
+        crs = p1.getCoordinateReferenceSystem();
+        add( p1 );
+        add( p2 );
+    }
 	/**
 	 * Creates a new PointArray based on another PointArray. This constructor
 	 * creates new Position objects.
 	 * 
 	 * @param aPointArray
 	 */
-	public PointArrayImpl(PointArrayImpl aPointArray) {
-
-		if (aPointArray.isEmpty())
-			throw new IllegalArgumentException("Parameter PointArray is empty. Cannot create empty PointArray.");
-
+	public PointArrayImpl(PointArray aPointArray) {
+		if (aPointArray.isEmpty()){
+			throw new IllegalArgumentException("Parameter PointArray is empty. Cannot create empty PointArray as we need the CRS");
+        }
 		// Position data will be cloned here
 		
 		//this.column = new ArrayList<PositionImpl>();
-		this.column = this.getFeatGeomFactory().getListFactory().getPositionList();
+		//this.column = this.getFeatGeomFactory().getListFactory().getPositionList();
 
 //		int coordDim = aPointArray.getFirst().getCoordinateDimension();
 //		CoordinateFactoryImpl coordFactory = FeatGeomFactoryImpl
@@ -93,14 +103,16 @@ public class PointArrayImpl implements PointArray {
 
 		// TODO JR: Zur kenntnisnahme:
 		// Wie in deinem Vorschlag von unserem Telefonat am 04/10 hole ich die CoordFactory über ein DP
-		CoordinateFactoryImpl coordFactory = this.getFeatGeomFactory().getCoordinateFactory();
-		
-		for (int i = 0; i < aPointArray.length(); i++) {
-			this.column.add((PositionImpl) coordFactory
-					.createPosition(aPointArray.get(i).getPosition()));
+        
+		//CoordinateFactoryImpl coordFactory = this.getFeatGeomFactory().getCoordinateFactory();		
+		for (int i = 0; i < aPointArray.size(); i++) {
+            Position copy = new PositionImpl( aPointArray.getPosition(i, null) );
+			add( copy );
 		}
+        crs = getPosition(0).getPosition().getCoordinateReferenceSystem();
 	}
 
+    
 	/**
 	 * Construct a new PointArray. This constructor does not create new position
 	 * objects.
@@ -108,11 +120,12 @@ public class PointArrayImpl implements PointArray {
 	 * @param positions
 	 * 
 	 */
-	public PointArrayImpl(List<PositionImpl> positions) {
-		if (positions.size() == 0)
-			throw new IllegalArgumentException("Parameter positions is empty. Cannot create empty PointArray.");
-		
-		this.column = positions;
+	public PointArrayImpl(List<Position> positions) {
+        super( positions );
+		if (positions.size() == 0){
+			throw new IllegalArgumentException("Parameter positions is empty. Cannot create empty PointArray as we need the CRS");
+        }
+        crs = getPosition(0).getPosition().getCoordinateReferenceSystem();
 	}
 	
 	
@@ -121,25 +134,22 @@ public class PointArrayImpl implements PointArray {
 	/**
 	 * Returns the Feature Geometry Factory Instance based on the reference of the DirectPositions of this PointArray
 	 * @return Factory instance
-	 */
+	 *
 	private FeatGeomFactoryImpl getFeatGeomFactory() {
-		if (this.column.isEmpty()) {
+		if (this.isEmpty()) {
 			return null;
 		}
-		
-		DirectPositionImpl tDP = this.column.get(0).getPosition();
+		DirectPositionImpl tDP = get(0).getPosition();
 		return tDP.getGeometryFactory();		
-	}
+	}*/
 	
-
 	/**
 	 * Returns the Point array as Set of Position
 	 * 
 	 * @return the positions
 	 */
-	public List<PositionImpl> getPointArray() {
-		// ok
-		return this.column;
+	public List<Position> getPointArray() {
+		return this;
 	}
 
 	/**
@@ -150,7 +160,7 @@ public class PointArrayImpl implements PointArray {
 	public double[] getCoordinate(int index) {
 		// test ok
 		
-		PositionImpl pos = this.get(index);
+		PositionImpl pos = getPosition(index);
 		return pos.getPosition().getCoordinates();
 
 		// Auskommentiert und geändert durch Sanjay am 21.08.2006
@@ -169,9 +179,9 @@ public class PointArrayImpl implements PointArray {
 	 * @param arg0
 	 * @return PositionImpl
 	 */
-	public PositionImpl get(int index) {
+	public PositionImpl getPosition(int index) {
 		// test ok
-		return (PositionImpl) this.column.get(index);
+		return (PositionImpl) get(index);
 	}
 
 	/**
@@ -181,7 +191,7 @@ public class PointArrayImpl implements PointArray {
 	 */
 	public PositionImpl getFirst() {
 		// ok
-		return (PositionImpl) this.column.get(0);
+		return (PositionImpl) get(0);
 	}
 
 	/**
@@ -190,8 +200,8 @@ public class PointArrayImpl implements PointArray {
 	 * @return Position
 	 */
 	public PositionImpl getLast() {
-		// ok
-		return (PositionImpl) this.column.get(this.column.size() - 1);
+		// ok        
+        return (PositionImpl) get(size() - 1);
 	}
 
 //	/**
@@ -247,15 +257,6 @@ public class PointArrayImpl implements PointArray {
 //		this.column = newColumn;
 //	}
 	
-
-	/**
-	 * @return boolean
-	 */
-	public boolean isEmpty() {
-		// Implementation OK
-		return this.column.isEmpty();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -263,7 +264,7 @@ public class PointArrayImpl implements PointArray {
 	 */
 	public int length() {
 		// Implementation OK
-		return this.column.size();
+		return size();
 	}
 
 //	/**
@@ -298,10 +299,8 @@ public class PointArrayImpl implements PointArray {
 	 * @return envelope for all points in point array
 	 */
 	public EnvelopeImpl getEnvelope() {
-
-		double[] c0 = getCoordinate(0);
-		
-		EnvelopeImpl env = this.getFeatGeomFactory().getCoordinateFactory().createEnvelope(c0);
+        Position position = getPosition( 0 );        
+		EnvelopeImpl env = new EnvelopeImpl( position );
 		
 		for (int i = 1, n = length(); i < n; i++) {
 			double[] c1 = getCoordinate(i);
@@ -317,13 +316,13 @@ public class PointArrayImpl implements PointArray {
 	 */
 	public boolean removePosition(Position p) {
 		// test ok
-		return this.column.remove(p);
+		return remove(p);
 	}
 
 	public String toString() {
 		String rString = ""; //$NON-NLS-1$
-		for (int i = 0; i < this.column.size(); i++) {
-			rString += this.column.get(i) + ", ";
+		for (int i = 0; i < size(); i++) {
+			rString += get(i) + ", ";
 		}
 		return rString;
 	}
@@ -332,39 +331,48 @@ public class PointArrayImpl implements PointArray {
 	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#getCoordinateReferenceSystem()
 	 */
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-		return this.getFeatGeomFactory().getCoordinateReferenceSystem();
+        return crs;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#get(int, org.opengis.spatialschema.geometry.DirectPosition)
 	 */
-	public DirectPositionImpl get(int col, DirectPosition dest)
+	public DirectPositionImpl getPosition(int col, DirectPosition dest)
 			throws IndexOutOfBoundsException {
 		// Test ok (SJ)
+		Position pos = get(col);
 
-		PositionImpl pos = this.column.get(col);
-
-		double[] coords = pos.getPosition().getCoordinates();
-		
+		double[] coords = pos.getPosition().getCoordinates();		
 		if (dest != null) {
-			// Set coordinates in existing DP
-			((DirectPositionImpl)dest).setCoordinate(coords);
+            if( dest instanceof DirectPositionImpl ){
+                DirectPositionImpl fast = (DirectPositionImpl) dest;
+                // Set coordinates in existing DP
+                fast.setCoordinate(coords);    
+            }
+            else {
+                for( int i=0; i<coords.length; i++ ){
+                    dest.setOrdinate( i, coords[i] );
+                }
+            }			
 		} else {
-			// Create new DP with coordinates
-			dest = this.getFeatGeomFactory().getCoordinateFactory().createDirectPosition(coords);
-		}
-		
+            dest = new DirectPositionImpl( pos );			
+		}		
 		return (DirectPositionImpl) dest;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#set(int, org.opengis.spatialschema.geometry.DirectPosition)
 	 */
-	public void set(int column, DirectPosition position)
+	public void setPosition(int index, DirectPosition position)
 			throws IndexOutOfBoundsException, UnsupportedOperationException {
 		// Test ok
 		// Set copy of the coordinates of the given DirectPosition
-		this.set(column, position.getCoordinates().clone());
+        Position pos = get(index);
+        DirectPosition inPlace = pos.getPosition();
+        double[] coord = position.getCoordinates();
+        for( int i=0; i<coord.length; i++){
+            inPlace.setOrdinate( i, coord[i] );
+        }
 	}
 
 	/**
@@ -375,8 +383,11 @@ public class PointArrayImpl implements PointArray {
 	public void set(int index, double[] coord) {
 		// TODO test
 		// Manipulate the coordinates at the Position entry at the index
-		PositionImpl pos = this.column.get(index);
-		pos.getPosition().setCoordinate(coord);
+		Position pos = get(index);
+        DirectPosition position = pos.getPosition();
+        for( int i=0; i<coord.length; i++){
+            position.setOrdinate( i, coord[i] );
+        }
 	}
 
 
@@ -385,7 +396,7 @@ public class PointArrayImpl implements PointArray {
 	 */
 	public List positions() {
 		// Test ok
-		return this.column;
+		return this;
 	}
 
 	/**
@@ -440,7 +451,7 @@ public class PointArrayImpl implements PointArray {
 	 */
 	public PositionImpl remove(int index) {
 		// Test ok
-		return this.column.remove(index);
+		return remove(index);
 	}
 
 	/**
@@ -456,13 +467,6 @@ public class PointArrayImpl implements PointArray {
 		return new LineSegmentsSequence(this, parentCurve);
 	}
 	
-    /**
-     * Reverses the orientation of the parameterizations of the control points of this PointArray.
-     */
-	public void reverse() {
-		Collections.reverse(this.column);
-	}
-
 	/**
 	 * Class to support on-the-fly generation of LineSegments
 	 * 
@@ -472,13 +476,9 @@ public class PointArrayImpl implements PointArray {
 	public class LineSegmentsSequence extends AbstractList<LineSegmentImpl> {
 
 		private PointArrayImpl pointArray;
-
 		private int index;
-
-		private double length;
-		
+		private double length;		
 		private CurveImpl parentCurve = null;
-
 
 		/**
 		 * Create a Line Segment sequence by a pointarray and a parent curve
@@ -503,12 +503,13 @@ public class PointArrayImpl implements PointArray {
 			// Calculate start param for this line segment
 			double startParam = 0.0;
 			for (int i=1; i<=arg0; i++) {
-				startParam = DoubleOperation.add(startParam, AlgoPointND.getDistance(this.getStartCoordinate(i-1), this.getEndCoordinate(i-1)));
+				startParam = DoubleOperation.add(
+                        startParam,
+                        AlgoPointND.getDistance(this.getStartCoordinate(i-1), this.getEndCoordinate(i-1))
+				);
 				//startParam += AlgoPointND.getDistance(this.getStartCoordinate(i-1), this.getEndCoordinate(i-1));
-			}
-			
-			LineSegmentImpl rSeg = this.pointArray.getFeatGeomFactory().getCoordinateFactory().createLineSegment(p0, p1, startParam);
-
+			}            
+			LineSegmentImpl rSeg = new LineSegmentImpl( pointArray.getCoordinateReferenceSystem(), p0, p1, startParam );            
 			rSeg.setCurve(this.parentCurve);
 
 			return rSeg;
@@ -521,7 +522,7 @@ public class PointArrayImpl implements PointArray {
 		 */
 		public DirectPositionImpl getStartDirectPositionCoordinate(int arg0,
 				DirectPosition dp) {
-			return this.pointArray.get(arg0, dp);
+			return this.pointArray.getPosition(arg0, dp);
 		}
 
 		/**
@@ -531,7 +532,7 @@ public class PointArrayImpl implements PointArray {
 		 */
 		public DirectPositionImpl getEndDirectPositionCoordinate(int arg0,
 				DirectPosition dp) {
-			return this.pointArray.get(arg0 + 1, dp);
+			return this.pointArray.getPosition(arg0 + 1, dp);
 		}
 
 		/**
@@ -571,7 +572,7 @@ public class PointArrayImpl implements PointArray {
 //			LineSegmentImpl ls = FeatGeomFactoryImpl
 //					.getDefaultCoordinateFactory(p0.length).createLineSegment(
 //							p0, p1, this.length);
-			LineSegmentImpl ls = this.pointArray.getFeatGeomFactory().getCoordinateFactory().createLineSegment(p0, p1, this.length);
+			LineSegmentImpl ls = new LineSegmentImpl( pointArray.getCoordinateReferenceSystem(), p0, p1, this.length);
 
 			this.length = DoubleOperation.add(this.length, AlgoPointND.getDistance(p0, p1));
 			//this.length += AlgoPointND.getDistance(p0, p1);
@@ -585,7 +586,7 @@ public class PointArrayImpl implements PointArray {
 	 * @see org.opengis.spatialschema.geometry.geometry.PointArray#getDimension()
 	 */
 	public int getDimension() {
-		return this.getFeatGeomFactory().getCoordinateDimension();
+		return crs.getCoordinateSystem().getDimension();
 	}
 
 

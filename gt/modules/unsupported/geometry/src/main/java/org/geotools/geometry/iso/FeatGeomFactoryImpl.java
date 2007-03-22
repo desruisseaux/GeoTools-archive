@@ -130,6 +130,8 @@ public class FeatGeomFactoryImpl {
 	private CoordinateFactoryImpl coordinateFactory;
 
 	private PrimitiveFactoryImpl primitiveFactory;
+    
+    private PositionFactoryImpl positionFactory;
 
 	private ComplexFactoryImpl complexFactory;
 
@@ -222,7 +224,7 @@ public class FeatGeomFactoryImpl {
 	 * 
 	 * @return the used Precision Model
 	 */
-	public PrecisionModel getPrecisionModel() {
+	public PrecisionModel getPrecision() {
 		return this.precisionModel;
 	}
 

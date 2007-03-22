@@ -35,6 +35,8 @@
  */
 package org.geotools.geometry.iso;
 
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 /**
  * The class Dimension represents the dimension type of a Feature Geometry. It
  * supports three dimension types:
@@ -71,11 +73,31 @@ package org.geotools.geometry.iso;
 public class DimensionModel {
 
 	public static final int TWO_DIMENSIONIAL = 1;
-
 	public static final int TWOoFIVE_DIMENSIONIAL = 2;
-
 	public static final int THREE_DIMENSIONIAL = 3;
 
+    /**
+     * One of the DimensionModel constants.
+     * <ul>
+     * <li>1 2   Dimensional
+     * <li>2 2.5 Dimensional
+     * <li>2 3   Dimensional (Unsupported)
+     * </ul>
+     * @return value based on crs
+     */
+    public static int toD( CoordinateReferenceSystem crs ){
+        int dimension = crs.getCoordinateSystem().getDimension();
+        if( dimension == 2 ){
+            return 1;
+        }
+        else if( dimension == 3 ){
+            return 2;
+        }
+        else {
+            return 3;
+        }
+    }
+    
 	private int dimensionModelType = 0;
 
 	/**

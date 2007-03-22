@@ -153,7 +153,7 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
         return DEFAULT;
     }
        
-    public CoordinateReferenceSystem createCoordinateReferenceSystem(String code) 
+    public synchronized CoordinateReferenceSystem createCoordinateReferenceSystem(String code) 
         throws FactoryException 
     {
         if (code == null) {
@@ -164,7 +164,7 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
         }
         final String EPSG_NUMBER = code.substring( code.indexOf(':')+1 ).trim();
         
-        if( cache.contains( EPSG_NUMBER ) ){
+        if( cache.containsKey( EPSG_NUMBER ) ){ 
             Object value = cache.get( EPSG_NUMBER );
             if( value instanceof Throwable ){
                 throw new FactoryException( "WKT for "+code+" could not be parsed", (Throwable) value );
@@ -183,8 +183,15 @@ public class EPSGCRSAuthorityFactory implements CRSAuthorityFactory {
         	wkt += ",AUTHORITY[\"EPSG\",\""+EPSG_NUMBER+"\"]]";
         	LOGGER.log(Level.WARNING, "EPSG:"+EPSG_NUMBER+" lacks a proper identifying authority in its Well-Known Text. It is being added programmatically.");
         }
-        return crsFactory.createFromWKT(wkt);
-        
+        try {
+            CoordinateReferenceSystem crs = crsFactory.createFromWKT(wkt);
+            cache.put(EPSG_NUMBER, crs);
+            return crs;
+        }
+        catch (FactoryException fex) {
+            cache.put(EPSG_NUMBER, fex);
+            throw fex;
+        }        
     }
     
     public IdentifiedObject createObject(String code) throws FactoryException {

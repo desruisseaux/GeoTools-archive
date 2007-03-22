@@ -634,7 +634,7 @@ public final class GeometryUtils {
         final PointArray controlPoints = lineString.getControlPoints();
         final DirectPosition[] returnable = new DirectPosition[controlPoints.length()];
         for (int i = 0; i < controlPoints.length(); i++) {
-            returnable[i] = controlPoints.get(i, null);
+            returnable[i] = controlPoints.getPosition(i, null);
         }
         return returnable;
     }

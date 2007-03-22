@@ -71,6 +71,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.spatialschema.geometry.Boundary;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
+import org.opengis.spatialschema.geometry.Precision;
 import org.opengis.spatialschema.geometry.TransfiniteSet;
 import org.opengis.spatialschema.geometry.aggregate.MultiPoint;
 import org.opengis.spatialschema.geometry.complex.Complex;
@@ -105,7 +106,6 @@ import org.opengis.spatialschema.geometry.Geometry;
 public abstract class GeometryImpl implements Geometry {
 
 	private boolean mutable = true;
-
 	private FeatGeomFactoryImpl factory;
 
 	/**
@@ -213,6 +213,9 @@ public abstract class GeometryImpl implements Geometry {
 		// TODO documentation
 		return this.factory.getCoordinateReferenceSystem();
 	}
+    public Precision getPrecision() {
+        return factory.getPrecision();
+    }
 
 	/*
 	 * (non-Javadoc)

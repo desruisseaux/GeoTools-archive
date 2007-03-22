@@ -37,10 +37,16 @@
 
 package org.geotools.geometry.iso.coordinate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
+import org.opengis.spatialschema.geometry.MismatchedDimensionException;
 import org.opengis.spatialschema.geometry.geometry.LineSegment;
+import org.opengis.spatialschema.geometry.geometry.Position;
 
 /**
  * 
@@ -108,7 +114,20 @@ public class LineSegmentImpl extends LineStringImpl implements LineSegment {
 	}
 
 
-	/*
+    /**
+     * This functionality taken from CoordinateFactory where 
+     * I am not quite clear as to the purpose (Jody).
+     * 
+     * @param crs
+     * @param to
+     * @param from
+     * @param startParam
+     */
+	public LineSegmentImpl( CoordinateReferenceSystem crs, double[] from, double[] to, double startParam ) {
+        this( new PointArrayImpl( new DirectPositionImpl( crs, from ), new DirectPositionImpl( crs, to )), startParam );        
+    }
+
+    /*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.geotools.geometry.featgeom.coordinate.CurveSegmentImpl#isSimple()
@@ -164,8 +183,7 @@ public class LineSegmentImpl extends LineStringImpl implements LineSegment {
 		// par = 0 => result = dp0
 		// par = 1 => result = dp1
 		double[] coord = AlgoPointND.evaluate(p0.getCoordinates(), p1.getCoordinates(), par);
-		return p0.getGeometryFactory().getCoordinateFactory().createDirectPosition(coord);
-		// old version: return DirectPositionImpl.evaluate(p0, p1, par);
+        return new DirectPositionImpl( p0.getCoordinateReferenceSystem(), coord );
 	}
 	
 	/**

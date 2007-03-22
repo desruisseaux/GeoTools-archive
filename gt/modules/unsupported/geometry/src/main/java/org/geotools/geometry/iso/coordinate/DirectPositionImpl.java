@@ -42,6 +42,7 @@ import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.MismatchedDimensionException;
+import org.opengis.spatialschema.geometry.geometry.Position;
 
 /**
  * @author Jackson Roehrig & Sanjay Jena
@@ -60,41 +61,50 @@ public class DirectPositionImpl implements DirectPosition {
 	 */
 	private double[] coordinate;
 
-	private FeatGeomFactoryImpl factory;
+    /**
+     * Coordinate Reference System used to determine meaning of above coordinates
+     */
+	private CoordinateReferenceSystem crs;
 
 	/**
 	 * Creates a direct Position initializing all ordiante values with 0.0
-	 * 
+	 * @deprecated Please use new DirectPosition( factory.getCoordianteReferenceSystem() );
 	 * @param factory
 	 */
 	public DirectPositionImpl(FeatGeomFactoryImpl factory) {
-		int n = factory.getCoordinateDimension();
-		this.factory = factory;
-		this.coordinate = new double[n];
-		for (int i = 0; i < n; ++i)
+        this( factory.getCoordinateReferenceSystem() );
+    }
+    
+    public DirectPositionImpl( CoordinateReferenceSystem crs ){
+		final int N = crs.getCoordinateSystem().getDimension();
+		this.crs = crs;        
+		this.coordinate = new double[N];
+		for (int i = 0; i < N; ++i){
 			this.coordinate[i] = 0.0;
+        }
 	}
 
 	/**
 	 * Creates a direct Position by using coordinates of another direct Position
-	 * 
 	 * @param factory
 	 * @param coord
 	 */
-	public DirectPositionImpl(FeatGeomFactoryImpl factory, double[] coord) {
-		this.factory = factory;
+	public DirectPositionImpl(CoordinateReferenceSystem crs, double[] coord) {
+		this.crs = crs;
 		this.coordinate = coord;
 	}
 
+    public DirectPositionImpl( Position position ){
+        this( position.getPosition() );
+    }
 	/**
 	 * Creates a direct Position by using coordinates of another direct Position
 	 * 
 	 * @param factory
 	 * @param p
 	 */
-	public DirectPositionImpl(FeatGeomFactoryImpl factory,
-			final DirectPosition p) {
-		this.factory = factory;
+	public DirectPositionImpl(final DirectPosition position) {
+		this.crs = position.getCoordinateReferenceSystem();
 		// Comment by Sanjay
 		// VORSICHT: Die folgende Codezeile verursachte, dass das selbe Objekt
 		// (double Array) verwendet wurde; folglich wurde z.B. beim
@@ -104,7 +114,11 @@ public class DirectPositionImpl implements DirectPosition {
 		// explizit kopiert werden, nur elementare Datentypen werden automatisch
 		// von Java neu erzeugt, alles andere sind nur Referenzen
 		// TODO Das Klonen sollte in die Factory verlagert werden
-		this.coordinate = p.getCoordinates().clone();
+        
+        // the above seems to say that the array must be explicitly copied
+        // but the direct position javadocs say that getCoordinates produces
+        // a copy ... so we should be good without the clone.
+		this.coordinate = position.getCoordinates(); //.clone()
 	}
 
 	/**
@@ -113,22 +127,22 @@ public class DirectPositionImpl implements DirectPosition {
 	 * @param y
 	 * @param z
 	 */
-	public DirectPositionImpl(FeatGeomFactoryImpl factory, double x, double y,
+	public DirectPositionImpl(CoordinateReferenceSystem crs, double x, double y,
 			double z) {
-		this.factory = factory;
+		this.crs = crs;
 		this.coordinate = new double[] { x, y, z };
 	}
 
 	/**
-	 * @param factory
+	 * @param crs
 	 * @param x
 	 * @param y
 	 * @param z
 	 * @param m
 	 */
-	public DirectPositionImpl(FeatGeomFactoryImpl factory, double x, double y,
+	public DirectPositionImpl( CoordinateReferenceSystem crs, double x, double y,
 			double z, double m) {
-		this.factory = factory;
+		this.crs = crs;
 		this.coordinate = new double[] { x, y, z, m };
 	}
 
@@ -138,8 +152,8 @@ public class DirectPositionImpl implements DirectPosition {
 	 * TODO I don´t know if this is a clear design, but it works for now. (SJ)
 	 * @return GeometryFactoryImpl
 	 */
-	public FeatGeomFactoryImpl getGeometryFactory() {
-		return this.factory;
+	private FeatGeomFactoryImpl XgetGeometryFactory() {
+		return null; //this.factory;
 	}
 
 	/*
@@ -148,7 +162,7 @@ public class DirectPositionImpl implements DirectPosition {
 	 * @see org.opengis.spatialschema.geometry.DirectPosition#getDimension()
 	 */
 	public int getDimension() {
-		return this.factory.getCoordinateDimension();
+		return crs.getCoordinateSystem().getDimension();
 	}
 
 	/*
@@ -157,8 +171,7 @@ public class DirectPositionImpl implements DirectPosition {
 	 * @see org.opengis.spatialschema.geometry.DirectPosition#getCoordinates()
 	 */
 	public double[] getCoordinates() {
-		// TODO semantic JR
-		return this.coordinate;
+		return (double[]) this.coordinate.clone(); // JG: modified to return clone each time
 	}
 
 	/*
@@ -167,7 +180,6 @@ public class DirectPositionImpl implements DirectPosition {
 	 * @see org.opengis.spatialschema.geometry.DirectPosition#getOrdinate(int)
 	 */
 	public double getOrdinate(int dimension) throws IndexOutOfBoundsException {
-		// TODO semantic JR
 		return this.coordinate[dimension];
 	}
 
@@ -181,8 +193,9 @@ public class DirectPositionImpl implements DirectPosition {
 			throws IndexOutOfBoundsException {
 		// TODO semantic JR
 		// TODO documentation
-		if (dimension >= this.coordinate.length || dimension < 0)
-			throw new IndexOutOfBoundsException("Index out of coordinate range"); //$NON-NLS-1$
+		if (dimension >= this.coordinate.length || dimension < 0){
+			throw new IndexOutOfBoundsException("Index "+dimension+" out of coordinate range (max "+ coordinate.length+")"); //$NON-NLS-1$
+        }
 		this.coordinate[dimension] = value;
 	}
 
@@ -196,7 +209,7 @@ public class DirectPositionImpl implements DirectPosition {
 		// TODO implementation Is the CRS correct/existent?
 		// TODO test
 		// TODO documentation
-		return this.factory.getCoordinateReferenceSystem();
+		return crs;
 	}
 
 	/*
@@ -206,17 +219,17 @@ public class DirectPositionImpl implements DirectPosition {
 	 */
 	public DirectPositionImpl clone() {
 		// Cloning the double array (in parameter) is important!
-
 		// Return new DirectPosition by cloning the Coordiante array of double which define the position
-		return new DirectPositionImpl(this.factory, this.coordinate.clone());
+		return new DirectPositionImpl( crs, coordinate.clone() );
 	}
 
 	/**
 	 * @param coord
 	 */
 	public void setCoordinate(double[] coord) {
-		if (coord.length != this.getDimension())
-			throw new IllegalArgumentException("Index out of coordinate range"); //$NON-NLS-1$
+		if (coord.length != this.getDimension()){
+			throw new IllegalArgumentException("Index "+coord.length+" out of coordinate range (expected "+getDimension()+")"); //$NON-NLS-1$
+        }
 		this.coordinate = coord;
 	}
 

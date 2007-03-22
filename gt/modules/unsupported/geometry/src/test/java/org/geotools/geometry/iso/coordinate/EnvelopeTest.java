@@ -42,11 +42,11 @@ public class EnvelopeTest extends TestCase {
 		EnvelopeImpl env1 = new EnvelopeImpl(dp1, dp2);
 		
 		// Envelope.getLowerCorner() + Envelope.equals(DP, tol)
-		assertTrue(env1.getLowerCorner().equals(dp1, 0));
+		assertTrue(env1.getLowerCorner().equals(dp1));
 		System.out.println(env1.getLowerCorner());
 		
 		// Envelope.getUpperCorner() + Envelope.equals(DP, tol)
-		assertTrue(env1.getUpperCorner().equals(dp2, 0));
+		assertTrue(env1.getUpperCorner().equals(dp2));
 		System.out.println(env1.getUpperCorner());
 		System.out.println(env1);
 		
@@ -92,9 +92,7 @@ public class EnvelopeTest extends TestCase {
 		env1.expand(dp5.getCoordinates());
 		System.out.println(env1);
 		
-		// TODO Test Intersects
-		
-		
+		// TODO Test Intersects		
 	}
 
 	

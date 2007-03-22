@@ -84,6 +84,7 @@ import java.util.List;
 
 import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.CoordinateFactoryImpl;
+import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.topograph2D.DirectedEdge;
@@ -95,6 +96,7 @@ import org.geotools.geometry.iso.topograph2D.util.CoordinateArrays;
 import org.geotools.geometry.iso.util.Assert;
 import org.geotools.geometry.iso.util.algorithm2D.PointLocator;
 import org.opengis.spatialschema.geometry.geometry.LineString;
+import org.opengis.spatialschema.geometry.geometry.Position;
 import org.opengis.spatialschema.geometry.primitive.CurveSegment;
 import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
 
@@ -246,9 +248,9 @@ public class LineBuilder {
 			Edge e = (Edge) it.next();
 			Label label = e.getLabel();
 
-			LineString line = coordinateFactory.createLineString(
-					CoordinateArrays.toPositionList(coordinateFactory, e
-							.getCoordinates()), 0.0);
+            List<Position> positions = CoordinateArrays.toPositionList(coordinateFactory, e
+                    .getCoordinates());
+			LineString line = coordinateFactory.createLineString( positions );					
 			LinkedList<CurveSegment> tLineStrings = new LinkedList<CurveSegment>();
 			tLineStrings.add((CurveSegment) line);
 			CurveImpl curve = primitiveFactory
