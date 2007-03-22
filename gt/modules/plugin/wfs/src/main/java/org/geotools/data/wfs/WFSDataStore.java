@@ -911,7 +911,7 @@ public class WFSDataStore extends AbstractDataStore {
 		PostPreProcessFilterSplittingVisitor wfsfv = new PostPreProcessFilterSplittingVisitor(capabilities
                 .getFilterCapabilities(), ft, transactionAccessor);
 
-        Filters.accept( q.getFilter(), wfsfv);
+        q.getFilter().accept(wfsfv, null);
 
         Filter[] f = new Filter[2]; 
         f[0] = wfsfv.getFilterPre(); // server
