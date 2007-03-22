@@ -32,18 +32,6 @@
       </modules>
     </profile>
     <profile>
-      <id>unix</id>
-      <activation>
-        <os>
-          <family>unix</family>
-        </os>
-      </activation>
-      <modules>
-        <module>epsg-access</module>      
-      </modules>
-    </profile>
-
-    <profile>
       <id>Java 1.4 Specific Plugins</id>
       <activation>
         <jdk>1.4</jdk>
