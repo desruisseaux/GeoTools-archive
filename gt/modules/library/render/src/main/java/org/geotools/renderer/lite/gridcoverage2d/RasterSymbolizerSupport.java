@@ -27,6 +27,7 @@ import org.geotools.coverage.Category;
 import org.geotools.coverage.FactoryFinder;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.filter.Expression;
 import org.geotools.styling.ColorMapEntry;
 import org.geotools.styling.RasterSymbolizer;
@@ -100,7 +101,7 @@ public final class RasterSymbolizerSupport {
 
 		return FactoryFinder.getGridCoverageFactory(null).create(
 				gridCoverage.getName(), gridCoverage.getRenderedImage(),
-				grid.getEnvelope(), targetBands,
+                (GridGeometry2D) gridCoverage.getGridGeometry(), targetBands,
 				new GridCoverage[] { gridCoverage }, null);
 	}
 

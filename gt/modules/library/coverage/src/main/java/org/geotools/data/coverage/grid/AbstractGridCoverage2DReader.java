@@ -18,6 +18,7 @@ package org.geotools.data.coverage.grid;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.color.ColorSpace;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
@@ -46,6 +47,7 @@ import org.geotools.data.DataSourceException;
 import org.geotools.factory.Hints;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.referencing.operation.BufferedCoordinateOperationFactory;
+import org.geotools.referencing.operation.matrix.XAffineTransform;
 import org.geotools.referencing.operation.transform.LinearTransform1D;
 import org.geotools.resources.CRSUtilities;
 import org.geotools.util.NumberRange;
@@ -58,6 +60,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.CoordinateOperationFactory;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import sun.text.Normalizer.Mode;
 
 /**
  * This class is a first attempt for providing a way to get more informations
@@ -200,6 +203,12 @@ public abstract class AbstractGridCoverage2DReader implements
 		// //
 		Integer imageChoice = new Integer(0);
 
+		// we are able to handle overviews properly only if the transformation is
+        // an affine transform with pure scale and translation, no rotational components
+        if(raster2Model != null && !isScaleTranslate(raster2Model))
+            return imageChoice;
+        
+		
 		// //
 		//
 		// Check Hint to ignore overviews
@@ -292,6 +301,18 @@ public abstract class AbstractGridCoverage2DReader implements
 		decimationOnReadingControl(imageChoice, readP, requestedRes);
 		return imageChoice;
 	}
+    
+    /**
+     * Checks the transformation is a pure scale/translate instance (using a tolerance)
+     * @param transform
+     * @return
+     */
+    protected final boolean isScaleTranslate(MathTransform transform) {
+        if(!(transform instanceof AffineTransform))
+            return false;
+        AffineTransform at = (AffineTransform) transform;
+        return at.getShearX() < EPS && at.getShearY() < EPS;
+    }
 
 	/**
 	 * This method is responsible for evaluating possible subsampling factors
@@ -492,6 +513,10 @@ public abstract class AbstractGridCoverage2DReader implements
 		// if (raster2Model != null)
 		// return FactoryFinder.getGridCoverageFactory(null).create(
 		// coverageName, image, crs, raster2Model, bands, null, null);
+		if ( raster2Model != null ) {
+			return coverageFactory.create(coverageName,image, crs, raster2Model,bands,null,null);	
+		}
+		
 		return coverageFactory.create(coverageName, image, new GeneralEnvelope(
 				originalEnvelope), bands, null, null);
 

@@ -92,6 +92,8 @@ public final class GridCoverageRenderer {
 	 */
 	private final static boolean DEBUG = Boolean
 			.getBoolean("org.geotools.renderer.lite.gridcoverage2d.debug");
+    
+    protected static final double EPS = 1E-6;
 
 	private static String debugDir;
 	static {
@@ -359,285 +361,315 @@ public final class GridCoverageRenderer {
 					.intersect(transformedSourceCoverageEnvelope);
 
 		}
-
-		// /////////////////////////////////////////////////////////////////
-		//
-		// CROP
-		// This step I aim to crop the area of the coverage we want to serve.
-		// I know that drawRenderedImage takes already into account tiling but
-		// there is reprojection in between and I do not want end up
-		// reprojecting 2 Giga of image for using 1 Kb.
-		//
-		// First I need to convert the source envelope into the destination crs.
-		//
-		// /////////////////////////////////////////////////////////////////
-		// //
-		//
-		// This is the destination envelope in the coverage crs which is going
-		// to be used for getting the crop area to crop the source coverage
-		//
-		// //
-		final GeneralEnvelope destinationEnvelopeInSourceGCCRS = doReprojection ? CRS
-				.transform(destinationCRSToSourceCRSTransformation,
-						destinationEnvelope)
-				: new GeneralEnvelope(destinationEnvelope);
-		destinationEnvelopeInSourceGCCRS
-				.setCoordinateReferenceSystem(sourceCoverageCRS);
-		final GridCoverage2D croppedGridCoverage = getCroppedCoverage(
-				gridCoverage, destinationEnvelopeInSourceGCCRS,
-				sourceCoverageCRS);
-		if (croppedGridCoverage == null) {
-			// nothing to render, the AOI does not overlap
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER
-						.fine(new StringBuffer(
-								"Skipping current coverage because cropped to an empty area")
-								.toString());
-			return;
-		}
-		if (DEBUG) {
-			try {
-				ImageIO.write(croppedGridCoverage.geophysics(false)
-						.getRenderedImage(), "tiff", new File(debugDir,
-						"cropped.tiff"));
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-
-		// ///////////////////////////////////////////////////////////////////
-		//
-		// DRAWING DIMENSIONS AND RESOLUTION
-		// I am here getting the final drawing dimensions (on the device) and
-		// the resolution for this renderer but in the CRS of the source
-		// coverage
-		// since I am going to compare this info with the same info for the
-		// source coverage. The objective is to come up with the needed scale
-		// factors for the original coverage in order to decide how to proceed.
-		// Options are first scale then reproject or the opposite.
-		//
-		// In case we need to upsample the coverage first we reproject and then
-		// we upsample otherwise we do the opposite in order
-		//
-		// ///////////////////////////////////////////////////////////////////
-		AffineTransform finalGridToWorldInGCCRS;
-		if (!sourceCRSToDestinationCRSTransformation.isIdentity()) {
-			assert new GeneralGridRange(destinationSize)
-					.equals(gridToEnvelopeMapper.getGridRange());
-			gridToEnvelopeMapper.setEnvelope(destinationEnvelopeInSourceGCCRS);
-			finalGridToWorldInGCCRS = new AffineTransform(gridToEnvelopeMapper
-					.createAffineTransform());
-		} else {
-			finalGridToWorldInGCCRS = new AffineTransform(finalGridToWorld);
-		}
-
-		// ///////////////////////////////////////////////////////////////////
-		//
-		// SCALE and REPROJECT in the best order.
-		// Let me now scale down or up to the EXACT needed SPATIAL resolution.
-		// This step does not prevent from having loaded an overview of the
-		// original image based on the requested scale but it complements it.
-		//
-		// ///////////////////////////////////////////////////////////////////
-		// //
-		//
-		// First step is computing the needed resolution levels for this
-		// coverage in its original crs to see the scale factors.
-		//
-		// //
-		final AffineTransform croppedCoverageGridToWorldTransformations = (AffineTransform) ((GridGeometry2D) croppedGridCoverage
-				.getGridGeometry()).getGridToCRS2D();
-		final boolean sourceGCHasLonFirst = (XAffineTransform
-				.getSwapXY(croppedCoverageGridToWorldTransformations) != -1);
-		final boolean destinationHasLonFirst = (XAffineTransform
-				.getSwapXY(finalGridToWorldInGCCRS) != -1);
-		final double actualScaleX = sourceGCHasLonFirst ? croppedCoverageGridToWorldTransformations
-				.getScaleX()
-				: croppedCoverageGridToWorldTransformations.getShearY();
-		final double actualScaleY = sourceGCHasLonFirst ? croppedCoverageGridToWorldTransformations
-				.getScaleY()
-				: croppedCoverageGridToWorldTransformations.getShearX();
-		final double scaleX = actualScaleX
-				/ (destinationHasLonFirst ? finalGridToWorldInGCCRS.getScaleX()
-						: finalGridToWorldInGCCRS.getShearY());
-		final double scaleY = actualScaleY
-				/ (destinationHasLonFirst ? finalGridToWorldInGCCRS.getScaleY()
-						: finalGridToWorldInGCCRS.getShearX());
-		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine(new StringBuffer("Scale factors are ").append(scaleX)
-					.append(" ").append(scaleY).toString());
-		final int actualW = sourceRange.getLength(0);
-		final int actualH = sourceRange.getLength(1);
-		if (Math.round(actualW * scaleX) < MIN_DIM_TOLERANCE
-				&& Math.round(actualH * scaleY) < MIN_DIM_TOLERANCE) {
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER
-						.fine(new StringBuffer(
-								"Skipping the actual coverage because one of the final dimension is null")
-								.toString());
-			return;
-		}
-
-		final Interpolation interpolation = (Interpolation) hints
-				.get(JAI.KEY_INTERPOLATION);
-		if (LOGGER.isLoggable(Level.FINE))
-			LOGGER.fine(new StringBuffer("Using interpolation ").append(
-					interpolation).toString());
-		// //
-		//
-		// Now if we are upsampling first reproject then scale else first scale
-		// then reproject.
-		//
-		// //
-		final GridCoverage2D preSymbolizer;
-		if (scaleX * scaleY <= 1.0) {
-			int scaleXInt = (int) Math.floor(1 / scaleX);
-			scaleXInt = scaleXInt == 0 ? 1 : scaleXInt;
-			int scaleYInt = (int) Math.floor(1 / scaleY);
-			scaleYInt = scaleYInt == 0 ? 1 : scaleYInt;
-
-			// ///////////////////////////////////////////////////////////////////
-			//
-			// SCALE DOWN to the needed resolution
-			//
-			// ///////////////////////////////////////////////////////////////////
-			// //
-			//
-			// first step for down sampling is filtered subsample which is fast.
-			// 
-			// //
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER
-						.fine(new StringBuffer(
-								"Filtered subsample with factors ").append(
-								scaleXInt).append(scaleYInt).toString());
-			final GridCoverage2D preScaledGridCoverage = filteredSubsample(
-					croppedGridCoverage, scaleXInt, scaleYInt,
-					new InterpolationNearest(), BorderExtender
-							.createInstance(BorderExtender.BORDER_COPY));
-			if (DEBUG) {
-				try {
-					ImageIO.write(preScaledGridCoverage.geophysics(false)
-							.getRenderedImage(), "tiff", new File(debugDir,
-							"prescaled.tiff"));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			// //
-			//
-			// Second step is scale
-			//
-			// //
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.fine(new StringBuffer("Scale down with factors ")
-						.append(scaleX * scaleXInt).append(scaleY * scaleYInt)
-						.toString());
-			final GridCoverage2D scaledGridCoverage;
-			if (scaleX * scaleXInt == 1.0 && scaleY * scaleYInt == 1.0)
-				scaledGridCoverage = preScaledGridCoverage;
-			else
-				scaledGridCoverage = scale(scaleX * scaleXInt, scaleY
-						* scaleYInt, 0f, 0f,
-						interpolation == null ? new InterpolationBilinear()
-								: interpolation, BorderExtender
-								.createInstance(BorderExtender.BORDER_COPY),
-						preScaledGridCoverage);
-
-			if (DEBUG) {
-				try {
-					ImageIO.write(scaledGridCoverage.geophysics(false)
-							.getRenderedImage(), "tiff", new File(debugDir,
-							"scaled.tiff"));
-				} catch (IOException e) {
-
-					e.printStackTrace();
-				}
-			}
-
-			// ///////////////////////////////////////////////////////////////////
-			//
-			// REPROJECT to the requested crs.
-			//
-			//
-			// ///////////////////////////////////////////////////////////////////
-			if (doReprojection) {
-				preSymbolizer = resample(scaledGridCoverage, destinationCRS,
-						interpolation == null ? new InterpolationBilinear()
-								: interpolation, croppedDestinationEnvelope);
-				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.fine(new StringBuffer("Reprojecting to crs ")
-							.append(destinationCRS.toWKT()).toString());
-				if (DEBUG) {
-					try {
-						ImageIO.write(preSymbolizer.geophysics(false)
-								.getRenderedImage(), "tiff", new File(debugDir,
-								"reprojected.tiff"));
-					} catch (IOException e) {
-	
-						e.printStackTrace();
-					}
-				}
-			} else
-				preSymbolizer = scaledGridCoverage;
-
-		} else {
-
-			// ///////////////////////////////////////////////////////////////////
-			//
-			// REPROJECT to the requested crs
-			//
-			//
-			// ///////////////////////////////////////////////////////////////////
-			final GridCoverage2D reprojectedCoverage;
-			if (doReprojection) {
-				reprojectedCoverage = resample(croppedGridCoverage,
-						destinationCRS,
-						interpolation == null ? new InterpolationBilinear()
-								: interpolation, croppedDestinationEnvelope);
-				if (LOGGER.isLoggable(Level.FINE))
-					LOGGER.fine(new StringBuffer("Reprojecting to crs ")
-							.append(destinationCRS.toWKT()).toString());
-			} else
-				reprojectedCoverage = croppedGridCoverage;
-
-			if (DEBUG) {
-				try {
-					ImageIO.write(reprojectedCoverage.geophysics(false)
-							.getRenderedImage(), "tiff", new File(
-							"c:/reprojected.tiff"));
-				} catch (IOException e) {
-
-					e.printStackTrace();
-				}
-			}
-			// ///////////////////////////////////////////////////////////////////
-			//
-			// SCALE UP to the needed resolution
-			//
-			// ///////////////////////////////////////////////////////////////////
-			if (LOGGER.isLoggable(Level.FINE))
-				LOGGER.fine(new StringBuffer("Scale up with factors ").append(
-						scaleX).append(scaleY).toString());
-			preSymbolizer = (GridCoverage2D) scale(scaleX, scaleY, 0f, 0f,
-					interpolation == null ? new InterpolationBilinear()
-							: interpolation, BorderExtender
-							.createInstance(BorderExtender.BORDER_COPY),
-					reprojectedCoverage);
-			if (DEBUG) {
-				try {
-					ImageIO.write(preSymbolizer.geophysics(false)
-							.getRenderedImage(), "tiff", new File(debugDir,
-							"scaleup.tiff"));
-				} catch (IOException e) {
-
-					e.printStackTrace();
-				}
-			}
-
-		}
+        
+        final Interpolation interpolation = (Interpolation) hints.get(JAI.KEY_INTERPOLATION);
+        if (LOGGER.isLoggable(Level.FINE))
+            LOGGER.fine(new StringBuffer("Using interpolation ").append(
+                    interpolation).toString());
+        
+        final GridCoverage2D preSymbolizer;
+        if(!isScaleTranslate(gridCoverage.getGridGeometry().getGridToCRS())) {
+            /////////////////////////////////////////////////////////////////////
+            //
+            // REPROJECT to the requested crs.
+            //
+            //
+            // ///////////////////////////////////////////////////////////////////
+            if (doReprojection) {
+                preSymbolizer = resample(gridCoverage, destinationCRS,
+                        interpolation == null ? new InterpolationBilinear()
+                                : interpolation, croppedDestinationEnvelope);
+                if (LOGGER.isLoggable(Level.FINE))
+                    LOGGER.fine(new StringBuffer("Reprojecting to crs ")
+                            .append(destinationCRS.toWKT()).toString());
+                if (DEBUG) {
+                    try {
+                        ImageIO.write(preSymbolizer.geophysics(false)
+                                .getRenderedImage(), "tiff", new File(debugDir,
+                                "reprojected.tiff"));
+                    } catch (IOException e) {
+        
+                        e.printStackTrace();
+                    }
+                }
+            } else
+                preSymbolizer = gridCoverage;
+            
+        } else {
+    		// /////////////////////////////////////////////////////////////////
+    		//
+    		// CROP
+    		// This step I aim to crop the area of the coverage we want to serve.
+    		// I know that drawRenderedImage takes already into account tiling but
+    		// there is reprojection in between and I do not want end up
+    		// reprojecting 2 Giga of image for using 1 Kb.
+    		//
+    		// First I need to convert the source envelope into the destination crs.
+    		//
+    		// /////////////////////////////////////////////////////////////////
+    		// //
+    		//
+    		// This is the destination envelope in the coverage crs which is going
+    		// to be used for getting the crop area to crop the source coverage
+    		//
+    		// //
+    		final GeneralEnvelope destinationEnvelopeInSourceGCCRS = doReprojection ? CRS
+    				.transform(destinationCRSToSourceCRSTransformation,
+    						destinationEnvelope)
+    				: new GeneralEnvelope(destinationEnvelope);
+    		destinationEnvelopeInSourceGCCRS
+    				.setCoordinateReferenceSystem(sourceCoverageCRS);
+    		final GridCoverage2D croppedGridCoverage = getCroppedCoverage(
+    				gridCoverage, destinationEnvelopeInSourceGCCRS,
+    				sourceCoverageCRS);
+    		if (croppedGridCoverage == null) {
+    			// nothing to render, the AOI does not overlap
+    			if (LOGGER.isLoggable(Level.FINE))
+    				LOGGER
+    						.fine(new StringBuffer(
+    								"Skipping current coverage because cropped to an empty area")
+    								.toString());
+    			return;
+    		}
+    		if (DEBUG) {
+    			try {
+    				ImageIO.write(croppedGridCoverage.geophysics(false)
+    						.getRenderedImage(), "tiff", new File(debugDir,
+    						"cropped.tiff"));
+    			} catch (IOException e1) {
+    				// TODO Auto-generated catch block
+    				e1.printStackTrace();
+    			}
+    		}
+    
+    		// ///////////////////////////////////////////////////////////////////
+    		//
+    		// DRAWING DIMENSIONS AND RESOLUTION
+    		// I am here getting the final drawing dimensions (on the device) and
+    		// the resolution for this renderer but in the CRS of the source
+    		// coverage
+    		// since I am going to compare this info with the same info for the
+    		// source coverage. The objective is to come up with the needed scale
+    		// factors for the original coverage in order to decide how to proceed.
+    		// Options are first scale then reproject or the opposite.
+    		//
+    		// In case we need to upsample the coverage first we reproject and then
+    		// we upsample otherwise we do the opposite in order
+    		//
+    		// ///////////////////////////////////////////////////////////////////
+    		AffineTransform finalGridToWorldInGCCRS;
+    		if (!sourceCRSToDestinationCRSTransformation.isIdentity()) {
+    			assert new GeneralGridRange(destinationSize)
+    					.equals(gridToEnvelopeMapper.getGridRange());
+    			gridToEnvelopeMapper.setEnvelope(destinationEnvelopeInSourceGCCRS);
+    			finalGridToWorldInGCCRS = new AffineTransform(gridToEnvelopeMapper
+    					.createAffineTransform());
+    		} else {
+    			finalGridToWorldInGCCRS = new AffineTransform(finalGridToWorld);
+    		}
+    
+    		// ///////////////////////////////////////////////////////////////////
+    		//
+    		// SCALE and REPROJECT in the best order.
+    		// Let me now scale down or up to the EXACT needed SPATIAL resolution.
+    		// This step does not prevent from having loaded an overview of the
+    		// original image based on the requested scale but it complements it.
+    		//
+    		// ///////////////////////////////////////////////////////////////////
+    		// //
+    		//
+    		// First step is computing the needed resolution levels for this
+    		// coverage in its original crs to see the scale factors.
+    		//
+    		// //
+    		final AffineTransform croppedCoverageGridToWorldTransformations = (AffineTransform) ((GridGeometry2D) croppedGridCoverage
+    				.getGridGeometry()).getGridToCRS2D();
+    		final boolean sourceGCHasLonFirst = (XAffineTransform
+    				.getSwapXY(croppedCoverageGridToWorldTransformations) != -1);
+    		final boolean destinationHasLonFirst = (XAffineTransform
+    				.getSwapXY(finalGridToWorldInGCCRS) != -1);
+    		final double actualScaleX = sourceGCHasLonFirst ? croppedCoverageGridToWorldTransformations
+    				.getScaleX()
+    				: croppedCoverageGridToWorldTransformations.getShearY();
+    		final double actualScaleY = sourceGCHasLonFirst ? croppedCoverageGridToWorldTransformations
+    				.getScaleY()
+    				: croppedCoverageGridToWorldTransformations.getShearX();
+    		final double scaleX = actualScaleX
+    				/ (destinationHasLonFirst ? finalGridToWorldInGCCRS.getScaleX()
+    						: finalGridToWorldInGCCRS.getShearY());
+    		final double scaleY = actualScaleY
+    				/ (destinationHasLonFirst ? finalGridToWorldInGCCRS.getScaleY()
+    						: finalGridToWorldInGCCRS.getShearX());
+    		if (LOGGER.isLoggable(Level.FINE))
+    			LOGGER.fine(new StringBuffer("Scale factors are ").append(scaleX)
+    					.append(" ").append(scaleY).toString());
+    		final int actualW = sourceRange.getLength(0);
+    		final int actualH = sourceRange.getLength(1);
+    		if (Math.round(actualW * scaleX) < MIN_DIM_TOLERANCE
+    				&& Math.round(actualH * scaleY) < MIN_DIM_TOLERANCE) {
+    			if (LOGGER.isLoggable(Level.FINE))
+    				LOGGER
+    						.fine(new StringBuffer(
+    								"Skipping the actual coverage because one of the final dimension is null")
+    								.toString());
+    			return;
+    		}
+    
+    		// //
+    		//
+    		// Now if we are upsampling first reproject then scale else first scale
+    		// then reproject.
+    		//
+    		// //
+    		if (scaleX * scaleY <= 1.0) {
+    			int scaleXInt = (int) Math.floor(1 / scaleX);
+    			scaleXInt = scaleXInt == 0 ? 1 : scaleXInt;
+    			int scaleYInt = (int) Math.floor(1 / scaleY);
+    			scaleYInt = scaleYInt == 0 ? 1 : scaleYInt;
+    
+    			// ///////////////////////////////////////////////////////////////////
+    			//
+    			// SCALE DOWN to the needed resolution
+    			//
+    			// ///////////////////////////////////////////////////////////////////
+    			// //
+    			//
+    			// first step for down sampling is filtered subsample which is fast.
+    			// 
+    			// //
+    			if (LOGGER.isLoggable(Level.FINE))
+    				LOGGER
+    						.fine(new StringBuffer(
+    								"Filtered subsample with factors ").append(
+    								scaleXInt).append(scaleYInt).toString());
+    			final GridCoverage2D preScaledGridCoverage = filteredSubsample(
+    					croppedGridCoverage, scaleXInt, scaleYInt,
+    					new InterpolationNearest(), BorderExtender
+    							.createInstance(BorderExtender.BORDER_COPY));
+    			if (DEBUG) {
+    				try {
+    					ImageIO.write(preScaledGridCoverage.geophysics(false)
+    							.getRenderedImage(), "tiff", new File(debugDir,
+    							"prescaled.tiff"));
+    				} catch (IOException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+    			}
+    			// //
+    			//
+    			// Second step is scale
+    			//
+    			// //
+    			if (LOGGER.isLoggable(Level.FINE))
+    				LOGGER.fine(new StringBuffer("Scale down with factors ")
+    						.append(scaleX * scaleXInt).append(scaleY * scaleYInt)
+    						.toString());
+    			final GridCoverage2D scaledGridCoverage;
+    			if (scaleX * scaleXInt == 1.0 && scaleY * scaleYInt == 1.0)
+    				scaledGridCoverage = preScaledGridCoverage;
+    			else
+    				scaledGridCoverage = scale(scaleX * scaleXInt, scaleY
+    						* scaleYInt, 0f, 0f,
+    						interpolation == null ? new InterpolationBilinear()
+    								: interpolation, BorderExtender
+    								.createInstance(BorderExtender.BORDER_COPY),
+    						preScaledGridCoverage);
+    
+    			if (DEBUG) {
+    				try {
+    					ImageIO.write(scaledGridCoverage.geophysics(false)
+    							.getRenderedImage(), "tiff", new File(debugDir,
+    							"scaled.tiff"));
+    				} catch (IOException e) {
+    
+    					e.printStackTrace();
+    				}
+    			}
+    
+    			// ///////////////////////////////////////////////////////////////////
+    			//
+    			// REPROJECT to the requested crs.
+    			//
+    			//
+    			// ///////////////////////////////////////////////////////////////////
+    			if (doReprojection) {
+    				preSymbolizer = resample(scaledGridCoverage, destinationCRS,
+    						interpolation == null ? new InterpolationBilinear()
+    								: interpolation, croppedDestinationEnvelope);
+    				if (LOGGER.isLoggable(Level.FINE))
+    					LOGGER.fine(new StringBuffer("Reprojecting to crs ")
+    							.append(destinationCRS.toWKT()).toString());
+    				if (DEBUG) {
+    					try {
+    						ImageIO.write(preSymbolizer.geophysics(false)
+    								.getRenderedImage(), "tiff", new File(debugDir,
+    								"reprojected.tiff"));
+    					} catch (IOException e) {
+    	
+    						e.printStackTrace();
+    					}
+    				}
+    			} else
+    				preSymbolizer = scaledGridCoverage;
+    
+    		} else {
+    
+    			// ///////////////////////////////////////////////////////////////////
+    			//
+    			// REPROJECT to the requested crs
+    			//
+    			//
+    			// ///////////////////////////////////////////////////////////////////
+    			final GridCoverage2D reprojectedCoverage;
+    			if (doReprojection) {
+    				reprojectedCoverage = resample(croppedGridCoverage,
+    						destinationCRS,
+    						interpolation == null ? new InterpolationBilinear()
+    								: interpolation, croppedDestinationEnvelope);
+    				if (LOGGER.isLoggable(Level.FINE))
+    					LOGGER.fine(new StringBuffer("Reprojecting to crs ")
+    							.append(destinationCRS.toWKT()).toString());
+    			} else
+    				reprojectedCoverage = croppedGridCoverage;
+    
+    			if (DEBUG) {
+    				try {
+    					ImageIO.write(reprojectedCoverage.geophysics(false)
+    							.getRenderedImage(), "tiff", new File(
+    							"c:/reprojected.tiff"));
+    				} catch (IOException e) {
+    
+    					e.printStackTrace();
+    				}
+    			}
+    			// ///////////////////////////////////////////////////////////////////
+    			//
+    			// SCALE UP to the needed resolution
+    			//
+    			// ///////////////////////////////////////////////////////////////////
+    			if (LOGGER.isLoggable(Level.FINE))
+    				LOGGER.fine(new StringBuffer("Scale up with factors ").append(
+    						scaleX).append(scaleY).toString());
+    			preSymbolizer = (GridCoverage2D) scale(scaleX, scaleY, 0f, 0f,
+    					interpolation == null ? new InterpolationBilinear()
+    							: interpolation, BorderExtender
+    							.createInstance(BorderExtender.BORDER_COPY),
+    					reprojectedCoverage);
+    			if (DEBUG) {
+    				try {
+    					ImageIO.write(preSymbolizer.geophysics(false)
+    							.getRenderedImage(), "tiff", new File(debugDir,
+    							"scaleup.tiff"));
+    				} catch (IOException e) {
+    
+    					e.printStackTrace();
+    				}
+    			}
+    
+    		}
+        }
+        
 		if (DEBUG) {
 
 			try {
@@ -920,5 +952,18 @@ public final class GridCoverageRenderer {
 		return (GridCoverage2D) coverageCropFactory.doOperation(param, hints);
 
 	}
+    
+    /**
+     * Checks the transformation is a pure scale/translate instance (using a tolerance)
+     * @param transform
+     * @return
+     */
+    private boolean isScaleTranslate(MathTransform transform) {
+        if(!(transform instanceof AffineTransform))
+            return false;
+        AffineTransform at = (AffineTransform) transform;
+        return at.getShearX() < EPS && at.getShearY() < EPS;
+    }
+     
 
 }

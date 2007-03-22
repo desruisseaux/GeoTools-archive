@@ -18,6 +18,7 @@ package org.geotools.coverage.grid.io;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.color.ColorSpace;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
@@ -198,6 +199,11 @@ public abstract class AbstractGridCoverage2DReader implements
 		//
 		// //
 		Integer imageChoice = new Integer(0);
+        
+		// we are able to handle overviews properly only if the transformation is
+        // an affine transform with pure scale and translation, no rotational components
+        if(raster2Model != null && !isScaleTranslate(raster2Model))
+            return imageChoice;
 
 		// //
 		//
@@ -700,4 +706,16 @@ public abstract class AbstractGridCoverage2DReader implements
 	public int getGridCoverageCount() {
 		throw new UnsupportedOperationException("Unsupported opertion.");
 	}
+    
+    /**
+     * Checks the transformation is a pure scale/translate instance (using a tolerance)
+     * @param transform
+     * @return
+     */
+    protected final boolean isScaleTranslate(MathTransform transform) {
+        if(!(transform instanceof AffineTransform))
+            return false;
+        AffineTransform at = (AffineTransform) transform;
+        return at.getShearX() < EPS && at.getShearY() < EPS;
+    }
 }
