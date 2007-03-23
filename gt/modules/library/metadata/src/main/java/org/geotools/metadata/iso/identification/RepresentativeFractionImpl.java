@@ -21,23 +21,18 @@ public class RepresentativeFractionImpl extends Number implements Representative
     public double doubleValue() {
         return 1.0 / (double) denominator;
     }
-
     public float floatValue() {
         return 1.0f / (float) denominator;
     }
-
     public int intValue() {
         return 0;
     }
-
     public long longValue() {
         return 0;
     }
-
     public int getDenominator() {
         return denominator;
     }
-
     public boolean equals( Object obj ) {
         if( obj == null || !(obj instanceof RepresentativeFraction) ){
             return false;
