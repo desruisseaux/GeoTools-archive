@@ -14,7 +14,7 @@
  *    Lesser General Public License for more details.
  *
  */
-package org.geotools.arcsde.data;
+package org.geotools.arcsde;
 
 import java.util.Collections;
 import java.util.Map;
