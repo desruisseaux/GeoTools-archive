@@ -91,8 +91,8 @@ public class PointImpl extends PrimitiveImpl implements Point {
 		// Cloning of the DP is done in the factory class
 		this.position = dp;
 	}
-
-	/*
+	
+    /*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.geotools.geometry.featgeom.root.GeometryImpl#clone()

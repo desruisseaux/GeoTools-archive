@@ -41,6 +41,7 @@ import org.geotools.geometry.iso.primitive.CurveBoundaryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
+import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
 import org.opengis.spatialschema.geometry.geometry.ParamForPoint;
 import org.opengis.spatialschema.geometry.geometry.Position;
@@ -251,19 +252,19 @@ public abstract class CurveSegmentImpl implements CurveSegment {
 	 * @return DirectPositionImpl
 	 */
 	// public abstract CurveSegment reverse();
-	public abstract DirectPositionImpl getStartPoint();
+	public abstract DirectPosition getStartPoint();
 
-	public abstract DirectPositionImpl getEndPoint();
+	public abstract DirectPosition getEndPoint();
 
 	/**
 	 * @return start position
 	 */
-	public abstract PositionImpl getStartPosition();
+	public abstract Position getStartPosition();
 
 	/**
 	 * @return end position
 	 */
-	public abstract PositionImpl getEndPosition();
+	public abstract Position getEndPosition();
 
 	/**
 	 * GenericCurve: {parameterization(startParam()) = startPoint()};

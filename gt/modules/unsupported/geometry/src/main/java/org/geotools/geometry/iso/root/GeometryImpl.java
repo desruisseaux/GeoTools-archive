@@ -106,7 +106,7 @@ import org.opengis.spatialschema.geometry.Geometry;
 public abstract class GeometryImpl implements Geometry {
 
 	private boolean mutable = true;
-	private FeatGeomFactoryImpl factory;
+	protected FeatGeomFactoryImpl factory;
 
 	/**
 	 * Creates a geometric root object.

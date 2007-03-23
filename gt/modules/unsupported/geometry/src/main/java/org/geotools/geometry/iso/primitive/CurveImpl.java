@@ -45,16 +45,13 @@ import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.coordinate.CurveSegmentImpl;
 import org.geotools.geometry.iso.coordinate.DirectPositionImpl;
 import org.geotools.geometry.iso.coordinate.EnvelopeImpl;
-import org.geotools.geometry.iso.coordinate.LineSegmentImpl;
 import org.geotools.geometry.iso.coordinate.LineStringImpl;
-import org.geotools.geometry.iso.coordinate.PositionImpl;
 import org.geotools.geometry.iso.io.GeometryToString;
 import org.geotools.geometry.iso.operation.IsSimpleOp;
 import org.geotools.geometry.iso.operation.Merger;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.opengis.spatialschema.geometry.DirectPosition;
 import org.opengis.spatialschema.geometry.Envelope;
-import org.opengis.spatialschema.geometry.complex.Complex;
 import org.opengis.spatialschema.geometry.complex.CompositeCurve;
 import org.opengis.spatialschema.geometry.geometry.LineSegment;
 import org.opengis.spatialschema.geometry.geometry.LineString;
@@ -63,10 +60,8 @@ import org.opengis.spatialschema.geometry.geometry.Position;
 import org.opengis.spatialschema.geometry.primitive.Curve;
 import org.opengis.spatialschema.geometry.primitive.CurveBoundary;
 import org.opengis.spatialschema.geometry.primitive.CurveSegment;
-import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
 import org.opengis.spatialschema.geometry.primitive.OrientablePrimitive;
 import org.opengis.spatialschema.geometry.primitive.Point;
-import org.opengis.spatialschema.geometry.primitive.PrimitiveBoundary;
 
 /**
  * Curve (Figure 11 of the ISO 19107 v5) is a descendent subtype of Primitive
@@ -222,7 +217,7 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		cs0.setCurve(this);
 		this.envelope = new EnvelopeImpl(cs0.getEnvelope());
 
-		PositionImpl p0 = cs0.getStartPosition();
+		Position p0 = cs0.getStartPosition();
 
 		// Änderung durch Sanjay, da in bisheriger Version nicht der Fall
 		// berücksichtigt wurde, dass nur 1 CurveSegment existiert
@@ -240,10 +235,10 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 			}
 			cs0 = cs1;
 		}
-		PositionImpl p1 = cs0.getEndPosition();
+		Position p1 = cs0.getEndPosition();
 
-		Point pt0 = p0.getPoint();
-		Point pt1 = p1.getPoint();
+		Point pt0 = toPoint( p0 );
+		Point pt1 = toPoint( p1 );
 		if (pt0 == null) {
 			pt0 = this.getGeometryFactory().getPrimitiveFactory().createPoint(
 					p0);
@@ -256,8 +251,13 @@ public class CurveImpl extends OrientableCurveImpl implements Curve {
 		this.boundary = this.calculateBoundary(pt0, pt1);
 		/* Calculate Parametrisation */
 		this.calculateParametrisation();
-
-	}
+    }
+    private Point toPoint( Position position ){
+        if( position instanceof Point ){
+            return (Point) position;
+        }
+        return new PointImpl( factory, new DirectPositionImpl(position));        
+    }
 	
 	/**
 	 * Calculates the Boundary for the curve

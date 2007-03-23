@@ -75,8 +75,6 @@
 package org.geotools.geometry.iso;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.geotools.geometry.iso.topograph2D.Coordinate;
 import org.opengis.spatialschema.geometry.DirectPosition;
@@ -349,7 +347,8 @@ public class PrecisionModel implements Serializable, Precision {
 	 *         <code>PrecisionModel</code> is less than, equal to, or greater
 	 *         than the specified <code>PrecisionModel</code>
 	 */
-	public int compareTo(PrecisionModel other) {		
+	public int compareTo(PrecisionModel other) {	
+        if( other == null ) return 0;
 		int sigDigits = getMaximumSignificantDigits();
 		int otherSigDigits = other.getMaximumSignificantDigits();
 		return (new Integer(sigDigits)).compareTo(new Integer(otherSigDigits));
@@ -372,11 +371,14 @@ public class PrecisionModel implements Serializable, Precision {
 		// return 0;
 	}
 
-    public int compareTo( Precision arg0 ) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int compareTo( Precision precision) {
+        if( precision == null ) return 0;
+        
+        int sigDigits = getMaximumSignificantDigits();
+        int otherSigDigits = precision.getMaximumSignificantDigits();
+        return (new Integer(sigDigits)).compareTo(new Integer(otherSigDigits));        
     }
-
+        
     public void round( DirectPosition position ) {        
         if (modelType.isFloating()){ // somekind of optimization
             return;

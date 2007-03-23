@@ -58,29 +58,38 @@ public class PointArrayTest extends TestCase {
 		assertTrue(pa.size() == 5);
 
 		// get-method creates new DP instance
-		DirectPosition dp = pa.getPosition(0, null);
-		System.out.println(dp);
-		assertTrue(dp.getOrdinate(0) == -50);
-		assertTrue(dp.getOrdinate(1) == 0);
+		DirectPosition directPosition = pa.getPosition(0, null);
+		//System.out.println(dp);
+		assertTrue(directPosition.getOrdinate(0) == -50);
+		assertTrue(directPosition.getOrdinate(1) == 0);
 		
-		DirectPosition newDp = pa.getPosition(4, dp);
-		System.out.println(dp);
-		assertTrue(dp.getOrdinate(0) == 50);
-		assertTrue(dp.getOrdinate(1) == 0);
+		DirectPosition directPositionAt4 = pa.getPosition(4, directPosition);
+		//System.out.println(dp);
+		assertTrue(directPosition.getOrdinate(0) == 50);
+		assertTrue(directPosition.getOrdinate(1) == 0);
 		// get-method uses the same DirectPosition without creating new instance
-		assertTrue(newDp == dp);
+		assertTrue(directPositionAt4 == directPosition);
 		
-		DirectPosition dp2 = tCoordFactory.createDirectPosition(new double[]{5, 5});
-		pa.set(4, dp2);
-		newDp = pa.getPosition(4, dp);
-		System.out.println(dp);
-		assertTrue(dp.getOrdinate(0) == 5);
-		assertTrue(dp.getOrdinate(1) == 5);
+		DirectPosition directPositionAddition = tCoordFactory.createDirectPosition(new double[]{5, 5});
+		pa.setPosition(4, directPositionAddition); // test to see of object or values is stored        
+        
+        DirectPosition directPositionAt4mk2 = pa.getPosition(4, directPosition); // retrive
+        assertEquals( "Same values as we put into 4", directPositionAt4mk2, directPositionAddition );
+        assertNotSame( "Not the same object we put into 4", directPositionAt4mk2, directPositionAddition );
+        
+        assertEquals( directPositionAt4mk2, directPositionAddition );
+        
+        // BEFORE
+		assertEquals( 5.0, directPosition.getOrdinate(0) );
+		assertEquals( 5.0, directPosition.getOrdinate(1) );
+        
 		// Check if the values were copied and not referenced (by modifying the ordinates)
-		dp2.setOrdinate(0, 2);
-		newDp = pa.getPosition(4, dp);
-		System.out.println(dp);
-		assertTrue(dp.getOrdinate(0) == 5);
+        // Modify values set into position 4
+		directPositionAddition.setOrdinate( 0, 2);
+		
+        // retrive values from position 4 again
+        DirectPosition directPositionAt4mk3 = pa.getPosition(4, directPosition);		
+		assertEquals( "check if position is independent", 5.0, directPositionAt4mk3.getOrdinate(0) );
 		
 		double[] coord = ((PointArrayImpl)pa).getCoordinate(0);
 		System.out.print(coord[0] + "|" + coord[1]);

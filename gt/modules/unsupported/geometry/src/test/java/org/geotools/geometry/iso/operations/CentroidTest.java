@@ -91,7 +91,7 @@ public class CentroidTest extends TestCase {
 		// MultiPoint
 
 		res = this.createMultiPointA3D().getCentroid().getCoordinates();
-		System.out.println(this.createMultiPointA3D().getCentroid());
+		//System.out.println(this.createMultiPointA3D().getCentroid());
 		assertTrue(Math.round(res[0] * 100) == 6667);
 		assertTrue(Math.round(res[1] * 100) == 6333);
 		assertTrue(Math.round(res[2] * 100) == 1833);
@@ -188,7 +188,7 @@ public class CentroidTest extends TestCase {
 		// Ring
 		
 		res = this.createSurfaceAwithoutHole().getBoundary().getExterior().getCentroid().getCoordinates();
-		System.out.println(this.createSurfaceAwithoutHole().getBoundary().getExterior().getCentroid());
+		//System.out.println(this.createSurfaceAwithoutHole().getBoundary().getExterior().getCentroid());
 		assertTrue(Math.round(res[0] * 1000) == 82178);
 		assertTrue(Math.round(res[1] * 1000) == 91658);
 

@@ -134,6 +134,19 @@
       <artifactId>jsr108</artifactId>
       <version>0.01</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt2-referencing</artifactId>
+      <version>${project.version}</version>
+	  <exclusions>      
+		  <exclusion>
+		       <groupId>org.opengis</groupId>
+               <artifactId>geoapi-nogenerics</artifactId>
+		  </exclusion>
+	  </exclusions>	  
+    </dependency>
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -145,15 +145,14 @@ public class PrimitiveFactoryImpl implements PrimitiveFactory {
 			throws MismatchedReferenceSystemException,
 			MismatchedDimensionException {
 		// Test ok
-		if (position == null)
+		if (position == null){
 			throw new IllegalArgumentException("Parameter position is null.");
-		
-		if (((PositionImpl) position).getCoordinateDimension()
-				!= this.getDimension())
+        }        
+		if ( position.getPosition().getDimension() != this.getDimension() ){
 			throw new MismatchedDimensionException();
-		
-		// The create-Method called will clone the DP
-		return createPoint((DirectPositionImpl) position.getPosition());
+        }        
+        DirectPositionImpl copy = new DirectPositionImpl( position.getPosition() );
+        return new PointImpl( this.geometryFactory, copy );
 	}
 
 	/**

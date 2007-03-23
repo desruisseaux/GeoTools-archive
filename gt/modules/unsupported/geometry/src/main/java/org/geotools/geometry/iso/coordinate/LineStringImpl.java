@@ -180,7 +180,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
      * 
      * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getStartPoint()
      */
-    public DirectPositionImpl getStartPoint() {
+    public DirectPosition getStartPoint() {
         // ok
         /* Return DirectPosition of first Control Point */
         return controlPoints.getFirst().getPosition();
@@ -192,7 +192,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
      * @see org.opengis.spatialschema.geometry.geometry.GenericCurve#getEndPoint()
      * @version Implementation OK
      */
-    public DirectPositionImpl getEndPoint() {
+    public DirectPosition getEndPoint() {
         // ok
         /* Return Direct Position of last Control Point */
         return controlPoints.getLast().getPosition();
@@ -203,7 +203,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
      * 
      * @see org.geotools.geometry.featgeom.coordinate.CurveSegmentImpl#getStartPosition()
      */
-    public PositionImpl getStartPosition() {
+    public Position getStartPosition() {
         // ok
         // Returns the first Point of the control points PointArray
         return controlPoints.getFirst();
@@ -214,7 +214,7 @@ public class LineStringImpl extends CurveSegmentImpl implements LineString {
      * 
      * @see org.geotools.geometry.featgeom.coordinate.CurveSegmentImpl#getEndPosition()
      */
-    public PositionImpl getEndPosition() {
+    public Position getEndPosition() {
         // ok
         // Returns the last Point of the control points PointArray
         return controlPoints.getLast();

@@ -38,7 +38,7 @@ public class PrimitiveFactoryTest extends TestCase {
 		DirectPosition dp2 = cf.createDirectPosition(new double[]{70, 30, 90});
 		Envelope env1 = cf.createEnvelope(dp1, dp2);
 		PrimitiveImpl prim1 = (PrimitiveImpl) pf.createPrimitive(env1);
-		System.out.println(prim1);
+		//System.out.println(prim1);
 		
 	}
 

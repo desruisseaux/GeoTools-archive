@@ -46,6 +46,7 @@ import org.geotools.geometry.iso.io.CollectionFactory;
 import org.geotools.geometry.iso.io.CollectionFactoryMemoryImpl;
 import org.geotools.geometry.iso.primitive.PrimitiveFactoryImpl;
 import org.geotools.geometry.iso.root.GeometryImpl;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.spatialschema.geometry.primitive.OrientableCurve;
 import org.opengis.spatialschema.geometry.primitive.OrientableSurface;
@@ -84,7 +85,12 @@ public class FeatGeomFactoryImpl {
 	private static FeatGeomFactoryImpl singleton3D = null;
 
 	/**
-	 * Returns the coordinate factory according to the desired dimension model
+	 * Returns the coordinate factory according to the desired dimension model.
+     * <p>
+     * Please understand that this default is useless as does not have
+     * a useful coordiante reference system. As such it is mostly useful
+     * for test cases.
+     * </p>
 	 * 
 	 * @param dimension
 	 * @return CoordinateFactory
@@ -92,11 +98,11 @@ public class FeatGeomFactoryImpl {
 	public static CoordinateFactoryImpl getDefaultCoordinateFactory(
 			DimensionModel dimension) {
 		if (dimension.is2D()) {
-			return singleton2D.getCoordinateFactory();
+			return getDefault2D().getCoordinateFactory();
 		} else if (dimension.is2o5D()) {
-			return singleton2o5D.getCoordinateFactory();
+			return getDefault2o5D().getCoordinateFactory();
 		} else if (dimension.is3D()) {
-			return singleton3D.getCoordinateFactory();
+			return getDefault3D().getCoordinateFactory();
 		} else {
 			return null;
 		}
@@ -172,7 +178,8 @@ public class FeatGeomFactoryImpl {
 	 */
 	public static FeatGeomFactoryImpl getDefault2D() {
 		if (singleton2D == null)
-			singleton2D = new FeatGeomFactoryImpl(null,
+			singleton2D = new FeatGeomFactoryImpl(
+                    DefaultGeographicCRS.WGS84,
 					DimensionModel.TWO_DIMENSIONIAL);
 		return singleton2D;
 	}
@@ -184,7 +191,8 @@ public class FeatGeomFactoryImpl {
 	 */
 	public static FeatGeomFactoryImpl getDefault2o5D() {
 		if (singleton2o5D == null)
-			singleton2o5D = new FeatGeomFactoryImpl(null,
+			singleton2o5D = new FeatGeomFactoryImpl(
+                DefaultGeographicCRS.WGS84_3D,
 					DimensionModel.TWOoFIVE_DIMENSIONIAL);
 		return singleton2o5D;
 	}
@@ -196,7 +204,8 @@ public class FeatGeomFactoryImpl {
 	 */
 	public static FeatGeomFactoryImpl getDefault3D() {
 		if (singleton3D == null)
-			singleton3D = new FeatGeomFactoryImpl(null,
+			singleton3D = new FeatGeomFactoryImpl(
+                    DefaultGeographicCRS.WGS84_3D,
 					DimensionModel.THREE_DIMENSIONIAL);
 		return singleton3D;
 	}

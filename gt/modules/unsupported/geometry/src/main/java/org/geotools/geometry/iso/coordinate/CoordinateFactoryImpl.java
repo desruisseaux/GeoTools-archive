@@ -290,7 +290,7 @@ public class CoordinateFactoryImpl implements GeometryFactory {
 		try {
 			pa = new PointArrayImpl( positions );
 		} catch(ClassCastException e) {
-			throw new IllegalArgumentException("List contains Position instances which can not be casted to the local geometry Position classes.");
+			throw new IllegalArgumentException("List contains Position instances which can not be casted to the local geometry Position classes.", e);
 		}
 		return pa;
 	}

@@ -39,11 +39,8 @@ package org.geotools.geometry.iso.coordinate;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.geotools.geometry.iso.FeatGeomFactoryImpl;
 import org.geotools.geometry.iso.primitive.CurveImpl;
 import org.geotools.geometry.iso.util.DoubleOperation;
 import org.geotools.geometry.iso.util.algorithmND.AlgoPointND;
@@ -160,7 +157,7 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	public double[] getCoordinate(int index) {
 		// test ok
 		
-		PositionImpl pos = getPosition(index);
+		Position pos = getPosition(index);
 		return pos.getPosition().getCoordinates();
 
 		// Auskommentiert und geändert durch Sanjay am 21.08.2006
@@ -179,9 +176,9 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	 * @param arg0
 	 * @return PositionImpl
 	 */
-	public PositionImpl getPosition(int index) {
+	public Position getPosition(int index) {
 		// test ok
-		return (PositionImpl) get(index);
+		return get(index);
 	}
 
 	/**
@@ -189,9 +186,9 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	 * 
 	 * @return Position
 	 */
-	public PositionImpl getFirst() {
+	public Position getFirst() {
 		// ok
-		return (PositionImpl) get(0);
+		return get(0);
 	}
 
 	/**
@@ -199,9 +196,9 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 	 * 
 	 * @return Position
 	 */
-	public PositionImpl getLast() {
+	public Position getLast() {
 		// ok        
-        return (PositionImpl) get(size() - 1);
+        return get(size() - 1);
 	}
 
 //	/**
@@ -441,17 +438,6 @@ public class PointArrayImpl extends ArrayList<Position> implements PointArray {
 			}
 			c0 = c1;
 		}
-	}
-
-	/**
-	 * Removes the Position at index
-	 * 
-	 * @param index
-	 * @return PositionImpl
-	 */
-	public PositionImpl remove(int index) {
-		// Test ok
-		return remove(index);
 	}
 
 	/**

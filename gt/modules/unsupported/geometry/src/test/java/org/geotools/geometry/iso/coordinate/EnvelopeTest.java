@@ -37,21 +37,21 @@ public class EnvelopeTest extends TestCase {
 
 		// Envelope.getDimension()
 		assertTrue(dp2.getDimension() == 2);
-		System.out.println("Dimension of dp1: " + dp2.getDimension());
+		//System.outprintln("Dimension of dp1: " + dp2.getDimension());
 		
 		EnvelopeImpl env1 = new EnvelopeImpl(dp1, dp2);
 		
 		// Envelope.getLowerCorner() + Envelope.equals(DP, tol)
 		assertTrue(env1.getLowerCorner().equals(dp1));
-		System.out.println(env1.getLowerCorner());
+		//System.outprintln(env1.getLowerCorner());
 		
 		// Envelope.getUpperCorner() + Envelope.equals(DP, tol)
 		assertTrue(env1.getUpperCorner().equals(dp2));
-		System.out.println(env1.getUpperCorner());
-		System.out.println(env1);
+		//System.outprintln(env1.getUpperCorner());
+		//System.outprintln(env1);
 		
 		EnvelopeImpl env2 = new EnvelopeImpl(env1);
-		System.out.println(env2);
+		//System.outprintln(env2);
 		
 		// Envelope.equals(Envelope)
 		assertTrue(env1.equals(env2));
@@ -64,33 +64,33 @@ public class EnvelopeTest extends TestCase {
 		DirectPositionImpl dp7 = tCoordFactory.createDirectPosition(new double[] {50,100.01});
 		
 		// Envelope.contains(DirectPosition)
-		System.out.println("Contains Method for " + env1);
+		//System.outprintln("Contains Method for " + env1);
 		assertTrue(env1.contains(dp3) == true);
-		System.out.println(dp3 + " liegt im Envelope: " + env1.contains(dp3));
+		//System.outprintln(dp3 + " liegt im Envelope: " + env1.contains(dp3));
 		assertTrue(env1.contains(dp4) == true);
-		System.out.println(dp4 + " liegt im Envelope: " + env1.contains(dp4));
+		//System.outprintln(dp4 + " liegt im Envelope: " + env1.contains(dp4));
 		assertTrue(env1.contains(dp5) == false);
-		System.out.println(dp5 + " liegt im Envelope: " + env1.contains(dp5));
+		//System.outprintln(dp5 + " liegt im Envelope: " + env1.contains(dp5));
 		assertTrue(env1.contains(dp6) == true);
-		System.out.println(dp6 + " liegt im Envelope: " + env1.contains(dp6));
+		//System.outprintln(dp6 + " liegt im Envelope: " + env1.contains(dp6));
 		assertTrue(env1.contains(dp7) == false);
-		System.out.println(dp7 + " liegt im Envelope: " + env1.contains(dp7));
+		//System.outprintln(dp7 + " liegt im Envelope: " + env1.contains(dp7));
 
 //		DirectPositionImpl dp8 = tCoordFactory.createDirectPosition(new double[] {200,200});
 //		
 //		EnvelopeImpl env2 = new EnvelopeImpl(dp6, dp8);
 //		EnvelopeImpl env3 = new EnvelopeImpl(dp7, dp8);
 //		
-//		System.out.println(env1 + " intersects with " + env2 + " : " + env1.intersects(env2));
-//		System.out.println(env1 + " intersects with " + env3 + " : " + env1.intersects(env3));
+//		//System.outprintln(env1 + " intersects with " + env2 + " : " + env1.intersects(env2));
+//		//System.outprintln(env1 + " intersects with " + env3 + " : " + env1.intersects(env3));
 		
-		System.out.println("TEST EXPAND");
+		//System.outprintln("TEST EXPAND");
 		env1 = tCoordFactory.createEnvelope(dp1.getCoordinates());
-		System.out.println(env1);
+		//System.outprintln(env1);
 		env1.expand(dp2.getCoordinates());
-		System.out.println(env1);
+		//System.outprintln(env1);
 		env1.expand(dp5.getCoordinates());
-		System.out.println(env1);
+		//System.outprintln(env1);
 		
 		// TODO Test Intersects		
 	}

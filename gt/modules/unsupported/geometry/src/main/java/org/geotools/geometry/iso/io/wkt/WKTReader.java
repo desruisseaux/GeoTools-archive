@@ -83,6 +83,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.geometry.iso.PositionFactoryImpl;
 import org.geotools.geometry.iso.util.AssertionFailedException;
 import org.opengis.spatialschema.geometry.geometry.GeometryFactory;
 import org.opengis.spatialschema.geometry.geometry.LineString;
@@ -120,7 +121,7 @@ public class WKTReader {
 	private StreamTokenizer tokenizer;
 
     public WKTReader(PrimitiveFactory aPrimitiveFactory, GeometryFactory aCoordinateFactory){
-        this( aPrimitiveFactory, aCoordinateFactory, null );
+        this( aPrimitiveFactory, aCoordinateFactory, new PositionFactoryImpl( aCoordinateFactory.getCoordinateReferenceSystem(),null) );
     }
 	/**
 	 * Creates a reader that creates objects using the given

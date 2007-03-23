@@ -529,60 +529,60 @@ public class RelateOperatorsTest extends TestCase {
 			boolean shouldbeWithin,
 			boolean shouldCross) {
 		
-		System.out.print("\nTestcase : (" + testCaseID + ")");
-		System.out.print("\nGeometry 1 :" + g1);
-		System.out.print("\nGeometry 2 :" + g2 + "\n");
+		//System.out.print("\nTestcase : (" + testCaseID + ")");
+		//System.out.print("\nGeometry 1 :" + g1);
+		//System.out.print("\nGeometry 2 :" + g2 + "\n");
 
 		boolean result = false;
 		
 		// EQUALS
 		result  = g1.equals(g2);
-		System.out.println("Equals - result: " + result);
+		//System.out.println("Equals - result: " + result);
 		assertTrue(shouldBeEqual == result);
 		
 		// INTERSECTION
 		result  = g1.intersects(g2);
-		System.out.println("Intersection - result: " + result);
+		//System.out.println("Intersection - result: " + result);
 		assertTrue(shouldIntersectAndNotBeDisjoint == result);
 		
 		// DISJOINT
 		result = g1.disjoint(g2);
-		System.out.println("Disjoint - result: " + result);
+		//System.out.println("Disjoint - result: " + result);
 		assertTrue(!shouldIntersectAndNotBeDisjoint == result);
 
 		// OVERLAPS
 		result  = g1.overlaps(g2);
-		System.out.println("Overlaps - result: " + result);
+		//System.out.println("Overlaps - result: " + result);
 		assertTrue(shouldOverlap == result);
 		
 		// TOUCHES
 		result  = g1.touches(g2);
-		System.out.println("Touches - result: " + result);
+		//System.out.println("Touches - result: " + result);
 		assertTrue(shouldTouch == result);
 		
 		// CONTAINS
 		result  = g1.contains(g2);
-		System.out.println("Contains - result: " + result);
+		//System.out.println("Contains - result: " + result);
 		assertTrue(shouldContain == result);
 		
 		// WITHIN
 		result = g1.within(g2);
-		System.out.println("Within - result: " + result);
+		//System.out.println("Within - result: " + result);
 		assertTrue(shouldbeWithin == result);
 
 		// CROSSES
 		result = g1.crosses(g2);
-		System.out.println("Crosses - result: " + result);
+		//System.out.println("Crosses - result: " + result);
 		assertTrue(shouldCross == result);
 
 //		// COVERS
 //		result  = g1.covers(g2);
-//		System.out.println("Covers - result: " + result);
+//		//System.out.println("Covers - result: " + result);
 //		assertTrue(shouldContain == result);
 //		
 //		// COVEREDBY
 //		result = g1.coveredBy(g2);
-//		System.out.println("CoveredBy - result: " + result);
+//		//System.out.println("CoveredBy - result: " + result);
 //		assertTrue(shouldBeCoveredBy == result);
 
 

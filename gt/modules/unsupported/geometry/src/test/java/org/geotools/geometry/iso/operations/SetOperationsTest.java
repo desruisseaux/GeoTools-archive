@@ -47,7 +47,7 @@ public class SetOperationsTest extends TestCase {
 		// INTERSECTION SHELL-A/SHELL-B
 		s1 = surfaceAwithoutHole;
 		s2 = surfaceBwithoutHole;
-		System.out.println("(S1)");
+		//System.out.println("(S1)");
 		this.testAndPrintTest("S1", s1, s2);
 
 		// (S2)
@@ -55,7 +55,7 @@ public class SetOperationsTest extends TestCase {
 		// INTERSECTION SHELL-A/SHELL-B
 		s1 = surfaceAwithHole;
 		s2 = surfaceBwithoutHole;
-		System.out.println("(S2)");
+		//System.out.println("(S2)");
 		this.testAndPrintTest("S2", s1, s2);
 
 		// (S3)
@@ -63,7 +63,7 @@ public class SetOperationsTest extends TestCase {
 		// INTERSECTION SHELL-A/SHELL-B AND SHELL-A/HOLE-B
 		s1 = surfaceAwithoutHole;
 		s2 = surfaceBwithHole;
-		System.out.println("(S3)");
+		//System.out.println("(S3)");
 		this.testAndPrintTest("S3", s1, s2);
 		
 		// (S4)
@@ -71,7 +71,7 @@ public class SetOperationsTest extends TestCase {
 		// INTERSECTION SHELL-A/SHELL-B AND SHELL-A/HOLE-B
 		s1 = surfaceAwithHole;
 		s2 = surfaceBwithHole;
-		System.out.println("(S4)");
+		//System.out.println("(S4)");
 		this.testAndPrintTest("S4", s1, s2);
 		
 		// (S5)
@@ -79,7 +79,7 @@ public class SetOperationsTest extends TestCase {
 		// INTERSECTION SHELL-A/SHELL-B
 		s1 = surfaceAwithTwoHoles;
 		s2 = surfaceBwithoutHole;
-		System.out.println("(S5)");
+		//System.out.println("(S5)");
 		this.testAndPrintTest("S5", s1, s2);
 
 		// (S6)
@@ -87,7 +87,7 @@ public class SetOperationsTest extends TestCase {
 		// INTERSECTION SHELL-A/SHELL-B AND SHELL-A/HOLE-B
 		s1 = surfaceAwithTwoHoles;
 		s2 = surfaceBwithHole;
-		System.out.println("(S6)");
+		//System.out.println("(S6)");
 		this.testAndPrintTest("S6", s1, s2);
 
 		// (S7)
@@ -95,7 +95,7 @@ public class SetOperationsTest extends TestCase {
 		// DISJOINT
 		s1 = surfaceBwithoutHole;
 		s2 = surfaceC;
-		System.out.println("(S7)");
+		//System.out.println("(S7)");
 		this.testAndPrintTest("S7", s1, s2);
 
 	}
@@ -116,12 +116,12 @@ public class SetOperationsTest extends TestCase {
 		
 		g1 = surfaceBwithoutHole;
 		g2 = curveA;
-		System.out.println("(CS1)");
+		//System.out.println("(CS1)");
 		this.testAndPrintTest("CS1", g1, g2);
 
 		g1 = surfaceAwithoutHole;
 		g2 = curveF;
-		System.out.println("(CS2)");
+		//System.out.println("(CS2)");
 		this.testAndPrintTest("CS2", g1, g2);
 
 		//GeometryImpl g = this._testIntersection(surface1, curve1);
@@ -144,25 +144,25 @@ public class SetOperationsTest extends TestCase {
 		// (C1) - Touch
 		c1 = curveA;
 		c2 = curveB;
-		System.out.println("(C1)");
+		//System.out.println("(C1)");
 		this.testAndPrintTest("C1", c1, c2);
 
 		// (C2) - Cross
 		c1 = curveB;
 		c2 = curveC;
-		System.out.println("(C2)");
+		//System.out.println("(C2)");
 		this.testAndPrintTest("C2", c1, c2);
 
 		// (C3) - Overlap
 		c1 = curveB;
 		c2 = curveD;
-		System.out.println("(C3)");
+		//System.out.println("(C3)");
 		this.testAndPrintTest("C3", c1, c2);
 
 		// (C4) - Equal
 		c1 = curveB;
 		c2 = curveB;
-		System.out.println("(C4)");
+		//System.out.println("(C4)");
 		this.testAndPrintTest("C4", c1, c2);
 
 		
@@ -174,31 +174,31 @@ public class SetOperationsTest extends TestCase {
 
 	private void testAndPrintTest(String testCaseID, GeometryImpl g1, GeometryImpl g2) {
 		
-		System.out.print("\nTestcase : (" + testCaseID + ")");
-		System.out.print("\nGeometry 1 :" + g1);
-		System.out.print("\nGeometry 2 :" + g2 + "\n");
+		//System.out.print("\nTestcase : (" + testCaseID + ")");
+		//System.out.print("\nGeometry 1 :" + g1);
+		//System.out.print("\nGeometry 2 :" + g2 + "\n");
 
 		GeometryImpl g = null;
 		
 		// INTERSECTION
 		g = this._testIntersection(g1, g2);
-		System.out.println("Intersection - result geometry: " + g);
+		//System.out.println("Intersection - result geometry: " + g);
 
 		// UNION
 		g = this._testUnion(g1, g2);
-		System.out.println("Union - result geometry: " + g);
+		//System.out.println("Union - result geometry: " + g);
 
 		// DIFFERENCE S1-S2
 		g = this._testDifference(g1, g2);
-		System.out.println("Difference - result geometry: " + g);
+		//System.out.println("Difference - result geometry: " + g);
 
 		// DIFFERENCE S2-S1
 		g = this._testDifference(g2, g1);
-		System.out.println("Difference - result geometry: " + g);
+		//System.out.println("Difference - result geometry: " + g);
 
 		// SYMMETRIC DIFFERENCE
 		g = this._testSymmetricDifference(g1, g2);
-		System.out.println("SymmetricDifference - result geometry: " + g);
+		//System.out.println("SymmetricDifference - result geometry: " + g);
 		
 	}
 

@@ -175,8 +175,8 @@ public class LineSegmentImpl extends LineStringImpl implements LineSegment {
 	 *            DirectPosition (from p0 to p1)
 	 * @return Position on the straight line at parameter 'par'
 	 */
-	public static DirectPositionImpl linearInterpolate(DirectPositionImpl p0,
-			DirectPositionImpl p1, double par) {
+	public static DirectPositionImpl linearInterpolate(DirectPosition p0,
+			DirectPosition p1, double par) {
 		// Test ok
 
 		// 0.0 <= factor <= 1.0

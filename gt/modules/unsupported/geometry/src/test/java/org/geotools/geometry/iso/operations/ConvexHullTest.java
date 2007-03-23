@@ -209,7 +209,7 @@ public class ConvexHullTest extends TestCase {
 		assertTrue(pos.get(7).getOrdinate(1) == 10);
 
 		res = this.createMultiSurfaceA().getConvexHull();
-		System.out.println(res);
+		//System.out.println(res);
 		pos = this.surfaceToPositions((Surface) res);
 		assertTrue(pos.get(0).getOrdinate(0) == 100);
 		assertTrue(pos.get(0).getOrdinate(1) == 10);
