@@ -73,7 +73,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @source $URL$
  * @version $Id$
  */
-class ArcSDEDataStore extends AbstractDataStore {
+public class ArcSDEDataStore extends AbstractDataStore {
     /** DOCUMENT ME! */
     private static final Logger LOGGER = Logger.getLogger(ArcSDEDataStore.class.getPackage()
                                                                                .getName());
