@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2007. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -278,7 +278,7 @@ public class DB2SpatialCatalog {
     private Integer getSridFromTable(Connection conn, String tableSchema,
         String tableName, String columnName) throws SQLException {
         Integer srsId = new Integer(0);
-        String querySrid = "SELECT \"" + columnName + "\"..ST_Srid()"
+        String querySrid = "SELECT DB2GSE.ST_SRID(\"" + columnName + "\")"
             + " FROM \"" + tableSchema + "\".\"" + tableName + "\""
             + " WHERE \"" + columnName + "\" IS NOT NULL"
             + " FETCH FIRST ROW ONLY";

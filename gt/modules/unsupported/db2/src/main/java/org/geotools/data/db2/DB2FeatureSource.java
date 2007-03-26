@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2007. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,13 +17,22 @@
 package org.geotools.data.db2;
 
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+
 import org.geotools.data.DataSourceException;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.jdbc.JDBCDataStore;
 import org.geotools.data.jdbc.JDBCFeatureSource;
+import org.geotools.data.jdbc.SQLBuilder;
+import org.geotools.feature.AttributeType;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.GeometryAttributeType;
+import org.geotools.filter.AttributeExpression;
 import org.geotools.filter.Filter;
+import org.geotools.filter.FilterFactory;
+import org.geotools.filter.FilterFactoryFinder;
+import org.geotools.filter.GeometryFilter;
 import org.geotools.filter.SQLEncoderException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -34,118 +43,166 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
-
 /**
- * DB2 Feature Source implementation.  Overrides functionality in
- * JDBCFeatureSource to provide more efficient or more appropriate
- * DB2-specific implementation.
- *
+ * DB2 Feature Source implementation. Overrides functionality in
+ * JDBCFeatureSource to provide more efficient or more appropriate DB2-specific
+ * implementation.
+ * 
  * @author David Adler - IBM Corporation
+ * @source $URL:
  * @source $URL$
  */
 public class DB2FeatureSource extends JDBCFeatureSource {
 
-    private static final Logger LOGGER = Logger.getLogger(
-            "org.geotools.data.db2");
+	private static final Logger LOGGER = Logger
+			.getLogger("org.geotools.data.db2");
 
-    /**
-     * Constructs a feature source based on a DB2 data store for a specified
-     * feature type.
-     *
-     * @param dataStore
-     * @param featureType
-     */
-    public DB2FeatureSource(DB2DataStore dataStore, FeatureType featureType) {
-        super(dataStore, featureType);
+	/**
+	 * Constructs a feature source based on a DB2 data store for a specified
+	 * feature type.
+	 * 
+	 * @param dataStore
+	 * @param featureType
+	 */
+	public DB2FeatureSource(DB2DataStore dataStore, FeatureType featureType) {
+		super(dataStore, featureType);
 
-    }
+	}
 
-    /**
-     * Closes everything associated with a query, the ResultSet, Statement and
-     * Connection.
-     *
-     * @param rs the ResultSet
-     * @param stmt the Statement
-     * @param conn the Connection
-     * @param transaction the Transaction
-     * @param e the SQLException, if any, or null
-     */
-    protected void closeAll(ResultSet rs, Statement stmt, Connection conn,
-        Transaction transaction, SQLException e) {
-        close(rs);
-        close(stmt);
-        close(conn, transaction, e);
-    }
+	/**
+	 * Closes everything associated with a query, the ResultSet, Statement and
+	 * Connection.
+	 * 
+	 * @param rs
+	 *            the ResultSet
+	 * @param stmt
+	 *            the Statement
+	 * @param conn
+	 *            the Connection
+	 * @param transaction
+	 *            the Transaction
+	 * @param e
+	 *            the SQLException, if any, or null
+	 */
+	protected void closeAll(ResultSet rs, Statement stmt, Connection conn,
+			Transaction transaction, SQLException e) {
+		close(rs);
+		close(stmt);
+		close(conn, transaction, e);
+	}
 
-    /**
-     * Gets the bounds of the feature using the specified query.
-     *
-     * @param query a query object.
-     *
-     * @return the envelope representing the bounds of the features.
-     *
-     * @throws IOException if there was an encoder problem.
-     * @throws DataSourceException if there was an error executing the query to
-     *         get the bounds.
-     */
-    public Envelope getBounds(Query query) throws IOException {
-        Envelope env = new Envelope();
-        CoordinateReferenceSystem crs = null;
+	/**
+	 * Gets the bounds of the feature using the specified query.
+	 * 
+	 * @param query
+	 *            a query object.
+	 * 
+	 * @return the envelope representing the bounds of the features.
+	 * 
+	 * @throws IOException
+	 *             if there was an encoder problem.
+	 * @throws DataSourceException
+	 *             if there was an error executing the query to get the bounds.
+	 */
+	public Envelope getBounds(Query query) throws IOException {
+		Envelope env = new Envelope();
+		CoordinateReferenceSystem crs = null;
+		LOGGER.fine("Query: " + query.toString());
+//		Exception e0 = new Exception();
+//		e0.printStackTrace();
+//		System.out.println("getBounds Query: " + query.toString());
+		if (getSchema() != null) {
+			String typeName = getSchema().getTypeName();
+			GeometryAttributeType geomType = getSchema().getDefaultGeometry();
+//			System.out.println("getBounds typeName: " + typeName);
+//			System.out.println("getBounds geomType: " + geomType);
+			if (geomType != null) {
+				org.opengis.filter.Filter filter = query.getFilter();
+//				System.out.println("getBounds filter: " + filter.toString());
+//				Object fclass = filter.getClass();
+//				System.out.println("getBounds filter class: " + fclass);
+//				int ftype = filter.getFilterType();
+//				System.out.println("getBounds filter type: " + ftype);
+//				if (ftype == Filter.GEOMETRY_INTERSECTS || ftype == Filter.GEOMETRY_BBOX) {
+//					filter = fixNullGeomFilter(filter);
+//				}
+//				JDBCDataStore jdbc = (JDBCDataStore) getJDBCDataStore();
+//				SQLBuilder sqlBuilder = jdbc.getSqlBuilder(typeName);
+//				filter = sqlBuilder.getPreQueryFilter(query.getFilter());
+				//           	filter = Filter.NONE;
+				if (filter != Filter.ALL) {
+					String sqlStmt = null;
+					try {
+						DB2SQLBuilder builder = (DB2SQLBuilder) ((DB2DataStore) this
+								.getDataStore()).getSqlBuilder(typeName);
+						LOGGER.fine("Filter: " + filter.toString());
+						sqlStmt = builder.buildSQLBoundsQuery(typeName,
+								geomType, filter);
+					} catch (SQLEncoderException e) {
+						throw new IOException("SQLEncoderException: " + e);
+					}
 
-        if (getSchema() != null) {
-            String typeName = getSchema().getTypeName();
-            GeometryAttributeType geomType = getSchema()
-                .getDefaultGeometry();
+					Connection conn = null;
+					Transaction transaction = null;
+					Statement statement = null;
+					ResultSet results = null;
 
-            if (query.getFilter() != Filter.EXCLUDE) {
-                String sqlStmt = null;
+					try {
+						conn = getConnection();
+						transaction = getTransaction();
+						statement = conn.createStatement();
+						results = statement.executeQuery(sqlStmt);
+						if (results.next()) {
+							double minx = results.getDouble(1);
+							double miny = results.getDouble(2);
+							double maxx = results.getDouble(3);
+							double maxy = results.getDouble(4);
+							env = new Envelope(minx, maxx, miny, maxy);
+						} else {
+							env = new Envelope();
+						}
+					} catch (SQLException e) {
+						closeAll(results, statement, conn, transaction, e);
+						System.out.println(e);
+						throw new DataSourceException("Could not get bounds "
+								+ query.getHandle(), e);
+					}
 
-                try {
-                    DB2SQLBuilder builder = (DB2SQLBuilder) ((DB2DataStore)this.getDataStore())
-                        .getSqlBuilder(typeName);
-                    sqlStmt = builder.buildSQLBoundsQuery(typeName, geomType,
-                            query.getFilter());
-                } catch (SQLEncoderException e) {
-                    throw new IOException("SQLEncoderException: " + e);
-                }
+					closeAll(results, statement, conn, transaction, null);
+				}
 
-                Connection conn = null;
-                Transaction transaction = null;
-                Statement statement = null;
-                ResultSet results = null;
+				crs = geomType.getCoordinateSystem();
+				env = new ReferencedEnvelope(env, crs);
+			}
+		}
 
-                try {
-                    conn = getConnection();
-                    transaction = getTransaction();
-                    statement = conn.createStatement();
-                    results = statement.executeQuery(sqlStmt);
+		LOGGER.fine("Bounds: " + env.toString());
 
-                    if (results.next()) {
-                        double minx = results.getDouble(1);
-                        double miny = results.getDouble(2);
-                        double maxx = results.getDouble(3);
-                        double maxy = results.getDouble(4);
-                        env = new Envelope(minx, maxx, miny, maxy);
-                    } else {
-                        env = new Envelope();
-                    }
-                } catch (SQLException e) {
-                    closeAll(results, statement, conn, transaction, e);
-                    System.out.println(e);
-                    throw new DataSourceException("Could not get bounds "
-                        + query.getHandle(), e);
-                }
-
-                closeAll(results, statement, conn, transaction, null);
-            }
-
-            crs = geomType.getCoordinateSystem();
-            env = new ReferencedEnvelope(env, crs);
-        }
-
-        LOGGER.finer("Bounds: " + env.toString());
-
-        return env;
-    }
-    
+		return env;
+	}
+/*
+ * Sometimes getBounds gets a filter with no geometry column - we substitute the
+ * default geometry column, if one can be found.
+ */
+	private Filter fixNullGeomFilter(Filter inFilter) {
+		GeometryFilter gf = (GeometryFilter) inFilter;
+		if (gf.getExpression1() == null) {
+			String attName = null;
+			GeometryAttributeType dg = getSchema().getDefaultGeometry();
+			if (dg != null) attName = dg.getName();
+			if (attName != null) {
+				
+				FilterFactory ff = FilterFactoryFinder.createFilterFactory();
+				AttributeExpression spatialColumn = ff
+						.createAttributeExpression(attName);
+				gf.addLeftGeometry(spatialColumn);
+				if (gf.getFilterType() == Filter.GEOMETRY_INTERSECTS) {
+					gf = ff.createGeometryFilter(Filter.GEOMETRY_BBOX);
+					gf.addLeftGeometry(spatialColumn);
+					gf.addRightGeometry(((GeometryFilter)inFilter).getRightGeometry());
+				}
+			}
+		}
+		return gf;
+	}
 }

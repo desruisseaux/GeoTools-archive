@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2007. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -156,16 +156,17 @@ public class DB2DataStore extends JDBCDataStore {
     protected AttributeType buildAttributeType(ResultSet rs)
         throws IOException {
         try {
-            int dataType = rs.getInt("DATA_TYPE");
+        	String spatialTypePrefix = "\"DB2GSE\".\"ST_";
 
-            // If this isn't a DB2 STRUCT type, let the default method handle it
-            if (dataType != Types.STRUCT) {
-                return super.buildAttributeType(rs);
-            }
-
+        	int dataType = rs.getInt("DATA_TYPE");
+            String typeName = rs.getString("TYPE_NAME");
             String tableSchema = rs.getString("TABLE_SCHEM");
             String tableName = rs.getString("TABLE_NAME");
             String columnName = rs.getString("COLUMN_NAME");
+            if (!typeName.startsWith(spatialTypePrefix)) {
+                return super.buildAttributeType(rs);
+            }
+            
             String geomTypeName = this.catalog.getDB2GeometryTypeName(tableSchema,
                     tableName, columnName);
 

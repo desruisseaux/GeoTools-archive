@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005-2006. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2007. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -61,33 +61,37 @@ public class DB2FeatureSourceTest extends DB2TestCase {
     public void testGetBounds() throws Exception {
         FeatureSource featureSource;
         Envelope env;
+        String coordString = null;
         DefaultQuery query;
 
         //Test "Places" - all bounds
         featureSource = dataStore.getFeatureSource("Places");
         env = featureSource.getBounds();
         assertEquals("all places bounds",
-            "Env[-74.160507 : -74.067637, 41.993695 : 42.05990399999999]",
+            "[74°09.6'W 41°59.6'N , 74°04.1'W 42°03.6'N]",
             env.toString());
 
         env = featureSource.getBounds(Query.ALL);
+        coordString = env2CoordString(env);        
         assertEquals("all places bounds",
-            "Env[-74.160507 : -74.067637, 41.993695 : 42.05990399999999]",
-            env.toString());
+            "Env[-74.160507 : -74.067637, 41.993695 : 42.05990399999999]", coordString);
 
         //Test "Roads" - all bounds
         featureSource = dataStore.getFeatureSource("Roads");
         env = featureSource.getBounds();
+        coordString = env2CoordString(env);
         assertEquals("all roads bounds",
-            "Env[598054.2 : 604430.47, 1158025.78 : 1165565.78]", env.toString());
+            "Env[598054.2 : 604430.47, 1158025.78 : 1165565.78]", coordString);
 
         //Test "Roads" - roadsEnv1 bbox		
         query = getBBOXQuery(featureSource, roadsEnv1);
         env = featureSource.getBounds(query);
+        coordString = env2CoordString(env);        
         assertEquals("all roads bounds",
             "Env[599280.58 : 604430.47, 1159468.47 : 1162830.55]",
-            env.toString());
+			coordString);
     }
+
     private void checkFidTable(String featureName, String testValue) throws IOException {
         FeatureSource featureSource;
         FeatureCollection features;
@@ -194,5 +198,11 @@ public class DB2FeatureSourceTest extends DB2TestCase {
         FeatureType ft = featureSource.getSchema();
 
         return new DefaultQuery(ft.getTypeName(), gf);
+    }
+        public String env2CoordString(Envelope env) {
+    	String result = null;
+    	result = "Env[" + env.getMinX() + " : " + env.getMaxX() 
+				 + ", " + env.getMinY() + " : " + env.getMaxY() + "]";
+    	return result;
     }
 }

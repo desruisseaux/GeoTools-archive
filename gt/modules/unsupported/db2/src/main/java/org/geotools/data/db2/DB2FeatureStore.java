@@ -44,11 +44,11 @@ import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
- * DOCUMENT ME!
- *
- * @author davea To change the template for this generated type comment go to
- *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
- *         Comments
+ * DB2 FeatureStore implementation. Overrides functionality in
+ * JDBCFeatureStore to provide more efficient or more appropriate DB2-specific
+ * implementation.
+ * 
+ * @author David Adler - IBM Corporation
  * @source $URL$
  */
 public class DB2FeatureStore extends JDBCFeatureStore{

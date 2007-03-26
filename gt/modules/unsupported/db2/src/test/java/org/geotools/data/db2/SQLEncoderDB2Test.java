@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2007. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -182,7 +182,7 @@ public class SQLEncoderDB2Test extends DB2TestCase {
         this.encoder.encode(output, gf);
         sqlString = output.toString();
         assertEquals("DWITHIN",
-            "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_Geometry('LINESTRING (0 0, 300 300)', 1)) > 10.0",
+            "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) > 10.0",
             sqlString);
         gf = createDistanceFilter(AbstractFilter.GEOMETRY_DWITHIN,
                 spatialColumn, geometryLiteral, 10.0);
@@ -191,7 +191,7 @@ public class SQLEncoderDB2Test extends DB2TestCase {
         this.encoder.encode(output, gf);
         sqlString = output.toString();
         assertEquals("DWITHIN",
-            "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_Geometry('LINESTRING (0 0, 300 300)', 1)) < 10.0",
+            "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) < 10.0",
             sqlString);
     }
 
@@ -211,7 +211,7 @@ public class SQLEncoderDB2Test extends DB2TestCase {
             this.encoder.encode(output, gf);
             sqlString = output.toString();
             assertEquals("DWITHIN",
-                "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_Geometry('LINESTRING (0 0, 300 300)', 1)) < 10.0",
+                "WHERE db2gse.ST_Distance(\"Geom\", db2gse.ST_LINESTRING('LINESTRING (0 0, 300 300)', 1)) < 10.0",
                 sqlString);
         } catch (SQLEncoderException e1) {
             // TODO Auto-generated catch block
@@ -265,7 +265,7 @@ public class SQLEncoderDB2Test extends DB2TestCase {
             sqlString = output.toString();
 
             String expected = "WHERE db2gse." + predicateName
-                + "(\"Geom\", db2gse.ST_Geometry('POLYGON ((-76 41, -76 42, -74 42, -74 41, -76 41))', 1)) = 1";
+                + "(\"Geom\", db2gse.ST_POLYGON('POLYGON ((-76 41, -76 42, -74 42, -74 41, -76 41))', 1)) = 1";
             assertEquals("Testing predicate: " + predicateName, expected,
                 sqlString);
         }

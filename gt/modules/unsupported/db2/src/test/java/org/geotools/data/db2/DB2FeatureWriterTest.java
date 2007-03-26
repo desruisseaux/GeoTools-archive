@@ -49,7 +49,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
         dataStore = getDataStore();
     }
 
-    public void xtestRemove() throws IOException {
+    public void testRemove() throws IOException {
         try {
             DB2FeatureStore fs = (DB2FeatureStore) dataStore.getFeatureSource(
                     "Roads");
@@ -71,7 +71,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
             System.out.println(e);
         }
     }
-    public void xtestUpdateRoads() throws IOException {
+    public void testUpdateRoads() throws IOException {
         try {
             DB2FeatureStore fs = (DB2FeatureStore) dataStore.getFeatureSource(
                     "Roads");
@@ -136,7 +136,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
         }
     }
 
-    public void xtestAppend() throws IOException {
+    public void testAppend() throws IOException {
         try {
 
             FeatureWriter fw = this.dataStore.getFeatureWriterAppend("Roads",
@@ -160,7 +160,7 @@ public class DB2FeatureWriterTest extends DB2TestCase {
             System.out.println(e);
         }
     }
-    public void xtestAppendPlaces() throws IOException {
+    public void testAppendPlaces() throws IOException {
         try {
 
             FeatureWriter fw = this.dataStore.getFeatureWriterAppend("Places",

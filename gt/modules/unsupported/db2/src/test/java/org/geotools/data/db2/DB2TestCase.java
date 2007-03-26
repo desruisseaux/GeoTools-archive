@@ -72,8 +72,9 @@ public class DB2TestCase extends TestCase {
      * @throws SQLException
      */
     protected void setPropertyValues() throws IOException, SQLException {
+    	String propertyFile = "db2test.properties";
         PropertyResourceBundle resource = new PropertyResourceBundle(this.getClass()
-                                                                         .getResourceAsStream("db2test.properties"));
+                                                                         .getResourceAsStream(propertyFile));
         host = resource.getString("host");
         portnum = Integer.parseInt(resource.getString("portnum"));
         dbname = resource.getString("dbname");
