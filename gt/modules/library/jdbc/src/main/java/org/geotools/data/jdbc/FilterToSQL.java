@@ -77,15 +77,16 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Encodes a filter into a SQL WHERE statement.  It should hopefully be generic
- * enough that any SQL database will work with it, though it has only been
- * tested with MySQL and Postgis.  This generic SQL encoder should eventually
+ * enough that any SQL database will work with it.
+ * This generic SQL encoder should eventually
  * be able to encode all filters except Geometry Filters.
  * This is because the OGC's SFS for SQL document specifies
  * two ways of doing SQL databases, one with native geometry types and one
  * without.  To implement an encoder for one of the two types simply subclass
  * off of this encoder and put in the proper GeometryFilter visit method. Then
- * add the filter types supported to the capabilities in the static
- * capabilities.addType block.
+ * add the filter types supported to the capabilities by overriding the
+ * {{@link #createFilterCapabilities()} method.
+ * 
  * 
  * This version was ported from the original to support org.opengis.filter type
  * Filters.
