@@ -1,4 +1,4 @@
-package org.geotools.geometry.iso.util.AlgorithmND;
+package org.geotools.geometry.iso.util.algorithmND;
 
 import junit.framework.TestCase;
 
