@@ -1,7 +1,7 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
  *    http://geotools.org
- *    (C) Copyright IBM Corporation, 2005. All rights reserved.
+ *    (C) Copyright IBM Corporation, 2005-2007. All rights reserved.
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -116,6 +116,17 @@ public class DB2DataStoreFactory extends AbstractDataStoreFactory
             throw new DataSourceException("Could not create connection pool", e);
         }
 
+        // If the table schema is null or blank, uset the userid for the table schema
+        if (tabschema == null || tabschema.length() == 0) {
+        	tabschema = user;
+        }
+        // if the table schema is not double-quoted, convert it to uppercase.
+        // if it is double-quoted, remove the double quotes.
+        if (tabschema.startsWith("\"")) {
+        	tabschema = tabschema.substring(1,tabschema.length()-1);
+        } else {
+        	tabschema = tabschema.toUpperCase();
+        }
         // Set the namespace and databaseSchemaName both to the table schema name
         // Set the timeout value to 100 seconds to force FeatureTypeHandler caching
         JDBCDataStoreConfig config = new JDBCDataStoreConfig(tabschema,

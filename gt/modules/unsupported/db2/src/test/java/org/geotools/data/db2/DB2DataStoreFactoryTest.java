@@ -50,7 +50,7 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
             fail("createDataStore failed:" + e);
         }
 
-        // Should fail
+        // Should fail if dbtype is not "DB2"
         try {
             Map params = copyParams(allParams);
             params.put("dbtype", "nodb");
@@ -60,7 +60,52 @@ public class DB2DataStoreFactoryTest extends DB2TestCase {
         } catch (IOException e) {
             // We should come here as a result
         }
+        // Should default schema to the user if schema is null
+        try {
+            Map params = copyParams(allParams);
+            params.put("tabschema", null);
+
+            DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+            String schema = dataStore.getTableSchema();
+            assertEquals("DB2ADMIN", schema);
+        } catch (IOException e) {
+            fail("createDataStore failed:" + e);
+        }       
+
+    // Should default schema to the user if schema is blank
+    try {
+        Map params = copyParams(allParams);
+        params.put("tabschema", "");
+
+        DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+        String schema = dataStore.getTableSchema();
+        assertEquals("DB2ADMIN", schema);
+    } catch (IOException e) {
+        fail("createDataStore failed:" + e);
+    }  
+    // Should convert schema to uppercase
+    try {
+        Map params = copyParams(allParams);
+        params.put("tabschema", "sde");
+
+        DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+        String schema = dataStore.getTableSchema();
+        assertEquals("SDE", schema);
+    } catch (IOException e) {
+        fail("createDataStore failed:" + e);
     }
+    // Should leave schema in mixed case
+    try {
+        Map params = copyParams(allParams);
+        params.put("tabschema", "\"Test\"");
+
+        DB2DataStore dataStore = (DB2DataStore) factory.createDataStore(params);
+        String schema = dataStore.getTableSchema();
+        assertEquals("Test", schema);
+    } catch (IOException e) {
+        fail("createDataStore failed:" + e);
+    }
+}
 
     public void testCreateNewDataStore() {
         // Should fail
