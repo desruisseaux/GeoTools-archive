@@ -56,7 +56,7 @@ import com.esri.sde.sdk.client.SeLayer;
  * @see org.geotools.data.sde.GeometryEncoderSDE
  * @source $URL$
  */
-public class SQLEncoderSDE extends FilterToSQL
+public class FilterToSQLSDE extends FilterToSQL
     implements FilterVisitor {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
@@ -65,15 +65,15 @@ public class SQLEncoderSDE extends FilterToSQL
     private SeLayer sdeLayer;
 
     /**
-     * Creates a new SQLEncoderSDE object.
+     * Creates a new FilterToSQLSDE object.
      */
-    public SQLEncoderSDE() {
+    public FilterToSQLSDE() {
 //    	intentionally blank
     }
 
     /**
      */
-    public SQLEncoderSDE(SeLayer layer, FeatureType ft) {
+    public FilterToSQLSDE(SeLayer layer, FeatureType ft) {
         this.sdeLayer = layer;
         this.featureType = ft;
     }

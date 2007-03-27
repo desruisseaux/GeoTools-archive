@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 import org.geotools.arcsde.filter.GeometryEncoderException;
 import org.geotools.arcsde.filter.GeometryEncoderSDE;
-import org.geotools.arcsde.filter.SQLEncoderSDE;
+import org.geotools.arcsde.filter.FilterToSQLSDE;
 import org.geotools.arcsde.pool.ArcSDEConnectionPool;
 import org.geotools.arcsde.pool.ArcSDEPooledConnection;
 import org.geotools.arcsde.pool.UnavailableArcSDEConnectionException;
@@ -933,7 +933,7 @@ class ArcSDEQuery {
          */
         private void createGeotoolsFilters() {
             /** DOCUMENT ME! */
-            SQLEncoderSDE sqlEncoder = new SQLEncoderSDE(this.sdeLayer, featureType);
+            FilterToSQLSDE sqlEncoder = new FilterToSQLSDE(this.sdeLayer, featureType);
             
             PostPreProcessFilterSplittingVisitor unpacker = new PostPreProcessFilterSplittingVisitor(sqlEncoder.getCapabilities(), featureType, null);
             sourceFilter.accept(unpacker, null);
@@ -982,7 +982,7 @@ class ArcSDEQuery {
 
                 if (!Filter.INCLUDE.equals(sqlFilter)) {
                     String whereClause = null;
-                    SQLEncoderSDE sqlEncoder = new SQLEncoderSDE(this.sdeLayer, featureType);
+                    FilterToSQLSDE sqlEncoder = new FilterToSQLSDE(this.sdeLayer, featureType);
 
                     try {
                         whereClause = sqlEncoder.encodeToString(sqlFilter);

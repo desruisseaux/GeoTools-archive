@@ -75,7 +75,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * <p>
  * Although not all filters support is coded yet, the strategy to filtering
  * queries for ArcSDE datasources is separated in two parts, the SQL where
- * clause construction, provided by <code>SQLEncoderSDE</code> and the spatial
+ * clause construction, provided by <code>FilterToSQLSDE</code> and the spatial
  * filters (or spatial constraints, in SDE vocabulary) provided here;
  * mirroring the java SDE api approach
  * </p>
