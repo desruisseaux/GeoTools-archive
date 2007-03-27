@@ -18,5 +18,6 @@ public class SeQuery {
 	public SeRow fetch() { return null; }
 	public void setSpatialConstraints(int i, boolean b, SeFilter[] f) {}
 	public SeTableStats calculateTableStatistics(String s, int i, SeQueryInfo q, int j) { return null; }
+    public void queryRasterTile(SeRasterConstraint c) {}
 
 }
