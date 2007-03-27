@@ -16,8 +16,12 @@
 package org.geotools.factory;
 
 // J2SE dependencies
+import java.util.Iterator;
 import java.util.Set;
 import java.util.LinkedHashSet;
+
+// Geotools dependencies
+import org.geotools.resources.XArray;
 
 
 /**
@@ -30,20 +34,83 @@ import java.util.LinkedHashSet;
  */
 public final class Factories {
     /**
-     * Alternative scanning methods used by {@link FactoryRegistry#scanForPlugins(Collection,Class)}
-     * in addition of the default lookup mechanism.
-     *
-     * @todo Replace by a concurrent hash set when we will be allowed to compile for J2SE 1.5,
-     *       and remove the synchronization in this class and the clone in
-     *       {@link #getIteratorProviders}.
+     * The system-wide configuration. This is the instance configured by
+     * the public static methods provided in this class.
      */
-    private static final Set/*<FactoryIteratorProvider>*/ iteratorProviders = new LinkedHashSet();
+    private static final Factories GLOBAL = new Factories();
 
     /**
-     * Do not allow instantiation of this class.
+     * Incremented every time a modification is performed.
      */
-    private Factories() {
+    private int modifications = 0;
+
+    /**
+     * Alternative scanning methods used by {@link FactoryRegistry#scanForPlugins(Collection,Class)}
+     * in addition of the default lookup mechanism. Will be created only when first needed.
+     */
+    private Set/*<FactoryIteratorProvider>*/ iteratorProviders;
+
+    /**
+     * Creates an initially empty set of factories.
+     */
+    Factories() {
     }
+
+    /**
+     * Synchronizes the content of the {@link #iteratorProviders} map with the {@linkplain #GLOBAL
+     * global} one. New providers are returned for later {@linkplain FactoryRegistry#register
+     * registration}. Note that this method is typically invoked in a different thread than
+     * {@link Factories} public static method calls.
+     *
+     * @return The new iterators providers {@linkplain #addFactoryIteratorProvider added} since
+     *         the last time this method was invoked, or {@code null} if none.
+     */
+    final FactoryIteratorProvider[] synchronizeIteratorProviders() {
+        FactoryIteratorProvider[] newProviders = null;
+        int count = 0;
+        synchronized (GLOBAL) {
+            if (modifications == GLOBAL.modifications) {
+                return null;
+            }
+            modifications = GLOBAL.modifications;
+            if (GLOBAL.iteratorProviders == null) {
+                /*
+                 * Should never happen. If GLOBAL.iteratorProviders was null, then every
+                 * 'modifications' count should be 0 and this method should have returned 'null'.
+                 */
+                throw new AssertionError(modifications);
+            }
+            /*
+             * If  'Factories.removeFactoryIteratorProvider(...)'  has been invoked since the last
+             * time this method was run, then synchronize 'iteratorProviders' accordingly. Current
+             * implementation do not unregister the factories that were created by those iterators.
+             */
+            if (iteratorProviders != null) {
+                iteratorProviders.retainAll(GLOBAL.iteratorProviders);
+            } else if (!GLOBAL.iteratorProviders.isEmpty()) {
+                iteratorProviders = new LinkedHashSet();
+            }
+            /*
+             * If 'Factories.addFactoryIteratorProvider(...)' has been invoked since the last
+             * time this method was run, then synchronize 'iteratorProviders' accordingly. We
+             * keep trace of new providers in order to allow 'FactoryRegistry' to use them for
+             * a immediate scanning.
+             */
+            int remaining = GLOBAL.iteratorProviders.size();
+            for (final Iterator it=GLOBAL.iteratorProviders.iterator(); it.hasNext();) {
+                final FactoryIteratorProvider candidate = (FactoryIteratorProvider) it.next();
+                if (iteratorProviders.add(candidate)) {
+                    if (newProviders == null) {
+                        newProviders = new FactoryIteratorProvider[remaining];
+                    }
+                    newProviders[count++] = candidate;
+                }
+                remaining--;
+            }
+        }
+        // Note: newProviders may be null.
+        return (FactoryIteratorProvider[]) XArray.resize(newProviders, count);
+    }    
 
     /**
      * Adds an alternative way to search for factory implementations. {@link FactoryRegistry} has
@@ -54,8 +121,13 @@ public final class Factories {
      * <a href="http://www.springframework.org/">Spring framework</a>.
      */
     public static void addFactoryIteratorProvider(FactoryIteratorProvider provider) {
-        synchronized (iteratorProviders) {
-            iteratorProviders.add(provider);
+        synchronized (GLOBAL) {
+            if (GLOBAL.iteratorProviders == null) {
+                GLOBAL.iteratorProviders = new LinkedHashSet();
+            }
+            if (GLOBAL.iteratorProviders.add(provider)) {
+                GLOBAL.modifications++;
+            }
         }
     }
 
@@ -65,20 +137,26 @@ public final class Factories {
      * {@linkplain FactoryRegistry#deregisterServiceProvider deregistered} by this method.
      */
     public static void removeFactoryIteratorProvider(FactoryIteratorProvider provider) {
-        synchronized (iteratorProviders) {
-            iteratorProviders.remove(provider);
+        synchronized (GLOBAL) {
+            if (GLOBAL.iteratorProviders != null) {
+                if (GLOBAL.iteratorProviders.remove(provider)) {
+                    GLOBAL.modifications++;
+                }
+            }
         }
     }
 
     /**
-     * Returns the iterator providers.
-     *
-     * @todo Remove the synchronization and the clone when we will be allowed to use
-     *       a concurrent hash set with J2SE 1.5.
+     * Returns all iterator providers. This method do not returns any live collection
+     * since the array will be used outside the synchronized block.
      */
-    static Set/*<FactoryIteratorProvider>*/ getIteratorProviders() {
-        synchronized (iteratorProviders) {
-            return (Set) ((LinkedHashSet) iteratorProviders).clone();
+    static FactoryIteratorProvider[] getIteratorProviders() {
+        synchronized (GLOBAL) {
+            if (GLOBAL.iteratorProviders == null) {
+                return new FactoryIteratorProvider[0];
+            }
+            return (FactoryIteratorProvider[]) GLOBAL.iteratorProviders.toArray(
+                    new FactoryIteratorProvider[GLOBAL.iteratorProviders.size()]);
         }
     }
 }

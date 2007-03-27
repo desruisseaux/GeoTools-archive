@@ -79,7 +79,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      */
     public synchronized void setEquivalentScale(final double newValue) {
         checkWritePermission();
-        equivalentScale = RepresentativeFractionImpl.fromDouble( newValue );
+        equivalentScale = RepresentativeFractionImpl.fromDouble(newValue);
     }
 
     /**
@@ -90,7 +90,7 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
     public double getDistance() {
         return distance;
     }    
-    
+
     /**
      * Set the ground sample distance.
      */
@@ -136,6 +136,5 @@ public class ResolutionImpl extends MetadataEntity implements Resolution {
      */
     public String toString() {
         return String.valueOf(distance);
-    }    
+    }
 }
-    

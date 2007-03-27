@@ -21,13 +21,13 @@ package org.geotools.metadata.iso.identification;
 
 // J2SE direct dependencies
 import java.util.Collection;
-import java.util.Collections;
 
 // OpenGIS dependencies
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.distribution.Format;
+import org.opengis.metadata.identification.AggregateInformation;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.BrowseGraphic;
 import org.opengis.metadata.identification.Keywords;
@@ -118,7 +118,12 @@ public class IdentificationImpl extends MetadataEntity implements Identification
      * Provides information about constraints which apply to the resource(s).
      */
     private Collection resourceConstraints;
-    
+
+    /**
+     * Provides aggregate dataset information.
+     */
+    private Collection aggregationInfo;
+
     /**
      * Constructs an initially empty identification.
      */
@@ -309,6 +314,24 @@ public class IdentificationImpl extends MetadataEntity implements Identification
     }
 
     /**
+     * Provides aggregate dataset information.
+     *
+     * @since 2.4
+     */
+    public synchronized Collection getAggregateInfo() {
+        return aggregationInfo = nonNullCollection(aggregationInfo, AggregateInformation.class);
+    }
+
+    /**
+     * Provides aggregate dataset information.
+     *
+     * @since 2.4
+     */
+    public synchronized void setAggregateInfo(final Collection newValues) {
+        aggregationInfo = copyCollection(newValues, aggregationInfo, AggregateInformation.class);
+    }
+
+    /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
     protected void freeze() {
@@ -324,6 +347,7 @@ public class IdentificationImpl extends MetadataEntity implements Identification
         descriptiveKeywords    = (Collection)          unmodifiable(descriptiveKeywords);
         resourceSpecificUsages = (Collection)          unmodifiable(resourceSpecificUsages);
         resourceConstraints    = (Collection)          unmodifiable(resourceConstraints);
+        aggregationInfo        = (Collection)          unmodifiable(aggregationInfo);
     }
 
     /**
@@ -345,7 +369,8 @@ public class IdentificationImpl extends MetadataEntity implements Identification
                    Utilities.equals(this.resourceFormat,         that.resourceFormat         ) &&
                    Utilities.equals(this.descriptiveKeywords,    that.descriptiveKeywords    ) &&
                    Utilities.equals(this.resourceSpecificUsages, that.resourceSpecificUsages ) &&
-                   Utilities.equals(this.resourceConstraints,    that.resourceConstraints    )  ;
+                   Utilities.equals(this.resourceConstraints,    that.resourceConstraints    ) &&
+                   Utilities.equals(this.aggregationInfo,        that.aggregationInfo        )  ;
         }
         return false;
     }
@@ -368,16 +393,11 @@ public class IdentificationImpl extends MetadataEntity implements Identification
         if (resourceConstraints     != null) code ^= resourceConstraints   .hashCode();
         return code;
     }
- 
+
     /**
      * Returns a string representation of this identification.
      */
     public String toString() {
         return String.valueOf(resourceMaintenance);
-    }
-
-    /** @return Collection<AggregateInformation> */
-    public Collection getAggregateInfo() {
-        return Collections.EMPTY_LIST; // TODO: store provided information
     }
 }

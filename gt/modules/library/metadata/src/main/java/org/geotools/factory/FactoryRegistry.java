@@ -45,13 +45,16 @@ import org.geotools.resources.i18n.LoggingKeys;
  * they are processed as if their content were merged.
  * <p>
  * Example use:
- * <blockquote><pre>
- * Set categories = Collections.singleton(new Class[] {MathTransformProvider.class});
- * FactoryRegistry registry = new FactoryRegistry(categories);
- * 
- * // get the providers
- * Iterator providers = registry.getProviders(MathTransformProvider.class)
- * </pre></blockquote>
+ * <blockquote><code>
+ * Set categories = Collections.singleton(new Class[] {MathTransformProvider.class});<br>
+ * FactoryRegistry registry = new FactoryRegistry(categories);<br>
+ * <br>
+ * // get the providers<br>
+ * Filter filter = null;<br>
+ * Hints hints = null;<br>
+ * Iterator<MathTransform> providers =
+ *     registry.getServiceProviders(MathTransformProvider.class, filter, hints);<br>
+ * </code></blockquote>
  * <p>
  * <strong>NOTE: This class is not thread safe</strong>. Users are responsable
  * for synchronisation. This is usually done in an utility class wrapping this
@@ -72,6 +75,16 @@ public class FactoryRegistry extends ServiceRegistry {
      * The logger for all events related to factory registry.
      */
     protected static final Logger LOGGER = Logger.getLogger("org.geotools.factory");
+
+    /**
+     * A copy of the global configuration set through {@link Factories} static methods. We keep
+     * a copy in every {@code FactoryRegistry} instance in order to compare against the master
+     * {@link Factories#GLOBAL} and detect if the configuration changed since the last time this
+     * registry was used.
+     *
+     * @see #synchronizeIteratorProviders
+     */
+    private final Factories globalConfiguration = new Factories();
 
     /**
      * Categories under scanning. This is used by {@link #scanForPlugins(Collection,Class)}
@@ -140,6 +153,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 return isAcceptable(provider, category, hints, filter);
             }
         };
+        synchronizeIteratorProviders();
         Iterator iterator = getServiceProviders(category, hintsFilter, true);
         if (!iterator.hasNext()) {
             scanForPlugins(getClassLoaders(), category);
@@ -159,6 +173,9 @@ public class FactoryRegistry extends ServiceRegistry {
      *   <li>We don't want a restrictive filter in order to avoid trigging a classpath
      *       scan if this method doesn't found any element to iterate.</li>
      * </ul>
+     * <p>
+     * <b>Note:</b>
+     * {@link #synchronizeIteratorProviders} should also be invoked once before this method.
      */
     final Iterator getUnfilteredProviders(final Class category) {
         if (!scanningCategories.isEmpty()) {
@@ -219,6 +236,7 @@ public class FactoryRegistry extends ServiceRegistry {
                                      Hints hints, final Hints.Key key)
             throws FactoryRegistryException
     {
+        synchronizeIteratorProviders();
         Class implementation = null;
         if (key != null) {
             /*
@@ -622,21 +640,22 @@ public class FactoryRegistry extends ServiceRegistry {
             final StringBuffer message = getLogHeader(category);
             boolean newServices = false;
             /*
-             * First, query the user-provider iterators, if any.
-             */
-            for (final Iterator ip=Factories.getIteratorProviders().iterator(); ip.hasNext();) {
-                final Iterator it = ((FactoryIteratorProvider) ip.next()).iterator(category);
-                if (it != null) {
-                    newServices |= register(it, category, message);
-                }
-            }
-            /*
-             * Next, scan META-INF/services directories (the default mechanism).
+             * First, scan META-INF/services directories (the default mechanism).
              */
             for (final Iterator it=loaders.iterator(); it.hasNext();) {
                 final ClassLoader loader = (ClassLoader) it.next();
                 newServices |= register(lookupProviders(category, loader), category, message);
                 newServices |= registerFromSystemProperty(loader, category, message);
+            }
+            /*
+             * Next, query the user-provider iterators, if any.
+             */
+            final FactoryIteratorProvider[] fip = Factories.getIteratorProviders();
+            for (int i=0; i<fip.length; i++) {
+                final Iterator it = fip[i].iterator(category);
+                if (it != null) {
+                    newServices |= register(it, category, message);
+                }
             }
             /*
              * Finally, log the list of registered factories.
@@ -652,15 +671,15 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * {@linkplain #registerServiceProvider Registers} all service providers given by the
+     * {@linkplain #registerServiceProvider Registers} all factories given by the
      * supplied iterator.
      *
-     * @param factories The service providers to register.
+     * @param factories The factories (or "service providers") to register.
      * @param category  the category under which to register the providers.
      * @param message   A buffer where to write the logging message.
-     * @return {@code true} if at least one service provider has been registered.
+     * @return {@code true} if at least one factory has been registered.
      */
-    private boolean register(final Iterator factories, final Class category,
+    private boolean register(final Iterator/*<T>*/ factories, final Class/*<T>*/ category,
                              final StringBuffer message)
     {
         boolean newServices = false;
@@ -676,7 +695,7 @@ public class FactoryRegistry extends ServiceRegistry {
                 /*
                  * A provider can't be registered because of some missing dependencies.
                  * This occurs for example when trying to register the WarpTransform2D
-                 * math transform on a machine without JAI installation. Since the service
+                 * math transform on a machine without JAI installation. Since the factory
                  * may not be essential (this is the case of WarpTransform2D), just skip it.
                  */
                 loadingFailure(category, error, false);
@@ -685,11 +704,12 @@ public class FactoryRegistry extends ServiceRegistry {
                 if (!Utilities.getShortClassName(error).equals("ServiceConfigurationError")) {
                     // We want to handle sun.misc.ServiceConfigurationError only. Unfortunatly, we
                     // need to rely on reflection because this error class is not a commited API.
+                    // TODO: Check if the error is catchable with JSE 6.
                     throw error;
                 }
                 /*
-                 * Failed to register a service for a reason probably related to the plugin
-                 * initialisation. It may be some service-dependent missing resources.
+                 * Failed to register a factory for a reason probably related to the plugin
+                 * initialisation. It may be some factory-dependent missing resources.
                  */
                 loadingFailure(category, error, true);
                 continue;
@@ -727,7 +747,7 @@ public class FactoryRegistry extends ServiceRegistry {
      * @param loader   The class loader to use.
      * @param category The category to scan for plug-ins.
      * @param message  A buffer where to write the logging message.
-     * @return {@code true} if at least one service provider has been registered.
+     * @return {@code true} if at least one factory has been registered.
      */
     private boolean registerFromSystemProperty(final ClassLoader loader, final Class category,
                                                final StringBuffer message)
@@ -779,7 +799,7 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Invoked when a service can't be loaded. Log a warning, but do not stop the process.
+     * Invoked when a factory can't be loaded. Log a warning, but do not stop the process.
      */
     private static void loadingFailure(final Class category, final Throwable error,
                                        final boolean showStackTrace)
@@ -820,34 +840,38 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Adds an alternative way to search for factory implementations. {@code FactoryRegistry} has
-     * a default mechanism bundled in it, which uses the content of all {@code META-INF/services}
-     * directories found on the classpath. This {@code addFactoryIteratorProvider} method allows
-     * to specify additional discovery algorithms. It may be useful in the context of some
-     * frameworks that use the <cite>constructor injection</cite> pattern, like the
-     * <a href="http://www.springframework.org/">Spring framework</a>.
+     * Synchronizes the content of the {@link #globalConfiguration} with {@link Factories#GLOBAL}.
+     * New providers are {@linkplain #register registered} immediately. Note that this method is
+     * typically invoked in a different thread than {@link Factories} method calls.
      *
-     * @deprecated Not used since we moved this method to {@link Factories}. We need to find
-     *             a way to get this method invoked automatically as a notification scheme.
+     * @see Factories#addFactoryIteratorProvider
      */
-    private void addFactoryIteratorProvider(final FactoryIteratorProvider provider) {
+    private void synchronizeIteratorProviders() {
+        final FactoryIteratorProvider[] newProviders =
+                globalConfiguration.synchronizeIteratorProviders();
+        if (newProviders == null) {
+            return;
+        }
         for (final Iterator categories=getCategories(); categories.hasNext();) {
             final Class category = (Class) categories.next();
             if (getServiceProviders(category, false).hasNext()) {
                 /*
                  * Register immediately the factories only if some other factories were already
-                 * registered for this category,  because in such case 'scanForPlugin' will not
+                 * registered for this category,  because in such case scanForPlugin() will not
                  * be invoked automatically. If no factory are registered for this category, do
-                 * nothing - we will rely on the lazy invocation of 'scanForPlugins' when first
+                 * nothing - we will rely on the lazy invocation of scanForPlugins() when first
                  * needed. We perform this check because getServiceProviders(category).hasNext()
                  * is the criterion used by FactoryRegistry in order to decide if it should invoke
-                 * automatically scanForPlugins.
+                 * automatically scanForPlugins().
                  */
-                final Iterator it = provider.iterator(category);
-                if (it != null) {
-                    final StringBuffer message = getLogHeader(category);
-                    if (register(it, category, message)) {
-                        log("addFactoryIteratorProvider", message);
+                for (int i=0; i<newProviders.length; i++) {
+                    final FactoryIteratorProvider provider = newProviders[i];
+                    final Iterator it = provider.iterator(category);
+                    if (it != null) {
+                        final StringBuffer message = getLogHeader(category);
+                        if (register(it, category, message)) {
+                            log("synchronizeIteratorProviders", message);
+                        }
                     }
                 }
             }
@@ -855,7 +879,7 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Set pairwise ordering between all services according a comparator. Calls to
+     * Set pairwise ordering between all factories according a comparator. Calls to
      * <code>{@linkplain Comparator#compare compare}(factory1, factory2)</code> should returns:
      * <ul>
      *   <li>{@code -1} if {@code factory1} is preferred to {@code factory2}</li>
@@ -900,17 +924,17 @@ public class FactoryRegistry extends ServiceRegistry {
     }
 
     /**
-     * Sets or unsets a pairwise ordering between all services meeting a criterion. For example
+     * Sets or unsets a pairwise ordering between all factories meeting a criterion. For example
      * in the CRS framework ({@link org.geotools.referencing.FactoryFinder}), this is used for
-     * setting ordering between all services provided by two vendors, or for two authorities.
-     * If one or both services are not currently registered, or if the desired ordering is
+     * setting ordering between all factories provided by two vendors, or for two authorities.
+     * If one or both factories are not currently registered, or if the desired ordering is
      * already set/unset, nothing happens and false is returned.
      *
      * @param base     The base category. Only categories {@linkplain Class#isAssignableFrom
      *                 assignable} to {@code base} will be processed.
      * @param set      {@code true} for setting the ordering, or {@code false} for unsetting.
-     * @param service1 Filter for the preferred service.
-     * @param service2 Filter for the service to which {@code service1} is preferred.
+     * @param service1 Filter for the preferred factory.
+     * @param service2 Filter for the factory to which {@code service1} is preferred.
      */
     public boolean setOrdering(final Class  base,
                                final boolean set,

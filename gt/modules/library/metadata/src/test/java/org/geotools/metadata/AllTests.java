@@ -49,21 +49,22 @@ public final class AllTests {
      */
     public static Test suite() {
         final TestSuite suite = new TestSuite("org.geotools.metadata");
-        suite.addTest(org.geotools.resources.XMathTest              .suite());
-        suite.addTest(org.geotools.resources.UtilitiesTest          .suite());
-        suite.addTest(org.geotools.resources.ResourceBundleTest     .suite());
-        suite.addTest(org.geotools.util     .MonolineFormatterTest  .suite());
-        suite.addTest(org.geotools.util     .InternationalStringTest.suite());
-        suite.addTest(org.geotools.util     .VersionTest            .suite());
-        suite.addTest(org.geotools.util     .RangeSetTest           .suite());
-        suite.addTest(org.geotools.util     .DisjointSetTest        .suite());
-        suite.addTest(org.geotools.util     .KeySortedListTest      .suite());
-        suite.addTest(org.geotools.util     .WeakHashSetTest        .suite());
-        suite.addTest(org.geotools.util     .WeakValueHashMapTest   .suite());
-        suite.addTest(org.geotools.util     .SoftValueHashMapTest   .suite());
-        suite.addTest(org.geotools.math     .GeometryTest           .suite());
-        suite.addTest(org.geotools.factory  .AbstractFactoryTest    .suite());
-        suite.addTest(org.geotools.factory  .FactoryRegistryTest    .suite());
+        suite.addTest(org.geotools.resources.XMathTest                  .suite());
+        suite.addTest(org.geotools.resources.UtilitiesTest              .suite());
+        suite.addTest(org.geotools.resources.ResourceBundleTest         .suite());
+        suite.addTest(org.geotools.util     .MonolineFormatterTest      .suite());
+        suite.addTest(org.geotools.util     .InternationalStringTest    .suite());
+        suite.addTest(org.geotools.util     .VersionTest                .suite());
+        suite.addTest(org.geotools.util     .RangeSetTest               .suite());
+        suite.addTest(org.geotools.util     .DisjointSetTest            .suite());
+        suite.addTest(org.geotools.util     .KeySortedListTest          .suite());
+        suite.addTest(org.geotools.util     .WeakHashSetTest            .suite());
+        suite.addTest(org.geotools.util     .WeakValueHashMapTest       .suite());
+        suite.addTest(org.geotools.util     .SoftValueHashMapTest       .suite());
+        suite.addTest(org.geotools.math     .GeometryTest               .suite());
+        suite.addTest(org.geotools.factory  .AbstractFactoryTest        .suite());
+        suite.addTest(org.geotools.factory  .FactoryRegistryTest        .suite());
+        suite.addTest(org.geotools.factory  .FactoryIteratorProviderTest.suite());
         return suite;
     }
 }

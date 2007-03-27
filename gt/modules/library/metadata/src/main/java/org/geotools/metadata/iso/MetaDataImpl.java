@@ -60,7 +60,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      * Serial number for interoperability with different versions.
      */
     private static final long serialVersionUID = 4280620497868178687L;
-    
+
     /**
      * Unique identifier for this metadata file, or {@code null} if none.
      */
@@ -76,7 +76,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      * strings for linguistic extensions.
      */
     private Collection locales;
-    
+
     /**
      * Full name of the character coding standard used for the metadata set.
      */
@@ -106,7 +106,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      * Uniformed Resource Identifier (URI) of the dataset to which the metadata applies.
      */
     private String dataSetUri;
-    
+
     /**
      * Date that the metadata was created, in milliseconds ellapsed since January 1st, 1970.
      * If not defined, then then value is {@link Long#MIN_VALUE}.
@@ -173,18 +173,18 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      * Provides information about the conceptual schema of a dataset.
      */
     private Collection applicationSchemaInfo;
-     
+
     /**
      * Provides information about the frequency of metadata updates, and the scope of those updates.
      */
     private MaintenanceInformation metadataMaintenance;
-     
+
     /**
      * Creates an initially empty metadata.
      */
     public MetaDataImpl() {
     }
-     
+
     /**
      * Creates a meta data initialised to the specified values.
      *
@@ -246,7 +246,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         checkWritePermission();
         fileIdentifier = newValue;
     }
-    
+
     /**
      * Returns the file identifier of the metadata to which this metadata is a subset (child).
      */
@@ -275,7 +275,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     public synchronized void setHierarchyLevels(final Collection newValues) {
         hierarchyLevels = copyCollection(newValues, hierarchyLevels, ScopeCode.class);
     }
-    
+
     /**
      * Returns the name of the hierarchy levels for which the metadata is provided.
      */
@@ -292,7 +292,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
 
     /**
      * Returns the party responsible for the metadata information.
-     * @deprecated use getContacts
+     * @deprecated use {@link #getContacts}.
      */
     public ResponsibleParty getContact() {
         Collection contacts = getContacts();
@@ -308,7 +308,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
 
     /**
      * Set the party responsible for the metadata information.
-     * @deprecated use setContacts
+     * @deprecated use {@link #setContacts}.
      */
     public synchronized void setContact(final ResponsibleParty newValue) {
         setContacts(Collections.singleton(newValue));
@@ -321,7 +321,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         checkWritePermission();
         contacts = copyCollection(newValues, contacts, ResponsibleParty.class);
     }
-    
+
     /**
      * Returns the date that the metadata was created.
      */
@@ -389,7 +389,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
      public synchronized Collection getReferenceSystemInfo() {
         return referenceSystemInfo = nonNullCollection(referenceSystemInfo, ReferenceSystem.class);
     }
-    
+
     /**
      * Set the description of the spatial and temporal reference systems used in the dataset.
      */
@@ -419,7 +419,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     public synchronized Collection getIdentificationInfo() {
         return identificationInfo = nonNullCollection(identificationInfo, Identification.class);
     }
-     
+
     /**
      * Set basic information about the resource(s) to which the metadata applies.
      */
@@ -434,7 +434,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     public synchronized Collection getContentInfo() {
         return contentInfo = nonNullCollection(contentInfo, Identification.class);
     }
-     
+
     /**
      * Set information about the feature catalogue and describes the coverage and
      * image data characteristics.
@@ -449,7 +449,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     public Distribution getDistributionInfo() {
         return distributionInfo;
     }
-     
+
     /**
      * Provides information about the distributor of and options for obtaining the resource(s).
      */
@@ -464,7 +464,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     public synchronized Collection getDataQualityInfo() {
         return dataQualityInfo = nonNullCollection(dataQualityInfo, DataQuality.class);
     }
-     
+
     /**
      * Set overall assessment of quality of a resource(s).
      */
@@ -480,7 +480,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         return portrayalCatalogueInfo = nonNullCollection(portrayalCatalogueInfo,
                                                           PortrayalCatalogueReference.class);
     }
-     
+
     /**
      * Set information about the catalogue of rules defined for the portrayal of a resource(s).
      */
@@ -495,7 +495,7 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
     public synchronized Collection getMetadataConstraints() {
         return metadataConstraints = nonNullCollection(metadataConstraints, Constraints.class);
     }
-     
+
     /**
      * Set restrictions on the access and use of data.
      */
@@ -518,14 +518,14 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         applicationSchemaInfo = copyCollection(newValues, applicationSchemaInfo,
                                                ApplicationSchemaInformation.class);
     }
-     
+
     /**
      * Provides information about the frequency of metadata updates, and the scope of those updates.
      */
     public MaintenanceInformation getMetadataMaintenance() {
         return metadataMaintenance;
     }
-     
+
     /**
      * Set information about the frequency of metadata updates, and the scope of those updates.
      */
@@ -533,25 +533,31 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         checkWritePermission();
         metadataMaintenance = newValue;
     }
-    
+
     /**
      * Provides information about an alternatively used localized character
      * string for a linguistic extension
+     *
+     * @since 2.4
      */
     public synchronized Collection getLocales() {
         return nonNullCollection(locales, Locale.class);
     }
-    
+
     /**
      * Set information about an alternatively used localized character
      * string for a linguistic extension
+     *
+     * @since 2.4
      */
     public synchronized void setLocales(final Collection newValues) {
         locales = copyCollection(newValues, locales, Locale.class);
     }
-    
+
     /**
      * Provides the URI of the dataset to which the metadata applies.
+     *
+     * @since 2.4
      */
     public String getDataSetUri() {
         return dataSetUri;
@@ -559,12 +565,14 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
 
     /**
      * Sets the URI of the dataset to which the metadata applies.
+     *
+     * @since 2.4
      */
     public void setDataSetUri(final String newValue) {
         checkWritePermission();
         dataSetUri = newValue;
     }
-     
+
     /**
      * Declare this metadata and all its attributes as unmodifiable.
      */
@@ -652,5 +660,4 @@ public class MetaDataImpl extends MetadataEntity implements MetaData {
         appendCollection(str, "Contacts", getContacts());
         return str.toString();
     }
-
 }
