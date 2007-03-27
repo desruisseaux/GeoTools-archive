@@ -126,38 +126,14 @@ public class FilterToSQL implements FilterVisitor, ExpressionVisitor {
     /** Standard java logger */
     private static Logger LOGGER = Logger.getLogger("org.geotools.filter");
 
-    /** Map of spatial types to sql representation */
-    private static Map spatial = new HashMap();
-
-    /** Map of logical types to sql representation */
-    private static Map logical = new HashMap();
-
     /** Map of expression types to sql representation */
     private static Map expressions = new HashMap();
 
     static {
-
         expressions.put(Add.class, "+");
         expressions.put(Divide.class, "/");
         expressions.put(Multiply.class, "*");
         expressions.put(Subtract.class, "-");
-
-        //more to come?
-        spatial.put(Equals.class, "Equals");
-        spatial.put(Disjoint.class, "Disjoint");
-        spatial.put(Intersects.class,
-            "Intersects");
-        spatial.put(Touches.class, "Touches");
-        spatial.put(Crosses.class, "Crosses");
-        spatial.put(Within.class, "Within");
-        spatial.put(Contains.class, "Contains");
-        spatial.put(Overlaps.class, "Overlaps");
-        spatial.put(Beyond.class, "Beyond");
-        spatial.put(BBOX.class, "BBOX");
-
-        logical.put(And.class, "AND");
-        logical.put(Or.class, "OR");
-        logical.put(Not.class, "NOT");
     }
 
     /** Character used to escape database schema, table and column names */
